@@ -94,6 +94,9 @@ C_SdNdeHalcChannelWidget::C_SdNdeHalcChannelWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_LabChannelCurrent->setText("");
    this->mpc_Ui->pc_ChxSafety->setText("");
 
+   // enable tab key navigation
+   this->mpc_Ui->pc_TreeConfig->setTabKeyNavigation(true);
+
    // connects
    connect(this->mpc_Ui->pc_LeName, &C_OgeLePropertiesName::textChanged,
            this, &C_SdNdeHalcChannelWidget::m_CheckName);
@@ -297,328 +300,112 @@ void C_SdNdeHalcChannelWidget::m_OnSafetyToggled(const bool oq_Checked) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelWidget::m_OnUseCaseChanged(const sint32 os32_NewIndex)
 {
-   if (this->ms32_OldUseCaseIndex != os32_NewIndex)
+   if (this->ms32_LastComboboxUseCaseIndex != os32_NewIndex)
    {
-      sint32 s32_Return = C_RANGE;
-
       if ((os32_NewIndex >= 0) && (os32_NewIndex < static_cast<sint32>(this->mc_CbxUseCaseIndices.size())))
       {
-         bool q_IsSure = false;
-         uint32 u32_UseCaseIndex = this->mc_CbxUseCaseIndices[os32_NewIndex];
-
-         // all use cases with default value(s)
-         std::vector<C_OSCHalcDefChannelUseCase> c_DefaultUseCases;
-
-         // get domain
-         const C_OSCHalcConfigDomain * pc_Domain =
-            C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(mu32_NodeIndex, mu32_DomainIndex);
-         if (pc_Domain != NULL)
+         bool q_IsLinkedOld;
+         bool q_IsLinkedNew;
+         std::vector<QString> c_LinkedChannelNamesOld;
+         std::vector<QString> c_LinkedChannelNamesNew;
+         std::vector<uint32> c_LinkedChannelIndicesOld;
+         std::vector<uint32> c_LinkedChannelIndicesNew;
+         sint32 s32_Result;
+         const uint32 u32_UseCaseIndexNew = this->mc_CbxUseCaseIndices[os32_NewIndex];
+         uint32 u32_UseCaseIndexOld = 0;
+         if ((this->ms32_LastComboboxUseCaseIndex >= 0) &&
+             (this->ms32_LastComboboxUseCaseIndex < static_cast<sint32>(this->mc_CbxUseCaseIndices.size())))
          {
-            for (std::vector<C_OSCHalcDefChannelUseCase>::const_iterator c_ItUseCases =
-                    pc_Domain->c_ChannelUseCases.begin();
-                 c_ItUseCases != pc_Domain->c_ChannelUseCases.end(); ++c_ItUseCases)
-            {
-               const C_OSCHalcDefChannelUseCase & rc_CurrentUseCase = *c_ItUseCases;
-
-               // only add available use cases to combobox
-               if (rc_CurrentUseCase.c_DefaultChannels.empty() == false)
-               {
-                  c_DefaultUseCases.push_back(rc_CurrentUseCase);
-               }
-            }
+            u32_UseCaseIndexOld = this->mc_CbxUseCaseIndices[this->ms32_LastComboboxUseCaseIndex];
          }
 
-         const C_OSCHalcDefChannelUseCase * pc_OldUseCase =
-            C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileUseCaseData(this->mu32_NodeIndex, this->mu32_DomainIndex,
-                                                                          this->mu32_Value);
-
-         const C_OSCHalcDefChannelUseCase * pc_UseCase =
-            C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileUseCaseData(this->mu32_NodeIndex, this->mu32_DomainIndex,
-                                                                          u32_UseCaseIndex);
-
-         if ((pc_OldUseCase != NULL) && (pc_UseCase != NULL))
-         {
-            for (uint32 u32_OldAvaIt = 0U; u32_OldAvaIt < pc_OldUseCase->c_Availability.size(); u32_OldAvaIt++)
-            {
-               if (pc_OldUseCase->c_Availability.at(u32_OldAvaIt).u32_ValueIndex == this->mu32_ChannelIndex)
-               {
-                  if (pc_OldUseCase->c_Availability.at(u32_OldAvaIt).c_DependentValues.empty() == false)
-                  {
-                     for (uint32 u32_OldCounter = 0U; u32_OldCounter < pc_OldUseCase->c_Availability.at(u32_OldAvaIt)
-                          .c_DependentValues.size(); u32_OldCounter++)
-                     {
-                        for (uint32 u32_NewAvaIt = 0U; u32_NewAvaIt < pc_UseCase->c_Availability.size(); u32_NewAvaIt++)
-                        {
-                           if (pc_UseCase->c_Availability.at(u32_NewAvaIt).u32_ValueIndex == this->mu32_ChannelIndex)
-                           {
-                              if (pc_UseCase->c_Availability.at(u32_NewAvaIt).c_DependentValues.size() == 1)
-                              {
-                                 const C_OSCHalcConfigChannel * pc_Channel =
-                                    C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(
-                                       this->mu32_NodeIndex, this->mu32_DomainIndex, pc_OldUseCase->c_Availability
-                                       .at(u32_NewAvaIt).c_DependentValues.at(u32_OldCounter),
-                                       this->mq_UseChannelIndex);
-
-                                 C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
-                                 c_MessageBox.SetHeading(C_GtGetText::h_GetText("Use Case Selection"));
-                                 c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                                        "Are you sure to select the use case '%1'?\n"
-                                                                        "Linked channel '%2' will lose its configuration "
-                                                                        "and also be set to this use case.")
-                                                                     ).arg(pc_UseCase->c_Display.c_str(),
-                                                                           pc_Channel->c_Name.c_str()));
-                                 c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Apply Selection"));
-                                 c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
-                                 c_MessageBox.SetCustomMinHeight(200, 200);
-                                 if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
-                                 {
-                                    q_IsSure = true;
-                                    s32_Return = this->m_SetDependentValuesOfNewUseCase(
-                                       s32_Return, c_DefaultUseCases, pc_UseCase->c_Availability.at(u32_NewAvaIt)
-                                       .c_DependentValues, pc_OldUseCase->c_Availability.at(u32_OldAvaIt)
-                                       .c_DependentValues.at(u32_OldCounter), u32_UseCaseIndex, pc_Domain);
-                                 }
-                              }
-                              else if (pc_UseCase->c_Availability.at(u32_NewAvaIt).c_DependentValues.size() > 1)
-                              {
-                                 const C_OSCHalcConfigChannel * pc_Channel =
-                                    C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(
-                                       this->mu32_NodeIndex, this->mu32_DomainIndex, pc_OldUseCase->c_Availability
-                                       .at(u32_NewAvaIt).c_DependentValues.at(u32_OldCounter),
-                                       this->mq_UseChannelIndex);
-
-                                 C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
-                                 c_MessageBox.SetHeading(C_GtGetText::h_GetText("Use Case Selection"));
-                                 c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                                        "Are you sure to select the use case '%1'?\n"
-                                                                        "Linked channel '%2' will lose its configuration "
-                                                                        "and also be set to this use case.")
-                                                                     ).arg(pc_UseCase->c_Display.c_str(),
-                                                                           pc_Channel->c_Name.c_str()));
-                                 c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Apply Selection"));
-                                 c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
-                                 c_MessageBox.SetCustomMinHeight(200, 200);
-                                 if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
-                                 {
-                                    q_IsSure = true;
-                                    s32_Return = this->m_SetDependentValuesOfNewUseCase(
-                                       s32_Return, c_DefaultUseCases, pc_UseCase->c_Availability.at(u32_NewAvaIt)
-                                       .c_DependentValues, 0U, u32_UseCaseIndex, pc_Domain);
-                                 }
-                              }
-                              else
-                              {
-                                 const C_OSCHalcConfigChannel * pc_Channel =
-                                    C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(
-                                       this->mu32_NodeIndex, this->mu32_DomainIndex, pc_OldUseCase->c_Availability
-                                       .at(u32_NewAvaIt).u32_ValueIndex, this->mq_UseChannelIndex);
-
-                                 C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
-                                 c_MessageBox.SetHeading(C_GtGetText::h_GetText("Use Case Selection"));
-                                 c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                                        "Are you sure to select the use case '%1'?\n"
-                                                                        "Linked channel '%2' will be reset to defaults.")
-                                                                     ).arg(pc_UseCase->c_Display.c_str(),
-                                                                           pc_Channel->c_Name.c_str()));
-                                 c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Apply Selection"));
-                                 c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
-                                 c_MessageBox.SetCustomMinHeight(180, 180);
-                                 if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
-                                 {
-                                    q_IsSure = true;
-                                    s32_Return = this->m_FindAndSetDefaultUseCase(
-                                       s32_Return, c_DefaultUseCases, pc_OldUseCase->c_Availability
-                                       .at(u32_OldAvaIt).c_DependentValues.at(u32_OldCounter));
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-                  else
-                  {
-                     for (uint32 u32_AvaIt = 0U; u32_AvaIt < pc_UseCase->c_Availability.size(); u32_AvaIt++)
-                     {
-                        if (pc_UseCase->c_Availability.at(u32_AvaIt).u32_ValueIndex == this->mu32_ChannelIndex)
-                        {
-                           if (pc_UseCase->c_Availability.at(u32_AvaIt).c_DependentValues.empty() == false)
-                           {
-                              const C_OSCHalcConfigChannel * pc_Channel =
-                                 C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(
-                                    this->mu32_NodeIndex, this->mu32_DomainIndex, pc_UseCase->c_Availability
-                                    .at(u32_AvaIt).u32_ValueIndex,
-                                    this->mq_UseChannelIndex);
-
-                              C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
-                              c_MessageBox.SetHeading(C_GtGetText::h_GetText("Use Case Selection"));
-                              c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                                     "Are you sure to select the use case '%1'?\n"
-                                                                     "Linked channel '%2' will lose its configuration "
-                                                                     "and also be set to this use case.")
-                                                                  ).arg(pc_UseCase->c_Display.c_str(),
-                                                                        pc_Channel->c_Name.c_str()));
-                              c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Apply Selection"));
-                              c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
-                              c_MessageBox.SetCustomMinHeight(200, 200);
-                              if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
-                              {
-                                 q_IsSure = true;
-                                 s32_Return = this->m_SetDependentValuesOfNewUseCase(
-                                    s32_Return, c_DefaultUseCases, pc_UseCase->c_Availability.at(u32_AvaIt)
-                                    .c_DependentValues, 0U, u32_UseCaseIndex, pc_Domain);
-                              }
-                           }
-                           else
-                           {
-                              q_IsSure = true;
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-
-         if (q_IsSure == true)
+         s32_Result =
+            C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex, this->mu32_DomainIndex,
+                                                                          this->mu32_ChannelIndex, true, q_IsLinkedOld,
+                                                                          &c_LinkedChannelNamesOld,
+                                                                          &c_LinkedChannelIndicesOld);
+         tgl_assert(s32_Result == C_NO_ERR);
+         s32_Result =
+            C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex, this->mu32_DomainIndex,
+                                                                          this->mu32_ChannelIndex, true, q_IsLinkedNew,
+                                                                          &c_LinkedChannelNamesNew,
+                                                                          &c_LinkedChannelIndicesNew,
+                                                                          &u32_UseCaseIndexNew);
+         tgl_assert(s32_Result == C_NO_ERR);
+         if (this->m_AskUserToContinueLinkingIfNecessary(q_IsLinkedOld, q_IsLinkedNew,
+                                                         c_LinkedChannelNamesOld, c_LinkedChannelNamesNew,
+                                                         u32_UseCaseIndexNew) == true)
          {
             // update data
-            s32_Return =
+            s32_Result =
                C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelConfigUseCase(this->mu32_NodeIndex,
                                                                                   this->mu32_DomainIndex,
                                                                                   this->mu32_ChannelIndex,
                                                                                   this->mq_UseChannelIndex,
-                                                                                  u32_UseCaseIndex);
+                                                                                  u32_UseCaseIndexNew);
+            tgl_assert(s32_Result == C_NO_ERR);
+
+            // update linked channels
+            s32_Result =
+               C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelConfigOfLinkedChannels(this->mu32_NodeIndex,
+                                                                                           this->mu32_DomainIndex,
+                                                                                           this->mu32_ChannelIndex,
+                                                                                           this->mq_UseChannelIndex,
+                                                                                           u32_UseCaseIndexOld,
+                                                                                           u32_UseCaseIndexNew);
+            tgl_assert(s32_Result == C_NO_ERR);
+
+            // update icon & link of linked channel
+            this->m_SetLinkedSymbolAndChannel(q_IsLinkedNew, c_LinkedChannelIndicesNew);
+
             // update configuration tree
             this->mpc_Ui->pc_TreeConfig->SetHalcChannelUseCase(this->mu32_DomainIndex, this->mu32_ChannelIndex,
-                                                               u32_UseCaseIndex, mq_UseChannelIndex);
+                                                               u32_UseCaseIndexNew, mq_UseChannelIndex);
             this->mpc_Ui->pc_TreeConfig->expandAll();
-            this->mu32_Value = u32_UseCaseIndex;
-            this->ms32_OldUseCaseIndex = os32_NewIndex;
+            this->ms32_LastComboboxUseCaseIndex = os32_NewIndex;
 
             // update channel tree icon
             this->m_EmitUpdateSignal();
-
-            tgl_assert(s32_Return == C_NO_ERR);
-         }
-         else
-         {
-            this->mpc_Ui->pc_CbxUseCase->setCurrentIndex(this->ms32_OldUseCaseIndex);
          }
       }
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Find and set use cases of others not linked channels to their "default" configuration
-
-   \param[in,out]  os32_Return               Error type
-   \param[in]      orc_DefaultUseCases       All default use cases of this channel
-   \param[in]      oru32_OldDependentValue   Dependent value of previous channel
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeHalcChannelWidget::m_FindAndSetDefaultUseCase(sint32 os32_Return,
-                                                            const std::vector<C_OSCHalcDefChannelUseCase> & orc_DefaultUseCases,
-                                                            const uint32 & oru32_OldDependentValue) const
-{
-   this->mpc_Ui->pc_PubLinkedIcon->setVisible(false);
-   this->mpc_Ui->pc_LabLinkedChannel->setText("");
-   for (uint32 u32_DefaultUseCaseIt = 0U; u32_DefaultUseCaseIt < orc_DefaultUseCases.size();
-        u32_DefaultUseCaseIt++)
-   {
-      for (uint32 u32_DefaultIt = 0U;
-           u32_DefaultIt < orc_DefaultUseCases.at(u32_DefaultUseCaseIt).c_DefaultChannels.size(); u32_DefaultIt++)
-      {
-         if (orc_DefaultUseCases.at(u32_DefaultUseCaseIt).c_DefaultChannels.at(u32_DefaultIt) ==
-             this->mu32_ChannelIndex)
-         {
-            // update data
-            os32_Return =
-               C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelConfigUseCase(
-                  this->mu32_NodeIndex,
-                  this->mu32_DomainIndex,
-                  oru32_OldDependentValue,
-                  this->mq_UseChannelIndex,
-                  static_cast<uint32>(orc_DefaultUseCases.at(u32_DefaultUseCaseIt).c_Value.GetValueU8()));
-         }
-      }
-   }
-   return os32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set one or more dependent values of new use case
-
-   \param[in,out]  os32_Return               Error type
-   \param[in]      orc_DefaultUseCases       All default use cases of this channel
-   \param[in]      orc_NewDependentValues    Dependent values of current channel
-   \param[in]      ou32_OldDependentValue    Old dependent value
-   \param[in]      ou32_UseCaseIndex         Dependent value of previous channel
-   \param[in]      opc_Domain                Domain
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeHalcChannelWidget::m_SetDependentValuesOfNewUseCase(sint32 os32_Return, const std::vector<C_OSCHalcDefChannelUseCase>
-                                                                  & orc_DefaultUseCases,
-                                                                  const std::vector<uint32> & orc_NewDependentValues,
-                                                                  const uint32 ou32_OldDependentValue,
-                                                                  const uint32 ou32_UseCaseIndex,
-                                                                  const C_OSCHalcConfigDomain * const opc_Domain) const
-{
-   for (uint32 u32_NewCounter = 0U; u32_NewCounter < orc_NewDependentValues.size(); u32_NewCounter++)
-   {
-      if ((ou32_OldDependentValue == orc_NewDependentValues.at(u32_NewCounter)) || (ou32_OldDependentValue == 0U))
-      {
-         // update data
-         os32_Return =
-            C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelConfigUseCase(this->mu32_NodeIndex,
-                                                                               this->mu32_DomainIndex,
-                                                                               orc_NewDependentValues
-                                                                               .at(u32_NewCounter),
-                                                                               this->mq_UseChannelIndex,
-                                                                               ou32_UseCaseIndex);
-         this->m_SetLinkedSymbolAndChannel(orc_NewDependentValues, opc_Domain);
-      }
-      else
-      {
-         os32_Return = this->m_FindAndSetDefaultUseCase(os32_Return,
-                                                        orc_DefaultUseCases,
-                                                        ou32_OldDependentValue);
-      }
-   }
-   return os32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  If an linked use case is set, set a linked symbol and the linked channel
 
-   \param[in]  orc_DependentValues  Dependent values
-   \param[in]  opc_Domain           Domain
+   \param[in]  oq_IsLinked                Flag if channel is linked or not
+   \param[in]  orc_LinkedChannelIndices   Linked channel indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelWidget::m_SetLinkedSymbolAndChannel(const std::vector<uint32> & orc_DependentValues,
-                                                           const C_OSCHalcConfigDomain * const opc_Domain) const
+void C_SdNdeHalcChannelWidget::m_SetLinkedSymbolAndChannel(const bool oq_IsLinked,
+                                                           const std::vector<uint32> & orc_LinkedChannelIndices) const
 {
-   const C_OSCHalcConfigChannel * pc_LinkedChannel =
-      C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(this->mu32_NodeIndex, this->mu32_DomainIndex,
-                                                                      orc_DependentValues.at(0),
-                                                                      this->mq_UseChannelIndex);
+   QString c_LinkText = "-";
 
-   if (opc_Domain != NULL)
+   // get link text
+   if ((oq_IsLinked == true) && (orc_LinkedChannelIndices.size() > 0))
    {
-      QString c_LinkedChannelName = QString("%1 (%2)").arg(pc_LinkedChannel->c_Name.c_str(),
-                                                           opc_Domain->c_Channels[orc_DependentValues.at(0)]
-                                                           .c_Name.c_str());
-      this->mpc_Ui->pc_LabLinkedChannel->setText(C_Uti::h_GetLink(c_LinkedChannelName, mc_STYLE_GUIDE_COLOR_6,
-                                                                  c_LinkedChannelName));
+      const uint32 u32_LinkedChannelIndex = orc_LinkedChannelIndices[0];
+      const C_OSCHalcConfigChannel * const pc_LinkedChannel =
+         C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(this->mu32_NodeIndex, this->mu32_DomainIndex,
+                                                                         u32_LinkedChannelIndex, true);
+      const C_OSCHalcConfigDomain * const pc_Domain =
+         C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(this->mu32_NodeIndex, this->mu32_DomainIndex);
+
+      if ((pc_LinkedChannel != NULL) && (pc_Domain != NULL) && (u32_LinkedChannelIndex < pc_Domain->c_Channels.size()))
+      {
+         c_LinkText = static_cast<QString>("%1 (%2)").arg(pc_LinkedChannel->c_Name.c_str(),
+                                             pc_Domain->c_Channels[u32_LinkedChannelIndex].c_Name.c_str());
+      }
    }
-   this->mpc_Ui->pc_PubLinkedIcon->setVisible(true);
+
+   // update link text
+   this->mpc_Ui->pc_LabLinkedChannel->setText(C_Uti::h_GetLink(c_LinkText, mc_STYLE_GUIDE_COLOR_6, c_LinkText));
+
+   // update visibility
+   this->mpc_Ui->pc_PubLinkedIcon->setVisible(oq_IsLinked);
+   this->mpc_Ui->pc_LabLinkedChannel->setVisible(oq_IsLinked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -664,8 +451,7 @@ void C_SdNdeHalcChannelWidget::m_OnViewDatapoolDetailsClicked(void)
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot of channel selected click.
@@ -681,13 +467,11 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
 
    if (pc_Domain != NULL)
    {
-      const C_OSCHalcConfigChannel * pc_Channel;
-
       // handle domain without channels
       this->mq_UseChannelIndex = !(pc_Domain->c_Channels.empty());
 
       // get channel
-      pc_Channel =
+      const C_OSCHalcConfigChannel * const pc_Channel =
          C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(this->mu32_NodeIndex, this->mu32_DomainIndex,
                                                                          this->mu32_ChannelIndex,
                                                                          this->mq_UseChannelIndex);
@@ -696,7 +480,8 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
       {
          bool q_IsLinked = false;
          uint32 u32_UseCaseCounter = 0; // for counting all channels and knowing indices of available ones
-         sintn sn_SelectedUseCaseCbxIndex = -1;
+         sint32 s32_SelectedUseCaseCbxIndex = -1;
+         std::vector<stw_types::uint32> c_LinkedChannelIndices;
 
          // disconnect to avoid data handling update while loading
          this->m_ConnectWidgets(false);
@@ -757,21 +542,17 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
                      // add to combobox
                      this->mpc_Ui->pc_CbxUseCase->addItem(rc_CurrentUseCase.c_Display.c_str());
 
-                     // remember indices
-                     this->mc_CbxUseCaseIndices.push_back(static_cast<uint32>(rc_CurrentUseCase.c_Value.GetValueU8()));
-                     tgl_assert(rc_CurrentUseCase.c_Value.GetType() == C_OSCNodeDataPoolContent::eUINT8);
+                     // remember index
+                     this->mc_CbxUseCaseIndices.push_back(u32_UseCaseCounter);
 
-                     // remember current item index for combobox
-                     if (pc_Channel->u32_UseCaseIndex == static_cast<uint32>(rc_CurrentUseCase.c_Value.GetValueU8()))
+                     // remember current item index for combobox & link property for link
+                     if ((pc_Channel->u32_UseCaseIndex == u32_UseCaseCounter))
                      {
-                        this->mu32_Value = static_cast<uint32>(rc_CurrentUseCase.c_Value.GetValueU8());
-                        sn_SelectedUseCaseCbxIndex = this->mpc_Ui->pc_CbxUseCase->count() - 1;
-                        this->ms32_OldUseCaseIndex = sn_SelectedUseCaseCbxIndex;
-
-                        if (!rc_CurrentAvail.c_DependentValues.empty())
+                        s32_SelectedUseCaseCbxIndex = static_cast<sint32>(this->mpc_Ui->pc_CbxUseCase->count() - 1);
+                        if (rc_CurrentAvail.c_DependentValues.empty() == false)
                         {
-                           this->m_SetLinkedSymbolAndChannel(rc_CurrentAvail.c_DependentValues, pc_Domain);
                            q_IsLinked = true;
+                           c_LinkedChannelIndices = rc_CurrentAvail.c_DependentValues;
                         }
                      }
                      break;
@@ -782,18 +563,15 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
          }
 
          // update linked channel visualization
-         this->mpc_Ui->pc_PubLinkedIcon->setVisible(q_IsLinked);
-         if (q_IsLinked == false)
-         {
-            this->mpc_Ui->pc_LabLinkedChannel->setText("");
-         }
+         this->ms32_LastComboboxUseCaseIndex = s32_SelectedUseCaseCbxIndex;
+         this->m_SetLinkedSymbolAndChannel(q_IsLinked, c_LinkedChannelIndices);
 
          // update combobox visibility
          this->mpc_Ui->pc_CbxUseCase->setVisible(this->mq_UseChannelIndex);
          this->mpc_Ui->pc_LabNoUseCase->setVisible(!this->mq_UseChannelIndex);
 
          // update configuration tree
-         this->mpc_Ui->pc_CbxUseCase->setCurrentIndex(sn_SelectedUseCaseCbxIndex);
+         this->mpc_Ui->pc_CbxUseCase->setCurrentIndex(s32_SelectedUseCaseCbxIndex);
          this->mpc_Ui->pc_TreeConfig->SetHalcChannelUseCase(mu32_DomainIndex, mu32_ChannelIndex,
                                                             pc_Channel->u32_UseCaseIndex,
                                                             mq_UseChannelIndex);
@@ -896,4 +674,86 @@ void C_SdNdeHalcChannelWidget::m_CheckName(const QString & orc_NewName) const
       }
       this->mpc_Ui->pc_LeName->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Ask user to continue linking if necessary
+
+   \param[in]  oq_IsLinkedOld             was linked
+   \param[in]  oq_IsLinkedNew             will be linked
+   \param[in]  orc_LinkedChannelNamesOld  Linked channel names of old use case
+   \param[in]  orc_LinkedChannelNamesNew  Linked channel names of new use case
+   \param[in]  ou32_NewUseCaseIndex       New use case index
+
+   \retval   true   continue
+   \retval   false  combobox was reverted, nothing to do
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeHalcChannelWidget::m_AskUserToContinueLinkingIfNecessary(const bool oq_IsLinkedOld,
+                                                                     const bool oq_IsLinkedNew,
+                                                                     const std::vector<QString> & orc_LinkedChannelNamesOld, const
+                                                                     std::vector<QString> & orc_LinkedChannelNamesNew,
+                                                                     const uint32 ou32_NewUseCaseIndex)
+{
+   bool q_Continue = true;
+
+   if ((oq_IsLinkedOld == true) || (oq_IsLinkedNew == true))
+   {
+      // if linking/unlinking: ask user to continue
+      const C_OSCHalcDefChannelUseCase * pc_UseCase =
+         C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileUseCaseData(this->mu32_NodeIndex,
+                                                                       this->mu32_DomainIndex,
+                                                                       ou32_NewUseCaseIndex);
+      if (pc_UseCase != NULL)
+      {
+         const std::vector<QString> & rc_LinkedChannelNames =
+            (oq_IsLinkedNew == true) ? orc_LinkedChannelNamesNew : orc_LinkedChannelNamesOld;
+         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
+         QString c_Description;
+         QString c_LinkedChannels = "";
+
+         for (std::vector<QString>::const_iterator c_ItLinkedNames = rc_LinkedChannelNames.begin();
+              c_ItLinkedNames != rc_LinkedChannelNames.end(); ++c_ItLinkedNames)
+         {
+            if (c_ItLinkedNames != rc_LinkedChannelNames.begin())
+            {
+               c_LinkedChannels += ", ";
+            }
+            c_LinkedChannels += "'" + *c_ItLinkedNames + "'";
+         }
+
+         if (oq_IsLinkedNew == true)
+         {
+            c_Description =
+               static_cast<QString>(C_GtGetText::h_GetText("Are you sure to select the use case '%1'?\n"
+                                              "Linked channel %2 will lose its configuration "
+                                              "and also be set to this use case. After linking, the configuration is "
+                                              "always applied to both channels.")).
+               arg(pc_UseCase->c_Display.c_str(), c_LinkedChannels);
+            c_MessageBox.SetCustomMinHeight(230, 230);
+         }
+         else
+         {
+            c_Description =
+               static_cast<QString>(C_GtGetText::h_GetText("Are you sure to select the use case '%1'?\n"
+                                              "Use case of linked channel %2 will be reset to default.")).
+               arg(pc_UseCase->c_Display.c_str(), c_LinkedChannels);
+            c_MessageBox.SetCustomMinHeight(200, 200);
+         }
+
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Use Case Selection"));
+         c_MessageBox.SetDescription(c_Description);
+         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Apply Selection"));
+         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+
+         if (c_MessageBox.Execute() != C_OgeWiCustomMessage::eYES)
+         {
+            q_Continue = false;
+            // reset
+            this->mpc_Ui->pc_CbxUseCase->setCurrentIndex(this->ms32_LastComboboxUseCaseIndex);
+         }
+      }
+   }
+
+   return q_Continue;
 }

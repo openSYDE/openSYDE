@@ -127,7 +127,6 @@ C_CamMetControlBarWidget::C_CamMetControlBarWidget(QWidget * const opc_Parent) :
            &C_CamMetControlBarWidget::m_HandleStop);
    connect(this->mpc_Ui->pc_PushButtonToggleDisplayMode, &QPushButton::toggled, this,
            &C_CamMetControlBarWidget::m_HandleToggleDisplayMode);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxProtocol, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
            this, &C_CamMetControlBarWidget::m_OnProtocolIndexChange);
 
@@ -548,9 +547,7 @@ void C_CamMetControlBarWidget::m_OpenTraceSettings(void)
    {
       c_New->HideOverlay();
    }
-
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  no memory leak because of the parent pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Generates a message for the user. User may not use Search while Trace is running

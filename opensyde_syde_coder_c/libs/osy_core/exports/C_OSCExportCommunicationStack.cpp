@@ -119,13 +119,14 @@ uint16 C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(const uint16 o
 
    switch (ou16_GenCodeVersion)
    {
-   case 1:
-   case 2:
+   case 1: //same logic ...
+   case 2: //same logic ...
    case 3:
       u16_Return = ou16_GenCodeVersion;
       break;
-   case 4:
-      u16_Return = ou16_GenCodeVersion - 1; // -1 because of no changes from version 3 to 4
+   case 4: //same value ...
+   case 5:
+      u16_Return = 3U;
       break;
    default:
       // should never occur...

@@ -40,7 +40,7 @@ public:
 private:
    //Avoid call
    C_GiLiCANBus(const C_GiLiCANBus &);
-   C_GiLiCANBus & operator =(const C_GiLiCANBus &);
+   C_GiLiCANBus & operator =(const C_GiLiCANBus &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

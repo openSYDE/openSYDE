@@ -354,12 +354,12 @@ void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std
                                                                                                        u32_ItDataPool]);
       if (pc_Datapool != NULL)
       {
-         orc_Content += QString("%1\n").arg(pc_Datapool->c_Name.c_str());
+         orc_Content += static_cast<QString>("%1\n").arg(pc_Datapool->c_Name.c_str());
       }
    }
    if (mu32_TOOL_TIP_MAXIMUM_ITEMS < orc_Indices.size())
    {
-      orc_Content += QString("+%1\n").arg(orc_Indices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+      orc_Content += static_cast<QString>("+%1\n").arg(orc_Indices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
    }
 }
 
@@ -777,7 +777,7 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message, C_Pui
       //Tx method always cyclic
       if (orc_Message.e_TxMethod != C_OSCCanMessage::eTX_METHOD_CYCLIC)
       {
-         c_Info.push_back(QString(C_GtGetText::h_GetText("Message transmission type changed from \"%1\" to \"%2\" due "
+         c_Info.push_back(static_cast<QString>(C_GtGetText::h_GetText("Message transmission type changed from \"%1\" to \"%2\" due "
                                                          "to ECeS/ECoS protocol restrictions.")).
                           arg(C_SdUtil::h_ConvertTxMethodToName(orc_Message.e_TxMethod)).
                           arg(C_SdUtil::h_ConvertTxMethodToName(C_OSCCanMessage::eTX_METHOD_CYCLIC)));
@@ -804,7 +804,7 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message, C_Pui
          //DLC fix 8
          if (orc_Message.u16_Dlc != 8U)
          {
-            c_Info.push_back(QString(C_GtGetText::h_GetText("Message DLC changed from %1 to 8 due to ECeS/ECoS "
+            c_Info.push_back(static_cast<QString>(C_GtGetText::h_GetText("Message DLC changed from %1 to 8 due to ECeS/ECoS "
                                                             "protocol restrictions.")).arg(orc_Message.u16_Dlc));
             orc_Message.u16_Dlc = 8U;
          }
@@ -821,7 +821,7 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message, C_Pui
          if ((orc_Message.u32_CanId < mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN) ||
              (orc_Message.u32_CanId > mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX))
          {
-            c_Info.push_back(QString(C_GtGetText::h_GetText("Message ID changed from 0x%1 to 0x%2 due to ECoS protocol "
+            c_Info.push_back(static_cast<QString>(C_GtGetText::h_GetText("Message ID changed from 0x%1 to 0x%2 due to ECoS protocol "
                                                             "restrictions. Allowed IDs: 0x%3-0x%2.")).
                              arg(orc_Message.u32_CanId, 0, 16).
                              arg(mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX, 0, 16).
@@ -878,7 +878,7 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OSCCanSignal & orc_Signal, const C_
       {
          if (orc_Signal.u16_ComBitStart >= mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX)
          {
-            c_Info.append(QString(C_GtGetText::h_GetText("Start bit of signal set from %1 to 0 because "
+            c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Start bit of signal set from %1 to 0 because "
                                                          "of reserved bytes in ECeS protocol.")).
                           arg(orc_Signal.u16_ComBitStart));
             orc_Signal.u16_ComBitStart = 0;
@@ -942,18 +942,18 @@ QString C_SdUtil::h_InitUsedIdsString(const std::vector<uint32> & orc_UsedIds, c
 
       for (uint32 u32_ItBusId = 0; u32_ItBusId < (orc_UsedIds.size() - 1UL); ++u32_ItBusId)
       {
-         c_BusIds += QString("%1,").arg(orc_UsedIds[u32_ItBusId]);
+         c_BusIds += static_cast<QString>("%1,").arg(orc_UsedIds[u32_ItBusId]);
       }
       //Append last one without comma
       c_BusIds += QString::number(orc_UsedIds[orc_UsedIds.size() - 1]);
 
       if (oq_SkipItem == true)
       {
-         c_Retval = QString(C_GtGetText::h_GetText("Already used IDs: %1")).arg(c_BusIds);
+         c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Already used IDs: %1")).arg(c_BusIds);
       }
       else
       {
-         c_Retval = QString(C_GtGetText::h_GetText("Already used IDs on %3 %1: %2")).arg(orc_ItemName).arg(
+         c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Already used IDs on %3 %1: %2")).arg(orc_ItemName).arg(
             c_BusIds).arg(orc_ItemType);
       }
    }
@@ -1132,7 +1132,7 @@ bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const bool 
       C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
 
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Datapool add"));
-      c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("The allowed maximum number of Datapools is %1.")).
+      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("The allowed maximum number of Datapools is %1.")).
                                   arg(mu32_NODE_DATA_POOL_MAX));
       c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
@@ -1199,7 +1199,7 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
                }
                else
                {
-                  orc_Text += QString(C_GtGetText::h_GetText("%1 duplicate node IDs detected.\n")).arg(
+                  orc_Text += static_cast<QString>(C_GtGetText::h_GetText("%1 duplicate node IDs detected.\n")).arg(
                      c_InvalidInterfaceIndices.size());
                }
             }
@@ -1217,12 +1217,12 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
                   oru32_NodeIndex, c_InvalidApplicationIndices[u32_ItAppl]);
                if (pc_Appl != NULL)
                {
-                  orc_Text += QString("%1\n").arg(pc_Appl->c_Name.c_str());
+                  orc_Text += static_cast<QString>("%1\n").arg(pc_Appl->c_Name.c_str());
                }
             }
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidApplicationIndices.size())
             {
-               orc_Text += QString("+%1\n").arg(
+               orc_Text += static_cast<QString>("+%1\n").arg(
                   c_InvalidApplicationIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             orc_Text += "\n";
@@ -1249,12 +1249,12 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
                                                                                 c_InvalidDomainIndices[u32_ItDomains]);
                if (pc_Domain != NULL)
                {
-                  orc_Text += QString("%1\n").arg(pc_Domain->c_Name.c_str());
+                  orc_Text += static_cast<QString>("%1\n").arg(pc_Domain->c_Name.c_str());
                }
             }
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDomainIndices.size())
             {
-               orc_Text += QString("+%1\n").arg(c_InvalidDomainIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+               orc_Text += static_cast<QString>("+%1\n").arg(c_InvalidDomainIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             orc_Text += "\n";
          }
@@ -1318,7 +1318,7 @@ void C_SdUtil::h_GetErrorToolTipBus(const uint32 & oru32_BusIndex, QString & orc
          }
          if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidNodesForBitRate.size())
          {
-            orc_Text += QString("+%1\n").arg(c_InvalidNodesForBitRate.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+            orc_Text += static_cast<QString>("+%1\n").arg(c_InvalidNodesForBitRate.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
          }
       }
       orc_Text += "\n";
@@ -1328,7 +1328,7 @@ void C_SdUtil::h_GetErrorToolTipBus(const uint32 & oru32_BusIndex, QString & orc
       orc_Text += C_GtGetText::h_GetText("COMM protocols with invalid content:\n");
       for (uint32 u32_ItP = 0; u32_ItP < c_InvalidProtocols.size(); ++u32_ItP)
       {
-         orc_Text += QString("%1\n").arg(C_PuiSdUtil::h_ConvertProtocolTypeToString(c_InvalidProtocols[u32_ItP]));
+         orc_Text += static_cast<QString>("%1\n").arg(C_PuiSdUtil::h_ConvertProtocolTypeToString(c_InvalidProtocols[u32_ItP]));
       }
       orc_Text += "\n";
    }
@@ -1469,7 +1469,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
          c_ToolTipContent.append("\n");
 
          //value type
-         c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Value type: "));
+         c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Value type: "));
          if (pc_UIElement->q_InterpretAsString == false)
          {
             c_ToolTipContent.append(C_SdNdeDpUtil::h_ConvertContentTypeToString(
@@ -1482,7 +1482,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
          c_ToolTipContent.append("\n");
 
          // array size
-         c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Array size: "));
+         c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Array size: "));
          if (pc_DpListElement->GetArray() == false)
          {
             c_ToolTipContent.append("-");
@@ -1497,7 +1497,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
          if (pc_UIElement->q_InterpretAsString == false)
          {
             // auto min max
-            c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Auto min/max: "));
+            c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Auto min/max: "));
             if (pc_UIElement->q_AutoMinMaxActive == true)
             {
                c_ToolTipContent.append(C_GtGetText::h_GetText("Enabled"));
@@ -1509,7 +1509,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
             c_ToolTipContent.append("\n");
 
             // min
-            c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Min: "));
+            c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Min: "));
             C_SdNdeDpContentUtil::h_GetValuesAsScaledString(pc_DpListElement->c_MinValue,
                                                             pc_DpListElement->f64_Factor,
                                                             pc_DpListElement->f64_Offset, c_HelpVector);
@@ -1529,7 +1529,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
             c_ToolTipContent.append("\n");
 
             // max
-            c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Max: "));
+            c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Max: "));
             c_HelpVector.clear();
             C_SdNdeDpContentUtil::h_GetValuesAsScaledString(pc_DpListElement->c_MaxValue,
                                                             pc_DpListElement->f64_Factor,
@@ -1550,12 +1550,12 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
             c_ToolTipContent.append("\n");
 
             // factor
-            c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Factor: "));
+            c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Factor: "));
             c_ToolTipContent.append(QString::number(pc_DpListElement->f64_Factor));
             c_ToolTipContent.append("\n");
 
             //offset
-            c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Offset: "));
+            c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Offset: "));
             c_ToolTipContent.append(QString::number(pc_DpListElement->f64_Offset));
             c_ToolTipContent.append("\n");
 
@@ -1563,7 +1563,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
             c_HelpString = pc_DpListElement->c_Unit.c_str();
             if (c_HelpString.isEmpty() == false)
             {
-               c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Unit: "));
+               c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Unit: "));
                c_ToolTipContent.append(c_HelpString);
                c_ToolTipContent.append("\n");
             }
@@ -1574,7 +1574,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
          {
             for (uint32 u32_PosDataset = 0; u32_PosDataset < pc_DpList->c_DataSets.size(); u32_PosDataset++)
             {
-               c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Dataset - "));
+               c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Dataset - "));
                c_ToolTipContent.append(pc_DpList->c_DataSets[u32_PosDataset].c_Name.c_str());
                c_ToolTipContent.append(": ");
                c_HelpVector.clear();
@@ -1594,7 +1594,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
          }
 
          // access
-         c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Access: "));
+         c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Access: "));
          c_ToolTipContent.append(C_SdNdeDpUtil::h_ConvertElementAccessToString(pc_DpListElement->e_Access));
          c_ToolTipContent.append("\n");
 
@@ -1602,7 +1602,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
          if (pc_Datapool->e_Type == C_OSCNodeDataPool::eNVM)
          {
             // data size
-            c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Data size: "));
+            c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Data size: "));
             c_ToolTipContent.append(QString::number(pc_DpListElement->GetSizeByte()));
             if (pc_DpListElement->GetSizeByte() == 1)
             {
@@ -1615,7 +1615,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
             c_ToolTipContent.append("\n");
 
             // address
-            c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Address: "));
+            c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Address: "));
             c_ToolTipContent.append(QString::number(pc_DpListElement->u32_NvMStartAddress -
                                                     pc_Datapool->u32_NvMStartAddress));
             c_ToolTipContent.append(" (");
@@ -1626,7 +1626,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
          else
          {
             // event call
-            c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Event call: "));
+            c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Event call: "));
             if (pc_DpListElement->q_DiagEventCall == true)
             {
                c_ToolTipContent.append(C_GtGetText::h_GetText("Enabled"));
@@ -1695,7 +1695,7 @@ QString C_SdUtil::h_GetToolTipContentSignal(const C_OSCCanMessageIdentificationI
        (pc_DpListElement != NULL))
    {
       QString c_AutoMinMaxInfo;
-      c_AutoMinMaxInfo.append(QString("   ") + C_GtGetText::h_GetText("Auto min/max: "));
+      c_AutoMinMaxInfo.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Auto min/max: "));
       if (pc_DpListElementUi->q_AutoMinMaxActive == true)
       {
          c_AutoMinMaxInfo.append(C_GtGetText::h_GetText("Enabled"));

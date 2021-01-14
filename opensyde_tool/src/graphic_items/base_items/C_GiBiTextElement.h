@@ -72,20 +72,17 @@ protected:
    virtual void m_ResizeUpdateItems(const stw_types::float64 of64_DiffWidth,
                                     const stw_types::float64 of64_DiffHeight) override;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual QVariant itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value) override;
    virtual bool sceneEventFilter(QGraphicsItem * const opc_Watched, QEvent * const opc_Event) override;
-   //lint -restore
 
    C_GiText * mpc_TextItem;
 
 private:
    //Avoid call
    C_GiBiTextElement(const C_GiBiTextElement &);
-   C_GiBiTextElement & operator =(const C_GiBiTextElement &);
+   C_GiBiTextElement & operator =(const C_GiBiTextElement &); //lint !e1511 //we want to hide the base func.
 
    void m_Init(void);
    void m_HandleTextInteractionMode(const bool & orq_On);

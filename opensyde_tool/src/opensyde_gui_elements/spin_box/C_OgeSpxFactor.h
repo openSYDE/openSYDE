@@ -29,19 +29,13 @@ class C_OgeSpxFactor :
 
 public:
    C_OgeSpxFactor(QWidget * const opc_Parent = NULL);
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void stepBy(const stw_types::sintn osn_Steps) override;
    virtual QValidator::State validate(QString & orc_Text, stw_types::sintn & orsn_Pos) const override;
-   //lint -restore
 
    static const stw_types::float64 mhf64_FACTOR_MIN;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual StepEnabled stepEnabled(void) const override;
-   //lint -restore
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

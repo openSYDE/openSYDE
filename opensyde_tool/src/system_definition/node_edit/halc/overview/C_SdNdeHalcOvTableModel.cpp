@@ -502,7 +502,7 @@ QVariant C_SdNdeHalcOvTableModel::headerData(const sintn osn_Section, const Qt::
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else
       {
@@ -611,14 +611,14 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
             pc_Domain = this->MapRowToDomain(orc_Index.row());
             if (pc_Domain != NULL)
             {
-               c_Retval = QString(pc_Domain->c_Name.c_str());
+               c_Retval = static_cast<QString>(pc_Domain->c_Name.c_str());
             }
             break;
          case eCHANNEL:
             pc_Def = this->MapRowToChannelDef(orc_Index.row());
             if (pc_Def != NULL)
             {
-               c_Retval = QString(pc_Def->c_Name.c_str());
+               c_Retval = static_cast<QString>(pc_Def->c_Name.c_str());
             }
             else
             {
@@ -629,14 +629,14 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
             pc_Data = this->MapRowToChannel(orc_Index.row());
             if (pc_Data != NULL)
             {
-               c_Retval = QString(pc_Data->c_Name.c_str());
+               c_Retval = static_cast<QString>(pc_Data->c_Name.c_str());
             }
             break;
          case eCOMMENT:
             pc_Data = this->MapRowToChannel(orc_Index.row());
             if (pc_Data != NULL)
             {
-               c_Retval = QString(pc_Data->c_Comment.c_str());
+               c_Retval = static_cast<QString>(pc_Data->c_Comment.c_str());
             }
             break;
          case eUSE_CASE:
@@ -648,7 +648,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
                {
                   const C_OSCHalcDefChannelUseCase & rc_UseCase =
                      pc_Domain->c_ChannelUseCases[pc_Data->u32_UseCaseIndex];
-                  c_Retval = QString(rc_UseCase.c_Display.c_str());
+                  c_Retval = static_cast<QString>(rc_UseCase.c_Display.c_str());
                }
                else
                {
@@ -724,37 +724,23 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
             pc_Data = this->MapRowToChannel(orc_Index.row());
             if ((pc_Node != NULL) && (pc_Data != NULL))
             {
-               if (pc_Data->q_SafetyRelevant)
+               const C_OSCNodeApplication * pc_Application = NULL;
+               const C_OSCNodeDataPool * const pc_Datapool =
+                  C_PuiSdHandler::h_GetInstance()->GetHALCDatapool(this->mu32_NodeIndex, pc_Data->q_SafetyRelevant);
+               if ((pc_Datapool != NULL) && (pc_Datapool->s32_RelatedDataBlockIndex >= 0))
                {
-                  if (pc_Node->c_HALCConfig.GetSafeDatablockAssigned())
-                  {
-                     if (pc_Node->c_HALCConfig.GetSafeDatablockIndex() < pc_Node->c_Applications.size())
-                     {
-                        const C_OSCNodeApplication & rc_Application =
-                           pc_Node->c_Applications[pc_Node->c_HALCConfig.GetSafeDatablockIndex()];
-                        c_Retval = QString(rc_Application.c_Name.c_str());
-                     }
-                  }
-                  else
-                  {
-                     c_Retval = "-";
-                  }
+                  pc_Application =
+                     C_PuiSdHandler::h_GetInstance()->
+                     GetApplication(this->mu32_NodeIndex, static_cast<uint32>(pc_Datapool->s32_RelatedDataBlockIndex));
+               }
+
+               if (pc_Application != NULL)
+               {
+                  c_Retval = static_cast<QString>(pc_Application->c_Name.c_str());
                }
                else
                {
-                  if (pc_Node->c_HALCConfig.GetUnsafeDatablockAssigned())
-                  {
-                     if (pc_Node->c_HALCConfig.GetUnsafeDatablockIndex() < pc_Node->c_Applications.size())
-                     {
-                        const C_OSCNodeApplication & rc_Application =
-                           pc_Node->c_Applications[pc_Node->c_HALCConfig.GetUnsafeDatablockIndex()];
-                        c_Retval = QString(rc_Application.c_Name.c_str());
-                     }
-                  }
-                  else
-                  {
-                     c_Retval = "-";
-                  }
+                  c_Retval = C_GtGetText::h_GetText("<not assigned>");
                }
             }
             break;
@@ -946,7 +932,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
       {

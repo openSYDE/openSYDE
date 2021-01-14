@@ -53,9 +53,9 @@ C_SdManUnoTopologyAddSnapshotCommand::C_SdManUnoTopologyAddSnapshotCommand(QGrap
                                     opc_Parent, orc_InitialSnapshotData)
 {
    //Handle pos
-   this->SetDataPositionOffset(orc_NewPos);
+   this->m_SetDataPositionOffset(orc_NewPos);
    //Handle Z
-   this->SetDataZOffset(of64_HighestUsedZValue);
+   this->m_SetDataZOffset(of64_HighestUsedZValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ C_SdManUnoTopologyAddSnapshotCommand::~C_SdManUnoTopologyAddSnapshotCommand(void
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddSnapshotCommand::m_AddNew(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SdTopologyScene * const pc_Scene = dynamic_cast<C_SdTopologyScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -80,7 +80,7 @@ void C_SdManUnoTopologyAddSnapshotCommand::m_AddNew(void)
       QMap<C_PuiBsTemporaryDataID, uint64> c_IDMap;
       uint32 u32_ItID = 0;
       const C_SdTopologyDataSnapshot c_InitialData = this->GetDataBackup();
-      const std::vector<stw_types::uint64> c_AllIDs = this->GetIDs();
+      const std::vector<stw_types::uint64> c_AllIDs = this->m_GetIDs();
       const uint32 u32_ItemCount = c_InitialData.Count();
       if (u32_ItemCount <= c_AllIDs.size())
       {

@@ -46,7 +46,7 @@ uint16 C_OSCDiagProtocolKfx::mh_PackDataPoolIndex(const uint16 ou16_List, const 
 
 void C_OSCDiagProtocolKfx::mh_UnpackDataPoolIndex(const uint16 ou16_Index, uint16 & oru16_List, uint16 & oru16_Variable)
 {
-   oru16_List    = static_cast<uint16>((ou16_Index & 0xFC00U) >> 10);
+   oru16_List    = static_cast<uint16>((ou16_Index & 0xFC00U) >> 10U);
    oru16_Variable = static_cast<uint16>(ou16_Index & 0x03FFU);
 }
 
@@ -68,7 +68,7 @@ void C_OSCDiagProtocolKfx::mh_CyclicResponseReceived(void * const opv_Instance, 
                                                      const sint64 os64_Value, const uint32 ou32_TimeStamp,
                                                      const bool oq_IsTimeStamped, const bool oq_Error)
 {
-   //lint -e{925}  We know that we registered; this cannot fail
+   //lint -e{9079}  We know that we registered; this cannot fail
    C_OSCDiagProtocolKfx * const pc_MeMyselfAndI = reinterpret_cast<C_OSCDiagProtocolKfx * const>(opv_Instance);
 
    tgl_assert(pc_MeMyselfAndI != NULL);
@@ -338,23 +338,23 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, 
                break;
             case 2:
                orc_ReadData[0] = static_cast<uint8>(s64_Value);
-               orc_ReadData[1] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 8);
+               orc_ReadData[1] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 8U);
                break;
             case 4:
                orc_ReadData[0] = static_cast<uint8>(s64_Value);
-               orc_ReadData[1] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 8);
-               orc_ReadData[2] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 16);
-               orc_ReadData[3] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 24);
+               orc_ReadData[1] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 8U);
+               orc_ReadData[2] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 16U);
+               orc_ReadData[3] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 24U);
                break;
             case 8:
                orc_ReadData[0] = static_cast<uint8>(s64_Value);
-               orc_ReadData[1] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 8);
-               orc_ReadData[2] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 16);
-               orc_ReadData[3] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 24);
-               orc_ReadData[4] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 32);
-               orc_ReadData[5] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 40);
-               orc_ReadData[6] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 48);
-               orc_ReadData[7] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 56);
+               orc_ReadData[1] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 8U);
+               orc_ReadData[2] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 16U);
+               orc_ReadData[3] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 24U);
+               orc_ReadData[4] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 32U);
+               orc_ReadData[5] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 40U);
+               orc_ReadData[6] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 48U);
+               orc_ReadData[7] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 56U);
                break;
             default:
                break; //checked at beginning of function
@@ -439,7 +439,6 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
       {
          const uint16 u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
 
-         //lint -e{864} //false positive due to const/non-const misinterpretation
          s32_Return = this->mpc_CommKefex->ReadAggregateVariable(u16_Index, orc_ReadData.size(), &orc_ReadData[0]);
          //map KEFEX to openSYDE error codes as good as possible:
          switch (s32_Return)
@@ -530,23 +529,23 @@ sint32 C_OSCDiagProtocolKfx::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex,
             break;
          case 2:
             u64_Value = static_cast<uint64>(orc_DataToWrite[0] +
-                                            ((static_cast<uint64>(orc_DataToWrite[1])) << 8));
+                                            ((static_cast<uint64>(orc_DataToWrite[1])) << 8U));
             break;
          case 4:
             u64_Value = static_cast<uint64>(orc_DataToWrite[0] +
-                                            ((static_cast<uint64>(orc_DataToWrite[1])) << 8) +
-                                            ((static_cast<uint64>(orc_DataToWrite[2])) << 16) +
-                                            ((static_cast<uint64>(orc_DataToWrite[3])) << 24));
+                                            ((static_cast<uint64>(orc_DataToWrite[1])) << 8U) +
+                                            ((static_cast<uint64>(orc_DataToWrite[2])) << 16U) +
+                                            ((static_cast<uint64>(orc_DataToWrite[3])) << 24U));
             break;
          case 8:
             u64_Value = static_cast<uint64>(orc_DataToWrite[0] +
-                                            ((static_cast<uint64>(orc_DataToWrite[1])) << 8) +
-                                            ((static_cast<uint64>(orc_DataToWrite[2])) << 16) +
-                                            ((static_cast<uint64>(orc_DataToWrite[3])) << 24) +
-                                            ((static_cast<uint64>(orc_DataToWrite[4])) << 32) +
-                                            ((static_cast<uint64>(orc_DataToWrite[5])) << 40) +
-                                            ((static_cast<uint64>(orc_DataToWrite[6])) << 48) +
-                                            ((static_cast<uint64>(orc_DataToWrite[7])) << 56));
+                                            ((static_cast<uint64>(orc_DataToWrite[1])) << 8U) +
+                                            ((static_cast<uint64>(orc_DataToWrite[2])) << 16U) +
+                                            ((static_cast<uint64>(orc_DataToWrite[3])) << 24U) +
+                                            ((static_cast<uint64>(orc_DataToWrite[4])) << 32U) +
+                                            ((static_cast<uint64>(orc_DataToWrite[5])) << 40U) +
+                                            ((static_cast<uint64>(orc_DataToWrite[6])) << 48U) +
+                                            ((static_cast<uint64>(orc_DataToWrite[7])) << 56U));
             break;
          default:
             u64_Value = 0U;
@@ -739,7 +738,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, c
    }
    else
    {
-      if ((ou8_DataPoolIndex == 0U) && (ou16_ListIndex < 64) && (ou16_ElementIndex < 1024) && (ou8_Rail < 3))
+      if ((ou8_DataPoolIndex == 0U) && (ou16_ListIndex < 64U) && (ou16_ElementIndex < 1024U) && (ou8_Rail < 3U))
       {
          const uint16 u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
          s32_Return =
@@ -798,7 +797,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIn
    }
    else
    {
-      if ((ou8_DataPoolIndex == 0U) && (ou16_ListIndex < 64) && (ou16_ElementIndex < 1024) && (ou8_Rail < 3))
+      if ((ou8_DataPoolIndex == 0U) && (ou16_ListIndex < 64U) && (ou16_ElementIndex < 1024U) && (ou8_Rail < 3U))
       {
          const uint16 u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
          s32_Return =
@@ -811,7 +810,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIn
             //TODO: Convert to OSY response codes
             if (opu8_NrCode != NULL)
             {
-               *opu8_NrCode = 0;
+               *opu8_NrCode = 0U;
             }
          }
       }
@@ -896,7 +895,6 @@ sint32 C_OSCDiagProtocolKfx::NvmRead(const uint32 ou32_MemoryAddress, std::vecto
    {
       if ((ou32_MemoryAddress <= 0xFFFFFFU) && (orc_DataRecord.size() > 0))
       {
-         //lint -e{864} //false positive due to const/non-const misinterpretation
          s32_Return = this->mpc_CommKefex->ReadEEPROM(ou32_MemoryAddress, orc_DataRecord.size(), &orc_DataRecord[0]);
          //map KEFEX to openSYDE error codes as good as possible:
          switch (s32_Return)
@@ -1132,15 +1130,15 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, 
          {
          case C_NO_ERR:
             //KEFEX format: 0xMmmr  -> convert
-            orau8_Version[0] = static_cast<uint8>((u32_Result & 0xF000U) >> 12);
-            orau8_Version[1] = static_cast<uint8>((u32_Result & 0x0FF0U) >> 4);
+            orau8_Version[0] = static_cast<uint8>((u32_Result & 0xF000U) >> 12U);
+            orau8_Version[1] = static_cast<uint8>((u32_Result & 0x0FF0U) >> 4U);
             orau8_Version[2] = static_cast<uint8>(u32_Result & 0x000FU);
             break;
          case C_WARN: //error response
             //TODO: Convert to OSY response codes
             if (opu8_NrCode != NULL)
             {
-               *opu8_NrCode = 0;
+               *opu8_NrCode = 0U;
             }
             break;
          case C_RD_WR: //could not send request

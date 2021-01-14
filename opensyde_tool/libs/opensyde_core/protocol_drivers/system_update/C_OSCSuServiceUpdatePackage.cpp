@@ -161,8 +161,8 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
    c_SupFiles.insert(mc_PACKAGE_UPDATE_DEF);
 
    // precondition checks
-   s32_Return = h_CheckParamsToCreatePackage(orc_PackagePath, orc_SystemDefinition, ou32_ActiveBusIndex,
-                                             orc_ActiveNodes, orc_NodesUpdateOrder, orc_ApplicationsToWrite);
+   s32_Return = mh_CheckParamsToCreatePackage(orc_PackagePath, orc_SystemDefinition, ou32_ActiveBusIndex,
+                                              orc_ActiveNodes, orc_NodesUpdateOrder, orc_ApplicationsToWrite);
 
    // * create folders with device application files (via h_CreateTemporaryFolder)
    //   h_CreateTemporaryFolder is creating the temporary folder (and deleting in advance if it already exists)
@@ -200,10 +200,10 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
          {
             const C_OSCSuSequences::C_DoFlash c_DoFlash = *c_Iter; // current node
             //Files
-            C_OSCSuServiceUpdatePackage::h_AppendFilesRelative(c_SupFiles, c_DoFlash.c_FilesToFlash, c_PackagePathTmp);
+            C_OSCSuServiceUpdatePackage::mh_AppendFilesRelative(c_SupFiles, c_DoFlash.c_FilesToFlash, c_PackagePathTmp);
             //Parameter set files
-            C_OSCSuServiceUpdatePackage::h_AppendFilesRelative(c_SupFiles, c_DoFlash.c_FilesToWriteToNvm,
-                                                               c_PackagePathTmp);
+            C_OSCSuServiceUpdatePackage::mh_AppendFilesRelative(c_SupFiles, c_DoFlash.c_FilesToWriteToNvm,
+                                                                c_PackagePathTmp);
          }
       }
 
@@ -249,7 +249,8 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
       // go through nodes in system definition to get device definition names and paths
       for (uint32 u32_Pos = 0; u32_Pos < orc_SystemDefinition.c_Nodes.size(); u32_Pos++)
       {
-         const C_OSCDeviceDefinition * pc_DeviceDefinition = orc_SystemDefinition.c_Nodes[u32_Pos].pc_DeviceDefinition;
+         const C_OSCDeviceDefinition * const pc_DeviceDefinition =
+            orc_SystemDefinition.c_Nodes[u32_Pos].pc_DeviceDefinition;
          tgl_assert(pc_DeviceDefinition != NULL);
          if (pc_DeviceDefinition != NULL)
          {
@@ -260,7 +261,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
 
       // * device.ini file
       // create and store specific devices.ini
-      s32_Return = h_CreateDeviceIniFile(c_PackagePathTmp, c_DeviceDefinitionFiles);
+      s32_Return = mh_CreateDeviceIniFile(c_PackagePathTmp, c_DeviceDefinitionFiles);
    }
 
    // * device definition files
@@ -277,7 +278,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
          const C_SCLString c_TargetFileName = TGL_ExtractFileName(*c_Iter);
          c_SupFiles.insert(c_TargetFileName);
          const C_SCLString c_TargetFilePath = c_PackagePathTmp + c_TargetFileName;
-         s32_Return = h_CopyFile(*c_Iter, c_TargetFilePath);
+         s32_Return = mh_CopyFile(*c_Iter, c_TargetFilePath);
          if (s32_Return != C_NO_ERR)
          {
             mhc_ErrorMessage = "Could not save device definition file \"" +
@@ -292,12 +293,12 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
    if (s32_Return == C_NO_ERR)
    {
       C_SupDefContent c_SupDefContent;
-      s32_Return = h_SupDefParamAdapter(orc_SystemDefinition, ou32_ActiveBusIndex,
-                                        orc_ActiveNodes, orc_NodesUpdateOrder,
-                                        c_ApplicationsToWrite, c_SupDefContent);
+      s32_Return = mh_SupDefParamAdapter(orc_SystemDefinition, ou32_ActiveBusIndex,
+                                         orc_ActiveNodes, orc_NodesUpdateOrder,
+                                         c_ApplicationsToWrite, c_SupDefContent);
 
       // create and store 'service_update_package' file
-      h_CreateUpdatePackageDefFile(c_PackagePathTmp, c_SupDefContent);
+      mh_CreateUpdatePackageDefFile(c_PackagePathTmp, c_SupDefContent);
    }
 
    // package temporary result folder to zip file
@@ -313,7 +314,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
    // cleanup: delete temporary result folder
    if (q_TemporaryFolderCreated == true)
    {
-      sint32 s32_Tmp = TGL_RemoveDirectory(c_PackagePathTmp, false);
+      const sint32 s32_Tmp = TGL_RemoveDirectory(c_PackagePathTmp, false);
       if (s32_Tmp != 0)
       {
          const C_SCLString c_Message = "Could not delete temporary result folder \"" + c_PackagePathTmp + "\".";
@@ -485,14 +486,13 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
 
       // go through all nodes
       C_SCLString c_SelectedNode;
-      sint32 s32_NextNode = C_NO_ERR;
       map<uint32, uint32> c_UpdateOrderByNodes; // to store node update positions which are represented by index at
                                                 // orc_NodesUpdateOrder
       uint32 u32_NodeCounter = 0;
       do
       {
          // get content of node
-         uint8 u8_NodeActive = static_cast<uint8>(c_XMLParser.GetAttributeUint32(mc_NODE_ACTIVE_ATTR));
+         const uint8 u8_NodeActive = static_cast<uint8>(c_XMLParser.GetAttributeUint32(mc_NODE_ACTIVE_ATTR));
          orc_ActiveNodes.push_back(u8_NodeActive);
          C_OSCSuSequences::C_DoFlash c_DoFlash;
          if (u8_NodeActive == mu8_ACTIVE_NODE)
@@ -500,12 +500,14 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
             // get update position
             const uint32 u32_UpdatePosition = static_cast<uint8>(
                c_XMLParser.GetAttributeUint32(mc_NODE_POSITION_ATTR));
-            C_OSCSuServiceUpdatePackage::h_LoadFilesSection(c_DoFlash.c_FilesToFlash, u32_NodeCounter,
-                                                            u32_UpdatePosition, c_UpdateOrderByNodes, c_TargetUnzipPath,
-                                                            c_XMLParser, mc_FILES, mc_FILE);
-            C_OSCSuServiceUpdatePackage::h_LoadFilesSection(c_DoFlash.c_FilesToWriteToNvm, u32_NodeCounter,
-                                                            u32_UpdatePosition, c_UpdateOrderByNodes, c_TargetUnzipPath,
-                                                            c_XMLParser, mc_PARAM_FILES, mc_PARAM_FILE);
+            C_OSCSuServiceUpdatePackage::mh_LoadFilesSection(c_DoFlash.c_FilesToFlash, u32_NodeCounter,
+                                                             u32_UpdatePosition, c_UpdateOrderByNodes,
+                                                             c_TargetUnzipPath,
+                                                             c_XMLParser, mc_FILES, mc_FILE);
+            C_OSCSuServiceUpdatePackage::mh_LoadFilesSection(c_DoFlash.c_FilesToWriteToNvm, u32_NodeCounter,
+                                                             u32_UpdatePosition, c_UpdateOrderByNodes,
+                                                             c_TargetUnzipPath,
+                                                             c_XMLParser, mc_PARAM_FILES, mc_PARAM_FILE);
             if (orc_SystemDefinition.c_Nodes[u32_NodeCounter].pc_DeviceDefinition != NULL)
             {
                c_DoFlash.c_OtherAcceptedDeviceNames =
@@ -518,9 +520,9 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
          //Next
          c_SelectedNode = c_XMLParser.SelectNodeNext(mc_NODE);
       }
-      while ((c_SelectedNode == mc_NODE) && (s32_NextNode == C_NO_ERR));
+      while (c_SelectedNode == mc_NODE);
 
-      h_SetNodesUpdateOrder(c_UpdateOrderByNodes, orc_NodesUpdateOrder);
+      mh_SetNodesUpdateOrder(c_UpdateOrderByNodes, orc_NodesUpdateOrder);
    }
 
    orc_WarningMessages = mhc_WarningMessages; // set warning messages for caller
@@ -563,24 +565,27 @@ C_SCLString C_OSCSuServiceUpdatePackage::h_GetPackageExtension()
    C_NOACT     active bus index is not in system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSuServiceUpdatePackage::h_CheckParamsToCreatePackage(const C_SCLString & orc_PackagePath,
-                                                                 const C_OSCSystemDefinition & orc_SystemDefinition,
-                                                                 const uint32 ou32_ActiveBusIndex,
-                                                                 const vector<uint8> & orc_ActiveNodes,
-                                                                 const vector<uint32> & orc_NodesUpdateOrder,
-                                                                 const vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite)
+sint32 C_OSCSuServiceUpdatePackage::mh_CheckParamsToCreatePackage(const C_SCLString & orc_PackagePath,
+                                                                  const C_OSCSystemDefinition & orc_SystemDefinition,
+                                                                  const uint32 ou32_ActiveBusIndex,
+                                                                  const vector<uint8> & orc_ActiveNodes,
+                                                                  const vector<uint32> & orc_NodesUpdateOrder,
+                                                                  const vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite)
 {
    sint32 s32_Return = C_NO_ERR;
 
-   // exists package already?
-   if ((TGL_FileExists(orc_PackagePath) == true) || (TGL_DirectoryExists(orc_PackagePath) == true))
+   // does package already exist ?
+   const bool q_FileExists = TGL_FileExists(orc_PackagePath);
+   const bool q_DirectoryExists = TGL_DirectoryExists(orc_PackagePath);
+
+   if ((q_FileExists == true) || (q_DirectoryExists == true))
    {
       mhc_ErrorMessage = "Update Package \"" + orc_PackagePath + "\" exists already.";
       osc_write_log_error("Creating Update Package", mhc_ErrorMessage);
       s32_Return = C_RANGE;
    }
 
-   // exists target directory for package?
+   // does target directory for package exist ?
    if (s32_Return == C_NO_ERR)
    {
       const C_SCLString c_TargetDir = TGL_ExtractFilePath(orc_PackagePath);
@@ -606,7 +611,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CheckParamsToCreatePackage(const C_SCLStri
       }
    }
 
-   // exists temporary result folder? (would be really strange, but who knows)
+   // does temporary result folder exist ? (would be really strange, but who knows)
    if (s32_Return == C_NO_ERR)
    {
       C_SCLString c_TmpPackagePath = orc_PackagePath.SubString(1, orc_PackagePath.Pos(mc_PACKAGE_EXT) - 1) +
@@ -705,7 +710,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CheckParamsToCreatePackage(const C_SCLStri
    C_RD_WR     read/write error (see log file)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSuServiceUpdatePackage::h_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLString & orc_TargetFile)
+sint32 C_OSCSuServiceUpdatePackage::mh_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLString & orc_TargetFile)
 {
    sint32 s32_Return = C_NO_ERR;
 
@@ -721,8 +726,8 @@ sint32 C_OSCSuServiceUpdatePackage::h_CopyFile(const C_SCLString & orc_SourceFil
    {
       c_Input << &std::noskipws;
 
-      std::istream_iterator<uint8> c_Begin(c_Input);
-      std::istream_iterator<uint8> c_End;
+      const std::istream_iterator<uint8> c_Begin(c_Input);
+      const std::istream_iterator<uint8> c_End;
 
       std::fstream c_Output(
          orc_TargetFile.c_str(), std::fstream::out | std::fstream::trunc | std::fstream::binary);
@@ -734,7 +739,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CopyFile(const C_SCLString & orc_SourceFil
       }
       else
       {
-         std::ostream_iterator<uint8> c_Begin2(c_Output);
+         const std::ostream_iterator<uint8> c_Begin2(c_Output);
          try
          {
             std::copy(c_Begin, c_End, c_Begin2);
@@ -766,8 +771,8 @@ sint32 C_OSCSuServiceUpdatePackage::h_CopyFile(const C_SCLString & orc_SourceFil
    C_RD_WR     read/write error (see log file)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSuServiceUpdatePackage::h_CreateUpdatePackageDefFile(const C_SCLString & orc_Path,
-                                                               const C_SupDefContent & orc_SupDefContent)
+void C_OSCSuServiceUpdatePackage::mh_CreateUpdatePackageDefFile(const C_SCLString & orc_Path,
+                                                                const C_SupDefContent & orc_SupDefContent)
 {
    const C_SCLString c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + mc_PACKAGE_UPDATE_DEF;
 
@@ -796,7 +801,7 @@ void C_OSCSuServiceUpdatePackage::h_CreateUpdatePackageDefFile(const C_SCLString
    //List nodes
    for (uint32 u32_Pos = 0; u32_Pos < orc_SupDefContent.c_Nodes.size(); u32_Pos++)
    {
-      C_SupDefNodeContent c_CurrentNode = orc_SupDefContent.c_Nodes[u32_Pos];
+      const C_SupDefNodeContent c_CurrentNode = orc_SupDefContent.c_Nodes[u32_Pos];
 
       //Node
       tgl_assert(c_XMLParser.CreateAndSelectNodeChild(mc_NODE) == mc_NODE);
@@ -812,8 +817,8 @@ void C_OSCSuServiceUpdatePackage::h_CreateUpdatePackageDefFile(const C_SCLString
             c_XMLParser.SetAttributeUint32(mc_NODE_POSITION_ATTR, c_CurrentNode.u32_Position);
          }
 
-         h_SaveFiles(c_CurrentNode.c_ApplicationFileNames, c_XMLParser, mc_FILES, mc_FILE);
-         h_SaveFiles(c_CurrentNode.c_NVMFileNames, c_XMLParser, mc_PARAM_FILES, mc_PARAM_FILE);
+         mh_SaveFiles(c_CurrentNode.c_ApplicationFileNames, c_XMLParser, mc_FILES, mc_FILE);
+         mh_SaveFiles(c_CurrentNode.c_NVMFileNames, c_XMLParser, mc_PARAM_FILES, mc_PARAM_FILE);
 
          tgl_assert(c_XMLParser.SelectNodeParent() == mc_NODES);
       }
@@ -856,8 +861,8 @@ void C_OSCSuServiceUpdatePackage::h_CreateUpdatePackageDefFile(const C_SCLString
    C_RD_WR     read/write error (see log file)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSuServiceUpdatePackage::h_CreateDeviceIniFile(const C_SCLString & orc_Path,
-                                                          const set<C_SCLString> & orc_DeviceDefinitionPaths)
+sint32 C_OSCSuServiceUpdatePackage::mh_CreateDeviceIniFile(const C_SCLString & orc_Path,
+                                                           const set<C_SCLString> & orc_DeviceDefinitionPaths)
 {
    sint32 s32_Return = C_NO_ERR;
 
@@ -869,7 +874,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreateDeviceIniFile(const C_SCLString & or
    const C_SCLString c_DeviceCount = "DeviceCount";
    const C_SCLString c_DeviceKey = "Device";
    uint32 u32_DeviceCounter = 1;
-   C_SCLString c_IniDevPath = TGL_FileIncludeTrailingDelimiter(orc_Path) + mc_INI_DEV;
+   const C_SCLString c_IniDevPath = TGL_FileIncludeTrailingDelimiter(orc_Path) + mc_INI_DEV;
 
    // build up devices.ini --> device definitions are in the same folder
    try
@@ -885,7 +890,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreateDeviceIniFile(const C_SCLString & or
       set<C_SCLString>::const_iterator c_Iter;
       for (c_Iter = orc_DeviceDefinitionPaths.begin(); c_Iter != orc_DeviceDefinitionPaths.end(); ++c_Iter)
       {
-         const C_SCLString c_Key = c_DeviceKey + C_SCLString(u32_DeviceCounter);
+         const C_SCLString c_Key = c_DeviceKey + C_SCLString::IntToStr(u32_DeviceCounter);
          const C_SCLString c_Value = TGL_ExtractFileName(*c_Iter);
          c_IniFile.WriteString(c_DeviceSection, c_Key, c_Value);
          u32_DeviceCounter++;
@@ -919,12 +924,12 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreateDeviceIniFile(const C_SCLString & or
    C_WARN       could not find update position for active node
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSuServiceUpdatePackage::h_SupDefParamAdapter(const C_OSCSystemDefinition & orc_SystemDefinition,
-                                                         const uint32 ou32_ActiveBusIndex,
-                                                         const vector<uint8> & orc_ActiveNodes,
-                                                         const vector<uint32> & orc_NodesUpdateOrder,
-                                                         const vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
-                                                         C_OSCSuServiceUpdatePackage::C_SupDefContent & orc_SupDefContent)
+sint32 C_OSCSuServiceUpdatePackage::mh_SupDefParamAdapter(const C_OSCSystemDefinition & orc_SystemDefinition,
+                                                          const uint32 ou32_ActiveBusIndex,
+                                                          const vector<uint8> & orc_ActiveNodes,
+                                                          const vector<uint32> & orc_NodesUpdateOrder,
+                                                          const vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
+                                                          C_OSCSuServiceUpdatePackage::C_SupDefContent & orc_SupDefContent)
 {
    sint32 s32_Return = C_NO_ERR;
    C_SupDefContent c_SupDefContent;
@@ -944,13 +949,13 @@ sint32 C_OSCSuServiceUpdatePackage::h_SupDefParamAdapter(const C_OSCSystemDefini
       {
          // get update position of node
          // nodes update order only contains active nodes with applications
-         sint32 s32_Tmp = h_GetUpdatePositionOfNode(orc_NodesUpdateOrder, u32_Pos,
-                                                    c_SupDefNodeContent.u32_Position);
+         const sint32 s32_Tmp = mh_GetUpdatePositionOfNode(orc_NodesUpdateOrder, u32_Pos,
+                                                           c_SupDefNodeContent.u32_Position);
          if (s32_Tmp != C_NO_ERR)
          {
             // strange: internal configuration error - should not happen!
             const C_SCLString c_Message = "Could not find update position for active node \"" +
-                                          C_SCLString(u32_Pos) + "\".";
+                                          C_SCLString::IntToStr(u32_Pos) + "\".";
             mhc_WarningMessages.Append(c_Message);
             osc_write_log_warning("Creating Update Package", c_Message);
             s32_Return = C_WARN;
@@ -965,7 +970,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_SupDefParamAdapter(const C_OSCSystemDefini
            ++c_IterAppl)
       {
          // store application file names with relative path
-         const C_SCLString c_Tmp = c_Folder + C_SCLString("/") + TGL_ExtractFileName(C_SCLString(*c_IterAppl));
+         const C_SCLString c_Tmp = c_Folder + "/" + TGL_ExtractFileName(*c_IterAppl);
          c_SupDefNodeContent.c_ApplicationFileNames.push_back(c_Tmp);
       }
       // get parameter sets of node
@@ -975,7 +980,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_SupDefParamAdapter(const C_OSCSystemDefini
            ++c_IterParam)
       {
          // store application file names with relative path
-         const C_SCLString c_Tmp = c_Folder + C_SCLString("/") + TGL_ExtractFileName(C_SCLString(*c_IterParam));
+         const C_SCLString c_Tmp = c_Folder + "/" + TGL_ExtractFileName(*c_IterParam);
          c_SupDefNodeContent.c_NVMFileNames.push_back(c_Tmp);
       }
       c_SupDefContent.c_Nodes.push_back(c_SupDefNodeContent);
@@ -997,9 +1002,9 @@ sint32 C_OSCSuServiceUpdatePackage::h_SupDefParamAdapter(const C_OSCSystemDefini
    C_NOACT      node not available in node update order
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSuServiceUpdatePackage::h_GetUpdatePositionOfNode(const vector<uint32> & orc_NodesUpdateOrder,
-                                                              const uint32 ou32_NodeForUpdate,
-                                                              uint32 & oru32_UpdatePosition)
+sint32 C_OSCSuServiceUpdatePackage::mh_GetUpdatePositionOfNode(const vector<uint32> & orc_NodesUpdateOrder,
+                                                               const uint32 ou32_NodeForUpdate,
+                                                               uint32 & oru32_UpdatePosition)
 {
    sint32 s32_Return = C_NOACT;
 
@@ -1027,8 +1032,8 @@ sint32 C_OSCSuServiceUpdatePackage::h_GetUpdatePositionOfNode(const vector<uint3
    C_WARN     contains no nodes for update order
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSuServiceUpdatePackage::h_SetNodesUpdateOrder(const map<uint32, uint32> & orc_UpdateOrderByNodes,
-                                                          vector<uint32> & orc_NodesUpdateOrder)
+sint32 C_OSCSuServiceUpdatePackage::mh_SetNodesUpdateOrder(const map<uint32, uint32> & orc_UpdateOrderByNodes,
+                                                           vector<uint32> & orc_NodesUpdateOrder)
 {
    sint32 s32_Return = 0;
 
@@ -1058,9 +1063,9 @@ sint32 C_OSCSuServiceUpdatePackage::h_SetNodesUpdateOrder(const map<uint32, uint
    \param[in]     orc_BasePath Path the files will be raltive to
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSuServiceUpdatePackage::h_AppendFilesRelative(std::set<C_SCLString> & orc_Set,
-                                                        const std::vector<C_SCLString> & orc_Files,
-                                                        const C_SCLString & orc_BasePath)
+void C_OSCSuServiceUpdatePackage::mh_AppendFilesRelative(std::set<C_SCLString> & orc_Set,
+                                                         const std::vector<C_SCLString> & orc_Files,
+                                                         const C_SCLString & orc_BasePath)
 {
    for (uint32 u32_PosFilesToFlash = 0;
         u32_PosFilesToFlash < orc_Files.size();
@@ -1088,14 +1093,14 @@ void C_OSCSuServiceUpdatePackage::h_AppendFilesRelative(std::set<C_SCLString> & 
    \param[in]     orc_ElementNodeName XML node name to use on item level
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSuServiceUpdatePackage::h_LoadFilesSection(std::vector<C_SCLString> & orc_Files,
-                                                     const uint32 ou32_NodeCounter, const uint32 ou32_UpdatePos,
-                                                     std::map<uint32,
-                                                              uint32> & orc_PositionMap,
-                                                     const C_SCLString & orc_TargetUnzipPath,
-                                                     C_OSCXMLParserBase & orc_XMLParser,
-                                                     const C_SCLString & orc_BaseNodeName,
-                                                     const C_SCLString & orc_ElementNodeName)
+void C_OSCSuServiceUpdatePackage::mh_LoadFilesSection(std::vector<C_SCLString> & orc_Files,
+                                                      const uint32 ou32_NodeCounter, const uint32 ou32_UpdatePos,
+                                                      std::map<uint32,
+                                                               uint32> & orc_PositionMap,
+                                                      const C_SCLString & orc_TargetUnzipPath,
+                                                      C_OSCXMLParserBase & orc_XMLParser,
+                                                      const C_SCLString & orc_BaseNodeName,
+                                                      const C_SCLString & orc_ElementNodeName)
 {
    if (orc_XMLParser.SelectNodeChild(orc_BaseNodeName) == orc_BaseNodeName)
    {
@@ -1106,7 +1111,6 @@ void C_OSCSuServiceUpdatePackage::h_LoadFilesSection(std::vector<C_SCLString> & 
       tgl_assert(orc_XMLParser.SelectNodeChild(orc_ElementNodeName) == orc_ElementNodeName);
 
       // go through all files
-      sint32 s32_NextFile = C_NO_ERR;
       do
       {
          // we have to take care of OS dependent path delimiters for windows '\\'
@@ -1120,7 +1124,7 @@ void C_OSCSuServiceUpdatePackage::h_LoadFilesSection(std::vector<C_SCLString> & 
          orc_Files.push_back(c_FilePath);
          c_SelectedNode = orc_XMLParser.SelectNodeNext(orc_ElementNodeName);
       }
-      while ((c_SelectedNode == orc_ElementNodeName) && (s32_NextFile == C_NO_ERR));
+      while (c_SelectedNode == orc_ElementNodeName);
       tgl_assert(orc_XMLParser.SelectNodeParent() == orc_BaseNodeName);
       tgl_assert(orc_XMLParser.SelectNodeParent() == mc_NODE);
    }
@@ -1135,9 +1139,9 @@ void C_OSCSuServiceUpdatePackage::h_LoadFilesSection(std::vector<C_SCLString> & 
    \param[in]     orc_ElementNodeName XML node name to use on item level
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSuServiceUpdatePackage::h_SaveFiles(const std::vector<C_SCLString> & orc_Files,
-                                              C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_BaseNodeName,
-                                              const C_SCLString & orc_ElementNodeName)
+void C_OSCSuServiceUpdatePackage::mh_SaveFiles(const std::vector<C_SCLString> & orc_Files,
+                                               C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_BaseNodeName,
+                                               const C_SCLString & orc_ElementNodeName)
 {
    if (orc_Files.size() > 0)
    {

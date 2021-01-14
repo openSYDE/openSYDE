@@ -81,9 +81,9 @@ C_GiSvDaSliderBase::C_GiSvDaSliderBase(const uint32 & oru32_ViewIndex, const uin
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_Slider and the Qt memory management
 C_GiSvDaSliderBase::~C_GiSvDaSliderBase(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_Slider and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ void C_GiSvDaSliderBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_S
    this->mpc_SliderWidget->SetCurrentStyle(oe_Style, oq_DarkMode);
    if (this->ms32_Index >= 0)
    {
-      const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+      const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
       if (pc_Dashboard != NULL)
       {
@@ -144,7 +144,7 @@ void C_GiSvDaSliderBase::ReInitializeSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::LoadData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -169,7 +169,7 @@ void C_GiSvDaSliderBase::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::UpdateData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -256,10 +256,10 @@ void C_GiSvDaSliderBase::SendCurrentValue(void)
       else
       {
          //In this case we have to skip a few steps (determined by this->mf64_SliderFactor)
-         this->mf64_WriteValue = this->mf64_UnscaledMinValue  +
-                                 (static_cast<float64>(this->mpc_SliderWidget->GetValue() -
-                                                       static_cast<float64>(this->ms32_SliderMin)) *
-                                  this->mf64_SliderFactor);
+         this->mf64_WriteValue =
+            this->mf64_UnscaledMinValue  +
+            ((static_cast<float64>(this->mpc_SliderWidget->GetValue()) - static_cast<float64>(this->ms32_SliderMin)) *
+             this->mf64_SliderFactor);
       }
       //For precision reasons we only use valid values (in range of actual type),
       // but this means we have to scale the actual value,
@@ -279,7 +279,7 @@ void C_GiSvDaSliderBase::SendCurrentValue(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaSliderBase::CallProperties(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -366,8 +366,7 @@ bool C_GiSvDaSliderBase::CallProperties(void)
          {
             c_New->HideOverlay();
          }
-         //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-      }
+      } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    }
    return true;
 }
@@ -413,7 +412,7 @@ void C_GiSvDaSliderBase::SetValuePe(const sintn osn_Value, const sintn osn_Min, 
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -454,16 +453,13 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                         if (u64_Steps <= static_cast<uint64>(std::numeric_limits<uint32>::max()))
                         {
                            //Standard
-                           //lint -e{530,10,1015,1013}  c++11 feature
                            const sint32 s32_Max =
                               static_cast<sint32>(static_cast<sint64>(std::numeric_limits<sint32>::lowest()) +
                                                   static_cast<sint64>(u64_Steps));
                            c_Text = this->GetUnscaledValueAsScaledString(f64_Min);
-                           //lint -e{530,10,1015,1013}  c++11 feature
                            this->mpc_SliderWidget->SetMin(std::numeric_limits<sint32>::lowest(), c_Text);
                            c_Text = this->GetUnscaledValueAsScaledString(f64_Max);
                            this->mpc_SliderWidget->SetMax(s32_Max, c_Text);
-                           //lint -e{530,10,1015,1013}  c++11 feature
                            this->ms32_SliderMin = std::numeric_limits<sint32>::lowest();
                            //Default
                            this->mf64_SliderFactor = 1.0;
@@ -487,17 +483,14 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                            {
                               //All in for :)
                            }
-                           //lint -e{530,10,1015,1013}  c++11 feature
+                           const float64 f64_Temp = static_cast<float64>(u64_Steps) / this->mf64_SliderFactor;
                            const sint32 s32_Max =
                               static_cast<sint32>(static_cast<sint64>(std::numeric_limits<sint32>::lowest()) +
-                                                  static_cast<sint64>(static_cast<float64>(u64_Steps) /
-                                                                      this->mf64_SliderFactor));
+                                                  (static_cast<sint64>(f64_Temp)));
                            c_Text = this->GetUnscaledValueAsScaledString(f64_Min);
-                           //lint -e{530,10,1015,1013}  c++11 feature
                            this->mpc_SliderWidget->SetMin(std::numeric_limits<sint32>::lowest(), c_Text);
                            c_Text = this->GetUnscaledValueAsScaledString(f64_Max);
                            this->mpc_SliderWidget->SetMax(s32_Max, c_Text);
-                           //lint -e{530,10,1015,1013}  c++11 feature
                            this->ms32_SliderMin = std::numeric_limits<sint32>::lowest();
                            //Tool tip (BEFORE start value)
                            this->mpc_SliderWidget->SetToolTipParameters(static_cast<float64>(this->ms32_SliderMin),
@@ -526,11 +519,9 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                   {
                      QString c_Text;
                      c_Text = this->GetUnscaledValueAsScaledString(f64_Min);
-                     //lint -e{530,10,1015,1013}  c++11 feature
                      this->mpc_SliderWidget->SetMin(std::numeric_limits<sint32>::lowest(), c_Text);
                      c_Text = this->GetUnscaledValueAsScaledString(f64_Max);
                      this->mpc_SliderWidget->SetMax(std::numeric_limits<sint32>::max(), c_Text);
-                     //lint -e{530,10,1015,1013}  c++11 feature
                      this->ms32_SliderMin = std::numeric_limits<sint32>::lowest();
                      //factor for uint32::max steps
                      this->mf64_SliderFactor = (f64_Max - f64_Min) /
@@ -560,7 +551,7 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
 bool C_GiSvDaSliderBase::m_IsOnChange(void) const
 {
    bool q_Retval = false;
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {

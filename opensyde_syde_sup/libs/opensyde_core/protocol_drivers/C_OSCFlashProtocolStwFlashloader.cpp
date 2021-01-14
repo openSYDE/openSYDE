@@ -51,8 +51,8 @@ using namespace stw_scl;
 C_OSCFlashProtocolStwFlashloader::C_OSCFlashProtocolStwFlashloader(const PR_ReportProgress opr_Progress,
                                                                    void * const opv_Instance) :
    C_XFLFlashWrite(),
-   mpr_ReportProgress(opr_Progress),
-   mpv_ReportProgressInstance(opv_Instance)
+   pr_ReportProgress(opr_Progress),
+   pv_ReportProgressInstance(opv_Instance)
 {
 }
 
@@ -64,8 +64,8 @@ C_OSCFlashProtocolStwFlashloader::C_OSCFlashProtocolStwFlashloader(const PR_Repo
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCFlashProtocolStwFlashloader::~C_OSCFlashProtocolStwFlashloader(void)
 {
-   mpr_ReportProgress = NULL;
-   mpv_ReportProgressInstance = NULL;
+   pr_ReportProgress = NULL;
+   pv_ReportProgressInstance = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,10 +86,10 @@ sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Pr
 {
    sint32 s32_Return = C_NO_ERR;
 
-   if (mpr_ReportProgress != NULL)
+   if (pr_ReportProgress != NULL)
    {
-      s32_Return = mpr_ReportProgress(mpv_ReportProgressInstance, static_cast<uint8>(ou16_Progress1_1000 / 10U),
-                                      "Information: " + orc_AdditionalText);
+      s32_Return = pr_ReportProgress(pv_ReportProgressInstance, static_cast<uint8>(ou16_Progress1_1000 / 10U),
+                                     "Information: " + orc_AdditionalText);
    }
    return s32_Return;
 }
@@ -105,7 +105,7 @@ sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Pr
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCFlashProtocolStwFlashloader::TRG_ReportStatus(const C_SCLString & orc_Text, const uint8 ou8_Type)
 {
-   if (mpr_ReportProgress != NULL)
+   if (pr_ReportProgress != NULL)
    {
       C_SCLString c_Text;
 
@@ -123,11 +123,10 @@ void C_OSCFlashProtocolStwFlashloader::TRG_ReportStatus(const C_SCLString & orc_
          c_Text = "Warning: " + orc_Text;
          break;
       default:
-         tgl_assert(false);
          break;
       }
 
       //Signal progress invalid: 255
-      mpr_ReportProgress(mpv_ReportProgressInstance, 0xFFU, c_Text);
+      pr_ReportProgress(pv_ReportProgressInstance, 0xFFU, c_Text);
    }
 }

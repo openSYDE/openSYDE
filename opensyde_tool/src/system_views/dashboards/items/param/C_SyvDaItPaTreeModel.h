@@ -54,7 +54,9 @@ public:
    void SetActionActive(const bool oq_Active);
    void DeleteSpecified(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds);
    void ClearECUValues(void);
-   void ApplyEcuValues(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds);
+   void ApplyEcuValues(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds,
+                       std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds,
+                       std::vector<QString> & orc_InvalidValues, std::vector<QString> & orc_NewValues);
    bool CheckRange(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds,
                    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds2) const;
    bool CheckAllListsRead(void) const;
@@ -75,9 +77,6 @@ public:
    void GetListSetValues(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ListId,
                          std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> & orc_ListValues) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    // Header:
    virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation, const stw_types::sintn osn_Role =
                                   static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
@@ -87,7 +86,6 @@ public:
    virtual bool setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                         const stw_types::sintn osn_Role = static_cast<stw_types::sintn>(Qt::EditRole)) override;
    virtual Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    static E_Columns h_ColumnToEnum(const stw_types::sint32 & ors32_Column);
    static stw_types::sint32 h_EnumToColumn(const E_Columns & ore_Value);
@@ -103,6 +101,12 @@ public:
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetElementIdsForId(
       const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id, const stw_types::uint32 ou32_ValidLayers)
    const;
+
+   static void h_AdaptFloatRangeOfValueAndAppendResults(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
+                                                        const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_DescriptionId, std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds, std::vector<QString> & orc_InvalidValues, std::vector<QString> & orc_NewValues);
+   static void h_AdaptFloatRangeOfValue(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
+                                        const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_Description);
+   static void h_FixInvalidFloatValue(stw_types::float64 & orf64_Value);
 
 private:
    C_PuiSvDbDataElementHandler * mpc_DataWidget;

@@ -137,7 +137,6 @@ QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent, c
          pc_ComboBox->addItem(C_GtGetText::h_GetText("float64 - data type IEEE 64bit float"));
          pc_ComboBox->addItem(C_GtGetText::h_GetText("string - character array"));
          pc_ComboBox->ResizeViewToContents();
-         //lint -e{64,826,918,929,1025,1703} Qt interface
          connect(pc_ComboBox, static_cast<void (C_OgeCbxTable::*)(sintn)>(&C_OgeCbxTable::currentIndexChanged), this,
                  &C_SdNdeDpListTableDelegate::m_OnValueTypeChange);
          pc_Retval = pc_ComboBox;
@@ -156,7 +155,6 @@ QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent, c
          }
 
          pc_SpinBox->SetMaximumCustom(500);
-         //lint -e{64,826,918,929,1025,1703} Qt interface
          connect(pc_SpinBox, static_cast<void (QSpinBox::*)(
                                             sintn)>(&QSpinBox::valueChanged), this,
                  &C_SdNdeDpListTableDelegate::m_OnArraySizeChange);
@@ -179,7 +177,6 @@ QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent, c
          break;
       case C_SdNdeDpListTableModel::eOFFSET:
          pc_DoubleSpinBox = new C_OgeSpxTableDouble(opc_Parent);
-         //lint -e{530,10,1015,1013}  c++11 feature
          pc_DoubleSpinBox->SetMinimumCustom(static_cast<float64>(std::numeric_limits<float64>::lowest()));
          pc_DoubleSpinBox->SetMaximumCustom(static_cast<float64>(std::numeric_limits<float64>::max()));
          pc_Retval = pc_DoubleSpinBox;
@@ -247,15 +244,15 @@ void C_SdNdeDpListTableDelegate::setEditorData(QWidget * const opc_Editor, const
 {
    if (((opc_Editor != NULL) && (orc_Index.isValid() == true)) && (this->mpc_Model != NULL))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       QLineEdit * const pc_LineEdit = dynamic_cast<QLineEdit * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       QTextEdit * const pc_TextEdit = dynamic_cast<QTextEdit * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       QSpinBox * const pc_SpinBoxInt = dynamic_cast<QSpinBox * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       QDoubleSpinBox * const pc_SpinBoxDouble = dynamic_cast<QDoubleSpinBox * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       QComboBox * const pc_ComboBox = dynamic_cast<QComboBox * const>(opc_Editor);
       const C_SdNdeDpListTableModel::E_Columns e_Col = this->mpc_Model->ColumnToEnum(orc_Index.column());
       switch (e_Col)
@@ -270,7 +267,6 @@ void C_SdNdeDpListTableDelegate::setEditorData(QWidget * const opc_Editor, const
          if (pc_LineEdit != NULL)
          {
             pc_LineEdit->setText(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toString());
-            //lint -e{64,918,1025,1703} Qt interface
             connect(pc_LineEdit, &QLineEdit::textChanged, this, &C_SdNdeDpListTableDelegate::m_OnNameChange);
          }
          break;
@@ -368,15 +364,15 @@ void C_SdNdeDpListTableDelegate::setModelData(QWidget * const opc_Editor, QAbstr
 {
    if ((((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true)) && (this->mpc_Model != NULL))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const QLineEdit * const pc_LineEdit = dynamic_cast<const QLineEdit * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const QTextEdit * const pc_TextEdit = dynamic_cast<const QTextEdit * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       QSpinBox * const pc_SpinBoxInt = dynamic_cast<QSpinBox * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       QDoubleSpinBox * const pc_SpinBoxDouble = dynamic_cast<QDoubleSpinBox * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const QComboBox * const pc_ComboBox = dynamic_cast<const QComboBox * const>(opc_Editor);
       const C_SdNdeDpListTableModel::E_Columns e_Col = this->mpc_Model->ColumnToEnum(orc_Index.column());
       switch (e_Col)
@@ -726,7 +722,7 @@ void C_SdNdeDpListTableDelegate::m_OnCreateEditor(const QModelIndex & orc_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableDelegate::m_OnNameChange(const QString & orc_Text) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    QWidget * const pc_Widget = dynamic_cast<QWidget * const>(this->sender());
 
    if ((pc_Widget != NULL) && (this->mpc_Model != NULL))
@@ -748,7 +744,7 @@ void C_SdNdeDpListTableDelegate::m_OnAutoMinMaxChange(const bool & orq_Checked)
    if ((this->mpc_Model != NULL) && (this->mq_ChangeInProgress == false))
    {
       this->mq_ChangeInProgress = true;
-      this->mpc_Model->setData(this->mc_Edit, QVariant(orq_Checked));
+      this->mpc_Model->setData(this->mc_Edit, static_cast<QVariant>(orq_Checked));
       this->mq_ChangeInProgress = false;
    }
    this->mq_Inital = false;
@@ -779,7 +775,7 @@ void C_SdNdeDpListTableDelegate::m_OnValueTypeChange(const sintn & orsn_Index)
    if ((this->mpc_Model != NULL) && (this->mq_ChangeInProgress == false))
    {
       this->mq_ChangeInProgress = true;
-      this->mpc_Model->setData(this->mc_Edit, QVariant(orsn_Index));
+      this->mpc_Model->setData(this->mc_Edit, static_cast<QVariant>(orsn_Index));
       this->mq_ChangeInProgress = false;
    }
 }
@@ -799,7 +795,7 @@ void C_SdNdeDpListTableDelegate::m_OnArraySizeChange(const sintn & orsn_NewSize)
       {
          //Only visible changes
          this->mq_ChangeInProgress = true;
-         this->mpc_Model->setData(this->mc_Edit, QVariant(orsn_NewSize));
+         this->mpc_Model->setData(this->mc_Edit, static_cast<QVariant>(orsn_NewSize));
          this->mq_ChangeInProgress = false;
       }
    }

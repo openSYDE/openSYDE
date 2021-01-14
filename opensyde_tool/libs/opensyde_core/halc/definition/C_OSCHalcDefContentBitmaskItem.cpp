@@ -46,6 +46,14 @@ C_OSCHalcDefContentBitmaskItem::C_OSCHalcDefContentBitmaskItem(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Denstructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCHalcDefContentBitmaskItem::~C_OSCHalcDefContentBitmaskItem()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set mask value by string
 
    \param[in] orc_Item Mask string
@@ -92,11 +100,11 @@ sint32 C_OSCHalcDefContentBitmaskItem::mh_ParseUintFromString(const stw_scl::C_S
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   if (orc_Item.LowerCase() == stw_scl::C_SCLString("true").LowerCase())
+   if (orc_Item.LowerCase() == "true")
    {
       oru64_Value = 1ULL;
    }
-   else if (orc_Item.LowerCase() == stw_scl::C_SCLString("false").LowerCase())
+   else if (orc_Item.LowerCase() == "false")
    {
       oru64_Value = 0ULL;
    }

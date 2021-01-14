@@ -36,10 +36,7 @@ public:
    explicit C_SdBueMessageSelectorTreeWidget(QWidget * const opc_Parent = NULL);
    virtual ~C_SdBueMessageSelectorTreeWidget(void);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QSize sizeHint(void) const override;
-   //lint -restore
 
    void SetNodeId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                   const std::vector<stw_types::uint32> & orc_DatapoolIndexes);
@@ -71,7 +68,10 @@ public:
    void CollapseAll(void);
    void EditName(void);
    void InternalAddMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
-   void InternalDeleteMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void InternalAddMessageCommit(void);
+   stw_types::uint32 InternalDeleteMessage(
+      const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void InternalDeleteMessageCommit(const stw_types::uint32 ou32_LastInternalMessageIndex);
    void InternalAddSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                           const stw_types::uint32 & oru32_SignalIndex);
    void InternalDeleteSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -86,8 +86,7 @@ public:
    bool CheckIfAnyNodeConnected(void) const;
    void SelectMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                       const bool oq_BlockSignal = true);
-   void SelectMessages(const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageIds,
-                       const bool oq_BlockSignal = true);
+   void SelectMessages(const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageIds);
    void SelectSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint32 & oru32_SignalIndex, const bool oq_BlockSignal = true);
    stw_types::sint32 GetLevelOfPos(const QPoint & orc_Pos) const;
@@ -108,14 +107,11 @@ Q_SIGNALS:
    void SigReload(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual void dropEvent(QDropEvent * const opc_Event) override;
    virtual void startDrag(const Qt::DropActions oc_SupportedActions) override;
    virtual QMimeData * mimeData(const QList<QTreeWidgetItem *> oc_Items) const override;
    virtual QStringList mimeTypes(void) const override;
-   //lint -restore
 
    virtual void m_LastMinuteToolTipUpdate(void) override;
 
@@ -126,7 +122,7 @@ private:
 
    void m_ReloadTree(const bool & orq_HandleSelection = true);
    void m_InsertMessage(const stw_types::uint32 & oru32_MessageIdIndex);
-   void m_InsertSignal(QTreeWidgetItem * const pc_MessageItem, const stw_types::uint32 u32_SignalIndex,
+   void m_InsertSignal(QTreeWidgetItem * const opc_MessageItem, const stw_types::uint32 ou32_SignalIndex,
                        const QString & orc_SignalName) const;
 
    void m_SelectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected);
@@ -139,7 +135,7 @@ private:
    stw_types::sint32 m_MapMessageIdToInternalMessageIndex(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
       stw_types::uint32 & oru32_InternalMessageIndex) const;
-   stw_types::sint32 GetMessageIdForAdd(stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   stw_types::sint32 m_GetMessageIdForAdd(stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_UpdateUniqueMessageIds(void);
    void m_UpdateUniqueMessageIdsSignals(const stw_types::uint32 & oru32_InternalMessageIndex);
    void m_DisconnectSelection(void);
@@ -148,7 +144,7 @@ private:
    void m_SendSignalSelectionUpdate(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                     const stw_types::uint32 & oru32_SignalIndex);
    void m_SaveSelection(void);
-   void m_RestoreSelection(const bool oq_AlsoSetCurrent = false);
+   void m_RestoreSelection(const bool oq_AlsoSetCurrent, const bool oq_SendSignalForLastSelected);
    void m_SaveExpand(void);
    void m_RestoreExpand(void);
    stw_types::sint32 m_MapSignalInternalIndexToDataIndex(const stw_types::uint32 & oru32_InternalMessageIndex,

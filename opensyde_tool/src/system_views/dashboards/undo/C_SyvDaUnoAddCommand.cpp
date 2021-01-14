@@ -85,12 +85,12 @@ C_SyvDaUnoAddCommand::~C_SyvDaUnoAddCommand(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddCommand::m_AddNew(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
    {
-      const std::vector<stw_types::uint64> c_IDs = this->GetIDs();
+      const std::vector<stw_types::uint64> c_IDs = this->m_GetIDs();
       if (c_IDs.size() > 0)
       {
          QMap<C_PuiBsTemporaryDataID, uint64> c_IDMap;
@@ -229,8 +229,8 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             {
                QPixmap c_Image(this->mc_AdditionalInformation);
                c_ImageData.c_UIPosition = mc_NewPos;
-               c_ImageData.f64_Height = c_Image.height();
-               c_ImageData.f64_Width = c_Image.width();
+               c_ImageData.f64_Height = static_cast<float64>(c_Image.height());
+               c_ImageData.f64_Width = static_cast<float64>(c_Image.width());
                c_ImageData.c_UIImagePixmap = c_Image;
                c_ImageData.f64_ZOrder = this->mf64_ZValue;
                c_InitialData.AddImage(c_ImageData);

@@ -49,7 +49,7 @@ public:
    QPixmap GetImage(void) const;
 
 protected:
-   void LateImageInit(const QString & orc_ImagePath);
+   void m_LateImageInit(const QString & orc_ImagePath);
    virtual void m_ResizeUpdateItems(const stw_types::float64 of64_DiffWidth,
                                     const stw_types::float64 of64_DiffHeight) override;
 
@@ -62,7 +62,8 @@ protected:
 private:
    //Avoid call
    C_GiImageGroupWithoutData(const C_GiImageGroupWithoutData &);
-   C_GiImageGroupWithoutData & operator =(const C_GiImageGroupWithoutData &);
+   C_GiImageGroupWithoutData & operator =(const C_GiImageGroupWithoutData &); //lint !e1511 //we want to hide the base
+                                                                              // func.
 
    void m_Init(void);
    void m_InitSvg(void);

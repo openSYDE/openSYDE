@@ -154,9 +154,10 @@ void C_SyvDaPePieChart::m_UpdatePreview(void)
    C_GiSvDaPieChartBase * pc_Item = new C_GiSvDaPieChartBase(0UL, 0UL, -1L, 0ULL, NULL);
    const QSizeF c_ItemSize(static_cast<float64>(c_ViewSize.height()),
                            static_cast<float64>(c_ViewSize.height()));
-   //20 to center the chart
-   const QPointF c_ItemPos(((static_cast<float64>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0) + 20,
-                           (static_cast<float64>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0);
+   //20.0 to center the chart
+   const QPointF c_ItemPos(
+      ((static_cast<float64>(c_ViewSize.width()) - static_cast<float64>(c_ItemSize.width())) / 2.0) + 20.0,
+      (static_cast<float64>(c_ViewSize.height()) - static_cast<float64>(c_ItemSize.height())) / 2.0);
 
    pc_Item->SetDisplayStyle(this->mrc_ParentDialog.GetTheme(), this->mq_DarkMode);
    pc_Item->UpdateTypePe(this->GetShowUnit(), this->GetShowValue());
@@ -172,5 +173,4 @@ void C_SyvDaPePieChart::m_UpdatePreview(void)
    this->mrc_ParentDialog.GetPreviewScene()->addItem(pc_Item);
    this->mrc_ParentDialog.GetPreviewScene()->clearSelection();
 
-   //lint -e{429}  no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management

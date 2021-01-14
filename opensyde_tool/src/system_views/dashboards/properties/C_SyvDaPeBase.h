@@ -70,10 +70,7 @@ Q_SIGNALS:
    void SigRefresh(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   //lint -restore
 
 private:
    //Avoid call

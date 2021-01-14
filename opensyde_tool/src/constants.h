@@ -160,6 +160,9 @@ const stw_types::uint32 mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX = 48U;
 const stw_types::uint32 mu32_NODE_DATA_POOL_MAX = 32U;
 const stw_types::uint32 mu32_NODE_DATA_POOL_LIST_MAX = 128U;
 const stw_types::uint32 mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX = 2048U;
+//Data set restrictions
+const stw_types::uint32 mu32_NODE_DATA_SET_PER_LIST_MAX = 16U;
+
 //Bus edit
 const stw_types::uint16 mu16_BUS_DEFAULT_SIGNAL_LENGTH = 1U;
 
@@ -192,7 +195,10 @@ const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET = 1U;
 const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE = 2U;
 
 // Highest known generated code structure version
-const stw_types::uint16 mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION = 4U;
+const stw_types::uint16 mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION = 5U;
+
+// File check interval (for e.g.: Update package file check, CAN Monitor database check, ...)
+const stw_types::uint32 mu32_FILE_CHECK_INTERVAL = 500U;
 
 //User roles
 //----------------------------------------------------------------------------------------------------------------------
@@ -250,6 +256,11 @@ const stw_types::sintn msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST = static
 //Generic table interface: Values for combo box (type: QStringList, default: none)
 const stw_types::sintn msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST = static_cast<stw_types::sintn>(Qt::UserRole) +
                                                                          77;
+//Generic table interface: Flag to use for editable property of combo box (type: bool, default: false)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_COMBO_BOX_EDITABLE = static_cast<stw_types::sintn>(Qt::UserRole) + 78;
+//Generic table interface: Strings for multi-selection combo box (type: QStringList, default: none)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_MULTI_SELECT_COMBO_BOX_STRINGS_LIST =
+   static_cast<stw_types::sintn>(Qt::UserRole) + 79;
 //Generic table interface: Parameters for spin box (type: QStringList, default: none)
 //Expected 4 elements:
 //0: Min of type C_OSCNodeDataPoolContent encoded as string
@@ -257,11 +268,7 @@ const stw_types::sintn msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST = static_
 //2: Factor (float64) encoded as string
 //3: Offset (float64) encoded as string
 const stw_types::sintn msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST =
-   static_cast<stw_types::sintn>(Qt::UserRole) + 78;
-//Generic table interface: Strings for combo box (type: QStringList, default: none)
-const stw_types::sintn msn_USER_ROLE_INTERACTION_MULTI_SELECT_COMBO_BOX_STRINGS_LIST =
-   static_cast<stw_types::sintn>(Qt::UserRole) +
-   79;
+   static_cast<stw_types::sintn>(Qt::UserRole) + 80;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 

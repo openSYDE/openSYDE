@@ -153,7 +153,7 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
 
    C_OSCNodeDataPool::E_Type e_RestoredDataPoolType = C_OSCNodeDataPool::eDIAG;
    uint32 u32_RestoredDataPoolTypeIndex = 0UL;
-   const C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
    sint32 s32_Counter;
    bool q_RestoredDataPoolFound = false;
 
@@ -230,6 +230,7 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
    if (q_RestoredDataPoolFound == true)
    {
       this->m_EmitActualDataPool(e_RestoredDataPoolType, u32_RestoredDataPoolTypeIndex);
+      this->mapc_Selectors[this->me_ActiveDataPoolType]->SetSelectedDataPool(this->msn_ActiveDataPoolWidget);
    }
 }
 
@@ -321,6 +322,7 @@ void C_SdNdeDpViewWidget::NavigateToNextDataPool(const bool oq_Forwards)
       {
          this->SetActualDataPool(s32_NewDpIndex); // first: update internal indices
          this->m_EmitActualDataPool(this->me_ActiveDataPoolType, this->msn_ActiveDataPoolWidget);
+         this->mapc_Selectors[this->me_ActiveDataPoolType]->SetSelectedDataPool(this->msn_ActiveDataPoolWidget);
       }
    }
 }
@@ -340,6 +342,7 @@ void C_SdNdeDpViewWidget::SetNoActualDataPool(void)
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_UsageBar and the Qt memory management
 C_SdNdeDpViewWidget::~C_SdNdeDpViewWidget()
 {
    m_StoreToUserSettings();
@@ -482,7 +485,8 @@ void C_SdNdeDpViewWidget::m_DpUpdateUsageView(void)
          tgl_assert(pc_DevDef != NULL);
          if (pc_DevDef != NULL)
          {
-            QString c_LabelTooltip = QString("%1% ") + C_GtGetText::h_GetText("reserved by Datapools") + QString(
+            QString c_LabelTooltip = static_cast<QString>("%1% ") + C_GtGetText::h_GetText("reserved by Datapools") +
+                                     static_cast<QString>(
                " (%2 / %3)");
             // check all datapools of the lists
             for (u32_DpCounter = 0; u32_DpCounter < pc_Node->c_DataPools.size(); ++u32_DpCounter)
@@ -490,7 +494,7 @@ void C_SdNdeDpViewWidget::m_DpUpdateUsageView(void)
                if (pc_Node->c_DataPools[u32_DpCounter].e_Type == stw_opensyde_core::C_OSCNodeDataPool::eNVM)
                {
                   // save the name of the datapool
-                  c_VecDatapoolNames.push_back(QString(pc_Node->c_DataPools[u32_DpCounter].c_Name.c_str()));
+                  c_VecDatapoolNames.push_back(static_cast<QString>(pc_Node->c_DataPools[u32_DpCounter].c_Name.c_str()));
                   c_VecUsedSize.push_back(pc_Node->c_DataPools[u32_DpCounter].u32_NvMSize);
                   u32_SumNvmSize += pc_Node->c_DataPools[u32_DpCounter].u32_NvMSize;
                }

@@ -16,6 +16,7 @@
 #include "gitypes.h"
 #include "C_PuiSdUtil.h"
 #include "C_PuiSdHandler.h"
+#include "C_OSCUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -87,8 +88,8 @@ C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64
    if (this->mpc_TextElementName != NULL)
    {
       // initial values?
-      if ((this->mpc_TextElementName->pos().x() == 0.0) &&
-          (this->mpc_TextElementName->pos().y() == 0.0))
+      if ((C_OSCUtils::h_IsFloat64NearlyEqual(this->mpc_TextElementName->pos().x(), 0.0) == true) &&
+          (C_OSCUtils::h_IsFloat64NearlyEqual(this->mpc_TextElementName->pos().y(), 0.0) == true))
       {
          QPointF c_Pos = this->GetPos();
          // Add a little offset to the text element
@@ -114,7 +115,8 @@ C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiBus::~C_GiLiBus()
+C_GiLiBus::~C_GiLiBus() //lint -e{1540}  no memory leak because of the parent of mpc_TextElementName and the Qt memory
+                        // management
 {
    if (this->mpc_TextElementName != NULL)
    {
@@ -146,7 +148,7 @@ QString C_GiLiBus::GetName(void) const
    //Translation: Default bus name
    QString c_Name = C_GtGetText::h_GetText("Bus");
 
-   const stw_opensyde_core::C_OSCSystemBus * pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ms32_Index);
+   const stw_opensyde_core::C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ms32_Index);
 
    if (pc_Bus != NULL)
    {
@@ -168,7 +170,7 @@ QString C_GiLiBus::GetName(void) const
 QString C_GiLiBus::GetBitrate(const bool oq_WithComma) const
 {
    QString c_Bitrate = "";
-   const stw_opensyde_core::C_OSCSystemBus * pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ms32_Index);
+   const stw_opensyde_core::C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ms32_Index);
 
    if ((pc_Bus != NULL) &&
        (pc_Bus->e_Type == C_OSCSystemBus::eCAN))
@@ -200,7 +202,7 @@ void C_GiLiBus::LoadData(void)
    //Object name for test
    if (pc_OSCBus != NULL)
    {
-      this->setObjectName(QString("Bus: %1").arg(pc_OSCBus->c_Name.c_str()));
+      this->setObjectName(static_cast<QString>("Bus: %1").arg(pc_OSCBus->c_Name.c_str()));
    }
 }
 
@@ -241,7 +243,7 @@ void C_GiLiBus::GenerateHint(void)
    bool q_Entry = false;
    QString c_ToolTip;
    const uint32 u32_BusIndex = static_cast<uint32>(this->GetIndex());
-   const C_OSCSystemBus * pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_BusIndex);
+   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_BusIndex);
 
    //Translation: 1 = Bus name
    //title
@@ -256,12 +258,12 @@ void C_GiLiBus::GenerateHint(void)
 
    if (pc_Bus != NULL)
    {
-      c_ToolTip.append(QString("Bus ID: %1").arg(QString::number(pc_Bus->u8_BusID)));
+      c_ToolTip.append(static_cast<QString>("Bus ID: %1").arg(QString::number(pc_Bus->u8_BusID)));
 
       if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
       {
-         c_ToolTip.append(QString("\nBitrate: %1 kbit/s").arg(QString::number(pc_Bus->u64_BitRate /
-                                                                              static_cast<uint64>(1000))));
+         c_ToolTip.append(static_cast<QString>("\nBitrate: %1 kbit/s").arg(QString::number(pc_Bus->u64_BitRate /
+                                                                                           static_cast<uint64>(1000))));
       }
    }
 
@@ -269,7 +271,7 @@ void C_GiLiBus::GenerateHint(void)
 
    for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
    {
-      const C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
 
       if (pc_Node != NULL)
       {
@@ -284,7 +286,7 @@ void C_GiLiBus::GenerateHint(void)
                {
                   //Translation: 1 = Bus name, 2 = Interface, 3 = Node ID
                   c_ToolTip.append("\n");
-                  c_ToolTip.append(QString(C_GtGetText::h_GetText("%1 (Interface: %2, Node ID: %3)")).
+                  c_ToolTip.append(static_cast<QString>(C_GtGetText::h_GetText("%1 (Interface: %2, Node ID: %3)")).
                                    arg(pc_Node->c_Properties.c_Name.c_str(), //Node
                                        C_PuiSdUtil::h_GetInterfaceName(rc_ComInterface.e_InterfaceType,
                                                                        rc_ComInterface.u8_InterfaceNumber), //Interface
@@ -299,7 +301,7 @@ void C_GiLiBus::GenerateHint(void)
    if (q_Entry == false)
    {
       //Translation: No bus interface connected
-      c_ToolTip.append(QString(C_GtGetText::h_GetText("\n-")));
+      c_ToolTip.append(static_cast<QString>(C_GtGetText::h_GetText("\n-")));
    }
 
    this->SetDefaultToolTipContent(c_ToolTip);
@@ -315,7 +317,7 @@ void C_GiLiBus::GenerateHint(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_GiLiBus * const pc_Item = dynamic_cast<const C_GiLiBus * const>(opc_GuidelineItem);
 
    if (pc_Item != NULL)

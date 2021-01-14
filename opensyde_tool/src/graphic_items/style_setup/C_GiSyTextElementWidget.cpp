@@ -65,7 +65,7 @@ C_GiSyTextElementWidget::C_GiSyTextElementWidget(C_GiSyBaseWidget & orc_Parent) 
    mpc_Ui->setupUi(this);
 
    //font color
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    this->mpc_LabelColorFont = new QLabel(dynamic_cast<QWidget *>(this->mpc_Ui->pc_BushButtonFontColor->parent()));
    this->mpc_LabelColorFont->setPixmap(c_Pic);
    this->mpc_LabelColorFont->lower();
@@ -231,8 +231,7 @@ void C_GiSyTextElementWidget::m_UpdatePreview(void)
    // add item
    this->mpc_ParentDialog->GetPreviewScene()->addItem(pc_Item);
    this->mpc_ParentDialog->GetPreviewScene()->clearSelection();
-   //lint -e{429}  no memory leak because of adding the item to the scene and the Qt memory management
-}
+} //lint !e429  //no memory leak because of adding the item to the scene and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of inner color button
@@ -273,8 +272,7 @@ void C_GiSyTextElementWidget::m_FontColorClicked(void)
    {
       c_Popup->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle font change

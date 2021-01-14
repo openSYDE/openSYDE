@@ -536,10 +536,10 @@ stw_types::sint32 C_UsSystemView::GetDashboardSelectedTabIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard selected tab index
 
-   \param[in]  orc_Value   New dashboard selected tab index
+   \param[in]  os32_Value   New dashboard selected tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemView::SetDashboardSelectedTabIndex(const stw_types::sint32 & orc_Value)
+void C_UsSystemView::SetDashboardSelectedTabIndex(const stw_types::sint32 os32_Value)
 {
-   this->ms32_DashboardSelectedTabIndex = orc_Value;
+   this->ms32_DashboardSelectedTabIndex = os32_Value;
 }

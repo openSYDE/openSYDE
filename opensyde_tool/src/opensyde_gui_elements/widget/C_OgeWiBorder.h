@@ -31,10 +31,7 @@ public:
    explicit C_OgeWiBorder(QWidget * const opc_Parent = NULL);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
-   //lint -restore
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

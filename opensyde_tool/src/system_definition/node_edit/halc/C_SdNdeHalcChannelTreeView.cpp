@@ -47,7 +47,8 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeHalcChannelTreeView::C_SdNdeHalcChannelTreeView(QWidget * const opc_Parent) :
    C_OgeTreeViewToolTipBase(opc_Parent),
-   mpc_ContextMenu(new C_OgeContextMenu)
+   mpc_ContextMenu(new C_OgeContextMenu),
+   mpc_CopyAction(NULL)
 {
    this->setModel(&this->mc_Model);
    this->setItemDelegate(&this->mc_Delegate);
@@ -67,6 +68,7 @@ C_SdNdeHalcChannelTreeView::C_SdNdeHalcChannelTreeView(QWidget * const opc_Paren
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of all elements and the Qt memory management
 C_SdNdeHalcChannelTreeView::~C_SdNdeHalcChannelTreeView()
 {
    delete this->mpc_ContextMenu;
@@ -273,8 +275,8 @@ void C_SdNdeHalcChannelTreeView::m_SetupContextMenu(void)
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Collapse all"), this,
                                     &C_SdNdeHalcChannelTreeView::collapseAll);
    this->mpc_ContextMenu->addSeparator();
-   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Copy Configuration"),
-                                    this, &C_SdNdeHalcChannelTreeView::m_OnCopy);
+   this->mpc_CopyAction = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Copy Configuration"),
+                                                           this, &C_SdNdeHalcChannelTreeView::m_OnCopy);
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Apply Configuration"),
                                     this, &C_SdNdeHalcChannelTreeView::m_OnPaste);
    this->mpc_ContextMenu->addSeparator();
@@ -294,6 +296,20 @@ void C_SdNdeHalcChannelTreeView::m_OnCustomContextMenuRequested(const QPoint & o
    {
       QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
 
+      // disable copy action if multiple indices are selected
+      if (this->mpc_CopyAction != NULL)
+      {
+         if (this->selectedIndexes().size() > 1)
+         {
+            this->mpc_CopyAction->setEnabled(false);
+         }
+         else
+         {
+            this->mpc_CopyAction->setEnabled(true);
+         }
+      }
+
+      // popup
       this->mpc_ContextMenu->popup(c_PosGlobal);
    }
 }
@@ -329,7 +345,8 @@ void C_SdNdeHalcChannelTreeView::m_OnReset(void)
 
    c_Message.SetHeading(C_GtGetText::h_GetText("Reset configuration"));
    c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to reset the selected channel(s) to their "
-                                                   "default configuration and lose your current settings?"));
+                                                   "default configuration and lose your current settings? For linked "
+                                                   "channel(s) the use case will be reset to default."));
    c_Message.SetOKButtonText(C_GtGetText::h_GetText("Reset"));
    c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
    if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)

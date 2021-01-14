@@ -164,8 +164,7 @@ void C_SyvDaPeUpdateModeTreeWidget::Init(const uint32 ou32_ViewIndex)
 
                //Insert table
                this->setItemWidget(pc_ViewItem, 0, pc_Table);
-               //lint -e{429} Cleaned up via Qt parent mechanism
-            }
+            }  //lint !e429  //Cleaned up via Qt parent mechanism
          }
       }
       //Final step
@@ -202,7 +201,7 @@ void C_SyvDaPeUpdateModeTreeWidget::Select(const C_PuiSvDbNodeDataPoolListElemen
                      QTreeWidgetItem * const pc_ViewItem = pc_TopLevelItem->child(0);
                      if (pc_ViewItem != NULL)
                      {
-                        //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                         C_SyvDaPeUpdateModeTableView * const pc_Table =
                            dynamic_cast<C_SyvDaPeUpdateModeTableView * const>(this->itemWidget(pc_ViewItem, 0));
                         if (pc_Table != NULL)
@@ -288,7 +287,7 @@ void C_SyvDaPeUpdateModeTreeWidget::m_OnExpandRequested(QTreeWidgetItem * const 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_SyvDaPeUpdateModeNodeHeader * const pc_Widget =
       dynamic_cast<C_SyvDaPeUpdateModeNodeHeader * const>(this->indexWidget(orc_Index));
 
@@ -306,7 +305,7 @@ void C_SyvDaPeUpdateModeTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::m_OnExpand(const QModelIndex & orc_Index) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_SyvDaPeUpdateModeNodeHeader * const pc_Widget =
       dynamic_cast<C_SyvDaPeUpdateModeNodeHeader * const>(this->indexWidget(orc_Index));
 

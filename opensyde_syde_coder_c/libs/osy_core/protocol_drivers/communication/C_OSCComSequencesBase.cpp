@@ -94,7 +94,6 @@ C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
                  No STW flashloader devices and no openSYDE devices are active
                  No STW flashloader devices on active bus and no openSYDE devices are active, but STW flashloader on
                      other busses are active
-   C_RD_WR       Configured communication DLL does not exist
    C_OVERFLOW    Unknown transport protocol or unknown diagnostic server for at least one node
    C_NOACT       No active nodes
    C_COM         CAN initialization failed or no route found for at least one node

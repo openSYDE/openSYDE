@@ -115,49 +115,49 @@ const C_SCLString & C_OSCLoggingHandler::h_GetCompleteLogFileLocation(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write info message to log
 
-   \param[in] orc_Activity Current activity
-   \param[in] orc_Message  Message to write (No '\n' necessary)
-   \param[in] opc_Class    Current class
-   \param[in] opc_Function Current function
+   \param[in] orc_Activity  Current activity
+   \param[in] orc_Message   Message to write (No '\n' necessary)
+   \param[in] opcn_Class    Current class
+   \param[in] opcn_Function Current function
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_WriteLogInfo(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
-                                         const stw_types::charn * const opc_Class,
-                                         const stw_types::charn * const opc_Function)
+                                         const stw_types::charn * const opcn_Class,
+                                         const stw_types::charn * const opcn_Function)
 {
-   C_OSCLoggingHandler::mh_WriteLog("INFO", orc_Activity, orc_Message, opc_Class, opc_Function);
+   C_OSCLoggingHandler::mh_WriteLog("INFO", orc_Activity, orc_Message, opcn_Class, opcn_Function);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write warning message to log
 
-   \param[in] orc_Activity Current activity
-   \param[in] orc_Message  Message to write (No '\n' necessary)
-   \param[in] opc_Class    Current class
-   \param[in] opc_Function Current function
+   \param[in] orc_Activity  Current activity
+   \param[in] orc_Message   Message to write (No '\n' necessary)
+   \param[in] opcn_Class    Current class
+   \param[in] opcn_Function Current function
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_WriteLogWarning(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
-                                            const stw_types::charn * const opc_Class,
-                                            const stw_types::charn * const opc_Function)
+                                            const stw_types::charn * const opcn_Class,
+                                            const stw_types::charn * const opcn_Function)
 {
-   C_OSCLoggingHandler::mh_WriteLog("WARNING", orc_Activity, orc_Message, opc_Class, opc_Function);
+   C_OSCLoggingHandler::mh_WriteLog("WARNING", orc_Activity, orc_Message, opcn_Class, opcn_Function);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write error message to log
 
-   \param[in] orc_Activity Current activity
-   \param[in] orc_Message  Message to write (No '\n' necessary)
-   \param[in] opc_Class    Current class
-   \param[in] opc_Function Current function
+   \param[in] orc_Activity  Current activity
+   \param[in] orc_Message   Message to write (No '\n' necessary)
+   \param[in] opcn_Class    Current class
+   \param[in] opcn_Function Current function
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_WriteLogError(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
-                                          const stw_types::charn * const opc_Class,
-                                          const stw_types::charn * const opc_Function)
+                                          const stw_types::charn * const opcn_Class,
+                                          const stw_types::charn * const opcn_Function)
 {
-   C_OSCLoggingHandler::mh_WriteLog("ERROR", orc_Activity, orc_Message, opc_Class, opc_Function);
+   C_OSCLoggingHandler::mh_WriteLog("ERROR", orc_Activity, orc_Message, opcn_Class, opcn_Function);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,14 +165,14 @@ void C_OSCLoggingHandler::h_WriteLogError(const C_SCLString & orc_Activity, cons
 
    Previous call of C_OSCLoggingHandler::h_StartPerformanceTimer() is mandatory ("tik and tok").
 
-   \param[in] ou16_TimerId Timer ID returned by previous call of C_OSCLoggingHandler::h_StartPerformanceTimer()
-   \param[in] orc_Message  Message to write (No '\n' necessary)
-   \param[in] opc_Class    Current class
-   \param[in] opc_Function Current function
+   \param[in] ou16_TimerId  Timer ID returned by previous call of C_OSCLoggingHandler::h_StartPerformanceTimer()
+   \param[in] orc_Message   Message to write (No '\n' necessary)
+   \param[in] opcn_Class    Current class
+   \param[in] opcn_Function Current function
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_WriteLogPerformance(const uint16 ou16_TimerId, const C_SCLString & orc_Message,
-                                                const charn * const opc_Class, const charn * const opc_Function)
+                                                const charn * const opcn_Class, const charn * const opcn_Function)
 {
    if (mhq_MeasureTime == true)
    {
@@ -182,7 +182,7 @@ void C_OSCLoggingHandler::h_WriteLogPerformance(const uint16 ou16_TimerId, const
          C_OSCLoggingHandler::mh_WriteLog(
             "INFO", "Performance measurement",
             orc_Message + " time: " + C_SCLString::IntToStr(stw_tgl::TGL_GetTickCount() - c_StartTime->second) + " ms",
-            opc_Class, opc_Function);
+            opcn_Class, opcn_Function);
 
          // update log file
          C_OSCLoggingHandler::h_Flush();
@@ -202,7 +202,7 @@ void C_OSCLoggingHandler::h_WriteLogPerformance(const uint16 ou16_TimerId, const
 //----------------------------------------------------------------------------------------------------------------------
 uint16 C_OSCLoggingHandler::h_StartPerformanceTimer(void)
 {
-   uint16 u16_Id = static_cast<uint16>(rand());
+   const uint16 u16_Id = static_cast<uint16>(rand());
 
    mhc_StartTimes[u16_Id] = stw_tgl::TGL_GetTickCount();
 
@@ -323,17 +323,17 @@ std::string C_OSCLoggingHandler::h_UtilConvertDateTimeToString(const C_TGLDateTi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write message to log
 
-   \param[in] oe_Type      Message type (maximum 7 characters)
-   \param[in] orc_Activity Current activity (maximum 26 characters)
-   \param[in] orc_Message  Message to write
-   \param[in] opc_Class    Current class (combined with function: maximum 50 characters)
-                           May be file path string which is reduced to file base name automatically
-   \param[in] opc_Function Current function (combined with function: maximum 50 characters)
+   \param[in] oe_Type       Message type (maximum 7 characters)
+   \param[in] orc_Activity  Current activity (maximum 26 characters)
+   \param[in] orc_Message   Message to write
+   \param[in] opcn_Class    Current class (combined with function: maximum 50 characters)
+                            May be file path string which is reduced to file base name automatically
+   \param[in] opcn_Function Current function (combined with function: maximum 50 characters)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::mh_WriteLog(const C_SCLString & orc_Type, const C_SCLString & orc_Activity,
-                                      const C_SCLString & orc_Message, const stw_types::charn * const opc_Class,
-                                      const stw_types::charn * const opc_Function)
+                                      const C_SCLString & orc_Message, const stw_types::charn * const opcn_Class,
+                                      const stw_types::charn * const opcn_Function)
 {
    std::string c_DateTimeFormatted;
    C_TGLDateTime c_DateTime;
@@ -341,17 +341,17 @@ void C_OSCLoggingHandler::mh_WriteLog(const C_SCLString & orc_Type, const C_SCLS
    C_SCLString c_Class;
    C_SCLString c_Function;
    C_SCLString c_CombinedClassAndFunction;
-   if (opc_Class != NULL)
+   if (opcn_Class != NULL)
    {
-      c_Class = TGL_ChangeFileExtension(TGL_ExtractFileName(opc_Class), "");
+      c_Class = TGL_ChangeFileExtension(TGL_ExtractFileName(opcn_Class), "");
    }
    else
    {
       c_Class = "UNKNOWN_CLASS";
    }
-   if (opc_Function != NULL)
+   if (opcn_Function != NULL)
    {
-      c_Function = opc_Function;
+      c_Function = opcn_Function;
    }
    else
    {

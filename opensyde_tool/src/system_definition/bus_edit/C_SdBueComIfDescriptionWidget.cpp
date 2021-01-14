@@ -198,19 +198,21 @@ void C_SdBueComIfDescriptionWidget::InitStaticNames(void) const
    // tooltip Layer 2
    c_Protocol = C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eLAYER2);
    this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(
-      0, c_Protocol, QString(C_GtGetText::h_GetText("Edit Messages and Signals of protocol type %1.")).arg(c_Protocol));
+      0, c_Protocol,
+      static_cast<QString>(C_GtGetText::h_GetText("Edit Messages and Signals of protocol type %1.")).arg(c_Protocol));
 
    // tooltip ECeS
    c_Protocol = C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eECES);
    this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(
-      1, c_Protocol, QString(C_GtGetText::h_GetText("Edit Messages and Signals of protocol type %1 "
-                                                    "(ESX CAN efficient safety protocol).")).arg(c_Protocol));
+      1, c_Protocol, static_cast<QString>(C_GtGetText::h_GetText("Edit Messages and Signals of protocol type %1 "
+                                                                 "(ESX CAN efficient safety protocol).")).arg(
+         c_Protocol));
 
    // tooltip ECoS
    c_Protocol = C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eCAN_OPEN_SAFETY);
    this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(
-      2, c_Protocol, QString(C_GtGetText::h_GetText("Edit Messages and Signals of protocol type %1 "
-                                                    "(ESX CANopen safety protocol).")).arg(c_Protocol));
+      2, c_Protocol, static_cast<QString>(C_GtGetText::h_GetText("Edit Messages and Signals of protocol type %1 "
+                                                                 "(ESX CANopen safety protocol).")).arg(c_Protocol));
 
    this->mpc_Ui->pc_InterfaceSelectorTitleLabel->setText(C_GtGetText::h_GetText("Node Interface"));
 
@@ -444,7 +446,10 @@ void C_SdBueComIfDescriptionWidget::SetBusId(const uint32 ou32_BusIndex)
 void C_SdBueComIfDescriptionWidget::SetInitialFocus(void) const
 {
    //handle initial focus
+   // Leaving the line edit with default focus or other element can cause unwanted change handling
+   this->mpc_Ui->pc_MsgSigEditWidget->DisconnectAllChanges();
    this->mpc_Ui->pc_MessageSelectorWidget->SetInitialFocus();
+   this->mpc_Ui->pc_MsgSigEditWidget->ConnectAllChanges();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -632,7 +637,7 @@ void C_SdBueComIfDescriptionWidget::ImportMessages(void)
    std::vector<uint32> c_InterfaceIndexes;
    const C_OSCCanProtocol::E_Type e_Protocol = this->GetActProtocol();
 
-   sint32 s32_Return =
+   const sint32 s32_Return =
       C_CieUtil::h_ImportFile(this->mu32_BusIndex, e_Protocol, this, c_NodeIndexes, c_InterfaceIndexes);
 
    if (s32_Return == C_NO_ERR)
@@ -736,7 +741,7 @@ void C_SdBueComIfDescriptionWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent
       }
    }
 
-   if (opc_KeyEvent->key() == Qt::Key_F5)
+   if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F5))
    {
       this->mpc_Ui->pc_MsgSigEditWidget->RefreshColors();
    }
@@ -1653,7 +1658,8 @@ void C_SdBueComIfDescriptionWidget::m_UpdateText(void)
    {
       if (this->mq_ModeSingleNode == true)
       {
-         if (this->mq_LinkOnly == false)
+         if ((this->mq_LinkOnly == false) &&
+             (this->mc_ProtocolUsedOnBus[u32_ProtocolCounter][this->mu32_InterfaceIndex] == false))
          {
             this->mc_MessageCount[u32_ProtocolCounter][this->mu32_InterfaceIndex] =
                this->mc_MessageSyncManager.GetUniqueMessageCount(
@@ -1888,8 +1894,8 @@ void C_SdBueComIfDescriptionWidget::m_GetNodeMessageAndSignalCount(const C_OSCCa
                   const C_OSCCanMessageContainer & rc_MessageContainer =
                      pc_Protocol->c_ComMessages[ou32_InterfaceIndex];
 
-                  oru32_MessageCount += rc_MessageContainer.c_RxMessages.size() +
-                                        rc_MessageContainer.c_TxMessages.size();
+                  oru32_MessageCount += static_cast<uint32>(rc_MessageContainer.c_RxMessages.size() +
+                                                            rc_MessageContainer.c_TxMessages.size());
                   oru32_SignalCount += u32_SignalSize1 + u32_SignalSize2;
                }
             }

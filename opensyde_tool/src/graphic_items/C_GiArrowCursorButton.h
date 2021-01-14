@@ -46,10 +46,7 @@ Q_SIGNALS:
    void StartConnector(const QPointF & orc_LineStart, const QPointF & orc_SceneTriggerPos);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    const C_GiNode * mpc_ConnectedNode; ///< Node this arrow cursor is currently attached to

@@ -38,7 +38,7 @@ public:
    static C_PuiProject * h_GetInstance(void);
    static void h_Destroy(void);
    static stw_types::uint64 h_GetProjectSize(const QString & orc_ProjectPath);
-   stw_types::sint32 LoadInitialProject(stw_types::uint16 * const opu16_FileVersion, QString & rc_LoadedProject);
+   stw_types::sint32 LoadInitialProject(stw_types::uint16 * const opu16_FileVersion, QString & orc_LoadedProject);
    void LoadEmpty(void);
    bool IsEmptyProject(void) const;
    static void h_HandlePendingEvents(void);

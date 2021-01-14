@@ -94,13 +94,10 @@ private:
    C_OgeWiHover & operator =(const C_OgeWiHover &);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
    virtual void mouseMoveEvent(QMouseEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QMouseEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
-   //lint -restore
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

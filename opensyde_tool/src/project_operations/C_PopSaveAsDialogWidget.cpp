@@ -190,7 +190,7 @@ void C_PopSaveAsDialogWidget::m_InitDefaultProjectName(void) const
    }
    else
    {
-      c_Proposal = QString("Copy_of_%1").arg(C_PuiProject::h_GetInstance()->GetName());
+      c_Proposal = static_cast<QString>("Copy_of_%1").arg(C_PuiProject::h_GetInstance()->GetName());
    }
    this->mpc_Ui->pc_LineEditName->setText(c_Proposal);
 }
@@ -215,7 +215,7 @@ sint32 C_PopSaveAsDialogWidget::m_SaveToFile(const QString & orc_File, const boo
    // try to save and return errors else
    C_PuiProject::h_GetInstance()->SetPath(orc_File);
    s32_Return = C_PuiProject::h_GetInstance()->Save(true, oq_UseDeprecatedFileFormatV2);
-   C_PopErrorHandling::mh_ProjectSaveErr(s32_Return, this->parentWidget());
+   C_PopErrorHandling::h_ProjectSaveErr(s32_Return, this->parentWidget());
 
    //Only use new path if not saved in deprecated format
    if ((s32_Return == C_NO_ERR) && (oq_UseDeprecatedFileFormatV2 == false))

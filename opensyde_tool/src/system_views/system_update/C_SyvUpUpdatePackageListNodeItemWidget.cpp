@@ -712,7 +712,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::m_UpdateAbsolutePath(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::m_UpdateTitle(void)
 {
-   this->mc_Title = QString("#%1 - %2").arg(QString::number(this->mu32_Number + 1U),
+   this->mc_Title = static_cast<QString>("#%1 - %2").arg(QString::number(this->mu32_Number + 1U),
                                             this->mc_Name);
 
    this->mpc_Ui->pc_LabelTitle->setText(C_Uti::h_AdaptStringToSize(this->mc_Title,

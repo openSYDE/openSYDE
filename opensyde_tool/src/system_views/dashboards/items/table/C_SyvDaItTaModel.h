@@ -49,16 +49,12 @@ public:
    void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
    void GetUniqueRows(const QModelIndexList & orc_Indices, std::vector<stw_types::uint32> & orc_ItemIndices) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation, const stw_types::sintn osn_Role =
                                   static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
    virtual stw_types::sintn columnCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
    virtual QVariant data(const QModelIndex & orc_Index, const stw_types::sintn osn_Role =
                             static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
-   //lint -restore
 
    //Common interface
    virtual void CopySelectedItems(const std::vector<stw_types::uint32> & orc_SelectedIndices) const override;
@@ -115,8 +111,8 @@ private:
       const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId);
    stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId m_RemoveItem(const stw_types::uint32 ou32_Index,
                                                                            std::vector<C_PuiSvDbNodeDataElementConfig> & orc_AdaptedItems);
-   stw_types::float32 GetPercentage(const stw_types::uint32 ou32_Index) const;
-   QString GetValue(const stw_types::uint32 ou32_Index) const;
+   stw_types::float32 m_GetPercentage(const stw_types::uint32 ou32_Index) const;
+   QString m_GetValue(const stw_types::uint32 ou32_Index) const;
    static std::vector<stw_types::uint32> mh_GetSelectedRows(const QModelIndexList & orc_Indices);
 };
 

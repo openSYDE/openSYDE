@@ -115,7 +115,7 @@ C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64 & oru64_ID, const float64 
    }
 
    //Mouse cursor
-   this->mc_DefaultCursor = QCursor(Qt::SizeAllCursor);
+   this->mc_DefaultCursor = static_cast<QCursor>(Qt::SizeAllCursor);
    this->RestoreDefaultCursor();
 }
 
@@ -182,18 +182,18 @@ void C_GiBiRectBaseGroup::m_InitActionPoints()
    this->m_UpdateActionPoints();
 
    // set the cursor of all interaction points
-   this->mc_ActionPoints[msn_IndexTopLeft]->setCursor(QCursor(Qt::SizeFDiagCursor));
-   this->mc_ActionPoints[msn_IndexTopRight]->setCursor(QCursor(Qt::SizeBDiagCursor));
+   this->mc_ActionPoints[msn_IndexTopLeft]->setCursor(static_cast<QCursor>(Qt::SizeFDiagCursor));
+   this->mc_ActionPoints[msn_IndexTopRight]->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
 
-   this->mc_ActionPoints[msn_IndexBottomLeft]->setCursor(QCursor(Qt::SizeBDiagCursor));
-   this->mc_ActionPoints[msn_IndexBottomRight]->setCursor(QCursor(Qt::SizeFDiagCursor));
+   this->mc_ActionPoints[msn_IndexBottomLeft]->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
+   this->mc_ActionPoints[msn_IndexBottomRight]->setCursor(static_cast<QCursor>(Qt::SizeFDiagCursor));
 
    if (this->mq_KeepAspectRatio == false)
    {
-      this->mc_ActionPoints[msn_IndexTop]->setCursor(QCursor(Qt::SizeVerCursor));
-      this->mc_ActionPoints[msn_IndexBottom]->setCursor(QCursor(Qt::SizeVerCursor));
-      this->mc_ActionPoints[msn_IndexLeft]->setCursor(QCursor(Qt::SizeHorCursor));
-      this->mc_ActionPoints[msn_IndexRight]->setCursor(QCursor(Qt::SizeHorCursor));
+      this->mc_ActionPoints[msn_IndexTop]->setCursor(static_cast<QCursor>(Qt::SizeVerCursor));
+      this->mc_ActionPoints[msn_IndexBottom]->setCursor(static_cast<QCursor>(Qt::SizeVerCursor));
+      this->mc_ActionPoints[msn_IndexLeft]->setCursor(static_cast<QCursor>(Qt::SizeHorCursor));
+      this->mc_ActionPoints[msn_IndexRight]->setCursor(static_cast<QCursor>(Qt::SizeHorCursor));
    }
 
    // configure the points
@@ -340,9 +340,9 @@ float64 C_GiBiRectBaseGroup::m_GetInteractionPointSceneWidth(void) const
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_BiggestSubItem and the Qt memory management
 C_GiBiRectBaseGroup::~C_GiBiRectBaseGroup()
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_BiggestSubItem and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -642,7 +642,7 @@ QVariant C_GiBiRectBaseGroup::itemChange(const GraphicsItemChange oe_Change, con
 
    c_Return = QGraphicsItemGroup::itemChange(oe_Change, c_Return);
 
-   switch (oe_Change)
+   switch (oe_Change) //lint !e788 //All other cases handled by call of parent
    {
    case ItemSelectedHasChanged:
       if (orc_Value == false)
@@ -688,7 +688,7 @@ QVariant C_GiBiRectBaseGroup::itemChange(const GraphicsItemChange oe_Change, con
       break;
    default:
       break;
-   } //lint !e788 //All other cases handled by call of parent
+   }
 
    return c_Return;
 }
@@ -707,7 +707,7 @@ void C_GiBiRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_E
        (this->mq_ResizingActive == true) &&
        (this->mq_BlockMoveAndResize == false))
    {
-      QPointF c_Pos = opc_Event->scenePos();
+      const QPointF c_Pos = opc_Event->scenePos();
 
       if (this->mc_ActionPoints[msn_IndexBottomRight]->IsPointInside(c_Pos) == true)
       {
@@ -928,10 +928,9 @@ bool C_GiBiRectBaseGroup::sceneEventFilter(QGraphicsItem * const opc_Watched, QE
 
    if (opc_Watched->type() == msn_GRAPHICS_ITEM_POINTINTERACTION)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      QGraphicsSceneMouseEvent * pc_MouseEvent = dynamic_cast<QGraphicsSceneMouseEvent *>(opc_Event);
+      QGraphicsSceneMouseEvent * const pc_MouseEvent = dynamic_cast<QGraphicsSceneMouseEvent *>(opc_Event);
 
-      switch (opc_Event->type())
+      switch (opc_Event->type()) //lint !e788  //not all enum constants are necessary here
       {
       case QEvent::GraphicsSceneMousePress:
          this->mousePressEvent(pc_MouseEvent);
@@ -947,7 +946,6 @@ bool C_GiBiRectBaseGroup::sceneEventFilter(QGraphicsItem * const opc_Watched, QE
 
       default:
          break;
-         //lint -e{788}  not all enum constants are necessary here
       }
    }
    else

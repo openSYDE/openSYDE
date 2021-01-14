@@ -12,6 +12,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "CSCLChecksums.h"
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -47,13 +48,13 @@ C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in] orc_Base                   Standard node data pool list element identification indices
-   \param[in] oe_Type                    Enum to denote the source type
-   \param[in] oq_UseArrayElementIndex    Flag to use array element index
-   \param[in] ou32_ArrayElementIndex     Array element index
-   \param[in] oq_IsValid                 Invalid flag
-   \param[in] oe_InvalidTypePlaceholder  Type placeholder to be used in case of invalid state
-   \param[in] orc_InvalidNamePlaceholder Name placeholder to be used in case of invalid state
+   \param[in]  orc_Base                      Standard node data pool list element identification indices
+   \param[in]  oe_Type                       Enum to denote the source type
+   \param[in]  oq_UseArrayElementIndex       Flag to use array element index
+   \param[in]  ou32_ArrayElementIndex        Array element index
+   \param[in]  oq_IsValid                    Invalid flag
+   \param[in]  oe_InvalidTypePlaceholder     Type placeholder to be used in case of invalid state
+   \param[in]  orc_InvalidNamePlaceholder    Name placeholder to be used in case of invalid state
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const C_OSCNodeDataPoolListElementId & orc_Base,
@@ -77,16 +78,16 @@ C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const C_O
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in] ou32_NodeIndex             Node index
-   \param[in] ou32_DataPoolIndex         Data pool index
-   \param[in] ou32_ListIndex             List index
-   \param[in] ou32_ElementIndex          Element index
-   \param[in] oe_Type                    Enum to denote the source type
-   \param[in] oq_UseArrayElementIndex    Flag to use array element index
-   \param[in] ou32_ArrayElementIndex     Array element index
-   \param[in] oq_IsValid                 Invalid flag
-   \param[in] oe_InvalidTypePlaceholder  Type placeholder to be used in case of invalid state
-   \param[in] orc_InvalidNamePlaceholder Name placeholder to be used in case of invalid state
+   \param[in]  ou32_NodeIndex                Node index
+   \param[in]  ou32_DataPoolIndex            Data pool index
+   \param[in]  ou32_ListIndex                List index
+   \param[in]  ou32_ElementIndex             Element index
+   \param[in]  oe_Type                       Enum to denote the source type
+   \param[in]  oq_UseArrayElementIndex       Flag to use array element index
+   \param[in]  ou32_ArrayElementIndex        Array element index
+   \param[in]  oq_IsValid                    Invalid flag
+   \param[in]  oe_InvalidTypePlaceholder     Type placeholder to be used in case of invalid state
+   \param[in]  orc_InvalidNamePlaceholder    Name placeholder to be used in case of invalid state
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const stw_types::uint32 ou32_NodeIndex,
@@ -112,7 +113,7 @@ C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const stw
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Less operator.
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    True  Current smaller than orc_Cmp
@@ -122,7 +123,6 @@ C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const stw
 bool C_PuiSvDbNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & orc_Cmp) const
 {
    bool q_Retval;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_PuiSvDbNodeDataPoolListElementId * const pc_NonBase =
       dynamic_cast<const C_PuiSvDbNodeDataPoolListElementId *>(&orc_Cmp);
 
@@ -167,7 +167,14 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & 
                   }
                   else if (this->mu32_ArrayElementIndex == pc_NonBase->GetArrayElementIndex())
                   {
-                     q_Retval = C_OSCNodeDataPoolListElementId::operator <(orc_Cmp);
+                     if (this->mc_HalChannelName == pc_NonBase->GetHalChannelName())
+                     {
+                        q_Retval = C_OSCNodeDataPoolListElementId::operator <(orc_Cmp);
+                     }
+                     else
+                     {
+                        q_Retval = this->mc_HalChannelName < pc_NonBase->GetHalChannelName();
+                     }
                   }
                   else
                   {
@@ -202,7 +209,7 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Equal operator.
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    True  Current equal to orc_Cmp
@@ -215,13 +222,14 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator ==(const C_OSCNodeDataPoolId &
 
    if (q_Retval == true)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_PuiSvDbNodeDataPoolListElementId * const pc_NonBase =
          dynamic_cast<const C_PuiSvDbNodeDataPoolListElementId *>(&orc_Cmp);
 
       //Not current class, assume base comparison is correct
       if (pc_NonBase != NULL)
       {
+         q_Retval = false;
+
          // In case of a false valid flag, we can not trust the indices
          if (((this->mq_IsValid == pc_NonBase->mq_IsValid) &&
               (this->mq_IsValid == true) &&
@@ -233,7 +241,10 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator ==(const C_OSCNodeDataPoolId &
             {
                if (this->mu32_ArrayElementIndex == pc_NonBase->GetArrayElementIndex())
                {
-                  q_Retval = true;
+                  if (this->mc_HalChannelName == pc_NonBase->GetHalChannelName())
+                  {
+                     q_Retval = true;
+                  }
                }
             }
             else
@@ -250,7 +261,27 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator ==(const C_OSCNodeDataPoolId &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if both elements use the same data element ID as a base
 
-   \param[in] orc_OtherId Compared instance
+   Array index is will not be checked in this function. Only base information is used for comparison.
+
+   \param[in]  orc_OtherId    Compared instance
+
+   \return
+   True  Current base data element ID equal to orc_OtherId
+   False Else
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbNodeDataPoolListElementId::CheckSameDataElement(const C_OSCNodeDataPoolListElementId & orc_OtherId)
+const
+{
+   return C_OSCNodeDataPoolListElementId::operator ==(orc_OtherId);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if both elements use the same data element ID as a base
+
+   Array index is will not be checked in this function. Only base information is used for comparison.
+
+   \param[in]  orc_OtherId    Compared instance
 
    \return
    True  Current base data element ID equal to orc_OtherId
@@ -294,19 +325,27 @@ const
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbNodeDataPoolListElementId::CalcHash(stw_types::uint32 & oru32_HashValue) const
 {
    C_OSCNodeDataPoolListElementId::CalcHash(oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_Type, sizeof(this->me_Type), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_UseArrayElementIndex, sizeof(this->mq_UseArrayElementIndex),
+                                      oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mu32_ArrayElementIndex, sizeof(this->mu32_ArrayElementIndex),
+                                      oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_IsValid, sizeof(this->mq_IsValid), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(this->mc_HalChannelName.toStdString().c_str(),
+                                      this->mc_HalChannelName.length(), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Mark element as invalid
 
-   \param[in] oe_InvalidTypePlaceholder New invalid type placeholder
-   \param[in] orc_InvalidName           New invalid name placeholder
+   \param[in]  oe_InvalidTypePlaceholder  New invalid type placeholder
+   \param[in]  orc_InvalidName            New invalid name placeholder
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbNodeDataPoolListElementId::MarkInvalid(const C_OSCNodeDataPool::E_Type oe_InvalidTypePlaceholder,
@@ -369,12 +408,35 @@ C_PuiSvDbNodeDataPoolListElementId::E_Type C_PuiSvDbNodeDataPoolListElementId::G
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set type
 
-   \param[in] oe_Type New type
+   \param[in]  oe_Type  New type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbNodeDataPoolListElementId::SetType(const C_PuiSvDbNodeDataPoolListElementId::E_Type oe_Type)
 {
    this->me_Type = oe_Type;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get HAL channel name
+
+   \return
+   Current HAL channel name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSvDbNodeDataPoolListElementId::GetHalChannelName(void) const
+{
+   return this->mc_HalChannelName;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set HAL channel name
+
+   \param[in]  orc_Value   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDbNodeDataPoolListElementId::SetHalChannelName(const QString & orc_Value)
+{
+   this->mc_HalChannelName = orc_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

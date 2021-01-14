@@ -38,26 +38,19 @@ public:
    void SetActualLine(const stw_types::sintn osn_Line);
    void ScrollToItem(const stw_types::sintn osn_Index);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void dropEvent(QDropEvent * const opc_Event) override;
-   //lint -restore
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
-
 Q_SIGNALS:
    //lint -restore
    void SigListChanged(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void startDrag(const Qt::DropActions oc_SupportedActions) override;
    virtual void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
    virtual void dragLeaveEvent(QDragLeaveEvent * const opc_Event) override;
    virtual void wheelEvent(QWheelEvent * const opc_Event) override;
-   //lint -restore
 
    virtual void m_MoveItem(const stw_types::sintn osn_SourceIndex, const stw_types::sintn osn_TargetIndex) = 0;
    virtual void m_UpdateNumbers(void) const = 0;

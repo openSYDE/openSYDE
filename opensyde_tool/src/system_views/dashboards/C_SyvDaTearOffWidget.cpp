@@ -152,8 +152,7 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const st
    connect(this->mpc_Dashboard, &C_SyvDaDashboardWidget::SigNvmReadList, this,
            &C_SyvDaTearOffWidget::SigNvmReadList);
 
-   //lint -e{429}  no memory leak because of the parent of pc_Layout and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Layout and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default destructor
@@ -518,8 +517,7 @@ void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_So
       {
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

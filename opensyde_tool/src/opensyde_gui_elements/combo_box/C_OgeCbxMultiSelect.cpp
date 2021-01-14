@@ -14,6 +14,8 @@
 
 #include <QVBoxLayout>
 #include <QStylePainter>
+#include <QApplication>
+#include <QDesktopWidget>
 
 #include "stwtypes.h"
 
@@ -47,10 +49,10 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeCbxMultiSelect::C_OgeCbxMultiSelect(QWidget * const opc_Parent) :
-   QComboBox(opc_Parent),
-   mu32_Screenbound(50),
+   C_OgeCbxToolTipBase(opc_Parent),
    mpc_PopFrame(new QFrame(this, Qt::Popup)),
-   mpc_ListWidget(new QListWidget)
+   mpc_ListWidget(new QListWidget),
+   mq_IsShown(false)
 {
    this->SetDisplayText(C_GtGetText::h_GetText("<none>"));
 
@@ -63,15 +65,16 @@ C_OgeCbxMultiSelect::C_OgeCbxMultiSelect(QWidget * const opc_Parent) :
    this->mpc_PopFrame->layout()->setContentsMargins(0, 0, 0, 0);
 
    connect(this->mpc_ListWidget, &QListWidget::itemClicked, this, &C_OgeCbxMultiSelect::m_ScanItemSelect);
+   connect(this->mpc_ListWidget, &QListWidget::clicked, this, &C_OgeCbxMultiSelect::m_ListWidgetItemClicked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ListWidget (use addWidget) and the Qt memory management
 C_OgeCbxMultiSelect::~C_OgeCbxMultiSelect()
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_ListWidget (use addWidget) and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,30 +168,65 @@ void C_OgeCbxMultiSelect::paintEvent(QPaintEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten mouse press event slot
+
+   Here: Mouse click to expand or collapse
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeCbxMultiSelect::mousePressEvent(QMouseEvent * const opc_Event)
+{
+   Q_UNUSED(opc_Event)
+
+   if (this->mq_IsShown == false)
+   {
+      this->showPopup();
+   }
+   else
+   {
+      this->hidePopup();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Show the popup from the combo box
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeCbxMultiSelect::showPopup()
 {
-   QRect c_Rect = QRect(geometry());
+   QRect c_Rect;
+   sintn sn_ListHeight = (this->mpc_ListWidget->count() * this->mpc_ListWidget->sizeHintForRow(0)) + 2;
+   const QRect c_ScreenRect = QApplication::desktop()->screenGeometry(this);
+   const QPoint c_Above = this->mapToGlobal(QPoint(0, 0));
+   const QPoint c_Below = this->mapToGlobal(QPoint(0, this->geometry().height()));
+   const sint32 s32_BelowHeight = std::min(abs(c_ScreenRect.bottom() - c_Below.y()), sn_ListHeight);
+   const sint32 s32_AboveHeight = std::min(abs(c_Above.y() - c_ScreenRect.y()), sn_ListHeight);
 
-   // get the two possible list points and height
-   QPoint c_Below = this->mapToGlobal(QPoint(0, c_Rect.height()));
+   // give the list widget a small minimum (important if only 2 or less entries exist)
+   this->mpc_ListWidget->setMinimumHeight(1);
 
-   // first activate it with height 1px to get all the items initialized
-   QRect c_Rect2;
+   // if we use below or above
+   if ((s32_BelowHeight == sn_ListHeight) || (s32_BelowHeight > s32_AboveHeight))
+   {
+      c_Rect.setTopLeft(c_Below);
+      c_Rect.setWidth(this->geometry().width());
+      c_Rect.setHeight(sn_ListHeight);
+   }
+   else
+   {
+      c_Rect.setTopLeft(c_Above - QPoint(0, s32_AboveHeight));
+      c_Rect.setWidth(this->geometry().width());
+      c_Rect.setHeight(sn_ListHeight);
+   }
 
-   c_Rect2.setTopLeft(c_Below);
-   c_Rect2.setWidth(c_Rect.width());
-   c_Rect.setHeight(1);
-
-   // determine rect
-   c_Rect2.setTopLeft(c_Below);
-   c_Rect2.setHeight((this->mpc_ListWidget->count() * this->mpc_ListWidget->sizeHintForRow(0)) + 4);
-
-   this->mpc_PopFrame->setGeometry(c_Rect2);
+   // set popup geometry
+   this->mpc_PopFrame->setGeometry(c_Rect);
    this->mpc_PopFrame->raise();
    this->mpc_PopFrame->show();
+
+   // remember
+   this->mq_IsShown = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -198,6 +236,8 @@ void C_OgeCbxMultiSelect::showPopup()
 void C_OgeCbxMultiSelect::hidePopup()
 {
    this->mpc_PopFrame->hide();
+
+   this->mq_IsShown = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -225,8 +265,7 @@ void C_OgeCbxMultiSelect::AddItem(const QString & orc_Text, const QVariant & orc
    }
 
    this->mpc_ListWidget->addItem(pc_ListWidgetItem);
-   //lint -e{429}  no memory leak because of the parent of pc_ListWidgetItem (use addItem) and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_ListWidgetItem (use addItem) and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set the check state to item
@@ -285,6 +324,7 @@ void C_OgeCbxMultiSelect::Init(const QStringList & orc_Strings, const QBitArray 
       {
          this->AddItem(orc_Strings.at(sn_It), orc_Values.at(sn_It));
       }
+      this->m_UpdateDisplayName();
    }
 }
 
@@ -299,8 +339,21 @@ void C_OgeCbxMultiSelect::Init(const QStringList & orc_Strings, const QBitArray 
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeCbxMultiSelect::m_ScanItemSelect(const QListWidgetItem * const opc_Item)
 {
+   this->m_UpdateDisplayName();
+
+   // inform about value changed
+   Q_EMIT (SigValueChanged(opc_Item->text(), opc_Item->checkState() == Qt::Checked));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Combo box and tool tip text
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeCbxMultiSelect::m_UpdateDisplayName(void)
+{
    bool q_Found = false;
    QString c_Display;
+   QString c_ToolTip;
 
    // search for items are checked
    for (stw_types::sint32 s32_Counter = 0; s32_Counter < this->mpc_ListWidget->count(); s32_Counter++)
@@ -319,8 +372,10 @@ void C_OgeCbxMultiSelect::m_ScanItemSelect(const QListWidgetItem * const opc_Ite
             if (!c_Display.isEmpty())
             {
                c_Display += ", ";
+               c_ToolTip += ",\n";
             }
             c_Display += pc_Item->text();
+            c_ToolTip += pc_Item->text();
          }
       }
    }
@@ -329,11 +384,37 @@ void C_OgeCbxMultiSelect::m_ScanItemSelect(const QListWidgetItem * const opc_Ite
    if (q_Found == false)
    {
       c_Display = C_GtGetText::h_GetText("<none>");
+      c_ToolTip = C_GtGetText::h_GetText("Nothing selected");
    }
 
    // set the item names to combo box
    this->SetDisplayText(c_Display);
+   this->SetToolTipInformation("Selected Elements:", c_ToolTip);
+}
 
-   // inform about value changed
-   Q_EMIT (SigValueChanged(opc_Item->text(), opc_Item->checkState() == Qt::Checked));
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check or uncheck clicked item
+
+   If an item checked, the text of this item is set to the combo box text.
+   If an item unchecked, the text of this item removed from the combo box text
+
+   \param[in]  orc_ModelIndex    Index of the list widget model
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeCbxMultiSelect::m_ListWidgetItemClicked(const QModelIndex & orc_ModelIndex)
+{
+   QListWidgetItem * pc_Item = this->mpc_ListWidget->item(orc_ModelIndex.row());
+
+   if (pc_Item != NULL)
+   {
+      if (pc_Item->checkState() == Qt::Checked)
+      {
+         pc_Item->setCheckState(Qt::Unchecked);
+      }
+      else
+      {
+         pc_Item->setCheckState(Qt::Checked);
+      }
+      this->m_ScanItemSelect(pc_Item);
+   }
 }

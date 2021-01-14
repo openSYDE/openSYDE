@@ -389,28 +389,12 @@ QVariant C_TblModelAction::mh_HandleHexValue(const uint64 ou64_Value, const sint
 
    if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
    {
-      c_Retval = C_TblModelAction::mh_GetValueAsHex(ou64_Value);
+      c_Retval = C_Uti::h_GetValueAsHex(ou64_Value);
    }
    else
    {
       c_Retval = ou64_Value;
    }
-   return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get value in hex format, ready to be displayed (including "0x")
-
-   \param[in] ou64_Value value to convert
-
-   \return
-   String to display
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_TblModelAction::mh_GetValueAsHex(const uint64 ou64_Value)
-{
-   const QString c_Retval = QString("0x%1").arg(QString("%1").arg(ou64_Value, 0, 16).toUpper());
-
    return c_Retval;
 }
 

@@ -200,5 +200,4 @@ void C_SyvDaPeUpdateModeConfiguration::m_ConfigureClicked(void) const
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent pc_Dialog and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent pc_Dialog and the Qt memory management

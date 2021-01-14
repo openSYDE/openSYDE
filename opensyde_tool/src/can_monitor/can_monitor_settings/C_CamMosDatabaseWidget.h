@@ -57,8 +57,10 @@ Q_SIGNALS:
                                 const stw_types::uint32 ou32_BusIndex);
    void SigRemoveDatabase(const QString & orc_Path, const QString & orc_OrgPath, const bool oq_IsUpdate);
    void SigActivateDatabase(const QString & orc_Path, const QString & orc_OrgPath, const bool oq_Active);
-   void SigSetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const stw_types::uint32 ou32_BusIndex);
+   void SigSetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const QString & orc_OrgPath,
+                                   const stw_types::uint32 ou32_BusIndex);
    void SigHide(void);
+   void SigNotifyMissingDataBase(const QString & orc_Path);
 
 private:
    Ui::C_CamMosDatabaseWidget * mpc_Ui;
@@ -76,7 +78,7 @@ private:
    void m_OnAddClicked(void);
    void m_AddDatabaseWidget(const stw_opensyde_gui_logic::C_CamProDatabaseData & orc_DatabaseData);
    void m_RemoveDatabase(C_CamMosDatabaseItemWidget * const opc_ItemWidget, const bool oq_AskUser);
-   void m_ActivateDatabase(const C_CamMosDatabaseItemWidget * const opc_ItemWidget, const bool & orq_Enable);
+   bool m_ActivateDatabase(const C_CamMosDatabaseItemWidget * const opc_ItemWidget, const bool & orq_Enable);
    void m_UpdateDatabasePath(C_CamMosDatabaseItemWidget * const opc_ItemWidget,
                              const stw_opensyde_gui_logic::C_CamProDatabaseData & orc_Database, const bool oq_IsUpdate);
    void m_UpdateDatabaseOsySysDefBus(const C_CamMosDatabaseItemWidget * const opc_ItemWidget,

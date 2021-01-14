@@ -25,12 +25,12 @@ class C_OSCBinaryHash
 {
 public:
    static stw_scl::C_SCLString h_CreateBinaryHash(void);
-   static void h_SetHashBool(bool const q_State);
+   static void h_SetHashBool(bool const oq_State);
    static bool h_GetHashBool(void);
 
 private:
-   static stw_scl::C_SCLString hc_BinaryHash;
-   static bool hq_HashCompleted;
+   static stw_scl::C_SCLString mhc_BinaryHash;
+   static bool mhq_HashCompleted;
    C_OSCBinaryHash();
 };
 

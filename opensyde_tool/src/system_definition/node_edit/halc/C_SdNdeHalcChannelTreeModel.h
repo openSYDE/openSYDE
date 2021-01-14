@@ -19,7 +19,6 @@ namespace stw_opensyde_gui_logic
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
-
 class C_SdNdeHalcChannelTreeModel :
    public C_TblTreModel
 {
@@ -29,11 +28,7 @@ public:
    C_SdNdeHalcChannelTreeModel(QObject * const opc_Parent = NULL);
    ~C_SdNdeHalcChannelTreeModel(void);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual stw_types::sintn columnCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
-   //lint -restore
 
    void SetNode(const stw_types::uint32 ou32_NodeIndex);
    void UpdateChannelText(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
@@ -55,12 +50,21 @@ private:
    C_SdNdeHalcChannelTreeModel & operator =(const C_SdNdeHalcChannelTreeModel &);
 
    stw_types::uint32 mu32_NodeIndex;
+   std::vector<QIcon> mc_InputIcons;
+   std::vector<QIcon> mc_OutputIcons;
+   std::vector<QIcon> mc_OtherIcons;
+
+   std::vector<QIcon> mc_Icons;
 
    static void mh_SetChannelText(C_TblTreItem * const opc_Item, const QString & orc_ChannelName,
                                  const QString & orc_ChannelID, const QString & orc_Comment);
-   static void mh_SetIcon(C_TblTreItem * const opc_Item,
-                          const stw_opensyde_core::C_OSCHalcDefDomain::E_Category oe_Category, const bool oq_Large,
-                          const bool oq_Error, const bool oq_Linked);
+   static QIcon mh_InitIcon(const stw_opensyde_core::C_OSCHalcDefDomain::E_Category oe_Category, const bool oq_Large,
+                            const bool oq_Error, const bool oq_Linked);
+   QIcon m_GetIcon(const stw_opensyde_core::C_OSCHalcDefDomain::E_Category oe_Category, const bool oq_Large,
+                   const bool oq_Error, const bool oq_Linked) const;
+   stw_types::uint32 m_GetIconIdentifier(const stw_opensyde_core::C_OSCHalcDefDomain::E_Category oe_Category,
+                                         const bool oq_Large, const bool oq_Error, const bool oq_Linked) const;
+   void m_InitIconsOfCategory(const stw_opensyde_core::C_OSCHalcDefDomain::E_Category oe_Category);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

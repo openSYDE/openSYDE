@@ -24,7 +24,6 @@ using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // Configuration for dynamic transparency color configuration of elements
-//lint -e{36,155}  c++11 feature
 const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
 {
    "stw_opensyde_gui--C_SdSearchTreeWidget",
@@ -42,6 +41,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTableView",
    "stw_opensyde_gui--C_SdNdeDpListTableView",
    "stw_opensyde_gui--C_SdNdeHalcConfigImportView",
+   "stw_opensyde_gui--C_SdCodeGenerationView",
    "stw_opensyde_gui--C_TblTreDataElementView",
    "stw_opensyde_gui--C_SyvDaItTaView",
    "stw_opensyde_gui--C_SyvDaItPaTreeView",
@@ -52,6 +52,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SdNdeHalcChannelTreeView",
    "stw_opensyde_gui--C_SdNdeHalcConfigTreeView",
    "stw_opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView QScrollBar",
+   "stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView QScrollBar",
    "stw_opensyde_gui_elements--C_OgeTedPropertiesComment",
    "stw_opensyde_gui_elements--C_OgeTebMessageDetails",
    "stw_opensyde_gui_elements--C_OgeTebReport",
@@ -74,13 +75,11 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget"
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_ScrollAreaProperties(
 {
-   C_UtiStyleSheets::C_PropertyValueColorConfig("", "background-color", QColor(Qt::transparent))
+   C_UtiStyleSheets::C_PropertyValueColorConfig("", "background-color", Qt::transparent)
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<C_UtiStyleSheets::C_ElementColorConfig> C_UtiStyleSheets::mhc_ElementColorsWithTransparency(
 {
    C_UtiStyleSheets::C_ElementColorConfig(
@@ -150,7 +149,6 @@ const std::vector<C_UtiStyleSheets::C_ElementColorConfig> C_UtiStyleSheets::mhc_
 }
    );
 
-//lint -e{36,155}  c++11 feature
 const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
 {
    "stw_opensyde_gui--C_SyvDaItPaArView QScrollBar",
@@ -165,6 +163,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTableView QScrollBar",
    "stw_opensyde_gui--C_SdNdeDpListTableView QScrollBar",
    "stw_opensyde_gui--C_SdNdeHalcConfigImportView QScrollBar",
+   "stw_opensyde_gui--C_SdCodeGenerationView QScrollBar",
    "stw_opensyde_gui--C_TblTreDataElementView QScrollBar",
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget QScrollBar",
    "stw_opensyde_gui_elements--C_OgeTableWidgetComIF QScrollBar",
@@ -176,6 +175,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui--C_SdNdeHalcChannelTreeView QScrollBar",
    "stw_opensyde_gui--C_SdNdeHalcConfigTreeView QScrollBar",
    "stw_opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView QScrollBar",
+   "stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView QScrollBar",
    "stw_opensyde_gui--C_SyvDaItPaTreeView QScrollBar[DarkMode=\"false\"]",
    "stw_opensyde_gui--C_SyvDaItTaView QScrollBar[DarkMode=\"false\"]",
    "stw_opensyde_gui_elements--C_OgeTedPropertiesComment QScrollBar",
@@ -198,11 +198,10 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget QScrollBar"
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_ScrollBarPropertiesBright(
 {
-   C_UtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", QColor(Qt::transparent)),
-   C_UtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", QColor(Qt::transparent)),
+   C_UtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", Qt::transparent),
+   C_UtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", Qt::transparent),
    C_UtiStyleSheets::C_PropertyValueColorConfig("::handle:pressed", "background-color", mc_STYLE_GUIDE_COLOR_8),
    C_UtiStyleSheets::C_PropertyValueColorConfig("::handle:pressed", "border-color", mc_STYLE_GUIDE_COLOR_8),
    C_UtiStyleSheets::C_PropertyValueColorConfig("::handle:hover:!pressed", "background-color", mc_STYLE_GUIDE_COLOR_9),
@@ -217,7 +216,6 @@ const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets
    C_UtiStyleSheets::C_PropertyValueColorConfig("::sub-page", "border-color", mc_STYLE_GUIDE_COLOR_11)
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsDark(
 {
    "stw_opensyde_gui--C_SyvDaItPaTreeView QScrollBar[DarkMode=\"true\"]",
@@ -231,11 +229,10 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsDark(
    "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_DARK\"]"
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_ScrollBarPropertiesDark(
 {
-   C_UtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", QColor(Qt::transparent)),
-   C_UtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", QColor(Qt::transparent)),
+   C_UtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", Qt::transparent),
+   C_UtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", Qt::transparent),
    C_UtiStyleSheets::C_PropertyValueColorConfig("::handle:pressed", "background-color", mc_STYLE_GUIDE_COLOR_10),
    C_UtiStyleSheets::C_PropertyValueColorConfig("::handle:pressed", "border-color", mc_STYLE_GUIDE_COLOR_10),
    C_UtiStyleSheets::C_PropertyValueColorConfig("::handle:hover:!pressed", "background-color", mc_STYLE_GUIDE_COLOR_35),
@@ -250,18 +247,16 @@ const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets
    C_UtiStyleSheets::C_PropertyValueColorConfig("::sub-page", "border-color", mc_STYLE_GUIDE_COLOR_32)
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsMainNavi(
 {
    "stw_opensyde_gui_logic--C_PopFileTableView QScrollBar",
    "stw_opensyde_gui_elements--C_OgeSaNaviBar QScrollBar"
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_ScrollBarPropertiesMainNavi(
 {
-   C_UtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", QColor(Qt::transparent)),
-   C_UtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", QColor(Qt::transparent)),
+   C_UtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", Qt::transparent),
+   C_UtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", Qt::transparent),
    C_UtiStyleSheets::C_PropertyValueColorConfig("::handle:pressed", "background-color", mc_STYLE_GUIDE_COLOR_12),
    C_UtiStyleSheets::C_PropertyValueColorConfig("::handle:pressed", "border-color", mc_STYLE_GUIDE_COLOR_12),
    C_UtiStyleSheets::C_PropertyValueColorConfig("::handle:hover:!pressed", "background-color", mc_STYLE_GUIDE_COLOR_11),
@@ -492,7 +487,7 @@ void C_UtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString> &
          {
             QString c_Entry;
             const QString & rc_Element = orc_ScrollBarElements[u32_ItElement];
-            c_Entry = QString("%1%2").arg(rc_Element, rc_Property.c_PropertyName);
+            c_Entry = static_cast<QString>("%1%2").arg(rc_Element, rc_Property.c_PropertyName);
             if (u32_ItElement < (orc_ScrollBarElements.size() - 1UL))
             {
                c_Entry += ",";
@@ -502,11 +497,11 @@ void C_UtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString> &
          }
          c_Value = "{\n";
          //Add config
-         c_Value += QString("%1:rgba(%2,%3,%4,%5);").arg(rc_Property.c_ValueName,
-                                                         QString::number(rc_Property.c_Color.red()),
-                                                         QString::number(rc_Property.c_Color.green()),
-                                                         QString::number(rc_Property.c_Color.blue()),
-                                                         QString::number(rc_Property.c_Color.alpha()));
+         c_Value += static_cast<QString>("%1:rgba(%2,%3,%4,%5);").arg(rc_Property.c_ValueName,
+                                                                      QString::number(rc_Property.c_Color.red()),
+                                                                      QString::number(rc_Property.c_Color.green()),
+                                                                      QString::number(rc_Property.c_Color.blue()),
+                                                                      QString::number(rc_Property.c_Color.alpha()));
          c_Value += "}\n";
          orc_Stylesheet += c_Value;
       }

@@ -122,9 +122,9 @@ C_SyvDaItPaTreeView::C_SyvDaItPaTreeView(QWidget * const opc_Parent) :
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} Never took ownership
 C_SyvDaItPaTreeView::~C_SyvDaItPaTreeView(void)
 {
-   //lint -e{1540} Never took ownership
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -294,7 +294,7 @@ uint32 C_SyvDaItPaTreeView::GetSelectedItemCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::Init(stw_opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DataWidget)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    this->mpc_DataWidget = opc_DataWidget;
@@ -643,7 +643,7 @@ bool C_SyvDaItPaTreeView::event(QEvent * const opc_Event)
    if (opc_Event->type() == QEvent::HoverMove)
    {
       // check if an ip address was hovered
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QHoverEvent * const pc_HoverEvent = dynamic_cast<QHoverEvent * const>(opc_Event);
       bool q_IpAddressHovered = false;
       if (pc_HoverEvent != NULL)
@@ -721,7 +721,7 @@ bool C_SyvDaItPaTreeView::m_ColumnsSortedAsExpected(const std::vector<sint32> & 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -823,10 +823,16 @@ void C_SyvDaItPaTreeView::m_HandleActionApply(const C_OSCNodeDataPoolListElement
    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_ListIds = this->mc_Model.GetListIdsForId(
       orc_Id, ou32_ValidLayers);
 
+   std::vector<C_OSCNodeDataPoolListElementId> c_InvalidValueIds;
+   std::vector<QString> c_InvalidValues;
+   std::vector<QString> c_NewValues;
+
    //Force change of focus
    this->setCurrentIndex(this->mc_Model.index(0, 0));
 
-   this->mc_Model.ApplyEcuValues(c_ListIds);
+   this->mc_Model.ApplyEcuValues(c_ListIds, c_InvalidValueIds, c_InvalidValues, c_NewValues);
+
+   Q_EMIT (this->SigInformUserFloatRangeCheck(c_InvalidValueIds, c_InvalidValues, c_NewValues));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -56,7 +56,7 @@ C_GiPointInteraction::C_GiPointInteraction(QGraphicsItem * const opc_Parent) :
    // It has to be on the highest level. It shall be always be visible.
    this->setZValue(mf64_ZORDER_MAX);
 
-   this->setCursor(QCursor(Qt::SizeBDiagCursor));
+   this->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -124,7 +124,6 @@ void C_GiPointInteraction::paint(QPainter * const opc_Painter, const QStyleOptio
    //Deactivate selection
    QStyleOptionGraphicsItem c_Option = (*opc_Option);
 
-   //lint -e{64,1013,1058,1514} Qt feature
    c_Option.state.setFlag(QStyle::State_Selected, false);
    QGraphicsEllipseItem::paint(opc_Painter, &c_Option, opc_Widget);
 }

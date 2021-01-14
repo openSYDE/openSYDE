@@ -190,8 +190,8 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
          else
          {
             const uint32 u32_NewSize = static_cast<uint32>(orc_NewData.toInt());
-            const C_OSCNodeDataPoolContent c_MinVal = GetCurrentTypeMinGeneric();
-            const C_OSCNodeDataPoolContent c_MaxVal = GetCurrentTypeMaxGeneric();
+            const C_OSCNodeDataPoolContent c_MinVal = m_GetCurrentTypeMinGeneric();
+            const C_OSCNodeDataPoolContent c_MaxVal = m_GetCurrentTypeMaxGeneric();
             uint32 u32_PrevSize;
             c_OSCElement.SetArray(true);
             u32_PrevSize = c_OSCElement.GetArraySize();
@@ -309,7 +309,8 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
             new C_SdNdeUnoLeDataPoolListElementDataChangeCommand(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                  this->mu32_DataPoolListIndex,
                                                                  this->mpc_DataPoolListModelViewManager,
-                                                                 this->mu32_DataPoolListElementIndex, QVariant(2),
+                                                                 this->mu32_DataPoolListElementIndex,
+                                                                 static_cast<QVariant>(2),
                                                                  C_SdNdeDpUtil::eELEMENT_ARRAY,
                                                                  0, 0, this);
          }
@@ -452,7 +453,7 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMin(void)
    if (pc_OSCElement != NULL)
    {
       QVariant c_Data;
-      const C_OSCNodeDataPoolContent c_TemporaryElement = GetCurrentTypeMinGeneric();
+      const C_OSCNodeDataPoolContent c_TemporaryElement = m_GetCurrentTypeMinGeneric();
       c_Data = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_TemporaryElement,
                                                                      pc_OSCElement->f64_Factor,
                                                                      pc_OSCElement->f64_Offset, 0);
@@ -497,7 +498,7 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMax(void)
    if (pc_OSCElement != NULL)
    {
       QVariant c_Data;
-      const C_OSCNodeDataPoolContent c_TemporaryElement = GetCurrentTypeMaxGeneric();
+      const C_OSCNodeDataPoolContent c_TemporaryElement = m_GetCurrentTypeMaxGeneric();
       c_Data = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_TemporaryElement,
                                                                      pc_OSCElement->f64_Factor,
                                                                      pc_OSCElement->f64_Offset, 0);
@@ -534,7 +535,7 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMax(void)
    Current minimum value in generic format
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::GetCurrentTypeMinGeneric(void) const
+C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_GetCurrentTypeMinGeneric(void) const
 {
    C_OSCNodeDataPoolContent c_Retval;
    const C_OSCNodeDataPoolListElement * const pc_OSCElement =
@@ -550,43 +551,33 @@ C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::GetCu
       switch (c_Retval.GetType())
       {
       case C_OSCNodeDataPoolContent::E_Type::eUINT8:
-         //lint -e{10,530,734,1015,1013,1960}  c++11 feature
          c_Retval.SetValueU8(std::numeric_limits<uint8>::lowest());
          break;
       case C_OSCNodeDataPoolContent::E_Type::eUINT16:
-         //lint -e{10,530,734,1015,1013,1960}  c++11 feature
          c_Retval.SetValueU16(std::numeric_limits<uint16>::lowest());
          break;
       case C_OSCNodeDataPoolContent::E_Type::eUINT32:
-         //lint -e{530,10,1015,1013}  c++11 feature
          c_Retval.SetValueU32(std::numeric_limits<uint32>::lowest());
          break;
       case C_OSCNodeDataPoolContent::E_Type::eUINT64:
-         //lint -e{10,530,747,1015,1013}  c++11 feature
          c_Retval.SetValueU64(std::numeric_limits<uint64>::lowest());
          break;
       case C_OSCNodeDataPoolContent::E_Type::eSINT8:
-         //lint -e{10,530,734,1015,1013,1960}  c++11 feature
          c_Retval.SetValueS8(std::numeric_limits<sint8>::lowest());
          break;
       case C_OSCNodeDataPoolContent::E_Type::eSINT16:
-         //lint -e{10,530,734,1015,1013,1960}  c++11 feature
          c_Retval.SetValueS16(std::numeric_limits<sint16>::lowest());
          break;
       case C_OSCNodeDataPoolContent::E_Type::eSINT32:
-         //lint -e{530,10,1015,1013}  c++11 feature
          c_Retval.SetValueS32(std::numeric_limits<sint32>::lowest());
          break;
       case C_OSCNodeDataPoolContent::E_Type::eSINT64:
-         //lint -e{10,530,747,1015,1013}  c++11 feature
          c_Retval.SetValueS64(std::numeric_limits<sint64>::lowest());
          break;
       case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
-         //lint -e{10,530,747,1015,1013,1960}  c++11 feature
          c_Retval.SetValueF32(std::numeric_limits<float32>::lowest());
          break;
       case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
-         //lint -e{10,530,747,1015,1013,1960}  c++11 feature
          c_Retval.SetValueF64(std::numeric_limits<float64>::lowest());
          break;
       default:
@@ -604,7 +595,7 @@ C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::GetCu
    Current maximum value in generic format
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::GetCurrentTypeMaxGeneric(void) const
+C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_GetCurrentTypeMaxGeneric(void) const
 {
    C_OSCNodeDataPoolContent c_Retval;
    const C_OSCNodeDataPoolListElement * const pc_OSCElement =

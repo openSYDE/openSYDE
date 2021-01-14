@@ -333,10 +333,10 @@ void C_GiSvDaRectBaseGroup::RegisterDataPoolElementCyclicError(
          break;
       default:
          c_AdditionalInfo =
-            QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_ErrorCode, 16));
+            static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_ErrorCode, 16));
          break;
       }
-      c_Info = QString(C_GtGetText::h_GetText("Cyclic service failed with error: %1")).arg(c_AdditionalInfo);
+      c_Info = static_cast<QString>(C_GtGetText::h_GetText("Cyclic service failed with error: %1")).arg(c_AdditionalInfo);
       this->mc_CommmunicationErrors.remove(orc_WidgetDataPoolElementId);
       this->mc_CommmunicationErrors.insert(orc_WidgetDataPoolElementId, c_Info);
       m_UpdateErrorIcon();
@@ -664,7 +664,7 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
             c_Description = C_GtGetText::h_GetText("Operation failed with an internal error.");
             //Update log file
             C_OSCLoggingHandler::h_Flush();
-            c_Details = QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
+            c_Details = static_cast<QString>("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
                         arg(C_GtGetText::h_GetText("For details see ")).
                         arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                         arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
@@ -709,7 +709,7 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
                   break;
                default:
                   c_Details =
-                     QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC, 16));
+                     static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC, 16));
                   c_Message.SetCustomMinHeight(180, 250);
                   break;
                }
@@ -748,13 +748,13 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
                   break;
                default:
                   c_Details =
-                     QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC, 16));
+                     static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC, 16));
                   c_Message.SetCustomMinHeight(180, 250);
                   break;
                }
             }
             c_Description =
-               QString(C_GtGetText::h_GetText("Operation failed with error response (%1).")).arg(c_Details);
+               static_cast<QString>(C_GtGetText::h_GetText("Operation failed with error response (%1).")).arg(c_Details);
             c_Details = "";
             c_Message.SetCustomMinHeight(180, 230);
             break;
@@ -764,7 +764,7 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
             break;
          }
          osc_write_log_info("Manual operation",
-                            QString("The C_SyvComDataDealer function ended with error code \"%1\"").arg(
+                            static_cast<QString>("The C_SyvComDataDealer function ended with error code \"%1\"").arg(
                                C_Uti::h_StwError(os32_Result)).toStdString().c_str());
          if (s32_Return == C_NO_ERR)
          {
@@ -828,7 +828,7 @@ void C_GiSvDaRectBaseGroup::SetErrorForFailedCyclicElementIdRegistrations(
    {
       //Clear last error
       this->mc_RegistrationFailedIdErrorDetails = "";
-      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->GetMappingDpElementToDataSerie();
+      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
 
       //Check if any elements are in here
       for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_It = rc_Elements.begin();
@@ -841,9 +841,8 @@ void C_GiSvDaRectBaseGroup::SetErrorForFailedCyclicElementIdRegistrations(
             {
                if (c_It.key() == orc_FailedIdRegisters[u32_ItInput])
                {
-                  const QString c_ErrorDescription = QString("Failed registration for %1 with Error message: %2").arg(
-                     C_PuiSdHandler::h_GetInstance()->GetNamespace(c_It.key())).arg(orc_FailedIdErrorDetails[
-                                                                                       u32_ItInput]);
+                  const QString c_ErrorDescription = static_cast<QString>("Failed registration for %1 with Error message: %2").arg(
+                     C_PuiSvHandler::h_GetNamespace(c_It.key())).arg(orc_FailedIdErrorDetails[u32_ItInput]);
                   //Add error
                   this->mc_RegistrationFailedIdErrorDetails += c_ErrorDescription;
                }
@@ -1009,7 +1008,7 @@ void C_GiSvDaRectBaseGroup::SetZValueCustom(const float64 of64_ZValue)
    - NULL
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSvDashboard * C_GiSvDaRectBaseGroup::GetSvDashboard(void) const
+const C_PuiSvDashboard * C_GiSvDaRectBaseGroup::m_GetSvDashboard(void) const
 {
    const C_PuiSvDashboard * pc_Dashboard = NULL;
 
@@ -1378,12 +1377,12 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
                            //Add name
                            if (c_Id.GetUseArrayElementIndex())
                            {
-                              c_ManualItems += QString("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                              c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
                                  c_Id.GetArrayElementIndex());
                            }
                            else
                            {
-                              c_ManualItems += QString(pc_Element->c_Name.c_str());
+                              c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
                            }
                            c_ManualItems += "\n";
                         }
@@ -1411,12 +1410,12 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
                      //Add name
                      if (c_Id.GetUseArrayElementIndex())
                      {
-                        c_ManualItems += QString("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                        c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
                            c_Id.GetArrayElementIndex());
                      }
                      else
                      {
-                        c_ManualItems += QString(pc_Element->c_Name.c_str());
+                        c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
                      }
                      c_ManualItems += "\n";
                   }
@@ -1455,7 +1454,7 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
          if (m_CheckHasValidElements(c_Name) == false)
          {
             c_Content +=
-               QString(C_GtGetText::h_GetText(
+               static_cast<QString>(C_GtGetText::h_GetText(
                           "- This widget and this data element (\"%1\") does not match, possible reasons:\n"
                           "   Data element was deleted\n"
                           "   Data element has become an array\n"
@@ -1514,8 +1513,7 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
                   C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id)->c_Name.c_str();
                if (c_Id.GetUseArrayElementIndex())
                {
-                  c_Heading = QString("%1[%2]").arg(c_ElementName).arg(
-                     c_Id.GetArrayElementIndex());
+                  c_Heading = static_cast<QString>("%1[%2]").arg(c_ElementName).arg(c_Id.GetArrayElementIndex());
                }
                else
                {
@@ -1558,7 +1556,7 @@ void C_GiSvDaRectBaseGroup::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc
 bool C_GiSvDaRectBaseGroup::m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const
 {
    bool q_ValidElement = false;
-   const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->GetMappingDpElementToDataSerie();
+   const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
 
    for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
         c_ItElement != rc_Elements.end(); ++c_ItElement)
@@ -1593,7 +1591,7 @@ bool C_GiSvDaRectBaseGroup::m_CheckManualReadRequired(void) const
    if (this->mq_ReadItem == true)
    {
       // Check for invalid elements
-      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->GetMappingDpElementToDataSerie();
+      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
 
       for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
            c_ItElement != rc_Elements.end(); ++c_ItElement)
@@ -1634,7 +1632,7 @@ bool C_GiSvDaRectBaseGroup::m_CheckHasAnyRequiredNodesActive(void) const
 {
    bool q_AtLeastOneValidElement = false;
 
-   const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->GetMappingDpElementToDataSerie();
+   const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
 
    for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
         c_ItElement != rc_Elements.end(); ++c_ItElement)
@@ -1673,7 +1671,7 @@ bool C_GiSvDaRectBaseGroup::m_CheckHasAnyRequiredBusesConnected(void) const
 
    if (pc_View != NULL)
    {
-      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->GetMappingDpElementToDataSerie();
+      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
 
       for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
            c_ItElement != rc_Elements.end(); ++c_ItElement)
@@ -1699,7 +1697,6 @@ bool C_GiSvDaRectBaseGroup::m_CheckHasAnyRequiredBusesConnected(void) const
                      {
                         //Active
                         q_AtLeastOneValidElement = true;
-                        break;
                      }
                      else
                      {
@@ -1730,6 +1727,10 @@ bool C_GiSvDaRectBaseGroup::m_CheckHasAnyRequiredBusesConnected(void) const
             //Allow continue as this means at least one element is not a bus element
             //so this check can at least clarify that one element is valid
             q_AtLeastOneValidElement = true;
+
+         }
+         if(q_AtLeastOneValidElement == true)
+         {
             break;
          }
       }
@@ -1955,8 +1956,7 @@ void C_GiSvDaRectBaseGroup::m_InitButton(void)
 
    this->mpc_ButtonGroup->setParentItem(this);
    this->mpc_ButtonGroup->setVisible(false);
-   //lint -e{429}  no memory leak because of adding pc_RectItem to the group and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of adding pc_RectItem to the group and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Trigger next manual read operation
@@ -2112,17 +2112,13 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIconToolTip(void)
       {
          if (c_It.key().GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
          {
-            c_Content +=
-               QString(C_GtGetText::h_GetText("%1 encountered error: %2")).arg(
-                  C_PuiSdHandler::h_GetInstance()->GetNamespace(c_It.key()))
-               .arg(c_It.value());
+            c_Content += static_cast<QString>(C_GtGetText::h_GetText("%1 encountered error: %2")).
+                         arg(C_PuiSdUtil::h_GetNamespace(c_It.key())).arg(c_It.value());
          }
          else
          {
-            c_Content +=
-               QString(C_GtGetText::h_GetText("%1 encountered error: %2")).arg(
-                  C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(c_It.key()))
-               .arg(c_It.value());
+            c_Content += static_cast<QString>(C_GtGetText::h_GetText("%1 encountered error: %2")).
+                         arg(C_PuiSdUtil::h_GetSignalNamespace(c_It.key())).arg(c_It.value());
          }
       }
    }
@@ -2135,8 +2131,8 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIconToolTip(void)
                  this->mc_InvalidDlcSignals.begin();
               c_It != this->mc_InvalidDlcSignals.end(); ++c_It)
          {
-            c_Content += QString(C_GtGetText::h_GetText("%1 had invalid DLC %2.")).arg(
-               C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(c_It.key())).arg(QString::number(c_It.value()));
+            c_Content += static_cast<QString>(C_GtGetText::h_GetText("%1 had invalid DLC %2.")).
+                         arg(C_PuiSdUtil::h_GetSignalNamespace(c_It.key())).arg(QString::number(c_It.value()));
          }
       }
    }

@@ -34,10 +34,7 @@ public:
    static const QWidget * h_GetTopWidget(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event);
-   //lint -restore
 
 private:
    static QWidget * mhpc_TopWidget; ///< Most top widget to gray out this most top widgets and all sub widgets when this

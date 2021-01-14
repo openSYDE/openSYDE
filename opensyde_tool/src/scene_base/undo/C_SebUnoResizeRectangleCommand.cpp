@@ -106,7 +106,7 @@ void C_SebUnoResizeRectangleCommand::m_UndoSingle(QGraphicsItem * const opc_Item
    {
       C_GiBiRectBaseGroup * pc_RectBase;
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       pc_RectBase = dynamic_cast<C_GiBiRectBaseGroup *>(opc_Item);
       if (pc_RectBase != NULL)
       {
@@ -127,7 +127,7 @@ void C_SebUnoResizeRectangleCommand::m_RedoSingle(QGraphicsItem * const opc_Item
    {
       C_GiBiRectBaseGroup * pc_RectBase;
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       pc_RectBase = dynamic_cast<C_GiBiRectBaseGroup *>(opc_Item);
       if (pc_RectBase != NULL)
       {

@@ -151,8 +151,7 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, QString oc_Ic
            this, &C_OgeWiHover::SigWiHoverMinBtnClicked);
    connect(this->mpc_Ui->pc_LabelIcon, &C_OgeLabDoubleClick::SigDoubleClicked,
            this, &C_OgeWiHover::SigWiHoverMinBtnClicked);
-   //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default destructor
@@ -266,9 +265,7 @@ void C_OgeWiHover::ApplyDarkMode(const bool oq_Active)
    c_Color.setAlpha(128);
    pc_Shadow->setColor(c_Color);
    this->mpc_Ui->pc_GroupBox->setGraphicsEffect(pc_Shadow);
-
-   //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot function for animation timer

@@ -62,7 +62,7 @@ C_SdNdeDpListHeaderUsageWidget::C_SdNdeDpListHeaderUsageWidget(QWidget * const o
    this->SetColorTooMuch(mc_STYLE_GUIDE_COLOR_24);
 
    // init the tooltip
-   this->SetToolTipWidgetName(QString(C_GtGetText::h_GetText("Datapool")));
+   this->SetToolTipWidgetName(static_cast<QString>(C_GtGetText::h_GetText("Datapool")));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -142,11 +142,11 @@ bool C_SdNdeDpListHeaderUsageWidget::event(QEvent * const opc_Event)
 
       if (this->mpc_ToolTip->isVisible() == false)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
          if (pc_HelpEvent != NULL)
          {
-            const QString c_Text = QString("%1% %2 (%3 / %4)").arg(QString::number(this->GetProgress()),
+            const QString c_Text = static_cast<QString>("%1% %2 (%3 / %4)").arg(QString::number(this->GetProgress()),
                                                                    C_GtGetText::h_GetText("used"),
                                                                    C_Uti::h_GetByteCountAsString(this->mu32_Used),
                                                                    C_Uti::h_GetByteCountAsString(this->mu32_Size));
@@ -195,7 +195,7 @@ bool C_SdNdeDpListHeaderUsageWidget::event(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderUsageWidget::SetToolTipWidgetName(const QString & orc_Value)
 {
-   this->mc_ToolTipHeading = orc_Value + QString(C_GtGetText::h_GetText(" Usage"));
+   this->mc_ToolTipHeading = orc_Value + static_cast<QString>(C_GtGetText::h_GetText(" Usage"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

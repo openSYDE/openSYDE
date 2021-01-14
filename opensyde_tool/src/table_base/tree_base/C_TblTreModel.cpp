@@ -66,7 +66,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
    {
       if (osn_Role == static_cast<stw_types::sintn>(Qt::DisplayRole))
       {
-         //lint -e{925}  Result of Qt interface restrictions, set by index function
+         //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
             static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
          if (pc_TreeItem != NULL)
@@ -76,7 +76,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
       }
       else if  (osn_Role == static_cast<stw_types::sintn>(Qt::DecorationRole))
       {
-         //lint -e{925}  Result of Qt interface restrictions, set by index function
+         //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
             static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
          if (pc_TreeItem != NULL)
@@ -86,7 +86,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
       }
       else if  (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
       {
-         //lint -e{925}  Result of Qt interface restrictions, set by index function
+         //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
             static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
          if (pc_TreeItem != NULL)
@@ -96,7 +96,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
       }
       else if  (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
       {
-         //lint -e{925}  Result of Qt interface restrictions, set by index function
+         //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
             static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
          if (pc_TreeItem != NULL)
@@ -127,7 +127,7 @@ Qt::ItemFlags C_TblTreModel::flags(const QModelIndex & orc_Index) const
    Qt::ItemFlags c_Retval = Qt::NoItemFlags;
    if (orc_Index.isValid() == true)
    {
-      //lint -e{925}  Result of Qt interface restrictions, set by index function
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreItem * const pc_TreeItem =
          static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)

@@ -54,8 +54,8 @@ C_SdNdeStwFlashloaderOptions::C_SdNdeStwFlashloaderOptions(stw_opensyde_gui_elem
    // register the widget for showing
    this->mrc_ParentDialog.SetWidget(this);
 
-   this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("STW Flashloader")));
-   this->mrc_ParentDialog.SetSubTitle(QString(C_GtGetText::h_GetText("Settings")));
+   this->mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("STW Flashloader")));
+   this->mrc_ParentDialog.SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Settings")));
 
    //Init
    InitStaticNames();

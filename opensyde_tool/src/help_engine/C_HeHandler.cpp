@@ -64,9 +64,9 @@ void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)
 
    const QString c_PageName = orc_ClassName;
 
-   //Debug helper
-   //std::cout << c_PageName.toStdString().c_str() << &std::endl;
-   QMap<QString, QString>::const_iterator c_Page = this->mc_LookUpHelpPageName.find(c_PageName);
+   //Debug helper: Which class call this function?
+   std::cout << c_PageName.toStdString().c_str() << &std::endl;
+   const QMap<QString, QString>::const_iterator c_Page = this->mc_LookUpHelpPageName.find(c_PageName);
    if (c_Page != this->mc_LookUpHelpPageName.end())
    {
       //Html help
@@ -83,7 +83,6 @@ void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)
       }
       else
       {
-         //lint -e{1960} All conversions as required by interface
          charn * const pcn_Text = new charn[static_cast<uint32>(c_PageSearchName.count() + 1)];
          HH_AKLINK c_Link;
          for (sint32 s32_It = 0; s32_It < c_PageSearchName.count(); ++s32_It)
@@ -175,6 +174,7 @@ C_HeHandler::C_HeHandler() :
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  DLL freed by function call
 C_HeHandler::~C_HeHandler()
 {
    //Free DLL
@@ -182,7 +182,6 @@ C_HeHandler::~C_HeHandler()
    {
       FreeLibrary(this->mpv_InstHtmlHelp);
    }
-   //lint -e{1540}  DLL freed by function call
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -199,6 +198,7 @@ void C_HeHandler::m_InitSpecialHelpPages(void)
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeNodeEditWidget", "Node Properties");
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDbViewWidget", "Datapool");
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDbProperties", "Data Block Properties");
+   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeHalcChannelWidget", "Hardware Configurator");
 
    //Bus Edit
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdBueBusEditWidget", "Bus Properties");

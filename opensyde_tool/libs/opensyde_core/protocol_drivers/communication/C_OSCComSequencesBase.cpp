@@ -94,7 +94,6 @@ C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
                  No STW flashloader devices and no openSYDE devices are active
                  No STW flashloader devices on active bus and no openSYDE devices are active, but STW flashloader on
                      other busses are active
-   C_RD_WR       Configured communication DLL does not exist
    C_OVERFLOW    Unknown transport protocol or unknown diagnostic server for at least one node
    C_NOACT       No active nodes
    C_COM         CAN initialization failed or no route found for at least one node
@@ -278,7 +277,7 @@ sint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(
    false    Node is not reachable on the current route
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::mq_IsNodeReachable(const uint32 ou32_NodeIndex) const
+bool C_OSCComSequencesBase::m_IsNodeReachable(const uint32 ou32_NodeIndex) const
 {
    bool q_Return;
 
@@ -328,7 +327,7 @@ bool C_OSCComSequencesBase::mq_IsNodeReachable(const uint32 ou32_NodeIndex) cons
 sint32 C_OSCComSequencesBase::mh_MyXflReportProgress(void * const opv_Instance, const uint8 ou8_Progress,
                                                      const C_SCLString & orc_Text)
 {
-   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
    return reinterpret_cast<C_OSCComSequencesBase *>(opv_Instance)->m_MyXflReportProgress(ou8_Progress, orc_Text);
 }
 
@@ -382,7 +381,6 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneOpenSydeNodeActive(void) const
    }
 
    return q_Return;
-   //lint -e{1763} False positive; we do not provide write access to class elements
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -415,7 +413,6 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeActive(void) const
    }
 
    return q_Return;
-   //lint -e{1763} False positive; we do not provide write access to class elements
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -478,5 +475,4 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeOnLocalBusActive(
    }
 
    return q_Return;
-   //lint -e{1763} False positive; we do not provide write access to class elements
 }

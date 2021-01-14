@@ -91,9 +91,9 @@ C_SdTopologyListWidget::C_SdTopologyListWidget(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent all elements and the Qt memory management
 C_SdTopologyListWidget::~C_SdTopologyListWidget()
 {
-   //lint -e{1540}  no memory leak because of the parent all elements and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -237,9 +237,8 @@ void C_SdTopologyListWidget::startDrag(const Qt::DropActions oc_SupportedActions
          pc_Drag->exec(oc_SupportedActions);
          //Clean up left over selection
          this->clearSelection();
-         //lint -e{429}  no memory leak because of the parent and the Qt memory management
+      } //lint !e429  //no memory leak because of the parent and the Qt memory management
          //              and QDrag does take ownership on setMimeData
-      }
    }
 }
 

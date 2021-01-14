@@ -144,6 +144,7 @@ C_SdNdeDpListTableView::C_SdNdeDpListTableView(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent and the Qt memory management or never took ownership
 C_SdNdeDpListTableView::~C_SdNdeDpListTableView(void)
 {
    m_HandleColumnStateSave();
@@ -152,7 +153,6 @@ C_SdNdeDpListTableView::~C_SdNdeDpListTableView(void)
       this->mpc_ModelViewManager->UnRegisterElementView(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                         this->mu32_ListIndex, this);
    }
-   //lint -e{1540}  no memory leak because of the parent and the Qt memory management or never took ownership
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -323,7 +323,7 @@ void C_SdNdeDpListTableView::Insert(const bool & orq_SetFocus)
       {
          c_Text = C_GtGetText::h_GetText("Data elements");
       }
-      c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Only %1 %2 allowed per list.")).arg(
+      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Only %1 %2 allowed per list.")).arg(
                                      mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX).arg(c_Text));
       c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
@@ -575,7 +575,7 @@ void C_SdNdeDpListTableView::keyPressEvent(QKeyEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::dropEvent(QDropEvent * const opc_Event)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_SdNdeDpListTableView * const pc_SourceTable =
       dynamic_cast<C_SdNdeDpListTableView * const>(opc_Event->source());
 
@@ -699,8 +699,7 @@ void C_SdNdeDpListTableView::startDrag(const Qt::DropActions oc_SupportedActions
 
       pc_Drag->setMimeData(this->model()->mimeData(c_SelectedItems));
       pc_Drag->exec(oc_SupportedActions, this->defaultDropAction());
-      //lint -e{429}  no memory leak because of the parent of pc_Drag and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Drag and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1242,9 +1241,7 @@ void C_SdNdeDpListTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
                                                                                 c_OSCElement, c_UIElement);
                      }
                   }
-                  //lint -e{429}  no memory leak because of the parent of pc_ArrayEditWidget and the Qt memory
-                  // management
-               }
+               } //lint !e429  //no memory leak because of the parent of pc_ArrayEditWidget and the Qt memory management
                if (c_Dialog != NULL)
                {
                   c_Dialog->HideOverlay();
@@ -1315,10 +1312,10 @@ void C_SdNdeDpListTableView::m_OnColumnResize(void)
             this->ms32_LastIndicatorSize = std::max(s32_ColAuto, s32_ColEvent);
 
             //Stylesheet to make complete checkbox area interact-able
-            c_Style = QString("stw_opensyde_gui--C_SdNdeDpListTableView::indicator {"
-                              "width: %1px;"
-                              "height: 30px;"
-                              "}").arg(this->ms32_LastIndicatorSize);
+            c_Style = static_cast<QString>("stw_opensyde_gui--C_SdNdeDpListTableView::indicator {"
+                                           "width: %1px;"
+                                           "height: 30px;"
+                                           "}").arg(this->ms32_LastIndicatorSize);
             this->setStyleSheet(c_Style);
          }
       }

@@ -25,28 +25,28 @@ class C_SdBueUnoSignalAddDeleteBaseCommand :
    public C_SdBueUnoMessageBaseCommand
 {
 public:
-   C_SdBueUnoSignalAddDeleteBaseCommand(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                        const stw_types::uint32 & oru32_SignalIndex,
-                                        const stw_types::uint16 ou16_StartBit,
-                                        const stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType oe_MultiplexerType,
-                                        const stw_types::uint16 ou16_MultiplexerValue,
-                                        C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
-                                        stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, const QString & orc_Text = "",
-                                        QUndoCommand * const opc_Parent = NULL);
+   C_SdBueUnoSignalAddDeleteBaseCommand(
+      const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageId,
+      const std::vector<stw_types::uint32> & orc_SignalIndex, const std::vector<stw_types::uint16> & orc_StartBit,
+      const std::vector<stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType> & orc_MultiplexerType,
+      const std::vector<stw_types::uint16> & orc_MultiplexerValue,
+      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+      stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
+      const QString & orc_Text = "", QUndoCommand * const opc_Parent = NULL);
 
 protected:
-   stw_types::uint32 mu32_SignalIndex;
-   stw_opensyde_core::C_OSCCanSignal mc_Signal;
-   stw_opensyde_core::C_OSCNodeDataPoolListElement mc_OSCSignalCommon;
-   C_PuiSdNodeDataPoolListElement mc_UISignalCommon;
-   C_PuiSdNodeCanSignal mc_UISignal;
+   std::vector<stw_types::uint32> mc_SignalIndex;
+   std::vector<stw_opensyde_core::C_OSCCanSignal> mc_Signal;
+   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> mc_OSCSignalCommon;
+   std::vector<C_PuiSdNodeDataPoolListElement> mc_UISignalCommon;
+   std::vector<C_PuiSdNodeCanSignal> mc_UISignal;
 
-   void Add(void);
-   void Delete(void);
+   void m_Add(void);
+   void m_Delete(void);
 
 private:
    void m_Store(void);
-   void m_Remove(void) const;
+   void m_Remove(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

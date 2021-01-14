@@ -166,8 +166,7 @@ void C_SyvUpProgressLog::AddSubHeading(const QString & orc_Value)
    //Insert before spacer
    this->mpc_Ui->pc_VerticalLayoutDynamic->insertWidget(
       this->mpc_Ui->pc_VerticalLayoutDynamic->count() - 1, pc_Entry, 0);
-   //lint -e{429}  deleted later, stored internally
-}
+} //lint !e429  //deleted later, stored internally
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add log entry
@@ -210,8 +209,7 @@ void C_SyvUpProgressLog::AddEntry(const uint32 ou32_NodeIndex, const QString & o
       this->mpc_Ui->pc_VerticalLayoutDynamic->insertWidget(
          this->mpc_Ui->pc_VerticalLayoutDynamic->count() - 3, pc_Entry, 0);
    }
-   //lint -e{429}  deleted later, stored internally
-}
+} //lint !e429  //deleted later, stored internally
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add spacer
@@ -229,8 +227,7 @@ void C_SyvUpProgressLog::AddSpacer(void)
    this->mc_SpacerEntries.push_back(pc_Entry);
    this->mpc_Ui->pc_VerticalLayoutDynamic->insertWidget(this->mpc_Ui->pc_VerticalLayoutDynamic->count() - 1, pc_Entry,
                                                         0);
-   //lint -e{429}  deleted later, stored internally
-}
+} //lint !e429  //deleted later, stored internally
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update log entry
@@ -282,7 +279,7 @@ void C_SyvUpProgressLog::AddLogHyperlink(void)
       //Update log file
       C_OSCLoggingHandler::h_Flush();
       //Configure
-      this->mpc_LogHyperlink->setText(QString("%1<a href=\"file:\\\\\\%2\"><span style=\"color: %3;\">%4</span></a>.").
+      this->mpc_LogHyperlink->setText(static_cast<QString>("%1<a href=\"file:\\\\\\%2\"><span style=\"color: %3;\">%4</span></a>.").
                                       arg(C_GtGetText::h_GetText("For more information see ")).
                                       arg(c_LogFilePath).
                                       arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
@@ -350,7 +347,7 @@ void C_SyvUpProgressLog::m_OpenLink(void) const
 {
    const QString c_LogFilePath = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
 
-   QDesktopServices::openUrl(QUrl(QString("file:%1").arg(c_LogFilePath)));
+   QDesktopServices::openUrl(QUrl(static_cast<QString>("file:%1").arg(c_LogFilePath)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

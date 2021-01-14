@@ -49,8 +49,7 @@ C_OgeCbxIconOnly::C_OgeCbxIconOnly(QWidget * const opc_Parent) :
    C_OgeCbxIconDelegate * const pc_ItemDelegate = new C_OgeCbxIconDelegate();
 
    this->setItemDelegate(pc_ItemDelegate);
-   //lint -e{429} Qt takes ownership of delegate (look at docu)
-}
+}  //lint !e429  //Qt takes ownership of delegate (look at docu)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor

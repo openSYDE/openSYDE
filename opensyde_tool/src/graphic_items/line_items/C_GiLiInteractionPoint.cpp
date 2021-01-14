@@ -50,7 +50,7 @@ C_GiLiInteractionPoint::C_GiLiInteractionPoint(const sint32 & ors32_PointIndex, 
    this->setFlag(ItemIsMovable);
    this->setFlag(ItemSendsGeometryChanges);
 
-   this->mc_DefaultCursor = QCursor(Qt::SizeBDiagCursor);
+   this->mc_DefaultCursor = static_cast<QCursor>(Qt::SizeBDiagCursor);
    this->RestoreDefaultCursor();
 }
 
@@ -145,7 +145,7 @@ QVariant C_GiLiInteractionPoint::itemChange(const GraphicsItemChange oe_Change, 
 {
    QVariant c_Retval = QGraphicsEllipseItem::itemChange(oe_Change, orc_Value);
 
-   switch (oe_Change)
+   switch (oe_Change) //lint !e788 //All other cases handled by call of parent
    {
    case ItemPositionChange:
    case ItemPositionHasChanged:
@@ -153,6 +153,6 @@ QVariant C_GiLiInteractionPoint::itemChange(const GraphicsItemChange oe_Change, 
       break;
    default:
       break;
-   } //lint !e788 //All other cases handled by call of parent
+   }
    return c_Retval;
 }

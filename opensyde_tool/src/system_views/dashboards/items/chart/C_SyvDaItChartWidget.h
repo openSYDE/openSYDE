@@ -80,11 +80,15 @@ public:
                     const bool oq_IsTransmissionError, const bool oq_ErrorActive) const;
    void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value) const;
 
-protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-   virtual void paintEvent(QPaintEvent * const opc_Event) override;
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
    //lint -restore
+   void SigChartDataChanged(void);
+
+protected:
+   virtual void paintEvent(QPaintEvent * const opc_Event) override;
 
 private:
    Ui::C_SyvDaItChartWidget * mpc_Ui;

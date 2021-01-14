@@ -37,12 +37,9 @@ public:
    void SetSize(const QSizeF & orc_Size);
    void SetFont(const QFont & orc_Font);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget);
    virtual QRectF boundingRect() const;
-   //lint -restore
 
 protected:
    QColor mc_BackgroundColorDefault;

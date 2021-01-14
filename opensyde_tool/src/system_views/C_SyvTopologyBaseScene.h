@@ -83,7 +83,7 @@ protected:
 private:
    //Avoid call
    C_SyvTopologyBaseScene(const C_SyvTopologyBaseScene &);
-   C_SyvTopologyBaseScene & operator =(const C_SyvTopologyBaseScene &);
+   C_SyvTopologyBaseScene & operator =(const C_SyvTopologyBaseScene &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

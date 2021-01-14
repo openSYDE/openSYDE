@@ -337,7 +337,7 @@ void C_SyvUpUpdatePackageListNodeWidget::RemoveAllFiles(void)
 
       if (pc_Item != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -373,7 +373,7 @@ const
 
       if (pc_Item != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -411,7 +411,7 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::CheckAllFiles(stw_types::uint32 & oru
 
       if (pc_Item != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -425,7 +425,7 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::CheckAllFiles(stw_types::uint32 & oru
                if (opc_MissingApps != NULL)
                {
                   const QString c_New =
-                     QString("#%1 - %2 - %3").arg(this->mu32_PositionNumber + 1U).arg(this->mc_NodeName).
+                     static_cast<QString>("#%1 - %2 - %3").arg(this->mu32_PositionNumber + 1U).arg(this->mc_NodeName).
                      arg(pc_App->GetAppName());
                   opc_MissingApps->push_back(c_New);
                }
@@ -440,14 +440,14 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::CheckAllFiles(stw_types::uint32 & oru
                   if (pc_App->IsAppInfoAmbiguous() == false)
                   {
                      c_New =
-                        QString(C_GtGetText::h_GetText("#%1 - %2 - %3: Device type %4 does not match node type %5")).
+                        static_cast<QString>(C_GtGetText::h_GetText("#%1 - %2 - %3: Device type %4 does not match node type %5")).
                         arg(this->mu32_PositionNumber + 1U).arg(this->mc_NodeName).arg(pc_App->GetAppName()).
                         arg(pc_App->GetAppDeviceType()).arg(this->mc_DeviceType);
                   }
                   else
                   {
                      c_New =
-                        QString(C_GtGetText::h_GetText("#%1 - %2 - %3: HEX file has multiple application blocks.")).
+                        static_cast<QString>(C_GtGetText::h_GetText("#%1 - %2 - %3: HEX file has multiple application blocks.")).
                         arg(this->mu32_PositionNumber + 1U).arg(this->mc_NodeName).arg(pc_App->GetAppName());
                   }
                   opc_FlashwareWarningsApps->push_back(c_New);
@@ -529,7 +529,7 @@ const
 
             if (pc_Item != NULL)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                pc_App = dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
                if (pc_App != NULL)
@@ -567,7 +567,7 @@ void C_SyvUpUpdatePackageListNodeWidget::SetApplicationSelect(const uint32 ou32_
    // Return the path of the application
    if (pc_Item != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
          dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -639,7 +639,7 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_
 
       if (pc_Item != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -659,7 +659,7 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_
 
                if (pc_App->GetState() != C_SyvUpUpdatePackageListNodeItemWidget::hu32_STATE_FINISHED)
                {
-                  orc_ApplicationsToWrite.c_FilesToFlash.push_back(stw_scl::C_SCLString(c_Path.toStdString().c_str()));
+                  orc_ApplicationsToWrite.c_FilesToFlash.push_back(c_Path.toStdString().c_str());
                }
                else
                {
@@ -670,7 +670,7 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_
                if (opc_AllApplications != NULL)
                {
                   // Fill vector with all applications independent of the state
-                  opc_AllApplications->c_FilesToFlash.push_back(stw_scl::C_SCLString(c_Path.toStdString().c_str()));
+                  opc_AllApplications->c_FilesToFlash.push_back(c_Path.toStdString().c_str());
                }
 
                osc_write_log_info("Generate Update Package",
@@ -800,7 +800,7 @@ QString C_SyvUpUpdatePackageListNodeWidget::m_GetApplicationPath(const uint32 ou
    // Return the path of the application
    if (pc_Item != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
          dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -834,7 +834,7 @@ void C_SyvUpUpdatePackageListNodeWidget::m_SetApplicationState(const uint32 ou32
    // Adapt the icon of the finished application
    if (pc_Item != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
          dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -918,8 +918,7 @@ void C_SyvUpUpdatePackageListNodeWidget::m_InitItems(void)
             {
                this->mpc_Ui->pc_WidgetAdd->setVisible(true);
             }
-            //lint -e{429}  no memory leak because of the parent of pc_Spacer and the Qt memory management
-         }
+         } //lint !e429  //no memory leak because of the parent of pc_Spacer and the Qt memory management
       }
    }
 
@@ -936,7 +935,7 @@ uint32 C_SyvUpUpdatePackageListNodeWidget::m_GetApplicationState(const uint32 ou
    // Adapt the icon of the finished application
    if (pc_Item != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
          dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -958,7 +957,7 @@ void C_SyvUpUpdatePackageListNodeWidget::m_SetApplicationConnected(const uint32 
    // Return the path of the application
    if (pc_Item != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
          dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -1000,7 +999,7 @@ void C_SyvUpUpdatePackageListNodeWidget::m_UpdateNumbers(void) const
 
       if (pc_Item != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 

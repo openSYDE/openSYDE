@@ -542,9 +542,9 @@ void C_PuiSvHandlerFiler::h_SaveLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDa
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvHandlerFiler::h_GetViewFileName(const QString & orc_ViewName)
 {
-   return C_SCLString("view_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(
-                         orc_ViewName.toStdString().c_str()) +
-                      ".xml").c_str();
+   return ("view_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(
+              orc_ViewName.toStdString().c_str()) +
+           ".xml").c_str();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -710,7 +710,7 @@ void C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationPaths(std::vector<QString>
                                                             const QString & orc_XMLTagBaseName,
                                                             C_OSCXMLParserBase & orc_XMLParser)
 {
-   const C_SCLString c_ParentName = QString(orc_XMLTagBaseName + "s").toStdString().c_str();
+   const C_SCLString c_ParentName = static_cast<QString>(orc_XMLTagBaseName + "s").toStdString().c_str();
    const C_SCLString c_ChildName = orc_XMLTagBaseName.toStdString().c_str();
 
    orc_Paths.clear();
@@ -2085,6 +2085,17 @@ void C_PuiSvHandlerFiler::mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & or
       }
       orc_Id = C_PuiSvDbNodeDataPoolListElementId(c_Base, e_SourceType, q_UseArrayElementIndex, u32_ArrayElementIndex,
                                                   q_IsValid, e_InvalidTypePlaceholder, c_InvalidNamePlaceholder);
+
+      if (orc_XMLParser.SelectNodeChild("hal-channel-name") == "hal-channel-name")
+      {
+         orc_Id.SetHalChannelName(orc_XMLParser.GetNodeContent().c_str());
+         //Return
+         orc_XMLParser.SelectNodeParent();
+      }
+      else
+      {
+         orc_Id.SetHalChannelName("");
+      }
    }
 }
 
@@ -2766,7 +2777,7 @@ void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformationPaths(const std::vector<QS
                                                             const QString & orc_XMLTagBaseName,
                                                             C_OSCXMLParserBase & orc_XMLParser)
 {
-   const C_SCLString c_ParentName = QString(orc_XMLTagBaseName + "s").toStdString().c_str();
+   const C_SCLString c_ParentName = static_cast<QString>(orc_XMLTagBaseName + "s").toStdString().c_str();
    const C_SCLString c_ChildName = orc_XMLTagBaseName.toStdString().c_str();
 
    orc_XMLParser.CreateAndSelectNodeChild(c_ParentName);
@@ -3373,6 +3384,7 @@ void C_PuiSvHandlerFiler::mh_SaveUiIndex(const C_PuiSvDbNodeDataPoolListElementI
    orc_XMLParser.CreateNodeChild("invalid-type-placeholder",
                                  C_OSCNodeDataPoolFiler::h_DataPoolToString(orc_Id.GetInvalidTypePlaceholder()));
    orc_XMLParser.CreateNodeChild("invalid-name-placeholder", orc_Id.GetInvalidNamePlaceholder().toStdString().c_str());
+   orc_XMLParser.CreateNodeChild("hal-channel-name", orc_Id.GetHalChannelName().toStdString().c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3412,6 +3424,8 @@ QString C_PuiSvHandlerFiler::mh_DeviceConfigModeToString(const C_PuiSvData::E_De
    case C_PuiSvData::eDCM_ONLY_USED_INTERFACES:
       c_Retval = "only-used-interfaces";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3437,6 +3451,8 @@ QString C_PuiSvHandlerFiler::mh_WriteModeToString(const C_PuiSvDbWidgetBase::E_W
       break;
    case C_PuiSvDbWidgetBase::eWM_ON_CHANGE:
       c_Retval = "on-change";
+      break;
+   default:
       break;
    }
 
@@ -3470,6 +3486,8 @@ QString C_PuiSvHandlerFiler::mh_DisplayStyleToString(const C_PuiSvDbWidgetBase::
    case C_PuiSvDbWidgetBase::eSKEUOMORPH:
       c_Retval = "skeuomorph";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3499,6 +3517,8 @@ QString C_PuiSvHandlerFiler::mh_ToggleTypeToString(const C_PuiSvDbToggle::E_Type
    case C_PuiSvDbToggle::eTYPE3:
       c_Retval = "type3";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3525,6 +3545,8 @@ QString C_PuiSvHandlerFiler::mh_SpinBoxTypeToString(const C_PuiSvDbSpinBox::E_Ty
    case C_PuiSvDbSpinBox::eTYPE2:
       c_Retval = "type2";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3550,6 +3572,8 @@ QString C_PuiSvHandlerFiler::mh_LabelTypeToString(const C_PuiSvDbLabel::E_Type o
       break;
    case C_PuiSvDbLabel::eTRANSPARENT:
       c_Retval = "transparent";
+      break;
+   default:
       break;
    }
 
@@ -3583,6 +3607,8 @@ QString C_PuiSvHandlerFiler::mh_SliderTypeToString(const C_PuiSvDbSlider::E_Type
    case C_PuiSvDbSlider::eTYPE_BIG_COLOR_2:
       c_Retval = "big-color-2";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3611,6 +3637,8 @@ QString C_PuiSvHandlerFiler::mh_ProgressBarTypeToString(const C_PuiSvDbProgressB
       break;
    case C_PuiSvDbProgressBar::eTYPE_3:
       c_Retval = "type3";
+      break;
+   default:
       break;
    }
 
@@ -3644,6 +3672,8 @@ QString C_PuiSvHandlerFiler::mh_ProgressBarAlignmentTypeToString(const C_PuiSvDb
    case C_PuiSvDbProgressBar::eRIGHT:
       c_Retval = "right";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3673,6 +3703,8 @@ QString C_PuiSvHandlerFiler::mh_TransmissionModeToString(const C_PuiSvReadDataCo
    case C_PuiSvReadDataConfiguration::eTM_ON_CHANGE:
       c_Retval = "cyclic-on-change";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3698,6 +3730,8 @@ QString C_PuiSvHandlerFiler::mh_SourceTypeToString(const C_PuiSvDbNodeDataPoolLi
       break;
    case C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL:
       c_Retval = "bus-signal";
+      break;
+   default:
       break;
    }
 
@@ -3756,6 +3790,8 @@ QString C_PuiSvHandlerFiler::mh_ChartZoomModeToString(const C_PuiSvDbChart::E_Se
       break;
    case C_PuiSvDbChart::eSETTING_ZM_Y:
       c_Retval = "setting_zm_y";
+      break;
+   default:
       break;
    }
 

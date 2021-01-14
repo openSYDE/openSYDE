@@ -53,7 +53,7 @@ C_OgeTreeToolTipBase::C_OgeTreeToolTipBase(void) :
    \param[in]  opc_Event   "mouseMove" parameter
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTreeToolTipBase::CallAfterMouseMove(const QMouseEvent * const opc_Event)
+void C_OgeTreeToolTipBase::m_CallAfterMouseMove(const QMouseEvent * const opc_Event)
 {
    this->m_HandleMouseMoveToolTip(opc_Event->globalPos());
 }
@@ -67,7 +67,7 @@ void C_OgeTreeToolTipBase::CallAfterMouseMove(const QMouseEvent * const opc_Even
    \retval false     Event ignored
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OgeTreeToolTipBase::CallForEvent(QEvent * const opc_Event)
+bool C_OgeTreeToolTipBase::m_CallForEvent(QEvent * const opc_Event)
 {
    bool q_Return;
 
@@ -76,7 +76,7 @@ bool C_OgeTreeToolTipBase::CallForEvent(QEvent * const opc_Event)
       //show tooltip
       if (this->m_GetToolTip()->isVisible() == false)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
          //Trigger tooltip update
@@ -166,7 +166,7 @@ bool C_OgeTreeToolTipBase::CallForEvent(QEvent * const opc_Event)
    //Necessary to detect mouse move events over integrated widgets
    else if (opc_Event->type() == QEvent::HoverMove)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QHoverEvent * const pc_HoverEvent = dynamic_cast<QHoverEvent * const>(opc_Event);
 
       if (pc_HoverEvent != NULL)
@@ -189,11 +189,11 @@ bool C_OgeTreeToolTipBase::CallForEvent(QEvent * const opc_Event)
    \param[in,out]  opc_Event  "eventFilter" parameter
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTreeToolTipBase::CallBeforeEventFilter(const QEvent * const opc_Event)
+void C_OgeTreeToolTipBase::m_CallBeforeEventFilter(const QEvent * const opc_Event)
 {
    if (opc_Event->type() == QEvent::HoverMove)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       const QHoverEvent * const pc_HoverEvent = dynamic_cast<const QHoverEvent * const>(opc_Event);
 
       if (pc_HoverEvent != NULL)

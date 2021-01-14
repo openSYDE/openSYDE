@@ -13,6 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
+#include <set>
 #include <QString>
 #include "C_PuiSvDbChart.h"
 #include "C_PuiSvDbLabel.h"
@@ -80,6 +81,7 @@ public:
    const C_PuiSvDbWidgetBase * GetWidgetBase(const C_PuiSvDbDataElement::E_Type oe_Type,
                                              const stw_types::uint32 ou32_Index) const;
    void GetAllWidgetItems(std::vector<const C_PuiSvDbWidgetBase *> & orc_Output) const;
+   void GetAllRegisteredDashboardElements(std::set<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_Ids) const;
 
    //Set
    stw_types::sint32 SetWidget(const stw_types::uint32 ou32_Index, const C_PuiSvDbWidgetBase * const opc_Value,

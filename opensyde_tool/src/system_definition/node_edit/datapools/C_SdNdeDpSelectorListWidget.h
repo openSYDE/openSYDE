@@ -13,13 +13,15 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
+#include <QWidget>
 #include <QAction>
+#include <QList>
 
 #include "stwtypes.h"
 
-#include "C_SdNdeDpSelectorListDelegate.h"
+//#include "C_SdNdeDpSelectorListDelegate.h"
 
-#include "C_OgeHorizontalListWidget.h"
+#include "C_SdNdeDpSelectorItemWidget.h"
 #include "C_OgeContextMenu.h"
 #include "C_OSCNodeDataPool.h"
 #include "C_OSCNodeDataPoolId.h"
@@ -34,7 +36,7 @@ namespace stw_opensyde_gui
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeDpSelectorListWidget :
-   public stw_opensyde_gui_elements::C_OgeHorizontalListWidget
+   public QWidget
 {
    Q_OBJECT
 
@@ -54,10 +56,20 @@ public:
    void UpdateSizeHint(const stw_types::sintn osn_MaxHeight);
    virtual QSize sizeHint(void) const override;
 
+   stw_types::sintn GetItemCount(void) const;
+   stw_types::sintn GetCurrentItemIndex(void) const;
+   stw_types::sintn GetViewPageCount(void) const;
+   stw_types::sintn GetCurrentViewPage(void) const;
+
+   void SetSelectedItem(const stw_types::uint32 ou32_Index);
+   void SetCurrentViewPage(const stw_types::sintn osn_ViewIndex);
+   void ScrollToItem(const stw_types::uint32 ou32_Index);
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
+   void SigListChanged(void);
    void SigWidgetFocused(void);
    void SigOpenDataPoolContent(const stw_types::sintn osn_DataPoolWidgetIndex);
    void SigDataPoolChanged(void);
@@ -67,18 +79,16 @@ Q_SIGNALS:
    void SigHideOtherToolTips(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void focusInEvent(QFocusEvent * const opc_Event) override;
-   //lint -restore
+   virtual void wheelEvent(QWheelEvent * const opc_Event) override;
 
-   virtual void m_MoveItem(const stw_types::sintn osn_SourceIndex, const stw_types::sintn osn_TargetIndex) override;
-   virtual void m_UpdateNumbers(void) const override;
-   virtual void m_DelegateStartPaint(void) override;
-   virtual void m_DelegateStopPaint(void) override;
+   void m_MoveItem(const stw_types::sintn osn_SourceIndex, const stw_types::sintn osn_TargetIndex);
+   void m_UpdateNumbers(void) const;
+   //void m_DelegateStartPaint(void);
+   //void m_DelegateStopPaint(void);
 
 private:
    //Avoid call
@@ -104,6 +114,8 @@ private:
    void m_SynchronizeDatapoolProperties(const stw_opensyde_core::C_OSCNodeDataPoolId & orc_AdaptedDatapool) const;
 
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
+   void m_OnItemCustomContextMenuRequested(const QPoint & orc_Pos, const stw_types::uint32 ou32_Index);
+   void m_OpenCustomContextMenu(const QPoint & orc_Pos, const C_SdNdeDpSelectorItemWidget * const opc_Item);
    void m_SetupContextMenu(void);
    void m_Edit(const bool oq_SelectName = false);
    void m_EditContent(void);
@@ -113,17 +125,22 @@ private:
    void m_Delete(const bool oq_AskUser);
    void m_MoveLeft(void);
    void m_MoveRight(void);
-   void m_ItemClicked(QListWidgetItem * const opc_Item);
-   void m_ItemDoubleClicked(QListWidgetItem * const opc_Item);
+   void m_MoveUp(void);
+   void m_MoveDown(void);
+   void m_ItemClicked(const stw_types::uint32 ou32_Index);
+   void m_ItemDoubleClicked(const stw_types::uint32 ou32_Index);
 
    void m_MoveDatapool(const stw_types::sintn osn_SourceIndex, const stw_types::sintn osn_TargetIndex);
    void m_InitFromData(const bool oq_Update = false);
+   void m_Clear(void);
    void m_SelectionChanged(void);
    void m_AdaptSize(const QSize & orc_WidgetSize);
-   void m_UpdateCounters(void);
-   void m_UpdateItemErrorToolTip(void) const;
+   void m_UpdateCounters(const bool oq_ForceRearrageItems = false);
+   void m_RearrangeItems(void);
+   void m_UpdateItemErrorToolTip(const stw_types::uint32 ou32_Index) const;
 
-   stw_opensyde_gui_logic::C_SdNdeDpSelectorListDelegate mc_Delegate;
+   // TODO BAY:
+   //stw_opensyde_gui_logic::C_SdNdeDpSelectorListDelegate mc_Delegate;
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
    QAction * mpc_AddAction;
    QAction * mpc_EditAction;
@@ -137,7 +154,19 @@ private:
    QAction * mpc_MoveActionSeparator;
    QAction * mpc_MoveLeftAction;
    QAction * mpc_MoveRightAction;
+   QAction * mpc_MoveUpAction;
+   QAction * mpc_MoveDownAction;
    bool mq_Selected;
+   stw_types::sintn msn_ItemsPerRow;
+   stw_types::sintn msn_ItemsPerViewPage;
+
+   stw_types::sintn msn_RowsPerViewPage;
+
+   stw_types::sintn msn_CountViewPages;
+   stw_types::sintn msn_CurrentViewPage;
+
+   stw_types::sintn msn_SelectedItemIndex;
+   QList<C_SdNdeDpSelectorItemWidget *> mc_DpItems;
 
    stw_types::uint32 mu32_NodeIndex;
    stw_opensyde_core::C_OSCNodeDataPool::E_Type me_DataPoolType;

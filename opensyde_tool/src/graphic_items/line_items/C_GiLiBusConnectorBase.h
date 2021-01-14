@@ -90,12 +90,9 @@ protected:
    bool mq_InAir; ///< Indicator if connection is currently moved by
    ///< user and therefore can be invalid / not connected
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
-   //lint -restore
 
    void m_SetBus(const C_GiLiBus * const opc_Bus);
    void m_UpdateBus(const QPointF & orc_Pos, const C_GiLiBus * const opc_BusItem);
@@ -124,7 +121,7 @@ protected:
 private:
    //Avoid call
    C_GiLiBusConnectorBase(const C_GiLiBusConnectorBase &);
-   C_GiLiBusConnectorBase & operator =(const C_GiLiBusConnectorBase &);
+   C_GiLiBusConnectorBase & operator =(const C_GiLiBusConnectorBase &); //lint !e1511 //we want to hide the base func.
 
    const C_GiLiBus * mpc_BusItem; ///< Bus item this connection is connected to
    std::vector<QPointF> mc_LastKnownBusScenePoints;

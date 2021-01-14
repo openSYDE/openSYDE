@@ -188,7 +188,7 @@ void C_SdBueMessageSelectorWidget::InitFromData(void) const
    this->mpc_Ui->pc_MessageTreeWidget->InitFromData();
 
    //Text
-   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(QString(C_GtGetText::h_GetText("Messages (%1)")).arg(this->mpc_Ui->
+   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(this->mpc_Ui->
                                                                                                    pc_MessageTreeWidget
                                                                                                    ->topLevelItemCount()));
 
@@ -736,7 +736,7 @@ void C_SdBueMessageSelectorWidget::m_OnMessageCountChanged(void)
    Q_EMIT (this->SigMessageCountChanged());
 
    //Text
-   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(QString(C_GtGetText::h_GetText("Messages (%1)")).arg(this->mpc_Ui->
+   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(this->mpc_Ui->
                                                                                                    pc_MessageTreeWidget
                                                                                                    ->topLevelItemCount()));
 

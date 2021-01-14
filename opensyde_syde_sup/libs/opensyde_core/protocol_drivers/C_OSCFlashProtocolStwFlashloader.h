@@ -28,8 +28,8 @@ public:
    typedef stw_types::sint32 (* PR_ReportProgress)(void * const opv_Instance, const stw_types::uint8 ou8_Progress,
                                                    const stw_scl::C_SCLString & orc_Text);
 
-   PR_ReportProgress mpr_ReportProgress;
-   void * mpv_ReportProgressInstance;
+   PR_ReportProgress pr_ReportProgress;
+   void * pv_ReportProgressInstance;
 
    C_OSCFlashProtocolStwFlashloader(const PR_ReportProgress opr_Progress, void * const opv_Instance);
    virtual ~C_OSCFlashProtocolStwFlashloader(void);
@@ -38,9 +38,11 @@ protected:
    //reporting functions from STW Flashloader protocol driver
    ///Report progress in 1/1000; return a value != C_NO_ERR to signal the flashing procedure to abort.
    ///This is just for informational purposes and not necessarily exactly linear to the actual progress.
+   //lint -e{8001,8011}  //name of function dictated by base class
    virtual stw_types::sint32 TRG_ReportProgress(const stw_types::uint16 ou16_Progress1_1000,
                                                 const stw_scl::C_SCLString & orc_AdditionalText);
    ///report status as text; can be used for logging what's going on
+   //lint -e{8001,8011}  //name of function dictated by base class
    virtual void TRG_ReportStatus(const stw_scl::C_SCLString & orc_Text, const stw_types::uint8 ou8_Type);
 
 private:

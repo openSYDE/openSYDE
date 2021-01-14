@@ -93,14 +93,12 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::h_GetAllRelevantObjects(const QList
         c_ItSelectedItem != orc_SelectedItems.end(); ++c_ItSelectedItem)
    {
       QGraphicsItem * const pc_CurrentItem = C_SebUtil::h_GetHighestParent(*c_ItSelectedItem);
-      //lint -e{740}  no problem because of common base class
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiUnique * const pc_UniqueElement = dynamic_cast<C_GiUnique *>(pc_CurrentItem);
       if (pc_UniqueElement != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(pc_CurrentItem);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(pc_CurrentItem);
          //Item is unique
          orc_AllRelevantItems.push_back(pc_CurrentItem);
@@ -150,7 +148,6 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_DeleteSave(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_Restore(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_SdTopologyScene * const pc_Scene = dynamic_cast<C_SdTopologyScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -167,7 +164,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_Restore(void)
    Boundary element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetBoundaryType(void) const
+sint32 C_SdManUnoTopologyAddDeleteBaseCommand::m_GetBoundaryType(void) const
 {
    return static_cast<sint32>(C_PuiSdDataElement::eBOUNDARY);
 }
@@ -179,7 +176,7 @@ sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetBoundaryType(void) const
    Image element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetImageType(void) const
+sint32 C_SdManUnoTopologyAddDeleteBaseCommand::m_GetImageType(void) const
 {
    return static_cast<sint32>(C_PuiSdDataElement::eIMAGE);
 }
@@ -191,7 +188,7 @@ sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetImageType(void) const
    Line arrow element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetLineArrowType(void) const
+sint32 C_SdManUnoTopologyAddDeleteBaseCommand::m_GetLineArrowType(void) const
 {
    return static_cast<sint32>(C_PuiSdDataElement::eLINE_ARROW);
 }
@@ -203,7 +200,7 @@ sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetLineArrowType(void) const
    Text element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetTextElementType(void) const
+sint32 C_SdManUnoTopologyAddDeleteBaseCommand::m_GetTextElementType(void) const
 {
    return static_cast<sint32>(C_PuiSdDataElement::eTEXT_ELEMENT);
 }
@@ -214,7 +211,7 @@ sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetTextElementType(void) const
    \param[in] orc_NewPos Offset
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdManUnoTopologyAddDeleteBaseCommand::SetDataPositionOffset(const QPointF & orc_NewPos)
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_SetDataPositionOffset(const QPointF & orc_NewPos)
 {
    this->mc_DataBackup.SetDataPositionOffset(orc_NewPos);
 }
@@ -225,7 +222,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::SetDataPositionOffset(const QPointF
    \param[in] of64_HighestUsedZValue Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdManUnoTopologyAddDeleteBaseCommand::SetDataZOffset(const float64 of64_HighestUsedZValue)
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_SetDataZOffset(const float64 of64_HighestUsedZValue)
 {
    this->mc_DataBackup.SetDataZOffset(of64_HighestUsedZValue);
 }
@@ -248,7 +245,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::mh_SearchAndAddAllAffectedBusConnec
    {
       //Bus connector
       QGraphicsItem * const pc_CurrentItem = C_SebUtil::h_GetHighestParent(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiLiBusConnector * const pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_CurrentItem);
       if (pc_BusConnector != NULL)
       {
@@ -292,7 +289,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::mh_SearchAndAddAllAffectedBusTextEl
    {
       //Bus connector
       QGraphicsItem * const pc_CurrentItem = C_SebUtil::h_GetHighestParent(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiTextElementBus * const pc_TextElementBus = dynamic_cast<C_GiTextElementBus *>(pc_CurrentItem);
       if (pc_TextElementBus != NULL)
       {
@@ -328,14 +325,12 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
    for (vector<QGraphicsItem *>::const_iterator c_ItRelatedItem = c_RelatedItems.begin();
         c_ItRelatedItem != c_RelatedItems.end(); ++c_ItRelatedItem)
    {
-      //lint -e{740}  no problem because of common base class
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       pc_Unique = dynamic_cast<C_GiUnique *>(*c_ItRelatedItem);
       if (pc_Unique != NULL)
       {
          const uint64 u64_CurUniqueID = pc_Unique->GetID();
          //lint -e{740}  no problem because of common base class
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          pc_Data = dynamic_cast<C_PuiSdDataElement *>(*c_ItRelatedItem);
          if (pc_Data != NULL)
          {
@@ -348,7 +343,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
 
                //Backup scene data internally
                //Node
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                pc_Node = dynamic_cast<C_GiNode *>(*c_ItRelatedItem);
                if (pc_Node != NULL)
                {
@@ -373,7 +368,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
                   }
                }
                //Bus
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                pc_Bus = dynamic_cast<C_GiLiBus *>(*c_ItRelatedItem);
                if (pc_Bus != NULL)
                {
@@ -400,7 +395,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
                }
 
                // Bus text element
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                pc_TextElementBus = dynamic_cast<C_GiTextElementBus *>(*c_ItRelatedItem);
                if (pc_TextElementBus != NULL)
                {
@@ -421,7 +416,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
          else
          {
             //Bus connector
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(*c_ItRelatedItem);
             if (pc_BusConnector != NULL)
             {
@@ -528,7 +523,6 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_Clear(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_Delete(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_SdTopologyScene * const pc_Scene = dynamic_cast<C_SdTopologyScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)

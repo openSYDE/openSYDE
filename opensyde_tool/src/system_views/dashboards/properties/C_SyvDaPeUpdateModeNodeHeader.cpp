@@ -89,7 +89,7 @@ C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const stw_types::ui
    if (pc_Node != NULL)
    {
       //Translation: 1: Node name
-      this->mpc_Ui->pc_LabelListName->setText(QString(C_GtGetText::h_GetText("Node - %1")).arg(pc_Node->c_Properties.
+      this->mpc_Ui->pc_LabelListName->setText(static_cast<QString>(C_GtGetText::h_GetText("Node - %1")).arg(pc_Node->c_Properties.
                                                                                                c_Name.c_str()));
    }
    this->UpdateCount();
@@ -151,7 +151,7 @@ void C_SyvDaPeUpdateModeNodeHeader::UpdateCount(const sint32 os32_Count) const
          u32_Cur = pc_View->CountCyclicTransmissions(this->mu32_NodeIndex);
       }
       //Translation: 1 = Current number of used transmissions, 2 = Allowed number of used transmissions
-      this->mpc_Ui->pc_LabelCountNumber->setText(QString(C_GtGetText::h_GetText("%1")).arg(u32_Cur));
+      this->mpc_Ui->pc_LabelCountNumber->setText(static_cast<QString>(C_GtGetText::h_GetText("%1")).arg(u32_Cur));
    }
 }
 

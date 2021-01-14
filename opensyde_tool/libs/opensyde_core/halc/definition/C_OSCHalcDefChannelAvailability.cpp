@@ -41,6 +41,14 @@ C_OSCHalcDefChannelAvailability::C_OSCHalcDefChannelAvailability(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Destructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCHalcDefChannelAvailability::~C_OSCHalcDefChannelAvailability()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.

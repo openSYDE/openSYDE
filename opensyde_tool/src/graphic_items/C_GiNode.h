@@ -93,12 +93,9 @@ Q_SIGNALS:
    void SigHideToolTip(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
-   //lint -restore
 
    virtual bool m_UpdateError(void);
    bool m_GetErrorStatus(void) const;
@@ -129,7 +126,7 @@ protected:
 private:
    //Avoid call
    C_GiNode(const C_GiNode &);
-   C_GiNode & operator =(const C_GiNode &);
+   C_GiNode & operator =(const C_GiNode &); //lint !e1511 //we want to hide the base func.
 
    C_GiNodeBoundary * mpc_Boundary;
    QVector<C_GiPort *> mc_Ports;
@@ -147,8 +144,8 @@ private:
    void m_UpdateItems(const stw_types::float64 of64_DiffWidth, const stw_types::float64 of64_DiffHeight,
                       const bool oq_Initial);
 
-   static const stw_types::float64 mahf64_ScaleMinWidthNode[7];
-   static const stw_types::float64 mahf64_ScaleMinHeightNode[7];
+   static const stw_types::float64 mhaf64_ScaleMinWidthNode[7];
+   static const stw_types::float64 mhaf64_ScaleMinHeightNode[7];
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

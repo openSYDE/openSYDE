@@ -45,9 +45,6 @@ public:
    bool Equals(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
                const stw_types::uint32 & oru32_ListIndex) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation, const stw_types::sintn osn_Role =
                                   static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
@@ -59,14 +56,10 @@ public:
 
    virtual Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;
    virtual Qt::DropActions supportedDropActions(void) const override;
-   //lint -restore
 
    // Add data:
    void DoInsertColumns(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolDataSet> & orc_OSCNames,
                         const std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues, const stw_types::uint32 & oru32_Row);
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual bool insertColumns(const stw_types::sintn osn_Column, const stw_types::sintn osn_Count,
                               const QModelIndex & orc_Parent = QModelIndex()) override;
 
@@ -78,17 +71,14 @@ public:
    virtual bool moveColumns(const QModelIndex & orc_SourceParent, const stw_types::sintn osn_SourceColumn,
                             const stw_types::sintn osn_Count, const QModelIndex & orc_DestinationParent,
                             const stw_types::sintn osn_DestinationChild) override;
-   //lint -restore
 
    static E_Rows h_RowToEnum(const stw_types::sint32 & ors32_Row);
    static stw_types::sint32 h_EnumToRow(const E_Rows & ore_Value);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    //Drag & drop
    virtual QStringList mimeTypes() const override;
    virtual QMimeData * mimeData(const QModelIndexList & orc_Indices) const override;
-   //lint -restore
+
    void HandleDataChange(const stw_types::uint32 & oru32_Column,
                          const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_ChangeType);
    void Reset(void);

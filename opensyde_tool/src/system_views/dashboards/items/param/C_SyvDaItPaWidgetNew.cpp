@@ -19,6 +19,7 @@
 #include "C_OSCUtils.h"
 #include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
+#include "C_PuiSdUtil.h"
 #include "C_GiSvDaParam.h"
 #include "C_PuiSvHandler.h"
 #include "C_OgePopUpDialog.h"
@@ -115,6 +116,8 @@ C_SyvDaItPaWidgetNew::C_SyvDaItPaWidgetNew(const uint32 & oru32_ViewIndex,
            &C_SyvDaItPaWidgetNew::m_RecordElements);
    connect(this->mpc_Ui->pc_TreeView, &C_SyvDaItPaTreeView::SigActionRemove, this,
            &C_SyvDaItPaWidgetNew::m_HandleRemoveTrigger);
+   connect(this->mpc_Ui->pc_TreeView, &C_SyvDaItPaTreeView::SigInformUserFloatRangeCheck, this,
+           &C_SyvDaItPaWidgetNew::m_InformUserFloatRangeCheck);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -208,7 +211,7 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
 
    if (q_Return == true)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
       if (pc_ParamWidget != NULL)
       {
@@ -220,9 +223,11 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                tgl_assert((this->mu32_ListCounter - 1UL) < this->mc_ListIds.size());
                if ((this->mu32_ListCounter - 1UL) < this->mc_ListIds.size())
                {
-                  this->mc_ListsWithCRCError.push_back(this->mc_ListIds[this->mu32_ListCounter - 1UL]);
+                  this->mc_ListsWithCRCError.push_back(
+                     this->mc_ListIds[static_cast<uintn>(this->mu32_ListCounter) - 1U]);
                   //Signal CRC error
-                  this->mpc_Ui->pc_TreeView->SetCRCStatus(this->mc_ListIds[this->mu32_ListCounter - 1UL], false);
+                  this->mpc_Ui->pc_TreeView->SetCRCStatus(
+                     this->mc_ListIds[static_cast<uintn>(this->mu32_ListCounter) - 1U], false);
                }
             }
             else if (s32_Result == C_NO_ERR)
@@ -232,12 +237,15 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                if ((this->mu32_ListCounter - 1UL) < this->mc_ListIds.size())
                {
                   //Signal CRC OK
-                  this->mpc_Ui->pc_TreeView->SetCRCStatus(this->mc_ListIds[this->mu32_ListCounter - 1UL], true);
+                  this->mpc_Ui->pc_TreeView->SetCRCStatus(
+                     this->mc_ListIds[static_cast<uintn>(this->mu32_ListCounter) - 1U], true);
                }
             }
             else
             {
+               // Nothing to do here. C_CHECKSUM is no functional error. The functional errors are handled later
             }
+
             //Ignore warn because CRC errors on read should be fixed by this widget
             if ((s32_Result == C_NO_ERR) || (s32_Result == C_CHECKSUM))
             {
@@ -275,13 +283,14 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                               rc_CurId.u32_NodeIndex, rc_CurId.u32_DataPoolIndex, rc_CurId.u32_ListIndex);
                         if (((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL))
                         {
-                           c_ListsString += QString("- %1::%2::%3\n").arg(pc_Node->c_Properties.c_Name.c_str()).arg(
-                              pc_DataPool->c_Name.c_str()).arg(pc_List->c_Name.c_str());
+                           c_ListsString += static_cast<QString>("- %1::%2::%3\n").
+                                            arg(pc_Node->c_Properties.c_Name.c_str()).
+                                            arg(pc_DataPool->c_Name.c_str()).arg(pc_List->c_Name.c_str());
                         }
                      }
                      c_MessageResult.SetHeading(C_GtGetText::h_GetText("Invalid List CRC"));
-                     c_MessageResult.SetDescription(QString(C_GtGetText::h_GetText(
-                                                               "Detected CRCs are invalid for at least one list.")));
+                     c_MessageResult.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                            "Detected CRCs are invalid for at least one list.")));
                      c_MessageResult.SetDetails(c_ListsString);
                      c_MessageResult.SetCustomMinHeight(180, 300);
                      c_MessageResult.Execute();
@@ -312,7 +321,7 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
             s32_Result = C_CONFIG;
          }
 
-         //Ignore warn because CRC errors on read should be fixed by this widget
+         // Handling of all functional errors
          if ((s32_Result != C_NO_ERR) && (s32_Result != C_CHECKSUM))
          {
             C_OgeWiCustomMessage c_MessageResult(pc_ParamWidget->GetPopUpParent()->parentWidget(), // parent because
@@ -337,12 +346,13 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                if ((this->mu32_ListCounter - 1UL) < this->mc_ListIds.size())
                {
                   const C_OSCNodeDataPoolListElementId & rc_CurEntryId =
-                     this->mc_ListIds[this->mu32_ListCounter - 1UL];
+                     this->mc_ListIds[static_cast<uintn>(this->mu32_ListCounter) - 1U];
                   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
                      rc_CurEntryId.u32_NodeIndex);
                   if (pc_Node != NULL)
                   {
-                     c_Node = QString(C_GtGetText::h_GetText("Node %1")).arg(pc_Node->c_Properties.c_Name.c_str());
+                     c_Node = static_cast<QString>(C_GtGetText::h_GetText("Node %1")).arg(
+                        pc_Node->c_Properties.c_Name.c_str());
                   }
                }
                switch (ou8_NRC)
@@ -370,11 +380,12 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                   break;
                default:
                   c_Details =
-                     QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC, 16));
+                     static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC,
+                                                                                                           16));
                   break;
                }
-               c_MessageResult.SetDescription(QString(C_GtGetText::h_GetText(
-                                                         "%1 responded with error response.")).arg(
+               c_MessageResult.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                      "%1 responded with error response.")).arg(
                                                  c_Node));
                c_MessageResult.SetDetails(c_Details);
                c_MessageResult.SetCustomMinHeight(180, 250);
@@ -423,7 +434,7 @@ void C_SyvDaItPaWidgetNew::SetDark(const bool oq_Value) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::ButtonAddClicked(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -477,8 +488,7 @@ void C_SyvDaItPaWidgetNew::ButtonAddClicked(void)
          pc_Dialog->SaveUserSettings();
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -665,7 +675,7 @@ void C_SyvDaItPaWidgetNew::m_ReadElements(void)
    {
       s32_Result = C_CONFIG;
    }
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
    if (pc_ParamWidget != NULL)
    {
@@ -688,6 +698,10 @@ void C_SyvDaItPaWidgetNew::m_ReadElements(void)
          c_MessageResult.SetCustomMinHeight(180, 250);
          c_MessageResult.Execute();
          this->mq_ReadActive = false;
+      }
+      else
+      {
+         // no error -> no error handling
       }
    }
 }
@@ -747,7 +761,7 @@ void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolLi
          c_InterestingInvalidLists.push_back(rc_InvalidId);
       }
    }
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
    if (pc_ParamWidget != NULL)
    {
@@ -824,8 +838,7 @@ void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolLi
                {
                   c_New->HideOverlay();
                }
-               //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-            }
+            } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
             // Reset all previous set NVM changed flags in all cases
             // If a flag would not be reseted in case of an error or a cancel,
@@ -872,13 +885,13 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
 
    if (pc_View != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
       if (pc_ParamWidget != NULL)
       {
          QString c_Folder;
          QString c_File;
-         const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE Parameter Set File")) + " (*" +
+         const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("openSYDE Parameter Set File")) + " (*" +
                                   mhc_FILE_EXTENSION_PARAMSET + ")";
 
          //User settings restore
@@ -903,6 +916,9 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
             {
                const QSize c_SizeImportReport(1210, 790);
                const C_OSCParamSetInterpretedData & rc_Data = c_ParamSetHandler.GetInterpretedData();
+               std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_FloatRangeCheckInvalidValueIds;
+               std::vector<QString> c_FloatRangeCheckInvalidValues;
+               std::vector<QString> c_FloatRangeCheckNewValues;
 
                QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(
                   pc_ParamWidget->GetPopUpParent(), pc_ParamWidget->GetPopUpParent());
@@ -915,6 +931,11 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
 
                //Resize
                c_New->SetSize(c_SizeImportReport);
+
+               pc_Dialog->GetFloatRangeCheckResults(c_FloatRangeCheckInvalidValueIds, c_FloatRangeCheckInvalidValues,
+                                                    c_FloatRangeCheckNewValues);
+               this->m_InformUserFloatRangeCheck(c_FloatRangeCheckInvalidValueIds, c_FloatRangeCheckInvalidValues,
+                                                 c_FloatRangeCheckNewValues);
 
                if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
                {
@@ -961,8 +982,7 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
                {
                   c_New->HideOverlay();
                }
-               //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-            }
+            } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
             else
             {
                QString c_Details;
@@ -973,10 +993,11 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
 
                c_MessageResultRead.SetHeading(C_GtGetText::h_GetText("Import configuration"));
                c_MessageResultRead.SetDescription(C_GtGetText::h_GetText("Could not read the file."));
-               c_Details = C_GtGetText::h_GetText("Possible reasons:<br/>"
-                                                  "- Invalid xml format (e.g. wrong filetype selected)<br/>"
-                                                  "- Invalid xml version (e.g. version incompatible with current tool version)<br/>"
-                                                  "- Invalid content (e.g. values invalid)<br/>");
+               c_Details = C_GtGetText::h_GetText(
+                  "Possible reasons:<br/>"
+                  "- Invalid xml format (e.g. wrong filetype selected)<br/>"
+                  "- Invalid xml version (e.g. version incompatible with current tool version)<br/>"
+                  "- Invalid content (e.g. values invalid)<br/>");
                c_Details += C_GtGetText::h_GetText("For more information see ");
                c_Details += C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
                                              C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
@@ -1059,7 +1080,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
             c_UsedNodeIndices.push_back(rc_CurElementId.u32_NodeIndex);
             c_IntNodes.resize(c_IntNodes.size() + 1);
             c_UsedDataPoolIndices.resize(c_IntNodes.size());
-            u32_CurIntNodeIndex = c_IntNodes.size() - 1;
+            u32_CurIntNodeIndex = static_cast<uint32>(c_IntNodes.size() - 1);
             pc_CurIntNode = &c_IntNodes[u32_CurIntNodeIndex];
 
             // Fill node information
@@ -1092,7 +1113,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
                // New interpreted datapool necessary
                c_UsedDataPoolIndices[u32_CurIntNodeIndex].push_back(rc_CurElementId.u32_DataPoolIndex);
                pc_CurIntNode->c_DataPools.resize(pc_CurIntNode->c_DataPools.size() + 1);
-               u32_CurIntDataPoolIndex = pc_CurIntNode->c_DataPools.size() - 1;
+               u32_CurIntDataPoolIndex = static_cast<uint32>((pc_CurIntNode->c_DataPools.size() - 1));
                pc_CurIntDataPool = &pc_CurIntNode->c_DataPools[u32_CurIntDataPoolIndex];
 
                // Fill datapool information
@@ -1142,7 +1163,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
          break;
       }
    }
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
    if (pc_ParamWidget != NULL)
    {
@@ -1182,14 +1203,14 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
                      c_Folder = c_Info.dir().absolutePath();
                   }
                   //Append default file name
-                  c_Folder += QString("/%1%2").arg(c_File, mhc_FILE_EXTENSION_PARAMSET);
+                  c_Folder += static_cast<QString>("/%1%2").arg(c_File, mhc_FILE_EXTENSION_PARAMSET);
                }
 
                c_FileName = C_OgeWiUtil::h_GetSaveFileName(pc_ParamWidget->GetPopUpParent(),
                                                            C_GtGetText::h_GetText("Save Parameter Set File"),
                                                            c_Folder,
-                                                           QString(C_GtGetText::h_GetText(
-                                                                      "openSYDE Parameter Set File")) +
+                                                           static_cast<QString>(C_GtGetText::h_GetText(
+                                                                                   "openSYDE Parameter Set File")) +
                                                            " (*" + mhc_FILE_EXTENSION_PARAMSET + ")", "");
 
                if (c_FileName.compare("") != 0)
@@ -1233,8 +1254,9 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
                   else
                   {
                      const QString c_Details =
-                        QString("File saved at: %1").arg(C_Uti::h_GetLink(c_FileName, mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                          "file:" + c_FileName));
+                        static_cast<QString>("File saved at: %1").arg(C_Uti::h_GetLink(c_FileName,
+                                                                                       mc_STYLESHEET_GUIDE_COLOR_LINK,
+                                                                                       "file:" + c_FileName));
                      C_OgeWiCustomMessage c_MessageResultSave(
                         pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::E_Type::eINFORMATION);
                      c_MessageResultSave.SetHeading(C_GtGetText::h_GetText("Configuration export"));
@@ -1281,7 +1303,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_RecordElements(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -1313,8 +1335,7 @@ void C_SyvDaItPaWidgetNew::m_RecordElements(const std::vector<C_OSCNodeDataPoolL
             pc_Dialog->SaveUserSettings();
             c_New->HideOverlay();
          }
-         //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-      }
+      } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    }
 }
 
@@ -1433,14 +1454,15 @@ void C_SyvDaItPaWidgetNew::m_HandleWriteProcessTrigger(const std::vector<C_OSCNo
 void C_SyvDaItPaWidgetNew::m_HandleRemoveTrigger(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
    C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
    if (pc_ParamWidget != NULL)
    {
       C_OgeWiCustomMessage c_MessageBox(pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::E_Type::eQUESTION);
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parametrization Widget delete lists"));
-      c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Do you really want to delete %1 list(s) of"
-                                                                 " the Parametrization Widget?")).
+      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Do you really want to delete %1 list(s) of"
+                                                          " the Parametrization Widget?")).
                                   arg(orc_ListIds.size()));
       c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
       c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
@@ -1492,14 +1514,14 @@ QString C_SyvDaItPaWidgetNew::mh_GetDefaultFileName(const uint32 ou32_ViewIndex,
 
    if (pc_View != NULL)
    {
-      const QString c_ViewPart1 = QString(C_GtGetText::h_GetText("View_%1_")).arg(ou32_ViewIndex + 1UL);
+      const QString c_ViewPart1 = static_cast<QString>(C_GtGetText::h_GetText("View_%1_")).arg(ou32_ViewIndex + 1UL);
       const QString c_ViewPart1File = C_OSCUtils::h_NiceifyStringForFileName(c_ViewPart1.toStdString().c_str()).c_str();
       const QString c_ViewPart2 = C_PuiSdHandler::h_AutomaticCStringAdaptation(pc_View->GetName());
       const QString c_DataElementFileName = mh_GetFile(orc_Id, ou32_ValidLayers);
-      const QString c_ViewFileName = QString("%1%2").arg(c_ViewPart1File).arg(c_ViewPart2);
+      const QString c_ViewFileName = static_cast<QString>("%1%2").arg(c_ViewPart1File).arg(c_ViewPart2);
       if (c_DataElementFileName.isEmpty() == false)
       {
-         c_Retval = QString("%1_%2").arg(c_ViewFileName).arg(c_DataElementFileName);
+         c_Retval = static_cast<QString>("%1_%2").arg(c_ViewFileName).arg(c_DataElementFileName);
       }
       else
       {
@@ -1544,8 +1566,8 @@ QString C_SyvDaItPaWidgetNew::mh_GetFile(const C_OSCNodeDataPoolListElementId & 
          if (pc_Element != NULL)
          {
             c_Retval =
-               QString(C_GtGetText::h_GetText("_%1")).arg(C_OSCUtils::h_NiceifyStringForFileName(
-                                                             pc_Element->c_Name.c_str()).c_str());
+               static_cast<QString>(C_GtGetText::h_GetText("_%1")).arg(C_OSCUtils::h_NiceifyStringForFileName(
+                                                                          pc_Element->c_Name.c_str()).c_str());
          }
          break;
       case 3UL:
@@ -1554,8 +1576,8 @@ QString C_SyvDaItPaWidgetNew::mh_GetFile(const C_OSCNodeDataPoolListElementId & 
          if (pc_List != NULL)
          {
             c_Retval =
-               QString(C_GtGetText::h_GetText("_%1")).arg(C_OSCUtils::h_NiceifyStringForFileName(
-                                                             pc_List->c_Name.c_str()).c_str());
+               static_cast<QString>(C_GtGetText::h_GetText("_%1")).arg(C_OSCUtils::h_NiceifyStringForFileName(
+                                                                          pc_List->c_Name.c_str()).c_str());
          }
          break;
       case 2UL:
@@ -1564,8 +1586,8 @@ QString C_SyvDaItPaWidgetNew::mh_GetFile(const C_OSCNodeDataPoolListElementId & 
          if (pc_DataPool != NULL)
          {
             c_Retval =
-               QString(C_GtGetText::h_GetText("_%1")).arg(C_OSCUtils::h_NiceifyStringForFileName(
-                                                             pc_DataPool->c_Name.c_str()).c_str());
+               static_cast<QString>(C_GtGetText::h_GetText("_%1")).arg(C_OSCUtils::h_NiceifyStringForFileName(
+                                                                          pc_DataPool->c_Name.c_str()).c_str());
          }
          break;
       case 1UL:
@@ -1573,8 +1595,8 @@ QString C_SyvDaItPaWidgetNew::mh_GetFile(const C_OSCNodeDataPoolListElementId & 
          if (pc_Node != NULL)
          {
             c_Retval =
-               QString(C_GtGetText::h_GetText("%1")).arg(C_OSCUtils::h_NiceifyStringForFileName(pc_Node->c_Properties.
-                                                                                                c_Name.c_str()).c_str());
+               static_cast<QString>(C_GtGetText::h_GetText("%1")).arg(C_OSCUtils::h_NiceifyStringForFileName(
+                                                                         pc_Node->c_Properties.c_Name.c_str()).c_str());
          }
          break;
       default:
@@ -1591,4 +1613,51 @@ QString C_SyvDaItPaWidgetNew::mh_GetFile(const C_OSCNodeDataPoolListElementId & 
       //Invalid
    }
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Inform user about value changes
+
+   \param[in,out]  orc_InvalidValueIds    Invalid value ids
+   \param[in,out]  orc_InvalidValues      Invalid values
+   \param[in,out]  orc_NewValues          New values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaWidgetNew::m_InformUserFloatRangeCheck(
+   const std::vector<C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds,
+   const std::vector<QString> & orc_InvalidValues, const std::vector<QString> & orc_NewValues) const
+{
+   tgl_assert((orc_InvalidValueIds.size() == orc_InvalidValues.size()) &&
+              (orc_InvalidValueIds.size() == orc_NewValues.size()));
+   if ((orc_InvalidValueIds.size() == orc_InvalidValues.size()) && (orc_InvalidValueIds.size() == orc_NewValues.size()))
+   {
+      if (orc_InvalidValueIds.size() > 0UL)
+      {
+
+         const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
+         if (pc_ParamWidget != NULL)
+         {
+            QString c_Content;
+            C_OgeWiCustomMessage c_Message(pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::eWARNING);
+
+            c_Message.SetHeading(C_GtGetText::h_GetText("Value changes"));
+            c_Message.SetDescription(C_GtGetText::h_GetText(
+                                        "Some values were changed due to invalid float values (-inf, inf, nan)"));
+
+            for (uint32 u32_It = 0UL; u32_It < orc_InvalidValueIds.size(); ++u32_It)
+            {
+               c_Content += static_cast<QString>(C_GtGetText::h_GetText(
+                                                    "Changed value of parameter \"%1\" from \"%2\" to \"%3\"\n")).
+                            arg(C_PuiSdUtil::h_GetNamespace(orc_InvalidValueIds[u32_It])).
+                            arg(orc_InvalidValues[u32_It]).
+                            arg(orc_NewValues[u32_It]);
+            }
+
+            c_Message.SetDetails(c_Content);
+            c_Message.SetCustomMinHeight(180, 350);
+            c_Message.SetCustomMinWidth(750);
+            c_Message.Execute();
+         }
+      }
+   }
 }

@@ -59,7 +59,7 @@ private:
 
    //Avoid call
    C_GiSvDaProgressBarBase(const C_GiSvDaProgressBarBase &);
-   C_GiSvDaProgressBarBase & operator =(const C_GiSvDaProgressBarBase &);
+   C_GiSvDaProgressBarBase & operator =(const C_GiSvDaProgressBarBase &); //lint !e1511 //we want to hide the base func.
 
    void m_UpdateStaticValues(void);
 };

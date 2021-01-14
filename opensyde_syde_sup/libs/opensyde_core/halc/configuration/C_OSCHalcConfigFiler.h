@@ -42,7 +42,7 @@ public:
    static stw_types::sint32 h_LoadIODomain(C_OSCHalcConfigDomain & orc_IODomain, C_OSCXMLParserBase & orc_XMLParser);
 
 private:
-   static const stw_types::uint16 hu16_FILE_VERSION_1 = 1U;
+   static const stw_types::uint16 mhu16_FILE_VERSION_1 = 1U;
 
    C_OSCHalcConfigFiler();
 

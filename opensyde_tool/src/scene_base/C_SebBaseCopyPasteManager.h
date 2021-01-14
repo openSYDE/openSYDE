@@ -45,7 +45,7 @@ public:
 protected:
    virtual void m_CalcOriginalPosition(const C_PuiBsElements * const opc_Data);
    static QPointF mh_Min(const QPointF & orc_P1, const QPointF & orc_P2);
-   void m_MinToOrgPos(const QPointF & orc_P);
+   void m_MinToOrgPos(const QPointF & orc_Point);
    static void mh_HandleZValueBox(const QGraphicsItem * const opc_Item, const QMap<const QGraphicsItem *,
                                                                                    stw_types::float64> & orc_NormalizedZValues, C_PuiBsBox & orc_Box);
    static void mh_HandleZValueLine(const QGraphicsItem * const opc_Item, const QMap<const QGraphicsItem *,

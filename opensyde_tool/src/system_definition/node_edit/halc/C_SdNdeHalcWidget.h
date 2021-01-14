@@ -52,11 +52,8 @@ Q_SIGNALS:
    void SigHalcDataPoolChanged(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void hideEvent(QHideEvent * const opc_Event) override;
    virtual void showEvent(QShowEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_SdNdeHalcWidget * mpc_Ui;

@@ -70,8 +70,8 @@ private:
    static const stw_types::sintn mhsn_INDEX_SIZE_500;
 
    void m_TriggerUpdate(void);
-   stw_types::sintn GetSizeIndex(const QFont & orc_Font) const;
-   void GetSize(QFont & orc_Font) const;
+   stw_types::sintn m_GetSizeIndex(const QFont & orc_Font) const;
+   void m_GetSize(QFont & orc_Font) const;
 
    //Avoid call
    C_OgeWiFontConfig(const C_OgeWiFontConfig &);

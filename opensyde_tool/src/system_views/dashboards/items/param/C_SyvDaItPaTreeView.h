@@ -82,13 +82,13 @@ Q_SIGNALS:
                       const stw_types::uint32 ou32_ValidLayers);
    void SigActionRecord(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds);
    void SigActionRemove(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds);
+   void SigInformUserFloatRangeCheck(
+      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds,
+      const std::vector<QString> & orc_InvalidValues, const std::vector<QString> & orc_NewValues);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual bool event(QEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    stw_opensyde_gui_logic::C_SyvDaItPaTreeDelegate mc_Delegate;

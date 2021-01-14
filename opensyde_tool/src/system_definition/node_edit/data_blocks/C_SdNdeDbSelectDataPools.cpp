@@ -264,17 +264,18 @@ void C_SdNdeDbSelectDataPools::m_UpdateSelection(const sintn osn_SelectionCount)
       {
          if (osn_SelectionCount > 1)
          {
-            this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("%1 selected Datapools")).arg(
+            this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                             "%1 selected Datapools")).arg(
                                                         osn_SelectionCount));
          }
          else
          {
-            this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("1 selected Datapool")));
+            this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText("1 selected Datapool")));
          }
       }
       else
       {
-         this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("No selected Datapool")));
+         this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText("No selected Datapool")));
       }
    }
 }

@@ -138,7 +138,7 @@ void C_OgeSliDashboard::HandleResize(void)
       sn_Offset = 1;
    }
    sn_HandleVMargin = (sn_AvailableHeight + sn_Offset) / 2;
-   c_Style = QString("stw_opensyde_gui_elements--C_OgeSliDashboard::groove {\n"
+   c_Style = static_cast<QString>("stw_opensyde_gui_elements--C_OgeSliDashboard::groove {\n"
                      " height:%1px;\n"
                      "}\n"
                      "stw_opensyde_gui_elements--C_OgeSliDashboard::handle {\n"

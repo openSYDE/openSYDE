@@ -73,7 +73,7 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
 {
    QWidget * pc_Retval;
 
-   if (orc_Index.data(msn_USER_ROLE_INTERACTION_IS_LINK) == true)
+   if (orc_Index.data(msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == true)
    {
       pc_Retval = NULL;
    }
@@ -95,15 +95,39 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
          c_StringListValues = orc_Index.data(msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST).toStringList();
          c_StringListStrings = orc_Index.data(msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST).toStringList();
          pc_ComboBox->InitFromStringList(c_StringListStrings, c_StringListValues);
-         // connect combo box with model (commit on text change)
-         //lint -e{64, 918, 929, 1025, 1703} Qt interface (function not recognized because of C++1 usage)
-         connect(pc_ComboBox, &QComboBox::currentTextChanged, this, &C_TblDelegate::m_CommitData);
+         if (orc_Index.data(msn_USER_ROLE_INTERACTION_COMBO_BOX_EDITABLE).toBool() == true)
+         {
+            // make editable
+            pc_ComboBox->setEditable(true);
+            pc_ComboBox->setInsertPolicy(QComboBox::NoInsert);
+            // minimum and maximum
+            c_StringList = orc_Index.data(msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST).toStringList();
+            if (c_StringList.size() == 4)
+            {
+               C_OSCNodeDataPoolContent c_Min;
+               C_OSCNodeDataPoolContent c_Max;
+               float64 f64_Factor;
+               float64 f64_Offset;
+               bool q_Ok;
+               const QString & rc_Factor = c_StringList.at(2);
+               const QString & rc_Offset = c_StringList.at(3);
+               tgl_assert(C_SdNdeDpContentUtil::h_SetAllContentFromString(c_StringList.at(0), c_Min) == C_NO_ERR);
+               tgl_assert(C_SdNdeDpContentUtil::h_SetAllContentFromString(c_StringList.at(1), c_Max) == C_NO_ERR);
+               f64_Factor = rc_Factor.toDouble(&q_Ok);
+               tgl_assert(q_Ok == true);
+               f64_Offset = rc_Offset.toDouble(&q_Ok);
+               tgl_assert(q_Ok == true);
+               pc_ComboBox->InitMinMaxAndScaling(c_Min, c_Max, f64_Factor, f64_Offset);
+            }
+         }
+         // connect combo box with model (commit on index change; includes commit on text change)
+         connect(pc_ComboBox, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+                 this, &C_TblDelegate::m_CommitData);
          pc_Retval = pc_ComboBox;
          break;
       case eURIEL_MULTI_SELECT_COMBO_BOX:
          pc_MultiSelectComboBox = m_CreateMultiSelectComboBox(opc_Parent);
          // connect combo box with model (commit on text change)
-         //lint -e{64, 918, 929, 1025, 1703} Qt interface (function not recognized because of C++1 usage)
          connect(pc_MultiSelectComboBox, &C_OgeCbxMultiSelect::SigValueChanged, this, &C_TblDelegate::m_CommitData);
          pc_Retval = pc_MultiSelectComboBox;
          break;
@@ -155,7 +179,7 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
    switch (C_TblDelegate::mh_GetInteractionElementValue(orc_Index))
    {
    case eURIEL_LINE_EDIT:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       pc_LineEdit = dynamic_cast<C_TblEditLineEditBase *>(opc_Editor);
       if (pc_LineEdit != NULL)
       {
@@ -172,7 +196,7 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
       }
       break;
    case eURIEL_COMBO_BOX:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       pc_ComboBox = dynamic_cast<C_OgeCbxTableBase *>(opc_Editor);
       if (pc_ComboBox != NULL)
       {
@@ -185,7 +209,7 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
       }
       break;
    case eURIEL_MULTI_SELECT_COMBO_BOX:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       pc_MultiSelectComboBox = dynamic_cast<C_OgeCbxMultiSelect *>(opc_Editor);
       if (pc_MultiSelectComboBox != NULL)
       {
@@ -224,7 +248,7 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
    switch (C_TblDelegate::mh_GetInteractionElementValue(orc_Index))
    {
    case eURIEL_LINE_EDIT:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       pc_LineEdit = dynamic_cast<C_TblEditLineEditBase *>(opc_Editor);
       if (pc_LineEdit != NULL)
       {
@@ -247,16 +271,29 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
       }
       break;
    case eURIEL_COMBO_BOX:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       pc_ComboBox = dynamic_cast<C_OgeCbxTableBase *>(opc_Editor);
       if (pc_ComboBox != NULL)
       {
-         opc_Model->setData(orc_Index, static_cast<sint64>(pc_ComboBox->GetValueForCurrentIndex()),
-                            static_cast<sintn>(Qt::EditRole));
+         QString c_ErrorDescription;
+         sint64 s64_Value;
+         if (pc_ComboBox->GetValue(s64_Value, c_ErrorDescription) == C_NO_ERR)
+         {
+            opc_Model->setData(orc_Index, s64_Value, static_cast<sintn>(Qt::EditRole));
+         }
+         else
+         {
+            C_OgeWiCustomMessage c_Message(opc_Editor, C_OgeWiCustomMessage::eWARNING);
+            c_Message.SetHeading(C_GtGetText::h_GetText("Invalid input"));
+            c_Message.SetDescription(c_ErrorDescription);
+            c_Message.Execute();
+            //Reset data to last known value
+            this->setEditorData(pc_ComboBox, orc_Index);
+         }
       }
       break;
    case eURIEL_MULTI_SELECT_COMBO_BOX:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       pc_MultiSelectComboBox = dynamic_cast<C_OgeCbxMultiSelect *>(opc_Editor);
       if (pc_MultiSelectComboBox != NULL)
       {
@@ -373,7 +410,6 @@ QWidget * C_TblDelegate::m_CreateGenericEditor(QWidget * const opc_Parent, const
       pc_SpinBoxGroup->Init(orc_Min, orc_Max, of64_Factor, of64_Offset, oru32_ArrayIndex);
       pc_Retval = pc_SpinBoxGroup;
       // connect spin box with model (commit on value change)
-      //lint -e{64, 918, 929, 1025, 1703} Qt interface (function not recognized because of C++11 usage)
       connect(pc_SpinBoxGroup, &C_OgeWiSpinBoxGroup::SigValueChanged, this, &C_TblDelegate::m_CommitData);
    }
    return pc_Retval;
@@ -388,7 +424,7 @@ QWidget * C_TblDelegate::m_CreateGenericEditor(QWidget * const opc_Parent, const
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblDelegate::m_SetGenericEditorDataVariable(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_OgeWiSpinBoxGroup * const pc_SpinBox = dynamic_cast<C_OgeWiSpinBoxGroup * const>(opc_Editor);
 
    if (pc_SpinBox != NULL)
@@ -429,7 +465,7 @@ void C_TblDelegate::m_CommitData(void)
 void C_TblDelegate::mh_SetModelGenericDataVariable(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                                    const QModelIndex & orc_Index)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_OgeWiSpinBoxGroup * const pc_SpinBox = dynamic_cast<C_OgeWiSpinBoxGroup * const>(opc_Editor);
 
    if (pc_SpinBox != NULL)

@@ -60,7 +60,7 @@ private:
 
    //Avoid call
    C_GiSvDaLabelBase(const C_GiSvDaLabelBase &);
-   C_GiSvDaLabelBase & operator =(const C_GiSvDaLabelBase &);
+   C_GiSvDaLabelBase & operator =(const C_GiSvDaLabelBase &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

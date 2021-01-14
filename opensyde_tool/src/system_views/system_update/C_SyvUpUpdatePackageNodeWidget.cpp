@@ -1222,7 +1222,7 @@ void C_SyvUpUpdatePackageNodeWidget::m_Init(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageNodeWidget::m_UpdateTitle(void) const
 {
-   this->mpc_Ui->pc_Title->setText(QString("#%1 - %2").arg(QString::number(this->mu32_PositionNumber + 1U),
+   this->mpc_Ui->pc_Title->setText(static_cast<QString>("#%1 - %2").arg(QString::number(this->mu32_PositionNumber + 1U),
                                                            this->mc_NodeName));
 }
 
@@ -1339,7 +1339,7 @@ C_SyvUpUpdatePackageListNodeWidget * C_SyvUpUpdatePackageNodeWidget::m_GetAppPar
 
    if (opc_App != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       pc_Parent = dynamic_cast<C_SyvUpUpdatePackageListNodeWidget *>(opc_App->GetListParent());
 
       tgl_assert(pc_Parent != NULL);
@@ -1403,7 +1403,7 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckFileAlreadyContained(const QString &
       // inform user that file already exists
       C_OgeWiCustomMessage c_Message(this);
       c_Message.SetHeading(C_GtGetText::h_GetText("Add file"));
-      c_Message.SetDescription(QString(C_GtGetText::h_GetText("The file %1 is already contained in the Update Package "
+      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("The file %1 is already contained in the Update Package "
                                                               "for this node and therefore not added again.")).
                                arg(C_PuiUtil::h_GetResolvedAbsPathFromProject(orc_File)));
       c_Message.SetCustomMinHeight(180, 180);

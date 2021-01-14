@@ -27,11 +27,8 @@ class C_SdNdeDpSelectorListDelegate :
 public:
    C_SdNdeDpSelectorListDelegate(QObject * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                       const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    void StartPaint(const stw_types::sint32 s32_Index, stw_opensyde_gui::C_SdNdeDpSelectorItemWidget * const opc_Widget);
    void StopPaint(void);

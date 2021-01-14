@@ -102,8 +102,8 @@ bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const stw_types::
                {
                   c_Indices.push_back(oru32_FirstIndex + u32_NewIndices);
                }
-               this->SetIndices(c_Indices);
-               this->SetInitialData(c_OSCContent, c_UIContent);
+               this->m_SetIndices(c_Indices);
+               this->m_SetInitialData(c_OSCContent, c_UIContent);
             }
             else
             {
@@ -130,7 +130,7 @@ bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const stw_types::
                {
                   c_Text = C_GtGetText::h_GetText("Data elements");
                }
-               c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Only %1 %2 allowed per list.")).arg(
+               c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Only %1 %2 allowed per list.")).arg(
                                               mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX).arg(c_Text));
                c_MessageBox.SetCustomMinHeight(180, 180);
                c_MessageBox.Execute();
@@ -148,7 +148,7 @@ bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const stw_types::
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementPasteCommand::redo(void)
 {
-   this->Add();
+   this->m_Add();
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::redo();
 }
 
@@ -159,5 +159,5 @@ void C_SdNdeUnoLeDataPoolListElementPasteCommand::redo(void)
 void C_SdNdeUnoLeDataPoolListElementPasteCommand::undo(void)
 {
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::undo();
-   this->Delete();
+   this->m_Delete();
 }

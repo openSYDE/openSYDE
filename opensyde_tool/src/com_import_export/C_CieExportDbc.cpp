@@ -127,7 +127,7 @@ sint32 C_CieExportDbc::h_ExportNetwork(const stw_scl::C_SCLString & orc_File,
       c_DbNameAttribute.valueType = Vector::DBC::AttributeValueType::String;
       c_DbcNetwork.attributeValues.insert(std::pair<std::string, Vector::DBC::Attribute>(
                                              c_DbName, c_DbNameAttribute));
-      c_DbcNetwork.comment = std::string(mh_EscapeCriticalSymbols(orc_Definition.c_Bus.c_Comment).c_str());
+      c_DbcNetwork.comment = mh_EscapeCriticalSymbols(orc_Definition.c_Bus.c_Comment).c_str();
 
       c_Message = "Filling up general network information, symbols and attributes for network \"" +
                   orc_Definition.c_Bus.c_Name + "\" ...";
@@ -158,9 +158,9 @@ sint32 C_CieExportDbc::h_ExportNetwork(const stw_scl::C_SCLString & orc_File,
    {
       c_Message = "Saving network to file ...";
       osc_write_log_info("DBC file export", c_Message);
-      Vector::DBC::Status c_Status = c_File.save(c_DbcNetwork, orc_File.c_str());
+      const Vector::DBC::Status e_Status = c_File.save(c_DbcNetwork, orc_File.c_str());
 
-      sint32 s32_Tmp = mh_CheckDbcFileStatus(c_Status);
+      const sint32 s32_Tmp = mh_CheckDbcFileStatus(e_Status);
 
       if (s32_Tmp != C_NO_ERR)
       {
@@ -303,7 +303,7 @@ sint32 C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CIENod
       std::vector<C_CieConverter::C_CIENodeMessage>::const_iterator c_MsgIter;
       for (c_MsgIter = c_Iter->c_TxMessages.begin(); c_MsgIter != c_Iter->c_TxMessages.end(); ++c_MsgIter)
       {
-         C_CieConverter::C_CIECanMessage c_CanMessage = c_MsgIter->c_CanMessage;
+         const C_CieConverter::C_CIECanMessage c_CanMessage = c_MsgIter->c_CanMessage;
          uint32 u32_CanId = c_CanMessage.u32_CanId;
          // only add new CAN messages
          std::map<uintn, Vector::DBC::Message>::iterator c_DBCMsgIter;
@@ -314,7 +314,7 @@ sint32 C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CIENod
             Vector::DBC::Message c_DBCMessage;
             if (c_CanMessage.q_IsExtended == true)
             {
-               c_DBCMessage.id = u32_CanId | 0x80000000UL;
+               c_DBCMessage.id = static_cast<uintn>(u32_CanId | 0x80000000UL);
             }
             else
             {
@@ -349,7 +349,7 @@ sint32 C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CIENod
             // DBC library supports more than one transmitter, maybe in case by activating
             // different nodes, but this is not supported in openSYDE.
             c_Message = "Setting node \"" + c_NodeName + "\" as transmitter for CAN message \"" +
-                        C_SCLString(c_DBCMsgIter->second.name.c_str()) + "\".";
+                        c_DBCMsgIter->second.name.c_str() + "\".";
             osc_write_log_info("DBC file export", c_Message);
             c_DBCMsgIter->second.transmitter = c_NodeName.c_str();
          }
@@ -357,7 +357,7 @@ sint32 C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CIENod
       // get Rx messages of node
       for (c_MsgIter = c_Iter->c_RxMessages.begin(); c_MsgIter != c_Iter->c_RxMessages.end(); ++c_MsgIter)
       {
-         C_CieConverter::C_CIECanMessage c_CanMessage = c_MsgIter->c_CanMessage;
+         const C_CieConverter::C_CIECanMessage c_CanMessage = c_MsgIter->c_CanMessage;
          uint32 u32_CanId = c_CanMessage.u32_CanId;
          // only add new CAN messages with signals and transceivers
          // (there is nothing in 'else case' to be done because we have already all information)
@@ -369,7 +369,7 @@ sint32 C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CIENod
             Vector::DBC::Message c_DBCMessage;
             if (c_CanMessage.q_IsExtended == true)
             {
-               c_DBCMessage.id = u32_CanId | 0x80000000UL;
+               c_DBCMessage.id = static_cast<uintn>(u32_CanId | 0x80000000UL);
             }
             else
             {
@@ -457,8 +457,8 @@ sint32 C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CIECanS
       }
 
       // set signal values
-      C_CieConverter::C_CIEDataPoolElement & c_Element = c_CIESignal.c_Element;
-      s32_Return = mh_SetSignalValues(c_Element, c_DBCSignal);
+      C_CieConverter::C_CIEDataPoolElement & rc_Element = c_CIESignal.c_Element;
+      s32_Return = mh_SetSignalValues(rc_Element, c_DBCSignal);
       tgl_assert(s32_Return == C_NO_ERR);
 
       if (s32_Return == C_NO_ERR)
@@ -470,16 +470,16 @@ sint32 C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CIECanS
             for (auto c_Receiver : c_Node.c_RxMessages)
             {
                // if we have the same message, then check if message is receiver of signal
-               if (c_Receiver.c_CanMessage.c_Name.AnsiCompare(stw_scl::C_SCLString(orc_DBCMessage.name.c_str())) == 0)
+               if (c_Receiver.c_CanMessage.c_Name.AnsiCompare(orc_DBCMessage.name.c_str()) == 0)
                {
-                  std::vector<C_CieConverter::C_CIECanSignal> & c_Signals = c_Receiver.c_CanMessage.c_Signals;
-                  for (auto c_Signal : c_Signals)
+                  std::vector<C_CieConverter::C_CIECanSignal> & rc_Signals = c_Receiver.c_CanMessage.c_Signals;
+                  for (const auto c_Signal : rc_Signals)
                   {
                      // check if node with Rx messages has signal
-                     if (c_Signal.c_Element.c_Name.AnsiCompare(stw_scl::C_SCLString(c_DBCSignal.name.c_str())) == 0)
+                     if (c_Signal.c_Element.c_Name.AnsiCompare(c_DBCSignal.name.c_str()) == 0)
                      {
                         // receiver for signal found -> add node as receiver if not already exists
-                        std::set<std::string>::iterator c_Iter = c_DBCSignal.receivers.find(c_NodeName);
+                        const std::set<std::string>::iterator c_Iter = c_DBCSignal.receivers.find(c_NodeName);
                         if (c_Iter == c_DBCSignal.receivers.end())
                         {
                            c_DBCSignal.receivers.insert(c_NodeName);
@@ -532,7 +532,7 @@ sint32 C_CieExportDbc::mh_SetSignalValues(const C_CieConverter::C_CIEDataPoolEle
    // set value type
    // the types of the min, max and init values must be the same!
    // this is guaranteed by the openSYDE system tool.
-   C_OSCNodeDataPoolContent::E_Type e_CurrentType = orc_Element.c_MinValue.GetType();
+   const C_OSCNodeDataPoolContent::E_Type e_CurrentType = orc_Element.c_MinValue.GetType();
 
    // value type
    if (e_CurrentType == C_OSCNodeDataPoolContent::eUINT8)
@@ -1142,14 +1142,14 @@ C_SCLString C_CieExportDbc::mh_EscapeCriticalSymbols(const C_SCLString & orc_Str
 
    for (sint32 s32_Char = 0; s32_Char < static_cast<sint32>(orc_String.Length()); ++s32_Char)
    {
-      const charn c_Char = orc_String[s32_Char + 1];
-      if (c_Char == '\"')
+      const charn cn_Char = orc_String[s32_Char + 1];
+      if (cn_Char == '\"')
       {
          c_Retval += "\\\"";
       }
       else
       {
-         c_Retval += c_Char;
+         c_Retval += cn_Char;
       }
    }
    return c_Retval;

@@ -61,12 +61,9 @@ Q_SIGNALS:
    void SigBlockDragAndDrop(const bool oq_Block);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void hideEvent(QHideEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call
@@ -128,6 +125,7 @@ private:
    static bool mh_IsUpdateFailure(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsUpdateAbort(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
 
+   void m_UpdateUpdatePackageStatus(void);
    void m_WiFixPosMaxBtnClicked(void);
    void m_WiHoverMinBtnClicked(void);
 

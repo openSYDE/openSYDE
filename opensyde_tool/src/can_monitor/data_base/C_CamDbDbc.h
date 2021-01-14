@@ -15,6 +15,7 @@
 #include <QMap>
 #include "C_CieConverter.h"
 #include "C_CamDbDbcMessageId.h"
+#include "C_CamDbDbcUnmappedMessageId.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -37,14 +38,16 @@ public:
 
    bool GetActive(void) const;
    const std::vector<QString> GetFoundMessages(void) const;
-   const C_CieConverter::C_CIECanMessage * GetDBCMessage(const QString & orc_Message) const;
+   const C_CieConverter::C_CIECanMessage * GetDBCMessage(const QString & orc_Message, const bool oq_UseHash,
+                                                         const stw_types::uint32 ou32_Hash) const;
+   bool CheckHashForMessage(const QString & orc_Message, const stw_types::uint32 ou32_Hash) const;
 
 private:
    bool mq_Active;
    bool mq_FoundAll;
    C_CieConverter::C_CIECommDefinition mc_Data;
    QMap<QString, C_CamDbDbcMessageId> mc_FoundMessagesNodes;
-   QMap<QString, stw_types::uint32> mc_FoundMessagesUnmapped;
+   QMap<QString, C_CamDbDbcUnmappedMessageId> mc_FoundMessagesUnmapped;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

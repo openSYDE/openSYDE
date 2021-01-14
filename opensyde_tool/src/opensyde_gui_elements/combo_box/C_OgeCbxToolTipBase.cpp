@@ -75,7 +75,6 @@ bool C_OgeCbxToolTipBase::event(QEvent * const opc_Event)
          //show tooltip
          if (this->m_GetToolTip()->isVisible() == false)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
             if (pc_HelpEvent != NULL)
@@ -129,7 +128,6 @@ void C_OgeCbxToolTipBase::SetItemState(const stw_types::sint32 os32_Index, const
 {
    if (os32_Index < this->count())
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       QStandardItemModel * const pc_Model = dynamic_cast<QStandardItemModel * const>(this->model());
       if (pc_Model != NULL)
       {

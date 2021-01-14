@@ -19,6 +19,7 @@
 #include "C_SdNdeDpListTableModel.h"
 #include "C_SdNdeDpListDataSetView.h"
 #include "C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand.h"
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
@@ -65,7 +66,7 @@ C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDasDataPoolListAddDelet
 /*! \brief   Add from internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::Add(void)
+void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::m_Add(void)
 {
    if (this->mpc_DataPoolListModelViewManager != NULL)
    {
@@ -130,7 +131,7 @@ void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::Add(void)
 /*! \brief   Save and delete
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::Delete(void)
+void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::m_Delete(void)
 {
    if (this->mpc_DataPoolListModelViewManager != NULL)
    {
@@ -207,7 +208,7 @@ void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::Delete(void)
    \param[in] orc_Value Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::SetIndices(const std::vector<stw_types::uint32> & orc_Value)
+void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::m_SetIndices(const std::vector<stw_types::uint32> & orc_Value)
 {
    mc_Indices = orc_Value;
 }
@@ -219,7 +220,7 @@ void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::SetIndices(const std::vector
    \param[in] orc_OSCDataSetValues Initial Data set values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::SetInitialData(
+void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::m_SetInitialData(
    const std::vector<C_OSCNodeDataPoolDataSet> & orc_OSCNames,
    const std::vector<std::vector<C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues)
 {

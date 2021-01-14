@@ -117,11 +117,11 @@ void C_SyvSeScene::SetEditMode(const bool oq_Active)
    // inform the items
    for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvNodeSyvSetup * const pc_Node = dynamic_cast<C_GiSvNodeSyvSetup *>(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvPcBusConnector * const pc_PcConnection = dynamic_cast<C_GiSvPcBusConnector *>(*c_ItItem);
       if (pc_Node != NULL)
       {
@@ -152,11 +152,11 @@ void C_SyvSeScene::Save(void) const
    // inform the items
    for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvNodeSyvSetup * const pc_Node = dynamic_cast<C_GiSvNodeSyvSetup *>(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvPcBusConnector * const pc_PcConnection = dynamic_cast<C_GiSvPcBusConnector *>(*c_ItItem);
       if (pc_Node != NULL)
       {
@@ -194,11 +194,11 @@ void C_SyvSeScene::ReloadViewData(void)
 
    for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvNodeSyvSetup * const pc_Node = dynamic_cast<C_GiSvNodeSyvSetup *>(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvPcBusConnector * const pc_PcBusConnection = dynamic_cast<C_GiSvPcBusConnector *>(*c_ItItem);
 
       if (pc_Node != NULL)
@@ -222,7 +222,7 @@ void C_SyvSeScene::ReloadViewData(void)
                for (QList<QGraphicsItem *>::const_iterator c_ItItem2 = rc_Items.begin(); c_ItItem2 != rc_Items.end();
                     ++c_ItItem2)
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                   C_GiLiBus * const pc_PcBus = dynamic_cast<C_GiLiBus *>(*c_ItItem2);
                   if (pc_PcBus != NULL)
                   {
@@ -258,9 +258,9 @@ void C_SyvSeScene::ReloadViewData(void)
             for (QList<QGraphicsItem *>::const_iterator c_ItItem2 = rc_Items.begin(); c_ItItem2 != rc_Items.end();
                  ++c_ItItem2)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                C_GiLiBus * const pc_PcBus = dynamic_cast<C_GiLiBus *>(*c_ItItem2);
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(*c_ItItem2);
                if (pc_Pc != NULL)
                {
@@ -317,7 +317,7 @@ void C_SyvSeScene::SetAllNodesConnected(const bool oq_Connected)
 
    for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvNodeSyvSetup * const pc_Node = dynamic_cast<C_GiSvNodeSyvSetup *>(*c_ItItem);
 
       if (pc_Node != NULL)
@@ -435,13 +435,12 @@ C_GiNode * C_SyvSeScene::m_CreateNode(const sint32 & ors32_Index, const uint64 &
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvNodeSyvSetup * const pc_SystemNode =
       dynamic_cast<const C_GiSvNodeSyvSetup * const>(opc_NodeGraphicsItem);
 
    if (pc_SystemNode != NULL)
    {
-      //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
       connect(pc_SystemNode, &C_GiSvNodeSyvSetup::SigViewConnectionChanged, this, &C_SyvSeScene::m_OnConnectionChanged);
    }
 
@@ -531,7 +530,7 @@ void C_SyvSeScene::m_Edit(QGraphicsItem * const opc_GraphicsItem) const
 {
    if (opc_GraphicsItem != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc * const>(opc_GraphicsItem);
 
       if (pc_Pc != NULL)
@@ -561,13 +560,13 @@ void C_SyvSeScene::m_SelectionChanged(void)
       // triggered by signal selectionChanged
       if (c_SelectedItems.size() == 1)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_GiBiRectBaseGroup * pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(c_SelectedItems[0]);
 
          // check if the only one selected item is a resizable rectangle based item
          if (pc_Item != NULL)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(pc_Item);
             if (pc_Pc != NULL)
             {
@@ -579,7 +578,7 @@ void C_SyvSeScene::m_SelectionChanged(void)
          if (c_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_PC_CONNECTION)
          {
             // bring the selected bus connector to the top
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             this->mpc_SelectedBusConnectorItem = dynamic_cast<C_GiSvPcBusConnector *>(c_SelectedItems[0]);
             if (this->mpc_SelectedBusConnectorItem != NULL)
             {
@@ -594,7 +593,7 @@ void C_SyvSeScene::m_SelectionChanged(void)
          for (c_ItItem = c_SelectedItems.begin(); c_ItItem != c_SelectedItems.end(); ++c_ItItem)
          {
             // check if the only one selected item is a resizable rectangle based item
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             C_GiBiRectBaseGroup * pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(*c_ItItem);
             if (pc_Item != NULL)
             {
@@ -602,7 +601,7 @@ void C_SyvSeScene::m_SelectionChanged(void)
             }
             else
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                C_GiLiLineGroup * pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(*c_ItItem);
                if (pc_LineItem != NULL)
                {
@@ -645,12 +644,11 @@ void C_SyvSeScene::m_OnPcBusConnectionStartConnect(const C_GiLiBusConnectorBase:
 
          for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            //lint -e{740}  no problem because of common base class
+
             C_GiBiCustomMouseItem * const pc_Item = dynamic_cast<C_GiBiCustomMouseItem *>(*c_ItItem);
             if (pc_Item != NULL)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                if (dynamic_cast<C_GiSvPc *>(*c_ItItem) == NULL)
                {
                   //Is not pc
@@ -671,12 +669,11 @@ void C_SyvSeScene::m_OnPcBusConnectionStartConnect(const C_GiLiBusConnectorBase:
 
          for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            //lint -e{740}  no problem because of common base class
+
             C_GiBiCustomMouseItem * const pc_Item = dynamic_cast<C_GiBiCustomMouseItem *>(*c_ItItem);
             if (pc_Item != NULL)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(*c_ItItem);
                //Is bus
                if (pc_Bus != NULL)

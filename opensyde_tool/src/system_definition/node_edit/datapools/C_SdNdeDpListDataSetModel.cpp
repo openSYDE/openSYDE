@@ -144,10 +144,10 @@ QVariant C_SdNdeDpListDataSetModel::headerData(const sintn osn_Section, const Qt
          switch (e_Row)
          {
          case eNAME:
-            c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+            c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
             break;
          case eCOMMENT:
-            c_Retval = QVariant(Qt::AlignLeft | Qt::AlignTop);
+            c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignTop);
             break;
          default:
             break;
@@ -166,7 +166,7 @@ QVariant C_SdNdeDpListDataSetModel::headerData(const sintn osn_Section, const Qt
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
       }
       else
       {
@@ -256,10 +256,10 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
                   switch (e_Col)
                   {
                   case eNAME:
-                     c_Retval = QString(rc_DataSet.c_Name.c_str());
+                     c_Retval = static_cast<QString>(rc_DataSet.c_Name.c_str());
                      break;
                   case eCOMMENT:
-                     c_Retval = QString(rc_DataSet.c_Comment.c_str());
+                     c_Retval = static_cast<QString>(rc_DataSet.c_Comment.c_str());
                      break;
                   default:
                      break;
@@ -273,10 +273,10 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
          switch (e_Col)
          {
          case eNAME:
-            c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+            c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
             break;
          case eCOMMENT:
-            c_Retval = QVariant(Qt::AlignLeft | Qt::AlignTop);
+            c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignTop);
             break;
          default:
             break;

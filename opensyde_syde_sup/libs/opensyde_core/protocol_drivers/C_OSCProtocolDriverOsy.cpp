@@ -438,8 +438,8 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
                            }
                            else
                            {
-                              m_LogErrorWithHeader("Synchronous communication", "Sync negative response to expected service"
-                                                   " but unexpected data bytes received. Ignoring.",
+                              m_LogErrorWithHeader("Synchronous communication", "Sync negative response to expected "
+                                                   " service but unexpected data bytes received. Ignoring.",
                                                    TGL_UTIL_FUNC_ID);
                            }
                            break;
@@ -844,7 +844,6 @@ sint32 C_OSCProtocolDriverOsy::OsyReadHardwareNumber(uint32 & oru32_HardwareNumb
    s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_NUMBER, 4U, true, c_Data, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      //lint -e{864} //false positive due to const/non-const misinterpretation
       oru32_HardwareNumber = ((static_cast<uint32>(c_Data[0])) << 24U) +
                              ((static_cast<uint32>(c_Data[1])) << 16U) +
                              ((static_cast<uint32>(c_Data[2])) << 8U) +
@@ -986,7 +985,6 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMaxNumberOfBlockLength(uint16 & oru16_MaxN
    if (s32_Return == C_NO_ERR)
    {
       //extract information:
-      //lint -e{864} //false positive due to const/non-const misinterpretation
       oru16_MaxNumberOfBlockLength = (static_cast<uint16>((static_cast<uint16>(c_Data[0])) << 8U)) + (c_Data[1]);
    }
    if (opu8_NrCode != NULL)
@@ -1379,7 +1377,6 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMaxNumOfEventDrivenTransmissions(uint16 & 
    s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_MAX_NUM_ASYNC, 2U, true, c_Data, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      //lint -e{864} //false positive due to const/non-const misinterpretation
       oru16_MaxNum = (static_cast<uint16>((static_cast<uint16>(c_Data[0])) << 8U)) + (c_Data[1]);
    }
    if (opu8_NrCode != NULL)
@@ -1508,7 +1505,6 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashCount(uint32 & oru32_FlashCount, uint
    s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_FLASH_COUNT, 4U, true, c_Data, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      //lint -e{864} //false positive due to const/non-const misinterpretation
       oru32_FlashCount = ((static_cast<uint32>(c_Data[0])) << 24U) +
                          ((static_cast<uint32>(c_Data[1])) << 16U) +
                          ((static_cast<uint32>(c_Data[2])) << 8U) +
@@ -1588,15 +1584,16 @@ sint32 C_OSCProtocolDriverOsy::m_PackDataPoolIdentifier(const uint8 ou8_DataPool
                                                         const uint16 ou16_ElementIndex, uint8(&orau8_PackedId)[3]) const
 {
    sint32 s32_Return = C_RANGE;
+   const uint8 ou8_ServerDpIndex = this->m_GetDataPoolIndexClientToServer(ou8_DataPoolIndex);
 
-   if ((ou8_DataPoolIndex < mhu8_OSY_MAX_NUM_DATA_POOLS) && (ou16_ListIndex < mhu8_OSY_MAX_NUM_DATA_POOL_LISTS) &&
+   if ((ou8_ServerDpIndex < mhu8_OSY_MAX_NUM_DATA_POOLS) && (ou16_ListIndex < mhu8_OSY_MAX_NUM_DATA_POOL_LISTS) &&
        (ou16_ElementIndex < mhu16_OSY_MAX_NUM_DATA_POOL_LIST_ELEMENTS))
    {
-      const uint32 u32_PackedId = (static_cast<uint32>(ou8_DataPoolIndex) << 18) +
-                                  (static_cast<uint32>(ou16_ListIndex) << 11) +
+      const uint32 u32_PackedId = (static_cast<uint32>(ou8_ServerDpIndex) << 18U) +
+                                  (static_cast<uint32>(ou16_ListIndex) << 11U) +
                                   ou16_ElementIndex;
-      orau8_PackedId[0] = static_cast<uint8>(u32_PackedId >> 16);
-      orau8_PackedId[1] = static_cast<uint8>(u32_PackedId >> 8);
+      orau8_PackedId[0] = static_cast<uint8>(u32_PackedId >> 16U);
+      orau8_PackedId[1] = static_cast<uint8>(u32_PackedId >> 8U);
       orau8_PackedId[2] = static_cast<uint8>(u32_PackedId);
       s32_Return = C_NO_ERR;
    }
@@ -1614,16 +1611,19 @@ sint32 C_OSCProtocolDriverOsy::m_PackDataPoolIdentifier(const uint8 ou8_DataPool
    \param[out] oru16_ElementIndex  element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCProtocolDriverOsy::mh_UnpackDataPoolIdentifier(const uint8 (&orau8_PackedId)[3], uint8 & oru8_DataPoolIndex,
-                                                         uint16 & oru16_ListIndex, uint16 & oru16_ElementIndex)
+void C_OSCProtocolDriverOsy::m_UnpackDataPoolIdentifier(const uint8 (&orau8_PackedId)[3], uint8 & oru8_DataPoolIndex,
+                                                        uint16 & oru16_ListIndex, uint16 & oru16_ElementIndex) const
 {
-   const uint32 u32_PackedId = (static_cast<uint32>(orau8_PackedId[0]) << 16) +
-                               (static_cast<uint32>(orau8_PackedId[1]) << 8) +
+   const uint32 u32_PackedId = (static_cast<uint32>(orau8_PackedId[0]) << 16U) +
+                               (static_cast<uint32>(orau8_PackedId[1]) << 8U) +
                                static_cast<uint32>(orau8_PackedId[2]);
 
-   oru8_DataPoolIndex = static_cast<uint8>(u32_PackedId >> 18) & 0x1FU;
+   const uint8 u8_ServerDataPoolIndex = static_cast<uint8>(u32_PackedId >> 18) & 0x1FU;
+
    oru16_ListIndex = static_cast<uint16>(u32_PackedId >> 11) & 0x7FU;
    oru16_ElementIndex = static_cast<uint16>(u32_PackedId) & 0x7FFU;
+
+   oru8_DataPoolIndex = this->m_GetDataPoolIndexServerToClient(u8_ServerDataPoolIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1719,7 +1719,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolData(const uint8 ou8_DataPoolIndex
    if (s32_Return != C_NO_ERR)
    {
       C_SCLString c_ErrorText;
-      c_ErrorText.PrintFormatted("ReadDataPoolData(Datapool:%d List:%d Element:%d)",
+      c_ErrorText.PrintFormatted("ReadDataPoolData(Client indexes: Datapool:%d List:%d Element:%d)",
                                  ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
@@ -1820,7 +1820,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolData(const uint8 ou8_DataPoolInde
    if (s32_Return != C_NO_ERR)
    {
       C_SCLString c_ErrorText;
-      c_ErrorText.PrintFormatted("WriteDataPoolData(Datapool:%d List:%d Element:%d Size:%d)",
+      c_ErrorText.PrintFormatted("WriteDataPoolData(Client indexes: Datapool:%d List:%d Element:%d Size:%d)",
                                  ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, orc_DataToWrite.size());
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
@@ -1876,7 +1876,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolEventDataRate(const uint8 ou8_Tra
       }
 
       c_Data.resize(2);
-      c_Data[0] = static_cast<uint8>(ou16_DataRate >> 8);
+      c_Data[0] = static_cast<uint8>(ou16_DataRate >> 8U);
       c_Data[1] = static_cast<uint8>(ou16_DataRate & 0xFFU);
 
       s32_Return = m_WriteDataByIdentifier(u16_DataIdentifier, c_Data, u8_NrErrorCode);
@@ -1990,7 +1990,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataCyclic(const uint8 ou8_DataPoo
    if (s32_Return != C_NO_ERR)
    {
       C_SCLString c_ErrorText;
-      c_ErrorText.PrintFormatted("ReadDataPoolDataCyclic(Datapool:%d List:%d Element:%d Rail:%d)",
+      c_ErrorText.PrintFormatted("ReadDataPoolDataCyclic(Client indexes: Datapool:%d List:%d Element:%d Rail:%d)",
                                  ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, ou8_TransmissionRail);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
@@ -2105,9 +2105,10 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataChangeDriven(const uint8 ou8_D
    if (s32_Return != C_NO_ERR)
    {
       C_SCLString c_ErrorText;
-      c_ErrorText.PrintFormatted("ReadDataPoolDataChangeDriven(Datapool:%d List:%d Element:%d Rail:%d Hysteresis:%d)",
-                                 ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, ou8_TransmissionRail,
-                                 ou32_Hysteresis);
+      c_ErrorText.PrintFormatted(
+         "ReadDataPoolDataChangeDriven(Client indexes: Datapool:%d List:%d Element:%d Rail:%d Hysteresis:%d)",
+         ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, ou8_TransmissionRail,
+         ou32_Hysteresis);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -2196,16 +2197,17 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolMetaData(const uint8 ou8_DataPoolI
 {
    sint32 s32_Return;
    uint8 u8_NrErrorCode = 0U;
+   const uint8 ou8_ServerDpIndex = this->m_GetDataPoolIndexClientToServer(ou8_DataPoolIndex);
 
    std::vector<uint8> c_SendData;
    std::vector<uint8> c_ReceiveData;
 
-   c_SendData.resize(1, ou8_DataPoolIndex);
+   c_SendData.resize(1, ou8_ServerDpIndex);
    s32_Return = m_RoutineControl(mhu16_OSY_RC_SID_READ_DATAPOOL_META_DATA, mhu8_OSY_RC_SUB_FUNCTION_START_ROUTINE,
                                  c_SendData, 0, false, c_ReceiveData, u8_NrErrorCode);
    if ((s32_Return == C_NO_ERR) && (c_ReceiveData.size() >= 1))
    {
-      if (c_ReceiveData[0] == ou8_DataPoolIndex)
+      if (c_ReceiveData[0] == ou8_ServerDpIndex)
       {
          bool q_Stop = false;
          orc_MetaData.c_Name = "";
@@ -2273,7 +2275,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolMetaData(const uint8 ou8_DataPoolI
    if (s32_Return != C_NO_ERR)
    {
       C_SCLString c_ErrorText;
-      c_ErrorText.PrintFormatted("RoutineControl::ReadDataPoolMetaData(Datapool:%d)", ou8_DataPoolIndex);
+      c_ErrorText.PrintFormatted("RoutineControl::ReadDataPoolMetaData(Client indexes: Datapool:%d)",
+                                 ou8_DataPoolIndex);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -2303,11 +2306,12 @@ sint32 C_OSCProtocolDriverOsy::OsyVerifyDataPool(const uint8 ou8_DataPoolIndex, 
 {
    sint32 s32_Return;
    uint8 u8_NrErrorCode = 0U;
+   const uint8 ou8_ServerDpIndex = this->m_GetDataPoolIndexClientToServer(ou8_DataPoolIndex);
 
    std::vector<uint8> c_SendData;
    std::vector<uint8> c_ReceiveData;
    c_SendData.resize(5);
-   c_SendData[0] = ou8_DataPoolIndex;
+   c_SendData[0] = ou8_ServerDpIndex;
    c_SendData[1] = static_cast<uint8>(ou32_DataPoolChecksum >> 24U);
    c_SendData[2] = static_cast<uint8>(ou32_DataPoolChecksum >> 16U);
    c_SendData[3] = static_cast<uint8>(ou32_DataPoolChecksum >> 8U);
@@ -2316,7 +2320,7 @@ sint32 C_OSCProtocolDriverOsy::OsyVerifyDataPool(const uint8 ou8_DataPoolIndex, 
                                  c_SendData, 2, true, c_ReceiveData, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      if (c_ReceiveData[0] == ou8_DataPoolIndex)
+      if (c_ReceiveData[0] == ou8_ServerDpIndex)
       {
          orq_Match = ((c_ReceiveData[1] & 0x01U) == 0x01U) ? false : true;
       }
@@ -2332,7 +2336,8 @@ sint32 C_OSCProtocolDriverOsy::OsyVerifyDataPool(const uint8 ou8_DataPoolIndex, 
    if (s32_Return != C_NO_ERR)
    {
       C_SCLString c_ErrorText;
-      c_ErrorText.PrintFormatted("RoutineControl::VerifyDataPool(Datapool:%d, Checksum:%d)", ou8_DataPoolIndex,
+      c_ErrorText.PrintFormatted("RoutineControl::VerifyDataPool(Client indexes: Datapool:%d, Checksum:%d)",
+                                 ou8_DataPoolIndex,
                                  ou32_DataPoolChecksum);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
@@ -2437,7 +2442,8 @@ sint32 C_OSCProtocolDriverOsy::OsyStopRouteDiagnosisCommunication(uint8 * const 
 {
    sint32 s32_Return;
 
-   std::vector<uint8> c_SendData;
+   const std::vector<uint8> c_SendData;
+
    std::vector<uint8> c_ReceiveData;
    uint8 u8_NrErrorCode = 0U;
 
@@ -2761,7 +2767,8 @@ sint32 C_OSCProtocolDriverOsy::OsyStopTunnelCanMessages(uint8 * const opu8_NrCod
 {
    sint32 s32_Return;
 
-   std::vector<uint8> c_SendData;
+   const std::vector<uint8> c_SendData;
+
    std::vector<uint8> c_ReceiveData;
    uint8 u8_NrErrorCode = 0U;
 
@@ -2904,6 +2911,41 @@ void C_OSCProtocolDriverOsy::GetNodeIdentifiers(C_OSCProtocolDriverOsyNode & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Registers a Datapool index mapping
+
+   The key of the map is the Datapool index on client side defined in the project.
+   The value of the map is the Datapool index on server side which is used for communication.
+
+   When the Datapool index is not registered, the original index is used.
+
+   \param[in]       orc_Mapping     Datapool index mapping
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCProtocolDriverOsy::RegisterDataPoolMapping(const std::map<uint8, uint8> & orc_Mapping)
+{
+   std::map<stw_types::uint8, stw_types::uint8>::const_iterator c_It;
+
+   this->mc_DataPoolMappingClientToServer = orc_Mapping;
+
+   // Invert the map to improve speed for the search in the other direction
+   for (c_It = this->mc_DataPoolMappingClientToServer.begin();
+        c_It != this->mc_DataPoolMappingClientToServer.end();
+        ++c_It)
+   {
+      this->mc_DataPoolMappingServerToClient[c_It->second] = c_It->first;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clears the registered Datapool index mapping
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCProtocolDriverOsy::ClearDataPoolMapping(void)
+{
+   this->mc_DataPoolMappingClientToServer.clear();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Perform cyclic communication tasks
 
    * Get exclusive access to reception handling
@@ -2958,9 +3000,9 @@ void C_OSCProtocolDriverOsy::m_OsyReadDataPoolDataEventReceived(const uint8 ou8_
                                                                 const std::vector<uint8> & orc_Value)
 {
    (void)orc_Value;
-   m_LogErrorWithHeader("Asynchronous communication", "Unhandled reception of async ReadDataPoolEventDriven response "
-                        "(Datapool index: " + C_SCLString::IntToStr(
-                           ou8_DataPoolIndex) +
+   m_LogErrorWithHeader("Asynchronous communication",
+                        "Unhandled reception of async ReadDataPoolEventDriven response "
+                        "(Client indexes: Datapool index: " + C_SCLString::IntToStr(ou8_DataPoolIndex) +
                         " List index: " + C_SCLString::IntToStr(ou16_ListIndex) +
                         " Element index: " + C_SCLString::IntToStr(ou16_ElementIndex) +
                         "). Ignoring.", TGL_UTIL_FUNC_ID);
@@ -2982,9 +3024,9 @@ void C_OSCProtocolDriverOsy::m_OsyReadDataPoolDataEventErrorReceived(const uint8
                                                                      const uint16 ou16_ElementIndex,
                                                                      const uint8 ou8_NrCode)
 {
-   m_LogErrorWithHeader("Asynchronous communication", "Unhandled reception of async ReadDataPoolEventDriven negative response"
-                        " (Datapool index: " + C_SCLString::IntToStr(
-                           ou8_DataPoolIndex) +
+   m_LogErrorWithHeader("Asynchronous communication",
+                        "Unhandled reception of async ReadDataPoolEventDriven negative response"
+                        " (Client indexes: Datapool index: " + C_SCLString::IntToStr(ou8_DataPoolIndex) +
                         " List index: " + C_SCLString::IntToStr(ou16_ListIndex) +
                         " Element index: " + C_SCLString::IntToStr(ou16_ElementIndex) + " NRC: " +
                         C_SCLString::IntToHex(ou8_NrCode, 2) + "). Ignoring.", TGL_UTIL_FUNC_ID);
@@ -3182,7 +3224,6 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8 ou8_Secu
 
    s32_Return = m_SecurityAccess(ou8_SecurityLevel, c_SendData, 0U, 4U, c_ReceiveData, u8_NrErrorCode);
 
-   //lint -e{864} //false positive due to const/non-const misinterpretation
    oru32_Seed = ((static_cast<uint32>(c_ReceiveData[0])) << 24U) +
                 ((static_cast<uint32>(c_ReceiveData[1])) << 16U) +
                 ((static_cast<uint32>(c_ReceiveData[2])) << 8U) +
@@ -3471,7 +3512,7 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataEvent(
       (void)std::memcpy(&c_Value[0], &orc_ReceivedService.c_Data[4], u16_NumberOfBytes);
 
       // Get the indexes of all parameter
-      mh_UnpackDataPoolIdentifier(au8_Identifier, u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex);
+      m_UnpackDataPoolIdentifier(au8_Identifier, u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex);
 
       m_OsyReadDataPoolDataEventReceived(u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex, c_Value);
 
@@ -3519,7 +3560,7 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataErrorEvent(
       au8_Identifier[2] = orc_ReceivedService.c_Data[5];
 
       // Get the indexes of all parameter
-      mh_UnpackDataPoolIdentifier(au8_Identifier, u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex);
+      m_UnpackDataPoolIdentifier(au8_Identifier, u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex);
 
       m_OsyReadDataPoolDataEventErrorReceived(u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex,
                                               orc_ReceivedService.c_Data[2]);
@@ -3559,9 +3600,9 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyTunnelCanMessagesEvent(
       // Bit 31 of CAN id is the flag for 29 bit or 11 bit decision
       c_CanMessage.u8_XTD = ((orc_ReceivedService.c_Data[1] & 0x80U) == 0x80U) ? 1U : 0U;
       // Bits 30 and 29 are reserved
-      c_CanMessage.u32_ID = ((static_cast<uint32>(orc_ReceivedService.c_Data[1]) & 0x1FU) << 24) +
-                            (static_cast<uint32>(orc_ReceivedService.c_Data[2]) << 16) +
-                            (static_cast<uint32>(orc_ReceivedService.c_Data[3]) << 8) +
+      c_CanMessage.u32_ID = ((static_cast<uint32>(orc_ReceivedService.c_Data[1]) & 0x1FU) << 24U) +
+                            (static_cast<uint32>(orc_ReceivedService.c_Data[2]) << 16U) +
+                            (static_cast<uint32>(orc_ReceivedService.c_Data[3]) << 8U) +
                             static_cast<uint32>(orc_ReceivedService.c_Data[4]);
 
       // 11 bit identifier range check
@@ -3598,6 +3639,72 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyTunnelCanMessagesEvent(
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Short function description
+
+   Detailed function description (optional). The function shall be described detailed if it is not described completely
+   by short function description and parameter description.
+
+   \param[in]       ou8_Aa     Detailed input parameter description
+
+   \return
+   Type of return values, e.g. STW error codes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint8 C_OSCProtocolDriverOsy::m_GetDataPoolIndexClientToServer(const uint8 ou8_ClientDataPoolIndex) const
+{
+   uint8 u8_ServerIndex;
+
+   const std::map<stw_types::uint8, stw_types::uint8>::const_iterator c_It =
+      this->mc_DataPoolMappingClientToServer.find(ou8_ClientDataPoolIndex);
+
+   if (c_It != this->mc_DataPoolMappingClientToServer.end())
+   {
+      // Server index is registered. Use the mapped value.
+      u8_ServerIndex = c_It->second;
+   }
+   else
+   {
+      // Server index is not registered for mapping. Use the origin value.
+      u8_ServerIndex = ou8_ClientDataPoolIndex;
+   }
+
+   return u8_ServerIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Short function description
+
+   Detailed function description (optional). The function shall be described detailed if it is not described completely
+   by short function description and parameter description.
+
+   \param[in]       ou8_Aa     Detailed input parameter description
+
+   \return
+   Type of return values, e.g. STW error codes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint8 C_OSCProtocolDriverOsy::m_GetDataPoolIndexServerToClient(const uint8 ou8_ServerDataPoolIndex) const
+{
+   uint8 u8_ClientIndex;
+
+   const std::map<stw_types::uint8, stw_types::uint8>::const_iterator c_It =
+      this->mc_DataPoolMappingServerToClient.find(ou8_ServerDataPoolIndex);
+
+   if (c_It != this->mc_DataPoolMappingServerToClient.end())
+   {
+      // Server index is registered. Use the mapped value.
+      u8_ClientIndex = c_It->second;
+   }
+   else
+   {
+      // Server index is not registered for mapping. Use the origin value.
+      u8_ClientIndex = ou8_ServerDataPoolIndex;
+   }
+
+   return u8_ClientIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -4393,17 +4500,18 @@ sint32 C_OSCProtocolDriverOsy::OsyNotifyNvmDataChanges(const uint8 ou8_DataPoolI
 {
    sint32 s32_Return;
    uint8 u8_NrErrorCode = 0U;
+   const uint8 ou8_ServerDpIndex = this->m_GetDataPoolIndexClientToServer(ou8_DataPoolIndex);
 
    std::vector<uint8> c_SendData;
    std::vector<uint8> c_ReceiveData;
    c_SendData.resize(2);
-   c_SendData[0] = ou8_DataPoolIndex;
+   c_SendData[0] = ou8_ServerDpIndex;
    c_SendData[1] = ou8_ListIndex;
    s32_Return = m_RoutineControl(mhu16_OSY_RC_SID_NOTIFY_NVM_DATA_CHANGED, mhu8_OSY_RC_SUB_FUNCTION_START_ROUTINE,
                                  c_SendData, 3, true, c_ReceiveData, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      if ((c_ReceiveData[0] == ou8_DataPoolIndex) && (c_ReceiveData[1] == ou8_ListIndex))
+      if ((c_ReceiveData[0] == ou8_ServerDpIndex) && (c_ReceiveData[1] == ou8_ListIndex))
       {
          orq_ApplicationAcknowledge = ((c_ReceiveData[2] & 0x01U) == 0x01U) ? false : true;
       }
@@ -4419,8 +4527,8 @@ sint32 C_OSCProtocolDriverOsy::OsyNotifyNvmDataChanges(const uint8 ou8_DataPoolI
    if (s32_Return != C_NO_ERR)
    {
       C_SCLString c_ErrorText;
-      c_ErrorText.PrintFormatted("RoutineControl::NotifyNvmDataChanges(Datapool:%d List:%d)", ou8_DataPoolIndex,
-                                 ou8_ListIndex);
+      c_ErrorText.PrintFormatted("RoutineControl::NotifyNvmDataChanges(Client indexes: Datapool:%d List:%d)",
+                                 ou8_DataPoolIndex, ou8_ListIndex);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -4766,12 +4874,10 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
       // parse response message for information
       if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_IdBlockAddresses)
       {
-         //lint -e{864} //false positive due to const/non-const misinterpretation
          orc_BlockInfo.u32_BlockStartAddress = ((static_cast<uint32>(c_ReceiveData[un_Counter + 1U])) << 24U) +
                                                ((static_cast<uint32>(c_ReceiveData[un_Counter + 2U])) << 16U) +
                                                ((static_cast<uint32>(c_ReceiveData[un_Counter + 3U])) << 8U) +
                                                (static_cast<uint32>(c_ReceiveData[un_Counter + 4U]));
-         //lint -e{864} //false positive due to const/non-const misinterpretation
          orc_BlockInfo.u32_BlockEndAddress = ((static_cast<uint32>(c_ReceiveData[un_Counter + 5U])) << 24U) +
                                              ((static_cast<uint32>(c_ReceiveData[un_Counter + 6U])) << 16U) +
                                              ((static_cast<uint32>(c_ReceiveData[un_Counter + 7U])) << 8U) +
@@ -4865,7 +4971,7 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestProgramming(uint8 * const opu8_NrCode)
    uint8 u8_NrErrorCode = 0U;
 
    std::vector<uint8> c_ReceiveData;
-   std::vector<uint8> c_SendData;
+   const std::vector<uint8> c_SendData;
 
    s32_Return = m_RoutineControl(mhu16_OSY_RC_SID_REQUEST_PROGRAMMING, mhu8_OSY_RC_SUB_FUNCTION_START_ROUTINE,
                                  c_SendData, 0U, true, c_ReceiveData, u8_NrErrorCode);

@@ -24,6 +24,7 @@
 #include "C_SyvUtil.h"
 #include "C_SdNdeDpContentUtil.h"
 #include "C_OSCNodeDataPoolContentUtil.h"
+#include "C_PuiSvHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -76,14 +77,23 @@ C_SyvDaItChartDataItemWidget::C_SyvDaItChartDataItemWidget(const uint32 ou32_Vie
    this->mc_IconParameter.load(":/images/system_definition/IconParameter.svg");
    this->mc_IconSignal.load(":/images/system_definition/IconSignal.svg");
    this->mc_IconVariable.load(":/images/system_definition/IconVariable.svg");
+   this->mc_IconHALInput.load(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg");
+   this->mc_IconHALOutput.load(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg");
+   this->mc_IconHALOther.load(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg");
    // Waring icon
    this->mc_IconParameterWarning.load(":/images/system_definition/IconParameterWarning.svg");
    this->mc_IconSignalWarning.load(":/images/system_definition/IconSignalWarning.svg");
    this->mc_IconVariableWarning.load(":/images/system_definition/IconVariableWarning.svg");
+   this->mc_IconHALInputWarning.load(":/images/system_definition/InputSmallInactive.svg");
+   this->mc_IconHALOutputWarning.load(":/images/system_definition/OutputSmallInactive.svg");
+   this->mc_IconHALOtherWarning.load(":/images/system_definition/OtherSmallInactive.svg");
    // Error icon
    this->mc_IconParameterError.load(":/images/system_definition/IconParameterError.svg");
    this->mc_IconSignalError.load(":/images/system_definition/IconSignalError.svg");
    this->mc_IconVariableError.load(":/images/system_definition/IconVariableError.svg");
+   this->mc_IconHALInputError.load(":/images/system_definition/NodeEdit/halc/InputSmallError.svg");
+   this->mc_IconHALOutputError.load(":/images/system_definition/NodeEdit/halc/OutputSmallError.svg");
+   this->mc_IconHALOtherError.load(":/images/system_definition/NodeEdit/halc/OtherSmallError.svg");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -132,6 +142,9 @@ void C_SyvDaItChartDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementC
                                                                  orc_DataPoolElementId.u32_DataPoolIndex,
                                                                  orc_DataPoolElementId.u32_ListIndex,
                                                                  orc_DataPoolElementId.u32_ElementIndex);
+   const C_OSCNodeDataPool * pc_Datapool =
+      C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_DataPoolElementId.u32_NodeIndex,
+                                                      orc_DataPoolElementId.u32_DataPoolIndex);
 
    C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(c_Style, orc_DataPoolElementColor);
 
@@ -159,10 +172,20 @@ void C_SyvDaItChartDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementC
    {
       if (pc_OscElement != NULL)
       {
-         c_Name = pc_OscElement->c_Name.c_str();
-         if (orc_DataPoolElementId.GetUseArrayElementIndex())
+         if (pc_Datapool != NULL)
          {
-            c_Name = QString("%1[%2]").arg(c_Name).arg(orc_DataPoolElementId.GetArrayElementIndex());
+            if (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC)
+            {
+               c_Name = C_PuiSvHandler::h_GetShortNamespace(orc_DataPoolElementId);
+            }
+            else
+            {
+               c_Name = pc_OscElement->c_Name.c_str();
+               if (orc_DataPoolElementId.GetUseArrayElementIndex())
+               {
+                  c_Name = static_cast<QString>("%1[%2]").arg(c_Name).arg(orc_DataPoolElementId.GetArrayElementIndex());
+               }
+            }
          }
       }
    }
@@ -389,7 +412,7 @@ bool C_SyvDaItChartDataItemWidget::event(QEvent * const opc_Event)
                c_str();
             if (this->mc_DataPoolElementId.GetUseArrayElementIndex())
             {
-               c_ToolTipHeading = QString("%1[%2]").arg(c_Name).arg(this->mc_DataPoolElementId.GetArrayElementIndex());
+               c_ToolTipHeading = static_cast<QString>("%1[%2]").arg(c_Name).arg(this->mc_DataPoolElementId.GetArrayElementIndex());
             }
             else
             {
@@ -482,7 +505,6 @@ void C_SyvDaItChartDataItemWidget::m_UpdateIcon(void) const
    }
 
    // Adapt the icon
-
    if (e_Type == C_OSCNodeDataPool::eDIAG)
    {
       // Diag datapool
@@ -515,7 +537,7 @@ void C_SyvDaItChartDataItemWidget::m_UpdateIcon(void) const
          this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconParameter);
       }
    }
-   else
+   else if (e_Type == C_OSCNodeDataPool::eCOM)
    {
       // COMM datapool
       if (this->mq_Error == true)
@@ -529,6 +551,80 @@ void C_SyvDaItChartDataItemWidget::m_UpdateIcon(void) const
       else
       {
          this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconSignal);
+      }
+   }
+   else
+   {
+      // HAL datapool
+      uint32 u32_DomainIndex;
+      bool q_UseChannelIndex;
+      uint32 u32_ChannelIndex;
+
+      C_OSCHalcDefDomain::E_VariableSelector e_Selector;
+      uint32 u32_ParameterIndex;
+      bool q_UseElementIndex;
+      uint32 u32_ParameterElementIndex;
+      bool q_IsUseCaseIndex;
+      bool q_IsChanNumIndex;
+
+      if (C_PuiSdHandler::h_GetInstance()->TranslateToHALCIndex(this->mc_DataPoolElementId,
+                                                                this->mc_DataPoolElementId.GetArrayElementIndexOrZero(),
+                                                                u32_DomainIndex, q_UseChannelIndex,
+                                                                u32_ChannelIndex, e_Selector, u32_ParameterIndex,
+                                                                q_UseElementIndex, u32_ParameterElementIndex,
+                                                                q_IsUseCaseIndex, q_IsChanNumIndex) == C_NO_ERR)
+      {
+         const C_OSCHalcDefDomain * const pc_Domain =
+            C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileDataConst(this->mc_DataPoolElementId.u32_NodeIndex,
+                                                                        u32_DomainIndex);
+         if (pc_Domain->c_Name == "Inputs")
+         {
+            // Inputs
+            if (this->mq_Error == true)
+            {
+               this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALInputError);
+            }
+            else if (this->mq_Warning == true)
+            {
+               this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALInputWarning);
+            }
+            else
+            {
+               this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALInput);
+            }
+         }
+         else if (pc_Domain->c_Name == "Outputs")
+         {
+            // Outputs
+            if (this->mq_Error == true)
+            {
+               this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOutputError);
+            }
+            else if (this->mq_Warning == true)
+            {
+               this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOutputWarning);
+            }
+            else
+            {
+               this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOutput);
+            }
+         }
+         else
+         {
+            // Others
+            if (this->mq_Error == true)
+            {
+               this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOtherError);
+            }
+            else if (this->mq_Warning == true)
+            {
+               this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOtherWarning);
+            }
+            else
+            {
+               this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOther);
+            }
+         }
       }
    }
 }

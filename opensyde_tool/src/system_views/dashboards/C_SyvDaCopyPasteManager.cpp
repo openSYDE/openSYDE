@@ -81,7 +81,7 @@ C_SyvDaCopyPasteManager::~C_SyvDaCopyPasteManager(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data snapshot
 
-   \param[in,out]  opc_Parent  Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 
    \return
    NULL No valid data snap shot found
@@ -90,146 +90,7 @@ C_SyvDaCopyPasteManager::~C_SyvDaCopyPasteManager(void)
 //----------------------------------------------------------------------------------------------------------------------
 const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc_Parent)
 {
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-   if (pc_View != NULL)
-   {
-      //Check params validity
-      for (uint32 u32_ItParam = 0; u32_ItParam < this->mc_LastKnownData.GetParams().size();)
-      {
-         std::set<QString> c_AdaptedLists;
-         bool q_Found = false;
-         bool q_ElementMissing = false;
-         const C_PuiSvDbParam & rc_ParamWidget = this->mc_LastKnownData.GetParams()[u32_ItParam];
-         //Check each parameter element
-         for (uint32 u32_ItElement = 0; u32_ItElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
-              ++u32_ItElement)
-         {
-            const C_PuiSvDbNodeDataElementConfig & rc_Config = rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
-            if (rc_Config.c_ElementId.GetIsValid() == true)
-            {
-               const stw_opensyde_core::C_OSCNodeDataPoolListId c_ListId(rc_Config.c_ElementId.u32_NodeIndex,
-                                                                         rc_Config.c_ElementId.u32_DataPoolIndex,
-                                                                         rc_Config.c_ElementId.u32_ListIndex);
-               const stw_opensyde_core::C_OSCNodeDataPoolList * const pc_List =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(c_ListId.u32_NodeIndex,
-                                                                      c_ListId.u32_DataPoolIndex,
-                                                                      c_ListId.u32_ListIndex);
-               if (pc_View->CheckNvmParamListUsage(c_ListId) == true)
-               {
-                  //Signal error message necessary
-                  q_Found = true;
-               }
-               //For each element check if all elements of this list are contained
-               if (pc_List != NULL)
-               {
-                  //Iterate over all list elements
-                  for (uint32 u32_ItSDElement = 0UL; u32_ItSDElement < pc_List->c_Elements.size(); ++u32_ItSDElement)
-                  {
-                     bool q_FoundOne = false;
-                     const stw_opensyde_core::C_OSCNodeDataPoolListElementId c_ElementId(
-                        rc_Config.c_ElementId.u32_NodeIndex,
-                        rc_Config.c_ElementId.u32_DataPoolIndex,
-                        rc_Config.c_ElementId.u32_ListIndex, u32_ItSDElement);
-                     //Check if each element contained
-                     for (uint32 u32_ItCheckElement = 0;
-                          u32_ItCheckElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
-                          ++u32_ItCheckElement)
-                     {
-                        const C_PuiSvDbNodeDataElementConfig & rc_CheckConfig =
-                           rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
-                        if (rc_CheckConfig.c_ElementId.GetIsValid() == true)
-                        {
-                           if (rc_CheckConfig.c_ElementId == c_ElementId)
-                           {
-                              //Signal match for this index
-                              q_FoundOne = true;
-                              break;
-                           }
-                        }
-                     }
-                     //Signal at least one element missing
-                     if (q_FoundOne == false)
-                     {
-                        QString c_Tmp;
-                        const stw_opensyde_core::C_OSCNode * const pc_Node =
-                           C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
-                              c_ListId.u32_NodeIndex);
-                        const stw_opensyde_core::C_OSCNodeDataPool * const pc_DataPool =
-                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
-                              c_ListId.u32_NodeIndex,
-                              c_ListId.u32_DataPoolIndex);
-
-                        //For each missing element add default
-                        q_ElementMissing = true;
-                        //Remember name
-                        if ((pc_Node != NULL) && (pc_DataPool != NULL))
-                        {
-                           c_Tmp = QString("%1::%2::%3").arg(pc_Node->c_Properties.c_Name.c_str()).arg(
-                              pc_DataPool->c_Name.c_str()).arg(
-                              pc_List->c_Name.c_str());
-                        }
-                        c_AdaptedLists.insert(c_Tmp);
-                        break;
-                     }
-                  }
-               }
-            }
-         }
-         //Check if error message necessary
-         if ((q_Found) || (q_ElementMissing))
-         {
-            QString c_Details;
-            C_OgeWiCustomMessage c_Message(opc_Parent);
-            //No iterator step because new element at current position
-            this->mc_LastKnownData.DeleteWidget(u32_ItParam, C_PuiSvDbDataElement::ePARAM);
-            c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
-            c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
-            c_Message.SetDescription(C_GtGetText::h_GetText("Parametrization widget could not be pasted."));
-            if (q_Found)
-            {
-               c_Details = C_GtGetText::h_GetText("Another parametrization widget in this view is already "
-                                                  "using at least one of the containing lists.");
-               c_Message.SetCustomMinHeight(180, 250);
-            }
-            else if (q_ElementMissing)
-            {
-               c_Details = C_GtGetText::h_GetText(
-                  "The following copied lists were changed before pasting the parametrization widget:\n");
-               for (std::set<QString>::const_iterator c_It = c_AdaptedLists.begin(); c_It != c_AdaptedLists.end();
-                    ++c_It)
-               {
-                  c_Details += *c_It;
-                  c_Details += "\n";
-               }
-               c_Message.SetCustomMinHeight(180, 270);
-            }
-            else
-            {
-               //Unexpected
-            }
-            c_Message.SetDetails(c_Details);
-            c_Message.Execute();
-         }
-         else
-         {
-            //Important iterator step
-            ++u32_ItParam;
-         }
-      }
-      //Check ID validity
-      if (this->mc_LastKnownData.DiscardInvalidIndices())
-      {
-         C_OgeWiCustomMessage c_Message(opc_Parent);
-         c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
-         c_Message.SetDescription(C_GtGetText::h_GetText(
-                                     "Some data elements were not found in your SYSTEM DEFINITION.\n"
-                                     "These were automatically removed from the pasted widgets"));
-         c_Message.SetCustomMinHeight(180, 180);
-         c_Message.Execute();
-      }
-   }
+   C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(this->mc_LastKnownData, this->mu32_ViewIndex, opc_Parent);
 
    return &this->mc_LastKnownData;
 }
@@ -237,8 +98,8 @@ const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepare call of CopyFromSceneToManager
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaCopyPasteManager::PrepareCopyFromSceneToManager(const uint32 ou32_ViewIndex,
@@ -251,8 +112,8 @@ void C_SyvDaCopyPasteManager::PrepareCopyFromSceneToManager(const uint32 ou32_Vi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy selected files to copy paste manager
 
-   \param[in] orc_SelectedItems     Selected items to copy
-   \param[in] orc_NormalizedZValues Normalized Z values for all copied items
+   \param[in]  orc_SelectedItems       Selected items to copy
+   \param[in]  orc_NormalizedZValues   Normalized Z values for all copied items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems,
@@ -291,34 +152,33 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
             }
             if (q_Handled == false)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-               //lint -e{740}  no problem because of common base class
+               
                C_PuiSvDbDataElement * const pc_Data = dynamic_cast<C_PuiSvDbDataElement *>(pc_CurItem);
                if (pc_Data != NULL)
                {
                   //Update core data
                   pc_Data->UpdateData();
                   {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     
                      const C_GiSvDaChartBase * const pc_Chart = dynamic_cast<const C_GiSvDaChartBase *>(pc_CurItem);
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     
                      const C_GiSvDaLabelBase * const pc_Label = dynamic_cast<const C_GiSvDaLabelBase *>(pc_CurItem);
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     
                      const C_GiSvDaParam * const pc_Param = dynamic_cast<const C_GiSvDaParam *>(pc_CurItem);
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     
                      const C_GiSvDaPieChartBase * const pc_PieChart =
                         dynamic_cast<const C_GiSvDaPieChartBase *>(pc_CurItem);
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     
                      const C_GiSvDaProgressBarBase * const pc_ProgressBar =
                         dynamic_cast<const C_GiSvDaProgressBarBase *>(pc_CurItem);
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     
                      const C_GiSvDaSliderBase * const pc_Slider = dynamic_cast<const C_GiSvDaSliderBase *>(pc_CurItem);
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     
                      const C_GiSvDaSpinBoxBase * const pc_SpinBox =
                         dynamic_cast<const C_GiSvDaSpinBoxBase *>(pc_CurItem);
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     
                      const C_GiSvDaTableBase * const pc_Table = dynamic_cast<const C_GiSvDaTableBase *>(pc_CurItem);
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     
                      const C_GiSvDaToggleBase * const pc_Toggle = dynamic_cast<const C_GiSvDaToggleBase *>(pc_CurItem);
                      if (pc_Chart != NULL)
                      {
@@ -428,7 +288,7 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         switch (pc_CurItem->type())
                         {
                         case msn_GRAPHICS_ITEM_TEXTELEMENT:
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            pc_TextElement = dynamic_cast<const C_GiSvDaTextElement *>(pc_CurItem);
                            if (pc_TextElement != NULL)
                            {
@@ -436,15 +296,14 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                               if (u32_Index < pc_Dashboard->c_TextElements.size())
                               {
                                  c_Snapshot.c_TextElements.push_back(pc_Dashboard->c_TextElements[u32_Index]);
-                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues,
-                                                                             c_Snapshot.c_TextElements[c_Snapshot.
-                                                                                                       c_TextElements.
-                                                                                                       size() - 1UL]);
+                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(
+                                    *c_ItItem, orc_NormalizedZValues,
+                                    c_Snapshot.c_TextElements[c_Snapshot.c_TextElements.size() - 1]);
                               }
                            }
                            break;
                         case msn_GRAPHICS_ITEM_BOUNDARY:
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            pc_Boundary = dynamic_cast<const C_GiSvDaBoundary *>(pc_CurItem);
                            if (pc_Boundary != NULL)
                            {
@@ -452,15 +311,14 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                               if (u32_Index < pc_Dashboard->c_Boundaries.size())
                               {
                                  c_Snapshot.c_Boundaries.push_back(pc_Dashboard->c_Boundaries[u32_Index]);
-                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues,
-                                                                             c_Snapshot.c_Boundaries[c_Snapshot.
-                                                                                                     c_Boundaries.
-                                                                                                     size() - 1UL]);
+                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(
+                                    *c_ItItem, orc_NormalizedZValues,
+                                    c_Snapshot.c_Boundaries[c_Snapshot.c_Boundaries.size() - 1]);
                               }
                            }
                            break;
                         case msn_GRAPHICS_ITEM_IMAGE:
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            pc_Image = dynamic_cast<const C_GiSvDaImageGroup *>(pc_CurItem);
                            if (pc_Image != NULL)
                            {
@@ -468,15 +326,14 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                               if (u32_Index < pc_Dashboard->c_Images.size())
                               {
                                  c_Snapshot.c_Images.push_back(pc_Dashboard->c_Images[u32_Index]);
-                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues,
-                                                                             c_Snapshot.c_Images[c_Snapshot.
-                                                                                                 c_Images.
-                                                                                                 size() - 1UL]);
+                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(
+                                    *c_ItItem, orc_NormalizedZValues,
+                                    c_Snapshot.c_Images[c_Snapshot.c_Images.size() - 1]);
                               }
                            }
                            break;
                         case msn_GRAPHICS_ITEM_LINE_ARROW:
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            pc_LineArrow = dynamic_cast<const C_GiSvDaArrow *>(pc_CurItem);
                            if (pc_LineArrow != NULL)
                            {
@@ -484,10 +341,9 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                               if (u32_Index < pc_Dashboard->c_LineArrows.size())
                               {
                                  c_Snapshot.c_LineArrows.push_back(pc_Dashboard->c_LineArrows[u32_Index]);
-                                 C_SyvDaCopyPasteManager::mh_HandleZValueLine(*c_ItItem, orc_NormalizedZValues,
-                                                                              c_Snapshot.c_LineArrows[c_Snapshot.
-                                                                                                      c_LineArrows.
-                                                                                                      size() - 1UL]);
+                                 C_SyvDaCopyPasteManager::mh_HandleZValueLine(
+                                    *c_ItItem, orc_NormalizedZValues,
+                                    c_Snapshot.c_LineArrows[c_Snapshot.c_LineArrows.size() - 1]);
                               }
                            }
                            break;
@@ -528,14 +384,165 @@ bool C_SyvDaCopyPasteManager::CheckValidContentAndPrepareData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt copy content for paste
+
+   \param[in,out]  orc_CopyData     Copy data
+   \param[in]      ou32_ViewIndex   View index
+   \param[in,out]  opc_Parent       Parent for dialog
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(C_PuiSvDashboard & orc_CopyData, const uint32 ou32_ViewIndex,
+                                                      QWidget * const opc_Parent)
+{
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
+
+   if (pc_View != NULL)
+   {
+      //Check param widget validity
+      for (uint32 u32_ItParam = 0; u32_ItParam < orc_CopyData.GetParams().size();)
+      {
+         std::set<QString> c_AdaptedLists;
+         bool q_Found = false;
+         bool q_ElementMissing = false;
+         const C_PuiSvDbParam & rc_ParamWidget = orc_CopyData.GetParams()[u32_ItParam];
+         //Check each parameter element
+         for (uint32 u32_ItElement = 0; u32_ItElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
+              ++u32_ItElement)
+         {
+            const C_PuiSvDbNodeDataElementConfig & rc_Config = rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
+            if (rc_Config.c_ElementId.GetIsValid() == true)
+            {
+               const stw_opensyde_core::C_OSCNodeDataPoolListId c_ListId(rc_Config.c_ElementId.u32_NodeIndex,
+                                                                         rc_Config.c_ElementId.u32_DataPoolIndex,
+                                                                         rc_Config.c_ElementId.u32_ListIndex);
+               const stw_opensyde_core::C_OSCNodeDataPoolList * const pc_List =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(c_ListId.u32_NodeIndex,
+                                                                      c_ListId.u32_DataPoolIndex,
+                                                                      c_ListId.u32_ListIndex);
+               if (pc_View->CheckNvmParamListUsage(c_ListId) == true)
+               {
+                  //Signal error message necessary
+                  q_Found = true;
+               }
+               //For each element check if all elements of this list are contained
+               if (pc_List != NULL)
+               {
+                  //Iterate over all list elements
+                  for (uint32 u32_ItSDElement = 0UL; u32_ItSDElement < pc_List->c_Elements.size(); ++u32_ItSDElement)
+                  {
+                     bool q_FoundOne = false;
+                     const stw_opensyde_core::C_OSCNodeDataPoolListElementId c_ElementId(
+                        rc_Config.c_ElementId.u32_NodeIndex,
+                        rc_Config.c_ElementId.u32_DataPoolIndex,
+                        rc_Config.c_ElementId.u32_ListIndex, u32_ItSDElement);
+                     //Check if each element contained
+                     for (uint32 u32_ItCheckElement = 0;
+                          u32_ItCheckElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
+                          ++u32_ItCheckElement)
+                     {
+                        const C_PuiSvDbNodeDataElementConfig & rc_CheckConfig =
+                           rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
+                        if (rc_CheckConfig.c_ElementId.GetIsValid() == true)
+                        {
+                           if (rc_CheckConfig.c_ElementId == c_ElementId)
+                           {
+                              //Signal match for this index
+                              q_FoundOne = true;
+                              break;
+                           }
+                        }
+                     }
+                     //Signal at least one element missing
+                     if (q_FoundOne == false)
+                     {
+                        QString c_Tmp;
+                        const stw_opensyde_core::C_OSCNode * const pc_Node =
+                           C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_ListId.u32_NodeIndex);
+                        const stw_opensyde_core::C_OSCNodeDataPool * const pc_DataPool =
+                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(c_ListId.u32_NodeIndex,
+                                                                           c_ListId.u32_DataPoolIndex);
+
+                        //For each missing element add default
+                        q_ElementMissing = true;
+                        //Remember name
+                        if ((pc_Node != NULL) && (pc_DataPool != NULL))
+                        {
+                           c_Tmp = static_cast<QString>("%1::%2::%3").arg(pc_Node->c_Properties.c_Name.c_str()).arg(
+                              pc_DataPool->c_Name.c_str()).arg(
+                              pc_List->c_Name.c_str());
+                        }
+                        c_AdaptedLists.insert(c_Tmp);
+                        break;
+                     }
+                  }
+               }
+            }
+         }
+         //Check if error message necessary
+         if ((q_Found) || (q_ElementMissing))
+         {
+            QString c_Details;
+            C_OgeWiCustomMessage c_Message(opc_Parent);
+            //No iterator step because new element at current position
+            orc_CopyData.DeleteWidget(u32_ItParam, C_PuiSvDbDataElement::ePARAM);
+            c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
+            c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
+            c_Message.SetDescription(C_GtGetText::h_GetText("Parametrization widget could not be pasted."));
+            if (q_Found)
+            {
+               c_Details = C_GtGetText::h_GetText("Another parametrization widget in this view is already "
+                                                  "using at least one of the containing lists.");
+               c_Message.SetCustomMinHeight(180, 250);
+            }
+            else if (q_ElementMissing)
+            {
+               c_Details = C_GtGetText::h_GetText(
+                  "The following copied lists were changed before pasting the parametrization widget:\n");
+               for (std::set<QString>::const_iterator c_It = c_AdaptedLists.begin(); c_It != c_AdaptedLists.end();
+                    ++c_It)
+               {
+                  c_Details += *c_It;
+                  c_Details += "\n";
+               }
+               c_Message.SetCustomMinHeight(180, 270);
+            }
+            else
+            {
+               //Unexpected
+            }
+            c_Message.SetDetails(c_Details);
+            c_Message.Execute();
+         }
+         else
+         {
+            //Important iterator step
+            ++u32_ItParam;
+         }
+      }
+      //Check ID validity
+      if (orc_CopyData.DiscardInvalidIndices())
+      {
+         C_OgeWiCustomMessage c_Message(opc_Parent);
+         c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
+         c_Message.SetDescription(C_GtGetText::h_GetText(
+                                     "Some data elements were not found in your SYSTEM DEFINITION.\n"
+                                     "These were automatically removed from the pasted widgets."));
+         c_Message.SetCustomMinHeight(180, 180);
+         c_Message.Execute();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Evaluate all items to get top left point
 
-   \param[in] opc_Data Data
+   \param[in]  opc_Data    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * const opc_Data)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_PuiSvDashboard * const pc_ExpectedData =
       dynamic_cast<const C_PuiSvDashboard * const>(opc_Data);
 

@@ -48,6 +48,9 @@ public:
                                             const stw_types::uint32 ou32_UseCaseIndex);
    stw_types::sint32 ResetDomainChannelConfig(const stw_types::uint32 ou32_DomainIndex,
                                               const stw_types::uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex);
+   stw_types::sint32 ResetDomainChannelUseCase(const stw_types::uint32 ou32_DomainIndex,
+                                               const stw_types::uint32 ou32_ChannelIndex,
+                                               const bool oq_UseChannelIndex);
    stw_types::sint32 SetDomainChannelConfigName(const stw_types::uint32 ou32_DomainIndex,
                                                 const stw_types::uint32 ou32_ChannelIndex,
                                                 const bool oq_UseChannelIndex, const stw_scl::C_SCLString & orc_Name);

@@ -57,10 +57,7 @@ Q_SIGNALS:
    void SigNoDataPoolSelected(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call
@@ -82,12 +79,10 @@ private:
    C_SdNdeDpSelectorWidget * mapc_Selectors[static_cast<stw_types::sintn>(stw_opensyde_core::C_OSCNodeDataPool::
                                                                           eHALC) + 1];
    C_SdNdeDpSelectorUsageWidget * mpc_UsageBar;
-   bool mq_UsageViewActive;
    stw_types::uint32 mu32_NodeIndex;
    stw_types::uint32 mu32_LastKnownDataPoolIndex;
    stw_opensyde_core::C_OSCNodeDataPool::E_Type me_ActiveDataPoolType;
    stw_types::sintn msn_ActiveDataPoolWidget;
-   bool mq_IndexValid;
 
    static const bool mhaq_StorageIndicatorActive[static_cast<stw_types::sintn>(stw_opensyde_core::C_OSCNodeDataPool::
                                                                                eHALC) + 1];

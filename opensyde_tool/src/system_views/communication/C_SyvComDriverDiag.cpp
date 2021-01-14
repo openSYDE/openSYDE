@@ -203,6 +203,7 @@ sint32 C_SyvComDriverDiag::InitDiag(void)
    C_CONFIG    InitDiag function was not called or not successful or protocol was not initialized properly.
    C_COM       Error of service
    C_CHECKSUM  Checksum of a datapool does not match
+               Datapool with the name orc_DatapoolName does not exist on the server
    C_TIMEOUT   Expected response not received within timeout
    C_RD_WR     malformed protocol response
    C_WARN      error response
@@ -328,13 +329,13 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
          if (s32_Return != C_NO_ERR)
          {
             osc_write_log_warning("Asynchronous communication",
-                                  QString("Node \"%1\" - DataPoolSetEventDataRate - error: %2\n"
+                                  static_cast<QString>("Node \"%1\" - DataPoolSetEventDataRate - error: %2\n"
                                           "C_RANGE    parameter out of range (checked by client-side function)\n"
                                           "C_TIMEOUT  expected response not received within timeout\n"
                                           "C_NOACT    could not send request (e.g. Tx buffer full)\n"
                                           "C_CONFIG   pre-requisites not correct; e.g. driver not initialized\n"
                                           "C_WARN     error response\n"
-                                          "C_RD_WR    malformed protocol response\n").arg(QString(m_GetActiveNodeName(
+                                          "C_RD_WR    malformed protocol response\n").arg(static_cast<QString>(m_GetActiveNodeName(
                                                                                                      u16_Node).c_str())).arg(
                                      C_Uti::h_StwError(s32_Return)).toStdString().c_str());
             s32_Return = C_COM;
@@ -356,7 +357,7 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
       {
          bool q_Found;
          //we need the node index within the list of active nodes:
-         uint32 u32_ActiveNodeIndex = this->m_GetActiveIndex(c_It.key().u32_NodeIndex, &q_Found);
+         const uint32 u32_ActiveNodeIndex = this->m_GetActiveIndex(c_It.key().u32_NodeIndex, &q_Found);
          //Skip inactive nodes
          if (q_Found == true)
          {
@@ -398,7 +399,6 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                //fill up to 4 bytes with zeroes
                c_Threshold.resize(4, 0U);
                //finally compose the uint32:
-               //lint -e{864} //false positive due to const/non-const misinterpretation
                u32_Threshold = c_Threshold[0] +
                                (static_cast<uint32>(c_Threshold[1]) << 8) +
                                (static_cast<uint32>(c_Threshold[2]) << 16) +
@@ -477,11 +477,11 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                      break;
                   default:
                      c_AdditionalInfo =
-                        QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NegResponseCode,
+                        static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NegResponseCode,
                                                                                                  16));
                      break;
                   }
-                  c_Details = QString(C_GtGetText::h_GetText("Error response (%1)")).arg(c_AdditionalInfo);
+                  c_Details = static_cast<QString>(C_GtGetText::h_GetText("Error response (%1)")).arg(c_AdditionalInfo);
                   break;
                case C_RD_WR:
                   c_Details = C_GtGetText::h_GetText("Malformed protocol response");
@@ -530,12 +530,12 @@ sint32 C_SyvComDriverDiag::StopCyclicTransmissions(void)
       //stop all transmissions
       for (u16_Node = 0U; u16_Node < this->mc_ActiveNodesIndexes.size(); u16_Node++)
       {
-         sint32 s32_Return2 = this->mc_DiagProtocols[u16_Node]->DataPoolStopEventDriven();
+         const sint32 s32_Return2 = this->mc_DiagProtocols[u16_Node]->DataPoolStopEventDriven();
          if (s32_Return2 != C_NO_ERR)
          {
             osc_write_log_warning("Asynchronous communication",
-                                  QString("Node \"%1\" - DataPoolStopEventDriven - warning: %2\n").
-                                  arg(QString(m_GetActiveNodeName(u16_Node).c_str())).
+                                  static_cast<QString>("Node \"%1\" - DataPoolStopEventDriven - warning: %2\n").
+                                  arg(static_cast<QString>(m_GetActiveNodeName(u16_Node).c_str())).
                                   arg(C_Uti::h_StwError(s32_Return2)).toStdString().c_str());
             s32_Return = C_COM;
          }
@@ -569,9 +569,8 @@ sint32 C_SyvComDriverDiag::StopDiagnosisServer(void)
 
       for (u32_Counter = 0U; u32_Counter < this->mc_DiagProtocols.size(); ++u32_Counter)
       {
-         //lint -e{740}  no problem because of common base class
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         C_OSCDiagProtocolKfx * pc_DiagProtocolKfx =
+         
+         C_OSCDiagProtocolKfx * const pc_DiagProtocolKfx =
             dynamic_cast<C_OSCDiagProtocolKfx *>(this->mc_DiagProtocols[u32_Counter]);
 
          if (pc_DiagProtocolKfx != NULL)
@@ -1424,7 +1423,7 @@ sint32 C_SyvComDriverDiag::m_StartRoutingSpecific(const uint32 ou32_ActiveNode, 
 
    if (opc_Node->c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_KEFEX)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_OSCDiagProtocolKfx * const pc_DiagProtocolKfx =
          dynamic_cast<C_OSCDiagProtocolKfx * const>(this->mc_DiagProtocols[ou32_ActiveNode]);
 
@@ -1463,7 +1462,7 @@ void C_SyvComDriverDiag::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
        (this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]].c_Properties.e_DiagnosticServer ==
         C_OSCNodeProperties::eDS_KEFEX))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_OSCDiagProtocolKfx * const pc_DiagProtocolKfx =
          dynamic_cast<C_OSCDiagProtocolKfx * const>(this->mc_DiagProtocols[ou32_ActiveNode]);
 
@@ -1552,7 +1551,7 @@ void C_SyvComDriverDiag::m_HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, con
                   C_PuiSvDbDataElementContent c_MultiplexerContent;
                   C_OSCCanUtil::h_GetSignalValue(orc_Msg.au8_Data, rc_WidgetRegistration.c_MultiplexerSignal,
                                                  c_MultiplexerContent);
-                  C_OSCNodeDataPoolContent::E_Type e_Type = c_MultiplexerContent.GetType();
+                  const C_OSCNodeDataPoolContent::E_Type e_Type = c_MultiplexerContent.GetType();
                   uint16 u16_MultiplexerValue;
 
                   // Multiplexer can be maximum 16 bit
@@ -1900,7 +1899,7 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
          tgl_assert(pc_Node != NULL);
          if (pc_Node != NULL)
          {
-            orc_ErrorDetails += QString("\"") + pc_Node->c_Properties.c_Name.c_str() + "\"\n";
+            orc_ErrorDetails += static_cast<QString>("\"") + pc_Node->c_Properties.c_Name.c_str() + "\"\n";
          }
          break;
       }
@@ -1922,8 +1921,7 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
 
             tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
             // Reconnect is only supported by openSYDE nodes
-            if (((pc_Node->pc_DeviceDefinition->q_DiagnosticProtocolOpenSydeCan == true) ||
-                 (pc_Node->pc_DeviceDefinition->q_DiagnosticProtocolOpenSydeEthernet == true)) &&
+            if ((pc_Node->c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_OPEN_SYDE) &&
                 (s32_Return == C_NO_ERR) &&
                 (this->GetClientId().u8_BusIdentifier == this->mc_ServerIDs[u32_ActiveNodeCounter].u8_BusIdentifier))
             {
@@ -1935,7 +1933,7 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
                orc_ErrorActiveNodes.insert(u32_ActiveNodeCounter);
                orc_ErrorActiveNodes.insert(u32_ErrorActiveNodeIndex);
 
-               orc_ErrorDetails += QString("\"") + pc_Node->c_Properties.c_Name.c_str() + "\"\n";
+               orc_ErrorDetails += static_cast<QString>("\"") + pc_Node->c_Properties.c_Name.c_str() + "\"\n";
                break;
             }
          }
@@ -1960,22 +1958,28 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
    C_WARN     error response
    C_RD_WR    malformed protocol response
    C_CHECKSUM checksum of datapool does not match
+              Datapool with the name orc_DatapoolName does not exist on the server
+   C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
 {
    sint32 s32_Retval = C_NO_ERR;
 
+   this->mc_ReadDatapoolMetadata.clear();
+
    if ((this->mq_Initialized == true) && (this->mc_DiagProtocols.size() > 0UL))
    {
       uint32 u32_Counter;
 
+      this->mc_ReadDatapoolMetadata.resize(this->mc_ActiveNodesIndexes.size());
+
       for (u32_Counter = 0U; u32_Counter < this->mc_DiagProtocols.size(); ++u32_Counter)
       {
-         // Check only if datapool of node is really used
+         // Check only if Datapool of node is really used
          if (this->mc_DiagNodes.find(this->mc_ActiveNodesIndexes[u32_Counter]) != this->mc_DiagNodes.end())
          {
-            const C_OSCNode * pc_Node =
+            const C_OSCNode * const pc_Node =
                C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_ActiveNodesIndexes[u32_Counter]);
 
             if (pc_Node != NULL)
@@ -2016,7 +2020,7 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
                      }
                      if (s32_Retval != C_NO_ERR)
                      {
-                        orc_ErrorDetails += QString("- ") + pc_Node->c_Properties.c_Name.c_str() +
+                        orc_ErrorDetails += static_cast<QString>("- ") + pc_Node->c_Properties.c_Name.c_str() +
                                             ", Datapool: \"" +
                                             pc_Node->c_DataPools[u8_DataPoolIndex].c_Name.c_str() + "\"\n";
                      }
@@ -2025,8 +2029,16 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
                }
                else
                {
-                  const sint32 s32_Return = mh_CheckDatapools(pc_Node, this->mc_DiagProtocols[u32_Counter],
-                                                              orc_ErrorDetails);
+                  sint32 s32_Return;
+
+                  // Get all Datapool names on node to create the mapping
+                  s32_Return = this->m_GetAllDatapoolMetadata(u32_Counter, orc_ErrorDetails);
+
+                  if (s32_Return == C_NO_ERR)
+                  {
+                     // Verify all used Datapools for checksum and version
+                     s32_Return = this->m_CheckOsyDatapoolsAndCreateMapping(u32_Counter, orc_ErrorDetails);
+                  }
 
                   if (s32_Return != C_NO_ERR)
                   {
@@ -2058,165 +2070,359 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check of Datapools
+/*! \brief  Get all Datapool meta data for specific openSYDE node
+
+   All Datapool names will be read from the node and tried
+
+   \param[in]      ou32_ActiveNodeIndex      Active node index (mc_ActiveNodesIndexes)
+   \param[in,out]  orc_ErrorDetails          Details for current error
+
+   \return
+   C_NO_ERR   Datapool metadata were read successfully
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not send protocol request
+   C_CONFIG   CAN dispatcher not installed
+   C_WARN     error response
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveNodeIndex, QString & orc_ErrorDetails)
+{
+   uint32 u32_ItDataPool;
+   sint32 s32_Return = C_NO_ERR;
+
+   for (u32_ItDataPool = 0U; u32_ItDataPool < mu32_NODE_DATA_POOL_MAX; ++u32_ItDataPool)
+   {
+      uint8 u8_ErrorCode;
+      C_OSCProtocolDriverOsy::C_DataPoolMetaData c_Metadata;
+
+      // Get meta data
+      s32_Return = this->mc_DiagProtocols[ou32_ActiveNodeIndex]->DataPoolReadMetaData(
+         static_cast<uint8>(u32_ItDataPool),
+         c_Metadata.au8_Version, c_Metadata.c_Name, &u8_ErrorCode);
+
+      if (s32_Return == C_NO_ERR)
+      {
+         // Datapool exists and metadata are available
+         this->mc_ReadDatapoolMetadata[ou32_ActiveNodeIndex].push_back(c_Metadata);
+      }
+      else
+      {
+         QString c_ErrorReason;
+         if (s32_Return == C_WARN)
+         {
+            // Error response
+            if (u8_ErrorCode == C_OSCProtocolDriverOsy::hu8_NR_CODE_REQUEST_OUT_OF_RANGE)
+            {
+               // Range reached. No error, no further Datapools available on node
+               s32_Return = C_NO_ERR;
+            }
+            else
+            {
+               c_ErrorReason = "The read of the Datapool meta data"
+                               " failed with error " +
+                               static_cast<QString>(C_OSCLoggingHandler::h_StwError(s32_Return).c_str()) +
+                               " and negative response code: " + QString::number(u8_ErrorCode);
+            }
+         }
+         else
+         {
+            // Service error
+            c_ErrorReason = "The read of the Datapool meta data"
+                            " failed with error " + static_cast<QString>(C_OSCLoggingHandler::h_StwError(s32_Return).c_str());
+         }
+
+         if (c_ErrorReason != "")
+         {
+            const uint32 u32_NodeIndex = this->mc_ActiveNodesIndexes[ou32_ActiveNodeIndex];
+            const C_OSCNode * const pc_Node =
+               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+            if (pc_Node != NULL)
+            {
+               stw_scl::C_SCLString c_Error;
+               c_Error.PrintFormatted("Datapool verify failed between client and node %s. " \
+                                      "Reason: %s",
+                                      pc_Node->c_Properties.c_Name.c_str(),
+                                      c_ErrorReason.toStdString().c_str());
+               osc_write_log_error("Starting diagnostics", c_Error);
+
+               //Translation: 1=Node name, 2=List of Datapool names
+               orc_ErrorDetails += static_cast<QString>(C_GtGetText::h_GetText("- %1: %2\n")).arg(
+                  pc_Node->c_Properties.c_Name.c_str()).arg("\n   " + c_ErrorReason);
+            }
+         }
+
+         break;
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check of openSYDE Datapools
 
    Each Datapool will be checked for matching name, version and CRC
 
-   \param[in]      opc_Node            Node
-   \param[in,out]  opc_Protocol        Protocol
-   \param[in,out]  orc_ErrorDetails    Details for current error
+   m_GetAllDatapoolMetadata must be called before calling m_CheckDatapoolsAndCreateMapping
+
+   \param[in]      ou32_ActiveNodeIndex      Active node index (mc_ActiveNodesIndexes)
+   \param[in,out]  orc_ErrorDetails          Details for current error
 
    \return
    C_NO_ERR   Datapools are as expected
    C_TIMEOUT  expected response not received within timeout
    C_NOACT    could not send request (e.g. Tx buffer full)
-   C_CONFIG   pre-requisites not correct; e.g. driver not initialized
-   C_WARN     error response
+   C_CONFIG   pre-requisites not correct; e.g. driver not initialized, node or view invalid
    C_RD_WR    malformed protocol response
-   C_CHECKSUM Checksum, name or version of Datapool does not match
+   C_CHECKSUM Checksum or version of Datapool does not match
+              Datapool with the name orc_DatapoolName does not exist on the server
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComDriverDiag::mh_CheckDatapools(const C_OSCNode * const opc_Node,
-                                             stw_opensyde_core::C_OSCDiagProtocolBase * const opc_Protocol,
-                                             QString & orc_ErrorDetails)
+sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::uint32 ou32_ActiveNodeIndex,
+                                                               QString & orc_ErrorDetails)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_CONFIG;
    QString c_DataPoolErrorString = "";
 
-   for (uint32 u32_ItDataPool = 0; u32_ItDataPool < opc_Node->c_DataPools.size(); ++u32_ItDataPool)
+   
+   stw_opensyde_core::C_OSCDiagProtocolOsy * const pc_Protocol =
+      dynamic_cast<C_OSCDiagProtocolOsy *>(this->mc_DiagProtocols[ou32_ActiveNodeIndex]);
+   const uint32 u32_NodeIndex = this->mc_ActiveNodesIndexes[ou32_ActiveNodeIndex];
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+   const C_OSCNode * const pc_Node =
+      C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+
+   if ((pc_View != NULL) &&
+       (pc_Node != NULL) &&
+       (pc_Protocol != NULL))
    {
-      const C_OSCNodeDataPool & rc_Datapool = opc_Node->c_DataPools[u32_ItDataPool];
-      uint32 u32_DataPoolChecksum = 0U;
-      sint32 s32_Return;
-      uint8 au8_Version[3];
-      C_SCLString c_DatapoolName;
-      QString c_ErrorReason = "";
-      uint8 u8_ErrorCode;
+      // Get all registered Datapool elements for comparing. Check only used Datapools
+      std::set<C_OSCNodeDataPoolListElementId> c_RegisteredElementIds;
+      pc_View->GetAllRegisteredDashboardElements(c_RegisteredElementIds);
+      std::map<uint8, uint8> c_DatapoolMapping;
 
-      // Check meta data
-      s32_Return = opc_Protocol->DataPoolReadMetaData(static_cast<uint8>(u32_ItDataPool),
-                                                      au8_Version, c_DatapoolName, &u8_ErrorCode);
+      s32_Retval = C_NO_ERR;
 
-      if (s32_Return == C_NO_ERR)
+      for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
       {
-         // Check name if string is not empty. Empty string in case of not supported data by protocol
-         if ((c_DatapoolName != "") &&
-             (c_DatapoolName != rc_Datapool.c_Name))
+         std::set<C_OSCNodeDataPoolListElementId>::const_iterator c_ItElement;
+         bool q_DatapoolRelevant = false;
+
+         // Search for a usage of the Datapool
+         for (c_ItElement = c_RegisteredElementIds.begin(); c_ItElement != c_RegisteredElementIds.end(); ++c_ItElement)
          {
-            // Name does not match
-            c_ErrorReason = "The name of Datapool does not match (Client: " + QString(rc_Datapool.c_Name.c_str()) +
-                            ", Server: " + QString(c_DatapoolName.c_str()) + ").";
-
-            s32_Return = C_CHECKSUM;
-         }
-         // Check version
-         else if (memcmp(rc_Datapool.au8_Version, au8_Version, sizeof(au8_Version)) != 0)
-         {
-            const QString c_VersionServer = QString("v%1.%2r%3").
-                                            arg(au8_Version[0], 2, 10, QChar('0')).
-                                            arg(au8_Version[1], 2, 10, QChar('0')).
-                                            arg(au8_Version[2], 2, 10, QChar('0'));
-            const QString c_VersionClient = QString("v%1.%2r%3").
-                                            arg(rc_Datapool.au8_Version[0], 2, 10, QChar('0')).
-                                            arg(rc_Datapool.au8_Version[1], 2, 10, QChar('0')).
-                                            arg(rc_Datapool.au8_Version[2], 2, 10, QChar('0'));
-
-            // Version does not match
-            c_ErrorReason = "The version of Datapool " + QString(rc_Datapool.c_Name.c_str()) +
-                            " does not match (Client: " + c_VersionClient +
-                            ", Server: " + c_VersionServer + ").";
-
-            s32_Return = C_CHECKSUM;
-         }
-         else
-         {
-            bool q_Match = false;
-
-            // Check checksum
-            rc_Datapool.CalcDefinitionHash(u32_DataPoolChecksum);
-
-            s32_Return = opc_Protocol->DataPoolVerify(
-               static_cast<uint8>(u32_ItDataPool),
-               0U, //N/A for openSYDE protocol
-               0U, //N/A for openSYDE protocol
-               u32_DataPoolChecksum,
-               q_Match);
-
-            if ((q_Match == false) &&
-                (s32_Return == C_NO_ERR))
+            if (((*c_ItElement).u32_NodeIndex == u32_NodeIndex) &&
+                ((*c_ItElement).u32_DataPoolIndex == u32_ItDataPool))
             {
-               // Checksum does not match
-               c_ErrorReason = "The checksum of Datapool " + QString(rc_Datapool.c_Name.c_str()) +
-                               " does not match.";
-               s32_Return = C_CHECKSUM;
+               q_DatapoolRelevant = true;
+               break;
             }
-            else if (s32_Return != C_NO_ERR)
+         }
+
+         if (q_DatapoolRelevant == true)
+         {
+            // Datapool is used on dashboard
+            const C_OSCNodeDataPool & rc_Datapool = pc_Node->c_DataPools[u32_ItDataPool];
+            uint32 u32_DataPoolChecksum = 0U;
+            sint32 s32_Return;
+            QString c_ErrorReason = "";
+            uint32 u32_ServerDatapoolIndex = 0U;
+            C_OSCProtocolDriverOsy::C_DataPoolMetaData c_ServerMetadata;
+
+            // Get metadata
+            s32_Return = this->m_GetReadDatapoolMetadata(ou32_ActiveNodeIndex,
+                                                         rc_Datapool.c_Name,
+                                                         u32_ServerDatapoolIndex,
+                                                         c_ServerMetadata);
+
+            // Compare metadata with already read metadata
+            if (s32_Return == C_NO_ERR)
             {
-               // Service error
-               c_ErrorReason = "The verify of the Datapool " + QString(rc_Datapool.c_Name.c_str()) +
-                               " failed with error " + QString(C_OSCLoggingHandler::h_StwError(s32_Return).c_str());
+               // Check name if string is not empty. Empty string in case of not supported data by protocol
+               if ((c_ServerMetadata.c_Name != "") &&
+                   (c_ServerMetadata.c_Name != rc_Datapool.c_Name))
+               {
+                  // Name does not match
+                  c_ErrorReason = "The name of Datapool does not match (Client: " +
+                                  static_cast<QString>(rc_Datapool.c_Name.c_str()) +
+                                  ", Server: " + static_cast<QString>(c_ServerMetadata.c_Name.c_str()) + ").";
+
+                  s32_Return = C_CHECKSUM;
+               }
+               // Check version
+               else if (memcmp(rc_Datapool.au8_Version, c_ServerMetadata.au8_Version,
+                               sizeof(c_ServerMetadata.au8_Version)) != 0)
+               {
+                  const QString c_VersionServer = static_cast<QString>("v%1.%2r%3").
+                                                  arg(c_ServerMetadata.au8_Version[0], 2, 10, QChar('0')).
+                                                  arg(c_ServerMetadata.au8_Version[1], 2, 10, QChar('0')).
+                                                  arg(c_ServerMetadata.au8_Version[2], 2, 10, QChar('0'));
+                  const QString c_VersionClient = static_cast<QString>("v%1.%2r%3").
+                                                  arg(rc_Datapool.au8_Version[0], 2, 10, QChar('0')).
+                                                  arg(rc_Datapool.au8_Version[1], 2, 10, QChar('0')).
+                                                  arg(rc_Datapool.au8_Version[2], 2, 10, QChar('0'));
+
+                  // Version does not match
+                  c_ErrorReason = "The version of Datapool " + static_cast<QString>(rc_Datapool.c_Name.c_str()) +
+                                  " does not match (Client: " + c_VersionClient +
+                                  ", Server: " + c_VersionServer + ").";
+
+                  s32_Return = C_CHECKSUM;
+               }
+               else
+               {
+                  bool q_Match = false;
+
+                  // Check checksum
+                  rc_Datapool.CalcDefinitionHash(u32_DataPoolChecksum);
+
+                  s32_Return = pc_Protocol->DataPoolVerify(
+                     static_cast<uint8>(u32_ServerDatapoolIndex),
+                     0U, //N/A for openSYDE protocol
+                     0U, //N/A for openSYDE protocol
+                     u32_DataPoolChecksum,
+                     q_Match);
+
+                  if (s32_Return == C_NO_ERR)
+                  {
+                     if (q_Match == false)
+                     {
+                        // Checksum does not match
+                        c_ErrorReason = "The checksum of Datapool " + static_cast<QString>(rc_Datapool.c_Name.c_str()) +
+                                        " does not match.";
+                        s32_Return = C_CHECKSUM;
+                     }
+                     else
+                     {
+                        // Datapool is fine. Add to mapping
+                        c_DatapoolMapping[static_cast<uint8>(u32_ItDataPool)] =
+                           static_cast<uint8>(u32_ServerDatapoolIndex);
+
+                        // Log the registered mapping
+                        if (u32_ItDataPool == u32_ServerDatapoolIndex)
+                        {
+                           osc_write_log_info("Starting diagnostics",
+                                              "No mapping for Datapool \"" + rc_Datapool.c_Name +
+                                              "\" necessary"
+                                              " (Datapool index: " + C_SCLString::IntToStr(u32_ItDataPool) + ").");
+                        }
+                        else
+                        {
+                           osc_write_log_info("Starting diagnostics",
+                                              "A mapping for Datapool \"" + rc_Datapool.c_Name +
+                                              "\" is necessary"
+                                              " (Datapool index on client: " + C_SCLString::IntToStr(u32_ItDataPool) +
+                                              " ;Datapool index on server: " +
+                                              C_SCLString::IntToStr(u32_ServerDatapoolIndex) + ").");
+                        }
+                     }
+                  }
+                  else
+                  {
+                     // Service error
+                     c_ErrorReason = "The verify of the Datapool " + static_cast<QString>(rc_Datapool.c_Name.c_str()) +
+                                     " failed with error " +
+                                     static_cast<QString>(C_OSCLoggingHandler::h_StwError(s32_Return).c_str());
+                  }
+               }
             }
             else
             {
-               // Nothing to do
+               // Special case: Datapool with this name does not exist
+               c_ErrorReason = "The Datapool " + static_cast<QString>(rc_Datapool.c_Name.c_str()) +
+                               " does not exist on the server.";
+               s32_Return = C_CHECKSUM;
+            }
+
+            if (s32_Return != C_NO_ERR)
+            {
+               // Verify failed
+               stw_scl::C_SCLString c_Error;
+               c_Error.PrintFormatted("Datapool verify failed between client and node %s. " \
+                                      "Reason: %s",
+                                      pc_Node->c_Properties.c_Name.c_str(),
+                                      c_ErrorReason.toStdString().c_str());
+               osc_write_log_error("Starting diagnostics", c_Error);
+
+               c_DataPoolErrorString += "\n   ";
+               //Translation: 1=Datapool name
+               c_DataPoolErrorString += c_ErrorReason;
+               s32_Retval = s32_Return;
+            }
+            else
+            {
+               stw_scl::C_SCLString c_Text;
+               c_Text.PrintFormatted("Datapool verified. Node: %s " \
+                                     "Datapool: %s", pc_Node->c_Properties.c_Name.c_str(), rc_Datapool.c_Name.c_str());
+               osc_write_log_info("Starting diagnostics", c_Text);
             }
          }
       }
-      else if (s32_Return == C_WARN)
+
+      if (s32_Retval == C_NO_ERR)
       {
-         if (u8_ErrorCode == C_OSCProtocolDriverOsy::hu8_NR_CODE_REQUEST_OUT_OF_RANGE)
-         {
-            // Special case: Datapool does not exist
-            c_ErrorReason = "The Datapool " + QString(rc_Datapool.c_Name.c_str()) +
-                            " does not exist on the server.";
-            s32_Return = C_CHECKSUM;
-         }
-         else
-         {
-            c_ErrorReason = "The read of the Datapool meta data of Datapool \"" + QString(rc_Datapool.c_Name.c_str()) +
-                            "\" failed with error " + QString(C_OSCLoggingHandler::h_StwError(s32_Return).c_str()) +
-                            " and negative response code: " + QString::number(u8_ErrorCode);
-         }
+         // Register the mapping
+         pc_Protocol->RegisterDataPoolMapping(c_DatapoolMapping);
       }
       else
       {
-         // Service error
-         c_ErrorReason = "The read of the Datapool meta data of Datapool \"" + QString(rc_Datapool.c_Name.c_str()) +
-                         "\" failed with error " + QString(C_OSCLoggingHandler::h_StwError(s32_Return).c_str());
-      }
-
-      if (s32_Return != C_NO_ERR)
-      {
-         // Verify failed
-         stw_scl::C_SCLString c_Error;
-         c_Error.PrintFormatted("Datapool verify failed between client and node %s. " \
-                                "Reason: %s",
-                                opc_Node->c_Properties.c_Name.c_str(),
-                                c_ErrorReason.toStdString().c_str());
-         osc_write_log_error("Starting diagnostics", c_Error);
-
-         c_DataPoolErrorString += "\n   ";
-         //Translation: 1=Datapool name
-         c_DataPoolErrorString += c_ErrorReason;
-         s32_Retval = s32_Return;
-      }
-      else
-      {
-         stw_scl::C_SCLString c_Text;
-         c_Text.PrintFormatted("Datapool verified. Node: %s " \
-                               "Datapool: %s", opc_Node->c_Properties.c_Name.c_str(), rc_Datapool.c_Name.c_str());
-         osc_write_log_info("Starting diagnostics", c_Text);
+         //Translation: 1=Node name, 2=List of Datapool names
+         orc_ErrorDetails += static_cast<QString>(C_GtGetText::h_GetText("- %1: %2\n")).arg(
+            pc_Node->c_Properties.c_Name.c_str()).arg(c_DataPoolErrorString);
       }
    }
-
-   if (s32_Retval != C_NO_ERR)
+   else
    {
-      //Translation: 1=Node name, 2=List of Datapool names
-      orc_ErrorDetails += QString(C_GtGetText::h_GetText("- %1: %2\n")).arg(
-         opc_Node->c_Properties.c_Name.c_str()).arg(c_DataPoolErrorString);
+      osc_write_log_error("Starting diagnostics", "Error on starting: Node or view invalid.");
    }
 
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets the Datapool metadata and its index on the server with a specific Datapool name
+
+   \param[in]      ou32_ActiveNodeIndex      Active node index (mc_ActiveNodesIndexes)
+   \param[in]      orc_DatapoolName          Searched Datapool name
+   \param[out]     oru32_ServerDatapoolIndex Index of Datapool on server (only valid when return value is C_NO_ERR)
+   \param[out]     orc_Metadata              Metadata of Datapool on server (only valid when return value is C_NO_ERR)
+
+   \retval   C_NO_ERR   Datapool was found
+   \retval   C_RANGE    Datapool with the name orc_DatapoolName does not exist on the server
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvComDriverDiag::m_GetReadDatapoolMetadata(const uint32 ou32_ActiveNodeIndex,
+                                                     const C_SCLString & orc_DatapoolName,
+                                                     uint32 & oru32_ServerDatapoolIndex,
+                                                     C_OSCProtocolDriverOsy::C_DataPoolMetaData & orc_Metadata) const
+{
+   sint32 s32_Return = C_RANGE;
+   const std::list<C_OSCProtocolDriverOsy::C_DataPoolMetaData> & rc_NodeDatapoolsMetadata =
+      this->mc_ReadDatapoolMetadata[ou32_ActiveNodeIndex];
+
+   std::list<C_OSCProtocolDriverOsy::C_DataPoolMetaData>::const_iterator c_ItMetadata;
+
+   oru32_ServerDatapoolIndex = 0U;
+
+   for (c_ItMetadata = rc_NodeDatapoolsMetadata.begin(); c_ItMetadata != rc_NodeDatapoolsMetadata.end();
+        ++c_ItMetadata)
+   {
+      const C_OSCProtocolDriverOsy::C_DataPoolMetaData & rc_Metadata = *c_ItMetadata;
+
+      if (orc_DatapoolName == rc_Metadata.c_Name)
+      {
+         // Datapool found
+         orc_Metadata = rc_Metadata;
+         s32_Return = C_NO_ERR;
+         break;
+      }
+
+      // Next one...
+      ++oru32_ServerDatapoolIndex;
+   }
+
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2247,7 +2453,7 @@ sint32 C_SyvComDriverDiag::m_Cycle(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::mh_ThreadFunc(void * const opv_Instance)
 {
-   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
+   //lint -e{925,9079}  This class is the only one which registers itself at the caller of this function. It must match.
    C_SyvComDriverDiag * const pc_ComDriver = reinterpret_cast<C_SyvComDriverDiag * const>(opv_Instance);
 
    tgl_assert(pc_ComDriver != NULL);

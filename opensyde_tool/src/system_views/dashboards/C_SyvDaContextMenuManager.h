@@ -52,7 +52,8 @@ protected:
 private:
    //Avoid call
    C_SyvDaContextMenuManager(const C_SyvDaContextMenuManager &);
-   C_SyvDaContextMenuManager & operator =(const C_SyvDaContextMenuManager &);
+   C_SyvDaContextMenuManager & operator =(const C_SyvDaContextMenuManager &); //lint !e1511 //we want to hide the base
+                                                                              // func.
 
    QList<QAction *> mc_ListVisibleRegisterdActions;
    QAction * mpc_ActionEdit;

@@ -74,10 +74,9 @@ private:
                          const QPointF & orc_P3, const stw_types::float64 of64_Radius);
    static stw_types::float64 mh_GetArc(const QPointF & orc_V1, const QPointF & orc_V2);
 
-   // Karsten Anfang
-   void SetLabelColor(QPainter & orc_Painter, QFont & orc_TextFont, QPen & orc_ArrowPen, QPen & orc_MinMaxPen,
+   void m_SetLabelColor(QPainter & orc_Painter, QFont & orc_TextFont, QPen & orc_ArrowPen, QPen & orc_MinMaxPen,
                       QPen & orc_ValuePen) const;
-   void SetBarMargins();
+   void m_SetBarMargins();
    QString mc_Value;
    QString mc_MinValue;
    QString mc_MaxValue;
@@ -90,7 +89,6 @@ private:
    stw_types::float32 mf32_BarMarginLeft;   // To Size the Progress Bar dependent on this->rect()
    stw_types::float32 mf32_BarMarginRight;  // To Size the Progress Bar dependent on this->rect()
    stw_types::sintn msn_Transparence;
-   // Karsten Ende
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

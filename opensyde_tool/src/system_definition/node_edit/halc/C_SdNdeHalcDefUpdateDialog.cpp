@@ -129,7 +129,8 @@ sint32 C_SdNdeHalcDefUpdateDialog::GetResult(C_OSCHalcConfig & orc_UpdatedHalcCo
       orc_ErrorDetails = "";
       break;
    default:
-      orc_ErrorDetails = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(this->ms32_Result));
+      orc_ErrorDetails =
+         static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(this->ms32_Result));
       break;
    }
 
@@ -210,9 +211,9 @@ void C_SdNdeHalcDefUpdateDialog::m_CreateReport(const QString & orc_FilePath) co
    QString c_Text;
 
    // Content summary
-   c_ReadContent += QString(C_GtGetText::h_GetText("Content version: %1; ")).
+   c_ReadContent += static_cast<QString>(C_GtGetText::h_GetText("Content version: %1; ")).
                     arg(this->mrc_LoadedHalcConfig.u32_ContentVersion);
-   c_ReadContent += QString(C_GtGetText::h_GetText("Domains: %1")).
+   c_ReadContent += static_cast<QString>(C_GtGetText::h_GetText("Domains: %1")).
                     arg(this->mrc_LoadedHalcConfig.GetDomainSize());
 
    // Source file information
@@ -239,10 +240,7 @@ void C_SdNdeHalcDefUpdateDialog::m_CreateReport(const QString & orc_FilePath) co
    \param[in]  orc_Content       Content of the section
 
    \return
-   Type of return values, e.g. STW error codes
-
-   \retval   Return value 1   Detailed description of 1st return value
-   \retval   Return value 2   Detailed description of 2nd return value
+   section content
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeHalcDefUpdateDialog::m_AddSection(const QString & orc_SectionName, const QStringList & orc_Content) const
@@ -250,11 +248,11 @@ QString C_SdNdeHalcDefUpdateDialog::m_AddSection(const QString & orc_SectionName
    QString c_Text = "";
 
    c_Text += "<p><b>";
-   c_Text += QString(C_GtGetText::h_GetText("%1 (%2)")).arg(orc_SectionName).arg(orc_Content.length());
+   c_Text += static_cast<QString>(C_GtGetText::h_GetText("%1 (%2)")).arg(orc_SectionName).arg(orc_Content.length());
    c_Text += "</b></p>";
    if (orc_Content.length() == 0)
    {
-      c_Text += QString(C_GtGetText::h_GetText("No %1 features.")).arg(orc_SectionName.toLower());
+      c_Text += static_cast<QString>(C_GtGetText::h_GetText("No %1 features.")).arg(orc_SectionName.toLower());
    }
    else
    {
@@ -304,100 +302,90 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateHalcConfiguration(void)
    tgl_assert(pc_CurrentConfig != NULL);
    if (pc_CurrentConfig != NULL)
    {
-      // Check the content version for a change (report should only be called if not)
-      if (this->mrc_LoadedHalcConfig.u32_ContentVersion != pc_CurrentConfig->u32_ContentVersion)
+      uint32 u32_UpdatedDomainCounter;
+      uint32 u32_CurrentDomainCounter;
+
+      // Copy the entire loaded configuration for further editing
+      this->mc_UpdatedHalcConfig = this->mrc_LoadedHalcConfig;
+
+      // Building the result by adding the necessary domains to mc_UpdatedHalcConfig
+      // By adding each domain to the updated configuration the order is like in the loaded configuration
+      // Check domains (update and add)
+      for (u32_UpdatedDomainCounter = 0UL; u32_UpdatedDomainCounter < this->mc_UpdatedHalcConfig.GetDomainSize();
+           ++u32_UpdatedDomainCounter)
       {
-         uint32 u32_UpdatedDomainCounter;
-         uint32 u32_CurrentDomainCounter;
+         const C_OSCHalcConfigDomain * const pc_UpdatedDomain = this->mc_UpdatedHalcConfig.GetDomainConfigDataConst(
+            u32_UpdatedDomainCounter);
 
-         // Copy the entire loaded configuration for further editing
-         this->mc_UpdatedHalcConfig = this->mrc_LoadedHalcConfig;
-
-         // Get the user specific adaptions of the HALC configuration
-         this->mc_UpdatedHalcConfig.SetSafeDatablockAssigned(pc_CurrentConfig->GetSafeDatablockAssigned(),
-                                                             pc_CurrentConfig->GetSafeDatablockIndex());
-         this->mc_UpdatedHalcConfig.SetUnsafeDatablockAssigned(pc_CurrentConfig->GetUnsafeDatablockAssigned(),
-                                                               pc_CurrentConfig->GetUnsafeDatablockIndex());
-
-         // Building the result by adding the necessary domains to mc_UpdatedHalcConfig
-         // By adding each domain to the updated configuration the order is like in the loaded configuration
-         // Check domains (update and add)
-         for (u32_UpdatedDomainCounter = 0UL; u32_UpdatedDomainCounter < this->mc_UpdatedHalcConfig.GetDomainSize();
-              ++u32_UpdatedDomainCounter)
+         tgl_assert(pc_UpdatedDomain != NULL);
+         if (pc_UpdatedDomain != NULL)
          {
-            const C_OSCHalcConfigDomain * const pc_UpdatedDomain = this->mc_UpdatedHalcConfig.GetDomainConfigDataConst(
-               u32_UpdatedDomainCounter);
+            bool q_DomainFound = false;
 
-            tgl_assert(pc_UpdatedDomain != NULL);
-            if (pc_UpdatedDomain != NULL)
+            // Comparing to the current definition/configuration
+            for (u32_CurrentDomainCounter = 0UL; u32_CurrentDomainCounter < pc_CurrentConfig->GetDomainSize();
+                 ++u32_CurrentDomainCounter)
             {
-               bool q_DomainFound = false;
+               const C_OSCHalcConfigDomain * const pc_CurrentDomain = pc_CurrentConfig->GetDomainConfigDataConst(
+                  u32_CurrentDomainCounter);
 
-               // Comparing to the current definition/configuration
-               for (u32_CurrentDomainCounter = 0UL; u32_CurrentDomainCounter < pc_CurrentConfig->GetDomainSize();
-                    ++u32_CurrentDomainCounter)
+               tgl_assert(pc_CurrentDomain != NULL);
+               if ((pc_CurrentDomain != NULL) &&
+                   (pc_UpdatedDomain->c_Id == pc_CurrentDomain->c_Id))
                {
-                  const C_OSCHalcConfigDomain * const pc_CurrentDomain = pc_CurrentConfig->GetDomainConfigDataConst(
-                     u32_CurrentDomainCounter);
+                  C_OSCHalcConfigDomain c_AdatedUpdatedDomain = *pc_UpdatedDomain;
 
-                  tgl_assert(pc_CurrentDomain != NULL);
-                  if ((pc_CurrentDomain != NULL) &&
-                      (pc_UpdatedDomain->c_Id == pc_CurrentDomain->c_Id))
-                  {
-                     C_OSCHalcConfigDomain c_AdatedUpdatedDomain = *pc_UpdatedDomain;
+                  // Same Id -> Compare and if necessary update
+                  C_SdNdeHalcDefUpdateDialog::m_UpdateDomainConfiguration(*pc_CurrentDomain, c_AdatedUpdatedDomain);
+                  this->mc_UpdatedHalcConfig.SetDomainConfig(u32_UpdatedDomainCounter, c_AdatedUpdatedDomain);
 
-                     // Same Id -> Compare and if necessary update
-                     C_SdNdeHalcDefUpdateDialog::m_UpdateDomainConfiguration(*pc_CurrentDomain, c_AdatedUpdatedDomain);
-                     this->mc_UpdatedHalcConfig.SetDomainConfig(u32_UpdatedDomainCounter, c_AdatedUpdatedDomain);
-
-                     q_DomainFound = true;
-                     break;
-                  }
-               }
-
-               if (q_DomainFound == false)
-               {
-                  // Report new domain
-                  this->mc_NewContent.append(QString(C_GtGetText::h_GetText("Domain ")) +
-                                             pc_UpdatedDomain->c_Name.c_str());
+                  q_DomainFound = true;
+                  break;
                }
             }
-         }
 
-         // Check domains with second loop which domains were removed for reporting by
-         // searching all current domain ids in the updated configuration
-         for (u32_CurrentDomainCounter = 0UL; u32_CurrentDomainCounter < pc_CurrentConfig->GetDomainSize();
-              ++u32_CurrentDomainCounter)
-         {
-            const C_OSCHalcConfigDomain * const pc_CurrentDomain = pc_CurrentConfig->GetDomainConfigDataConst(
-               u32_CurrentDomainCounter);
-
-            tgl_assert(pc_CurrentDomain != NULL);
-            if (pc_CurrentDomain != NULL)
+            if (q_DomainFound == false)
             {
-               bool q_CurrentDomainFound = false;
+               // Report new domain
+               this->mc_NewContent.append(static_cast<QString>(C_GtGetText::h_GetText("Domain ")) +
+                                          pc_UpdatedDomain->c_Name.c_str());
+            }
+         }
+      }
 
-               for (u32_UpdatedDomainCounter = 0UL;
-                    u32_UpdatedDomainCounter < this->mc_UpdatedHalcConfig.GetDomainSize();
-                    ++u32_UpdatedDomainCounter)
-               {
-                  const C_OSCHalcConfigDomain * const pc_UpdatedDomain =
-                     this->mc_UpdatedHalcConfig.GetDomainConfigDataConst(u32_UpdatedDomainCounter);
+      // Check domains with second loop which domains were removed for reporting by
+      // searching all current domain ids in the updated configuration
+      for (u32_CurrentDomainCounter = 0UL; u32_CurrentDomainCounter < pc_CurrentConfig->GetDomainSize();
+           ++u32_CurrentDomainCounter)
+      {
+         const C_OSCHalcConfigDomain * const pc_CurrentDomain = pc_CurrentConfig->GetDomainConfigDataConst(
+            u32_CurrentDomainCounter);
 
-                  tgl_assert(pc_UpdatedDomain != NULL);
-                  if ((pc_UpdatedDomain != NULL) &&
-                      (pc_UpdatedDomain->c_Id == pc_CurrentDomain->c_Id))
-                  {
-                     q_CurrentDomainFound = true;
-                     break;
-                  }
-               }
-               if (q_CurrentDomainFound == false)
+         tgl_assert(pc_CurrentDomain != NULL);
+         if (pc_CurrentDomain != NULL)
+         {
+            bool q_CurrentDomainFound = false;
+
+            for (u32_UpdatedDomainCounter = 0UL;
+                 u32_UpdatedDomainCounter < this->mc_UpdatedHalcConfig.GetDomainSize();
+                 ++u32_UpdatedDomainCounter)
+            {
+               const C_OSCHalcConfigDomain * const pc_UpdatedDomain =
+                  this->mc_UpdatedHalcConfig.GetDomainConfigDataConst(u32_UpdatedDomainCounter);
+
+               tgl_assert(pc_UpdatedDomain != NULL);
+               if ((pc_UpdatedDomain != NULL) &&
+                   (pc_UpdatedDomain->c_Id == pc_CurrentDomain->c_Id))
                {
-                  // Report domain removed
-                  this->mc_RemovedContent.append(QString(C_GtGetText::h_GetText("Domain ")) +
-                                                 pc_CurrentDomain->c_Name.c_str());
+                  q_CurrentDomainFound = true;
+                  break;
                }
+            }
+            if (q_CurrentDomainFound == false)
+            {
+               // Report domain removed
+               this->mc_RemovedContent.append(static_cast<QString>(C_GtGetText::h_GetText("Domain ")) +
+                                              pc_CurrentDomain->c_Name.c_str());
             }
          }
       }
@@ -456,7 +444,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateDomainConfiguration(const C_OSCHalcConf
       if (q_ChannelFound == false)
       {
          // Report new channel
-         this->mc_NewContent.append(QString(C_GtGetText::h_GetText("Channel ")) +
+         this->mc_NewContent.append(static_cast<QString>(C_GtGetText::h_GetText("Channel ")) +
                                     orc_UpdatedConfig.c_ChannelConfigs[u32_UpdatedChannelCounter].c_Name.c_str());
       }
    }
@@ -483,7 +471,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateDomainConfiguration(const C_OSCHalcConf
       if (q_CurrentChannelFound == false)
       {
          // Report channel removed
-         this->mc_RemovedContent.append(QString(C_GtGetText::h_GetText("Channel ")) +
+         this->mc_RemovedContent.append(static_cast<QString>(C_GtGetText::h_GetText("Channel ")) +
                                         orc_CurrentConfig.c_ChannelConfigs[u32_CurrentChannelCounter].c_Name.c_str());
       }
    }
@@ -540,15 +528,16 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
       uint32 u32_UseCaseCounter;
       bool q_UseCaseFound = false;
       bool q_UseCaseAvailable = false;
+      const C_OSCHalcDefChannelUseCase & rc_CurrentUseCase =
+         orc_CurrentConfig.c_ChannelUseCases[rc_CurrentChannelConfig.u32_UseCaseIndex];
 
       // Check previous use case. Only relevant for channels, not domains
       for (u32_UseCaseCounter = 0U; u32_UseCaseCounter < orc_UpdatedConfig.c_ChannelUseCases.size();
            ++u32_UseCaseCounter)
       {
          const C_OSCHalcDefChannelUseCase & rc_UseCase = orc_UpdatedConfig.c_ChannelUseCases[u32_UseCaseCounter];
-         uint32 u32_UseCaseIndex = static_cast<uint32>(rc_UseCase.c_Value.GetValueU8());
 
-         if (rc_CurrentChannelConfig.u32_UseCaseIndex == u32_UseCaseIndex)
+         if (rc_CurrentUseCase.c_Id == rc_UseCase.c_Id)
          {
             uint32 u32_AvailabilityCounter;
 
@@ -561,8 +550,9 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
             {
                if (rc_UseCase.c_Availability[u32_AvailabilityCounter].u32_ValueIndex == ou32_UpdatedChannelIndex)
                {
+                  const uint32 u32_UseCaseIndex = static_cast<uint32>(rc_UseCase.c_Value.GetValueU8());
                   // Use case is available too. Can be updated. Check of parameters
-                  rc_UpdatedChannelConfig.u32_UseCaseIndex = rc_CurrentChannelConfig.u32_UseCaseIndex;
+                  rc_UpdatedChannelConfig.u32_UseCaseIndex = u32_UseCaseIndex;
                   q_UseCaseAvailable = true;
                   break;
                }
@@ -586,8 +576,9 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
          // Using the loaded default values of definition.
          q_ResetToDefault = true;
          // Report channel reset to default due to missing use case
-         this->mc_ResetContent.append(QString(C_GtGetText::h_GetText("Configured use case of channel %1 is not "
-                                                                     "available anymore and was reset to default."))
+         this->mc_ResetContent.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                                              "Configured use case of channel %1 is not "
+                                                              "available anymore and was reset to default."))
                                       .arg(rc_UpdatedChannelConfig.c_Name.c_str()));
       }
    }
@@ -661,9 +652,9 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
                {
                   // Parameter struct changed, no update possible
                   // Reporting parameter structure changed
-                  this->mc_ResetContent.append(QString(C_GtGetText::h_GetText(
-                                                          "Configured parameter %1 of channel %2 is not "
-                                                          "updated due to changed configuration structure."))
+                  this->mc_ResetContent.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                       "Configured parameter %1 of channel %2 is not "
+                                                                       "updated due to changed configuration structure."))
                                                .arg(rc_UpdatedParameterDef.c_Display.c_str())
                                                .arg(rc_UpdatedChannelConfig.c_Name.c_str()));
                }
@@ -675,7 +666,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
          if (q_ParameterFound == false)
          {
             // Reporting new parameter
-            this->mc_NewContent.append(QString(C_GtGetText::h_GetText("Parameter %1 of channel %2"))
+            this->mc_NewContent.append(static_cast<QString>(C_GtGetText::h_GetText("Parameter %1 of channel %2"))
                                        .arg(rc_UpdatedParameterDef.c_Display.c_str())
                                        .arg(rc_UpdatedChannelConfig.c_Name.c_str()));
          }
@@ -704,7 +695,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
          if (q_CurrentParameterFound == false)
          {
             // Reporting parameter removed
-            this->mc_RemovedContent.append(QString(C_GtGetText::h_GetText("Parameter %1 of channel %2"))
+            this->mc_RemovedContent.append(static_cast<QString>(C_GtGetText::h_GetText("Parameter %1 of channel %2"))
                                            .arg((*pc_CurrentParametersToCompare)[u32_CurrentDefParameterCounter].
                                                 c_Display.c_str())
                                            .arg(rc_UpdatedChannelConfig.c_Name.c_str()));
@@ -781,7 +772,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateSubParameterConfiguration(const C_OSCHa
       if (q_ParameterFound == false)
       {
          // Reporting new sub parameter
-         this->mc_NewContent.append(QString(C_GtGetText::h_GetText("Parameter %1 of channel %2"))
+         this->mc_NewContent.append(static_cast<QString>(C_GtGetText::h_GetText("Parameter %1 of channel %2"))
                                     .arg(rc_UpdatedParameterDef.c_Display.c_str())
                                     .arg(orc_ChannelName.c_str()));
       }
@@ -810,7 +801,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateSubParameterConfiguration(const C_OSCHa
       if (q_CurrentParameterFound == false)
       {
          // Reporting sub parameter removed
-         this->mc_RemovedContent.append(QString(C_GtGetText::h_GetText("Parameter %1 of channel %2"))
+         this->mc_RemovedContent.append(static_cast<QString>(C_GtGetText::h_GetText("Parameter %1 of channel %2"))
                                         .arg(orc_CurrentParameterDef.c_StructElements[u32_CurrentDefSubParameterCounter]
                                              .c_Display.c_str())
                                         .arg(orc_ChannelName.c_str()));
@@ -844,7 +835,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateParameterElementConfiguration(
    bool q_ParameterRelevantAndCompatible = C_SdNdeHalcDefUpdateDialog::mh_CheckParameterDefForUseCase(
       orc_CurrentParameterDef, oq_IsDomainConfiguration, ou32_UseCaseIndex);
    // Check use case of updated parameter. Could be different
-   bool q_UpdatedParameterRelevantForUseCase = C_SdNdeHalcDefUpdateDialog::mh_CheckParameterDefForUseCase(
+   const bool q_UpdatedParameterRelevantForUseCase = C_SdNdeHalcDefUpdateDialog::mh_CheckParameterDefForUseCase(
       orc_UpdatedParameterDef, oq_IsDomainConfiguration, ou32_UseCaseIndex);
 
    if (q_ParameterRelevantAndCompatible == true)
@@ -855,8 +846,8 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateParameterElementConfiguration(
    {
       // In previous definition the parameter was not relevant for the use case but with the new definition it is
       // Nothing to update, but to report
-      this->mc_NewContent.append(QString(C_GtGetText::h_GetText(
-                                            "Parameter %1 of channel %2 is now available for its set use case"))
+      this->mc_NewContent.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                                         "Parameter %1 of channel %2 is now available for its set use case"))
                                  .arg(orc_UpdatedParameterDef.c_Display.c_str())
                                  .arg(orc_ChannelName.c_str()));
    }
@@ -883,9 +874,9 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateParameterElementConfiguration(
          else
          {
             // Reporting parameter not updated due to changed min max values
-            this->mc_ResetContent.append(QString(C_GtGetText::h_GetText(
-                                                    "Configured parameter %1 of channel %2 is not "
-                                                    "updated due to changed range and was reset to default."))
+            this->mc_ResetContent.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                 "Configured parameter %1 of channel %2 is not "
+                                                                 "updated due to changed range and was reset to default."))
                                          .arg(orc_UpdatedParameterDef.c_Display.c_str())
                                          .arg(orc_ChannelName.c_str()));
          }
@@ -893,9 +884,9 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateParameterElementConfiguration(
       else
       {
          // Reporting parameter not updated due to changed value type
-         this->mc_ResetContent.append(QString(C_GtGetText::h_GetText(
-                                                 "Configured parameter %1 of channel %2 is not "
-                                                 "updated due to changed value type and was reset to default."))
+         this->mc_ResetContent.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                                              "Configured parameter %1 of channel %2 is not "
+                                                              "updated due to changed value type and was reset to default."))
                                       .arg(orc_UpdatedParameterDef.c_Display.c_str())
                                       .arg(orc_ChannelName.c_str()));
       }

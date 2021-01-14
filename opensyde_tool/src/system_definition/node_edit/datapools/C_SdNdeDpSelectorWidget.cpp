@@ -131,6 +131,7 @@ C_SdNdeDpSelectorWidget::C_SdNdeDpSelectorWidget(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_LabelStateImg and the Qt memory management
 C_SdNdeDpSelectorWidget::~C_SdNdeDpSelectorWidget()
 {
    delete mpc_Ui;
@@ -253,6 +254,17 @@ bool C_SdNdeDpSelectorWidget::SetTypeAndNode(const stw_opensyde_core::C_OSCNodeD
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the selected Datapool
+
+   \param[in]       ou32_Index     Index of Datapool item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorWidget::SetSelectedDataPool(const uint32 ou32_Index) const
+{
+   this->mpc_Ui->pc_ListWidget->SetSelectedItem(ou32_Index);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the conflict state of the active datapool
 
    \param[in] osn_DataPoolWidgetIndex  Datapool type index of Datapool which is affected
@@ -328,11 +340,14 @@ void C_SdNdeDpSelectorWidget::focusInEvent(QFocusEvent * const opc_Event)
    this->mpc_Ui->pc_ListWidget->SetSelected(true);
    this->SetSelected(true);
 
-   if ((this->mpc_Ui->pc_ListWidget->currentRow() < 0) &&
-       (this->mpc_Ui->pc_ListWidget->count() > 0))
+   if ((this->mpc_Ui->pc_ListWidget->GetCurrentItemIndex() < 0) &&
+       (this->mpc_Ui->pc_ListWidget->GetItemCount() > 0))
    {
-      this->mpc_Ui->pc_ListWidget->setCurrentRow(0);
+      this->mpc_Ui->pc_ListWidget->SetSelectedItem(0);
    }
+
+   // Assign the focus to the list widget with the key event handling
+   this->mpc_Ui->pc_ListWidget->setFocus();
 
    Q_EMIT (this->SigWidgetFocused(this->me_DataPoolType));
 }
@@ -406,22 +421,26 @@ void C_SdNdeDpSelectorWidget::keyPressEvent(QKeyEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the state of the widget depending of the list widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorWidget::m_UpdateWidget(void)
 {
-   if (this->mpc_Ui->pc_ListWidget->GetCountLines() > 1)
+   if (this->mpc_Ui->pc_ListWidget->GetViewPageCount() > 1)
    {
       // not all items are visible at the same time
       // adapt the ui
       this->mpc_Ui->pc_PushButtonScrollLeft->setVisible(this->mq_Selected);
       this->mpc_Ui->pc_PushButtonScrollRight->setVisible(this->mq_Selected);
 
-      if (this->mpc_Ui->pc_ListWidget->GetActualLine() < 1)
+      if (this->mpc_Ui->pc_ListWidget->GetCurrentViewPage() < 1)
       {
          // position is at the start of the list
          this->mpc_Ui->pc_PushButtonScrollLeft->setEnabled(false);
          this->mpc_Ui->pc_PushButtonScrollRight->setEnabled(true);
       }
-      else if (this->mpc_Ui->pc_ListWidget->GetActualLine() >= (this->mpc_Ui->pc_ListWidget->GetCountLines() - 1))
+      else if (this->mpc_Ui->pc_ListWidget->GetCurrentViewPage() >=
+               (this->mpc_Ui->pc_ListWidget->GetViewPageCount() - 1))
       {
          // position is at the end of the list
          this->mpc_Ui->pc_PushButtonScrollLeft->setEnabled(true);
@@ -443,8 +462,8 @@ void C_SdNdeDpSelectorWidget::m_UpdateWidget(void)
       {
          this->mpc_Ui->pc_IndexViewWidget->SetColor(mc_STYLE_GUIDE_COLOR_4, mc_STYLE_GUIDE_COLOR_10);
       }
-      this->mpc_Ui->pc_IndexViewWidget->SetCountIndex(this->mpc_Ui->pc_ListWidget->GetCountLines());
-      this->mpc_Ui->pc_IndexViewWidget->SetCurrentIndex(this->mpc_Ui->pc_ListWidget->GetActualLine());
+      this->mpc_Ui->pc_IndexViewWidget->SetCountIndex(this->mpc_Ui->pc_ListWidget->GetViewPageCount());
+      this->mpc_Ui->pc_IndexViewWidget->SetCurrentIndex(this->mpc_Ui->pc_ListWidget->GetCurrentViewPage());
    }
    else
    {
@@ -455,7 +474,7 @@ void C_SdNdeDpSelectorWidget::m_UpdateWidget(void)
    }
 
    // update the label with the datapool count
-   this->mpc_Ui->pc_LabelDpCount->setText(QString::number(this->mpc_Ui->pc_ListWidget->count()));
+   this->mpc_Ui->pc_LabelDpCount->setText(QString::number(this->mpc_Ui->pc_ListWidget->GetItemCount()));
 
    this->update();
 }
@@ -479,13 +498,13 @@ void C_SdNdeDpSelectorWidget::m_OpenDataPoolItemContent(const sintn osn_DataPool
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorWidget::m_ButtonRightClicked(void) const
 {
-   this->mpc_Ui->pc_ListWidget->SetActualLine(this->mpc_Ui->pc_ListWidget->GetActualLine() + 1);
+   this->mpc_Ui->pc_ListWidget->SetCurrentViewPage(this->mpc_Ui->pc_ListWidget->GetCurrentViewPage() + 1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorWidget::m_ButtonLeftClicked(void) const
 {
-   this->mpc_Ui->pc_ListWidget->SetActualLine(this->mpc_Ui->pc_ListWidget->GetActualLine() - 1);
+   this->mpc_Ui->pc_ListWidget->SetCurrentViewPage(this->mpc_Ui->pc_ListWidget->GetCurrentViewPage() - 1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -564,7 +583,7 @@ void C_SdNdeDpSelectorWidget::m_UpdateErrorToolTip(void)
       bool q_NvmProblem = false;
       std::vector<uint32> c_InvalidDataPoolIndices;
 
-      for (sintn sn_ItDp = 0; sn_ItDp < this->mpc_Ui->pc_ListWidget->count(); ++sn_ItDp)
+      for (sintn sn_ItDp = 0; sn_ItDp < this->mpc_Ui->pc_ListWidget->GetItemCount(); ++sn_ItDp)
       {
          const sint32 s32_Index = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
                                                                                     this->me_DataPoolType,

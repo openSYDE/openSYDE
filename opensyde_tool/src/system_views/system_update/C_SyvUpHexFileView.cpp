@@ -181,7 +181,7 @@ void C_SyvUpHexFileView::mh_AddFileSection(const QString & orc_Path, QString & o
 {
    const QFileInfo c_FileInfo(orc_Path);
 
-   orc_Content += "<h3>" + QString(C_GtGetText::h_GetText("File Information")) + "</h3>";
+   orc_Content += "<h3>" + static_cast<QString>(C_GtGetText::h_GetText("File Information")) + "</h3>";
    orc_Content += "<table>";
    orc_Content += "<tr>";
    orc_Content += C_SyvUpHexFileView::mhc_StartTD;
@@ -196,7 +196,7 @@ void C_SyvUpHexFileView::mh_AddFileSection(const QString & orc_Path, QString & o
    orc_Content += C_GtGetText::h_GetText("Size:");
    orc_Content += "</td>";
    orc_Content += C_SyvUpHexFileView::mhc_ContinueTD;
-   orc_Content += QString("%1 bytes").arg(c_FileInfo.size());
+   orc_Content += static_cast<QString>("%1 bytes").arg(c_FileInfo.size());
    orc_Content += "</td>";
    orc_Content += "</tr>";
    orc_Content += "<tr>";
@@ -250,7 +250,7 @@ void C_SyvUpHexFileView::mh_AddDataInformation(C_OsyHexFile & orc_HexFile, QStri
 
    orc_HexFile.CalcFileChecksum(u32_CRC);
 
-   orc_Content += "<h3>" + QString(C_GtGetText::h_GetText("Data Information")) + "</h3>";
+   orc_Content += "<h3>" + static_cast<QString>(C_GtGetText::h_GetText("Data Information")) + "</h3>";
    orc_Content += "<table>";
    orc_Content += "<tr>";
    orc_Content += C_SyvUpHexFileView::mhc_StartTD;
@@ -265,7 +265,7 @@ void C_SyvUpHexFileView::mh_AddDataInformation(C_OsyHexFile & orc_HexFile, QStri
    orc_Content += C_GtGetText::h_GetText("32bit CRC:");
    orc_Content += "</td>";
    orc_Content += C_SyvUpHexFileView::mhc_ContinueTD;
-   orc_Content += QString("0x%1").arg(u32_CRC, 0, 16);
+   orc_Content += static_cast<QString>("0x%1").arg(u32_CRC, 0, 16);
    orc_Content += "</td>";
    orc_Content += "</tr>";
    orc_Content += "</table>";
@@ -282,7 +282,7 @@ void C_SyvUpHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexFile
 {
    SCLDynamicArray<stw_diag_lib::C_XFLECUInformation> c_InfoBlocks;
    orc_HexFile.GetECUInformationBlocks(c_InfoBlocks, 0UL, false, false, false);
-   orc_Content += "<h3>" + QString(C_GtGetText::h_GetText("File Information Blocks")) + "</h3>";
+   orc_Content += "<h3>" + static_cast<QString>(C_GtGetText::h_GetText("File Information Blocks")) + "</h3>";
    orc_Content += "<table>";
    orc_Content += "<tr>";
    orc_Content += C_SyvUpHexFileView::mhc_StartTD;
@@ -297,7 +297,7 @@ void C_SyvUpHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexFile
    {
       const stw_diag_lib::C_XFLECUInformation & rc_CurInfo = c_InfoBlocks[s32_ItAppl];
       orc_Content += "<h3>" +
-                     QString(C_GtGetText::h_GetText("Block %1")).arg(s32_ItAppl + 1L, 2, 10, QChar('0')) + "</h3>";
+                     static_cast<QString>(C_GtGetText::h_GetText("Block %1")).arg(s32_ItAppl + 1L, 2, 10, QChar('0')) + "</h3>";
       orc_Content += "<table>";
       orc_Content += "<tr>";
       orc_Content += C_SyvUpHexFileView::mhc_StartTD;

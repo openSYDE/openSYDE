@@ -56,6 +56,7 @@ sint32 C_OSCZipData::h_Zip(uint8 * const opu8_Destination, uint32 & oru32_Destin
                            const uint8 * const opu8_Source, const uint32 ou32_SourceLength)
 {
    sint32 s32_Return;
+   //lint -e{8080} //using type provided by the library for compatibility
    mz_ulong u32_DestinationLength = oru32_DestinationLength;
 
    s32_Return = mz_compress(opu8_Destination, &u32_DestinationLength, opu8_Source, ou32_SourceLength);
@@ -90,6 +91,7 @@ sint32 C_OSCZipData::h_Unzip(uint8 * const opu8_Destination, uint32 & oru32_Dest
                              const uint8 * const opu8_Source, const uint32 ou32_SourceLength)
 {
    sint32 s32_Return;
+   //lint -e{8080} //using type provided by the library for compatibility
    mz_ulong u32_DestinationLength = oru32_DestinationLength;
 
    s32_Return = mz_uncompress(opu8_Destination, &u32_DestinationLength, opu8_Source, ou32_SourceLength);

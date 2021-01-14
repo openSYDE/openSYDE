@@ -57,11 +57,8 @@ Q_SIGNALS:
 protected:
    virtual void m_ResizeUpdateItems(const stw_types::float64 of64_DiffWidth,
                                     const stw_types::float64 of64_DiffHeight) override;
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    bool mq_Connected;
@@ -71,13 +68,13 @@ private:
    static const stw_types::uint32 mhu32_ScaleCategory1;
    static const stw_types::uint32 mhu32_ScaleCategory2;
    static const stw_types::uint32 mhu32_ScaleCategory3;
-   static const stw_types::float64 mahf64_ScaleMinWidthNode[3];
-   static const stw_types::float64 mahf64_ScaleMinHeightNode[3];
+   static const stw_types::float64 mhaf64_ScaleMinWidthNode[3];
+   static const stw_types::float64 mhaf64_ScaleMinHeightNode[3];
    static const stw_types::float64 mhf64_InitSizeOfPc;
 
    //Avoid call
    C_GiSvPc(const C_GiSvPc &);
-   C_GiSvPc & operator =(const C_GiSvPc &);
+   C_GiSvPc & operator =(const C_GiSvPc &); //lint !e1511 //we want to hide the base func.
 
    bool m_OpenCANDllDialog(void) const;
 

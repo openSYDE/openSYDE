@@ -135,25 +135,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonAddFromDatabase">
-       <property name="minimumSize">
-        <size>
-         <width>21</width>
-         <height>21</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>21</width>
-         <height>21</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonAdd">
        <property name="minimumSize">
         <size>
@@ -168,7 +149,26 @@
         </size>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>+</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonAddFromDatabase">
+       <property name="minimumSize">
+        <size>
+         <width>21</width>
+         <height>21</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>21</width>
+         <height>21</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Db+</string>
        </property>
       </widget>
      </item>
@@ -187,7 +187,7 @@
         </size>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>C</string>
        </property>
       </widget>
      </item>
@@ -206,7 +206,7 @@
         </size>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>P</string>
        </property>
       </widget>
      </item>
@@ -225,7 +225,7 @@
         </size>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>Cut</string>
        </property>
       </widget>
      </item>
@@ -244,7 +244,7 @@
         </size>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>Del</string>
        </property>
       </widget>
      </item>
@@ -263,7 +263,7 @@
         </size>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>Up</string>
        </property>
       </widget>
      </item>
@@ -282,7 +282,7 @@
         </size>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>Down</string>
        </property>
       </widget>
      </item>

@@ -62,7 +62,6 @@ C_SdBueNodeSelectorCheckBoxItemWidget::C_SdBueNodeSelectorCheckBoxItemWidget(con
    this->mpc_CheckBox->setText(orc_Name);
    this->mpc_CheckBox->setIcon(this->mc_IconInactive);
 
-   //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(this->mpc_CheckBox, &C_OgeChxDefaultSmall::SigCheckBoxToggled,
            this, &C_SdBueNodeSelectorCheckBoxItemWidget::m_NodeToggled);
 
@@ -186,7 +185,7 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::UpdateToolTip(void)
             if ((u32_RxSize > 0U) ||
                 (u32_TxSize > 0U))
             {
-               c_Content += QString(C_GtGetText::h_GetText("\nMessages: %1 Tx, %2 Rx")).
+               c_Content += static_cast<QString>(C_GtGetText::h_GetText("\nMessages: %1 Tx, %2 Rx")).
                             arg(u32_TxSize).arg(u32_RxSize);
             }
             else
@@ -219,7 +218,7 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::UpdateToolTip(void)
 
             if (u32_SignalSize > 0U)
             {
-               c_Content += QString(C_GtGetText::h_GetText("\nSignals: %1")).arg(u32_SignalSize);
+               c_Content += static_cast<QString>(C_GtGetText::h_GetText("\nSignals: %1")).arg(u32_SignalSize);
             }
             else
             {

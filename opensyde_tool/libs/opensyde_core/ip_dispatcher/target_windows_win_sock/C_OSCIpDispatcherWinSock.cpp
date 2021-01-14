@@ -34,24 +34,24 @@ using namespace stw_tgl;
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
 //export a few WinSock constants here
-//Purpose: the definitions in the Windows header violate a lot of coding rules.
+//Purpose: the definitions in the Windows headers violate a lot of coding rules.
 //So we can relocate the required suppressions here at a central spot ...
 //The violations do not cause problems in the application as long as we are on a Windows platform.
 static SOCKET m_WsInvalidSocket(void)
 {
-   return INVALID_SOCKET; //lint !e1960
+   return INVALID_SOCKET; //lint !e9130
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 static sint32 m_WsFionBio(void)
 {
-   return FIONBIO; //lint !e1960 !e970 !e1924 !e569
+   return FIONBIO; //lint !e569 !e970 !e1924 !e9105 !e9112 !e9128 !e9130 !e9136
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 static sint32 m_WsFionRead(void)
 {
-   return FIONREAD; //lint !e1960 !e970 !e1924
+   return FIONREAD; //lint !e970 !e1924 !e9112 !e9128 !e9130 !e9136
 }
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -170,9 +170,9 @@ C_OSCIpDispatcherWinSock::~C_OSCIpDispatcherWinSock(void)
    //make sure to release resources in case the user forgot to
    for (uint16 u16_Index = 0U; u16_Index < this->mc_SocketsTcp.size(); u16_Index++)
    {
-      (void)this->CloseTcp(u16_Index);
+      (void)this->C_OSCIpDispatcherWinSock::CloseTcp(u16_Index);
    }
-   (void)this->CloseUdp();
+   (void)this->C_OSCIpDispatcherWinSock::CloseUdp();
 
    (void)WSACleanup(); //spec: one call of cleanup per call of startup; final call performs actual cleanup
 }
@@ -226,6 +226,7 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
    sint32 s32_Return = C_NOACT;
    PIP_ADAPTER_ADDRESSES pt_Addresses;
    uint32 u32_RetVal;
+   //lint -e{8080} //using type provided by the library for compatibility
    ULONG u32_AddressesBufLen = 0U;
 
    mc_LocalInterfaceIps.resize(0);
@@ -237,7 +238,7 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
 
    u32_RetVal = GetAdaptersAddresses(AF_INET, 0U, NULL, pt_Addresses, &u32_AddressesBufLen);
 
-   if (u32_RetVal == NO_ERROR) //lint !e1960 //constant defined by API; no problem
+   if (u32_RetVal == NO_ERROR) //lint !e620 //constant defined by API; no problem
    {
       PIP_ADAPTER_ADDRESSES pt_Adapter = pt_Addresses;
       while (pt_Adapter != NULL)
@@ -254,8 +255,8 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
                {
                   // sockaddr is the generic descriptor and sockaddr_in is IPV4 specific
                   // https://stackoverflow.com/questions/21099041/why-do-we-cast-sockaddr-in-to-sockaddr-when-calling-bind/21099196
-                  //lint -e{929,740} // Both struct have the same size and is a kind of C style polymorphism
-                  in_addr t_IpAddr = reinterpret_cast<sockaddr_in *>(pt_Address->Address.lpSockaddr)->sin_addr;
+                  //lint -e{929,740,9176} // Both struct have the same size and is a kind of C style polymorphism
+                  const in_addr t_IpAddr = reinterpret_cast<sockaddr_in *>(pt_Address->Address.lpSockaddr)->sin_addr;
 
                   //ignore localhost; otherwise "locally" running servers will get requests via the localhost and
                   // a physical local interface
@@ -265,8 +266,8 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
 
                      mc_LocalInterfaceIps.push_back(ntohl(t_IpAddr.S_un.S_addr)); //add to list of known interfaces
 
-                     c_Info =  "Local IP interface used with IP: " + C_SCLString(inet_ntoa(t_IpAddr)) +
-                              ", name of adapter: \"" + C_SCLString(pt_Adapter->FriendlyName) +
+                     c_Info =  "Local IP interface used with IP: " + static_cast<C_SCLString>(inet_ntoa(t_IpAddr)) +
+                              ", name of adapter: \"" + pt_Adapter->FriendlyName +
                               "\"";
 
                      osc_write_log_info("openSYDE IP-TP", c_Info);
@@ -287,10 +288,7 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
                           C_SCLString::IntToStr(u32_RetVal));
    }
 
-   if (pt_Addresses != NULL)
-   {
-      delete[] pt_Addresses;
-   }
+   delete[] pt_Addresses;
 
    return s32_Return;
 }
@@ -331,6 +329,7 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
    if (q_Error == false)
    {
       //make socket non-blocking:
+      //lint -e{8080} //using type provided by the library for compatibility
       u_long u32_Mode = 1U;
       if (ioctlsocket(orc_Connection.un_Socket, m_WsFionBio(), &u32_Mode) == SOCKET_ERROR)
       {
@@ -353,7 +352,7 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
       c_TcpService.sin_addr.S_un.S_un_b.s_b4  = orc_Connection.au8_IpAddress[3];
       c_TcpService.sin_port = htons(mhu16_UDP_TCP_PORT); //server port
 
-      //lint -e{929,740}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
+      //lint -e{929,740,9176}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
       sn_Return =
          connect(orc_Connection.un_Socket, reinterpret_cast<const sockaddr *>(&c_TcpService), sizeof(c_TcpService));
       //for this non-blocking TCP socket the function should immediately return with WSAEWOULDBLOCK:
@@ -394,14 +393,14 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
             q_Error = false;
             break;
          case 1:
-            //lint -e{1924,929,909} //macro defined by API; no problem
+            //lint -e{1924,929,909,9119} //macro defined by API; no problem
             if (FD_ISSET(orc_Connection.un_Socket, &t_SocketWriteSet))
             {
                // Get port of client for logging (the byte order must be changed of the read port by ntohs)
                sockaddr_in c_SocketInfo;
                sintn sn_Size = sizeof(c_SocketInfo);
 
-               //lint -e{929,740}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
+               //lint -e{929,740,9176}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
                getsockname(orc_Connection.un_Socket, reinterpret_cast<sockaddr *>(&c_SocketInfo), &sn_Size);
 
                //event caused by write (= connect finished)
@@ -464,7 +463,7 @@ sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, 
    if ((q_Error == false) && (oq_ServerPort == false))
    {
       //set broadcast permission for UDP client socket
-      charn cn_Broadcast = 'a';
+      const charn cn_Broadcast = 'a';
       sn_Return =
          setsockopt(orun_Socket, SOL_SOCKET, SO_BROADCAST, &cn_Broadcast, sizeof(cn_Broadcast));
       if (sn_Return == SOCKET_ERROR)
@@ -498,7 +497,7 @@ sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, 
          c_UdpService.sin_port = 0U;
       }
 
-      //lint -e{929,740}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
+      //lint -e{929,740,9176}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
       sn_Return =
          bind(orun_Socket, reinterpret_cast<const sockaddr *>(&c_UdpService), sizeof(c_UdpService));
       if (sn_Return == SOCKET_ERROR)
@@ -516,6 +515,7 @@ sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, 
    if (q_Error == false)
    {
       //make socket non-blocking:
+      //lint -e{8080} //using type provided by the library for compatibility
       u_long u32_Mode = 1U;
       if (ioctlsocket(orun_Socket, m_WsFionBio(), &u32_Mode) == SOCKET_ERROR)
       {
@@ -743,7 +743,7 @@ sint32 C_OSCIpDispatcherWinSock::CloseTcp(const uint32 ou32_Handle)
       sockaddr_in c_SocketInfo;
       sintn sn_Size = sizeof(c_SocketInfo);
 
-      //lint -e{929,740}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
+      //lint -e{929,740,9176}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
       getsockname(this->mc_SocketsTcp[ou32_Handle].un_Socket, reinterpret_cast<sockaddr *>(&c_SocketInfo), &sn_Size);
 
       shutdown(this->mc_SocketsTcp[ou32_Handle].un_Socket, SD_BOTH);
@@ -824,7 +824,8 @@ sint32 C_OSCIpDispatcherWinSock::SendTcp(const uint32 ou32_Handle, const std::ve
       }
       else
       {
-         //lint -e{926}  Side-effect of the "char"-based API. No side effects as long as we are on the Windows platform.
+         //lint -e{926,9176}  //Side-effect of the "char"-based API.
+         //No side effects as long as we are on the Windows platform.
          const sintn sn_BytesSent = send(this->mc_SocketsTcp[ou32_Handle].un_Socket,
                                          reinterpret_cast<const charn *>(&orc_Data[0]), orc_Data.size(), 0);
          if (sn_BytesSent != static_cast<sintn>(orc_Data.size()))
@@ -903,16 +904,17 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<u
       else
       {
          sintn sn_Return;
+         //lint -e{8080} //using type provided by the library for compatibility
          u_long u32_SizeInBuffer;
          //do we have enough bytes in Rx buffer ?
          sn_Return = ioctlsocket(this->mc_SocketsTcp[ou32_Handle].un_Socket, m_WsFionRead(), &u32_SizeInBuffer);
          if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= orc_Data.size()))
          {
             //enough bytes: read
-            //lint -e{926}  Side-effect of the "char"-based API. No side effects as long as we are on the Windows
+            //lint -e{926,9176}  Side-effect of the "char"-based API. No side effects as long as we are on the Windows
             // platform.
-            sintn sn_BytesRead = recv(this->mc_SocketsTcp[ou32_Handle].un_Socket,
-                                      reinterpret_cast<charn *>(&orc_Data[0]), orc_Data.size(), 0);
+            const sintn sn_BytesRead = recv(this->mc_SocketsTcp[ou32_Handle].un_Socket,
+                                            reinterpret_cast<charn *>(&orc_Data[0]), orc_Data.size(), 0);
             if (sn_BytesRead == static_cast<sintn>(orc_Data.size()))
             {
                s32_Return = C_NO_ERR;
@@ -982,16 +984,14 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, const uint8 o
       if (orc_Data.size() > 4)
       {
          //are source and target address correct ?
-         //lint -e{864} //false positive due to const/non-const misinterpretation
          const uint16 u16_SourceAddress =
-            (static_cast<uint16>(static_cast<uint16>(orc_Data[0]) << 8) + orc_Data[1]) - 1U;
-         //lint -e{864} //false positive due to const/non-const misinterpretation
+            (static_cast<uint16>(static_cast<uint16>(orc_Data[0]) << 8U) + orc_Data[1]) - 1U;
          const uint16 u16_TargetAddress =
-            (static_cast<uint16>(static_cast<uint16>(orc_Data[2]) << 8) + orc_Data[3]) - 1U;
+            (static_cast<uint16>(static_cast<uint16>(orc_Data[2]) << 8U) + orc_Data[3]) - 1U;
          const uint8 u8_SourceNodeId = static_cast<uint8>(u16_SourceAddress & 0x7FU);
-         const uint8 u8_SourceBusId = static_cast<uint8>((u16_SourceAddress >> 7) & 0x0FU);
+         const uint8 u8_SourceBusId = static_cast<uint8>((u16_SourceAddress >> 7U) & 0x0FU);
          const uint8 u8_TargetNodeId = static_cast<uint8>(u16_TargetAddress & 0x7FU);
-         const uint8 u8_TargetbusId = static_cast<uint8>((u16_TargetAddress >> 7) & 0x0FU);
+         const uint8 u8_TargetbusId = static_cast<uint8>((u16_TargetAddress >> 7U) & 0x0FU);
 
          if ((u8_SourceNodeId != ou8_ServerNodeIdentifier) ||
              (u8_SourceBusId != ou8_ServerBusIdentifier) ||
@@ -1066,8 +1066,8 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdentifi
    sint32 s32_Return = C_NOACT;
 
    std::map<C_BufferIdentifier, std::list<std::vector<stw_types::uint8> > >::iterator c_ItBuffer;
-   C_BufferIdentifier c_Id(ou8_ClientBusIdentifier, ou8_ClientNodeIdentifier, ou8_ServerBusIdentifier,
-                           ou8_ServerNodeIdentifier);
+   const C_BufferIdentifier c_Id(ou8_ClientBusIdentifier, ou8_ClientNodeIdentifier, ou8_ServerBusIdentifier,
+                                 ou8_ServerNodeIdentifier);
 
    mhc_LockBuffer.Acquire();
 
@@ -1125,9 +1125,9 @@ sint32 C_OSCIpDispatcherWinSock::SendUdp(const std::vector<uint8> & orc_Data)
             sockaddr_in t_TargetAddress;
             t_TargetAddress.sin_family = AF_INET;
             t_TargetAddress.sin_port = htons(mhu16_UDP_TCP_PORT);      //target port [REQ DoIp-011]
-            t_TargetAddress.sin_addr.s_addr = htonl(INADDR_BROADCAST); //lint !e1960 //constant defined by API; no
-                                                                       // problem
-            //lint -e{740,926,929}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
+            t_TargetAddress.sin_addr.s_addr = htonl(INADDR_BROADCAST); //lint !e9105 //constant defined by API;
+            //no problem
+            //lint -e{740,926,929,9176}  //Side-effect of the POSIX-style API. Match is guaranteed by the API.
             const sintn sn_Return = sendto(mc_SocketsUdpClient[u32_Interface],
                                            reinterpret_cast<const charn *>(&orc_Data[0]),
                                            orc_Data.size(), 0, reinterpret_cast<const sockaddr *>(&t_TargetAddress),
@@ -1185,6 +1185,7 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
          if (mc_SocketsUdpClient[u32_Interface] != m_WsInvalidSocket())
          {
             //do we have a package in Rx buffer ?
+            //lint -e{8080} //using type provided by the library for compatibility
             u_long u32_SizeInBuffer;
             sintn sn_Return = ioctlsocket(mc_SocketsUdpServer[u32_Interface], m_WsFionRead(), &u32_SizeInBuffer);
             if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= 1U))
@@ -1194,8 +1195,8 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
                //enough bytes: read
                orc_Data.resize(u32_SizeInBuffer);
 
-               //lint -e{926,929} Side-effect of the "char"-based API. No problems as long as we are on Windows.
-               //lint -e{740}     Side-effect of the POSIX-style API. Match is guaranteed by the API.
+               //lint -e{926,929}  //Side-effect of the "char"-based API. No problems as long as we are on Windows.
+               //lint -e{740,9176} //Side-effect of the POSIX-style API. Match is guaranteed by the API.
                sn_Return = recvfrom(mc_SocketsUdpServer[u32_Interface], reinterpret_cast<charn *>(&orc_Data[0]),
                                     orc_Data.size(), 0, reinterpret_cast<sockaddr *>(&t_Sender),
                                     &sn_AddressSize);
@@ -1265,7 +1266,7 @@ void C_OSCIpDispatcherWinSock::LoadConfigFile(const C_SCLString & orc_FileLocati
    if (TGL_FileExists(orc_FileLocation) == true)
    {
       C_SCLIniFile c_Ini(orc_FileLocation);
-      C_SCLString c_Help = c_Ini.ReadString("ETH_CONFIG", "ETH_INTERFACE_NAME", "");
+      const C_SCLString c_Help = c_Ini.ReadString("ETH_CONFIG", "ETH_INTERFACE_NAME", "");
 
       c_Help.Tokenize(",", this->mc_PreferredInterfaceNames.Strings);
    }

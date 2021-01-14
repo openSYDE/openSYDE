@@ -24,14 +24,15 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
+using namespace stw_scl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::uint32 C_OSCHalcDefStructFiler::hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH = 31UL;
-const stw_scl::C_SCLString C_OSCHalcDefStructFiler::mhc_False = "FALSE";
-const stw_scl::C_SCLString C_OSCHalcDefStructFiler::mhc_True = "TRUE";
+const C_SCLString C_OSCHalcDefStructFiler::mhc_False = "FALSE";
+const C_SCLString C_OSCHalcDefStructFiler::mhc_True = "TRUE";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -65,10 +66,10 @@ const stw_scl::C_SCLString C_OSCHalcDefStructFiler::mhc_True = "TRUE";
 sint32 C_OSCHalcDefStructFiler::h_LoadStructs(std::vector<C_OSCHalcDefStruct> & orc_Structs,
                                               C_OSCXMLParserBase & orc_XMLParser,
                                               const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases,
-                                              const stw_scl::C_SCLString & orc_CurrentNodeName,
-                                              const stw_scl::C_SCLString & orc_SectionNodeName,
-                                              const stw_scl::C_SCLString & orc_GroupNodeName,
-                                              const stw_scl::C_SCLString & orc_SingleNodeName, const bool oq_RequireId,
+                                              const C_SCLString & orc_CurrentNodeName,
+                                              const C_SCLString & orc_SectionNodeName,
+                                              const C_SCLString & orc_GroupNodeName,
+                                              const C_SCLString & orc_SingleNodeName, const bool oq_RequireId,
                                               const bool oq_RequireSection, const uint32 ou32_DomainNameLength)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -76,7 +77,7 @@ sint32 C_OSCHalcDefStructFiler::h_LoadStructs(std::vector<C_OSCHalcDefStruct> & 
    orc_Structs.clear();
    if (orc_XMLParser.SelectNodeChild(orc_SectionNodeName) == orc_SectionNodeName)
    {
-      stw_scl::C_SCLString c_NodeChannel = orc_XMLParser.SelectNodeChild(orc_GroupNodeName);
+      C_SCLString c_NodeChannel = orc_XMLParser.SelectNodeChild(orc_GroupNodeName);
       if (c_NodeChannel == orc_GroupNodeName)
       {
          do
@@ -109,8 +110,7 @@ sint32 C_OSCHalcDefStructFiler::h_LoadStructs(std::vector<C_OSCHalcDefStruct> & 
       if (oq_RequireSection)
       {
          osc_write_log_error("Loading HALC definition",
-                             stw_scl::C_SCLString(stw_scl::C_SCLString("Could not find \"") + orc_SectionNodeName +
-                                                  "\" node.").c_str());
+                             "Could not find \"" + orc_SectionNodeName + "\" node.");
          s32_Retval = C_CONFIG;
       }
    }
@@ -136,10 +136,10 @@ sint32 C_OSCHalcDefStructFiler::h_LoadStructs(std::vector<C_OSCHalcDefStruct> & 
 sint32 C_OSCHalcDefStructFiler::h_SaveStructs(const std::vector<C_OSCHalcDefStruct> & orc_Structs,
                                               const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases,
                                               C_OSCXMLParserBase & orc_XMLParser,
-                                              const stw_scl::C_SCLString & orc_CurrentNodeName,
-                                              const stw_scl::C_SCLString & orc_SectionNodeName,
-                                              const stw_scl::C_SCLString & orc_GroupNodeName,
-                                              const stw_scl::C_SCLString & orc_SingleNodeName)
+                                              const C_SCLString & orc_CurrentNodeName,
+                                              const C_SCLString & orc_SectionNodeName,
+                                              const C_SCLString & orc_GroupNodeName,
+                                              const C_SCLString & orc_SingleNodeName)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -177,19 +177,18 @@ sint32 C_OSCHalcDefStructFiler::h_SaveStructs(const std::vector<C_OSCHalcDefStru
    C_CONFIG    IO definition content is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefStructFiler::h_ParseSimplestTypeValue(const stw_scl::C_SCLString & orc_TypeStr,
+sint32 C_OSCHalcDefStructFiler::h_ParseSimplestTypeValue(const C_SCLString & orc_TypeStr,
                                                          C_OSCNodeDataPoolContent & orc_Content,
                                                          const C_OSCXMLParserBase & orc_XMLParser,
-                                                         const stw_scl::C_SCLString & orc_AttributeName)
+                                                         const C_SCLString & orc_AttributeName)
 {
    sint32 s32_Retval = C_NO_ERR;
-   const stw_scl::C_SCLString c_ItemStr = orc_XMLParser.GetAttributeString(orc_AttributeName);
+   const C_SCLString c_ItemStr = orc_XMLParser.GetAttributeString(orc_AttributeName);
 
    if (c_ItemStr == "")
    {
       osc_write_log_error("Loading HALC definition",
-                          stw_scl::C_SCLString(stw_scl::C_SCLString("Content of attribute \"") + orc_AttributeName +
-                                               "\" is empty.").c_str());
+                          "Content of attribute \"" + orc_AttributeName + "\" is empty.");
       s32_Retval = C_CONFIG;
    }
    else
@@ -321,12 +320,14 @@ sint32 C_OSCHalcDefStructFiler::h_ParseSimplestTypeValue(const stw_scl::C_SCLStr
             s32_Retval = C_CONFIG;
          }
          break;
+      default:
+         break;
       }
       if (s32_Retval == C_CONFIG)
       {
          osc_write_log_error("Loading HALC definition",
-                             stw_scl::C_SCLString(stw_scl::C_SCLString("Content of attribute \"") + orc_AttributeName +
-                                                  "\" could not be parsed into type \"" + orc_TypeStr + "\".").c_str());
+                             "Content of attribute \"" + orc_AttributeName + "\" could not be parsed into type \"" +
+                             orc_TypeStr + "\".");
       }
    }
    return s32_Retval;
@@ -343,7 +344,7 @@ sint32 C_OSCHalcDefStructFiler::h_ParseSimplestTypeValue(const stw_scl::C_SCLStr
    C_CONFIG    String is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefStructFiler::h_GetTypeForSimplestTypeString(const stw_scl::C_SCLString & orc_TypeStr,
+sint32 C_OSCHalcDefStructFiler::h_GetTypeForSimplestTypeString(const C_SCLString & orc_TypeStr,
                                                                C_OSCNodeDataPoolContent::E_Type & ore_Type)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -405,9 +406,10 @@ sint32 C_OSCHalcDefStructFiler::h_GetTypeForSimplestTypeString(const stw_scl::C_
    Type string
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHalcDefStructFiler::h_GetTypeString(const C_OSCNodeDataPoolContent::E_Type oe_Type)
+C_SCLString C_OSCHalcDefStructFiler::h_GetTypeString(const C_OSCNodeDataPoolContent::E_Type oe_Type)
 {
-   stw_scl::C_SCLString c_Retval;
+   C_SCLString c_Retval;
+
    switch (oe_Type)
    {
    case C_OSCNodeDataPoolContent::eUINT8:
@@ -440,6 +442,8 @@ stw_scl::C_SCLString C_OSCHalcDefStructFiler::h_GetTypeString(const C_OSCNodeDat
    case C_OSCNodeDataPoolContent::eFLOAT64:
       c_Retval = "float64";
       break;
+   default:
+      break;
    }
    return c_Retval;
 }
@@ -456,7 +460,7 @@ stw_scl::C_SCLString C_OSCHalcDefStructFiler::h_GetTypeString(const C_OSCNodeDat
    C_CONFIG   data invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefStructFiler::h_SaveSimpleValueAsAttribute(const stw_scl::C_SCLString & orc_Node,
+sint32 C_OSCHalcDefStructFiler::h_SaveSimpleValueAsAttribute(const C_SCLString & orc_Node,
                                                              C_OSCXMLParserBase & orc_XMLParser,
                                                              const C_OSCNodeDataPoolContent & orc_Content)
 {
@@ -533,9 +537,9 @@ sint32 C_OSCHalcDefStructFiler::h_SaveSimpleValueAsAttribute(const stw_scl::C_SC
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_OSCHalcDefContent & orc_Content,
-                                          stw_scl::C_SCLString & orc_TypeStr, stw_scl::C_SCLString & orc_BaseTypeStr,
-                                          const stw_scl::C_SCLString & orc_CurrentNodeName,
-                                          const stw_scl::C_SCLString & orc_UseCaseForLog)
+                                          C_SCLString & orc_TypeStr, C_SCLString & orc_BaseTypeStr,
+                                          const C_SCLString & orc_CurrentNodeName,
+                                          const C_SCLString & orc_UseCaseForLog)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -682,14 +686,13 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
    //Parse enum
    if (s32_Retval == C_NO_ERR)
    {
-      stw_scl::C_SCLString c_EnumItemNode = orc_XMLParser.SelectNodeChild("enum-item");
+      C_SCLString c_EnumItemNode = orc_XMLParser.SelectNodeChild("enum-item");
       if (c_EnumItemNode == "enum-item")
       {
          if (orc_TypeStr != "enum")
          {
             osc_write_log_error(orc_UseCaseForLog,
-                                stw_scl::C_SCLString(stw_scl::C_SCLString("\"enum-item\" node found for type \"") +
-                                                     orc_TypeStr + "\".").c_str());
+                                "\"enum-item\" node found for type \"" + orc_TypeStr + "\".");
             s32_Retval = C_CONFIG;
          }
          else
@@ -697,7 +700,7 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
             do
             {
                C_OSCNodeDataPoolContent c_Content = orc_Content;
-               stw_scl::C_SCLString c_Display;
+               C_SCLString c_Display;
                if (orc_XMLParser.AttributeExists("display"))
                {
                   c_Display = orc_XMLParser.GetAttributeString("display");
@@ -724,8 +727,7 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
                   if (orc_Content.AddEnumItem(c_Display, c_Content) != C_NO_ERR)
                   {
                      osc_write_log_error(orc_UseCaseForLog,
-                                         stw_scl::C_SCLString(stw_scl::C_SCLString("\"enum-item\" display name \"") +
-                                                              c_Display + "\" is duplicate").c_str());
+                                         "\"enum-item\" display name \"" + c_Display + "\" is duplicate");
                      s32_Retval = C_CONFIG;
                   }
                }
@@ -754,15 +756,13 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
    //Parse bitmask
    if (s32_Retval == C_NO_ERR)
    {
-      stw_scl::C_SCLString c_BitmaskItemNode = orc_XMLParser.SelectNodeChild("bitmask-selection");
+      C_SCLString c_BitmaskItemNode = orc_XMLParser.SelectNodeChild("bitmask-selection");
       if (c_BitmaskItemNode == "bitmask-selection")
       {
          if (orc_TypeStr != "bitmask")
          {
             osc_write_log_error(orc_UseCaseForLog,
-                                stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                        "\"bitmask-selection\" node found for type \"") + orc_TypeStr +
-                                                     "\".").c_str());
+                                "\"bitmask-selection\" node found for type \"" + orc_TypeStr + "\".");
             s32_Retval = C_CONFIG;
          }
          else
@@ -789,7 +789,7 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
                {
                   if (orc_XMLParser.AttributeExists("initial-apply-value-setting"))
                   {
-                     const stw_scl::C_SCLString c_Content = orc_XMLParser.GetAttributeString(
+                     const C_SCLString c_Content = orc_XMLParser.GetAttributeString(
                         "initial-apply-value-setting");
                      if (c_Content.LowerCase() == mhc_False.LowerCase())
                      {
@@ -816,14 +816,12 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
                {
                   if (orc_XMLParser.AttributeExists("value"))
                   {
-                     const stw_scl::C_SCLString c_Content = orc_XMLParser.GetAttributeString("value");
+                     const C_SCLString c_Content = orc_XMLParser.GetAttributeString("value");
                      if (c_BitmaskItem.SetValueByString(c_Content) !=
                          C_NO_ERR)
                      {
                         osc_write_log_error(orc_UseCaseForLog,
-                                            stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                                    "\"value\" attribute content \"") +
-                                                                 c_Content + "\" cannot be parsed.").c_str());
+                                            "\"value\" attribute content \"" + c_Content + "\" cannot be parsed.");
                         s32_Retval = C_CONFIG;
                      }
                   }
@@ -880,11 +878,11 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcDefStructFiler::h_ParseAttributeIntoContent(C_OSCHalcDefContent & orc_Content,
                                                             const C_OSCXMLParserBase & orc_XMLParser,
-                                                            const stw_scl::C_SCLString & orc_AttributeName,
-                                                            const stw_scl::C_SCLString & orc_Type,
-                                                            const stw_scl::C_SCLString & orc_BaseType,
+                                                            const C_SCLString & orc_AttributeName,
+                                                            const C_SCLString & orc_Type,
+                                                            const C_SCLString & orc_BaseType,
                                                             const bool oq_RequireAttribute,
-                                                            const stw_scl::C_SCLString & orc_CurrentNodeName)
+                                                            const C_SCLString & orc_CurrentNodeName)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -932,7 +930,7 @@ sint32 C_OSCHalcDefStructFiler::h_ParseAttributeIntoContent(C_OSCHalcDefContent 
       }
       else if (orc_Type == "bool")
       {
-         const stw_scl::C_SCLString c_ItemStr = orc_XMLParser.GetAttributeString(orc_AttributeName);
+         const C_SCLString c_ItemStr = orc_XMLParser.GetAttributeString(orc_AttributeName);
          if (c_ItemStr.LowerCase() == mhc_False.LowerCase())
          {
             orc_Content.SetValueU8(static_cast<uint8>(false));
@@ -948,7 +946,7 @@ sint32 C_OSCHalcDefStructFiler::h_ParseAttributeIntoContent(C_OSCHalcDefContent 
       }
       else if (orc_Type == "enum")
       {
-         const stw_scl::C_SCLString c_ItemStr = orc_XMLParser.GetAttributeString(orc_AttributeName);
+         const C_SCLString c_ItemStr = orc_XMLParser.GetAttributeString(orc_AttributeName);
          //Try enum
          if (orc_Content.SetEnumValue(c_ItemStr) != C_NO_ERR)
          {
@@ -963,8 +961,7 @@ sint32 C_OSCHalcDefStructFiler::h_ParseAttributeIntoContent(C_OSCHalcDefContent 
       else
       {
          osc_write_log_error("Loading HALC definition",
-                             stw_scl::C_SCLString(stw_scl::C_SCLString("Unexpected type \"") + orc_Type +
-                                                  "\" in node \"" + orc_CurrentNodeName + "\".").c_str());
+                             "Unexpected type \"" + orc_Type + "\" in node \"" + orc_CurrentNodeName + "\".");
          s32_Retval = C_CONFIG;
       }
    }
@@ -973,8 +970,8 @@ sint32 C_OSCHalcDefStructFiler::h_ParseAttributeIntoContent(C_OSCHalcDefContent 
       if (oq_RequireAttribute)
       {
          osc_write_log_error("Loading HALC definition",
-                             stw_scl::C_SCLString(stw_scl::C_SCLString("Could not find \"") + orc_AttributeName +
-                                                  "\" attribute in node \"" + orc_CurrentNodeName + "\".").c_str());
+                             "Could not find \"" + orc_AttributeName + "\" attribute in node \"" + orc_CurrentNodeName +
+                             "\".");
          s32_Retval = C_CONFIG;
       }
    }
@@ -1007,15 +1004,15 @@ C_OSCHalcDefStructFiler::C_OSCHalcDefStructFiler(void)
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcDefStructFiler::mh_LoadStruct(C_OSCHalcDefStruct & orc_Struct, C_OSCXMLParserBase & orc_XMLParser,
                                               const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases,
-                                              const stw_scl::C_SCLString & orc_GroupNodeName,
-                                              const stw_scl::C_SCLString & orc_SingleNodeName, const bool oq_RequireId,
+                                              const C_SCLString & orc_GroupNodeName,
+                                              const C_SCLString & orc_SingleNodeName, const bool oq_RequireId,
                                               const uint32 ou32_DomainNameLength)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (orc_XMLParser.AttributeExists("type"))
    {
-      const stw_scl::C_SCLString c_Type = orc_XMLParser.GetAttributeString("type");
+      const C_SCLString c_Type = orc_XMLParser.GetAttributeString("type");
       if (c_Type == "struct")
       {
          if (orc_XMLParser.AttributeExists("id"))
@@ -1039,18 +1036,13 @@ sint32 C_OSCHalcDefStructFiler::mh_LoadStruct(C_OSCHalcDefStruct & orc_Struct, C
                    C_OSCHalcDefStructFiler::hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH)
                {
                   osc_write_log_error("Loading HALC definition",
-                                      stw_scl::C_SCLString(stw_scl::C_SCLString("Content of \"display\" attribute \"") +
-                                                           orc_Struct.c_Display +
-                                                           "\" is too long to be combined with domain \"singular-name\" (or \"name\" if not existing) node, maximum allowed characters of combined value: "
-                                                           +
-                                                           stw_scl::C_SCLString::IntToStr(C_OSCHalcDefStructFiler::
-                                                                                          hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH)
-                                                           +
-                                                           " (Current: " +
-                                                           stw_scl::C_SCLString::IntToStr(orc_Struct.c_Display.Length()
-                                                                                          +
-                                                                                          ou32_DomainNameLength) +
-                                                           ")."));
+                                      "Content of \"display\" attribute \"" + orc_Struct.c_Display +
+                                      "\" is too long to be combined with domain \"singular-name\" (or \"name\" if not existing) node, maximum allowed characters of combined value: " +
+                                      C_SCLString::IntToStr(C_OSCHalcDefStructFiler::
+                                                            hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH) +
+                                      " (Current: " +
+                                      C_SCLString::IntToStr(orc_Struct.c_Display.Length() +
+                                                            ou32_DomainNameLength) + ").");
                   s32_Retval = C_CONFIG;
                }
             }
@@ -1064,7 +1056,7 @@ sint32 C_OSCHalcDefStructFiler::mh_LoadStruct(C_OSCHalcDefStruct & orc_Struct, C
          {
             if (orc_XMLParser.AttributeExists("availability"))
             {
-               const stw_scl::C_SCLString c_Availability = orc_XMLParser.GetAttributeString("availability");
+               const C_SCLString c_Availability = orc_XMLParser.GetAttributeString("availability");
                s32_Retval = C_OSCHalcDefStructFiler::mh_ParseAttributeAvailability(
                   orc_Struct.c_UseCaseAvailabilities,
                   c_Availability, orc_UseCases);
@@ -1077,7 +1069,7 @@ sint32 C_OSCHalcDefStructFiler::mh_LoadStruct(C_OSCHalcDefStruct & orc_Struct, C
          }
          if (s32_Retval == C_NO_ERR)
          {
-            stw_scl::C_SCLString c_NodeParameter;
+            C_SCLString c_NodeParameter;
             if (orc_XMLParser.SelectNodeChild("comment") == "comment")
             {
                orc_Struct.c_Comment = orc_XMLParser.GetNodeContent();
@@ -1138,15 +1130,14 @@ sint32 C_OSCHalcDefStructFiler::mh_LoadStruct(C_OSCHalcDefStruct & orc_Struct, C
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcDefStructFiler::mh_SaveStruct(const C_OSCHalcDefStruct & orc_Struct,
                                               const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases,
-                                              C_OSCXMLParserBase & orc_XMLParser,
-                                              const stw_scl::C_SCLString & orc_GroupNodeName,
-                                              const stw_scl::C_SCLString & orc_SingleNodeName)
+                                              C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_GroupNodeName,
+                                              const C_SCLString & orc_SingleNodeName)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (orc_Struct.c_StructElements.size() > 0UL)
    {
-      stw_scl::C_SCLString c_Availability;
+      C_SCLString c_Availability;
       if (orc_Struct.c_Id.IsEmpty() == false)
       {
          orc_XMLParser.SetAttributeString("id", orc_Struct.c_Id);
@@ -1197,13 +1188,13 @@ sint32 C_OSCHalcDefStructFiler::mh_LoadDataElement(C_OSCHalcDefElement & orc_Ele
                                                    C_OSCXMLParserBase & orc_XMLParser,
                                                    const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases,
                                                    const std::vector<stw_types::uint32> & orc_BaseAvailability,
-                                                   const stw_scl::C_SCLString & orc_SingleNodeName,
-                                                   const bool oq_RequireId, const uint32 ou32_DomainNameLength)
+                                                   const C_SCLString & orc_SingleNodeName, const bool oq_RequireId,
+                                                   const uint32 ou32_DomainNameLength)
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   stw_scl::C_SCLString c_TypeStr;
-   stw_scl::C_SCLString c_BaseTypeStr;
+   C_SCLString c_TypeStr;
+   C_SCLString c_BaseTypeStr;
 
    if (orc_XMLParser.SelectNodeChild("comment") == "comment")
    {
@@ -1232,17 +1223,12 @@ sint32 C_OSCHalcDefStructFiler::mh_LoadDataElement(C_OSCHalcDefElement & orc_Ele
              C_OSCHalcDefStructFiler::hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH)
          {
             osc_write_log_error("Loading HALC definition",
-                                stw_scl::C_SCLString(stw_scl::C_SCLString("Content of \"display\" attribute \"") +
-                                                     orc_Element.c_Display +
-                                                     "\" is too long to be combined with domain \"singular-name\" (or \"name\" if not existing) node, maximum allowed characters of combined value: "
-                                                     +
-                                                     stw_scl::C_SCLString::IntToStr(C_OSCHalcDefStructFiler::
-                                                                                    hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH)
-                                                     +
-                                                     " (Current: " +
-                                                     stw_scl::C_SCLString::IntToStr(orc_Element.c_Display.Length() +
-                                                                                    ou32_DomainNameLength) +
-                                                     ")."));
+                                "Content of \"display\" attribute \"" + orc_Element.c_Display +
+                                "\" is too long to be combined with domain \"singular-name\" (or \"name\" if not existing) node, maximum allowed characters of combined value: " +
+                                C_SCLString::IntToStr(C_OSCHalcDefStructFiler::
+                                                      hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH) +
+                                " (Current: " + C_SCLString::IntToStr(orc_Element.c_Display.Length() +
+                                                                      ou32_DomainNameLength) + ").");
             s32_Retval = C_CONFIG;
          }
       }
@@ -1256,7 +1242,7 @@ sint32 C_OSCHalcDefStructFiler::mh_LoadDataElement(C_OSCHalcDefElement & orc_Ele
    {
       if (orc_XMLParser.AttributeExists("availability"))
       {
-         const stw_scl::C_SCLString c_Availability = orc_XMLParser.GetAttributeString("availability");
+         const C_SCLString c_Availability = orc_XMLParser.GetAttributeString("availability");
          s32_Retval = C_OSCHalcDefStructFiler::mh_ParseAttributeAvailability(orc_Element.c_UseCaseAvailabilities,
                                                                              c_Availability, orc_UseCases);
       }
@@ -1385,10 +1371,10 @@ sint32 C_OSCHalcDefStructFiler::mh_LoadDataElement(C_OSCHalcDefElement & orc_Ele
 sint32 C_OSCHalcDefStructFiler::mh_SaveDataElement(const C_OSCHalcDefElement & orc_Element,
                                                    const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases,
                                                    C_OSCXMLParserBase & orc_XMLParser,
-                                                   const stw_scl::C_SCLString & orc_SingleNodeName)
+                                                   const C_SCLString & orc_SingleNodeName)
 {
    sint32 s32_Retval = C_NO_ERR;
-   const stw_scl::C_SCLString c_BaseType = h_GetTypeString(orc_Element.GetType());
+   const C_SCLString c_BaseType = h_GetTypeString(orc_Element.GetType());
 
    if (orc_Element.c_Id.IsEmpty() == false)
    {
@@ -1425,11 +1411,11 @@ sint32 C_OSCHalcDefStructFiler::mh_SaveDataElement(const C_OSCHalcDefElement & o
       break;
    case C_OSCHalcDefContent::eCT_ENUM:
       {
-         const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> & rc_EnumItems = orc_Element.GetEnumItems();
+         const std::map<C_SCLString, C_OSCNodeDataPoolContent> & rc_EnumItems = orc_Element.GetEnumItems();
          orc_XMLParser.SetAttributeString("type", "enum");
          orc_XMLParser.SetAttributeString("base-type", c_BaseType);
          //Items
-         for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = rc_EnumItems.begin();
+         for (std::map<C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = rc_EnumItems.begin();
               (c_It != rc_EnumItems.end()) && (s32_Retval == C_NO_ERR); ++c_It)
          {
             tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("enum-item") == "enum-item");
@@ -1445,6 +1431,9 @@ sint32 C_OSCHalcDefStructFiler::mh_SaveDataElement(const C_OSCHalcDefElement & o
    case C_OSCHalcDefContent::eCT_PLAIN:
       orc_XMLParser.SetAttributeString("type", c_BaseType);
       break;
+   default:
+      tgl_assert(false);
+      break;
    }
    //Handle values
    s32_Retval = h_SaveSimpleValueAsAttribute("initial-value", orc_XMLParser, orc_Element.c_InitialValue);
@@ -1458,7 +1447,7 @@ sint32 C_OSCHalcDefStructFiler::mh_SaveDataElement(const C_OSCHalcDefElement & o
    }
    if (s32_Retval == C_NO_ERR)
    {
-      stw_scl::C_SCLString c_Availability;
+      C_SCLString c_Availability;
       s32_Retval = mh_GetAvailabilityString(orc_Element.c_UseCaseAvailabilities, orc_UseCases, c_Availability);
       if (s32_Retval == C_NO_ERR)
       {
@@ -1481,7 +1470,7 @@ sint32 C_OSCHalcDefStructFiler::mh_SaveDataElement(const C_OSCHalcDefElement & o
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcDefStructFiler::mh_ParseAttributeAvailability(std::vector<stw_types::uint32> & orc_Availability,
-                                                              const stw_scl::C_SCLString & orc_AttributeContent,
+                                                              const C_SCLString & orc_AttributeContent,
                                                               const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1495,11 +1484,11 @@ sint32 C_OSCHalcDefStructFiler::mh_ParseAttributeAvailability(std::vector<stw_ty
    }
    else
    {
-      stw_scl::SCLDynamicArray<stw_scl::C_SCLString> c_SplittedString;
+      SCLDynamicArray<C_SCLString> c_SplittedString;
       orc_AttributeContent.Tokenize(",", c_SplittedString);
       for (sint32 s32_ItSplit = 0L; s32_ItSplit < c_SplittedString.GetLength(); ++s32_ItSplit)
       {
-         const stw_scl::C_SCLString c_CurSplit = c_SplittedString[s32_ItSplit].Trim();
+         const C_SCLString c_CurSplit = c_SplittedString[s32_ItSplit].Trim();
          bool q_Found = false;
          for (uint32 u32_ItUseCase = 0UL; u32_ItUseCase < orc_UseCases.size(); ++u32_ItUseCase)
          {
@@ -1514,10 +1503,8 @@ sint32 C_OSCHalcDefStructFiler::mh_ParseAttributeAvailability(std::vector<stw_ty
          if (q_Found == false)
          {
             osc_write_log_error("Loading HALC definition",
-                                stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                        "Could not match \"availability\" attribute content \"")
-                                                     +
-                                                     c_CurSplit + "\" to any use case.").c_str());
+                                "Could not match \"availability\" attribute content \"" +
+                                c_CurSplit + "\" to any use case.");
             s32_Retval = C_CONFIG;
          }
       }
@@ -1538,7 +1525,7 @@ sint32 C_OSCHalcDefStructFiler::mh_ParseAttributeAvailability(std::vector<stw_ty
 //----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_OSCHalcDefStructFiler::mh_GetAvailabilityString(
    const std::vector<stw_types::uint32> & orc_Availability,
-   const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases, stw_scl::C_SCLString & orc_Output)
+   const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases, C_SCLString & orc_Output)
 {
    stw_types::sint32 s32_Retval = C_NO_ERR;
    orc_Output = "";
@@ -1556,11 +1543,9 @@ stw_types::sint32 C_OSCHalcDefStructFiler::mh_GetAvailabilityString(
       else
       {
          osc_write_log_error("Saving HALC definition",
-                             stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                     "Availability index ") +
-                                                  stw_scl::C_SCLString::IntToStr(orc_Availability[u32_It]) +
-                                                  " no longer in range of use-case count " +
-                                                  stw_scl::C_SCLString::IntToStr(orc_UseCases.size())).c_str());
+                             "Availability index " + C_SCLString::IntToStr(orc_Availability[u32_It]) +
+                             " no longer in range of use-case count " +
+                             C_SCLString::IntToStr(orc_UseCases.size()));
          s32_Retval = C_CONFIG;
       }
    }
@@ -1574,7 +1559,7 @@ stw_types::sint32 C_OSCHalcDefStructFiler::mh_GetAvailabilityString(
    \param[in,out]  orc_Content   Content to set
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefStructFiler::mh_SetMaxValForType(const stw_scl::C_SCLString & orc_TypeStr,
+void C_OSCHalcDefStructFiler::mh_SetMaxValForType(const C_SCLString & orc_TypeStr,
                                                   C_OSCNodeDataPoolContent & orc_Content)
 {
    if (orc_TypeStr == "float64")
@@ -1634,7 +1619,7 @@ void C_OSCHalcDefStructFiler::mh_SetMaxValForType(const stw_scl::C_SCLString & o
    \param[in,out]  orc_Content   Content to set
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefStructFiler::mh_SetMinValForType(const stw_scl::C_SCLString & orc_TypeStr,
+void C_OSCHalcDefStructFiler::mh_SetMinValForType(const C_SCLString & orc_TypeStr,
                                                   C_OSCNodeDataPoolContent & orc_Content)
 {
    if (orc_TypeStr == "float64")
@@ -1703,8 +1688,8 @@ bool C_OSCHalcDefStructFiler::mh_CheckInitialBitmaskContentValid(const C_OSCHalc
 
    if (orc_Content.GetComplexType() == C_OSCHalcDefContent::eCT_BIT_MASK)
    {
-      stw_scl::C_SCLString c_Is = "invalid";
-      stw_scl::C_SCLString c_Should = "invalid";
+      C_SCLString c_Is = "invalid";
+      C_SCLString c_Should = "invalid";
       C_OSCHalcDefContent c_Copy = orc_Content;
       const std::vector<C_OSCHalcDefContentBitmaskItem> & rc_Bitmasks = c_Copy.GetBitmaskItems();
       for (std::vector<C_OSCHalcDefContentBitmaskItem>::const_iterator c_ItBitmask = rc_Bitmasks.begin();
@@ -1712,7 +1697,7 @@ bool C_OSCHalcDefStructFiler::mh_CheckInitialBitmaskContentValid(const C_OSCHalc
       {
          c_Copy.SetBitmask(c_ItBitmask->c_Display, c_ItBitmask->q_ApplyValueSetting);
       }
-      switch (orc_Content.GetType())
+      switch (orc_Content.GetType()) //lint !e788 not all enum constants used; this is unsigned only
       {
       case C_OSCNodeDataPoolContent::eUINT8:
          if (orc_Content.GetValueU8() != c_Copy.GetValueU8())
@@ -1754,10 +1739,8 @@ bool C_OSCHalcDefStructFiler::mh_CheckInitialBitmaskContentValid(const C_OSCHalc
       if (q_Retval == false)
       {
          osc_write_log_error("Loading HALC definition",
-                             stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                     "\"value\" attribute content for bitmask has invalid initial value \"")
-                                                  +
-                                                  c_Is + "\" which should be \"" + c_Should + "\"").c_str());
+                             "\"value\" attribute content for bitmask has invalid initial value \"" +
+                             c_Is + "\" which should be \"" + c_Should + "\"");
       }
    }
 
@@ -1773,9 +1756,10 @@ bool C_OSCHalcDefStructFiler::mh_CheckInitialBitmaskContentValid(const C_OSCHalc
    Value in hex
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHalcDefStructFiler::mh_ConvertToHex(const uint64 ou64_Value)
+C_SCLString C_OSCHalcDefStructFiler::mh_ConvertToHex(const uint64 ou64_Value)
 {
-   stw_scl::C_SCLString c_Retval;
+   C_SCLString c_Retval;
+
    std::stringstream c_Mask;
    c_Mask << "0x" << &std::hex << ou64_Value;
    c_Retval = c_Mask.str().c_str();
@@ -1792,9 +1776,9 @@ void C_OSCHalcDefStructFiler::mh_HandleEnumMinMax(C_OSCHalcDefElement & orc_Elem
 {
    if (orc_Element.GetComplexType() == C_OSCHalcDefContent::eCT_ENUM)
    {
-      const std::map<stw_scl::C_SCLString,
+      const std::map<C_SCLString,
                      C_OSCNodeDataPoolContent> & rc_Enums = orc_Element.c_InitialValue.GetEnumItems();
-      for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = rc_Enums.begin();
+      for (std::map<C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = rc_Enums.begin();
            c_It != rc_Enums.end(); ++c_It)
       {
          if (c_It == rc_Enums.begin())
@@ -1830,7 +1814,7 @@ void C_OSCHalcDefStructFiler::mh_HandleEnumMinMax(C_OSCHalcDefElement & orc_Elem
    C_RANGE     invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefStructFiler::mh_CheckValidUint(const stw_scl::C_SCLString & orc_Item)
+sint32 C_OSCHalcDefStructFiler::mh_CheckValidUint(const C_SCLString & orc_Item)
 {
    uint64 u64_Value;
    sint32 s32_Retval = C_NO_ERR;
@@ -1854,7 +1838,7 @@ sint32 C_OSCHalcDefStructFiler::mh_CheckValidUint(const stw_scl::C_SCLString & o
    C_RANGE     invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefStructFiler::mh_CheckValidSint(const stw_scl::C_SCLString & orc_Item)
+sint32 C_OSCHalcDefStructFiler::mh_CheckValidSint(const C_SCLString & orc_Item)
 {
    sint64 s64_Value;
    sint32 s32_Retval = C_NO_ERR;
@@ -1878,7 +1862,7 @@ sint32 C_OSCHalcDefStructFiler::mh_CheckValidSint(const stw_scl::C_SCLString & o
    C_RANGE     invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefStructFiler::mh_CheckValidDouble(const stw_scl::C_SCLString & orc_Item)
+sint32 C_OSCHalcDefStructFiler::mh_CheckValidDouble(const C_SCLString & orc_Item)
 {
    float64 f64_Value;
    sint32 s32_Retval = C_NO_ERR;

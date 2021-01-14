@@ -57,10 +57,7 @@ public:
    bool GetDiscardedStatus(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   //lint -restore
 
 private:
    Ui::C_SyvUpNodePropertiesDialog * mpc_Ui;

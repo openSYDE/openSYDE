@@ -59,9 +59,9 @@ C_SyvDaContextMenuManager::C_SyvDaContextMenuManager()
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of all mpc_Action* and the Qt memory management
 C_SyvDaContextMenuManager::~C_SyvDaContextMenuManager()
 {
-   //lint -e{1540}  no memory leak because of the parent of all mpc_Action* and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ void C_SyvDaContextMenuManager::m_SetActionsInvisible(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_GiLiLineGroup * pc_LineGroup = dynamic_cast<C_GiLiLineGroup *>(this->mpc_ActiveItem);
    bool q_Return = false;
 

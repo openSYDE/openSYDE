@@ -90,7 +90,6 @@ bool C_TblViewInteraction::event(QEvent * const opc_Event)
    }
    else if (opc_Event->type() == QEvent::HoverMove)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       QHoverEvent * const pc_HoverEvent = dynamic_cast<QHoverEvent * const>(opc_Event);
       if (pc_HoverEvent != NULL)
       {

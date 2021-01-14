@@ -47,11 +47,8 @@ public:
    void InitText(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    enum E_Step
@@ -110,7 +107,7 @@ private:
    void m_ShowConfigInfoOfInterface(const stw_opensyde_core::C_OSCNodeComInterfaceSettings & orc_IntfSetting,
                                     const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
                                     const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
-                                    QString & orc_Text, const bool q_BusConnected, const bool q_Configured);
+                                    QString & orc_Text, const bool oq_BusConnected, const bool oq_Configured);
    void m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate);
    stw_types::sint32 m_GetRelevantConfigInfo(
       std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
@@ -147,7 +144,7 @@ private:
 
    void m_OnBitRateChanged(void) const;
    void m_OnDeviceConfigModeChanged(void) const;
-   stw_types::sint32 GetBitRateValue(stw_types::uint32 & oru32_Value) const;
+   stw_types::sint32 m_GetBitRateValue(stw_types::uint32 & oru32_Value) const;
 
    void m_AssignmentConnect(const stw_types::uint32 ou32_NodeIndex, const QString & orc_SerialNumber) const;
    void m_AssignmentDisconnect(const stw_types::uint32 ou32_NodeIndex, const QString & orc_SerialNumber) const;

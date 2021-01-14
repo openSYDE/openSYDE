@@ -128,7 +128,6 @@ void C_SebUnoSetupStyleCommand::m_Restore(const QMap<uint64, C_PuiBsTemporaryDat
          C_GiBiBoundary * pc_Boundary;
          C_GiBiTextElement * pc_TextElement;
          //Line arrow
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          pc_Arrow = dynamic_cast<C_GiBiArrow *>(*c_ItItem);
          if (pc_Arrow != NULL)
          {
@@ -149,7 +148,6 @@ void C_SebUnoSetupStyleCommand::m_Restore(const QMap<uint64, C_PuiBsTemporaryDat
             }
          }
          //Boundary
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          pc_Boundary = dynamic_cast<C_GiBiBoundary *>(*c_ItItem);
          if (pc_Boundary != NULL)
          {
@@ -175,7 +173,6 @@ void C_SebUnoSetupStyleCommand::m_Restore(const QMap<uint64, C_PuiBsTemporaryDat
             }
          }
          //TextElement
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          pc_TextElement = dynamic_cast<C_GiBiTextElement *>(*c_ItItem);
          if (pc_TextElement != NULL)
          {
@@ -226,7 +223,6 @@ void C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(const std::vector<QGraph
            ++c_ItItem)
       {
          //Line arrow
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          pc_Arrow = dynamic_cast<C_GiBiArrow *>(*c_ItItem);
          if (pc_Arrow != NULL)
          {
@@ -247,7 +243,6 @@ void C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(const std::vector<QGraph
             }
          }
          //Boundary
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          pc_Boundary = dynamic_cast<C_GiBiBoundary *>(*c_ItItem);
          if (pc_Boundary != NULL)
          {
@@ -274,7 +269,6 @@ void C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(const std::vector<QGraph
             }
          }
          //TextElement
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          pc_TextElement = dynamic_cast<C_GiBiTextElement *>(*c_ItItem);
          if (pc_TextElement != NULL)
          {
@@ -301,5 +295,4 @@ void C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(const std::vector<QGraph
          }
       }
    }
-   //lint -e{429} Never took ownership of input parameter
-}
+}  //lint !e429  //Never took ownership of input parameter

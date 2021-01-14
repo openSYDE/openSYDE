@@ -60,7 +60,7 @@ C_ImpCodeGenerationReportWidget::C_ImpCodeGenerationReportWidget(
    this->mrc_ParentDialog.SetWidget(this);
 
    // set main title
-   this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("Code Generation")));
+   this->mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("Code Generation")));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Report"));
 
    // connects
@@ -108,7 +108,7 @@ const
 
       // section title
       c_MessageResultText += "<h4>";
-      c_MessageResultText += QString(C_GtGetText::h_GetText("\n%1, Data Block \"%2\"")).
+      c_MessageResultText += static_cast<QString>(C_GtGetText::h_GetText("\n%1, Data Block \"%2\"")).
                              arg(rc_ReportData.c_NodeName).arg(rc_ReportData.c_AppName);
       c_MessageResultText += "</h4>";
 

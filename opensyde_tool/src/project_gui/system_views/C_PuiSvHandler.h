@@ -110,7 +110,6 @@ public:
                                                               const stw_types::uint32 ou32_LastKnownCrc);
 
    //Add
-   void AddLastKnownHalcCrc(const C_PuiSvDbNodeDataPoolListElementId & orc_Id, const stw_types::uint32 ou32_Crc);
    void AddView(const C_PuiSvData & orc_View, const bool oq_AutoAdaptName, const bool oq_AutoAdaptContent);
    stw_types::sint32 SetView(const stw_types::uint32 ou32_Index, const C_PuiSvData & orc_View);
    stw_types::sint32 InsertView(const stw_types::uint32 ou32_Index, const C_PuiSvData & orc_View,
@@ -228,6 +227,7 @@ public:
                                              const stw_types::uint32 ou32_NodeIndex,
                                              stw_types::uint32 & oru32_Crc) const;
    static QString h_GetNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id);
+   static QString h_GetShortNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id);
    bool CheckBusDisabled(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_BusIndex) const;
    stw_types::sint32 ClearViewDashboardParamDataPoolElements(const stw_types::uint32 ou32_ViewIndex,
                                                              const stw_types::uint32 ou32_DashboardIndex,
@@ -246,6 +246,7 @@ protected:
 
    stw_types::sint32 m_LoadFromFile(const QString & orc_Path,
                                     const std::vector<stw_opensyde_core::C_OSCNode> & orc_OSCNodes);
+   void m_AddLastKnownHalcCrc(const C_PuiSvDbNodeDataPoolListElementId & orc_Id, const stw_types::uint32 ou32_Crc);
 
    //Avoid call (protected access for test)
    explicit C_PuiSvHandler(QObject * const opc_Parent = NULL);
@@ -326,7 +327,6 @@ private:
    void m_OnSyncClear(void);
 
    //Other
-   static QString mh_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id);
    stw_types::uint32 m_CalcHashSystemViews(void) const;
    void m_FixInvalidRailConfig(void);
    std::map<stw_scl::C_SCLString, bool> m_GetExistingViewNames(void) const;

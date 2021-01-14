@@ -15,6 +15,7 @@
 #include <QListWidget>
 
 #include "stwtypes.h"
+#include "C_OgeCbxToolTipBase.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
@@ -24,7 +25,7 @@ namespace stw_opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgeCbxMultiSelect :
-   public QComboBox
+   public C_OgeCbxToolTipBase
 {
    Q_OBJECT
 
@@ -44,6 +45,8 @@ public:
    virtual void showPopup();
    virtual void hidePopup();
 
+   void SelectItem(const stw_types::uint32 u32_Index);
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 Q_SIGNALS:
@@ -52,18 +55,14 @@ Q_SIGNALS:
 
 protected:
    // custom paint
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
-   //lint -restore
+   virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
 
 private:
    //Avoid call
    C_OgeCbxMultiSelect(const C_OgeCbxMultiSelect &);
    C_OgeCbxMultiSelect & operator =(const C_OgeCbxMultiSelect &);
 
-   // lower/upper screen bound
-   stw_types::uint32 mu32_Screenbound;
    // hold the main display text
    QString mc_DisplayText;
    // popup frame
@@ -71,8 +70,12 @@ private:
    // multi selection list in the popup frame
    QListWidget * mpc_ListWidget;
 
+   bool mq_IsShown;
+
    // react on changes of the item checkbox
    void m_ScanItemSelect(const QListWidgetItem * const opc_Item);
+   void m_UpdateDisplayName(void);
+   void m_ListWidgetItemClicked(const QModelIndex & orc_ModelIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

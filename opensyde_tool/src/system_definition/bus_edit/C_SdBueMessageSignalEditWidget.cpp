@@ -383,6 +383,24 @@ void C_SdBueMessageSignalEditWidget::RefreshColors(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect update signals for fields which signal changes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalEditWidget::ConnectAllChanges(void)
+{
+   this->mpc_Ui->pc_MsgPropertiesWidget->ConnectAllChanges();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect update signals for fields which signal changes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalEditWidget::DisconnectAllChanges(void)
+{
+   this->mpc_Ui->pc_MsgPropertiesWidget->DisconnectAllChanges();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten show event slot
 
    Here: Load splitter position
@@ -407,7 +425,7 @@ void C_SdBueMessageSignalEditWidget::showEvent(QShowEvent * const opc_Event)
 void C_SdBueMessageSignalEditWidget::m_OnMessageIdChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectMessage(orc_MessageId);
-   Q_EMIT this->SigMessageIdChanged();
+   Q_EMIT (this->SigMessageIdChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -416,7 +434,7 @@ void C_SdBueMessageSignalEditWidget::m_OnMessageIdChange(const C_OSCCanMessageId
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnMessageNameChange(void)
 {
-   Q_EMIT this->SigMessageNameChanged();
+   Q_EMIT (this->SigMessageNameChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

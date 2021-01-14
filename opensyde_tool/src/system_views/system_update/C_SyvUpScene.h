@@ -69,10 +69,7 @@ protected:
                                    const stw_types::float64 & orf64_Width, const stw_types::float64 & orf64_Height,
                                    QGraphicsItem * const opc_Parent) override;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
-   //lint -restore
 
    virtual void m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem);
 
@@ -81,9 +78,9 @@ private:
 
    //Avoid call
    C_SyvUpScene(const C_SyvUpScene &);
-   C_SyvUpScene & operator =(const C_SyvUpScene &);
+   C_SyvUpScene & operator =(const C_SyvUpScene &); //lint !e1511 //we want to hide the base func.
 
-   stw_types::sint32 m_StartProgressAnimationBusses(const stw_opensyde_gui_logic::C_SyvRoRouteCalculation & rc_Calc,
+   stw_types::sint32 m_StartProgressAnimationBusses(const stw_opensyde_gui_logic::C_SyvRoRouteCalculation & orc_Calc,
                                                     const stw_types::uint32 ou32_NodeIndex) const;
    static stw_types::sint32 mh_GetAnimationPath(const QPointF & orc_PointStart, const QPointF & orc_PointEnd,
                                                 const std::vector<QPointF> & orc_UIInteractionPoints,

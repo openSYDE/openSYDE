@@ -52,10 +52,7 @@ Q_SIGNALS:
    void SigSavedAsNew(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_CamTitleBarWidget * mpc_Ui;

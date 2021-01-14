@@ -29,6 +29,7 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_UsHandler.h"
 #include "C_CamUti.h"
+#include "constants.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
@@ -55,7 +56,7 @@ using namespace stw_errors;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseWidget::C_CamMosDatabaseWidget(QWidget * const opc_Parent) :
@@ -103,7 +104,7 @@ void C_CamMosDatabaseWidget::LoadUserSettings(void) const
 
    This always correlates to first entry in list.
 
-   \param[in] os32_Result Result of DBC file load
+   \param[in]  os32_Result    Result of DBC file load
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::OnLoadFinishedDbc(const sint32 os32_Result)
@@ -126,8 +127,8 @@ void C_CamMosDatabaseWidget::OnLoadFinishedDbc(const sint32 os32_Result)
 
    This always correlates to first entry in list.
 
-   \param[in] os32_Result Result of openSYDE system definition file load
-   \param[in] orc_Busses  Buses found in system definition
+   \param[in]  os32_Result    Result of openSYDE system definition file load
+   \param[in]  orc_Busses     Buses found in system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const sint32 os32_Result,
@@ -178,8 +179,7 @@ void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const sint32 os32_Result,
             {
                c_New->HideOverlay();
             }
-            //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-         }
+         } //lint !e429  no memory leak because of the parent pc_Dialog and the Qt memory management
 
          this->m_LoadFinishedGeneric(os32_Result);
       }
@@ -189,8 +189,8 @@ void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const sint32 os32_Result,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot for result of openSYDE bus selection.
 
-   \param[in] orc_PathSystemDefinition system definition identifier (i.e. path)
-   \param[in] os32_Result              result of bus selection
+   \param[in]  orc_PathSystemDefinition   system definition identifier (i.e. path)
+   \param[in]  os32_Result                result of bus selection
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::OnSigOsySysDefBusResult(const QString & orc_PathSystemDefinition, const sint32 os32_Result)
@@ -235,7 +235,7 @@ void C_CamMosDatabaseWidget::OnSigOsySysDefBusResult(const QString & orc_PathSys
       }
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eWARNING);
       c_Message.SetHeading(C_GtGetText::h_GetText("Bus Selection"));
-      c_Message.SetDescription(QString(C_GtGetText::h_GetText(
+      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
                                           "An error occurred on bus that was selected for database %1. "
                                           "Returned to previous bus.")).arg(
                                   orc_PathSystemDefinition));
@@ -246,7 +246,7 @@ void C_CamMosDatabaseWidget::OnSigOsySysDefBusResult(const QString & orc_PathSys
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
 
       c_Message.SetHeading(C_GtGetText::h_GetText("Bus Selection"));
-      c_Message.SetDescription(QString(
+      c_Message.SetDescription(static_cast<QString>(
                                   C_GtGetText::h_GetText(
                                      "An unknown error occurred on bus that was selected for database %1. "
                                      "Behavior of used bus undefined and can be displayed wrong.")).
@@ -258,7 +258,7 @@ void C_CamMosDatabaseWidget::OnSigOsySysDefBusResult(const QString & orc_PathSys
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot for communication change signal.
 
-   \param[in] oq_Online Online/offline flag
+   \param[in]  oq_Online   Online/offline flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::OnCommunicationStarted(const bool oq_Online)
@@ -269,7 +269,7 @@ void C_CamMosDatabaseWidget::OnCommunicationStarted(const bool oq_Online)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Prepare widget for popup view in collapsed state resp. expanded view.
 
-   \param[in] oq_Expand true: prepare for expanded, false: prepare for collapsed popup
+   \param[in]  oq_Expand   true: prepare for expanded, false: prepare for collapsed popup
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::PrepareForExpanded(const bool oq_Expand) const
@@ -317,7 +317,7 @@ void C_CamMosDatabaseWidget::OnSigSavedAsNew(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add dropped database. Forwarded from main window.
 
-   \param[in] orc_Path path of database file
+   \param[in]  orc_Path    path of database file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::AddDroppedDatabase(const QString & orc_Path)
@@ -442,7 +442,7 @@ void C_CamMosDatabaseWidget::m_LoadConfig(void)
    Counterpart of m_AddDatabaseWidget.
    Does no external data handling.
 
-   \param[in] opc_ItemWidget Database widget to remove
+   \param[in]  opc_ItemWidget    Database widget to remove
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_RemoveDatabaseWidget(C_CamMosDatabaseItemWidget * const opc_ItemWidget) const
@@ -495,7 +495,7 @@ void C_CamMosDatabaseWidget::m_OnAddClicked()
    Counterpart of m_RemoveDatabaseWidget.
    Does no external data handling.
 
-   \param[in] orc_DatabaseData database data
+   \param[in]  orc_DatabaseData  database data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_AddDatabaseWidget(const C_CamProDatabaseData & orc_DatabaseData)
@@ -526,13 +526,15 @@ void C_CamMosDatabaseWidget::m_AddDatabaseWidget(const C_CamProDatabaseData & or
            this, &C_CamMosDatabaseWidget::m_UpdateDatabasePath);
    connect(pc_NewItem, &C_CamMosDatabaseItemWidget::SigUpdateDatabaseOsySysdefBus,
            this, &C_CamMosDatabaseWidget::m_UpdateDatabaseOsySysDefBus);
+   connect(pc_NewItem, &C_CamMosDatabaseItemWidget::SigNotifyMissingDataBase,
+           this, &C_CamMosDatabaseWidget::SigNotifyMissingDataBase);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Remove existing database (widget and data).
 
-   \param[in,out] opc_ItemWidget Item widget
-   \param[in]     oq_AskUser     Ask user
+   \param[in,out]  opc_ItemWidget   Item widget
+   \param[in]      oq_AskUser       Ask user
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_RemoveDatabase(C_CamMosDatabaseItemWidget * const opc_ItemWidget, const bool oq_AskUser)
@@ -547,7 +549,7 @@ void C_CamMosDatabaseWidget::m_RemoveDatabase(C_CamMosDatabaseItemWidget * const
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
 
       C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(
-         C_CamUti::h_GetAbsPathFromProj(opc_ItemWidget->GetDatabaseData().c_Name), c_Description, c_Details);
+         opc_ItemWidget->GetDatabaseData().c_Name, c_Description, c_Details);
       c_Message.SetHeading(C_GtGetText::h_GetText("Database Delete"));
       c_Message.SetDescription(c_Description);
       c_Message.SetDetails(c_Details);
@@ -607,27 +609,65 @@ void C_CamMosDatabaseWidget::m_RemoveDatabase(C_CamMosDatabaseItemWidget * const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Activate or deactivate given filter.
 
-   \param[in] opc_ItemWidget Filter widget to select
-   \param[in] orq_Enable     True: activate filter, false: deactivate filter
+   \param[in]  opc_ItemWidget    Filter widget to select
+   \param[in]  orq_Enable        True: activate filter, false: deactivate filter
+
+   \return
+   Resulting state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseWidget::m_ActivateDatabase(const C_CamMosDatabaseItemWidget * const opc_ItemWidget,
+bool C_CamMosDatabaseWidget::m_ActivateDatabase(const C_CamMosDatabaseItemWidget * const opc_ItemWidget,
                                                 const bool & orq_Enable)
 {
+   bool q_State = orq_Enable;
    const sint32 s32_Index = this->m_GetIndexFromWidget(opc_ItemWidget);
+   bool q_Continue = true;
 
-   // index is -1 if item widget is NULL which can not happen
-   tgl_assert(s32_Index >= 0);
-   if (s32_Index >= 0)
+   if ((orq_Enable == false) && (opc_ItemWidget != NULL))
    {
-      C_CamProHandler::h_GetInstance()->SetDatabaseEnabled(s32_Index, orq_Enable);
-   }
+      QString c_Details;
+      QString c_TmpDescription;
+      // ask user
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
 
-   // activate database
-   // if database is not yet loaded this is a no-op and the signal gets emitted again as soon as load finished
-   Q_EMIT (this->SigActivateDatabase(
-              C_CamUti::h_GetAbsPathFromProj(opc_ItemWidget->GetDatabaseData().c_Name),
-              opc_ItemWidget->GetDatabaseData().c_Name, orq_Enable));
+      C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(
+         opc_ItemWidget->GetDatabaseData().c_Name, c_TmpDescription, c_Details);
+      if (c_TmpDescription.isEmpty() == false)
+      {
+         QString c_Description = C_GtGetText::h_GetText("Do you really want to disable this database?");
+         c_Description.append(c_TmpDescription);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Database Disable"));
+         c_Message.SetDescription(c_Description);
+         c_Message.SetDetails(c_Details);
+         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Disable"));
+         c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+
+         if (c_Message.Execute() != C_OgeWiCustomMessage::eOK)
+         {
+            q_Continue = false;
+            q_State = !orq_Enable;
+         }
+      }
+   }
+   if (q_Continue)
+   {
+      // index is -1 if item widget is NULL which can not happen
+      tgl_assert(s32_Index >= 0);
+      if (s32_Index >= 0)
+      {
+         C_CamProHandler::h_GetInstance()->SetDatabaseEnabled(s32_Index, orq_Enable);
+      }
+
+      // activate database
+      // if database is not yet loaded this is a no-op and the signal gets emitted again as soon as load finished
+      if (opc_ItemWidget != NULL)
+      {
+         Q_EMIT (this->SigActivateDatabase(
+                    C_CamUti::h_GetAbsPathFromProj(opc_ItemWidget->GetDatabaseData().c_Name),
+                    opc_ItemWidget->GetDatabaseData().c_Name, orq_Enable));
+      }
+   }
+   return q_State;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -635,9 +675,9 @@ void C_CamMosDatabaseWidget::m_ActivateDatabase(const C_CamMosDatabaseItemWidget
 
    Slot for signal from item widget on browse finished.
 
-   \param[in] opc_ItemWidget widget of database item
-   \param[in] orc_Database   database data
-   \param[in] oq_IsUpdate    Flag if action is used to update
+   \param[in]  opc_ItemWidget    widget of database item
+   \param[in]  orc_Database      database data
+   \param[in]  oq_IsUpdate       Flag if action is used to update
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_UpdateDatabasePath(C_CamMosDatabaseItemWidget * const opc_ItemWidget,
@@ -669,14 +709,15 @@ void C_CamMosDatabaseWidget::m_UpdateDatabasePath(C_CamMosDatabaseItemWidget * c
 
    Slot for bus editing finished.
 
-   \param[in] opc_ItemWidget widget of database item
-   \param[in] os32_BusIndex  bus index
+   \param[in]  opc_ItemWidget    widget of database item
+   \param[in]  os32_BusIndex     bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_UpdateDatabaseOsySysDefBus(const C_CamMosDatabaseItemWidget * const opc_ItemWidget,
                                                           const sint32 os32_BusIndex)
 {
    Q_EMIT (this->SigSetDatabaseOsySysDefBus(C_CamUti::h_GetAbsPathFromProj(opc_ItemWidget->GetDatabaseData().c_Name),
+                                            opc_ItemWidget->GetDatabaseData().c_Name,
                                             os32_BusIndex));
    // note: data handling is done later after another signal was received
 }
@@ -684,7 +725,7 @@ void C_CamMosDatabaseWidget::m_UpdateDatabaseOsySysDefBus(const C_CamMosDatabase
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data handling index of database from database widget pointer.
 
-   \param[in] opc_ItemWidget pointer to database widget
+   \param[in]  opc_ItemWidget    pointer to database widget
 
    \return
    index of database in data handling
@@ -718,7 +759,7 @@ sint32 C_CamMosDatabaseWidget::m_GetIndexFromWidget(const C_CamMosDatabaseItemWi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add database to loading queue and trigger loading start if queue was empty before.
 
-   \param[in] opc_ItemWidget pointer to database widget
+   \param[in]  opc_ItemWidget    pointer to database widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_AddToLoadingQueue(C_CamMosDatabaseItemWidget * const opc_ItemWidget)
@@ -735,8 +776,7 @@ void C_CamMosDatabaseWidget::m_AddToLoadingQueue(C_CamMosDatabaseItemWidget * co
          this->m_CheckAndLoadDatabase();
       }
    }
-   //lint -e{429}  no memory leak because of remove handling of items
-}
+} //lint !e429  no memory leak because of remove handling of items
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Start loading next database.
@@ -793,7 +833,7 @@ void C_CamMosDatabaseWidget::m_CheckAndLoadDatabase(void)
 
    Generic because it does not depend on database type.
 
-   \param[in] os32_ErrorCode error code of loading
+   \param[in]  os32_ErrorCode    error code of loading
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_LoadFinishedGeneric(const sint32 os32_ErrorCode)
@@ -852,13 +892,13 @@ void C_CamMosDatabaseWidget::m_OnFileCheckTimeout()
    }
 
    // time till next check can be greater than time till first check
-   this->mc_Timer.setInterval(3000);
+   this->mc_Timer.setInterval(mu32_FILE_CHECK_INTERVAL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Start or stop file check timer.
 
-   \param[in] oq_Active true: start timer, false: stop timer
+   \param[in]  oq_Active   true: start timer, false: stop timer
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_StartCheckTimer(const bool oq_Active)
@@ -876,7 +916,7 @@ void C_CamMosDatabaseWidget::m_StartCheckTimer(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot of expand signal.
 
-   \param[in] oq_Expand true: expand; false: collapse
+   \param[in]  oq_Expand   true: expand; false: collapse
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_OnExpand(const bool oq_Expand) const
@@ -892,5 +932,5 @@ void C_CamMosDatabaseWidget::m_OnExpand(const bool oq_Expand) const
 void C_CamMosDatabaseWidget::m_UpdateTitleDatabaseCount(void) const
 {
    this->mpc_Ui->pc_WiHeader->SetTitle(
-      QString(C_GtGetText::h_GetText("Database (%1)")).arg(this->mc_Entries.size()));
+      static_cast<QString>(C_GtGetText::h_GetText("Database (%1)")).arg(this->mc_Entries.size()));
 }

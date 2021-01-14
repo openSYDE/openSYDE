@@ -55,7 +55,7 @@ private:
 
    //Avoid call
    C_GiSvDaSliderBase(const C_GiSvDaSliderBase &);
-   C_GiSvDaSliderBase & operator =(const C_GiSvDaSliderBase &);
+   C_GiSvDaSliderBase & operator =(const C_GiSvDaSliderBase &); //lint !e1511 //we want to hide the base func.
 
    void m_UpdateStaticValues(void);
    bool m_IsOnChange(void) const;

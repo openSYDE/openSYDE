@@ -64,7 +64,7 @@ C_GiSvNodeSyvSetup::C_GiSvNodeSyvSetup(const uint32 ou32_ViewIndex, const sint32
 {
    this->m_InitCheckBox();
 
-   this->mc_DefaultCursor = QCursor(Qt::ArrowCursor);
+   this->mc_DefaultCursor = static_cast<QCursor>(Qt::ArrowCursor);
    this->RestoreDefaultCursor();
 }
 
@@ -74,9 +74,9 @@ C_GiSvNodeSyvSetup::C_GiSvNodeSyvSetup(const uint32 ou32_ViewIndex, const sint32
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_CheckBox and the Qt memory management
 C_GiSvNodeSyvSetup::~C_GiSvNodeSyvSetup()
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_CheckBox and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

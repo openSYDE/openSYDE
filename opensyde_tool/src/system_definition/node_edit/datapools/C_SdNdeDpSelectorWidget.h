@@ -50,6 +50,7 @@ public:
    bool SetTypeAndNode(const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_Type,
                        const stw_types::uint32 ou32_NodeIndex, const bool oq_UsageViewActive,
                        const bool oq_AddBtnVisible);
+   void SetSelectedDataPool(const stw_types::uint32 ou32_Index) const;
    void SetCurrentDataPoolConflict(const stw_types::sintn osn_DataPoolWidgetIndex, const bool oq_Active);
    void UpdateActualDataPool(void) const;
    void ErrorCheck(void);
@@ -68,13 +69,10 @@ Q_SIGNALS:
    void SigNoDataPoolSelected(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void focusInEvent(QFocusEvent * const opc_Event) override;
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

@@ -157,6 +157,33 @@ sint32 C_OSCHalcConfigDomain::ResetChannelToDefault(const uint32 ou32_ChannelInd
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reset channel use case
+
+   \param[in]  ou32_ChannelIndex    Channel index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfigDomain::ResetChannelUseCase(const uint32 ou32_ChannelIndex)
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   if ((ou32_ChannelIndex < this->c_ChannelConfigs.size()) && (ou32_ChannelIndex < this->c_Channels.size()))
+   {
+      C_OSCHalcConfigChannel & rc_Config = this->c_ChannelConfigs[ou32_ChannelIndex];
+      rc_Config.u32_UseCaseIndex = this->m_InitChannelUseCase(ou32_ChannelIndex);
+   }
+   else
+   {
+      s32_Return = C_RANGE;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Reset domain configuration to default
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -363,25 +390,43 @@ C_OSCHalcConfigChannel C_OSCHalcConfigDomain::m_InitChannelConfig(const uint32 o
          C_OSCHalcConfigDomain::mh_InitConfigFromName(this->c_SingularName + "_" +
                                                       stw_scl::C_SCLString::IntToStr(ou32_ChannelIndex + 1));
 
-      //Defaults
-      for (uint32 u32_ItUseCase = 0UL; u32_ItUseCase < this->c_ChannelUseCases.size(); ++u32_ItUseCase)
-      {
-         const C_OSCHalcDefChannelUseCase & rc_UseCase = this->c_ChannelUseCases[u32_ItUseCase];
-         for (uint32 u32_ItDefault = 0UL; u32_ItDefault < rc_UseCase.c_DefaultChannels.size(); ++u32_ItDefault)
-         {
-            if (rc_UseCase.c_DefaultChannels[u32_ItDefault] == ou32_ChannelIndex)
-            {
-               c_NewChannel.u32_UseCaseIndex = u32_ItUseCase;
-               break;
-            }
-         }
-      }
+      //Default use case
+      c_NewChannel.u32_UseCaseIndex = this->m_InitChannelUseCase(ou32_ChannelIndex);
 
       //Add parameters
       C_OSCHalcConfigDomain::mh_AddParameters(this->c_ChannelValues.c_Parameters, c_NewChannel.c_Parameters);
    }
 
    return c_NewChannel;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize channel use case
+
+   \param[in]  ou32_ChannelIndex    Channel index
+
+   \return
+   Use case index (0 if no default was found)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCHalcConfigDomain::m_InitChannelUseCase(const uint32 ou32_ChannelIndex)
+{
+   uint32 u32_UseCaseIndex = 0;
+
+   for (uint32 u32_ItUseCase = 0UL; u32_ItUseCase < this->c_ChannelUseCases.size(); ++u32_ItUseCase)
+   {
+      const C_OSCHalcDefChannelUseCase & rc_UseCase = this->c_ChannelUseCases[u32_ItUseCase];
+      for (uint32 u32_ItDefault = 0UL; u32_ItDefault < rc_UseCase.c_DefaultChannels.size(); ++u32_ItDefault)
+      {
+         if (rc_UseCase.c_DefaultChannels[u32_ItDefault] == ou32_ChannelIndex)
+         {
+            u32_UseCaseIndex = u32_ItUseCase;
+            break;
+         }
+      }
+   }
+
+   return u32_UseCaseIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

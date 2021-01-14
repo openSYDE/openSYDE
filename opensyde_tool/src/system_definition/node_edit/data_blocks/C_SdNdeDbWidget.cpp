@@ -82,7 +82,6 @@ C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_
    //Remove debug string
    this->mpc_Ui->pc_PushButtonEdit->setText("");
    this->mpc_Ui->pc_PushButtonDelete->setText("");
-   this->mpc_Ui->pc_PushButtonGenerateCode->setText("");
    this->mpc_Ui->pc_PushButtonOpenIde->setText("");
    this->mpc_Ui->pc_LabelErrorIcon->setText("");
 
@@ -102,12 +101,6 @@ C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_
                                                      "://images/IconCloseClicked.svg",
                                                      "://images/IconCloseDisabled.svg");
 
-   this->mpc_Ui->pc_PushButtonGenerateCode->setIconSize(mc_ICON_SIZE_24);
-   this->mpc_Ui->pc_PushButtonGenerateCode->SetCustomIcons("://images/system_definition/IconGenerateCode.svg",
-                                                           "://images/system_definition/IconGenerateCode.svg",
-                                                           "://images/system_definition/IconGenerateCode.svg",
-                                                           "://images/system_definition/IconGenerateCode.svg");
-
    this->mpc_Ui->pc_PushButtonOpenIde->setIconSize(mc_ICON_SIZE_24);
    this->mpc_Ui->pc_PushButtonOpenIde->SetCustomIcons("://images/system_definition/IconOpenExternalTool.svg",
                                                       "://images/system_definition/IconOpenExternalTool.svg",
@@ -120,8 +113,6 @@ C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_
    //Visual connections
    connect(this->mpc_Ui->pc_PushButtonEdit, &QPushButton::clicked, this, &C_SdNdeDbWidget::m_OnEdit);
    connect(this->mpc_Ui->pc_PushButtonDelete, &QPushButton::clicked, this, &C_SdNdeDbWidget::m_OnDelete);
-   connect(this->mpc_Ui->pc_PushButtonGenerateCode, &QPushButton::clicked, this,
-           &C_SdNdeDbWidget::m_OnCodeExportClicked);
    connect(this->mpc_Ui->pc_PushButtonOpenIde, &QPushButton::clicked, this, &C_SdNdeDbWidget::m_OnOpenIdeClicked);
 }
 
@@ -149,7 +140,7 @@ void C_SdNdeDbWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelDataPoolDescription->setText(C_GtGetText::h_GetText("Owned Datapools"));
 
    //Update application index
-   this->mpc_Ui->pc_LabelNamePrefix->setText(QString(C_GtGetText::h_GetText("#%1 -")).arg(this->mu32_ApplicationIndex +
+   this->mpc_Ui->pc_LabelNamePrefix->setText(static_cast<QString>(C_GtGetText::h_GetText("#%1 -")).arg(this->mu32_ApplicationIndex +
                                                                                           1));
 
    //Tool tips
@@ -168,16 +159,6 @@ void C_SdNdeDbWidget::InitStaticNames(void) const
                                                                     C_GtGetText::h_GetText(
                                                                        "List of all Datapools which are mapped to this programmable application."
                                                                        "\n(Relevant for code generation)"));
-
-   this->mpc_Ui->pc_PushButtonGenerateCode->SetToolTipInformation(C_GtGetText::h_GetText("Generate Code"),
-                                                                  C_GtGetText::h_GetText(
-                                                                     "Generate Code for this programming application."
-                                                                     "\n - openSYDE server initialization wrapper"
-                                                                     "\n   Create a .c and .h file providing initialization structures for the OSS DPD and DPH init functions."
-                                                                     "\n - COMM stack definition"
-                                                                     "\n   Create a .c and .h file providing entire communication stack configuration."
-                                                                     "\n - Datapools"
-                                                                     "\n   Generate code for Datapool settings of an openSYDE node."));
 
    this->mpc_Ui->pc_PushButtonOpenIde->SetToolTipInformation(C_GtGetText::h_GetText("Open IDE"),
                                                              C_GtGetText::h_GetText(
@@ -239,7 +220,7 @@ void C_SdNdeDbWidget::UpdateDataPools(void)
                                                                              this->mu32_NodeIndex, u32_ItDataPool));
                   }
                   c_Temp += ")";
-                  c_Text += QString(C_Uti::h_GetLink(c_Temp, mc_STYLE_GUIDE_COLOR_6, QString::number(u32_ItDataPool)));
+                  c_Text += static_cast<QString>(C_Uti::h_GetLink(c_Temp, mc_STYLE_GUIDE_COLOR_6, QString::number(u32_ItDataPool)));
                }
             }
          }
@@ -263,7 +244,7 @@ void C_SdNdeDbWidget::UpdateDataPools(void)
       }
 
       //update owned dp count
-      this->mpc_Ui->pc_LabelDataPoolDescription->setText(QString(C_GtGetText::h_GetText("Owned Datapools (%1)")).arg(
+      this->mpc_Ui->pc_LabelDataPoolDescription->setText(static_cast<QString>(C_GtGetText::h_GetText("Owned Datapools (%1)")).arg(
                                                             u8_OwnedDpCounter));
    }
    //Conditional visibility for empty data pool label
@@ -399,7 +380,6 @@ void C_SdNdeDbWidget::m_HandleType(void) const
    this->mpc_Ui->pc_ScrollAreaDataPool->setVisible(q_Visible);
 
    //Project
-   this->mpc_Ui->pc_PushButtonGenerateCode->setVisible(q_Visible);
    this->mpc_Ui->pc_PushButtonOpenIde->setVisible(q_Visible);
 }
 
@@ -450,6 +430,8 @@ void C_SdNdeDbWidget::m_ShowProperties(void)
          tgl_assert(C_PuiSdHandler::h_GetInstance()->SetApplication(this->mu32_NodeIndex, this->mu32_ApplicationIndex,
                                                                     c_Copy) == C_NO_ERR);
          pc_Dialog->HandleDataPools(this->mu32_ApplicationIndex);
+         // Inform about change (for Datapool tab tooltips)
+         Q_EMIT (this->SigOwnedDataPoolsChanged());
          //Reload all
          this->m_LoadData();
       }
@@ -458,8 +440,7 @@ void C_SdNdeDbWidget::m_ShowProperties(void)
       {
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -610,27 +591,6 @@ uint32 C_SdNdeDbWidget::m_CountAllAssociatedDataPools(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   trigger code export
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbWidget::m_OnCodeExportClicked(void)
-{
-   std::vector<stw_types::uint32> c_Node;
-   std::vector<stw_types::uint32> c_Application;
-   std::vector<std::vector<stw_types::uint32> > c_Applications;
-
-   if (C_ImpUtil::h_CheckProjForCodeGeneration(this) == true)
-   {
-      c_Node.push_back(this->mu32_NodeIndex);               // c_Node = [mu32_NodeIndex] (1-length-vector)
-      c_Application.push_back(this->mu32_ApplicationIndex); // c_Application = [mu32_ApplicationIndex] (1-length-vector)
-      c_Applications.push_back(c_Application);              // c_Applications = [[mu32_ApplicationIndex]] (vector of
-                                                            // lenght 1, where the only entry is another vector
-                                                            // of lenght 1)
-      C_ImpUtil::h_ExportCode(c_Node, c_Applications, this);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Trigger open IDE
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -642,9 +602,9 @@ void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
    if (pc_Application != NULL)
    {
       const QString c_IDECall =
-         QString(C_PuiUtil::h_ResolvePlaceholderVariables(
-                    pc_Application->c_IDECall.c_str(),
-                    C_PuiUtil::h_GetResolvedAbsPathFromProject(pc_Application->c_ProjectPath.c_str())));
+         static_cast<QString>(C_PuiUtil::h_ResolvePlaceholderVariables(
+                                 pc_Application->c_IDECall.c_str(),
+                                 C_PuiUtil::h_GetResolvedAbsPathFromProject(pc_Application->c_ProjectPath.c_str())));
 
       if (c_IDECall == "")
       {
@@ -661,7 +621,8 @@ void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
                                            C_GtGetText::h_GetText("Could not start IDE. Possible reasons: "
                                                                   "Insufficient permissions or missing executable."));
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
-         c_MessageBox.SetDetails(QString(C_GtGetText::h_GetText("The following call returned an error: \n%1")).
+         c_MessageBox.SetDetails(static_cast<QString>(C_GtGetText::h_GetText(
+                                                         "The following call returned an error: \n%1")).
                                  arg(c_IDECall));
          c_MessageBox.SetCustomMinHeight(200, 270);
          c_MessageBox.Execute();

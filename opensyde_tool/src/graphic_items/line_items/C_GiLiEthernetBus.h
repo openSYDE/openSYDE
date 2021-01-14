@@ -41,7 +41,7 @@ public:
 private:
    //Avoid call
    C_GiLiEthernetBus(const C_GiLiEthernetBus &);
-   C_GiLiEthernetBus & operator =(const C_GiLiEthernetBus &);
+   C_GiLiEthernetBus & operator =(const C_GiLiEthernetBus &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

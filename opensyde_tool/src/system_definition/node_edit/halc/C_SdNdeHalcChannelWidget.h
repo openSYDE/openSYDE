@@ -61,8 +61,7 @@ private:
    stw_types::uint32 mu32_ChannelIndex;
    bool mq_UseChannelIndex;
    std::vector<stw_types::uint32> mc_CbxUseCaseIndices;
-   stw_types::uint32 mu32_Value;
-   stw_types::sint32 ms32_OldUseCaseIndex;
+   stw_types::sint32 ms32_LastComboboxUseCaseIndex;
 
    //Avoid call
    C_SdNdeHalcChannelWidget(const C_SdNdeHalcChannelWidget &);
@@ -71,29 +70,19 @@ private:
    void m_OnNameEdited(void);
    void m_OnCommentEdited(void);
    void m_OnSafetyToggled(const bool oq_Checked) const;
-   void m_OnBitfieldsChanged (const QString & orc_ItemText, const bool oq_Checked) const;
-   void m_OnBitmarksChanged (const QString & orc_ItemText, const bool oq_Checked) const;
    void m_OnUseCaseChanged(const stw_types::sint32 os32_NewIndex);
    void m_OnLinkedChannelClicked(const QString & orc_LinkedChannelName);
    void m_OnViewDatapoolDetailsClicked(void);
-   stw_types::sint32 m_FindAndSetDefaultUseCase(stw_types::sint32 os32_Return,
-                                                const std::vector<stw_opensyde_core::C_OSCHalcDefChannelUseCase> & orc_DefaultUseCases,
-                                                const stw_types::uint32 & oru32_OldDependentValue) const;
-   stw_types::sint32 m_SetDependentValuesOfNewUseCase(stw_types::sint32 os32_Return, const std::vector<stw_opensyde_core::C_OSCHalcDefChannelUseCase>
-                                                      & orc_DefaultUseCases,
-                                                      const std::vector<stw_types::uint32> & orc_NewDependentValues,
-                                                      const stw_types::uint32 ou32_OldDependentValue,
-                                                      const stw_types::uint32 ou32_UseCaseIndex,
-                                                      const stw_opensyde_core::C_OSCHalcConfigDomain * const opc_Domain)
-   const;
-   void m_SetLinkedSymbolAndChannel(const std::vector<stw_types::uint32> & orc_DependentValues,
-                                    const stw_opensyde_core::C_OSCHalcConfigDomain * opc_Domain) const;
-
-   void m_OnOpenOptionsClicked(void);
+   void m_SetLinkedSymbolAndChannel(const bool oq_IsLinked,
+                                    const std::vector<stw_types::uint32> & orc_LinkedChannelIndices) const;
    void m_LoadChannelData(void);
    void m_EmitUpdateSignal(void);
    void m_ConnectWidgets(const bool oq_Connect);
    void m_CheckName(const QString & orc_NewName) const;
+   bool m_AskUserToContinueLinkingIfNecessary(const bool oq_IsLinkedOld, const bool oq_IsLinkedNew,
+                                              const std::vector<QString> & orc_LinkedChannelNamesOld, const
+                                              std::vector<QString> & orc_LinkedChannelNamesNew,
+                                              const stw_types::uint32 ou32_NewUseCaseIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

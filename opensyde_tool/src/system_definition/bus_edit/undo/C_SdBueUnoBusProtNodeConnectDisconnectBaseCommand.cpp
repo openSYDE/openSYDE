@@ -165,7 +165,7 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DeleteDataPool(void) c
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_UpdateUi(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SdBueComIfDescriptionWidget * const pc_Widget =
       dynamic_cast<C_SdBueComIfDescriptionWidget * const>(this->mpc_Widget);
 

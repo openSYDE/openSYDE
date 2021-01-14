@@ -152,13 +152,14 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
                {
                case eNAME:
                   // Translation: %1 = sequential number, %2 = project name
-                  c_Retval = QString("#%1 - %2").arg(orc_Index.row() + 1).arg(c_ProjectFileInfo.completeBaseName());
+                  c_Retval = static_cast<QString>("#%1 - %2").arg(orc_Index.row() + 1).arg(
+                     c_ProjectFileInfo.completeBaseName());
                   break;
                case eVERSION:
                   c_Retval = rc_RecentProjects.c_Version.c_str();
                   break;
                case ePATH:
-                  c_Retval = C_Uti::h_MinimizePath(QString(rc_RecentFilePaths), c_Font, 535, 12);
+                  c_Retval = C_Uti::h_MinimizePath(static_cast<QString>(rc_RecentFilePaths), c_Font, 535, 12);
                   break;
                default:
                   break;
@@ -185,7 +186,7 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
       {
@@ -227,8 +228,8 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
                c_ProjectFileInfo.setFile(rc_RecentFilePaths);
                QString c_TooltipContent;
                c_TooltipContent =
-                  QString(C_GtGetText::h_GetText("Version: %1 \nAuthor: %2 \nCreated: %3 \n"
-                                                 "Last modified: %4 (by %5) \nUsed openSYDE version: %6")).
+                  static_cast<QString>(C_GtGetText::h_GetText("Version: %1 \nAuthor: %2 \nCreated: %3 \n"
+                                                              "Last modified: %4 (by %5) \nUsed openSYDE version: %6")).
                   arg(rc_RecentProject.c_Version.c_str()).
                   arg(rc_RecentProject.c_Author.c_str()).
                   arg(C_OSCProject::h_GetTimeFormatted(rc_RecentProject.c_CreationTime).c_str()).
@@ -240,8 +241,10 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
                   const uint64 u64_SizeByte = C_PuiProject::h_GetProjectSize(rc_RecentFilePaths);
                   const float64 f64_SizeFloat = std::ceil(static_cast<float64>(u64_SizeByte) / 1024.0);
 
-                  c_TooltipContent.append(QString(C_GtGetText::h_GetText("\nSize: %L1 kB")).arg(static_cast<uint64>(
-                                                                                                   f64_SizeFloat)));
+                  c_TooltipContent.append(
+                     static_cast<QString>(C_GtGetText::h_GetText("\nSize: %L1 kB")).arg(static_cast
+                                                                                        <uint64>(
+                                                                                           f64_SizeFloat)));
                }
                c_TooltipContent.append("\n\n" + rc_RecentFilePaths);
                c_Retval = c_TooltipContent;

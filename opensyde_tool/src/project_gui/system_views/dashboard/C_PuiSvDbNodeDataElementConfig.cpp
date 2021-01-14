@@ -44,6 +44,16 @@ C_PuiSvDbNodeDataElementConfig::C_PuiSvDbNodeDataElementConfig(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   destructor
+
+   clean up ...
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvDbNodeDataElementConfig::~C_PuiSvDbNodeDataElementConfig(void)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.

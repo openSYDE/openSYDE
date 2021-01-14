@@ -100,14 +100,14 @@ void C_SyvUpUpdatePackageListDelegate::paint(QPainter * const opc_Painter, const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update index to paint widget in drag
 
-   \param[in]      s32_Index     Update index for
+   \param[in]      os32_Index    Update index for
    \param[in,out]  opc_Widget    Actual widget which will be moved
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdatePackageListDelegate::StartPaint(const sint32 s32_Index,
+void C_SyvUpUpdatePackageListDelegate::StartPaint(const sint32 os32_Index,
                                                   C_SyvUpUpdatePackageNodeWidget * const opc_Widget)
 {
-   this->ms32_IndexPaint = s32_Index;
+   this->ms32_IndexPaint = os32_Index;
    this->mpc_ActualWidget = opc_Widget;
 }
 

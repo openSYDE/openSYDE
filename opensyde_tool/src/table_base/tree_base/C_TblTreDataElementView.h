@@ -58,12 +58,8 @@ Q_SIGNALS:
    void SigSelectionChanged(const stw_types::sintn osn_Count);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
    virtual void selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected) override;
-
-   //lint -restore
 
 private:
    stw_opensyde_gui_logic::C_TblTreDataElementModel mc_Model;

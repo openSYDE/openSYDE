@@ -77,13 +77,10 @@ Q_SIGNALS:
    void SigEnabledDisabled(bool oq_Connected);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void hideEvent(QHideEvent * const opc_Event) override;
    virtual void showEvent(QShowEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call
@@ -91,7 +88,7 @@ private:
    C_SyvDaDashboardSelectorTabWidget & operator =(const C_SyvDaDashboardSelectorTabWidget &);
 
    void m_WidgetComeBack(C_SyvDaTearOffWidget * const opc_Widget);
-   void m_MakeScreenshot(const stw_types::sint32 s32_Index);
+   void m_MakeScreenshot(const stw_types::sint32 os32_Index);
    void m_InitTabStyle(const stw_types::uint32 ou32_Index, const QString & orc_Name, const QString & orc_Comment,
                        const bool oq_Active, const bool oq_Dark);
    void m_CurrentChanged(const stw_types::sintn osn_CurrentIndex) const;
@@ -109,7 +106,8 @@ private:
    void m_OnPasteAction(void);
    void m_OnDeleteAction(const stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source);
    void m_OnCloseAction(const stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source);
-   stw_types::sint32 GetTabIndex(const stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_DrawingWidget) const;
+   stw_types::sint32 m_GetTabIndex(
+      const stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_DrawingWidget) const;
    void m_OnUndock(const stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source);
    void m_OnEditProperties(stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source);
    void m_TearOffWidget(const stw_types::uint32 ou32_DataIndex, const QPoint & orc_Pos,
@@ -121,8 +119,8 @@ private:
    void m_CopyTab(const stw_types::uint32 ou32_DataIndex) const;
    bool m_EditTab(const stw_types::uint32 & oru32_DataIndex, QString & orc_Name, QString & orc_Comment);
    void m_StoreUserSettings(void);
-   void m_Connect(C_SyvDaDashboardWidget * const opc_Widget);
-   void m_Disconnect(C_SyvDaDashboardWidget * const opc_Widget);
+   void m_Connect(const C_SyvDaDashboardWidget * const opc_Widget) const;
+   void m_Disconnect(const C_SyvDaDashboardWidget * const opc_Widget) const;
    void m_OnTabChanged(const stw_types::sintn osn_Index) const;
 
    stw_opensyde_gui_elements::C_OgePubIconText * mpc_PushButton;

@@ -89,7 +89,6 @@ QWidget * C_SdNdeComIfSettingsTableDelegate::createEditor(QWidget * const opc_Pa
       case C_SdNdeComIfSettingsTableDelegate::E_Columns::eNODEID:
          pc_SpinBox = new C_OgeSpxTableComIf(opc_Parent);
          pc_SpinBox->SetMaximumCustom(u8_Maximum);
-         //lint -e{64,826,918,929,1025,1703}  Qt interface
          connect(pc_SpinBox, static_cast<void (QSpinBox::*)(sintn)>(&QSpinBox::valueChanged), this,
                  &C_SdNdeComIfSettingsTableDelegate::m_CheckValue);
          pc_Retval = pc_SpinBox;
@@ -117,7 +116,7 @@ void C_SdNdeComIfSettingsTableDelegate::setEditorData(QWidget * const opc_Editor
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QSpinBox * const pc_SpinBoxInt = dynamic_cast<QSpinBox * const>(opc_Editor);
 
       switch (orc_Index.column())
@@ -151,7 +150,7 @@ void C_SdNdeComIfSettingsTableDelegate::setModelData(QWidget * const opc_Editor,
 {
    if (((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QSpinBox * const pc_SpinBoxInt = dynamic_cast<QSpinBox * const>(opc_Editor);
 
       switch (orc_Index.column())
@@ -177,7 +176,7 @@ void C_SdNdeComIfSettingsTableDelegate::setModelData(QWidget * const opc_Editor,
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeComIfSettingsTableDelegate::m_CheckValue(const sintn & orsn_Value) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_OgeSpxToolTipBase * const pc_Widget = dynamic_cast<C_OgeSpxToolTipBase * const>(this->sender());
 
    if (pc_Widget != NULL)

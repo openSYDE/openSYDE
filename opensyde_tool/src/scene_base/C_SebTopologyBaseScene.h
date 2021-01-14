@@ -96,7 +96,7 @@ protected:
 private:
    //Avoid call
    C_SebTopologyBaseScene(const C_SebTopologyBaseScene &);
-   C_SebTopologyBaseScene & operator =(const C_SebTopologyBaseScene &);
+   C_SebTopologyBaseScene & operator =(const C_SebTopologyBaseScene &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

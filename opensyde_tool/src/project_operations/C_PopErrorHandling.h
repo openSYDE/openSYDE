@@ -27,10 +27,10 @@ namespace stw_opensyde_gui_logic
 class C_PopErrorHandling
 {
 public:
-   static void mh_ProjectLoadErr(const stw_types::sint32 & ors32_Err, const QString & orc_Path,
-                                 QWidget * const opc_Parent, const stw_types::uint16 ou16_SystemDefinitionVersion);
-   static void mh_ProjectSaveErr(const stw_types::sint32 & ors32_Err, QWidget * const opc_Parent);
-   static void mh_GetTextInitializeErr(const stw_types::sint32 & ors32_Err);
+   static void h_ProjectLoadErr(const stw_types::sint32 & ors32_Err, const QString & orc_Path,
+                                QWidget * const opc_Parent, const stw_types::uint16 ou16_SystemDefinitionVersion);
+   static void h_ProjectSaveErr(const stw_types::sint32 & ors32_Err, QWidget * const opc_Parent);
+   static void h_GetTextInitializeErr(const stw_types::sint32 & ors32_Err);
 
 private:
    C_PopErrorHandling();

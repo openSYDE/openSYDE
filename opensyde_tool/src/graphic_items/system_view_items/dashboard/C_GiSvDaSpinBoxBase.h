@@ -54,7 +54,7 @@ private:
 
    //Avoid call
    C_GiSvDaSpinBoxBase(const C_GiSvDaSpinBoxBase &);
-   C_GiSvDaSpinBoxBase & operator =(const C_GiSvDaSpinBoxBase &);
+   C_GiSvDaSpinBoxBase & operator =(const C_GiSvDaSpinBoxBase &); //lint !e1511 //we want to hide the base func.
 
    void m_UpdateStaticValues(void);
 };

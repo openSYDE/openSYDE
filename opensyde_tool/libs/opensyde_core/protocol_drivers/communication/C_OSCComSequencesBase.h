@@ -70,7 +70,7 @@ protected:
    bool mq_StwFlashloaderDevicesActiveOnLocalBus;
    C_OSCProtocolDriverOsyNode mc_StwFlashloaderDeviceOnLocalBus;
 
-   bool mq_IsNodeReachable(const stw_types::uint32 ou32_NodeIndex) const;
+   bool m_IsNodeReachable(const stw_types::uint32 ou32_NodeIndex) const;
    virtual stw_types::sint32 m_XflReportProgress(const stw_types::uint8 ou8_Progress,
                                                  const stw_scl::C_SCLString & orc_Text) = 0;
 

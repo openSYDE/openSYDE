@@ -54,6 +54,8 @@ public:
    void GetLastSelection(bool & orq_MessageSelected, QString & orc_MessageName, bool & orq_SignalSelected,
                          QString & orc_SignalName) const;
    void RefreshColors(void) const;
+   void ConnectAllChanges(void);
+   void DisconnectAllChanges(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -85,10 +87,7 @@ Q_SIGNALS:
                         const stw_types::uint32 ou32_SignalIndex);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void showEvent(QShowEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

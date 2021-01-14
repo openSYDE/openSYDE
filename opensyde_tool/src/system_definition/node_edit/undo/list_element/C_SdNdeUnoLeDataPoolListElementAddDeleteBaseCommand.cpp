@@ -19,8 +19,8 @@
 #include "C_SdUtil.h"
 #include "C_SdNdeDpListTableView.h"
 #include "TGLUtils.h"
-
 #include "C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand.h"
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
@@ -68,7 +68,7 @@ C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::C_SdNdeUnoLeDataPoolListEle
 /*! \brief   Add from internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Add(void)
+void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_Add(void)
 {
    const uint16 u16_TimerId = osc_write_log_performance_start();
 
@@ -94,7 +94,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Add(void)
 /*! \brief   Save and delete
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Delete(void)
+void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_Delete(void)
 {
    const uint16 u16_TimerId = osc_write_log_performance_start();
 
@@ -162,7 +162,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Delete(void)
    \param[in] orc_Value Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::SetIndices(const std::vector<stw_types::uint32> & orc_Value)
+void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SetIndices(const std::vector<stw_types::uint32> & orc_Value)
 {
    this->mc_Indices = orc_Value;
 }
@@ -174,7 +174,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::SetIndices(const std::
    \param[in] orc_UIContent  Initial UI content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::SetInitialData(
+void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SetInitialData(
    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContent,
    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContent)
 {

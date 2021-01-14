@@ -85,7 +85,6 @@ QSize C_NagViewListDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, c
 
    if (orc_Index.isValid() == true)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_NagViewList * const pc_View = dynamic_cast<const C_NagViewList * const>(this->mpc_View);
 
       if (pc_View != NULL)

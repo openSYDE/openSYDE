@@ -37,6 +37,7 @@ using namespace stw_opensyde_gui_logic;
 C_CamDbDbcMessageId::C_CamDbDbcMessageId(void) :
    u32_NodeIndex(0UL),
    q_MessageIsTx(false),
+   u32_Hash(0UL),
    u32_MessageIndex(0UL)
 {
 }

@@ -334,6 +334,39 @@ sint32 C_OSCHalcConfig::ResetDomainChannelConfig(const uint32 ou32_DomainIndex, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reset domain channel use case
+
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  oq_UseChannelIndex   Use channel index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfig::ResetDomainChannelUseCase(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
+                                                  const bool oq_UseChannelIndex)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_DomainIndex < this->mc_Domains.size())
+   {
+      if (oq_UseChannelIndex == true)
+      {
+         C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
+         s32_Retval = rc_Domain.ResetChannelUseCase(ou32_ChannelIndex);
+      }
+      // domains have no use case
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set domain channel config name
 
    \param[in]  ou32_DomainIndex     Domain index

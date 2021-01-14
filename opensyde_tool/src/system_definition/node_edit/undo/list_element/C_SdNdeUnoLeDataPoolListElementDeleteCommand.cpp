@@ -59,7 +59,7 @@ C_SdNdeUnoLeDataPoolListElementDeleteCommand::C_SdNdeUnoLeDataPoolListElementDel
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementDeleteCommand::redo(void)
 {
-   this->Delete();
+   this->m_Delete();
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::redo();
 }
 
@@ -70,5 +70,5 @@ void C_SdNdeUnoLeDataPoolListElementDeleteCommand::redo(void)
 void C_SdNdeUnoLeDataPoolListElementDeleteCommand::undo(void)
 {
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::undo();
-   this->Add();
+   this->m_Add();
 }

@@ -394,8 +394,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                   {
                      //Optional: Use default values
                      osc_write_log_info("Loading device definition",
-                                        C_SCLString("Default values for flashloader reset wait times"
-                                                    " for XML file \"") + orc_Path + "\" were used.");
+                                        "Default values for flashloader reset wait times"
+                                        " for XML file \"" + orc_Path + "\" were used.");
                   }
                   else
                   {
@@ -410,8 +410,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                      orc_DeviceDefinition.u32_FlashloaderResetWaitTimeFundamentalChangesEthernet = u32_Value;
 
                      osc_write_log_info("Loading device definition",
-                                        C_SCLString("Due to compatibility all flashloader reset wait times set to the"
-                                                    " same configuration value (") + C_SCLString::IntToStr(u32_Value) +
+                                        "Due to compatibility all flashloader reset wait times set to the"
+                                        " same configuration value (" + C_SCLString::IntToStr(u32_Value) +
                                         " ms) for XML file \"" + orc_Path + "\".");
 
                      c_Text = c_XML.SelectNodeParent(); //back to parent ...
@@ -433,8 +433,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                      if (orc_DeviceDefinition.u8_NumCanBusses > 0U)
                      {
                         osc_write_log_info("Loading device definition",
-                                           C_SCLString("Default value for flashloader reset wait time "
-                                                       "u32_FlashloaderResetWaitTimeNoChangesCan (") +
+                                           "Default value for flashloader reset wait time "
+                                           "u32_FlashloaderResetWaitTimeNoChangesCan (" +
                                            C_SCLString::IntToStr(orc_DeviceDefinition.
                                                                  u32_FlashloaderResetWaitTimeNoChangesCan) +
                                            " ms) for XML file \"" + orc_Path + "\" used.");
@@ -454,8 +454,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                      if (orc_DeviceDefinition.u8_NumEthernetBusses > 0U)
                      {
                         osc_write_log_info("Loading device definition",
-                                           C_SCLString("Default value for flashloader reset wait time "
-                                                       "u32_FlashloaderResetWaitTimeNoChangesEthernet (") +
+                                           "Default value for flashloader reset wait time "
+                                           "u32_FlashloaderResetWaitTimeNoChangesEthernet (" +
                                            C_SCLString::IntToStr(orc_DeviceDefinition.
                                                                  u32_FlashloaderResetWaitTimeNoChangesEthernet) +
                                            " ms) for XML file \"" + orc_Path + "\" used.");
@@ -475,8 +475,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                      if (orc_DeviceDefinition.u8_NumCanBusses > 0U)
                      {
                         osc_write_log_info("Loading device definition",
-                                           C_SCLString("Default value for flashloader reset wait time "
-                                                       "u32_FlashloaderResetWaitTimeNoFundamentalChangesCan (") +
+                                           "Default value for flashloader reset wait time "
+                                           "u32_FlashloaderResetWaitTimeNoFundamentalChangesCan (" +
                                            C_SCLString::IntToStr(orc_DeviceDefinition.
                                                                  u32_FlashloaderResetWaitTimeNoFundamentalChangesCan) +
                                            " ms) for XML file \"" + orc_Path + "\" used.");
@@ -496,8 +496,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                      if (orc_DeviceDefinition.u8_NumEthernetBusses > 0U)
                      {
                         osc_write_log_info("Loading device definition",
-                                           C_SCLString("Default value for flashloader reset wait time "
-                                                       "u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet (") +
+                                           "Default value for flashloader reset wait time "
+                                           "u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet (" +
                                            C_SCLString::IntToStr(orc_DeviceDefinition.
                                                                  u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet) +
                                            " ms) for XML file \"" + orc_Path + "\" used.");
@@ -517,8 +517,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                      if (orc_DeviceDefinition.u8_NumCanBusses > 0U)
                      {
                         osc_write_log_info("Loading device definition",
-                                           C_SCLString("Default value for flashloader reset wait time "
-                                                       "u32_FlashloaderResetWaitTimeFundamentalChangesCan (") +
+                                           "Default value for flashloader reset wait time "
+                                           "u32_FlashloaderResetWaitTimeFundamentalChangesCan (" +
                                            C_SCLString::IntToStr(orc_DeviceDefinition.
                                                                  u32_FlashloaderResetWaitTimeFundamentalChangesCan) +
                                            " ms) for XML file \"" + orc_Path + "\" used.");
@@ -538,8 +538,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                      if (orc_DeviceDefinition.u8_NumEthernetBusses > 0U)
                      {
                         osc_write_log_info("Loading device definition",
-                                           C_SCLString("Default value for flashloader reset wait time "
-                                                       "u32_FlashloaderResetWaitTimeFundamentalChangesEthernet (") +
+                                           "Default value for flashloader reset wait time "
+                                           "u32_FlashloaderResetWaitTimeFundamentalChangesEthernet (" +
                                            C_SCLString::IntToStr(orc_DeviceDefinition.
                                                                  u32_FlashloaderResetWaitTimeFundamentalChangesEthernet) +
                                            " ms) for XML file \"" + orc_Path + "\" used.");

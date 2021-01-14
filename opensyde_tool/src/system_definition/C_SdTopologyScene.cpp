@@ -113,10 +113,8 @@ C_SdTopologyScene::C_SdTopologyScene(const bool & orq_LoadSystemDefintion, QObje
    //Reconnection manager
    connect(&(this->mc_BusConnectorReconnectManager), &C_SdManTopologyBusConnectorReconnectManager::SigCleanUpPorts,
            this, &C_SdTopologyScene::m_CleanUpPorts);
-   //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(&(this->mc_BusConnectorReconnectManager), &C_SdManTopologyBusConnectorReconnectManager::SigReconnectNode,
            this, &C_SdTopologyScene::m_ReconnectBusConnectorNode);
-   //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(&(this->mc_BusConnectorReconnectManager), &C_SdManTopologyBusConnectorReconnectManager::SigReconnectBus,
            this, &C_SdTopologyScene::m_ReconnectBusConnectorBus);
    connect(&(this->mc_BusConnectorReconnectManager), &C_SdManTopologyBusConnectorReconnectManager::SigRevertNode,
@@ -141,6 +139,7 @@ C_SdTopologyScene::C_SdTopologyScene(const bool & orq_LoadSystemDefintion, QObje
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1579}  no memory leak because of the parents of the items and the Qt memory management
 C_SdTopologyScene::~C_SdTopologyScene()
 {
    UpdateSystemDefinition();
@@ -556,9 +555,9 @@ void C_SdTopologyScene::AddBusConnector(C_GiNode * const opc_Node, const C_GiLiB
          c_Points.push_back(orc_Pos);
       }
       // Connect the node to the bus
-      C_GiLiBusConnector * pc_Connector = new C_GiLiBusConnector(u64_UniqueID, c_Points,
-                                                                 opc_Node,
-                                                                 opc_Bus);
+      C_GiLiBusConnector * const pc_Connector = new C_GiLiBusConnector(u64_UniqueID, c_Points,
+                                                                       opc_Node,
+                                                                       opc_Bus);
       //Initial z order
       pc_Connector->RestoreZOrder();
       opc_Node->AddConnection(pc_Connector);
@@ -581,7 +580,6 @@ void C_SdTopologyScene::UpdateTransform(const QTransform & orc_Transform)
    //for (QList<QGraphicsItem *>::iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
    //{
    //   QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(*c_ItItem);
-   //   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    //   C_GiArrowCursorButton * const pc_ArrowCursorButton = dynamic_cast<C_GiArrowCursorButton * const>(pc_Parent);
    //   if (pc_ArrowCursorButton != NULL)
    //   {
@@ -646,7 +644,6 @@ void C_SdTopologyScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
    QGraphicsView * const pc_View = this->views().at(0);
    const C_PuiBsElements * const pc_Data = this->mc_CopyPasteManager.GetSnapshot(pc_View);
 
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_SdTopologyDataSnapshot * const pc_SnapShot =
       dynamic_cast<const C_SdTopologyDataSnapshot * const>(pc_Data);
 
@@ -827,7 +824,7 @@ void C_SdTopologyScene::Save(void) const
 void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
 {
    // if the selected item is a bus, the bus class itself is the parent
-   QGraphicsItem * pc_Item = C_SebUtil::h_GetHighestParent(opc_Item);
+   QGraphicsItem * const pc_Item = C_SebUtil::h_GetHighestParent(opc_Item);
 
    if (pc_Item != NULL)
    {
@@ -838,13 +835,8 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
             // single selected item will be deleted
             this->mpc_SelectedBusConnectorItem = NULL;
          }
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
-         C_PuiSdDataElement * pc_DataElement = dynamic_cast<C_PuiSdDataElement *>(pc_Item);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
-         QObject * pc_Object = dynamic_cast<QObject *>(pc_Item);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         C_PuiSdDataElement * const pc_DataElement = dynamic_cast<C_PuiSdDataElement *>(pc_Item);
+         QObject * const pc_Object = dynamic_cast<QObject *>(pc_Item);
          C_GiLiBusConnector * const pc_Connector = dynamic_cast<C_GiLiBusConnector *>(pc_Item);
 
          // clean up specific things
@@ -854,7 +846,6 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
          }
          else
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(pc_Item);
             if (pc_Bus != NULL)
             {
@@ -863,7 +854,6 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
             }
             else
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(pc_Item);
                if (pc_Node != NULL)
                {
@@ -872,7 +862,6 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
                }
                else
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                   C_GiSdBoundary * const pc_Boundary = dynamic_cast<C_GiSdBoundary *>(pc_Item);
                   if (pc_Boundary != NULL)
                   {
@@ -880,7 +869,6 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
                   }
                   else
                   {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                      C_GiTextElementBus * const pc_BusTextElement = dynamic_cast<C_GiTextElementBus *>(pc_Item);
                      if (pc_BusTextElement != NULL)
                      {
@@ -888,7 +876,6 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
                      }
                      else
                      {
-                        //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                         C_GiSdTextElement * const pc_TextElement = dynamic_cast<C_GiSdTextElement *>(pc_Item);
                         if (pc_TextElement != NULL)
                         {
@@ -896,7 +883,6 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
                         }
                         else
                         {
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                            C_GiSdImageGroup * const pc_ImageGroup = dynamic_cast<C_GiSdImageGroup *>(pc_Item);
                            if (pc_ImageGroup != NULL)
                            {
@@ -904,7 +890,6 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
                            }
                            else
                            {
-                              //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                               C_GiSdArrow * const pc_Arrow = dynamic_cast<C_GiSdArrow *>(pc_Item);
                               if (pc_Arrow != NULL)
                               {
@@ -957,17 +942,18 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
 bool C_SdTopologyScene::IsItemMovable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = false;
+   const sintn sn_Type = opc_Item->type();
 
-   if ((opc_Item->type() == msn_GRAPHICS_ITEM_NODE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_CANBUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_ETHERNETBUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_IMAGE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BUS_CONNECT))
+   if ((sn_Type == msn_GRAPHICS_ITEM_NODE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_CANBUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_ETHERNETBUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
+       (sn_Type == msn_GRAPHICS_ITEM_IMAGE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BUS_CONNECT))
    {
       q_Return = true;
    }
@@ -988,18 +974,19 @@ bool C_SdTopologyScene::IsItemMovable(const QGraphicsItem * const opc_Item) cons
 bool C_SdTopologyScene::IsItemSelectable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = false;
+   const sintn sn_Type = opc_Item->type();
 
-   if ((opc_Item->type() == msn_GRAPHICS_ITEM_NODE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_CANBUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_ETHERNETBUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_IMAGE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_ARROWCURSORBTN) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BUS_CONNECT))
+   if ((sn_Type == msn_GRAPHICS_ITEM_NODE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_CANBUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_ETHERNETBUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
+       (sn_Type == msn_GRAPHICS_ITEM_IMAGE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
+       (sn_Type == msn_GRAPHICS_ITEM_ARROWCURSORBTN) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BUS_CONNECT))
    {
       q_Return = true;
    }
@@ -1044,16 +1031,18 @@ bool C_SdTopologyScene::IsZOrderChangeable(const QGraphicsItem * const opc_Item)
    bool q_Return = false;
 
    // check if the graphics items z order is changeable
-   if ((opc_Item->type() == msn_GRAPHICS_ITEM_NODE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_CANBUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_ETHERNETBUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BUS_CONNECT) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_IMAGE))
+   const sintn sn_Type = opc_Item->type();
+
+   if ((sn_Type == msn_GRAPHICS_ITEM_NODE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_CANBUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_ETHERNETBUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
+       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
+       (sn_Type == msn_GRAPHICS_ITEM_IMAGE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BUS_CONNECT))
    {
       q_Return = true;
    }
@@ -1165,7 +1154,7 @@ void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
          if ((pc_Item != NULL) && (pc_Item != this->mpc_EmptyConnectItem))
          {
             //Delete temporary item
-            //lint -e{845,944,948} Variable necessary to deactivate feature until finished
+            //lint -e{845,944,948,774,506} Variable necessary to deactivate feature until finished
             if ((C_SdTopologyScene::mhq_NewConnectState == true) && (this->mpc_EmptyConnectItem != NULL))
             {
                delete (this->mpc_EmptyConnectItem);
@@ -1173,16 +1162,14 @@ void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
             }
             mc_ToolTipPos = opc_Event->scenePos();
             QGraphicsItem * const pc_ItemParent = C_SebUtil::h_GetHighestParent(pc_Item);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus * const>(pc_ItemParent);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             C_GiNode * const pc_Node = dynamic_cast<C_GiNode * const>(pc_ItemParent);
             if (pc_Bus != NULL)
             {
                mpc_CurrentHoverItem = pc_Bus;
                this->m_StartTimerForToolTipDirect();
                q_Found = true;
-               //lint -e948 Variable necessary to deactivate feature until finished
+               //lint -e{948,774,506} Variable necessary to deactivate feature until finished
                if (C_SdTopologyScene::mhq_NewConnectState == true)
                {
                   pc_Bus->SetDisabledLook(false);
@@ -1193,7 +1180,7 @@ void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
                mpc_CurrentHoverItem = pc_Node;
                this->m_StartTimerForToolTipDirect();
                q_Found = true;
-               //lint -e948 Variable necessary to deactivate feature until finished
+               //lint -e{948,774,506} Variable necessary to deactivate feature until finished
                if (C_SdTopologyScene::mhq_NewConnectState == true)
                {
                   pc_Node->SetDrawWhiteFilter(false);
@@ -1216,7 +1203,7 @@ void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
             //TODO custom cursor
             m_RevertOverrideCursor();
             //Add temporary item?
-            //lint -e948 Variable necessary to deactivate feature until finished
+            //lint -e{948,774,506} Variable necessary to deactivate feature until finished
             if (C_SdTopologyScene::mhq_NewConnectState == true)
             {
                if (this->mpc_EmptyConnectItem == NULL)
@@ -1242,8 +1229,7 @@ void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
              (opc_Event->buttons().testFlag(Qt::LeftButton) == true) &&
              (this->m_IsRubberBandActive() == false))
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            const C_GiTextElementBus * pc_BusName = dynamic_cast<const C_GiTextElementBus * const>(rc_SelectedItems[0]);
+            const C_GiTextElementBus * const pc_BusName = dynamic_cast<const C_GiTextElementBus * const>(rc_SelectedItems[0]);
 
             if (pc_BusName != NULL)
             {
@@ -1257,7 +1243,6 @@ void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
 
                   for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
                   {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                      const C_GiLiBus * const pc_Bus = dynamic_cast<const C_GiLiBus * const>(*c_ItItem);
                      if (pc_Bus != NULL)
                      {
@@ -1282,7 +1267,7 @@ void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
                {
                   // update the position of the line
                   QPointF c_ClosestPointOnBus;
-                  QPointF c_PointOnTextElement = pc_BusName->mapToScene(pc_BusName->boundingRect().center());
+                  const QPointF c_PointOnTextElement = pc_BusName->mapToScene(pc_BusName->boundingRect().center());
                   // get the position on the bus
                   this->mpc_BusNameLineBus->FindClosestPoint(c_PointOnTextElement, c_ClosestPointOnBus);
                   this->mpc_BusNameLine->UpdateP2(c_ClosestPointOnBus);
@@ -1346,8 +1331,8 @@ void C_SdTopologyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_E
          else
          {
             //Create connector if selection valid
-            QPointF c_Pos = opc_Event->scenePos();
-            QTransform c_Transform;
+            const QPointF c_Pos = opc_Event->scenePos();
+            const QTransform c_Transform;
             QGraphicsItem * pc_BusChild;
 
             //Now get most top item
@@ -1358,7 +1343,6 @@ void C_SdTopologyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_E
             {
                // the parent of the C_GiLiLineConnection is the bus item
                pc_BusChild = C_SebUtil::h_GetHighestParent(pc_BusChild);
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                this->mpc_BusConnectItem = dynamic_cast<C_GiLiBus *>(pc_BusChild);
 
                if (opc_Event->button() == Qt::LeftButton)
@@ -1372,7 +1356,6 @@ void C_SdTopologyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_E
                   }
                   else
                   {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                      C_GiNode * const pc_Node = dynamic_cast<C_GiNode * const>(pc_BusChild);
                      //Check node to node
                      this->m_ShowNewNodeToNodeConnectionPopUp(this->mpc_NodeConnectItem, pc_Node);
@@ -1400,13 +1383,15 @@ void C_SdTopologyScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const o
 
    if (rc_SelectedItems.count() == 1)
    {
-      if (rc_SelectedItems[0]->type() != msn_GRAPHICS_ITEM_TEXTELEMENT)
+      const sintn sn_Type = rc_SelectedItems[0]->type();
+
+      if (sn_Type != msn_GRAPHICS_ITEM_TEXTELEMENT)
       {
-         if ((rc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_NODE) ||
-             (rc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
-             (rc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_BUS) ||
-             (rc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_CANBUS) ||
-             (rc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_ETHERNETBUS))
+         if ((sn_Type == msn_GRAPHICS_ITEM_NODE) ||
+             (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
+             (sn_Type == msn_GRAPHICS_ITEM_BUS) ||
+             (sn_Type == msn_GRAPHICS_ITEM_CANBUS) ||
+             (sn_Type == msn_GRAPHICS_ITEM_ETHERNETBUS))
          {
             this->m_Edit(rc_SelectedItems[0], true);
          }
@@ -1638,10 +1623,8 @@ void C_SdTopologyScene::m_Copy(void)
         ++c_ItItem)
    {
       //Bus
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_GiLiBus * pc_Bus = dynamic_cast<C_GiLiBus *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_GiTextElementBus * pc_TextBus = dynamic_cast<C_GiTextElementBus *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
+      C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
+      C_GiTextElementBus * const pc_TextBus = dynamic_cast<C_GiTextElementBus *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
       if (pc_Bus != NULL)
       {
          c_ToAdd.push_back(pc_Bus->GetTextElementBus());
@@ -1706,14 +1689,13 @@ bool C_SdTopologyScene::m_HandleDeleteUserConfirmation(const QList<QGraphicsItem
          c_MessageBox.SetCustomMinHeight(180, 180);
          e_ReturnMessageBox = c_MessageBox.Execute();
 
-         switch (e_ReturnMessageBox)
+         if (e_ReturnMessageBox == C_OgeWiCustomMessage::eOK)
          {
-         case C_OgeWiCustomMessage::eOK:
             q_Retval = true;
-            break;
-         default:
+         }
+         else
+         {
             q_Retval = false;
-            break;
          }
       }
    }
@@ -1728,7 +1710,7 @@ bool C_SdTopologyScene::m_HandleDeleteUserConfirmation(const QList<QGraphicsItem
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_PasteOfClipBoard(const QPointF * const opc_Pos)
 {
-   QClipboard * pc_Clipboard = QApplication::clipboard();
+   QClipboard * const pc_Clipboard = QApplication::clipboard();
 
    if (pc_Clipboard != NULL)
    {
@@ -1897,7 +1879,7 @@ void C_SdTopologyScene::m_HandleRevertableResizeLine(const sint32 & ors32_Intera
 bool C_SdTopologyScene::m_CallSetupStyle(QGraphicsItem * const opc_Item) const
 {
    bool q_Retval = false;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(opc_Item);
 
    if (pc_Bus != NULL)
@@ -1934,8 +1916,8 @@ void C_SdTopologyScene::m_SelectionChanged(void)
       {
          for (c_ItItem = c_SelectedItems.begin(); c_ItItem != c_SelectedItems.end(); ++c_ItItem)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            C_GiLiBusConnector * pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(*c_ItItem);
+
+            C_GiLiBusConnector * const pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(*c_ItItem);
             if (pc_BusConnector != NULL)
             {
                pc_BusConnector->setSelected(false);
@@ -1948,14 +1930,14 @@ void C_SdTopologyScene::m_SelectionChanged(void)
       // triggered by signal selectionChanged
       if (c_SelectedItems.size() == 1)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         C_GiBiRectBaseGroup * pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(c_SelectedItems[0]);
+
+         C_GiBiRectBaseGroup * const pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(c_SelectedItems[0]);
 
          // check if the only one selected item is a resizable rectangle based item
          if (pc_Item != NULL)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            C_GiNode * pc_Node = dynamic_cast<C_GiNode *>(pc_Item);
+
+            C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(pc_Item);
             if (pc_Node != NULL)
             {
                this->mpc_ArrowCursorButton->DetachNode();
@@ -1968,15 +1950,15 @@ void C_SdTopologyScene::m_SelectionChanged(void)
          }
          else
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            C_GiLiLineGroup * pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(c_SelectedItems[0]);
+
+            C_GiLiLineGroup * const pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(c_SelectedItems[0]);
             if (pc_LineItem != NULL)
             {
                //Custom rubberband flag
                if (this->m_IsRubberBandActive() == true)
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-                  C_GiLiBusConnector * pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_LineItem);
+
+                  C_GiLiBusConnector * const pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_LineItem);
                   if (pc_BusConnector == NULL)
                   {
                      pc_LineItem->SetResizing(false);
@@ -1992,7 +1974,7 @@ void C_SdTopologyScene::m_SelectionChanged(void)
          if (c_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_BUS_CONNECT)
          {
             // bring the selected bus connector to the top
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             this->mpc_SelectedBusConnectorItem = dynamic_cast<C_GiLiBusConnector *>(c_SelectedItems[0]);
             if (this->mpc_SelectedBusConnectorItem != NULL)
             {
@@ -2007,16 +1989,16 @@ void C_SdTopologyScene::m_SelectionChanged(void)
          for (c_ItItem = c_SelectedItems.begin(); c_ItItem != c_SelectedItems.end(); ++c_ItItem)
          {
             // check if the only one selected item is a resizable rectangle based item
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            C_GiBiRectBaseGroup * pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(*c_ItItem);
+
+            C_GiBiRectBaseGroup * const pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(*c_ItItem);
             if (pc_Item != NULL)
             {
                pc_Item->SetResizing(false);
             }
             else
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-               C_GiLiLineGroup * pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(*c_ItItem);
+
+               C_GiLiLineGroup * const pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(*c_ItItem);
                if (pc_LineItem != NULL)
                {
                   pc_LineItem->SetResizing(false);
@@ -2059,11 +2041,13 @@ void C_SdTopologyScene::m_EditPressed(void)
 
    if (rc_SelectedItems.count() == 1)
    {
-      if ((rc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_NODE) ||
-          (rc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
-          (rc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_BUS) ||
-          (rc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_CANBUS) ||
-          (rc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_ETHERNETBUS))
+      const sintn sn_Type = rc_SelectedItems[0]->type();
+
+      if ((sn_Type == msn_GRAPHICS_ITEM_NODE) ||
+          (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
+          (sn_Type == msn_GRAPHICS_ITEM_BUS) ||
+          (sn_Type == msn_GRAPHICS_ITEM_CANBUS) ||
+          (sn_Type == msn_GRAPHICS_ITEM_ETHERNETBUS))
       {
          this->m_Edit(rc_SelectedItems[0], true);
       }
@@ -2102,7 +2086,7 @@ void C_SdTopologyScene::m_Edit(const QGraphicsItem * const opc_Item, const bool 
 
    if (opc_Item->type() == msn_GRAPHICS_ITEM_NODE)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_GiNode * const pc_Node = dynamic_cast<const C_GiNode *>(opc_Item);
 
       if (pc_Node != NULL)
@@ -2118,7 +2102,7 @@ void C_SdTopologyScene::m_Edit(const QGraphicsItem * const opc_Item, const bool 
             (opc_Item->type() == msn_GRAPHICS_ITEM_CANBUS) ||
             (opc_Item->type() == msn_GRAPHICS_ITEM_ETHERNETBUS))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_GiLiBus * const pc_Bus = dynamic_cast<const C_GiLiBus *>(opc_Item);
 
       if (pc_Bus != NULL)
@@ -2132,7 +2116,7 @@ void C_SdTopologyScene::m_Edit(const QGraphicsItem * const opc_Item, const bool 
    }
    else if (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_GiTextElementBus * const pc_Text = dynamic_cast<const C_GiTextElementBus *>(opc_Item);
 
       if (pc_Text != NULL)
@@ -2159,9 +2143,7 @@ void C_SdTopologyScene::UpdateSystemDefinition(void) const
         ++c_ItItem)
    {
       //Node
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
-      C_PuiSdDataElement * pc_DataElement = dynamic_cast<C_PuiSdDataElement *>(*c_ItItem);
+      C_PuiSdDataElement * const pc_DataElement = dynamic_cast<C_PuiSdDataElement *>(*c_ItItem);
       if (pc_DataElement != NULL)
       {
          pc_DataElement->UpdateData();
@@ -2205,8 +2187,6 @@ void C_SdTopologyScene::m_SyncIndex(const stw_opensyde_gui_logic::C_PuiSdDataEle
       //Node
       try
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
          pc_DataElement = dynamic_cast<C_PuiSdDataElement *>(*c_ItItem);
          if (pc_DataElement != NULL)
          {
@@ -2314,8 +2294,6 @@ void C_SdTopologyScene::m_RestoreToolTips(void) const
       //Node
       try
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
          pc_CustomToolTip = dynamic_cast<C_GiBiCustomToolTip *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
          if (pc_CustomToolTip != NULL)
          {
@@ -2371,7 +2349,7 @@ void C_SdTopologyScene::m_RemoveBusOfScene(C_GiLiBus * const opc_BusGraphicsItem
    for (QList<QGraphicsItem *>::iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
    {
       // update all other busses and its bus text elements because of the possible new bus index
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(*c_ItItem);
       if (pc_Bus != NULL)
       {
@@ -2555,9 +2533,9 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
             try
             {
                pc_Parent = C_SebUtil::h_GetHighestParent(*c_ItItem);
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                pc_Bus = dynamic_cast<C_GiLiBus *>(pc_Parent);
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                pc_Node = dynamic_cast<C_GiNode *>(pc_Parent);
                if (pc_Bus != NULL)
                {
@@ -2569,7 +2547,7 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
                   {
                      if (pc_Bus->GetType() == *ope_Type)
                      {
-                        pc_Bus->SetTemporaryCursor(QCursor(Qt::CrossCursor));
+                        pc_Bus->SetTemporaryCursor(Qt::CrossCursor);
                         pc_Bus->DeactivateToolTipTemporarily();
                         q_SpecialBusTypeHandling = true;
                      }
@@ -2579,12 +2557,12 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
                   {
                      if (opc_Node->CheckConnectionAvailable(pc_Bus->GetType()))
                      {
-                        pc_Bus->SetTemporaryCursor(QCursor(Qt::CrossCursor));
+                        pc_Bus->SetTemporaryCursor(Qt::CrossCursor);
                         pc_Bus->DeactivateToolTipTemporarily();
                      }
                      else
                      {
-                        pc_Bus->SetTemporaryCursor(QCursor(Qt::ForbiddenCursor));
+                        pc_Bus->SetTemporaryCursor(Qt::ForbiddenCursor);
                         {
                            QString c_BusType;
                            if (pc_Bus->GetType() == C_OSCSystemBus::E_Type::eCAN)
@@ -2596,10 +2574,10 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
                               c_BusType = C_GtGetText::h_GetText("Ethernet");
                            }
                            //Translation 1 = Bus name
-                           pc_Bus->SetTemporaryToolTipHeading(QString(C_GtGetText::h_GetText("%1:")
-                                                                      ).arg(pc_Bus->GetName()));
+                           pc_Bus->SetTemporaryToolTipHeading(static_cast<QString>(C_GtGetText::h_GetText("%1:")
+                                                                                   ).arg(pc_Bus->GetName()));
                            //Translation 1 = Bus type string 2 = Node name
-                           pc_Bus->SetTemporaryToolTipContent(QString(
+                           pc_Bus->SetTemporaryToolTipContent(static_cast<QString>(
                                                                  C_GtGetText::h_GetText(
                                                                     "No free %1 Interfaces of \"%2\" available")).arg(
                                                                  c_BusType, opc_Node->GetText()));
@@ -2634,8 +2612,6 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
                }
                else
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-                  //lint -e{740}  no problem because of common base class
                   pc_Other = dynamic_cast<C_GiBiCustomMouseItem *>(pc_Parent);
                   if ((pc_Other != NULL) && (pc_Bus == NULL))
                   {
@@ -2660,9 +2636,9 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
             try
             {
                pc_Parent = C_SebUtil::h_GetHighestParent(*c_ItItem);
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                pc_Node = dynamic_cast<C_GiNode *>(pc_Parent);
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                pc_Bus = dynamic_cast<C_GiLiBus *>(pc_Parent);
                if (pc_Node != NULL)
                {
@@ -2682,23 +2658,25 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
                         }
                         //Adapt
                         //Translation 1 = Node name
-                        pc_Node->SetTemporaryToolTipHeading(QString(C_GtGetText::h_GetText("%1:")
-                                                                    ).arg(pc_Node->GetText()));
+                        pc_Node->SetTemporaryToolTipHeading(
+                           static_cast<QString>(C_GtGetText::h_GetText("%1:")
+                                                ).arg(pc_Node->GetText()));
                         //Translation 1 = Bus type string 2 = Node name
-                        pc_Node->SetTemporaryToolTipContent(QString(C_GtGetText::h_GetText(
-                                                                       "No free %1 Interfaces of \"%2\" available")).arg(
-                                                               c_BusType, opc_Node->GetText()));
-                        pc_Node->SetTemporaryCursor(QCursor(Qt::ForbiddenCursor));
+                        pc_Node->SetTemporaryToolTipContent(
+                           static_cast<QString>(C_GtGetText::h_GetText(
+                                                   "No free %1 Interfaces of \"%2\" available")).arg(
+                              c_BusType, opc_Node->GetText()));
+                        pc_Node->SetTemporaryCursor(Qt::ForbiddenCursor);
                      }
                      else
                      {
-                        pc_Node->SetTemporaryCursor(QCursor(Qt::CrossCursor));
+                        pc_Node->SetTemporaryCursor(Qt::CrossCursor);
                         pc_Node->DeactivateToolTipTemporarily();
                      }
                   }
                   else
                   {
-                     pc_Node->SetTemporaryCursor(QCursor(Qt::CrossCursor));
+                     pc_Node->SetTemporaryCursor(Qt::CrossCursor);
                      pc_Node->DeactivateToolTipTemporarily();
                   }
                }
@@ -2709,8 +2687,7 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
                }
                else
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-                  //lint -e{740}  no problem because of common base class
+
                   pc_Other = dynamic_cast<C_GiBiCustomMouseItem *>(pc_Parent);
                   if ((pc_Other != NULL) && (pc_Node == NULL))
                   {
@@ -2744,18 +2721,18 @@ void C_SdTopologyScene::m_LeaveConnectState(void)
    this->mq_ConnectState = false;
    this->mq_RestoreMouseCursorWhenPossible = true;
    this->mc_BusConnectorReconnectManager.DeactivateReconnection();
-   //lint -e948 Variable necessary to deactivate feature until finished
+   //lint -e{948,774,506} Variable necessary to deactivate feature until finished
    if (C_SdTopologyScene::mhq_NewConnectState == true)
    {
       const QList<QGraphicsItem *> c_Items = this->items();
       //Reenable all nodes and busses
       for (QList<QGraphicsItem *>::const_iterator c_It = c_Items.begin(); c_It != c_Items.end(); ++c_It)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_GiNode * const pc_Node = dynamic_cast<C_GiNode * const>(*c_It);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus * const>(*c_It);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_GiLiBusConnector * const pc_BusConnector =
             dynamic_cast<C_GiLiBusConnector * const>(C_SebUtil::h_GetHighestParent(*c_It));
          if (pc_Node != NULL)
@@ -2794,7 +2771,7 @@ void C_SdTopologyScene::m_RemoveConnectorAndLeaveConnectState()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_DisableEverythingForConnectState(const C_GiNode * const opc_Node) const
 {
-   //lint -e948 Variable necessary to deactivate feature until finished
+   //lint -e{948,774,506} Variable necessary to deactivate feature until finished
    if (C_SdTopologyScene::mhq_NewConnectState == true)
    {
       const QList<QGraphicsItem *> c_Items = this->items();
@@ -2802,11 +2779,11 @@ void C_SdTopologyScene::m_DisableEverythingForConnectState(const C_GiNode * cons
       //Disable all nodes and busses
       for (QList<QGraphicsItem *>::const_iterator c_It = c_Items.begin(); c_It != c_Items.end(); ++c_It)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_GiNode * const pc_Node = dynamic_cast<C_GiNode * const>(*c_It);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus * const>(*c_It);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_GiLiBusConnector * const pc_BusConnector =
             dynamic_cast<C_GiLiBusConnector * const>(C_SebUtil::h_GetHighestParent(*c_It));
          if ((pc_Node != NULL) && (pc_Node != opc_Node))
@@ -2907,8 +2884,7 @@ void C_SdTopologyScene::m_ShowNewConnectionPopUp(const C_GiNode * const opc_Node
       {
          c_Dialog->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2997,7 +2973,7 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
                //Map data index to unique index
                for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                   C_GiLiBus * const pc_Item = dynamic_cast<C_GiLiBus * const>(C_SebUtil::h_GetHighestParent(*c_ItItem));
 
                   if (pc_Item != NULL)
@@ -3032,8 +3008,7 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
       {
          c_Dialog->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3044,7 +3019,7 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ShowInterfaceChangePopUp(QGraphicsItem * const opc_Item)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_GiLiBusConnector * const pc_BusConn = dynamic_cast<C_GiLiBusConnector * const>(opc_Item);
 
    if (pc_BusConn != NULL)
@@ -3129,8 +3104,8 @@ void C_SdTopologyScene::mh_AddAndUpdateHigher(QVector<uint32> & orc_Vec, const u
    {
       if (orc_Vec[s32_ItVec] >= oru32_New)
       {
-         uint32 & rc_CurVal = orc_Vec[s32_ItVec];
-         ++rc_CurVal;
+         uint32 & ru32_CurVal = orc_Vec[s32_ItVec];
+         ++ru32_CurVal;
       }
    }
    orc_Vec.push_back(oru32_New);
@@ -3151,9 +3126,9 @@ void C_SdTopologyScene::m_BusConnectorReconnectionStart(const C_GiLiBusConnector
                                                         const C_OSCSystemBus::E_Type * const ope_Type,
                                                         C_GiLiBusConnectorBase * const opc_BusConnector)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    m_EnterConnectState(ore_ConnectState, dynamic_cast<const C_GiNode * const>(opc_Item), ope_Type);
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    this->mc_BusConnectorReconnectManager.StartReconnectMode(dynamic_cast<C_GiLiBusConnector * const>(opc_BusConnector),
                                                             ore_ConnectState);
 }
@@ -3195,7 +3170,7 @@ void C_SdTopologyScene::m_CleanUpPorts(void) const
       //Node
       try
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          pc_Node = dynamic_cast<C_GiNode *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
          if (pc_Node != NULL)
          {
@@ -3314,7 +3289,7 @@ void C_SdTopologyScene::m_ReconnectBusConnectorBus(const stw_opensyde_gui::C_GiL
 void C_SdTopologyScene::m_RemoveConnectorLine(void)
 {
    this->m_RemoveTemporaryLine(&this->mpc_ConnectorLine);
-   //lint -e{845,944,948} Variable necessary to deactivate feature until finished
+   //lint -e{845,944,948,774,506} Variable necessary to deactivate feature until finished
    if ((C_SdTopologyScene::mhq_NewConnectState == true) && (this->mpc_EmptyConnectItem != NULL))
    {
       delete (this->mpc_EmptyConnectItem);

@@ -62,7 +62,7 @@ C_TblTreItem * C_TblTreItem::GetItem(const uint32 ou32_Index)
         c_It != this->c_Children.end(); ++c_It)
    {
       C_TblTreSimpleItem * const pc_Item = *c_It;
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_TblTreItem * const pc_CurItem = dynamic_cast<C_TblTreItem * const>(pc_Item);
       if ((pc_CurItem != NULL) && (pc_CurItem->u32_Index == ou32_Index))
       {

@@ -51,6 +51,7 @@ Q_SIGNALS:
    void SigDelete(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ApplicationIndex);
    void SigCheckNodeId(void);
    void SigOpenDataPool(const stw_types::uint32 ou32_DataPoolIndex);
+   void SigOwnedDataPoolsChanged(void) const;
 
 private:
    //Avoid call
@@ -66,7 +67,6 @@ private:
    void m_UnassignAllAssociatedDataPools(void) const;
    stw_opensyde_core::C_OSCNodeApplication::E_Type m_GetType(void) const;
    stw_types::uint32 m_CountAllAssociatedDataPools(void) const;
-   void m_OnCodeExportClicked(void);
    void m_OnOpenIdeClicked(void);
 
    Ui::C_SdNdeDbWidget * mpc_Ui;

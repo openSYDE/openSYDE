@@ -37,10 +37,7 @@ Q_SIGNALS:
    void SigEditingFinished(void) const; ///< emitted on focus out (return/enter key press mean "new line" in text edits)
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void focusOutEvent(QFocusEvent * const opc_Event) override;
-   //lint -restore
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

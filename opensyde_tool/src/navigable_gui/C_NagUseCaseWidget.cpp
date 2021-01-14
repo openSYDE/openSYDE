@@ -218,8 +218,7 @@ void C_NagUseCaseWidget::SaveAs(void)
       pc_Dialog->SaveUserSettings();
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle open color picker action
@@ -244,5 +243,4 @@ void C_NagUseCaseWidget::OpenColorPicker(void)
    {
       c_Popup->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_ColorWidget and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_ColorWidget and the Qt memory management

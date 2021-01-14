@@ -190,10 +190,10 @@ C_SyvComPollingThreadDiag::C_SyvComPollingThreadDiag(void) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of we never took ownership
 C_SyvComPollingThreadDiag::~C_SyvComPollingThreadDiag(void)
 {
    mpc_Dealer = NULL;
-   //lint -e{1540}  no memory leak because of we never took ownership
 }
 
 //----------------------------------------------------------------------------------------------------------------------

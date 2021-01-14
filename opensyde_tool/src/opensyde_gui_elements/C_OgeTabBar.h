@@ -29,10 +29,7 @@ public:
    C_OgeTabBar(QWidget * const opc_Parent = NULL);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QSize tabSizeHint(const stw_types::sintn osn_Index) const override;
-   //lint -restore
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

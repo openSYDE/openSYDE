@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       openSYDE protocol IP driver for Windows
+   \brief       openSYDE protocol IP driver for Linux
 
    For details cf. documentation in .h file.
 
@@ -21,7 +21,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-//#include <netdb.h>
 #include <ifaddrs.h>
 
 #include "stwtypes.h"
@@ -39,29 +38,6 @@ using namespace stw_tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 #define INVALID_SOCKET     (-1)
-
-//export a few WinSock constants here
-//Purpose: the definitions in the Windows header violate a lot of coding rules.
-//So we can relocate the required suppressions here at a central spot ...
-//The violations do not cause problems in the application as long as we are on a Windows platform.
-/*
-static sintn m_WsInvalidSocket(void)
-{
-   return -1;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-static sint32 m_WsFionBio(void)
-{
-   return FIONBIO; //lint !e1960 !e970 !e1924 !e569
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-static sint32 m_WsFionRead(void)
-{
-   return FIONREAD; //lint !e1960 !e970 !e1924
-}
-*/
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 

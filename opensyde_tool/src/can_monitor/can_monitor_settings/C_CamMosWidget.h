@@ -69,17 +69,16 @@ Q_SIGNALS:
                                 const stw_types::uint32 ou32_BusIndex);
    void SigRemoveDatabase(const QString & orc_Path, const QString & orc_OrgPath, const bool oq_IsUpdate);
    void SigActivateDatabase(const QString & orc_Path, const QString & orc_OrgPath, const bool oq_Active);
-   void SigSetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const stw_types::uint32 ou32_BusIndex);
+   void SigSetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const QString & orc_OrgPath,
+                                   const stw_types::uint32 ou32_BusIndex);
    void SigAddLogFileAsc(const QString & orc_FilePath);
    void SigAddLogFileBlf(const QString & orc_FilePath);
    void SigRemoveAllLogFiles(void);
    void SigCANDllConfigured(void);
+   void SigNotifyMissingDataBase(const QString & orc_Path);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void moveEvent(QMoveEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_CamMosWidget * mpc_Ui;

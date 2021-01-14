@@ -185,8 +185,6 @@ public:
    stw_types::sint32 MapBusIndexToName(const stw_types::uint32 ou32_BusIndex, QString & orc_BusName) const;
    QString GetCanSignalDisplayName(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                    const stw_types::uint32 & oru32_SignalIndex) const;
-   QString GetNamespace(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id) const;
-   QString GetSignalNamespace(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id) const;
 
 protected:
    C_PuiSdHandlerBusLogic(QObject * const opc_Parent = NULL);

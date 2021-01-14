@@ -84,7 +84,7 @@ void C_SyvUpScene::SetConnected(const bool oq_Active, const bool oq_SignalNodes)
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if ((pc_Node != NULL) && (oq_SignalNodes == true))
          {
@@ -92,7 +92,7 @@ void C_SyvUpScene::SetConnected(const bool oq_Active, const bool oq_SignalNodes)
          }
          else
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(pc_CurItemParent);
             if (pc_Pc != NULL)
             {
@@ -120,7 +120,7 @@ void C_SyvUpScene::SetUpdating(const bool oq_Active) const
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if (pc_Node != NULL)
          {
@@ -152,7 +152,7 @@ void C_SyvUpScene::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeI
          if (pc_CurItemParent != NULL)
          {
             //Nodes
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
             if (pc_Node != NULL)
             {
@@ -186,7 +186,7 @@ void C_SyvUpScene::StartConnectionAnimation(void) const
       if (pc_CurItemParent != NULL)
       {
          //PC connection
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiSvPcBusConnector * const pc_CurPcConnector = dynamic_cast<C_GiSvPcBusConnector *>(pc_CurItemParent);
          if (pc_CurPcConnector != NULL)
          {
@@ -226,13 +226,13 @@ void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
          if (pc_CurItemParent != NULL)
          {
             //Connectors
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             C_GiLiBusConnector * const pc_CurBusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_CurItemParent);
             if (pc_CurBusConnector != NULL)
             {
                const C_GiLiBus * const pc_ConnectedBus = pc_CurBusConnector->GetBusItem();
                const C_GiNode * const pc_ConnectedNode = pc_CurBusConnector->GetNodeItem();
-               const C_PuiSdNodeConnectionId * pc_ConnectionData = pc_CurBusConnector->GetConnectionData();
+               const C_PuiSdNodeConnectionId * const pc_ConnectionData = pc_CurBusConnector->GetConnectionData();
                if (((pc_ConnectedBus != NULL) && (pc_ConnectedNode != NULL)) && (pc_ConnectionData != NULL))
                {
                   //On route
@@ -332,7 +332,7 @@ void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
             else
             {
                //PC connection
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               
                C_GiSvPcBusConnector * const pc_CurPcConnector =
                   dynamic_cast<C_GiSvPcBusConnector *>(pc_CurItemParent);
                if (pc_CurPcConnector != NULL)
@@ -349,7 +349,7 @@ void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
                else
                {
                   //Nodes
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                  
                   C_GiSvNodeSyvUpdate * const pc_Node =
                      dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
                   if (pc_Node != NULL)
@@ -399,7 +399,7 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
       if (pc_CurItemParent != NULL)
       {
          //Busses
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiLiBus * const pc_CurBus = dynamic_cast<C_GiLiBus *>(pc_CurItemParent);
          if (pc_CurBus != NULL)
          {
@@ -409,7 +409,7 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
          else
          {
             //Connectors
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             C_GiLiBusConnector * const pc_CurBusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_CurItemParent);
             if (pc_CurBusConnector != NULL)
             {
@@ -419,7 +419,7 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
             else
             {
                //PC connection
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               
                C_GiSvPcBusConnector * const pc_CurPcConnector =
                   dynamic_cast<C_GiSvPcBusConnector *>(pc_CurItemParent);
                if (pc_CurPcConnector != NULL)
@@ -430,7 +430,7 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
                else
                {
                   //Nodes
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                  
                   C_GiSvNodeSyvUpdate * const pc_Node =
                      dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
                   if (pc_Node != NULL)
@@ -461,7 +461,7 @@ void C_SyvUpScene::SetNoResponse(const uint32 ou32_NodeIndex) const
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if ((pc_Node != NULL) && (static_cast<uint32>(pc_Node->GetIndex()) == ou32_NodeIndex))
          {
@@ -490,7 +490,7 @@ std::vector<uint32> C_SyvUpScene::GetActiveNoResponseNodeIndices(void) const
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          const C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<const C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->HasNoResponseAndIsActive() == true))
          {
@@ -522,7 +522,7 @@ std::vector<uint32> C_SyvUpScene::GetActiveNoneThirdPartyNodeIndices(void) const
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          const C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<const C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if ((((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true)) &&
              (pc_Node->IsStwDevice() == true))
@@ -550,7 +550,7 @@ void C_SyvUpScene::CheckUpdateDisabledState(void) const
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true))
          {
@@ -644,7 +644,7 @@ void C_SyvUpScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Ev
       if (pc_Parent != NULL)
       {
          //Nodes
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_Parent);
          if (pc_Node != NULL)
          {
@@ -652,7 +652,7 @@ void C_SyvUpScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Ev
          }
          else
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc * const>(pc_Parent);
 
             if (pc_Pc != NULL)
@@ -672,7 +672,7 @@ void C_SyvUpScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Ev
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_GiSvNodeSyvUpdate * const pc_UpdateNode = dynamic_cast<C_GiSvNodeSyvUpdate * const>(opc_NodeGraphicsItem);
 
    if (pc_UpdateNode != NULL)
@@ -685,21 +685,21 @@ void C_SyvUpScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle bus progress animation start
 
-   \param[in] rc_Calc        Routes
-   \param[in] ou32_NodeIndex Node index
+   \param[in] orc_Calc        Routes
+   \param[in] ou32_NodeIndex  Node index
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculation & rc_Calc,
+sint32 C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculation & orc_Calc,
                                                     const uint32 ou32_NodeIndex) const
 {
    sint32 s32_Retval = C_NO_ERR;
    const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
    const C_PuiSdNode * const pc_UiNode = C_PuiSdHandler::h_GetInstance()->GetUINode(ou32_NodeIndex);
-   const C_OSCRoutingRoute * const pc_Route = rc_Calc.GetBestRoute();
+   const C_OSCRoutingRoute * const pc_Route = orc_Calc.GetBestRoute();
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    if (((pc_UiNode != NULL) && (pc_OSCNode != NULL)) &&
@@ -738,9 +738,9 @@ sint32 C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculatio
          for (uint32 u32_ItRoute = 0; u32_ItRoute < pc_Route->c_VecRoutePoints.size(); ++u32_ItRoute)
          {
             const C_OSCRoutingRoutePoint & rc_Point = pc_Route->c_VecRoutePoints[u32_ItRoute];
-            const C_PuiSdNodeConnection * pc_InConnection = C_PuiSdHandler::h_GetInstance()->GetUiConnection(
+            const C_PuiSdNodeConnection * const pc_InConnection = C_PuiSdHandler::h_GetInstance()->GetUiConnection(
                rc_Point.u32_NodeIndex, rc_Point.u8_InInterfaceNumber, rc_Point.e_InInterfaceType);
-            const C_PuiSdNodeConnection * pc_OutConnection = C_PuiSdHandler::h_GetInstance()->GetUiConnection(
+            const C_PuiSdNodeConnection * const pc_OutConnection = C_PuiSdHandler::h_GetInstance()->GetUiConnection(
                rc_Point.u32_NodeIndex, rc_Point.u8_OutInterfaceNumber, rc_Point.e_OutInterfaceType);
             if ((pc_InConnection != NULL) && (pc_OutConnection != NULL))
             {
@@ -818,7 +818,7 @@ sint32 C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculatio
                         if (pc_CurItemParent != NULL)
                         {
                            //Busses
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            C_GiLiBus * const pc_CurBus = dynamic_cast<C_GiLiBus *>(pc_CurItemParent);
                            if ((pc_CurBus != NULL) &&
                                (static_cast<uint32>(pc_CurBus->GetIndex()) == c_Busses[u32_ItBus]))

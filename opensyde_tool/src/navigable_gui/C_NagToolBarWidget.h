@@ -59,10 +59,7 @@ public:
    void ShowSearch(const bool oq_Active);
    void Search(void) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool eventFilter(QObject * const opc_Object, QEvent * const opc_Event) override;
-   //lint -restore
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -77,10 +74,7 @@ Q_SIGNALS:
                       const stw_types::sint32 os32_Flag);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

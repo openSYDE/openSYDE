@@ -126,6 +126,10 @@ void C_OSCNodeDataPoolList::MoveElement(const stw_types::uint32 & oru32_Start, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get number of bytes occupied by variables (including CRC space)
 
+   This only counts the raw data bytes. So any possible alignment gaps when handling the data in a "struct" will not be
+    considered.
+   If the list is configured to be CRCed 2 bytes will be added to the result.
+
    \return
    Number of bytes occupied by variables (including CRC space)
 */

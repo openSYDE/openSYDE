@@ -40,9 +40,11 @@ font-weight:normal;
 
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_12 */
-stw_opensyde_gui--C_CamGenTableView::item,
+stw_opensyde_gui--C_CamGenTableView,
 stw_opensyde_gui--C_CamMosFilterTableView,
+stw_opensyde_gui--C_CamGenSigTableView,
 stw_opensyde_gui_elements--C_CamOgeCbxTable,
+stw_opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox,
 stw_opensyde_gui_elements--C_CamOgeLeTableEdit,
 stw_opensyde_gui_elements--C_CamOgeCbxTableSmall,
 stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView,
@@ -75,8 +77,6 @@ font-weight:normal;
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_13 */
 stw_opensyde_gui_elements--C_CamOgeCbxWhite,
-stw_opensyde_gui--C_CamGenSigTableView::item,
-stw_opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="13"][SemiBold="false"][Bold="false"],
 stw_opensyde_gui_elements--C_OgeLeDark,
 stw_opensyde_gui_elements--C_CamOgeLeFilePath,

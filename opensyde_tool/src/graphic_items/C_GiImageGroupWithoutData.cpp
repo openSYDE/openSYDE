@@ -12,14 +12,14 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <QFileInfo>
+
 #include "stwtypes.h"
 #include "C_GiBiImageGroup.h"
 #include "C_PuiSdDataElement.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiBsImage.h"
 #include "gitypes.h"
-
-#include <QFileInfo>
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -66,7 +66,7 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, co
 {
    if (oq_RequestLateImageInit == false)
    {
-      LateImageInit(orc_ImagePath);
+      m_LateImageInit(orc_ImagePath);
    }
 }
 
@@ -135,7 +135,7 @@ QPixmap C_GiImageGroupWithoutData::GetImage(void) const
    \param[in] orc_ImagePath File path of image
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiImageGroupWithoutData::LateImageInit(const QString & orc_ImagePath)
+void C_GiImageGroupWithoutData::m_LateImageInit(const QString & orc_ImagePath)
 {
    QFileInfo c_File;
 

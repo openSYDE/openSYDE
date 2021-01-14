@@ -63,11 +63,11 @@ const uint32 C_GiNode::mhu32_ScaleCategory5 = 4U;
 const uint32 C_GiNode::mhu32_ScaleCategory6 = 5U;
 const uint32 C_GiNode::mhu32_ScaleCategory7 = 6U;
 
-const float64 C_GiNode::mahf64_ScaleMinWidthNode[7] =
+const float64 C_GiNode::mhaf64_ScaleMinWidthNode[7] =
 {
    150.0, 200.0, 250.0, 300.0, 350.0, 400.0, 450.0
 };
-const float64 C_GiNode::mahf64_ScaleMinHeightNode[7] =
+const float64 C_GiNode::mhaf64_ScaleMinHeightNode[7] =
 {
    100.0, 130.0, 165.0, 200.0, 230.0, 265.0, 300.0
 };
@@ -624,7 +624,7 @@ void C_GiNode::GenerateHint(void)
             //Translation: 1 = bus name
             //tooltip title
             c_Title = this->GetText();
-            c_Title.append(QString(" (Type: %1)").arg(pc_Node->c_DeviceType.c_str()));
+            c_Title.append(static_cast<QString>(" (Type: %1)").arg(pc_Node->c_DeviceType.c_str()));
             this->SetDefaultToolTipHeading(c_Title);
 
             //comment
@@ -663,13 +663,15 @@ void C_GiNode::GenerateHint(void)
                                  //Bus + Node Id Info
                                  if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
                                  {
-                                    c_BusName.append(QString(" (Node ID: %1, Bitrate: %2 kbit/s);").
+                                    c_BusName.append(static_cast<QString>(" (Node ID: %1, Bitrate: %2 kbit/s);").
                                                      arg(QString::number(rc_Conn.u8_NodeID),
                                                          QString::number(pc_Bus->u64_BitRate / 1000ULL)));
                                  }
                                  else
                                  {
-                                    c_BusName.append(QString(" (Node ID: %1);").arg(QString::number(rc_Conn.u8_NodeID)));
+                                    c_BusName.append(static_cast<QString>(" (Node ID: %1);").arg(QString::number(rc_Conn
+                                                                                                                 .
+                                                                                                                 u8_NodeID)));
                                  }
 
                                  //Update enabled?
@@ -681,7 +683,7 @@ void C_GiNode::GenerateHint(void)
                                  {
                                     c_EnabledString = C_GtGetText::h_GetText("NO");
                                  }
-                                 c_BusName.append(QString(" Update: %1;").arg(c_EnabledString));
+                                 c_BusName.append(static_cast<QString>(" Update: %1;").arg(c_EnabledString));
                                  //Routing enabled?
                                  if (rc_Conn.q_IsRoutingEnabled == true)
                                  {
@@ -691,7 +693,7 @@ void C_GiNode::GenerateHint(void)
                                  {
                                     c_EnabledString = C_GtGetText::h_GetText("NO");
                                  }
-                                 c_BusName.append(QString(" Routing: %1;").arg(c_EnabledString));
+                                 c_BusName.append(static_cast<QString>(" Routing: %1;").arg(c_EnabledString));
                                  //Diagnostic enabled?
                                  if (rc_Conn.q_IsDiagnosisEnabled == true)
                                  {
@@ -701,7 +703,7 @@ void C_GiNode::GenerateHint(void)
                                  {
                                     c_EnabledString = C_GtGetText::h_GetText("NO");
                                  }
-                                 c_BusName.append(QString(" Diagnostic: %1").arg(c_EnabledString));
+                                 c_BusName.append(static_cast<QString>(" Diagnostic: %1").arg(c_EnabledString));
                                  q_Found = true;
                               }
                            }
@@ -723,8 +725,9 @@ void C_GiNode::GenerateHint(void)
                      c_Entry = "\n";
                   }
                   c_ToolTip.append(c_Entry);
-                  c_Entry =  QString("%1: %2").arg(C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
-                                                                                   u8_ItInterface), c_BusName);
+                  c_Entry =  static_cast<QString>("%1: %2").arg(C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
+                                                                                                u8_ItInterface),
+                                                                c_BusName);
                   c_ToolTip.append(c_Entry);
                }
             }
@@ -753,7 +756,8 @@ void C_GiNode::GenerateHint(void)
                                  c_BusName = C_GtGetText::h_GetText("Linked to ");
                                  c_BusName.append(pc_Bus->c_Name.c_str());
                                  //Bus + Node Id Info
-                                 c_BusName.append(QString(" (Node ID: %1);").arg(QString::number(rc_Conn.u8_NodeID)));
+                                 c_BusName.append(static_cast<QString>(" (Node ID: %1);").arg(QString::number(rc_Conn.
+                                                                                                              u8_NodeID)));
                                  //Update enabled?
                                  if (rc_Conn.q_IsUpdateEnabled == true)
                                  {
@@ -763,7 +767,7 @@ void C_GiNode::GenerateHint(void)
                                  {
                                     c_EnabledString = C_GtGetText::h_GetText("NO");
                                  }
-                                 c_BusName.append(QString(" Update: %1;").arg(c_EnabledString));
+                                 c_BusName.append(static_cast<QString>(" Update: %1;").arg(c_EnabledString));
                                  //Routing enabled?
                                  if (rc_Conn.q_IsRoutingEnabled == true)
                                  {
@@ -773,7 +777,7 @@ void C_GiNode::GenerateHint(void)
                                  {
                                     c_EnabledString = C_GtGetText::h_GetText("NO");
                                  }
-                                 c_BusName.append(QString(" Routing: %1;").arg(c_EnabledString));
+                                 c_BusName.append(static_cast<QString>(" Routing: %1;").arg(c_EnabledString));
                                  //Diagnostic enabled?
                                  if (rc_Conn.q_IsDiagnosisEnabled == true)
                                  {
@@ -783,7 +787,7 @@ void C_GiNode::GenerateHint(void)
                                  {
                                     c_EnabledString = C_GtGetText::h_GetText("NO");
                                  }
-                                 c_BusName.append(QString(" Diagnostic: %1").arg(c_EnabledString));
+                                 c_BusName.append(static_cast<QString>(" Diagnostic: %1").arg(c_EnabledString));
                                  q_Found = true;
                               }
                            }
@@ -804,8 +808,10 @@ void C_GiNode::GenerateHint(void)
                      c_Entry = "\n";
                   }
                   c_ToolTip.append(c_Entry);
-                  c_Entry = QString("%1: %2").arg(C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eETHERNET,
-                                                                                  u8_ItInterface), c_BusName);
+                  c_Entry =
+                     static_cast<QString>("%1: %2").arg(C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eETHERNET,
+                                                                                        u8_ItInterface),
+                                                        c_BusName);
                   c_ToolTip.append(c_Entry);
                }
             }
@@ -904,7 +910,7 @@ void C_GiNode::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
-   bool q_PreviousState = this->mq_ErrorIconHovered;
+   const bool q_PreviousState = this->mq_ErrorIconHovered;
 
    this->mq_ErrorIconHovered = false;
 
@@ -1013,32 +1019,32 @@ uint32 C_GiNode::m_GetScaleCategory(void) const
    uint32 u32_ScaleCategory = mhu32_ScaleCategory0;
 
    // check first scaling
-   if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory1]) &&
-       (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory1]))
+   if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory1]) &&
+       (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory1]))
    {
       // check second scaling
-      if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory2]) &&
-          (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory2]))
+      if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory2]) &&
+          (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory2]))
       {
          // check third scaling
-         if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory3]) &&
-             (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory3]))
+         if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory3]) &&
+             (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory3]))
          {
             // check fourth scaling
-            if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory4]) &&
-                (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory4]))
+            if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory4]) &&
+                (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory4]))
             {
                // check fifth scaling
-               if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory5]) &&
-                   (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory5]))
+               if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory5]) &&
+                   (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory5]))
                {
                   // check sixth scaling
-                  if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory6]) &&
-                      (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory6]))
+                  if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory6]) &&
+                      (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory6]))
                   {
                      // check seventh scaling
-                     if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory7]) &&
-                         (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory7]))
+                     if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory7]) &&
+                         (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory7]))
                      {
                         u32_ScaleCategory = mhu32_ScaleCategory7;
                      }
@@ -1159,7 +1165,7 @@ void C_GiNode::LoadData(void)
    //Object name for test
    if (pc_OSCNode != NULL)
    {
-      this->setObjectName(QString("Node: %1").arg(pc_OSCNode->c_Properties.c_Name.c_str()));
+      this->setObjectName(static_cast<QString>("Node: %1").arg(pc_OSCNode->c_Properties.c_Name.c_str()));
    }
 }
 
@@ -1320,7 +1326,8 @@ const C_PuiSdNodeConnectionId * C_GiNode::GetNodeConnectionId(const C_GiLiBusCon
 
    if (opc_Connection != NULL)
    {
-      const C_PuiSdNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetUINode(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSdNode * const pc_Node =
+         C_PuiSdHandler::h_GetInstance()->GetUINode(static_cast<uint32>(this->ms32_Index));
       if (pc_Node != NULL)
       {
          const sint32 s32_Index = GetIndexOfConnector(opc_Connection);

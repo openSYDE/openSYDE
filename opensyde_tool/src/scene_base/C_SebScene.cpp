@@ -95,9 +95,9 @@ C_SebScene::C_SebScene(QObject * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parents of the items and the Qt memory management
 C_SebScene::~C_SebScene()
 {
-   //lint -e{1540}  no memory leak because of the parents of the items and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -132,7 +132,6 @@ void C_SebScene::FilterChangableZValues(QList<QGraphicsItem *> & orc_ZValues) co
 //----------------------------------------------------------------------------------------------------------------------
 float64 C_SebScene::GetHighestUsedZValueList(const QList<QGraphicsItem *> & orc_Items) const
 {
-   //lint -e{530,10,1015,1013,1960}  c++11 feature
    float64 f64_Retval = std::numeric_limits<float64>::lowest();
    bool q_NothingFound = true;
 
@@ -200,8 +199,6 @@ void C_SebScene::BlockContextMenu(void)
 void C_SebScene::DisplayToolTip(const QPointF & orc_ScenePos)
 {
    //Check if item has tool tip
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //lint -e{740}  no problem because of common base class
    const C_GiBiCustomToolTip * pc_ToolTip =
       dynamic_cast<C_GiBiCustomToolTip *>(C_SebUtil::h_GetHighestParent(this->itemAt(orc_ScenePos,
                                                                                      QTransform())));
@@ -279,13 +276,11 @@ void C_SebScene::UpdateTransform(const QTransform & orc_Transform)
    {
       C_GiBiRectBaseGroup * pc_Rect;
       QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_GiLiLineGroup * const pc_Line = dynamic_cast<C_GiLiLineGroup *>(pc_Parent);
       if (pc_Line != NULL)
       {
          pc_Line->UpdateTransform(orc_Transform);
       }
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       pc_Rect = dynamic_cast<C_GiBiRectBaseGroup *>(pc_Parent);
       if (pc_Rect != NULL)
       {
@@ -311,7 +306,7 @@ void C_SebScene::SetDarkModeActive(const bool oq_Value)
 
    \param[in,out] opc_Item     Line item
    \param[in]     orc_ScenePos Scene position
-   \param[in]     opc_Index    Optional specific index to add point add
+   \param[in]     ops32_Index  Optional specific index to add point add
 
    \return
    -1: error
@@ -319,15 +314,14 @@ void C_SebScene::SetDarkModeActive(const bool oq_Value)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SebScene::BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
-                            const stw_types::sint32 * const opc_Index)
+                            const stw_types::sint32 * const ops32_Index)
 {
    sint32 s32_Retval = -1;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiLiLineGroup * const pc_Line = dynamic_cast<C_GiLiLineGroup *>(opc_Item);
 
    if (pc_Line != NULL)
    {
-      s32_Retval = pc_Line->BendLine(orc_ScenePos, opc_Index);
+      s32_Retval = pc_Line->BendLine(orc_ScenePos, ops32_Index);
       Q_EMIT this->SigTriggerUpdateTransform();
    }
    return s32_Retval;
@@ -336,9 +330,9 @@ sint32 C_SebScene::BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Remove bend point of line
 
-   \param[in,out] opc_Item     Line item
-   \param[in]     orc_ScenePos Scene position
-   \param[in]     opc_Index    Optional specific index which point to remove
+   \param[in,out] opc_Item      Line item
+   \param[in]     orc_ScenePos  Scene position
+   \param[in]     ops32_Index   Optional specific index which point to remove
 
    \return
    -1: error
@@ -346,15 +340,14 @@ sint32 C_SebScene::BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SebScene::RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
-                                  const sint32 * const opc_Index) const
+                                  const sint32 * const ops32_Index) const
 {
    sint32 s32_Retval = -1;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiLiLineGroup * const pc_Line = dynamic_cast<C_GiLiLineGroup *>(opc_Item);
 
    if (pc_Line != NULL)
    {
-      s32_Retval = pc_Line->RemoveBend(orc_ScenePos, opc_Index);
+      s32_Retval = pc_Line->RemoveBend(orc_ScenePos, ops32_Index);
    }
    return s32_Retval;
 }
@@ -382,8 +375,6 @@ QGraphicsItem * C_SebScene::GetItemByID(const uint64 & oru64_ID) const
       pc_CurItemParent = C_SebUtil::h_GetHighestParent(*c_ItItem);
       if (pc_CurItemParent != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
          pc_Unique = dynamic_cast<const C_GiUnique *>(pc_CurItemParent);
          if (pc_Unique != NULL)
          {
@@ -999,8 +990,6 @@ void C_SebScene::m_SetItemSelectionAndMoveAvailability(QGraphicsItem * const opc
 
       if (pc_Parent != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
          C_GiBiCustomMouseItem * const pc_Special = dynamic_cast<C_GiBiCustomMouseItem *>(pc_Parent);
          bool q_Selectable = false;
          bool q_Moveable = false;
@@ -1008,12 +997,12 @@ void C_SebScene::m_SetItemSelectionAndMoveAvailability(QGraphicsItem * const opc
          if (this->IsItemSelectable(pc_Parent) == true)
          {
             q_Selectable = true;
-            c_NewCursor = QCursor(Qt::SizeAllCursor);
+            c_NewCursor = static_cast<QCursor>(Qt::SizeAllCursor);
          }
          else
          {
             q_Selectable = false;
-            c_NewCursor = QCursor(Qt::ArrowCursor);
+            c_NewCursor = static_cast<QCursor>(Qt::ArrowCursor);
          }
          pc_Parent->setFlag(QGraphicsItem::ItemIsSelectable, q_Selectable);
          if (pc_Special != NULL)
@@ -1194,7 +1183,7 @@ void C_SebScene::m_AddImage(const QString & orc_Path, const QPointF & orc_Positi
 void C_SebScene::m_AddImageWithFileDialog(const QPointF & orc_Pos)
 {
    const QString c_Filter =
-      QString(C_GtGetText::h_GetText("Images (%1)")).arg(C_SebScene::mh_GetImageFileTypesFilter());
+      static_cast<QString>(C_GtGetText::h_GetText("Images (%1)")).arg(C_SebScene::mh_GetImageFileTypesFilter());
    const QString c_Dir = "";
    QString c_File;
    const QList<QGraphicsView *> & rc_Views = this->views();
@@ -1482,8 +1471,6 @@ void C_SebScene::m_UpdateHints(void) const
    {
       try
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
          pc_CustomToolTip = dynamic_cast<C_GiBiCustomToolTip *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
          if (pc_CustomToolTip != NULL)
          {
@@ -1540,7 +1527,6 @@ void C_SebScene::m_StopToolTip(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiLiLineGroup * const pc_Line = dynamic_cast<C_GiLiLineGroup *>(opc_Item);
 
    if ((pc_Line != NULL) && (this->m_GetUndoManager() != NULL))
@@ -1552,7 +1538,6 @@ void C_SebScene::m_BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiLiLineGroup * const pc_Line = dynamic_cast<C_GiLiLineGroup *>(opc_Item);
 
    if ((pc_Line != NULL) && (this->m_GetUndoManager() != NULL))
@@ -1574,7 +1559,6 @@ void C_SebScene::m_RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF 
 bool C_SebScene::m_CallSetupStyle(QGraphicsItem * const opc_Item) const
 {
    bool q_Retval = false;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiBiBoundary * const pc_Boundary = dynamic_cast<C_GiBiBoundary *>(opc_Item);
 
    if (pc_Boundary != NULL)
@@ -1583,7 +1567,6 @@ bool C_SebScene::m_CallSetupStyle(QGraphicsItem * const opc_Item) const
    }
    else
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_GiBiTextElement * const pc_TextElement = dynamic_cast<C_GiBiTextElement *>(opc_Item);
 
       if (pc_TextElement != NULL)
@@ -1592,7 +1575,6 @@ bool C_SebScene::m_CallSetupStyle(QGraphicsItem * const opc_Item) const
       }
       else
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          C_GiBiArrow * const pc_Arrow = dynamic_cast<C_GiBiArrow *>(opc_Item);
 
          if (pc_Arrow != NULL)
@@ -1619,7 +1601,6 @@ void C_SebScene::m_ApplySetupStyleMultiple(const QList<QGraphicsItem *> & orc_Se
       for (QList<QGraphicsItem *>::const_iterator c_ItItem = orc_SelectedItems.begin();
            c_ItItem != orc_SelectedItems.end(); ++c_ItItem)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          C_GiBiRectBaseGroup * const pc_RectItem = dynamic_cast<C_GiBiRectBaseGroup *>(*c_ItItem);
          if (pc_RectItem != NULL)
          {
@@ -1627,7 +1608,6 @@ void C_SebScene::m_ApplySetupStyleMultiple(const QList<QGraphicsItem *> & orc_Se
          }
          else
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             C_GiLiLineGroup * const pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(*c_ItItem);
             if (pc_LineItem != NULL)
             {
@@ -1939,7 +1919,7 @@ QString C_SebScene::mh_GetImageFileTypesFilter(void)
    for (QList<QByteArray>::const_iterator c_It = c_Types.begin(); c_It != c_Types.end(); ++c_It)
    {
       const QString c_CurrentType(*c_It);
-      c_Retval += QString("*.%1; ").arg(c_CurrentType);
+      c_Retval += static_cast<QString>("*.%1; ").arg(c_CurrentType);
    }
    return c_Retval;
 }

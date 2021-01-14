@@ -45,7 +45,7 @@ using namespace stw_errors;
    else                                            see C_SYDEsup::Update for precise error descriptions
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn main(const sintn osn_Argc, charn * const oapcn_Argv[])
+sintn main(const sintn osn_Argc, charn * const oppcn_Argv[])
 {
    C_SYDEsup::E_Result e_Return;
    C_SYDEsup c_SYDEServiceUpdater;
@@ -61,7 +61,7 @@ sintn main(const sintn osn_Argc, charn * const oapcn_Argv[])
       "   |\\_________\\\\___/ /        \\|_______|\\|_______|\\_________\\|_______|\\|__|\n"
       "   \\|_________\\|___|/                            \\|_________|\n" << &std::endl;
 
-   e_Return = c_SYDEServiceUpdater.ParseCommandLine(osn_Argc, oapcn_Argv);
+   e_Return = c_SYDEServiceUpdater.ParseCommandLine(osn_Argc, oppcn_Argv);
 
    if (e_Return == C_SYDEsup::eOK)
    {

@@ -245,8 +245,7 @@ void C_SyvDaDashboardsWidget::OpenSettings(void)
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle dark mode toggle
@@ -782,16 +781,16 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
       break;
    case C_CONFIG:
       orc_Message =
-         QString(C_GtGetText::h_GetText("System connect failed. Configuration error.")); //Many possibilities for this
+         static_cast<QString>(C_GtGetText::h_GetText("System connect failed. Configuration error.")); //Many possibilities for this
                                                                                          // error
       break;
    case C_RD_WR:
       orc_Message =
-         QString(C_GtGetText::h_GetText("Configured communication DLL does not exist or DLL could not be opened."));
+         static_cast<QString>(C_GtGetText::h_GetText("Configured communication DLL does not exist or DLL could not be opened."));
       break;
    case C_OVERFLOW:
       orc_Message =
-         QString(C_GtGetText::h_GetText(
+         static_cast<QString>(C_GtGetText::h_GetText(
                     "Unknown transport protocol or unknown diagnostic server for at least one node."));
       break;
    case C_BUSY:
@@ -803,38 +802,38 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
          if ((((((q_NameInvalid == false) && (q_PCNotConnected == false)) && (q_RoutingInvalid == false)) &&
                (q_SysDefInvalid == false)) && (q_NoNodesActive == false)) && (q_UpdateDisabledButDataBlocks == false))
          {
-            orc_Message = QString(C_GtGetText::h_GetText("System View Dashboard configuration error detected. "
+            orc_Message = static_cast<QString>(C_GtGetText::h_GetText("System View Dashboard configuration error detected. "
                                                          "Check your Dashboard configuration settings and retry."));
          }
          else
          {
             orc_Message =
-               QString(C_GtGetText::h_GetText(
+               static_cast<QString>(C_GtGetText::h_GetText(
                           "System View is invalid. Action cannot be performed. Fix the issues and retry."));
          }
       }
       else
       {
-         orc_Message = QString(C_GtGetText::h_GetText("System View check failed."));
+         orc_Message = static_cast<QString>(C_GtGetText::h_GetText("System View check failed."));
       }
       break;
    case C_COM:
       orc_Message =
-         QString(C_GtGetText::h_GetText(
+         static_cast<QString>(C_GtGetText::h_GetText(
                     "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
                     "double-click on PC)."));
       break;
    case C_CHECKSUM:
-      orc_Message = QString(C_GtGetText::h_GetText("Internal buffer overflow detected."));
+      orc_Message = static_cast<QString>(C_GtGetText::h_GetText("Internal buffer overflow detected."));
       break;
    case C_RANGE:
-      orc_Message = QString(C_GtGetText::h_GetText("Routing configuration failed."));
+      orc_Message = static_cast<QString>(C_GtGetText::h_GetText("Routing configuration failed."));
       break;
    case C_UNKNOWN_ERR:
-      orc_Message = QString(C_GtGetText::h_GetText("Wrapped error of internal function call."));
+      orc_Message = static_cast<QString>(C_GtGetText::h_GetText("Wrapped error of internal function call."));
       break;
    default:
-      orc_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
+      orc_Message = static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
       break;
    }
 
@@ -1054,11 +1053,11 @@ void C_SyvDaDashboardsWidget::m_ConnectStepFinished(void)
             break;
          case C_CONFIG:
             c_Message =
-               QString(C_GtGetText::h_GetText("System connect failed. Configuration error.")); //Many possibilities for
+               static_cast<QString>(C_GtGetText::h_GetText("System connect failed. Configuration error.")); //Many possibilities for
                                                                                                // this error
             break;
          default:
-            c_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
+            c_Message = static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
             break;
          }
       }

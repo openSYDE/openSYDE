@@ -188,7 +188,7 @@ sint32 C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & 
       {
          orc_ErrorDescription += "\n";
       }
-      orc_ErrorDescription += QString(C_GtGetText::h_GetText("Minimum: %1")).arg(this->mc_MinValue);
+      orc_ErrorDescription += static_cast<QString>(C_GtGetText::h_GetText("Minimum: %1")).arg(this->mc_MinValue);
    }
    if (this->mc_MaxValue.isEmpty() == false)
    {
@@ -196,7 +196,7 @@ sint32 C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & 
       {
          orc_ErrorDescription += "\n";
       }
-      orc_ErrorDescription += QString(C_GtGetText::h_GetText("Maximum: %1")).arg(this->mc_MaxValue);
+      orc_ErrorDescription += static_cast<QString>(C_GtGetText::h_GetText("Maximum: %1")).arg(this->mc_MaxValue);
    }
    return s32_Retval;
 }
@@ -213,7 +213,7 @@ void C_TblEditLineEditBase::m_UpdateToolTip(void)
       QString c_Content = "";
       if (this->mc_MinValue.isEmpty() == false)
       {
-         c_Content += QString(C_GtGetText::h_GetText("Minimum: %1")).arg(this->mc_MinValue);
+         c_Content += static_cast<QString>(C_GtGetText::h_GetText("Minimum: %1")).arg(this->mc_MinValue);
       }
       if (this->mc_MaxValue.isEmpty() == false)
       {
@@ -221,7 +221,7 @@ void C_TblEditLineEditBase::m_UpdateToolTip(void)
          {
             c_Content += "\n";
          }
-         c_Content += QString(C_GtGetText::h_GetText("Maximum: %1")).arg(this->mc_MaxValue);
+         c_Content += static_cast<QString>(C_GtGetText::h_GetText("Maximum: %1")).arg(this->mc_MaxValue);
       }
       this->SetToolTipInformation(c_Heading, c_Content);
    }

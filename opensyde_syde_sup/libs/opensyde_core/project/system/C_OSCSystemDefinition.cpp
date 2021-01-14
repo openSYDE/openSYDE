@@ -1345,7 +1345,7 @@ uint32 C_OSCSystemDefinition::m_GetRelatedProtocolHash(const uint32 ou32_NodeInd
    \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
    \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
    \param[out]    opc_DatapoolIndexes  Optional: Vector with all Datapool ids which are connected to the bus
-                                       If ore_ComProtocol is not NULL the Datapool will be checked if it is
+                                       If ope_ComProtocol is not NULL the Datapool will be checked if it is
                                        associated to the protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------

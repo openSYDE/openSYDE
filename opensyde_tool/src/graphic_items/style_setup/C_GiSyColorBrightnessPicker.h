@@ -36,7 +36,7 @@ public:
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void NewHsv(stw_types::sintn oc_h, stw_types::sintn oc_s, stw_types::sintn oc_v);
+   void NewHsv(const stw_types::sintn osn_Hue, const stw_types::sintn osn_Sat, const stw_types::sintn osn_Value);
    void ColorSelected(void);
 
 protected:

@@ -27,8 +27,9 @@
 #include <QLayout>
 #include <QDateTimeAxis>
 #include <QPolarChart>
-#include <ctime> //lint !e829 //this module is specifically for Windows targets; no trouble with unspecified
+//lint -estring(829,*ctime*)  //this module is specifically for Windows targets; no trouble with unspecified
 // behavior expected
+#include <ctime>
 #include <C_OgeChaViewBase.h>
 #include <QGraphicsTextItem>
 
@@ -125,9 +126,9 @@ C_SyvDaDashboardScene::C_SyvDaDashboardScene(const uint32 ou32_ViewIndex, const 
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_TestPointer and the Qt memory management
 C_SyvDaDashboardScene::~C_SyvDaDashboardScene(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_TestPointer and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -153,8 +154,7 @@ bool C_SyvDaDashboardScene::IsMousePosRelevantForProxyWidgetInteraction(const QP
       // update the items
       for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
+         
          C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
          if (pc_Item != NULL)
          {
@@ -191,12 +191,10 @@ void C_SyvDaDashboardScene::SetEditMode(const bool oq_Active)
    // update the items
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiBiTextElement * const pc_TextItem = dynamic_cast<C_GiBiTextElement *>(*c_ItItem);
 
       if (pc_Item != NULL)
@@ -225,8 +223,7 @@ void C_SyvDaDashboardScene::SetDrawingActive(const bool oq_Active) const
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
       QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiSvDaRectBaseGroup * const pc_DataElement = dynamic_cast<C_GiSvDaRectBaseGroup *>(pc_Parent);
       if (pc_DataElement != NULL)
       {
@@ -253,8 +250,7 @@ void C_SyvDaDashboardScene::SetDashboardIndex(const uint32 ou32_DashboardIndex)
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
       QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_PuiSvDbDataElement * const pc_DataElement = dynamic_cast<C_PuiSvDbDataElement *>(pc_Parent);
       if (pc_DataElement != NULL)
       {
@@ -291,8 +287,7 @@ void C_SyvDaDashboardScene::Save(void) const
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
       // TODO Watch if parent necessary
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_PuiSvDbDataElement * const pc_DataElement = dynamic_cast<C_PuiSvDbDataElement *>(*c_ItItem);
       if (pc_DataElement != NULL)
       {
@@ -475,18 +470,16 @@ void C_SyvDaDashboardScene::CopyFromSnapshotToScene(const C_PuiSvDashboard & orc
 void C_SyvDaDashboardScene::DeleteItem(QGraphicsItem * const opc_Item)
 {
    // if the selected item is a bus, the bus class itself is the parent
-   QGraphicsItem * pc_Item = C_SebUtil::h_GetHighestParent(opc_Item);
+   QGraphicsItem * const pc_Item = C_SebUtil::h_GetHighestParent(opc_Item);
 
    if (pc_Item != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
-      C_PuiBsDataElement * pc_DataElement = dynamic_cast<C_PuiBsDataElement *>(pc_Item);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
-      QObject * pc_Object = dynamic_cast<QObject *>(pc_Item);
+      
+      C_PuiBsDataElement * const pc_DataElement = dynamic_cast<C_PuiBsDataElement *>(pc_Item);
+      
+      QObject * const pc_Object = dynamic_cast<QObject *>(pc_Item);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_GiSvDaRectBaseGroup * const pc_Widget = dynamic_cast<C_GiSvDaRectBaseGroup *>(pc_Item);
       if (pc_Widget != NULL)
       {
@@ -494,7 +487,7 @@ void C_SyvDaDashboardScene::DeleteItem(QGraphicsItem * const opc_Item)
       }
       else
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiSvDaBoundary * const pc_Boundary = dynamic_cast<C_GiSvDaBoundary *>(pc_Item);
          if (pc_Boundary != NULL)
          {
@@ -502,7 +495,7 @@ void C_SyvDaDashboardScene::DeleteItem(QGraphicsItem * const opc_Item)
          }
          else
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             C_GiSvDaTextElement * const pc_TextElement = dynamic_cast<C_GiSvDaTextElement *>(pc_Item);
             if (pc_TextElement != NULL)
             {
@@ -510,7 +503,7 @@ void C_SyvDaDashboardScene::DeleteItem(QGraphicsItem * const opc_Item)
             }
             else
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               
                C_GiSvDaImageGroup * const pc_ImageGroup = dynamic_cast<C_GiSvDaImageGroup *>(pc_Item);
                if (pc_ImageGroup != NULL)
                {
@@ -518,7 +511,7 @@ void C_SyvDaDashboardScene::DeleteItem(QGraphicsItem * const opc_Item)
                }
                else
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                  
                   C_GiSvDaArrow * const pc_Arrow = dynamic_cast<C_GiSvDaArrow *>(pc_Item);
                   if (pc_Arrow != NULL)
                   {
@@ -579,8 +572,7 @@ void C_SyvDaDashboardScene::SetDarkModeActive(const bool oq_Value)
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
       // TODO Watch if parent necessary
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiSvDaRectBaseGroup * const pc_RectBase = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
       if (pc_RectBase != NULL)
       {
@@ -588,8 +580,7 @@ void C_SyvDaDashboardScene::SetDarkModeActive(const bool oq_Value)
       }
       else
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
+         
          C_PuiSvDbDataElement * const pc_OtherElement = dynamic_cast<C_PuiSvDbDataElement * const>(*c_ItItem);
          //Reload data & dark mode for basic drawing items
          if (pc_OtherElement != NULL)
@@ -631,7 +622,7 @@ void C_SyvDaDashboardScene::UpdateBoundaries(void) const
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end();
         ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_GiSvDaBoundary * const pc_Item = dynamic_cast< C_GiSvDaBoundary * const>(*c_ItItem);
       if (pc_Item != NULL)
       {
@@ -650,7 +641,7 @@ void C_SyvDaDashboardScene::CopyFromManagerToScene(const QPointF * const opc_Pos
 {
    QGraphicsView * const pc_View = this->views().at(0);
    const C_PuiBsElements * const pc_Data = this->mc_CopyPasteManager.GetSnapshot(pc_View);
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_SyvDaDashboardSnapshot * const pc_SnapShot =
       dynamic_cast<const C_SyvDaDashboardSnapshot * const>(pc_Data);
 
@@ -727,19 +718,21 @@ bool C_SyvDaDashboardScene::IsItemMovable(const QGraphicsItem * const opc_Item) 
 
    // no restrictions for moving elements
    // list all items (invalid items should have unknown type)
-   if ((opc_Item->type() == msn_GRAPHICS_ITEM_DB_LABEL) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_SLIDER) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_CHART) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_TABLE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PARAM) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_IMAGE))
+   const sintn sn_Type = opc_Item->type();
+
+   if ((sn_Type == msn_GRAPHICS_ITEM_DB_LABEL) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_CHART) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
+       (sn_Type == msn_GRAPHICS_ITEM_IMAGE))
    {
       //If correct item type use the edit mode flag
       q_Return = this->mq_EditMode;
@@ -769,19 +762,21 @@ bool C_SyvDaDashboardScene::IsItemSelectable(const QGraphicsItem * const opc_Ite
 
    // no restrictions for selecting elements
    // list all items (invalid items should have unknown type)
-   if ((opc_Item->type() == msn_GRAPHICS_ITEM_DB_LABEL) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_SLIDER) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_CHART) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_TABLE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PARAM) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_IMAGE))
+   const sintn sn_Type = opc_Item->type();
+
+   if ((sn_Type == msn_GRAPHICS_ITEM_DB_LABEL) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_CHART) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
+       (sn_Type == msn_GRAPHICS_ITEM_IMAGE))
    {
       //If correct item type use the edit mode flag
       q_Return = this->mq_EditMode;
@@ -811,19 +806,21 @@ bool C_SyvDaDashboardScene::IsItemDeletable(const QGraphicsItem * const opc_Item
 
    // no restrictions for deleting elements
    // list all items (invalid items should have unknown type)
-   if ((opc_Item->type() == msn_GRAPHICS_ITEM_DB_LABEL) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_SLIDER) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_CHART) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_TABLE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PARAM) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_IMAGE))
+   const sintn sn_Type = opc_Item->type();
+
+   if ((sn_Type == msn_GRAPHICS_ITEM_DB_LABEL) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_CHART) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
+       (sn_Type == msn_GRAPHICS_ITEM_IMAGE))
    {
       //If correct item type use the edit mode flag
       q_Return = this->mq_EditMode;
@@ -853,19 +850,21 @@ bool C_SyvDaDashboardScene::IsZOrderChangeable(const QGraphicsItem * const opc_I
 
    // no restrictions for using z order
    // list all items (invalid items should have unknown type)
-   if ((opc_Item->type() == msn_GRAPHICS_ITEM_DB_LABEL) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_SLIDER) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_CHART) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_TABLE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PARAM) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_IMAGE))
+   const sintn sn_Type = opc_Item->type();
+
+   if ((sn_Type == msn_GRAPHICS_ITEM_DB_LABEL) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_CHART) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
+       (sn_Type == msn_GRAPHICS_ITEM_IMAGE))
    {
       //If correct item type use the edit mode flag
       q_Return = this->mq_EditMode;
@@ -895,19 +894,21 @@ bool C_SyvDaDashboardScene::IsAlignmentUsable(const QGraphicsItem * const opc_It
 
    // no restrictions for using alignment
    // list all items (invalid items should have unknown type)
-   if ((opc_Item->type() == msn_GRAPHICS_ITEM_DB_LABEL) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_SLIDER) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_CHART) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_TABLE) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_DB_PARAM) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (opc_Item->type() == msn_GRAPHICS_ITEM_IMAGE))
+   const sintn sn_Type = opc_Item->type();
+
+   if ((sn_Type == msn_GRAPHICS_ITEM_DB_LABEL) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_CHART) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
+       (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
+       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
+       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
+       (sn_Type == msn_GRAPHICS_ITEM_IMAGE))
    {
       //If correct item type use the edit mode flag
       q_Return = this->mq_EditMode;
@@ -960,11 +961,9 @@ void C_SyvDaDashboardScene::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) 
    // update the items
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_PuiSvDbDataElementHandler * const pc_Item = dynamic_cast<C_PuiSvDbDataElementHandler *>(*c_ItItem);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiSvDaParam * const pc_Param = dynamic_cast<C_GiSvDaParam *>(*c_ItItem);
 
       if (pc_Item != NULL)
@@ -1002,8 +1001,7 @@ void C_SyvDaDashboardScene::ConnectionActiveChanged(const bool oq_Active) const
    // inform the items
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
       if (pc_Item != NULL)
       {
@@ -1035,8 +1033,7 @@ void C_SyvDaDashboardScene::UpdateShowValues(void) const
    // update the items
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
       if (pc_Item != NULL)
       {
@@ -1056,8 +1053,7 @@ void C_SyvDaDashboardScene::UpdateTransmissionConfiguration(void) const
    // update the items
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
       if (pc_Item != NULL)
       {
@@ -1082,8 +1078,7 @@ void C_SyvDaDashboardScene::HandleManualOperationFinished(const sint32 os32_Resu
    // update the items
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
       if (pc_Item != NULL)
       {
@@ -1108,8 +1103,7 @@ void C_SyvDaDashboardScene::SetErrorForFailedCyclicElementIdRegistrations(
    // update the items
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
       if (pc_Item != NULL)
       {
@@ -1433,14 +1427,13 @@ bool C_SyvDaDashboardScene::m_HandleDeleteUserConfirmation(const QList<QGraphics
          c_MessageBox.SetCustomMinHeight(180, 180);
          e_ReturnMessageBox = c_MessageBox.Execute();
 
-         switch (e_ReturnMessageBox)
+         if (e_ReturnMessageBox == C_OgeWiCustomMessage::eOK)
          {
-         case C_OgeWiCustomMessage::eOK:
             q_Retval = true;
-            break;
-         default:
+         }
+         else
+         {
             q_Retval = false;
-            break;
          }
       }
    }
@@ -1465,8 +1458,7 @@ void C_SyvDaDashboardScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * co
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_AllItems.begin(); c_ItItem != rc_AllItems.end();
         ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_GiSvDaRectBaseGroup * const pc_Widget = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
       if (pc_Widget != NULL)
       {
@@ -1482,8 +1474,7 @@ void C_SyvDaDashboardScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * co
          // inform the item
          QGraphicsItem * const pc_Item = rc_Items.at(0);
          QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(pc_Item);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
+         
          C_GiSvDaRectBaseGroup * const pc_Widget = dynamic_cast<C_GiSvDaRectBaseGroup *>(pc_Parent);
          if (pc_Widget != NULL)
          {
@@ -1507,7 +1498,7 @@ void C_SyvDaDashboardScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * con
 
    if (rc_SelectedItems.count() == 1)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_GiSvDaRectBaseGroup * const pc_RectBase = dynamic_cast<C_GiSvDaRectBaseGroup * const>(rc_SelectedItems[0]);
 
       if (pc_RectBase != NULL)
@@ -1536,7 +1527,7 @@ void C_SyvDaDashboardScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * con
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_OnWidgetEditProperties(QGraphicsItem * const opc_Item) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_GiSvDaRectBaseGroup * const pc_RectBase = dynamic_cast<C_GiSvDaRectBaseGroup * const>(opc_Item);
 
    if (pc_RectBase != NULL)
@@ -1708,8 +1699,7 @@ void C_SyvDaDashboardScene::m_SyncIndex(const C_PuiSvDbDataElement::E_Type & ore
         ++c_ItItem)
    {
       // TODO Watch if parent necessary
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       C_PuiSvDbDataElement * const pc_DataElement = dynamic_cast<C_PuiSvDbDataElement *>(*c_ItItem);
       if (pc_DataElement != NULL)
       {
@@ -2078,8 +2068,8 @@ void C_SyvDaDashboardScene::m_SelectionChanged(void)
    // triggered by signal selectionChanged
    if (c_SelectedItems.size() == 1)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_GiBiRectBaseGroup * pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(c_SelectedItems[0]);
+      
+      C_GiBiRectBaseGroup * const pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(c_SelectedItems[0]);
 
       // check if the only one selected item is a resizable rectangle based item
       if (pc_Item != NULL)
@@ -2089,8 +2079,8 @@ void C_SyvDaDashboardScene::m_SelectionChanged(void)
       }
       else
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         C_GiLiLineGroup * pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(c_SelectedItems[0]);
+         
+         C_GiLiLineGroup * const pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(c_SelectedItems[0]);
          if (pc_LineItem != NULL)
          {
             //Custom rubberband flag
@@ -2111,16 +2101,16 @@ void C_SyvDaDashboardScene::m_SelectionChanged(void)
       for (c_ItItem = c_SelectedItems.begin(); c_ItItem != c_SelectedItems.end(); ++c_ItItem)
       {
          // check if the only one selected item is a resizable rectangle based item
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         C_GiBiRectBaseGroup * pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(*c_ItItem);
+         
+         C_GiBiRectBaseGroup * const pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(*c_ItItem);
          if (pc_Item != NULL)
          {
             pc_Item->SetResizing(false);
          }
          else
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            C_GiLiLineGroup * pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(*c_ItItem);
+            
+            C_GiLiLineGroup * const pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(*c_ItItem);
             if (pc_LineItem != NULL)
             {
                pc_LineItem->SetResizing(false);
@@ -2138,7 +2128,7 @@ void C_SyvDaDashboardScene::m_SelectionChanged(void)
 /*! \brief   Initialize base context menu manager signals (AFTER virtual get context menu manager is valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardScene::m_InitBaseSceneContextMenuManager(void)
+void C_SyvDaDashboardScene::m_InitBaseSceneContextMenuManager(void) const
 {
    connect(&this->mc_ContextMenuManager, &C_SyvDaContextMenuManager::SigEditProperties, this,
            &C_SyvDaDashboardScene::m_OnWidgetEditProperties);

@@ -98,14 +98,11 @@ public:
    void UpdateSectionsVisibility(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
    virtual void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
    virtual void dragLeaveEvent(QDragLeaveEvent * const opc_Event) override;
    virtual void dropEvent(QDropEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_SyvUpUpdatePackageNodeWidget * mpc_Ui;

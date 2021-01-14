@@ -39,10 +39,10 @@ protected:
                                                           stw_types::uint64> & orc_MapTypeAndIndexToID,
                       const C_PuiBsElements & orc_AllElements) const;
 
-   virtual stw_types::sint32 GetBoundaryType(void) const = 0;
-   virtual stw_types::sint32 GetImageType(void) const = 0;
-   virtual stw_types::sint32 GetLineArrowType(void) const = 0;
-   virtual stw_types::sint32 GetTextElementType(void) const = 0;
+   virtual stw_types::sint32 m_GetBoundaryType(void) const = 0;
+   virtual stw_types::sint32 m_GetImageType(void) const = 0;
+   virtual stw_types::sint32 m_GetLineArrowType(void) const = 0;
+   virtual stw_types::sint32 m_GetTextElementType(void) const = 0;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

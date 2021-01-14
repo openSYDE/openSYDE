@@ -315,7 +315,7 @@ void C_SdNdeHalcWidget::m_OnImportConfigClicked(void)
 {
    const QString c_Folder =
       C_SdNdeHalcWidget::mh_GetDialogPath(C_UsHandler::h_GetInstance()->GetLastKnownHalcImportPath());
-   const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE Hardware Configuration File")) + "(*" +
+   const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("openSYDE Hardware Configuration File")) + "(*" +
                             mhc_CONFIG_FILE_TYPE + ")";
 
    const QString c_FileName =
@@ -372,8 +372,7 @@ void C_SdNdeHalcWidget::m_OnImportConfigClicked(void)
          c_PopUpDialog->HideOverlay();
       }
 
-      //lint -e{429}  no memory leak because of the parent of pc_ImportDialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -396,7 +395,7 @@ void C_SdNdeHalcWidget::m_OnExportConfigClicked(void)
 
    c_FileName =
       C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("openSYDE Hardware Configuration Export"), c_Folder,
-                                     QString(C_GtGetText::h_GetText("openSYDE Hardware Configuration File")) +
+                                     static_cast<QString>(C_GtGetText::h_GetText("openSYDE Hardware Configuration File")) +
                                      " (*" + mhc_CONFIG_FILE_TYPE + ")", c_DefaultName);
 
    if (c_FileName != "")
@@ -541,7 +540,7 @@ void C_SdNdeHalcWidget::m_OnSelectClicked(void)
          C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR);
 
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Select Hardware Description"));
-         c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
+         c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
                                                 "Cannot select hardware description,\n"
                                                 "because HAL Datapools may not be created,\n"
                                                 "as the max Datapool count (%1) would be exceeded.")).arg(
@@ -605,7 +604,7 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
             C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
             c_Message.SetHeading("Update Hardware Description");
             c_Message.SetDescription(
-               QString(C_GtGetText::h_GetText("The content version '%1' of the selected hardware description "
+               static_cast<QString>(C_GtGetText::h_GetText("The content version '%1' of the selected hardware description "
                                               "equals the current hardware description version.\n"
                                               "Do you want to update the hardware description anyway?")).
                arg(c_HalcConfig.u32_ContentVersion));
@@ -662,8 +661,7 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
                c_PopUpDialog->HideOverlay();
             }
 
-            //lint -e{429} no memory leak because of the parent of pc_UpdateDialog and the Qt memory management
-         }
+         }  //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
       }
    }
 }
@@ -694,7 +692,7 @@ void C_SdNdeHalcWidget::m_RunDatapoolMagician(void)
       {
          c_Message.SetType(C_OgeWiCustomMessage::eERROR);
          c_Message.SetDescription(C_GtGetText::h_GetText("Configuration Error!"));
-         c_Message.SetDetails(QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
+         c_Message.SetDetails(static_cast<QString>("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
                               arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                               arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                               arg(C_GtGetText::h_GetText("log file")));
@@ -833,7 +831,7 @@ bool C_SdNdeHalcWidget::m_LoadHalcDefinitionFile(C_OSCHalcConfig & orc_HalcConfi
                c_Message.SetHeading(C_GtGetText::h_GetText("Load hardware description"));
                c_Message.SetDescription(C_GtGetText::h_GetText("The selected hardware description is intended for a "
                                                                "different device type. Nothing was loaded."));
-               c_Message.SetDetails(QString(C_GtGetText::h_GetText("The selected hardware description is for nodes "
+               c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("The selected hardware description is for nodes "
                                                                    "of type: %1\n"
                                                                    "The current node is of type: %2")).
                                     arg(orc_HalcConfig.c_DeviceName.c_str()).
@@ -849,7 +847,7 @@ bool C_SdNdeHalcWidget::m_LoadHalcDefinitionFile(C_OSCHalcConfig & orc_HalcConfi
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Load hardware description"));
          c_Message.SetDescription(C_GtGetText::h_GetText("Error occured loading hardware description file."));
-         c_Message.SetDetails(QString(C_GtGetText::h_GetText("For details see ")) +
+         c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("For details see ")) +
                               C_Uti::h_GetLink(C_GtGetText::h_GetText("log file."),  mc_STYLESHEET_GUIDE_COLOR_LINK,
                                                C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()));
          C_OSCLoggingHandler::h_Flush(); // update log file
@@ -906,7 +904,7 @@ void C_SdNdeHalcWidget::m_UpdatePinCount(void) const
       }
       if (u32_PinCount > 0)
       {
-         this->mpc_Ui->pc_PubOverview->setText(QString(C_GtGetText::h_GetText("Channel Overview (%1)")).arg(
+         this->mpc_Ui->pc_PubOverview->setText(static_cast<QString>(C_GtGetText::h_GetText("Channel Overview (%1)")).arg(
                                                   u32_PinCount));
       }
       else

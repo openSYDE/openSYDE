@@ -41,10 +41,7 @@ public:
    std::vector<C_CieDbcOsyNodeAssignment> GetNodeAssignments(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   //lint -restore
 
 private:
    Ui::C_CieDbcImportNodeAssignmentWidget * mpc_Ui;
@@ -64,7 +61,7 @@ private:
    void m_InitNodes(const stw_types::uint32 ou32_BusIndex,
                     const stw_opensyde_gui_logic::C_CieConverter::C_CIECommDefinition & orc_CIECommDef);
    void m_OnUnmappedCbxIndexChanged(const stw_types::sint32 os32_Index);
-   void m_UpdateComboboxEntries(const stw_types::uint32 u32_Index, const bool q_Enable,
+   void m_UpdateComboboxEntries(const stw_types::uint32 ou32_Index, const bool oq_Enable,
                                 C_CieDbcImportNodeAssignmentItemWidget * const opc_Sender);
 
    //Avoid call

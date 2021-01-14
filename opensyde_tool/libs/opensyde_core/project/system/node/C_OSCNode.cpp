@@ -1113,6 +1113,33 @@ uint32 C_OSCNode::GetElementAbsoluteAddress(const uint32 ou32_DataPoolIndex, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get HAL data pool of specified type
+
+   \param[in]  oq_SafeDatapool   Flag to differ HAL safe datapool and HAL nonsafe datapool
+
+   \return
+   NULL No matching HAL data pool found
+   Else Pointer to HAL data pool of node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCNodeDataPool * C_OSCNode::GetHalDataPoolConst(const bool oq_SafeDatapool) const
+{
+   const C_OSCNodeDataPool * pc_Retval = NULL;
+
+   for (uint32 u32_ItDatapools = 0; u32_ItDatapools < this->c_DataPools.size(); ++u32_ItDatapools)
+   {
+      const C_OSCNodeDataPool & rc_Datapool = this->c_DataPools[u32_ItDatapools];
+      if ((rc_Datapool.e_Type == C_OSCNodeDataPool::eHALC) && (rc_Datapool.q_IsSafety == oq_SafeDatapool))
+      {
+         pc_Retval = &this->c_DataPools[u32_ItDatapools];
+         break;
+      }
+   }
+
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get communication data pool for specified protocol
 
    \param[in]  ore_Protocol         Communication protocol

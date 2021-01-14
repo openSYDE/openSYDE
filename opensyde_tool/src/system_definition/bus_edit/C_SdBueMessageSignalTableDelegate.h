@@ -29,11 +29,9 @@ class C_SdBueMessageSignalTableDelegate :
 public:
    C_SdBueMessageSignalTableDelegate(QObject * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                       const QModelIndex & orc_Index) const;
-   //lint -restore
+
    bool SetHoveredRow(const stw_types::sint32 & ors32_Value);
    void SetModel(const QAbstractTableModel * const opc_Value);
 

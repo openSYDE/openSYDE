@@ -104,6 +104,8 @@ public:
    //Search
    void GetAllMessagesFromDatabase(const QString & orc_File, QStringList * const opc_CompleteMessageNames,
                                    std::vector<stw_types::uint32> * const opc_MessageIndices) const;
+   std::vector<stw_types::uint32> GetInvalidMessagesFromDatabase(const QString & orc_File) const;
+   std::vector<stw_types::uint32> GetInvalidMessagesWithNoDatabase(void) const;
    bool CheckFilterNameAvailable(const QString & orc_Name) const;
 
    //Utility

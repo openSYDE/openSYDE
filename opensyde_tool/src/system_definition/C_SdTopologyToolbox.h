@@ -45,14 +45,11 @@ public:
    void InitStaticNames(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void enterEvent(QEvent * const opc_Event) override;
    virtual void leaveEvent(QEvent * const opc_Event) override;
    virtual void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
    virtual void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
    virtual void dropEvent(QDropEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

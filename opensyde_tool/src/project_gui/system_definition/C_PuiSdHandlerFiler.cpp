@@ -1775,7 +1775,8 @@ sint32 C_PuiSdHandlerFiler::h_SaveSystemDefinitionUiFile(const QString & orc_Fil
                C_PuiSdHandlerFiler::mh_SaveNodeFile(rc_UINode, rc_OSCNode, c_Folder.absoluteFilePath(
                                                        c_FileName), &c_Folder);
             //Store file name
-            c_XMLParser.CreateNodeChild("node", QString(c_FolderName + "/" + c_FileName).toStdString().c_str());
+            c_XMLParser.CreateNodeChild("node",
+                                        static_cast<QString>(c_FolderName + "/" + c_FileName).toStdString().c_str());
          }
       }
       else
@@ -1921,8 +1922,8 @@ QString C_PuiSdHandlerFiler::h_GetNodeUiFileName(void)
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSdHandlerFiler::h_GetCommUiFileName(const C_SCLString & orc_DatapoolName)
 {
-   return C_SCLString("comm_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(orc_DatapoolName) +
-                      "_ui.xml").c_str();
+   return ("comm_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(orc_DatapoolName) +
+           "_ui.xml").c_str();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1936,8 +1937,8 @@ QString C_PuiSdHandlerFiler::h_GetCommUiFileName(const C_SCLString & orc_Datapoo
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSdHandlerFiler::h_GetDatapoolUiFileName(const C_SCLString & orc_DatapoolName)
 {
-   return C_SCLString("dp_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(orc_DatapoolName) +
-                      "_ui.xml").c_str();
+   return ("dp_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(orc_DatapoolName) +
+           "_ui.xml").c_str();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2419,7 +2420,7 @@ stw_types::sint32 C_PuiSdHandlerFiler::mh_LoadTextElement(C_PuiBsTextElement * c
                                                           stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Return;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_PuiSdTextElementBus * const opc_BusTextElement =
       dynamic_cast<C_PuiSdTextElementBus * const>(opc_TextElement);
 
@@ -2442,7 +2443,7 @@ stw_types::sint32 C_PuiSdHandlerFiler::mh_LoadTextElement(C_PuiBsTextElement * c
 void C_PuiSdHandlerFiler::mh_SaveTextElement(const C_PuiBsTextElement * const opc_TextElement,
                                              stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_PuiSdTextElementBus * const opc_BusTextElement =
       dynamic_cast<const C_PuiSdTextElementBus * const>(opc_TextElement);
 

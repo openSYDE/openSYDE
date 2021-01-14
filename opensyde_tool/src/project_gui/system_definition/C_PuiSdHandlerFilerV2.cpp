@@ -1546,7 +1546,6 @@ stw_types::sint32 C_PuiSdHandlerFilerV2::mh_LoadTextElement(C_PuiBsTextElement *
                                                             stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Return;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_PuiSdTextElementBus * const opc_BusTextElement =
       dynamic_cast<C_PuiSdTextElementBus * const>(opc_TextElement);
 
@@ -1569,7 +1568,6 @@ stw_types::sint32 C_PuiSdHandlerFilerV2::mh_LoadTextElement(C_PuiBsTextElement *
 void C_PuiSdHandlerFilerV2::mh_SaveTextElement(const C_PuiBsTextElement * const opc_TextElement,
                                                stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_PuiSdTextElementBus * const opc_BusTextElement =
       dynamic_cast<const C_PuiSdTextElementBus * const>(opc_TextElement);
 

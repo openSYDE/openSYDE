@@ -54,13 +54,13 @@ C_OgeWiDashboardSpinBoxGroup::C_OgeWiDashboardSpinBoxGroup(QWidget * const opc_P
 void C_OgeWiDashboardSpinBoxGroup::AdjustFontToSize(void)
 {
    //Consider borders (absolute) + buttons (relative)!
-   const sintn sn_ImprovedWidth = (this->size().width() - 2) - GetSpinButtonWidth();
+   const sintn sn_ImprovedWidth = (this->size().width() - 2) - m_GetSpinButtonWidth();
    const QSize c_Size = QSize(std::max(1, sn_ImprovedWidth), this->size().height() - 2);
    const sintn sn_NewPointSize = C_OgeWiUtil::h_UpdateFontSize(this, this->GetText(), 1.0F, false, &c_Size);
 
    if (sn_NewPointSize > 0)
    {
-      this->setStyleSheet(QString("*{font-size:%1pt;}").arg(sn_NewPointSize));
+      this->setStyleSheet(static_cast<QString>("*{font-size:%1pt;}").arg(sn_NewPointSize));
    }
 }
 

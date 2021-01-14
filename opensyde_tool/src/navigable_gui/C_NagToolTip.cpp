@@ -73,8 +73,7 @@ C_NagToolTip::C_NagToolTip(const QString & orc_Heading, const QString & orc_Cont
       c_Color.setAlpha(110);
       pc_Shadow->setColor(c_Color);
       this->mpc_Ui->mpc_GroupBox->setGraphicsEffect(pc_Shadow);
-      //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

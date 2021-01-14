@@ -53,17 +53,14 @@ Q_SIGNALS:
    void SigTextInteractionModeStateChanged(const bool & orq_On);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual QVariant itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value) override;
-   //lint -restore
 
 private:
    //Avoid call
    C_GiText(const C_GiText &);
-   C_GiText & operator =(const C_GiText &);
+   C_GiText & operator =(const C_GiText &); //lint !e1511 //we want to hide the base func.
 
    bool mq_Editable;
 };

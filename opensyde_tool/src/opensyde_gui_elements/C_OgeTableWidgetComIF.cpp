@@ -186,7 +186,6 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
 
       if (this->mpc_ToolTip->isVisible() == false)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
          if (pc_HelpEvent != NULL)
@@ -295,7 +294,6 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
    //Necessary to detect mouse move events over integrated widgets
    else if (opc_Event->type() == QEvent::HoverMove)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       QHoverEvent * const pc_HoverEvent = dynamic_cast<QHoverEvent * const>(opc_Event);
       bool q_IpAddressHovered = false;  // for pointing-hand-cursor on link to IP address settings
       bool q_BusBitrateHovered = false; // for pointing-hand-cursor on link to bus property screen
@@ -307,7 +305,6 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
          QModelIndex c_Index = this->indexAt(this->viewport()->mapFromGlobal(this->mapToGlobal(pc_HoverEvent->pos())));
          if (c_Index.isValid())
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             QLabel * const pc_Label = dynamic_cast<QLabel * const>(this->cellWidget(c_Index.row(), c_Index.column()));
             if ((pc_Label != NULL) && ((pc_Label->text().split(".")).size() == 4))
             {

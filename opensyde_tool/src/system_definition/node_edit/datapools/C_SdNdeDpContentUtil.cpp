@@ -107,6 +107,8 @@ sint32 C_SdNdeDpContentUtil::h_GetValueAsFloat64(const C_OSCNodeDataPoolContent 
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orf64_Output = orc_Content.GetValueAF64Element(ou32_Index);
             break;
+         default:
+            break;
          }
       }
       else
@@ -148,6 +150,8 @@ sint32 C_SdNdeDpContentUtil::h_GetValueAsFloat64(const C_OSCNodeDataPoolContent 
          break;
       case C_OSCNodeDataPoolContent::eFLOAT64:
          orf64_Output = orc_Content.GetValueF64();
+         break;
+      default:
          break;
       }
    }
@@ -211,6 +215,8 @@ void C_SdNdeDpContentUtil::h_GetValuesAsFloat64(const C_OSCNodeDataPoolContent &
          case C_OSCNodeDataPoolContent::eFLOAT64:
             f64_Value = orc_Content.GetValueAF64Element(u32_It);
             break;
+         default:
+            break;
          }
 
          orc_Output.push_back(f64_Value);
@@ -272,6 +278,8 @@ void C_SdNdeDpContentUtil::h_GetAnyValueAsUint64(const C_OSCNodeDataPoolContent 
          case C_OSCNodeDataPoolContent::eFLOAT64:
             oru64_Output = static_cast<uint64>(orc_Content.GetValueAF64Element(ou32_Index));
             break;
+         default:
+            break;
          }
       }
    }
@@ -308,6 +316,8 @@ void C_SdNdeDpContentUtil::h_GetAnyValueAsUint64(const C_OSCNodeDataPoolContent 
          break;
       case C_OSCNodeDataPoolContent::eFLOAT64:
          oru64_Output = static_cast<uint64>(orc_Content.GetValueF64());
+         break;
+      default:
          break;
       }
    }
@@ -362,6 +372,8 @@ void C_SdNdeDpContentUtil::h_GetAnyValueAsSint64(const C_OSCNodeDataPoolContent 
          case C_OSCNodeDataPoolContent::eFLOAT64:
             ors64_Output = static_cast<sint64>(orc_Content.GetValueAF64Element(ou32_Index));
             break;
+         default:
+            break;
          }
       }
    }
@@ -399,6 +411,8 @@ void C_SdNdeDpContentUtil::h_GetAnyValueAsSint64(const C_OSCNodeDataPoolContent 
       case C_OSCNodeDataPoolContent::eFLOAT64:
          ors64_Output = static_cast<sint64>(orc_Content.GetValueF64());
          break;
+      default:
+         break;
       }
    }
 }
@@ -426,17 +440,14 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
    switch (orc_Content.GetType())
    {
    case C_OSCNodeDataPoolContent::eUINT8:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (os64_Value <= static_cast<sint64>(std::numeric_limits<uint8>::lowest()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAU8Element(std::numeric_limits<uint8>::lowest(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueU8(std::numeric_limits<uint8>::lowest());
          }
          q_ValueAssigned = true;
@@ -445,29 +456,24 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAU8Element(std::numeric_limits<uint8>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueU8(std::numeric_limits<uint8>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eUINT16:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (os64_Value <= static_cast<sint64>(std::numeric_limits<uint16>::lowest()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAU16Element(std::numeric_limits<uint16>::lowest(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueU16(std::numeric_limits<uint16>::lowest());
          }
          q_ValueAssigned = true;
@@ -476,29 +482,24 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAU16Element(std::numeric_limits<uint16>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueU16(std::numeric_limits<uint16>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eUINT32:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (os64_Value <= static_cast<sint64>(std::numeric_limits<uint32>::lowest()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAU32Element(std::numeric_limits<uint32>::lowest(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueU32(std::numeric_limits<uint32>::lowest());
          }
          q_ValueAssigned = true;
@@ -507,29 +508,24 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAU32Element(std::numeric_limits<uint32>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueU32(std::numeric_limits<uint32>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eUINT64:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (os64_Value <= static_cast<sint64>(std::numeric_limits<uint64>::lowest()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,747,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAU64Element(std::numeric_limits<uint64>::lowest(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,747,1015,1013,1960}  c++11 feature
             orc_Content.SetValueU64(std::numeric_limits<uint64>::lowest());
          }
          q_ValueAssigned = true;
@@ -537,17 +533,14 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
       //Value cannot be over uint64 max
       break;
    case C_OSCNodeDataPoolContent::eSINT8:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (os64_Value <= static_cast<sint64>(std::numeric_limits<sint8>::lowest()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAS8Element(std::numeric_limits<sint8>::lowest(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueS8(std::numeric_limits<sint8>::lowest());
          }
          q_ValueAssigned = true;
@@ -556,29 +549,24 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAS8Element(std::numeric_limits<sint8>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueS8(std::numeric_limits<sint8>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eSINT16:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (os64_Value <= static_cast<sint64>(std::numeric_limits<sint16>::lowest()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAS16Element(std::numeric_limits<sint16>::lowest(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueS16(std::numeric_limits<sint16>::lowest());
          }
          q_ValueAssigned = true;
@@ -587,29 +575,24 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAS16Element(std::numeric_limits<sint16>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueS16(std::numeric_limits<sint16>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eSINT32:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (os64_Value <= static_cast<sint64>(std::numeric_limits<sint32>::lowest()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAS32Element(std::numeric_limits<sint32>::lowest(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueS32(std::numeric_limits<sint32>::lowest());
          }
          q_ValueAssigned = true;
@@ -618,12 +601,10 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAS32Element(std::numeric_limits<sint32>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueS32(std::numeric_limits<sint32>::max());
          }
          q_ValueAssigned = true;
@@ -632,6 +613,8 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
    case C_OSCNodeDataPoolContent::eSINT64:
       //Value cannot be out of range for sint64
       break;
+   case C_OSCNodeDataPoolContent::eFLOAT32:
+   case C_OSCNodeDataPoolContent::eFLOAT64:
    default:
       //Not an integer type
       break;
@@ -673,6 +656,8 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orc_Content.SetValueAF64Element(static_cast<float64>(os64_Value), ou32_ArrayIndex);
             break;
+         default:
+            break;
          }
       }
       else
@@ -708,6 +693,8 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
             break;
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orc_Content.SetValueF64(static_cast<float64>(os64_Value));
+            break;
+         default:
             break;
          }
       }
@@ -937,6 +924,8 @@ sint32 C_SdNdeDpContentUtil::h_GetNumberOfAvailableSteps(const C_OSCNodeDataPool
             s32_Retval = C_RANGE;
          }
          break;
+      case C_OSCNodeDataPoolContent::eFLOAT32:
+      case C_OSCNodeDataPoolContent::eFLOAT64:
       default:
          s32_Retval = C_RANGE;
          break;
@@ -1046,6 +1035,8 @@ sint32 C_SdNdeDpContentUtil::h_GetMinMaxAfterScaling(const C_OSCNodeDataPoolCont
                orc_NewMin.SetValueF64(f64_Min);
                orc_NewMax.SetValueF64(f64_Max);
                break;
+            default:
+               break;
             }
          }
          else
@@ -1130,6 +1121,8 @@ sint32 C_SdNdeDpContentUtil::h_GetMinMaxAfterScaling(const C_OSCNodeDataPoolCont
                   //Set output
                   orc_NewMin.SetValueF64(f64_Min);
                   orc_NewMax.SetValueF64(f64_Max);
+                  break;
+               default:
                   break;
                }
             }
@@ -1279,28 +1272,24 @@ C_OSCNodeDataPoolContent::E_Type C_SdNdeDpContentUtil::h_GetMinimumTypeForRange(
          if (of64_Min < 0.0)
          {
             //Signed integer
-            //lint -e{530,10,1015,1013}  c++11 feature
             if (((of64_Min >= static_cast<float64>(std::numeric_limits<sint8>::lowest())) &&
                  (of64_Max <= static_cast<float64>(std::numeric_limits<sint8>::max()))) &&
                 (ou64_Steps <= static_cast<uint64>(std::numeric_limits<uint8>::max())))
             {
                e_Retval = C_OSCNodeDataPoolContent::eSINT8;
             }
-            //lint -e{530,10,1015,1013}  c++11 feature
             else if (((of64_Min >= static_cast<float64>(std::numeric_limits<sint16>::lowest())) &&
                       (of64_Max <= static_cast<float64>(std::numeric_limits<sint16>::max()))) &&
                      (ou64_Steps <= static_cast<uint64>(std::numeric_limits<uint16>::max())))
             {
                e_Retval = C_OSCNodeDataPoolContent::eSINT16;
             }
-            //lint -e{530,10,1015,1013}  c++11 feature
             else if (((of64_Min >= static_cast<float64>(std::numeric_limits<sint32>::lowest())) &&
                       (of64_Max <= static_cast<float64>(std::numeric_limits<sint32>::max()))) &&
                      (ou64_Steps <= static_cast<uint64>(std::numeric_limits<uint32>::max())))
             {
                e_Retval = C_OSCNodeDataPoolContent::eSINT32;
             }
-            //lint -e{530,10,1015,1013}  c++11 feature
             else if ((of64_Min >= static_cast<float64>(std::numeric_limits<sint64>::lowest())) &&
                      (of64_Max <= static_cast<float64>(std::numeric_limits<sint64>::max())))
             {
@@ -1395,6 +1384,8 @@ sint32 C_SdNdeDpContentUtil::h_SimpleConvertToVariant(const C_OSCNodeDataPoolCon
       case C_OSCNodeDataPoolContent::eFLOAT64:
          orc_Variant = orc_Content.GetValueF64();
          break;
+      default:
+         break;
       }
    }
    else
@@ -1424,7 +1415,7 @@ sint32 C_SdNdeDpContentUtil::h_SimpleConvertFromVariant(const QVariant & orc_Var
    bool q_Ok;
    sint32 s32_Retval = C_NO_ERR;
 
-   switch (orc_Variant.type())
+   switch (orc_Variant.type()) //lint !e788 not all types handled here
    {
    case QVariant::Int:
       orc_Content.SetType(C_OSCNodeDataPoolContent::eSINT32);
@@ -1467,20 +1458,23 @@ sint32 C_SdNdeDpContentUtil::h_SimpleConvertFromVariant(const QVariant & orc_Var
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all values as scaled strings
 
-   \param[in]   orc_Content   The source content
-   \param[in]   of64_Factor   Scaling factor
-   \param[in]   of64_Offset   Scaling offset
-   \param[out]  orc_Output    Scaled strings
+   \param[in]   orc_Content               The source content
+   \param[in]   of64_Factor               Scaling factor
+   \param[in]   of64_Offset               Scaling offset
+   \param[out]  orc_Output                Scaled strings
+   \param[in]   oq_AllowRangeAdaptation   Allow range adaptation
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_GetValuesAsScaledString(const C_OSCNodeDataPoolContent & orc_Content,
                                                      const float64 of64_Factor, const float64 of64_Offset,
-                                                     std::vector<QString> & orc_Output)
+                                                     std::vector<QString> & orc_Output,
+                                                     const bool oq_AllowRangeAdaptation)
 {
    if (orc_Content.GetArray() == false)
    {
       QString c_Tmp;
-      C_SdNdeDpContentUtil::h_GetValueAsScaledString(orc_Content, of64_Factor, of64_Offset, c_Tmp, 0);
+      C_SdNdeDpContentUtil::h_GetValueAsScaledString(orc_Content, of64_Factor, of64_Offset, c_Tmp, 0,
+                                                     oq_AllowRangeAdaptation);
       orc_Output.push_back(c_Tmp);
    }
    else
@@ -1490,7 +1484,7 @@ void C_SdNdeDpContentUtil::h_GetValuesAsScaledString(const C_OSCNodeDataPoolCont
       {
          QString c_Tmp;
          C_SdNdeDpContentUtil::h_GetValueAsScaledString(orc_Content, of64_Factor, of64_Offset, c_Tmp,
-                                                        u32_ItElement);
+                                                        u32_ItElement, oq_AllowRangeAdaptation);
          orc_Output.push_back(c_Tmp);
       }
    }
@@ -1499,19 +1493,20 @@ void C_SdNdeDpContentUtil::h_GetValuesAsScaledString(const C_OSCNodeDataPoolCont
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all values as one scaled and combined string
 
-   \param[in]   orc_Content   The source content
-   \param[in]   of64_Factor   Scaling factor
-   \param[in]   of64_Offset   Scaling offset
-   \param[out]  orc_Output    Scaled and combined string
+   \param[in]   orc_Content               The source content
+   \param[in]   of64_Factor               Scaling factor
+   \param[in]   of64_Offset               Scaling offset
+   \param[out]  orc_Output                Scaled and combined string
+   \param[in]   oq_AllowRangeAdaptation   Allow range adaptation
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(const C_OSCNodeDataPoolContent & orc_Content,
                                                              const float64 of64_Factor, const float64 of64_Offset,
-                                                             QString & orc_Output)
+                                                             QString & orc_Output, const bool oq_AllowRangeAdaptation)
 {
    std::vector<QString> c_Output;
    C_SdNdeDpContentUtil::h_GetValuesAsScaledString(orc_Content, of64_Factor, of64_Offset,
-                                                   c_Output);
+                                                   c_Output, oq_AllowRangeAdaptation);
    orc_Output = C_SdNdeDpContentUtil::h_CombineString(c_Output);
 }
 
@@ -1542,20 +1537,22 @@ QString C_SdNdeDpContentUtil::h_CombineString(const std::vector<QString> & orc_I
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all value as scaled string
 
-   \param[in]   orc_Content   The source content
-   \param[in]   of64_Factor   Scaling factor
-   \param[in]   of64_Offset   Scaling offset
-   \param[out]  orc_Output    Scaled string
-   \param[in]   ou32_Index    Index to use in case of array
+   \param[in]   orc_Content               The source content
+   \param[in]   of64_Factor               Scaling factor
+   \param[in]   of64_Offset               Scaling offset
+   \param[out]  orc_Output                Scaled string
+   \param[in]   ou32_Index                Index to use in case of array
+   \param[in]   oq_AllowRangeAdaptation   Allow range adaptation
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_GetValueAsScaledString(const C_OSCNodeDataPoolContent & orc_Content,
                                                     const float64 of64_Factor, const float64 of64_Offset,
-                                                    QString & orc_Output, const uint32 ou32_Index)
+                                                    QString & orc_Output, const uint32 ou32_Index,
+                                                    const bool oq_AllowRangeAdaptation)
 {
    std::string c_Str;
 
-   orc_Content.GetValueAsScaledString(of64_Factor, of64_Offset, c_Str, ou32_Index);
+   orc_Content.GetValueAsScaledString(of64_Factor, of64_Offset, c_Str, ou32_Index, oq_AllowRangeAdaptation);
    orc_Output = c_Str.c_str();
    //Replace separators
    orc_Output.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(), Qt::CaseInsensitive);
@@ -1701,6 +1698,8 @@ void C_SdNdeDpContentUtil::h_InitMax(C_OSCNodeDataPoolContent & orc_Content)
          }
       }
       break;
+   default:
+      break;
    }
 }
 
@@ -1717,14 +1716,12 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
    case C_OSCNodeDataPoolContent::eSINT8:
       if (orc_Content.GetArray() == false)
       {
-         //lint -e{10,530,734,1015,1013,1960}  c++11 feature
          orc_Content.SetValueS8(std::numeric_limits<sint8>::lowest());
       }
       else
       {
          for (uint32 u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
          {
-            //lint -e{10,530,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAS8Element(std::numeric_limits<sint8>::lowest(), u32_It);
          }
       }
@@ -1732,14 +1729,12 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
    case C_OSCNodeDataPoolContent::eSINT16:
       if (orc_Content.GetArray() == false)
       {
-         //lint -e{10,530,734,1015,1013,1960}  c++11 feature
          orc_Content.SetValueS16(std::numeric_limits<sint16>::lowest());
       }
       else
       {
          for (uint32 u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
          {
-            //lint -e{10,530,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAS16Element(std::numeric_limits<sint16>::lowest(), u32_It);
          }
       }
@@ -1747,14 +1742,12 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
    case C_OSCNodeDataPoolContent::eSINT32:
       if (orc_Content.GetArray() == false)
       {
-         //lint -e{530,10,1015,1013}  c++11 feature
          orc_Content.SetValueS32(std::numeric_limits<sint32>::lowest());
       }
       else
       {
          for (uint32 u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAS32Element(std::numeric_limits<sint32>::lowest(), u32_It);
          }
       }
@@ -1762,14 +1755,12 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
    case C_OSCNodeDataPoolContent::eSINT64:
       if (orc_Content.GetArray() == false)
       {
-         //lint -e{10,530,747,1015,1013}  c++11 feature
          orc_Content.SetValueS64(std::numeric_limits<sint64>::lowest());
       }
       else
       {
          for (uint32 u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
          {
-            //lint -e{10,530,747,1015,1013}  c++11 feature
             orc_Content.SetValueAS64Element(std::numeric_limits<sint64>::lowest(), u32_It);
          }
       }
@@ -1777,14 +1768,12 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
    case C_OSCNodeDataPoolContent::eUINT8:
       if (orc_Content.GetArray() == false)
       {
-         //lint -e{10,530,734,1015,1013,1960}  c++11 feature
          orc_Content.SetValueU8(std::numeric_limits<uint8>::lowest());
       }
       else
       {
          for (uint32 u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
          {
-            //lint -e{10,530,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAU8Element(std::numeric_limits<uint8>::lowest(), u32_It);
          }
       }
@@ -1792,14 +1781,12 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
    case C_OSCNodeDataPoolContent::eUINT16:
       if (orc_Content.GetArray() == false)
       {
-         //lint -e{10,530,734,1015,1013,1960}  c++11 feature
          orc_Content.SetValueU16(std::numeric_limits<uint16>::lowest());
       }
       else
       {
          for (uint32 u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
          {
-            //lint -e{10,530,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAU16Element(std::numeric_limits<uint16>::lowest(), u32_It);
          }
       }
@@ -1807,14 +1794,12 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
    case C_OSCNodeDataPoolContent::eUINT32:
       if (orc_Content.GetArray() == false)
       {
-         //lint -e{530,10,1015,1013}  c++11 feature
          orc_Content.SetValueU32(std::numeric_limits<uint32>::lowest());
       }
       else
       {
          for (uint32 u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAU32Element(std::numeric_limits<uint32>::lowest(), u32_It);
          }
       }
@@ -1822,14 +1807,12 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
    case C_OSCNodeDataPoolContent::eUINT64:
       if (orc_Content.GetArray() == false)
       {
-         //lint -e{10,530,747,1015,1013}  c++11 feature
          orc_Content.SetValueU64(std::numeric_limits<uint64>::lowest());
       }
       else
       {
          for (uint32 u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
          {
-            //lint -e{10,530,747,1015,1013}  c++11 feature
             orc_Content.SetValueAU64Element(std::numeric_limits<uint64>::lowest(), u32_It);
          }
       }
@@ -1837,14 +1820,12 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
    case C_OSCNodeDataPoolContent::eFLOAT32:
       if (orc_Content.GetArray() == false)
       {
-         //lint -e{10,530,747,1015,1013,1960}  c++11 feature
          orc_Content.SetValueF32(std::numeric_limits<float32>::lowest());
       }
       else
       {
          for (uint32 u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
          {
-            //lint -e{10,530,747,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAF32Element(std::numeric_limits<float32>::lowest(), u32_It);
          }
       }
@@ -1852,17 +1833,17 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
    case C_OSCNodeDataPoolContent::eFLOAT64:
       if (orc_Content.GetArray() == false)
       {
-         //lint -e{10,530,747,1015,1013,1960}  c++11 feature
          orc_Content.SetValueF64(std::numeric_limits<float64>::lowest());
       }
       else
       {
          for (uint32 u32_It = 0; u32_It < orc_Content.GetArraySize(); ++u32_It)
          {
-            //lint -e{10,530,747,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAF64Element(std::numeric_limits<float64>::lowest(), u32_It);
          }
       }
+      break;
+   default:
       break;
    }
 }
@@ -1917,7 +1898,6 @@ QVariant C_SdNdeDpContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPool
          c_Retval = orc_Input.GetValueF64();
          break;
       default:
-         //Nothing to do
          break;
       }
    }
@@ -1956,7 +1936,6 @@ QVariant C_SdNdeDpContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPool
          c_Retval = orc_Input.GetValueAF64Element(oru32_Index);
          break;
       default:
-         //Nothing to do
          break;
       }
    }
@@ -1966,10 +1945,11 @@ QVariant C_SdNdeDpContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPool
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert node data pool content type to QVariant using scaling
 
-   \param[in]  orc_Input      Node data pool content type
-   \param[in]  of64_Factor    Factor
-   \param[in]  of64_Offset    Offset
-   \param[in]  oru32_Index    Optional array index
+   \param[in]  orc_Input                  Node data pool content type
+   \param[in]  of64_Factor                Factor
+   \param[in]  of64_Offset                Offset
+   \param[in]  oru32_Index                Optional array index
+   \param[in]  oq_AllowRangeAdaptation    Allow range adaptation
 
    \return
    QVariant content
@@ -1977,7 +1957,8 @@ QVariant C_SdNdeDpContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPool
 //----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(const C_OSCNodeDataPoolContent & orc_Input,
                                                                const float64 of64_Factor, const float64 of64_Offset,
-                                                               const uint32 & oru32_Index)
+                                                               const uint32 & oru32_Index,
+                                                               const bool oq_AllowRangeAdaptation)
 {
    QVariant c_Retval;
 
@@ -1991,7 +1972,8 @@ QVariant C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(const C_OSCNodeDa
       C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_Input, c_Values);
       if (oru32_Index < c_Values.size())
       {
-         const float64 f64_ScaledValue = C_OSCUtils::h_GetValueScaled(c_Values[oru32_Index], of64_Factor, of64_Offset);
+         const float64 f64_ScaledValue = C_OSCUtils::h_GetValueScaled(c_Values[oru32_Index], of64_Factor, of64_Offset,
+                                                                      oq_AllowRangeAdaptation);
          if (C_Uti::h_CheckFloatHasNoFractionPart(f64_ScaledValue) == false)
          {
             c_Retval = f64_ScaledValue;
@@ -2037,7 +2019,7 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   switch (orc_Value.type())
+   switch (orc_Value.type()) //lint !e788 not all types handled here
    {
    case QVariant::ULongLong:
       if (orc_Output.GetArray() == false)
@@ -2075,7 +2057,6 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
             orc_Output.SetValueF64(static_cast<float64>(orc_Value.toULongLong()));
             break;
          default:
-            //Nothing to do
             break;
          }
       }
@@ -2114,7 +2095,6 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
             orc_Output.SetValueAF64Element(static_cast<float64>(orc_Value.toULongLong()), oru32_Index);
             break;
          default:
-            //Nothing to do
             break;
          }
       }
@@ -2155,7 +2135,6 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
             orc_Output.SetValueF64(static_cast<float64>(orc_Value.toLongLong()));
             break;
          default:
-            //Nothing to do
             break;
          }
       }
@@ -2194,7 +2173,6 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
             orc_Output.SetValueAF64Element(static_cast<float64>(orc_Value.toLongLong()), oru32_Index);
             break;
          default:
-            //Nothing to do
             break;
          }
       }
@@ -2235,7 +2213,6 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
             orc_Output.SetValueF64(static_cast<float64>(orc_Value.toUInt()));
             break;
          default:
-            //Nothing to do
             break;
          }
       }
@@ -2274,7 +2251,6 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
             orc_Output.SetValueAF64Element(static_cast<float64>(orc_Value.toUInt()), oru32_Index);
             break;
          default:
-            //Nothing to do
             break;
          }
       }
@@ -2315,7 +2291,6 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
             orc_Output.SetValueF64(static_cast<float64>(orc_Value.toInt()));
             break;
          default:
-            //Nothing to do
             break;
          }
       }
@@ -2354,7 +2329,6 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
             orc_Output.SetValueAF64Element(static_cast<float64>(orc_Value.toInt()), oru32_Index);
             break;
          default:
-            //Nothing to do
             break;
          }
       }
@@ -2395,7 +2369,6 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
             orc_Output.SetValueF64(static_cast<float64>(orc_Value.toDouble()));
             break;
          default:
-            //Nothing to do
             break;
          }
       }
@@ -2434,7 +2407,6 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
             orc_Output.SetValueAF64Element(static_cast<float64>(orc_Value.toDouble()), oru32_Index);
             break;
          default:
-            //Nothing to do
             break;
          }
       }
@@ -2477,7 +2449,7 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(const QVari
       float64 f64_TmpValue = 0.0;
       bool q_Success;
 
-      switch (orc_Value.type())
+      switch (orc_Value.type()) //lint !e788 not all types handled here
       {
       case QVariant::Int:
          f64_TmpValue = static_cast<float64>(orc_Value.toInt(&q_Success));

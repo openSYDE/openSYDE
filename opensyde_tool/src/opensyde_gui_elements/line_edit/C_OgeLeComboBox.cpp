@@ -54,7 +54,6 @@ C_OgeLeComboBox::C_OgeLeComboBox(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeComboBox::mousePressEvent(QMouseEvent * const opc_Event)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_OgeCbxText * const pc_Parent = dynamic_cast<C_OgeCbxText *>(this->parent());
 
    C_OgeLeContextMenuBase::mousePressEvent(opc_Event);

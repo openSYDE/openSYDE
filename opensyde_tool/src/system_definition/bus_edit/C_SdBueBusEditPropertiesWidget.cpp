@@ -247,7 +247,7 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
             }
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidNodesForBitRate.size())
             {
-               c_Content += QString("+%1\n").arg(c_InvalidNodesForBitRate.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+               c_Content += static_cast<QString>("+%1\n").arg(c_InvalidNodesForBitRate.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
          }
@@ -361,7 +361,7 @@ void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SdBueBusEditPropertiesWidget::m_GetComboBoxString(const uint32 ou32_Bitrate) const
 {
-   const QString c_Text = QString::number(ou32_Bitrate) + QString(" kbit/s");
+   const QString c_Text = QString::number(ou32_Bitrate) + static_cast<QString>(" kbit/s");
 
    return c_Text;
 }
@@ -488,7 +488,7 @@ void C_SdBueBusEditPropertiesWidget::m_RegisterNameChange(void)
                                                                  c_str(), &this->mu32_BusIndex,
                                                                  &c_ExistingNames) == false)
       {
-         const QString c_Description = QString(C_GtGetText::h_GetText(
+         const QString c_Description = static_cast<QString>(C_GtGetText::h_GetText(
                                                   "A bus with the name \"%1\" already exists. Choose another name.")).
                                        arg(this->mpc_Ui->pc_LineEditBusName->text());
          QString c_Details;
@@ -499,7 +499,7 @@ void C_SdBueBusEditPropertiesWidget::m_RegisterNameChange(void)
          for (uint32 u32_ItExistingName = 0UL; u32_ItExistingName < c_ExistingNames.size(); ++u32_ItExistingName)
          {
             const C_SCLString & rc_Name = c_ExistingNames[u32_ItExistingName];
-            c_Details.append(QString("\"%1\"\n").arg(rc_Name.c_str()));
+            c_Details.append(static_cast<QString>("\"%1\"\n").arg(rc_Name.c_str()));
          }
          c_Message.SetDetails(c_Details);
          c_Message.SetCustomMinHeight(180, 300);

@@ -79,7 +79,6 @@ C_SdNdeDpListsWidget::C_SdNdeDpListsWidget(QWidget * const opc_Parent) :
            &C_SdNdeDpListsWidget::SigSizeChange);
    connect(this->mpc_Ui->pc_TreeWidget, &C_SdNdeDpListsTreeWidget::SigSelectionChanged, this,
            &C_SdNdeDpListsWidget::m_HandleSelection);
-   //lint -e{64,918,1025,1703} Qt interface
    connect(this->mpc_Ui->pc_TreeWidget, &C_SdNdeDpListsTreeWidget::SigButtonChange, this,
            &C_SdNdeDpListsWidget::m_HandleButtonChange);
    connect(this->mpc_Ui->pc_TreeWidget, &C_SdNdeDpListsTreeWidget::SigChanged, this,
@@ -240,7 +239,7 @@ void C_SdNdeDpListsWidget::m_UpdateDpLabel(const uint32 ou32_NodeIndex, const ui
    {
       const sint32 s32_TypeSpecificNum = C_PuiSdHandler::h_GetInstance()->GetDataPoolTypeIndex(ou32_NodeIndex,
                                                                                                ou32_DataPoolIndex);
-      const QString c_Text = QString(C_GtGetText::h_GetText("%1 Datapool: #%2 %3")).
+      const QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("%1 Datapool: #%2 %3")).
                              arg(C_PuiSdUtil::h_ConvertDataPoolTypeToString(pc_Dp->e_Type)).
                              arg(s32_TypeSpecificNum + 1).
                              arg(pc_Dp->c_Name.c_str());
@@ -301,11 +300,11 @@ void C_SdNdeDpListsWidget::m_HandleSelection(const uint32 & oru32_Count, const b
       {
          if (this->mu32_LastKnownListSelectionCount == 1)
          {
-            c_Text = QString(C_GtGetText::h_GetText("1 List selected"));
+            c_Text = static_cast<QString>(C_GtGetText::h_GetText("1 List selected"));
          }
          else
          {
-            c_Text = QString(C_GtGetText::h_GetText("%1 Lists selected")).arg(this->mu32_LastKnownListSelectionCount);
+            c_Text = static_cast<QString>(C_GtGetText::h_GetText("%1 Lists selected")).arg(this->mu32_LastKnownListSelectionCount);
          }
       }
       else
@@ -314,13 +313,13 @@ void C_SdNdeDpListsWidget::m_HandleSelection(const uint32 & oru32_Count, const b
          if (this->mu32_LastKnownTableSelectionCount == 1)
          {
             //Translation: 1: Data element type
-            c_Text = QString(C_GtGetText::h_GetText("1 %1 selected")).arg(c_Type);
+            c_Text = static_cast<QString>(C_GtGetText::h_GetText("1 %1 selected")).arg(c_Type);
          }
          else
          {
             //Translation: 1: Number of selected items 2: Data element type
             c_Text =
-               QString(C_GtGetText::h_GetText("%1 %2s selected")).arg(this->mu32_LastKnownTableSelectionCount).arg(
+               static_cast<QString>(C_GtGetText::h_GetText("%1 %2s selected")).arg(this->mu32_LastKnownTableSelectionCount).arg(
                   c_Type);
          }
       }

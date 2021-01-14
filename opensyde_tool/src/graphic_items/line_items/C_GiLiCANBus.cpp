@@ -112,8 +112,8 @@ bool C_GiLiCANBus::OpenStyleDialog(void)
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and pc_SettingsWidget and the Qt memory management
-   return q_Retval;
+   return q_Retval; //lint !e429  //no memory leak because of the parent of pc_Dialog and pc_SettingsWidget and the
+                    //Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

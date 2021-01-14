@@ -44,7 +44,7 @@ public:
    stw_types::sint32 NvmSafeWriteChangedValues(std::vector<C_OSCNodeDataPoolListElementId> & orc_ChangedElements, const std::vector<C_OSCNodeDataPoolListId> * const opc_AdditionalListsToUpdate =
                                                   NULL,
                                                stw_types::uint8 * const opu8_NrCode = NULL);
-   stw_types::sint32 NvmSafeReadValues(const C_OSCNode * & orpc_NodeCopy, stw_types::uint8 * const opu8_NrCode);
+   stw_types::sint32 NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCopy), stw_types::uint8 * const opu8_NrCode);
    stw_types::sint32 NvmSafeWriteCrcs(stw_types::uint8 * const opu8_NrCode);
 
    //Create file process

@@ -76,10 +76,10 @@ C_GiSvDaPieChartBase::C_GiSvDaPieChartBase(const uint32 & oru32_ViewIndex, const
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_PieChartWidget by calling SetWidget and the Qt memory
+// management
 C_GiSvDaPieChartBase::~C_GiSvDaPieChartBase(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_PieChartWidget by calling SetWidget and the Qt memory
-   // management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ void C_GiSvDaPieChartBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
 
    if (this->ms32_Index >= 0)
    {
-      const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+      const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
       if (pc_Dashboard != NULL)
       {
          const C_PuiSvDbPieChart * const pc_Box = pc_Dashboard->GetPieChart(static_cast<uint32>(this->ms32_Index));
@@ -134,7 +134,7 @@ void C_GiSvDaPieChartBase::ReInitializeSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaPieChartBase::LoadData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -156,7 +156,7 @@ void C_GiSvDaPieChartBase::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaPieChartBase::UpdateData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -235,7 +235,7 @@ void C_GiSvDaPieChartBase::ConnectionActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaPieChartBase::CallProperties(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -332,8 +332,7 @@ bool C_GiSvDaPieChartBase::CallProperties(void)
                c_New->HideOverlay();
             }
             ;
-            //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-         }
+         } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
       }
    }
    return true;
@@ -413,7 +412,8 @@ void C_GiSvDaPieChartBase::m_UpdateStaticValues(void)
             const QString c_Value = this->GetUnscaledValueInRangeAsScaledString(0.0, 0UL, &f64_Progress);
             this->mpc_PieChartWidget->SetUnit(c_Scaling.c_Unit);
             //Update value
-            this->mpc_PieChartWidget->SetValue(c_Value, static_cast<sint32>(f64_Progress * 2000000.0));
+            const float64 f64_Temp = f64_Progress * 2000000.0;
+            this->mpc_PieChartWidget->SetValue(c_Value, static_cast<sint32>(f64_Temp));
          }
       }
    }
@@ -422,7 +422,7 @@ void C_GiSvDaPieChartBase::m_UpdateStaticValues(void)
       if (this->mpc_PieChartWidget != NULL)
       {
          //Update value
-         this->mpc_PieChartWidget->SetValue(QString("%1").arg(0.0), 0);
+         this->mpc_PieChartWidget->SetValue(static_cast<QString>("%1").arg(0.0), 0);
       }
    }
 }

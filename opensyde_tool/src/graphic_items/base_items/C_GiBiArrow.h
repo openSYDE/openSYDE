@@ -51,10 +51,7 @@ public:
    static bool h_HasOffsetInteractionPoint(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType & ore_Type);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
-   //lint -restore
 
    void m_GenerateArrows(void);
    void m_LoadFromData(const stw_opensyde_gui_logic::C_PuiBsLineArrow & orc_Data);
@@ -67,7 +64,7 @@ protected:
 private:
    //Avoid call
    C_GiBiArrow(const C_GiBiArrow &);
-   C_GiBiArrow & operator =(const C_GiBiArrow &);
+   C_GiBiArrow & operator =(const C_GiBiArrow &); //lint !e1511 //we want to hide the base func.
    C_GiBiArrow();
 
    void m_GenerateArrow(QGraphicsPathItem * const opc_ArrowItem,

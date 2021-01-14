@@ -56,8 +56,8 @@ private:
    C_SyvUpPackageListNodeParamSetsWidget(const C_SyvUpPackageListNodeParamSetsWidget &);
    C_SyvUpPackageListNodeParamSetsWidget & operator =(const C_SyvUpPackageListNodeParamSetsWidget &);
 
-   stw_types::sint32 GetParamsetFileInfo(const QString & orc_File,
-                                         stw_opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo & orc_ParamFileInfo);
+   stw_types::sint32 m_GetParamsetFileInfo(const QString & orc_File,
+                                           stw_opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo & orc_ParamFileInfo);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

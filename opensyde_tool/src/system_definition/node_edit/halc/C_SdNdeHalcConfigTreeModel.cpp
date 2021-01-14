@@ -152,7 +152,7 @@ QVariant C_SdNdeHalcConfigTreeModel::headerData(const sintn osn_Section, const Q
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else
       {
@@ -478,7 +478,7 @@ Qt::ItemFlags C_SdNdeHalcConfigTreeModel::flags(const QModelIndex & orc_Index) c
    const C_SdNdeHalcConfigTreeModel::E_Columns e_Col =
       C_SdNdeHalcConfigTreeModel::h_ColumnToEnum(orc_Index.column());
 
-   if ((e_Col == eVALUE) && (this->rowCount(orc_Index) == 0))
+   if ((e_Col == eVALUE) && (this->rowCount(orc_Index) == 0) /*i.e. no children*/)
    {
       c_Retval = c_Retval | Qt::ItemIsEditable;
    }
@@ -554,51 +554,50 @@ void C_SdNdeHalcConfigTreeModel::SetHalcChannelUseCase(const uint32 ou32_DomainI
       // create tree items for parameters and elements that are relevant for selected channel and use case resp. domain
       for (uint32 u32_ParamIt = 0; u32_ParamIt < rc_Parameters.size(); u32_ParamIt++)
       {
+         bool q_AddParameterToTree = false;
          const C_OSCHalcDefStruct & rc_Parameter = rc_Parameters[u32_ParamIt];
          C_TblTreItem * const pc_ParameterTreeItem = new C_TblTreItem();
+
          pc_ParameterTreeItem->c_Name = rc_Parameter.c_Display.c_str();
          pc_ParameterTreeItem->c_ToolTipHeading = pc_ParameterTreeItem->c_Name;
          pc_ParameterTreeItem->c_ToolTipContent = rc_Parameter.c_Comment.c_str();
          pc_ParameterTreeItem->u32_Index = u32_ParamIt;
 
-         // add parameter elements
-         for (uint32 u32_ElementIt = 0; u32_ElementIt < rc_Parameter.c_StructElements.size(); u32_ElementIt++)
+         // check availability of parameter itself
+         if (this->m_CheckAvailability(rc_Parameter) == true)
          {
-            const C_OSCHalcDefElement & rc_Element = rc_Parameter.c_StructElements[u32_ElementIt];
-            bool q_AvailableForUseCase = false;
-
-            // in channel case: check if element is available for selected use case
-            if (mq_ChannelCase == true)
+            // add parameter elements
+            for (uint32 u32_ElementIt = 0; u32_ElementIt < rc_Parameter.c_StructElements.size(); u32_ElementIt++)
             {
-               for (std::vector<stw_types::uint32>::const_iterator c_ItAvail =
-                       rc_Element.c_UseCaseAvailabilities.begin();
-                    c_ItAvail != rc_Element.c_UseCaseAvailabilities.end(); ++c_ItAvail)
+               const C_OSCHalcDefElement & rc_Element = rc_Parameter.c_StructElements[u32_ElementIt];
+
+               // add tree item if element is available for selected use case or in domain case
+               if (this->m_CheckAvailability(rc_Element) == true)
                {
-                  if (*c_ItAvail == this->mu32_UseCaseIndex)
-                  {
-                     q_AvailableForUseCase = true;
-                     break;
-                  }
+                  C_TblTreItem * const pc_Child = new C_TblTreItem();
+                  pc_Child->c_Name = rc_Element.c_Display.c_str();
+                  pc_Child->c_ToolTipHeading = pc_Child->c_Name;
+                  pc_Child->c_ToolTipContent = rc_Element.c_Comment.c_str();
+                  pc_Child->u32_Index = u32_ElementIt;
+
+                  // add parameter element to tree
+                  pc_ParameterTreeItem->AddChild(pc_Child);
+
+                  // parameter can be added because at least one available parameter element found
+                  q_AddParameterToTree = true;
                }
             }
 
-            if ((mq_ChannelCase == false) || (q_AvailableForUseCase == true))
+            // no elements case: parameter is configurable itself (and is available too)
+            if (rc_Parameter.c_StructElements.empty() == true)
             {
-               C_TblTreItem * const pc_Child = new C_TblTreItem();
-               pc_Child->c_Name = rc_Element.c_Display.c_str();
-               pc_Child->c_ToolTipHeading = pc_Child->c_Name;
-               pc_Child->c_ToolTipContent = rc_Element.c_Comment.c_str();
-               pc_Child->u32_Index = u32_ElementIt;
-
-               // add to tree
-               pc_ParameterTreeItem->AddChild(pc_Child);
+               q_AddParameterToTree = true;
             }
          }
 
-         // add to tree if at least one parameter element is available or if parameter is configurable itself
+         // finally add to tree
          if ((this->mpc_InvisibleRootItem != NULL) &&
-             ((pc_ParameterTreeItem->c_Children.size() > 0) || /* something available*/
-              (rc_Parameter.c_StructElements.size() == 0) /* parameter without elements */))
+             (q_AddParameterToTree == true))
          {
             this->mpc_InvisibleRootItem->AddChild(pc_ParameterTreeItem);
          }
@@ -661,11 +660,11 @@ bool C_SdNdeHalcConfigTreeModel::mh_GetParameterElementIndexe(const QModelIndex 
    if (orc_Index.isValid() == true)
    {
       // Decode model index: parent or child?
-      //lint -e{925}  Result of Qt interface restrictions, set by index function
+      //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreItem * const pc_CurrentItem = static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
       if (pc_CurrentItem != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          const C_TblTreItem * const pc_Parent = dynamic_cast<const C_TblTreItem * const>(pc_CurrentItem->pc_Parent);
          if ((pc_Parent != NULL) && (pc_Parent->pc_Parent != NULL))
          {
@@ -787,6 +786,44 @@ const C_OSCHalcDefElement * C_SdNdeHalcConfigTreeModel::m_GetDefParameterElement
    }
 
    return pc_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check availability of parameter (element)
+
+   For channels: check if parameter struct is available for current use case
+   For domain: domain parameters are always available
+
+   \param[in]  orc_Parameter  Parameter to check
+
+   \retval   true   parameter is available
+   \retval   false  parameter is not available
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeHalcConfigTreeModel::m_CheckAvailability(const C_OSCHalcDefElement & orc_Parameter) const
+{
+   bool q_Available = false;
+
+   if (this->mq_ChannelCase == true)
+   {
+      std::vector<stw_types::uint32>::const_iterator c_ItParamAvail;
+      for (c_ItParamAvail = orc_Parameter.c_UseCaseAvailabilities.begin();
+           c_ItParamAvail != orc_Parameter.c_UseCaseAvailabilities.end(); ++c_ItParamAvail)
+      {
+         if (*c_ItParamAvail == this->mu32_UseCaseIndex)
+         {
+            q_Available = true;
+            break;
+         }
+      }
+   }
+   else
+   {
+      // domain without channels case: all parameters are available
+      q_Available = true;
+   }
+
+   return q_Available;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

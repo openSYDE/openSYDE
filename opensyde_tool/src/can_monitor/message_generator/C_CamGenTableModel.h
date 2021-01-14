@@ -49,9 +49,6 @@ public:
    void UpdateMessageData(const stw_types::uint32 ou32_MessageIndex);
    void TriggerModelUpdateCyclicMessage(const stw_types::uint32 ou32_MessageIndex, const bool oq_Active);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation,
                                const stw_types::sintn osn_Role = static_cast<stw_types::sintn>(Qt::DisplayRole))
    const override;
@@ -61,7 +58,6 @@ public:
    virtual bool setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                         const stw_types::sintn osn_Role = static_cast<stw_types::sintn>(Qt::EditRole)) override;
    virtual Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    virtual void CopySelectedItems(const std::vector<stw_types::uint32> & orc_SelectedIndices) const override;
 

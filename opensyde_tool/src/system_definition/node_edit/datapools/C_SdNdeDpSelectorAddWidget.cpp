@@ -236,7 +236,7 @@ void C_SdNdeDpSelectorAddWidget::m_InitFromData(void)
 
          if (pc_Node != NULL)
          {
-            const QString c_NodeName = QString(pc_Node->c_Properties.c_Name.c_str()) + "::";
+            const QString c_NodeName = static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) + "::";
 
             c_DatapoolId.u32_NodeIndex = u32_NodeCounter;
 
@@ -246,7 +246,7 @@ void C_SdNdeDpSelectorAddWidget::m_InitFromData(void)
 
                if (rc_Datapool.e_Type == this->mrc_OSCDataPool.e_Type)
                {
-                  const QString c_Text = c_NodeName + QString(rc_Datapool.c_Name.c_str());
+                  const QString c_Text = c_NodeName + static_cast<QString>(rc_Datapool.c_Name.c_str());
                   this->mpc_Ui->pc_ComboBoxSharedDatapool->addItem(c_Text);
 
                   // Save the unique identification for the datapool

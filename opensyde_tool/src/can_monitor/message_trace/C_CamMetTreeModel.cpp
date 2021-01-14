@@ -930,14 +930,13 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
          if (orc_Index.parent().isValid() == false)
          {
             const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-            switch (e_Col)
+            if (e_Col == eCAN_DATA)
             {
-            case eCAN_DATA:
-               c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
-               break;
-            default:
+               c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
+            }
+            else
+            {
                //Use parent value
-               break;
             }
          }
       }
@@ -1727,7 +1726,7 @@ void C_CamMetTreeModel::m_AddRowsUnique(const std::list<C_CamMetTreeLoggerData> 
          const QMap<stw_scl::C_SCLString,
                     C_CamMetTreeLoggerData>::const_iterator c_ItMessage = this->mc_UniqueMessages.find(
             c_ItData->c_CanIdDec);
-         const sint32 s32_MuxValue = C_CamMetUtil::mh_GetMultiplexerValue(c_ItData->c_Signals);
+         const sint32 s32_MuxValue = C_CamMetUtil::h_GetMultiplexerValue(c_ItData->c_Signals);
 
          //Check if there is a new row
          if (c_ItMessage != this->mc_UniqueMessages.end())
@@ -1949,7 +1948,7 @@ void C_CamMetTreeModel::m_GrayOutTimer(void)
                 rc_Data.c_GreyOutInformation.c_MapMultiplexerValueToGrayOutValue[c_ItValue->first])
             {
                QVector<sintn> c_Roles;
-               const sint32 s32_Row = C_CamMetUtil::mh_GetRowForMultiplexerValue(rc_Data.c_Signals, c_ItValue->first);
+               const sint32 s32_Row = C_CamMetUtil::h_GetRowForMultiplexerValue(rc_Data.c_Signals, c_ItValue->first);
                // Save the new value
                rc_Data.c_GreyOutInformation.c_MapMultiplexerValueToGrayOutValue[c_ItValue->first] =
                   sn_TransparencyStepDataByte;
@@ -2243,8 +2242,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
          }
       }
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  no memory leak because of the parent pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Compares one data entry with the search string

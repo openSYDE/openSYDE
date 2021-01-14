@@ -38,86 +38,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfig::C_OSCHalcConfig(void) :
-   mq_SafeDatablockAssigned(false),
-   mu32_SafeDatablockIndex(0UL),
-   mq_UnsafeDatablockAssigned(false),
-   mu32_UnsafeDatablockIndex(0UL)
+C_OSCHalcConfig::C_OSCHalcConfig(void)
 {
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get safe datablock assigned
-
-   \return
-   Safe datablock assigned
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHalcConfig::GetSafeDatablockAssigned() const
-{
-   return mq_SafeDatablockAssigned;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get safe datablock index
-
-   \return
-   Safe datablock index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_OSCHalcConfig::GetSafeDatablockIndex() const
-{
-   return mu32_SafeDatablockIndex;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get unsafe datablock assigned
-
-   \return
-   Unsafe datablock assigned
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHalcConfig::GetUnsafeDatablockAssigned() const
-{
-   return mq_UnsafeDatablockAssigned;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get unsafe datablock index
-
-   \return
-   Unsafe datablock index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_OSCHalcConfig::GetUnsafeDatablockIndex() const
-{
-   return mu32_UnsafeDatablockIndex;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set safe datablock assigned
-
-   \param[in]  oq_IsSet       Is set
-   \param[in]  ou32_NewValue  New value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfig::SetSafeDatablockAssigned(const bool oq_IsSet, const uint32 ou32_NewValue)
-{
-   this->mq_SafeDatablockAssigned = oq_IsSet;
-   this->mu32_SafeDatablockIndex = ou32_NewValue;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set unsafe datablock assigned
-
-   \param[in]  oq_IsSet       Is set
-   \param[in]  ou32_NewValue  New value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfig::SetUnsafeDatablockAssigned(const bool oq_IsSet, const uint32 ou32_NewValue)
-{
-   this->mq_UnsafeDatablockAssigned = oq_IsSet;
-   this->mu32_UnsafeDatablockIndex = ou32_NewValue;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -325,6 +247,39 @@ sint32 C_OSCHalcConfig::ResetDomainChannelConfig(const uint32 ou32_DomainIndex, 
       {
          rc_Domain.ResetDomainToDefault();
       }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reset domain channel use case
+
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  oq_UseChannelIndex   Use channel index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfig::ResetDomainChannelUseCase(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
+                                                  const bool oq_UseChannelIndex)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_DomainIndex < this->mc_Domains.size())
+   {
+      if (oq_UseChannelIndex == true)
+      {
+         C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
+         s32_Retval = rc_Domain.ResetChannelUseCase(ou32_ChannelIndex);
+      }
+      // domains have no use case
    }
    else
    {
@@ -1119,15 +1074,6 @@ void C_OSCHalcConfig::CheckDomainConfigValid(const uint32 ou32_DomainIndex, bool
 void C_OSCHalcConfig::CalcHash(uint32 & oru32_HashValue) const
 {
    C_OSCHalcDefBase::CalcHash(oru32_HashValue);
-
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_SafeDatablockAssigned, sizeof(this->mq_SafeDatablockAssigned),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mu32_SafeDatablockIndex, sizeof(this->mu32_SafeDatablockIndex),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_UnsafeDatablockAssigned, sizeof(this->mq_UnsafeDatablockAssigned),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mu32_UnsafeDatablockIndex, sizeof(this->mu32_UnsafeDatablockIndex),
-                                      oru32_HashValue);
 
    for (uint32 u32_It = 0UL; u32_It < this->mc_Domains.size(); ++u32_It)
    {

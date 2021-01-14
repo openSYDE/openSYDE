@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenMessagesWidget::C_CamGenMessagesWidget(QWidget * const opc_Parent) :
@@ -135,18 +135,20 @@ void C_CamGenMessagesWidget::LoadUserSettings(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Remove all messages for the specified file
 
-   \param[in] orc_File Database to remove all messages for
+   \param[in]  orc_File       Database to remove all messages for
+   \param[in]  opc_Indices    Optional indices to specify which messages should be deleted instead of all
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenMessagesWidget::RemoveMessagesForFile(const QString & orc_File) const
+void C_CamGenMessagesWidget::RemoveMessagesForFile(const QString & orc_File,
+                                                   const std::vector<stw_types::uint32> * const opc_Indices) const
 {
-   this->mpc_Ui->pc_TableView->RemoveMessagesForFile(orc_File);
+   this->mpc_Ui->pc_TableView->RemoveMessagesForFile(orc_File, opc_Indices);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Signal communication start
 
-   \param[in]  oq_Online    Online/offline flag of trace
+   \param[in]  oq_Online   Online/offline flag of trace
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::SetCommunicationStarted(const bool oq_Online)
@@ -157,7 +159,7 @@ void C_CamGenMessagesWidget::SetCommunicationStarted(const bool oq_Online)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if the key needs to be handled by this widget
 
-   \param[in] orc_Input Key input interpreted as text
+   \param[in]  orc_Input   Key input interpreted as text
 
    \return
    True  Handled by this widget
@@ -172,7 +174,7 @@ bool C_CamGenMessagesWidget::CheckAndHandleKey(const QString & orc_Input) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update message data
 
-   \param[in] ou32_MessageIndex Message index
+   \param[in]  ou32_MessageIndex    Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::UpdateMessageData(const stw_types::uint32 ou32_MessageIndex) const
@@ -185,8 +187,8 @@ void C_CamGenMessagesWidget::UpdateMessageData(const stw_types::uint32 ou32_Mess
 
    Reason: have one central point for each check which has to be done when changing an existing message
 
-   \param[in] ou32_MessageIndex Message index
-   \param[in] oq_Active         Change of cyclic message state
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  oq_Active            Change of cyclic message state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::TriggerModelUpdateCyclicMessage(const stw_types::uint32 ou32_MessageIndex,
@@ -275,7 +277,7 @@ void C_CamGenMessagesWidget::m_InitButtons(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::m_UpdateHeading(void) const
 {
-   this->mpc_Ui->pc_LabelHeading->setText(QString(C_GtGetText::h_GetText("Messages (%1)")).arg(C_CamProHandler::
+   this->mpc_Ui->pc_LabelHeading->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(C_CamProHandler::
                                                                                                h_GetInstance()->
                                                                                                GetMessages().size()));
 }
@@ -297,7 +299,7 @@ void C_CamGenMessagesWidget::m_LoadConfig(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Register item count change
 
-   \param[in] ou32_NewItemCount New item count
+   \param[in]  ou32_NewItemCount    New item count
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::m_OnItemCountChanged(const stw_types::uint32 ou32_NewItemCount) const

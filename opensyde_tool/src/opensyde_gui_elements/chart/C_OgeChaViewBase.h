@@ -54,9 +54,6 @@ Q_SIGNALS:
    void SigZoomReseted(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual bool viewportEvent(QEvent * const opc_Event) override;
    virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
@@ -64,7 +61,6 @@ protected:
    virtual void mouseReleaseEvent(QMouseEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void wheelEvent(QWheelEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    bool mq_IsTouching;

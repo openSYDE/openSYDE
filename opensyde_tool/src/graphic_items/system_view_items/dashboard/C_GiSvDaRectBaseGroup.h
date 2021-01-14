@@ -76,12 +76,9 @@ public:
    virtual void SetErrorForInvalidDlc(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ElementId,
                                       const stw_types::uint8 ou8_DLC);
    virtual void SetDrawingActive(const bool oq_Active);
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
+
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget = NULL) override;
-   //lint restore
 
    virtual void ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager, const bool oq_Active);
 
@@ -107,7 +104,7 @@ Q_SIGNALS:
    void SigHideToolTip(void);
 
 protected:
-   const stw_opensyde_gui_logic::C_PuiSvDashboard * GetSvDashboard(void) const;
+   const stw_opensyde_gui_logic::C_PuiSvDashboard * m_GetSvDashboard(void) const;
 
    virtual stw_types::sint32 m_GetLastValue(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
                                             std::vector<stw_types::float64> & orc_Values,
@@ -118,8 +115,6 @@ protected:
    virtual void m_ResizeUpdateItems(const stw_types::float64 of64_DiffWidth, const stw_types::float64 of64_DiffHeight);
    virtual void m_ForceWidgetResize(const QSizeF & orc_NewSize);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
@@ -130,7 +125,7 @@ protected:
    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
-   //lint -restore
+
    virtual bool m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const;
    bool m_CheckManualReadRequired(void) const;
    bool m_CheckHasAnyRequiredNodesActive(void) const;
@@ -179,7 +174,7 @@ private:
 
    //Avoid call
    C_GiSvDaRectBaseGroup(const C_GiSvDaRectBaseGroup &);
-   C_GiSvDaRectBaseGroup & operator =(const C_GiSvDaRectBaseGroup &);
+   C_GiSvDaRectBaseGroup & operator =(const C_GiSvDaRectBaseGroup &); //lint !e1511 //we want to hide the base func.
 
    void m_InitConflictIcon(void);
    void m_InitButton(void);

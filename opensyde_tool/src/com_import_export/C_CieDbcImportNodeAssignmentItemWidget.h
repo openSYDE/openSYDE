@@ -48,13 +48,13 @@ public:
    C_CieDbcOsyNodeAssignment GetNodeAssignment(void) const;
    bool IsAssigned(void) const;
 
-   void UpdateComboboxEntries(stw_types::uint32 u32_Index, bool q_Enable) const;
+   void UpdateComboboxEntries(const stw_types::uint32 ou32_Index, const bool oq_Enable) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void SigUpdateOtherComboboxes(stw_types::uint32 u32_Index, bool q_Enable,
+   void SigUpdateOtherComboboxes(const stw_types::uint32 ou32_Index, const bool oq_Enable,
                                  C_CieDbcImportNodeAssignmentItemWidget * const opc_Sender);
 
 private:

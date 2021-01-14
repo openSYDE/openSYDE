@@ -58,5 +58,5 @@ C_SdNdeUnoDasDataPoolListAddSpecificCommand::C_SdNdeUnoDasDataPoolListAddSpecifi
    C_SdNdeUnoDasDataPoolListAddCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                        opc_DataPoolListModelViewManager, orc_Indices, opc_Parent)
 {
-   this->SetInitialData(orc_OSCNames, orc_OSCDataSetValues);
+   this->m_SetInitialData(orc_OSCNames, orc_OSCDataSetValues);
 }

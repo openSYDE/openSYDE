@@ -56,7 +56,7 @@ private:
 
    //Avoid call
    C_GiSvDaPieChartBase(const C_GiSvDaPieChartBase &);
-   C_GiSvDaPieChartBase & operator =(const C_GiSvDaPieChartBase &);
+   C_GiSvDaPieChartBase & operator =(const C_GiSvDaPieChartBase &); //lint !e1511 //we want to hide the base func.
 
    void m_UpdateStaticValues(void);
 };

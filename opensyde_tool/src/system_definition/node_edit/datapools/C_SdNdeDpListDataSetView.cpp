@@ -431,7 +431,7 @@ void C_SdNdeDpListDataSetView::OnColumnCountChange(const sint32 & ors32_NewColum
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::dropEvent(QDropEvent * const opc_Event)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_SdNdeDpListDataSetView * const pc_SourceTable =
       dynamic_cast<C_SdNdeDpListDataSetView * const>(opc_Event->source());
 
@@ -597,8 +597,7 @@ void C_SdNdeDpListDataSetView::startDrag(const Qt::DropActions oc_SupportedActio
 
       pc_Drag->setMimeData(this->model()->mimeData(c_SelectedItems));
       pc_Drag->exec(oc_SupportedActions, this->defaultDropAction());
-      //lint -e{429}  no memory leak because of the parent of pc_Drag and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_Drag and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

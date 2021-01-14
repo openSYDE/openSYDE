@@ -85,8 +85,7 @@ void C_SdNdeUnoAedDataPoolListManager::DoDataChangeElements(const uint32 & oru32
       this->mpc_UndoCommand);
    //Do action once
    pc_Command->redo();
-   //lint -e{429}  no memory leak because of the parent of pc_Command and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Command and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   GetUndocommand and take ownership

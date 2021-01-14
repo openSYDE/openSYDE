@@ -48,6 +48,7 @@ C_OgeLeListHeader::C_OgeLeListHeader(QWidget * const opc_Parent) :
    mc_Name("")
 {
    connect(this, &C_OgeLeListHeader::editingFinished, this, &C_OgeLeListHeader::m_OnEditingFinished);
+   connect(this, &C_OgeLeListHeader::textEdited, this, &C_OgeLeListHeader::m_OnTextEdited);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -141,7 +142,7 @@ void C_OgeLeListHeader::m_UpdateText(void)
    if (this->hasFocus() == false)
    {
       this->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT + 10); // " (1234567)" should definitely be enough
-      this->setText(QString("%1 (%2)").arg(this->mc_Name).arg(this->mu32_Counter));
+      this->setText(static_cast<QString>("%1 (%2)").arg(this->mc_Name).arg(this->mu32_Counter));
    }
    else
    {
@@ -158,4 +159,13 @@ void C_OgeLeListHeader::m_OnEditingFinished(void)
 {
    this->mc_Name = this->text();
    this->m_UpdateText();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot of text edited signal: set new name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeLeListHeader::m_OnTextEdited()
+{
+   this->mc_Name = this->text();
 }

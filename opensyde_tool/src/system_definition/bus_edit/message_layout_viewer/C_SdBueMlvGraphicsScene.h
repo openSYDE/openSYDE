@@ -82,13 +82,10 @@ Q_SIGNALS:
                         const stw_types::uint32 ou32_SignalIndex);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

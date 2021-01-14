@@ -96,13 +96,13 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
    // set title
    if (oq_ShowNVMLists == true)
    {
-      this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("NVM List")));
+      this->mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("NVM List")));
       this->mpc_Ui->pc_ComboBoxType->setVisible(false);
       this->mpc_Ui->pc_LabelDataElement->setText(C_GtGetText::h_GetText("Select NVM List"));
    }
    else
    {
-      this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("Data Element")));
+      this->mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("Data Element")));
       this->mpc_Ui->pc_ComboBoxType->setVisible(true);
       this->mpc_Ui->pc_LabelDataElement->setText(C_GtGetText::h_GetText("Select Data Element"));
 
@@ -129,7 +129,7 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
    }
    //After tree was filled
    m_UpdateSelection(0);
-   this->mrc_ParentDialog.SetSubTitle(QString(C_GtGetText::h_GetText("Selection")));
+   this->mrc_ParentDialog.SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Selection")));
 
    //Deactivate combo box for write widgets
    this->mpc_Ui->pc_ComboBoxType->setEnabled(!oq_ShowOnlyWriteElements);
@@ -369,12 +369,12 @@ void C_SyvDaPeDataElementBrowse::m_UpdateSelection(const sintn osn_SelectionCoun
       this->mpc_Ui->pc_LabelSelection->setVisible(true);
       if (osn_SelectionCount > 0)
       {
-         this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("%1 selected data element(s)")).
+         this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText("%1 selected data element(s)")).
                                                   arg(osn_SelectionCount));
       }
       else
       {
-         this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("No selected data element")));
+         this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText("No selected data element")));
       }
    }
 }

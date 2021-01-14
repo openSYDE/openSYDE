@@ -92,7 +92,7 @@ void C_OSCProject::CalcHash(uint32 & oru32_HashValue) const
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCProject::h_GetTimeFormatted(const C_SCLDateTime & orc_Time)
 {
-   C_SCLString c_StrTime = orc_Time.DateTimeToString();
+   const C_SCLString c_StrTime = orc_Time.DateTimeToString();
 
    //Remove seconds
    return c_StrTime.SubString(1, 16);

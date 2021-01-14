@@ -38,11 +38,8 @@ Q_SIGNALS:
    void SigFocus(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void focusInEvent(QFocusEvent * const opc_Event) override;
    virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    bool mq_JustGotFocus;

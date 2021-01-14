@@ -295,7 +295,6 @@ void C_SyvDaItTaView::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Styl
    this->mc_Model.SetDisplayStyle(oe_Style, oq_DarkMode);
    switch (oe_Style)
    {
-   //TBD by Karsten: done
    case C_PuiSvDbWidgetBase::eOPENSYDE:
       this->setGridStyle(Qt::NoPen);
       this->setShowGrid(false);

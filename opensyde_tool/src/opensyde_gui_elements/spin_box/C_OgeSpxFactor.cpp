@@ -48,7 +48,6 @@ const stw_types::float64 C_OgeSpxFactor::mhf64_FACTOR_MIN = std::pow(10, -msn_DO
 C_OgeSpxFactor::C_OgeSpxFactor(QWidget * const opc_Parent) :
    C_OgeSpxDoubleToolTipBase(opc_Parent)
 {
-   //lint -e{10,530,747,1013,1015,1960}  c++11 feature
    this->SetMinimumCustom(std::numeric_limits<float64>::lowest());
    this->SetMaximumCustom(std::numeric_limits<float64>::max());
    this->setValue(1.0); // default value

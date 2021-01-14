@@ -118,7 +118,7 @@ public:
    void SetSdTopologyToolboxMaximized(const bool & orq_New);
    void SetCurrentSaveAsPath(const QString & orc_Value);
    void SetRecentColors(const QVector<QColor> & orc_RecentColorsVector);
-   void SetNextRecentColorButtonNumber(const stw_types::sintn & orc_NextRecentColorButtonNumber);
+   void SetNextRecentColorButtonNumber(const stw_types::sintn osn_NextRecentColorButtonNumber);
 
    void AddToRecentProjects(const QString & orc_Str);
    void RemoveOfRecentProjects(const QString & orc_Str);

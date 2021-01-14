@@ -41,10 +41,7 @@ public:
    void InitStaticNames(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   //lint -restore
 
 private:
    Ui::C_SdNdeHalcChannelDpPreviewPopUp * mpc_Ui;
@@ -61,6 +58,9 @@ private:
    static void mh_AddDeSection(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DomainIndex,
                                const stw_types::uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
                                QString & orc_Text);
+   static void mh_AddUseCase(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DomainIndex,
+                             const stw_types::uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
+                             QString & orc_Text);
    static void mh_AddListSection(const std::vector<stw_opensyde_core::C_OSCHalcDefStruct> & orc_Definition,
                                  const std::vector<stw_types::uint32> & orc_Indices,
                                  const stw_scl::C_SCLString & orc_ListName,

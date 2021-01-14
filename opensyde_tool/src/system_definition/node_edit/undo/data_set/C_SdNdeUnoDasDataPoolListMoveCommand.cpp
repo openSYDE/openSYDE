@@ -74,11 +74,11 @@ C_SdNdeUnoDasDataPoolListMoveCommand::C_SdNdeUnoDasDataPoolListMoveCommand(const
 void C_SdNdeUnoDasDataPoolListMoveCommand::redo(void)
 {
    //DELETE
-   this->SetIndices(mc_SourceCol);
-   this->Delete();
+   this->m_SetIndices(mc_SourceCol);
+   this->m_Delete();
    //ADD
-   this->SetIndices(mc_TargetCol);
-   this->Add();
+   this->m_SetIndices(mc_TargetCol);
+   this->m_Add();
    C_SdNdeUnoDasDataPoolListBaseCommand::redo();
    this->mq_Initial = false;
 }
@@ -91,9 +91,9 @@ void C_SdNdeUnoDasDataPoolListMoveCommand::undo(void)
 {
    C_SdNdeUnoDasDataPoolListBaseCommand::undo();
    //DELETE
-   this->SetIndices(mc_TargetCol);
-   this->Delete();
+   this->m_SetIndices(mc_TargetCol);
+   this->m_Delete();
    //ADD
-   this->SetIndices(mc_SourceCol);
-   this->Add();
+   this->m_SetIndices(mc_SourceCol);
+   this->m_Add();
 }

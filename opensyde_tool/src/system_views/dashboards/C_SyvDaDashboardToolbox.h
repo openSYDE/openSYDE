@@ -41,11 +41,8 @@ public:
    void ApplyDarkMode(const bool oq_Active);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void enterEvent(QEvent * const opc_Event) override;
    virtual void leaveEvent(QEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

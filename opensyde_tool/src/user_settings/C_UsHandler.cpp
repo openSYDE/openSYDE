@@ -398,7 +398,7 @@ void C_UsHandler::GetMostRecentFolder(QString & orc_Str) const
    }
    else
    {
-      QFileInfo c_FileInfo(this->mc_RecentProjects[0]);
+      const QFileInfo c_FileInfo(this->mc_RecentProjects[0]);
       QDir c_Dir(c_FileInfo.path());
       q_Exists = c_Dir.exists();
       if (q_Exists == true)
@@ -784,7 +784,7 @@ sintn C_UsHandler::GetProjLastSysDefBusTabIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsHandler::SetLanguage(const QString & orc_Lang)
 {
-   sint32 s32_Retval = h_CheckLanguageExists(orc_Lang);
+   const sint32 s32_Retval = h_CheckLanguageExists(orc_Lang);
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -983,12 +983,12 @@ void C_UsHandler::SetRecentColors(const QVector<QColor> & orc_RecentColorsVector
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set next recent color button number from color picker
 
-   \param[in]  orc_NextRecentColorButtonNumber  Next recent color button number from color picker
+   \param[in]  osn_NextRecentColorButtonNumber  Next recent color button number from color picker
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetNextRecentColorButtonNumber(const sintn & orc_NextRecentColorButtonNumber)
+void C_UsHandler::SetNextRecentColorButtonNumber(const sintn osn_NextRecentColorButtonNumber)
 {
-   this->msn_NextRecentColorButtonNumber = orc_NextRecentColorButtonNumber;
+   this->msn_NextRecentColorButtonNumber = osn_NextRecentColorButtonNumber;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2237,7 +2237,7 @@ sint32 C_UsHandler::h_GetParentFolder(const QString & orc_CompletePath, QString 
       //RemoveFile
       if (orq_CompletePathContainsFile == true)
       {
-         QFileInfo c_File(orc_CompletePath);
+         const QFileInfo c_File(orc_CompletePath);
          c_Path = c_File.absoluteDir().absolutePath();
       }
       else
@@ -2271,8 +2271,7 @@ sint32 C_UsHandler::h_GetParentFolder(const QString & orc_CompletePath, QString 
 C_UsHandler::C_UsHandler(void) :
    mc_IniPathAndName(C_Uti::h_GetExePath() + "/User/user_settings.ini"),
    mc_ActualProject(""),
-   mc_DefaultProjectsFolder(QString(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) +
-                                    "/openSYDE/Projects")),
+   mc_DefaultProjectsFolder(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/openSYDE/Projects"),
    ms32_SdNodeEditSplitterX(1000),
    ms32_SdNodEditHalcSplitterX(400),
    ms32_SdBusEditTreeSplitterX(0),

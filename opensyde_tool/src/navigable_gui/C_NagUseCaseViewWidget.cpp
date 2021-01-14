@@ -172,7 +172,7 @@ void C_NagUseCaseViewWidget::m_HandleSubSections(void) const
    {
       if (this->mq_CombineItemAndSubSubName)
       {
-         const QString c_Text = QString(C_GtGetText::h_GetText("%1 | %2")).arg(this->mc_ItemName).arg(
+         const QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("%1 | %2")).arg(this->mc_ItemName).arg(
             this->mc_ItemSubSubName);
          this->mpc_Ui->pc_GroupBoxSubSubMode->setVisible(false);
          this->mpc_Ui->pc_LabelSubmode->setText(c_Text);
@@ -251,7 +251,6 @@ void C_NagUseCaseViewWidget::RemoveUseCaseWidget(void)
       QSpacerItem * pc_Item;
 
       this->mpc_Ui->pc_VerticalLayout->removeWidget(this->mpc_Widget);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       pc_Item = dynamic_cast<QSpacerItem *>(this->mpc_Ui->pc_VerticalLayout->itemAt(3));
 
       // is it a SpacerItem?

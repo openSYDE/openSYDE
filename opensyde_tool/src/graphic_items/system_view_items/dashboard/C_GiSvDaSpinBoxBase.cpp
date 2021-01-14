@@ -87,9 +87,9 @@ C_GiSvDaSpinBoxBase::C_GiSvDaSpinBoxBase(const uint32 & oru32_ViewIndex, const u
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_SpinBoxWidget and the Qt memory management
 C_GiSvDaSpinBoxBase::~C_GiSvDaSpinBoxBase(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_SpinBoxWidget and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ void C_GiSvDaSpinBoxBase::ReInitializeSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::LoadData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -145,7 +145,7 @@ void C_GiSvDaSpinBoxBase::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::UpdateData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -192,7 +192,7 @@ void C_GiSvDaSpinBoxBase::DeleteData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::ConnectionActiveChanged(const bool oq_Active)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (oq_Active == true)
    {
@@ -272,7 +272,7 @@ void C_GiSvDaSpinBoxBase::SendCurrentValue(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaSpinBoxBase::CallProperties(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -359,8 +359,7 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
          {
             c_New->HideOverlay();
          }
-         //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-      }
+      }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    }
    return true;
 }
@@ -404,12 +403,11 @@ void C_GiSvDaSpinBoxBase::SetValuePe(const sint32 os32_Value)
       c_Max.SetArray(false);
       c_Value.SetType(C_OSCNodeDataPoolContent::eSINT32);
       c_Value.SetArray(false);
-      //lint -e{530,10,1015,1013}  c++11 feature
       c_Min.SetValueS32(std::numeric_limits<sint32>::lowest());
       c_Max.SetValueS32(std::numeric_limits<sint32>::max());
       this->mpc_SpinBoxWidget->Init(c_Min, c_Max);
       c_Value.SetValueS32(os32_Value);
-      this->mpc_SpinBoxWidget->SetValue(QVariant(static_cast<sint64>(c_Value.GetValueS32())));
+      this->mpc_SpinBoxWidget->SetValue(static_cast<QVariant>(static_cast<sint64>(c_Value.GetValueS32())));
    }
 }
 
@@ -434,7 +432,7 @@ void C_GiSvDaSpinBoxBase::m_UpdateStaticValues(void)
 {
    if (this->mpc_SpinBoxWidget != NULL)
    {
-      const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+      const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
       C_PuiSvDbNodeDataPoolListElementId c_ID;
 
       if ((this->GetDataPoolElementIndex(0, c_ID) == C_NO_ERR) && (pc_Dashboard != NULL))

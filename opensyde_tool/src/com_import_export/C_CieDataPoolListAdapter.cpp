@@ -67,7 +67,7 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDBCFileIm
    C_CieDataPoolListStructure c_DataStructure; // return value
 
    // get node name
-   c_DataStructure.c_NodeName = QString((orc_CIENode.c_Properties.c_Name).c_str());
+   c_DataStructure.c_NodeName = orc_CIENode.c_Properties.c_Name.c_str();
 
    // get Tx core data
    mh_FillUpCoreStructureByDBCValues(orc_CIENode.c_TxMessages,
@@ -185,7 +185,7 @@ void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDBCValues(
             c_Tmp += c_CanMessageIter->c_Warnings.Strings[u32_Pos];
             c_Tmp += mhc_MessageLineBreak;
          }
-         orc_WarningMessages.push_back(QString(c_Tmp.c_str()));
+         orc_WarningMessages.push_back(c_Tmp.c_str());
       }
       else
       {
@@ -378,8 +378,7 @@ sint32 C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(const uint32 ou32_B
    C_PuiSdNodeCanMessageSyncManager c_MessageSyncManager;
    c_MessageSyncManager.Init(ou32_BusIndex, oe_Type);
    C_OSCCanMessageIdentificationIndices c_MessageId;
-   if (c_MessageSyncManager.GetMessageIdForMessageName(QString(orc_OSCCanMessage.c_Name.c_str()),
-                                                       c_MessageId) == C_NO_ERR)
+   if (c_MessageSyncManager.GetMessageIdForMessageName(orc_OSCCanMessage.c_Name.c_str(), c_MessageId) == C_NO_ERR)
    {
       // get Signals
       for (uint32 u32_PosSignal = 0; u32_PosSignal < orc_OSCCanMessage.c_Signals.size(); u32_PosSignal++)
@@ -419,9 +418,10 @@ sint32 C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(const uint32 ou32_B
          }
          else
          {
-            C_SCLString c_Message = "Can't find data elements for signal with position \"" +
-                                    C_SCLString(u32_PosSignal) + "\" in message \"" +
-                                    orc_OSCCanMessage.c_Name + "\" in bus \"" + C_SCLString(ou32_BusIndex) + "\".";
+            const C_SCLString c_Message = "Can't find data elements for signal with position \"" +
+                                          C_SCLString::IntToStr(u32_PosSignal) + "\" in message \"" +
+                                          orc_OSCCanMessage.c_Name + "\" in bus \"" +
+                                          C_SCLString::IntToStr(ou32_BusIndex) + "\".";
             orc_Warnings.Append(c_Message);
             osc_write_log_warning("DBC Export", c_Message);
             s32_Return = C_WARN;
@@ -430,8 +430,8 @@ sint32 C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(const uint32 ou32_B
    }
    else
    {
-      C_SCLString c_Message = "Can't find valid signal for message \"" + orc_OSCCanMessage.c_Name +
-                              "\" in bus \"" + C_SCLString(ou32_BusIndex) + "\".";
+      const C_SCLString c_Message = "Can't find valid signal for message \"" + orc_OSCCanMessage.c_Name +
+                                    "\" in bus \"" + C_SCLString::IntToStr(ou32_BusIndex) + "\".";
       orc_Warnings.Append(c_Message);
       osc_write_log_warning("DBC Export", c_Message);
       s32_Return = C_WARN;

@@ -52,5 +52,5 @@ C_SdNdeUnoLeDataPoolListElementAddSpecificCommand::C_SdNdeUnoLeDataPoolListEleme
    C_SdNdeUnoLeDataPoolListElementAddCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                              opc_DataPoolListModelViewManager, orc_Indices, opc_Parent)
 {
-   this->SetInitialData(orc_OSCData, orc_UIData);
+   this->m_SetInitialData(orc_OSCData, orc_UIData);
 }

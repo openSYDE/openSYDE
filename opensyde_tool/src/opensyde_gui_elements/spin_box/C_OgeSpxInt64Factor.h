@@ -28,11 +28,9 @@ public:
    C_OgeSpxInt64Factor(QWidget * const opc_Parent = NULL, const bool & orq_IsUnsigned = false);
 
    void InterpretValue(void);
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
+
    virtual void stepBy(const stw_types::sintn osn_Steps) override;
    virtual QValidator::State validate(QString & orc_Text, stw_types::sintn & orsn_Pos) const override;
-   //lint -restore
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

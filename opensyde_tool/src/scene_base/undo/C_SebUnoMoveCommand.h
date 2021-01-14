@@ -32,10 +32,7 @@ public:
    virtual void undo(void) override;
    virtual void redo(void) override;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool mergeWith(const QUndoCommand * const opc_Command);
-   //lint -restore
 
 private:
    QPointF mc_PositionDifference;

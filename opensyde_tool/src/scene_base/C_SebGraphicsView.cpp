@@ -118,9 +118,9 @@ C_SebGraphicsView::C_SebGraphicsView(QWidget * const opc_Parent) :
 /*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ZoomButton and the Qt memory management
 C_SebGraphicsView::~C_SebGraphicsView()
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_ZoomButton and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -155,7 +155,6 @@ sintn C_SebGraphicsView::GetZoomValue(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::UpdateTransform(void) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_SebScene * pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
 
    if (pc_Scene != NULL)
@@ -278,7 +277,6 @@ void C_SebGraphicsView::SetDarkMode(const bool oq_DarkMode)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::SetSceneAndConnect(QGraphicsScene * const opc_Scene)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_SebScene * const pc_Scene = dynamic_cast<C_SebScene * const>(opc_Scene);
 
    this->setScene(opc_Scene);
@@ -464,7 +462,6 @@ void C_SebGraphicsView::mouseMoveEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::mousePressEvent(QMouseEvent * const opc_Event)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_SebScene * pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
    bool q_BlockPressHandling = false;
 
@@ -676,7 +673,6 @@ bool C_SebGraphicsView::event(QEvent * const opc_Event)
 
    if (opc_Event->type() == QEvent::ToolTip)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       QHelpEvent * pc_Help = dynamic_cast<QHelpEvent *>(opc_Event);
       if (pc_Help != NULL)
       {
@@ -746,7 +742,6 @@ void C_SebGraphicsView::m_ScaleBy(const float64 of64_ScaleFactor, const bool & o
 
    {
       // adapt the scene rectangle
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_SebScene * pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
       if (pc_Scene != NULL)
       {
@@ -831,7 +826,6 @@ void C_SebGraphicsView::m_DragMove(const QMouseEvent * const opc_Event)
    if ((std::fabs(this->mc_DragMoveDistance.x()) > 2.0) ||
        (std::fabs(this->mc_DragMoveDistance.y()) > 2.0))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_SebScene * pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
 
       if (pc_Scene != NULL)

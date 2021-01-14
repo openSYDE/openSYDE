@@ -73,31 +73,36 @@ static const uint8 mu8_XFL_CMD_GET_BLOCK_COMPARE_MODE  = 0x11U;
 
 //sub-commands:
 //get_flash_information
-//const uint8 XFL_CMD_GET_FLASH_INFORMATION_IDX_IC_COUNT          = 0x01;
-//const uint8 XFL_CMD_GET_FLASH_INFORMATION_IDX_TOTAL_SIZE        = 0x02;
-//const uint8 XFL_CMD_GET_FLASH_INFORMATION_IDX_PROTECTED_SECTORS = 0x03;
-//const uint8 XFL_CMD_GET_FLASH_INFORMATION_IDX_OFFSET_ADDRESS    = 0x04;
-//const uint8 XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_REGIONS       = 0x05;
-//const uint8 XFL_CMD_GET_FLASH_INFORMATION_IDX_REGION_INFO       = 0x06;
-//const uint8 XFL_CMD_GET_FLASH_INFORMATION_IDX_ERASE_TIME        = 0x07;
-//const uint8 XFL_CMD_GET_FLASH_INFORMATION_IDX_PROGRAM_TIME      = 0x08;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_IC_COUNT          = 0x01;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_TOTAL_SIZE        = 0x02;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_PROTECTED_SECTORS = 0x03;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_OFFSET_ADDRESS    = 0x04;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_REGIONS       = 0x05;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_REGION_INFO       = 0x06;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ERASE_TIME        = 0x07;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_PROGRAM_TIME      = 0x08;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_ALIASES       = 0x09U;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_PHYSICAL    = 0x0AU;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_SIZE        = 0x0BU;
+static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_ADDRESS     = 0x0CU;
+
 //get_implementation_information
-//const uint8 XFL_CMD_GET_IMPLEMENTATION_INFORMATION_PROTOCOL_VERSION = 0x01;
-//const uint8 XFL_CMD_GET_IMPLEMENTATION_INFORMATION_SPECIAL_SERVICES = 0x02;
-//const uint8 XFL_CMD_GET_IMPLEMENTATION_INFORMATION_GET_SERVICES     = 0x03;
-//const uint8 XFL_CMD_GET_IMPLEMENTATION_INFORMATION_SET_SERVICES     = 0x04;
-//const uint8 XFL_CMD_GET_IMPLEMENTATION_INFORMATION_FLASH_SERVICES   = 0x05;
-//const uint8 XFL_CMD_GET_IMPLEMENTATION_INFORMATION_TARGET_SPECIFIC_SERVICES = 0x06;
-//const uint8 XFL_CMD_GET_IMPLEMENTATION_INFORMATION_HEX_RECORDS      = 0x07;
+static const uint8 mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_PROTOCOL_VERSION = 0x01;
+static const uint8 mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_SPECIAL_SERVICES = 0x02;
+static const uint8 mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_GET_SERVICES     = 0x03;
+static const uint8 mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_SET_SERVICES     = 0x04;
+static const uint8 mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_FLASH_SERVICES   = 0x05;
+static const uint8 mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_TARGET_SPECIFIC_SERVICES = 0x06;
+static const uint8 mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_HEX_RECORDS      = 0x07;
 //get_set_finger_print
-//const uint8 XFL_CMD_FINGER_PRINT_SUPPORTED_INDEXES = 0x00;
-//const uint8 XFL_CMD_FINGER_PRINT_PROGRAMMING_TIME  = 0x01;
-//const uint8 XFL_CMD_FINGER_PRINT_PROGRAMMING_DATE  = 0x02;
-//const uint8 XFL_CMD_FINGER_PRINT_CHECKSUM          = 0x03;
-//const uint8 XFL_CMD_FINGER_PRINT_USERNAME_1        = 0x04;
-//const uint8 XFL_CMD_FINGER_PRINT_USERNAME_2        = 0x05;
-//const uint8 XFL_CMD_FINGER_PRINT_USERNAME_3        = 0x06;
-//const uint8 XFL_CMD_FINGER_PRINT_USERNAME_4        = 0x07;
+static const uint8 mu8_XFL_CMD_FINGER_PRINT_SUPPORTED_INDEXES = 0x00;
+static const uint8 mu8_XFL_CMD_FINGER_PRINT_PROGRAMMING_TIME  = 0x01;
+static const uint8 mu8_XFL_CMD_FINGER_PRINT_PROGRAMMING_DATE  = 0x02;
+static const uint8 mu8_XFL_CMD_FINGER_PRINT_CHECKSUM          = 0x03;
+static const uint8 mu8_XFL_CMD_FINGER_PRINT_USERNAME_1        = 0x04;
+static const uint8 mu8_XFL_CMD_FINGER_PRINT_USERNAME_2        = 0x05;
+static const uint8 mu8_XFL_CMD_FINGER_PRINT_USERNAME_3        = 0x06;
+static const uint8 mu8_XFL_CMD_FINGER_PRINT_USERNAME_4        = 0x07;
 //get_device_info_address
 //const uint8 XFL_CMD_GET_DEVICE_INFO_ADDRESS_STRUCT_ADDRESS = 0x00;
 
@@ -444,50 +449,50 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             c_Help2 = "";
             switch (orc_Msg.au8_Data[3])
             {
-            case 1U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_IC_COUNT:
                c_Help = c_Help + "number_of_ics";
                break;
-            case 2U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_TOTAL_SIZE:
                c_Help = c_Help + "total_size";
                c_Help2 = " IC: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 3U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_PROTECTED_SECTORS:
                c_Help = c_Help + "protected_sectors";
                c_Help2 = " IDX: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 4U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_OFFSET_ADDRESS:
                c_Help = c_Help + "sector_0_offset";
                c_Help2 = " IC: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 5U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_REGIONS:
                c_Help = c_Help + "number_of_regions";
                c_Help2 = " IC: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 6U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_REGION_INFO:
                c_Help = c_Help + "region_information";
                c_Help2 = " IC: " + m_GetValueDecHex(orc_Msg.au8_Data[4]) +
                          " REG: " + m_GetValueDecHex(orc_Msg.au8_Data[5]);
                break;
-            case 7U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ERASE_TIME:
                c_Help = c_Help + "max_erase_time";
                c_Help2 = " IC: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 8U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_PROGRAM_TIME:
                c_Help = c_Help + "max_program_time";
                c_Help2 = " IC: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 9U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_ALIASES:
                c_Help = c_Help + "num_aliases";
                break;
-            case 10U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_PHYSICAL:
                c_Help = c_Help + "aliases_physical_address";
                c_Help2 = " RANGE: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 11U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_SIZE:
                c_Help = c_Help + "aliases_size";
                c_Help2 = " RANGE: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 12U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_ADDRESS:
                c_Help = c_Help + "aliases_alias_address";
                c_Help2 = " RANGE: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
@@ -523,25 +528,25 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             c_Help = "get_implementation_information ";
             switch (orc_Msg.au8_Data[3])
             {
-            case 1U:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_PROTOCOL_VERSION:
                c_Help = c_Help + "protocol_version";
                break;
-            case 2U:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_SPECIAL_SERVICES:
                c_Help = c_Help + "special_services";
                break;
-            case 3U:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_GET_SERVICES:
                c_Help = c_Help + "get_services";
                break;
-            case 4U:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_SET_SERVICES:
                c_Help = c_Help + "set_services";
                break;
-            case 5U:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_FLASH_SERVICES:
                c_Help = c_Help + "flash_services";
                break;
-            case 6U:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_TARGET_SPECIFIC_SERVICES:
                c_Help = c_Help + "target_specific_services";
                break;
-            case 7U:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_HEX_RECORDS:
                c_Help = c_Help + "hex_record_config";
                break;
             default:
@@ -1197,29 +1202,29 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             c_Help2 = "";
             switch (orc_Msg.au8_Data[3])
             {
-            case 1U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_IC_COUNT:
                c_Help = c_Help + "number_of_ics";
                c_Help2 = " ICS: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 2U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_TOTAL_SIZE:
                c_Help = c_Help + "total_size";
                c_Help2 = " SIZE: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "bytes";
                break;
-            case 3U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_PROTECTED_SECTORS:
                c_Help = c_Help + "protected_sectors";
                c_Help2 = " SEC: " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
                          " IC: " + m_GetValueDecHex(orc_Msg.au8_Data[6]) +
                          " STAT: " + m_GetValueDecHex(orc_Msg.au8_Data[7]);
                break;
-            case 4U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_OFFSET_ADDRESS:
                c_Help = c_Help + "sector_0_offset";
                c_Help2 = " OFFS: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "bytes";
                break;
-            case 5U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_REGIONS:
                c_Help = c_Help + "number_of_regions";
                c_Help2 = " REGS: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 6U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_REGION_INFO:
                c_Help = c_Help + "region_information";
                u16_Help = m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]);
                if (u16_Help == 0U)
@@ -1233,27 +1238,27 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                u16_Help = m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]);
                c_Help2 = c_Help2 + " NUMSECS: " + m_GetValueDecHex(u16_Help);
                break;
-            case 7U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ERASE_TIME:
                c_Help = c_Help + "max_erase_time";
                c_Help2 = " TIME: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "ms";
                break;
-            case 8U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_PROGRAM_TIME:
                c_Help = c_Help + "max_program_time";
                c_Help2 = " TIME: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "ms";
                break;
-            case 9U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_ALIASES:
                c_Help = c_Help + "num_aliases";
                c_Help2 = " RANGES: " + m_GetValueDecHex(orc_Msg.au8_Data[4]);
                break;
-            case 10U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_PHYSICAL:
                c_Help = c_Help + "aliases_physical_address";
                c_Help2 = " ADD: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
                break;
-            case 11U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_SIZE:
                c_Help = c_Help + "aliases_size";
                c_Help2 = " SIZE: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "bytes";
                break;
-            case 12U:
+            case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_ADDRESS:
                c_Help = c_Help + "aliases_alias_address";
                c_Help2 = " ADD: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
                break;
@@ -1280,7 +1285,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             c_Help2 = "";
             switch (orc_Msg.au8_Data[3])
             {
-            case 1:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_PROTOCOL_VERSION:
                c_Help = c_Help + "protocol_version";
                u16_Help = m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]);
                (void)c_Help2.PrintFormatted(" V%x.%x%xr%x",
@@ -1289,22 +1294,22 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                                             static_cast<uint8>((u16_Help >> 4) & 0x0FU),
                                             static_cast<uint8>((u16_Help) & 0x0FU));
                break;
-            case 2:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_SPECIAL_SERVICES:
                c_Help = c_Help + "special_services";
                break;
-            case 3:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_GET_SERVICES:
                c_Help = c_Help + "get_services";
                break;
-            case 4:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_SET_SERVICES:
                c_Help = c_Help + "set_services";
                break;
-            case 5:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_FLASH_SERVICES:
                c_Help = c_Help + "flash_services";
                break;
-            case 6:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_TARGET_SPECIFIC_SERVICES:
                c_Help = c_Help + "target_specific_services";
                break;
-            case 7:
+            case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_HEX_RECORDS:
                c_Help = c_Help + "hex_record_config";
                c_Help2 = " MAX: " + m_GetValueDecHex(orc_Msg.au8_Data[4]) + "bytes" +
                          " GRA: " + m_GetValueDecHex(orc_Msg.au8_Data[5]) + "bytes";
@@ -1331,28 +1336,28 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             c_Help = "get_finger_print ";
             switch (orc_Msg.au8_Data[3])
             {
-            case 0:
+            case mu8_XFL_CMD_FINGER_PRINT_SUPPORTED_INDEXES:
                c_Help = c_Help + "supported_indexes";
                break;
-            case 1:
+            case mu8_XFL_CMD_FINGER_PRINT_PROGRAMMING_TIME:
                c_Help = c_Help + "programming_time";
                break;
-            case 2:
+            case mu8_XFL_CMD_FINGER_PRINT_PROGRAMMING_DATE:
                c_Help = c_Help + "programming_date";
                break;
-            case 3:
+            case mu8_XFL_CMD_FINGER_PRINT_CHECKSUM:
                c_Help = c_Help + "checksum";
                break;
-            case 4:
+            case mu8_XFL_CMD_FINGER_PRINT_USERNAME_1:
                c_Help = c_Help + "username1";
                break;
-            case 5:
+            case mu8_XFL_CMD_FINGER_PRINT_USERNAME_2:
                c_Help = c_Help + "username2";
                break;
-            case 6:
+            case mu8_XFL_CMD_FINGER_PRINT_USERNAME_3:
                c_Help = c_Help + "username3";
                break;
-            case 7:
+            case mu8_XFL_CMD_FINGER_PRINT_USERNAME_4:
                c_Help = c_Help + "username4";
                break;
             default:

@@ -33,8 +33,6 @@ class C_SdNdeDpListTableDelegate :
 public:
    C_SdNdeDpListTableDelegate(QObject * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QWidget * createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
                                   const QModelIndex & orc_Index) const override;
    virtual void destroyEditor(QWidget * const opc_Editor, const QModelIndex & orc_Index) const override;
@@ -43,7 +41,6 @@ public:
                              const QModelIndex & orc_Index) const override;
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                       const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    void SetModel(C_SdNdeDpListTableModel * const opc_Value);
 

@@ -47,7 +47,7 @@ void C_CamDbHandler::RemoveAllFiles(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove DBC file
 
-   \param[in] orc_File File to remove
+   \param[in]  orc_File    File to remove
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamDbHandler::RemoveDbcFile(const QString & orc_File)
@@ -58,7 +58,7 @@ void C_CamDbHandler::RemoveDbcFile(const QString & orc_File)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove OSY file
 
-   \param[in] orc_File File to remove
+   \param[in]  orc_File    File to remove
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamDbHandler::RemoveOsyFile(const QString & orc_File)
@@ -69,8 +69,8 @@ void C_CamDbHandler::RemoveOsyFile(const QString & orc_File)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append data of DBC file
 
-   \param[in] orc_File File to add
-   \param[in] orc_Data Data extracted from this file
+   \param[in]  orc_File    File to add
+   \param[in]  orc_Data    Data extracted from this file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamDbHandler::AddDbcFile(const QString & orc_File, const C_CieConverter::C_CIECommDefinition & orc_Data)
@@ -84,8 +84,8 @@ void C_CamDbHandler::AddDbcFile(const QString & orc_File, const C_CieConverter::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append data of OSY file
 
-   \param[in] orc_File File to add
-   \param[in] orc_Data Data extracted from this file
+   \param[in]  orc_File    File to add
+   \param[in]  orc_Data    Data extracted from this file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamDbHandler::AddOsyFile(const QString & orc_File,
@@ -100,7 +100,7 @@ void C_CamDbHandler::AddOsyFile(const QString & orc_File,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if file already loaded
 
-   \param[in] orc_File File to search for
+   \param[in]  orc_File    File to search for
 
    \return
    True  Already loaded
@@ -115,7 +115,7 @@ bool C_CamDbHandler::GetContainsDbc(const QString & orc_File) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if file already loaded
 
-   \param[in] orc_File File to search for
+   \param[in]  orc_File    File to search for
 
    \return
    True  Already loaded
@@ -148,9 +148,9 @@ void C_CamDbHandler::FindAllMessages(void)
 
    First searching all OSY files, then all DBC files
 
-   \param[in]  ou32_Id     CAN ID to search for
-   \param[out] orc_File    Found file path (only valid if C_NO_ERR)
-   \param[out] orc_Message Found message name (only valid if C_NO_ERR)
+   \param[in]   ou32_Id       CAN ID to search for
+   \param[out]  orc_File      Found file path (only valid if C_NO_ERR)
+   \param[out]  orc_Message   Found message name (only valid if C_NO_ERR)
 
    \return
    C_NO_ERR Found at least one matching message
@@ -187,8 +187,8 @@ sint32 C_CamDbHandler::FindMessageById(const uint32 ou32_Id, QString & orc_File,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Find OSY message in data base
 
-   \param[in] orc_File    File path of file to search in
-   \param[in] orc_Message Message name to search for
+   \param[in]  orc_File       File path of file to search in
+   \param[in]  orc_Message    Message name to search for
 
    \return
    C_NO_ERR Found message
@@ -215,8 +215,8 @@ sint32 C_CamDbHandler::FindOsyMessage(const QString & orc_File, const QString & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Find DBC message in data base
 
-   \param[in] orc_File    File path of file to search in
-   \param[in] orc_Message Message name to search for
+   \param[in]  orc_File       File path of file to search in
+   \param[in]  orc_Message    Message name to search for
 
    \return
    C_NO_ERR Found message
@@ -245,8 +245,10 @@ sint32 C_CamDbHandler::FindDbcMessage(const QString & orc_File, const QString & 
 
    Requirement: this function can only return a valid index if the function FindOsyMessage was at least called once
 
-   \param[in] orc_File    File name to look in
-   \param[in] orc_Message Message name to look for
+   \param[in]  orc_File       File name to look in
+   \param[in]  orc_Message    Message name to look for
+   \param[in]  oq_UseHash     Use hash
+   \param[in]  ou32_Hash      Hash
 
    \return
    NULL OSC CAN message not found
@@ -254,14 +256,16 @@ sint32 C_CamDbHandler::FindDbcMessage(const QString & orc_File, const QString & 
 */
 //----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_core::C_OSCCanMessage * C_CamDbHandler::GetOSCMessage(const QString & orc_File,
-                                                                         const QString & orc_Message) const
+                                                                         const QString & orc_Message,
+                                                                         const bool oq_UseHash,
+                                                                         const uint32 ou32_Hash) const
 {
    const stw_opensyde_core::C_OSCCanMessage * pc_Retval = NULL;
    const QMap<QString, C_CamDbOsy>::const_iterator c_It = this->mc_OSYFiles.find(orc_File);
 
    if (c_It != this->mc_OSYFiles.end())
    {
-      pc_Retval = c_It->GetOSCMessage(orc_Message);
+      pc_Retval = c_It->GetOSCMessage(orc_Message, oq_UseHash, ou32_Hash);
    }
    return pc_Retval;
 }
@@ -271,8 +275,10 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamDbHandler::GetOSCMessage(const Q
 
    Requirement: this function can only return a valid index if the function FindOsyMessage was at least called once
 
-   \param[in] orc_File    File name to look in
-   \param[in] orc_Message Message name to look for
+   \param[in]  orc_File       File name to look in
+   \param[in]  orc_Message    Message name to look for
+   \param[in]  oq_UseHash     Use hash
+   \param[in]  ou32_Hash      Hash
 
    \return
    NULL OSC list not found
@@ -280,14 +286,16 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamDbHandler::GetOSCMessage(const Q
 */
 //----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamDbHandler::GetOSCList(const QString & orc_File,
-                                                                            const QString & orc_Message) const
+                                                                            const QString & orc_Message,
+                                                                            const bool oq_UseHash,
+                                                                            const uint32 ou32_Hash) const
 {
    const stw_opensyde_core::C_OSCNodeDataPoolList * pc_Retval = NULL;
    const QMap<QString, C_CamDbOsy>::const_iterator c_It = this->mc_OSYFiles.find(orc_File);
 
    if (c_It != this->mc_OSYFiles.end())
    {
-      pc_Retval = c_It->GetOSCList(orc_Message);
+      pc_Retval = c_It->GetOSCList(orc_Message, oq_UseHash, ou32_Hash);
    }
    return pc_Retval;
 }
@@ -297,8 +305,10 @@ const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamDbHandler::GetOSCList(cons
 
    Requirement: this function can only return a valid index if the function FindDbcMessage was at least called once
 
-   \param[in] orc_File    File name to look in
-   \param[in] orc_Message Message name to look for
+   \param[in]  orc_File       File name to look in
+   \param[in]  orc_Message    Message name to look for
+   \param[in]  oq_UseHash     Use hash
+   \param[in]  ou32_Hash      Hash
 
    \return
    NULL ODBC message not found
@@ -306,14 +316,16 @@ const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamDbHandler::GetOSCList(cons
 */
 //----------------------------------------------------------------------------------------------------------------------
 const C_CieConverter::C_CIECanMessage * C_CamDbHandler::GetDbcMessage(const QString & orc_File,
-                                                                      const QString & orc_Message) const
+                                                                      const QString & orc_Message,
+                                                                      const bool oq_UseHash,
+                                                                      const uint32 ou32_Hash) const
 {
    const C_CieConverter::C_CIECanMessage * pc_Retval = NULL;
    const QMap<QString, C_CamDbDbc>::const_iterator c_It = this->mc_DBCFiles.find(orc_File);
 
    if (c_It != this->mc_DBCFiles.end())
    {
-      pc_Retval = c_It->GetDBCMessage(orc_Message);
+      pc_Retval = c_It->GetDBCMessage(orc_Message, oq_UseHash, ou32_Hash);
    }
    return pc_Retval;
 }
@@ -345,8 +357,8 @@ const QMap<QString, C_CamDbOsy> & C_CamDbHandler::GetOSYFiles(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set active flag
 
-   \param[in] orc_File  File to change active state for
-   \param[in] oq_Active New active state
+   \param[in]  orc_File    File to change active state for
+   \param[in]  oq_Active   New active state
 
    \return
    C_NO_ERR Changed flag
@@ -369,8 +381,8 @@ sint32 C_CamDbHandler::SetDBCActive(const QString & orc_File, const bool oq_Acti
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set active flag
 
-   \param[in] orc_File  File to change active state for
-   \param[in] oq_Active New active state
+   \param[in]  orc_File    File to change active state for
+   \param[in]  oq_Active   New active state
 
    \return
    C_NO_ERR Changed flag
@@ -395,9 +407,9 @@ sint32 C_CamDbHandler::SetOsyActive(const QString & orc_File, const bool oq_Acti
 
    Warning: this clears the found indices
 
-   \param[in]  orc_File      File to change bus index for
-   \param[in]  ou32_BusIndex New bus index
-   \param[out] orq_Change    Flag if bus index was changed
+   \param[in]   orc_File         File to change bus index for
+   \param[in]   ou32_BusIndex    New bus index
+   \param[out]  orq_Change       Flag if bus index was changed
 
    \return
    All OSY files
@@ -414,6 +426,36 @@ sint32 C_CamDbHandler::ReplaceOsyBusIndex(const QString & orc_File, const uint32
       s32_Retval = C_NO_ERR;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check hash for message
+
+   \param[in]  orc_File       File
+   \param[in]  orc_Message    Message
+   \param[in]  ou32_Hash      Hash
+
+   \retval   true   Valid
+   \retval   false  Invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CamDbHandler::CheckHashForMessage(const QString & orc_File, const QString & orc_Message,
+                                         const uint32 ou32_Hash) const
+{
+   bool q_Retval = false;
+   const QMap<QString, C_CamDbOsy>::const_iterator c_ItOsy = this->mc_OSYFiles.find(orc_File);
+   const QMap<QString, C_CamDbDbc>::const_iterator c_ItDbc = this->mc_DBCFiles.find(orc_File);
+
+   if (c_ItOsy != this->mc_OSYFiles.end())
+   {
+      q_Retval = c_ItOsy->CheckHashForMessage(orc_Message, ou32_Hash);
+   }
+
+   if (c_ItDbc != this->mc_DBCFiles.end())
+   {
+      q_Retval = c_ItDbc->CheckHashForMessage(orc_Message, ou32_Hash);
+   }
+   return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

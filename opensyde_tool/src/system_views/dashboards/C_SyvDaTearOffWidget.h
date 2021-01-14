@@ -82,11 +82,8 @@ Q_SIGNALS:
    void SigMySig(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual void closeEvent(QCloseEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    void m_OnActiveChange(stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source, const bool oq_Active);

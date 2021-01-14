@@ -48,15 +48,11 @@ public:
 
    C_SdNdeComIfSettingsTableDelegate(QObject * const opc_Parent = NULL, const stw_types::uint32 ou32_NodeIndex = 0);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-
    virtual QWidget * createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
                                   const QModelIndex & orc_Index) const;
    virtual void setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const;
    virtual void setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                              const QModelIndex & orc_Index) const;
-   //lint -restore
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

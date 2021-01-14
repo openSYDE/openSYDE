@@ -133,7 +133,7 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
          switch (pc_CurItem->type())
          {
          case msn_GRAPHICS_ITEM_NODE:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             pc_Node = dynamic_cast<const C_GiNode *>(pc_CurItem);
             if (pc_Node != NULL)
             {
@@ -154,7 +154,7 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
             break;
          case msn_GRAPHICS_ITEM_CANBUS: //Same data element
          case msn_GRAPHICS_ITEM_ETHERNETBUS:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             pc_Bus = dynamic_cast<const C_GiLiBus *>(pc_CurItem);
             if (pc_Bus != NULL)
             {
@@ -177,7 +177,7 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
             }
             break;
          case msn_GRAPHICS_ITEM_TEXTELEMENT:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             pc_TextElement = dynamic_cast<const C_GiSdTextElement *>(pc_CurItem);
             if (pc_TextElement != NULL)
             {
@@ -197,7 +197,7 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
             }
             break;
          case msn_GRAPHICS_ITEM_TEXTELEMENT_BUS:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             pc_TextElementBus = dynamic_cast<const C_GiTextElementBus *>(pc_CurItem);
             if (pc_TextElementBus != NULL)
             {
@@ -217,7 +217,7 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
             }
             break;
          case msn_GRAPHICS_ITEM_BOUNDARY:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             pc_Boundary = dynamic_cast<const C_GiSdBoundary *>(pc_CurItem);
             if (pc_Boundary != NULL)
             {
@@ -236,7 +236,7 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
             }
             break;
          case msn_GRAPHICS_ITEM_IMAGE:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             pc_Image = dynamic_cast<const C_GiSdImageGroup *>(pc_CurItem);
             if (pc_Image != NULL)
             {
@@ -254,7 +254,7 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
             }
             break;
          case msn_GRAPHICS_ITEM_LINE_ARROW:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             pc_LineArrow = dynamic_cast<const C_GiSdArrow *>(pc_CurItem);
             if (pc_LineArrow != NULL)
             {
@@ -351,7 +351,7 @@ bool C_SdManTopologyCopyPasteManager::CheckValidContentAndPrepareData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * const opc_Data)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_SdTopologyDataSnapshot * const pc_ExpectedData =
       dynamic_cast<const C_SdTopologyDataSnapshot * const>(opc_Data);
 

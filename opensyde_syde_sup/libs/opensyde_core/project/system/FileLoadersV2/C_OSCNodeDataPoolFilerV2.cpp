@@ -911,7 +911,7 @@ C_SCLString C_OSCNodeDataPoolFilerV2::h_DataPoolToString(const C_OSCNodeDataPool
 {
    C_SCLString c_Retval;
 
-   switch (ore_DataPool)
+   switch (ore_DataPool) //lint !e788 not all enum constants used; no newer data pool types supported here
    {
    case C_OSCNodeDataPool::eDIAG:
       c_Retval = "diag";
@@ -1092,6 +1092,8 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolElementValue(C_OSCNodeDataPoolCon
       case C_OSCNodeDataPoolContent::eFLOAT64:
          orc_NodeDataPoolContent.SetValueF64(orc_XMLParser.GetAttributeFloat64("value"));
          break;
+      default:
+         break;
       }
    }
    else
@@ -1149,6 +1151,8 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolElementValue(C_OSCNodeDataPoolCon
             case C_OSCNodeDataPoolContent::eFLOAT64:
                orc_NodeDataPoolContent.SetValueAF64Element(orc_XMLParser.GetAttributeFloat64("value"),
                                                            u32_CurIndex);
+               break;
+            default:
                break;
             }
             u32_CurIndex++; //next element
@@ -1221,6 +1225,8 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolElementValue(const stw_scl::C_SCLSt
       case C_OSCNodeDataPoolContent::eFLOAT64:
          orc_XMLParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueF64());
          break;
+      default:
+         break;
       }
    }
    else
@@ -1268,6 +1274,8 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolElementValue(const stw_scl::C_SCLSt
             break;
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orc_XMLParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueAF64Element(u32_ItElem));
+            break;
+         default:
             break;
          }
          //Return to parent
@@ -1331,6 +1339,8 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCo
       case C_OSCNodeDataPoolContent::eFLOAT64:
          orc_XMLParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueF64());
          break;
+      default:
+         break;
       }
    }
    else
@@ -1380,6 +1390,8 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCo
             break;
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orc_XMLParser.SetAttributeFloat64("content", orc_NodeDataPoolContent.GetValueAF64Element(u32_ItElem));
+            break;
+         default:
             break;
          }
          //Return
@@ -1486,6 +1498,8 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolContentV1(C_OSCNodeDataPoolConten
                case C_OSCNodeDataPoolContent::eFLOAT64:
                   orc_NodeDataPoolContent.SetValueAF64Element(orc_XMLParser.GetAttributeFloat64("content"),
                                                               u32_CurIndex);
+                  break;
+               default:
                   break;
                }
                c_CurNode = orc_XMLParser.SelectNodeNext("element");

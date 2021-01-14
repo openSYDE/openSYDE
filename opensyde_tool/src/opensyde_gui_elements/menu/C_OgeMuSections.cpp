@@ -63,5 +63,4 @@ void C_OgeMuSections::AddCustomSection(const QString & orc_SectionTitle)
    pc_Action->setDefaultWidget(pc_Label);
    this->addAction(pc_Action);
 
-   //lint -e{429}  no memory leak because of the parent of pc_Label and pc_Action and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Label and pc_Action and the Qt memory management

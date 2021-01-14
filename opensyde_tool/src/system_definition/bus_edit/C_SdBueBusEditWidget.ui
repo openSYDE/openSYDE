@@ -68,7 +68,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_TabComIfDescription">
+       <widget class="QWidget" name="pc_TabCommMessages">
         <attribute name="title">
          <string>COM Interface Description</string>
         </attribute>

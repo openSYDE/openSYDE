@@ -2954,6 +2954,8 @@ QString C_PuiSvHandlerFilerV1::mh_DeviceConfigModeToString(const C_PuiSvData::E_
    case C_PuiSvData::eDCM_ONLY_USED_INTERFACES:
       c_Retval = "only-used-interfaces";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -2979,6 +2981,8 @@ QString C_PuiSvHandlerFilerV1::mh_WriteModeToString(const C_PuiSvDbWidgetBase::E
       break;
    case C_PuiSvDbWidgetBase::eWM_ON_CHANGE:
       c_Retval = "on-change";
+      break;
+   default:
       break;
    }
 
@@ -3012,6 +3016,8 @@ QString C_PuiSvHandlerFilerV1::mh_DisplayStyleToString(const C_PuiSvDbWidgetBase
    case C_PuiSvDbWidgetBase::eSKEUOMORPH:
       c_Retval = "skeuomorph";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3041,6 +3047,8 @@ QString C_PuiSvHandlerFilerV1::mh_ToggleTypeToString(const C_PuiSvDbToggle::E_Ty
    case C_PuiSvDbToggle::eTYPE3:
       c_Retval = "type3";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3067,6 +3075,8 @@ QString C_PuiSvHandlerFilerV1::mh_SpinBoxTypeToString(const C_PuiSvDbSpinBox::E_
    case C_PuiSvDbSpinBox::eTYPE2:
       c_Retval = "type2";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3092,6 +3102,8 @@ QString C_PuiSvHandlerFilerV1::mh_LabelTypeToString(const C_PuiSvDbLabel::E_Type
       break;
    case C_PuiSvDbLabel::eTRANSPARENT:
       c_Retval = "transparent";
+      break;
+   default:
       break;
    }
 
@@ -3125,6 +3137,8 @@ QString C_PuiSvHandlerFilerV1::mh_SliderTypeToString(const C_PuiSvDbSlider::E_Ty
    case C_PuiSvDbSlider::eTYPE_BIG_COLOR_2:
       c_Retval = "big-color-2";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3153,6 +3167,8 @@ QString C_PuiSvHandlerFilerV1::mh_ProgressBarTypeToString(const C_PuiSvDbProgres
       break;
    case C_PuiSvDbProgressBar::eTYPE_3:
       c_Retval = "type3";
+      break;
+   default:
       break;
    }
 
@@ -3186,6 +3202,8 @@ QString C_PuiSvHandlerFilerV1::mh_ProgressBarAlignmentTypeToString(const C_PuiSv
    case C_PuiSvDbProgressBar::eRIGHT:
       c_Retval = "right";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3216,6 +3234,8 @@ QString C_PuiSvHandlerFilerV1::mh_TransmissionModeToString(
    case C_PuiSvReadDataConfiguration::eTM_ON_CHANGE:
       c_Retval = "cyclic-on-change";
       break;
+   default:
+      break;
    }
 
    return c_Retval;
@@ -3241,6 +3261,8 @@ QString C_PuiSvHandlerFilerV1::mh_SourceTypeToString(const C_PuiSvDbNodeDataPool
       break;
    case C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL:
       c_Retval = "bus-signal";
+      break;
+   default:
       break;
    }
 

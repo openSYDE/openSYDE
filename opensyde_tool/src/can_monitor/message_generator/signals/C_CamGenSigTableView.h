@@ -53,12 +53,9 @@ Q_SIGNALS:
    void SigTriggerModelUpdateCyclicMessage(const stw_types::uint32 ou32_MessageIndex, const bool oq_Active);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    C_CamGenSigTableDelegate mc_Delegate;

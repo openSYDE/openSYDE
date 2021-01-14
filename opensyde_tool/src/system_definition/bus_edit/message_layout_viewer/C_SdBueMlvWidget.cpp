@@ -363,7 +363,7 @@ void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OSCCanMessageIdentifica
             {
                // Selection possible
                std::set<uint16>::const_iterator c_ItValue;
-               const QString c_SignalName = QString(pc_MultiplexerElement->c_Name.c_str()) + QString(" = ");
+               const QString c_SignalName = static_cast<QString>(pc_MultiplexerElement->c_Name.c_str()) + static_cast<QString>(" = ");
                QString c_SpecificEntry = "";
 
                // Add all multiplexer values to the combo box

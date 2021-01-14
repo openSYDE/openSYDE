@@ -43,9 +43,6 @@ public:
                const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
                const stw_types::uint32 & oru32_DataSetIndex) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation, const stw_types::sintn osn_Role =
                                   static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
@@ -55,7 +52,6 @@ public:
    virtual bool setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                         const stw_types::sintn osn_Role = static_cast<stw_types::sintn>(Qt::EditRole)) override;
    virtual Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    void HandleDataChange(const stw_types::uint32 & oru32_Column);
    stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type GetType(void) const;

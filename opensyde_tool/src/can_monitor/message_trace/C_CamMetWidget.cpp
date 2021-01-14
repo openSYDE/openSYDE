@@ -314,13 +314,16 @@ void C_CamMetWidget::ActivateDatabase(const QString & orc_PathDatabase, const QS
    C_NOACT     No system definition found with this path
 
    \param[in]  orc_PathSystemDefinition   Path of system definition file (Must be .syde_sysdef)
+   \param[in]  orc_OrgPath                Org path
    \param[in]  ou32_BusIndex              Bus index of CAN bus of system definition for monitoring
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetWidget::SetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition,
+void C_CamMetWidget::SetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const QString & orc_OrgPath,
                                              const stw_types::uint32 ou32_BusIndex)
 {
    sint32 s32_Return;
+
+   Q_UNUSED(orc_OrgPath)
 
    s32_Return = this->mpc_Ui->pc_TraceView->SetOsySysDefBus(orc_PathSystemDefinition.toStdString().c_str(),
                                                             ou32_BusIndex);

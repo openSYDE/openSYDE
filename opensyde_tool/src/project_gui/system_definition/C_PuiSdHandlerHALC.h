@@ -57,15 +57,13 @@ public:
                                                                                const stw_types::uint32 ou32_DomainIndex,
                                                                                const stw_opensyde_core::C_OSCHalcDefDomain::E_VariableSelector oe_Selector,
                                                                                const stw_types::uint32 ou32_Index) const;
+   const stw_opensyde_core::C_OSCNodeDataPool * GetHALCDatapool(const stw_types::uint32 ou32_NodeIndex,
+                                                                const bool oq_SafeDatapool);
 
    //Set
    stw_types::sint32 ClearHALCConfig(const stw_types::uint32 ou32_NodeIndex);
    stw_types::sint32 SetHALCConfig(const stw_types::uint32 ou32_NodeIndex,
                                    const stw_opensyde_core::C_OSCHalcConfig & orc_Config);
-   stw_types::sint32 SetHALCConfigSafeDataBlock(const stw_types::uint32 ou32_NodeIndex, const bool oq_IsSet,
-                                                const stw_types::uint32 ou32_NewValue);
-   stw_types::sint32 SetHALCConfigUnsafeDataBlock(const stw_types::uint32 ou32_NodeIndex, const bool oq_IsSet,
-                                                  const stw_types::uint32 ou32_NewValue);
    stw_types::sint32 SetHALCDomainConfig(const stw_types::uint32 ou32_NodeIndex,
                                          const stw_types::uint32 ou32_DomainIndex,
                                          const stw_opensyde_core::C_OSCHalcConfigDomain & orc_Domain);
@@ -84,6 +82,10 @@ public:
                                                   const stw_types::uint32 ou32_DomainIndex,
                                                   const stw_types::uint32 ou32_ChannelIndex,
                                                   const bool oq_UseChannelIndex);
+   stw_types::sint32 ResetHALCDomainChannelUseCase(const stw_types::uint32 ou32_NodeIndex,
+                                                   const stw_types::uint32 ou32_DomainIndex,
+                                                   const stw_types::uint32 ou32_ChannelIndex,
+                                                   const bool oq_UseChannelIndex);
    stw_types::sint32 SetHALCDomainChannelConfigName(const stw_types::uint32 ou32_NodeIndex,
                                                     const stw_types::uint32 ou32_DomainIndex,
                                                     const stw_types::uint32 ou32_ChannelIndex,
@@ -140,6 +142,9 @@ public:
                                                                        const bool oq_Value);
 
    //Misc
+   stw_types::sint32 GetHalChannelOrDomainName(const stw_types::uint32 ou32_NodeIndex,
+                                               const stw_types::uint32 ou32_DomainIndex,
+                                               const stw_types::uint32 ou32_Channel, QString & orc_Name) const;
    stw_types::sint32 TranslateToHALCIndex(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
                                           const stw_types::uint32 ou32_ArrayIndex,
                                           stw_types::uint32 & oru32_DomainIndex, bool & orq_UseChannelIndex,
@@ -152,9 +157,16 @@ public:
    stw_types::sint32 CheckHALCDomainChannelLinked(const stw_types::uint32 ou32_NodeIndex,
                                                   const stw_types::uint32 ou32_DomainIndex,
                                                   const stw_types::uint32 ou32_ChannelIndex,
-                                                  const bool oq_UseChannelIndex, bool & orq_IsLinked, std::vector<QString> * const opc_LinkedChannelNames =
-                                                     NULL, std::vector<stw_types::uint32> * const opc_LinkedChannelIndices =
-                                                     NULL) const;
+                                                  const bool oq_UseChannelIndex, bool & orq_IsLinked, std::vector<QString> * const
+                                                  opc_LinkedChannelNames = NULL, std::vector<stw_types::uint32> * const
+                                                  opc_LinkedChannelIndices = NULL,
+                                                  const stw_types::uint32 * const opu32_UseCaseIndex = NULL) const;
+   stw_types::sint32 SetHALCDomainChannelConfigOfLinkedChannels(const stw_types::uint32 ou32_NodeIndex,
+                                                                const stw_types::uint32 ou32_DomainIndex,
+                                                                const stw_types::uint32 ou32_ChannelIndex,
+                                                                const bool oq_UseChannelIndex,
+                                                                const stw_types::uint32 ou32_UseCaseIndexOld,
+                                                                const stw_types::uint32 ou32_UseCaseIndexNew);
    stw_types::sint32 CheckHALCDomainChannelError(const stw_types::uint32 ou32_NodeIndex,
                                                  const stw_types::uint32 ou32_DomainIndex,
                                                  const stw_types::uint32 ou32_ChannelIndex,

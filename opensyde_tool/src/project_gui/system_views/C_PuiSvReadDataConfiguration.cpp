@@ -45,6 +45,16 @@ C_PuiSvReadDataConfiguration::C_PuiSvReadDataConfiguration(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   destructor
+
+   clean up ...
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvReadDataConfiguration::~C_PuiSvReadDataConfiguration(void)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.

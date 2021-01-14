@@ -65,12 +65,9 @@ Q_SIGNALS:
    void SigDataItemSelected(const stw_types::uint32 ou32_DataPoolElementConfigIndex);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool event(QEvent * const opc_Event) override;
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_SyvDaItChartDataItemWidget * mpc_Ui;
@@ -91,12 +88,21 @@ private:
    QPixmap mc_IconSignal;
    QPixmap mc_IconVariable;
    QPixmap mc_IconParameter;
+   QPixmap mc_IconHALInput;
+   QPixmap mc_IconHALOutput;
+   QPixmap mc_IconHALOther;
    QPixmap mc_IconSignalWarning;
    QPixmap mc_IconVariableWarning;
    QPixmap mc_IconParameterWarning;
+   QPixmap mc_IconHALInputWarning;
+   QPixmap mc_IconHALOutputWarning;
+   QPixmap mc_IconHALOtherWarning;
    QPixmap mc_IconSignalError;
    QPixmap mc_IconVariableError;
    QPixmap mc_IconParameterError;
+   QPixmap mc_IconHALInputError;
+   QPixmap mc_IconHALOutputError;
+   QPixmap mc_IconHALOtherError;
 
    void m_DataItemToggled(const bool oq_Checked);
    void m_UpdateIcon(void) const;

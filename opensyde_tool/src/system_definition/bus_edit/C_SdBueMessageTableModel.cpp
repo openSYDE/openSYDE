@@ -151,7 +151,7 @@ QVariant C_SdBueMessageTableModel::headerData(const sintn osn_Section, const Qt:
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else
       {
@@ -238,10 +238,10 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                      c_Retval = QIcon(":images/system_definition/IconMessage.svg");
                      break;
                   case eNAME:
-                     c_Retval = QString(pc_Message->c_Name.c_str());
+                     c_Retval = static_cast<QString>(pc_Message->c_Name.c_str());
                      break;
                   case eCOMMENT:
-                     c_Retval = QString(pc_Message->c_Comment.c_str());
+                     c_Retval = static_cast<QString>(pc_Message->c_Comment.c_str());
                      break;
                   case eEXTENDED:
                      c_Retval = "";
@@ -496,7 +496,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
       {
@@ -732,7 +732,7 @@ const
    {
       QString c_AdditionalInfo;
 
-      c_Return += QString(pc_Node->c_Properties.c_Name.c_str());
+      c_Return += static_cast<QString>(pc_Node->c_Properties.c_Name.c_str());
 
       // Add additional info about Datapool and/or Interface if ambiguous
       if (pc_Node->GetCANProtocolsConst(orc_CurMatchingId.e_ComProtocol).size() > 1)

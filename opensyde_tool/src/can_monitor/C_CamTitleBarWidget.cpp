@@ -191,11 +191,11 @@ void C_CamTitleBarWidget::UpdateRecentProjectsAndWindowTitle(void)
    // update window title (window title of this widget is connected to main window)
    if (c_ActualProject.completeBaseName() == "")
    {
-      c_NewTitle = QString("openSYDE CAN Monitor - New project");
+      c_NewTitle = static_cast<QString>("openSYDE CAN Monitor - New project");
    }
    else
    {
-      c_NewTitle = QString("openSYDE CAN Monitor - %1 (%2)").arg(c_ActualProject.completeBaseName()).arg(
+      c_NewTitle = static_cast<QString>("openSYDE CAN Monitor - %1 (%2)").arg(c_ActualProject.completeBaseName()).arg(
          c_ActualProject.absoluteFilePath());
    }
    //Send title changed signal to update main window title (this would only set child window title)
@@ -234,6 +234,7 @@ bool C_CamTitleBarWidget::HandleProjectComparison(void)
          q_Continue = true;
          break;
       case C_OgeWiCustomMessage::eCANCEL:
+      case C_OgeWiCustomMessage::eINVALID:
          q_Continue = false;
          break;
       default:
@@ -365,8 +366,8 @@ void C_CamTitleBarWidget::m_ShowAbout(void)
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+
+} //lint !e429  no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Trigger help
@@ -374,7 +375,6 @@ void C_CamTitleBarWidget::m_ShowAbout(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_TriggerHelp(void)
 {
-   //lint -e{10,48,64,746,1013,1055} Will be defined via moc compiler, PC lint unable to handle this construct
    stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->metaObject()->className());
 }
 
@@ -417,10 +417,10 @@ void C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
    {
       const QString c_Log = C_Uti::h_GetLink(
          C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str(), mc_STYLE_GUIDE_COLOR_LINK,
-         QString("file:\\\\\\") + C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+         static_cast<QString>("file:\\\\\\") + C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Project save"));
-      c_Message.SetDescription(QString(C_GtGetText::h_GetText("For more details see log file %1")).arg(c_Log));
+      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("For more details see log file %1")).arg(c_Log));
 
       //Update log file
       C_OSCLoggingHandler::h_Flush();

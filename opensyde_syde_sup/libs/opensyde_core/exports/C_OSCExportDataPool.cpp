@@ -98,6 +98,7 @@ uint16 C_OSCExportDataPool::h_ConvertOverallCodeVersion(const uint16 ou16_GenCod
    case 2:
    case 3:
    case 4:
+   case 5:
       u16_Return = ou16_GenCodeVersion - 1; // -1 because of no changes from version 1 to 2
       break;
    default:
@@ -608,7 +609,6 @@ void C_OSCExportDataPool::mh_AddDefinesImpl(C_SCLStringList & orc_Data, const C_
       orc_Data.Append("#if OSY_DPA_DATA_POOL_DEFINITION_VERSION != 0x" +
                       C_SCLString::IntToHex(static_cast<sint64>(C_OSCExportDataPool::h_ConvertOverallCodeVersion(
                                                                    ou16_GenCodeVersion)), 4U) + "U");
-      // datapool export version is one less than over all code structure version (no changes from version 1 to 2)
       orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
                       "generated code");
       orc_Data.Append("static T_osy_non_existing_type_" + orc_ProjectId + " mt_Variable;");
@@ -777,8 +777,8 @@ void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data,  con
          if (oe_Linkage == eREMOTEPUBLIC)
          {
             orc_Data.Append("///Pointer to global Datapool RAM variables in other application:");
-            orc_Data.Append("OSY_DPA_SAFE_RAM_DATA_PRIVATE_ZERO T_" + orc_DataPool.c_Name + "_DataPoolValues * gpt_" + orc_DataPool.c_Name +
-                            "_DataPoolValues = NULL;");
+            orc_Data.Append("OSY_DPA_SAFE_RAM_DATA_PRIVATE_ZERO T_" + orc_DataPool.c_Name + "_DataPoolValues * gpt_" +
+                            orc_DataPool.c_Name + "_DataPoolValues = NULL;");
          }
       }
    }
@@ -802,7 +802,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
                                              const uint16 ou16_GenCodeVersion, const uint8 ou8_ProcessId,
                                              const uint8 ou8_DataPoolIndexRemote, const E_Linkage oe_Linkage)
 {
-   C_SCLString c_DataPoolName = orc_DataPool.c_Name;
+   const C_SCLString c_DataPoolName = orc_DataPool.c_Name;
    C_SCLString c_String;
    uint32 u32_HashValue = 0U;
 
@@ -1136,6 +1136,8 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
             orc_Data.Append("   (void**)&gpt_" + orc_DataPool.c_Name +
                             "_DataPoolValues,  ///< Pointer to pointer to struct containing all Datapool values");
             break;
+         default:
+            break;
          }
          orc_Data.Append("   0x" + C_SCLString::IntToHex(static_cast<sint64>(u32_HashValue), 4U) +
                          "U, ///< CRC of Datapool definition");
@@ -1146,16 +1148,45 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
    }
 
    orc_Data.Append("///Create Datapool instance data:");
-   c_String = "OSY_DPA_CREATE_STATIC_DP_INSTANCE_DATA(mt_DpInstanceData, ";
-   switch (oe_Linkage)
+
+   //KFXTCSWRSCC_449: special macro from V5 on if local and NVM:
+   if ((ou16_GenCodeVersion >= 5U) && (oe_Linkage == eLOCAL) &&
+       (orc_DataPool.e_Type == C_OSCNodeDataPool::eNVM))
    {
-   case eLOCAL:
-      c_String += "&mt_DataPoolDefinition)";
-      break;
-   case eREMOTE:
-   case eREMOTEPUBLIC:
-      c_String += "NULL)";
-      break;
+      uint16 u16_ListIndex;
+      uint32 u32_BufferSize;
+      uint32 u32_HighestBufferSize = 0U;
+
+      //get number of used bytes from "biggest" list:
+      for (u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
+      {
+         const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u16_ListIndex];
+         u32_BufferSize = rc_List.GetNumBytesUsed();
+         if (u32_BufferSize > u32_HighestBufferSize)
+         {
+            u32_HighestBufferSize = u32_BufferSize;
+         }
+      }
+
+      c_String = "OSY_DPA_CREATE_STATIC_DP_INSTANCE_DATA_WITH_BUFFER(mt_DpInstanceData, &mt_DataPoolDefinition, " +
+                 C_SCLString::IntToStr(u32_HighestBufferSize) + "U)";
+   }
+   else
+   {
+      //KFXTCSWRSCC_360: create instance data without "NVM buffer"
+      c_String = "OSY_DPA_CREATE_STATIC_DP_INSTANCE_DATA(mt_DpInstanceData, ";
+      switch (oe_Linkage)
+      {
+      case eLOCAL:
+         c_String += "&mt_DataPoolDefinition)";
+         break;
+      case eREMOTE:
+      case eREMOTEPUBLIC:
+         c_String += "NULL)";
+         break;
+      default:
+         break;
+      }
    }
 
    orc_Data.Append(c_String);
@@ -1170,6 +1201,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
    c_String = "   ";
    if (ou16_GenCodeVersion >= 4U)
    {
+      //KFXTCSWRSCC_516: add linkage information
       c_String += "OSY_DPA_DATA_POOL_LINKAGE_" + C_OSCExportDataPool::mh_ConvertLinkageToString(oe_Linkage) +
                   ",  ///< Datapool linkage";
    }
@@ -1202,6 +1234,8 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
    case eREMOTE:
    case eREMOTEPUBLIC:
       orc_Data.Append("   &mt_RemoteDataPoolInfo,  ///< info about remote Datapool");
+      break;
+   default:
       break;
    }
 
@@ -1521,6 +1555,8 @@ C_SCLString C_OSCExportDataPool::mh_ConvertLinkageToString(const C_OSCExportData
       break;
    case eREMOTEPUBLIC:
       c_Return = "REMOTE_PUBLIC";
+      break;
+   default:
       break;
    }
 

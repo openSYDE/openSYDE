@@ -103,7 +103,7 @@ QVariant C_SyvDaItPaArModel::headerData(const sintn osn_Section, const Qt::Orien
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else
       {
@@ -118,7 +118,7 @@ QVariant C_SyvDaItPaArModel::headerData(const sintn osn_Section, const Qt::Orien
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
       }
       else
       {
@@ -202,7 +202,8 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
                                                                                    pc_Element->f64_Factor,
                                                                                    pc_Element->f64_Offset,
                                                                                    static_cast<uint32>(orc_Index.
-                                                                                                       column()));
+                                                                                                       column()),
+                                                                                   false);
                }
                else
                {
@@ -214,7 +215,7 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
                                                                                       pc_Element->f64_Offset,
                                                                                       static_cast<uint32>(
                                                                                          orc_Index.
-                                                                                         column()));
+                                                                                         column()), false);
                   }
                }
             }
@@ -222,7 +223,7 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
       }
       else if (osn_Role == static_cast<sintn>(Qt::FontRole))
       {
@@ -241,6 +242,10 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
          {
             c_Retval = mc_STYLE_GUIDE_COLOR_18;
          }
+      }
+      else
+      {
+         // no special handling here
       }
    }
    return c_Retval;
@@ -268,7 +273,7 @@ bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant &
       {
          if (orc_Index.column() >= 0)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             const C_GiSvDaParam * const pc_ParamWidget =
                dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -400,7 +405,7 @@ const C_OSCNodeDataPoolListElement * C_SyvDaItPaArModel::GetOSCElement(void) con
 const C_OSCNodeDataPoolContent * C_SyvDaItPaArModel::GetElementData(void) const
 {
    const C_OSCNodeDataPoolContent * pc_Retval = NULL;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_GiSvDaParam * const pc_ParamWidget =
       dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -439,7 +444,7 @@ void C_SyvDaItPaArModel::Reset(void)
 const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItPaArModel::m_GetElementId(void) const
 {
    const C_PuiSvDbNodeDataPoolListElementId * pc_Retval = NULL;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_GiSvDaParam * const pc_ParamWidget =
       dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -470,7 +475,7 @@ const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItPaArModel::m_GetElementId(vo
 sint32 C_SyvDaItPaArModel::m_GetDataSetIndex(void) const
 {
    sint32 s32_Retval = -1;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_GiSvDaParam * const pc_ParamWidget =
       dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 

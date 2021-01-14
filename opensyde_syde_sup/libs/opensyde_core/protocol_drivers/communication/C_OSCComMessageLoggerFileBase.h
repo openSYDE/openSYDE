@@ -41,7 +41,6 @@ protected:
 private:
    //Avoid call
    C_OSCComMessageLoggerFileBase(const C_OSCComMessageLoggerFileBase &);
-   C_OSCComMessageLoggerFileBase & operator =(const C_OSCComMessageLoggerFileBase &);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

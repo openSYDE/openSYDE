@@ -73,9 +73,9 @@ sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & o
       s32_Retval = C_NO_ERR;
       {
          //Helper to seperate path and file name
-         QFileInfo c_File(orc_Path);
+         const QFileInfo c_File(orc_Path);
          //Check if directory exists
-         QDir c_Dir(c_File.path());
+         const QDir c_Dir(c_File.path());
          if (c_Dir.exists() == false)
          {
             c_Dir.mkpath(".");
@@ -171,14 +171,14 @@ sint32 C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Pat
 void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_NodeIdBase,
                             const QString & orc_NodeName, const C_UsNode & orc_Node)
 {
-   const QString c_NodeIdName = QString("%1Name").arg(orc_NodeIdBase);
-   const QString c_HALCOvColumnId = QString("%1HALCOverview").arg(orc_NodeIdBase);
-   const QString c_HALCConfigColumnId = QString("%1HALCParamConfig").arg(orc_NodeIdBase);
-   const QString c_NodeIdSelectedHALCDomain = QString("%1Selected_HALC_domain").arg(orc_NodeIdBase);
-   const QString c_NodeIdSelectedHALCChannel = QString("%1Selected_HALC_channel").arg(orc_NodeIdBase);
-   const QString c_NodeIdDatapoolCount = QString("%1Datapool_count").arg(orc_NodeIdBase);
-   const QString c_NodeIdSelectedDatapoolName = QString("%1Selected_datapool_name").arg(orc_NodeIdBase);
-   const QString c_NodeIdSelectedProtocol = QString("%1Selected_protocol").arg(orc_NodeIdBase);
+   const QString c_NodeIdName = static_cast<QString>("%1Name").arg(orc_NodeIdBase);
+   const QString c_HALCOvColumnId = static_cast<QString>("%1HALCOverview").arg(orc_NodeIdBase);
+   const QString c_HALCConfigColumnId = static_cast<QString>("%1HALCParamConfig").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedHALCDomain = static_cast<QString>("%1Selected_HALC_domain").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedHALCChannel = static_cast<QString>("%1Selected_HALC_channel").arg(orc_NodeIdBase);
+   const QString c_NodeIdDatapoolCount = static_cast<QString>("%1Datapool_count").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedDatapoolName = static_cast<QString>("%1Selected_datapool_name").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedProtocol = static_cast<QString>("%1Selected_protocol").arg(orc_NodeIdBase);
    const QList<QString> c_DatapoolKeyList = orc_Node.GetDatapoolKeysInternal();
    sintn sn_ItDatapool = 0;
 
@@ -211,7 +211,7 @@ void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    for (QList<QString>::const_iterator c_ItDatapoolKey = c_DatapoolKeyList.begin();
         c_ItDatapoolKey != c_DatapoolKeyList.end(); ++c_ItDatapoolKey)
    {
-      const QString c_DatapoolIdBase = QString("%1Datapool%2").arg(orc_NodeIdBase).arg(sn_ItDatapool);
+      const QString c_DatapoolIdBase = static_cast<QString>("%1Datapool%2").arg(orc_NodeIdBase).arg(sn_ItDatapool);
       const QString c_DatapoolName = *c_ItDatapoolKey;
       const C_UsNodeDatapool c_Datapool = orc_Node.GetDatapool(c_DatapoolName);
       mh_SaveDatapool(orc_Ini, orc_SectionName, c_DatapoolIdBase, c_DatapoolName, c_Datapool);
@@ -234,15 +234,15 @@ void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
 void C_UsFiler::mh_SaveBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_BusIdBase,
                            const QString & orc_BusName, const C_UsCommunication & orc_Bus)
 {
-   const QString c_BusIdName = QString("%1Name").arg(orc_BusIdBase);
+   const QString c_BusIdName = static_cast<QString>("%1Name").arg(orc_BusIdBase);
    const QString c_BusIdSelectedComProtocol =
-      QString("%1Selected_com_protocol").arg(orc_BusIdBase);
-   const QString c_BusIdMessageOverview = QString("%1MessageOverview").arg(orc_BusIdBase);
-   const QString c_BusIdSignalOverview = QString("%1SignalOverview").arg(orc_BusIdBase);
-   const QString c_BusIdMessageSelected = QString("%1Message_selected").arg(orc_BusIdBase);
-   const QString c_BusIdSelectedMessageName = QString("%1Selected_message_name").arg(orc_BusIdBase);
-   const QString c_BusIdSignalSelected = QString("%1Signal_selected").arg(orc_BusIdBase);
-   const QString c_BusIdSelectedSignalName = QString("%1Selected_signal_index").arg(orc_BusIdBase);
+      static_cast<QString>("%1Selected_com_protocol").arg(orc_BusIdBase);
+   const QString c_BusIdMessageOverview = static_cast<QString>("%1MessageOverview").arg(orc_BusIdBase);
+   const QString c_BusIdSignalOverview = static_cast<QString>("%1SignalOverview").arg(orc_BusIdBase);
+   const QString c_BusIdMessageSelected = static_cast<QString>("%1Message_selected").arg(orc_BusIdBase);
+   const QString c_BusIdSelectedMessageName = static_cast<QString>("%1Selected_message_name").arg(orc_BusIdBase);
+   const QString c_BusIdSignalSelected = static_cast<QString>("%1Signal_selected").arg(orc_BusIdBase);
+   const QString c_BusIdSelectedSignalName = static_cast<QString>("%1Selected_signal_index").arg(orc_BusIdBase);
 
    stw_opensyde_core::C_OSCCanProtocol::E_Type e_SelectedProtocol;
    bool q_MessageSelected;
@@ -290,20 +290,22 @@ void C_UsFiler::mh_SaveDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
 {
    sintn sn_ItBus = 0;
    sintn sn_ItList = 0;
-   const QString c_DatapoolIdName = QString("%1Name").arg(orc_DatapoolIdBase);
+   const QString c_DatapoolIdName = static_cast<QString>("%1Name").arg(orc_DatapoolIdBase);
    const std::vector<QString> & rc_ExpandedListNames = orc_Datapool.GetExpandedListNames();
    const std::vector<QString> & rc_SelectedListNames = orc_Datapool.GetSelectedListNames();
    const std::vector<QString> & rc_SelectedVariableNames = orc_Datapool.GetSelectedVariableNames();
    const QList<QString> c_Interfaces = orc_Datapool.GetInterfaceSettingsKeysInternal();
    const QList<QString> & rc_Lists = orc_Datapool.GetListSettingsKeysInternal();
-   const QString c_DatapoolIdExpandedListNameCount = QString("%1ExpandedListName_count").arg(orc_DatapoolIdBase);
-   const QString c_DatapoolIdSelectedListNameCount = QString("%1SelectedListName_count").arg(orc_DatapoolIdBase);
+   const QString c_DatapoolIdExpandedListNameCount =
+      static_cast<QString>("%1ExpandedListName_count").arg(orc_DatapoolIdBase);
+   const QString c_DatapoolIdSelectedListNameCount =
+      static_cast<QString>("%1SelectedListName_count").arg(orc_DatapoolIdBase);
    const QString c_DatapoolIdSelectedVariableNameCount =
-      QString("%1SelectedVariableName_count").arg(orc_DatapoolIdBase);
+      static_cast<QString>("%1SelectedVariableName_count").arg(orc_DatapoolIdBase);
    const QString c_DatapoolIdInterfaceCount =
-      QString("%1Interface_count").arg(orc_DatapoolIdBase);
+      static_cast<QString>("%1Interface_count").arg(orc_DatapoolIdBase);
    const QString c_DatapoolIdListCount =
-      QString("%1Lists_count").arg(orc_DatapoolIdBase);
+      static_cast<QString>("%1Lists_count").arg(orc_DatapoolIdBase);
 
    //Name
    orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_DatapoolIdName.toStdString().c_str(),
@@ -315,9 +317,11 @@ void C_UsFiler::mh_SaveDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
 
    for (uint32 u32_ItExpandedList = 0; u32_ItExpandedList < rc_ExpandedListNames.size(); ++u32_ItExpandedList)
    {
-      const QString c_DatapoolIdExpandedListNameBaseId = QString("%1ExpandedListName%2").arg(orc_DatapoolIdBase).arg(
+      const QString c_DatapoolIdExpandedListNameBaseId = static_cast<QString>("%1ExpandedListName%2").arg(
+         orc_DatapoolIdBase).arg(
          u32_ItExpandedList);
-      const QString c_DatapoolIdExpandedListNameId = QString("%1Name").arg(c_DatapoolIdExpandedListNameBaseId);
+      const QString c_DatapoolIdExpandedListNameId = static_cast<QString>("%1Name").arg(
+         c_DatapoolIdExpandedListNameBaseId);
       orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_DatapoolIdExpandedListNameId.toStdString().c_str(),
                           rc_ExpandedListNames[u32_ItExpandedList].toStdString().c_str());
    }
@@ -328,9 +332,11 @@ void C_UsFiler::mh_SaveDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
 
    for (uint32 u32_ItSelectedList = 0; u32_ItSelectedList < rc_SelectedListNames.size(); ++u32_ItSelectedList)
    {
-      const QString c_DatapoolIdSelectedListNameBaseId = QString("%1SelectedListName%2").arg(orc_DatapoolIdBase).arg(
+      const QString c_DatapoolIdSelectedListNameBaseId = static_cast<QString>("%1SelectedListName%2").arg(
+         orc_DatapoolIdBase).arg(
          u32_ItSelectedList);
-      const QString c_DatapoolIdSelectedListNameId = QString("%1Name").arg(c_DatapoolIdSelectedListNameBaseId);
+      const QString c_DatapoolIdSelectedListNameId = static_cast<QString>("%1Name").arg(
+         c_DatapoolIdSelectedListNameBaseId);
       orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_DatapoolIdSelectedListNameId.toStdString().c_str(),
                           rc_SelectedListNames[u32_ItSelectedList].toStdString().c_str());
    }
@@ -344,9 +350,10 @@ void C_UsFiler::mh_SaveDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
         ++u32_ItSelectedVariable)
    {
       const QString c_DatapoolIdSelectedVariableNameBaseId =
-         QString("%1SelectedVariableName%2").arg(orc_DatapoolIdBase).arg(
+         static_cast<QString>("%1SelectedVariableName%2").arg(orc_DatapoolIdBase).arg(
             u32_ItSelectedVariable);
-      const QString c_DatapoolIdSelectedVariableNameId = QString("%1Name").arg(c_DatapoolIdSelectedVariableNameBaseId);
+      const QString c_DatapoolIdSelectedVariableNameId = static_cast<QString>("%1Name").arg(
+         c_DatapoolIdSelectedVariableNameBaseId);
       orc_Ini.WriteString(orc_SectionName.toStdString().c_str(),
                           c_DatapoolIdSelectedVariableNameId.toStdString().c_str(),
                           rc_SelectedVariableNames[u32_ItSelectedVariable].toStdString().c_str());
@@ -359,7 +366,7 @@ void C_UsFiler::mh_SaveDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
    for (QList<QString>::const_iterator c_ItBusKey = c_Interfaces.begin(); c_ItBusKey != c_Interfaces.end();
         ++c_ItBusKey)
    {
-      const QString c_BusIdBase = QString("%1Interface%2").arg(orc_DatapoolIdBase).arg(sn_ItBus);
+      const QString c_BusIdBase = static_cast<QString>("%1Interface%2").arg(orc_DatapoolIdBase).arg(sn_ItBus);
       const C_UsCommunication c_Bus = orc_Datapool.GetCommList(*c_ItBusKey);
       mh_SaveBus(orc_Ini, orc_SectionName, c_BusIdBase, *c_ItBusKey, c_Bus);
 
@@ -374,7 +381,7 @@ void C_UsFiler::mh_SaveDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
    for (QList<QString>::const_iterator c_ItListKey = rc_Lists.begin(); c_ItListKey != rc_Lists.end();
         ++c_ItListKey)
    {
-      const QString c_ListIdBase = QString("%1List%2").arg(orc_DatapoolIdBase).arg(sn_ItList);
+      const QString c_ListIdBase = static_cast<QString>("%1List%2").arg(orc_DatapoolIdBase).arg(sn_ItList);
       const C_UsNodeDatapoolList c_List = orc_Datapool.GetOtherList(*c_ItListKey);
       mh_SaveList(orc_Ini, orc_SectionName, c_ListIdBase, *c_ItListKey, c_List);
 
@@ -396,7 +403,7 @@ void C_UsFiler::mh_SaveDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
 void C_UsFiler::mh_SaveList(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_ListIdBase,
                             const QString & orc_ListName, const C_UsNodeDatapoolList & orc_List)
 {
-   const QString c_ListIdName = QString("%1Name").arg(orc_ListIdBase);
+   const QString c_ListIdName = static_cast<QString>("%1Name").arg(orc_ListIdBase);
    const std::vector<sint32> & rc_ColumnWidths = orc_List.GetColumnWidths();
 
    //Name
@@ -420,37 +427,44 @@ void C_UsFiler::mh_SaveList(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
 void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_ViewIdBase,
                             const QString & orc_ViewName, const C_UsSystemView & orc_View)
 {
-   const QString c_ViewIdName = QString("%1Name").arg(orc_ViewIdBase);
-   const QString c_ViewIdNavigationExpandedStatus = QString("%1_navigation_expanded_status").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodesCount = QString("%1Node_count").arg(orc_ViewIdBase);
-   const QString c_ViewIdSetupPoxX = QString("%1_setup_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdSetupPoxY = QString("%1_setup_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdSetupZoom = QString("%1_setup_zoom_value").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdatePoxX = QString("%1_update_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdatePoxY = QString("%1_update_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateZoom = QString("%1_update_zoom_value").arg(orc_ViewIdBase);
-   const QString c_ViewIdParamExportPath = QString("%1_param_export_path").arg(orc_ViewIdBase);
-   const QString c_ViewIdParamImportPath = QString("%1_param_import_path").arg(orc_ViewIdBase);
-   const QString c_ViewIdParamRecordPath = QString("%1_param_record_path").arg(orc_ViewIdBase);
-   const QString c_ViewIdParamRecordFileName = QString("%1_param_record_file_name").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateSplitterX = QString("%1_update_splitter_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateHorizontalSplitterY = QString("%1_update_horizontal_splitter_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateProgressLogPositionX = QString("%1_update_progress_log_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateProgressLogPositionY = QString("%1_update_progress_log_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateProgressLogSizeWidth = QString("%1_update_progress_log_width").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateProgressLogSizeHeight = QString("%1_update_progress_log_height").arg(orc_ViewIdBase);
+   const QString c_ViewIdName = static_cast<QString>("%1Name").arg(orc_ViewIdBase);
+   const QString c_ViewIdNavigationExpandedStatus =
+      static_cast<QString>("%1_navigation_expanded_status").arg(orc_ViewIdBase);
+   const QString c_ViewIdNodesCount = static_cast<QString>("%1Node_count").arg(orc_ViewIdBase);
+   const QString c_ViewIdSetupPoxX = static_cast<QString>("%1_setup_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdSetupPoxY = static_cast<QString>("%1_setup_y").arg(orc_ViewIdBase);
+   const QString c_ViewIdSetupZoom = static_cast<QString>("%1_setup_zoom_value").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdatePoxX = static_cast<QString>("%1_update_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdatePoxY = static_cast<QString>("%1_update_y").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateZoom = static_cast<QString>("%1_update_zoom_value").arg(orc_ViewIdBase);
+   const QString c_ViewIdParamExportPath = static_cast<QString>("%1_param_export_path").arg(orc_ViewIdBase);
+   const QString c_ViewIdParamImportPath = static_cast<QString>("%1_param_import_path").arg(orc_ViewIdBase);
+   const QString c_ViewIdParamRecordPath = static_cast<QString>("%1_param_record_path").arg(orc_ViewIdBase);
+   const QString c_ViewIdParamRecordFileName = static_cast<QString>("%1_param_record_file_name").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateSplitterX = static_cast<QString>("%1_update_splitter_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateHorizontalSplitterY =
+      static_cast<QString>("%1_update_horizontal_splitter_y").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateProgressLogPositionX =
+      static_cast<QString>("%1_update_progress_log_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateProgressLogPositionY =
+      static_cast<QString>("%1_update_progress_log_y").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateProgressLogSizeWidth =
+      static_cast<QString>("%1_update_progress_log_width").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateProgressLogSizeHeight =
+      static_cast<QString>("%1_update_progress_log_height").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateProgressLogIsMaximized =
-      QString("%1_update_progress_log_is_maximized").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateSummaryBig = QString("%1_update_summary_is_type_big").arg(orc_ViewIdBase);
+      static_cast<QString>("%1_update_progress_log_is_maximized").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateSummaryBig = static_cast<QString>("%1_update_summary_is_type_big").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateEmptyOptionalSectionsVisible =
-      QString("%1_empty_optional_sections_visible").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardToolboxPositionX = QString("%1_toolbox_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardToolboxPositionY = QString("%1_toolbox_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardToolboxSizeWidth = QString("%1_toolbox_width").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardToolboxSizeHeight = QString("%1_toolbox_height").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardToolboxIsMaximized = QString("%1_toolbox_is_maximized").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardSelectedTabIndex = QString("%1_selected_tab_index").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardCount = QString("%1Dashboard_count").arg(orc_ViewIdBase);
+      static_cast<QString>("%1_empty_optional_sections_visible").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardToolboxPositionX = static_cast<QString>("%1_toolbox_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardToolboxPositionY = static_cast<QString>("%1_toolbox_y").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardToolboxSizeWidth = static_cast<QString>("%1_toolbox_width").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardToolboxSizeHeight = static_cast<QString>("%1_toolbox_height").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardToolboxIsMaximized = static_cast<QString>("%1_toolbox_is_maximized").arg(
+      orc_ViewIdBase);
+   const QString c_ViewIdDashboardSelectedTabIndex = static_cast<QString>("%1_selected_tab_index").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardCount = static_cast<QString>("%1Dashboard_count").arg(orc_ViewIdBase);
    const QList<QString> & rc_DashboardKeyList = orc_View.GetDashboardKeysInternal();
    const QList<QString> & rc_NodesKeyList = orc_View.GetViewNodesKeysInternal();
    sintn sn_Iterator;
@@ -524,7 +538,7 @@ void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    for (QList<QString>::const_iterator c_ItNodesKey = rc_NodesKeyList.begin(); c_ItNodesKey != rc_NodesKeyList.end();
         ++c_ItNodesKey)
    {
-      const QString c_NodeIdBase = QString("%1Node%2").arg(orc_ViewIdBase).arg(sn_Iterator);
+      const QString c_NodeIdBase = static_cast<QString>("%1Node%2").arg(orc_ViewIdBase).arg(sn_Iterator);
       const C_UsSystemViewNode c_Node = orc_View.GetSvNode(*c_ItNodesKey);
       mh_SaveViewNode(orc_Ini, orc_SectionName, c_NodeIdBase, *c_ItNodesKey, c_Node);
 
@@ -557,7 +571,7 @@ void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    for (QList<QString>::const_iterator c_ItDashboardKey = rc_DashboardKeyList.begin();
         c_ItDashboardKey != rc_DashboardKeyList.end(); ++c_ItDashboardKey)
    {
-      const QString c_DashboardIdBase = QString("%1Dashboard%2").arg(orc_ViewIdBase).arg(sn_Iterator);
+      const QString c_DashboardIdBase = static_cast<QString>("%1Dashboard%2").arg(orc_ViewIdBase).arg(sn_Iterator);
       const QString c_DashboardName = *c_ItDashboardKey;
       const C_UsSystemViewDashboard c_Dashboard = orc_View.GetDashboardSettings(c_DashboardName);
       mh_SaveDashboard(orc_Ini, orc_SectionName, c_DashboardIdBase, c_DashboardName, c_Dashboard);
@@ -580,7 +594,7 @@ void C_UsFiler::mh_SaveDataRatesPerNode(C_SCLIniFile & orc_Ini, const QString & 
                                         const QString & orc_DataRatePerNodeIdBase, const C_UsSystemViewNode & orc_Node)
 {
    sint32 s32_ItDataRate = 0;
-   const QString c_DataRateIdCount = QString("%1_count").arg(orc_DataRatePerNodeIdBase);
+   const QString c_DataRateIdCount = static_cast<QString>("%1_count").arg(orc_DataRatePerNodeIdBase);
    const QMap<uint32, float64 > & rc_UpdateDataRateHistory = orc_Node.GetUpdateDataRateHistory();
 
    //Data rate count
@@ -590,9 +604,10 @@ void C_UsFiler::mh_SaveDataRatesPerNode(C_SCLIniFile & orc_Ini, const QString & 
    for (QMap<uint32, float64 >::const_iterator c_ItDataRateKey = rc_UpdateDataRateHistory.begin();
         c_ItDataRateKey != rc_UpdateDataRateHistory.end(); ++c_ItDataRateKey)
    {
-      const QString c_DataRateIdBase = QString("%1DataRate%2").arg(orc_DataRatePerNodeIdBase).arg(s32_ItDataRate);
-      const QString c_DataRateIdChecksum = QString("%1_checksum").arg(c_DataRateIdBase);
-      const QString c_DataRateIdCurrentValue = QString("%1_value").arg(c_DataRateIdBase);
+      const QString c_DataRateIdBase =
+         static_cast<QString>("%1DataRate%2").arg(orc_DataRatePerNodeIdBase).arg(s32_ItDataRate);
+      const QString c_DataRateIdChecksum = static_cast<QString>("%1_checksum").arg(c_DataRateIdBase);
+      const QString c_DataRateIdCurrentValue = static_cast<QString>("%1_value").arg(c_DataRateIdBase);
 
       //Key
       orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_DataRateIdChecksum.toStdString().c_str(),
@@ -620,8 +635,8 @@ void C_UsFiler::mh_SaveViewNode(C_SCLIniFile & orc_Ini, const QString & orc_Sect
                                 const QString & orc_ViewNodeIdBase, const QString & orc_NodeName,
                                 const C_UsSystemViewNode & orc_ViewNode)
 {
-   const QString c_NodeIdName = QString("%1Name").arg(orc_ViewNodeIdBase);
-   const QString c_NodeIdUpdateDataRateBaseId = QString("%1_update_data_rate").arg(orc_ViewNodeIdBase);
+   const QString c_NodeIdName = static_cast<QString>("%1Name").arg(orc_ViewNodeIdBase);
+   const QString c_NodeIdUpdateDataRateBaseId = static_cast<QString>("%1_update_data_rate").arg(orc_ViewNodeIdBase);
    const QMap<uint32, bool> & rc_ExpandedFlags = orc_ViewNode.GetSectionsExpanded();
    QString c_NodeIdExpandedFlag;
 
@@ -639,9 +654,9 @@ void C_UsFiler::mh_SaveViewNode(C_SCLIniFile & orc_Ini, const QString & orc_Sect
 
    for (std::vector<uint32>::const_iterator c_It = c_Types.begin(); c_It != c_Types.end(); ++c_It)
    {
-      c_NodeIdExpandedFlag = QString("%1Section%2").arg(orc_ViewNodeIdBase).arg(*c_It);
-      orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_NodeIdExpandedFlag.toStdString().c_str(),
-                           rc_ExpandedFlags[*c_It]);
+      c_NodeIdExpandedFlag = static_cast<QString>("%1Section%2").arg(orc_ViewNodeIdBase).arg(*c_It);
+      orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(), c_NodeIdExpandedFlag.toStdString().c_str(),
+                        rc_ExpandedFlags[*c_It]);
    }
 
    //Data rate
@@ -662,17 +677,17 @@ void C_UsFiler::mh_SaveDashboard(C_SCLIniFile & orc_Ini, const QString & orc_Sec
                                  const QString & orc_DashboardIdBase, const QString & orc_DashboardName,
                                  const C_UsSystemViewDashboard & orc_Dashboard)
 {
-   const QString c_DashboardIdName = QString("%1Name").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdWindowPosX = QString("%1_window_x").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdWindowPosY = QString("%1_window_y").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdSizeWidth = QString("%1_width").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdSizeHeight = QString("%1_height").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdTornOffFlag = QString("%1_torn_off_flag").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdMinFlag = QString("%1_min_flag").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdMaxFlag = QString("%1_max_flag").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdScenePosX = QString("%1_scene_x").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdScenePosY = QString("%1_scene_y").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdSceneZoom = QString("%1_scene_zoom").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdName = static_cast<QString>("%1Name").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdWindowPosX = static_cast<QString>("%1_window_x").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdWindowPosY = static_cast<QString>("%1_window_y").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdSizeWidth = static_cast<QString>("%1_width").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdSizeHeight = static_cast<QString>("%1_height").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdTornOffFlag = static_cast<QString>("%1_torn_off_flag").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdMinFlag = static_cast<QString>("%1_min_flag").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdMaxFlag = static_cast<QString>("%1_max_flag").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdScenePosX = static_cast<QString>("%1_scene_x").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdScenePosY = static_cast<QString>("%1_scene_y").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdSceneZoom = static_cast<QString>("%1_scene_zoom").arg(orc_DashboardIdBase);
 
    //Name
    orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_DashboardIdName.toStdString().c_str(),
@@ -741,19 +756,19 @@ void C_UsFiler::mh_SaveColors(const C_UsHandler & orc_UserSettings, C_SCLIniFile
    sintn sn_Counter = 0;
 
    QVector<QColor> c_RecentColors = orc_UserSettings.GetRecentColors();
-   QVector<QColor>::const_iterator cp_ItColor;
-   for (cp_ItColor = c_RecentColors.begin(); cp_ItColor != c_RecentColors.end(); ++cp_ItColor)
+   QVector<QColor>::const_iterator pc_ItColor;
+   for (pc_ItColor = c_RecentColors.begin(); pc_ItColor != c_RecentColors.end(); ++pc_ItColor)
    {
       ++sn_Counter;
 
-      orc_Ini.WriteInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
-                           C_SCLString("_Red"), cp_ItColor->red());
-      orc_Ini.WriteInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
-                           C_SCLString("_Green"), cp_ItColor->green());
-      orc_Ini.WriteInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
-                           C_SCLString("_Blue"), cp_ItColor->blue());
-      orc_Ini.WriteInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
-                           C_SCLString("_Alpha"), cp_ItColor->alpha());
+      orc_Ini.WriteInteger("RecentColors", "ColorNr" + C_SCLString::IntToStr(sn_Counter) +
+                           "_Red", pc_ItColor->red());
+      orc_Ini.WriteInteger("RecentColors", "ColorNr" + C_SCLString::IntToStr(sn_Counter) +
+                           "_Green", pc_ItColor->green());
+      orc_Ini.WriteInteger("RecentColors", "ColorNr" + C_SCLString::IntToStr(sn_Counter) +
+                           "_Blue", pc_ItColor->blue());
+      orc_Ini.WriteInteger("RecentColors", "ColorNr" + C_SCLString::IntToStr(sn_Counter) +
+                           "_Alpha", pc_ItColor->alpha());
    }
 }
 
@@ -780,7 +795,7 @@ void C_UsFiler::mh_SaveNextRecentColorButtonNumber(const C_UsHandler & orc_UserS
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
-   QStringList c_List = orc_UserSettings.GetRecentProjects();
+   const QStringList c_List = orc_UserSettings.GetRecentProjects();
 
    // clear recent projects section (the ini file can only add keys and does not delete keys that do not exist anymore)
    if (orc_Ini.SectionExists("RecentProjects") == true)
@@ -952,7 +967,7 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       for (QList<QString>::const_iterator c_ItNodeKey = c_NodeKeyList.begin(); c_ItNodeKey != c_NodeKeyList.end();
            ++c_ItNodeKey)
       {
-         const QString c_NodeIdBase = QString("SdNode%1").arg(sn_ItNode);
+         const QString c_NodeIdBase = static_cast<QString>("SdNode%1").arg(sn_ItNode);
          const QString c_NodeName = *c_ItNodeKey;
          const C_UsNode c_Node = orc_UserSettings.GetProjSdNode(c_NodeName);
          mh_SaveNode(orc_Ini, orc_ActiveProject, c_NodeIdBase, c_NodeName, c_Node);
@@ -966,7 +981,7 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       for (QList<QString>::const_iterator c_ItBusKey = c_BusKeyList.begin(); c_ItBusKey != c_BusKeyList.end();
            ++c_ItBusKey)
       {
-         const QString c_BusIdBase = QString("SdBus%1").arg(sn_ItBus);
+         const QString c_BusIdBase = static_cast<QString>("SdBus%1").arg(sn_ItBus);
          const QString c_BusName = *c_ItBusKey;
          const C_UsCommunication c_Bus = orc_UserSettings.GetProjSdBus(c_BusName);
          mh_SaveBus(orc_Ini, orc_ActiveProject, c_BusIdBase, c_BusName, c_Bus);
@@ -981,7 +996,7 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       for (QList<QString>::const_iterator c_ItViewKey = c_ViewKeyList.begin(); c_ItViewKey != c_ViewKeyList.end();
            ++c_ItViewKey)
       {
-         const QString c_ViewIdBase = QString("SvSetupView%1").arg(sn_ItView);
+         const QString c_ViewIdBase = static_cast<QString>("SvSetupView%1").arg(sn_ItView);
          const QString c_ViewName = *c_ItViewKey;
          const C_UsSystemView c_View = orc_UserSettings.GetProjSvSetupView(c_ViewName);
          mh_SaveView(orc_Ini, orc_ActiveProject, c_ViewIdBase, c_ViewName, c_View);
@@ -1010,13 +1025,13 @@ void C_UsFiler::mh_LoadNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    stw_opensyde_core::C_OSCCanProtocol::E_Type e_Tmp;
    std::vector<sint32> c_Columns;
 
-   const QString c_HALCOvColumnId = QString("%1HALCOverview").arg(orc_NodeIdBase);
-   const QString c_HALCConfigColumnId = QString("%1HALCParamConfig").arg(orc_NodeIdBase);
-   const QString c_NodeIdSelectedHALCDomain = QString("%1Selected_HALC_domain").arg(orc_NodeIdBase);
-   const QString c_NodeIdSelectedHALCChannel = QString("%1Selected_HALC_channel").arg(orc_NodeIdBase);
-   const QString c_NodeIdDatapoolCount = QString("%1Datapool_count").arg(orc_NodeIdBase);
-   const QString c_NodeIdSelectedDatapoolName = QString("%1Selected_datapool_name").arg(orc_NodeIdBase);
-   const QString c_NodeIdSelectedProtocol = QString("%1Selected_protocol").arg(orc_NodeIdBase);
+   const QString c_HALCOvColumnId = static_cast<QString>("%1HALCOverview").arg(orc_NodeIdBase);
+   const QString c_HALCConfigColumnId = static_cast<QString>("%1HALCParamConfig").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedHALCDomain = static_cast<QString>("%1Selected_HALC_domain").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedHALCChannel = static_cast<QString>("%1Selected_HALC_channel").arg(orc_NodeIdBase);
+   const QString c_NodeIdDatapoolCount = static_cast<QString>("%1Datapool_count").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedDatapoolName = static_cast<QString>("%1Selected_datapool_name").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedProtocol = static_cast<QString>("%1Selected_protocol").arg(orc_NodeIdBase);
 
    //Selected datapool name
    c_Tmp = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
@@ -1051,7 +1066,7 @@ void C_UsFiler::mh_LoadNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    //Datapool
    for (sintn sn_ItDatapool = 0; sn_ItDatapool < sn_DatapoolCount; ++sn_ItDatapool)
    {
-      const QString c_DatapoolIdBase = QString("%1Datapool%2").arg(orc_NodeIdBase).arg(sn_ItDatapool);
+      const QString c_DatapoolIdBase = static_cast<QString>("%1Datapool%2").arg(orc_NodeIdBase).arg(sn_ItDatapool);
       mh_LoadDatapool(orc_Ini, orc_SectionName, c_DatapoolIdBase, orc_NodeName, orc_UserSettings);
    }
 }
@@ -1074,13 +1089,13 @@ void C_UsFiler::mh_LoadBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionNa
                            const QString & orc_NodeName, const QString & orc_DataPoolName)
 {
    const QString c_BusIdSelectedComProtocol =
-      QString("%1Selected_com_protocol").arg(orc_BusIdBase);
-   const QString c_BusIdMessageOverview = QString("%1MessageOverview").arg(orc_BusIdBase);
-   const QString c_BusIdSignalOverview = QString("%1SignalOverview").arg(orc_BusIdBase);
-   const QString c_BusIdMessageSelected = QString("%1Message_selected").arg(orc_BusIdBase);
-   const QString c_BusIdSelectedMessageName = QString("%1Selected_message_name").arg(orc_BusIdBase);
-   const QString c_BusIdSignalSelected = QString("%1Signal_selected").arg(orc_BusIdBase);
-   const QString c_BusIdSelectedSignalName = QString("%1Selected_signal_index").arg(orc_BusIdBase);
+      static_cast<QString>("%1Selected_com_protocol").arg(orc_BusIdBase);
+   const QString c_BusIdMessageOverview = static_cast<QString>("%1MessageOverview").arg(orc_BusIdBase);
+   const QString c_BusIdSignalOverview = static_cast<QString>("%1SignalOverview").arg(orc_BusIdBase);
+   const QString c_BusIdMessageSelected = static_cast<QString>("%1Message_selected").arg(orc_BusIdBase);
+   const QString c_BusIdSelectedMessageName = static_cast<QString>("%1Selected_message_name").arg(orc_BusIdBase);
+   const QString c_BusIdSignalSelected = static_cast<QString>("%1Signal_selected").arg(orc_BusIdBase);
+   const QString c_BusIdSelectedSignalName = static_cast<QString>("%1Selected_signal_index").arg(orc_BusIdBase);
 
    stw_opensyde_core::C_OSCCanProtocol::E_Type e_SelectedProtocol;
    bool q_MessageSelected;
@@ -1139,7 +1154,7 @@ void C_UsFiler::mh_LoadDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
                                 const QString & orc_DatapoolIdBase, const QString & orc_NodeName,
                                 C_UsHandler & orc_UserSettings)
 {
-   const QString c_DatapoolIdName = QString("%1Name").arg(orc_DatapoolIdBase);
+   const QString c_DatapoolIdName = static_cast<QString>("%1Name").arg(orc_DatapoolIdBase);
    const QString c_DatapoolName = orc_Ini.ReadString(
       orc_SectionName.toStdString().c_str(), c_DatapoolIdName.toStdString().c_str(), "").c_str();
 
@@ -1147,14 +1162,16 @@ void C_UsFiler::mh_LoadDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
    {
       sintn sn_SystemBusCount;
       sintn sn_ListCount;
-      const QString c_DatapoolIdExpandedListNameCount = QString("%1ExpandedListName_count").arg(orc_DatapoolIdBase);
-      const QString c_DatapoolIdSelectedListNameCount = QString("%1SelectedListName_count").arg(orc_DatapoolIdBase);
-      const QString c_DatapoolIdSelectedVariableNameCount = QString("%1SelectedVariableName_count").arg(
-         orc_DatapoolIdBase);
+      const QString c_DatapoolIdExpandedListNameCount =
+         static_cast<QString>("%1ExpandedListName_count").arg(orc_DatapoolIdBase);
+      const QString c_DatapoolIdSelectedListNameCount =
+         static_cast<QString>("%1SelectedListName_count").arg(orc_DatapoolIdBase);
+      const QString c_DatapoolIdSelectedVariableNameCount =
+         static_cast<QString>("%1SelectedVariableName_count").arg(orc_DatapoolIdBase);
       const QString c_DatapoolIdListCount =
-         QString("%1Lists_count").arg(orc_DatapoolIdBase);
+         static_cast<QString>("%1Lists_count").arg(orc_DatapoolIdBase);
       const QString c_DatapoolIdInterfaceCount =
-         QString("%1Interface_count").arg(orc_DatapoolIdBase);
+         static_cast<QString>("%1Interface_count").arg(orc_DatapoolIdBase);
       std::vector<QString> c_ExpandedListNames;
       std::vector<QString> c_SelectedListNames;
       std::vector<QString> c_SelectedVariableNames;
@@ -1169,9 +1186,10 @@ void C_UsFiler::mh_LoadDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
       c_ExpandedListNames.reserve(sn_ExpandedListNameCount);
       for (sintn sn_ItExpandedListName = 0; sn_ItExpandedListName < sn_ExpandedListNameCount; ++sn_ItExpandedListName)
       {
-         const QString c_DatapoolIdExpandedListNameBaseId = QString("%1ExpandedListName%2").arg(orc_DatapoolIdBase).arg(
-            sn_ItExpandedListName);
-         const QString c_DatapoolIdExpandedListNameId = QString("%1Name").arg(c_DatapoolIdExpandedListNameBaseId);
+         const QString c_DatapoolIdExpandedListNameBaseId =
+            static_cast<QString>("%1ExpandedListName%2").arg(orc_DatapoolIdBase).arg(sn_ItExpandedListName);
+         const QString c_DatapoolIdExpandedListNameId =
+            static_cast<QString>("%1Name").arg(c_DatapoolIdExpandedListNameBaseId);
          const QString c_DatapoolIdExpandedListName = orc_Ini.ReadString(
             orc_SectionName.toStdString().c_str(), c_DatapoolIdExpandedListNameId.toStdString().c_str(), "").c_str();
          if (c_DatapoolIdExpandedListName.compare("") != 0)
@@ -1185,9 +1203,10 @@ void C_UsFiler::mh_LoadDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
       c_SelectedListNames.reserve(sn_SelectedListNameCount);
       for (sintn sn_ItSelectedListName = 0; sn_ItSelectedListName < sn_SelectedListNameCount; ++sn_ItSelectedListName)
       {
-         const QString c_DatapoolIdSelectedListNameBaseId = QString("%1SelectedListName%2").arg(orc_DatapoolIdBase).arg(
-            sn_ItSelectedListName);
-         const QString c_DatapoolIdSelectedListNameId = QString("%1Name").arg(c_DatapoolIdSelectedListNameBaseId);
+         const QString c_DatapoolIdSelectedListNameBaseId =
+            static_cast<QString>("%1SelectedListName%2").arg(orc_DatapoolIdBase).arg(sn_ItSelectedListName);
+         const QString c_DatapoolIdSelectedListNameId =
+            static_cast<QString>("%1Name").arg(c_DatapoolIdSelectedListNameBaseId);
          const QString c_DatapoolIdSelectedListName = orc_Ini.ReadString(
             orc_SectionName.toStdString().c_str(), c_DatapoolIdSelectedListNameId.toStdString().c_str(), "").c_str();
          if (c_DatapoolIdSelectedListName.compare("") != 0)
@@ -1202,11 +1221,11 @@ void C_UsFiler::mh_LoadDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
       for (sintn sn_ItSelectedVariableName = 0; sn_ItSelectedVariableName < sn_SelectedVariableNameCount;
            ++sn_ItSelectedVariableName)
       {
-         const QString c_DatapoolIdSelectedVariableNameBaseId = QString("%1SelectedVariableName%2").arg(
+         const QString c_DatapoolIdSelectedVariableNameBaseId = static_cast<QString>("%1SelectedVariableName%2").arg(
             orc_DatapoolIdBase).arg(
             sn_ItSelectedVariableName);
          const QString c_DatapoolIdSelectedVariableNameId =
-            QString("%1Name").arg(c_DatapoolIdSelectedVariableNameBaseId);
+            static_cast<QString>("%1Name").arg(c_DatapoolIdSelectedVariableNameBaseId);
          const QString c_DatapoolIdSelectedVariableName = orc_Ini.ReadString(
             orc_SectionName.toStdString().c_str(), c_DatapoolIdSelectedVariableNameId.toStdString().c_str(),
             "").c_str();
@@ -1223,8 +1242,8 @@ void C_UsFiler::mh_LoadDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
          orc_SectionName.toStdString().c_str(), c_DatapoolIdInterfaceCount.toStdString().c_str(), 0);
       for (sintn sn_ItBus = 0; sn_ItBus < sn_SystemBusCount; ++sn_ItBus)
       {
-         const QString c_BusIdBase = QString("%1Interface%2").arg(orc_DatapoolIdBase).arg(sn_ItBus);
-         const QString c_BusIdName = QString("%1Name").arg(c_BusIdBase);
+         const QString c_BusIdBase = static_cast<QString>("%1Interface%2").arg(orc_DatapoolIdBase).arg(sn_ItBus);
+         const QString c_BusIdName = static_cast<QString>("%1Name").arg(c_BusIdBase);
          const QString c_BusName = orc_Ini.ReadString(
             orc_SectionName.toStdString().c_str(), c_BusIdName.toStdString().c_str(), "").c_str();
          if (c_BusName.compare("") != 0)
@@ -1239,7 +1258,7 @@ void C_UsFiler::mh_LoadDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
                                          c_DatapoolIdListCount.toStdString().c_str(), 0);
       for (sintn sn_ItList = 0; sn_ItList < sn_ListCount; ++sn_ItList)
       {
-         const QString c_ListIdBase = QString("%1List%2").arg(orc_DatapoolIdBase).arg(sn_ItList);
+         const QString c_ListIdBase = static_cast<QString>("%1List%2").arg(orc_DatapoolIdBase).arg(sn_ItList);
          mh_LoadList(orc_Ini, orc_SectionName, c_ListIdBase, orc_NodeName, c_DatapoolName, orc_UserSettings);
       }
    }
@@ -1260,7 +1279,7 @@ void C_UsFiler::mh_LoadList(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                             const QString & orc_NodeName, const QString & orc_DataPoolName,
                             C_UsHandler & orc_UserSettings)
 {
-   const QString c_ListIdName = QString("%1Name").arg(orc_ListIdBase);
+   const QString c_ListIdName = static_cast<QString>("%1Name").arg(orc_ListIdBase);
    const QString c_ListName = orc_Ini.ReadString(
       orc_SectionName.toStdString().c_str(), c_ListIdName.toStdString().c_str(), "").c_str();
 
@@ -1285,36 +1304,43 @@ void C_UsFiler::mh_LoadList(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
 void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_ViewIdBase,
                             const QString & orc_ViewName, C_UsHandler & orc_UserSettings)
 {
-   const QString c_ViewIdNavigationExpandedStatus = QString("%1_navigation_expanded_status").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodesCount = QString("%1Node_count").arg(orc_ViewIdBase);
-   const QString c_ViewIdSetupPoxX = QString("%1_setup_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdSetupPoxY = QString("%1_setup_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdSetupZoom = QString("%1_setup_zoom_value").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdatePoxX = QString("%1_update_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdatePoxY = QString("%1_update_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateZoom = QString("%1_update_zoom_value").arg(orc_ViewIdBase);
-   const QString c_ViewIdParamExportPath = QString("%1_param_export_path").arg(orc_ViewIdBase);
-   const QString c_ViewIdParamImportPath = QString("%1_param_import_path").arg(orc_ViewIdBase);
-   const QString c_ViewIdParamRecordPath = QString("%1_param_record_path").arg(orc_ViewIdBase);
-   const QString c_ViewIdParamRecordFileName = QString("%1_param_record_file_name").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateSplitterX = QString("%1_update_splitter_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateHorizontalSplitterY = QString("%1_update_horizontal_splitter_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateProgressLogPositionX = QString("%1_update_progress_log_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateProgressLogPositionY = QString("%1_update_progress_log_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateProgressLogSizeWidth = QString("%1_update_progress_log_width").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateProgressLogSizeHeight = QString("%1_update_progress_log_height").arg(orc_ViewIdBase);
+   const QString c_ViewIdNavigationExpandedStatus =
+      static_cast<QString>("%1_navigation_expanded_status").arg(orc_ViewIdBase);
+   const QString c_ViewIdNodesCount = static_cast<QString>("%1Node_count").arg(orc_ViewIdBase);
+   const QString c_ViewIdSetupPoxX = static_cast<QString>("%1_setup_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdSetupPoxY = static_cast<QString>("%1_setup_y").arg(orc_ViewIdBase);
+   const QString c_ViewIdSetupZoom = static_cast<QString>("%1_setup_zoom_value").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdatePoxX = static_cast<QString>("%1_update_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdatePoxY = static_cast<QString>("%1_update_y").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateZoom = static_cast<QString>("%1_update_zoom_value").arg(orc_ViewIdBase);
+   const QString c_ViewIdParamExportPath = static_cast<QString>("%1_param_export_path").arg(orc_ViewIdBase);
+   const QString c_ViewIdParamImportPath = static_cast<QString>("%1_param_import_path").arg(orc_ViewIdBase);
+   const QString c_ViewIdParamRecordPath = static_cast<QString>("%1_param_record_path").arg(orc_ViewIdBase);
+   const QString c_ViewIdParamRecordFileName = static_cast<QString>("%1_param_record_file_name").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateSplitterX = static_cast<QString>("%1_update_splitter_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateHorizontalSplitterY =
+      static_cast<QString>("%1_update_horizontal_splitter_y").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateProgressLogPositionX =
+      static_cast<QString>("%1_update_progress_log_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateProgressLogPositionY =
+      static_cast<QString>("%1_update_progress_log_y").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateProgressLogSizeWidth =
+      static_cast<QString>("%1_update_progress_log_width").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateProgressLogSizeHeight =
+      static_cast<QString>("%1_update_progress_log_height").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateProgressLogIsMaximized =
-      QString("%1_update_progress_log_is_maximized").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateSummaryBig = QString("%1_update_summary_is_type_big").arg(orc_ViewIdBase);
+      static_cast<QString>("%1_update_progress_log_is_maximized").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateSummaryBig = static_cast<QString>("%1_update_summary_is_type_big").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateEmptyOptionalSectionsVisible =
-      QString("%1_empty_optional_sections_visible").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardToolboxPositionX = QString("%1_toolbox_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardToolboxPositionY = QString("%1_toolbox_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardToolboxSizeWidth = QString("%1_toolbox_width").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardToolboxSizeHeight = QString("%1_toolbox_height").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardToolboxIsMaximized = QString("%1_toolbox_is_maximized").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardSelectedTabIndex = QString("%1_selected_tab_index").arg(orc_ViewIdBase);
-   const QString c_ViewIdDashboardCount = QString("%1Dashboard_count").arg(orc_ViewIdBase);
+      static_cast<QString>("%1_empty_optional_sections_visible").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardToolboxPositionX = static_cast<QString>("%1_toolbox_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardToolboxPositionY = static_cast<QString>("%1_toolbox_y").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardToolboxSizeWidth = static_cast<QString>("%1_toolbox_width").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardToolboxSizeHeight = static_cast<QString>("%1_toolbox_height").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardToolboxIsMaximized = static_cast<QString>("%1_toolbox_is_maximized").arg(
+      orc_ViewIdBase);
+   const QString c_ViewIdDashboardSelectedTabIndex = static_cast<QString>("%1_selected_tab_index").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardCount = static_cast<QString>("%1Dashboard_count").arg(orc_ViewIdBase);
 
    QPoint c_Pos;
    QSize c_Size;
@@ -1404,7 +1430,7 @@ void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                                   c_ViewIdNodesCount.toStdString().c_str(), 0);
    for (sintn sn_ItNodes = 0; sn_ItNodes < sn_Value; ++sn_ItNodes)
    {
-      const QString c_DashboardIdBase = QString("%1Node%2").arg(orc_ViewIdBase).arg(sn_ItNodes);
+      const QString c_DashboardIdBase = static_cast<QString>("%1Node%2").arg(orc_ViewIdBase).arg(sn_ItNodes);
       mh_LoadViewNode(orc_Ini, orc_SectionName, c_DashboardIdBase, orc_ViewName, orc_UserSettings);
    }
 
@@ -1431,7 +1457,7 @@ void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                                   c_ViewIdDashboardCount.toStdString().c_str(), 0);
    for (sintn sn_ItDashboard = 0; sn_ItDashboard < sn_Value; ++sn_ItDashboard)
    {
-      const QString c_DashboardIdBase = QString("%1Dashboard%2").arg(orc_ViewIdBase).arg(sn_ItDashboard);
+      const QString c_DashboardIdBase = static_cast<QString>("%1Dashboard%2").arg(orc_ViewIdBase).arg(sn_ItDashboard);
       mh_LoadDashboard(orc_Ini, orc_SectionName, c_DashboardIdBase, orc_ViewName, orc_UserSettings);
    }
 }
@@ -1451,7 +1477,7 @@ void C_UsFiler::mh_LoadDataRatesPerNode(C_SCLIniFile & orc_Ini, const QString & 
                                         const QString & orc_DataRatePerNodeIdBase, const QString & orc_ViewName,
                                         const QString & orc_NodeName, C_UsHandler & orc_UserSettings)
 {
-   const QString c_DataRateIdCount = QString("%1_count").arg(orc_DataRatePerNodeIdBase);
+   const QString c_DataRateIdCount = static_cast<QString>("%1_count").arg(orc_DataRatePerNodeIdBase);
    const sint32 s32_ItDataRate = orc_Ini.ReadInteger(
       orc_SectionName.toStdString().c_str(), c_DataRateIdCount.toStdString().c_str(), 0);
 
@@ -1459,9 +1485,9 @@ void C_UsFiler::mh_LoadDataRatesPerNode(C_SCLIniFile & orc_Ini, const QString & 
    //Per checksum section
    for (sint32 s32_It = 0; s32_It < s32_ItDataRate; ++s32_It)
    {
-      const QString c_DataRateIdBase = QString("%1DataRate%2").arg(orc_DataRatePerNodeIdBase).arg(s32_It);
-      const QString c_DataRateIdChecksum = QString("%1_checksum").arg(c_DataRateIdBase);
-      const QString c_DataRateIdCurrentValue = QString("%1_value").arg(c_DataRateIdBase);
+      const QString c_DataRateIdBase = static_cast<QString>("%1DataRate%2").arg(orc_DataRatePerNodeIdBase).arg(s32_It);
+      const QString c_DataRateIdChecksum = static_cast<QString>("%1_checksum").arg(c_DataRateIdBase);
+      const QString c_DataRateIdCurrentValue = static_cast<QString>("%1_value").arg(c_DataRateIdBase);
       //Key
       const QString c_Checksum = orc_Ini.ReadString(
          orc_SectionName.toStdString().c_str(), c_DataRateIdChecksum.toStdString().c_str(), "").c_str();
@@ -1496,8 +1522,8 @@ void C_UsFiler::mh_LoadViewNode(C_SCLIniFile & orc_Ini, const QString & orc_Sect
                                 const QString & orc_ViewNodeIdBase, const QString & orc_ViewName,
                                 C_UsHandler & orc_UserSettings)
 {
-   const QString c_ViewNodeIdName = QString("%1Name").arg(orc_ViewNodeIdBase);
-   const QString c_NodeIdUpdateDataRateBaseId = QString("%1_update_data_rate").arg(orc_ViewNodeIdBase);
+   const QString c_ViewNodeIdName = static_cast<QString>("%1Name").arg(orc_ViewNodeIdBase);
+   const QString c_NodeIdUpdateDataRateBaseId = static_cast<QString>("%1_update_data_rate").arg(orc_ViewNodeIdBase);
    const QString c_ViewNodeName = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
                                                      c_ViewNodeIdName.toStdString().c_str(), "").c_str();
 
@@ -1515,7 +1541,8 @@ void C_UsFiler::mh_LoadViewNode(C_SCLIniFile & orc_Ini, const QString & orc_Sect
       {
          const bool q_Value =
             orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
-                             QString("%1Section%2").arg(orc_ViewNodeIdBase).arg(*c_It).toStdString().c_str(), true);
+                             static_cast<QString>("%1Section%2").arg(orc_ViewNodeIdBase).arg(
+                                *c_It).toStdString().c_str(), true);
          c_ExpandedFlags[*c_It] = q_Value;
       }
 
@@ -1543,7 +1570,7 @@ void C_UsFiler::mh_LoadDashboard(C_SCLIniFile & orc_Ini, const QString & orc_Sec
                                  const QString & orc_DashboardIdBase, const QString & orc_ViewName,
                                  C_UsHandler & orc_UserSettings)
 {
-   const QString c_DashboardIdName = QString("%1Name").arg(orc_DashboardIdBase);
+   const QString c_DashboardIdName = static_cast<QString>("%1Name").arg(orc_DashboardIdBase);
    const QString c_DashboardName = orc_Ini.ReadString(
       orc_SectionName.toStdString().c_str(), c_DashboardIdName.toStdString().c_str(), "").c_str();
 
@@ -1552,21 +1579,21 @@ void C_UsFiler::mh_LoadDashboard(C_SCLIniFile & orc_Ini, const QString & orc_Sec
       QPoint c_Pos;
       QSize c_Size;
       stw_types::sintn sn_Value;
-      const QString c_DashboardIdTornOffFlag = QString("%1_torn_off_flag").arg(orc_DashboardIdBase);
-      const QString c_DashboardIdScenePosX = QString("%1_scene_x").arg(orc_DashboardIdBase);
-      const QString c_DashboardIdScenePosY = QString("%1_scene_y").arg(orc_DashboardIdBase);
-      const QString c_DashboardIdSceneZoom = QString("%1_scene_zoom").arg(orc_DashboardIdBase);
+      const QString c_DashboardIdTornOffFlag = static_cast<QString>("%1_torn_off_flag").arg(orc_DashboardIdBase);
+      const QString c_DashboardIdScenePosX = static_cast<QString>("%1_scene_x").arg(orc_DashboardIdBase);
+      const QString c_DashboardIdScenePosY = static_cast<QString>("%1_scene_y").arg(orc_DashboardIdBase);
+      const QString c_DashboardIdSceneZoom = static_cast<QString>("%1_scene_zoom").arg(orc_DashboardIdBase);
 
       //Torn off flag
       if (orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
                            c_DashboardIdTornOffFlag.toStdString().c_str(), false) == true)
       {
-         const QString c_DashboardIdWindowPosX = QString("%1_window_x").arg(orc_DashboardIdBase);
-         const QString c_DashboardIdWindowPosY = QString("%1_window_y").arg(orc_DashboardIdBase);
-         const QString c_DashboardIdSizeWidth = QString("%1_width").arg(orc_DashboardIdBase);
-         const QString c_DashboardIdSizeHeight = QString("%1_height").arg(orc_DashboardIdBase);
-         const QString c_DashboardIdMinFlag = QString("%1_min_flag").arg(orc_DashboardIdBase);
-         const QString c_DashboardIdMaxFlag = QString("%1_max_flag").arg(orc_DashboardIdBase);
+         const QString c_DashboardIdWindowPosX = static_cast<QString>("%1_window_x").arg(orc_DashboardIdBase);
+         const QString c_DashboardIdWindowPosY = static_cast<QString>("%1_window_y").arg(orc_DashboardIdBase);
+         const QString c_DashboardIdSizeWidth = static_cast<QString>("%1_width").arg(orc_DashboardIdBase);
+         const QString c_DashboardIdSizeHeight = static_cast<QString>("%1_height").arg(orc_DashboardIdBase);
+         const QString c_DashboardIdMinFlag = static_cast<QString>("%1_min_flag").arg(orc_DashboardIdBase);
+         const QString c_DashboardIdMaxFlag = static_cast<QString>("%1_max_flag").arg(orc_DashboardIdBase);
          bool q_Min;
          bool q_Max;
          //Window pos
@@ -1648,14 +1675,18 @@ void C_UsFiler::mh_LoadColors(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc
    for (sintn sn_Counter = 1; sn_Counter <= 6; sn_Counter++)
    {
       QColor c_Color;
-      c_Color.setRed(orc_Ini.ReadInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
-                                         C_SCLString("_Red"), 255));
-      c_Color.setGreen(orc_Ini.ReadInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
-                                           C_SCLString("_Green"), 255));
-      c_Color.setBlue(orc_Ini.ReadInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
-                                          C_SCLString("_Blue"), 255));
-      c_Color.setAlpha(orc_Ini.ReadInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
-                                           C_SCLString("_Alpha"), 255));
+      c_Color.setRed(orc_Ini.ReadInteger("RecentColors",
+                                         "ColorNr" + C_SCLString::IntToStr(sn_Counter) +
+                                         "_Red", 255));
+      c_Color.setGreen(orc_Ini.ReadInteger("RecentColors",
+                                           "ColorNr" + C_SCLString::IntToStr(sn_Counter) +
+                                           "_Green", 255));
+      c_Color.setBlue(orc_Ini.ReadInteger("RecentColors",
+                                          "ColorNr" + C_SCLString::IntToStr(sn_Counter) +
+                                          "_Blue", 255));
+      c_Color.setAlpha(orc_Ini.ReadInteger("RecentColors",
+                                           "ColorNr" + C_SCLString::IntToStr(sn_Counter) +
+                                           "_Alpha", 255));
       c_RecentColorsVector.push_back(c_Color);
    }
 
@@ -1893,8 +1924,8 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
          orc_ActiveProject.toStdString().c_str(), "ProjSdNode_count", 0);
       for (sintn sn_ItNode = 0; sn_ItNode < sn_SystemNodeCount; ++sn_ItNode)
       {
-         const QString c_NodeIdBase = QString("SdNode%1").arg(sn_ItNode);
-         const QString c_NodeIdName = QString("%1Name").arg(c_NodeIdBase);
+         const QString c_NodeIdBase = static_cast<QString>("SdNode%1").arg(sn_ItNode);
+         const QString c_NodeIdName = static_cast<QString>("%1Name").arg(c_NodeIdBase);
          const QString c_NodeName = orc_Ini.ReadString(
             orc_ActiveProject.toStdString().c_str(), c_NodeIdName.toStdString().c_str(), "").c_str();
          if (c_NodeName.compare("") != 0)
@@ -1908,8 +1939,8 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
          orc_ActiveProject.toStdString().c_str(), "ProjSdBus_count", 0);
       for (sintn sn_ItBus = 0; sn_ItBus < sn_SystemBusCount; ++sn_ItBus)
       {
-         const QString c_BusIdBase = QString("SdBus%1").arg(sn_ItBus);
-         const QString c_BusIdName = QString("%1Name").arg(c_BusIdBase);
+         const QString c_BusIdBase = static_cast<QString>("SdBus%1").arg(sn_ItBus);
+         const QString c_BusIdName = static_cast<QString>("%1Name").arg(c_BusIdBase);
          const QString c_BusName = orc_Ini.ReadString(
             orc_ActiveProject.toStdString().c_str(), c_BusIdName.toStdString().c_str(), "").c_str();
          if (c_BusName.compare("") != 0)
@@ -1923,8 +1954,8 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
          orc_ActiveProject.toStdString().c_str(), "ProjSvSetupView_count", 0);
       for (sintn sn_ItView = 0; sn_ItView < sn_SystemViewCount; ++sn_ItView)
       {
-         const QString c_ViewIdBase = QString("SvSetupView%1").arg(sn_ItView);
-         const QString c_ViewIdName = QString("%1Name").arg(c_ViewIdBase);
+         const QString c_ViewIdBase = static_cast<QString>("SvSetupView%1").arg(sn_ItView);
+         const QString c_ViewIdName = static_cast<QString>("%1Name").arg(c_ViewIdBase);
          const QString c_ViewName = orc_Ini.ReadString(
             orc_ActiveProject.toStdString().c_str(), c_ViewIdName.toStdString().c_str(), "").c_str();
          if (c_ViewName.compare("") != 0)
@@ -1988,13 +2019,13 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
 void C_UsFiler::mh_SaveColumns(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_IdBase,
                                const std::vector<sint32> & orc_ColumnWidths)
 {
-   const QString c_IdColumnCount = QString("%1Column_Count").arg(orc_IdBase);
+   const QString c_IdColumnCount = static_cast<QString>("%1Column_Count").arg(orc_IdBase);
 
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
                         c_IdColumnCount.toStdString().c_str(), orc_ColumnWidths.size());
    for (uint32 u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
    {
-      const QString c_IdColumn = QString("%1Column%2").arg(orc_IdBase).arg(u32_ItCol);
+      const QString c_IdColumn = static_cast<QString>("%1Column%2").arg(orc_IdBase).arg(u32_ItCol);
       orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_IdColumn.toStdString().c_str(),
                            orc_ColumnWidths[u32_ItCol]);
    }
@@ -2012,14 +2043,14 @@ void C_UsFiler::mh_SaveColumns(C_SCLIniFile & orc_Ini, const QString & orc_Secti
 void C_UsFiler::mh_LoadColumns(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_IdBase,
                                std::vector<sint32> & orc_ColumnWidths)
 {
-   const QString c_IdColumnCount = QString("%1Column_Count").arg(orc_IdBase);
+   const QString c_IdColumnCount = static_cast<QString>("%1Column_Count").arg(orc_IdBase);
    const sint32 s32_ColumnCount = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
                                                       c_IdColumnCount.toStdString().c_str(), 0);
 
    orc_ColumnWidths.reserve(s32_ColumnCount);
    for (sint32 s32_ItCol = 0; s32_ItCol < s32_ColumnCount; ++s32_ItCol)
    {
-      const QString c_IdColumn = QString("%1Column%2").arg(orc_IdBase).arg(s32_ItCol);
+      const QString c_IdColumn = static_cast<QString>("%1Column%2").arg(orc_IdBase).arg(s32_ItCol);
       orc_ColumnWidths.push_back(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
                                                      c_IdColumn.toStdString().c_str(), 0));
    }

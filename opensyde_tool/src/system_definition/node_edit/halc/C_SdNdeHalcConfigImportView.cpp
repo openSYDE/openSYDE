@@ -43,6 +43,7 @@ C_SdNdeHalcConfigImportView::C_SdNdeHalcConfigImportView(QWidget * const opc_Par
    C_OgeTreeViewToolTipBase(opc_Parent)
 {
    this->setModel(&this->mc_Model);
+   this->setItemDelegate(&this->mc_Delegate);
 
    this->setHeaderHidden(true);
 
@@ -88,4 +89,33 @@ sint32 C_SdNdeHalcConfigImportView::Init(const C_OSCHalcConfig & orc_Config,
 void C_SdNdeHalcConfigImportView::GetAdaptedConfiguration(C_OSCHalcConfig & orc_AdaptedConfig)
 {
    return this->mc_Model.GetAdaptedConfiguration(orc_AdaptedConfig);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if selection of linked channels is valid
+
+   \param[out]     orc_DomainIndices            Domain indices corresponding to orc_MissingChannelIndices
+   \param[out]     orc_MissingChannelIndices    Indices of all linked channels that are not checked
+
+   \retval  true     For all selected linked channels the link buddies are also selected
+   \retval  false    There exist linked channels where one is selected and the other one not
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeHalcConfigImportView::IsSelectionOfLinkedChannelsValid(std::vector<uint32> & orc_DomainIndices,
+                                                                   std::vector<std::vector<uint32> > & orc_MissingChannelIndices)
+{
+   return this->mc_Model.IsSelectionOfLinkedChannelsValid(orc_DomainIndices, orc_MissingChannelIndices);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check channels
+
+   \param[in]  orc_DomainIndices    Domain indices
+   \param[in]  orc_ChannelIndices   Channel indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcConfigImportView::CheckChannels(const std::vector<uint32> & orc_DomainIndices,
+                                                const std::vector<std::vector<uint32> > & orc_ChannelIndices)
+{
+   return this->mc_Model.CheckChannels(orc_DomainIndices, orc_ChannelIndices);
 }

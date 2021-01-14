@@ -26,10 +26,7 @@ class C_OgeSpxDoubleAutoFixCustomTrigger :
 public:
    C_OgeSpxDoubleAutoFixCustomTrigger(QWidget * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void stepBy(const stw_types::sintn osn_Steps) override;
-   //lint -restore
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

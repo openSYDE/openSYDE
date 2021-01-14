@@ -261,11 +261,10 @@ void C_CamMosDatabaseBusSelectionPopup::m_InitComboBox(void) const
       // only show can buses
       if (c_Iter->e_Type == C_OSCSystemBus::eCAN)
       {
-         this->mpc_Ui->pc_CbxBus->addItem(QString(c_Iter->c_Name.c_str()));
+         this->mpc_Ui->pc_CbxBus->addItem(static_cast<QString>(c_Iter->c_Name.c_str()));
       }
    }
 
-   //lint -e{64, 826, 918, 929, 1025, 1703} Qt interface (cast required, function not recognized because of C++1 usage)
    connect(this->mpc_Ui->pc_CbxBus, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
            this, &C_CamMosDatabaseBusSelectionPopup::m_OnComboBoxChanged);
 }

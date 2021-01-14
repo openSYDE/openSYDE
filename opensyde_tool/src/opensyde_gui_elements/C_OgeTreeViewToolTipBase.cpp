@@ -15,6 +15,8 @@
 #include <QEvent>
 #include <QHelpEvent>
 #include <QHeaderView>
+#include <QCheckBox>
+#include "TGLUtils.h"
 #include "C_OgeTreeViewToolTipBase.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -33,6 +35,119 @@ using namespace stw_opensyde_gui_elements;
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Default constructor
+
+   \param[in,out]  opc_Parent    Optional pointer to parent
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OgeTreeViewToolTipBaseDelegate::C_OgeTreeViewToolTipBaseDelegate(QObject * const opc_Parent) :
+   QStyledItemDelegate(opc_Parent)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Editor event function to handle the checkbox handling
+
+   Used original Qt implementation as base from QStyledItemDelegate with an adaption
+   to make the entire line with the label of the checkbox clickable.
+
+   \param[in,out]   opc_Event   Received event
+   \param[in,out]   opc_Model   Model of view
+   \param[in]       orc_Option  Detailed Style options of item
+   \param[in]       orc_Index   Index of affected item
+
+   \retval   true    Event is handled
+   \retval   false   Event is not handled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OgeTreeViewToolTipBaseDelegate::editorEvent(QEvent * const opc_Event, QAbstractItemModel * const opc_Model,
+                                                   const QStyleOptionViewItem & orc_Option,
+                                                   const QModelIndex & orc_Index)
+{
+   bool q_Return = false;
+
+   if ((opc_Model->flags(orc_Index).testFlag(Qt::ItemIsUserCheckable) == true) &&
+       (opc_Model->flags(orc_Index).testFlag(Qt::ItemIsEnabled) == true))
+   {
+      // make sure that we have a check state
+      QVariant c_Value = orc_Index.data(static_cast<sintn>(Qt::CheckStateRole));
+      if (c_Value.isValid() == true)
+      {
+         bool q_AdaptState = true;
+
+         // make sure that we have the right event type
+         if ((opc_Event->type() == QEvent::MouseButtonRelease) ||
+             (opc_Event->type() == QEvent::MouseButtonDblClick) ||
+             (opc_Event->type() == QEvent::MouseButtonPress))
+         {
+            QStyleOptionViewItem c_ViewOpt(orc_Option);
+            QRect c_CheckRect = orc_Option.widget->rect();
+            
+            QMouseEvent * const pc_MouseEvent = dynamic_cast<QMouseEvent *>(opc_Event);
+
+            tgl_assert(pc_MouseEvent != NULL);
+            if (pc_MouseEvent != NULL)
+            {
+               this->initStyleOption(&c_ViewOpt, orc_Index);
+
+               if ((pc_MouseEvent->button() != Qt::LeftButton) ||
+                   (c_CheckRect.contains(pc_MouseEvent->pos()) == false))
+               {
+                  q_AdaptState = false;
+               }
+               else if ((opc_Event->type() == QEvent::MouseButtonPress) ||
+                        (opc_Event->type() == QEvent::MouseButtonDblClick))
+               {
+                  q_AdaptState = false;
+                  q_Return = true;
+               }
+               else
+               {
+                  // Nothing to do
+               }
+            }
+         }
+         else if (opc_Event->type() == QEvent::KeyPress)
+         {
+            
+            QKeyEvent * const pc_KeyEvent = dynamic_cast<QKeyEvent *>(opc_Event);
+
+            tgl_assert(pc_KeyEvent != NULL);
+            if (pc_KeyEvent != NULL)
+            {
+               if ((pc_KeyEvent->key() != static_cast<sintn>(Qt::Key_Space)) &&
+                   (pc_KeyEvent->key() != static_cast<sintn>(Qt::Key_Select)))
+               {
+                  q_AdaptState = false;
+               }
+            }
+         }
+         else
+         {
+            q_AdaptState = false;
+         }
+
+         if (q_AdaptState == true)
+         {
+            Qt::CheckState e_State = static_cast<Qt::CheckState>(c_Value.toInt());
+            if (opc_Model->flags(orc_Index).testFlag(Qt::ItemIsUserTristate) == true)
+            {
+               e_State = static_cast<Qt::CheckState>(((static_cast<sintn>(e_State) + 1) % 3));
+            }
+            else
+            {
+               e_State = (e_State == Qt::Checked) ? Qt::Unchecked : Qt::Checked;
+            }
+            q_Return =
+               opc_Model->setData(orc_Index, static_cast<sintn>(e_State), static_cast<sintn>(Qt::CheckStateRole));
+         }
+      }
+   }
+
+   return q_Return;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
@@ -59,7 +174,7 @@ C_OgeTreeViewToolTipBase::C_OgeTreeViewToolTipBase(QWidget * const opc_Parent) :
 void C_OgeTreeViewToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    QTreeView::mouseMoveEvent(opc_Event);
-   this->CallAfterMouseMove(opc_Event);
+   this->m_CallAfterMouseMove(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,7 +191,7 @@ void C_OgeTreeViewToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgeTreeViewToolTipBase::event(QEvent * const opc_Event)
 {
-   return this->CallForEvent(opc_Event);
+   return this->m_CallForEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -94,7 +209,7 @@ bool C_OgeTreeViewToolTipBase::event(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgeTreeViewToolTipBase::eventFilter(QObject * const opc_Object, QEvent * const opc_Event)
 {
-   this->CallBeforeEventFilter(opc_Event);
+   this->m_CallBeforeEventFilter(opc_Event);
    return QTreeView::eventFilter(opc_Object, opc_Event);
 }
 

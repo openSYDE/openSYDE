@@ -69,14 +69,11 @@ Q_SIGNALS:
    void SigColumnCountChange(const stw_types::sint32 & ors32_NewColumnCount);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void dropEvent(QDropEvent * const opc_Event) override;
    virtual void mouseMoveEvent(QMouseEvent * const opc_Event) override;
    virtual void leaveEvent(QEvent * const opc_Event) override;
    virtual void selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected) override;
    virtual void startDrag(const Qt::DropActions oc_SupportedActions) override;
-   //lint -restore
 
 private:
    stw_types::uint32 mu32_NodeIndex;

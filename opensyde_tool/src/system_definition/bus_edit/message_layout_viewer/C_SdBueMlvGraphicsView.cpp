@@ -133,7 +133,7 @@ bool C_SdBueMlvGraphicsView::event(QEvent * const opc_Event)
 {
    if (opc_Event->type() == QEvent::ToolTip)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QHelpEvent * pc_Help = dynamic_cast<QHelpEvent *>(opc_Event);
       if (pc_Help != NULL)
       {

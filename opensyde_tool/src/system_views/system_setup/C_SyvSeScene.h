@@ -70,10 +70,7 @@ protected:
    virtual void m_AddPcBusConnectorToScene(C_GiSvPcBusConnector * const opc_PcBusConnectorGraphicsItem) override;
    virtual void m_AddTextElementToScene(C_GiBiTextElement * const opc_Item) override;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

@@ -34,14 +34,14 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]     orc_MessageId          Message identification indices
-   \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
-   \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
-   \param[in,out] opc_Parent             Optional pointer to parent
+   \param[in]      orc_MessageId             Message identification indices
+   \param[in,out]  opc_MessageSyncManager    Message sync manager to perform actions on
+   \param[in,out]  opc_MessageTreeWidget     Message tree widget to perform actions on
+   \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoMessageDeleteCommand::C_SdBueUnoMessageDeleteCommand(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MessageId,
    C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
    C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, QUndoCommand * const opc_Parent) :
    C_SdBueUnoMessageAddDeleteBaseCommand(orc_MessageId, opc_MessageSyncManager, opc_MessageTreeWidget, "Delete Message",
@@ -55,7 +55,7 @@ C_SdBueUnoMessageDeleteCommand::C_SdBueUnoMessageDeleteCommand(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageDeleteCommand::redo(void)
 {
-   this->Delete();
+   this->m_Delete();
    C_SdBueUnoMessageAddDeleteBaseCommand::redo();
 }
 
@@ -66,5 +66,5 @@ void C_SdBueUnoMessageDeleteCommand::redo(void)
 void C_SdBueUnoMessageDeleteCommand::undo(void)
 {
    C_SdBueUnoMessageAddDeleteBaseCommand::undo();
-   this->Add();
+   this->m_Add();
 }

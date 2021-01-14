@@ -33,6 +33,7 @@ public:
    static stw_types::sint32 h_GetConfigStandaloneChannel(const C_OSCHalcConfig & orc_Config,
                                                          const stw_types::uint32 ou32_DomainIndex,
                                                          const stw_types::uint32 ou32_ChannelIndex,
+                                                         const bool oq_DomainOnly,
                                                          C_OSCHalcConfigStandalone & orc_ConfigStandalone);
 };
 

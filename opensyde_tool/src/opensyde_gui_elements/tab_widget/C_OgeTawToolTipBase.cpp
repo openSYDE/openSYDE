@@ -115,7 +115,7 @@ bool C_OgeTawToolTipBase::event(QEvent * const opc_Event)
 
       if (this->mpc_ToolTip->isVisible() == false)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
          if (pc_HelpEvent != NULL)

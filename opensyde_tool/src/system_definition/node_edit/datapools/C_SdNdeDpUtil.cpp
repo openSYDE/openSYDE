@@ -497,9 +497,9 @@ QWidget * C_SdNdeDpUtil::h_CreateGenericEditor(QWidget * const opc_Parent, const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpUtil::h_SetGenericEditorDataVariable(QWidget * const opc_Editor, const QModelIndex & orc_Index)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_OgeWiSpinBoxGroup * const pc_SpinBox = dynamic_cast<C_OgeWiSpinBoxGroup * const>(opc_Editor);
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    QLineEdit * const pc_LineEdit = dynamic_cast<QLineEdit * const>(opc_Editor);
 
    if (pc_SpinBox != NULL)
@@ -524,9 +524,9 @@ void C_SdNdeDpUtil::h_SetGenericEditorDataVariable(QWidget * const opc_Editor, c
 void C_SdNdeDpUtil::h_SetModelGenericDataVariable(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                                   const QModelIndex & orc_Index)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_OgeWiSpinBoxGroup * const pc_SpinBox = dynamic_cast<C_OgeWiSpinBoxGroup * const>(opc_Editor);
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    QLineEdit * const pc_LineEdit = dynamic_cast<QLineEdit * const>(opc_Editor);
 
    if (pc_SpinBox != NULL)
@@ -573,7 +573,7 @@ QString C_SdNdeDpUtil::h_ConvertToString(const C_OSCNodeDataPoolContent & orc_Da
       }
       else
       {
-         c_Retval = QString(static_cast<charn>(orc_Data.GetValueS8()));
+         c_Retval = static_cast<QString>(static_cast<charn>(orc_Data.GetValueS8()));
       }
    }
    return c_Retval;
@@ -929,7 +929,7 @@ sint32 C_SdNdeDpUtil::h_GetSharedDatapoolGroup(const uint32 ou32_SharedDatapoolG
                if (rc_DpId.u32_NodeIndex != ou32_NodeIndex)
                {
                   // Add the node name if the datapool is of an other node
-                  c_Text = QString(pc_Node->c_Properties.c_Name.c_str()) + "::";
+                  c_Text = static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) + "::";
                }
 
                // Get the datapool name

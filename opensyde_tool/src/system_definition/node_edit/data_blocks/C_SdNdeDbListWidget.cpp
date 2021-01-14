@@ -129,8 +129,9 @@ void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint
            &C_SdNdeDbListWidget::m_CheckNodeId);
    connect(pc_ItemWidget, &C_SdNdeDbWidget::SigOpenDataPool, this,
            &C_SdNdeDbListWidget::SigOpenDataPool);
-   //lint -e{429}  no memory leak because of the parent of pc_Item by calling addItem and the Qt memory management
-}
+   connect(pc_ItemWidget, &C_SdNdeDbWidget::SigOwnedDataPoolsChanged, this,
+           &C_SdNdeDbListWidget::SigOwnedDataPoolsChanged);
+}  //lint !e429  //no memory leak because of the parent of pc_Item by calling addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update applications
@@ -142,7 +143,7 @@ void C_SdNdeDbListWidget::UpdateApplications(void) const
    for (sintn sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
    {
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SdNdeDbWidget * const pc_WidgetItem =
          dynamic_cast<C_SdNdeDbWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -231,7 +232,7 @@ void C_SdNdeDbListWidget::dropEvent(QDropEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::startDrag(const Qt::DropActions oc_SupportedActions)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_SdNdeDbWidget * pc_ItemWidget =
       dynamic_cast<C_SdNdeDbWidget *>(this->itemWidget(this->item(this->currentIndex().row())));
 
@@ -269,7 +270,7 @@ void C_SdNdeDbListWidget::m_UpdateApplicationIndexes(void) const
    for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
    {
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SdNdeDbWidget * const pc_WidgetItem =
          dynamic_cast<C_SdNdeDbWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -289,7 +290,7 @@ void C_SdNdeDbListWidget::m_CheckNodeId(void) const
    for (sintn sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
    {
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_SdNdeDbWidget * const pc_WidgetItem =
          dynamic_cast<const C_SdNdeDbWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)

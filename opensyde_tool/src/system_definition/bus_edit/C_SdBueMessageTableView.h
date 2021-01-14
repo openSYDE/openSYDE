@@ -48,12 +48,9 @@ Q_SIGNALS:
    void SigMessageSelected(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mouseMoveEvent(QMouseEvent * const opc_Event) override;
    virtual void leaveEvent(QEvent * const opc_Event) override;
    virtual void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

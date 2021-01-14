@@ -710,7 +710,6 @@ bool C_SyvDaItChartWidget::RemoveDataSerie(C_PuiSvDbNodeDataPoolListElementId & 
       {
          tgl_assert(this->mc_DataColorsUsed.size() >
                     this->mc_DataPoolElementsDataColorIndexes[u32_DataPoolElementConfigIndex]);
-         //lint -e{808} C++11 usage of correct handling for bool vector element assignment
          auto && rc_Value =
             this->mc_DataColorsUsed[this->mc_DataPoolElementsDataColorIndexes[u32_DataPoolElementConfigIndex]];
          rc_Value = false;
@@ -842,7 +841,7 @@ void C_SyvDaItChartWidget::AddDataSerieContent(const C_PuiSvDbNodeDataPoolListEl
       {
          const C_PuiSvDbNodeDataPoolListElementId & rc_CurDataPoolElementId =
             this->mc_Data.c_DataPoolElementsConfig[u32_ConfigCounter].c_ElementId;
-         if ((rc_CurDataPoolElementId.CheckSameDataElement(orc_DataPoolElementId)) &&
+         if ((rc_CurDataPoolElementId == orc_DataPoolElementId) &&
              (u32_ConfigCounter < this->mc_DataPoolElementsDataSeries.size()))
          {
             QLineSeries * const pc_LineSerie = this->mc_DataPoolElementsDataSeries[u32_ConfigCounter];
@@ -1157,8 +1156,7 @@ void C_SyvDaItChartWidget::m_AddDataSerie(const stw_types::uint32 ou32_DataPoolE
 
    // Set the axis for the new data serie
    this->SelectDataSeriesAxis(ou32_DataPoolElementConfigIndex);
-   //lint -e{429}  no memory leak because of the parent of pc_Series and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Series and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::m_ResetChart(void)
@@ -1196,7 +1194,6 @@ QColor C_SyvDaItChartWidget::m_GetColor(void)
    {
       if (this->mc_DataColorsUsed[u32_Counter] == false)
       {
-         //lint -e{808} C++11 usage of correct handling for bool vector element assignment
          auto && rc_Value = this->mc_DataColorsUsed[u32_Counter];
          rc_Value = true;
          c_Color = C_SyvDaItChartWidget::mhac_DataColors[u32_Counter];
@@ -1221,10 +1218,11 @@ void C_SyvDaItChartWidget::m_DataItemToggled(const stw_types::uint32 ou32_DataPo
 
    if (ou32_DataPoolElementConfigIndex < this->mc_Data.c_DataPoolElementsActive.size())
    {
-      //lint -e{808} C++11 usage of correct handling for bool vector element assignment
       auto && rc_Value = this->mc_Data.c_DataPoolElementsActive[ou32_DataPoolElementConfigIndex];
       rc_Value = oq_Checked;
    }
+
+   Q_EMIT (this->SigChartDataChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1258,6 +1256,8 @@ void C_SyvDaItChartWidget::m_SettingZoomModeChanged(const C_PuiSvDbChart::E_Sett
    }
 
    this->mc_Data.e_SettingZoomMode = oe_SettingZoomMode;
+
+   Q_EMIT (this->SigChartDataChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

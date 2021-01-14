@@ -56,13 +56,13 @@ protected:
    virtual void m_DeleteSave(void);
    virtual void m_Restore(void);
 
-   virtual stw_types::sint32 GetBoundaryType(void) const;
-   virtual stw_types::sint32 GetImageType(void) const;
-   virtual stw_types::sint32 GetLineArrowType(void) const;
-   virtual stw_types::sint32 GetTextElementType(void) const;
+   virtual stw_types::sint32 m_GetBoundaryType(void) const;
+   virtual stw_types::sint32 m_GetImageType(void) const;
+   virtual stw_types::sint32 m_GetLineArrowType(void) const;
+   virtual stw_types::sint32 m_GetTextElementType(void) const;
 
-   void SetDataPositionOffset(const QPointF & orc_NewPos);
-   void SetDataZOffset(const stw_types::float64 of64_HighestUsedZValue);
+   void m_SetDataPositionOffset(const QPointF & orc_NewPos);
+   void m_SetDataZOffset(const stw_types::float64 of64_HighestUsedZValue);
 
 private:
    QMap<C_PuiBsTemporaryDataID, stw_types::uint64> mc_MapTypeAndIndexToID;

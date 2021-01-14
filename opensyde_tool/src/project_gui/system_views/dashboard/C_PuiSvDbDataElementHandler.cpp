@@ -456,14 +456,14 @@ void C_PuiSvDbDataElementHandler::AddNewNvmValueIntoQueue(
 
    Warning: expected to be in range of min & max
 
-   \param[in]  f64_Value            Unscaled value
+   \param[in]  of64_Value           Unscaled value
    \param[in]  ou32_IndexElement    Optional index of element (if more than one)
 
    \return
    Value as scaled string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSvDbDataElementHandler::GetUnscaledValueAsScaledString(const float64 f64_Value,
+QString C_PuiSvDbDataElementHandler::GetUnscaledValueAsScaledString(const float64 of64_Value,
                                                                     const uint32 ou32_IndexElement) const
 {
    QString c_Retval;
@@ -479,14 +479,14 @@ QString C_PuiSvDbDataElementHandler::GetUnscaledValueAsScaledString(const float6
       if (pc_Element != NULL)
       {
          C_OSCNodeDataPoolContent c_Tmp = pc_Element->c_MinValue;
-         C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_Value, c_Tmp, 0UL);
+         C_OSCNodeDataPoolContentUtil::h_SetValueInContent(of64_Value, c_Tmp, 0UL);
          C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_Tmp, c_Scaling.f64_Factor, c_Scaling.f64_Offset,
                                                         c_Retval, 0UL);
       }
    }
    if (c_Retval.compare("") == 0)
    {
-      c_Retval = QString::number(f64_Value);
+      c_Retval = QString::number(of64_Value);
    }
    return c_Retval;
 }
@@ -617,7 +617,6 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
          //Set timestamp valid
          if (ou32_WidgetDataPoolElementIndex < this->mc_LastDataPoolElementTimeStampsValid.size())
          {
-            //lint -e{808} C++11 usage of correct handling for bool vector element assignment
             auto && rc_Value = this->mc_LastDataPoolElementTimeStampsValid[ou32_WidgetDataPoolElementIndex];
             rc_Value = true;
          }
@@ -706,7 +705,6 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
          //Set timestamp valid
          if (ou32_WidgetDataPoolElementIndex < this->mc_LastDataPoolElementTimeStampsValid.size())
          {
-            //lint -e{808} C++11 usage of correct handling for bool vector element assignment
             auto && rc_Value = this->mc_LastDataPoolElementTimeStampsValid[ou32_WidgetDataPoolElementIndex];
             rc_Value = true;
          }
@@ -800,7 +798,6 @@ sint32 C_PuiSvDbDataElementHandler::m_GetAllValues(const uint32 ou32_WidgetDataP
          //Set timestamp valid
          if (ou32_WidgetDataPoolElementIndex < this->mc_LastDataPoolElementTimeStampsValid.size())
          {
-            //lint -e{808} C++11 usage of correct handling for bool vector element assignment
             auto && rc_Value = this->mc_LastDataPoolElementTimeStampsValid[ou32_WidgetDataPoolElementIndex];
             rc_Value = true;
          }
@@ -976,7 +973,6 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(voi
            ++c_ItItem)
       {
          const C_PuiSvDbNodeDataPoolListElementId & rc_ElementId = c_ItItem.key();
-         //lint -e{808} C++11 usage of correct handling for bool vector element assignment
          auto && rc_Value = this->mc_DataPoolElementValid[c_ItItem.value()];
          uint16 u16_UpdateRate = 0U;
          // Update the valid flag
@@ -1108,7 +1104,7 @@ void C_PuiSvDbDataElementHandler::m_DataPoolElementsChanged(void)
    Current configured scaling configuration for each data element
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & C_PuiSvDbDataElementHandler::GetMappingDpElementToDataSerie(
+const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & C_PuiSvDbDataElementHandler::m_GetMappingDpElementToDataSerie(
    void) const
 {
    return this->mc_MappingDpElementToDataSerie;

@@ -365,7 +365,7 @@ void C_SyvHandlerWidget::Save(void)
       else
       {
          //Save to file
-         C_PopErrorHandling::mh_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
+         C_PopErrorHandling::h_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
 
          this->mq_DataChanged = false;
       }

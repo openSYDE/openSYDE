@@ -294,8 +294,7 @@ void C_SyvSeSetupWidget::StartDeviceConfiguration(void)
       pc_Dialog->CleanUp();
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function to prepare closing the scene

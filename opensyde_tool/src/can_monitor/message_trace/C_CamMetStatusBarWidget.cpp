@@ -99,9 +99,9 @@ void C_CamMetStatusBarWidget::InitStaticNames(void)
 void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad, const stw_types::sint32 os32_CANBitrate)
 {
    const QString c_Bitrate =
-      (os32_CANBitrate > 0) ? QString(" (@%1 kBit/s)").arg(QString::number(os32_CANBitrate)) : "";
+      (os32_CANBitrate > 0) ? static_cast<QString>(" (@%1 kBit/s)").arg(QString::number(os32_CANBitrate)) : "";
 
-   this->mpc_Ui->pc_BusLoadLabel->setText(QString(C_GtGetText::h_GetText("Bus Load: %1%%2")).
+   this->mpc_Ui->pc_BusLoadLabel->setText(static_cast<QString>(C_GtGetText::h_GetText("Bus Load: %1%%2")).
                                           arg(QString::number(ou8_BusLoad)).arg(c_Bitrate));
 
    // Prevent applying the stylesheet each call
@@ -181,7 +181,7 @@ void C_CamMetStatusBarWidget::m_UpdateFilterLabel(void) const
 {
    if (this->mu32_ActiveFilters > 0U)
    {
-      this->mpc_Ui->pc_ActiveFiltersLabel->setText(QString(C_GtGetText::h_GetText("Active Filters: %1")).
+      this->mpc_Ui->pc_ActiveFiltersLabel->setText(static_cast<QString>(C_GtGetText::h_GetText("Active Filters: %1")).
                                                    arg(QString::number(this->mu32_ActiveFilters)));
    }
    else
@@ -193,7 +193,7 @@ void C_CamMetStatusBarWidget::m_UpdateFilterLabel(void) const
        (this->mu32_ActiveFilters > 0U))
    {
       this->mpc_Ui->pc_ActiveFiltersLabel->setText(this->mpc_Ui->pc_ActiveFiltersLabel->text() +
-                                                   QString(C_GtGetText::h_GetText(" (Filtered Messages: %1)")).
+                                                   static_cast<QString>(C_GtGetText::h_GetText(" (Filtered Messages: %1)")).
                                                    arg(QString::number(this->mu32_FilteredMessages)));
    }
 }

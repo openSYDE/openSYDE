@@ -65,7 +65,7 @@ QModelIndex C_TblTreSimpleModel::index(const sintn osn_Row, const sintn osn_Colu
    {
       if (orc_Parent.isValid() == true)
       {
-         //lint -e{925}  Result of Qt interface restrictions, set by index function
+         //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreSimpleItem * const pc_TreeItem =
             static_cast<const C_TblTreSimpleItem * const>(orc_Parent.internalPointer());
          if (pc_TreeItem != NULL)
@@ -107,7 +107,7 @@ QModelIndex C_TblTreSimpleModel::parent(const QModelIndex & orc_Index) const
 
    if (orc_Index.isValid() == true)
    {
-      //lint -e{925}  Result of Qt interface restrictions, set by index function
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreSimpleItem * const pc_TreeItem =
          static_cast<const C_TblTreSimpleItem * const>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
@@ -140,7 +140,7 @@ sintn C_TblTreSimpleModel::rowCount(const QModelIndex & orc_Parent) const
 
    if (orc_Parent.isValid() == true)
    {
-      //lint -e{925}  Result of Qt interface restrictions, set by index function
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreSimpleItem * const pc_TreeItem =
          static_cast<const C_TblTreSimpleItem * const>(orc_Parent.internalPointer());
       if (pc_TreeItem != NULL)

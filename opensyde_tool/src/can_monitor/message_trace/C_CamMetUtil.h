@@ -28,9 +28,9 @@ public:
 
    static std::vector<stw_types::sintn> h_GetMultiplexerOrder(
       const std::vector<stw_opensyde_core::C_OSCComMessageLoggerDataSignal> & orc_Signals);
-   static stw_types::sint32 mh_GetMultiplexerValue(
+   static stw_types::sint32 h_GetMultiplexerValue(
       const std::vector<stw_opensyde_core::C_OSCComMessageLoggerDataSignal> & orc_Signals);
-   static stw_types::sint32 mh_GetRowForMultiplexerValue(
+   static stw_types::sint32 h_GetRowForMultiplexerValue(
       const std::vector<stw_opensyde_core::C_OSCComMessageLoggerDataSignal> & orc_Signals,
       const stw_types::sint32 os32_MultiplexerValue);
 };

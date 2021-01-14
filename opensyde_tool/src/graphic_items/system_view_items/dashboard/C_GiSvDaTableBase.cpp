@@ -85,9 +85,9 @@ C_GiSvDaTableBase::C_GiSvDaTableBase(const uint32 & oru32_ViewIndex, const uint3
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} Either handled by Qt parent handling or not owned by this class in the first place
 C_GiSvDaTableBase::~C_GiSvDaTableBase(void)
 {
-   //lint -e{1540} Either handled by Qt parent handling or not owned by this class in the first place
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -282,7 +282,7 @@ bool C_GiSvDaTableBase::CallProperties(void)
 
       if (c_Indices.size() == 1)
       {
-         const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+         const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
          if (pc_Dashboard != NULL)
          {
@@ -322,7 +322,6 @@ bool C_GiSvDaTableBase::CallProperties(void)
                   this->RemoveDataPoolElement(c_ElementId);
                   this->RegisterDataPoolElement(c_Tmp.c_ElementId, c_Tmp.c_ElementScaling);
 
-                  tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(c_Tmp.c_ElementId) == C_NO_ERR);
                   tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                                  this->mu32_DashboardIndex,
                                                                                  static_cast<uint32>(this->ms32_Index),
@@ -334,8 +333,7 @@ bool C_GiSvDaTableBase::CallProperties(void)
                {
                   c_New->HideOverlay();
                }
-               //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-            }
+            }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
          }
       }
    }
@@ -547,11 +545,6 @@ sint32 C_GiSvDaTableBase::SetTableItem(const C_PuiSvDbTable & orc_Content) const
 
    if (this->ms32_Index >= 0)
    {
-      for (uint32 u32_ItEl = 0UL; u32_ItEl < orc_Content.c_DataPoolElementsConfig.size(); ++u32_ItEl)
-      {
-         const C_PuiSvDbNodeDataElementConfig & rc_Config = orc_Content.c_DataPoolElementsConfig[u32_ItEl];
-         tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(rc_Config.c_ElementId) == C_NO_ERR);
-      }
       s32_Retval = C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
                                                                        static_cast<uint32>(this->ms32_Index),
                                                                        &orc_Content, C_PuiSvDbDataElement::eTABLE);
@@ -680,9 +673,9 @@ bool C_GiSvDaTableBase::CheckItemError(const C_PuiSvDbNodeDataPoolListElementId 
       if (c_ItInvalidDlc != this->mc_InvalidDlcSignals.end())
       {
          q_Retval = true;
-         orc_Content += QString(C_GtGetText::h_GetText("%1 had invalid DLC %2.")).arg(
-            C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(c_ItInvalidDlc.key())).arg(QString::number(
-                                                                                              c_ItInvalidDlc.value()));
+         orc_Content += static_cast<QString>(C_GtGetText::h_GetText("%1 had invalid DLC %2.")).
+                        arg(C_PuiSdUtil::h_GetSignalNamespace(c_ItInvalidDlc.key())).
+                        arg(QString::number(c_ItInvalidDlc.value()));
       }
       orq_IsTransmissionError = false;
    }
@@ -767,6 +760,7 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
                const C_PuiSvDbNodeDataPoolListElementId & rc_DataElement = c_DataElements[u32_Counter];
                if (rc_DataElement.GetIsValid() == true)
                {
+                  tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(rc_DataElement) == C_NO_ERR);
                   this->m_RegisterDataElementRail(rc_DataElement);
                   this->mpc_TableWidget->AddItem(rc_DataElement);
                }
@@ -783,8 +777,7 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
          pc_Dialog->SaveUserSettings();
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

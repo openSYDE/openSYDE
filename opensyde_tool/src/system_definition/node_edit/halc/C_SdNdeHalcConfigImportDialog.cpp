@@ -17,6 +17,7 @@
 #include "CSCLString.h"
 #include "C_GtGetText.h"
 #include "C_Uti.h"
+#include "C_OgeWiCustomMessage.h"
 #include "C_SdNdeHalcConfigImportDialog.h"
 #include "ui_C_SdNdeHalcConfigImportDialog.h"
 
@@ -115,8 +116,7 @@ void C_SdNdeHalcConfigImportDialog::InitStaticNames(void) const
 sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
 {
    sint32 s32_Return = C_NO_ERR;
-   const C_OSCHalcConfig * pc_Config =
-      stw_opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+   const C_OSCHalcConfig * pc_Config = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
 
    orc_ErrorDetails = "";
 
@@ -132,24 +132,22 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
          {
             s32_Return = C_CHECKSUM;
             orc_ErrorDetails =
-               C_GtGetText::h_GetText(C_SCLString(
-                                         "Imported Hardware configuration is not compatible to this device type.\n"
-                                         "Current device type: " + pc_Config->c_DeviceName + "\n"
-                                         "Device type of imported Hardware configuration: " +
-                                         this->mc_ImportConfig.c_DeviceType + "\n").c_str());
+               C_GtGetText::h_GetText(("Imported Hardware configuration is not compatible to this device type.\n"
+                                       "Current device type: " + pc_Config->c_DeviceName + "\n"
+                                       "Device type of imported Hardware configuration: " +
+                                       this->mc_ImportConfig.c_DeviceType + "\n").c_str());
          }
          else if (this->mc_ImportConfig.u32_DefinitionContentVersion != pc_Config->u32_ContentVersion)
          {
             s32_Return = C_CHECKSUM;
             orc_ErrorDetails =
-               C_GtGetText::h_GetText(C_SCLString(
-                                         "Imported Hardware configuration version does not match the current "
-                                         "used Hardware configuration version of this node.\n"
-                                         "Current used version: " +
-                                         C_SCLString::IntToStr(pc_Config->u32_ContentVersion) + "\n"
-                                         "Version of imported Hardware configuration: " +
-                                         C_SCLString::IntToStr(this->mc_ImportConfig.u32_DefinitionContentVersion) +
-                                         "\n").c_str());
+               C_GtGetText::h_GetText(("Imported Hardware configuration version does not match the current "
+                                       "used Hardware configuration version of this node.\n"
+                                       "Current used version: " +
+                                       C_SCLString::IntToStr(pc_Config->u32_ContentVersion) + "\n"
+                                       "Version of imported Hardware configuration: " +
+                                       C_SCLString::IntToStr(this->mc_ImportConfig.u32_DefinitionContentVersion) +
+                                       "\n").c_str());
          }
          else
          {
@@ -167,7 +165,7 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
                   break;
                default:
                   orc_ErrorDetails =
-                     QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Return));
+                     static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Return));
                   break;
                }
             }
@@ -187,7 +185,7 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
             orc_ErrorDetails = C_GtGetText::h_GetText("The Hardware configuration content of the file is invalid.");
             break;
          default:
-            orc_ErrorDetails = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Return));
+            orc_ErrorDetails = static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Return));
             break;
          }
       }
@@ -226,7 +224,7 @@ sint32 C_SdNdeHalcConfigImportDialog::GetResult(QString & orc_ErrorDetails) cons
       orc_ErrorDetails = C_GtGetText::h_GetText("The import dialog was not accepted or opened.");
       break;
    default:
-      orc_ErrorDetails = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(this->ms32_Result));
+      orc_ErrorDetails = static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(this->ms32_Result));
       break;
    }
 
@@ -253,7 +251,7 @@ void C_SdNdeHalcConfigImportDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
           (opc_KeyEvent->modifiers().testFlag(Qt::ShiftModifier) == false))
       {
-         this->mrc_ParentDialog.accept();
+         this->m_OkClicked();
       }
       else
       {
@@ -272,14 +270,34 @@ void C_SdNdeHalcConfigImportDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcConfigImportDialog::m_OkClicked(void)
 {
-   C_OSCHalcConfig c_AdaptedConfig;
+   std::vector<uint32> c_DomainIndices;
+   std::vector<std::vector<uint32> > c_MissingChannelIndices;
 
-   this->mpc_Ui->pc_TreeView->GetAdaptedConfiguration(c_AdaptedConfig);
+   if (this->mpc_Ui->pc_TreeView->IsSelectionOfLinkedChannelsValid(c_DomainIndices, c_MissingChannelIndices) == false)
+   {
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
+      c_Message.SetHeading(C_GtGetText::h_GetText("Invalid selection"));
+      c_Message.SetDescription(
+         C_GtGetText::h_GetText(
+            "Your selection contains channels that are or will get linked to another channel which is not selected. "
+            "Do you want to select all linked channels too?"));
+      c_Message.SetOKButtonText(C_GtGetText::h_GetText("Select Linked Channels"));
+      c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+      if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
+      {
+         this->mpc_Ui->pc_TreeView->CheckChannels(c_DomainIndices, c_MissingChannelIndices);
+      }
+   }
+   else
+   {
+      C_OSCHalcConfig c_AdaptedConfig;
 
-   this->ms32_Result = stw_opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->SetHALCConfig(this->mu32_NodeIndex,
-                                                                                              c_AdaptedConfig);
+      this->mpc_Ui->pc_TreeView->GetAdaptedConfiguration(c_AdaptedConfig);
 
-   this->mrc_ParentDialog.accept();
+      this->ms32_Result = C_PuiSdHandler::h_GetInstance()->SetHALCConfig(this->mu32_NodeIndex, c_AdaptedConfig);
+
+      this->mrc_ParentDialog.accept();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

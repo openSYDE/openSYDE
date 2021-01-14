@@ -32,6 +32,7 @@ public:
 
    void CheckChannelNameUnique(const stw_types::uint32 ou32_ChannelIndex, bool * const opq_NameConflict) const;
    stw_types::sint32 ResetChannelToDefault(const stw_types::uint32 ou32_ChannelIndex);
+   stw_types::sint32 ResetChannelUseCase(const stw_types::uint32 ou32_ChannelIndex);
    void ResetDomainToDefault(void);
    stw_types::sint32 GetRelevantIndicesForSelectedUseCase(const stw_types::uint32 ou32_ChannelIndex,
                                                           const bool oq_UseChannelIndex,
@@ -50,6 +51,7 @@ private:
                                 std::vector<C_OSCHalcConfigParameterStruct> & orc_ParamConfig);
    static C_OSCHalcConfigChannel mh_InitConfigFromName(const stw_scl::C_SCLString & orc_Name);
    C_OSCHalcConfigChannel m_InitChannelConfig(const stw_types::uint32 ou32_ChannelIndex);
+   stw_types::uint32 m_InitChannelUseCase(const stw_types::uint32 ou32_ChannelIndex);
    void m_InitDomainConfig(void);
 };
 

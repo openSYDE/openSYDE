@@ -79,7 +79,6 @@ void C_NagViewList::Init(void)
    for (uint32 u32_ItView = 0UL; u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount(); ++u32_ItView)
    {
       const QModelIndex c_Index = this->mc_Model.index(u32_ItView);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_NagViewItem * pc_ViewWidget = dynamic_cast<C_NagViewItem *>(this->indexWidget(c_Index));
       if (pc_ViewWidget == NULL)
       {
@@ -238,7 +237,6 @@ void C_NagViewList::SetActive(const uint32 ou32_ViewIndex, const sint32 os32_Sub
 //----------------------------------------------------------------------------------------------------------------------
 C_NagViewItem * C_NagViewList::GetItemAt(const sintn osn_Index) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    return dynamic_cast<C_NagViewItem *>(this->indexWidget(this->mc_Model.index(osn_Index)));
 }
 
@@ -380,7 +378,6 @@ void C_NagViewList::m_AfterDrag(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_StartDrag(const QModelIndex & orc_Index)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_NagViewItem * const pc_Item = dynamic_cast<C_NagViewItem *>(this->indexWidget(orc_Index));
 
    if (pc_Item != NULL)

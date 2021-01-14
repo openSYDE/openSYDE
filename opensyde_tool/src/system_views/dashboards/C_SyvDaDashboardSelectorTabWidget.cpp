@@ -125,8 +125,8 @@ void C_SyvDaDashboardSelectorTabWidget::TearOffWidget(const sint32 os32_Index, c
    //Block tear off of last tab
    if (this->count() > 1)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_WidgetRef =
+
+      C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(os32_Index));
 
       if (pc_WidgetRef != NULL)
@@ -152,7 +152,7 @@ void C_SyvDaDashboardSelectorTabWidget::SetEditMode(const bool oq_Active)
    sint32 s32_Counter;
 
    QList<C_SyvDaTearOffWidget *>::const_iterator c_ItItem;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_SyvDaDashboardSelectorTabBar * const pc_TabBar =
       dynamic_cast<C_SyvDaDashboardSelectorTabBar * const>(this->tabBar());
 
@@ -160,8 +160,8 @@ void C_SyvDaDashboardSelectorTabWidget::SetEditMode(const bool oq_Active)
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_WidgetRef =
+
+      C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -304,8 +304,8 @@ void C_SyvDaDashboardSelectorTabWidget::Save(void)
    //Tabs
    for (sint32 s32_ItTab = 0; s32_ItTab < this->count(); ++s32_ItTab)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_WidgetRef =
+
+      C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_ItTab));
 
       if (pc_WidgetRef != NULL)
@@ -337,14 +337,14 @@ void C_SyvDaDashboardSelectorTabWidget::ApplyDarkMode(const bool oq_Active)
    sint32 s32_Counter;
 
    QList<C_SyvDaTearOffWidget *>::const_iterator c_ItItem;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_SyvDaDashboardSelectorTabBar * const pc_TabBar =
       dynamic_cast<C_SyvDaDashboardSelectorTabBar * const>(this->tabBar());
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_WidgetRef =
+
+      C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -355,7 +355,7 @@ void C_SyvDaDashboardSelectorTabWidget::ApplyDarkMode(const bool oq_Active)
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_OgeWiDashboardTab * const pc_DrawingWidget =
          dynamic_cast<C_OgeWiDashboardTab * const>(this->tabBar()->tabButton(s32_Counter,
                                                                              C_SyvDaDashboardSelectorTabWidget::
@@ -401,8 +401,8 @@ void C_SyvDaDashboardSelectorTabWidget::RegisterWidgets(C_SyvComDriverDiag & orc
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_WidgetRef =
+
+      C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -432,8 +432,8 @@ void C_SyvDaDashboardSelectorTabWidget::ConnectionActiveChanged(const bool oq_Ac
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_WidgetRef =
+
+      C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -450,7 +450,7 @@ void C_SyvDaDashboardSelectorTabWidget::ConnectionActiveChanged(const bool oq_Ac
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_OgeWiDashboardTab * const pc_DrawingWidget =
          dynamic_cast<C_OgeWiDashboardTab * const>(this->tabBar()->tabButton(s32_Counter,
                                                                              C_SyvDaDashboardSelectorTabWidget::
@@ -478,8 +478,8 @@ void C_SyvDaDashboardSelectorTabWidget::UpdateShowValues(void) const
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_WidgetRef =
+
+      C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -505,8 +505,8 @@ void C_SyvDaDashboardSelectorTabWidget::UpdateTransmissionConfiguration()
 
    for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_WidgetRef =
+
+      C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -540,8 +540,9 @@ sint32 C_SyvDaDashboardSelectorTabWidget::GetDashboardIndexForTabIndex(const sin
 
    if (os32_TabIndex < this->count())
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_Widget = dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(os32_TabIndex));
+
+      C_SyvDaDashboardWidget * const pc_Widget =
+         dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(os32_TabIndex));
       if (pc_Widget != NULL)
       {
          oru32_DashboardIndex = pc_Widget->GetDataIndex();
@@ -569,8 +570,8 @@ void C_SyvDaDashboardSelectorTabWidget::HandleManualOperationFinished(const sint
 {
    for (sint32 s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_WidgetRef =
+
+      C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -599,8 +600,8 @@ void C_SyvDaDashboardSelectorTabWidget::SetErrorForFailedCyclicElementIdRegistra
 {
    for (sint32 s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_WidgetRef =
+
+      C_SyvDaDashboardWidget * const pc_WidgetRef =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_WidgetRef != NULL)
@@ -720,16 +721,17 @@ void C_SyvDaDashboardSelectorTabWidget::m_WidgetComeBack(C_SyvDaTearOffWidget * 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardSelectorTabWidget::m_MakeScreenshot(const sint32 s32_Index)
+
+void C_SyvDaDashboardSelectorTabWidget::m_MakeScreenshot(const sint32 os32_Index)
 {
-   QWidget * pc_Widget = this->widget(s32_Index);
+   QWidget * const pc_Widget = this->widget(os32_Index);
 
    if ((pc_Widget != NULL) &&
        (this->mpc_TabBar != NULL))
    {
       QPixmap c_Screenshot(pc_Widget->size());
       // create the screenshot
-      pc_Widget->render(&c_Screenshot, QPoint(), QRegion(pc_Widget->rect()));
+      pc_Widget->render(&c_Screenshot, QPoint(), static_cast<QRegion>(pc_Widget->rect()));
       // resize the screenshot
       c_Screenshot = c_Screenshot.scaledToWidth(200, Qt::FastTransformation);
 
@@ -759,7 +761,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_InitTabStyle(const uint32 ou32_Index, 
    pc_GroupBox->resize(40, 1);
 
    //Space
-   //lint -e{948}  Kept in case button is moved to the other side
+   //lint -e{948,774}  Kept in case button is moved to the other side
    if (C_SyvDaDashboardSelectorTabWidget::mhe_TabContentPosition == QTabBar::RightSide)
    {
       e_SpacerPosition = QTabBar::LeftSide;
@@ -796,8 +798,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_InitTabStyle(const uint32 ou32_Index, 
    pc_DrawingWidget->SetActive(oq_Active);
    pc_DrawingWidget->SetInteractive(!this->mq_Connected);
    this->setTabText(static_cast<sintn>(ou32_Index), "");
-   //lint -e{429}  no memory leak because of the parent of pc_DrawingWidget and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_DrawingWidget and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle current change event
@@ -810,7 +811,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_CurrentChanged(const sintn osn_Current
    //Highlighting
    for (sint32 s32_ItTab = 0; s32_ItTab < this->count(); ++s32_ItTab)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_OgeWiDashboardTab * const pc_DrawingWidget =
          dynamic_cast<C_OgeWiDashboardTab * const>(this->tabBar()->tabButton(s32_ItTab,
                                                                              C_SyvDaDashboardSelectorTabWidget::
@@ -828,8 +829,9 @@ void C_SyvDaDashboardSelectorTabWidget::m_CurrentChanged(const sintn osn_Current
       }
    }
    //Focus
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SyvDaDashboardWidget * pc_Widget = dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(osn_CurrentIndex));
+
+   C_SyvDaDashboardWidget * const pc_Widget =
+      dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(osn_CurrentIndex));
    if (pc_Widget != NULL)
    {
       pc_Widget->SetSceneFocus();
@@ -843,11 +845,11 @@ void C_SyvDaDashboardSelectorTabWidget::m_CurrentChanged(const sintn osn_Current
 void C_SyvDaDashboardSelectorTabWidget::m_OnAddClicked(void)
 {
    // show popup dialog
-   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_SyvDaDashboardTabProperties * pc_Dialog = new C_SyvDaDashboardTabProperties(*c_New, "DASHBOARD TAB",
-                                                                                 0U,
-                                                                                 this->mu32_ViewIndex,
-                                                                                 true);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   C_SyvDaDashboardTabProperties * const pc_Dialog = new C_SyvDaDashboardTabProperties(*c_New, "DASHBOARD TAB",
+                                                                                       0U,
+                                                                                       this->mu32_ViewIndex,
+                                                                                       true);
 
    Q_UNUSED(pc_Dialog)
 
@@ -865,8 +867,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnAddClicked(void)
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle add button repositioning
@@ -937,8 +938,8 @@ sint32 C_SyvDaDashboardSelectorTabWidget::m_MapDataIndexToTabIndex(const uint32 
 
    for (sint32 s32_ItTab = 0; s32_ItTab < this->count(); ++s32_ItTab)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_Widget =
+
+      C_SyvDaDashboardWidget * const pc_Widget =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_ItTab));
       if (pc_Widget != NULL)
       {
@@ -1002,9 +1003,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_AddSpecificTab(const uint32 ou32_DataI
          m_InitTabStyle(static_cast<uint32>(sn_Index), pc_Dashboard->GetName(), pc_Dashboard->GetComment(),
                         pc_Dashboard->GetActive(), pc_View->GetDarkModeActive());
          m_Connect(pc_Widget);
-
-         //lint -e{429}  no memory leak because of the parent of pc_Widget and the Qt memory management
-      }
+      } //lint !e429  //no memory leak because of the parent of pc_Widget and the Qt memory management
    }
 
    osc_write_log_performance_stop(u16_TimerId, "Load dashboard");
@@ -1021,8 +1020,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_SyncDashboardDeleteDataIndex(const uin
    //Sync tabs
    for (sint32 s32_ItTab = 0; s32_ItTab < this->count(); ++s32_ItTab)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_Widget = dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_ItTab));
+
+      C_SyvDaDashboardWidget * const pc_Widget = dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_ItTab));
       if (pc_Widget != NULL)
       {
          const uint32 u32_CurDataIndex = pc_Widget->GetDataIndex();
@@ -1058,13 +1057,13 @@ void C_SyvDaDashboardSelectorTabWidget::m_SyncDashboardDeleteDataIndex(const uin
 void C_SyvDaDashboardSelectorTabWidget::m_OnActiveChange(const C_OgeWiDashboardTab * const opc_Source,
                                                          const bool oq_Active)
 {
-   sintn sn_Match = GetTabIndex(opc_Source);
+   const sintn sn_Match = m_GetTabIndex(opc_Source);
 
    if (sn_Match >= 0)
    {
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SyvDaDashboardWidget * pc_Widget =
+
+      C_SyvDaDashboardWidget * const pc_Widget =
          dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(sn_Match));
       if ((pc_Widget != NULL) && (pc_View != NULL))
       {
@@ -1086,10 +1085,10 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnActiveChange(const C_OgeWiDashboardT
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnCopyAction(const C_OgeWiDashboardTab * const opc_Source) const
 {
-   const sint32 s32_TabIndex = this->GetTabIndex(opc_Source);
+   const sint32 s32_TabIndex = this->m_GetTabIndex(opc_Source);
 
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SyvDaDashboardWidget * pc_Widget =
+
+   C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<sintn>(s32_TabIndex)));
 
    if (pc_Widget != NULL)
@@ -1107,10 +1106,10 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnCopyAction(const C_OgeWiDashboardTab
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnCutAction(const C_OgeWiDashboardTab * const opc_Source)
 {
-   const sint32 s32_TabIndex = this->GetTabIndex(opc_Source);
+   const sint32 s32_TabIndex = this->m_GetTabIndex(opc_Source);
 
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SyvDaDashboardWidget * pc_Widget =
+
+   C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<sintn>(s32_TabIndex)));
 
    if (pc_Widget != NULL)
@@ -1134,7 +1133,13 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnPasteAction(void)
       QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_Rails;
       if (C_SyvClipBoardHelper::h_LoadRailsFromClipboard(c_Rails, "Tab") == C_NO_ERR)
       {
+         // handle invalid data element indices and param widget duplicates
+         C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(c_Dashboard, this->mu32_ViewIndex, this);
+
+         // add tab
          this->m_AddTab(c_Dashboard);
+
+         // add rails
          for (QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
                    C_PuiSvReadDataConfiguration>::const_iterator c_It = c_Rails.begin();
               c_It != c_Rails.end(); ++c_It)
@@ -1154,10 +1159,10 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnPasteAction(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnDeleteAction(const C_OgeWiDashboardTab * const opc_Source)
 {
-   const sint32 s32_TabIndex = this->GetTabIndex(opc_Source);
+   const sint32 s32_TabIndex = this->m_GetTabIndex(opc_Source);
 
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SyvDaDashboardWidget * pc_Widget =
+
+   C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<sintn>(s32_TabIndex)));
 
    if (pc_Widget != NULL)
@@ -1174,7 +1179,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnDeleteAction(const C_OgeWiDashboardT
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnCloseAction(const C_OgeWiDashboardTab * const opc_Source)
 {
-   sintn sn_Match = GetTabIndex(opc_Source);
+   const sintn sn_Match = m_GetTabIndex(opc_Source);
 
    if ((sn_Match >= 0) && (this->count() > 1))
    {
@@ -1192,13 +1197,13 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnCloseAction(const C_OgeWiDashboardTa
    Else Matching tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaDashboardSelectorTabWidget::GetTabIndex(const C_OgeWiDashboardTab * const opc_DrawingWidget) const
+sint32 C_SyvDaDashboardSelectorTabWidget::m_GetTabIndex(const C_OgeWiDashboardTab * const opc_DrawingWidget) const
 {
    sint32 s32_Retval = -1;
 
    for (sintn sn_ItTab = 0; sn_ItTab < this->count(); ++sn_ItTab)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_OgeWiDashboardTab * const pc_DrawingWidget =
          dynamic_cast<const C_OgeWiDashboardTab * const>(this->tabBar()->tabButton(sn_ItTab,
                                                                                    C_SyvDaDashboardSelectorTabWidget::
@@ -1219,7 +1224,7 @@ sint32 C_SyvDaDashboardSelectorTabWidget::GetTabIndex(const C_OgeWiDashboardTab 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnUndock(const C_OgeWiDashboardTab * const opc_Source)
 {
-   const sint32 s32_TabIndex = this->GetTabIndex(opc_Source);
+   const sint32 s32_TabIndex = this->m_GetTabIndex(opc_Source);
 
    if (s32_TabIndex >= 0)
    {
@@ -1235,10 +1240,10 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnUndock(const C_OgeWiDashboardTab * c
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_Source)
 {
-   const sint32 s32_TabIndex = this->GetTabIndex(opc_Source);
+   const sint32 s32_TabIndex = this->m_GetTabIndex(opc_Source);
 
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SyvDaDashboardWidget * pc_Widget =
+
+   C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<sintn>(s32_TabIndex)));
 
    if (pc_Widget != NULL)
@@ -1377,8 +1382,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_AddTab(const C_PuiSvDashboard & orc_Da
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_DeleteTab(const sint32 os32_TabIndex)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SyvDaDashboardWidget * pc_Widget =
+
+   C_SyvDaDashboardWidget * const pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<sintn>(os32_TabIndex)));
    const bool q_LastDashboard = (this->count() == 1);
 
@@ -1388,7 +1393,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_DeleteTab(const sint32 os32_TabIndex)
       C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
 
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard delete"));
-      c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Do you really want to delete dashboard \"%1\"?")).arg(
+      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Do you really want to delete dashboard \"%1\"?")).arg(
                                      pc_Widget->GetName()));
       c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
       c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
@@ -1489,10 +1495,10 @@ bool C_SyvDaDashboardSelectorTabWidget::m_EditTab(const uint32 & oru32_DataIndex
    bool q_Return = false;
 
    // show popup dialog
-   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_SyvDaDashboardTabProperties * pc_Dialog = new C_SyvDaDashboardTabProperties(*c_New, "Dashboard Tab",
-                                                                                 oru32_DataIndex,
-                                                                                 this->mu32_ViewIndex);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   C_SyvDaDashboardTabProperties * const pc_Dialog = new C_SyvDaDashboardTabProperties(*c_New, "Dashboard Tab",
+                                                                                       oru32_DataIndex,
+                                                                                       this->mu32_ViewIndex);
 
    Q_UNUSED(pc_Dialog)
 
@@ -1513,9 +1519,7 @@ bool C_SyvDaDashboardSelectorTabWidget::m_EditTab(const uint32 & oru32_DataIndex
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-
-   return q_Return;
+   return q_Return; //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1552,8 +1556,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_StoreUserSettings(void)
       //Save tabs
       for (sint32 s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         C_SyvDaDashboardWidget * pc_Widget =
+
+         C_SyvDaDashboardWidget * const pc_Widget =
             dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
          if (pc_Widget != NULL)
@@ -1581,7 +1585,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_StoreUserSettings(void)
    \param[in,out]  opc_Widget    Dashboard widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardSelectorTabWidget::m_Connect(C_SyvDaDashboardWidget * const opc_Widget)
+void C_SyvDaDashboardSelectorTabWidget::m_Connect(const C_SyvDaDashboardWidget * const opc_Widget) const
 {
    if (opc_Widget != NULL)
    {
@@ -1604,7 +1608,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_Connect(C_SyvDaDashboardWidget * const
    \param[in,out]  opc_Widget    Dashboard widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardSelectorTabWidget::m_Disconnect(C_SyvDaDashboardWidget * const opc_Widget)
+void C_SyvDaDashboardSelectorTabWidget::m_Disconnect(const C_SyvDaDashboardWidget * const opc_Widget) const
 {
    if (opc_Widget != NULL)
    {
@@ -1631,8 +1635,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnTabChanged(const sintn osn_Index) co
 {
    for (sint32 s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      const C_SyvDaDashboardWidget * pc_Widget =
+
+      const C_SyvDaDashboardWidget * const pc_Widget =
          dynamic_cast<const C_SyvDaDashboardWidget * const>(this->widget(s32_Counter));
 
       if (pc_Widget != NULL)

@@ -83,7 +83,7 @@ void C_GiSdImageGroup::LoadData(void)
       this->LoadBasicData(C_PuiSdHandler::h_GetInstance()->c_Elements.c_Images[static_cast<uint32>(this->ms32_Index)]);
    }
    //Object name for test
-   this->setObjectName(QString("Meta: Image"));
+   this->setObjectName("Meta: Image");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

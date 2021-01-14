@@ -37,11 +37,7 @@ public:
    void Init(void);
    std::vector<std::array<QString, 2> > GetDataElements(const QModelIndex & orc_Index) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual stw_types::sintn columnCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
-   //lint -restore
 
    //Generic interface
    QModelIndex GetIndexForItem(const QString & orc_ItemText) const;

@@ -92,8 +92,7 @@ C_CamGenKeySelect::C_CamGenKeySelect(stw_opensyde_gui_elements::C_OgePopUpDialog
 
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_CamGenKeySelect::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked, this, &C_CamGenKeySelect::m_CancelClicked);
-   //lint -e{429}  no memory leak because of the parent of pc_Validator and the Qt memory management
-}
+} //lint !e429  no memory leak because of the parent of pc_Validator and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default destructor

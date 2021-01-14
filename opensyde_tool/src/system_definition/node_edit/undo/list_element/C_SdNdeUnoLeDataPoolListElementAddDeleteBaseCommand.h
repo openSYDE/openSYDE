@@ -38,11 +38,11 @@ public:
                                                        QUndoCommand * const opc_Parent = NULL);
 
 protected:
-   void Add(void);
-   void Delete(void);
-   void SetIndices(const std::vector<stw_types::uint32> & orc_Value);
-   void SetInitialData(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCContent,
-                       const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContent);
+   void m_Add(void);
+   void m_Delete(void);
+   void m_SetIndices(const std::vector<stw_types::uint32> & orc_Value);
+   void m_SetInitialData(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCContent,
+                         const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContent);
    void m_ReSelect(const std::vector<std::vector<stw_types::uint32> > & orc_Items, const bool oq_ScrollToLast);
 
 private:

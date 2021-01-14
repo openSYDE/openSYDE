@@ -25,12 +25,13 @@
 #include "CSCLChecksums.h"
 #include "C_OSCXMLParser.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSvHandlerFiler.h"
-#include "C_OSCHALCMagicianUtil.h"
 #include "C_PuiSvHandlerFilerV1.h"
 #include "C_SyvRoRouteCalculation.h"
 #include "C_OSCRoutingCalculation.h"
+#include "C_OSCHALCMagicianUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -1008,18 +1009,6 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationParamInfoContent(const uint32 ou3
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Add last known halc CRC
-
-   \param[in]  orc_Id      Id
-   \param[in]  ou32_Crc    CRC
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::AddLastKnownHalcCrc(const C_PuiSvDbNodeDataPoolListElementId & orc_Id, const uint32 ou32_Crc)
-{
-   this->mc_LastKnownHalcCrcs[orc_Id] = ou32_Crc;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2271,7 +2260,7 @@ sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, bool & orq_Rout
                    (c_RouteCalcDiag.GetState() == C_CONFIG))
                {
                   orq_RoutingError = true;
-                  orc_ErrorMessage += c_Space + QString(pc_Node->c_Properties.c_Name.c_str()) +
+                  orc_ErrorMessage += c_Space + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
                                       C_GtGetText::h_GetText(" (CAN to Ethernet routing not supported)");
                   c_Space = ", ";
                }
@@ -2290,13 +2279,13 @@ sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, bool & orq_Rout
                      if (q_RoutingDiagnosticError == true)
                      {
                         //Combined error
-                        orc_ErrorMessage += c_Space + QString(pc_Node->c_Properties.c_Name.c_str()) +
+                        orc_ErrorMessage += c_Space + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
                                             C_GtGetText::h_GetText(" (Update + Diagnostic)");
                      }
                      else
                      {
                         //Update error
-                        orc_ErrorMessage += c_Space + QString(pc_Node->c_Properties.c_Name.c_str()) +
+                        orc_ErrorMessage += c_Space + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
                                             C_GtGetText::h_GetText(" (Update)");
                      }
                      c_Space = ", ";
@@ -2307,7 +2296,7 @@ sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, bool & orq_Rout
                      {
                         //Diagnostic error
                         orq_RoutingError = true;
-                        orc_ErrorMessage += c_Space + QString(pc_Node->c_Properties.c_Name.c_str()) +
+                        orc_ErrorMessage += c_Space + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
                                             C_GtGetText::h_GetText(" (Diagnostic)");
                         c_Space = ", ";
                      }
@@ -2413,8 +2402,11 @@ sint32 C_PuiSvHandler::CheckAndHandleNewElement(const C_PuiSvDbNodeDataPoolListE
                                                                           orc_NewId.u32_ElementIndex);
             if (pc_Element != NULL)
             {
+               const std::string c_Tmp = orc_NewId.GetHalChannelName().toStdString();
                uint32 u32_Hash = 0UL;
                pc_Element->CalcHashElement(u32_Hash, orc_NewId.GetArrayElementIndexOrZero());
+               stw_scl::C_SCLChecksums::CalcCRC32(
+                  c_Tmp.c_str(), c_Tmp.length(), u32_Hash);
                this->mc_LastKnownHalcCrcs[orc_NewId] = u32_Hash;
             }
             else
@@ -2628,21 +2620,103 @@ QString C_PuiSvHandler::h_GetNamespace(const C_PuiSvDbNodeDataPoolListElementId 
                                                                e_Type) == C_NO_ERR) &&
              (e_Type == C_OSCNodeDataPool::eHALC))
          {
-            c_Retval = C_PuiSvHandler::mh_GetHALCNamespace(orc_Id);
+            c_Retval = C_PuiSdUtil::h_GetHALCNamespace(orc_Id);
          }
          else
          {
-            c_Retval = C_PuiSdHandler::h_GetInstance()->GetNamespace(orc_Id);
+            c_Retval = C_PuiSdUtil::h_GetNamespace(orc_Id);
             if (orc_Id.GetUseArrayElementIndex())
             {
                //Append array element index
-               c_Retval += QString(C_GtGetText::h_GetText("[%1]")).arg(orc_Id.GetArrayElementIndex());
+               c_Retval += static_cast<QString>(C_GtGetText::h_GetText("[%1]")).arg(orc_Id.GetArrayElementIndex());
             }
          }
       }
       else
       {
-         c_Retval = C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(orc_Id);
+         c_Retval = C_PuiSdUtil::h_GetSignalNamespace(orc_Id);
+      }
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get short namespace from Id
+
+   \param[in]  orc_Id   Datapool element ID
+
+   \return
+   short namespace
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSvHandler::h_GetShortNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id)
+{
+   QString c_Retval = C_GtGetText::h_GetText("Unknown HAL data element");
+   uint32 u32_DomainIndex;
+   bool q_UseChannelIndex;
+   uint32 u32_ChannelIndex;
+
+   C_OSCHalcDefDomain::E_VariableSelector e_Selector;
+   uint32 u32_ParameterIndex;
+   bool q_UseElementIndex;
+   uint32 u32_ParameterElementIndex;
+   bool q_IsUseCaseIndex;
+   bool q_IsChanNumIndex;
+
+   if (C_PuiSdHandler::h_GetInstance()->TranslateToHALCIndex(orc_Id, orc_Id.GetArrayElementIndexOrZero(),
+                                                             u32_DomainIndex, q_UseChannelIndex,
+                                                             u32_ChannelIndex, e_Selector, u32_ParameterIndex,
+                                                             q_UseElementIndex,
+                                                             u32_ParameterElementIndex, q_IsUseCaseIndex,
+                                                             q_IsChanNumIndex) == C_NO_ERR)
+   {
+      {
+         const C_OSCNodeDataPoolList * const pc_List =
+            C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(orc_Id.u32_NodeIndex,
+                                                                orc_Id.u32_DataPoolIndex,
+                                                                orc_Id.u32_ListIndex);
+         const C_OSCHalcConfigChannel * const pc_Config =
+            C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(orc_Id.u32_NodeIndex,
+                                                                            u32_DomainIndex,
+                                                                            u32_ChannelIndex,
+                                                                            q_UseChannelIndex);
+         const C_OSCHalcDefDomain * const pc_Domain =
+            C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileDataConst(orc_Id.u32_NodeIndex,
+                                                                        u32_DomainIndex);
+
+         if ((((pc_List != NULL)) && (pc_Config != NULL)) && (pc_Domain != NULL))
+         {
+            QString c_ElementName;
+
+            if (q_IsUseCaseIndex)
+            {
+               c_ElementName = C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(pc_Domain->c_SingularName).c_str();
+            }
+            else if (q_IsChanNumIndex)
+            {
+               c_ElementName = C_OSCHALCMagicianUtil::h_GetChanNumVariableName(pc_Domain->c_SingularName).c_str();
+            }
+            else
+            {
+               const C_OSCHalcDefStruct * const pc_Param =
+                  C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileVariableData(orc_Id.u32_NodeIndex,
+                                                                                 u32_DomainIndex, e_Selector,
+                                                                                 u32_ParameterIndex);
+               c_ElementName = pc_Param->c_Display.c_str();
+               if (q_UseElementIndex)
+               {
+                  if (u32_ParameterElementIndex < pc_Param->c_StructElements.size())
+                  {
+                     const C_OSCHalcDefElement & rc_Param = pc_Param->c_StructElements[u32_ParameterElementIndex];
+                     c_ElementName = rc_Param.c_Display.c_str();
+                  }
+               }
+            }
+            c_Retval = static_cast<QString>("%1::%2::%3").
+                       arg(pc_Config->c_Name.c_str()).
+                       arg(pc_List->c_Name.c_str()).
+                       arg(c_ElementName);
+         }
       }
    }
    return c_Retval;
@@ -2797,11 +2871,8 @@ C_PuiSvHandler * C_PuiSvHandler::h_GetInstance(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::h_Destroy(void)
 {
-   if (C_PuiSvHandler::mhpc_Singleton != NULL)
-   {
-      delete (C_PuiSvHandler::mhpc_Singleton);
-      C_PuiSvHandler::mhpc_Singleton = NULL;
-   }
+   delete C_PuiSvHandler::mhpc_Singleton;
+   C_PuiSvHandler::mhpc_Singleton = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2837,7 +2908,7 @@ sint32 C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
             if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
             {
                bool q_Ok;
-               const sintn sn_FileVersion = QString(c_XMLParser.GetNodeContent().c_str()).toInt(&q_Ok, 0);
+               const sintn sn_FileVersion = static_cast<QString>(c_XMLParser.GetNodeContent().c_str()).toInt(&q_Ok, 0);
                if (q_Ok)
                {
                   tgl_assert(c_XMLParser.SelectNodeParent() == "opensyde-system-views");
@@ -2890,6 +2961,18 @@ sint32 C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
    }
 
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add last known HAL CRC
+
+   \param[in]  orc_Id      Id
+   \param[in]  ou32_Crc    Crc
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandler::m_AddLastKnownHalcCrc(const C_PuiSvDbNodeDataPoolListElementId & orc_Id, const uint32 ou32_Crc)
+{
+   this->mc_LastKnownHalcCrcs[orc_Id] = ou32_Crc;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2956,7 +3039,6 @@ C_PuiSvHandler::C_PuiSvHandler(QObject * const opc_Parent) :
    connect(
       C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeDataPoolListElementMoved, this,
       &C_PuiSvHandler::m_OnSyncNodeDataPoolListElementMoved);
-   //lint -e{64,918,1025,1703} Interface does match
    connect(
       C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeDataPoolListElementChanged, this,
       &C_PuiSvHandler::m_OnSyncNodeDataPoolListElementArrayChanged);
@@ -3020,19 +3102,53 @@ void C_PuiSvHandler::m_OnSyncNodeHALC(const uint32 ou32_Index)
                   const C_OSCNodeDataPoolListElement & rc_El = rc_Li.c_Elements[u32_ItEl];
                   for (uint32 u32_ItAr = 0UL; u32_ItAr < rc_El.GetArraySize(); ++u32_ItAr)
                   {
-                     uint32 u32_Hash = 0UL;
-                     rc_El.CalcHashElement(u32_Hash, u32_ItAr);
-                     for (std::map<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32>::const_iterator c_ItCur =
-                             this->mc_LastKnownHalcCrcs.begin();
-                          c_ItCur != this->mc_LastKnownHalcCrcs.end(); ++c_ItCur)
+                     C_PuiSvDbNodeDataPoolListElementId c_NewId(ou32_Index, u32_ItDp, u32_ItLi, u32_ItEl,
+                                                                C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
+                                                                rc_El.GetArraySize() != 1, u32_ItAr);
+                     uint32 u32_DomainIndex;
+                     bool q_UseChannelIndex;
+                     uint32 u32_ChannelIndex;
+
+                     C_OSCHalcDefDomain::E_VariableSelector e_Selector;
+                     uint32 u32_ParameterIndex;
+                     bool q_UseElementIndex;
+                     uint32 u32_ParameterElementIndex;
+                     bool q_IsUseCaseIndex;
+                     bool q_IsChanNumIndex;
+
+                     if (C_PuiSdHandler::h_GetInstance()->TranslateToHALCIndex(c_NewId,
+                                                                               c_NewId.GetArrayElementIndexOrZero(),
+                                                                               u32_DomainIndex, q_UseChannelIndex,
+                                                                               u32_ChannelIndex, e_Selector,
+                                                                               u32_ParameterIndex,
+                                                                               q_UseElementIndex,
+                                                                               u32_ParameterElementIndex,
+                                                                               q_IsUseCaseIndex,
+                                                                               q_IsChanNumIndex) == C_NO_ERR)
                      {
-                        if (c_ItCur->second == u32_Hash)
+                        QString c_Name;
+                        if (C_PuiSdHandler::h_GetInstance()->GetHalChannelOrDomainName(ou32_Index,
+                                                                                       u32_DomainIndex,
+                                                                                       u32_ChannelIndex,
+                                                                                       c_Name) == C_NO_ERR)
                         {
-                           const C_PuiSvDbNodeDataPoolListElementId c_NewId(ou32_Index, u32_ItDp, u32_ItLi, u32_ItEl,
-                                                                            C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
-                                                                            rc_El.GetArraySize() != 1, u32_ItAr);
-                           c_NewMap[c_NewId] = u32_Hash;
-                           c_MapCurToNew[c_ItCur->first] = c_NewId;
+                           std::string c_Tmp = c_Name.toStdString();
+                           uint32 u32_Hash = 0UL;
+                           rc_El.CalcHashElement(u32_Hash, u32_ItAr);
+                           stw_scl::C_SCLChecksums::CalcCRC32(
+                              c_Tmp.c_str(), c_Tmp.length(), u32_Hash);
+                           c_NewId.SetHalChannelName(c_Name);
+                           for (std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                         stw_types::uint32>::const_iterator c_ItCur =
+                                   this->mc_LastKnownHalcCrcs.begin();
+                                c_ItCur != this->mc_LastKnownHalcCrcs.end(); ++c_ItCur)
+                           {
+                              if (c_ItCur->second == u32_Hash)
+                              {
+                                 c_NewMap[c_NewId] = u32_Hash;
+                                 c_MapCurToNew[c_ItCur->first] = c_NewId;
+                              }
+                           }
                         }
                      }
                   }
@@ -3513,96 +3629,6 @@ void C_PuiSvHandler::m_OnSyncClear(void)
 {
    this->mc_Views.clear();
    this->mc_LastKnownHalcCrcs.clear();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get HALC namespace
-
-   \param[in]  orc_Id   Id
-
-   \return
-   HALC namespace
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSvHandler::mh_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id)
-{
-   QString c_Retval;
-   uint32 u32_DomainIndex;
-   bool q_UseChannelIndex;
-   uint32 u32_ChannelIndex;
-
-   C_OSCHalcDefDomain::E_VariableSelector e_Selector;
-   uint32 u32_ParameterIndex;
-   bool q_UseElementIndex;
-   uint32 u32_ParameterElementIndex;
-   bool q_IsUseCaseIndex;
-   bool q_IsChanNumIndex;
-
-   if (C_PuiSdHandler::h_GetInstance()->TranslateToHALCIndex(orc_Id, orc_Id.GetArrayElementIndexOrZero(),
-                                                             u32_DomainIndex, q_UseChannelIndex,
-                                                             u32_ChannelIndex, e_Selector, u32_ParameterIndex,
-                                                             q_UseElementIndex,
-                                                             u32_ParameterElementIndex, q_IsUseCaseIndex,
-                                                             q_IsChanNumIndex) == C_NO_ERR)
-   {
-      {
-         const C_OSCNode * const pc_Node =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_Id.u32_NodeIndex);
-         const C_OSCNodeDataPool * const pc_DataPool =
-            C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_Id.u32_NodeIndex,
-                                                            orc_Id.u32_DataPoolIndex);
-         const C_OSCNodeDataPoolList * const pc_List =
-            C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(orc_Id.u32_NodeIndex,
-                                                                orc_Id.u32_DataPoolIndex,
-                                                                orc_Id.u32_ListIndex);
-         const C_OSCHalcConfigChannel * const pc_Config =
-            C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(orc_Id.u32_NodeIndex,
-                                                                            u32_DomainIndex,
-                                                                            u32_ChannelIndex,
-                                                                            q_UseChannelIndex);
-         const C_OSCHalcDefDomain * const pc_Domain =
-            C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileDataConst(orc_Id.u32_NodeIndex,
-                                                                        u32_DomainIndex);
-
-         if (((((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL)) && (pc_Config != NULL)) &&
-             (pc_Domain != NULL))
-         {
-            QString c_ElementName;
-
-            if (q_IsUseCaseIndex)
-            {
-               c_ElementName = C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(pc_Domain->c_SingularName).c_str();
-            }
-            else if (q_IsChanNumIndex)
-            {
-               c_ElementName = C_OSCHALCMagicianUtil::h_GetChanNumVariableName(pc_Domain->c_SingularName).c_str();
-            }
-            else
-            {
-               const C_OSCHalcDefStruct * const pc_Param =
-                  C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileVariableData(orc_Id.u32_NodeIndex,
-                                                                                 u32_DomainIndex, e_Selector,
-                                                                                 u32_ParameterIndex);
-               c_ElementName = pc_Param->c_Display.c_str();
-               if (q_UseElementIndex)
-               {
-                  if (u32_ParameterElementIndex < pc_Param->c_StructElements.size())
-                  {
-                     const C_OSCHalcDefElement & rc_Param = pc_Param->c_StructElements[u32_ParameterElementIndex];
-                     c_ElementName = rc_Param.c_Display.c_str();
-                  }
-               }
-            }
-            c_Retval = QString("%1::%2::%3::%4::%5").
-                       arg(pc_Node->c_Properties.c_Name.c_str()).
-                       arg(pc_DataPool->c_Name.c_str()).
-                       arg(pc_Config->c_Name.c_str()).
-                       arg(pc_List->c_Name.c_str()).
-                       arg(c_ElementName);
-         }
-      }
-   }
-   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

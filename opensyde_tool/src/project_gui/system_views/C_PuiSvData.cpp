@@ -60,6 +60,16 @@ C_PuiSvData::C_PuiSvData(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   destructor
+
+   clean up ...
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvData::~C_PuiSvData(void)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
@@ -773,6 +783,22 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets all registered dashboard elements of all dashboard tabs
+
+   \param[in,out]  orc_Ids    Set with all registered elements. Will not be cleared when called
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::GetAllRegisteredDashboardElements(std::set<C_OSCNodeDataPoolListElementId> & orc_Ids) const
+{
+   uint32 u32_DashboardCounter;
+
+   for (u32_DashboardCounter = 0U; u32_DashboardCounter < this->mc_Dashboards.size(); ++u32_DashboardCounter)
+   {
+      this->mc_Dashboards[u32_DashboardCounter].GetAllRegisteredDashboardElements(orc_Ids);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard name
 
    \param[in]  ou32_DashboardIndex  Dashboard index
@@ -1118,36 +1144,41 @@ void C_PuiSvData::OnSyncNodeHALC(const uint32 ou32_Index, const std::map<C_PuiSv
    {
       if (ou32_Index == c_ItReadItem.key().u32_NodeIndex)
       {
-         C_OSCNodeDataPool::E_Type e_Type;
-         if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(c_ItReadItem.key().u32_NodeIndex,
-                                                              c_ItReadItem.key().u32_DataPoolIndex, e_Type) == C_NO_ERR)
+         if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(c_ItReadItem.key().u32_NodeIndex,
+                                                             c_ItReadItem.key().u32_DataPoolIndex) != NULL)
          {
-            if (e_Type == C_OSCNodeDataPool::eHALC)
+            C_OSCNodeDataPool::E_Type e_Type;
+            if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(c_ItReadItem.key().u32_NodeIndex,
+                                                                 c_ItReadItem.key().u32_DataPoolIndex,
+                                                                 e_Type) == C_NO_ERR)
             {
-               //Manual compare because only base is necessary
-               for (std::map<C_PuiSvDbNodeDataPoolListElementId,
-                             C_PuiSvDbNodeDataPoolListElementId>::const_iterator c_ItMap =
-                       orc_MapCurToNew.begin();
-                    c_ItMap != orc_MapCurToNew.end(); ++c_ItMap)
+               if (e_Type == C_OSCNodeDataPool::eHALC)
                {
-                  if ((((c_ItMap->first.u32_NodeIndex == c_ItReadItem.key().u32_NodeIndex) &&
-                        (c_ItMap->first.u32_DataPoolIndex == c_ItReadItem.key().u32_DataPoolIndex)) &&
-                       (c_ItMap->first.u32_ListIndex == c_ItReadItem.key().u32_ListIndex)) &&
-                      (c_ItMap->first.u32_ElementIndex == c_ItReadItem.key().u32_ElementIndex))
+                  //Manual compare because only base is necessary
+                  for (std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                C_PuiSvDbNodeDataPoolListElementId>::const_iterator c_ItMap =
+                          orc_MapCurToNew.begin();
+                       c_ItMap != orc_MapCurToNew.end(); ++c_ItMap)
                   {
-                     c_NewItems.insert(c_ItMap->second, c_ItReadItem.value());
-                     break;
+                     if ((((c_ItMap->first.u32_NodeIndex == c_ItReadItem.key().u32_NodeIndex) &&
+                           (c_ItMap->first.u32_DataPoolIndex == c_ItReadItem.key().u32_DataPoolIndex)) &&
+                          (c_ItMap->first.u32_ListIndex == c_ItReadItem.key().u32_ListIndex)) &&
+                         (c_ItMap->first.u32_ElementIndex == c_ItReadItem.key().u32_ElementIndex))
+                     {
+                        c_NewItems.insert(c_ItMap->second, c_ItReadItem.value());
+                        break;
+                     }
                   }
+               }
+               else
+               {
+                  c_NewItems.insert(c_ItReadItem.key(), c_ItReadItem.value());
                }
             }
             else
             {
                c_NewItems.insert(c_ItReadItem.key(), c_ItReadItem.value());
             }
-         }
-         else
-         {
-            c_NewItems.insert(c_ItReadItem.key(), c_ItReadItem.value());
          }
       }
       else
@@ -2757,7 +2788,7 @@ void C_PuiSvData::FixInvalidRailConfig(void)
       if (u32_Count == 0UL)
       {
          osc_write_log_warning("fix invalid rail config",
-                               QString(
+                               static_cast<QString>(
                                   "detected and removed unused rail (node-index: %1, datapool-index: %2, list-index: %3, element-index: %4)").arg(
                                   c_ItReadItem.key().u32_NodeIndex).arg(c_ItReadItem.key().u32_DataPoolIndex).arg(
                                   c_ItReadItem.key().
@@ -2861,6 +2892,8 @@ QString C_PuiSvData::GetUniqueDashboardName(const QString & orc_Proposal) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if data element id in use
 
+   Array index is ignored for this check
+
    \param[in]  orc_Id   Data element id to search for
 
    \return
@@ -2892,13 +2925,25 @@ bool C_PuiSvData::CheckReadUsage(const C_OSCNodeDataPoolListElementId & orc_Id) 
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config =
                   pc_Widget->c_DataPoolElementsConfig[u32_ItDataElement];
-               //Check if match
-               if (rc_Config.c_ElementId == orc_Id)
+               //Check if match (array index in case of an array must be ignored in this case use explicit the
+               // base compare operator)
+               if (rc_Config.c_ElementId.CheckSameDataElement(orc_Id) == true)
                {
                   q_Retval = true;
+                  break;
                }
             }
+
+            if (q_Retval == true)
+            {
+               break;
+            }
          }
+      }
+
+      if (q_Retval == true)
+      {
+         break;
       }
    }
    return q_Retval;
@@ -2929,7 +2974,6 @@ bool C_PuiSvData::CheckNonParamReadUsage(const C_OSCNodeDataPoolListElementId & 
       for (uint32 u32_ItWidget = 0; (u32_ItWidget < c_Widgets.size()) && (q_Retval == false); ++u32_ItWidget)
       {
          const C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          if (((pc_Widget != NULL) && (pc_Widget->IsReadElement() == true)) &&
              (dynamic_cast<const C_PuiSvDbParam * const>(pc_Widget) == NULL))
          {

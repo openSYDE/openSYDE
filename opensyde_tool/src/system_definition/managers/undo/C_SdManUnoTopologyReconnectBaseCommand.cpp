@@ -124,7 +124,7 @@ C_GiLiBusConnector * C_SdManUnoTopologyReconnectBaseCommand::m_GetBusConnector(v
 
    if (c_Items.size() > 0)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       pc_Retval = dynamic_cast<C_GiLiBusConnector *>(c_Items[0]);
    }
    return pc_Retval;

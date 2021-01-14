@@ -61,9 +61,8 @@ private:
    bool mq_ShowValue;
    QFont mc_Font;
    stw_types::sintn msn_Transparence;
-   // Karsten Angang
    bool mq_TransparentBackground;
-   stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style e_Style;
+   stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style me_Style;
    bool mq_DarkMode;
    void m_SetPie(QPainter & orc_Painter, QBrush oc_PieBrush, const Qt::PenCapStyle oe_CapStyle,
                  const QRect & orc_PieCircleRect, const stw_types::float32 of32_PieWidth,
@@ -81,7 +80,6 @@ private:
                          const stw_types::float32 of32_PieGap, const stw_types::float32 of32_PieSize,
                          const stw_types::float32 of32_RimSize, const stw_types::float32 of32_GesamtPixel,
                          const stw_types::float32 of32_AdditionalFactor = static_cast<stw_types::float32>(0.0)) const;
-   // Karsten Ende
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

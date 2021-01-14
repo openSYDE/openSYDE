@@ -61,12 +61,9 @@ using namespace stw_opensyde_gui_logic;
 void C_Uti::h_Uniqueify(std::vector<uint32> & orc_Indices)
 {
    std::vector<uint32>::const_iterator c_Last;
-   //lint -e{864} Call as expected by interface
    std::sort(orc_Indices.begin(), orc_Indices.end());
 
-   //lint -e{864} Call as expected by interface
    c_Last = std::unique(orc_Indices.begin(), orc_Indices.end());
-   //lint -e{64,119,1025,1703} Function not recognized
    orc_Indices.erase(c_Last, orc_Indices.end());
 }
 
@@ -243,7 +240,7 @@ QString C_Uti::h_GetStringFromDouble(const float64 of64_Value)
       {
          // example:
          // 0,0000321 --> 0000321 --> 321 --> 3 --> index of 3 in 0000321 is 4 and this is exactly what should be added
-         QString c_HelpString = c_SplitString.at(1);
+         const QString c_HelpString = c_SplitString.at(1);
          sn_Index = c_HelpString.length() - 1;
          for (sintn sn_Pos = 0; sn_Pos < c_HelpString.length(); sn_Pos++)
          {
@@ -329,7 +326,6 @@ std::vector<uint32> C_Uti::h_UniquifyAndSortDescending(const std::vector<uint32>
    c_Retval.reserve(c_Ascending.size());
    for (uint32 u32_It = c_Ascending.size(); u32_It > 0UL; --u32_It)
    {
-      //lint -e{1960} All types as expected
       c_Retval.push_back(c_Ascending[u32_It - 1UL]);
    }
    return c_Retval;
@@ -472,11 +468,11 @@ QString C_Uti::h_GetByteCountAsString(const stw_types::uint32 ou32_ByteCount)
 
    if (ou32_ByteCount == 1)
    {
-      c_Text += QString(" Byte");
+      c_Text += static_cast<QString>(" Byte");
    }
    else
    {
-      c_Text += QString(" Bytes");
+      c_Text += static_cast<QString>(" Bytes");
    }
 
    return c_Text;
@@ -561,20 +557,20 @@ QString C_Uti::h_GetApplicationVersion(const bool oq_UseSTWFormat)
       {
          //reinterpret_cast required due to function interface
          if (VerQueryValueA(pu8_Buffer, "\\",
-                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e929
+                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e929 !e9176
                             &un_ValSize) != FALSE)
          {
             if (oq_UseSTWFormat)
             {
-               c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16),
+               c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16U),
                                         pt_Info->dwFileVersionMS & 0x0000FFFFUL,
-                                        (pt_Info->dwFileVersionLS >> 16));
+                                        (pt_Info->dwFileVersionLS >> 16U));
             }
             else
             {
-               c_Version.PrintFormatted("%d.%02d.%d", (pt_Info->dwFileVersionMS >> 16),
+               c_Version.PrintFormatted("%d.%02d.%d", (pt_Info->dwFileVersionMS >> 16U),
                                         pt_Info->dwFileVersionMS & 0x0000FFFFUL,
-                                        (pt_Info->dwFileVersionLS >> 16));
+                                        (pt_Info->dwFileVersionLS >> 16U));
             }
          }
       }
@@ -610,7 +606,8 @@ QString C_Uti::h_CheckAndReplaceWithExePathIfNecessary(const QString & orc_Path)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert text to styled link
 
-   When problems occure with \n as new line symbol using <br/> can fix the problem probably
+   There are problems when using this function together with "\n" as new line symbol, especially in text browsers.
+   Just use "<br>" instead to make it work fine.
 
    \param[in]  orc_DisplayedText    Text displayed by link
    \param[in]  orc_Color            Link color
@@ -622,7 +619,7 @@ QString C_Uti::h_CheckAndReplaceWithExePathIfNecessary(const QString & orc_Path)
 //----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetLink(const QString & orc_DisplayedText, const QColor & orc_Color, const QString & orc_HyperLink)
 {
-   const QString c_Retval = QString(
+   const QString c_Retval = static_cast<QString>(
       "<a href=\"%5\">"
       "<span style=\"color: rgba(%1,%2,%3,%4);\">" + orc_DisplayedText +
       "</span></a>").arg(
@@ -664,7 +661,7 @@ QString C_Uti::h_GetCompleteLogFileLocation(const QString & orc_Extension)
    //Final step as this step changes the format size
    c_FileBaseName = c_FileBaseName.replace(10, 1, "__");
 
-   c_Retval = QString("%1/Logs/%2").arg(C_Uti::h_GetExePath()).arg(c_FileBaseName);
+   c_Retval = static_cast<QString>("%1/Logs/%2").arg(C_Uti::h_GetExePath()).arg(c_FileBaseName);
 
    return c_Retval;
 }
@@ -726,10 +723,10 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
 
    if (orc_Path != "")
    {
-      QFileInfo c_FileInfo(orc_Path);
+      const QFileInfo c_FileInfo(orc_Path);
 
-      QFontMetrics c_FontMetrics(orc_Font);
-      QString c_Path = c_FileInfo.filePath(); // in case we have windows-style path
+      const QFontMetrics c_FontMetrics(orc_Font);
+      const QString c_Path = c_FileInfo.filePath(); // in case we have windows-style path
       // get drive name
       const QStorageInfo c_StorageInfo(c_FileInfo.absoluteDir());
       QString c_DriveName = c_StorageInfo.rootPath();
@@ -749,7 +746,8 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
       // get file name
       const QString c_FileName = c_FileInfo.fileName();
 
-      const QString c_Placeholder = QString(QChar(0x2026)) + "/"; // with horizontal ellipsis "..."
+      const QString c_Placeholder = static_cast<QString>(static_cast<QChar>(0x2026)) + "/"; // with horizontal ellipsis
+                                                                                            // "..."
 
       sintn sn_CurrentWidth;
       uint32 u32_AvailableWidth; // width excluding text margins
@@ -787,7 +785,7 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
                c_MinimizedPath = c_DriveName + c_Placeholder +
                                  c_MinimizedPath.right((c_MinimizedPath.length() - sn_DelimPos) - 1);
 
-               sn_DelimPos = QString(c_DriveName + c_Placeholder).length();
+               sn_DelimPos = static_cast<QString>(c_DriveName + c_Placeholder).length();
                sn_CurrentWidth = c_FontMetrics.width(c_MinimizedPath);
             }
             // second condition should not occur and is only defensive
@@ -821,7 +819,7 @@ QString C_Uti::h_IpAddressToString(const uint8 (&orau8_IpAddress)[4])
 {
    QString c_Result;
 
-   c_Result = QString("%1.%2.%3.%4").
+   c_Result = static_cast<QString>("%1.%2.%3.%4").
               arg(QString::number(orau8_IpAddress[0])).
               arg(QString::number(orau8_IpAddress[1])).
               arg(QString::number(orau8_IpAddress[2])).
@@ -892,7 +890,7 @@ QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QStrin
 
    if ((orc_BaseDir.isEmpty() == false) &&
        (QDir::isAbsolutePath(orc_RelativeOrAbsolutePath) == false) &&
-       (QFileInfo(orc_BaseDir).isFile() == false))
+       (static_cast<QFileInfo>(orc_BaseDir).isFile() == false))
    {
       c_Retval = orc_BaseDir + "/" + orc_RelativeOrAbsolutePath;
 
@@ -976,7 +974,7 @@ stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & 
          {
             s32_MaxDeviation = 1;
          }
-         c_Retval = c_BaseStr + '_' + C_SCLString(s32_MaxDeviation + static_cast<sint32>(1));
+         c_Retval = c_BaseStr + '_' + C_SCLString::IntToStr(s32_MaxDeviation + static_cast<sint32>(1));
       }
    }
    while (q_Conflict == true);
@@ -996,7 +994,7 @@ stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & 
 QString C_Uti::h_GetUniqueNameQ(const std::map<C_SCLString, bool> & orc_ExistingStrings,
                                 const QString & orc_ProposedName)
 {
-   C_SCLString c_Result = C_Uti::h_GetUniqueName(orc_ExistingStrings, orc_ProposedName.toStdString().c_str());
+   const C_SCLString c_Result = C_Uti::h_GetUniqueName(orc_ExistingStrings, orc_ProposedName.toStdString().c_str());
 
    return c_Result.c_str();
 }
@@ -1090,7 +1088,7 @@ std::vector<sint32> C_Uti::h_CreateAscendingIndexMap(const std::vector<uint32> &
    {
       if (orc_UnsortedIndices[u32_Index] >= c_IndexMap.size())
       {
-         uint32 u32_NewSize = orc_UnsortedIndices[u32_Index] + 1U;
+         const uint32 u32_NewSize = orc_UnsortedIndices[u32_Index] + 1U;
          c_IndexMap.resize(u32_NewSize, -1);
       }
       c_IndexMap[orc_UnsortedIndices[u32_Index]] = u32_Index;
@@ -1144,7 +1142,7 @@ bool C_Uti::h_CheckSortedAscending(const std::vector<uint32> & orc_Indices)
 //----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetAbsolutePathFromExe(const QString & orc_Path)
 {
-   QString c_Folder = C_Uti::h_GetExePath(); // always absolute
+   const QString c_Folder = C_Uti::h_GetExePath(); // always absolute
 
    return C_Uti::h_ConcatPathIfNecessary(c_Folder, orc_Path);
 }
@@ -1181,7 +1179,7 @@ bool C_Uti::h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & or
 
    if ((orc_PathIn.isEmpty() == false) && (orc_AbsoluteReferenceDir.isEmpty() == false))
    {
-      QDir c_Dir(orc_AbsoluteReferenceDir);
+      const QDir c_Dir(orc_AbsoluteReferenceDir);
       QFileInfo c_PathInfo;
 
       // check if path can be represented relative to given directory
@@ -1254,9 +1252,39 @@ QString C_Uti::h_ResolveProjIndependentPlaceholderVariables(const QString & orc_
    \return  MD5-Checksum
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_GetHashValueAsQString()
+QString C_Uti::h_GetHashValueAsQString(void)
 {
    return QString::fromStdString(stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash().c_str());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get value as hex
+
+   \param[in]  ou64_Value        Value
+   \param[in]  ou32_FieldWidth   Minimum amount of space that argument a shall occupy
+
+   \return
+   Hexadecimal representation of value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_Uti::h_GetValueAsHex(const uint64 ou64_Value, const uint8 ou8_FieldWidth)
+{
+   return "0x" + static_cast<QString>("%1").arg(ou64_Value, ou8_FieldWidth, 16, QChar('0')).toUpper();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get value as hex
+
+   \param[in]  ou64_Value        Value
+   \param[in]  ou32_FieldWidth   Minimum amount of space that argument a shall occupy
+
+   \return
+   Hexadecimal representation of value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_Uti::h_GetValueAsHex(const uint32 ou32_Value, const uint8 ou8_FieldWidth)
+{
+   return C_Uti::h_GetValueAsHex(static_cast<uint64>(ou32_Value), ou8_FieldWidth);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

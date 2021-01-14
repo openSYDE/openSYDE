@@ -24,7 +24,8 @@ namespace stw_opensyde_gui_logic
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
-typedef HWND (WINAPI * PR_HtmlHelp)(HWND, LPCSTR, UINT, DWORD);
+
+typedef HWND (WINAPI * PR_HtmlHelp)(HWND opv_Caller, LPCSTR opcn_File, UINT oun_Command, DWORD ou32_Data);
 
 class C_HeHandler
 {

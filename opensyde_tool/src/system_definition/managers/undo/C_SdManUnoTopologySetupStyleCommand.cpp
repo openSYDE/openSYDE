@@ -75,7 +75,7 @@ void C_SdManUnoTopologySetupStyleCommand::m_Restore(const QMap<uint64,
                                                                C_PuiBsTemporaryDataID> & orc_MapIDToTypeAndIndex,
                                                     const C_PuiBsElements * const opc_Snapshot)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_SdTopologyDataSnapshot * const pc_Snapshot =
       dynamic_cast<const C_SdTopologyDataSnapshot * const>(opc_Snapshot);
 
@@ -89,7 +89,7 @@ void C_SdManUnoTopologySetupStyleCommand::m_Restore(const QMap<uint64,
       for (vector<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
       {
          //Bus
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(*c_ItItem);
          if (pc_Bus != NULL)
          {
@@ -123,7 +123,7 @@ void C_SdManUnoTopologySetupStyleCommand::m_CreateMapAndSaveState(const vector<Q
                                                                   QMap<uint64, C_PuiBsTemporaryDataID> & orc_Map,
                                                                   C_PuiBsElements * const opc_Snapshot) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SdTopologyDataSnapshot * const pc_Snapshot = dynamic_cast<C_SdTopologyDataSnapshot * const>(opc_Snapshot);
 
    C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(orc_Items, orc_Map, opc_Snapshot);
@@ -137,7 +137,7 @@ void C_SdManUnoTopologySetupStyleCommand::m_CreateMapAndSaveState(const vector<Q
            ++c_ItItem)
       {
          //Bus
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          pc_Bus = dynamic_cast<C_GiLiBus *>(*c_ItItem);
          if (pc_Bus != NULL)
          {

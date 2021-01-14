@@ -103,6 +103,7 @@ public:
    stw_types::uint32 GetElementAbsoluteAddress(const stw_types::uint32 ou32_DataPoolIndex,
                                                const stw_types::uint32 ou32_ListIndex,
                                                const stw_types::uint32 ou32_ElementIndex) const;
+   const C_OSCNodeDataPool * GetHalDataPoolConst(const bool oq_SafeDatapool) const;
    const C_OSCNodeDataPool * GetComDataPoolConst(const C_OSCCanProtocol::E_Type & ore_Protocol,
                                                  const stw_types::uint32 ou32_DataPoolIndex) const;
    C_OSCNodeDataPool * GetComDataPool(const C_OSCCanProtocol::E_Type & ore_Protocol,

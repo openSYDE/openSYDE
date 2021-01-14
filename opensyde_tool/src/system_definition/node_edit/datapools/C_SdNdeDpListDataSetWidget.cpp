@@ -10,15 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include "stwtypes.h"
+#include "stwerrors.h"
 #include "C_SdNdeDpListDataSetWidget.h"
 #include "ui_C_SdNdeDpListDataSetWidget.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
+#include "C_OgeWiCustomMessage.h"
+#include "C_SdClipBoardHelper.h"
+#include "constants.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_opensyde_gui;
+using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
@@ -113,7 +119,6 @@ C_SdNdeDpListDataSetWidget::C_SdNdeDpListDataSetWidget(stw_opensyde_gui_elements
            &C_SdNdeDpListDataSetView::DoMoveLeft);
    connect(this->mpc_Ui->pc_PushButtonPaste, &QPushButton::clicked, this->mpc_Ui->pc_TableView,
            &C_SdNdeDpListDataSetView::Paste);
-   //lint -e{64,918,1025,1703} Qt interface
    connect(this->mpc_Ui->pc_TableView, &C_SdNdeDpListDataSetView::SigButtonChange, this,
            &C_SdNdeDpListDataSetWidget::m_HandleButtonChange);
 }
@@ -141,9 +146,9 @@ void C_SdNdeDpListDataSetWidget::InitStaticNames(void) const
 
    if (pc_List != NULL)
    {
-      mrc_Parent.SetTitle(QString(C_GtGetText::h_GetText("List %1")).arg(pc_List->c_Name.c_str()));
+      mrc_Parent.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("List %1")).arg(pc_List->c_Name.c_str()));
    }
-   mrc_Parent.SetSubTitle(QString(C_GtGetText::h_GetText("Dataset Configuration")));
+   mrc_Parent.SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Dataset Configuration")));
    this->mpc_Ui->pc_LabelReplacement->setText(C_GtGetText::h_GetText(
                                                  "No Dataset is declared, add any via the '+' button"));
    this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"), "");
@@ -235,7 +240,7 @@ void C_SdNdeDpListDataSetWidget::keyPressEvent(QKeyEvent * const opc_Event)
             if (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true)
             {
                q_CallOrig = false;
-               this->mpc_Ui->pc_TableView->Paste();
+               this->m_DoPaste();
                opc_Event->accept();
             }
             break;
@@ -249,7 +254,7 @@ void C_SdNdeDpListDataSetWidget::keyPressEvent(QKeyEvent * const opc_Event)
             if (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true)
             {
                q_CallOrig = false;
-               this->mpc_Ui->pc_TableView->Insert(false);
+               this->m_DoInsert();
                opc_Event->accept();
             }
             break;
@@ -279,6 +284,38 @@ void C_SdNdeDpListDataSetWidget::keyPressEvent(QKeyEvent * const opc_Event)
    {
       QWidget::keyPressEvent(opc_Event);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check whether adding additional data sets would breach the maximum number
+
+   If not show a corresponding message box and let caller know.
+
+   \param[in] ou32_NumberOfNewDataSets   number of additional data sets that shall be added
+
+   \return
+   true:   still space for additional data sets
+   false:  not enough space for additional data sets
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeDpListDataSetWidget::m_IsThereStillSpaceForDataSets(const uint32 ou32_NumberOfNewDataSets)
+{
+   bool q_Return = true;
+
+   if (((static_cast<uint32>(this->mpc_Ui->pc_TableView->model()->columnCount()) + ou32_NumberOfNewDataSets)) >
+       mu32_NODE_DATA_SET_PER_LIST_MAX)
+   {
+      C_OgeWiCustomMessage c_MessageBox(this);
+
+      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Only %1 Datasets allowed per Datapool list.")).
+                                  arg(mu32_NODE_DATA_SET_PER_LIST_MAX));
+      c_MessageBox.SetCustomMinHeight(180, 180);
+      c_MessageBox.Execute();
+
+      q_Return = false;
+   }
+
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -425,11 +462,11 @@ void C_SdNdeDpListDataSetWidget::m_OnDataSetSelectionChange(const uint32 & oru32
    }
    else if (oru32_SelectionCount == 1)
    {
-      c_Text = QString(C_GtGetText::h_GetText("1 Dataset selected"));
+      c_Text = static_cast<QString>(C_GtGetText::h_GetText("1 Dataset selected"));
    }
    else
    {
-      c_Text = QString(C_GtGetText::h_GetText("%1 Datasets selected")).arg(oru32_SelectionCount);
+      c_Text = static_cast<QString>(C_GtGetText::h_GetText("%1 Datasets selected")).arg(oru32_SelectionCount);
    }
    this->mpc_Ui->pc_SelectionLabel->setText(c_Text);
 }
@@ -461,9 +498,9 @@ void C_SdNdeDpListDataSetWidget::m_SetupContextMenu(void)
       static_cast<sintn>(Qt::Key_C));
    this->mpc_ActionPaste = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText(
-         "Paste"), this->mpc_Ui->pc_TableView, &C_SdNdeDpListDataSetView::Paste,
+         "Paste"), this, &C_SdNdeDpListDataSetWidget::m_DoPaste,
       static_cast<sintn>(Qt::CTRL) +
-      static_cast<sintn>(Qt::Key_C));
+      static_cast<sintn>(Qt::Key_V));
 
    this->mpc_ContextMenu->addSeparator();
 
@@ -511,7 +548,34 @@ void C_SdNdeDpListDataSetWidget::m_OnCustomContextMenuRequested(const QPoint & o
 /*! \brief   Handle insert action
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetWidget::m_DoInsert(void) const
+void C_SdNdeDpListDataSetWidget::m_DoInsert(void)
 {
-   this->mpc_Ui->pc_TableView->Insert(true);
+   if (m_IsThereStillSpaceForDataSets(1U) == true)
+   {
+      this->mpc_Ui->pc_TableView->Insert(true);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle paste action
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpListDataSetWidget::m_DoPaste(void)
+{
+   std::vector<stw_opensyde_core::C_OSCNodeDataPoolDataSet> c_OSCNames;
+   std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> > c_OSCDataSetValues;
+
+   //how many items does the user want to paste ?
+   if (C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(c_OSCNames,
+                                                                      c_OSCDataSetValues) == stw_errors::C_NO_ERR)
+   {
+      if (m_IsThereStillSpaceForDataSets(c_OSCNames.size()) == true)
+      {
+         this->mpc_Ui->pc_TableView->Paste();
+      }
+   }
+   else
+   {
+      //not a parseable data set information; makes not sense to try pasting anything
+   }
 }

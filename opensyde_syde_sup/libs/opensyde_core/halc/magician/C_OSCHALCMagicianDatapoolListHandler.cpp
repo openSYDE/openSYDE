@@ -16,6 +16,7 @@
 #include "stwerrors.h"
 #include "C_OSCHALCMagicianUtil.h"
 #include "C_OSCHALCMagicianDatapoolListHandler.h"
+#include "TGLUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -187,10 +188,8 @@ C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetChanNumL
 {
    C_OSCNodeDataPoolListElement * pc_Retval = NULL;
    uint32 u32_Index;
-   const sint32 s32_Result = this->m_GetListIndex(ou32_DomainIndex,
-                                                  0UL,
-                                                  0UL,
-                                                  u32_Index, C_OSCHalcDefDomain::eVA_PARAM, false, true, oq_IsSafe);
+   const sint32 s32_Result = this->m_GetListIndex(ou32_DomainIndex, 0UL, 0UL, u32_Index, C_OSCHalcDefDomain::eVA_PARAM,
+                                                  false, true, oq_IsSafe);
 
    if ((s32_Result == C_NO_ERR) && (u32_Index < orc_List.c_Elements.size()))
    {
@@ -389,6 +388,8 @@ const
                      oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_DomainValues.c_StatusValues);
                      break;
+                  default:
+                     break;
                   }
                }
                else
@@ -412,6 +413,8 @@ const
                      oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_ChannelValues.c_StatusValues);
                      break;
+                  default:
+                     break;
                   }
                }
             }
@@ -424,12 +427,12 @@ const
 
       if ((oq_GetUseCaseIndex == false) && (oq_GetChanNumIndex == false))
       {
-         const C_OSCHalcDefDomain * const pc_CurrentDomain =
+         const C_OSCHalcDefDomain * const pc_CurrentDomainDef =
             this->mrc_HalcConfig.GetDomainDefDataConst(ou32_DomainIndex);
          const C_OSCHalcConfigDomain * const pc_CurrentDomainConfig = this->mrc_HalcConfig.GetDomainConfigDataConst(
             ou32_DomainIndex);
          //Current domain
-         if ((pc_CurrentDomain != NULL) && (pc_CurrentDomainConfig != NULL))
+         if ((pc_CurrentDomainDef != NULL) && (pc_CurrentDomainConfig != NULL))
          {
             const uint32 u32_CountRelevantItems = C_OSCHALCMagicianDatapoolListHandler::h_CountRelevantItems(
                pc_CurrentDomainConfig->c_ChannelConfigs, pc_CurrentDomainConfig->c_DomainConfig, oq_IsSafe);
@@ -442,7 +445,7 @@ const
                }
 
                //usecase
-               if (C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(*pc_CurrentDomain))
+               if (C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(*pc_CurrentDomainConfig))
                {
                   oru32_ListIndex += 1UL;
                }
@@ -451,56 +454,63 @@ const
                switch (oe_Selector)
                {
                case C_OSCHalcDefDomain::eVA_PARAM:
-                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(ou32_ParameterStructIndex,
-                                                                                  ou32_ParameterStructElementIndex,
-                                                                                  pc_CurrentDomain->c_DomainValues.
-                                                                                  c_Parameters,
-                                                                                  oru32_ListIndex) == C_RANGE)
+                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                         ou32_ParameterStructIndex,
+                         ou32_ParameterStructElementIndex,
+                         pc_CurrentDomainDef->c_DomainValues.c_Parameters,
+                         oru32_ListIndex) == C_RANGE)
                   {
-                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(ou32_ParameterStructIndex,
-                                                                                              ou32_ParameterStructElementIndex,
-                                                                                              pc_CurrentDomain->c_ChannelValues.c_Parameters,
-                                                                                              oru32_ListIndex);
+                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                        ou32_ParameterStructIndex,
+                        ou32_ParameterStructElementIndex,
+                        pc_CurrentDomainDef->c_ChannelValues.c_Parameters,
+                        oru32_ListIndex);
                   }
                   break;
                case C_OSCHalcDefDomain::eVA_INPUT:
-                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(ou32_ParameterStructIndex,
-                                                                                  ou32_ParameterStructElementIndex,
-                                                                                  pc_CurrentDomain->c_DomainValues.
-                                                                                  c_InputValues,
-                                                                                  oru32_ListIndex) == C_RANGE)
+                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                         ou32_ParameterStructIndex,
+                         ou32_ParameterStructElementIndex,
+                         pc_CurrentDomainDef->c_DomainValues.c_InputValues,
+                         oru32_ListIndex) == C_RANGE)
                   {
-                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(ou32_ParameterStructIndex,
-                                                                                              ou32_ParameterStructElementIndex,
-                                                                                              pc_CurrentDomain->c_ChannelValues.c_InputValues,
-                                                                                              oru32_ListIndex);
+                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                        ou32_ParameterStructIndex,
+                        ou32_ParameterStructElementIndex,
+                        pc_CurrentDomainDef->c_ChannelValues.c_InputValues,
+                        oru32_ListIndex);
                   }
                   break;
                case C_OSCHalcDefDomain::eVA_OUTPUT:
-                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(ou32_ParameterStructIndex,
-                                                                                  ou32_ParameterStructElementIndex,
-                                                                                  pc_CurrentDomain->c_DomainValues.
-                                                                                  c_OutputValues,
-                                                                                  oru32_ListIndex) == C_RANGE)
+                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                         ou32_ParameterStructIndex,
+                         ou32_ParameterStructElementIndex,
+                         pc_CurrentDomainDef->c_DomainValues.
+                         c_OutputValues,
+                         oru32_ListIndex) == C_RANGE)
                   {
-                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(ou32_ParameterStructIndex,
-                                                                                              ou32_ParameterStructElementIndex,
-                                                                                              pc_CurrentDomain->c_ChannelValues.c_OutputValues,
-                                                                                              oru32_ListIndex);
+                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                        ou32_ParameterStructIndex,
+                        ou32_ParameterStructElementIndex,
+                        pc_CurrentDomainDef->c_ChannelValues.c_OutputValues,
+                        oru32_ListIndex);
                   }
                   break;
                case C_OSCHalcDefDomain::eVA_STATUS:
-                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(ou32_ParameterStructIndex,
-                                                                                  ou32_ParameterStructElementIndex,
-                                                                                  pc_CurrentDomain->c_DomainValues.
-                                                                                  c_StatusValues,
-                                                                                  oru32_ListIndex) == C_RANGE)
+                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                         ou32_ParameterStructIndex,
+                         ou32_ParameterStructElementIndex,
+                         pc_CurrentDomainDef->c_DomainValues.c_StatusValues,
+                         oru32_ListIndex) == C_RANGE)
                   {
-                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(ou32_ParameterStructIndex,
-                                                                                              ou32_ParameterStructElementIndex,
-                                                                                              pc_CurrentDomain->c_ChannelValues.c_StatusValues,
-                                                                                              oru32_ListIndex);
+                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                        ou32_ParameterStructIndex,
+                        ou32_ParameterStructElementIndex,
+                        pc_CurrentDomainDef->c_ChannelValues.c_StatusValues,
+                        oru32_ListIndex);
                   }
+                  break;
+               default:
                   break;
                }
             }

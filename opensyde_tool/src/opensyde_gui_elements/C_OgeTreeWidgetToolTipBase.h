@@ -31,12 +31,9 @@ public:
    C_OgeTreeWidgetToolTipBase(QWidget * const opc_Parent = NULL);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mouseMoveEvent(QMouseEvent * const opc_Event) override;
    virtual bool event(QEvent * const opc_Event) override;
    virtual bool eventFilter(QObject * const opc_Object, QEvent * const opc_Event) override;
-   //lint -restore
 
    virtual QPoint m_MapToGlobal(const QPoint & orc_LocalPos) const override;
    virtual const QHeaderView * m_Header(void) const override;

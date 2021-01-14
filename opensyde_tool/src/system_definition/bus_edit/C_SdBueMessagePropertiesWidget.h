@@ -52,6 +52,9 @@ public:
 
    void OnNodeDisconnected(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
 
+   void ConnectAllChanges(void) const;
+   void DisconnectAllChanges(void) const;
+
    std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> GetMatchingMessageIds(void) const;
 
 private:
@@ -94,8 +97,8 @@ private:
    void m_LoadFromData(void);
    void m_OnExtendedChange(const bool & orq_Extended) const;
    void m_OnTxMethodChange(const stw_types::sint32 & ors32_State) const;
-   static stw_types::sint32 h_TxMethodToIndex(const stw_opensyde_core::C_OSCCanMessage::E_TxMethodType & ore_TxMethod);
-   static stw_opensyde_core::C_OSCCanMessage::E_TxMethodType h_IndexToTxMethod(const stw_types::sint32 & ors32_Index);
+   static stw_types::sint32 mh_TxMethodToIndex(const stw_opensyde_core::C_OSCCanMessage::E_TxMethodType & ore_TxMethod);
+   static stw_opensyde_core::C_OSCCanMessage::E_TxMethodType mh_IndexToTxMethod(const stw_types::sint32 & ors32_Index);
    void m_OnNameChanged(void);
    void m_OnIdChanged(void);
    void m_OnDlcChanged(void);
@@ -114,12 +117,10 @@ private:
    void m_OnRxTimeoutValueChanged(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                                   const stw_types::uint32 ou32_DatapoolIndex,
                                   const stw_types::uint32 ou32_TimeoutValue);
-   void m_ConnectProtocolSpecificFields(void);
-   void m_DisconnectProtocolSpecificFields(void);
-   void m_ConnectNodeSpecificFields(void);
-   void m_DisconnectNodeSpecificFields(void);
-   void m_ConnectAllChanges(void);
-   void m_DisconnectAllChanges(void);
+   void m_ConnectProtocolSpecificFields(void) const;
+   void m_DisconnectProtocolSpecificFields(void) const;
+   void m_ConnectNodeSpecificFields(void) const;
+   void m_DisconnectNodeSpecificFields(void) const;
    void m_SetModeSpecificWidgetsVisible(const bool oq_BusMode) const;
    void m_SetNodeModeTransmitVisible(const bool oq_Visible) const;
    void m_SetNodeModeReceiveVisible(const bool oq_Visible) const;

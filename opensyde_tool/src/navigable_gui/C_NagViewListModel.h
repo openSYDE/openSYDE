@@ -30,9 +30,6 @@ public:
 
    void SetNumRows(const stw_types::sintn osn_Rows);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
    virtual QVariant data(const QModelIndex & orc_Index, const stw_types::sintn osn_Role =
                             static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
@@ -41,7 +38,6 @@ public:
    //Drag & drop
    virtual QStringList mimeTypes(void) const override;
    virtual QMimeData * mimeData(const QModelIndexList & orc_Indices) const override;
-   //lint -restore
 
 private:
    stw_types::sintn msn_Rows;

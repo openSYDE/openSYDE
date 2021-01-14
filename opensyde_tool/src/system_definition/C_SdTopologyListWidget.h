@@ -46,11 +46,8 @@ Q_SIGNALS:
    void SigDelete(const QPoint & orc_Pos);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void startDrag(const Qt::DropActions oc_SupportedActions) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

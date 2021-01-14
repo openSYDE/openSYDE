@@ -66,7 +66,8 @@ public:
    void AddDatabaseDbc(const QString & orc_PathDbc);
    void RemoveDatabase(const QString & orc_PathDatabase, const QString & orc_OrgPath);
    void ActivateDatabase(const QString & orc_PathDatabase, const QString & orc_OrgPath, const bool oq_Active);
-   void SetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const stw_types::uint32 ou32_BusIndex);
+   void SetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const QString & orc_OrgPath,
+                                const stw_types::uint32 ou32_BusIndex);
 
    // Logging configuration
    void AddLogFileAsc(const QString & orc_FilePath);

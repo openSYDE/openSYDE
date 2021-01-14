@@ -31,11 +31,7 @@ class C_TblModelAction :
 public:
    C_TblModelAction(QObject * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
-   //lint -restore
 
    stw_types::uint32 AddNewItem(const std::vector<stw_types::uint32> & orc_SelectedIndices);
 
@@ -125,7 +121,6 @@ protected:
    virtual void m_EndRemoveRows(const stw_types::uint32 ou32_FirstIndex, const stw_types::uint32 ou32_LastIndex);
 
    static QVariant mh_HandleHexValue(const stw_types::uint64 ou64_Value, const stw_types::sintn osn_Role);
-   static QString mh_GetValueAsHex(const stw_types::uint64 ou64_Value);
    static QVariant mh_GetBoolAsCheckStateVariant(const bool oq_Value);
    static bool mh_GetCheckStateVariantAsBool(const QVariant & orc_Value);
    stw_types::uint32 m_GetLastSelectedIndex(const std::vector<stw_types::uint32> & orc_SelectedIndices) const;

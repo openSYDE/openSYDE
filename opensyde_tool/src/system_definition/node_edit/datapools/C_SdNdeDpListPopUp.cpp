@@ -108,7 +108,6 @@ C_SdNdeDpListPopUp::C_SdNdeDpListPopUp(C_OgePopUpDialog & orc_Parent, const uint
    //Connects
    connect(this->mpc_Ui->pc_WidgetTable, &C_SdNdeDpListTableWidget::SigSelectionChanged, this,
            &C_SdNdeDpListPopUp::m_HandleSelection);
-   //lint -e{64,918,1025,1703}  Qt interface
    connect(this->mpc_Ui->pc_WidgetTable, &C_SdNdeDpListTableWidget::SigButtonChange, this,
            &C_SdNdeDpListPopUp::m_HandleButtonChange);
    connect(this->mpc_Ui->pc_WidgetTable, &C_SdNdeDpListTableWidget::SigSizeChangePossible,
@@ -381,13 +380,13 @@ void C_SdNdeDpListPopUp::m_HandleSelection(const uint32 & oru32_ListIndex, const
       else if (oru32_Count == 1)
       {
          //Translation: 1: Data element type
-         c_Text = QString(C_GtGetText::h_GetText("1 %1 selected")).arg(c_Type);
+         c_Text = static_cast<QString>(C_GtGetText::h_GetText("1 %1 selected")).arg(c_Type);
       }
       else
       {
          //Translation: 1: Number of selected items 2: Data element type
          c_Text =
-            QString(C_GtGetText::h_GetText("%1 %2s selected")).arg(oru32_Count).arg(c_Type);
+            static_cast<QString>(C_GtGetText::h_GetText("%1 %2s selected")).arg(oru32_Count).arg(c_Type);
       }
       this->mpc_Ui->pc_SelectionLabel->setText(c_Text);
       this->mpc_Ui->pc_SelectionLabel->setVisible(q_Visible);
@@ -442,5 +441,4 @@ void C_SdNdeDpListPopUp::m_OpenColorPicker(void)
    {
       c_Popup->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_ColorWidget and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_ColorWidget and the Qt memory management

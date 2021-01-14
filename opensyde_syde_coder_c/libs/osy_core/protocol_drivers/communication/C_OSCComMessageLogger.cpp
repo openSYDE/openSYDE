@@ -314,6 +314,8 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
                u32_UsedBusIndex = u32_FirstBusIndex;
             }
 
+            // Adapt ECeS messages
+            mh_PostProcessSysDef(c_SysDef);
             // Save the system definition
             this->m_InsertOsySysDef(orc_PathSystemDefinition, c_SysDef, u32_UsedBusIndex);
          }
@@ -1449,4 +1451,114 @@ void C_OSCComMessageLogger::m_ResetCounter(void)
 {
    std::fill(this->mc_MsgCounterStandardId.begin(), this->mc_MsgCounterStandardId.end(), 0U);
    this->mc_MsgCounterExtendedId.clear();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Post process a loaded openSYDE system definition.
+
+   More precisely, manipulate all messages of protocol ECeS by adding two signals for message counter and checksum.
+
+   \param[in,out]  orc_SystemDefinition   System definition
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCComMessageLogger::mh_PostProcessSysDef(C_OSCSystemDefinition & orc_SystemDefinition)
+{
+   // indices
+   uint32 u32_ItNodes;
+   uint32 u32_ItInterfaces;
+   uint32 u32_ItProtocols;
+   uint32 u32_ItMessages;
+   C_OSCCanMessageIdentificationIndices c_Id;
+
+   // for all nodes
+   for (u32_ItNodes = 0; u32_ItNodes < orc_SystemDefinition.c_Nodes.size(); u32_ItNodes++)
+   {
+      C_OSCNode & rc_Node = orc_SystemDefinition.c_Nodes[u32_ItNodes];
+      c_Id.u32_NodeIndex = u32_ItNodes;
+
+      // for all interfaces of this node
+      for (u32_ItInterfaces = 0; u32_ItInterfaces < rc_Node.c_Properties.c_ComInterfaces.size(); u32_ItInterfaces++)
+      {
+         c_Id.u32_InterfaceIndex = u32_ItInterfaces;
+
+         // for all protocols of this node
+         for (u32_ItProtocols = 0; u32_ItProtocols < rc_Node.c_ComProtocols.size(); u32_ItProtocols++)
+         {
+            const C_OSCCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u32_ItProtocols];
+
+            if (rc_Protocol.e_Type == C_OSCCanProtocol::eECES)
+            {
+               c_Id.u32_DatapoolIndex = rc_Protocol.u32_DataPoolIndex;
+               c_Id.e_ComProtocol = rc_Protocol.e_Type;
+
+               // one container for each interface
+               if (u32_ItInterfaces < rc_Protocol.c_ComMessages.size())
+               {
+                  const C_OSCCanMessageContainer & rc_Container = rc_Protocol.c_ComMessages[u32_ItInterfaces];
+
+                  // Tx messages
+                  for (u32_ItMessages = 0; u32_ItMessages < rc_Container.c_TxMessages.size(); u32_ItMessages++)
+                  {
+                     const C_OSCCanMessage & rc_Message = rc_Container.c_TxMessages[u32_ItMessages];
+                     c_Id.q_MessageIsTx = true;
+                     c_Id.u32_MessageIndex = u32_ItMessages;
+                     mh_AddSpecialECeSSignals(rc_Node, c_Id, rc_Message.c_Signals.size());
+                  }
+                  // Rx messages
+                  for (u32_ItMessages = 0; u32_ItMessages < rc_Container.c_RxMessages.size(); u32_ItMessages++)
+                  {
+                     const C_OSCCanMessage & rc_Message = rc_Container.c_RxMessages[u32_ItMessages];
+                     c_Id.q_MessageIsTx = false;
+                     c_Id.u32_MessageIndex = u32_ItMessages;
+                     mh_AddSpecialECeSSignals(rc_Node, c_Id, rc_Message.c_Signals.size());
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add two signals incl. their Datapool elements for message counter and checksum to a message.
+
+   \param[in,out]  orc_Node            Node
+   \param[in]      orc_Id              Message identification indices
+   \param[in]      ou32_SignalIndex    Signal index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCComMessageLogger::mh_AddSpecialECeSSignals(C_OSCNode & orc_Node,
+                                                     const C_OSCCanMessageIdentificationIndices & orc_Id,
+                                                     const uint32 ou32_SignalIndex)
+{
+   // create signals incl. datapool element
+   C_OSCCanSignal c_MessageCounterSig;
+   C_OSCCanSignal c_ChecksumSig;
+   C_OSCNodeDataPoolListElement c_MessageCounterElement;
+   C_OSCNodeDataPoolListElement c_ChecksumElement;
+
+   c_MessageCounterSig.e_ComByteOrder = C_OSCCanSignal::eBYTE_ORDER_INTEL;
+   c_MessageCounterSig.u16_ComBitLength = 8;
+   c_MessageCounterSig.u16_ComBitStart = 48;
+   c_MessageCounterElement.c_Name = "ECeS_Message_Counter";
+   c_MessageCounterElement.c_Comment =
+      "Automatically generated signal to represent message counter signal of the ECeS Message.";
+
+   c_ChecksumSig.e_ComByteOrder = C_OSCCanSignal::eBYTE_ORDER_INTEL;
+   c_ChecksumSig.u16_ComBitLength = 8;
+   c_ChecksumSig.u16_ComBitStart = 56;
+   c_ChecksumElement.c_Name = "ECeS_Checksum";
+   c_ChecksumElement.c_Comment =
+      "Automatically generated signal to represent CRC checksum signal of the ECeS Message.";
+
+   // insert signals
+   sint32 s32_Result;
+   s32_Result = orc_Node.InsertSignal(orc_Id.e_ComProtocol, orc_Id.u32_InterfaceIndex, orc_Id.u32_DatapoolIndex,
+                                      orc_Id.q_MessageIsTx, orc_Id.u32_MessageIndex, ou32_SignalIndex,
+                                      c_MessageCounterSig, c_MessageCounterElement);
+   tgl_assert(s32_Result == C_NO_ERR);
+   s32_Result = orc_Node.InsertSignal(orc_Id.e_ComProtocol, orc_Id.u32_InterfaceIndex, orc_Id.u32_DatapoolIndex,
+                                      orc_Id.q_MessageIsTx, orc_Id.u32_MessageIndex, ou32_SignalIndex + 1,
+                                      c_ChecksumSig, c_ChecksumElement);
+   tgl_assert(s32_Result == C_NO_ERR);
 }

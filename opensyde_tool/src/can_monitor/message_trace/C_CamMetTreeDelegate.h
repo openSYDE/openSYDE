@@ -33,12 +33,9 @@ public:
    C_CamMetTreeDelegate(QObject * const opc_Parent = NULL);
    ~C_CamMetTreeDelegate(void);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                       const QModelIndex & orc_Index) const override;
    virtual QSize sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

@@ -74,10 +74,10 @@ C_GiSvDaLabelBase::C_GiSvDaLabelBase(const uint32 & oru32_ViewIndex, const uint3
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_LabelWidget by calling SetWidget and the Qt memory
+// management
 C_GiSvDaLabelBase::~C_GiSvDaLabelBase(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_LabelWidget by calling SetWidget and the Qt memory
-   // management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ void C_GiSvDaLabelBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_St
    // Apply style before calling the base function (required so size call can work properly)
    if (this->ms32_Index >= 0)
    {
-      const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+      const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
       if (pc_Dashboard != NULL)
       {
          const C_PuiSvDbLabel * const pc_Box = pc_Dashboard->GetLabel(static_cast<uint32>(this->ms32_Index));
@@ -136,7 +136,7 @@ void C_GiSvDaLabelBase::ReInitializeSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaLabelBase::LoadData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -161,7 +161,7 @@ void C_GiSvDaLabelBase::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaLabelBase::UpdateData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -265,7 +265,7 @@ void C_GiSvDaLabelBase::ConnectionActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaLabelBase::CallProperties(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -356,8 +356,7 @@ bool C_GiSvDaLabelBase::CallProperties(void)
          {
             c_New->HideOverlay();
          }
-         //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-      }
+      }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    }
    return true;
 }
@@ -451,17 +450,31 @@ void C_GiSvDaLabelBase::m_UpdateCaption(const C_PuiSvDbLabel & orc_Data) const
                                                                           rc_CurItem.c_ElementId.u32_DataPoolIndex,
                                                                           rc_CurItem.c_ElementId.u32_ListIndex,
                                                                           rc_CurItem.c_ElementId.u32_ElementIndex);
+            const C_OSCNodeDataPool * pc_Datapool =
+               C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(rc_CurItem.c_ElementId.u32_NodeIndex,
+                                                               rc_CurItem.c_ElementId.u32_DataPoolIndex);
+
             if (pc_Element != NULL)
             {
                QString c_Caption;
-               if (rc_CurItem.c_ElementId.GetUseArrayElementIndex())
+               if (pc_Datapool != NULL)
                {
-                  c_Caption = QString("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
-                     rc_CurItem.c_ElementId.GetArrayElementIndex());
-               }
-               else
-               {
-                  c_Caption = pc_Element->c_Name.c_str();
+                  if (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC)
+                  {
+                     c_Caption = C_PuiSvHandler::h_GetShortNamespace(rc_CurItem.c_ElementId);
+                  }
+                  else
+                  {
+                     if (rc_CurItem.c_ElementId.GetUseArrayElementIndex())
+                     {
+                        c_Caption = static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                           rc_CurItem.c_ElementId.GetArrayElementIndex());
+                     }
+                     else
+                     {
+                        c_Caption = pc_Element->c_Name.c_str();
+                     }
+                  }
                }
                this->mpc_LabelWidget->SetCaption(c_Caption);
             }

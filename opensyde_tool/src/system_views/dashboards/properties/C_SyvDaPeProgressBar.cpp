@@ -307,6 +307,4 @@ void C_SyvDaPeProgressBar::m_UpdatePreview(void)
    // add item
    this->mrc_ParentDialog.GetPreviewScene()->addItem(pc_Item);
    this->mrc_ParentDialog.GetPreviewScene()->clearSelection();
-
-   //lint -e{429}  no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management

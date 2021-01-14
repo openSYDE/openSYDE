@@ -111,9 +111,9 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
          {
             orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid View:");
             orc_ErrorLabelText =
-               QString(C_GtGetText::h_GetText(
-                          "There are Data Blocks defined for %1"
-                          " but there are no interfaces which support update for these nodes."))
+               static_cast<QString>(C_GtGetText::h_GetText(
+                                       "There are Data Blocks defined for %1"
+                                       " but there are no interfaces which support update for these nodes."))
                .arg(c_ErrorText);
          }
       }
@@ -244,15 +244,18 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
                {
                case 0:
                   //Translation: 1 = Time in milliseconds
-                  c_CyclicText = QString(C_GtGetText::h_GetText("Fast - %1 ms")).arg(pc_View->GetUpdateRateFast());
+                  c_CyclicText = static_cast<QString>(C_GtGetText::h_GetText("Fast - %1 ms")).arg(
+                     pc_View->GetUpdateRateFast());
                   break;
                case 1:
                   //Translation: 1 = Time in milliseconds
-                  c_CyclicText = QString(C_GtGetText::h_GetText("Medium - %1 ms")).arg(pc_View->GetUpdateRateMedium());
+                  c_CyclicText = static_cast<QString>(C_GtGetText::h_GetText("Medium - %1 ms")).arg(
+                     pc_View->GetUpdateRateMedium());
                   break;
                case 2:
                   //Translation: 1 = Time in milliseconds
-                  c_CyclicText = QString(C_GtGetText::h_GetText("Slow - %1 ms")).arg(pc_View->GetUpdateRateSlow());
+                  c_CyclicText = static_cast<QString>(C_GtGetText::h_GetText("Slow - %1 ms")).arg(
+                     pc_View->GetUpdateRateSlow());
                   break;
                default:
                   c_CyclicText = "";
@@ -266,7 +269,7 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
                   break;
                case C_PuiSvReadDataConfiguration::eTM_CYCLIC:
                   //Translation: 1 = Additional information
-                  c_Text = QString(C_GtGetText::h_GetText("Cyclic (%1)")).arg(c_CyclicText);
+                  c_Text = static_cast<QString>(C_GtGetText::h_GetText("Cyclic (%1)")).arg(c_CyclicText);
                   break;
                case C_PuiSvReadDataConfiguration::eTM_ON_CHANGE:
                   //Additional text for threshold type
@@ -311,7 +314,8 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
                      }
                   }
                   //Translation: 1 = Additional information, 2 = Threshold value
-                  c_Text = QString(C_GtGetText::h_GetText("Cyclic on change (%1),Threshold: %2")).arg(c_CyclicText).arg(
+                  c_Text = static_cast<QString>(C_GtGetText::h_GetText("Cyclic on change (%1),Threshold: %2")).arg(
+                     c_CyclicText).arg(
                      c_ThresholdText);
                   break;
                }
@@ -333,16 +337,18 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
                switch (pc_Message->e_TxMethod)
                {
                case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
-                  c_Retval = QString(C_GtGetText::h_GetText("On Event"));
+                  c_Retval = static_cast<QString>(C_GtGetText::h_GetText("On Event"));
                   break;
                case C_OSCCanMessage::eTX_METHOD_CYCLIC:
-                  c_Retval = QString(C_GtGetText::h_GetText("Cyclic (%1 ms)")).arg(pc_Message->u32_CycleTimeMs);
+                  c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Cyclic (%1 ms)")).arg(
+                     pc_Message->u32_CycleTimeMs);
                   break;
                case C_OSCCanMessage::eTX_METHOD_ON_CHANGE:
                   //Translation1: Timeout, 2: Minimum delay, 3: "greater than or equal" - sign, 4: "less than or equal"
                   // - sign
                   c_Retval =
-                     QString(C_GtGetText::h_GetText("On Change (%3 %2 ms; %4 %1 ms)")).arg(pc_Message->u32_CycleTimeMs).
+                     static_cast<QString>(C_GtGetText::h_GetText("On Change (%3 %2 ms; %4 %1 ms)")).arg(
+                        pc_Message->u32_CycleTimeMs).
                      arg(
                         pc_Message->u16_DelayTimeMs).arg(QChar(0x2265)).arg(QChar(0x2264));
                   break;
@@ -377,12 +383,12 @@ QString C_SyvUtil::h_GetCommonDashboardItemToolTip(const uint32 ou32_ViewIndex,
    c_DashboardDescription = C_GtGetText::h_GetText("Visualization Properties: \n");
 
    //Source
-   c_DashboardDescription += QString("   ") + C_GtGetText::h_GetText("Source: ");
+   c_DashboardDescription += static_cast<QString>("   ") + C_GtGetText::h_GetText("Source: ");
    c_DashboardDescription += C_PuiSvHandler::h_GetNamespace(orc_Id);
    c_DashboardDescription += "\n";
 
    //Update Mode
-   c_DashboardDescription += QString("   ") + C_GtGetText::h_GetText("Update mode: ");
+   c_DashboardDescription += static_cast<QString>("   ") + C_GtGetText::h_GetText("Update mode: ");
 
    if (oq_ReadItem == true)
    {
@@ -423,20 +429,20 @@ void C_SyvUtil::h_GetViewDisplayName(const uint32 ou32_ViewIndex, const sint32 o
       switch (os32_SubMode)
       {
       case ms32_SUBMODE_SYSVIEW_SETUP:
-         orc_SubSubMode = QString(C_GtGetText::h_GetText("Setup"));
+         orc_SubSubMode = static_cast<QString>(C_GtGetText::h_GetText("Setup"));
          break;
       case ms32_SUBMODE_SYSVIEW_UPDATE:
-         orc_SubSubMode = QString(C_GtGetText::h_GetText("Update"));
+         orc_SubSubMode = static_cast<QString>(C_GtGetText::h_GetText("Update"));
          break;
       case ms32_SUBMODE_SYSVIEW_DASHBOARD:
-         orc_SubSubMode = QString(C_GtGetText::h_GetText("Dashboards (%1)")).arg(pc_View->GetDashboards().size());
+         orc_SubSubMode = static_cast<QString>(C_GtGetText::h_GetText("Dashboards (%1)")).arg(pc_View->GetDashboards().size());
          break;
       default:
          //Skip addendum
          orc_SubSubMode = "";
          break;
       }
-      orc_SubMode = QString(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(ou32_ViewIndex + 1UL).arg(pc_View->GetName());
+      orc_SubMode = static_cast<QString>(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(ou32_ViewIndex + 1UL).arg(pc_View->GetName());
    }
 }
 

@@ -93,7 +93,7 @@ void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> 
    for (sn_Counter = (sn_ItemCount - 1); sn_Counter >= 0; --sn_Counter)
    {
       QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(sn_Counter);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
          dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget *>(pc_Item->widget());
       this->mpc_Ui->pc_CbxVerticalLayout->removeItem(pc_Item);
@@ -101,7 +101,6 @@ void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> 
       if (pc_SelectorItem != NULL)
       {
          // delete the widget
-         //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
          disconnect(pc_SelectorItem, &C_SdBueNodeSelectorCheckBoxItemWidget::SigNodeToggled,
                     this, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled);
          delete pc_SelectorItem;
@@ -123,8 +122,7 @@ void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> 
       this->mpc_Ui->pc_CbxVerticalLayout->addSpacerItem(pc_Spacer);
       this->mpc_Ui->pc_CbxVerticalLayout->setStretch(this->mpc_Ui->pc_CbxVerticalLayout->count() - 1, 1);
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Spacer by addSpacerItem and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Spacer by addSpacerItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks nodes in the checkbox list
@@ -148,7 +146,7 @@ void C_SdBueNodeSelectorCheckBoxListWidget::CheckNodes(const std::vector<uint32>
       for (sn_Counter = (sn_ItemCount - 1); sn_Counter >= 0; --sn_Counter)
       {
          QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(sn_Counter);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
             dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget *>(pc_Item->widget());
 
@@ -191,7 +189,7 @@ void C_SdBueNodeSelectorCheckBoxListWidget::CheckSpecificNode(const uint32 ou32_
    for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_CbxVerticalLayout->count(); ++sn_Counter)
    {
       QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(sn_Counter);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
          dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget *>(pc_Item->widget());
 
@@ -229,7 +227,7 @@ const
       QLayoutItem * const pc_Layout = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(s32_ItItem);
       if (pc_Layout != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
             dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget * const>(pc_Layout->widget());
          if (pc_SelectorItem != NULL)
@@ -251,7 +249,7 @@ void C_SdBueNodeSelectorCheckBoxListWidget::Refresh(void) const
       QLayoutItem * const pc_Layout = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(s32_ItItem);
       if (pc_Layout != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
             dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget * const>(pc_Layout->widget());
          if (pc_SelectorItem != NULL)
@@ -271,19 +269,18 @@ void C_SdBueNodeSelectorCheckBoxListWidget::Refresh(void) const
 void C_SdBueNodeSelectorCheckBoxListWidget::m_AddNode(const QString & orc_Name, const uint32 ou32_Index,
                                                       const uint32 ou32_SubIndex)
 {
-   C_SdBueNodeSelectorCheckBoxItemWidget * pc_SelectorItem = new C_SdBueNodeSelectorCheckBoxItemWidget(ou32_Index,
-                                                                                                       ou32_SubIndex,
-                                                                                                       orc_Name,
-                                                                                                       this);
+   C_SdBueNodeSelectorCheckBoxItemWidget * pc_SelectorItem =
+      new C_SdBueNodeSelectorCheckBoxItemWidget(ou32_Index,
+                                                ou32_SubIndex,
+                                                orc_Name,
+                                                this);
 
-   //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(pc_SelectorItem, &C_SdBueNodeSelectorCheckBoxItemWidget::SigNodeToggled,
            this, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled);
 
    this->mpc_Ui->pc_CbxVerticalLayout->addWidget(pc_SelectorItem);
 
-   //lint -e{429}  no memory leak because of the parent of pc_SelectorItem by addWidget and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_SelectorItem by addWidget and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::m_ScrollBarRangeChanged(const sintn osn_Min, const sintn osn_Max) const

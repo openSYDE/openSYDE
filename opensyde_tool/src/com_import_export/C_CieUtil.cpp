@@ -10,6 +10,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <QApplication>
+
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_CieUtil.h"
@@ -42,6 +44,7 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
+using namespace stw_scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QSize C_CieUtil::mhc_SIZE_REPORT(1210, 790);
@@ -87,7 +90,7 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_BusIndex, const C_OSCCanProtoco
    //Load user settings value
    QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownImportPath();
    // open file selector with DBC filter
-   const QString c_Filter = QString(C_GtGetText::h_GetText("COMM Messages Files")) +
+   const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("COMM Messages Files")) +
                             " (*.dbc *.eds *.dcf)";
    sint32 s32_Return = C_NOACT;
 
@@ -155,8 +158,8 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
 {
    //Load user settings value
    QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownExportPath();
-   const QString c_FilterName = QString(C_GtGetText::h_GetText("openSYDE DBC export")) + " (*.dbc)";
-   const QString c_DefaultFilename = QString(orc_CommDef.c_Bus.c_Name.c_str()) + ".dbc";
+   const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("openSYDE DBC export")) + " (*.dbc)";
+   const QString c_DefaultFilename = static_cast<QString>(orc_CommDef.c_Bus.c_Name.c_str()) + ".dbc";
    QString c_FullFilePath;
    sint32 s32_Return = C_NOACT;
 
@@ -181,8 +184,8 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
       C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownExportPath(c_FileInfo.absoluteDir().absolutePath());
       if (c_Extension == "dbc")
       {
-         stw_scl::C_SCLString c_Error;
-         stw_scl::C_SCLStringList c_Warnings;
+         C_SCLString c_Error;
+         C_SCLStringList c_Warnings;
 
          // import network of DBC file
          QApplication::setOverrideCursor(Qt::WaitCursor); // big DBC file can take some time to load
@@ -194,13 +197,13 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
 
          if ((s32_Return == C_NO_ERR) || (s32_Return == C_WARN))
          {
-            std::map<stw_scl::C_SCLString, stw_scl::C_SCLString> c_NodeMapping;
+            std::map<C_SCLString, C_SCLString> c_NodeMapping;
             sint32 s32_Tmp = C_CieExportDbc::h_GetNodeMapping(c_NodeMapping);
 
             tgl_assert(s32_Tmp == C_NO_ERR);
             if (s32_Tmp == C_NO_ERR)
             {
-               uint32 u32_NumOfOutputNodes = static_cast<uint32>(c_NodeMapping.size());
+               const uint32 u32_NumOfOutputNodes = static_cast<uint32>(c_NodeMapping.size());
 
                C_CieExportDbc::C_ExportStatistic c_ExportStatistic;
                s32_Tmp = C_CieExportDbc::h_GetExportStatistic(c_ExportStatistic);
@@ -208,8 +211,8 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
 
                if (s32_Tmp == C_NO_ERR)
                {
-                  uint32 u32_NumOfOutputMessages = c_ExportStatistic.u32_NumOfMessages;
-                  uint32 u32_NumOfOutputSignals = c_ExportStatistic.u32_NumOfSignals;
+                  const uint32 u32_NumOfOutputMessages = c_ExportStatistic.u32_NumOfMessages;
+                  const uint32 u32_NumOfOutputSignals = c_ExportStatistic.u32_NumOfSignals;
 
                   // check number of input and output items
                   if ((ou32_NumOfNodes != u32_NumOfOutputNodes) ||
@@ -219,21 +222,22 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
                      // build up additional warnings (there can be also one from export itself)
                      if (ou32_NumOfNodes != u32_NumOfOutputNodes)
                      {
-                        c_Warnings.Add("Number of input nodes (" + stw_scl::C_SCLString(ou32_NumOfNodes) +
+                        c_Warnings.Add("Number of input nodes (" + C_SCLString::IntToStr(ou32_NumOfNodes) +
                                        ") does not match number of exported nodes (" +
-                                       stw_scl::C_SCLString(u32_NumOfOutputNodes) + ").");
+                                       C_SCLString::IntToStr(u32_NumOfOutputNodes) + ").");
                      }
                      if (ou32_NumOfMessages != u32_NumOfOutputMessages)
                      {
-                        c_Warnings.Add("Number of input messages (" + stw_scl::C_SCLString(ou32_NumOfMessages) +
+                        c_Warnings.Add("Number of input messages (" + C_SCLString::IntToStr(
+                                          ou32_NumOfMessages) +
                                        ") does not match number of exported messages (" +
-                                       stw_scl::C_SCLString(u32_NumOfOutputMessages) + ").");
+                                       C_SCLString::IntToStr(u32_NumOfOutputMessages) + ").");
                      }
                      if (ou32_NumOfSignals != u32_NumOfOutputSignals)
                      {
-                        c_Warnings.Add("Number of input signals (" + stw_scl::C_SCLString(ou32_NumOfSignals) +
+                        c_Warnings.Add("Number of input signals (" + C_SCLString::IntToStr(ou32_NumOfSignals) +
                                        ") does not match number of exported signals (" +
-                                       stw_scl::C_SCLString(u32_NumOfOutputSignals) + ").");
+                                       C_SCLString::IntToStr(u32_NumOfOutputSignals) + ").");
                      }
                   }
                }
@@ -260,8 +264,7 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
                {
                   c_PopUpDialogReportDialog->HideOverlay();
                }
-               //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-            }
+            } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
          }
          else
          {
@@ -278,7 +281,7 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
       {
          C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
          c_Message.SetDescription(C_GtGetText::h_GetText("The specified file has the wrong extension, use: \".dbc\"."));
-         c_Message.SetDetails(QString("Invalid extension: \"%1\"").arg("." + c_Extension));
+         c_Message.SetDetails(static_cast<QString>("Invalid extension: \"%1\"").arg("." + c_Extension));
          c_Message.SetCustomMinHeight(180, 250);
          c_Message.Execute();
       }
@@ -311,8 +314,8 @@ sint32 C_CieUtil::mh_ImportDBCFile(const uint32 ou32_BusIndex, const C_OSCCanPro
    sint32 s32_ImportReturn;
 
    C_CieConverter::C_CIECommDefinition c_CommDef;
-   stw_scl::C_SCLStringList c_WarningMessages;
-   stw_scl::C_SCLString c_ErrorMessage;
+   C_SCLStringList c_WarningMessages;
+   C_SCLString c_ErrorMessage;
 
    // import network of DBC file
    QApplication::setOverrideCursor(Qt::WaitCursor); // big DBC file can take some time to load
@@ -423,19 +426,17 @@ sint32 C_CieUtil::mh_ImportDBCFile(const uint32 ou32_BusIndex, const C_OSCCanPro
             {
                c_PopUpDialogReportDialog->HideOverlay();
             }
-            //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-         }
+         } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
          if (c_PopUpDialogNodeAssignment != NULL)
          {
             c_PopUpDialogNodeAssignment->HideOverlay();
          }
-         //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-      }
+      } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    }
    else
    {
       // display error message to user
-      QString c_ErrorMsg =  c_ErrorMessage.c_str();
+      const QString c_ErrorMsg = c_ErrorMessage.c_str();
       C_OgeWiCustomMessage c_MessageResult(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
       c_MessageResult.SetHeading(C_GtGetText::h_GetText("DBC file import"));
       c_MessageResult.SetDescription(C_GtGetText::h_GetText("DBC file import error occurred."));
@@ -500,12 +501,12 @@ sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCan
          {
             const C_OSCNodeComInterfaceSettings & rc_CurInterface =
                pc_Node->c_Properties.c_ComInterfaces[u32_InterfaceIndex];
-            stw_scl::C_SCLString c_ParsingError;
+            C_SCLString c_ParsingError;
             std::vector<C_OSCCanMessage> c_OSCRxMessageData;
             std::vector<C_OSCNodeDataPoolListElement> c_OSCRxSignalData;
             std::vector<C_OSCCanMessage> c_OSCTxMessageData;
             std::vector<C_OSCNodeDataPoolListElement> c_OSCTxSignalData;
-            std::vector<std::vector<stw_scl::C_SCLString> > c_ImportMessagesPerMessage;
+            std::vector<std::vector<C_SCLString> > c_ImportMessagesPerMessage;
             const sint32 s32_ImportResult = C_OSCImportEdsDcf::h_Import(
                orc_FullFilePath.toStdString().c_str(), rc_CurInterface.u8_NodeID, c_OSCRxMessageData,
                c_OSCRxSignalData, c_OSCTxMessageData, c_OSCTxSignalData, c_ImportMessagesPerMessage,
@@ -546,8 +547,7 @@ sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCan
                   {
                      c_New->HideOverlay();
                   }
-                  //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-               }
+               } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
                else
                {
                   C_OgeWiCustomMessage c_Message(opc_Parent);
@@ -565,12 +565,12 @@ sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCan
                {
                case C_RANGE:
                   c_Message.SetDescription(C_GtGetText::h_GetText("Invalid parameter."));
-                  c_Message.SetDetails(QString(c_ParsingError.c_str()));
+                  c_Message.SetDetails(static_cast<QString>(c_ParsingError.c_str()));
                   c_Message.SetCustomMinHeight(180, 300);
                   break;
                case C_NOACT:
-                  c_Message.SetDescription(QString(C_GtGetText::h_GetText(
-                                                      "EDS file import failed.\nNode ID %1 is invalid.")).arg(
+                  c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                   "EDS file import failed.\nNode ID %1 is invalid.")).arg(
                                               rc_CurInterface.u8_NodeID));
                   c_Message.SetDetails(C_GtGetText::h_GetText("CANopen standard only supports node IDs in the range "
                                                               "of 1 to 127.\nThe node ID can be changed in node "
@@ -581,7 +581,8 @@ sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCan
                   c_Message.SetDescription(C_GtGetText::h_GetText("An error occured while parsing."));
                   //Update log file
                   C_OSCLoggingHandler::h_Flush();
-                  c_Message.SetDetails(QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
+                  c_Message.SetDetails(static_cast<QString>(
+                                          "%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
                                        arg(C_GtGetText::h_GetText("For more information see ")).
                                        arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                                        arg(mc_STYLESHEET_GUIDE_COLOR_LINK).

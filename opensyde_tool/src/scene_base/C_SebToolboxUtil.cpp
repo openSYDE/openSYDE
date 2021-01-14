@@ -78,8 +78,7 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
          pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LabelSize);
          sn_Index = opc_Layout->indexOf(pc_Heading);
          opc_Layout->setStretch(sn_Index, 0);
-         //lint -e{429}  no memory leak because of the parent of pc_Heading and the Qt memory management
-      }
+      } //lint !e429  //no memory leak because of the parent of pc_Heading and the Qt memory management
       else
       {
          // Configure
@@ -92,9 +91,8 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
       orc_ListWidgets.push_back(pc_Retval);
       sn_Index = opc_Layout->indexOf(pc_Retval);
       opc_Layout->setStretch(sn_Index, 0);
-      //lint -e{429}  no memory leak because of the parent of pc_Heading,the call of addWidget and the Qt memory
-      // management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Heading,the call of addWidget and the Qt memory
+     // management
 
    return pc_Retval;
 }
@@ -128,10 +126,8 @@ C_OgeFrameSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name
       {
          QSpacerItem * const pc_SpacerTop = new QSpacerItem(0, C_SebToolboxUtil::hsn_HeadingSpacerSizeTop);
          opc_Layout->addSpacerItem(pc_SpacerTop);
-         //lint -e{429}  no memory leak because of the parent of pc_SpacerTop, the call of addSpacerItem and the Qt
-         // memory management
-      }
-
+      } //lint !e429  //no memory leak because of the parent of pc_Heading,the call of addWidget and the Qt memory
+      //management
       // Set name to heading
       pc_Heading->setText(orc_Name);
 
@@ -150,9 +146,8 @@ C_OgeFrameSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name
       opc_Layout->addLayout(pc_FrameLayout);
       pc_FrameLayout->setContentsMargins(13, 0, 0, 0);
 
-      //lint -e{429}  no memory leak because of the parent of the call of addSpacerItem and the Qt
-      // memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of the call of addSpacerItem and the Qt
+   // memory management
    return pc_FrameSeparator;
 }
 
@@ -312,7 +307,7 @@ void C_SebToolboxUtil::h_AddFinalSpacer(QVBoxLayout * const opc_Layout, QListWid
       opc_Layout->insertSpacing(sn_Index, 10);
 
       // configure spacer
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       pc_Spacer = dynamic_cast<QSpacerItem *>(opc_Layout->itemAt(sn_Index));
       if (pc_Spacer != NULL)
       {

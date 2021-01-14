@@ -126,6 +126,7 @@ stw_opensyde_gui--C_SyvDaPeUpdateModeTableView QHeaderView,
 stw_opensyde_gui--C_SdNdeDpListTableView QHeaderView,
 stw_opensyde_gui--C_TblTreDataElementView QHeaderView,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView QHeaderView,
+stw_opensyde_gui--C_SdCodeGenerationView QHeaderView,
 stw_opensyde_gui--C_SyvDaItTaView QHeaderView,
 stw_opensyde_gui--C_SyvDaItPaTreeView QHeaderView,
 stw_opensyde_gui--C_SdNdeDpListDataSetView QHeaderView,
@@ -136,6 +137,7 @@ stw_opensyde_gui--C_SdBueMessageRxTimeoutConfig,
 stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget,
 stw_opensyde_gui--C_SdNdeHalcDefUpdateDialog,
 stw_opensyde_gui--C_SdNdeHalcConfigImportDialog,
+stw_opensyde_gui--C_SdCodeGenerationDialog,
 stw_opensyde_gui--C_SdNdeDpListCommentDialog,
 stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"][Type="2"]:up-button,
 stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"][Type="2"]::down-button,
@@ -359,7 +361,9 @@ stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::item:selected:!hover,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:selected:!hover
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:selected:!hover,
+stw_opensyde_gui--C_SdCodeGenerationView,
+stw_opensyde_gui--C_SdCodeGenerationView::item:selected:!hover
 {
 background-color: rgb(255, 255, 255);
 }
@@ -421,7 +425,9 @@ stw_opensyde_gui_elements--C_OgeCbxTableHalc QListView::item,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::item,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::item
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::item,
+stw_opensyde_gui--C_SdCodeGenerationView,
+stw_opensyde_gui--C_SdCodeGenerationView::item
 {
 color: rgb(19, 19, 45);
 }
@@ -628,6 +634,9 @@ stw_opensyde_gui--C_TblTreDataElementView::item:closed:!selected,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:open,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:selected,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:closed:!selected,
+stw_opensyde_gui--C_SdCodeGenerationView::item:open,
+stw_opensyde_gui--C_SdCodeGenerationView::item:selected,
+stw_opensyde_gui--C_SdCodeGenerationView::item:closed:!selected,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::item:selected,
 stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled,
 stw_opensyde_gui_elements--C_OgeChxDefaultSmall,
@@ -936,6 +945,7 @@ stw_opensyde_gui_elements--C_OgeSpxDoubleProperties:!enabled,
 stw_opensyde_gui_elements--C_OgeSpxInt64Properties:!enabled,
 stw_opensyde_gui--C_TblTreDataElementView::item:!enabled,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:!enabled,
+stw_opensyde_gui--C_SdCodeGenerationView::item:!enabled,
 stw_opensyde_gui_elements--C_OgeCbxParam:!enabled,
 stw_opensyde_gui_elements--C_OgeCbxTable:!enabled,
 stw_opensyde_gui_elements--C_OgeCbxFontProperties:disabled,
@@ -1063,6 +1073,7 @@ stw_opensyde_gui_elements--C_OgeCbxTableHalc QListView,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView,
+stw_opensyde_gui--C_SdCodeGenerationView,
 stw_opensyde_gui_elements--C_OgeSpxEditProperties::down-button,
 stw_opensyde_gui_elements--C_OgeSpxEditProperties::up-button,
 stw_opensyde_gui_elements--C_OgeSpxEditProperties,
@@ -1191,6 +1202,8 @@ stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:dis
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:enabled:!checked,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:disabled,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:!checked,
+stw_opensyde_gui--C_SdCodeGenerationView::indicator:disabled,
+stw_opensyde_gui--C_SdCodeGenerationView::indicator:enabled:!checked,
 stw_opensyde_gui_elements--C_OgePubOpen:hover:!pressed,
 stw_opensyde_gui_elements--C_OgePubOpen:hover:!open,
 stw_opensyde_gui_elements--C_OgePubPathVariables:enabled:hover,
@@ -1409,7 +1422,9 @@ stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator:enabled:indeterminate
 stw_opensyde_gui_elements--C_OgeChxTristate::indicator:enabled:checked,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:enabled:checked,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:checked,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:indeterminate
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:indeterminate,
+stw_opensyde_gui--C_SdCodeGenerationView::indicator:enabled:checked,
+stw_opensyde_gui--C_SdCodeGenerationView::indicator:enabled:indeterminate
 {
 background-color: rgb(203, 235, 193);
 }

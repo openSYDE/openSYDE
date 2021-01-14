@@ -106,7 +106,7 @@ void C_SebUnoAlignCommand::m_Align(const uint64 & oru64_GuidelineItemID, const E
          //Align objects
          QGraphicsItem * pc_CurItem;
          C_GiUnique * pc_UniqueItem;
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_SebScene * const pc_Scene = dynamic_cast<C_SebScene * const>(this->mpc_Scene);
          QRectF c_CurRect;
          QPointF c_Difference;
@@ -155,8 +155,7 @@ void C_SebUnoAlignCommand::m_Align(const uint64 & oru64_GuidelineItemID, const E
                      //UNKNOWN
                      break;
                   }
-                  //lint -e{740}  no problem because of common base class
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                  
                   pc_UniqueItem = dynamic_cast<C_GiUnique *>(pc_CurItem);
                   if (pc_UniqueItem != NULL)
                   {

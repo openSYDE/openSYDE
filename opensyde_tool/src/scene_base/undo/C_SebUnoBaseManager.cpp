@@ -392,11 +392,9 @@ void C_SebUnoBaseManager::mh_MapItemToID(const QList<QGraphicsItem *> & orc_Item
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::mh_MapItemToID(const QGraphicsItem * const opc_Item, uint64 & oru64_ID)
 {
-   const C_GiUnique * pc_UniqueItem;
+   const C_GiUnique * const pc_UniqueItem =
+      dynamic_cast<const C_GiUnique *>(C_SebUtil::h_GetHighestParent(opc_Item));
 
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //lint -e{740}  no problem because of common base class
-   pc_UniqueItem = dynamic_cast<const C_GiUnique *>(C_SebUtil::h_GetHighestParent(opc_Item));
    if (pc_UniqueItem != NULL)
    {
       oru64_ID = pc_UniqueItem->GetID();

@@ -44,7 +44,7 @@ protected:
 
    QGraphicsScene * const mpc_Scene;
 
-   const std::vector<stw_types::uint64> GetIDs(void) const;
+   const std::vector<stw_types::uint64> m_GetIDs(void) const;
 
 private:
    const std::vector<stw_types::uint64> mc_IDs;

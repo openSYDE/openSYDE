@@ -33,10 +33,7 @@ public:
    void SetIconOnly(const bool oq_IconOnly);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_PaintEvent);
-   //lint -restore
 
 private:
    QString mc_SvgIcon;

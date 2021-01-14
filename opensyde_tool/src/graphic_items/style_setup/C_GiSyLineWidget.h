@@ -68,8 +68,6 @@ public:
    void SetEndArrow(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_Value);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void showEvent(QShowEvent * const opc_Event) override;
 
 private:

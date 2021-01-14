@@ -112,7 +112,7 @@ bool C_OgeSliToolTipBase::event(QEvent * const opc_Event)
          //show tooltip
          if (this->m_GetToolTip()->isVisible() == false)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
             if (pc_HelpEvent != NULL)
@@ -165,9 +165,26 @@ void C_OgeSliToolTipBase::m_OnValueChange(void)
    C_OSCNodeDataPoolContent c_Tmp;
 
    c_Tmp.SetArray(false);
-   c_Tmp.SetType(this->me_RepresentationType);
+   if (this->me_RepresentationType < stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type::eFLOAT32)
+   {
+      //For all integer types:
+      //Use UINT64 data type for slider values to prevent getting in max datatype range
+      //Example of an SINT8 value
+      //   slider value: 255 (=128)
+      //   Trying to convert 255 to sint8 the engine cuts the value to 128 (=sint8 max).
+      //   Resulting into Tooltip value = -1 for slider values >= 127
+      c_Tmp.SetType(stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type::eUINT64);
+   }
+   else
+   {
+      c_Tmp.SetType(this->me_RepresentationType);
+   }
+
+   //set slider value in content (c_Tmp)
    C_OSCNodeDataPoolContentUtil::h_SetValueInContent(
       static_cast<float64>(this->value()) - this->mf64_ToolTipRangeOffset, c_Tmp);
+
+   //apply factor and offset
    C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_Tmp, this->mf64_ToolTipFactor, this->mf64_ToolTipOffset,
                                                   c_Content, 0UL);
 

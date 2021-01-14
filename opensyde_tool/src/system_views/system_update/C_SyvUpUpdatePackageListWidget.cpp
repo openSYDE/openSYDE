@@ -97,6 +97,7 @@ C_SyvUpUpdatePackageListWidget::C_SyvUpUpdatePackageListWidget(QWidget * const o
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of all elements and the Qt memory management
 C_SyvUpUpdatePackageListWidget::~C_SyvUpUpdatePackageListWidget()
 {
    // save user settings
@@ -110,7 +111,6 @@ C_SyvUpUpdatePackageListWidget::~C_SyvUpUpdatePackageListWidget()
                                                                                 this->mq_EmptyOptionalSectionsVisible);
    }
 
-   //lint -e{1540}  no memory leak because of the parent of all elements and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -219,7 +219,7 @@ void C_SyvUpUpdatePackageListWidget::SetConnected(void)
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -243,7 +243,7 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateStarted(void) const
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -269,7 +269,7 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationStarted(const uint32 ou
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -300,7 +300,7 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationFinished(const uint32 o
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -328,10 +328,10 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationError(const uint32 ou32
    for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      const C_SyvUpUpdatePackageNodeWidget * pc_WidgetItem =
+
+      const C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
       {
@@ -360,7 +360,7 @@ void C_SyvUpUpdatePackageListWidget::DiscardApplicationStatus(const uint32 ou32_
       // Search for match
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -388,7 +388,7 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateFinished(void) const
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -412,7 +412,7 @@ void C_SyvUpUpdatePackageListWidget::SetDisconnected(void)
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -447,7 +447,7 @@ const
          // activate the first item and deactivate all other items
          QListWidgetItem * const pc_Item = this->item(sn_NodeWidgetCounter);
 
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
             dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
          if (pc_WidgetItem != NULL)
@@ -483,7 +483,7 @@ void C_SyvUpUpdatePackageListWidget::SetNodeProgress(const uint32 ou32_NodeIndex
    {
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -508,7 +508,7 @@ void C_SyvUpUpdatePackageListWidget::RemoveAllFiles(void) const
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -525,10 +525,12 @@ void C_SyvUpUpdatePackageListWidget::RemoveAllFiles(void) const
 void C_SyvUpUpdatePackageListWidget::ExportConfig(void)
 {
    const QString c_Folder = this->m_GetDialogPath();
-   QString c_FileName =
-      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Export Update Package Configuration"), c_Folder,
-                                     QString(C_GtGetText::h_GetText("openSYDE Update Package Configuration File")) +
-                                     " (*" + mhc_CONFIG_FILE_TYPE + ")", "");
+   const QString c_FileName =
+      C_OgeWiUtil::h_GetSaveFileName(
+         this, C_GtGetText::h_GetText("Export Update Package Configuration"), c_Folder,
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "openSYDE Update Package Configuration File")) +
+         " (*" + mhc_CONFIG_FILE_TYPE + ")", "");
 
    if (c_FileName != "")
    {
@@ -559,7 +561,7 @@ void C_SyvUpUpdatePackageListWidget::ExportConfig(void)
             // Check all paths from all nodes
             QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
                dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
             if (pc_WidgetItem != NULL)
@@ -601,7 +603,8 @@ void C_SyvUpUpdatePackageListWidget::ExportConfig(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::ImportConfig(void)
 {
-   const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE Update Package Configuration File")) + "(*" +
+   const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("openSYDE Update Package Configuration File")) +
+                            "(*" +
                             mhc_CONFIG_FILE_TYPE + ")";
    const QString c_FileName =
       C_OgeWiUtil::h_GetOpenFileName(this->parentWidget(),
@@ -643,7 +646,7 @@ void C_SyvUpUpdatePackageListWidget::ImportConfig(void)
                // Check all paths from all nodes
                QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
                   dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
                if (pc_WidgetItem != NULL)
@@ -700,10 +703,13 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
       c_DefaultFilename = pc_ViewData->GetName();
    }
 
-   c_DefaultFilename += "_ServiceUpdatePackage" + QString(C_OSCSuServiceUpdatePackage::h_GetPackageExtension().c_str());
-   const QString c_FilterName = QString(C_GtGetText::h_GetText("openSYDE Service Update Package File")) + " (*" +
-                                QString(C_GtGetText::h_GetText(C_OSCSuServiceUpdatePackage::h_GetPackageExtension().
-                                                               c_str())) + ")";
+   c_DefaultFilename += "_ServiceUpdatePackage" +
+                        static_cast<QString>(C_OSCSuServiceUpdatePackage::h_GetPackageExtension().c_str());
+   const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("openSYDE Service Update Package File")) +
+                                " (*" +
+                                static_cast<QString>(C_GtGetText::h_GetText(C_OSCSuServiceUpdatePackage::
+                                                                            h_GetPackageExtension().
+                                                                            c_str())) + ")";
    const QString c_Folder = this->m_GetDialogPath();
    const QString c_FullPackagePath =
       C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Directory for Service Update Package"),
@@ -745,7 +751,7 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
          const stw_types::uint32 u32_ActiveBusIndex = pc_View->GetPcData().GetBusIndex();
 
          // active nodes
-         std::vector<uint8> c_ActiveNodes = pc_View->GetNodeActiveFlags();
+         const std::vector<uint8> c_ActiveNodes = pc_View->GetNodeActiveFlags();
 
          // update applications of nodes, update position of nodes,
          std::vector<C_OSCSuSequences::C_DoFlash> c_ApplicationsToWrite;
@@ -773,11 +779,12 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
             C_OgeWiCustomMessage c_MessageResult(this);
             c_MessageResult.SetHeading(C_GtGetText::h_GetText("Create Service Update Package"));
             c_MessageResult.SetDescription(C_GtGetText::h_GetText("Service Update Package successfully created."));
-            QString c_Details = QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
-                                arg(C_GtGetText::h_GetText("File saved at ")).
-                                arg(c_FullPackagePath).
-                                arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                                arg(c_FullPackagePath);
+            const QString c_Details =
+               static_cast<QString>("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
+               arg(C_GtGetText::h_GetText("File saved at ")).
+               arg(c_FullPackagePath).
+               arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
+               arg(c_FullPackagePath);
             c_MessageResult.SetDetails(c_Details);
             c_MessageResult.SetCustomMinHeight(180, 250);
             c_MessageResult.Execute();
@@ -835,7 +842,7 @@ sint32 C_SyvUpUpdatePackageListWidget::CheckAllPaths(uint32 & oru32_CountFiles,
       // Check all paths from all nodes
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -897,7 +904,7 @@ sint32 C_SyvUpUpdatePackageListWidget::GetUpdatePackage(
    {
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -1002,7 +1009,7 @@ void C_SyvUpUpdatePackageListWidget::resizeEvent(QResizeEvent * const opc_Event)
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -1033,7 +1040,7 @@ void C_SyvUpUpdatePackageListWidget::paintEvent(QPaintEvent * const opc_Event)
       // show a tip for adding a datapool
       QPen c_Pen = c_Painter.pen();
       QFont c_Font;
-      const QString c_Text = QString(C_GtGetText::h_GetText("There are no active nodes to be updated."));
+      const QString c_Text = C_GtGetText::h_GetText("There are no active nodes to be updated.");
 
       // configure color
       c_Pen.setColor(mc_STYLE_GUIDE_COLOR_8);
@@ -1062,7 +1069,7 @@ void C_SyvUpUpdatePackageListWidget::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 {
-   QPoint c_Pos = opc_Event->pos();
+   const QPoint c_Pos = opc_Event->pos();
 
    QListWidgetItem * const pc_Item = this->itemAt(c_Pos);
 
@@ -1074,7 +1081,7 @@ void C_SyvUpUpdatePackageListWidget::mouseDoubleClickEvent(QMouseEvent * const o
        (this->mq_Connected == false))
    {
       const QModelIndex c_Current = this->currentIndex();
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
 
@@ -1113,7 +1120,7 @@ void C_SyvUpUpdatePackageListWidget::m_MoveItem(const sintn osn_SourceIndex, con
          // activate the first item and deactivate all other items
          QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
             dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
          if (pc_WidgetItem != NULL)
@@ -1144,7 +1151,7 @@ void C_SyvUpUpdatePackageListWidget::m_UpdateNumbers(void) const
    for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
    {
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -1157,8 +1164,8 @@ void C_SyvUpUpdatePackageListWidget::m_UpdateNumbers(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::m_DelegateStartPaint(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SyvUpUpdatePackageNodeWidget * pc_ItemWidget =
+
+   C_SyvUpUpdatePackageNodeWidget * const pc_ItemWidget =
       dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(this->item(this->currentIndex().row())));
 
    this->mc_Delegate.StartPaint(this->currentIndex().row(), pc_ItemWidget);
@@ -1179,18 +1186,17 @@ void C_SyvUpUpdatePackageListWidget::m_DelegateStopPaint(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::m_AddNodeWidget(const uint32 ou32_NodeIndex, const QString & orc_NodeName)
 {
-   QListWidgetItem * pc_Item = new QListWidgetItem(NULL, static_cast<sintn>(QListWidgetItem::ItemType::UserType));
-   C_SyvUpUpdatePackageNodeWidget * pc_ItemWidget = new C_SyvUpUpdatePackageNodeWidget(this->mu32_ViewIndex,
-                                                                                       this->count(),
-                                                                                       ou32_NodeIndex,
-                                                                                       orc_NodeName, this);
+   QListWidgetItem * const pc_Item = new QListWidgetItem(NULL, static_cast<sintn>(QListWidgetItem::ItemType::UserType));
+   C_SyvUpUpdatePackageNodeWidget * const pc_ItemWidget = new C_SyvUpUpdatePackageNodeWidget(this->mu32_ViewIndex,
+                                                                                             this->count(),
+                                                                                             ou32_NodeIndex,
+                                                                                             orc_NodeName, this);
 
    pc_Item->setSizeHint(pc_ItemWidget->size());
 
    this->addItem(pc_Item);
    this->setItemWidget(pc_Item, pc_ItemWidget);
-   //lint -e{429}  no memory leak because of the parent of pc_Item and pc_ItemWidget and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Item and pc_ItemWidget and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show custom context menu
@@ -1211,7 +1217,7 @@ void C_SyvUpUpdatePackageListWidget::m_OnCustomContextMenuRequested(const QPoint
        (this->mq_Connected == false))
    {
       const QModelIndex c_Current = this->currentIndex();
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
 
@@ -1337,13 +1343,14 @@ void C_SyvUpUpdatePackageListWidget::m_AddFileAction(void)
       {
          // No file based and a openSYDE device, only parameter set image files are possible to add
          this->m_AddNewFile(C_GtGetText::h_GetText("openSYDE parameter set image"),
-                            QString(C_GtGetText::h_GetText("openSYDE parameter set image")) + " (*.syde_psi)");
+                            static_cast<QString>(C_GtGetText::h_GetText(
+                                                    "openSYDE parameter set image")) + " (*.syde_psi)");
       }
       else
       {
          // File based device. All is possible. A parameter set image file will be added by file extension
          this->m_AddNewFile(C_GtGetText::h_GetText("Add File"),
-                            QString(C_GtGetText::h_GetText("All files")) + " (*.*)");
+                            static_cast<QString>(C_GtGetText::h_GetText("All files")) + " (*.*)");
       }
    }
 }
@@ -1378,7 +1385,7 @@ void C_SyvUpUpdatePackageListWidget::m_AddNewFile(const QString & orc_DialogCapt
          {
             for (sint32 s32_Pos = 0; s32_Pos < c_Files.size(); ++s32_Pos)
             {
-               QFileInfo c_File(c_Files[s32_Pos]);
+               const QFileInfo c_File(c_Files[s32_Pos]);
                const bool q_ParamsetFile = c_File.completeSuffix().toLower() == "syde_psi";
 
                // add file
@@ -1417,19 +1424,19 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
          case mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK:
             if (this->mpc_SelectedNode->IsFileBased() == false)
             {
-               c_Filter = QString(C_GtGetText::h_GetText("HEX files")) + " (*.hex);;" + c_Filter;
+               c_Filter = static_cast<QString>(C_GtGetText::h_GetText("HEX files")) + " (*.hex);;" + c_Filter;
                q_HexFile = true;
             }
             else
             {
-               c_Filter = QString(C_GtGetText::h_GetText("All files")) + " (*.*)";
+               c_Filter = static_cast<QString>(C_GtGetText::h_GetText("All files")) + " (*.*)";
             }
             break;
          case mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET:
-            c_Filter = QString(C_GtGetText::h_GetText("openSYDE parameter set image")) + " (*.syde_psi)";
+            c_Filter = static_cast<QString>(C_GtGetText::h_GetText("openSYDE parameter set image")) + " (*.syde_psi)";
             break;
          case mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE:
-            c_Filter = QString(C_GtGetText::h_GetText("All files")) + " (*.*)";
+            c_Filter = static_cast<QString>(C_GtGetText::h_GetText("All files")) + " (*.*)";
             break;
          default:
             tgl_assert(false);
@@ -1599,7 +1606,7 @@ void C_SyvUpUpdatePackageListWidget::m_HideShowOptionalSections(void)
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)

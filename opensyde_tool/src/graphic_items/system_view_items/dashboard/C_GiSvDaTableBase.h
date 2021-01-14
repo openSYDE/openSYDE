@@ -86,7 +86,7 @@ private:
 
    //Avoid call
    C_GiSvDaTableBase(const C_GiSvDaTableBase &);
-   C_GiSvDaTableBase & operator =(const C_GiSvDaTableBase &);
+   C_GiSvDaTableBase & operator =(const C_GiSvDaTableBase &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

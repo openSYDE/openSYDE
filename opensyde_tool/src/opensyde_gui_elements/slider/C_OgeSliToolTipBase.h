@@ -36,10 +36,7 @@ public:
                              const stw_types::float64 of64_ToolTipOffset, const stw_types::float64 of64_ToolTipFactor,
                              const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type oe_RepresentationType);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool event(QEvent * const opc_Event) override;
-   //lint -restore
 
 protected:
    void m_OnValueChange(void);

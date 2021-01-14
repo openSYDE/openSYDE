@@ -77,6 +77,8 @@ C_SdNdeDbViewWidget::C_SdNdeDbViewWidget(QWidget * const opc_Parent) :
            &C_SdNdeDbViewWidget::AddApp);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigOpenDataPool, this,
            &C_SdNdeDbViewWidget::SigOpenDataPool);
+   connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigOwnedDataPoolsChanged, this,
+           &C_SdNdeDbViewWidget::SigOwnedDataPoolsChanged);
    connect(this->mpc_Ui->pc_PushButtonCodeGenerationOptions, &QPushButton::clicked, this,
            &C_SdNdeDbViewWidget::m_ProgrammingOptions);
 }
@@ -229,8 +231,7 @@ void C_SdNdeDbViewWidget::AddApp(void)
             {
                c_New->HideOverlay();
             }
-            //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-         }
+         }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
          else
          {
             //no fbl support
@@ -426,7 +427,7 @@ void C_SdNdeDbViewWidget::m_AddFromTSP(void)
    if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
    {
       C_OgeWiCustomMessage c_Message(this);
-      QString c_Description = QString(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).")).
+      QString c_Description = static_cast<QString>(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).")).
                               arg(pc_Dialog->GetTSPApplicationCount());
       QString c_Details = "";
       c_Message.SetHeading(C_GtGetText::h_GetText("Add new Data Blocks"));
@@ -460,8 +461,7 @@ void C_SdNdeDbViewWidget::m_AddFromTSP(void)
       C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownTSPPath(pc_Dialog->GetTSPPath());
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update data block count
@@ -474,7 +474,7 @@ void C_SdNdeDbViewWidget::m_UpdateCount(void) const
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
    {
-      this->mpc_Ui->pc_LabelApplicationName->setText(QString("Data Blocks (%1)").arg(pc_Node->c_Applications.size()));
+      this->mpc_Ui->pc_LabelApplicationName->setText(static_cast<QString>("Data Blocks (%1)").arg(pc_Node->c_Applications.size()));
    }
 }
 
@@ -511,8 +511,7 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
       {
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
    else
    {
       C_OgeWiCustomMessage c_Message(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
@@ -564,6 +563,8 @@ void C_SdNdeDbViewWidget::m_AddManualApplication(const C_OSCNodeApplication::E_T
       pc_Dialog->ApplyNewData(c_Tmp);
       u32_Index = m_AddApplication(c_Tmp);
       pc_Dialog->HandleDataPools(u32_Index);
+      // Inform about change (for Datapool tab tooltips)
+      Q_EMIT (this->SigOwnedDataPoolsChanged());
       //Reload data pool section
       this->UpdateApplications();
    }
@@ -572,8 +573,7 @@ void C_SdNdeDbViewWidget::m_AddManualApplication(const C_OSCNodeApplication::E_T
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle visibility of button "Code generation settings"

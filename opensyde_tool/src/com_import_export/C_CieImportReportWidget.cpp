@@ -87,8 +87,9 @@ C_CieImportReportWidget::C_CieImportReportWidget(C_OgePopUpDialog & orc_Parent, 
    this->mrc_ParentDialog.SetWidget(this);
 
    // set main title
-   this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("%1 File Import")).arg(c_FileInfo.completeSuffix().
-                                                                                         toUpper()));
+   this->mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("%1 File Import")).arg(c_FileInfo.
+                                                                                                      completeSuffix().
+                                                                                                      toUpper()));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Report"));
 
    //Trigger report
@@ -243,9 +244,7 @@ void C_CieImportReportWidget::m_OkClicked(void)
                {
                   c_Popup->HideOverlay();
                }
-               //lint -e{429}  no memory leak because of the parent of pc_DialogImportReport and the Qt memory
-               // management
-            }
+            } //lint !e429  //no memory leak because of the parent of pc_DialogImportReport and the Qt memory
          }
       }
       else
@@ -402,8 +401,8 @@ void C_CieImportReportWidget::mh_AdaptName(stw_scl::C_SCLString & orc_Name, stw_
       //Set comment before overwriting the original name
       //Translation: 1=Original name from file,2=Optional line break if there was some more content
       orc_Comment +=
-         QString(C_GtGetText::h_GetText("%2Original name (from import source): %1")).arg(orc_Name.c_str()).arg(
-            c_Addition.c_str()).toStdString().c_str();
+         static_cast<QString>(C_GtGetText::h_GetText("%2Original name (from import source): %1")).arg(orc_Name.c_str()).
+         arg(c_Addition.c_str()).toStdString().c_str();
       orc_Name = c_NewName;
    }
 }
@@ -471,7 +470,7 @@ sint32 C_CieImportReportWidget::m_ShowReport(void)
       {
          C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
          c_ReadContent += rc_CurData.c_ImportData.c_NodeName;
-         c_ReadContent += QString(C_GtGetText::h_GetText(" (%1 Tx / %2 Rx); ")).
+         c_ReadContent += static_cast<QString>(C_GtGetText::h_GetText(" (%1 Tx / %2 Rx); ")).
                           arg(rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.size()).
                           arg(rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.size());
       }
@@ -512,7 +511,7 @@ sint32 C_CieImportReportWidget::m_ShowReport(void)
          //New table
          c_CompleteLog += "<p><b>";
          //Translation: 1=Number of messages
-         c_CompleteLog += QString(C_GtGetText::h_GetText("Import Messages (%1)")).arg(u32_MessageCount);
+         c_CompleteLog += static_cast<QString>(C_GtGetText::h_GetText("Import Messages (%1)")).arg(u32_MessageCount);
          c_CompleteLog += "</b></p>";
          c_CompleteLog += "<table>";
          //Header
@@ -928,7 +927,7 @@ QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32 ou32_Index, con
                c_TableEntryEnd;
    //Message name
    //Translation: 1=CAN Message name, 2=CAN Message ID
-   c_Retval += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START + QString("%1 (0x%2)").arg(
+   c_Retval += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START + static_cast<QString>("%1 (0x%2)").arg(
       orc_CurMessage.c_Name.c_str()).arg(orc_CurMessage.u32_CanId, 0, 16) + c_TableEntryEnd;
    //Signals
    if (orc_CurMessage.c_Signals.size() == 0UL)
@@ -950,7 +949,7 @@ QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32 ou32_Index, con
             {
                c_Tmp += c_LineBreak;
             }
-            c_Tmp += QString(rc_CurSignalData.c_Name.c_str());
+            c_Tmp += static_cast<QString>(rc_CurSignalData.c_Name.c_str());
          }
       }
    }

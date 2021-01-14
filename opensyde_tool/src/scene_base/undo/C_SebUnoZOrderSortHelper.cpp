@@ -91,6 +91,5 @@ bool C_SebUnoZOrderSortHelper::operator ()(const QGraphicsItem * const opc_Item1
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoZOrderSortHelper::h_SortZValues(QList<QGraphicsItem *> & orc_ZValues)
 {
-   //lint -e{864} Call as expected by interface
    std::sort(orc_ZValues.begin(), orc_ZValues.end(), C_SebUnoZOrderSortHelper());
 }

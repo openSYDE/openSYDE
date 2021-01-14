@@ -114,8 +114,8 @@ bool C_GiLiEthernetBus::OpenStyleDialog(void)
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   return q_Retval;
+   return q_Retval; //lint !e429  //no memory leak because of the parent of pc_Dialog and pc_SettingsWidget and the
+                    //Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -128,7 +128,7 @@ bool C_GiLiEthernetBus::OpenStyleDialog(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiEthernetBus::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiLiBus * const pc_Item = dynamic_cast<const C_GiLiBus * const>(opc_GuidelineItem);
 
    if (pc_Item != NULL)

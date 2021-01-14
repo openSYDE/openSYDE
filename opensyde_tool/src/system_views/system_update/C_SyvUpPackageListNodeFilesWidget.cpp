@@ -105,8 +105,7 @@ void C_SyvUpPackageListNodeFilesWidget::AddFile(const QString & orc_File)
          ++this->mu32_FileCount;
 
          this->m_FileCountChanged();
-         //lint -e{429}  no memory leak because of the parent of pc_AppWidget and the Qt memory management
-      }
+      }  //lint !e429  //no memory leak because of the parent of pc_AppWidget and the Qt memory management
    }
 }
 
@@ -179,7 +178,7 @@ void C_SyvUpPackageListNodeFilesWidget::PrepareExportConfig(C_SyvUpUpdatePackage
 
          if (pc_Item != NULL)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
                dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -313,8 +312,7 @@ void C_SyvUpPackageListNodeFilesWidget::m_InitSpecificItem(const stw_opensyde_co
 
       ++this->mu32_FileCount;
       this->mpc_Ui->pc_AppVerticalLayout->addWidget(pc_AppWidget);
-      //lint -e{429}  no memory leak because of the parent of pc_AppWidget and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_AppWidget and the Qt memory management
 
    this->mq_ShowAddButton = true;
 }

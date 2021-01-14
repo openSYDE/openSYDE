@@ -944,7 +944,7 @@ void C_SyvUpSequences::m_ReportStwFlashloaderInformationRead(const C_XflDeviceIn
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::mh_ThreadFunc(void * const opv_Instance)
 {
-   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
+   //lint -e{925,9079}  This class is the only one which registers itself at the caller of this function. It must match.
    C_SyvUpSequences * const pc_Sequences = reinterpret_cast<C_SyvUpSequences * const>(opv_Instance);
 
    tgl_assert(pc_Sequences != NULL);

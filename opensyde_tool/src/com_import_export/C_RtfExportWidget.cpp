@@ -12,6 +12,7 @@
 
 #include <limits>
 #include <fstream>
+#include <cstdio>
 #include <QFileInfo>
 #include <QDir>
 #include <QGraphicsView>
@@ -19,8 +20,6 @@
 #include <QProcess>
 #include <QFileDialog>
 #include <QDateTime>
-//#include <cstdio> // do not need to include because of indirect include,
-// otherwise PCLint warning 451 repeatly included
 #include "TGLUtils.h"
 #include "stwerrors.h"
 #include "constants.h"
@@ -114,7 +113,7 @@ C_RtfExportWidget::~C_RtfExportWidget(void)
 void C_RtfExportWidget::InitStaticNames(void) const
 {
    // set main title
-   this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("SYSTEM DEFINITION")));
+   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("SYSTEM DEFINITION"));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Report"));
 
    // labels and buttons
@@ -182,10 +181,10 @@ sint32 C_RtfExportWidget::GetRtfPath(C_SCLString & orc_RtfPath) const
       if (TGL_DirectoryExists(TGL_ExtractFilePath(orc_RtfPath)) == true)
       {
          // check if file name is valid
-         C_SCLString c_FileExtAct = TGL_ExtractFileExtension(orc_RtfPath);
+         const C_SCLString c_FileExtAct = TGL_ExtractFileExtension(orc_RtfPath);
          if (c_FileExtAct.LowerCase() == ".rtf")
          {
-            QFileInfo c_Info(orc_RtfPath.c_str());
+            const QFileInfo c_Info(orc_RtfPath.c_str());
             if (C_OSCUtils::h_CheckValidFileName(c_Info.completeBaseName().toStdString().c_str()))
             {
                if (TGL_FileExists(orc_RtfPath) == true)
@@ -268,7 +267,7 @@ sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) 
          if (TGL_FileExists(orc_CompanyLogoPath) == true)
          {
             // check if file name is valid
-            C_SCLString c_FileExtAct = TGL_ExtractFileExtension(orc_CompanyLogoPath);
+            const C_SCLString c_FileExtAct = TGL_ExtractFileExtension(orc_CompanyLogoPath);
             if ((c_FileExtAct.LowerCase() == ".jpg") || (c_FileExtAct.LowerCase() == ".png"))
             {
                s32_Return = C_NO_ERR;
@@ -361,7 +360,7 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
    tgl_assert(c_DirDocuCreatorTmp.cdUp() == true);                      // go one directory up
    c_DocuCreatorPath = c_DirDocuCreatorTmp.absolutePath();              // get current path
    c_DocuCreatorPath += "/connectors/DocuCreator/osy_docu_creator.exe"; // add DocuCreator location
-   C_SCLString c_SclStringDocuCreatorPath = c_DocuCreatorPath.toStdString().c_str();
+   const C_SCLString c_SclStringDocuCreatorPath = c_DocuCreatorPath.toStdString().c_str();
    C_SCLString c_SclStringDocuCreatorConfigPath = c_DirDocuCreatorTmp.absolutePath().toStdString().c_str();
    c_SclStringDocuCreatorConfigPath += "/connectors/DocuCreator/config.xml";
 
@@ -392,7 +391,7 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       sintn sn_Height = static_cast<sintn>(opc_Widget->GetScene()->height());
       // factor values for pixels are empirical evaluated and a matter of taste
       // get longer side
-      sintn sn_LongerSide = (sn_Width > sn_Height) ? sn_Width : sn_Height;
+      const sintn sn_LongerSide = (sn_Width > sn_Height) ? sn_Width : sn_Height;
       sn_Factor = 6000 / sn_LongerSide; // a maximum of round about 6000 pixels for the longer side should be enough
       if (sn_Factor != 0)
       {
@@ -400,7 +399,7 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
          sn_Height *= sn_Factor;
       }
 
-      QSize c_ImageSize(sn_Width, sn_Height);
+      const QSize c_ImageSize(sn_Width, sn_Height);
       QImage c_Image(c_ImageSize, QImage::Format_ARGB32);
       QPainter c_Painter(&c_Image);
       c_Painter.setRenderHint(QPainter::Antialiasing);
@@ -417,7 +416,7 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       {
          // could not save 'Network Topology' screenshot to disk
          this->mc_Error = "Could not save Network Topology screenshot to \"" +
-                          C_SCLString(c_PathNetworkTopologyScreenshot.toStdString().c_str()) + "\".";
+                          static_cast<C_SCLString>(c_PathNetworkTopologyScreenshot.toStdString().c_str()) + "\".";
          osc_write_log_error("RTF File Export", this->mc_Error);
          s32_Return = C_BUSY;
       }
@@ -432,13 +431,14 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       C_ExportXmlStructure c_ConfigXml;
       QString c_SysDefPathTmp; // get path of system definition file '.syde_sysdef'
       C_PuiProject::h_AdaptProjectPathToSystemDefinition(C_PuiProject::h_GetInstance()->GetPath(), c_SysDefPathTmp);
-      QDateTime c_CurrentTime(QDateTime::currentDateTime());
+      const QDateTime c_CurrentTime(QDateTime::currentDateTime());
 
       // Project
       c_ConfigXml.c_Title = "Project Documentation";
       c_ConfigXml.c_Name = C_PuiProject::h_GetInstance()->GetName().toStdString().c_str();
       c_ConfigXml.c_Version = C_PuiProject::h_GetInstance()->c_Version;
-      c_ConfigXml.c_Created = C_SCLString(c_CurrentTime.toString("dd.MM.yyyy hh:mm").toStdString().c_str());
+      c_ConfigXml.c_Created =
+         static_cast<C_SCLString>(c_CurrentTime.toString("dd.MM.yyyy hh:mm").toStdString().c_str());
       c_ConfigXml.c_Author = C_PuiProject::h_GetInstance()->c_Editor;
       c_ConfigXml.c_SysDefPath = c_SysDefPathTmp.toStdString().c_str();
       c_ConfigXml.c_DevicesIniPath = C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str();
@@ -459,13 +459,13 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
 
       QStringList c_Arguments;
       c_Arguments.push_back("-c");
-      c_Arguments.push_back(QString(c_SclStringDocuCreatorConfigPath.c_str()));
+      c_Arguments.push_back(c_SclStringDocuCreatorConfigPath.c_str());
 
-      QProcess * pc_Process = new QProcess(new QObject());
+      QProcess * const pc_Process = new QProcess(new QObject());
       // execute DocuCreator
-      pc_Process->start(QString(c_SclStringDocuCreatorPath.c_str()), c_Arguments);
+      pc_Process->start(c_SclStringDocuCreatorPath.c_str(), c_Arguments);
       // wait until DocuCreator has finished
-      bool q_Tmp = pc_Process->waitForFinished(30000); // 30 seconds (default)
+      const bool q_Tmp = pc_Process->waitForFinished(30000); // 30 seconds (default)
       if (q_Tmp == true)
       {
          // evaluate return code of 'DocuCreator'
@@ -483,7 +483,7 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       }
       else
       {
-         QProcess::ProcessError e_Error = pc_Process->error();
+         const QProcess::ProcessError e_Error = pc_Process->error();
          if (e_Error == QProcess::ProcessError::FailedToStart)
          {
             this->mc_Error =
@@ -521,8 +521,7 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       pc_Process->deleteLater(); // not necessary but does also no harm
 
       osc_write_log_info("RTF File Export", "RTF document created, export successful.");
-      //lint -e{429}  no memory leak because of the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the Qt memory management
 
    orc_WarningMessages = this->mc_Warnings; // give user feedback
    orc_ErrorMessage = this->mc_Error;       //        -"-
@@ -682,7 +681,7 @@ void C_RtfExportWidget::m_CancelClicked(void)
 void C_RtfExportWidget::m_RtfPathClicked(void)
 {
    QString c_Folder; // for default folder
-   C_SCLString c_Tmp =
+   const C_SCLString c_Tmp =
       C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditRtfPath->GetPath()).toStdString().c_str();
 
    if (TGL_DirectoryExists(TGL_ExtractFilePath(c_Tmp)) == true)
@@ -697,7 +696,7 @@ void C_RtfExportWidget::m_RtfPathClicked(void)
    QString c_DefaultFilename = C_PuiProject::h_GetInstance()->GetName();
    c_DefaultFilename += ".rtf";
 
-   const QString c_FilterName = QString(C_GtGetText::h_GetText("RTF file (*.rtf)"));
+   const QString c_FilterName = C_GtGetText::h_GetText("RTF file (*.rtf)");
    const QString c_FullRtfFilePath = C_OgeWiUtil::h_GetSaveFileName(
       this, C_GtGetText::h_GetText("Save File for RTF Export"), c_Folder, c_FilterName, c_DefaultFilename,
       QFileDialog::DontConfirmOverwrite); // overwrite is handled later
@@ -714,10 +713,10 @@ void C_RtfExportWidget::m_RtfPathClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_RtfExportWidget::m_LogoPathClicked(void) const
 {
-   const QString c_Filter = QString(C_GtGetText::h_GetText("Image file (*.jpg *.png)"));
+   const QString c_Filter = C_GtGetText::h_GetText("Image file (*.jpg *.png)");
    QString c_Folder; // for default folder
 
-   C_SCLString c_Tmp =
+   const C_SCLString c_Tmp =
       C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditLogoPath->GetPath()).toStdString().c_str();
 
    if (TGL_DirectoryExists(TGL_ExtractFilePath(c_Tmp)) == true)

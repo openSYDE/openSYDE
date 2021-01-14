@@ -28,7 +28,7 @@ public:
    ~C_GiSyColorPicker(void);
 
    void SetCircleVisible(const bool oq_Visible);
-   void SetColor(const stw_types::sintn osn_H, const stw_types::sintn osn_S);
+   void SetColor(const stw_types::sintn osn_Hue, const stw_types::sintn osn_Saturation);
 
    virtual QSize sizeHint(void) const override;
 
@@ -36,7 +36,7 @@ public:
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void NewColor(stw_types::sintn oc_h, stw_types::sintn oc_s);
+   void NewColor(stw_types::sintn osn_Hue, stw_types::sintn osn_Saturation);
    void ColorSelected(void);
 
 protected:

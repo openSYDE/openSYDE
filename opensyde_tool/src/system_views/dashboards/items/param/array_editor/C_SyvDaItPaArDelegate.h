@@ -29,14 +29,12 @@ class C_SyvDaItPaArDelegate :
 public:
    C_SyvDaItPaArDelegate(QObject * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QWidget * createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
                                   const QModelIndex & orc_Index) const;
    virtual void setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const;
    virtual void setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                              const QModelIndex & orc_Index) const;
-   //lint -restore
+
    void SetModel(const C_SyvDaItPaArModel * const opc_Value);
 
 private:

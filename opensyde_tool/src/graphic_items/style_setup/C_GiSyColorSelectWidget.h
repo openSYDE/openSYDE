@@ -41,7 +41,7 @@ class C_GiSyColorSelectWidget :
    Q_OBJECT
 
 public:
-   explicit C_GiSyColorSelectWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const QColor c_Color);
+   explicit C_GiSyColorSelectWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const QColor oc_Color);
    ~C_GiSyColorSelectWidget(void);
 
    QColor ChooseSelectedColor(void) const;
@@ -49,11 +49,8 @@ public:
    bool HandleColorPickingMouseButtonRelease(const QMouseEvent * const opc_MouseEvent);
 
 protected:
-   //The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
    virtual void showEvent(QShowEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_GiSyColorSelectWidget * mpc_Ui;
@@ -105,7 +102,7 @@ private:
    void m_InitElements(void) const;
    void m_InitStandardColorButtons(void);
    void m_SetTransparentBackground(void);
-   void m_InitConnects(void);
+   void m_InitConnects(void) const;
    void m_RepaintColorShowerButton(void) const;
    void m_OkClicked(void);
    void m_CancelClicked(void);
@@ -133,9 +130,9 @@ private:
    void m_NewColor(void);
    void m_AutomaticallyFillOutLineEditColor(void);
    void m_SetRecentColorToRecentButton(stw_opensyde_gui_elements::C_OgePubColor * const opc_Button,
-                                       const QColor c_Color) const;
+                                       const QColor oc_Color) const;
    void m_AddRecentColors(void);
-   void m_NewHsv(const stw_types::sintn osn_H, const stw_types::sintn osn_S, const stw_types::sintn osn_V);
+   void m_NewHsv(const stw_types::sintn osn_Hue, const stw_types::sintn osn_Sat, const stw_types::sintn osn_Value);
    void m_PickScreenColor(void);
    void m_UpdatePositionWhileScreenColorPicking(void);
    void m_UpdateColorPicking(const QPoint & orc_GlobalPosition);

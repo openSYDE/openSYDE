@@ -19,6 +19,7 @@
 #include "stwerrors.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_PuiSvHandler.h"
 #include "C_SdNdeDpUtil.h"
 #include "C_SdNdeDpContentUtil.h"
@@ -141,7 +142,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::headerData(const sintn osn_Section, cons
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
       {
@@ -246,10 +247,10 @@ sintn C_SyvDaPeUpdateModeTableModel::rowCount(const QModelIndex & orc_Parent) co
 {
    sintn sn_Retval = 0;
 
-   if (!orc_Parent.isValid())
+   if (orc_Parent.isValid() == false)
    {
       //Top level
-      return this->mc_UniqueDataElementIds.size();
+      sn_Retval = this->mc_UniqueDataElementIds.size();
    }
 
    return sn_Retval;
@@ -268,7 +269,7 @@ sintn C_SyvDaPeUpdateModeTableModel::columnCount(const QModelIndex & orc_Parent)
 {
    sintn sn_Retval = 0;
 
-   if (!orc_Parent.isValid())
+   if (orc_Parent.isValid() == false)
    {
       //Top level
       sn_Retval = 10;
@@ -315,23 +316,25 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   c_Retval = orc_Index.row() + 1;
                   break;
                case eNAME:
-                  c_Retval = C_PuiSdHandler::h_GetInstance()->GetNamespace(rc_CurId);
+                  c_Retval = C_PuiSdUtil::h_GetNamespace(rc_CurId);
                   break;
                case eVALUE_TYPE:
-                  pc_UIElement = C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(rc_CurId.u32_NodeIndex,
-                                                                                           rc_CurId.u32_DataPoolIndex,
-                                                                                           rc_CurId.u32_ListIndex,
-                                                                                           rc_CurId.u32_ElementIndex);
+                  pc_UIElement =
+                     C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(rc_CurId.u32_NodeIndex,
+                                                                               rc_CurId.u32_DataPoolIndex,
+                                                                               rc_CurId.u32_ListIndex,
+                                                                               rc_CurId.u32_ElementIndex);
                   if (pc_UIElement->q_InterpretAsString == true)
                   {
                      c_Retval = C_GtGetText::h_GetText("string");
                   }
                   else
                   {
-                     pc_OSCElement = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_CurId.u32_NodeIndex,
-                                                                                                rc_CurId.u32_DataPoolIndex,
-                                                                                                rc_CurId.u32_ListIndex,
-                                                                                                rc_CurId.u32_ElementIndex);
+                     pc_OSCElement =
+                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_CurId.u32_NodeIndex,
+                                                                                   rc_CurId.u32_DataPoolIndex,
+                                                                                   rc_CurId.u32_ListIndex,
+                                                                                   rc_CurId.u32_ElementIndex);
                      if (pc_OSCElement != NULL)
                      {
                         c_Retval = C_SdNdeDpUtil::h_ConvertContentTypeToString(pc_OSCElement->c_Value.GetType());
@@ -339,10 +342,11 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   }
                   break;
                case eARRAY_SIZE:
-                  pc_OSCElement = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_CurId.u32_NodeIndex,
-                                                                                             rc_CurId.u32_DataPoolIndex,
-                                                                                             rc_CurId.u32_ListIndex,
-                                                                                             rc_CurId.u32_ElementIndex);
+                  pc_OSCElement =
+                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_CurId.u32_NodeIndex,
+                                                                                rc_CurId.u32_DataPoolIndex,
+                                                                                rc_CurId.u32_ListIndex,
+                                                                                rc_CurId.u32_ElementIndex);
                   if (pc_OSCElement->GetArray() == false)
                   {
                      c_Retval = "-";
@@ -372,7 +376,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   }
                   else
                   {
-                     c_Retval = QString('-');
+                     c_Retval = static_cast<QString>('-');
                   }
                   break;
                case eTHRESHOLD:
@@ -383,7 +387,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   }
                   else
                   {
-                     c_Retval = QString('-');
+                     c_Retval = static_cast<QString>('-');
                   }
                   break;
                case eUSAGE:
@@ -399,31 +403,21 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
             }
             else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
             {
-               switch (e_Col)
+               if (e_Col == eNAME)
                {
-               case eNAME:
-                  c_Retval = C_PuiSdHandler::h_GetInstance()->GetNamespace(rc_CurId);
-                  break;
-               default:
-                  //Not necessary
-                  break;
+                  c_Retval = C_PuiSdUtil::h_GetNamespace(rc_CurId);
                }
             }
             else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
             {
-               switch (e_Col)
+               if (e_Col == eNAME)
                {
-               case eNAME:
                   c_Retval = C_SdUtil::h_GetToolTipContentDpListElement(rc_CurId);
-                  break;
-               default:
-                  //Not necessary
-                  break;
                }
             }
             else if (osn_Role == static_cast<sintn>(Qt::EditRole))
             {
-               switch (e_Col)
+               switch (e_Col) //lint !e788 //not all columns handled explicitly
                {
                case eTRANSMISSION_MODE:
                   c_Retval = C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToIndex(rc_CurConfig.e_TransmissionMode);
@@ -443,9 +437,8 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
             {
                QStringList c_Tmp;
                C_OSCNodeDataPool::E_Type e_DataPoolType;
-               switch (e_Col)
+               if (e_Col == eICON)
                {
-               case eICON:
                   if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(rc_CurId.u32_NodeIndex,
                                                                        rc_CurId.u32_DataPoolIndex,
                                                                        e_DataPoolType) == C_NO_ERR)
@@ -459,16 +452,54 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                      {
                         c_Tmp.push_back(":/images/system_definition/IconSignal.svg");
                      }
-                     else
+                     else if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eNVM)
                      {
                         c_Tmp.push_back(":/images/system_definition/IconParameter.svg");
                      }
+                     else
+                     {
+                        uint32 u32_DomainIndex;
+                        bool q_UseChannelIndex;
+                        uint32 u32_ChannelIndex;
+
+                        C_OSCHalcDefDomain::E_VariableSelector e_Selector;
+                        uint32 u32_ParameterIndex;
+                        bool q_UseElementIndex;
+                        uint32 u32_ParameterElementIndex;
+                        bool q_IsUseCaseIndex;
+                        bool q_IsChanNumIndex;
+
+                        if (C_PuiSdHandler::h_GetInstance()->TranslateToHALCIndex(rc_CurId, 0,
+                                                                                  u32_DomainIndex, q_UseChannelIndex,
+                                                                                  u32_ChannelIndex, e_Selector,
+                                                                                  u32_ParameterIndex,
+                                                                                  q_UseElementIndex,
+                                                                                  u32_ParameterElementIndex,
+                                                                                  q_IsUseCaseIndex,
+                                                                                  q_IsChanNumIndex) == C_NO_ERR)
+                        {
+                           const C_OSCHalcDefDomain * const pc_Domain =
+                              C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileDataConst(rc_CurId.u32_NodeIndex,
+                                                                                          u32_DomainIndex);
+                           if (pc_Domain != NULL)
+                           {
+                              switch (pc_Domain->e_Category)
+                              {
+                              case C_OSCHalcDefDomain::eCA_INPUT:
+                                 c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg");
+                                 break;
+                              case C_OSCHalcDefDomain::eCA_OUTPUT:
+                                 c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg");
+                                 break;
+                              case C_OSCHalcDefDomain::eCA_OTHER:
+                                 c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg");
+                                 break;
+                              }
+                           }
+                        }
+                     }
                      c_Retval = c_Tmp;
                   }
-                  break;
-               default:
-                  //Not necessary
-                  break;
                }
             }
             else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
@@ -501,14 +532,13 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
             }
             else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
             {
-               c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+               c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
             }
             else if (osn_Role == msn_USER_ROLE_INTERACTION_MAXIMUM_VALUE)
             {
                //Max requested
-               switch (e_Col)
+               if (e_Col == eTHRESHOLD)
                {
-               case eTHRESHOLD:
                   switch (rc_CurConfig.c_ChangeThreshold.GetType())
                   {
                   case C_OSCNodeDataPoolContent::eUINT8:
@@ -545,10 +575,6 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                      //Nothing to do
                      break;
                   }
-                  break;
-               default:
-                  //Not required
-                  break;
                }
             }
             else
@@ -592,7 +618,7 @@ bool C_SyvDaPeUpdateModeTableModel::setData(const QModelIndex & orc_Index, const
                sint32 s32_Count = 0;
                QVector<sintn> c_Roles;
                C_PuiSvReadDataConfiguration & rc_CurConfig = this->mc_DataElementConfigurations[u32_Index];
-               switch (e_Col)
+               switch (e_Col) //lint !e788 //not all columns need handling here
                {
                case eTRANSMISSION_MODE:
                   rc_CurConfig.e_TransmissionMode = C_SyvDaPeUpdateModeTableModel::mh_IndexToTransmissionMode(
@@ -889,7 +915,7 @@ void C_SyvDaPeUpdateModeTableModel::m_Init(const uint32 ou32_NodeIndex)
             for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
             {
                const C_PuiSvDbWidgetBase * const pc_CurWidget = c_Widgets[u32_ItWidget];
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               
                if (((pc_CurWidget != NULL) && (pc_CurWidget->IsReadElement() == true)) &&
                    (dynamic_cast<const C_PuiSvDbParam * const>(pc_CurWidget) == NULL))
                {
@@ -925,7 +951,7 @@ void C_SyvDaPeUpdateModeTableModel::m_Init(const uint32 ou32_NodeIndex)
                if (c_Count[u32_ItDataElement] > 0)
                {
                   this->mc_Usage[u32_ItDataElement] +=
-                     QString("%1(%2);").arg(pc_Dashboard->GetName()).arg(c_Count[u32_ItDataElement]);
+                     static_cast<QString>("%1(%2);").arg(pc_Dashboard->GetName()).arg(c_Count[u32_ItDataElement]);
                }
             }
          }
@@ -959,6 +985,8 @@ QString C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToString(
    case C_PuiSvReadDataConfiguration::eTM_ON_CHANGE:
       c_Retval = C_GtGetText::h_GetText("On Change");
       break;
+   default:
+      break;
    }
    return c_Retval;
 }
@@ -983,13 +1011,13 @@ QString C_SyvDaPeUpdateModeTableModel::m_RailIndexToString(const uint8 ou8_RailI
       switch (ou8_RailIndex)
       {
       case 0U:
-         c_Retval = QString(C_GtGetText::h_GetText("Fast (%1 ms)")).arg(pc_View->GetUpdateRateFast());
+         c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Fast (%1 ms)")).arg(pc_View->GetUpdateRateFast());
          break;
       case 1U:
-         c_Retval = QString(C_GtGetText::h_GetText("Medium (%1 ms)")).arg(pc_View->GetUpdateRateMedium());
+         c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Medium (%1 ms)")).arg(pc_View->GetUpdateRateMedium());
          break;
       case 2U:
-         c_Retval = QString(C_GtGetText::h_GetText("Slow (%1 ms)")).arg(pc_View->GetUpdateRateSlow());
+         c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Slow (%1 ms)")).arg(pc_View->GetUpdateRateSlow());
          break;
       default:
          c_Retval = "";
@@ -1027,6 +1055,7 @@ sintn C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToIndex(
       break;
    default:
       sn_Retval = 0;
+      break;
    }
    return sn_Retval;
 }

@@ -43,6 +43,11 @@ public:
    static bool h_GetBit(const stw_types::uint32 ou32_BitPos, const std::vector<stw_types::uint8> & orc_Bytes);
    static void h_SetBit(const stw_types::uint32 ou32_BitPos, std::vector<stw_types::uint8> & orc_Bytes,
                         const bool oq_Value);
+   static stw_types::uint32 h_CalcMessageHash(const stw_opensyde_core::C_OSCCanMessage & orc_Message,
+                                              const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_DatapoolPart);
+   static stw_types::uint32 h_CalcMessageHash(const stw_opensyde_core::C_OSCCanMessage & orc_Message,
+                                              const stw_opensyde_core::C_OSCNodeDataPoolList & orc_List);
+   static stw_types::uint32 h_CalcMessageHash(const C_CieConverter::C_CIECanMessage & orc_Message);
 
 private:
    C_CamGenSigUtil(void);

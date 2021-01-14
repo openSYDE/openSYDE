@@ -36,10 +36,7 @@ Q_SIGNALS:
    void SigDoubleClick(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QSplitterHandle * createHandle(void) override;
-   //lint -restore
 };
 
 class C_CamOgeSpiHandle :
@@ -57,11 +54,8 @@ Q_SIGNALS:
    void SigDoubleClick(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
-   //lint -restore
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

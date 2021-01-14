@@ -69,7 +69,7 @@ C_GiSyColorBrightnessPicker::~C_GiSyColorBrightnessPicker()
    \param[in]   osn_Value   New value value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorBrightnessPicker::SetColorWithHSV(sintn const osn_Hue, sintn const osn_Sat, sintn const osn_Value)
+void C_GiSyColorBrightnessPicker::SetColorWithHSV(const sintn osn_Hue, const sintn osn_Sat, const sintn osn_Value)
 {
    this->msn_Hue = osn_Hue;
    this->msn_Sat = osn_Sat;
@@ -86,7 +86,7 @@ void C_GiSyColorBrightnessPicker::SetColorWithHSV(sintn const osn_Hue, sintn con
    \param[in,out]   osn_Sat   New sat value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorBrightnessPicker::SetColorWithHS(sintn const osn_Hue, sintn const osn_Sat)
+void C_GiSyColorBrightnessPicker::SetColorWithHS(const sintn osn_Hue, const sintn osn_Sat)
 {
    Q_EMIT NewHsv(osn_Hue, osn_Sat, this->msn_Value);
 }

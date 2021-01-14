@@ -44,6 +44,16 @@ C_PuiSvDbDataElementScaling::C_PuiSvDbDataElementScaling(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   destructor
+
+   clean up ...
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvDbDataElementScaling::~C_PuiSvDbDataElementScaling(void)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.

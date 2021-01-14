@@ -67,10 +67,10 @@ private:
    void m_SwitchToBusProperties(const stw_types::uint32 ou32_Index, const QString & orc_BusName);
    void m_SetFlag(const stw_types::uint32 ou32_Flag) const;
    void m_ErrorChange(void);
-   void GenerateCode(void) const;
-   void Export(void);
-   void Import(void);
-   void RtfExport(void);
+   void m_GenerateCode(void) const;
+   void m_Export(void);
+   void m_Import(void);
+   void m_RtfExport(void);
 
    Ui::C_SdHandlerWidget * mpc_Ui;
    C_SdTopologyWidget * mpc_Topology;

@@ -67,7 +67,7 @@ C_SdNdeUnoDataPoolListMoveCommand::C_SdNdeUnoDataPoolListMoveCommand(const uint3
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListMoveCommand::redo(void)
 {
-   this->DoMoveRows(this->mc_SourceRows, this->mc_TargetRows);
+   this->m_DoMoveRows(this->mc_SourceRows, this->mc_TargetRows);
    //Update
    this->mpc_DataPoolListsTreeWidget->UpdateUI();
    C_SdNdeUnoDataPoolListBaseCommand::redo();
@@ -80,7 +80,7 @@ void C_SdNdeUnoDataPoolListMoveCommand::redo(void)
 void C_SdNdeUnoDataPoolListMoveCommand::undo(void)
 {
    C_SdNdeUnoDataPoolListBaseCommand::undo();
-   this->DoMoveRows(this->mc_TargetRows, this->mc_SourceRows);
+   this->m_DoMoveRows(this->mc_TargetRows, this->mc_SourceRows);
    //Update
    this->mpc_DataPoolListsTreeWidget->UpdateUI();
 }
@@ -99,8 +99,8 @@ void C_SdNdeUnoDataPoolListMoveCommand::undo(void)
                                    "move down" -> orc_TargetIndices + 1
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDataPoolListMoveCommand::DoMoveRows(const std::vector<uint32> & orc_SelectedIndices,
-                                                   const std::vector<uint32> & orc_TargetIndices)
+void C_SdNdeUnoDataPoolListMoveCommand::m_DoMoveRows(const std::vector<uint32> & orc_SelectedIndices,
+                                                     const std::vector<uint32> & orc_TargetIndices)
 {
    if (orc_SelectedIndices.size() == orc_TargetIndices.size())
    {

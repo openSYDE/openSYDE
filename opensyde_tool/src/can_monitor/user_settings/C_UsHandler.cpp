@@ -929,7 +929,7 @@ sint32 C_UsHandler::h_GetParentFolder(const QString & orc_CompletePath, QString 
 C_UsHandler::C_UsHandler(void) :
    mc_IniPathAndName(C_Uti::h_GetExePath() + "/User/can_monitor_user_settings.ini"),
    mc_ActualProject(""),
-   mc_DefaultProjectsFolder(QString(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) +
+   mc_DefaultProjectsFolder(static_cast<QString>(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) +
                                     "/openSYDE/Projects")),
    mq_ButtonHexActive(false),
    mq_ButtonRelativeTimeStampActive(false),

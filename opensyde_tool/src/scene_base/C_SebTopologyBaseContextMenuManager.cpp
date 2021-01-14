@@ -60,7 +60,7 @@ C_SebTopologyBaseContextMenuManager::~C_SebTopologyBaseContextMenuManager(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SebTopologyBaseContextMenuManager::m_ActivateSpecificActions(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_GiLiLineGroup * pc_LineGroup = dynamic_cast<C_GiLiLineGroup *>(this->mpc_ActiveItem);
    bool q_Return = false;
 

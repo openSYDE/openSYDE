@@ -67,7 +67,7 @@ C_SdNdeUnoLeDataPoolListElementAddCommand::C_SdNdeUnoLeDataPoolListElementAddCom
          C_PuiSdHandler::h_InitDataElement(pc_DataPool->e_Type, pc_DataPool->q_IsSafety, c_OSCContent[u32_ItData]);
       }
    }
-   this->SetInitialData(c_OSCContent, c_UIContent);
+   this->m_SetInitialData(c_OSCContent, c_UIContent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ C_SdNdeUnoLeDataPoolListElementAddCommand::C_SdNdeUnoLeDataPoolListElementAddCom
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddCommand::redo(void)
 {
-   this->Add();
+   this->m_Add();
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::redo();
 }
 
@@ -87,5 +87,5 @@ void C_SdNdeUnoLeDataPoolListElementAddCommand::redo(void)
 void C_SdNdeUnoLeDataPoolListElementAddCommand::undo(void)
 {
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::undo();
-   this->Delete();
+   this->m_Delete();
 }

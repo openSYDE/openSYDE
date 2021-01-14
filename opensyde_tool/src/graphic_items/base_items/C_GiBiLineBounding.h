@@ -36,17 +36,17 @@ public:
    C_GiBiLineBounding(const QLineF & orc_Line, const stw_types::float64 & orf64_Width, const stw_types::float64 & orf64_InteractionPointWidth =
                          stw_opensyde_gui::mf64_INTERACTION_POINT_WIDTH);
    QPainterPath GetShape(void);
-   static QPointF h_GetNorm(const QPointF & orc_P);
-   static QPointF h_AdaptVecToWidth(const QPointF & orc_P, const stw_types::float64 & orf64_Length);
-   static QPointF h_GetPerpendicular(const QPointF & orc_P);
+   static QPointF h_GetNorm(const QPointF & orc_Point);
+   static QPointF h_AdaptVecToWidth(const QPointF & orc_Point, const stw_types::float64 & orf64_Length);
+   static QPointF h_GetPerpendicular(const QPointF & orc_Point);
    static stw_types::float64 h_CrossProduct(const QPointF & orc_P1, const QPointF & orc_P2);
 
 private:
    C_GiBiLineBounding();
    void m_AppendLineBoundingPointsTop(const stw_types::sint32 & ors32_IndexStart,
                                       const stw_types::sint32 & ors32_IndexEnd);
-   QPointF m_AdaptVecToWidth(const QPointF & orc_P) const;
-   static stw_types::float64 mh_GetLength(const QPointF & orc_P);
+   QPointF m_AdaptVecToWidth(const QPointF & orc_Point) const;
+   static stw_types::float64 mh_GetLength(const QPointF & orc_Point);
    void m_ConsolidateLine(const stw_types::sint32 & ors32_RangeIndexStart,
                           const stw_types::sint32 & ors32_RangeIndexEnd);
    static bool mh_CalcIntersection(const QPointF & orc_Start1, const QPointF & orc_End1, const QPointF & orc_Start2,

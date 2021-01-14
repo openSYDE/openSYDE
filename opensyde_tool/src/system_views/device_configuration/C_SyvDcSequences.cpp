@@ -1137,7 +1137,7 @@ void C_SyvDcSequences::m_RunConfOpenSydeDevicesState(const uint32 ou32_Step, con
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::mh_ThreadFunc(void * const opv_Instance)
 {
-   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
+   //lint -e{925,9079}  This class is the only one which registers itself at the caller of this function. It must match.
    C_SyvDcSequences * const pc_Sequences = reinterpret_cast<C_SyvDcSequences * const>(opv_Instance);
 
    tgl_assert(pc_Sequences != NULL);

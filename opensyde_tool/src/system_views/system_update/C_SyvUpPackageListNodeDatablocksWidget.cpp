@@ -130,7 +130,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::AdaptFile(const QString & orc_File,
                         c_Message.SetDescription(C_GtGetText::h_GetText("Device type of selected HEX file does not "
                                                                         "match the node type."));
                         c_Message.SetDetails(
-                           QString(C_GtGetText::h_GetText("Device type of %1 does not match node type %2."))
+                           static_cast<QString>(C_GtGetText::h_GetText("Device type of %1 does not match node type %2."))
                            .arg(c_AppDeviceType.trimmed(), this->mc_DeviceType.trimmed()));
                         c_Message.SetCustomMinHeight(230, 250);
                         c_Message.Execute();
@@ -158,7 +158,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::AdaptFile(const QString & orc_File,
             }
             else
             {
-               const QString c_Details = QString(C_GtGetText::h_GetText("File path: %1")).arg(c_AbsoluteFilePath);
+               const QString c_Details = static_cast<QString>(C_GtGetText::h_GetText("File path: %1")).arg(c_AbsoluteFilePath);
                // Invalid file
                C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_Message.SetHeading(C_GtGetText::h_GetText("Update Package configuration"));
@@ -227,7 +227,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::RevertFile(C_SyvUpUpdatePackageList
          else
          {
             C_OgeWiCustomMessage c_Message(this);
-            c_Message.SetDescription(QString(C_GtGetText::h_GetText("No default output file declared in properties of "
+            c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("No default output file declared in properties of "
                                                                     "Data Block \"%1\". ")).arg(opc_App->GetAppName()));
             c_Message.SetHeading(C_GtGetText::h_GetText("Revert to Default"));
             c_Message.Execute();
@@ -271,7 +271,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::PrepareExportConfig(C_SyvUpUpdatePa
 
          if (pc_Item != NULL)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
                dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -312,7 +312,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::LoadImportConfig(const C_SyvUpUpdat
 
             if (pc_Item != NULL)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
                   dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -365,7 +365,7 @@ const
 
       if (pc_Item != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -529,8 +529,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::m_InitSpecificItem(const stw_opensy
 
          ++this->mu32_FileCount;
          this->mpc_Ui->pc_AppVerticalLayout->addWidget(pc_AppWidget);
-         //lint -e{429}  no memory leak because of the parent of pc_AppWidget and the Qt memory management
-      }
+      }  //lint !e429  //no memory leak because of the parent of pc_AppWidget and the Qt memory management
    }
 
    this->mq_ShowAddButton = false;

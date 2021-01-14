@@ -94,7 +94,7 @@ void C_SdNdeDpListCommentDialog::InitStaticNames(void) const
 
    if (pc_List != NULL)
    {
-      mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("List %1")).arg(pc_List->c_Name.c_str()));
+      mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("List %1")).arg(pc_List->c_Name.c_str()));
       this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
       this->mpc_Ui->pc_TextEditComment->setText(pc_List->c_Comment.c_str());
    }

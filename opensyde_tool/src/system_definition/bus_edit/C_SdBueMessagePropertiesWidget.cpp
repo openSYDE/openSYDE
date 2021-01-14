@@ -130,6 +130,7 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because the ownership of these objects was never transfered to this class
 C_SdBueMessagePropertiesWidget::~C_SdBueMessagePropertiesWidget(void)
 {
    delete mpc_Ui;
@@ -278,7 +279,7 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
       const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
 
       //Disconnects for RegisterChange
-      m_DisconnectAllChanges();
+      DisconnectAllChanges();
 
       tgl_assert(pc_Message != NULL);
       if (pc_Message != NULL)
@@ -301,7 +302,7 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
          this->mpc_Ui->pc_SpinBoxDlc->setValue(pc_Message->u16_Dlc);
 
          //Tx method
-         this->mpc_Ui->pc_ComboBoxTxMethod->setCurrentIndex(h_TxMethodToIndex(pc_Message->e_TxMethod));
+         this->mpc_Ui->pc_ComboBoxTxMethod->setCurrentIndex(mh_TxMethodToIndex(pc_Message->e_TxMethod));
 
          if (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT)
          {
@@ -379,7 +380,7 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
       }
 
       //connects for RegisterChange
-      m_ConnectAllChanges();
+      ConnectAllChanges();
    }
 }
 
@@ -462,7 +463,7 @@ void C_SdBueMessagePropertiesWidget::m_OnTxMethodChange(const sint32 & ors32_Sta
    Combo box index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueMessagePropertiesWidget::h_TxMethodToIndex(const C_OSCCanMessage::E_TxMethodType & ore_TxMethod)
+sint32 C_SdBueMessagePropertiesWidget::mh_TxMethodToIndex(const C_OSCCanMessage::E_TxMethodType & ore_TxMethod)
 {
    sint32 s32_Retval;
 
@@ -493,7 +494,7 @@ sint32 C_SdBueMessagePropertiesWidget::h_TxMethodToIndex(const C_OSCCanMessage::
    Tx method type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanMessage::E_TxMethodType C_SdBueMessagePropertiesWidget::h_IndexToTxMethod(const sint32 & ors32_Index)
+C_OSCCanMessage::E_TxMethodType C_SdBueMessagePropertiesWidget::mh_IndexToTxMethod(const sint32 & ors32_Index)
 {
    C_OSCCanMessage::E_TxMethodType e_Retval;
    if (ors32_Index == ms32_TX_TYPE_INDEX_CYCLIC)
@@ -631,7 +632,7 @@ void C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged(void)
             c_MessageData.u16_Dlc = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxDlc->value());
 
             //Tx method
-            e_CurrentTxMethod = h_IndexToTxMethod(this->mpc_Ui->pc_ComboBoxTxMethod->currentIndex());
+            e_CurrentTxMethod = mh_IndexToTxMethod(this->mpc_Ui->pc_ComboBoxTxMethod->currentIndex());
             if (e_CurrentTxMethod != c_MessageData.e_TxMethod)
             {
                if (c_MessageData.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT)
@@ -733,7 +734,7 @@ void C_SdBueMessagePropertiesWidget::m_OnDirectionChanged(void)
             tgl_assert(rc_Messages.size() > 0);
             if (rc_Messages.size() > 0)
             {
-               this->mc_MessageId.u32_MessageIndex = rc_Messages.size() - 1UL;
+               this->mc_MessageId.u32_MessageIndex = static_cast<uint32>(rc_Messages.size()) - 1UL;
             }
          }
 
@@ -893,7 +894,8 @@ void C_SdBueMessagePropertiesWidget::m_OnTxChanged(void)
                            this->mc_MessageId.u32_InterfaceIndex = this->mc_BusInterfaceIndexes[u32_CurrentIndex];
                            this->mc_MessageId.u32_DatapoolIndex = this->mc_BusDatapoolIndexes[u32_CurrentIndex];
                            this->mc_MessageId.q_MessageIsTx = true;
-                           this->mc_MessageId.u32_MessageIndex = pc_MessageContainer->c_TxMessages.size() - 1UL;
+                           this->mc_MessageId.u32_MessageIndex =
+                              static_cast<uint32>(pc_MessageContainer->c_TxMessages.size()) - 1UL;
 
                            Q_EMIT (this->SigMessageIdChanged(this->mc_MessageId));
                         }
@@ -1076,7 +1078,7 @@ void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutValueChanged(const uint32 ou32
 /*! \brief   Reconnect update signals for fields which are affected by protocol changes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessagePropertiesWidget::m_ConnectProtocolSpecificFields(void)
+void C_SdBueMessagePropertiesWidget::m_ConnectProtocolSpecificFields(void) const
 {
    connect(this->mpc_Ui->pc_CheckBoxExtendedType, &C_OgeChxProperties::toggled, this,
            &C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged);
@@ -1096,7 +1098,7 @@ void C_SdBueMessagePropertiesWidget::m_ConnectProtocolSpecificFields(void)
 /*! \brief   Disconnect update signals for fields which are affected by protocol changes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessagePropertiesWidget::m_DisconnectProtocolSpecificFields(void)
+void C_SdBueMessagePropertiesWidget::m_DisconnectProtocolSpecificFields(void) const
 {
    disconnect(this->mpc_Ui->pc_CheckBoxExtendedType, &C_OgeChxProperties::toggled, this,
               &C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged);
@@ -1116,7 +1118,7 @@ void C_SdBueMessagePropertiesWidget::m_DisconnectProtocolSpecificFields(void)
 /*! \brief   Reconnect update signals for fields which are affected by node changes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessagePropertiesWidget::m_ConnectNodeSpecificFields(void)
+void C_SdBueMessagePropertiesWidget::m_ConnectNodeSpecificFields(void) const
 {
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxTransmitterNode, static_cast<void (QComboBox::*)(
@@ -1138,7 +1140,7 @@ void C_SdBueMessagePropertiesWidget::m_ConnectNodeSpecificFields(void)
 /*! \brief   Disconnect update signals for fields which are affected by node changes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessagePropertiesWidget::m_DisconnectNodeSpecificFields(void)
+void C_SdBueMessagePropertiesWidget::m_DisconnectNodeSpecificFields(void) const
 {
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_ComboBoxTransmitterNode,
@@ -1154,74 +1156,6 @@ void C_SdBueMessagePropertiesWidget::m_DisconnectNodeSpecificFields(void)
               &C_SdBueMessagePropertiesWidget::m_OnRxTimeoutFlagChanged);
    disconnect(this->mpc_Ui->pc_WidgetReceiver, &C_SdBueMessageRxList::SigNodeReceiveTimeout, this,
               &C_SdBueMessagePropertiesWidget::m_OnRxTimeoutValueChanged);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Reconnect update signals for fields which signal changes
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessagePropertiesWidget::m_ConnectAllChanges(void)
-{
-   m_ConnectProtocolSpecificFields();
-   m_ConnectNodeSpecificFields();
-   connect(this->mpc_Ui->pc_LineEditName, &QLineEdit::editingFinished, this,
-           &C_SdBueMessagePropertiesWidget::m_OnNameChanged);
-   connect(this->mpc_Ui->pc_TextEditComment, &QTextEdit::textChanged, this,
-           &C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxCycleTime, static_cast<void (QSpinBox::*)(
-                                                             sintn)>(&C_OgeSpxNumber::valueChanged), this,
-           &C_SdBueMessagePropertiesWidget::m_OnCycleTimeChanged);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxEarly, static_cast<void (QSpinBox::*)(
-                                                         sintn)>(&C_OgeSpxNumber::valueChanged), this,
-           &C_SdBueMessagePropertiesWidget::m_OnEarlyOrLaterTimeChanged);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxLater, static_cast<void (QSpinBox::*)(
-                                                         sintn)>(&C_OgeSpxNumber::valueChanged), this,
-           &C_SdBueMessagePropertiesWidget::m_OnEarlyOrLaterTimeChanged);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_ComboBoxDirection, static_cast<void (QComboBox::*)(
-                                                              sintn)>(&C_OgeCbxText::currentIndexChanged), this,
-           &C_SdBueMessagePropertiesWidget::m_OnDirectionChanged);
-   //lint -e{929,1013} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_ComboBoxTransmitterDatapoolOnly,
-           static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged),
-           this, &C_SdBueMessagePropertiesWidget::m_NodeModeTransmitDatapoolChanged);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Disconnect update signals for fields which signal changes
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessagePropertiesWidget::m_DisconnectAllChanges(void)
-{
-   m_DisconnectProtocolSpecificFields();
-   m_DisconnectNodeSpecificFields();
-   disconnect(this->mpc_Ui->pc_LineEditName, &QLineEdit::editingFinished, this,
-              &C_SdBueMessagePropertiesWidget::m_OnNameChanged);
-   disconnect(this->mpc_Ui->pc_TextEditComment, &QTextEdit::textChanged, this,
-              &C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_SpinBoxCycleTime, static_cast<void (QSpinBox::*)(
-                                                                sintn)>(&C_OgeSpxNumber::valueChanged), this,
-              &C_SdBueMessagePropertiesWidget::m_OnCycleTimeChanged);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_SpinBoxEarly, static_cast<void (QSpinBox::*)(
-                                                            sintn)>(&C_OgeSpxNumber::valueChanged), this,
-              &C_SdBueMessagePropertiesWidget::m_OnEarlyOrLaterTimeChanged);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_SpinBoxLater, static_cast<void (QSpinBox::*)(
-                                                            sintn)>(&C_OgeSpxNumber::valueChanged), this,
-              &C_SdBueMessagePropertiesWidget::m_OnEarlyOrLaterTimeChanged);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_ComboBoxDirection, static_cast<void (QComboBox::*)(
-                                                                 sintn)>(&C_OgeCbxText::currentIndexChanged), this,
-              &C_SdBueMessagePropertiesWidget::m_OnDirectionChanged);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_ComboBoxTransmitterDatapoolOnly,
-              static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged),
-              this, &C_SdBueMessagePropertiesWidget::m_NodeModeTransmitDatapoolChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1356,8 +1290,8 @@ void C_SdBueMessagePropertiesWidget::m_UpdateTxSelection(
                    (this->mc_BusInterfaceIndexes[u32_ItNode] == rc_CurrentMessageId.u32_InterfaceIndex) &&
                    (this->mc_BusDatapoolIndexes[u32_ItNode] == rc_CurrentMessageId.u32_DatapoolIndex))
                {
-                  uint32 u32_ComboBoxNodeIndex;
-                  uint32 u32_ComboBoxDatapoolIndex;
+                  uint32 u32_ComboBoxNodeIndex = 0U;
+                  uint32 u32_ComboBoxDatapoolIndex = 0U;
                   uint32 u32_CounterDatapoolIndex;
                   const std::vector<QString> * pc_MappedDatapoolNames;
 
@@ -1557,7 +1491,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
       if (q_TxSelected == true)
       {
          //Typical size (1 tx, X rx)
-         u32_Size = orc_MatchingMessageIds.size() - 1UL;
+         u32_Size = static_cast<uint32>(orc_MatchingMessageIds.size()) - 1UL;
       }
       else
       {
@@ -1788,7 +1722,7 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeDirectionChanged(const bool oq_Di
 
          if (oq_Disconnect == true)
          {
-            this->m_DisconnectAllChanges();
+            this->DisconnectAllChanges();
          }
 
          // get all names
@@ -1908,7 +1842,7 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeDirectionChanged(const bool oq_Di
 
          if (oq_Disconnect == true)
          {
-            this->m_ConnectAllChanges();
+            this->ConnectAllChanges();
          }
       }
    }
@@ -1945,7 +1879,8 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeTransmitDatapoolChanged(void)
                   //Update message id
                   this->mc_MessageId.u32_DatapoolIndex = u32_SelectedDatapoolIndex;
                   this->mc_MessageId.q_MessageIsTx = true;
-                  this->mc_MessageId.u32_MessageIndex = pc_MessageContainer->c_TxMessages.size() - 1UL;
+                  this->mc_MessageId.u32_MessageIndex = static_cast<uint32>(pc_MessageContainer->c_TxMessages.size()) -
+                                                        1UL;
 
                   Q_EMIT this->SigMessageIdChanged(this->mc_MessageId);
                }
@@ -2069,7 +2004,7 @@ void C_SdBueMessagePropertiesWidget::OnConnectionChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Type & ore_Value)
 {
-   m_DisconnectAllChanges();
+   DisconnectAllChanges();
    this->me_ComProtocol = ore_Value;
    //Protocol specific changes
    if (ore_Value == C_OSCCanProtocol::eECES)
@@ -2123,7 +2058,7 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Ty
    this->mpc_Ui->pc_SpinBoxCycleTime->SetMaximumCustom(50000);
    this->mpc_Ui->pc_SpinBoxLater->SetMinimumCustom(1);
    this->mpc_Ui->pc_SpinBoxLater->SetMaximumCustom(50000);
-   m_ConnectAllChanges();
+   ConnectAllChanges();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2156,6 +2091,74 @@ void C_SdBueMessagePropertiesWidget::OnNodeDisconnected(const uint32 ou32_NodeIn
          this->mpc_MessageSyncManager->ReplaceMessageIdWithMatchingId(this->mc_MessageId);
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect update signals for fields which signal changes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessagePropertiesWidget::ConnectAllChanges(void) const
+{
+   m_ConnectProtocolSpecificFields();
+   m_ConnectNodeSpecificFields();
+   connect(this->mpc_Ui->pc_LineEditName, &QLineEdit::editingFinished, this,
+           &C_SdBueMessagePropertiesWidget::m_OnNameChanged);
+   connect(this->mpc_Ui->pc_TextEditComment, &QTextEdit::textChanged, this,
+           &C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_SpinBoxCycleTime, static_cast<void (QSpinBox::*)(
+                                                             sintn)>(&C_OgeSpxNumber::valueChanged), this,
+           &C_SdBueMessagePropertiesWidget::m_OnCycleTimeChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_SpinBoxEarly, static_cast<void (QSpinBox::*)(
+                                                         sintn)>(&C_OgeSpxNumber::valueChanged), this,
+           &C_SdBueMessagePropertiesWidget::m_OnEarlyOrLaterTimeChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_SpinBoxLater, static_cast<void (QSpinBox::*)(
+                                                         sintn)>(&C_OgeSpxNumber::valueChanged), this,
+           &C_SdBueMessagePropertiesWidget::m_OnEarlyOrLaterTimeChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_ComboBoxDirection, static_cast<void (QComboBox::*)(
+                                                              sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+           &C_SdBueMessagePropertiesWidget::m_OnDirectionChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_ComboBoxTransmitterDatapoolOnly,
+           static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged),
+           this, &C_SdBueMessagePropertiesWidget::m_NodeModeTransmitDatapoolChanged);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect update signals for fields which signal changes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessagePropertiesWidget::DisconnectAllChanges(void) const
+{
+   m_DisconnectProtocolSpecificFields();
+   m_DisconnectNodeSpecificFields();
+   disconnect(this->mpc_Ui->pc_LineEditName, &QLineEdit::editingFinished, this,
+              &C_SdBueMessagePropertiesWidget::m_OnNameChanged);
+   disconnect(this->mpc_Ui->pc_TextEditComment, &QTextEdit::textChanged, this,
+              &C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_SpinBoxCycleTime, static_cast<void (QSpinBox::*)(
+                                                                sintn)>(&C_OgeSpxNumber::valueChanged), this,
+              &C_SdBueMessagePropertiesWidget::m_OnCycleTimeChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_SpinBoxEarly, static_cast<void (QSpinBox::*)(
+                                                            sintn)>(&C_OgeSpxNumber::valueChanged), this,
+              &C_SdBueMessagePropertiesWidget::m_OnEarlyOrLaterTimeChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_SpinBoxLater, static_cast<void (QSpinBox::*)(
+                                                            sintn)>(&C_OgeSpxNumber::valueChanged), this,
+              &C_SdBueMessagePropertiesWidget::m_OnEarlyOrLaterTimeChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_ComboBoxDirection, static_cast<void (QComboBox::*)(
+                                                                 sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+              &C_SdBueMessagePropertiesWidget::m_OnDirectionChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_ComboBoxTransmitterDatapoolOnly,
+              static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged),
+              this, &C_SdBueMessagePropertiesWidget::m_NodeModeTransmitDatapoolChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2319,10 +2322,10 @@ void C_SdBueMessagePropertiesWidget::m_CheckEarlyTime(void) const
          const QString c_Heading1 = C_GtGetText::h_GetText("Not earlier than");
          const QString c_Heading2 = C_GtGetText::h_GetText("But not later than");
          const QString c_Content1 =
-            QString(C_GtGetText::h_GetText("Value may not be greater than the value for \"%1\"")).arg(
+            static_cast<QString>(C_GtGetText::h_GetText("Value may not be greater than the value for \"%1\"")).arg(
                c_Heading2);
          const QString c_Content2 =
-            QString(C_GtGetText::h_GetText("Value may not be smaller than the value for \"%1\"")).arg(
+            static_cast<QString>(C_GtGetText::h_GetText("Value may not be smaller than the value for \"%1\"")).arg(
                c_Heading1);
          this->mpc_Ui->pc_SpinBoxEarly->SetToolTipAdditionalInfo(c_Content1, C_NagToolTip::eERROR);
          this->mpc_Ui->pc_SpinBoxLater->SetToolTipAdditionalInfo(c_Content2, C_NagToolTip::eERROR);

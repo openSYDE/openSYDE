@@ -447,11 +447,7 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_LoadApps(C_OSCXMLParser & orc_XMLParser
             // Type of application
             if (orc_XMLParser.SelectNodeChild("type") == "type")
             {
-               if (C_OSCNodeApplication::h_StringToApplication(orc_XMLParser.GetNodeContent(),
-                                                               c_AppConfig.e_Type) != C_NO_ERR)
-               {
-                  q_Success = false;
-               }
+               C_OSCNodeApplication::h_StringToApplication(orc_XMLParser.GetNodeContent(), c_AppConfig.e_Type);
 
                //Return
                tgl_assert(orc_XMLParser.SelectNodeParent() == "application");

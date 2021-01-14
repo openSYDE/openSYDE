@@ -2419,106 +2419,11 @@ QString C_PuiSdHandlerBusLogic::GetCanSignalDisplayName(const C_OSCCanMessageIde
    {
       if (pc_Signal->e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
-         c_Retval = QString("%1 (Multiplexer)").arg(pc_SignalData->c_Name.c_str());
+         c_Retval = static_cast<QString>("%1 (Multiplexer)").arg(pc_SignalData->c_Name.c_str());
       }
       else
       {
          c_Retval = pc_SignalData->c_Name.c_str();
-      }
-   }
-   return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get namespace for ID
-
-   \param[in]  orc_Id   ID
-
-   \return
-   Namespace
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdHandlerBusLogic::GetNamespace(const C_OSCNodeDataPoolListElementId & orc_Id) const
-{
-   QString c_Retval;
-   const C_OSCNode * const pc_Node = this->GetOSCNodeConst(orc_Id.u32_NodeIndex);
-   const C_OSCNodeDataPool * const pc_DataPool = this->GetOSCDataPool(orc_Id.u32_NodeIndex, orc_Id.u32_DataPoolIndex);
-   const C_OSCNodeDataPoolList * const pc_List = this->GetOSCDataPoolList(orc_Id.u32_NodeIndex,
-                                                                          orc_Id.u32_DataPoolIndex,
-                                                                          orc_Id.u32_ListIndex);
-   const C_OSCNodeDataPoolListElement * const pc_Element = this->GetOSCDataPoolListElement(orc_Id.u32_NodeIndex,
-                                                                                           orc_Id.u32_DataPoolIndex,
-                                                                                           orc_Id.u32_ListIndex,
-                                                                                           orc_Id.u32_ElementIndex);
-
-   if ((((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL)) && (pc_Element != NULL))
-   {
-      QString c_ElementName;
-      C_OSCCanMessageIdentificationIndices c_MessageID;
-      uint32 u32_SignalIndex;
-      //Special handling for signals: append message name as the signal name might not be unique
-      if ((pc_DataPool->e_Type == C_OSCNodeDataPool::eCOM) &&
-          (C_PuiSdUtil::h_ConvertIndex(orc_Id, c_MessageID, u32_SignalIndex) == C_NO_ERR))
-      {
-         const C_OSCCanMessage * const pc_Message = this->GetCanMessage(c_MessageID);
-         if (pc_Message != NULL)
-         {
-            c_ElementName = QString("%1_%2").arg(pc_Message->c_Name.c_str()).arg(pc_Element->c_Name.c_str());
-         }
-         else
-         {
-            c_ElementName = pc_Element->c_Name.c_str();
-         }
-      }
-      else
-      {
-         c_ElementName = pc_Element->c_Name.c_str();
-      }
-      c_Retval =
-         QString("%1::%2::%3::%4").arg(pc_Node->c_Properties.c_Name.c_str()).arg(pc_DataPool->c_Name.c_str()).arg(
-            pc_List->c_Name.c_str()).arg(c_ElementName);
-   }
-   return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get namespace for signal ID
-
-   \param[in]  orc_Id   Signal ID
-
-   \return
-   Namespace
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdHandlerBusLogic::GetSignalNamespace(const C_OSCNodeDataPoolListElementId & orc_Id) const
-{
-   QString c_Retval;
-   C_OSCCanMessageIdentificationIndices c_MessageID;
-   uint32 u32_SignalIndex;
-
-   if (C_PuiSdUtil::h_ConvertIndex(orc_Id, c_MessageID, u32_SignalIndex) == C_NO_ERR)
-   {
-      const C_OSCNode * const pc_Node = this->GetOSCNodeConst(c_MessageID.u32_NodeIndex);
-      if ((pc_Node != NULL) && (c_MessageID.u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
-      {
-         const C_OSCNodeComInterfaceSettings & rc_Interface =
-            pc_Node->c_Properties.c_ComInterfaces[c_MessageID.u32_InterfaceIndex];
-         if (rc_Interface.q_IsBusConnected == true)
-         {
-            const C_OSCSystemBus * const pc_Bus = this->GetOSCBus(rc_Interface.u32_BusIndex);
-            const C_OSCCanMessage * const pc_Message = this->GetCanMessage(c_MessageID);
-            const C_OSCNodeDataPoolListElement * const pc_Element = this->GetOSCDataPoolListElement(
-               orc_Id.u32_NodeIndex,
-               orc_Id.u32_DataPoolIndex,
-               orc_Id.u32_ListIndex,
-               orc_Id.u32_ElementIndex);
-
-            if (((pc_Bus != NULL) && (pc_Message != NULL)) && (pc_Element != NULL))
-            {
-               c_Retval = QString("%1::%2::%3").arg(pc_Bus->c_Name.c_str()).arg(pc_Message->c_Name.c_str()).arg(
-                  pc_Element->c_Name.c_str());
-            }
-         }
       }
    }
    return c_Retval;

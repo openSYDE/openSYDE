@@ -51,7 +51,7 @@ public:
    ~C_CamMosDatabaseItemWidget(void);
 
    void SetState(const E_LoadingState oe_State);
-   void SetBusIndex(const stw_types::uint32 u32_BusIndex);
+   void SetBusIndex(const stw_types::uint32 ou32_BusIndex);
    void SetBusses(const std::vector<stw_opensyde_core::C_OSCSystemBus> & orc_Busses);
    void UpdateTooltip(void) const;
    void UpdateDatabasePathRelativeness(const QString & orc_NewDatabaseName);
@@ -69,12 +69,13 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigRemoveDatabase(C_CamMosDatabaseItemWidget * const opc_Sender, const bool oq_AskUser);
-   void SigEnableDatabase(const C_CamMosDatabaseItemWidget * const opc_Sender, const bool oq_Select);
+   bool SigEnableDatabase(const C_CamMosDatabaseItemWidget * const opc_Sender, const bool oq_Select);
    void SigUpdateDatabasePath(C_CamMosDatabaseItemWidget * const opc_Sender,
                               const stw_opensyde_gui_logic::C_CamProDatabaseData & orc_Database,
                               const bool oq_IsUpdate);
    void SigUpdateDatabaseOsySysdefBus(C_CamMosDatabaseItemWidget * const opc_Sender,
                                       const stw_types::sint32 os32_BusIndex);
+   void SigNotifyMissingDataBase(const QString & orc_Path);
 
 private:
    Ui::C_CamMosDatabaseItemWidget * mpc_Ui;
@@ -101,10 +102,7 @@ private:
    void m_ButtonReleased(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool event(QEvent * const opc_Event) override;
-   //lint -restore
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

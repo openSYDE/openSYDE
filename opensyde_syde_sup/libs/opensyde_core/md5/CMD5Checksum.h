@@ -29,7 +29,6 @@
 
 namespace stw_md5
 {
-
 class PACKAGE CMD5Checksum
 {
 public:
@@ -49,21 +48,12 @@ private:
       stw_types::uint8 au8_Buffer[64];
    };
 
-   static void mh_md5_init(C_HashState * const opc_HashState);
-   static stw_types::sint32 mh_md5_process(C_HashState * const opc_HashState, const stw_types::uint8 * opu8_Input,
-                                           stw_types::uint32 ou32_InputLength);
-   static stw_types::sint32 mh_md5_done(C_HashState * const opc_HashState, stw_types::uint8 * const opu8_Output);
-   static void mh_md5_compress(C_HashState * const opc_HashState, const stw_types::uint8 * const opu8_Buffer);
+   static void mh_MD5Init(C_HashState * const opc_HashState);
+   static stw_types::sint32 mh_MD5Process(C_HashState * const opc_HashState, const stw_types::uint8 * opu8_Input,
+                                          stw_types::uint32 ou32_InputLength);
+   static stw_types::sint32 mh_MD5Done(C_HashState * const opc_HashState, stw_types::uint8 * const opu8_Output);
+   static void mh_MD5Compress(C_HashState * const opc_HashState, const stw_types::uint8 * const opu8_Buffer);
 };
-
 }
 
 #endif
-
-
-
-
-
-
-
-

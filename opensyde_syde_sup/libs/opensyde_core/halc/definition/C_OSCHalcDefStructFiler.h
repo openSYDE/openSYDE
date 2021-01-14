@@ -38,10 +38,10 @@ public:
                                           const stw_scl::C_SCLString & orc_SectionNodeName,
                                           const stw_scl::C_SCLString & orc_GroupNodeName,
                                           const stw_scl::C_SCLString & orc_SingleNodeName);
-   static void h_ParseSimplestTypeValue(const stw_scl::C_SCLString & orc_TypeStr,
-                                        C_OSCNodeDataPoolContent & orc_Content,
-                                        const C_OSCXMLParserBase & orc_XMLParser,
-                                        const stw_scl::C_SCLString & orc_AttributeName);
+   static stw_types::sint32 h_ParseSimplestTypeValue(const stw_scl::C_SCLString & orc_TypeStr,
+                                                     C_OSCNodeDataPoolContent & orc_Content,
+                                                     const C_OSCXMLParserBase & orc_XMLParser,
+                                                     const stw_scl::C_SCLString & orc_AttributeName);
    static stw_types::sint32 h_GetTypeForSimplestTypeString(const stw_scl::C_SCLString & orc_TypeStr,
                                                            C_OSCNodeDataPoolContent::E_Type & ore_Type);
    static stw_scl::C_SCLString h_GetTypeString(const C_OSCNodeDataPoolContent::E_Type oe_Type);
@@ -60,10 +60,11 @@ public:
                                                         const bool oq_RequireAttribute,
                                                         const stw_scl::C_SCLString & orc_CurrentNodeName);
 
+   static const stw_types::uint32 hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH;
+
 private:
    static const stw_scl::C_SCLString mhc_False;
    static const stw_scl::C_SCLString mhc_True;
-   static const stw_types::uint32 hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH = 32UL;
 
    C_OSCHalcDefStructFiler(void);
 
@@ -97,6 +98,9 @@ private:
    static bool mh_CheckInitialBitmaskContentValid(const C_OSCHalcDefContent & orc_Content);
    static stw_scl::C_SCLString mh_ConvertToHex(const stw_types::uint64 ou64_Value);
    static void mh_HandleEnumMinMax(C_OSCHalcDefElement & orc_Element);
+   static stw_types::sint32 mh_CheckValidUint(const stw_scl::C_SCLString & orc_Item);
+   static stw_types::sint32 mh_CheckValidSint(const stw_scl::C_SCLString & orc_Item);
+   static stw_types::sint32 mh_CheckValidDouble(const stw_scl::C_SCLString & orc_Item);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

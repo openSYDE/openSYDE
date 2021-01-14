@@ -250,7 +250,7 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxProgramming->addItem(C_GtGetText::h_GetText("Enabled"));
 
    //Add space because of spacing issue between icon and text
-   this->mpc_Ui->pc_PushButtonFlashloaderOptions->setText(QString(' ') +
+   this->mpc_Ui->pc_PushButtonFlashloaderOptions->setText(static_cast<QString>(' ') +
                                                           C_GtGetText::h_GetText("STW Flashloader Settings"));
 
    this->mpc_Ui->pc_LabelFlashAccess->setText(C_GtGetText::h_GetText("Flash Access"));
@@ -337,31 +337,35 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColUpdate, Qt::Horizontal,
                                                                   C_GtGetText::h_GetText("Update"),
                                                                   C_GtGetText::h_GetText(
-                                                                     "Is the openSYDE tool legitimated to use this "
-                                                                     "interface for System Update?"
-                                                                     "\nUse case: System Update. This property is just "
-                                                                     "a configuration for openSYDE tool, "
-                                                                     "\nit is NOT configured on device."));
+                                                                     "Here the interface is authorized via which the "
+                                                                     "openSYDE PC tool may update the system. "
+                                                                     "\nUse case: SYSTEM COMMISSIONING - System Update. "
+                                                                     "\n\nThis property is just "
+                                                                     "a configuration for openSYDE PC tool, "
+                                                                     "it is NOT configured on device."));
 
    this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColDiagnostic, Qt::Horizontal,
                                                                   C_GtGetText::h_GetText("Diagnostic"),
                                                                   C_GtGetText::h_GetText(
-                                                                     "Is the openSYDE tool legitimated to use this "
-                                                                     "interface for diagnostic requests?"
-                                                                     "\nUse case: Dashboards. This property is just a "
-                                                                     "configuration for openSYDE tool, "
-                                                                     "\nit is NOT configured on device."));
+                                                                     "Here the interface is authorized, which the "
+                                                                     "openSYDE PC tool can use for diagnostic requests. "
+                                                                     "\nUse case: SYSTEM COMMISSIONING - Dashboards. "
+                                                                     "\n\nThis property is just a "
+                                                                     "configuration for openSYDE PC tool, "
+                                                                     "it is NOT configured on device."));
 
    this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColRouting, Qt::Horizontal,
                                                                   C_GtGetText::h_GetText("Routing"),
                                                                   C_GtGetText::h_GetText(
-                                                                     "Is the openSYDE tool legitimated to use this "
-                                                                     "interface for diagnostic protocol routing? "
+                                                                     "Here the interface is authorized, which the "
+                                                                     "openSYDE PC tool can use for diagnostic protocol "
+                                                                     "routing."
                                                                      "\nAttention: This property is intended as additive "
-                                                                     "feature in addition to \"Update\" resp. \"Diagnostic\" "
-                                                                     "\nUse cases: System Update and Dashboards. This "
+                                                                     "feature in addition to \"Update\" and \"Diagnostic\" "
+                                                                     "\nUse cases: SYSTEM COMMISSIONING - System Update "
+                                                                     "and Dashboards.\n\nThis "
                                                                      "property is just a configuration for openSYDE tool, "
-                                                                     "\nit is NOT configured on device."));
+                                                                     "it is NOT configured on device."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -441,7 +445,8 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
          this->mpc_Ui->pc_TextEditComment->setText(pc_Node->c_Properties.c_Comment.c_str());
 
          //protocol
-         if ((pc_DevDef->q_FlashloaderOpenSydeCan == true) ||
+         if ((pc_DevDef->q_FlashloaderOpenSydeEthernet == true) ||
+             (pc_DevDef->q_FlashloaderOpenSydeCan == true) ||
              (pc_DevDef->q_FlashloaderStwCan == true))
          {
             if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE)
@@ -462,7 +467,8 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                tgl_assert(false);
             }
 
-            if ((pc_DevDef->q_FlashloaderOpenSydeCan == true) &&
+            if (((pc_DevDef->q_FlashloaderOpenSydeEthernet == true) ||
+                 (pc_DevDef->q_FlashloaderOpenSydeCan == true)) &&
                 (pc_DevDef->q_FlashloaderStwCan == true))
             {
                // Hybrid node. Both variants are possible.
@@ -619,7 +625,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                                                   static_cast<uint8>(u16_ComIfCnt -
                                                                      static_cast<sintn> (pc_DevDef->u8_NumCanBusses)));
             }
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             dynamic_cast<C_OgeChxTristateTransparentError *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
                                                                  u16_ComIfCnt, sn_ColInterface))->setText(c_ComIfName);
 
@@ -650,7 +656,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                c_BusName = "-"; // "not connected";
             }
 
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
                                        u16_ComIfCnt, sn_ColConnection))->setText(c_BusName);
 
@@ -707,10 +713,10 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                c_IpAddressString = "-";
             }
 
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
                                        u16_ComIfCnt, sn_ColIpAddress))->setText(c_IpAddressString);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
                                        u16_ComIfCnt, sn_ColIpAddress))->setAlignment(Qt::AlignCenter);
 
@@ -746,7 +752,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             //set node value
             if (q_IsUpdateAvailable == true)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                  ->cellWidget(u16_ComIfCnt, sn_ColUpdate))
                ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u16_ComIfCnt].q_IsUpdateEnabled);
@@ -757,7 +763,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, sn_ColUpdate)->setEnabled(false);
             }
             //connect to RegisterChange
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                       ->cellWidget(u16_ComIfCnt,
                                                                    sn_ColUpdate)), &QCheckBox::stateChanged, this,
@@ -772,7 +778,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             if (q_IsRoutingAvailable == true)
             {
                //set node value
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                  ->cellWidget(u16_ComIfCnt, sn_ColRouting))
                ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u16_ComIfCnt].q_IsRoutingEnabled);
@@ -784,7 +790,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                setEnabled(false);
             }
             //connect to RegisterChange
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                       ->cellWidget(u16_ComIfCnt,
                                                                    sn_ColRouting)), &QCheckBox::stateChanged, this,
@@ -798,7 +804,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             if (q_IsDiagnosisAvailable == true)
             {
                //set node value
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                  ->cellWidget(u16_ComIfCnt, sn_ColDiagnostic))
                ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u16_ComIfCnt].q_IsDiagnosisEnabled);
@@ -811,7 +817,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             }
 
             //connect to RegisterChange
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                       ->cellWidget(u16_ComIfCnt,
                                                                    sn_ColDiagnostic)), &QCheckBox::stateChanged, this,
@@ -928,7 +934,7 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
                if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
                                                                          sn_ColUpdate)->isEnabled() == true)
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                   q_NewValue =
                      dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                        ->cellWidget(u16_ComIfCnt, sn_ColUpdate))->isChecked();
@@ -951,7 +957,7 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
                if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
                                                                          sn_ColRouting)->isEnabled() == true)
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                   q_NewValue =
                      dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                        ->cellWidget(u16_ComIfCnt, sn_ColRouting))->isChecked();
@@ -974,7 +980,7 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
                if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
                                                                          sn_ColDiagnostic)->isEnabled() == true)
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                   q_NewValue =
                      dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                        ->cellWidget(u16_ComIfCnt, sn_ColDiagnostic))->isChecked();
@@ -1033,7 +1039,7 @@ void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
             const C_OSCNodeComInterfaceSettings & rc_CurInterface = pc_Node->c_Properties.c_ComInterfaces[u16_ComIfCnt];
             const sintn sn_ColRouting = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eROUTING);
             const bool q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             C_OgeChxTristate * pc_Tristate = dynamic_cast<C_OgeChxTristate *>(this->mpc_Ui->pc_TableWidgetComIfSettings
                                                                               ->cellWidget(u16_ComIfCnt,
                                                                                            sn_ColRouting));
@@ -1141,9 +1147,10 @@ void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
                                                                   c_str(), &this->mu32_NodeIndex,
                                                                   &c_ExistingNames) == false)
       {
-         const QString c_Description = QString(C_GtGetText::h_GetText(
-                                                  "A node with the name \"%1\" already exists. Choose another name.")).
-                                       arg(this->mpc_Ui->pc_LineEditNodeName->text());
+         const QString c_Description =
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "A node with the name \"%1\" already exists. Choose another name.")).
+            arg(this->mpc_Ui->pc_LineEditNodeName->text());
          QString c_Details;
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Node naming"));
@@ -1152,7 +1159,7 @@ void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
          for (uint32 u32_ItExistingName = 0UL; u32_ItExistingName < c_ExistingNames.size(); ++u32_ItExistingName)
          {
             const C_SCLString & rc_Name = c_ExistingNames[u32_ItExistingName];
-            c_Details.append(QString("\"%1\"\n").arg(rc_Name.c_str()));
+            c_Details.append(static_cast<QString>("\"%1\"\n").arg(rc_Name.c_str()));
          }
          c_Message.SetDetails(c_Details);
          c_Message.SetCustomMinHeight(220, 350);
@@ -1255,7 +1262,7 @@ void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const ui
          }
 
          //handle invalid icon
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          dynamic_cast<QCheckBox *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                     ->cellWidget(sn_RowCounter,
                                                  static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eINTERFACE)))
@@ -1371,8 +1378,7 @@ void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32 ou32_Row)
       {
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1403,7 +1409,7 @@ void C_SdNdeNodePropertiesWidget::m_BusBitrateClick(const uint32 ou32_Row, const
          QString c_BusName = pc_Bus->c_Name.c_str();
 
          //get label text of the cell, that was clicked
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          QLabel * pc_CellLabel =
             dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(ou32_Row, ou32_Column));
 
@@ -1463,6 +1469,5 @@ void C_SdNdeNodePropertiesWidget::m_FlashloaderOptions(void) const
       {
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
 }

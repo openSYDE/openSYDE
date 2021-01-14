@@ -70,8 +70,7 @@ C_GiSyScreenColorPickingEventFilter::~C_GiSyScreenColorPickingEventFilter(void)
 bool C_GiSyScreenColorPickingEventFilter::eventFilter(QObject * const opc_Object, QEvent * const opc_Event)
 {
    Q_UNUSED(opc_Object)
-   //lint -save -e929  false positive in PC-Lint: allowed by MISRA 5-2-7
-   switch (opc_Event->type())
+   switch (opc_Event->type()) //lint !e788 //only selected events handled by us on purpose
    {
    case QEvent::MouseMove:
       return mpc_ColorSelectWidget->HandleColorPickingMouseMove(dynamic_cast<QMouseEvent *>(opc_Event));
@@ -82,6 +81,5 @@ bool C_GiSyScreenColorPickingEventFilter::eventFilter(QObject * const opc_Object
    default:
       break;
    }
-   //lint -restore
    return false;
 }

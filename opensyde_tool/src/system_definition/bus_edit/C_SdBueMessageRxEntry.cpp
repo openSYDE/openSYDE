@@ -78,7 +78,6 @@ C_SdBueMessageRxEntry::C_SdBueMessageRxEntry(QWidget * const opc_Parent) :
 
    connect(this->mpc_Ui->pc_CheckBoxActive, &stw_opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
            this, &C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged);
-   //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(this->mpc_Ui->pc_LabelTimeoutLink, &QLabel::linkActivated,
            this, &C_SdBueMessageRxEntry::m_OnTimeoutConfigLinkClicked);
 }
@@ -571,7 +570,6 @@ void C_SdBueMessageRxEntry::m_AdaptParentCheckBoxState(void) const
       }
 
       // Disconnect due to avoiding informing the sub entries again
-      //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
       disconnect(this->mpc_Ui->pc_CheckBoxActive, &stw_opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
                  this, &C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged);
 
@@ -601,7 +599,6 @@ void C_SdBueMessageRxEntry::m_AdaptParentCheckBoxState(void) const
          this->m_ToggleIcon(false);
       }
 
-      //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
       connect(this->mpc_Ui->pc_CheckBoxActive, &stw_opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
               this, &C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged);
    }
@@ -713,8 +710,7 @@ void C_SdBueMessageRxEntry::m_OnTimeoutConfigLinkClicked(void)
       {
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -775,5 +771,5 @@ void C_SdBueMessageRxEntry::m_UpdateTimeoutLink(void) const
       }
    }
 
-   this->mpc_Ui->pc_LabelTimeoutLink->setText(QString(C_Uti::h_GetLink(c_LinkText, mc_STYLE_GUIDE_COLOR_6, "Link")));
+   this->mpc_Ui->pc_LabelTimeoutLink->setText(static_cast<QString>(C_Uti::h_GetLink(c_LinkText, mc_STYLE_GUIDE_COLOR_6, "Link")));
 }

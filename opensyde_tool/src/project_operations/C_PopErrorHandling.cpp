@@ -54,8 +54,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in] ou16_SystemDefinitionVersion System definition version
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QString & orc_Path,
-                                           QWidget * const opc_Parent, const uint16 ou16_SystemDefinitionVersion)
+void C_PopErrorHandling::h_ProjectLoadErr(const sint32 & ors32_Err, const QString & orc_Path,
+                                          QWidget * const opc_Parent, const uint16 ou16_SystemDefinitionVersion)
 {
    if (ors32_Err != C_NO_ERR)
    {
@@ -63,39 +63,32 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
       C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Project load"));
       c_Message.SetDescription(C_GtGetText::h_GetText("Failed to load project: ") + orc_Path);
+      c_Message.SetCustomMinHeight(250, 300);
+
       switch (ors32_Err)
       {
       case C_RD_WR:
          c_Details = C_GtGetText::h_GetText("There are problems accessing the file system.\n"
                                             "For example, there may be no read access to the file.");
-         c_Message.SetCustomMinHeight(200, 250);
          break;
       case C_RANGE:
          c_Details = C_GtGetText::h_GetText("At least one project file is missing.");
-         c_Message.SetCustomMinHeight(200, 250);
          break;
       case C_NOACT:
          c_Details = C_GtGetText::h_GetText("A project file is present but its structure is invalid.\n"
                                             "For example this can be caused by an invalid XML file.");
-         c_Message.SetCustomMinHeight(200, 250);
          break;
       case C_CONFIG:
          c_Details = C_GtGetText::h_GetText("The content of a project file is invalid or incomplete.");
-         c_Message.SetCustomMinHeight(230, 250);
          break;
       case C_CHECKSUM:
-         //Update log file
-         C_OSCLoggingHandler::h_Flush();
          c_Details = C_GtGetText::h_GetText("The verification of the project failed.");
-         c_Message.SetCustomMinHeight(200, 300);
          break;
       case C_COM:
          c_Details = C_GtGetText::h_GetText("The device definition for the project was not found.");
-         c_Message.SetCustomMinHeight(200, 300);
          break;
       default:
          c_Details = C_GtGetText::h_GetText("Unknown cause.");
-         c_Message.SetCustomMinHeight(200, 250);
          break;
       }
 
@@ -134,7 +127,7 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_PopErrorHandling::mh_ProjectSaveErr(const sint32 & ors32_Err, QWidget * const opc_Parent)
+void C_PopErrorHandling::h_ProjectSaveErr(const sint32 & ors32_Err, QWidget * const opc_Parent)
 {
    if (ors32_Err != C_NO_ERR)
    {
@@ -169,7 +162,7 @@ void C_PopErrorHandling::mh_ProjectSaveErr(const sint32 & ors32_Err, QWidget * c
    \param[in]   ors32_Err   Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PopErrorHandling::mh_GetTextInitializeErr(const sint32 & ors32_Err)
+void C_PopErrorHandling::h_GetTextInitializeErr(const sint32 & ors32_Err)
 {
    if (ors32_Err != C_NO_ERR)
    {

@@ -75,8 +75,8 @@ void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, con
    uint32 u32_CounterMessage;
 
    //Build header
-   C_CamMetClipBoardHelper::h_AddHeader(c_Text, sn_WidthInitial, sn_WidthTime, sn_WidthID, sn_WidthName, sn_WidthDir,
-                                        sn_WidthDLC, sn_WidthData);
+   C_CamMetClipBoardHelper::mh_AddHeader(c_Text, sn_WidthInitial, sn_WidthTime, sn_WidthID, sn_WidthName, sn_WidthDir,
+                                         sn_WidthDLC, sn_WidthData);
 
    for (u32_CounterMessage = 0U; u32_CounterMessage < orc_MessageData.size(); ++u32_CounterMessage)
    {
@@ -84,11 +84,11 @@ void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, con
 
       if (pc_Data != NULL)
       {
-         C_CamMetClipBoardHelper::h_AddMessage(c_Text, *pc_Data, orc_MessageData[u32_CounterMessage].q_Extended,
-                                               oq_DisplayAsHex, oq_DisplayTimestampRelative,
-                                               oq_DisplayTimestampAbsoluteTimeOfDay, sn_WidthInitial, sn_WidthTime,
-                                               sn_WidthID, sn_WidthName, sn_WidthDir, sn_WidthDLC, sn_WidthData,
-                                               orc_MessageData[u32_CounterMessage].c_ExpandedIndices);
+         C_CamMetClipBoardHelper::mh_AddMessage(c_Text, *pc_Data, orc_MessageData[u32_CounterMessage].q_Extended,
+                                                oq_DisplayAsHex, oq_DisplayTimestampRelative,
+                                                oq_DisplayTimestampAbsoluteTimeOfDay, sn_WidthInitial, sn_WidthTime,
+                                                sn_WidthID, sn_WidthName, sn_WidthDir, sn_WidthDLC, sn_WidthData,
+                                                orc_MessageData[u32_CounterMessage].c_ExpandedIndices);
       }
    }
 
@@ -108,9 +108,9 @@ void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, con
    \param[in]      osn_WidthData       Width data section
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetClipBoardHelper::h_AddHeader(QString & orc_Text, const sintn osn_WidthInitial, const sintn osn_WidthTime,
-                                          const sintn osn_WidthID, const sintn osn_WidthName, const sintn osn_WidthDir,
-                                          const sintn osn_WidthDLC, const sintn osn_WidthData)
+void C_CamMetClipBoardHelper::mh_AddHeader(QString & orc_Text, const sintn osn_WidthInitial, const sintn osn_WidthTime,
+                                           const sintn osn_WidthID, const sintn osn_WidthName, const sintn osn_WidthDir,
+                                           const sintn osn_WidthDLC, const sintn osn_WidthData)
 {
    sintn sn_TextLength;
 
@@ -167,14 +167,14 @@ void C_CamMetClipBoardHelper::h_AddHeader(QString & orc_Text, const sintn osn_Wi
    \param[in]      orc_ExpandedIndices                   Expanded indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetClipBoardHelper::h_AddMessage(QString & orc_Text, const C_OSCComMessageLoggerData & orc_MessageData,
-                                           const bool oq_IsExtended, const bool oq_DisplayAsHex,
-                                           const bool oq_DisplayTimestampRelative,
-                                           const bool oq_DisplayTimestampAbsoluteTimeOfDay,
-                                           const sintn osn_WidthInitial, const sintn osn_WidthTime,
-                                           const sintn osn_WidthID, const sintn osn_WidthName, const sintn osn_WidthDir,
-                                           const sintn osn_WidthDLC, const sintn osn_WidthData,
-                                           const std::vector<sintn> & orc_ExpandedIndices)
+void C_CamMetClipBoardHelper::mh_AddMessage(QString & orc_Text, const C_OSCComMessageLoggerData & orc_MessageData,
+                                            const bool oq_IsExtended, const bool oq_DisplayAsHex,
+                                            const bool oq_DisplayTimestampRelative,
+                                            const bool oq_DisplayTimestampAbsoluteTimeOfDay,
+                                            const sintn osn_WidthInitial, const sintn osn_WidthTime,
+                                            const sintn osn_WidthID, const sintn osn_WidthName,
+                                            const sintn osn_WidthDir, const sintn osn_WidthDLC,
+                                            const sintn osn_WidthData, const std::vector<sintn> & orc_ExpandedIndices)
 {
    QString c_Line;
    sintn sn_LineLength;
@@ -293,12 +293,12 @@ void C_CamMetClipBoardHelper::h_AddMessage(QString & orc_Text, const C_OSCComMes
    c_Line = c_Line.leftJustified(sn_LineLength + osn_WidthData, ' ');
 
    // Counter
-   c_Line += orc_MessageData.c_Counter.c_str() + QString("\n");
+   c_Line += orc_MessageData.c_Counter.c_str() + static_cast<QString>("\n");
 
    if (oq_IsExtended == true)
    {
-      C_CamMetClipBoardHelper::h_AddCanSignals(osn_WidthInitial, oq_DisplayAsHex, orc_MessageData.c_Signals,
-                                               orc_ExpandedIndices, c_Line);
+      C_CamMetClipBoardHelper::mh_AddCanSignals(osn_WidthInitial, oq_DisplayAsHex, orc_MessageData.c_Signals,
+                                                orc_ExpandedIndices, c_Line);
    }
 
    orc_Text += c_Line;
@@ -314,10 +314,10 @@ void C_CamMetClipBoardHelper::h_AddMessage(QString & orc_Text, const C_OSCComMes
    \param[in,out]  orc_CompleteString           Complete string
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetClipBoardHelper::h_AddCanSignals(const sintn osn_LineWidthInitial, const bool oq_DisplayAsHex,
-                                              const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals,
-                                              const std::vector<sintn> & orc_ExpandedSignalIndices,
-                                              QString & orc_CompleteString)
+void C_CamMetClipBoardHelper::mh_AddCanSignals(const sintn osn_LineWidthInitial, const bool oq_DisplayAsHex,
+                                               const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals,
+                                               const std::vector<sintn> & orc_ExpandedSignalIndices,
+                                               QString & orc_CompleteString)
 {
    uint32 u32_MultiplexerCounter = 0UL;
 
@@ -397,9 +397,9 @@ void C_CamMetClipBoardHelper::h_AddCanSignals(const sintn osn_LineWidthInitial, 
       {
          q_IsMuxSig = false;
       }
-      C_CamMetClipBoardHelper::h_AddCanSignal(osn_LineWidthInitial, oq_DisplayAsHex, rc_Signal,
-                                              orc_CompleteString,
-                                              q_IsMuxSig);
+      C_CamMetClipBoardHelper::mh_AddCanSignal(osn_LineWidthInitial, oq_DisplayAsHex, rc_Signal,
+                                               orc_CompleteString,
+                                               q_IsMuxSig);
    }
 }
 
@@ -413,9 +413,9 @@ void C_CamMetClipBoardHelper::h_AddCanSignals(const sintn osn_LineWidthInitial, 
    \param[in]      oq_IsMux               Is mux
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetClipBoardHelper::h_AddCanSignal(const sintn osn_LineWidthInitial, const bool oq_DisplayAsHex,
-                                             const C_OSCComMessageLoggerDataSignal & orc_Signal,
-                                             QString & orc_CompleteString, const bool oq_IsMux)
+void C_CamMetClipBoardHelper::mh_AddCanSignal(const sintn osn_LineWidthInitial, const bool oq_DisplayAsHex,
+                                              const C_OSCComMessageLoggerDataSignal & orc_Signal,
+                                              QString & orc_CompleteString, const bool oq_IsMux)
 {
    QString c_LineSignal;
 
@@ -442,7 +442,7 @@ void C_CamMetClipBoardHelper::h_AddCanSignal(const sintn osn_LineWidthInitial, c
    {
       // Value
       sn_LineLength = c_LineSignal.length();
-      c_LineSignal += orc_Signal.c_Value.c_str() + QString(" ") + orc_Signal.c_Unit.c_str();
+      c_LineSignal += orc_Signal.c_Value.c_str() + static_cast<QString>(" ") + orc_Signal.c_Unit.c_str();
       c_LineSignal = c_LineSignal.leftJustified(sn_LineLength + 25, ' ');
       // Name could be longer
       c_LineSignal += "   ";
@@ -477,7 +477,7 @@ void C_CamMetClipBoardHelper::h_AddCanSignal(const sintn osn_LineWidthInitial, c
    }
 
    // Comment
-   c_LineSignal += orc_Signal.c_Comment.c_str() + QString("\n");
+   c_LineSignal += orc_Signal.c_Comment.c_str() + static_cast<QString>("\n");
 
    orc_CompleteString += c_LineSignal;
 }

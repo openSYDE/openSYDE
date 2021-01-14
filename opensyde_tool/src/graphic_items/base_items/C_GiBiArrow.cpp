@@ -96,9 +96,9 @@ C_GiBiArrow::C_GiBiArrow(const uint64 & oru64_ID, const std::vector<QPointF> * c
 /*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ArrowHeadStart and -End and the Qt memory management
 C_GiBiArrow::~C_GiBiArrow(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_ArrowHeadStart and -End and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -167,8 +167,8 @@ bool C_GiBiArrow::OpenStyleDialog(const bool oq_DarkMode)
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
-   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Line/Arrow"), oq_DarkMode);
-   C_GiSyLineWidget * pc_SettingsWidget = new C_GiSyLineWidget(C_GiSyLineWidget::E_Type::eLINE, *pc_Dialog);
+   C_GiSyBaseWidget * const pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Line/Arrow"), oq_DarkMode);
+   C_GiSyLineWidget * const pc_SettingsWidget = new C_GiSyLineWidget(C_GiSyLineWidget::E_Type::eLINE, *pc_Dialog);
 
    pc_SettingsWidget->SetLineColor(this->GetColor());
    pc_SettingsWidget->SetLineWidth(this->GetWidth());
@@ -193,8 +193,7 @@ bool C_GiBiArrow::OpenStyleDialog(const bool oq_DarkMode)
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   return q_Retval;
+   return q_Retval; //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -207,7 +206,6 @@ bool C_GiBiArrow::OpenStyleDialog(const bool oq_DarkMode)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_GiBiArrow * const pc_Item = dynamic_cast<const C_GiBiArrow * const>(opc_GuidelineItem);
 
    if (pc_Item != NULL)

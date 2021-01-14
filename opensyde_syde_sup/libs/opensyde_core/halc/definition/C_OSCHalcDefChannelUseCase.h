@@ -24,6 +24,7 @@ class C_OSCHalcDefChannelUseCase
 {
 public:
    C_OSCHalcDefChannelUseCase(void);
+   virtual ~C_OSCHalcDefChannelUseCase();
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 

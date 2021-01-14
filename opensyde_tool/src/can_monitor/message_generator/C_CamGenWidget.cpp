@@ -41,7 +41,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenWidget::C_CamGenWidget(QWidget * const opc_Parent) :
@@ -136,18 +136,20 @@ void C_CamGenWidget::TriggerSignalReload(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Remove all messages for the specified file
 
-   \param[in] orc_File Database to remove all messages for
+   \param[in]  orc_File       Database to remove all messages for
+   \param[in]  opc_Indices    Optional indices to specify which messages should be deleted instead of all
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenWidget::RemoveMessagesForFile(const QString & orc_File) const
+void C_CamGenWidget::RemoveMessagesForFile(const QString & orc_File,
+                                           const std::vector<stw_types::uint32> * const opc_Indices) const
 {
-   this->mpc_Ui->pc_WidgetMessages->RemoveMessagesForFile(orc_File);
+   this->mpc_Ui->pc_WidgetMessages->RemoveMessagesForFile(orc_File, opc_Indices);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Signal communication start
 
-   \param[in]  oq_Online    Online/offline flag of trace
+   \param[in]  oq_Online   Online/offline flag of trace
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenWidget::SetCommunicationStarted(const bool oq_Online) const
@@ -158,7 +160,7 @@ void C_CamGenWidget::SetCommunicationStarted(const bool oq_Online) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if the key needs to be handled by this widget
 
-   \param[in] orc_Input Key input interpreted as text
+   \param[in]  orc_Input   Key input interpreted as text
 
    \return
    True  Handled by this widget
@@ -173,8 +175,8 @@ bool C_CamGenWidget::CheckAndHandleKey(const QString & orc_Input) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Expand or collapse messages widget.
 
-   \param[in] oq_Expand true: expand messages widget subsections
-                        false: collapse messages widget subsections
+   \param[in]  oq_Expand   true: expand messages widget subsections
+                           false: collapse messages widget subsections
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenWidget::ExpandMessageGen(const bool oq_Expand) const
@@ -186,8 +188,8 @@ void C_CamGenWidget::ExpandMessageGen(const bool oq_Expand) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle expand or collapse message generator sub widgets.
 
-   \param[in] oq_Expand true: expand settings subsections
-                        false: collapse settings subsections
+   \param[in]  oq_Expand   true: expand settings subsections
+                           false: collapse settings subsections
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenWidget::m_OnExpandMessageGen(const bool oq_Expand)

@@ -64,12 +64,9 @@ Q_SIGNALS:
    void SigCloseIgnored();
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void closeEvent(QCloseEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_OgePopUpDialog * mpc_Ui;     ///< Reference for variables defined in ui file

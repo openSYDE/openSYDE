@@ -87,7 +87,7 @@ private:
 
    //Avoid call
    C_GiLiBusConnector(const C_GiLiBusConnector &);
-   C_GiLiBusConnector & operator =(const C_GiLiBusConnector &);
+   C_GiLiBusConnector & operator =(const C_GiLiBusConnector &); //lint !e1511 //we want to hide the base func.
 
    void m_InitConnector(C_GiNode * const opc_NodeItem, const QPointF & orc_Pos);
    void m_UpdatePort(const QPointF & orc_Pos);

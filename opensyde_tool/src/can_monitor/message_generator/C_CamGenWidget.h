@@ -41,7 +41,8 @@ public:
    void SaveUserSettings(void) const;
 
    void TriggerSignalReload(void) const;
-   void RemoveMessagesForFile(const QString & orc_File) const;
+   void RemoveMessagesForFile(const QString & orc_File,
+                              const std::vector<stw_types::uint32> * const opc_Indices = NULL) const;
    void SetCommunicationStarted(const bool oq_Online) const;
    bool CheckAndHandleKey(const QString & orc_Input) const;
 

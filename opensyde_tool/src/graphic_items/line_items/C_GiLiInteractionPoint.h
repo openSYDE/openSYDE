@@ -53,17 +53,14 @@ Q_SIGNALS:
    void PointChanged(const stw_types::sint32 & ors32_PointIndex);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QVariant itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value) override;
-   //lint -restore
 
 private:
    stw_types::sint32 ms32_PointIndex;
 
    //Avoid call
    C_GiLiInteractionPoint(const C_GiLiInteractionPoint &);
-   C_GiLiInteractionPoint & operator =(const C_GiLiInteractionPoint &);
+   C_GiLiInteractionPoint & operator =(const C_GiLiInteractionPoint &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

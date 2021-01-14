@@ -49,8 +49,7 @@ C_CamOgeCbxDark::C_CamOgeCbxDark(QWidget * const opc_Parent) :
    QStyledItemDelegate * const pc_ItemDelegate = new QStyledItemDelegate();
 
    this->setItemDelegate(pc_ItemDelegate);
-   //lint -e{429}  no memory leak because of the parent all elements and the Qt memory management
-}
+} //lint !e429  no memory leak because of the parent all elements and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor.

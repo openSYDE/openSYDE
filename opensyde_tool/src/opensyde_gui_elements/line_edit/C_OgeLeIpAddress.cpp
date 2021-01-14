@@ -87,13 +87,13 @@ void C_OgeLeIpAddress::SetIPAddress(const uint8 oau8_IPAddress[])
 
    // set IP address (padded with blanks)
    c_HelpString = "";
-   c_HelpString.append(QString("%1").arg(oau8_IPAddress[0], 3, 10, QChar(' ')));
+   c_HelpString.append(static_cast<QString>("%1").arg(oau8_IPAddress[0], 3, 10, QChar(' ')));
    c_HelpString.append(".");
-   c_HelpString.append(QString("%1").arg(oau8_IPAddress[1], 3, 10, QChar(' ')));
+   c_HelpString.append(static_cast<QString>("%1").arg(oau8_IPAddress[1], 3, 10, QChar(' ')));
    c_HelpString.append(".");
-   c_HelpString.append(QString("%1").arg(oau8_IPAddress[2], 3, 10, QChar(' ')));
+   c_HelpString.append(static_cast<QString>("%1").arg(oau8_IPAddress[2], 3, 10, QChar(' ')));
    c_HelpString.append(".");
-   c_HelpString.append(QString("%1").arg(oau8_IPAddress[3], 3, 10, QChar(' ')));
+   c_HelpString.append(static_cast<QString>("%1").arg(oau8_IPAddress[3], 3, 10, QChar(' ')));
 
    this->setText(c_HelpString);
 }

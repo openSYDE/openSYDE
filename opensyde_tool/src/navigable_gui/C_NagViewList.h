@@ -56,13 +56,10 @@ Q_SIGNALS:
                   const QString & orc_Name, const QString & orc_SubSubItemName);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
    virtual void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
    virtual void dropEvent(QDropEvent * const opc_Event) override;
    virtual void startDrag(const Qt::DropActions oc_SupportedActions) override;
-   //lint -restore
 
 private:
    C_NagViewListModel mc_Model;

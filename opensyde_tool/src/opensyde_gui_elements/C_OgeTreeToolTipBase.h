@@ -28,9 +28,9 @@ public:
    C_OgeTreeToolTipBase(void);
 
 protected:
-   void CallAfterMouseMove(const QMouseEvent * const opc_Event);
-   bool CallForEvent(QEvent * const opc_Event);
-   void CallBeforeEventFilter(const QEvent * const opc_Event);
+   void m_CallAfterMouseMove(const QMouseEvent * const opc_Event);
+   bool m_CallForEvent(QEvent * const opc_Event);
+   void m_CallBeforeEventFilter(const QEvent * const opc_Event);
 
    virtual void m_HideToolTip(void) override;
 

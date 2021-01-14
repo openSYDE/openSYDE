@@ -64,12 +64,9 @@ public:
    void SetAnimated(const bool oq_Active, const bool oq_Inverse = false, const bool oq_SpeedUp = false,
                     const QPolygonF oc_Polygon = QPolygonF(), const bool oq_ShowOrignalLine = true);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget = NULL) override;
-   //lint -restore
+
    virtual QPainterPath shape(void) const;
 
    virtual void FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const;
@@ -83,7 +80,7 @@ protected:
 private:
    //Avoid call
    C_GiLiLine(const C_GiLiLine &);
-   C_GiLiLine & operator =(const C_GiLiLine &);
+   C_GiLiLine & operator =(const C_GiLiLine &); //lint !e1511 //we want to hide the base func.
 
    void m_AddLineAt(const stw_types::sint32 & ors32_Index);
    void m_RemoveLineAt(const stw_types::sint32 & ors32_Index);

@@ -66,7 +66,7 @@ C_SdNdeUnoDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDataPoolListAddDeleteBaseC
 /*! \brief   Add from internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Add(void)
+void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_Add(void)
 {
    const uint16 u16_TimerId = osc_write_log_performance_start();
 
@@ -108,7 +108,7 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Add(void)
 /*! \brief   Save and delete
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Delete(void)
+void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_Delete(void)
 {
    const uint16 u16_TimerId = osc_write_log_performance_start();
 
@@ -171,7 +171,7 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Delete(void)
    \param[in] orc_Value Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::SetIndices(const std::vector<stw_types::uint32> & orc_Value)
+void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_SetIndices(const std::vector<stw_types::uint32> & orc_Value)
 {
    mc_Indices = orc_Value;
 }
@@ -183,7 +183,7 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::SetIndices(const std::vector<st
    \param[in] orc_UIContent  Initial UI content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::SetInitialData(
+void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_SetInitialData(
    const std::vector<C_OSCNodeDataPoolList> & orc_OSCContent,
    const std::vector<C_PuiSdNodeDataPoolList> & orc_UIContent)
 {

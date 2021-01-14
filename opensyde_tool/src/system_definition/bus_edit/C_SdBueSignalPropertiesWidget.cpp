@@ -400,6 +400,8 @@ void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
          case C_OSCNodeDataPoolContent::eFLOAT64:
             this->me_DataType = eTY_FLOAT64;
             break;
+         default:
+            break;
          }
 
          //One time changes
@@ -751,6 +753,9 @@ sint32 C_SdBueSignalPropertiesWidget::mh_InitMin(C_OSCNodeDataPoolContent & orc_
       }
       q_IsFloat = true;
       break;
+   default:
+      s32_Retval = C_RANGE;
+      break;
    }
    if (s32_Retval == C_NO_ERR)
    {
@@ -916,6 +921,9 @@ sint32 C_SdBueSignalPropertiesWidget::mh_InitMax(C_OSCNodeDataPoolContent & orc_
          s32_Retval = C_RANGE;
       }
       q_IsFloat = true;
+      break;
+   default:
+      s32_Retval = C_RANGE;
       break;
    }
    if (s32_Retval == C_NO_ERR)
@@ -1085,6 +1093,8 @@ C_OSCNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType
       break;
    case eTY_FLOAT64:
       e_Retval = C_OSCNodeDataPoolContent::eFLOAT64;
+      break;
+   default:
       break;
    }
    return e_Retval;
@@ -1580,6 +1590,8 @@ void C_SdBueSignalPropertiesWidget::m_ApplyNewValueFromUI(const C_SdBueSignalPro
          this->mc_DataOSCSignal.u16_ComBitLength = pc_Signal->u16_ComBitLength;
       }
       break;
+   default:
+      break;
    }
 }
 
@@ -1838,6 +1850,8 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
       orc_Changes.push_back(eCHA_MAX);
       orc_Changes.push_back(eCHA_INIT);
       break;
+   default:
+      break;
    }
 }
 
@@ -1960,6 +1974,8 @@ void C_SdBueSignalPropertiesWidget::m_UpdateOtherSignalsForChange(
    case eCHA_FACTOR:
    case eCHA_OFFSET:
       //No change necessary
+      break;
+   default:
       break;
    }
 }
@@ -2232,7 +2248,6 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          this->mpc_Ui->pc_LabelOffset->setEnabled(true);
          this->mpc_Ui->pc_DoubleSpinBoxOffset->setEnabled(true);
       }
-      //lint -e{10,530,747,1015,1013,1960}  c++11 feature
       this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64>::lowest());
       this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMaximumCustom(std::numeric_limits<float64>::max());
       //Value
@@ -2241,6 +2256,8 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
    case eCHA_MLV:
       //Update UI via signal
       Q_EMIT (this->SigUpdateMlv(this->mc_MessageId, this->mu32_SignalIndex));
+      break;
+   default:
       break;
    }
    this->m_UpdateErrorForChange(oe_Change);
@@ -2291,6 +2308,8 @@ void C_SdBueSignalPropertiesWidget::m_UpdateErrorForChange(const C_SdBueSignalPr
    case eCHA_MLV:
       //No check necessary
       break;
+   default:
+      break;
    }
 }
 
@@ -2338,6 +2357,8 @@ void C_SdBueSignalPropertiesWidget::m_SendSignalForChange(const C_SdBueSignalPro
       break;
    case eCHA_MLV:
       Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      break;
+   default:
       break;
    }
    Q_EMIT (this->SigChanged());

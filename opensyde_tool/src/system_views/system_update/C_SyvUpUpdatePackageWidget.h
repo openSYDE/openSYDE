@@ -95,8 +95,6 @@ private:
    QStringList mc_MissingParamFiles;
    QStringList mc_MissingFiles;
    QStringList mc_FlashwareWarningsApps;
-
-   static const stw_types::uint32 mhu32_FILE_CHECK_INTERVAL = 500U;
 };
 }
 

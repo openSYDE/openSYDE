@@ -75,7 +75,7 @@ void C_GiSdArrow::LoadData(void)
       m_LoadFromData(C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows[this->ms32_Index]);
    }
    //Object name for test
-   this->setObjectName(QString("Meta: Line/Arrow"));
+   this->setObjectName("Meta: Line/Arrow");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

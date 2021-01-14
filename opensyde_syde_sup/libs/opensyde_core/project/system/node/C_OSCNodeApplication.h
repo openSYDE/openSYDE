@@ -30,7 +30,7 @@ public:
 
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
-   static const stw_types::uint16 hu16_HIGHEST_KNOWN_CODE_VERSION = 4U;
+   static const stw_types::uint16 hu16_HIGHEST_KNOWN_CODE_VERSION = 5U;
    ///< highest known code format version in openSYDE core library
 
    enum E_Type ///< possible application types
@@ -40,8 +40,7 @@ public:
    };
 
    static stw_scl::C_SCLString h_ApplicationToString(const C_OSCNodeApplication::E_Type & ore_Application);
-   static stw_types::sint32 h_StringToApplication(const stw_scl::C_SCLString & orc_String,
-                                                  C_OSCNodeApplication::E_Type & ore_Type);
+   static void h_StringToApplication(const stw_scl::C_SCLString & orc_String, C_OSCNodeApplication::E_Type & ore_Type);
 
    E_Type e_Type;                            ///< Application type
    stw_scl::C_SCLString c_Name;              ///< Application name

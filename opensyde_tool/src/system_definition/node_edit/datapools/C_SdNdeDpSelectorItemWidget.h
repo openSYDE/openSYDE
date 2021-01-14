@@ -67,14 +67,16 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void SigUpdateErrorToolTip(void);
+   void SigUpdateErrorToolTip(const stw_types::uint32 ou32_Index);
+   void SigClicked(const stw_types::uint32 ou32_Index);
+   void SigDoubleClicked(const stw_types::uint32 ou32_Index);
+   void SigContextMenuRequested(const QPoint & orc_Pos, const stw_types::uint32 ou32_Index);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
+   virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
+   virtual void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual bool event(QEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call
@@ -84,6 +86,8 @@ private:
    void m_UpdateLabel(void);
    void m_UpdateName(void) const;
    void m_SetSelectColor(const bool oq_Active);
+   void m_UpdateErrorToolTip(void);
+   void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
 
    Ui::C_SdNdeDpSelectorItemWidget * mpc_Ui;
    stw_opensyde_gui_elements::C_OgeLabToolTipBase * mpc_LabelStateImg;

@@ -436,7 +436,7 @@ void C_OSCCanOpenObject::DataTypeToTextAndSize(C_SCLString * const opc_Text, uin
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsReadable(void) const
 {
-   C_SCLString c_Help = c_Access.UpperCase();
+   const C_SCLString c_Help = c_Access.UpperCase();
 
    return ((c_Help  == "RO") || (c_Help == "RW") || (c_Help == "RWW") || (c_Help == "RWR") || (c_Help == "CONST"));
 }
@@ -451,7 +451,7 @@ bool C_OSCCanOpenObject::IsReadable(void) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsWriteable(void) const
 {
-   C_SCLString c_Help = c_Access.UpperCase();
+   const C_SCLString c_Help = c_Access.UpperCase();
 
    return ((c_Help == "RW") || (c_Help == "RWW") || (c_Help == "RWR") || (c_Help == "WO"));
 }

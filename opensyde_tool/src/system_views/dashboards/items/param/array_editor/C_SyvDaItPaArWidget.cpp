@@ -86,7 +86,7 @@ void C_SyvDaItPaArWidget::InitStaticNames(void)
 {
    sint32 s32_DataSetIndex = -1;
    const C_PuiSvDbNodeDataPoolListElementId * pc_Id = NULL;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -129,18 +129,18 @@ void C_SyvDaItPaArWidget::InitStaticNames(void)
          }
 
          //Translation: 1: Data element type, 2: Data element name, 3: Value type
-         this->mrc_Parent.SetTitle(QString(C_GtGetText::h_GetText("%1 %2 (%3)")).arg(c_Type).arg(
+         this->mrc_Parent.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("%1 %2 (%3)")).arg(c_Type).arg(
                                       pc_Element->c_Name.c_str()).arg(c_EditType));
       }
    }
 
    if ((this->mq_ECUValues == true) || (s32_DataSetIndex >= 0L))
    {
-      this->mrc_Parent.SetSubTitle(QString(C_GtGetText::h_GetText("Array Editor (Read Only)")));
+      this->mrc_Parent.SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Array Editor (Read Only)")));
    }
    else
    {
-      this->mrc_Parent.SetSubTitle(QString(C_GtGetText::h_GetText("Array Editor")));
+      this->mrc_Parent.SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Array Editor")));
    }
 }
 

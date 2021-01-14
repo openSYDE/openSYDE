@@ -63,9 +63,6 @@ public:
    bool Equals(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
                const stw_types::uint32 & oru32_ListIndex) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation, const stw_types::sintn osn_Role =
                                   static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
@@ -76,7 +73,6 @@ public:
                         const stw_types::sintn osn_Role = static_cast<stw_types::sintn>(Qt::EditRole)) override;
    virtual Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;
    virtual Qt::DropActions supportedDropActions(void) const override;
-   //lint -restore
 
    // Add data:
    std::vector<std::vector<stw_types::uint32> > DoInsertRows(
@@ -85,29 +81,25 @@ public:
       const std::vector<stw_types::uint32> & orc_Rows);
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
    // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual bool insertColumns(const stw_types::sintn osn_Col, const stw_types::sintn osn_Count,
                               const QModelIndex & orc_Parent = QModelIndex()) override;
    // Remove data:
    void DoRemoveRows(const std::vector<stw_types::uint32> & orc_Rows);
    virtual bool removeColumns(const stw_types::sintn osn_Col, const stw_types::sintn osn_Count,
                               const QModelIndex & orc_Parent = QModelIndex()) override;
-   //lint -restore
 
    //Move data:
    void DoMoveRows(const std::vector<stw_types::uint32> & orc_SelectedIndices,
                    const std::vector<stw_types::uint32> & orc_TargetIndices);
 
    E_Columns ColumnToEnum(const stw_types::sint32 & ors32_Column,
-                          stw_types::sint32 * const opc_DataSetIndex = NULL) const;
+                          stw_types::sint32 * const ops32_DataSetIndex = NULL) const;
    stw_types::sint32 EnumToColumn(const E_Columns & ore_Value) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    //Drag & drop
    virtual QStringList mimeTypes() const override;
    virtual QMimeData * mimeData(const QModelIndexList & orc_Indices) const override;
-   //lint -restore
+
    const stw_opensyde_core::C_OSCNodeDataPoolListElement * GetOSCElement(const QModelIndex & orc_Index) const;
    const C_PuiSdNodeDataPoolListElement * GetUIElement(const QModelIndex & orc_Index) const;
    void HandleDataChange(const stw_types::uint32 & oru32_Row,

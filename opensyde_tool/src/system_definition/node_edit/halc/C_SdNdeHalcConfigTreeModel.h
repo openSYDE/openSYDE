@@ -36,9 +36,6 @@ public:
    C_SdNdeHalcConfigTreeModel(QObject * const opc_Parent = NULL);
    ~C_SdNdeHalcConfigTreeModel(void);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual stw_types::sintn columnCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
    virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation,
                                const stw_types::sintn osn_Role = static_cast<stw_types::sintn>(Qt::DisplayRole))
@@ -48,7 +45,6 @@ public:
    virtual bool setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                         const stw_types::sintn osn_Role = static_cast<stw_types::sintn>(Qt::EditRole)) override;
    virtual Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    void SetNode(const stw_types::uint32 ou32_NodeIndex);
    stw_types::uint32 GetNodeIndex(void) const;
@@ -73,6 +69,8 @@ private:
                                             stw_types::uint32 & oru32_ParameterElementIndex);
    const stw_opensyde_core::C_OSCHalcConfigParameter * m_GetParameterElement(const QModelIndex & orc_Index) const;
    const stw_opensyde_core::C_OSCHalcDefElement * m_GetDefParameterElement(const QModelIndex & orc_Index) const;
+   bool m_CheckAvailability(const stw_opensyde_core::C_OSCHalcDefElement & orc_Parameter) const;
+
    static QStringList mh_ConvertEnumsToStringList(const stw_opensyde_core::C_OSCHalcDefContent & orc_Value);
    static QStringList mh_ConvertBitmasksToStringList(const stw_opensyde_core::C_OSCHalcDefContent & orc_Value);
    static QString mh_ConvertBitmasksToString(const stw_opensyde_core::C_OSCHalcDefContent & orc_Value);

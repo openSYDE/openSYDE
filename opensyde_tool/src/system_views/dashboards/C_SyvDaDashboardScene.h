@@ -117,16 +117,13 @@ protected:
    virtual bool m_IsUndoAvailable(void) const;
    virtual bool m_HandleDeleteUserConfirmation(const QList<QGraphicsItem *> & orc_SelectedItems) const override;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event) override;
    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call
    C_SyvDaDashboardScene(const C_SyvDaDashboardScene &);
-   C_SyvDaDashboardScene & operator =(const C_SyvDaDashboardScene &);
+   C_SyvDaDashboardScene & operator =(const C_SyvDaDashboardScene &); //lint !e1511 //we want to hide the base func.
 
    //Properties
    void m_OnWidgetEditProperties(QGraphicsItem * const opc_Item) const;
@@ -152,7 +149,7 @@ private:
                                 stw_types::uint64> * const opc_IDMap);
 
    void m_SelectionChanged(void);
-   void m_InitBaseSceneContextMenuManager(void);
+   void m_InitBaseSceneContextMenuManager(void) const;
 
    C_SyvDaContextMenuManager mc_ContextMenuManager;
    stw_opensyde_gui_logic::C_SyvDaUnoManager mc_UndoManager;

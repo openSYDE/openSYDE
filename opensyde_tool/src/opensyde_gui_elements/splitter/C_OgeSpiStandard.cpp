@@ -68,7 +68,6 @@ C_OgeSpiStandard::C_OgeSpiStandard(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiStandard::SetColor(const QColor & orc_Color) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    // Index 0 is always is hidden, take number 1
    C_OgeSpiStandardHandle * const pc_Handle = dynamic_cast<C_OgeSpiStandardHandle *>(this->handle(1));
 
@@ -87,7 +86,6 @@ void C_OgeSpiStandard::SetColor(const QColor & orc_Color) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiStandard::SetMargins(const sint32 os32_MarginTop, const sint32 os32_MarginBottom) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    // Index 0 is always is hidden, take number 1
    C_OgeSpiStandardHandle * const pc_Handle = dynamic_cast<C_OgeSpiStandardHandle *>(this->handle(1));
 

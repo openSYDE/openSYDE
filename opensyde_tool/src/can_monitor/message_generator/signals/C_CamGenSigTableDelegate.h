@@ -29,10 +29,7 @@ class C_CamGenSigTableDelegate :
 public:
    C_CamGenSigTableDelegate(QObject * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

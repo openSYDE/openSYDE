@@ -24,8 +24,8 @@ using namespace stw_md5;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-bool C_OSCBinaryHash::hq_HashCompleted = false;
-stw_scl::C_SCLString C_OSCBinaryHash::hc_BinaryHash = "";
+bool C_OSCBinaryHash::mhq_HashCompleted = false;
+stw_scl::C_SCLString C_OSCBinaryHash::mhc_BinaryHash = "";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -41,7 +41,7 @@ stw_scl::C_SCLString C_OSCBinaryHash::hc_BinaryHash = "";
 /*! \brief  Default constructor. Set to private
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCBinaryHash::C_OSCBinaryHash()
+C_OSCBinaryHash::C_OSCBinaryHash(void)
 {
 }
 
@@ -53,28 +53,29 @@ C_OSCBinaryHash::C_OSCBinaryHash()
 //----------------------------------------------------------------------------------------------------------------------
 stw_scl::C_SCLString C_OSCBinaryHash::h_CreateBinaryHash(void)
 {
-   stw_scl::C_SCLString c_ExePath = stw_tgl::TGL_GetExePath();
+   const stw_scl::C_SCLString c_ExePath = stw_tgl::TGL_GetExePath();
+
    if (h_GetHashBool() == true)
    {
-      return hc_BinaryHash;
+      return mhc_BinaryHash;
    }
    else
    {
-      hc_BinaryHash = stw_md5::CMD5Checksum::GetMD5(c_ExePath).UpperCase();
+      mhc_BinaryHash = stw_md5::CMD5Checksum::GetMD5(c_ExePath).UpperCase();
       h_SetHashBool(true);
-      return hc_BinaryHash;
+      return mhc_BinaryHash;
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set, whether Checksum has already been created or not
 
-   \param[in]       q_State   represents if checksum has already been created.
+   \param[in]       oq_State   represents if checksum has already been created.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCBinaryHash::h_SetHashBool(bool const q_State)
+void C_OSCBinaryHash::h_SetHashBool(bool const oq_State)
 {
-   hq_HashCompleted = q_State;
+   mhq_HashCompleted = oq_State;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -84,7 +85,7 @@ void C_OSCBinaryHash::h_SetHashBool(bool const q_State)
 
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCBinaryHash::h_GetHashBool()
+bool C_OSCBinaryHash::h_GetHashBool(void)
 {
-   return hq_HashCompleted;
+   return mhq_HashCompleted;
 }

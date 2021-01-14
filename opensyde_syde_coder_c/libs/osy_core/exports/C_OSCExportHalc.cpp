@@ -75,8 +75,8 @@ uint16 C_OSCExportHalc::h_ConvertOverallCodeVersion(const uint16 ou16_GenCodeVer
 {
    uint16 u16_Return;
 
-   //Technically HALC code is "compatible" with overall versions up to 4. So don't impose any artifical limits here.
-   if (ou16_GenCodeVersion <= 4U)
+   //Technically HALC code is "compatible" with overall versions up to 5. So don't impose any artifical limits here.
+   if (ou16_GenCodeVersion <= 5U)
    {
       u16_Return = 1U;
    }

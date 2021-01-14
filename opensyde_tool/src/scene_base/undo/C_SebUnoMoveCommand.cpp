@@ -98,7 +98,6 @@ void C_SebUnoMoveCommand::redo(void)
 bool C_SebUnoMoveCommand::mergeWith(const QUndoCommand * const opc_Command)
 {
    bool q_Retval = false;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_SebUnoMoveCommand * const pc_MoveCommand =
       dynamic_cast<const C_SebUnoMoveCommand * const>(opc_Command);
 

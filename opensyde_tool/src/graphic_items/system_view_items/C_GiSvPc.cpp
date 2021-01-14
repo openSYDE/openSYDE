@@ -39,11 +39,11 @@ const uint32 C_GiSvPc::mhu32_ScaleCategory1 = 0U;
 const uint32 C_GiSvPc::mhu32_ScaleCategory2 = 1U;
 const uint32 C_GiSvPc::mhu32_ScaleCategory3 = 2U;
 
-const float64 C_GiSvPc::mahf64_ScaleMinWidthNode[3] =
+const float64 C_GiSvPc::mhaf64_ScaleMinWidthNode[3] =
 {
    250.0, 350.0, 450.0
 };
-const float64 C_GiSvPc::mahf64_ScaleMinHeightNode[3] =
+const float64 C_GiSvPc::mhaf64_ScaleMinHeightNode[3] =
 {
    165.0, 230.0, 300.0
 };
@@ -79,11 +79,11 @@ C_GiSvPc::C_GiSvPc(const uint64 ou64_UniqueID, const uint32 ou32_ViewIndex) :
    //Image
    if (C_GiSvPc::mh_GetIsLaptop() == true)
    {
-      this->LateImageInit("://images/system_views/Laptop.svg");
+      this->m_LateImageInit("://images/system_views/Laptop.svg");
    }
    else
    {
-      this->LateImageInit("://images/system_views/Rechner.svg");
+      this->m_LateImageInit("://images/system_views/Rechner.svg");
    }
    this->SetEditMode(false);
 
@@ -112,9 +112,9 @@ C_GiSvPc::C_GiSvPc(const uint64 ou64_UniqueID, const uint32 ou32_ViewIndex) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ConflictIcon and the Qt memory management
 C_GiSvPc::~C_GiSvPc(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_ConflictIcon and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -390,7 +390,7 @@ void C_GiSvPc::GenerateHint()
    if (pc_View != NULL)
    {
       QString c_ToolTipContent;
-      C_PuiSvPc c_PcData = pc_View->GetPcData();
+      const C_PuiSvPc c_PcData = pc_View->GetPcData();
 
       // content
       c_ToolTipContent += C_GtGetText::h_GetText("CAN Interface: ");
@@ -403,7 +403,8 @@ void C_GiSvPc::GenerateHint()
          c_ToolTipContent += "Vector";
          break;
       case C_PuiSvPc::eOTHER:
-         c_ToolTipContent += QString(C_GtGetText::h_GetText("Other (%1)")).arg(c_PcData.GetCustomCANDllPath());
+         c_ToolTipContent += static_cast<QString>(C_GtGetText::h_GetText("Other (%1)")).arg(
+            c_PcData.GetCustomCANDllPath());
          break;
       default:
          break;
@@ -476,7 +477,7 @@ bool C_GiSvPc::m_OpenCANDllDialog(void) const
 
    if (pc_View != NULL)
    {
-      C_PuiSvPc c_PcData = pc_View->GetPcData();
+      const C_PuiSvPc c_PcData = pc_View->GetPcData();
       QGraphicsView * const pc_GraphicsView = this->scene()->views().at(0);
       QPointer<C_OgePopUpDialog> const c_DllDialog = new C_OgePopUpDialog(pc_GraphicsView, pc_GraphicsView);
       C_SyvSeDllConfigurationDialog * const pc_DllWidget = new C_SyvSeDllConfigurationDialog(*c_DllDialog);
@@ -510,8 +511,7 @@ bool C_GiSvPc::m_OpenCANDllDialog(void) const
       {
          c_DllDialog->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_DllWidget and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_DllWidget and the Qt memory management
    return q_Retval;
 }
 
@@ -634,21 +634,20 @@ void C_GiSvPc::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_GiSvPc::m_GetScaleCategory(void) const
 {
-   const QSizeF c_ActSize = this->mpc_SvgGraphicsItem->boundingRect().size(); //Karsten
-                                                                              // mpc_Image->boundingRect().size();
+   const QSizeF c_ActSize = this->mpc_SvgGraphicsItem->boundingRect().size();
    uint32 u32_ScaleCategory = mhu32_ScaleCategory0;
 
    // check first scaling
-   if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory1]) &&
-       (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory1]))
+   if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory1]) &&
+       (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory1]))
    {
       // check second scaling
-      if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory2]) &&
-          (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory2]))
+      if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory2]) &&
+          (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory2]))
       {
          // check third scaling
-         if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory3]) &&
-             (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory3]))
+         if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory3]) &&
+             (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory3]))
          {
             u32_ScaleCategory = mhu32_ScaleCategory3;
          }

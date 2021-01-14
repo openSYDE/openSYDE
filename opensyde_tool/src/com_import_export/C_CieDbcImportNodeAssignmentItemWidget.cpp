@@ -47,7 +47,7 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CieDbcImportNodeAssignmentItemWidget::C_CieDbcImportNodeAssignmentItemWidget(
-   const stw_opensyde_gui_logic::C_CieConverter::C_CIENode & orc_DbcNode, const std::vector<QString> & orc_OsyNodeNames,
+   const C_CieConverter::C_CIENode & orc_DbcNode, const std::vector<QString> & orc_OsyNodeNames,
    const std::vector<uint32> & orc_NodeIndexes, const std::vector<uint32> & orc_InterfaceIndexes,
    QWidget * const opc_Parent) :
    QWidget(opc_Parent),
@@ -62,7 +62,7 @@ C_CieDbcImportNodeAssignmentItemWidget::C_CieDbcImportNodeAssignmentItemWidget(
    this->mpc_Ui->pc_LabImportNode->SetToolTipInformation(orc_DbcNode.c_Properties.c_Name.c_str(),
                                                          orc_DbcNode.c_Properties.c_Comment.c_str());
 
-   this->mpc_Ui->pc_LabInfo->setText(QString("%1 Tx / %2 Rx").
+   this->mpc_Ui->pc_LabInfo->setText(static_cast<QString>("%1 Tx / %2 Rx").
                                      arg(orc_DbcNode.c_TxMessages.size()).arg(orc_DbcNode.c_RxMessages.size()));
 
    // fill combobox with all connected topology nodes
@@ -95,9 +95,7 @@ C_CieDbcImportNodeAssignmentItemWidget::~C_CieDbcImportNodeAssignmentItemWidget(
    class package of DBC nodes an its assigned node indexes and interface indexes
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui::C_CieDbcOsyNodeAssignment stw_opensyde_gui::C_CieDbcImportNodeAssignmentItemWidget::GetNodeAssignment(
-   void)
-const
+C_CieDbcOsyNodeAssignment C_CieDbcImportNodeAssignmentItemWidget::GetNodeAssignment(void) const
 {
    C_CieDbcOsyNodeAssignment c_Return;
    const sint32 s32_CurrentIndex = this->mpc_Ui->pc_CbxOsyNodes->currentIndex();
@@ -110,7 +108,7 @@ const
    {
       tgl_assert(this->mc_InterfaceIndexes.size() == this->mc_NodeIndexes.size());
 
-      if (s32_CurrentIndex - 1 < static_cast<sint32>(this->mc_NodeIndexes.size()))
+      if ((s32_CurrentIndex - 1) < static_cast<sint32>(this->mc_NodeIndexes.size()))
       {
          // subtract one of current index because of ignore item in combobox
          c_Return.s32_AssignedOsyNodeIndex = this->mc_NodeIndexes[s32_CurrentIndex - 1];
@@ -137,13 +135,13 @@ bool C_CieDbcImportNodeAssignmentItemWidget::IsAssigned(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Enable or disable specified combobox item.
 
-   \param[in]       u32_Index    Combobox index of item that should be enabled/disabled
-   \param[in]       q_Enable     flag of enable or disable
+   \param[in]       ou32_Index    Combobox index of item that should be enabled/disabled
+   \param[in]       oq_Enable     flag of enable or disable
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieDbcImportNodeAssignmentItemWidget::UpdateComboboxEntries(uint32 u32_Index, bool q_Enable) const
+void C_CieDbcImportNodeAssignmentItemWidget::UpdateComboboxEntries(const uint32 ou32_Index, const bool oq_Enable) const
 {
-   this->mpc_Ui->pc_CbxOsyNodes->SetItemState(u32_Index, q_Enable);
+   this->mpc_Ui->pc_CbxOsyNodes->SetItemState(ou32_Index, oq_Enable);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

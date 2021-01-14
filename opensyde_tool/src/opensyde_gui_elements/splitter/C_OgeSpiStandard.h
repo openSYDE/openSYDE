@@ -36,10 +36,7 @@ public:
    void SetMargins(const stw_types::sint32 os32_MarginTop, const stw_types::sint32 os32_MarginBottom) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QSplitterHandle * createHandle(void) override;
-   //lint -restore
 };
 
 class C_OgeSpiStandardHandle :
@@ -52,10 +49,7 @@ public:
    void SetMargins(const stw_types::sint32 os32_MarginTop, const stw_types::sint32 os32_MarginBottom);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    QColor mc_Color;

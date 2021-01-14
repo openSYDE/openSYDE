@@ -54,7 +54,7 @@ public:
    };
 
    void HandleMousePressEvent(const QMouseEvent * const opc_Event);
-   void HandleMouseReleaseEvent(QMouseEvent * const opc_Event);
+   void HandleMouseReleaseEvent(const QMouseEvent * const opc_Event);
    void HandleMouseMoveEvent(const QMouseEvent * const opc_Event);
 
    C_OgeWiCustomMessage::E_Outputs Execute(void);
@@ -76,10 +76,7 @@ public:
    void SetCustomMinHeight(const stw_types::sint32 & ors32_MinHeight, const stw_types::sint32 & ors32_MaxHeight);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   //lint -restore
 
 private:
    Ui::C_OgeWiCustomMessage * mpc_Ui;

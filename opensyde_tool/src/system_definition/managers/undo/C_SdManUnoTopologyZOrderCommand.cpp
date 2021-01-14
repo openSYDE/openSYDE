@@ -80,7 +80,7 @@ void C_SdManUnoTopologyZOrderCommand::h_CheckZOrderPriority(const QList<QGraphic
          // search all bus connectors of the node or bus
          for (c_ItItem = orc_Items.begin(); c_ItItem != orc_Items.end(); ++c_ItItem)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             pc_BusConnectorItem = dynamic_cast<C_GiLiBusConnector *>(*c_ItItem);
 
             if (pc_BusConnectorItem != NULL)
@@ -105,7 +105,7 @@ void C_SdManUnoTopologyZOrderCommand::h_CheckZOrderPriority(const QList<QGraphic
       }
       else if ((*c_ItSelectedItem)->type() == msn_GRAPHICS_ITEM_BUS_CONNECT)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          pc_BusConnectorItem = dynamic_cast<C_GiLiBusConnector *>(*c_ItSelectedItem);
          mh_CheckZOrderOfBusConnectors(pc_BusConnectorItem, orc_NewZValues);
       }

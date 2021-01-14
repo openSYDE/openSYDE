@@ -26,7 +26,8 @@ margin-bottom: 4px;
 }
 
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator,
+stw_opensyde_gui--C_SdCodeGenerationView::indicator
 {
 width: 15px;
 height: 15px;
@@ -59,7 +60,8 @@ stw_opensyde_gui_elements--C_OgeChxTristate::indicator,
 stw_opensyde_gui_elements--C_OgeChxTristateTransparentError::indicator,
 stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator,
+stw_opensyde_gui--C_SdCodeGenerationView::indicator
 {
 border: none;
 }
@@ -117,13 +119,15 @@ stw_opensyde_gui--C_SdBueMessageTableView::indicator:enabled:checked,
 stw_opensyde_gui--C_SdNdeHalcOvTableView::indicator:enabled:checked,
 stw_opensyde_gui--C_SdNdeDpListTableView::indicator:enabled:checked,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:enabled:checked,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:checked
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:checked,
+stw_opensyde_gui--C_SdCodeGenerationView::indicator:enabled:checked
 {
 image: url(://images/CheckBoxActiveWithoutBackground.svg);
 }
 
 stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator:indeterminate,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:indeterminate
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:indeterminate,
+stw_opensyde_gui--C_SdCodeGenerationView::indicator:indeterminate
 {
 image: url(://images/CheckBoxIndeterminate.svg);
 }
@@ -140,7 +144,8 @@ stw_opensyde_gui_elements--C_OgeChxTristate::indicator:disabled:checked,
 stw_opensyde_gui_elements--C_OgeChxProperties::indicator:disabled:checked,
 stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator:disabled:checked,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:disabled:checked,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:disabled:checked
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:disabled:checked,
+stw_opensyde_gui--C_SdCodeGenerationView::indicator:disabled:checked
 {
 image: url(://images/CheckBoxActiveDisabledWithoutBackground.svg);
 }

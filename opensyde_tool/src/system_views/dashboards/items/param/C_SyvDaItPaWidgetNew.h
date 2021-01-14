@@ -72,10 +72,7 @@ Q_SIGNALS:
    void SigNvmReadList(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call
@@ -114,6 +111,10 @@ private:
                                         const stw_types::uint32 ou32_ValidLayers);
    static QString mh_GetFile(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
                              const stw_types::uint32 ou32_Value);
+
+   void m_InformUserFloatRangeCheck(
+      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds,
+      const std::vector<QString> & orc_InvalidValues, const std::vector<QString> & orc_NewValues) const;
 
    Ui::C_SyvDaItPaWidgetNew * mpc_Ui;
    const stw_types::uint32 mu32_ViewIndex;

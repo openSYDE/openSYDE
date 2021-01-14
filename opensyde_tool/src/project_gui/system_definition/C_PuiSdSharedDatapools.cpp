@@ -118,7 +118,6 @@ void C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc_N
       c_Group.push_back(orc_ShareDatapool);
       c_Group.push_back(orc_NewDatapool);
 
-      //lint -e{864} Call as expected by interface
       std::sort(c_Group.begin(), c_Group.end());
 
       this->c_SharedDatapools.push_back(c_Group);
@@ -144,7 +143,6 @@ sint32 C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc
    {
       this->c_SharedDatapools[ou32_SharedDatapoolGroup].push_back(orc_NewDatapool);
 
-      //lint -e{864} Call as expected by interface
       std::sort(this->c_SharedDatapools[ou32_SharedDatapoolGroup].begin(),
                 this->c_SharedDatapools[ou32_SharedDatapoolGroup].end());
 

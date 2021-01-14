@@ -63,16 +63,16 @@ C_SyvDaUnoAddSnapshotCommand::C_SyvDaUnoAddSnapshotCommand(QGraphicsScene * cons
                             opc_Parent, orc_InitialSnapshotData)
 {
    //Handle pos
-   this->SetDataPositionOffset(orc_NewPos);
+   this->m_SetDataPositionOffset(orc_NewPos);
    //Handle Z
-   this->SetDataZOffset(of64_HighestUsedZValue);
+   this->m_SetDataZOffset(of64_HighestUsedZValue);
    //Handle rails
    for (QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
              C_PuiSvReadDataConfiguration>::const_iterator c_It = orc_RestoredRails.begin();
         c_It != orc_RestoredRails.end(); ++c_It)
    {
       //Should never return anything but C_NO_ERR
-      this->AddReadRailToInternalBackup(c_It.key(), c_It.value());
+      this->m_AddReadRailToInternalBackup(c_It.key(), c_It.value());
    }
 }
 
@@ -90,15 +90,15 @@ C_SyvDaUnoAddSnapshotCommand::~C_SyvDaUnoAddSnapshotCommand(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddSnapshotCommand::m_AddNew(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
    {
       QMap<C_PuiBsTemporaryDataID, uint64> c_IDMap;
       uint32 u32_ItID = 0;
-      const C_PuiSvDashboard c_InitialData = this->GetDataBackup();
-      const std::vector<stw_types::uint64> c_AllIDs = this->GetIDs();
+      const C_PuiSvDashboard c_InitialData = this->m_GetDataBackup();
+      const std::vector<stw_types::uint64> c_AllIDs = this->m_GetIDs();
       const uint32 u32_ItemCount = c_InitialData.Count();
       if (u32_ItemCount <= c_AllIDs.size())
       {
@@ -200,7 +200,7 @@ void C_SyvDaUnoAddSnapshotCommand::m_AddNew(void)
          }
          //Read rails
          //Check if any were set by constructor otherwise use default implementation
-         if (this->GetStoredReadRailCount() == 0)
+         if (this->m_GetStoredReadRailCount() == 0)
          {
             m_InitialReadRailHandling();
          }
@@ -219,7 +219,7 @@ void C_SyvDaUnoAddSnapshotCommand::m_AddNew(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddSnapshotCommand::m_InitialReadRailHandling(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -228,7 +228,7 @@ void C_SyvDaUnoAddSnapshotCommand::m_InitialReadRailHandling(void)
       if (pc_View != NULL)
       {
          std::vector<const C_PuiSvDbWidgetBase *> c_Widgets;
-         const C_PuiSvDashboard c_InitialData = this->GetDataBackup();
+         const C_PuiSvDashboard c_InitialData = this->m_GetDataBackup();
          c_InitialData.GetAllWidgetItems(c_Widgets);
          for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
          {
@@ -255,7 +255,7 @@ void C_SyvDaUnoAddSnapshotCommand::m_InitialReadRailHandling(void)
                            tgl_assert(c_Config.InitDefaultThreshold(pc_Element->c_MinValue,
                                                                     pc_Element->c_MaxValue) == C_NO_ERR);
                            //Definitely add of read rail required
-                           if (this->AddReadRailToInternalBackup(rc_Config.c_ElementId, c_Config) == C_NO_ERR)
+                           if (this->m_AddReadRailToInternalBackup(rc_Config.c_ElementId, c_Config) == C_NO_ERR)
                            {
                               //No explicit undo step after this so this has to be done manually
                               tgl_assert(C_PuiSvHandler::h_GetInstance()->AddViewReadRailItem(pc_Scene->GetViewIndex(),

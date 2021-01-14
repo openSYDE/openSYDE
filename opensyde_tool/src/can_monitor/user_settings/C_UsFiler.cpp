@@ -443,12 +443,12 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
 void C_UsFiler::mh_SaveColumns(C_SCLIniFile & orc_Ini, const C_SCLString & orc_SectionName,
                                const std::string & orc_IdentifierBaseName, const std::vector<sint32> & orc_Columns)
 {
-   const QString c_CountId = QString("%1_count").arg(orc_IdentifierBaseName.c_str());
+   const QString c_CountId = static_cast<QString>("%1_count").arg(orc_IdentifierBaseName.c_str());
 
    orc_Ini.WriteInteger(orc_SectionName.c_str(), c_CountId.toStdString().c_str(), orc_Columns.size());
    for (uint32 u32_ItCol = 0UL; u32_ItCol < orc_Columns.size(); ++u32_ItCol)
    {
-      const QString c_ItemId = QString("%1_%2").arg(orc_IdentifierBaseName.c_str()).arg(u32_ItCol);
+      const QString c_ItemId = static_cast<QString>("%1_%2").arg(orc_IdentifierBaseName.c_str()).arg(u32_ItCol);
       orc_Ini.WriteInteger(orc_SectionName.c_str(), c_ItemId.toStdString().c_str(), orc_Columns[u32_ItCol]);
    }
 }
@@ -465,14 +465,14 @@ void C_UsFiler::mh_SaveColumns(C_SCLIniFile & orc_Ini, const C_SCLString & orc_S
 void C_UsFiler::mh_LoadColumns(C_SCLIniFile & orc_Ini, const C_SCLString & orc_SectionName,
                                const std::string & orc_IdentifierBaseName, std::vector<sint32> & orc_Columns)
 {
-   const QString c_CountId = QString("%1_count").arg(orc_IdentifierBaseName.c_str());
+   const QString c_CountId = static_cast<QString>("%1_count").arg(orc_IdentifierBaseName.c_str());
    const sint32 s32_Count = orc_Ini.ReadInteger(orc_SectionName.c_str(), c_CountId.toStdString().c_str(), 0);
 
    orc_Columns.clear();
    orc_Columns.reserve(s32_Count);
    for (sint32 s32_ItCol = 0L; s32_ItCol < s32_Count; ++s32_ItCol)
    {
-      const QString c_ItemId = QString("%1_%2").arg(orc_IdentifierBaseName.c_str()).arg(s32_ItCol);
+      const QString c_ItemId = static_cast<QString>("%1_%2").arg(orc_IdentifierBaseName.c_str()).arg(s32_ItCol);
       const sint32 s32_Value = orc_Ini.ReadInteger(orc_SectionName.c_str(), c_ItemId.toStdString().c_str(), 50);
       orc_Columns.push_back(s32_Value);
    }

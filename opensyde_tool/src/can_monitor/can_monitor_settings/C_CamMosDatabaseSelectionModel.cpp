@@ -45,7 +45,7 @@ const QString C_CamMosDatabaseSelectionModel::mhc_IconMessage = "://images/IconM
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseSelectionModel::C_CamMosDatabaseSelectionModel(QObject * const opc_Parent) :
@@ -87,7 +87,7 @@ void C_CamMosDatabaseSelectionModel::Init(void)
    0: database name
    1: message name
 
-   \param[in] orc_Index Model index
+   \param[in]  orc_Index   Model index
 
    \return
    Current selected data elements
@@ -140,7 +140,7 @@ std::vector<std::array<QString,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get tree column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -155,7 +155,7 @@ sintn C_CamMosDatabaseSelectionModel::columnCount(const QModelIndex & orc_Parent
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get item index by item name
 
-   \param[in] orc_ItemText Item display text
+   \param[in]  orc_ItemText   Item display text
 
    \return
    Model index
@@ -180,7 +180,7 @@ QModelIndex C_CamMosDatabaseSelectionModel::GetIndexForItem(const QString & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert model index to generic item representation
 
-   \param[in] orc_ItemIndex Model index
+   \param[in]  orc_ItemIndex  Model index
 
    \return
    Generic item representation
@@ -193,7 +193,7 @@ const
    QModelIndex c_CurItem = orc_ItemIndex;
    while (c_CurItem.isValid() == true)
    {
-      //lint -e{925}  Result of Qt interface restrictions, set by index function
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreItem * const pc_TreeItem = static_cast<const C_TblTreItem * const>(c_CurItem.internalPointer());
       if (pc_TreeItem != NULL)
       {
@@ -235,7 +235,7 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
          if (c_Messages.size() == 0UL)
          {
             //Special handling for no messages
-            pc_DatabaseItem->c_Name = QString(C_GtGetText::h_GetText("%1 (No mapped messages)")).arg(
+            pc_DatabaseItem->c_Name = static_cast<QString>(C_GtGetText::h_GetText("%1 (No mapped messages)")).arg(
                pc_DatabaseItem->c_Name);
          }
          else
@@ -247,7 +247,7 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
                  c_ItMessage != c_Messages.end(); ++c_ItMessage)
             {
                const C_CieConverter::C_CIECanMessage * const pc_Message =
-                  C_CamDbHandler::h_GetInstance()->GetDbcMessage(c_ItDbc.key(), *c_ItMessage);
+                  C_CamDbHandler::h_GetInstance()->GetDbcMessage(c_ItDbc.key(), *c_ItMessage, false, 0UL);
                if (pc_Message != NULL)
                {
                   const C_OSCCanMessage c_OSCMessage = C_CamGenSigUtil::h_ConvertDBCToOSY(*pc_Message);
@@ -265,14 +265,14 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
    {
       if (c_ItOsy->GetActive())
       {
-         const QMap<QString, C_OSCCanMessageIdentificationIndices> & rc_Messages = c_ItOsy->GetFoundMessages();
+         const QMap<QString, C_CamDbOsyMessageId> & rc_Messages = c_ItOsy->GetFoundMessages();
          //Database
          C_TblTreItem * const pc_DatabaseItem = this->m_CreateAndFillDatabaseNode(
             c_ItOsy.key(), this->mpc_InvisibleRootItem);
          if (rc_Messages.size() == 0UL)
          {
             //Special handling for no messages
-            pc_DatabaseItem->c_Name = QString(C_GtGetText::h_GetText("%1 (No mapped messages)")).arg(
+            pc_DatabaseItem->c_Name = static_cast<QString>(C_GtGetText::h_GetText("%1 (No mapped messages)")).arg(
                pc_DatabaseItem->c_Name);
          }
          else
@@ -280,11 +280,11 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
             //Reserve
             pc_DatabaseItem->ReserveChildrenSpace(rc_Messages.size());
             //Each message
-            for (QMap<QString, C_OSCCanMessageIdentificationIndices>::const_iterator c_ItMessage = rc_Messages.begin();
+            for (QMap<QString, C_CamDbOsyMessageId>::const_iterator c_ItMessage = rc_Messages.begin();
                  c_ItMessage != rc_Messages.end(); ++c_ItMessage)
             {
                const C_OSCCanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetOSCMessage(
-                  c_ItOsy.key(), c_ItMessage.key());
+                  c_ItOsy.key(), c_ItMessage.key(), true, c_ItMessage->u32_Hash);
                if (pc_Message != NULL)
                {
                   m_CreateAndFillMessageNode(*pc_Message, pc_DatabaseItem);
@@ -298,8 +298,8 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create and fill tree node for database item (without messages)
 
-   \param[in]     orc_File       File to create node for
-   \param[in,out] opc_ParentItem Parent item to insert this node
+   \param[in]      orc_File         File to create node for
+   \param[in,out]  opc_ParentItem   Parent item to insert this node
 
    \return
    Database tree node
@@ -326,8 +326,8 @@ C_TblTreItem * C_CamMosDatabaseSelectionModel::m_CreateAndFillDatabaseNode(const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create and fill tree node for message item (without signals)
 
-   \param[in]     orc_Message    Message to create node for
-   \param[in,out] opc_ParentItem Parent item to insert this node
+   \param[in]      orc_Message      Message to create node for
+   \param[in,out]  opc_ParentItem   Parent item to insert this node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionModel::m_CreateAndFillMessageNode(const C_OSCCanMessage & orc_Message,
@@ -337,8 +337,8 @@ void C_CamMosDatabaseSelectionModel::m_CreateAndFillMessageNode(const C_OSCCanMe
 
    //Init current node
    pc_MessageItem->u32_Index = 0UL;
-   pc_MessageItem->c_Name = QString("%1 (0x%2)").arg(orc_Message.c_Name.c_str()).
-                            arg(QString("%1").arg(orc_Message.u32_CanId, 0, 16).toUpper());
+   pc_MessageItem->c_Name = static_cast<QString>("%1 (0x%2)").arg(orc_Message.c_Name.c_str()).
+                            arg(static_cast<QString>("%1").arg(orc_Message.u32_CanId, 0, 16).toUpper());
 
    //Remember the original name (required by getter)
    this->mc_MessageMap.insert(pc_MessageItem->c_Name, orc_Message.c_Name.c_str());
@@ -351,8 +351,8 @@ void C_CamMosDatabaseSelectionModel::m_CreateAndFillMessageNode(const C_OSCCanMe
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append all items from the vector orc_SmallVectorToAdd to the vector orc_BigVectorToAppendTo
 
-   \param[in,out] orc_BigVectorToAppendTo All current items which will get expanded
-   \param[in]     orc_SmallVectorToAdd    New items
+   \param[in,out]  orc_BigVectorToAppendTo   All current items which will get expanded
+   \param[in]      orc_SmallVectorToAdd      New items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionModel::mh_CombineIndices(std::vector<std::array<QString,

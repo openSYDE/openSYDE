@@ -36,11 +36,8 @@ public:
    virtual ~C_GiNodeBoundary();
 
    virtual QRectF boundingRect() const;
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget);
-   //lint -restore
    virtual void Redraw(void) override;
    void SetText(const QString & orc_Text);
    void SetFont(const QFont & orc_Font);
@@ -50,7 +47,7 @@ public:
 private:
    //Avoid call
    C_GiNodeBoundary(const C_GiNodeBoundary &);
-   C_GiNodeBoundary & operator =(const C_GiNodeBoundary &);
+   C_GiNodeBoundary & operator =(const C_GiNodeBoundary &); //lint !e1511 //we want to hide the base func.
 
    QString mc_Text;
    QFont mc_Font;

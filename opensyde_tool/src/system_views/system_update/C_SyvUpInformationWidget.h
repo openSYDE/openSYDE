@@ -79,10 +79,7 @@ Q_SIGNALS:
    void SigUpdatePackageState(const stw_types::sint32 os32_State) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void showEvent(QShowEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_SyvUpInformationWidget * mpc_Ui;

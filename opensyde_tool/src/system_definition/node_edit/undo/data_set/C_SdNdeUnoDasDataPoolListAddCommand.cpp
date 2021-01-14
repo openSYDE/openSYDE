@@ -76,7 +76,7 @@ C_SdNdeUnoDasDataPoolListAddCommand::C_SdNdeUnoDasDataPoolListAddCommand(const u
          }
       }
    }
-   this->SetInitialData(c_OSCNames, c_OSCDataSetValues);
+   this->m_SetInitialData(c_OSCNames, c_OSCDataSetValues);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ C_SdNdeUnoDasDataPoolListAddCommand::C_SdNdeUnoDasDataPoolListAddCommand(const u
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListAddCommand::redo(void)
 {
-   this->Add();
+   this->m_Add();
    C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::redo();
 }
 
@@ -96,6 +96,6 @@ void C_SdNdeUnoDasDataPoolListAddCommand::redo(void)
 void C_SdNdeUnoDasDataPoolListAddCommand::undo(void)
 {
    C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::undo();
-   this->Delete();
+   this->m_Delete();
    this->mq_Initial = false;
 }

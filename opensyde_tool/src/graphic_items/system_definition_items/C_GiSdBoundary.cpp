@@ -63,7 +63,7 @@ void C_GiSdBoundary::LoadData(void)
       m_LoadFromData(C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries[this->ms32_Index], false);
    }
    //Object name for test
-   this->setObjectName(QString("Meta: Boundary"));
+   this->setObjectName("Meta: Boundary");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

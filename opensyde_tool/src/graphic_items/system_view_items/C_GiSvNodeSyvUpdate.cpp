@@ -546,7 +546,8 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                            if (((rc_OsyDeviceInfo.c_ApplicationName == rc_FileInfo.acn_ProjectName) &&
                                 (rc_OsyDeviceInfo.c_ApplicationVersion == rc_FileInfo.acn_ProjectVersion)) &&
                                ((rc_OsyDeviceInfo.c_BuildDate + rc_OsyDeviceInfo.c_BuildTime) ==
-                                (QString(rc_FileInfo.acn_Date) + rc_FileInfo.acn_Time).toStdString().c_str()))
+                                (static_cast<QString>(rc_FileInfo.acn_Date) +
+                                 rc_FileInfo.acn_Time).toStdString().c_str()))
                            {
                               if (rc_OsyDeviceInfo.u8_SignatureValid == 0U) //0 == valid
                               {
@@ -595,12 +596,16 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                            orc_DeviceApplicationInfos.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks[
                               s32_ItDeviceInfoBlock];
                         //Search for match
-                        if (((QString(rc_STWDeviceInfo.acn_ProjectName).compare(rc_FileInfo.acn_ProjectName) == 0) &&
-                             (QString(rc_STWDeviceInfo.acn_ProjectVersion).compare(rc_FileInfo.acn_ProjectVersion) ==
+                        if (((static_cast<QString>(rc_STWDeviceInfo.acn_ProjectName).compare(rc_FileInfo.acn_ProjectName)
+                              == 0) &&
+                             (static_cast<QString>(rc_STWDeviceInfo.acn_ProjectVersion).compare(rc_FileInfo.
+                                                                                                acn_ProjectVersion) ==
                               0)) &&
-                            (QString((QString(rc_STWDeviceInfo.acn_Date) +
-                                      rc_STWDeviceInfo.acn_Time)).compare((QString(rc_FileInfo.acn_Date) +
-                                                                           rc_FileInfo.acn_Time)) == 0))
+                            (static_cast<QString>((static_cast<QString>(rc_STWDeviceInfo.acn_Date) +
+                                                   rc_STWDeviceInfo.acn_Time)).compare((static_cast<QString>(rc_FileInfo
+                                                                                                             .acn_Date)
+                                                                                        +
+                                                                                        rc_FileInfo.acn_Time)) == 0))
                         {
                            q_Found = true;
                            break;
@@ -1101,7 +1106,7 @@ bool C_GiSvNodeSyvUpdate::m_CheckAlwaysUpdate(void) const
    \param[in]  opc_TooltipText   Tooltip text
 
    \retval   True    Update disabled check result
-   \retval   False   Update disabled check result
+   \retval   False   Update not disabled check result
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvNodeSyvUpdate::m_CheckUpdateDisabledState(QString * const opc_TooltipText) const
@@ -1111,11 +1116,12 @@ bool C_GiSvNodeSyvUpdate::m_CheckUpdateDisabledState(QString * const opc_Tooltip
    //Default message
    if (opc_TooltipText != NULL)
    {
-      *opc_TooltipText = C_GtGetText::h_GetText("Node update disabled."
-                                                "\nPossible reasons: "
-                                                "\n- There are no active Data Blocks declared (SYSTEM DEFINITION / Node / Properties)"
-                                                "\n- Update setting is disabled on connected node interface (SYSTEM DEFINITION / Node / Properties)"
-                                                "\n- Node has no protocol support.");
+      *opc_TooltipText = C_GtGetText::h_GetText(
+         "Node update disabled."
+         "\nPossible reasons: "
+         "\n- There are no active Data Blocks declared (SYSTEM DEFINITION / Node / Properties)"
+         "\n- Update setting is disabled on connected node interface (SYSTEM DEFINITION / Node / Properties)"
+         "\n- Node has no protocol support.");
    }
 
    if ((q_Retval) && (this->ms32_Index >= 0))
@@ -1158,13 +1164,14 @@ bool C_GiSvNodeSyvUpdate::m_CheckUpdateDisabledState(QString * const opc_Tooltip
                            q_Retval = true;
                            if (opc_TooltipText != NULL)
                            {
-                              *opc_TooltipText = C_GtGetText::h_GetText("Node update disabled."
-                                                                        "\nUpdate Package doesn't contain any files for this node");
+                              *opc_TooltipText = C_GtGetText::h_GetText(
+                                 "Node update disabled."
+                                 "\nUpdate Package doesn't contain any files for this node");
                            }
                         }
                         else
                         {
-                           //Any file assoziated
+                           //Any file associated
                            q_Retval = false;
                         }
                      }

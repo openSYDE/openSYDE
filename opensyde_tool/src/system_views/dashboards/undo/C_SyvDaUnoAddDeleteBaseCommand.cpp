@@ -87,7 +87,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_DeleteSave(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_Restore(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -109,7 +109,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_RestoreReadRailsOnly(void)
 {
    if (this->mc_SavedRailAssignments.size() > 0)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
       if (pc_Scene != NULL)
@@ -148,7 +148,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_RestoreReadRailsOnly(void)
    Boundary element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::GetBoundaryType(void) const
+sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetBoundaryType(void) const
 {
    return static_cast<sint32>(C_PuiSvDbDataElement::eBOUNDARY);
 }
@@ -160,7 +160,7 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::GetBoundaryType(void) const
    Image element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::GetImageType(void) const
+sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetImageType(void) const
 {
    return static_cast<sint32>(C_PuiSvDbDataElement::eIMAGE);
 }
@@ -172,7 +172,7 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::GetImageType(void) const
    Line arrow element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::GetLineArrowType(void) const
+sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetLineArrowType(void) const
 {
    return static_cast<sint32>(C_PuiSvDbDataElement::eLINE_ARROW);
 }
@@ -184,7 +184,7 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::GetLineArrowType(void) const
    Text element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::GetTextElementType(void) const
+sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetTextElementType(void) const
 {
    return static_cast<sint32>(C_PuiSvDbDataElement::eTEXT_ELEMENT);
 }
@@ -195,7 +195,7 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::GetTextElementType(void) const
    \param[in] orc_NewPos Offset
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaUnoAddDeleteBaseCommand::SetDataPositionOffset(const QPointF & orc_NewPos)
+void C_SyvDaUnoAddDeleteBaseCommand::m_SetDataPositionOffset(const QPointF & orc_NewPos)
 {
    this->mc_DataBackup.SetDataPositionOffset(orc_NewPos);
 }
@@ -206,7 +206,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::SetDataPositionOffset(const QPointF & orc_N
    \param[in] of64_HighestUsedZValue Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaUnoAddDeleteBaseCommand::SetDataZOffset(const float64 of64_HighestUsedZValue)
+void C_SyvDaUnoAddDeleteBaseCommand::m_SetDataZOffset(const float64 of64_HighestUsedZValue)
 {
    this->mc_DataBackup.SetDataZOffset(of64_HighestUsedZValue);
 }
@@ -218,7 +218,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::SetDataZOffset(const float64 of64_HighestUs
    Current backup data
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvDashboard C_SyvDaUnoAddDeleteBaseCommand::GetDataBackup(void) const
+C_PuiSvDashboard C_SyvDaUnoAddDeleteBaseCommand::m_GetDataBackup(void) const
 {
    return this->mc_DataBackup;
 }
@@ -230,7 +230,7 @@ C_PuiSvDashboard C_SyvDaUnoAddDeleteBaseCommand::GetDataBackup(void) const
    The number of stored read rails
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::GetStoredReadRailCount(void) const
+sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetStoredReadRailCount(void) const
 {
    return this->mc_SavedRailAssignments.size();
 }
@@ -246,8 +246,8 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::GetStoredReadRailCount(void) const
    C_NOACT  Already exists
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::AddReadRailToInternalBackup(const C_OSCNodeDataPoolListElementId & orc_Id,
-                                                                   const C_PuiSvReadDataConfiguration & orc_Value)
+sint32 C_SyvDaUnoAddDeleteBaseCommand::m_AddReadRailToInternalBackup(const C_OSCNodeDataPoolListElementId & orc_Id,
+                                                                     const C_PuiSvReadDataConfiguration & orc_Value)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -268,7 +268,7 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::AddReadRailToInternalBackup(const C_OSCNo
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -292,12 +292,10 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
             for (std::vector<QGraphicsItem *>::const_iterator c_ItRelatedItem = c_RelatedItems.begin();
                  c_ItRelatedItem != c_RelatedItems.end(); ++c_ItRelatedItem)
             {
-               //lint -e{740,929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                pc_Unique = dynamic_cast<C_GiUnique *>(*c_ItRelatedItem);
                if (pc_Unique != NULL)
                {
                   const uint64 u64_CurUniqueID = pc_Unique->GetID();
-                  //lint -e{740,929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                   pc_Data = dynamic_cast<C_PuiSvDbDataElement *>(*c_ItRelatedItem);
                   if (pc_Data != NULL)
                   {
@@ -312,35 +310,35 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
 
                         //Backup scene data internally
                         //Widgets
-                        //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                        
                         pc_RectBase = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItRelatedItem);
                         if (pc_RectBase != NULL)
                         {
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            const C_GiSvDaLabelBase * const pc_Label  =
                               dynamic_cast<const C_GiSvDaLabelBase * const>(*c_ItRelatedItem);
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            const C_GiSvDaParam * const pc_ParamWidget  =
                               dynamic_cast<const C_GiSvDaParam * const>(*c_ItRelatedItem);
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            const C_GiSvDaSpinBoxBase * const pc_SpinBox  =
                               dynamic_cast<const C_GiSvDaSpinBoxBase * const>(*c_ItRelatedItem);
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            const C_GiSvDaSliderBase * const pc_Slider  =
                               dynamic_cast<const C_GiSvDaSliderBase * const>(*c_ItRelatedItem);
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            const C_GiSvDaProgressBarBase * const pc_ProgressBar  =
                               dynamic_cast<const C_GiSvDaProgressBarBase * const>(*c_ItRelatedItem);
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            const C_GiSvDaToggleBase * const pc_Toggle  =
                               dynamic_cast<const C_GiSvDaToggleBase * const>(*c_ItRelatedItem);
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            const C_GiSvDaChartBase * const pc_Chart  =
                               dynamic_cast<const C_GiSvDaChartBase * const>(*c_ItRelatedItem);
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            const C_GiSvDaPieChartBase * const pc_PieChart  =
                               dynamic_cast<const C_GiSvDaPieChartBase * const>(*c_ItRelatedItem);
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           
                            const C_GiSvDaTableBase * const pc_Table  =
                               dynamic_cast<const C_GiSvDaTableBase * const>(*c_ItRelatedItem);
                            if (pc_Label != NULL)
@@ -523,7 +521,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Clear(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_Delete(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -611,7 +609,6 @@ const C_PuiSvDbWidgetBase * C_SyvDaUnoAddDeleteBaseCommand::mh_GetGenericWidget(
          const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(ou32_DashboardIndex);
          if (pc_Dashboard != NULL)
          {
-            //lint -save -e929 false positive in PC-Lint: allowed by MISRA 5-2-2
             const uint32 u32_Index = static_cast<uint32>(opc_DataElement->GetIndex());
             const C_GiSvDaLabelBase * const pc_Label  =
                dynamic_cast<const C_GiSvDaLabelBase * const>(opc_DataElement);
@@ -631,7 +628,6 @@ const C_PuiSvDbWidgetBase * C_SyvDaUnoAddDeleteBaseCommand::mh_GetGenericWidget(
                dynamic_cast<const C_GiSvDaPieChartBase * const>(opc_DataElement);
             const C_GiSvDaTableBase * const pc_Table  =
                dynamic_cast<const C_GiSvDaTableBase * const>(opc_DataElement);
-            //lint -restore
             if (pc_Label != NULL)
             {
                pc_Retval = pc_Dashboard->GetLabel(u32_Index);

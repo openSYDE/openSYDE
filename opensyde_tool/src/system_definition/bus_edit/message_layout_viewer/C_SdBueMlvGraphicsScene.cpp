@@ -13,8 +13,10 @@
 #include "precomp_headers.h"
 
 #include <cstdlib>
-#include <ctime> //lint !e829 //this module is specifically for Windows targets; no trouble with unspecified
+
+//lint -estring(829,*ctime*)  //this module is specifically for Windows targets; no trouble with unspecified
 // behavior expected
+#include <ctime>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
 
@@ -167,9 +169,9 @@ C_SdBueMlvGraphicsScene::C_SdBueMlvGraphicsScene(QObject * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_BorderItemUpperLeft and the Qt memory management
 C_SdBueMlvGraphicsScene::~C_SdBueMlvGraphicsScene(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_BorderItemUpperLeft and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -709,8 +711,7 @@ void C_SdBueMlvGraphicsScene::m_InitBorderItems(void)
 
    this->m_UpdateBorderItems();
 
-   //lint -e{429}  no memory leak because of the parent of pc_Item by addItem and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
@@ -725,8 +726,7 @@ void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
       pc_Item->setZValue(C_SdBueMlvGraphicsScene::mhf64_ZOrderEmptyItem);
       this->addItem(pc_Item);
 
-      //lint -e{429}  no memory leak because of the parent of pc_Item by addItem and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
 
    this->m_UpdateEmptyItems();
 }
@@ -754,8 +754,7 @@ void C_SdBueMlvGraphicsScene::m_InitProtocolItems(void)
 
    this->m_UpdateProtocolItems();
 
-   //lint -e{429}  no memory leak because of the parent of mapc_ECeSHints by addItem and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of mapc_ECeSHints by addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a signal
@@ -1009,9 +1008,7 @@ void C_SdBueMlvGraphicsScene::m_AddSignalToGridMapping(C_SdBueMlvSignalManager *
       }
    }
 
-   // suppression is for function m_AddSignal
-   //lint -e{429}  no memory leak because of the parent of pc_Item by addItem and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateSignalInGridMapping(C_SdBueMlvSignalManager * const opc_Item)

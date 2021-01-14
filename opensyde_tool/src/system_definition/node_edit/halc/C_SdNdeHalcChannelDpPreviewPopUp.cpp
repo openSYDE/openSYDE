@@ -197,36 +197,32 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDpSection(const uint32 ou32_NodeInd
    orc_Text += "</h3>";
    if ((pc_Channel != NULL) && (pc_Node != NULL))
    {
+      const C_OSCNodeDataPool * const pc_Datapool =
+         C_PuiSdHandler::h_GetInstance()->GetHALCDatapool(ou32_NodeIndex, pc_Channel->q_SafetyRelevant);
+      const C_OSCNodeApplication * pc_Appl = NULL;
+
       orc_Text += "<table style=\"width:100%;\">";
       orc_Text += "<tr>";
-      orc_Text += "<td>" + QString(C_GtGetText::h_GetText("Datapool:")) + "</td>";
-      orc_Text += "<td>" + QString(C_OSCHALCMagicianUtil::h_GetDatapoolName(pc_Channel->q_SafetyRelevant).c_str()) +
+      orc_Text += "<td>" + static_cast<QString>(C_GtGetText::h_GetText("Datapool:")) + "</td>";
+      orc_Text += "<td>" + static_cast<QString>(C_OSCHALCMagicianUtil::h_GetDatapoolName(pc_Channel->q_SafetyRelevant).c_str()) +
                   "</td>";
       orc_Text += "</tr>";
       orc_Text += "<tr>";
-      orc_Text += "<td>" + QString(C_GtGetText::h_GetText("Mapped Datablock:")) + "</td>";
-      if (((pc_Channel->q_SafetyRelevant) && (pc_Node->c_HALCConfig.GetSafeDatablockAssigned())) ||
-          ((pc_Channel->q_SafetyRelevant == false) && (pc_Node->c_HALCConfig.GetUnsafeDatablockAssigned())))
+      orc_Text += "<td>" + static_cast<QString>(C_GtGetText::h_GetText("Mapped Datablock:")) + "</td>";
+
+      if ((pc_Datapool != NULL) && (pc_Datapool->s32_RelatedDataBlockIndex >= 0))
       {
-         const C_OSCNodeApplication * const pc_Appl =
-            pc_Channel->q_SafetyRelevant ?
+         pc_Appl =
             C_PuiSdHandler::h_GetInstance()->GetApplication(ou32_NodeIndex,
-                                                            pc_Node->c_HALCConfig.GetSafeDatablockIndex())
-            :
-            C_PuiSdHandler::h_GetInstance()->GetApplication(
-               ou32_NodeIndex, pc_Node->c_HALCConfig.GetUnsafeDatablockIndex());
-         if (pc_Appl != NULL)
-         {
-            orc_Text += "<td>" + QString(pc_Appl->c_Name.c_str()) + "</td>";
-         }
-         else
-         {
-            orc_Text += "<td>" + QString("-") + "</td>";
-         }
+                                                            static_cast<uint32>(pc_Datapool->s32_RelatedDataBlockIndex));
+      }
+      if (pc_Appl != NULL)
+      {
+         orc_Text += "<td>" + static_cast<QString>(pc_Appl->c_Name.c_str()) + "</td>";
       }
       else
       {
-         orc_Text += "<td>" + QString("-") + "</td>";
+         orc_Text += "<td>" + static_cast<QString>("-") + "</td>";
       }
       orc_Text += "</tr>";
       orc_Text += "</table>";
@@ -250,17 +246,20 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
                                                        const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
                                                        QString & orc_Text)
 {
-   const QString c_Column1HeadingTagStart = QString("<td style=\"padding: 30px %1 6px 0px;font-weight: bold;\">").arg(
-      C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
-   const QString c_ColumnContentHeadingTagStart = QString(
-      "<td style=\"padding: 30px %1 6px %1;font-weight: bold;\">").arg(
-      C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
+   const QString c_Column1HeadingTagStart = static_cast<QString>("<td style=\"padding: 30px %1 6px 0px;font-weight: bold;\">").
+                                            arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
+   const QString c_ColumnContentHeadingTagStart = static_cast<QString>("<td style=\"padding: 30px %1 6px %1;font-weight: bold;\">").
+                                                  arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
 
    orc_Text += "<h3>";
    orc_Text += C_GtGetText::h_GetText("Used Datapool Elements");
    orc_Text += "</h3>";
    orc_Text += "<p>";
-   orc_Text += C_GtGetText::h_GetText("Used Datapool elements according to current channel configuration:");
+   orc_Text += C_GtGetText::h_GetText("Used Datapool elements according to current ");
+   orc_Text += oq_UseChannelIndex ? C_GtGetText::h_GetText("channel") : C_GtGetText::h_GetText("domain");
+   orc_Text += C_GtGetText::h_GetText(" configuration");
+   mh_AddUseCase(ou32_NodeIndex, ou32_DomainIndex, ou32_ChannelIndex, oq_UseChannelIndex, orc_Text);
+   orc_Text += ":";
    orc_Text += "</p>";
 
    orc_Text += "<table style=\"width:100%;\">";
@@ -349,6 +348,41 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add use case in channel case (nothing in domain case)
+
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DomainIndex    Domain index
+   \param[in]      ou32_ChannelIndex   Channel index
+   \param[in]      oq_UseChannelIndex  Use channel index
+   \param[in,out]  orc_Text            Text
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddUseCase(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
+                                                     const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
+                                                     QString & orc_Text)
+{
+   QString c_UseCase = "";
+
+   if (oq_UseChannelIndex == true)
+   {
+      const C_OSCHalcConfigChannel * pc_Channel =
+         C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(ou32_NodeIndex, ou32_DomainIndex,
+                                                                         ou32_ChannelIndex, oq_UseChannelIndex);
+      const C_OSCHalcConfigDomain * pc_Domain =
+         C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(ou32_NodeIndex, ou32_DomainIndex);
+      if ((pc_Domain != NULL) && (pc_Channel != NULL) &&
+          (pc_Channel->u32_UseCaseIndex < pc_Domain->c_ChannelUseCases.size()))
+      {
+         const C_OSCHalcDefChannelUseCase & rc_UseCase = pc_Domain->c_ChannelUseCases[pc_Channel->u32_UseCaseIndex];
+         orc_Text += C_GtGetText::h_GetText(" (use case \'");
+         orc_Text += rc_UseCase.c_Display.c_str();
+         orc_Text += c_UseCase;
+         orc_Text += "\')";
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add list section
 
    \param[in]      orc_Definition            Definition
@@ -377,14 +411,14 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(const std::vector<C_OSC
          if (C_OSCHALCMagicianUtil::h_CheckChanNumVariableNecessary(orc_Domain))
          {
             const C_OSCNodeDataPoolListElement c_Tmp = C_OSCHALCMagicianUtil::h_GetChanNumVariable(
-               orc_DomainSingularName, 1UL, false);
+               orc_DomainSingularName, true /*irrelevant here*/, 1UL, false);
             C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(orc_ListName, q_AddedList, c_Tmp.c_Name, c_Tmp.c_Comment,
                                                               orc_Text);
          }
          if (C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(orc_Domain))
          {
             const C_OSCNodeDataPoolListElement c_Tmp = C_OSCHALCMagicianUtil::h_GetUseCaseVariable(
-               orc_DomainSingularName, 1UL, false);
+               orc_DomainSingularName, true /*irrelevant here*/, 1UL, false);
             C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(orc_ListName, q_AddedList, c_Tmp.c_Name, c_Tmp.c_Comment,
                                                               orc_Text);
          }
@@ -437,9 +471,9 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(const stw_scl::C_SCLStrin
                                                        const stw_scl::C_SCLString & orc_VarName,
                                                        const stw_scl::C_SCLString & orc_VarComment, QString & orc_Text)
 {
-   const QString c_Column1TagStart = QString("<td style=\"padding: 0 %1 0 0px;\">").arg(
+   const QString c_Column1TagStart = static_cast<QString>("<td style=\"padding: 0 %1 0 0px;\">").arg(
       C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
-   const QString c_ColumnContentTagStart = QString(
+   const QString c_ColumnContentTagStart = static_cast<QString>(
       "<td valign=\"middle\" style=\"padding: 0 %1 0 %1;\">").arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
 
    orc_Text += "<tr>";

@@ -41,8 +41,8 @@ public:
                    QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiLiLineGroup(void);
 
-   stw_types::sint32 BendLine(const QPointF & orc_ScenePos, const stw_types::sint32 * const opc_Index = NULL);
-   stw_types::sint32 RemoveBend(const QPointF & orc_ScenePos, const stw_types::sint32 * const opc_Index = NULL);
+   stw_types::sint32 BendLine(const QPointF & orc_ScenePos, const stw_types::sint32 * const ops32_Index = NULL);
+   stw_types::sint32 RemoveBend(const QPointF & orc_ScenePos, const stw_types::sint32 * const ops32_Index = NULL);
    virtual void OnPointChange(const stw_types::sint32 & ors32_PointIndex);
    virtual QRectF boundingRect() const override;
    virtual void RestoreDefaultCursor(void) override;
@@ -81,11 +81,8 @@ public:
 
    virtual void TriggerSigChangedGraphic(void);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget) override;
-   //lint -restore
    virtual QPainterPath shape(void) const;
    void UpdateTransform(const QTransform & orc_Transform);
 
@@ -113,13 +110,10 @@ protected:
    void m_UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data) const;
    void m_Init(const std::vector<QPointF> & orc_Points);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QVariant itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value) override;
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
-   //lint -restore
 
    enum E_MoveMode
    {
@@ -137,7 +131,7 @@ protected:
 private:
    //Avoid call
    C_GiLiLineGroup(const C_GiLiLineGroup &);
-   C_GiLiLineGroup & operator =(const C_GiLiLineGroup &);
+   C_GiLiLineGroup & operator =(const C_GiLiLineGroup &); //lint !e1511 //we want to hide the base func.
 
    void m_SetInteractionVisibility(const bool & orq_Visible);
    void m_HideInteraction(const bool & orq_Invisible);

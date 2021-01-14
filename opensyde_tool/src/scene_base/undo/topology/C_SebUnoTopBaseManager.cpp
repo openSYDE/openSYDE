@@ -156,7 +156,6 @@ bool C_SebUnoTopBaseManager::m_CheckBusConnectorChange(const QList<QGraphicsItem
 
    if (orc_Items.size() == 1)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_GiLiBusConnectorBase * const pc_BusConnector =
          dynamic_cast<const C_GiLiBusConnectorBase * const>(orc_Items[0]);
       if (pc_BusConnector != NULL)

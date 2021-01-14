@@ -65,13 +65,11 @@ C_GiSyLineWidget::C_GiSyLineWidget(const E_Type oe_Mode, C_GiSyBaseWidget & orc_
    mpc_Ui->setupUi(this);
 
    //color
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    this->mpc_LabelColor = new QLabel(dynamic_cast<QWidget *>(this->mpc_Ui->pc_BushButtonColor->parent()));
    this->mpc_LabelColor->setPixmap(c_Pic);
    this->mpc_LabelColor->lower();
 
    //color innerline
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    this->mpc_LabelColorInner = new QLabel(dynamic_cast<QWidget *>(this->mpc_Ui->pc_BushButtonColorInner->parent()));
    this->mpc_LabelColorInner->setPixmap(c_Pic);
    this->mpc_LabelColorInner->lower();
@@ -414,8 +412,7 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
       pc_Item->SetMiddleLineColor(this->mc_InnerLineColor);
       pc_Item->setFlag(QGraphicsItem::ItemStacksBehindParent);
       this->mpc_ParentDialog->GetPreviewScene()->addItem(pc_Item);
-      //lint -e{429}  no memory leak because of adding the item to the scene and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of adding the item to the scene and the Qt memory management
    else
    {
       C_GiBiArrow * pc_Arrow;
@@ -445,8 +442,7 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
       pc_Arrow->SetEndArrowHeadType(this->GetEndArrow());
 
       this->mpc_ParentDialog->GetPreviewScene()->addItem(pc_Arrow);
-      //lint -e{429}  no memory leak because of adding the item to the scene and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of adding the item to the scene and the Qt memory management
 
    //refresh the graphicsview
    if (this->mpc_ParentDialog->GetPreviewScene()->views().size() > 0)
@@ -497,8 +493,7 @@ void C_GiSyLineWidget::m_ColorClicked(void)
    {
       c_Popup->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of inner color button
@@ -539,8 +534,7 @@ void C_GiSyLineWidget::m_ColorInnerClicked(void)
    {
       c_Popup->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of spin box changed

@@ -251,7 +251,6 @@ C_SdNdeDpListArrayEditModel * C_SdNdeDpListModelViewManager::GetArrayEditModel(c
       //Connects
       connect(pc_Retval, &C_SdNdeDpListArrayEditModel::SigErrorChangePossible, this,
               &C_SdNdeDpListModelViewManager::m_OnArrayEditErrorChangePossible);
-      //lint -e{64,918,1025,1703} Qt interface
       connect(pc_Retval, &C_SdNdeDpListArrayEditModel::SigDataChange, this,
               &C_SdNdeDpListModelViewManager::m_OnArrayEditDataChange);
    }
@@ -330,7 +329,6 @@ C_SdNdeDpListTableModel * C_SdNdeDpListModelViewManager::GetElementModel(const u
               &C_SdNdeDpListModelViewManager::m_OnElementErrorChangePossible);
       connect(pc_Retval, &C_SdNdeDpListTableModel::SigSizeChangePossible, this,
               &C_SdNdeDpListModelViewManager::m_OnElementSizeChangePossible);
-      //lint -e{64,918,1025,1703} Qt interface
       connect(pc_Retval, &C_SdNdeDpListTableModel::SigDataChange, this,
               &C_SdNdeDpListModelViewManager::m_OnElementDataChange);
    }

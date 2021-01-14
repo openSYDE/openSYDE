@@ -24,19 +24,16 @@ using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // Configuration for dynamic transparency color configuration of elements
-//lint -e{36,155}  c++11 feature
 const std::vector<QString> C_CamUtiStyleSheets::mhc_ScrollAreaElements(
 {
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyleSheets::mhc_ScrollAreaProperties(
 {
-   C_CamUtiStyleSheets::C_PropertyValueColorConfig("", "background-color", QColor(Qt::transparent))
+   C_CamUtiStyleSheets::C_PropertyValueColorConfig("", "background-color", static_cast<QColor>(Qt::transparent))
 }
    );
 
-//lint -e{36,155}  c++11 feature
 const std::vector<QString> C_CamUtiStyleSheets::mhc_ScrollBarElementsBright(
 {
    "stw_opensyde_gui--C_CamGenTableView QScrollBar",
@@ -47,11 +44,12 @@ const std::vector<QString> C_CamUtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar"
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyleSheets::mhc_ScrollBarPropertiesBright(
 {
-   C_CamUtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", QColor(Qt::transparent)),
-   C_CamUtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", QColor(Qt::transparent)),
+   C_CamUtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color",
+                                                   static_cast<QColor>(Qt::transparent)),
+   C_CamUtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color",
+                                                   static_cast<QColor>(Qt::transparent)),
    C_CamUtiStyleSheets::C_PropertyValueColorConfig("::handle:pressed", "background-color", mc_STYLE_GUIDE_COLOR_8),
    C_CamUtiStyleSheets::C_PropertyValueColorConfig("::handle:pressed", "border-color", mc_STYLE_GUIDE_COLOR_8),
    C_CamUtiStyleSheets::C_PropertyValueColorConfig("::handle:hover:!pressed", "background-color",
@@ -67,17 +65,17 @@ const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyle
    C_CamUtiStyleSheets::C_PropertyValueColorConfig("::sub-page", "border-color", mc_STYLE_GUIDE_COLOR_11)
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<QString> C_CamUtiStyleSheets::mhc_ScrollBarElementsDark(
 {
    // insert dark scroll bar here
 }
    );
-//lint -e{36,155}  c++11 feature
 const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyleSheets::mhc_ScrollBarPropertiesDark(
 {
-   C_CamUtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", QColor(Qt::transparent)),
-   C_CamUtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", QColor(Qt::transparent)),
+   C_CamUtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color",
+                                                   static_cast<QColor>(Qt::transparent)),
+   C_CamUtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color",
+                                                   static_cast<QColor>(Qt::transparent)),
    C_CamUtiStyleSheets::C_PropertyValueColorConfig("::handle:pressed", "background-color", mc_STYLE_GUIDE_COLOR_10),
    C_CamUtiStyleSheets::C_PropertyValueColorConfig("::handle:pressed", "border-color", mc_STYLE_GUIDE_COLOR_10),
    C_CamUtiStyleSheets::C_PropertyValueColorConfig("::handle:hover:!pressed", "background-color",
@@ -218,7 +216,7 @@ void C_CamUtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString
          {
             QString c_Entry;
             const QString & rc_Element = orc_ScrollBarElements[u32_ItElement];
-            c_Entry = QString("%1%2").arg(rc_Element, rc_Property.c_PropertyName);
+            c_Entry = static_cast<QString>("%1%2").arg(rc_Element, rc_Property.c_PropertyName);
             if (u32_ItElement < (orc_ScrollBarElements.size() - 1UL))
             {
                c_Entry += ",";
@@ -228,7 +226,7 @@ void C_CamUtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString
          }
          c_Value = "{\n";
          //Add config
-         c_Value += QString("%1:rgba(%2,%3,%4,%5);").arg(rc_Property.c_ValueName,
+         c_Value += static_cast<QString>("%1:rgba(%2,%3,%4,%5);").arg(rc_Property.c_ValueName,
                                                          QString::number(rc_Property.c_Color.red()),
                                                          QString::number(rc_Property.c_Color.green()),
                                                          QString::number(rc_Property.c_Color.blue()),

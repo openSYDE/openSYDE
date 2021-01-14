@@ -26,6 +26,7 @@ class C_PuiSvDbNodeDataElementConfig
 {
 public:
    C_PuiSvDbNodeDataElementConfig(void);
+   virtual ~C_PuiSvDbNodeDataElementConfig(void);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 

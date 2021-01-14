@@ -78,10 +78,11 @@ private:
    void m_RemoveDataElement(void);
    void m_RegisterDataElementRail(
       const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const;
+   stw_types::sint32 m_SetChangedChartData(void);
 
    //Avoid call
    C_GiSvDaChartBase(const C_GiSvDaChartBase &);
-   C_GiSvDaChartBase & operator =(const C_GiSvDaChartBase &);
+   C_GiSvDaChartBase & operator =(const C_GiSvDaChartBase &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

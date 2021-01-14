@@ -38,10 +38,7 @@ public:
    void AddApplication(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ApplicationIndex);
    void UpdateApplications(void) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void dropEvent(QDropEvent * const opc_Event) override;
-   //lint -restore
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -52,12 +49,10 @@ Q_SIGNALS:
    void SigAppDisplay(void);
    void SigErrorChange(void) const;
    void SigOpenDataPool(const stw_types::uint32 ou32_DataPoolIndex);
+   void SigOwnedDataPoolsChanged(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void startDrag(const Qt::DropActions oc_SupportedActions) override;
-   //lint -restore
 
 private:
    //Avoid call

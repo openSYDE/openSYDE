@@ -75,7 +75,7 @@ C_SdNdeUnoDataPoolListAddCommand::C_SdNdeUnoDataPoolListAddCommand(const uint32 
          }
       }
    }
-   this->SetInitialData(c_OSCContent, c_UIContent);
+   this->m_SetInitialData(c_OSCContent, c_UIContent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ C_SdNdeUnoDataPoolListAddCommand::C_SdNdeUnoDataPoolListAddCommand(const uint32 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddCommand::redo(void)
 {
-   this->Add();
+   this->m_Add();
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand::redo();
 }
 
@@ -95,5 +95,5 @@ void C_SdNdeUnoDataPoolListAddCommand::redo(void)
 void C_SdNdeUnoDataPoolListAddCommand::undo(void)
 {
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand::undo();
-   this->Delete();
+   this->m_Delete();
 }

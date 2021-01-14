@@ -125,7 +125,7 @@ sint32 C_SyvClipBoardHelper::h_LoadRailsFromClipboard(QMap<C_OSCNodeDataPoolList
    {
       if (c_StringXml.SelectNodeChild("rail-assignments") == "rail-assignments")
       {
-         C_PuiSvHandlerFiler::h_LoadReadRails(orc_Rails, c_StringXml);
+         s32_Retval = C_PuiSvHandlerFiler::h_LoadReadRails(orc_Rails, c_StringXml);
          c_StringXml.SelectNodeParent();
       }
       else

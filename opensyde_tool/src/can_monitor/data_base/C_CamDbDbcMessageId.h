@@ -28,6 +28,7 @@ public:
 
    stw_types::uint32 u32_NodeIndex;
    bool q_MessageIsTx;
+   stw_types::uint32 u32_Hash;
    stw_types::uint32 u32_MessageIndex;
 };
 

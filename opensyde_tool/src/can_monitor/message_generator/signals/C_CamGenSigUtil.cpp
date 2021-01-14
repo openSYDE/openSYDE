@@ -15,6 +15,7 @@
 #include "stwtypes.h"
 #include "TGLUtils.h"
 #include "C_OSCCanUtil.h"
+#include "CSCLChecksums.h"
 #include "C_CamGenSigUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -38,7 +39,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Convert message data array to vector
 
-   \param[in] orc_Message message data
+   \param[in]  orc_Message    message data
 
    \return
    Converted message data of DLC length
@@ -61,9 +62,9 @@ std::vector<uint8> C_CamGenSigUtil::h_ConvertRawDataFormat(const C_CamProMessage
 
    Based on: openSYDE structure
 
-   \param[in] orc_Raw       Raw value
-   \param[in] orc_Signal    Signal description
-   \param[in] orc_SignalMin Signal min value structure (only used for init)
+   \param[in]  orc_Raw        Raw value
+   \param[in]  orc_Signal     Signal description
+   \param[in]  orc_SignalMin  Signal min value structure (only used for init)
 
    \return
    Value as C_OSCNodeDataPoolContent
@@ -97,9 +98,9 @@ C_OSCNodeDataPoolContent C_CamGenSigUtil::h_DecodeRawToContentSignal(const std::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Decode signal value to raw
 
-   \param[in,out] orc_Raw    Raw CAN message values
-   \param[in]     orc_Signal Signal description
-   \param[in]     orc_Value  Signal value
+   \param[in,out]  orc_Raw       Raw CAN message values
+   \param[in]      orc_Signal    Signal description
+   \param[in]      orc_Value     Signal value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigUtil::h_DecodeSignalValueToRaw(std::vector<uint8> & orc_Raw, const C_OSCCanSignal & orc_Signal,
@@ -140,7 +141,7 @@ void C_CamGenSigUtil::h_DecodeSignalValueToRaw(std::vector<uint8> & orc_Raw, con
 
    Warning: u32_ComDataElementIndex is invalid
 
-   \param[in] orc_Input DBC input
+   \param[in]  orc_Input   DBC input
 
    \return
    opensyde signal
@@ -164,7 +165,7 @@ C_OSCCanSignal C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIECan
 
    Warning: e_Access & q_DiagEventCall & q_NvMValueChanged & q_IsValid & u32_NvMStartAddress are invalid
 
-   \param[in] orc_Input DBC input
+   \param[in]  orc_Input   DBC input
 
    \return
    opensyde signal
@@ -192,7 +193,7 @@ C_OSCNodeDataPoolListElement C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConve
 
    Warning: u32_TimeoutMs & u16_DelayTimeMs & signals are all not filled in
 
-   \param[in] orc_Input DBC input
+   \param[in]  orc_Input   DBC input
 
    \return
    opensyde message
@@ -218,8 +219,8 @@ C_OSCCanMessage C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIECa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get a single bit from the input byte vector
 
-   \param[in] ou32_BitPos Bit position
-   \param[in] orc_Bytes   Bytes to use as data
+   \param[in]  ou32_BitPos    Bit position
+   \param[in]  orc_Bytes      Bytes to use as data
 
    \return
    Bit value
@@ -248,9 +249,9 @@ bool C_CamGenSigUtil::h_GetBit(const uint32 ou32_BitPos, const std::vector<uint8
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set a single bit in the output byte vector
 
-   \param[in]     ou32_BitPos Bit position
-   \param[in,out] orc_Bytes   Bytes to change
-   \param[in]     oq_Value    Bit value
+   \param[in]      ou32_BitPos   Bit position
+   \param[in,out]  orc_Bytes     Bytes to change
+   \param[in]      oq_Value      Bit value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigUtil::h_SetBit(const uint32 ou32_BitPos, std::vector<uint8> & orc_Bytes, const bool oq_Value)
@@ -277,6 +278,99 @@ void C_CamGenSigUtil::h_SetBit(const uint32 ou32_BitPos, std::vector<uint8> & or
          }
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calculate message hash
+
+   \param[in]  orc_Message       Message
+   \param[in]  orc_DatapoolPart  Datapool part
+
+   \return
+   Message hash
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_CamGenSigUtil::h_CalcMessageHash(const C_OSCCanMessage & orc_Message,
+                                          const std::vector<C_OSCNodeDataPoolListElement> & orc_DatapoolPart)
+{
+   uint32 u32_Retval = 0UL;
+   const uint32 u32_Size = orc_DatapoolPart.size();
+
+   orc_Message.CalcHash(u32_Retval);
+   stw_scl::C_SCLChecksums::CalcCRC32(&u32_Size, sizeof(u32_Size), u32_Retval);
+   for (uint32 u32_ItDpPart = 0UL; u32_ItDpPart < orc_DatapoolPart.size(); ++u32_ItDpPart)
+   {
+      orc_DatapoolPart[u32_ItDpPart].CalcHash(u32_Retval);
+   }
+   return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calc message hash
+
+   \param[in]  orc_Message    Message
+   \param[in]  orc_List       List
+
+   \return
+   Message hash
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_CamGenSigUtil::h_CalcMessageHash(const C_OSCCanMessage & orc_Message, const C_OSCNodeDataPoolList & orc_List)
+{
+   uint32 u32_Retval;
+
+   std::vector<C_OSCNodeDataPoolListElement> c_DatapoolPart;
+
+   //Fill
+   c_DatapoolPart.reserve(orc_Message.c_Signals.size());
+   for (uint32 u32_ItSignal = 0UL; u32_ItSignal < orc_Message.c_Signals.size(); ++u32_ItSignal)
+   {
+      const C_OSCCanSignal & rc_Signal = orc_Message.c_Signals[u32_ItSignal];
+      if (rc_Signal.u32_ComDataElementIndex < orc_List.c_Elements.size())
+      {
+         const C_OSCNodeDataPoolListElement & rc_Element =
+            orc_List.c_Elements[rc_Signal.u32_ComDataElementIndex];
+         c_DatapoolPart.push_back(rc_Element);
+      }
+   }
+
+   //Hash
+   u32_Retval = C_CamGenSigUtil::h_CalcMessageHash(orc_Message, c_DatapoolPart);
+
+   return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calc message hash
+
+   \param[in]  orc_Message    Message
+
+   \return
+   Message hash
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_CamGenSigUtil::h_CalcMessageHash(const C_CieConverter::C_CIECanMessage & orc_Message)
+{
+   uint32 u32_Retval;
+   C_OSCCanMessage c_Message = C_CamGenSigUtil::h_ConvertDBCToOSY(orc_Message);
+
+   std::vector<C_OSCNodeDataPoolListElement> c_DatapoolPart;
+
+   //Fill
+   c_Message.c_Signals.clear();
+   c_Message.c_Signals.reserve(orc_Message.c_Signals.size());
+   c_DatapoolPart.reserve(orc_Message.c_Signals.size());
+   for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+   {
+      const C_CieConverter::C_CIECanSignal & rc_Signal = orc_Message.c_Signals[u32_ItSig];
+      c_Message.c_Signals.push_back(C_CamGenSigUtil::h_ConvertDBCToOSY(rc_Signal));
+      c_DatapoolPart.push_back(C_CamGenSigUtil::h_ConvertDBCToOSY(rc_Signal.c_Element));
+   }
+
+   //Hash
+   u32_Retval = C_CamGenSigUtil::h_CalcMessageHash(c_Message, c_DatapoolPart);
+
+   return u32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

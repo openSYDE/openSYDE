@@ -38,6 +38,8 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamProMessageData::C_CamProMessageData(void) :
+   q_ContainsValidHash(false),
+   u32_Hash(0UL),
    q_DoCyclicTrigger(false),
    u32_CyclicTriggerTime(100UL),
    u32_KeyPressOffset(0UL),
@@ -55,19 +57,21 @@ C_CamProMessageData::C_CamProMessageData(void) :
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProMessageData::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_DataBaseFilePath.c_str(),
                                       this->c_DataBaseFilePath.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_ContainsValidHash, sizeof(this->q_ContainsValidHash), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_Hash, sizeof(this->u32_Hash), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsExtended, sizeof(this->q_IsExtended), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsRTR, sizeof(this->q_IsRTR), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_Id, sizeof(this->u32_Id), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_Dlc, sizeof(this->u16_Dlc), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->c_Bytes[0UL], c_Bytes.size(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_DoCyclicTrigger, sizeof(this->q_DoCyclicTrigger), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_CyclicTriggerTime, sizeof(this->u32_CyclicTriggerTime),
                                       oru32_HashValue);
@@ -134,8 +138,8 @@ bool C_CamProMessageData::GetRTR(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set message uint32 value
 
-   \param[in] oe_Selector Data specifier
-   \param[in] ou32_Value  New value
+   \param[in]  oe_Selector    Data specifier
+   \param[in]  ou32_Value     New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProMessageData::SetMessageUint32Value(const C_CamProMessageData::E_GenericUint32DataSelector oe_Selector,
@@ -182,8 +186,8 @@ void C_CamProMessageData::SetMessageUint32Value(const C_CamProMessageData::E_Gen
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set message bool value
 
-   \param[in] oe_Selector Data specifier
-   \param[in] oq_Value    New value
+   \param[in]  oe_Selector    Data specifier
+   \param[in]  oq_Value       New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProMessageData::SetMessageBoolValue(const C_CamProMessageData::E_GenericBoolDataSelector oe_Selector,
@@ -206,8 +210,8 @@ void C_CamProMessageData::SetMessageBoolValue(const C_CamProMessageData::E_Gener
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set message key related values
 
-   \param[in] orc_Key     New key (single character only)
-   \param[in] ou32_Offset Key trigger offset (ms)
+   \param[in]  orc_Key        New key (single character only)
+   \param[in]  ou32_Offset    Key trigger offset (ms)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProMessageData::SetMessageKey(const QString & orc_Key, const uint32 ou32_Offset)
@@ -219,7 +223,7 @@ void C_CamProMessageData::SetMessageKey(const QString & orc_Key, const uint32 ou
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set CAN message data bytes
 
-   \param[in] orc_DataBytes New data byte content
+   \param[in]  orc_DataBytes  New data byte content
 
    \return
    C_NO_ERR Operation success
@@ -247,7 +251,7 @@ sint32 C_CamProMessageData::SetMessageDataBytes(const std::vector<uint8> & orc_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Convert bool to U8
 
-   \param[in] oq_Value Bool value
+   \param[in]  oq_Value    Bool value
 
    \return
    U8 value

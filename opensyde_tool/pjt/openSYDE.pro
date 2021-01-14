@@ -821,7 +821,10 @@ SOURCES += ../src/main.cpp \
     ../src/table_base/tree_base/C_TblTreDataElementItem.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubPrevNavigation.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabElided.cpp \
-    ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.cpp
+    ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.cpp \
+    ../src/system_definition/C_SdCodeGenerationDialog.cpp \
+    ../src/system_definition/C_SdCodeGenerationView.cpp \
+    ../src/system_definition/C_SdCodeGenerationModel.cpp
 
 #using our standard compiler warning switches we will get some (non-critical) warnings in miniz.c
 #we do not want to modify that library (as it is not maintained by us)
@@ -1656,7 +1659,10 @@ HEADERS  += \
     ../src/table_base/tree_base/C_TblTreDataElementItem.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubPrevNavigation.h \
     ../src/opensyde_gui_elements/label/C_OgeLabElided.h \
-    ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.h
+    ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.h \
+    ../src/system_definition/C_SdCodeGenerationDialog.h \
+    ../src/system_definition/C_SdCodeGenerationView.h \
+    ../src/system_definition/C_SdCodeGenerationModel.h
 
 FORMS    += \
     ../src/system_definition/C_SdTopologyWidget.ui \
@@ -1798,7 +1804,8 @@ FORMS    += \
     ../src/system_definition/node_edit/halc/overview/C_SdNdeHalcOvWidget.ui \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpListEditWidget.ui \
     ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelDpPreviewPopUp.ui \
-    ../src/system_definition/node_edit/datapools/C_SdNdeDpListCommentDialog.ui
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListCommentDialog.ui \
+    ../src/system_definition/C_SdCodeGenerationDialog.ui
 
 INCLUDEPATH += ../src \
                ../src/com_import_export \

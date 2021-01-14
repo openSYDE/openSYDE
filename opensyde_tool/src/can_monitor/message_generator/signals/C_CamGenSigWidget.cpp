@@ -91,13 +91,7 @@ C_CamGenSigWidget::~C_CamGenSigWidget(void)
 void C_CamGenSigWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelHeading->setText(C_GtGetText::h_GetText("Signals of Message:"));
-   this->mpc_Ui->pc_LabelNoDatabase->setText(C_GtGetText::h_GetText(
-                                                "No data found. Database not available. \n\n"
-                                                "Possible reasons:\n"
-                                                "   - Database deactivated\n"
-                                                "   - Database not loaded yet\n"
-                                                "   - Database loading failed\n"
-                                                "   - Database loaded but message missing"));
+   this->mpc_Ui->pc_LabelNoDatabase->setText(C_GtGetText::h_GetText("Database loading..."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -178,9 +172,13 @@ void C_CamGenSigWidget::UpdateSelection(const stw_types::uint32 ou32_NumSelected
          if (rc_Message.c_DataBaseFilePath.IsEmpty() == false)
          {
             if (((C_CamDbHandler::h_GetInstance()->GetOSCMessage(rc_Message.c_DataBaseFilePath.c_str(),
-                                                                 rc_Message.c_Name.c_str()) != NULL)) ||
+                                                                 rc_Message.c_Name.c_str(),
+                                                                 rc_Message.q_ContainsValidHash,
+                                                                 rc_Message.u32_Hash) != NULL)) ||
                 (C_CamDbHandler::h_GetInstance()->GetDbcMessage(rc_Message.c_DataBaseFilePath.c_str(),
-                                                                rc_Message.c_Name.c_str()) != NULL))
+                                                                rc_Message.c_Name.c_str(),
+                                                                rc_Message.q_ContainsValidHash,
+                                                                rc_Message.u32_Hash) != NULL))
             {
                //Case: database and message found
                this->mpc_Ui->pc_GroupBoxNoDatabase->setVisible(false);

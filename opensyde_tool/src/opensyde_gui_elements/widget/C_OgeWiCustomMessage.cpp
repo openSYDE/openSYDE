@@ -112,8 +112,7 @@ C_OgeWiCustomMessage::C_OgeWiCustomMessage(QWidget * const opc_Parent, const E_T
       c_Color.setAlpha(180);
       pc_Shadow->setColor(c_Color);
       this->mpc_Ui->pc_GroupBoxBackground->setGraphicsEffect(pc_Shadow);
-      //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
 
    // Mouse Events for Box moving
    connect(this->mpc_Ui->pc_GroupBoxBackground, &C_OgeGbxMouseMove::SigMousePress, this,
@@ -172,7 +171,7 @@ void C_OgeWiCustomMessage::HandleMousePressEvent(const QMouseEvent * const opc_E
    \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiCustomMessage::HandleMouseReleaseEvent(QMouseEvent * const opc_Event)
+void C_OgeWiCustomMessage::HandleMouseReleaseEvent(const QMouseEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
    mq_Pressed = false;
@@ -411,7 +410,7 @@ void C_OgeWiCustomMessage::m_ExpandCollapseDetails(const bool & orq_Expand) cons
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeWiCustomMessage::E_Outputs C_OgeWiCustomMessage::Execute(void)
 {
-   const QWidget * pc_TopWidget = C_OgeOverlay::h_GetTopWidget();
+   const QWidget * const pc_TopWidget = C_OgeOverlay::h_GetTopWidget();
 
    // store recent override cursor shape
    sintn sn_CursorShape = -1;
@@ -425,8 +424,8 @@ C_OgeWiCustomMessage::E_Outputs C_OgeWiCustomMessage::Execute(void)
    //Center dialog
    if (pc_TopWidget != NULL)
    {
-      QPoint c_DialogCenter = mapToGlobal(this->rect().center());
-      QPoint c_ParentWindowCenter = pc_TopWidget->window()->mapToGlobal(pc_TopWidget->window()->rect().center());
+      const QPoint c_DialogCenter = mapToGlobal(this->rect().center());
+      const QPoint c_ParentWindowCenter = pc_TopWidget->window()->mapToGlobal(pc_TopWidget->window()->rect().center());
       this->move(c_ParentWindowCenter - c_DialogCenter);
    }
 
@@ -435,7 +434,7 @@ C_OgeWiCustomMessage::E_Outputs C_OgeWiCustomMessage::Execute(void)
 
    if (sn_CursorShape != -1)
    {
-      QApplication::setOverrideCursor(QCursor(static_cast<Qt::CursorShape>(sn_CursorShape)));
+      QApplication::setOverrideCursor(static_cast<QCursor>(static_cast<Qt::CursorShape>(sn_CursorShape)));
    }
 
    return me_Output;

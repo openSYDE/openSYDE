@@ -60,7 +60,7 @@ protected:
 private:
    //Avoid call
    C_GiBiBoundary(const C_GiBiBoundary &);
-   C_GiBiBoundary & operator =(const C_GiBiBoundary &);
+   C_GiBiBoundary & operator =(const C_GiBiBoundary &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

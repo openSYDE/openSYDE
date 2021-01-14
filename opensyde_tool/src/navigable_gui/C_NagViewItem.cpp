@@ -28,9 +28,9 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_NagViewItem::hsn_SizeTop = 48;
-const stw_types::sintn C_NagViewItem::hsn_SizeSub = 30;
-const stw_types::sintn C_NagViewItem::hsn_FixSizeBottom = 18;
+const stw_types::sintn C_NagViewItem::mhsn_SizeTop = 48;
+const stw_types::sintn C_NagViewItem::mhsn_SizeSub = 30;
+const stw_types::sintn C_NagViewItem::mhsn_FixSizeBottom = 18;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -204,7 +204,8 @@ void C_NagViewItem::UpdateName(void) const
 
    if (pc_View != NULL)
    {
-      const QString c_Name = QString(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(this->mu32_ViewIndex + 1UL).arg(
+      const QString c_Name = static_cast<QString>(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(
+         this->mu32_ViewIndex + 1UL).arg(
          pc_View->GetName());
       this->mpc_Ui->pc_LabelHeading->setText(c_Name);
    }
@@ -371,11 +372,11 @@ void C_NagViewItem::SetHovered(const bool oq_Hovered) const
 QSize C_NagViewItem::sizeHint(void) const
 {
    QSize c_Retval = QWidget::sizeHint();
-   sintn sn_Height = C_NagViewItem::hsn_SizeTop;
+   sintn sn_Height = C_NagViewItem::mhsn_SizeTop;
 
    if (this->m_IsExpanded() == true)
    {
-      sn_Height += (3 * C_NagViewItem::hsn_SizeSub) + C_NagViewItem::hsn_FixSizeBottom;
+      sn_Height += (3 * C_NagViewItem::mhsn_SizeSub) + C_NagViewItem::mhsn_FixSizeBottom;
    }
 
    c_Retval.setWidth(this->width());
@@ -486,7 +487,8 @@ void C_NagViewItem::m_OnNameEditFinished(void)
          c_ImportWarnings(this, stw_opensyde_gui_elements::C_OgeWiCustomMessage::eERROR);
       c_ImportWarnings.SetHeading(C_GtGetText::h_GetText("View rename"));
       c_ImportWarnings.SetDescription(
-         QString(C_GtGetText::h_GetText("A view with the name \"%1\" already exists. Choose another name.")).
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "A view with the name \"%1\" already exists. Choose another name.")).
          arg(this->mpc_Ui->pc_LineEditHeading->text()));
       c_ImportWarnings.SetCustomMinHeight(180, 180);
       c_ImportWarnings.Execute();

@@ -167,7 +167,7 @@ void C_OgeWiFontConfig::SetFont(const QFont & orc_Font)
    this->mpc_Ui->pc_PushButtonBold->setChecked(orc_Font.bold());
    this->mpc_Ui->pc_PushButtonUnderline->setChecked(orc_Font.underline());
    this->mpc_Ui->pc_FontComboBox->setCurrentFont(orc_Font);
-   this->mpc_Ui->pc_ComboBoxSize->setCurrentIndex(GetSizeIndex(orc_Font));
+   this->mpc_Ui->pc_ComboBoxSize->setCurrentIndex(m_GetSizeIndex(orc_Font));
 
    //Reconnect update
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
@@ -189,7 +189,7 @@ void C_OgeWiFontConfig::m_TriggerUpdate(void)
 {
    QFont c_Font = this->mpc_Ui->pc_FontComboBox->currentFont();
 
-   this->GetSize(c_Font);
+   this->m_GetSize(c_Font);
    c_Font.setBold(this->mpc_Ui->pc_PushButtonBold->isChecked());
    c_Font.setItalic(this->mpc_Ui->pc_PushButtonItalic->isChecked());
    c_Font.setUnderline(this->mpc_Ui->pc_PushButtonUnderline->isChecked());
@@ -206,7 +206,7 @@ void C_OgeWiFontConfig::m_TriggerUpdate(void)
    Size combo box index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_OgeWiFontConfig::GetSizeIndex(const QFont & orc_Font) const
+sintn C_OgeWiFontConfig::m_GetSizeIndex(const QFont & orc_Font) const
 {
    sintn sn_Retval = -1;
    sint32 s32_Size;
@@ -296,7 +296,7 @@ sintn C_OgeWiFontConfig::GetSizeIndex(const QFont & orc_Font) const
    \param[in,out] orc_Font Font to update
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiFontConfig::GetSize(QFont & orc_Font) const
+void C_OgeWiFontConfig::m_GetSize(QFont & orc_Font) const
 {
    switch (this->mpc_Ui->pc_ComboBoxSize->currentIndex())
    {

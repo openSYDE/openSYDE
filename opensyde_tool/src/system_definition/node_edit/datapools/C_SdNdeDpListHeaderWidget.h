@@ -98,7 +98,7 @@ private:
    void m_OnEditCommentClicked(void);
    void m_EditSizeFinished(void);
    void m_OpenDataSetEdit(void);
-   void m_ChangeName(void) const;
+   void m_CheckName(void) const;
    void m_OnDoubleClickTimeout(void) const;
    void m_OnOK(void);
    void m_UpdateErrorToolTip(void) const;

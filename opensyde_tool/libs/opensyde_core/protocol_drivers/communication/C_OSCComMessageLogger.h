@@ -141,6 +141,9 @@ private:
    void m_InterpretSysDefCanSignal(C_OSCComMessageLoggerData & orc_MessageData,
                                    const C_OSCCanSignal & orc_OscSignal) const;
    void m_ResetCounter(void);
+   static void mh_PostProcessSysDef(stw_opensyde_core::C_OSCSystemDefinition & orc_SystemDefinition);
+   static void mh_AddSpecialECeSSignals(C_OSCNode & orc_Node, const C_OSCCanMessageIdentificationIndices & orc_Id,
+                                        const stw_types::uint32 ou32_SignalIndex);
 
    C_OSCComMessageLoggerData mc_HandledCanMessage;
    stw_types::uint64 mu64_FirstTimeStampStart;

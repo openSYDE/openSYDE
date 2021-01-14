@@ -129,7 +129,7 @@ C_SyvUpUpdatePackageWidget::~C_SyvUpUpdatePackageWidget()
 void C_SyvUpUpdatePackageWidget::InitText(void) const
 {
    this->mpc_Ui->pc_LabelTitle->setText(
-      QString(C_GtGetText::h_GetText("UPDATE PACKAGE (%1)")).arg(QString::number(this->mpc_Ui->pc_ListWidget->count())));
+      static_cast<QString>(C_GtGetText::h_GetText("UPDATE PACKAGE (%1)")).arg(QString::number(this->mpc_Ui->pc_ListWidget->count())));
 
    this->mpc_Ui->pc_PushButtonClearAll->SetToolTipInformation(C_GtGetText::h_GetText("Clear Update Package"),
                                                               C_GtGetText::h_GetText(
@@ -461,7 +461,7 @@ void C_SyvUpUpdatePackageWidget::m_FileCheckTimer(void)
 
    Q_EMIT (this->SigUpdatePackageState(s32_Return));
 
-   this->mc_Timer.setInterval(mhu32_FILE_CHECK_INTERVAL);
+   this->mc_Timer.setInterval(mu32_FILE_CHECK_INTERVAL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

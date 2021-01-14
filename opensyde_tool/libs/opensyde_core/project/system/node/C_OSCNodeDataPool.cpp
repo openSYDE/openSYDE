@@ -54,10 +54,7 @@ C_OSCNodeDataPool::C_OSCNodeDataPool(void) :
    this->au8_Version[0] = 0;
    this->au8_Version[1] = 0;
    this->au8_Version[2] = 0;
-   if ((this->e_Type == eDIAG) || (this->e_Type == eNVM))
-   {
-      c_Lists.resize(1);
-   }
+   c_Lists.resize(1); //one default list for DIAG DP
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,15 +103,15 @@ void C_OSCNodeDataPool::CalcDefinitionHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Type, 1U, oru32_HashValue);
 
    au8_Data[0] = static_cast<uint8>(this->u32_NvMStartAddress);
-   au8_Data[1] = static_cast<uint8>(this->u32_NvMStartAddress >> 8);
-   au8_Data[2] = static_cast<uint8>(this->u32_NvMStartAddress >> 16);
-   au8_Data[3] = static_cast<uint8>(this->u32_NvMStartAddress >> 24);
+   au8_Data[1] = static_cast<uint8>(this->u32_NvMStartAddress >> 8U);
+   au8_Data[2] = static_cast<uint8>(this->u32_NvMStartAddress >> 16U);
+   au8_Data[3] = static_cast<uint8>(this->u32_NvMStartAddress >> 24U);
    stw_scl::C_SCLChecksums::CalcCRC32(&au8_Data[0], sizeof(this->u32_NvMStartAddress), oru32_HashValue);
 
    au8_Data[0] = static_cast<uint8>(this->u32_NvMSize);
-   au8_Data[1] = static_cast<uint8>(this->u32_NvMSize >> 8);
-   au8_Data[2] = static_cast<uint8>(this->u32_NvMSize >> 16);
-   au8_Data[3] = static_cast<uint8>(this->u32_NvMSize >> 24);
+   au8_Data[1] = static_cast<uint8>(this->u32_NvMSize >> 8U);
+   au8_Data[2] = static_cast<uint8>(this->u32_NvMSize >> 16U);
+   au8_Data[3] = static_cast<uint8>(this->u32_NvMSize >> 24U);
    stw_scl::C_SCLChecksums::CalcCRC32(&au8_Data[0], sizeof(this->u32_NvMSize), oru32_HashValue);
 
    for (uint32 u32_ListCount = 0U; u32_ListCount < this->c_Lists.size(); u32_ListCount++)
@@ -127,9 +124,9 @@ void C_OSCNodeDataPool::CalcDefinitionHash(uint32 & oru32_HashValue) const
          const uint32 u32_Size = this->c_Lists[u32_ListCount].c_Elements[u32_ElementCount].GetSizeByte();
          const uint8 u8_Type = static_cast<uint8>(this->c_Lists[u32_ListCount].c_Elements[u32_ElementCount].GetType());
          au8_Data[0] = static_cast<uint8>(u32_Size);
-         au8_Data[1] = static_cast<uint8>(u32_Size >> 8);
-         au8_Data[2] = static_cast<uint8>(u32_Size >> 16);
-         au8_Data[3] = static_cast<uint8>(u32_Size >> 24);
+         au8_Data[1] = static_cast<uint8>(u32_Size >> 8U);
+         au8_Data[2] = static_cast<uint8>(u32_Size >> 16U);
+         au8_Data[3] = static_cast<uint8>(u32_Size >> 24U);
          stw_scl::C_SCLChecksums::CalcCRC32(&au8_Data[0], sizeof(u32_Size), oru32_HashValue);
          stw_scl::C_SCLChecksums::CalcCRC32(&u8_Type, sizeof(u8_Type), oru32_HashValue);
       }
@@ -153,7 +150,10 @@ void C_OSCNodeDataPool::MoveList(const stw_types::uint32 & oru32_Start, const st
       this->c_Lists.erase(this->c_Lists.begin() + oru32_Start);
       //Insert
       this->c_Lists.insert(this->c_Lists.begin() + oru32_Target, c_ListData);
-      RecalculateAddress();
+      if (this->e_Type == C_OSCNodeDataPool::eNVM)
+      {
+         RecalculateAddress();
+      }
    }
 }
 
@@ -163,14 +163,17 @@ void C_OSCNodeDataPool::MoveList(const stw_types::uint32 & oru32_Start, const st
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::RecalculateAddress(void)
 {
-   uint32 u32_Offset = this->u32_NvMStartAddress;
-
-   for (uint32 u32_ItList = 0; u32_ItList < this->c_Lists.size(); ++u32_ItList)
+   if (this->e_Type == C_OSCNodeDataPool::eNVM)
    {
-      C_OSCNodeDataPoolList & rc_List = this->c_Lists[u32_ItList];
-      rc_List.u32_NvMStartAddress = u32_Offset;
-      rc_List.RecalculateAddress();
-      u32_Offset += rc_List.u32_NvMSize;
+      uint32 u32_Offset = this->u32_NvMStartAddress;
+
+      for (uint32 u32_ItList = 0; u32_ItList < this->c_Lists.size(); ++u32_ItList)
+      {
+         C_OSCNodeDataPoolList & rc_List = this->c_Lists[u32_ItList];
+         rc_List.u32_NvMStartAddress = u32_Offset;
+         rc_List.RecalculateAddress();
+         u32_Offset += rc_List.u32_NvMSize;
+      }
    }
 }
 
@@ -227,7 +230,7 @@ uint32 C_OSCNodeDataPool::GetListsSize(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check error for specified list
 
-   \param[in]  oru_ListIndex             Node data pool list index
+   \param[in]  oru32_ListIndex           Node data pool list index
    \param[out] opq_NameConflict          Name conflict
    \param[out] opq_NameInvalid           Name not usable as variable
    \param[out] opq_UsageInvalid          Usage over 100.0%
@@ -238,7 +241,7 @@ uint32 C_OSCNodeDataPool::GetListsSize(void) const
    \param[out] opc_InvalidElementIndices Indices of invalid elements
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * const opq_NameConflict,
+void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru32_ListIndex, bool * const opq_NameConflict,
                                        bool * const opq_NameInvalid, bool * const opq_UsageInvalid,
                                        bool * const opq_OutOfDataPool, bool * const opq_DataSetsInvalid,
                                        bool * const opq_ElementsInvalid,
@@ -246,9 +249,9 @@ void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * cons
                                        std::vector<uint32> * const opc_InvalidElementIndices) const
 {
    //Init
-   if (oru_ListIndex < this->c_Lists.size())
+   if (oru32_ListIndex < this->c_Lists.size())
    {
-      const C_OSCNodeDataPoolList & rc_CheckedList = this->c_Lists[oru_ListIndex];
+      const C_OSCNodeDataPoolList & rc_CheckedList = this->c_Lists[oru32_ListIndex];
       //Check variable name
       if (opq_NameInvalid != NULL)
       {
@@ -267,7 +270,7 @@ void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * cons
          *opq_NameConflict = false;
          for (uint32 u32_ItElement = 0; u32_ItElement < this->c_Lists.size(); ++u32_ItElement)
          {
-            if (u32_ItElement != oru_ListIndex)
+            if (u32_ItElement != oru32_ListIndex)
             {
                const C_OSCNodeDataPoolList & rc_List = this->c_Lists[u32_ItElement];
                if (rc_CheckedList.c_Name.LowerCase() == rc_List.c_Name.LowerCase())
@@ -295,7 +298,7 @@ void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * cons
       {
          uint32 u32_NvmSizeReserved = 0;
          //Check reserved size
-         for (uint32 u32_ItList = 0; u32_ItList <= oru_ListIndex; ++u32_ItList)
+         for (uint32 u32_ItList = 0; u32_ItList <= oru32_ListIndex; ++u32_ItList)
          {
             const C_OSCNodeDataPoolList & rc_CurrentList = this->c_Lists[u32_ItList];
             u32_NvmSizeReserved += rc_CurrentList.u32_NvMSize;
@@ -377,7 +380,7 @@ void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * cons
             else
             {
                //Get Hash for all relevant data
-               const uint32 u32_Hash = m_GetElementHash(oru_ListIndex, u32_ItElement);
+               const uint32 u32_Hash = m_GetElementHash(oru32_ListIndex, u32_ItElement);
                //Check if check was already performed in the past
                const std::map<uint32, bool>::const_iterator c_ItErr = hc_PreviousResults.find(u32_Hash);
                //Append new name
@@ -447,8 +450,8 @@ void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get hash for element
 
-   \param[in] ou32_ListIndex    List index
-   \param[in] ou32_ElementIndex Element index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
 
    \return
    Hash for element

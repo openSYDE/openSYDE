@@ -104,7 +104,7 @@ void C_CieDcfEdsImportNodeSelectWidget::InitStaticNames(void)
    this->mpc_Ui->pc_LabelNode->SetToolTipInformation(
       C_GtGetText::h_GetText("Assignee"),
       C_GtGetText::h_GetText("Select a node from Network Topology. All messages get imported to this node."));
-   this->mpc_Ui->pc_LabPathTitle->setText(C_GtGetText::h_GetText("Path"));
+   this->mpc_Ui->pc_LabPathTitle->setText(C_GtGetText::h_GetText("Path:"));
 
    // buttons
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));

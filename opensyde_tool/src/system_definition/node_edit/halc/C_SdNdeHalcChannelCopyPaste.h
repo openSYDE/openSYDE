@@ -33,14 +33,15 @@ private:
    static bool mh_CheckDataFromClipboard(const stw_types::uint32 ou32_NodeIndex,
                                          const stw_opensyde_core::C_OSCHalcConfigStandalone & orc_HalcConfig,
                                          QString & orc_ErrorDescription);
-   static bool mh_CheckSelectedChannels(const stw_types::uint32 ou32_NodeIndex,
-                                        const stw_opensyde_core::C_OSCHalcConfigStandalone & orc_HalcConfig,
-                                        const QModelIndexList & orc_TargetIndexes, bool & orq_ChannelCase,
-                                        QString & orc_ErrorDescription);
+   static bool  mh_CheckSelectedChannels(const stw_types::uint32 ou32_NodeIndex,
+                                         const stw_opensyde_core::C_OSCHalcConfigStandalone & orc_HalcConfig,
+                                         const QModelIndexList & orc_TargetIndexes, bool & orq_ChannelCase,
+                                         QString & orc_ErrorDescription, bool & orq_LinkedChange);
    static bool mh_CheckSelectedChannel(const stw_types::uint32 ou32_NodeIndex,
                                        const stw_opensyde_core::C_OSCHalcConfigStandaloneDomain & orc_SourceDomain,
                                        const stw_opensyde_core::C_OSCHalcConfigChannel & orc_SourceChannel, const
-                                       QModelIndex & orc_TargetIndex, QString & orc_InvalidChannels);
+                                       QModelIndex & orc_TargetIndex, QString & orc_InvalidChannels,
+                                       bool & orq_LinkedChange);
    static bool mh_CheckSelectedDomain(const stw_types::uint32 ou32_NodeIndex,
                                       const stw_opensyde_core::C_OSCHalcConfigStandaloneDomain & orc_SourceDomain,
                                       const QModelIndex & orc_TargetIndex, QString & orc_InvalidDomain);

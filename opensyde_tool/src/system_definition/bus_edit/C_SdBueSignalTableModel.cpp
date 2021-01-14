@@ -169,7 +169,7 @@ QVariant C_SdBueSignalTableModel::headerData(const sintn osn_Section, const Qt::
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else
       {
@@ -259,7 +259,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                if (pc_Message != NULL)
                {
                   c_Retval =
-                     QString("%1 (0x%2)").arg(pc_Message->c_Name.c_str(), QString::number(pc_Message->u32_CanId, 16));
+                     static_cast<QString>("%1 (0x%2)").arg(pc_Message->c_Name.c_str(), QString::number(pc_Message->u32_CanId, 16));
                }
                break;
             case eMULTIPLEXING:
@@ -289,11 +289,11 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                                                                                             u32_Multiplexer);
                            if (pc_OSCSignalCommon != NULL)
                            {
-                              c_MultiplexerName = QString(pc_OSCSignalCommon->c_Name.c_str());
+                              c_MultiplexerName = static_cast<QString>(pc_OSCSignalCommon->c_Name.c_str());
                            }
                         } // if no multiplexer is found dummy-text is used
 
-                        c_Retval = QString(C_GtGetText::h_GetText("%1=%2")).arg(c_MultiplexerName).arg(
+                        c_Retval = static_cast<QString>(C_GtGetText::h_GetText("%1=%2")).arg(c_MultiplexerName).arg(
                            pc_OSCSignal->u16_MultiplexValue);
                      }
                      break;
@@ -305,7 +305,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId, u32_SignalIndex);
                if (pc_OSCSignalCommon != NULL)
                {
-                  c_Retval = QString(pc_OSCSignalCommon->c_Name.c_str());
+                  c_Retval = static_cast<QString>(pc_OSCSignalCommon->c_Name.c_str());
                }
                break;
             case eCOMMENT:
@@ -313,7 +313,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId, u32_SignalIndex);
                if (pc_OSCSignalCommon != NULL)
                {
-                  c_Retval = QString(pc_OSCSignalCommon->c_Comment.c_str());
+                  c_Retval = static_cast<QString>(pc_OSCSignalCommon->c_Comment.c_str());
                }
                break;
             case eSTART_BIT:
@@ -405,7 +405,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId, u32_SignalIndex);
                if (pc_OSCSignalCommon != NULL)
                {
-                  c_Retval = QString(pc_OSCSignalCommon->c_Unit.c_str());
+                  c_Retval = static_cast<QString>(pc_OSCSignalCommon->c_Unit.c_str());
                }
                break;
             }
@@ -533,7 +533,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
       {

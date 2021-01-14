@@ -112,7 +112,17 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
       uint32 u32_CurDomainCounter;
 
       pc_DomainItem->c_Name = rc_ImpDomain.c_DomainConfig.c_Name.c_str();
+      pc_DomainItem->c_ToolTipHeading = pc_DomainItem->c_Name;
       pc_DomainItem->u32_ImportIndex = u32_ImpDomainCounter;
+      if (rc_ImpDomain.c_Channels.empty() == true)
+      {
+         pc_DomainItem->c_ToolTipContent = rc_ImpDomain.c_DomainConfig.c_Comment.c_str();
+         pc_DomainItem->c_ToolTipContent += "\n\n";
+         pc_DomainItem->c_ToolTipContent += C_GtGetText::h_GetText("Configuration:\n");
+         pc_DomainItem->c_ToolTipContent += C_GtGetText::h_GetText("   Safety Relevant Parameters: ");
+         pc_DomainItem->c_ToolTipContent += rc_ImpDomain.c_DomainConfig.q_SafetyRelevant ?
+                                            C_GtGetText::h_GetText("Yes") : C_GtGetText::h_GetText("No");
+      }
 
       // Check domains
       for (u32_CurDomainCounter = 0U; u32_CurDomainCounter < this->mc_ConfigCopy.GetDomainSize();
@@ -131,12 +141,8 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
                pc_DomainItem->u32_Index = u32_CurDomainCounter;
                pc_DomainItem->q_Selectable = false;
 
-               // If the domain does not have any channels
-               if (pc_CurConfig->c_Channels.size() == 0)
-               {
-                  pc_DomainItem->c_Name += " (-)";
-               }
-               else
+               // If the domain has any channels
+               if (rc_ImpDomain.c_Channels.empty() == false)
                {
                   // Check channels
                   for (u32_ImpChannelCounter = 0U; u32_ImpChannelCounter < rc_ImpDomain.c_StandaloneChannels.size();
@@ -144,11 +150,15 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
                   {
                      C_SdNdeHalcConfigImportItem * const pc_ChannelItem = new C_SdNdeHalcConfigImportItem();
                      uint32 u32_CurChannelCounter;
+                     const C_OSCHalcConfigChannel & rc_ImpChannelConfig =
+                        rc_ImpDomain.c_ChannelConfigs[u32_ImpChannelCounter];
+                     const C_OSCHalcDefChannelDef & rc_ImpChannelDef = rc_ImpDomain.c_Channels[u32_ImpChannelCounter];
 
-                     pc_ChannelItem->c_Name = rc_ImpDomain.c_Channels[u32_ImpChannelCounter].c_Name.c_str();
                      pc_ChannelItem->c_Name =
-                        QString("%1 (%2)").arg(rc_ImpDomain.c_ChannelConfigs[u32_ImpChannelCounter].c_Name.c_str(),
-                                               rc_ImpDomain.c_Channels[u32_ImpChannelCounter].c_Name.c_str());
+                        static_cast<QString>("%1 (%2)").arg(rc_ImpChannelConfig.c_Name.c_str(), rc_ImpChannelDef.c_Name.c_str());
+                     pc_ChannelItem->c_ToolTipHeading = pc_ChannelItem->c_Name;
+                     pc_ChannelItem->c_ToolTipContent =
+                        this->m_CreateTooltipContent(u32_CurDomainCounter, u32_ImpChannelCounter);
 
                      pc_ChannelItem->u32_ImportIndex = u32_ImpChannelCounter;
                      pc_ChannelItem->q_Enabled = false;
@@ -157,8 +167,7 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
                      for (u32_CurChannelCounter = 0U; u32_CurChannelCounter < pc_CurConfig->c_Channels.size();
                           ++u32_CurChannelCounter)
                      {
-                        if (pc_CurConfig->c_Channels[u32_CurChannelCounter].c_Name ==
-                            rc_ImpDomain.c_Channels[u32_ImpChannelCounter].c_Name)
+                        if (pc_CurConfig->c_Channels[u32_CurChannelCounter].c_Name == rc_ImpChannelDef.c_Name)
                         {
                            // Channel Ids match found
                            pc_ChannelItem->u32_Index = u32_CurChannelCounter;
@@ -210,12 +219,12 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
 void C_SdNdeHalcConfigImportModel::GetAdaptedConfiguration(C_OSCHalcConfig & orc_AdaptedConfig)
 {
    uint32 u32_DomainCounter;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const C_SdNdeHalcConfigImportItem * pc_VisibleRootItem = NULL;
 
    if (this->mpc_InvisibleRootItem->c_Children.size() > 0)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       pc_VisibleRootItem =
          dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(this->mpc_InvisibleRootItem->c_Children[0]);
    }
@@ -227,7 +236,7 @@ void C_SdNdeHalcConfigImportModel::GetAdaptedConfiguration(C_OSCHalcConfig & orc
       for (u32_DomainCounter = 0UL; u32_DomainCounter < pc_VisibleRootItem->c_Children.size();
            ++u32_DomainCounter)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          const C_SdNdeHalcConfigImportItem * const pc_DomainItem =
             dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(pc_VisibleRootItem->c_Children[u32_DomainCounter]);
 
@@ -266,7 +275,7 @@ void C_SdNdeHalcConfigImportModel::GetAdaptedConfiguration(C_OSCHalcConfig & orc
                   for (u32_ChannelCounter = 0UL; u32_ChannelCounter < pc_DomainItem->c_Children.size();
                        ++u32_ChannelCounter)
                   {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     
                      const C_SdNdeHalcConfigImportItem * const pc_ChildItem =
                         dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(
                            pc_DomainItem->c_Children[u32_ChannelCounter]);
@@ -289,6 +298,193 @@ void C_SdNdeHalcConfigImportModel::GetAdaptedConfiguration(C_OSCHalcConfig & orc
                   tgl_assert(orc_AdaptedConfig.SetDomainConfig(pc_DomainItem->u32_Index,
                                                                c_DomainConfigAdaption) == C_NO_ERR);
                }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if selection of linked channels is valid
+
+   \param[out]     orc_DomainIndices            Domain indices corresponding to orc_MissingChannelIndices
+   \param[out]     orc_MissingChannelIndices    Indices of all linked channels that are not checked
+
+   \retval  true     For all selected linked channels the link buddies are also selected
+   \retval  false    There exist linked channels where one is selected and the other one not
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeHalcConfigImportModel::IsSelectionOfLinkedChannelsValid(std::vector<uint32> & orc_DomainIndices,
+                                                                    std::vector<std::vector<uint32> > & orc_MissingChannelIndices)
+{
+   bool q_LinkedValid = true;
+   uint32 u32_DomainCounter;
+   
+   const C_SdNdeHalcConfigImportItem * pc_VisibleRootItem = NULL;
+
+   if (this->mpc_InvisibleRootItem->c_Children.size() > 0)
+   {
+      
+      pc_VisibleRootItem =
+         dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(this->mpc_InvisibleRootItem->c_Children[0]);
+   }
+
+   if (pc_VisibleRootItem != NULL)
+   {
+      for (u32_DomainCounter = 0UL; u32_DomainCounter < pc_VisibleRootItem->c_Children.size();
+           ++u32_DomainCounter)
+      {
+         
+         const C_SdNdeHalcConfigImportItem * const pc_DomainItem =
+            dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(pc_VisibleRootItem->c_Children[u32_DomainCounter]);
+         std::map<uint32, bool> c_LinkBuddyCheckStates;
+
+         if ((pc_DomainItem != NULL) && (pc_DomainItem->q_Enabled == true))
+         {
+            uint32 u32_ChannelCounter;
+
+            tgl_assert(pc_DomainItem->u32_Index < this->mc_ConfigCopy.GetDomainSize());
+            tgl_assert(pc_DomainItem->u32_ImportIndex < this->mc_ImportConfigCopy.c_Domains.size());
+
+            const C_OSCHalcConfigDomain & rc_ImpDomainConfig =
+               this->mc_ImportConfigCopy.c_Domains[pc_DomainItem->u32_ImportIndex];
+            const C_OSCHalcConfigDomain * pc_CopyDomainConfig =
+               this->mc_ConfigCopy.GetDomainConfigDataConst(pc_DomainItem->u32_Index);
+
+            if (pc_CopyDomainConfig != NULL)
+            {
+               for (u32_ChannelCounter = 0UL; u32_ChannelCounter < pc_DomainItem->c_Children.size();
+                    ++u32_ChannelCounter)
+               {
+                  
+                  const C_SdNdeHalcConfigImportItem * const pc_ChildItem =
+                     dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(pc_DomainItem->c_Children[
+                                                                                u32_ChannelCounter]);
+
+                  if ((pc_ChildItem != NULL) && (pc_ChildItem->e_CheckState != Qt::Unchecked) &&
+                      (pc_ChildItem->u32_ImportIndex < rc_ImpDomainConfig.c_ChannelConfigs.size()))
+                  {
+                     bool q_IsLinkedOld;
+                     bool q_IsLinkedNew;
+                     std::vector<uint32> c_LinkedChannelIndicesOld;
+                     std::vector<uint32> c_LinkedChannelIndicesNew;
+                     const C_OSCHalcConfigChannel & rc_Channel =
+                        rc_ImpDomainConfig.c_ChannelConfigs[pc_ChildItem->u32_ImportIndex];
+
+                     // use copy for linked check (standalone config has no use case information!)
+                     // together with imported use case index
+                     pc_CopyDomainConfig->CheckChannelLinked(u32_ChannelCounter, true, q_IsLinkedNew, NULL,
+                                                             &c_LinkedChannelIndicesNew, &rc_Channel.u32_UseCaseIndex);
+                     pc_CopyDomainConfig->CheckChannelLinked(u32_ChannelCounter, true, q_IsLinkedOld, NULL,
+                                                             &c_LinkedChannelIndicesOld, NULL);
+
+                     // check of linked channels: are all link-buddies also checked?
+                     if ((q_IsLinkedNew == true) || (q_IsLinkedOld == true))
+                     {
+                        std::map<uint32, bool>::const_iterator c_ItFind;
+
+                        // if current channel is not in the map, its buddies are also not there and need to be added
+                        c_ItFind = c_LinkBuddyCheckStates.find(u32_ChannelCounter);
+                        if (c_ItFind == c_LinkBuddyCheckStates.end())
+                        {
+                           uint32 u32_LinkedChannelCounter;
+
+                           if (q_IsLinkedNew == true)
+                           {
+                              // add all linked channel buddies for channels that get linked
+                              for (u32_LinkedChannelCounter = 0UL;
+                                   u32_LinkedChannelCounter < c_LinkedChannelIndicesNew.size();
+                                   u32_LinkedChannelCounter++)
+                              {
+                                 c_ItFind =
+                                    c_LinkBuddyCheckStates.find(c_LinkedChannelIndicesNew[u32_LinkedChannelCounter]);
+                                 if (c_ItFind == c_LinkBuddyCheckStates.end())
+                                 {
+                                    // only add / set to false if it not already exists
+                                    c_LinkBuddyCheckStates[c_LinkedChannelIndicesNew[u32_LinkedChannelCounter]] = false;
+                                 }
+                              }
+                           }
+
+                           if (q_IsLinkedOld == true)
+                           {
+                              // add all linked channel buddies for channels that were linked
+                              for (u32_LinkedChannelCounter = 0UL;
+                                   u32_LinkedChannelCounter < c_LinkedChannelIndicesOld.size();
+                                   u32_LinkedChannelCounter++)
+                              {
+                                 c_ItFind =
+                                    c_LinkBuddyCheckStates.find(c_LinkedChannelIndicesOld[u32_LinkedChannelCounter]);
+                                 if (c_ItFind == c_LinkBuddyCheckStates.end())
+                                 {
+                                    // only add / set to false if it not already exists
+                                    c_LinkBuddyCheckStates[c_LinkedChannelIndicesOld[u32_LinkedChannelCounter]] = false;
+                                 }
+                              }
+                           }
+                        }
+
+                        // current channel is certainly checked
+                        c_LinkBuddyCheckStates[u32_ChannelCounter] = true;
+                     }
+                  }
+               }
+            }
+         }
+
+         if (c_LinkBuddyCheckStates.empty() == false)
+         {
+            // find all missing linked channels and collect their indices
+            std::map<uint32, bool>::const_iterator c_ItLinkBuddies;
+            std::vector<uint32> c_MissingChannelIndicesPerDomain;
+            for (c_ItLinkBuddies = c_LinkBuddyCheckStates.begin(); c_ItLinkBuddies != c_LinkBuddyCheckStates.end();
+                 ++c_ItLinkBuddies)
+            {
+               if (c_ItLinkBuddies->second == false)
+               {
+                  c_MissingChannelIndicesPerDomain.push_back(c_ItLinkBuddies->first);
+                  q_LinkedValid = false;
+               }
+            }
+
+            if (c_MissingChannelIndicesPerDomain.empty() == false)
+            {
+               orc_DomainIndices.push_back(u32_DomainCounter);
+               orc_MissingChannelIndices.push_back(c_MissingChannelIndicesPerDomain);
+            }
+         }
+      }
+   }
+   return q_LinkedValid;
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check channels
+
+   This function only works if all domains and channels are visible, i.e. if index = row in tree.
+
+   \param[in]  orc_DomainIndices    Domain indices
+   \param[in]  orc_ChannelIndices   Channel indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcConfigImportModel::CheckChannels(const std::vector<uint32> & orc_DomainIndices,
+                                                 const std::vector<std::vector<uint32> > & orc_ChannelIndices)
+{
+   tgl_assert(orc_DomainIndices.size() == orc_ChannelIndices.size());
+
+   const QModelIndex & rc_VisibleRoot = this->index(0, 0);
+   if (rc_VisibleRoot.isValid() == true)
+   {
+      for (uint32 u32_DomainCounter = 0; u32_DomainCounter < orc_DomainIndices.size(); u32_DomainCounter++)
+      {
+         const std::vector<uint32> & rc_ChannelIndices = orc_ChannelIndices[u32_DomainCounter];
+         const QModelIndex & rc_Domain = rc_VisibleRoot.child(orc_DomainIndices[u32_DomainCounter], 0);
+
+         if (rc_Domain.isValid() == true)
+         {
+            for (uint32 u32_ChannelCounter = 0; u32_ChannelCounter < rc_ChannelIndices.size(); u32_ChannelCounter++)
+            {
+               const QModelIndex & rc_Channel = rc_Domain.child(rc_ChannelIndices[u32_ChannelCounter], 0);
+               this->setData(rc_Channel, static_cast<sintn>(Qt::Checked), static_cast<sintn>(Qt::CheckStateRole));
             }
          }
       }
@@ -327,7 +523,7 @@ QVariant C_SdNdeHalcConfigImportModel::data(const QModelIndex & orc_Index, const
    if ((osn_Role == static_cast<sintn>(Qt::CheckStateRole)) &&
        (orc_Index.isValid() == true))
    {
-      //lint -e{925}  Result of Qt interface restrictions, set by index function
+      //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
       C_SdNdeHalcConfigImportItem * const pc_TreeItem =
          static_cast<C_SdNdeHalcConfigImportItem * const>(orc_Index.internalPointer());
 
@@ -365,7 +561,7 @@ bool C_SdNdeHalcConfigImportModel::setData(const QModelIndex & orc_Index, const 
    {
       if (orc_Index.isValid() == true)
       {
-         //lint -e{925}  Result of Qt interface restrictions, set by index function
+         //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
          C_SdNdeHalcConfigImportItem * const pc_TreeItem =
             static_cast<C_SdNdeHalcConfigImportItem * const>(orc_Index.internalPointer());
 
@@ -412,7 +608,7 @@ Qt::ItemFlags C_SdNdeHalcConfigImportModel::flags(const QModelIndex & orc_Index)
 
    if (orc_Index.isValid() == true)
    {
-      //lint -e{925}  Result of Qt interface restrictions, set by index function
+      //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
       const C_SdNdeHalcConfigImportItem * const pc_TreeItem =
          static_cast<const C_SdNdeHalcConfigImportItem * const>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
@@ -447,7 +643,7 @@ void C_SdNdeHalcConfigImportModel::m_CheckChildren(C_SdNdeHalcConfigImportItem *
 
       for (u32_ChildCounter = 0U; u32_ChildCounter < opc_TreeItem->c_Children.size(); ++u32_ChildCounter)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_SdNdeHalcConfigImportItem * const pc_ChildItem =
             dynamic_cast<C_SdNdeHalcConfigImportItem * const>(opc_TreeItem->c_Children[u32_ChildCounter]);
          const QModelIndex c_ChildIndex = this->index(u32_ChildCounter, 0, orc_ItemIndex);
@@ -477,7 +673,7 @@ void C_SdNdeHalcConfigImportModel::m_CheckParent(const C_SdNdeHalcConfigImportIt
 {
    if (opc_TreeItem->pc_Parent != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_SdNdeHalcConfigImportItem * const pc_ParentItem =
          dynamic_cast<C_SdNdeHalcConfigImportItem * const>(opc_TreeItem->pc_Parent);
 
@@ -492,7 +688,7 @@ void C_SdNdeHalcConfigImportModel::m_CheckParent(const C_SdNdeHalcConfigImportIt
          // Check the other children to get the necessary state of the parent
          for (u32_ChildCounter = 0U; u32_ChildCounter < pc_ParentItem->c_Children.size(); ++u32_ChildCounter)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             C_SdNdeHalcConfigImportItem * const pc_ChildItem =
                dynamic_cast<C_SdNdeHalcConfigImportItem * const>(pc_ParentItem->c_Children[u32_ChildCounter]);
 
@@ -541,4 +737,90 @@ void C_SdNdeHalcConfigImportModel::m_CleanUpLastModel(void)
       delete (this->mpc_InvisibleRootItem);
       this->mpc_InvisibleRootItem = NULL;
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create tool tip content
+
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+
+   \return
+   tool tip content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdNdeHalcConfigImportModel::m_CreateTooltipContent(const uint32 ou32_DomainIndex,
+                                                             const uint32 ou32_ChannelIndex) const
+{
+   QString c_Return;
+
+   if ((ou32_DomainIndex < this->mc_ImportConfigCopy.c_Domains.size()) &&
+       (ou32_DomainIndex < this->mc_ConfigCopy.GetDomainSize()))
+   {
+      const C_OSCHalcConfigDomain * pc_CurDomain =  this->mc_ConfigCopy.GetDomainConfigDataConst(ou32_DomainIndex);
+      const C_OSCHalcConfigStandaloneDomain & rc_ImpDomain =  this->mc_ImportConfigCopy.c_Domains[ou32_DomainIndex];
+
+      if ((pc_CurDomain != NULL) && (ou32_ChannelIndex < rc_ImpDomain.c_ChannelConfigs.size()))
+      {
+         const C_OSCHalcConfigChannel & rc_ImpChannelConfig = rc_ImpDomain.c_ChannelConfigs[ou32_ChannelIndex];
+
+         std::vector<uint32> c_LinkedChannelIndices;
+         bool q_IsLinked = false;
+
+         // comment
+         c_Return = rc_ImpChannelConfig.c_Comment.c_str();
+         c_Return += "\n\n";
+
+         c_Return += C_GtGetText::h_GetText("Configuration: ");
+         c_Return += "\n";
+
+         // safety flag
+         c_Return += C_GtGetText::h_GetText("   Safety Relevant Parameters: ");
+         c_Return += rc_ImpChannelConfig.q_SafetyRelevant ?
+                     C_GtGetText::h_GetText("Yes") : C_GtGetText::h_GetText("No");
+         c_Return += "\n";
+
+         // selected use case
+
+         if (rc_ImpChannelConfig.u32_UseCaseIndex < pc_CurDomain->c_ChannelUseCases.size())
+         // use pc_CurDomain for use cases because they are part of the definition
+         {
+            const C_OSCHalcDefChannelUseCase & rc_UseCase =
+               pc_CurDomain->c_ChannelUseCases[rc_ImpChannelConfig.u32_UseCaseIndex];
+            c_Return += C_GtGetText::h_GetText("   Use Case: ");
+            c_Return += rc_UseCase.c_Display.c_str();
+            c_Return += "\n";
+         }
+
+         // linked channel information
+         pc_CurDomain->CheckChannelLinked(ou32_ChannelIndex, true, q_IsLinked, NULL,
+                                          &c_LinkedChannelIndices, &rc_ImpChannelConfig.u32_UseCaseIndex);
+         // import configuration does not know about linked channels so we need to ask current domain;
+         // and we want the names of the import channel to be displayed so we cannot use opc_LinkedChannelNames
+         if (q_IsLinked == true)
+         {
+            c_Return += C_GtGetText::h_GetText("   Linked to: ");
+            for (uint32 u32_LinkBuddyCounter = 0; u32_LinkBuddyCounter < c_LinkedChannelIndices.size();
+                 u32_LinkBuddyCounter++)
+            {
+               const uint32 u32_CurLinkedChannelIndex = c_LinkedChannelIndices[u32_LinkBuddyCounter];
+
+               if (u32_LinkBuddyCounter != 0)
+               {
+                  c_Return += ", ";
+               }
+
+               if ((u32_CurLinkedChannelIndex < rc_ImpDomain.c_ChannelConfigs.size()) &&
+                   (u32_CurLinkedChannelIndex < pc_CurDomain->c_Channels.size()))
+               {
+                  c_Return += rc_ImpDomain.c_ChannelConfigs[u32_CurLinkedChannelIndex].c_Name.c_str();
+                  c_Return += " (";
+                  c_Return += pc_CurDomain->c_Channels[u32_CurLinkedChannelIndex].c_Name.c_str();
+                  c_Return += ")";
+               }
+            }
+         }
+      }
+   }
+   return c_Return;
 }

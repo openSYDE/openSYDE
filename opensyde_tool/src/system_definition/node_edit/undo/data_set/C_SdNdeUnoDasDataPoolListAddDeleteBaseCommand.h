@@ -38,11 +38,11 @@ public:
                                                  const QString & orc_Text = "", QUndoCommand * const opc_Parent = NULL);
 
 protected:
-   void Add(void);
-   void Delete(void);
-   void SetIndices(const std::vector<stw_types::uint32> & orc_Value);
-   void SetInitialData(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolDataSet> & orc_OSCNames,
-                       const std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues);
+   void m_Add(void);
+   void m_Delete(void);
+   void m_SetIndices(const std::vector<stw_types::uint32> & orc_Value);
+   void m_SetInitialData(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolDataSet> & orc_OSCNames,
+                         const std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues);
 
    bool mq_Initial;
 

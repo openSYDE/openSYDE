@@ -33,9 +33,9 @@ public:
 private:
    C_CamProClipBoardHelper(void);
 
-   static void m_GetNewParser(stw_opensyde_core::C_OSCXMLParserString & orc_XMLParser);
-   static void m_StoreParserInClipBoard(const stw_opensyde_core::C_OSCXMLParserString & orc_XMLParser);
-   static stw_types::sint32 m_GetParserFromClipBoard(stw_opensyde_core::C_OSCXMLParserString & orc_XMLParser);
+   static void mh_GetNewParser(stw_opensyde_core::C_OSCXMLParserString & orc_XMLParser);
+   static void mh_StoreParserInClipBoard(const stw_opensyde_core::C_OSCXMLParserString & orc_XMLParser);
+   static stw_types::sint32 mh_GetParserFromClipBoard(stw_opensyde_core::C_OSCXMLParserString & orc_XMLParser);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -64,9 +64,9 @@ C_SdNdeHalcConfigTreeView::C_SdNdeHalcConfigTreeView(QWidget * const opc_Parent)
 /*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} never took ownership of this button (parent is scrollbar)
 C_SdNdeHalcConfigTreeView::~C_SdNdeHalcConfigTreeView(void)
 {
-   //lint -e{1540} never took ownership of this button (parent is scrollbar)
 }
 
 //----------------------------------------------------------------------------------------------------------------------

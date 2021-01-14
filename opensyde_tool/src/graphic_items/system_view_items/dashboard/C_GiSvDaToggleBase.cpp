@@ -76,10 +76,10 @@ C_GiSvDaToggleBase::C_GiSvDaToggleBase(const uint32 & oru32_ViewIndex, const uin
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_CheckBoxWidget by calling SetWidget and
+// the Qt memory management
 C_GiSvDaToggleBase::~C_GiSvDaToggleBase(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_CheckBoxWidget by calling SetWidget and
-   // the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ void C_GiSvDaToggleBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_S
 
    if (this->ms32_Index >= 0)
    {
-      const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+      const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
       if (pc_Dashboard != NULL)
       {
@@ -135,7 +135,7 @@ void C_GiSvDaToggleBase::ReInitializeSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::LoadData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -159,7 +159,7 @@ void C_GiSvDaToggleBase::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::UpdateData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -221,7 +221,7 @@ void C_GiSvDaToggleBase::SendCurrentValue(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaToggleBase::CallProperties(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -312,8 +312,7 @@ bool C_GiSvDaToggleBase::CallProperties(void)
             {
                c_New->HideOverlay();
             }
-            //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-         }
+         }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
       }
    }
    return true;
@@ -327,7 +326,7 @@ bool C_GiSvDaToggleBase::CallProperties(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::ConnectionActiveChanged(const bool oq_Active)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
    if (pc_Dashboard != NULL)
@@ -365,7 +364,6 @@ void C_GiSvDaToggleBase::UpdateType(const C_PuiSvDbToggle::E_Type oe_Type)
 
       switch (this->me_Style)
       {
-      //TBD by Karsten: in progress
       case C_PuiSvDbWidgetBase::eOPENSYDE:
          switch (oe_Type)
          {
@@ -541,7 +539,7 @@ bool C_GiSvDaToggleBase::m_CheckHasValidElements(QString & orc_FirstInvalidEleme
 
    if (q_Retval == true)
    {
-      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->GetMappingDpElementToDataSerie();
+      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
 
       for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
            c_ItElement != rc_Elements.end(); ++c_ItElement)

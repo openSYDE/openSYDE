@@ -45,9 +45,9 @@ void C_CamProClipBoardHelper::h_SaveMessages(const std::vector<C_CamProMessageDa
 {
    C_OSCXMLParserString c_Parser;
 
-   m_GetNewParser(c_Parser);
+   mh_GetNewParser(c_Parser);
    C_CamProHandlerFiler::h_SaveMessages(orc_Messages, c_Parser);
-   m_StoreParserInClipBoard(c_Parser);
+   mh_StoreParserInClipBoard(c_Parser);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ sint32 C_CamProClipBoardHelper::h_LoadMessages(std::vector<C_CamProMessageData> 
    sint32 s32_Retval;
    C_OSCXMLParserString c_Parser;
 
-   s32_Retval = m_GetParserFromClipBoard(c_Parser);
+   s32_Retval = mh_GetParserFromClipBoard(c_Parser);
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = C_CamProHandlerFiler::h_LoadMessages(orc_Messages, c_Parser);
@@ -87,7 +87,7 @@ C_CamProClipBoardHelper::C_CamProClipBoardHelper(void)
    \param[out] orc_XMLParser XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamProClipBoardHelper::m_GetNewParser(C_OSCXMLParserString & orc_XMLParser)
+void C_CamProClipBoardHelper::mh_GetNewParser(C_OSCXMLParserString & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild("opensyde-can-monitor-configuration-clip-board");
 }
@@ -98,7 +98,7 @@ void C_CamProClipBoardHelper::m_GetNewParser(C_OSCXMLParserString & orc_XMLParse
    \param[in] orc_XMLParser XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamProClipBoardHelper::m_StoreParserInClipBoard(const C_OSCXMLParserString & orc_XMLParser)
+void C_CamProClipBoardHelper::mh_StoreParserInClipBoard(const C_OSCXMLParserString & orc_XMLParser)
 {
    stw_scl::C_SCLString c_String;
    orc_XMLParser.SaveToString(c_String);
@@ -115,7 +115,7 @@ void C_CamProClipBoardHelper::m_StoreParserInClipBoard(const C_OSCXMLParserStrin
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProClipBoardHelper::m_GetParserFromClipBoard(C_OSCXMLParserString & orc_XMLParser)
+sint32 C_CamProClipBoardHelper::mh_GetParserFromClipBoard(C_OSCXMLParserString & orc_XMLParser)
 {
    sint32 s32_Retval = C_CONFIG;
    const QString c_Content = C_UtiClipBoardHelper::mh_GetClipBoard();

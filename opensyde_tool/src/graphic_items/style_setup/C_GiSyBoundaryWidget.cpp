@@ -61,13 +61,11 @@ C_GiSyBoundaryWidget::C_GiSyBoundaryWidget(C_GiSyBaseWidget & orc_Parent) :
    mpc_Ui->setupUi(this);
 
    //border
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    this->mpc_LabelBorder = new QLabel(dynamic_cast<QWidget *>(this->mpc_Ui->pc_BushButtonBorderColor->parent()));
    this->mpc_LabelBorder->setPixmap(c_Pic);
    this->mpc_LabelBorder->lower();
 
    //background
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    this->mpc_LabelBackground =
       new QLabel(dynamic_cast<QWidget *>(this->mpc_Ui->pc_BushButtonBackgroundColor->parent()));
    this->mpc_LabelBackground->setPixmap(c_Pic);
@@ -97,8 +95,7 @@ C_GiSyBoundaryWidget::C_GiSyBoundaryWidget(C_GiSyBaseWidget & orc_Parent) :
    connect(this->mpc_Ui->pc_SpinBoxWidth, static_cast<void (QSpinBox::*)(sintn)>(&QSpinBox::valueChanged),
            this, &C_GiSyBoundaryWidget::m_WidthChanged);
 
-   //lint -e{429}  no memory leak because of the parent of pc_Label-Background / Border and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Label-Background / Border and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default destructor
@@ -247,8 +244,7 @@ void C_GiSyBoundaryWidget::m_UpdatePreview(void)
    this->mpc_ParentDialog->GetPreviewScene()->addItem(pc_Item);
    this->mpc_ParentDialog->GetPreviewScene()->clearSelection();
 
-   //lint -e{429}  no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of Color button
@@ -289,8 +285,7 @@ void C_GiSyBoundaryWidget::m_BorderColorClicked(void)
    {
       c_Popup->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of inner color button
@@ -331,8 +326,7 @@ void C_GiSyBoundaryWidget::m_BackgroundColorClicked(void)
    {
       c_Popup->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of spin box changed

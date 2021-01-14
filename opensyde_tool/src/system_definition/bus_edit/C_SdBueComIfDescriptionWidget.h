@@ -87,12 +87,9 @@ Q_SIGNALS:
    void SigCommDataPoolAdded(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void hideEvent(QHideEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

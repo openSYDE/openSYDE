@@ -83,11 +83,8 @@ public:
    static const stw_types::uint32 hu32_STATE_TO_DO = 4U;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual bool event(QEvent * const opc_Event) override;
-   //lint -restore
 
    virtual void m_LoadFileInformation(bool & orq_FileExists, bool & orq_FlashwareWarning, bool & orq_TriggerRemove);
    virtual QString m_CreateToolTipContent(void) const;

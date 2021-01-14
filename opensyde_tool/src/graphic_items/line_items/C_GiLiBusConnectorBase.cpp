@@ -240,8 +240,6 @@ const C_GiBiConnectableItem * C_GiLiBusConnectorBase::GetGenericPositionItem(voi
 void C_GiLiBusConnectorBase::RestoreZOrder(void)
 {
    const C_GiLiBus * const pc_Bus = this->GetBusItem();
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //lint -e{740}  no problem because of common base class
    const QGraphicsItem * const pc_Item = dynamic_cast<const QGraphicsItem *>(this->mpc_GenericSignalItem);
 
    if ((pc_Bus != NULL) && (pc_Item != NULL))
@@ -322,8 +320,6 @@ void C_GiLiBusConnectorBase::mousePressEvent(QGraphicsSceneMouseEvent * const op
          const C_OSCSystemBus::E_Type e_Type = this->GetBusItem()->GetType();
          if (this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex())
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            //lint -e{740}  no problem because of common base class
             Q_EMIT this->SigStartConnect(E_ConnectState::eTO_GENERIC,
                                          dynamic_cast<QGraphicsItem *>(this->mpc_GenericSignalItem),
                                          &e_Type, this);
@@ -331,8 +327,6 @@ void C_GiLiBusConnectorBase::mousePressEvent(QGraphicsSceneMouseEvent * const op
          }
          else if (this->msn_ActiveItemIndex == m_GetBusInteractionIndex())
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            //lint -e{740}  no problem because of common base class
             Q_EMIT this->SigStartConnect(E_ConnectState::eTO_BUS,
                                          dynamic_cast<QGraphicsItem *>(this->mpc_GenericSignalItem),
                                          &e_Type, this);
@@ -441,10 +435,8 @@ void C_GiLiBusConnectorBase::m_UpdateBus(const QPointF & orc_Pos, const C_GiLiBu
 {
    if (this->GetBusItem() != NULL)
    {
-      //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
       disconnect(this->GetBusItem(), &C_GiLiBus::SigChangedGraphic,
                  this, &C_GiLiBusConnectorBase::m_UpdateExternal);
-      //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
       disconnect(this->GetBusItem(), &C_GiLiBus::SigChangedZOrder,
                  this, &C_GiLiBusConnectorBase::RestoreZOrder);
    }
@@ -456,10 +448,8 @@ void C_GiLiBusConnectorBase::m_UpdateBus(const QPointF & orc_Pos, const C_GiLiBu
 
       c_Lines = this->GetBusItem()->GetLines();
       ms32_KnownLineCount = c_Lines.size();
-      //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
       connect(this->GetBusItem(), &C_GiLiBus::SigChangedGraphic,
               this, &C_GiLiBusConnectorBase::m_UpdateExternal);
-      //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
       connect(this->GetBusItem(), &C_GiLiBus::SigChangedZOrder,
               this, &C_GiLiBusConnectorBase::RestoreZOrder);
       m_UpdateConnection(orc_Pos);
@@ -532,8 +522,6 @@ void C_GiLiBusConnectorBase::m_UpdateExternal(void)
 {
    if (this->GetBusItem() != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
       const QGraphicsItem * const pc_Item = dynamic_cast<QGraphicsItem *>(this->mpc_GenericSignalItem);
       //Bus
 
@@ -608,8 +596,6 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
    if ((this->me_ActiveResizeMode == C_GiLiBusConnectorBase::eNO_ELEMENT) ||
        (this->me_ActiveResizeMode == C_GiLiBusConnectorBase::eALL))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
       const QGraphicsItem * const pc_Item = dynamic_cast<const QGraphicsItem *>(this->mpc_GenericSignalItem);
       disconnect(this, &C_GiLiBusConnectorBase::SigChangedGraphic, this, &C_GiLiBusConnectorBase::m_UpdateInternal);
       //Moved by other element
@@ -651,8 +637,6 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
             {
                QPointF c_PNew;
                QPointF c_POld;
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-               //lint -e{740}  no problem because of common base class
                const QGraphicsItem * const pc_Item = dynamic_cast<const QGraphicsItem *>(this->mpc_GenericSignalItem);
                //find closest point in shape and set pLast to closest point in shape
                if (this->GetBusItem()->isSelected() == false)
@@ -746,8 +730,6 @@ void C_GiLiBusConnectorBase::m_CalcConnPos(const C_GiLiLineConnection * const op
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_UpdateGenericPoint(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //lint -e{740}  no problem because of common base class
    QGraphicsItem * const pc_Item = dynamic_cast<QGraphicsItem *>(this->mpc_GenericPositionItem);
 
    if ((pc_Item != NULL) && (this->mpc_GenericPositionItem != NULL))
@@ -780,8 +762,6 @@ sint32 C_GiLiBusConnectorBase::mh_GetGenericInteractionIndex(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_CalcInitialLocalPos(const QPointF & orc_InPos)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //lint -e{740}  no problem because of common base class
    QGraphicsItem * const pc_Item = dynamic_cast<QGraphicsItem *>(this->mpc_GenericPositionItem);
 
    if ((pc_Item != NULL) && (this->mpc_GenericPositionItem != NULL))
@@ -854,7 +834,6 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
             for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_All.begin(); c_ItItem != c_All.end(); ++c_ItItem)
             {
                QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(c_ItItem.operator *());
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(pc_Parent);
                //try node
                if (this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex())
@@ -933,8 +912,6 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
 void C_GiLiBusConnectorBase::m_OnIterationBusInteractionPointMoveCleanUp(QGraphicsItem * const opc_HighestParentItem,
                                                                          bool & orq_RestoreMouseCursor)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //lint -e{740}  no problem because of common base class
    C_GiBiCustomMouseItem * const pc_Mouse = dynamic_cast<C_GiBiCustomMouseItem *>(opc_HighestParentItem);
 
    if ((pc_Mouse != NULL) && (pc_Mouse != this))

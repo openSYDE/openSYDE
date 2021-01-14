@@ -84,8 +84,7 @@ void C_SdNdeUnoDasDataPoolListManager::DoMoveElements(const uint32 & oru32_NodeI
          orc_TargetIndex, orq_AdaptIndices, this->mpc_UndoCommand);
       //Do action once
       pc_Command->redo();
-      //lint -e{429}  no memory leak because of the parent of pc_Command and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Command and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,8 +115,7 @@ void C_SdNdeUnoDasDataPoolListManager::DoDeleteElements(const uint32 & oru32_Nod
 
       //Do action once
       pc_Command->redo();
-      //lint -e{429}  no memory leak because of the parent of pc_Command and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Command and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -158,8 +156,7 @@ void C_SdNdeUnoDasDataPoolListManager::DoPaste(const uint32 & oru32_NodeIndex, c
                                                                       c_OSCDataSetValues, this->mpc_UndoCommand);
          //Do action once
          pc_Command->redo();
-         //lint -e{429}  no memory leak because of the parent of pc_Command and the Qt memory management
-      }
+      } //lint !e429  //no memory leak because of the parent of pc_Command and the Qt memory management
    }
 }
 
@@ -189,8 +186,7 @@ void C_SdNdeUnoDasDataPoolListManager::DoAddElements(const uint32 & oru32_NodeIn
          orc_Indices, this->mpc_UndoCommand);
       //Do action once
       pc_Command->redo();
-      //lint -e{429}  no memory leak because of the parent of pc_Command and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Command and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -222,8 +218,7 @@ void C_SdNdeUnoDasDataPoolListManager::DoAddSpecificElements(const uint32 & oru3
          orc_Indices, orc_OSCNames, orc_OSCDataSetValues, this->mpc_UndoCommand);
       //Do action once
       pc_Command->redo();
-      //lint -e{429}  no memory leak because of the parent of pc_Command and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Command and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -254,8 +249,7 @@ void C_SdNdeUnoDasDataPoolListManager::DoDataChangeElements(const uint32 & oru32
       oru32_DataPoolListDataSetIndex, orc_NewData, ore_DataChangeType, this->mpc_UndoCommand);
    //Do action once
    pc_Command->redo();
-   //lint -e{429}  no memory leak because of the parent of pc_Command and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Command and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   GetUndocommand and take ownership

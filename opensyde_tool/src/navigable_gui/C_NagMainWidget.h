@@ -58,11 +58,8 @@ Q_SIGNALS:
    void SigNewApplicationName(const QString & orc_Name);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

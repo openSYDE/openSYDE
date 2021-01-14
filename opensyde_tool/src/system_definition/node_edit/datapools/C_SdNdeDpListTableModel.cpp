@@ -186,8 +186,8 @@ QVariant C_SdNdeDpListTableModel::headerData(const sintn osn_Section, const Qt::
                {
                   if (static_cast<uint32>(s32_DataSetIndex) < pc_List->c_DataSets.size())
                   {
-                     c_Retval = QString(C_GtGetText::h_GetText("Dataset -\n")) +
-                                QString(pc_List->c_DataSets[s32_DataSetIndex].c_Name.c_str());
+                     c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Dataset -\n")) +
+                                static_cast<QString>(pc_List->c_DataSets[s32_DataSetIndex].c_Name.c_str());
                   }
                }
             }
@@ -211,7 +211,7 @@ QVariant C_SdNdeDpListTableModel::headerData(const sintn osn_Section, const Qt::
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
          // header font etc. are styled via stylesheets of class C_SdNdeSingleHeaderView
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
@@ -681,17 +681,17 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                   u32_SizeByte = pc_OSCElement->GetSizeByte();
                   if (u32_SizeByte == 1)
                   {
-                     c_Retval = QString("%1 Byte").arg(u32_SizeByte);
+                     c_Retval = static_cast<QString>("%1 Byte").arg(u32_SizeByte);
                   }
                   else
                   {
-                     c_Retval = QString("%1 Bytes").arg(u32_SizeByte);
+                     c_Retval = static_cast<QString>("%1 Bytes").arg(u32_SizeByte);
                   }
                   break;
                case eADDRESS:
                   pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(this->mu32_NodeIndex,
                                                                                 this->mu32_DataPoolIndex);
-                  c_Retval = QString("%1 (%2)").arg(
+                  c_Retval = static_cast<QString>("%1 (%2)").arg(
                      pc_OSCElement->u32_NvMStartAddress - pc_Datapool->u32_NvMStartAddress).arg(
                      pc_OSCElement->u32_NvMStartAddress);
                   break;
@@ -710,11 +710,9 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
          if (orc_Index.row() >= 0)
          {
             C_OSCNodeDataPool::E_Type e_DataPoolType;
-            const C_OSCNodeDataPoolList * pc_OSCElement;
-            switch (e_Col)
+            if (e_Col == eINVALID)
             {
-            case eINVALID:
-               pc_OSCElement =
+               const C_OSCNodeDataPoolList * const pc_OSCElement =
                   C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(this->mu32_NodeIndex,
                                                                       this->mu32_DataPoolIndex,
                                                                       this->mu32_ListIndex);
@@ -742,28 +740,27 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                         {
                            c_Name = C_GtGetText::h_GetText("Parameter");
                         }
-                        c_Retval = QString(C_GtGetText::h_GetText("%1 has invalid content")).arg(c_Name);
+                        c_Retval = static_cast<QString>(C_GtGetText::h_GetText("%1 has invalid content")).arg(c_Name);
                      }
                   }
                }
-               break;
-            default:
+            }
+            else
+            {
                //No tool tip
-               break;
             }
          }
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_TYPE)
       {
-         switch (e_Col)
+         if (e_Col == eINVALID)
          {
-         case eINVALID:
             c_Retval = static_cast<sintn>(C_NagToolTip::eERROR);
-            break;
-         default:
+         }
+         else
+         {
             c_Retval = static_cast<sintn>(C_NagToolTip::eDEFAULT);
             //No tool tip
-            break;
          }
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
@@ -781,7 +778,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
             if ((pc_OSCElement != NULL) && (pc_UIElement != NULL))
             {
                const C_OSCNodeDataPoolList * pc_OSCList;
-               switch (e_Col)
+               switch (e_Col) //lint !e788 //not all columns get a tooltip
                {
                case eINVALID:
                   pc_OSCList =
@@ -823,12 +820,14 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                               if (q_NameConflict == true)
                               {
                                  c_Output +=
-                                    QString(C_GtGetText::h_GetText("Duplicate %1 name detected.\n")).arg(c_Name);
+                                    static_cast<QString>(C_GtGetText::h_GetText("Duplicate %1 name detected.\n")).arg(
+                                       c_Name);
                               }
                               if (q_NameInvalid == true)
                               {
                                  c_Output +=
-                                    QString(C_GtGetText::h_GetText("%1 name is empty or contains invalid characters.\n"))
+                                    static_cast<QString>(C_GtGetText::h_GetText(
+                                                            "%1 name is empty or contains invalid characters.\n"))
                                     .arg(c_Name);
                               }
                               if (q_MinOverMax == true)
@@ -853,12 +852,12 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                                                                                                   u32_ItAppl]);
                                  if (pc_DataSet != NULL)
                                  {
-                                    c_Output += QString("%1\n").arg(pc_DataSet->c_Name.c_str());
+                                    c_Output += static_cast<QString>("%1\n").arg(pc_DataSet->c_Name.c_str());
                                  }
                               }
                               if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDataSetIndices.size())
                               {
-                                 c_Output += QString("+%1\n").arg(
+                                 c_Output += static_cast<QString>("+%1\n").arg(
                                     c_InvalidDataSetIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
                               }
                               c_Output += "\n";
@@ -963,7 +962,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
             const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
             const C_PuiSdNodeDataPoolListElement * pc_UIElement;
             const C_OSCNodeDataPoolListElement * pc_OSCElement;
-            switch (e_Col)
+            switch (e_Col) //lint !e788 //not all columns handled on purpose
             {
             case eAUTO_MIN_MAX:
                pc_UIElement =
@@ -1210,7 +1209,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else if (osn_Role == msn_USER_ROLE_ICON)
       {
@@ -1437,12 +1436,10 @@ bool C_SdNdeDpListTableModel::setData(const QModelIndex & orc_Index, const QVari
          else if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
          {
             const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
-            sint32 s32_DataSetIndex;
-            const C_SdNdeDpListTableModel::E_Columns e_Col =
-               ColumnToEnum(orc_Index.column(), &s32_DataSetIndex);
+            const C_SdNdeDpListTableModel::E_Columns e_Col = this->ColumnToEnum(orc_Index.column());
             if (orc_Value.type() == QVariant::Int)
             {
-               Qt::CheckState e_CheckedState = static_cast<Qt::CheckState>(orc_Value.toInt());
+               const Qt::CheckState e_CheckedState = static_cast<Qt::CheckState>(orc_Value.toInt());
                bool q_Val;
                if (e_CheckedState == Qt::Checked)
                {
@@ -1452,12 +1449,12 @@ bool C_SdNdeDpListTableModel::setData(const QModelIndex & orc_Index, const QVari
                {
                   q_Val = false;
                }
-               switch (e_Col)
+               switch (e_Col) //lint !e788 //not all columns handled on purpose
                {
                case eAUTO_MIN_MAX:
                   Q_EMIT this->SigDataChange(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                              this->mu32_ListIndex,
-                                             u32_Index, QVariant(q_Val),
+                                             u32_Index, static_cast<QVariant>(q_Val),
                                              C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_AUTO_MIN_MAX,
                                              0, 0);
                   q_Retval = true;
@@ -1465,7 +1462,7 @@ bool C_SdNdeDpListTableModel::setData(const QModelIndex & orc_Index, const QVari
                case eEVENT_CALL:
                   Q_EMIT this->SigDataChange(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                              this->mu32_ListIndex,
-                                             u32_Index, QVariant(q_Val),
+                                             u32_Index, static_cast<QVariant>(q_Val),
                                              C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_EVENT_CALL,
                                              0, 0);
                   q_Retval = true;
@@ -1813,22 +1810,22 @@ void C_SdNdeDpListTableModel::DoMoveRows(const std::vector<uint32> & orc_Selecte
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Column to enum conversion
 
-   \param[in]   ors32_Column        Column
-   \param[out]  opc_DataSetIndex    Optional: If column is a data set, this contains the data set index
-                                    Else -1
+   \param[in]   ors32_Column          Column
+   \param[out]  ops32_DataSetIndex    Optional: If column is a data set, this contains the data set index
+                                      Else -1
 
    \return
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListTableModel::E_Columns C_SdNdeDpListTableModel::ColumnToEnum(const sint32 & ors32_Column,
-                                                                         sint32 * const opc_DataSetIndex)
+                                                                         sint32 * const ops32_DataSetIndex)
 const
 {
    C_SdNdeDpListTableModel::E_Columns e_Retval;
-   if (opc_DataSetIndex != NULL)
+   if (ops32_DataSetIndex != NULL)
    {
-      *opc_DataSetIndex = -1;
+      *ops32_DataSetIndex = -1;
    }
    switch (ors32_Column)
    {
@@ -1891,9 +1888,9 @@ const
       else
       {
          e_Retval = eDATA_SET;
-         if (opc_DataSetIndex != NULL)
+         if (ops32_DataSetIndex != NULL)
          {
-            *opc_DataSetIndex = ors32_Column - 13;
+            *ops32_DataSetIndex = ors32_Column - 13;
          }
       }
       break;
@@ -2182,7 +2179,7 @@ void C_SdNdeDpListTableModel::HandleDataChange(const uint32 & oru32_Row,
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::DoInsertDataSet(const uint32 & oru32_DataSetIndex)
 {
-   sint32 s32_Index = this->EnumToColumn(eDATA_SET);
+   const sint32 s32_Index = this->EnumToColumn(eDATA_SET);
 
    if (s32_Index >= 0)
    {
@@ -2199,7 +2196,7 @@ void C_SdNdeDpListTableModel::DoInsertDataSet(const uint32 & oru32_DataSetIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::DoDeleteDataSet(const uint32 & oru32_DataSetIndex)
 {
-   sint32 s32_Index = this->EnumToColumn(eDATA_SET);
+   const sint32 s32_Index = this->EnumToColumn(eDATA_SET);
 
    if (s32_Index >= 0)
    {

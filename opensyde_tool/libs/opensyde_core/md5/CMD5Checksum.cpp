@@ -48,34 +48,34 @@ using namespace stw_scl;
    \param[in]      opu8_Buffer     input buffer
 */
 //----------------------------------------------------------------------------------------------------------------------
-void CMD5Checksum::mh_md5_compress(C_HashState * const opc_HashState, const uint8 * opu8_Buffer)
+void CMD5Checksum::mh_MD5Compress(C_HashState * const opc_HashState, const uint8 * const opu8_Buffer)
 {
 #define LOAD32L(x, y)                            \
-   x = ((uint32)((y)[3] & 255) << 24) | \
-       ((uint32)((y)[2] & 255) << 16) | \
-       ((uint32)((y)[1] & 255) << 8)  | \
-       ((uint32)((y)[0] & 255));
+   (x) = (static_cast<uint32>((y)[3] & 255U) << 24) | \
+         (static_cast<uint32>((y)[2] & 255U) << 16) | \
+         (static_cast<uint32>((y)[1] & 255U) << 8)  | \
+         (static_cast<uint32>((y)[0] & 255U));
 
-#define F(x, y, z)  (z ^ (x & (y ^ z)))
-#define G(x, y, z)  (y ^ (z & (y ^ x)))
-#define H(x, y, z)  (x ^ y ^ z)
-#define I(x, y, z)  (y ^ (x | (~z)))
+#define F(x, y, z)  ((z) ^ ((x) & ((y) ^ (z))))
+#define G(x, y, z)  ((y) ^ ((z) & ((y) ^ (x))))
+#define H(x, y, z)  ((x) ^ (y) ^ (z))
+#define I(x, y, z)  ((y) ^ ((x) | (~(z))))
 
-#define ROLc(x, y) ((((uint32)(x) << (uint32)((y) & 31)) | \
-                     (((uint32)(x) & 0xFFFFFFFFUL) >> (uint32)((32 - ((y) & 31)) & 31))) & \
+#define ROLc(x, y) (((static_cast<uint32>(x) << static_cast<uint32>((y) & 31U)) | \
+                     ((static_cast<uint32>(x) & 0xFFFFFFFFUL) >> static_cast<uint32>((32 - ((y) & 31U)) & 31U))) & \
                     0xFFFFFFFFUL)
 
 #define FF(a, b, c, d, M, s, t) \
-   a = (a + F(b, c, d) + M + t); a = ROLc(a, s) + b;
+   (a) = ((a) + F((b), (c), (d)) + (M) + (t)); (a) = ROLc((a), (s)) + (b);
 
 #define GG(a, b, c, d, M, s, t) \
-   a = (a + G(b, c, d) + M + t); a = ROLc(a, s) + b;
+   (a) = ((a) + G((b), (c), (d)) + (M) + (t)); (a) = ROLc((a), (s)) + (b);
 
 #define HH(a, b, c, d, M, s, t) \
-   a = (a + H(b, c, d) + M + t); a = ROLc(a, s) + b;
+   (a) = ((a) + H((b), (c), (d)) + (M) + (t)); (a) = ROLc((a), (s)) + (b);
 
 #define II(a, b, c, d, M, s, t) \
-   a = (a + I(b, c, d) + M + t); a = ROLc(a, s) + b;
+   (a) = ((a) + I((b), (c), (d)) + (M) + (t)); (a) = ROLc((a), (s)) + (b);
 
    uint32 au32_W[16];
    uint32 u32_A;
@@ -95,70 +95,70 @@ void CMD5Checksum::mh_md5_compress(C_HashState * const opc_HashState, const uint
    u32_C = opc_HashState->au32_State[2];
    u32_D = opc_HashState->au32_State[3];
 
-   FF(u32_A, u32_B, u32_C, u32_D, au32_W[0], 7, 0xd76aa478UL)
-   FF(u32_D, u32_A, u32_B, u32_C, au32_W[1], 12, 0xe8c7b756UL)
-   FF(u32_C, u32_D, u32_A, u32_B, au32_W[2], 17, 0x242070dbUL)
-   FF(u32_B, u32_C, u32_D, u32_A, au32_W[3], 22, 0xc1bdceeeUL)
-   FF(u32_A, u32_B, u32_C, u32_D, au32_W[4], 7, 0xf57c0fafUL)
-   FF(u32_D, u32_A, u32_B, u32_C, au32_W[5], 12, 0x4787c62aUL)
-   FF(u32_C, u32_D, u32_A, u32_B, au32_W[6], 17, 0xa8304613UL)
-   FF(u32_B, u32_C, u32_D, u32_A, au32_W[7], 22, 0xfd469501UL)
-   FF(u32_A, u32_B, u32_C, u32_D, au32_W[8], 7, 0x698098d8UL)
-   FF(u32_D, u32_A, u32_B, u32_C, au32_W[9], 12, 0x8b44f7afUL)
-   FF(u32_C, u32_D, u32_A, u32_B, au32_W[10], 17, 0xffff5bb1UL)
-   FF(u32_B, u32_C, u32_D, u32_A, au32_W[11], 22, 0x895cd7beUL)
-   FF(u32_A, u32_B, u32_C, u32_D, au32_W[12], 7, 0x6b901122UL)
-   FF(u32_D, u32_A, u32_B, u32_C, au32_W[13], 12, 0xfd987193UL)
-   FF(u32_C, u32_D, u32_A, u32_B, au32_W[14], 17, 0xa679438eUL)
-   FF(u32_B, u32_C, u32_D, u32_A, au32_W[15], 22, 0x49b40821UL)
-   GG(u32_A, u32_B, u32_C, u32_D, au32_W[1], 5, 0xf61e2562UL)
-   GG(u32_D, u32_A, u32_B, u32_C, au32_W[6], 9, 0xc040b340UL)
-   GG(u32_C, u32_D, u32_A, u32_B, au32_W[11], 14, 0x265e5a51UL)
-   GG(u32_B, u32_C, u32_D, u32_A, au32_W[0], 20, 0xe9b6c7aaUL)
-   GG(u32_A, u32_B, u32_C, u32_D, au32_W[5], 5, 0xd62f105dUL)
-   GG(u32_D, u32_A, u32_B, u32_C, au32_W[10], 9, 0x02441453UL)
-   GG(u32_C, u32_D, u32_A, u32_B, au32_W[15], 14, 0xd8a1e681UL)
-   GG(u32_B, u32_C, u32_D, u32_A, au32_W[4], 20, 0xe7d3fbc8UL)
-   GG(u32_A, u32_B, u32_C, u32_D, au32_W[9], 5, 0x21e1cde6UL)
-   GG(u32_D, u32_A, u32_B, u32_C, au32_W[14], 9, 0xc33707d6UL)
-   GG(u32_C, u32_D, u32_A, u32_B, au32_W[3], 14, 0xf4d50d87UL)
-   GG(u32_B, u32_C, u32_D, u32_A, au32_W[8], 20, 0x455a14edUL)
-   GG(u32_A, u32_B, u32_C, u32_D, au32_W[13], 5, 0xa9e3e905UL)
-   GG(u32_D, u32_A, u32_B, u32_C, au32_W[2], 9, 0xfcefa3f8UL)
-   GG(u32_C, u32_D, u32_A, u32_B, au32_W[7], 14, 0x676f02d9UL)
-   GG(u32_B, u32_C, u32_D, u32_A, au32_W[12], 20, 0x8d2a4c8aUL)
-   HH(u32_A, u32_B, u32_C, u32_D, au32_W[5], 4, 0xfffa3942UL)
-   HH(u32_D, u32_A, u32_B, u32_C, au32_W[8], 11, 0x8771f681UL)
-   HH(u32_C, u32_D, u32_A, u32_B, au32_W[11], 16, 0x6d9d6122UL)
-   HH(u32_B, u32_C, u32_D, u32_A, au32_W[14], 23, 0xfde5380cUL)
-   HH(u32_A, u32_B, u32_C, u32_D, au32_W[1], 4, 0xa4beea44UL)
-   HH(u32_D, u32_A, u32_B, u32_C, au32_W[4], 11, 0x4bdecfa9UL)
-   HH(u32_C, u32_D, u32_A, u32_B, au32_W[7], 16, 0xf6bb4b60UL)
-   HH(u32_B, u32_C, u32_D, u32_A, au32_W[10], 23, 0xbebfbc70UL)
-   HH(u32_A, u32_B, u32_C, u32_D, au32_W[13], 4, 0x289b7ec6UL)
-   HH(u32_D, u32_A, u32_B, u32_C, au32_W[0], 11, 0xeaa127faUL)
-   HH(u32_C, u32_D, u32_A, u32_B, au32_W[3], 16, 0xd4ef3085UL)
-   HH(u32_B, u32_C, u32_D, u32_A, au32_W[6], 23, 0x04881d05UL)
-   HH(u32_A, u32_B, u32_C, u32_D, au32_W[9], 4, 0xd9d4d039UL)
-   HH(u32_D, u32_A, u32_B, u32_C, au32_W[12], 11, 0xe6db99e5UL)
-   HH(u32_C, u32_D, u32_A, u32_B, au32_W[15], 16, 0x1fa27cf8UL)
-   HH(u32_B, u32_C, u32_D, u32_A, au32_W[2], 23, 0xc4ac5665UL)
-   II(u32_A, u32_B, u32_C, u32_D, au32_W[0], 6, 0xf4292244UL)
-   II(u32_D, u32_A, u32_B, u32_C, au32_W[7], 10, 0x432aff97UL)
-   II(u32_C, u32_D, u32_A, u32_B, au32_W[14], 15, 0xab9423a7UL)
-   II(u32_B, u32_C, u32_D, u32_A, au32_W[5], 21, 0xfc93a039UL)
-   II(u32_A, u32_B, u32_C, u32_D, au32_W[12], 6, 0x655b59c3UL)
-   II(u32_D, u32_A, u32_B, u32_C, au32_W[3], 10, 0x8f0ccc92UL)
-   II(u32_C, u32_D, u32_A, u32_B, au32_W[10], 15, 0xffeff47dUL)
-   II(u32_B, u32_C, u32_D, u32_A, au32_W[1], 21, 0x85845dd1UL)
-   II(u32_A, u32_B, u32_C, u32_D, au32_W[8], 6, 0x6fa87e4fUL)
-   II(u32_D, u32_A, u32_B, u32_C, au32_W[15], 10, 0xfe2ce6e0UL)
-   II(u32_C, u32_D, u32_A, u32_B, au32_W[6], 15, 0xa3014314UL)
-   II(u32_B, u32_C, u32_D, u32_A, au32_W[13], 21, 0x4e0811a1UL)
-   II(u32_A, u32_B, u32_C, u32_D, au32_W[4], 6, 0xf7537e82UL)
-   II(u32_D, u32_A, u32_B, u32_C, au32_W[11], 10, 0xbd3af235UL)
-   II(u32_C, u32_D, u32_A, u32_B, au32_W[2], 15, 0x2ad7d2bbUL)
-   II(u32_B, u32_C, u32_D, u32_A, au32_W[9], 21, 0xeb86d391UL)
+   FF(u32_A, u32_B, u32_C, u32_D, au32_W[0],   7U, 0xd76aa478UL)
+   FF(u32_D, u32_A, u32_B, u32_C, au32_W[1],  12U, 0xe8c7b756UL)
+   FF(u32_C, u32_D, u32_A, u32_B, au32_W[2],  17U, 0x242070dbUL)
+   FF(u32_B, u32_C, u32_D, u32_A, au32_W[3],  22U, 0xc1bdceeeUL)
+   FF(u32_A, u32_B, u32_C, u32_D, au32_W[4],   7U, 0xf57c0fafUL)
+   FF(u32_D, u32_A, u32_B, u32_C, au32_W[5],  12U, 0x4787c62aUL)
+   FF(u32_C, u32_D, u32_A, u32_B, au32_W[6],  17U, 0xa8304613UL)
+   FF(u32_B, u32_C, u32_D, u32_A, au32_W[7],  22U, 0xfd469501UL)
+   FF(u32_A, u32_B, u32_C, u32_D, au32_W[8],   7U, 0x698098d8UL)
+   FF(u32_D, u32_A, u32_B, u32_C, au32_W[9],  12U, 0x8b44f7afUL)
+   FF(u32_C, u32_D, u32_A, u32_B, au32_W[10], 17U, 0xffff5bb1UL)
+   FF(u32_B, u32_C, u32_D, u32_A, au32_W[11], 22U, 0x895cd7beUL)
+   FF(u32_A, u32_B, u32_C, u32_D, au32_W[12],  7U, 0x6b901122UL)
+   FF(u32_D, u32_A, u32_B, u32_C, au32_W[13], 12U, 0xfd987193UL)
+   FF(u32_C, u32_D, u32_A, u32_B, au32_W[14], 17U, 0xa679438eUL)
+   FF(u32_B, u32_C, u32_D, u32_A, au32_W[15], 22U, 0x49b40821UL)
+   GG(u32_A, u32_B, u32_C, u32_D, au32_W[1],   5U, 0xf61e2562UL)
+   GG(u32_D, u32_A, u32_B, u32_C, au32_W[6],   9U, 0xc040b340UL)
+   GG(u32_C, u32_D, u32_A, u32_B, au32_W[11], 14U, 0x265e5a51UL)
+   GG(u32_B, u32_C, u32_D, u32_A, au32_W[0],  20U, 0xe9b6c7aaUL)
+   GG(u32_A, u32_B, u32_C, u32_D, au32_W[5],   5U, 0xd62f105dUL)
+   GG(u32_D, u32_A, u32_B, u32_C, au32_W[10],  9U, 0x02441453UL)
+   GG(u32_C, u32_D, u32_A, u32_B, au32_W[15], 14U, 0xd8a1e681UL)
+   GG(u32_B, u32_C, u32_D, u32_A, au32_W[4],  20U, 0xe7d3fbc8UL)
+   GG(u32_A, u32_B, u32_C, u32_D, au32_W[9],   5U, 0x21e1cde6UL)
+   GG(u32_D, u32_A, u32_B, u32_C, au32_W[14],  9U, 0xc33707d6UL)
+   GG(u32_C, u32_D, u32_A, u32_B, au32_W[3],  14U, 0xf4d50d87UL)
+   GG(u32_B, u32_C, u32_D, u32_A, au32_W[8],  20U, 0x455a14edUL)
+   GG(u32_A, u32_B, u32_C, u32_D, au32_W[13],  5U, 0xa9e3e905UL)
+   GG(u32_D, u32_A, u32_B, u32_C, au32_W[2],   9U, 0xfcefa3f8UL)
+   GG(u32_C, u32_D, u32_A, u32_B, au32_W[7],  14U, 0x676f02d9UL)
+   GG(u32_B, u32_C, u32_D, u32_A, au32_W[12], 20U, 0x8d2a4c8aUL)
+   HH(u32_A, u32_B, u32_C, u32_D, au32_W[5],   4U, 0xfffa3942UL)
+   HH(u32_D, u32_A, u32_B, u32_C, au32_W[8],  11U, 0x8771f681UL)
+   HH(u32_C, u32_D, u32_A, u32_B, au32_W[11], 16U, 0x6d9d6122UL)
+   HH(u32_B, u32_C, u32_D, u32_A, au32_W[14], 23U, 0xfde5380cUL)
+   HH(u32_A, u32_B, u32_C, u32_D, au32_W[1],   4U, 0xa4beea44UL)
+   HH(u32_D, u32_A, u32_B, u32_C, au32_W[4],  11U, 0x4bdecfa9UL)
+   HH(u32_C, u32_D, u32_A, u32_B, au32_W[7],  16U, 0xf6bb4b60UL)
+   HH(u32_B, u32_C, u32_D, u32_A, au32_W[10], 23U, 0xbebfbc70UL)
+   HH(u32_A, u32_B, u32_C, u32_D, au32_W[13],  4U, 0x289b7ec6UL)
+   HH(u32_D, u32_A, u32_B, u32_C, au32_W[0],  11U, 0xeaa127faUL)
+   HH(u32_C, u32_D, u32_A, u32_B, au32_W[3],  16U, 0xd4ef3085UL)
+   HH(u32_B, u32_C, u32_D, u32_A, au32_W[6],  23U, 0x04881d05UL)
+   HH(u32_A, u32_B, u32_C, u32_D, au32_W[9],   4U, 0xd9d4d039UL)
+   HH(u32_D, u32_A, u32_B, u32_C, au32_W[12], 11U, 0xe6db99e5UL)
+   HH(u32_C, u32_D, u32_A, u32_B, au32_W[15], 16U, 0x1fa27cf8UL)
+   HH(u32_B, u32_C, u32_D, u32_A, au32_W[2],  23U, 0xc4ac5665UL)
+   II(u32_A, u32_B, u32_C, u32_D, au32_W[0],   6U, 0xf4292244UL)
+   II(u32_D, u32_A, u32_B, u32_C, au32_W[7],  10U, 0x432aff97UL)
+   II(u32_C, u32_D, u32_A, u32_B, au32_W[14], 15U, 0xab9423a7UL)
+   II(u32_B, u32_C, u32_D, u32_A, au32_W[5],  21U, 0xfc93a039UL)
+   II(u32_A, u32_B, u32_C, u32_D, au32_W[12],  6U, 0x655b59c3UL)
+   II(u32_D, u32_A, u32_B, u32_C, au32_W[3],  10U, 0x8f0ccc92UL)
+   II(u32_C, u32_D, u32_A, u32_B, au32_W[10], 15U, 0xffeff47dUL)
+   II(u32_B, u32_C, u32_D, u32_A, au32_W[1],  21U, 0x85845dd1UL)
+   II(u32_A, u32_B, u32_C, u32_D, au32_W[8],   6U, 0x6fa87e4fUL)
+   II(u32_D, u32_A, u32_B, u32_C, au32_W[15], 10U, 0xfe2ce6e0UL)
+   II(u32_C, u32_D, u32_A, u32_B, au32_W[6],  15U, 0xa3014314UL)
+   II(u32_B, u32_C, u32_D, u32_A, au32_W[13], 21U, 0x4e0811a1UL)
+   II(u32_A, u32_B, u32_C, u32_D, au32_W[4],   6U, 0xf7537e82UL)
+   II(u32_D, u32_A, u32_B, u32_C, au32_W[11], 10U, 0xbd3af235UL)
+   II(u32_C, u32_D, u32_A, u32_B, au32_W[2],  15U, 0x2ad7d2bbUL)
+   II(u32_B, u32_C, u32_D, u32_A, au32_W[9],  21U, 0xeb86d391UL)
 
    opc_HashState->au32_State[0] = opc_HashState->au32_State[0] + u32_A;
    opc_HashState->au32_State[1] = opc_HashState->au32_State[1] + u32_B;
@@ -172,7 +172,7 @@ void CMD5Checksum::mh_md5_compress(C_HashState * const opc_HashState, const uint
    \param[in,out]  opc_HashState   hash engine state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void CMD5Checksum::mh_md5_init(C_HashState * const opc_HashState)
+void CMD5Checksum::mh_MD5Init(C_HashState * const opc_HashState)
 {
    opc_HashState->au32_State[0] = 0x67452301UL;
    opc_HashState->au32_State[1] = 0xefcdab89UL;
@@ -194,8 +194,7 @@ void CMD5Checksum::mh_md5_init(C_HashState * const opc_HashState)
    C_CONFIG  inconsistent hash engine status
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 CMD5Checksum::mh_md5_process(C_HashState * const opc_HashState, const uint8 * opu8_Input,
-                                    uint32 ou32_InputLength)
+sint32 CMD5Checksum::mh_MD5Process(C_HashState * const opc_HashState, const uint8 * opu8_Input, uint32 ou32_InputLength)
 {
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
@@ -211,7 +210,7 @@ sint32 CMD5Checksum::mh_md5_process(C_HashState * const opc_HashState, const uin
    {
       if ((opc_HashState->u32_CurLen == 0) && (ou32_InputLength >= 64))
       {
-         mh_md5_compress(opc_HashState, opu8_Input);
+         mh_MD5Compress(opc_HashState, opu8_Input);
          opc_HashState->u64_Length += (64 * 8);
          opu8_Input             += 64;
          ou32_InputLength       -= 64;
@@ -220,13 +219,14 @@ sint32 CMD5Checksum::mh_md5_process(C_HashState * const opc_HashState, const uin
       {
          uint32 u32_CurrentSize;
          u32_CurrentSize = MIN(ou32_InputLength, (64 - opc_HashState->u32_CurLen));
-         memcpy(&opc_HashState->au8_Buffer[opc_HashState->u32_CurLen], opu8_Input, (size_t)u32_CurrentSize);
+         std::memcpy(&opc_HashState->au8_Buffer[opc_HashState->u32_CurLen], opu8_Input,
+                     static_cast<size_t>(u32_CurrentSize));
          opc_HashState->u32_CurLen += u32_CurrentSize;
          opu8_Input             += u32_CurrentSize;
          ou32_InputLength       -= u32_CurrentSize;
          if (opc_HashState->u32_CurLen == 64)
          {
-            mh_md5_compress(opc_HashState, &opc_HashState->au8_Buffer[0]);
+            mh_MD5Compress(opc_HashState, &opc_HashState->au8_Buffer[0]);
             opc_HashState->u64_Length += (8 * 64);
             opc_HashState->u32_CurLen = 0;
          }
@@ -246,17 +246,17 @@ sint32 CMD5Checksum::mh_md5_process(C_HashState * const opc_HashState, const uin
    C_CONFIG  inconsistent hash engine status
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 CMD5Checksum::mh_md5_done(C_HashState * const opc_HashState, uint8 * const opu8_Output)
+sint32 CMD5Checksum::mh_MD5Done(C_HashState * const opc_HashState, uint8 * const opu8_Output)
 {
 #define STORE32L(x, y)                                                                     \
-   (y)[3] = static_cast<uint8>(((x) >> 24) & 255); (y)[2] = static_cast<uint8>(((x) >> 16) & 255);   \
-   (y)[1] = static_cast<uint8>(((x) >> 8) & 255); (y)[0] = static_cast<uint8>((x) & 255);
+   (y)[3] = static_cast<uint8>(((x) >> 24) & 255U); (y)[2] = static_cast<uint8>(((x) >> 16) & 255U);   \
+   (y)[1] = static_cast<uint8>(((x) >> 8) & 255U); (y)[0] = static_cast<uint8>((x) & 255U);
 
 #define STORE64L(x, y)                                                                     \
-   (y)[7] = static_cast<uint8>(((x) >> 56) & 255); (y)[6] = static_cast<uint8>(((x) >> 48) & 255);   \
-   (y)[5] = static_cast<uint8>(((x) >> 40) & 255); (y)[4] = static_cast<uint8>(((x) >> 32) & 255);   \
-   (y)[3] = static_cast<uint8>(((x) >> 24) & 255); (y)[2] = static_cast<uint8>(((x) >> 16) & 255);   \
-   (y)[1] = static_cast<uint8>(((x) >> 8) & 255); (y)[0] = static_cast<uint8>((x) & 255);
+   (y)[7] = static_cast<uint8>(((x) >> 56) & 255U); (y)[6] = static_cast<uint8>(((x) >> 48) & 255U);   \
+   (y)[5] = static_cast<uint8>(((x) >> 40) & 255U); (y)[4] = static_cast<uint8>(((x) >> 32) & 255U);   \
+   (y)[3] = static_cast<uint8>(((x) >> 24) & 255U); (y)[2] = static_cast<uint8>(((x) >> 16) & 255U);   \
+   (y)[1] = static_cast<uint8>(((x) >> 8) & 255U); (y)[0] = static_cast<uint8>((x) & 255U);
 
    if (opc_HashState->u32_CurLen >= sizeof(opc_HashState->au8_Buffer))
    {
@@ -264,10 +264,11 @@ sint32 CMD5Checksum::mh_md5_done(C_HashState * const opc_HashState, uint8 * cons
    }
 
    /* increase the length of the message */
-   opc_HashState->u64_Length += opc_HashState->u32_CurLen * 8;
+   opc_HashState->u64_Length += (static_cast<uint64>(opc_HashState->u32_CurLen) * 8U);
 
    /* append the '1' bit */
-   opc_HashState->au8_Buffer[opc_HashState->u32_CurLen++] = (unsigned char)0x80;
+   opc_HashState->au8_Buffer[opc_HashState->u32_CurLen] = static_cast<uint8>(0x80U);
+   opc_HashState->u32_CurLen++;
 
    /* if the length is currently above 56 bytes we append zeros
     * then compress.  Then we can fall back to padding zeros and length
@@ -277,21 +278,23 @@ sint32 CMD5Checksum::mh_md5_done(C_HashState * const opc_HashState, uint8 * cons
    {
       while (opc_HashState->u32_CurLen < 64)
       {
-         opc_HashState->au8_Buffer[opc_HashState->u32_CurLen++] = 0;
+         opc_HashState->au8_Buffer[opc_HashState->u32_CurLen] = 0;
+         opc_HashState->u32_CurLen++;
       }
-      mh_md5_compress(opc_HashState, opc_HashState->au8_Buffer);
+      mh_MD5Compress(opc_HashState, opc_HashState->au8_Buffer);
       opc_HashState->u32_CurLen = 0;
    }
 
    /* pad upto 56 bytes of zeroes */
    while (opc_HashState->u32_CurLen < 56)
    {
-      opc_HashState->au8_Buffer[opc_HashState->u32_CurLen++] = 0;
+      opc_HashState->au8_Buffer[opc_HashState->u32_CurLen] = 0;
+      opc_HashState->u32_CurLen++;
    }
 
    /* store length */
-   STORE64L(opc_HashState->u64_Length, opc_HashState->au8_Buffer + 56);
-   mh_md5_compress(opc_HashState, opc_HashState->au8_Buffer);
+   STORE64L(opc_HashState->u64_Length, &opc_HashState->au8_Buffer[56]);
+   mh_MD5Compress(opc_HashState, opc_HashState->au8_Buffer);
 
    /* copy output */
    for (uint8 u8_Word = 0; u8_Word < 4; u8_Word++)
@@ -313,10 +316,10 @@ sint32 CMD5Checksum::mh_md5_done(C_HashState * const opc_HashState, uint8 * cons
 C_SCLString CMD5Checksum::GetMD5(const C_SCLString & orc_FilePath)
 {
    //open the file as a binary file in readonly mode, denying write access
-   FILE * pt_File;
+   std::FILE * pt_File;
    C_SCLString c_Return;
 
-   pt_File = fopen(orc_FilePath.c_str(), "rb");
+   pt_File = std::fopen(orc_FilePath.c_str(), "rb");
    if (pt_File == NULL)
    {
       return "";
@@ -324,7 +327,7 @@ C_SCLString CMD5Checksum::GetMD5(const C_SCLString & orc_FilePath)
 
    //the file has been successfully opened, so now get and return its checksum
    c_Return = GetMD5(pt_File);
-   fclose(pt_File);
+   std::fclose(pt_File);
    return c_Return;
 }
 
@@ -351,10 +354,10 @@ C_SCLString CMD5Checksum::GetMD5(std::FILE * const opt_File)
       return "";
    }
 
-   mh_md5_init(&c_Hash);
+   mh_MD5Init(&c_Hash);
 
    //checksum the file in individual blocks
-   while (1)
+   while (true)
    {
       sn_BlockSize = fread(&au8_Data[0], 1, un_BufferSize, opt_File);
       if (sn_BlockSize <= 0)
@@ -362,10 +365,10 @@ C_SCLString CMD5Checksum::GetMD5(std::FILE * const opt_File)
          break;
       }
       //we have data: process it
-      mh_md5_process(&c_Hash, &au8_Data[0], sn_BlockSize);
+      mh_MD5Process(&c_Hash, &au8_Data[0], sn_BlockSize);
    }
 
-   mh_md5_done(&c_Hash, au8_Result);
+   mh_MD5Done(&c_Hash, au8_Result);
 
    //Convert the hexadecimal checksum to a C_SCLString
    for (uint8 u8_Byte = 0U; u8_Byte < 16U; u8_Byte++)
@@ -394,9 +397,9 @@ C_SCLString CMD5Checksum::GetMD5(const uint8 * const opu8_Data, const uint32 ou3
    C_HashState c_Hash;
    uint8 au8_Result[16];
 
-   mh_md5_init(&c_Hash);
-   mh_md5_process(&c_Hash, opu8_Data, ou32_Length);
-   mh_md5_done(&c_Hash, au8_Result);
+   mh_MD5Init(&c_Hash);
+   mh_MD5Process(&c_Hash, opu8_Data, ou32_Length);
+   mh_MD5Done(&c_Hash, au8_Result);
 
    //Convert the hexadecimal checksum to a C_SCLString
    for (uint8 u8_Byte = 0U; u8_Byte < 16U; u8_Byte++)

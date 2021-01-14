@@ -127,9 +127,9 @@ void C_SdManUnoTopologyReconnectBusCommand::m_Reconnect(const uint64 & oru64_Sta
                                                         const bool oq_ActivateDatapoolECeS,
                                                         const bool oq_ActivateDatapoolECoS)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_GiLiBus * pc_StartingBus = dynamic_cast<C_GiLiBus *>(m_GetSceneItem(oru64_StartingID));
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_GiLiBus * pc_LastBus = dynamic_cast<C_GiLiBus *>(m_GetSceneItem(oru64_LastID));
    C_GiLiBusConnector * pc_BusConnector = m_GetBusConnector();
 

@@ -43,10 +43,7 @@ public:
    stw_opensyde_gui_logic::C_CamProFilterData GetFilterData(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   //lint -restore
 
 private:
    Ui::C_CamMosFilterPopup * mpc_Ui;
@@ -78,7 +75,6 @@ private:
    stw_types::sint32 m_GetCurrentSelectedRowIndex(void) const;
    void m_UpdateTitleFilterItemCount(void) const;
    void m_SetMessageDataFromDatabase(const stw_types::uint32 ou32_CanId, const bool oq_IsExtended);
-   static QString mh_GetValueAsHex(const stw_types::uint32 ou32_Value);
 
    //Avoid call
    C_CamMosFilterPopup(const C_CamMosFilterPopup &);

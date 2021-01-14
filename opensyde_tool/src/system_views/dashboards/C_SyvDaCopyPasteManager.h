@@ -36,6 +36,9 @@ public:
    override;
    virtual bool CheckValidContentAndPrepareData(void) override;
 
+   static void h_AdaptCopyDataForPaste(stw_opensyde_gui_logic::C_PuiSvDashboard & orc_CopyData,
+                                       const stw_types::uint32 ou32_ViewIndex, QWidget * const opc_Parent);
+
    static const QString hc_ClipBoardBaseTagName;
 
 protected:

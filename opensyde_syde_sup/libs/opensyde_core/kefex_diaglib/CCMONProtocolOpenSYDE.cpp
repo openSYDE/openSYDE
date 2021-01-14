@@ -485,7 +485,6 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
    const uint8 u8_Service = (opu8_ServiceData[0] & 0xBFU);
    C_SCLString c_Text;
    uint8 u8_FirstRawByte = 1U; //index of first raw data byte to handle (to be displayed as dump data)
-   uint32 u32_DpIndex;
 
    switch (u8_Service)
    {
@@ -510,9 +509,9 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
       }
       else
       {
-         u32_DpIndex = (static_cast<uint32>(opu8_ServiceData[1]) << 16) +
-                       (static_cast<uint32>(opu8_ServiceData[2]) << 8) +
-                       opu8_ServiceData[3];
+         const uint32 u32_DpIndex = (static_cast<uint32>(opu8_ServiceData[1]) << 16) +
+                                    (static_cast<uint32>(opu8_ServiceData[2]) << 8) +
+                                    opu8_ServiceData[3];
          c_Text += m_DataPoolIdentifierToText(u32_DpIndex, q_IsResponse, ort_CanAddressInformation);
       }
       u8_FirstRawByte = 4U;
@@ -568,9 +567,9 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
                }
                else
                {
-                  uint32 u32_DpIndex = (static_cast<uint32>(opu8_ServiceData[2]) << 16) +
-                                       (static_cast<uint32>(opu8_ServiceData[3]) << 8) +
-                                       opu8_ServiceData[4];
+                  const uint32 u32_DpIndex = (static_cast<uint32>(opu8_ServiceData[2]) << 16) +
+                                             (static_cast<uint32>(opu8_ServiceData[3]) << 8) +
+                                             opu8_ServiceData[4];
                   c_Text += m_DataPoolIdentifierToText(u32_DpIndex, q_IsResponse, ort_CanAddressInformation);
                   if (q_IsChange == true)
                   {
@@ -600,9 +599,9 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
          }
          else
          {
-            uint32 u32_DpIndex = (static_cast<uint32>(opu8_ServiceData[1]) << 16) +
-                                 (static_cast<uint32>(opu8_ServiceData[2]) << 8) +
-                                 opu8_ServiceData[3];
+            const uint32 u32_DpIndex = (static_cast<uint32>(opu8_ServiceData[1]) << 16) +
+                                       (static_cast<uint32>(opu8_ServiceData[2]) << 8) +
+                                       opu8_ServiceData[3];
             c_Text += m_DataPoolIdentifierToText(u32_DpIndex, q_IsResponse, ort_CanAddressInformation);
          }
          u8_FirstRawByte = 4U; //display data in raw format
@@ -1439,9 +1438,9 @@ C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_
                            (orc_Msg.au8_Data[2] == OSY_DPD_SI_OS_READ_DATAPOOLDATA_EVENT_DRIVEN))
                   {
                      //special negative response for this service
-                     uint32 u32_DpIndex = (static_cast<uint32>(orc_Msg.au8_Data[4]) << 16) +
-                                          (static_cast<uint32>(orc_Msg.au8_Data[5]) << 8) +
-                                          orc_Msg.au8_Data[6];
+                     const uint32 u32_DpIndex = (static_cast<uint32>(orc_Msg.au8_Data[4]) << 16) +
+                                                (static_cast<uint32>(orc_Msg.au8_Data[5]) << 8) +
+                                                orc_Msg.au8_Data[6];
                      c_Text += m_ServiceIdToText(orc_Msg.au8_Data[2], true) + " NRC:" +
                                m_NegativeResponseCodeToText(orc_Msg.au8_Data[3]) + " " +
                                m_DataPoolIdentifierToText(u32_DpIndex, true, t_Address);
@@ -1537,9 +1536,9 @@ C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_
                   else
                   {
                      //we should have data:
-                     uint32 u32_DpIndex = (static_cast<uint32>(orc_Msg.au8_Data[1]) << 16) +
-                                          (static_cast<uint32>(orc_Msg.au8_Data[2]) << 8) +
-                                          orc_Msg.au8_Data[3];
+                     const uint32 u32_DpIndex = (static_cast<uint32>(orc_Msg.au8_Data[1]) << 16) +
+                                                (static_cast<uint32>(orc_Msg.au8_Data[2]) << 8) +
+                                                orc_Msg.au8_Data[3];
                      c_Text += m_DataPoolIdentifierToText(u32_DpIndex, true, t_Address);
                      //display data in raw format
                      if ((orc_Msg.u8_DLC - 4U) > 0U) //do we have data byte(s) left to display in raw format ...

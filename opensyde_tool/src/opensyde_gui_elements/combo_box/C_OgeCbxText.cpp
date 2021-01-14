@@ -65,7 +65,6 @@ C_OgeCbxText::C_OgeCbxText(QWidget * const opc_Parent) :
 
    this->setContextMenuPolicy(Qt::NoContextMenu);
 
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this, static_cast<void (QComboBox::*)(const QString &)>(&C_OgeCbxText::activated), this,
            &C_OgeCbxText::m_Activated);
 }

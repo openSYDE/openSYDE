@@ -76,7 +76,7 @@ public:
    bool GetDashboardToolboxMaximized(void) const;
    void SetDashboardToolboxMaximized(const bool oq_Value);
    stw_types::sint32 GetDashboardSelectedTabIndex(void) const;
-   void SetDashboardSelectedTabIndex(const stw_types::sint32 & orc_Value);
+   void SetDashboardSelectedTabIndex(const stw_types::sint32 os32_Value);
 
    stw_types::sintn sn_SetupViewZoom;
    QPoint c_SetupViewPos;

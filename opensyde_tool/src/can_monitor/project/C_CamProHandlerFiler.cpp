@@ -40,8 +40,8 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle technical save operations for project
 
-   \param[in]     orc_Handler   Data
-   \param[in,out] orc_XMLParser XML parser to store in
+   \param[in]      orc_Handler      Data
+   \param[in,out]  orc_XMLParser    XML parser to store in
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_Save(const C_CamProHandler & orc_Handler, C_OSCXMLParserBase & orc_XMLParser)
@@ -67,8 +67,8 @@ void C_CamProHandlerFiler::h_Save(const C_CamProHandler & orc_Handler, C_OSCXMLP
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle technical load operations for project
 
-   \param[out]    orc_Handler   Data
-   \param[in,out] orc_XMLParser XML parser to load from
+   \param[out]     orc_Handler      Data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success
@@ -114,8 +114,8 @@ sint32 C_CamProHandlerFiler::h_Load(C_CamProHandler & orc_Handler, C_OSCXMLParse
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save messages
 
-   \param[in]     orc_Messages  Data
-   \param[in,out] orc_XMLParser XML parser to load from
+   \param[in]      orc_Messages     Data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveMessages(const std::vector<C_CamProMessageData> & orc_Messages,
@@ -134,12 +134,14 @@ void C_CamProHandlerFiler::h_SaveMessages(const std::vector<C_CamProMessageData>
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save message
 
-   \param[in]     orc_Message   Data
-   \param[in,out] orc_XMLParser XML parser to load from
+   \param[in]      orc_Message      Data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveMessage(const C_CamProMessageData & orc_Message, C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("has-valid-hash", orc_Message.q_ContainsValidHash);
+   orc_XMLParser.SetAttributeUint32("hash", orc_Message.u32_Hash);
    orc_XMLParser.SetAttributeUint32("ID", orc_Message.u32_Id);
    orc_XMLParser.SetAttributeUint32("DLC", orc_Message.u16_Dlc);
    orc_XMLParser.SetAttributeBool("XTD", orc_Message.q_IsExtended);
@@ -163,8 +165,8 @@ void C_CamProHandlerFiler::h_SaveMessage(const C_CamProMessageData & orc_Message
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load messages
 
-   \param[out]    orc_Messages  Data
-   \param[in,out] orc_XMLParser XML parser to load from
+   \param[out]     orc_Messages     Data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success
@@ -220,8 +222,8 @@ sint32 C_CamProHandlerFiler::h_LoadMessages(std::vector<C_CamProMessageData> & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load message
 
-   \param[out]    orc_Message   Data
-   \param[in,out] orc_XMLParser XML parser to load from
+   \param[out]     orc_Message      Data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success
@@ -232,6 +234,14 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
 {
    sint32 s32_Retval = C_NO_ERR;
 
+   if (orc_XMLParser.AttributeExists("has-valid-hash") == true)
+   {
+      orc_Message.q_ContainsValidHash = orc_XMLParser.GetAttributeBool("has-valid-hash");
+   }
+   if (orc_XMLParser.AttributeExists("hash") == true)
+   {
+      orc_Message.u32_Hash = orc_XMLParser.GetAttributeUint32("hash");
+   }
    if (orc_XMLParser.AttributeExists("ID") == true)
    {
       orc_Message.u32_Id = orc_XMLParser.GetAttributeUint32("ID");
@@ -389,8 +399,8 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save settings section.
 
-   \param[in]     orc_Handler   Data
-   \param[in,out] orc_XMLParser XML parser to store in
+   \param[in]      orc_Handler      Data
+   \param[in,out]  orc_XMLParser    XML parser to store in
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveSettings(const C_CamProHandler & orc_Handler, C_OSCXMLParserBase & orc_XMLParser)
@@ -426,8 +436,8 @@ void C_CamProHandlerFiler::h_SaveSettings(const C_CamProHandler & orc_Handler, C
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load settings section.
 
-   \param[out]    orc_Handler   Data
-   \param[in,out] orc_XMLParser XML parser to load from
+   \param[out]     orc_Handler      Data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success
@@ -520,8 +530,8 @@ sint32 C_CamProHandlerFiler::h_LoadSettings(C_CamProHandler & orc_Handler, C_OSC
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save filters.
 
-   \param[in]     orc_Filters   Filters data
-   \param[in,out] orc_XMLParser XML parser to load from
+   \param[in]      orc_Filters      Filters data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveFilters(const std::vector<C_CamProFilterData> & orc_Filters,
@@ -540,8 +550,8 @@ void C_CamProHandlerFiler::h_SaveFilters(const std::vector<C_CamProFilterData> &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save filter.
 
-   \param[in]     orc_Filter    Filter data
-   \param[in,out] orc_XMLParser XML parser to load from
+   \param[in]      orc_Filter       Filter data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveFilter(const C_CamProFilterData & orc_Filter, C_OSCXMLParserBase & orc_XMLParser)
@@ -568,8 +578,8 @@ void C_CamProHandlerFiler::h_SaveFilter(const C_CamProFilterData & orc_Filter, C
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save filter item.
 
-   \param[in]     orc_FilterItem    Filter item data
-   \param[in,out] orc_XMLParser     XML parser to load from
+   \param[in]      orc_FilterItem   Filter item data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveFilterItem(const C_CamProFilterItemData & orc_FilterItem,
@@ -586,8 +596,8 @@ void C_CamProHandlerFiler::h_SaveFilterItem(const C_CamProFilterItemData & orc_F
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load filters.
 
-   \param[out]    orc_Filters   Filters data
-   \param[in,out] orc_XMLParser XML parser to load from
+   \param[out]     orc_Filters      Filters data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success
@@ -644,8 +654,8 @@ sint32 C_CamProHandlerFiler::h_LoadFilters(std::vector<C_CamProFilterData> & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load filter.
 
-   \param[out]    orc_Filter     Filter data
-   \param[in,out] orc_XMLParser  XML parser to load from
+   \param[out]     orc_Filter       Filter data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success
@@ -740,8 +750,8 @@ sint32 C_CamProHandlerFiler::h_LoadFilter(C_CamProFilterData & orc_Filter, C_OSC
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load filter.
 
-   \param[out]    orc_FilterItem    Filter item data
-   \param[in,out] orc_XMLParser     XML parser to load from
+   \param[out]     orc_FilterItem   Filter item data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success
@@ -815,8 +825,8 @@ sint32 C_CamProHandlerFiler::h_LoadFilterItem(C_CamProFilterItemData & orc_Filte
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save databases.
 
-   \param[in]     orc_Databases   Databases data
-   \param[in,out] orc_XMLParser   XML parser to load from
+   \param[in]      orc_Databases    Databases data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveDatabases(const std::vector<C_CamProDatabaseData> & orc_Databases,
@@ -835,8 +845,8 @@ void C_CamProHandlerFiler::h_SaveDatabases(const std::vector<C_CamProDatabaseDat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save filter.
 
-   \param[in]     orc_Database   Database data
-   \param[in,out] orc_XMLParser  XML parser to load from
+   \param[in]      orc_Database     Database data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveDatabase(const C_CamProDatabaseData & orc_Database, C_OSCXMLParserBase & orc_XMLParser)
@@ -849,8 +859,8 @@ void C_CamProHandlerFiler::h_SaveDatabase(const C_CamProDatabaseData & orc_Datab
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load databases.
 
-   \param[out]    orc_Databases   Databases data
-   \param[in,out] orc_XMLParser   XML parser to load from
+   \param[out]     orc_Databases    Databases data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success
@@ -908,8 +918,8 @@ sint32 C_CamProHandlerFiler::h_LoadDatabases(std::vector<C_CamProDatabaseData> &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load database.
 
-   \param[out]    orc_Database     Database data
-   \param[in,out] orc_XMLParser    XML parser to load from
+   \param[out]     orc_Database     Database data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success
@@ -955,8 +965,8 @@ sint32 C_CamProHandlerFiler::h_LoadDatabase(C_CamProDatabaseData & orc_Database,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save settings section.
 
-   \param[in]     orc_LoggingData   Logging data
-   \param[in,out] orc_XMLParser     XML parser to store in
+   \param[in]      orc_LoggingData  Logging data
+   \param[in,out]  orc_XMLParser    XML parser to store in
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveLoggingConfig(const C_CamProLoggingData & orc_LoggingData,
@@ -973,8 +983,8 @@ void C_CamProHandlerFiler::h_SaveLoggingConfig(const C_CamProLoggingData & orc_L
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load logging configuration.
 
-   \param[out]    orc_LoggingData   Logging data
-   \param[in,out] orc_XMLParser     XML parser to load from
+   \param[out]     orc_LoggingData  Logging data
+   \param[in,out]  orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success

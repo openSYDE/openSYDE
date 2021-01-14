@@ -88,7 +88,6 @@ void C_SebUnoTopBusConnectorMoveCommand::undo(void)
 
    for (vector<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_GiLiBusConnectorBase * const pc_BusConn = dynamic_cast<C_GiLiBusConnectorBase *>(*c_ItItem);
       if (pc_BusConn != NULL)
       {
@@ -108,7 +107,6 @@ void C_SebUnoTopBusConnectorMoveCommand::redo(void)
 
    for (vector<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_GiLiBusConnectorBase * const pc_BusConn = dynamic_cast<C_GiLiBusConnectorBase *>(*c_ItItem);
       if (pc_BusConn != NULL)
       {

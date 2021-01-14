@@ -57,8 +57,7 @@ C_CamMosSectionPopup::C_CamMosSectionPopup(QWidget * const opc_Parent) :
       c_Color.setAlpha(50);
       pc_Shadow->setColor(c_Color);
       this->setGraphicsEffect(pc_Shadow);
-      //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
-   }
+   } //lint !e429  no memory leak because of the parent of pc_Shadow and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

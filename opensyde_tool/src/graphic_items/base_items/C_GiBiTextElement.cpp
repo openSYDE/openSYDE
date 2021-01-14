@@ -93,9 +93,9 @@ void C_GiBiTextElement::m_Init()
 {
    QFont c_Font;
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   QRectF c_Rect = QRectF(0.0, 0.0,
-                          std::max(mhf64_MinWidthTextElement, 1.0),
-                          std::max(mhf64_MinHeightTextElement, 1.0));
+   const QRectF c_Rect = QRectF(0.0, 0.0,
+                                std::max(mhf64_MinWidthTextElement, 1.0),
+                                std::max(mhf64_MinHeightTextElement, 1.0));
 
    this->mpc_TextItem = new C_GiText(c_Rect, this->mq_Editable);
 
@@ -129,9 +129,9 @@ void C_GiBiTextElement::m_Init()
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_TextItem and the Qt memory management
 C_GiBiTextElement::~C_GiBiTextElement()
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_TextItem and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -162,8 +162,9 @@ bool C_GiBiTextElement::OpenStyleDialog(const bool oq_DarkMode)
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
-   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Text Element"), oq_DarkMode);
-   C_GiSyTextElementWidget * pc_SettingsWidget = new C_GiSyTextElementWidget(*pc_Dialog);
+   C_GiSyBaseWidget * const pc_Dialog =
+      new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Text Element"), oq_DarkMode);
+   C_GiSyTextElementWidget * const pc_SettingsWidget = new C_GiSyTextElementWidget(*pc_Dialog);
 
    pc_SettingsWidget->SetFontColor(this->GetFontColor());
    pc_SettingsWidget->SetFontStyle(this->GetFontStyle());
@@ -183,9 +184,9 @@ bool C_GiBiTextElement::OpenStyleDialog(const bool oq_DarkMode)
    }
 
    this->mpc_TextItem->AutoAdaptSize();
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and pc_SettingsWidget and the Qt memory management
    return q_Retval;
-}
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and pc_SettingsWidget and the
+  //Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Copy the style of the provided element
@@ -197,7 +198,7 @@ bool C_GiBiTextElement::OpenStyleDialog(const bool oq_DarkMode)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiTextElement::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiBiTextElement * const pc_Item = dynamic_cast<const C_GiBiTextElement * const>(opc_GuidelineItem);
 
    if (pc_Item != NULL)
@@ -225,7 +226,7 @@ void C_GiBiTextElement::RestoreDefaultCursor(void)
 void C_GiBiTextElement::SetTemporaryCursor(const QCursor & orc_TemporaryCursor)
 {
    C_GiBiRectBaseGroup::SetTemporaryCursor(orc_TemporaryCursor);
-   this->mpc_TextItem->setCursor(QCursor(Qt::IBeamCursor));
+   this->mpc_TextItem->setCursor(static_cast<QCursor>(Qt::IBeamCursor));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -371,6 +372,7 @@ void C_GiBiTextElement::m_UpdateTextElementData(C_PuiBsTextElement * const opc_D
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+
 void C_GiBiTextElement::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
 {
    Q_UNUSED(of64_DiffWidth)
@@ -432,7 +434,7 @@ QVariant C_GiBiTextElement::itemChange(const GraphicsItemChange oe_Change, const
 {
    QVariant c_Return = C_GiBiRectBaseGroup::itemChange(oe_Change, orc_Value);
 
-   switch (oe_Change)
+   switch (oe_Change) //lint !e788 //All other cases handled by call of parent
    {
    case ItemSceneHasChanged:
       if (this->scene() != NULL)
@@ -450,7 +452,7 @@ QVariant C_GiBiTextElement::itemChange(const GraphicsItemChange oe_Change, const
       break;
    default:
       break;
-   } //lint !e788 //All other cases handled by call of parent
+   }
 
    return c_Return;
 }
@@ -475,29 +477,25 @@ bool C_GiBiTextElement::sceneEventFilter(QGraphicsItem * const opc_Watched, QEve
    if ((opc_Watched == this->mpc_TextItem) &&
        (this->mpc_TextItem->IsEditModeActive() == false))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      QGraphicsSceneMouseEvent * pc_MouseEvent = dynamic_cast<QGraphicsSceneMouseEvent *>(opc_Event);
 
-      switch (opc_Event->type())
+      QGraphicsSceneMouseEvent * const pc_MouseEvent = dynamic_cast<QGraphicsSceneMouseEvent *>(opc_Event);
+
+      switch (opc_Event->type()) //lint !e788  not all enum constants are necessary here
       {
       case QEvent::GraphicsSceneMousePress:
          C_GiBiRectBaseGroup::mousePressEvent(pc_MouseEvent);
          q_Return = true;
          break;
-
       case QEvent::GraphicsSceneMouseRelease:
          C_GiBiRectBaseGroup::mouseReleaseEvent(pc_MouseEvent);
          q_Return = true;
          break;
-
       case QEvent::GraphicsSceneMouseMove:
          C_GiBiRectBaseGroup::mouseMoveEvent(pc_MouseEvent);
          q_Return = true;
          break;
-
       default:
          break;
-         //lint -e{788}  not all enum constants are necessary here
       }
    }
    else
@@ -520,7 +518,7 @@ void C_GiBiTextElement::m_HandleTextInteractionMode(const bool & orq_On)
 
    if (orq_On == true)
    {
-      this->SetTemporaryCursor(QCursor(Qt::ArrowCursor));
+      this->SetTemporaryCursor(static_cast<QCursor>(Qt::ArrowCursor));
    }
    else
    {

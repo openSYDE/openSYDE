@@ -87,7 +87,7 @@ C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
 
    mpc_Ui->setupUi(this);
 
-   this->mpc_Ui->pc_UsageWidget->SetToolTipWidgetName(QString(C_GtGetText::h_GetText("List")));
+   this->mpc_Ui->pc_UsageWidget->SetToolTipWidgetName(static_cast<QString>(C_GtGetText::h_GetText("List")));
    this->NotifySelection(false);
 
    //Init buttons
@@ -146,7 +146,7 @@ C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
    connect(this->mpc_Ui->pc_PushButtonDataset, &C_OgePubSvgIconOnly::clicked, this,
            &C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit);
    connect(this->mpc_Ui->pc_LineEditName, &stw_opensyde_gui_elements::C_OgeLeListHeader::textChanged, this,
-           &C_SdNdeDpListHeaderWidget::m_ChangeName);
+           &C_SdNdeDpListHeaderWidget::m_CheckName);
    connect(this->mpc_Ui->pc_PushButtonComment, &C_OgePubSvgIconOnly::clicked, this,
            &C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked);
 
@@ -363,12 +363,12 @@ void C_SdNdeDpListHeaderWidget::UpdateDataSetCount(void)
 
       if (pc_List->c_DataSets.size() < 11)
       {
-         c_Svg = QString("://images/system_definition/NodeEdit/datasets/IconDatasets%1%2.svg").
+         c_Svg = static_cast<QString>("://images/system_definition/NodeEdit/datasets/IconDatasets%1%2.svg").
                  arg(pc_List->c_DataSets.size()).arg(c_Error);
       }
       else
       {
-         c_Svg = QString("://images/system_definition/NodeEdit/datasets/IconDatasetsMore%1.svg").arg(c_Error);
+         c_Svg = static_cast<QString>("://images/system_definition/NodeEdit/datasets/IconDatasetsMore%1.svg").arg(c_Error);
       }
 
       this->mpc_Ui->pc_PushButtonDataset->SetSvg(c_Svg);
@@ -505,7 +505,7 @@ void C_SdNdeDpListHeaderWidget::m_OnPushButtonExpandClicked(const bool oq_Checke
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::m_UpdateListNamePrefix(void) const
 {
-   const QString c_Text = QString(C_GtGetText::h_GetText("List #%1 - ")).arg(QString::number(this->mu32_ListIndex + 1));
+   const QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("List #%1 - ")).arg(QString::number(this->mu32_ListIndex + 1));
 
    this->mpc_Ui->pc_LabelListNamePrefix->setText(c_Text);
 }
@@ -539,7 +539,7 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
    if ((pc_Node != NULL) && ((pc_List != NULL) && (pc_DataPool != NULL)))
    {
       // name and comment
-      const QString c_SimplifiedComment = QString(pc_List->c_Comment.c_str()).simplified();
+      const QString c_SimplifiedComment = static_cast<QString>(pc_List->c_Comment.c_str()).simplified();
 
       this->mpc_Ui->pc_LineEditName->SetName(pc_List->c_Name.c_str());
       this->mpc_Ui->pc_LineEditName->SetCounter(pc_List->c_Elements.size());
@@ -578,7 +578,7 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
 
          //Size value
          this->mpc_Ui->pc_SpinBoxSize->setValue(pc_List->u32_NvMSize);
-         this->mpc_Ui->pc_LabelUsage->setText(QString(C_GtGetText::h_GetText("Usage: %1%")).arg(u32_Usage));
+         this->mpc_Ui->pc_LabelUsage->setText(static_cast<QString>(C_GtGetText::h_GetText("Usage: %1%")).arg(u32_Usage));
       }
       else
       {
@@ -606,11 +606,17 @@ void C_SdNdeDpListHeaderWidget::m_EditNameFinished(void)
 
       if (this->mpc_UndoManager != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          this->mpc_UndoManager->DoChangeListData(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                  dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
                                                                                                 mpc_TreeWidget),
                                                  this->mu32_ListIndex, c_Data, C_SdNdeDpUtil::eLIST_NAME);
+      }
+
+      // remove focus from line edit
+      if (this->mpc_Ui->pc_LineEditName->hasFocus())
+      {
+         this->setFocus();
       }
    }
 }
@@ -635,7 +641,7 @@ void C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked(void)
       {
          // save to data on ok
          const QVariant c_Data = pc_ArrayEditWidget->GetComment();
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          this->mpc_UndoManager->DoChangeListData(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                  dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->mpc_TreeWidget),
                                                  this->mu32_ListIndex, c_Data, C_SdNdeDpUtil::eLIST_COMMENT);
@@ -647,8 +653,7 @@ void C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked(void)
          c_Dialog->HideOverlay();
       }
 
-      //lint -e{429}  no memory leak because of the parent of pc_ImportDialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -664,7 +669,7 @@ void C_SdNdeDpListHeaderWidget::m_EditSizeFinished(void)
 
       if (this->mpc_UndoManager != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          this->mpc_UndoManager->DoChangeListData(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                  dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
                                                                                                 mpc_TreeWidget),
@@ -717,8 +722,7 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
             Q_EMIT (this->SigErrorChange());
          }
       }
-      //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    if (c_Dialog != NULL)
    {
       c_Dialog->HideOverlay();
@@ -729,7 +733,7 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
 /*! \brief   Check error on name change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListHeaderWidget::m_ChangeName(void) const
+void C_SdNdeDpListHeaderWidget::m_CheckName(void) const
 {
    QString c_Content;
    const stw_scl::C_SCLString c_Name = this->mpc_Ui->pc_LineEditName->GetName().toStdString().c_str();
@@ -862,12 +866,12 @@ void C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip(void) const
                      c_InvalidDataSetIndices[u32_ItDataSet]);
                if (pc_DataSet != NULL)
                {
-                  c_Content += QString("%1\n").arg(pc_DataSet->c_Name.c_str());
+                  c_Content += static_cast<QString>("%1\n").arg(pc_DataSet->c_Name.c_str());
                }
             }
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDataSetIndices.size())
             {
-               c_Content += QString("+%1\n").arg(
+               c_Content += static_cast<QString>("+%1\n").arg(
                   c_InvalidDataSetIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             c_Content += "\n";
@@ -887,12 +891,12 @@ void C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip(void) const
                                                                              c_InvalidElementIndices[u32_ItElement]);
                if (pc_Appl != NULL)
                {
-                  c_Content += QString("%1\n").arg(pc_Appl->c_Name.c_str());
+                  c_Content += static_cast<QString>("%1\n").arg(pc_Appl->c_Name.c_str());
                }
             }
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidElementIndices.size())
             {
-               c_Content += QString("+%1\n").arg(
+               c_Content += static_cast<QString>("+%1\n").arg(
                   c_InvalidElementIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             c_Content += "\n";

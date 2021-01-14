@@ -22,6 +22,7 @@
 #include "C_Uti.h"
 #include "C_SyvDaItUtil.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_SdNdeDpUtil.h"
 #include "C_SdNdeDpContentUtil.h"
 #include "C_PuiSvDbDataElementHandler.h"
@@ -126,25 +127,25 @@ C_SyvDaItPaWriteWidget::~C_SyvDaItPaWriteWidget()
 void C_SyvDaItPaWriteWidget::InitText(void)
 {
    // set title
-   this->mpc_ParentDialog->SetTitle(QString(C_GtGetText::h_GetText("Parametrization")));
-   this->mpc_ParentDialog->SetSubTitle(QString(C_GtGetText::h_GetText("Write Parameters to System")));
+   this->mpc_ParentDialog->SetTitle(static_cast<QString>(C_GtGetText::h_GetText("Parametrization")));
+   this->mpc_ParentDialog->SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Write Parameters to System")));
 
-   this->mpc_Ui->pc_LabelFinished->setText(QString(C_GtGetText::h_GetText("Finished")));
-   this->mpc_Ui->pc_LabelConfirm->setText(QString(C_GtGetText::h_GetText("Confirm")));
-   this->mpc_Ui->pc_LabelWrite->setText(QString(C_GtGetText::h_GetText("Write")));
-   this->mpc_Ui->pc_LabelRead->setText(QString(C_GtGetText::h_GetText("Read")));
-   this->mpc_Ui->pc_LabelCrc->setText(QString(C_GtGetText::h_GetText("Write CRC")));
+   this->mpc_Ui->pc_LabelFinished->setText(static_cast<QString>(C_GtGetText::h_GetText("Finished")));
+   this->mpc_Ui->pc_LabelConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Confirm")));
+   this->mpc_Ui->pc_LabelWrite->setText(static_cast<QString>(C_GtGetText::h_GetText("Write")));
+   this->mpc_Ui->pc_LabelRead->setText(static_cast<QString>(C_GtGetText::h_GetText("Read")));
+   this->mpc_Ui->pc_LabelCrc->setText(static_cast<QString>(C_GtGetText::h_GetText("Write CRC")));
 
    this->mpc_Ui->pc_LabelHeadingSteps->setText(C_GtGetText::h_GetText("Write Parameter Values"));
    this->mpc_Ui->pc_LabelStepDescription->setText(
       C_GtGetText::h_GetText("The following parameter values will be written to NVM memory. "
                              "Click \"Write\" to start this process."));
 
-   this->mpc_Ui->pc_LabelHeadingConfirm->setText(QString(C_GtGetText::h_GetText("Parameters")));
-   this->mpc_Ui->pc_LabelHeadingNotification->setText(QString(C_GtGetText::h_GetText("Application Notification")));
-   this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Write")));
-   this->mpc_Ui->pc_CbConfirm->setText(QString(C_GtGetText::h_GetText("Confirmed, parameter values are valid")));
-   this->mpc_Ui->pc_CbNotifiction->setText(QString(C_GtGetText::h_GetText("Trigger Application Notification")));
+   this->mpc_Ui->pc_LabelHeadingConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Parameters")));
+   this->mpc_Ui->pc_LabelHeadingNotification->setText(static_cast<QString>(C_GtGetText::h_GetText("Application Notification")));
+   this->mpc_Ui->pc_PbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Write")));
+   this->mpc_Ui->pc_CbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Confirmed, parameter values are valid")));
+   this->mpc_Ui->pc_CbNotifiction->setText(static_cast<QString>(C_GtGetText::h_GetText("Trigger Application Notification")));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -511,7 +512,7 @@ void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
                         "Activate \"Parameter values are valid\" when the values are OK and click \"Continue\". "
                         "If list checksum is enabled in list definition, the checksum will be updated and the "
                         "NVM data is marked as valid. "));
-                  this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Continue")));
+                  this->mpc_Ui->pc_PbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Continue")));
                   this->mpc_Ui->pc_CbConfirm->setVisible(true);
                   this->mpc_Ui->pc_PbConfirm->setVisible(true);
                   this->mpc_Ui->pc_PbConfirm->setEnabled(false);
@@ -600,8 +601,8 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
 
          if (pc_OSCNode != NULL)
          {
-            c_Text += "<u>" + QString(C_GtGetText::h_GetText("Node")) + " - " +
-                      QString(pc_OSCNode->c_Properties.c_Name.c_str()) + "</u>";
+            c_Text += "<u>" + static_cast<QString>(C_GtGetText::h_GetText("Node")) + " - " +
+                      static_cast<QString>(pc_OSCNode->c_Properties.c_Name.c_str()) + "</u>";
          }
       }
 
@@ -627,9 +628,9 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
 
             if (pc_OSCDataPool != NULL)
             {
-               c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
-               c_Text += QString(C_GtGetText::h_GetText("Datapool")) +
-                         " - " + QString(pc_OSCDataPool->c_Name.c_str()) + "</div>";
+               c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
+               c_Text += static_cast<QString>(C_GtGetText::h_GetText("Datapool")) +
+                         " - " + static_cast<QString>(pc_OSCDataPool->c_Name.c_str()) + "</div>";
             }
          }
 
@@ -638,9 +639,9 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
          {
             uint32 u32_ElementCounter;
             // Heading for list
-            c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
-            c_Text += QString(C_GtGetText::h_GetText("List")) + " - " + QString(pc_OSCList->c_Name.c_str()) + "</div>";
-            c_Text += QString("<table width=\"100%\" %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(3UL));
+            c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
+            c_Text += static_cast<QString>(C_GtGetText::h_GetText("List")) + " - " + static_cast<QString>(pc_OSCList->c_Name.c_str()) + "</div>";
+            c_Text += static_cast<QString>("<table width=\"100%\" %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(3UL));
 
             for (u32_ElementCounter = 0U; u32_ElementCounter < pc_OSCList->c_Elements.size(); ++u32_ElementCounter)
             {
@@ -694,7 +695,7 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
                         pc_OSCElement->c_NvmValue,
                         pc_OSCList->c_Elements[u32_ElementCounter].f64_Factor,
                         pc_OSCList->c_Elements[u32_ElementCounter].f64_Offset,
-                        c_NvmValues);
+                        c_NvmValues, false);
                   }
                }
                // Filling of all table data cells
@@ -714,7 +715,7 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
                      c_Text += c_NvmValues[un_ArrayCounter] + ";";
                   }
                   c_Text.chop(1); // remove last ";"
-                  c_Text += " " + QString(pc_OSCList->c_Elements[u32_ElementCounter].c_Unit.c_str()) +
+                  c_Text += " " + static_cast<QString>(pc_OSCList->c_Elements[u32_ElementCounter].c_Unit.c_str()) +
                             c_SpanChangedEnd + "</td>";
                   c_Text += "</tr>";
                }
@@ -925,7 +926,7 @@ void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
                   c_Result = C_GtGetText::h_GetText("OK");
                }
                c_Text +=
-                  QString(C_GtGetText::h_GetText("%1 ended with %2\n")).arg(mh_GetId(*c_NotificationIterator)).arg(
+                  static_cast<QString>(C_GtGetText::h_GetText("%1 ended with %2\n")).arg(mh_GetId(*c_NotificationIterator)).arg(
                      c_Result);
                //Important iterator step
                ++c_NotificationIterator;
@@ -934,7 +935,7 @@ void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
             if (q_AnyNonAcks == true)
             {
                C_OgeWiCustomMessage c_Message(this);
-               c_Message.SetDescription(QString(C_GtGetText::h_GetText("At least one application did not acknowledge "
+               c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("At least one application did not acknowledge "
                                                                        "the application notification")));
                c_Message.SetDetails(c_Text);
                c_Message.SetCustomMinHeight(180, 250);
@@ -1155,21 +1156,20 @@ QString C_SyvDaItPaWriteWidget::m_GetSuspectElementReport(void) const
          tgl_assert(pc_Element != NULL);
          if (pc_Element != NULL)
          {
-            const QString c_Namespace =
-               C_PuiSdHandler::h_GetInstance()->GetNamespace(c_It->first);
+            const QString c_Namespace = C_PuiSdUtil::h_GetNamespace(c_It->first);
             QString c_Expected;
             QString c_Actual;
             QString c_Entry;
             //Mark as suspect
             C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(c_It->second.c_Expected,
                                                                     pc_Element->f64_Factor,
-                                                                    pc_Element->f64_Offset, c_Expected);
-            c_Expected += QString(" ") + pc_Element->c_Unit.c_str();
+                                                                    pc_Element->f64_Offset, c_Expected, false);
+            c_Expected += static_cast<QString>(" ") + pc_Element->c_Unit.c_str();
             C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(c_It->second.c_Actual,
                                                                     pc_Element->f64_Factor,
-                                                                    pc_Element->f64_Offset, c_Actual);
-            c_Actual += QString(" ") + pc_Element->c_Unit.c_str();
-            c_Entry = QString(C_GtGetText::h_GetText("%1 written: %2, read: %3")).arg(c_Namespace).arg(c_Expected).arg(
+                                                                    pc_Element->f64_Offset, c_Actual, false);
+            c_Actual += static_cast<QString>(" ") + pc_Element->c_Unit.c_str();
+            c_Entry = static_cast<QString>(C_GtGetText::h_GetText("%1 written: %2, read: %3")).arg(c_Namespace).arg(c_Expected).arg(
                c_Actual);
             c_Retval += c_Entry + "\n";
          }
@@ -1219,8 +1219,8 @@ void C_SyvDaItPaWriteWidget::m_ReportError(const QString & orc_FunctionName, con
    osc_write_log_info("Write NVM Parameters",
                       c_Text.toStdString().c_str());
 
-   c_Message.SetDescription(QString(C_GtGetText::h_GetText("Function %1 ended with error.")).arg(orc_FunctionName));
-   c_Message.SetDetails(QString(C_GtGetText::h_GetText("Error code:\n %1\nError text: \n %2"))
+   c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Function %1 ended with error.")).arg(orc_FunctionName));
+   c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("Error code:\n %1\nError text: \n %2"))
                         .arg(os32_ErrorCode).arg(orc_ErrorText));
    c_Message.SetCustomMinHeight(180, 270);
    c_Message.Execute();
@@ -1292,7 +1292,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
             C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
+         c_Details = static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
          break;
       }
       c_Description += "Server sent error response";
@@ -1310,7 +1310,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
    }
 
    C_OSCLoggingHandler::h_Flush();
-   c_Details += QString(C_GtGetText::h_GetText("See log file for details: ")) +
+   c_Details += static_cast<QString>(C_GtGetText::h_GetText("See log file for details: ")) +
                 C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
 
    c_Message.SetDescription(c_Description);
@@ -1392,7 +1392,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
             C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
+         c_Details = static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
          break;
       }
       break;
@@ -1406,7 +1406,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
    }
 
    C_OSCLoggingHandler::h_Flush();
-   c_Details += QString(C_GtGetText::h_GetText("See log file for details: ")) +
+   c_Details += static_cast<QString>(C_GtGetText::h_GetText("See log file for details: ")) +
                 C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
 
    c_Message.SetType(C_OgeWiCustomMessage::eERROR);
@@ -1499,7 +1499,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
             C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
+         c_Details = static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
          break;
       }
       break;
@@ -1516,7 +1516,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
    }
 
    C_OSCLoggingHandler::h_Flush();
-   c_Details += QString(C_GtGetText::h_GetText("See log file for details: ")) +
+   c_Details += static_cast<QString>(C_GtGetText::h_GetText("See log file for details: ")) +
                 C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
 
    c_Message.SetType(C_OgeWiCustomMessage::eERROR);
@@ -1588,7 +1588,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
             C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NRC, 16));
+         c_Details = static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NRC, 16));
          break;
       }
       break;
@@ -1605,7 +1605,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
    }
 
    C_OSCLoggingHandler::h_Flush();
-   c_Details += QString(C_GtGetText::h_GetText("See log file for details: ")) +
+   c_Details += static_cast<QString>(C_GtGetText::h_GetText("See log file for details: ")) +
                 C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
 
    c_Message.SetType(C_OgeWiCustomMessage::eERROR);
@@ -1665,7 +1665,7 @@ QString C_SyvDaItPaWriteWidget::mh_GetId(const C_OSCNodeDataPoolListId & orc_Id)
 
    if (((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL))
    {
-      c_Default = QString("%1::%2::%3").arg(pc_Node->c_Properties.c_Name.c_str()).arg(pc_DataPool->c_Name.c_str()).arg(
+      c_Default = static_cast<QString>("%1::%2::%3").arg(pc_Node->c_Properties.c_Name.c_str()).arg(pc_DataPool->c_Name.c_str()).arg(
          pc_List->c_Name.c_str());
    }
    return c_Default;

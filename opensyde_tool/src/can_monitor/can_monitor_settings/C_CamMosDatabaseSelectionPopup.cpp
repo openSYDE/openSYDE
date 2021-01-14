@@ -39,8 +39,8 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent          Reference to parent
-   \param[in]     oq_AllowMultiSelect Flag to allow multi select for the message selection
+   \param[in,out]  orc_Parent             Reference to parent
+   \param[in]      oq_AllowMultiSelect    Flag to allow multi select for the message selection
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseSelectionPopup::C_CamMosDatabaseSelectionPopup(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
@@ -173,7 +173,7 @@ const
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -250,7 +250,7 @@ void C_CamMosDatabaseSelectionPopup::m_CancelClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Filter for string
 
-   \param[in] orc_Text String
+   \param[in]  orc_Text    String
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_OnSearch(const QString & orc_Text) const
@@ -282,7 +282,7 @@ void C_CamMosDatabaseSelectionPopup::m_OnSearch(const QString & orc_Text) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update number of selected items
 
-   \param[in] osn_SelectionCount Number of selected items
+   \param[in]  osn_SelectionCount   Number of selected items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_UpdateSelection(const sintn osn_SelectionCount) const
@@ -298,23 +298,25 @@ void C_CamMosDatabaseSelectionPopup::m_UpdateSelection(const sintn osn_Selection
       {
          if (osn_SelectionCount > 1)
          {
-            this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("%1 selected messages")).arg(
+            this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText("%1 selected messages")).arg(
                                                         osn_SelectionCount));
          }
          else
          {
-            this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("1 selected message")));
+            this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText("1 selected message")));
          }
       }
       else
       {
-         this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("No selected message")));
+         this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText("No selected message")));
       }
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Setup context menu entries
+
+   \param[in]  orq_MultiSelect   Multi select
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_SetupContextMenu(const bool & orq_MultiSelect)
@@ -346,7 +348,7 @@ void C_CamMosDatabaseSelectionPopup::m_SetupContextMenu(const bool & orq_MultiSe
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show custom context menu
 
-   \param[in] orc_Pos Local context menu position
+   \param[in]  orc_Pos  Local context menu position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)

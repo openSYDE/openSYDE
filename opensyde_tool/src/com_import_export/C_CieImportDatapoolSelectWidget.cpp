@@ -90,8 +90,9 @@ C_CieImportDatapoolSelectWidget::~C_CieImportDatapoolSelectWidget(void)
 void C_CieImportDatapoolSelectWidget::InitStaticNames(void) const
 {
    const QString c_Description =
-      QString(C_GtGetText::h_GetText("There are multiple Datapools with communication protocol type \"%1\" defined. "
-                                     "Choose one Datapool for importing new messages.")).
+      static_cast<QString>(C_GtGetText::h_GetText(
+                              "There are multiple Datapools with communication protocol type \"%1\" defined. "
+                              "Choose one Datapool for importing new messages.")).
       arg(C_PuiSdUtil::h_ConvertProtocolTypeToString(this->me_ComProtocolType));
 
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Import New Messages"));

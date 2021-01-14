@@ -201,9 +201,9 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
    if (opc_Painter != NULL)
    {
       QLinearGradient c_Gradient;
-      QRectF c_Rect = boundingRect();
-      QRectF c_ShaddowRect;
-      QRectF c_SurroundingRect = c_Rect;
+      const QRectF c_Rect = boundingRect();
+      QRectF c_ShadowRect;
+      const QRectF c_SurroundingRect = c_Rect;
       QRectF c_InsideRect;
 
       if (this->mq_DrawBoder == true)
@@ -215,16 +215,16 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
             opc_Painter->setBrush(QBrush(mc_STYLE_GUIDE_COLOR_3));
             opc_Painter->drawRoundedRect(c_SurroundingRect, 12.0, 12.0);
 
-            // Draw shaddow as bigger rect than base -> smaler when surrounding rect is drawn
-            c_ShaddowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
+            // Draw shadow as bigger rect than base -> smaller when surrounding rect is drawn
+            c_ShadowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
                                   static_cast<float64>(c_Rect.top()) + 2.0,
                                   static_cast<float64>(c_Rect.width()) - 4.0,
                                   static_cast<float64>(c_Rect.height()) - 4.0);
          }
          else
          {
-            // Draw shaddow as bigger rect than base -> bigger when no surrounding rect
-            c_ShaddowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
+            // Draw shadow as bigger rect than base -> bigger when no surrounding rect
+            c_ShadowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
                                   static_cast<float64>(c_Rect.top()) + 2.0,
                                   static_cast<float64>(c_Rect.width()) - 4.0,
                                   static_cast<float64>(c_Rect.height()) - 3.0);
@@ -232,15 +232,15 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
       }
       else
       {
-         // Draw shaddow as bigger rect than base -> bigger when no surrounding rect
-         c_ShaddowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
+         // Draw shadow as bigger rect than base -> bigger when no surrounding rect
+         c_ShadowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
                                static_cast<float64>(c_Rect.top()) + 2.0,
                                static_cast<float64>(c_Rect.width()) - 4.0,
                                static_cast<float64>(c_Rect.height()) - 3.0);
       }
       opc_Painter->setPen(Qt::NoPen);
       opc_Painter->setBrush(QBrush(QColor(206, 206, 217)));
-      opc_Painter->drawRoundedRect(c_ShaddowRect, 10.0, 10.0);
+      opc_Painter->drawRoundedRect(c_ShadowRect, 10.0, 10.0);
 
       // Scalings depending on assumed c_Rect with  w:210, h:137.5
       //rounded rect

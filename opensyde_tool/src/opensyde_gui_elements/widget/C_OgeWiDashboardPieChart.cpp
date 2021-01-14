@@ -58,7 +58,7 @@ C_OgeWiDashboardPieChart::C_OgeWiDashboardPieChart(QWidget * const opc_Parent) :
    mq_ShowValue(true),
    msn_Transparence(msn_TRANSPARENCY_END),
    mq_TransparentBackground(false),
-   e_Style(C_PuiSvDbWidgetBase::eOPENSYDE),
+   me_Style(C_PuiSvDbWidgetBase::eOPENSYDE),
    mq_DarkMode(false)
 {
 }
@@ -75,42 +75,13 @@ C_OgeWiDashboardPieChart::C_OgeWiDashboardPieChart(QWidget * const opc_Parent) :
 void C_OgeWiDashboardPieChart::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode,
                                                const bool oq_ShowUnit, const bool oq_ShowValue)
 {
-   this->e_Style = oe_Style;
+   this->me_Style = oe_Style;
    this->mq_DarkMode = oq_DarkMode;
 
    this->mq_ShowUnit = oq_ShowUnit;
    this->mq_ShowValue = oq_ShowValue;
    this->mq_TransparentBackground = false;
 
-   //   switch (oe_Style)
-   //   {
-   //   //TBD by Karsten
-   //   case C_PuiSvDbWidgetBase::eOPENSYDE:
-   //      this->mq_ValueCircle = false;
-   //      if (oq_DarkMode == true)
-   //      {
-   //         this->mc_ValueStart = mc_STYLE_GUIDE_COLOR_13;
-   //         this->mc_ValueEnd = mc_STYLE_GUIDE_COLOR_13;
-   //         this->mc_InnerBorderTop = mc_STYLE_GUIDE_COLOR_2;
-   //         this->mc_InnerBorderBottom = mc_STYLE_GUIDE_COLOR_2;
-   //         this->mc_InnerCircleTop = mc_STYLE_GUIDE_COLOR_52;
-   //         this->mc_InnerCircleBottom = mc_STYLE_GUIDE_COLOR_52;
-   //         this->mc_StringColor = mc_STYLE_GUIDE_COLOR_0;
-   //      }
-   //      else
-   //      {
-   //         this->mc_ValueStart = mc_STYLE_GUIDE_COLOR_13;
-   //         this->mc_ValueEnd = mc_STYLE_GUIDE_COLOR_13;
-   //         this->mc_InnerBorderTop = mc_STYLE_GUIDE_COLOR_38;
-   //         this->mc_InnerBorderBottom = mc_STYLE_GUIDE_COLOR_38;
-   //         this->mc_InnerCircleTop = mc_STYLE_GUIDE_COLOR_12;
-   //         this->mc_InnerCircleBottom = mc_STYLE_GUIDE_COLOR_12;
-   //         this->mc_StringColor = mc_STYLE_GUIDE_COLOR_34;
-   //      }
-   //      break;
-   //   default:
-   //      break;
-   //   }
    ReInitSize();
    this->update();
 }
@@ -208,7 +179,6 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
    QPainter c_Painter(this);
    QColor c_HelpingColor;
 
-   // Karsten Anfang
    // Variables for general Pie-----------------------------------------------
    stw_types::float32 f32_PieWidth = 8.0F; // Width of the pieCircle
    stw_types::float32 f32_RimWidth = 7.0F; // Width of the rim (to fill gaps: +1 later
@@ -224,7 +194,6 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
    QRect c_InnerCircleRect; // Rectangele of the inner circuit
    QRect c_RimRect;         // rectangle of the rim
    QRect c_PieRect;         // rectangle of the Pies
-   // Karsten Ende
 
    Q_UNUSED(opc_Event)
    c_Painter.setRenderHint(QPainter::Antialiasing, true);
@@ -233,7 +202,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
    if ((this->mq_ShowUnit == true) &&
        (this->mq_ShowValue == true))
    {
-      c_DisplayString = QString("%1%2").arg(this->mc_Value).arg(this->mc_Unit);
+      c_DisplayString = static_cast<QString>("%1%2").arg(this->mc_Value).arg(this->mc_Unit);
    }
    else if (this->mq_ShowValue == true)
    {
@@ -248,8 +217,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
       c_DisplayString = "";
    }
 
-   // Karsten Anfang
-   switch (this->e_Style) // Different Dashboard-Styles
+   switch (this->me_Style) // Different Dashboard-Styles
    {
    case C_PuiSvDbWidgetBase::eOPENSYDE: // Material (openSYDE)
 
@@ -550,11 +518,10 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
    default:
       break;
    }
-   // Karsten Ende
 }
 
-// Karsten Anfang
 //----------------------------------------------------------------------------------------------------------------------
+
 void C_OgeWiDashboardPieChart::m_SetPie(QPainter & orc_Painter, QBrush oc_PieBrush, const Qt::PenCapStyle oe_CapStyle,
                                         const QRect & orc_PieCircleRect, const stw_types::float32 of32_PieWidth,
                                         const stw_types::float32 of32_GesamtPixel,
@@ -742,4 +709,3 @@ void C_OgeWiDashboardPieChart::m_SetAllPieRects(QRect & orc_InnerCircleRect, QRe
                              static_cast<stw_types::sintn>(f32_PieCircleRectW),
                              static_cast<stw_types::sintn>(f32_PieCircleRectH));
 }
-// Karsten Ende

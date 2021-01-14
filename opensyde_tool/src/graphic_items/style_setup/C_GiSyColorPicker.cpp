@@ -77,21 +77,21 @@ void C_GiSyColorPicker::SetCircleVisible(const bool oq_Visible)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set a new color to the color picker and repaint it
 
-   \param[in]   osn_H   new hue value
-   \param[in]   osn_S   new sat value
+   \param[in]   osn_Hue         new hue value
+   \param[in]   osn_Saturation   new sat value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorPicker::SetColor(sintn const osn_H, sintn const osn_S)
+void C_GiSyColorPicker::SetColor(sintn const osn_Hue, sintn const osn_Saturation)
 {
-   if ((qMin(qMax(0, osn_H), 359) == this->msn_Hue) && (qMin(qMax(0, osn_S), 255) == this->msn_Sat))
+   if ((qMin(qMax(0, osn_Hue), 359) == this->msn_Hue) && (qMin(qMax(0, osn_Saturation), 255) == this->msn_Sat))
    {
       return;
    }
    QRect c_Rect(QPoint(((360 - this->msn_Hue) * (contentsRect().width() - 1)) / 360,
                        ((255 - this->msn_Sat) * (contentsRect().height() - 1)) / 255),
                 QSize(50, 20));
-   this->msn_Hue = qMin(qMax(0, osn_H), 359);
-   this->msn_Sat = qMin(qMax(0, osn_S), 255);
+   this->msn_Hue = qMin(qMax(0, osn_Hue), 359);
+   this->msn_Sat = qMin(qMax(0, osn_Saturation), 255);
    c_Rect = c_Rect.united(QRect(QPoint(((360 - this->msn_Hue) * (contentsRect().width() - 1)) / 360,
                                        ((255 - this->msn_Sat) * (contentsRect().height() - 1)) / 255),
                                 QSize(50, 20)));

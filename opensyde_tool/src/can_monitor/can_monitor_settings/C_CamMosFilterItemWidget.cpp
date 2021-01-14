@@ -121,7 +121,7 @@ void C_CamMosFilterItemWidget::m_CreateTooltipInformation(void)
 
    QList<C_CamProFilterItemData> c_FilterItems = mc_Filter.c_FilterItems;
 
-   c_Content += QString(C_GtGetText::h_GetText("Number of Filter Items: %1")).arg(c_FilterItems.size());
+   c_Content += static_cast<QString>(C_GtGetText::h_GetText("Number of Filter Items: %1")).arg(c_FilterItems.size());
    c_Content += "\n";
 
    // show information of first few filter items (maximum 3)
@@ -131,7 +131,7 @@ void C_CamMosFilterItemWidget::m_CreateTooltipInformation(void)
       QString c_Temp = "";
 
       c_Content += "\n";
-      c_Content += QString(C_GtGetText::h_GetText("Filter Item %1\n")).arg(s32_Pos + 1);
+      c_Content += static_cast<QString>(C_GtGetText::h_GetText("Filter Item %1\n")).arg(s32_Pos + 1);
 
       // enabled flag
       c_Content += "   ";
@@ -181,17 +181,17 @@ void C_CamMosFilterItemWidget::m_CreateTooltipInformation(void)
       if (rc_FilterItem.e_Type == C_CamProFilterItemData::eID_SINGLE)
       {
          c_Content += C_GtGetText::h_GetText("ID 0x");
-         c_Content += QString("%1").arg(rc_FilterItem.u32_StartId, 0, 16).toUpper();
+         c_Content += static_cast<QString>("%1").arg(rc_FilterItem.u32_StartId, 0, 16).toUpper();
          c_Content += c_Temp;
          c_Content += "\n";
       }
       else
       {
          c_Content += C_GtGetText::h_GetText("From 0x");
-         c_Content += QString("%1").arg(rc_FilterItem.u32_StartId, 0, 16).toUpper();
+         c_Content += static_cast<QString>("%1").arg(rc_FilterItem.u32_StartId, 0, 16).toUpper();
          c_Content += c_Temp;
          c_Content += C_GtGetText::h_GetText(" to 0x");
-         c_Content += QString("%1").arg(rc_FilterItem.u32_EndId, 0, 16).toUpper();
+         c_Content += static_cast<QString>("%1").arg(rc_FilterItem.u32_EndId, 0, 16).toUpper();
          c_Content += c_Temp;
          c_Content += "\n";
       }
@@ -248,8 +248,7 @@ void C_CamMosFilterItemWidget::m_OnEdit()
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot for remove button.

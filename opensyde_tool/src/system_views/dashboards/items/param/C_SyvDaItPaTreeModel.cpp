@@ -12,9 +12,11 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <cmath>
 #include "TGLUtils.h"
 #include "stwerrors.h"
 #include "constants.h"
+#include "C_OSCUtils.h"
 #include "C_GtGetText.h"
 #include "C_GiSvDaParam.h"
 #include "C_PuiSvHandler.h"
@@ -22,6 +24,7 @@
 #include "C_SdNdeDpUtil.h"
 #include "C_SyvDaItPaTreeModel.h"
 #include "C_SdNdeDpContentUtil.h"
+#include "C_OSCNodeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -72,11 +75,11 @@ C_SyvDaItPaTreeModel::C_SyvDaItPaTreeModel(QObject * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} Never took ownership of mpc_DataWidget
 C_SyvDaItPaTreeModel::~C_SyvDaItPaTreeModel(void)
 {
    //Clean up if necessary
    delete (this->mpc_InvisibleRootItem);
-   //lint -e{1540} Never took ownership of mpc_DataWidget
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -171,7 +174,7 @@ void C_SyvDaItPaTreeModel::SetActionActive(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::DeleteSpecified(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -203,7 +206,6 @@ void C_SyvDaItPaTreeModel::ClearECUValues(void)
    {
       for (uint32 u32_ItElement = 0UL; u32_ItElement < this->mc_ECUValuesString.size(); ++u32_ItElement)
       {
-         //lint -e{808} C++11 usage of correct handling for bool vector element assignment
          auto && rc_Ref = this->mc_ECUValuesReadStatus[u32_ItElement];
          rc_Ref = false;
          for (uint32 u32_ItValue = 0UL; u32_ItValue < this->mc_ECUValuesString[u32_ItElement].size(); ++u32_ItValue)
@@ -216,7 +218,6 @@ void C_SyvDaItPaTreeModel::ClearECUValues(void)
    //Reset all valid flags
    for (uint32 u32_ItList = 0; u32_ItList < this->mc_ECUCRCValidStatus.size(); ++u32_ItList)
    {
-      //lint -e{808} C++11 usage of correct handling for bool vector element assignment
       auto && rc_Ref = this->mc_ECUCRCValidStatus[u32_ItList];
       rc_Ref = false;
    }
@@ -232,12 +233,18 @@ void C_SyvDaItPaTreeModel::ClearECUValues(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set set values same as device values
 
-   \param[in]  orc_ListIds    List IDs
+   \param[in]      orc_ListIds            List IDs
+   \param[in,out]  orc_InvalidValueIds    Invalid value ids
+   \param[in,out]  orc_InvalidValues      Invalid values
+   \param[in,out]  orc_NewValues          New values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
+void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds,
+                                          std::vector<C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds,
+                                          std::vector<QString> & orc_InvalidValues,
+                                          std::vector<QString> & orc_NewValues)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -274,6 +281,13 @@ void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolLis
                   {
                      q_AllRead = false;
                   }
+                  else
+                  {
+                     C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValueAndAppendResults(c_Copy.c_ListValues[u32_ItConfig],
+                                                                                    rc_Config.c_ElementId,
+                                                                                    orc_InvalidValueIds,
+                                                                                    orc_InvalidValues, orc_NewValues);
+                  }
                }
             }
          }
@@ -287,6 +301,13 @@ void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolLis
             pc_ParamWidget->SetParamItem(c_Copy);
             //Update set value column
             Q_EMIT this->dataChanged(this->index(0, sn_Col), this->index(this->rowCount() - 1, sn_Col), c_Roles);
+         }
+         else
+         {
+            //Ignore
+            orc_InvalidValueIds.clear();
+            orc_InvalidValues.clear();
+            orc_NewValues.clear();
          }
       }
    }
@@ -308,7 +329,7 @@ bool C_SyvDaItPaTreeModel::CheckRange(const std::vector<C_OSCNodeDataPoolListEle
 const
 {
    bool q_Retval = true;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -414,7 +435,7 @@ bool C_SyvDaItPaTreeModel::CheckAllListsRead(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if ((pc_ParamWidget != NULL) && (orc_ListIds.size() > 0UL))
@@ -485,7 +506,7 @@ void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OSCNodeDataP
 void C_SyvDaItPaTreeModel::RemoveValuesChangedFlag(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if ((pc_ParamWidget != NULL) && (orc_ListIds.size() > 0UL))
@@ -559,7 +580,7 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
          if (pc_AllNode != NULL)
          {
             uint32 u32_ItNode = 0UL;
-            QModelIndex c_AllBase = this->index(0, 0);
+            const QModelIndex c_AllBase = this->index(0, 0);
             for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
                  c_ItNode != pc_AllNode->c_Children.end(); ++c_ItNode)
             {
@@ -568,7 +589,7 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
                if (pc_Node != NULL)
                {
                   uint32 u32_ItDp = 0UL;
-                  QModelIndex c_Node = this->index(static_cast<sintn>(u32_ItNode), 0, c_AllBase);
+                  const QModelIndex c_Node = this->index(static_cast<sintn>(u32_ItNode), 0, c_AllBase);
                   for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
                        c_ItDp != pc_Node->c_Children.end(); ++c_ItDp)
                   {
@@ -577,7 +598,7 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
                      if (pc_Dp != NULL)
                      {
                         uint32 u32_ItLi = 0UL;
-                        QModelIndex c_Dp = this->index(static_cast<sintn>(u32_ItDp), 0, c_Node);
+                        const QModelIndex c_Dp = this->index(static_cast<sintn>(u32_ItDp), 0, c_Node);
                         for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItLi = pc_Dp->c_Children.begin();
                              c_ItLi != pc_Dp->c_Children.end(); ++c_ItLi)
                         {
@@ -585,11 +606,11 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
                            const C_TblTreSimpleItem * const pc_Li = *c_ItLi;
                            if (pc_Li != NULL)
                            {
-                              QModelIndex c_Li = this->index(static_cast<sintn>(u32_ItLi), 0, c_Dp);
+                              const QModelIndex c_Li = this->index(static_cast<sintn>(u32_ItLi), 0, c_Dp);
                               for (uint32 u32_ItEl = 0L; u32_ItEl < pc_Li->c_Children.size(); ++u32_ItEl)
                               {
                                  //Element level
-                                 QModelIndex c_El = this->index(static_cast<sintn>(u32_ItEl), 0, c_Li);
+                                 const QModelIndex c_El = this->index(static_cast<sintn>(u32_ItEl), 0, c_Li);
                                  c_Retval.push_back(c_El);
                               }
                               c_Retval.push_back(c_Li);
@@ -634,11 +655,11 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
            c_ItAll != this->mpc_InvisibleRootItem->c_Children.end(); ++c_ItAll)
       {
          //Top level
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          const C_TblTreItem * const pc_AllNode = dynamic_cast<const C_TblTreItem * const>(*c_ItAll);
          if (pc_AllNode != NULL)
          {
-            QModelIndex c_AllNode = this->index(static_cast<sintn>(u32_ItAll), 0);
+            const QModelIndex c_AllNode = this->index(static_cast<sintn>(u32_ItAll), 0);
             if (oru32_ValidLayers == 0UL)
             {
                c_Retval = c_AllNode;
@@ -650,11 +671,11 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                     c_ItNode != pc_AllNode->c_Children.end(); ++c_ItNode)
                {
                   //Node level
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                   const C_TblTreItem * const pc_Node = dynamic_cast<const C_TblTreItem * const>(*c_ItNode);
                   if ((pc_Node != NULL) && (pc_Node->u32_Index == orc_Id.u32_NodeIndex))
                   {
-                     QModelIndex c_Node = this->index(static_cast<sintn>(u32_ItNode), 0, c_AllNode);
+                     const QModelIndex c_Node = this->index(static_cast<sintn>(u32_ItNode), 0, c_AllNode);
                      if (oru32_ValidLayers == 1UL)
                      {
                         c_Retval = c_Node;
@@ -666,11 +687,11 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                              c_ItDp != pc_Node->c_Children.end(); ++c_ItDp)
                         {
                            //Datapool level
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                            const C_TblTreItem * const pc_Dp = dynamic_cast<const C_TblTreItem * const>(*c_ItDp);
                            if ((pc_Dp != NULL) && (pc_Dp->u32_Index == orc_Id.u32_DataPoolIndex))
                            {
-                              QModelIndex c_Dp = this->index(static_cast<sintn>(u32_ItDp), 0, c_Node);
+                              const QModelIndex c_Dp = this->index(static_cast<sintn>(u32_ItDp), 0, c_Node);
                               if (oru32_ValidLayers == 2UL)
                               {
                                  c_Retval = c_Dp;
@@ -683,12 +704,12 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                                       c_ItLi != pc_Dp->c_Children.end(); ++c_ItLi)
                                  {
                                     //List level
-                                    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                                     const C_TblTreItem * const pc_Li =
                                        dynamic_cast<const C_TblTreItem * const>(*c_ItLi);
                                     if ((pc_Li != NULL) && (pc_Li->u32_Index == orc_Id.u32_ListIndex))
                                     {
-                                       QModelIndex c_Li = this->index(static_cast<sintn>(u32_ItLi), 0, c_Dp);
+                                       const QModelIndex c_Li = this->index(static_cast<sintn>(u32_ItLi), 0, c_Dp);
                                        if (oru32_ValidLayers == 3UL)
                                        {
                                           c_Retval = c_Li;
@@ -701,12 +722,13 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                                                c_ItEl != pc_Li->c_Children.end(); ++c_ItEl)
                                           {
                                              //Element level
-                                             //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                                              const C_TblTreItem * const pc_El =
                                                 dynamic_cast<const C_TblTreItem * const>(*c_ItEl);
                                              if ((pc_El != NULL) && (pc_El->u32_Index == orc_Id.u32_ElementIndex))
                                              {
-                                                QModelIndex c_El = this->index(static_cast<sintn>(u32_ItEl), 0, c_Li);
+                                                const QModelIndex c_El = this->index(static_cast<sintn>(u32_ItEl), 0,
+                                                                                     c_Li);
                                                 c_Retval = c_El;
                                              }
                                              ++u32_ItEl;
@@ -742,7 +764,7 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
 std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetAllListIds(void) const
 {
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_Retval;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -778,7 +800,7 @@ std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeMo
 bool C_SyvDaItPaTreeModel::CheckListsRead(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
 {
    bool q_Retval = true;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -823,7 +845,7 @@ std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeMo
 const
 {
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_Retval;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -882,7 +904,7 @@ const
 std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeModel::GetInvalidListIds(void) const
 {
    std::vector<C_OSCNodeDataPoolListId> c_Retval;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -901,7 +923,7 @@ std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeModel::GetInvalidListIds(voi
                    (rc_Config.c_ElementId.GetIsValid() == true))
                {
                   uint32 u32_ItFinalIndex;
-                  bool q_Found1 = m_GetListIndex(rc_Config.c_ElementId, u32_ItFinalIndex);
+                  const bool q_Found1 = m_GetListIndex(rc_Config.c_ElementId, u32_ItFinalIndex);
 
                   if (((q_Found1 == true) && (u32_ItFinalIndex < this->mc_ECUCRCValidStatus.size())) &&
                       (this->mc_ECUCRCValidStatus[u32_ItFinalIndex] == false))
@@ -938,7 +960,7 @@ std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeModel::GetInvalidListIds(voi
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::UpdateECUValues(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -957,7 +979,6 @@ void C_SyvDaItPaTreeModel::UpdateECUValues(void)
                   if (((u32_Index < this->mc_ECUValuesReadStatus.size()) && (u32_Index < this->mc_ECUValues.size())) &&
                       (u32_Index < this->mc_ECUValuesString.size()))
                   {
-                     //lint -e{808} C++11 usage of correct handling for bool vector element assignment
                      auto && rc_Ref = this->mc_ECUValuesReadStatus[u32_Index];
                      const C_OSCNodeDataPoolListElement * const pc_OSCElement =
                         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
@@ -988,7 +1009,7 @@ void C_SyvDaItPaTreeModel::UpdateECUValues(void)
                            C_SdNdeDpContentUtil::h_GetValuesAsScaledString(c_Content,
                                                                            pc_OSCElement->f64_Factor,
                                                                            pc_OSCElement->f64_Offset,
-                                                                           rc_ValueStrings);
+                                                                           rc_ValueStrings, false);
                         }
                      }
                   }
@@ -1022,7 +1043,6 @@ void C_SyvDaItPaTreeModel::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_List
    if ((q_Found == true) && (u32_ItFinalIndex < this->mc_ECUCRCValidStatus.size()))
    {
       //Update CRC flag
-      //lint -e{808} C++11 usage of correct handling for bool vector element assignment
       auto && rc_Ref = this->mc_ECUCRCValidStatus[u32_ItFinalIndex];
       rc_Ref = oq_Status;
    }
@@ -1038,7 +1058,7 @@ void C_SyvDaItPaTreeModel::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_List
 void C_SyvDaItPaTreeModel::GetListSetValues(const C_OSCNodeDataPoolListElementId & orc_ListId,
                                             std::vector<C_OSCNodeDataPoolContent> & orc_ListValues) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -1077,7 +1097,7 @@ void C_SyvDaItPaTreeModel::GetListSetValues(const C_OSCNodeDataPoolListElementId
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidget)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(opc_DataWidget);
 
    this->beginResetModel();
@@ -1363,7 +1383,7 @@ QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Ori
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else
       {
@@ -1413,7 +1433,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          const C_PuiSdNodeDataPoolListElement * pc_UiElement;
          C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
          switch (u32_ValidLayers)
          {
@@ -1479,7 +1499,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                               if (this->mc_ECUValuesReadStatus[u32_Index] == true)
                               {
                                  uint32 u32_ItFinalIndex;
-                                 bool q_Found = m_GetListIndex(c_Id, u32_ItFinalIndex);
+                                 const bool q_Found = m_GetListIndex(c_Id, u32_ItFinalIndex);
                                  if ((q_Found == true) && (u32_ItFinalIndex < this->mc_ECUCRCValidStatus.size()))
                                  {
                                     if (this->mc_ECUCRCValidStatus[u32_ItFinalIndex] == true)
@@ -1494,7 +1514,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                               }
                               else
                               {
-                                 c_Retval = QString(C_GtGetText::h_GetText("CRC: %1")).arg(
+                                 c_Retval = static_cast<QString>(C_GtGetText::h_GetText("CRC: %1")).arg(
                                     C_SyvDaItPaTreeModel::mhc_ECUValueInitString);
                               }
                            }
@@ -1535,7 +1555,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                               if ((pc_List != NULL) && (u32_DataSet < pc_List->c_DataSets.size()))
                               {
                                  const C_OSCNodeDataPoolDataSet & rc_DataSet = pc_List->c_DataSets[u32_DataSet];
-                                 c_Retval = QString(C_GtGetText::h_GetText("Dataset \"%1\"")).arg(
+                                 c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Dataset \"%1\"")).arg(
                                     rc_DataSet.c_Name.c_str());
                               }
                            }
@@ -1667,7 +1687,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                                     c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(*pc_Content,
                                                                                                      pc_OSCElement->f64_Factor,
                                                                                                      pc_OSCElement->f64_Offset,
-                                                                                                     0);
+                                                                                                     0, false);
                                  }
                               }
                               else
@@ -1676,7 +1696,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                                  C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(*pc_Content,
                                                                                          pc_OSCElement->f64_Factor,
                                                                                          pc_OSCElement->f64_Offset,
-                                                                                         c_Output);
+                                                                                         c_Output, false);
                                  c_Retval = c_Output;
                               }
                            }
@@ -1783,7 +1803,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
       else if (osn_Role == static_cast<sintn>(Qt::FontRole))
       {
          QFont c_Font;
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          const C_GiSvDaParam * const pc_ParamWidget =
             dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
@@ -1846,7 +1866,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                {
                   const uint32 u32_ItemIndex = GetParamIndexId(c_Id);
                   uint32 u32_ItFinalIndex;
-                  bool q_Found = m_GetListIndex(c_Id, u32_ItFinalIndex);
+                  const bool q_Found = m_GetListIndex(c_Id, u32_ItFinalIndex);
                   //Check if CRC read and still invalid
                   if (((((q_Found == true) && (u32_ItFinalIndex < this->mc_ECUCRCValidStatus.size())) &&
                         (u32_ItemIndex < this->mc_ECUValuesReadStatus.size())) &&
@@ -1914,7 +1934,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          if (((e_Col == C_SyvDaItPaTreeModel::eDEVICE_VALUE) || (e_Col == C_SyvDaItPaTreeModel::eSET)) &&
              (u32_ValidLayers == 4UL))
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             const C_GiSvDaParam * const pc_ParamWidget =
                dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
             if (pc_ParamWidget != NULL)
@@ -2021,7 +2041,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          else
          {
             //Check data set
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             const C_GiSvDaParam * const pc_ParamWidget =
                dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
             if (pc_ParamWidget != NULL)
@@ -2083,7 +2103,7 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
 
       C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
       const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
       switch (e_Col)
       {
@@ -2098,7 +2118,7 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
                if (pc_ParamData != NULL)
                {
                   bool q_Ok;
-                  const sint32 s32_NewDataSetValue = orc_Value.toInt(&q_Ok) - 1L;
+                  const sint32 s32_NewDataSetValue = static_cast<sint32>(orc_Value.toInt(&q_Ok)) - 1L;
                   if (q_Ok == true)
                   {
                      C_PuiSvDbParam c_Copy = *pc_ParamData;
@@ -2197,7 +2217,7 @@ Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
    uint32 u32_ValidLayers;
    C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
    const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
    switch (u32_ValidLayers)
    {
@@ -2556,31 +2576,31 @@ void C_SyvDaItPaTreeModel::h_DecodeIndex(const QModelIndex & orc_Index, C_OSCNod
    oru32_ValidLayers = 0UL;
    if (orc_Index.isValid() == true)
    {
-      //lint -e{925}  Result of Qt interface restrictions, set by index function
+      //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreItem * const pc_TreeItem =
          static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          const C_TblTreItem * const pc_FirstParent = dynamic_cast<const C_TblTreItem * const>(pc_TreeItem->pc_Parent);
          if ((pc_FirstParent != NULL) && (pc_FirstParent->pc_Parent != NULL))
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
             const C_TblTreItem * const pc_SecondParent =
                dynamic_cast<const C_TblTreItem * const>(pc_FirstParent->pc_Parent);
             if ((pc_SecondParent != NULL) && (pc_SecondParent->pc_Parent != NULL))
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                const C_TblTreItem * const pc_ThirdParent =
                   dynamic_cast<const C_TblTreItem * const>(pc_SecondParent->pc_Parent);
                if ((pc_ThirdParent != NULL) && (pc_ThirdParent->pc_Parent != NULL))
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                   const C_TblTreItem * const pc_FourthParent =
                      dynamic_cast<const C_TblTreItem * const>(pc_ThirdParent->pc_Parent);
                   if ((pc_FourthParent != NULL) && (pc_FourthParent->pc_Parent != NULL))
                   {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                      const C_TblTreItem * const pc_FifthParent =
                         dynamic_cast<const C_TblTreItem * const>(pc_FourthParent->pc_Parent);
                      if ((pc_FifthParent != NULL) && (pc_FifthParent->pc_Parent != NULL))
@@ -2658,7 +2678,7 @@ void C_SyvDaItPaTreeModel::h_DecodeIndex(const QModelIndex & orc_Index, C_OSCNod
 uint32 C_SyvDaItPaTreeModel::GetParamIndexId(const C_OSCNodeDataPoolListElementId & orc_Id) const
 {
    uint32 u32_Retval = 0UL;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -2770,7 +2790,7 @@ std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForI
    C_OSCNodeDataPoolListElementId c_IdCopy = orc_Id;
 
    std::vector<C_OSCNodeDataPoolListElementId> c_Retval;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
    switch (ou32_ValidLayers)
    {
@@ -2900,6 +2920,103 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt range of value to next valid value and append results
+
+   \param[in,out]  orc_Content            Content to change
+   \param[in]      orc_DescriptionId      Description id
+   \param[in,out]  orc_InvalidValueIds    Invalid value ids
+   \param[in,out]  orc_InvalidValues      Invalid values
+   \param[in,out]  orc_NewValues          New values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValueAndAppendResults(C_OSCNodeDataPoolContent & orc_Content,
+                                                                    const C_OSCNodeDataPoolListElementId & orc_DescriptionId, std::vector<C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds, std::vector<QString> & orc_InvalidValues,
+                                                                    std::vector<QString> & orc_NewValues)
+{
+   const C_OSCNodeDataPoolListElement * const pc_Element =
+      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_DescriptionId);
+
+   if (pc_Element != NULL)
+   {
+      bool q_WasChanged = false;
+      std::vector<float64> c_Values;
+      C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_Content, c_Values);
+      for (uint32 u32_ItVal = 0UL; u32_ItVal < c_Values.size(); ++u32_ItVal)
+      {
+         const float64 f64_Val = C_OSCUtils::h_GetValueScaled(c_Values[u32_ItVal],
+                                                              pc_Element->f64_Factor,
+                                                              pc_Element->f64_Offset, false);
+         if (std::isnan(f64_Val) || std::isinf(f64_Val))
+         {
+            q_WasChanged = true;
+         }
+      }
+      if (q_WasChanged)
+      {
+         QString c_Tmp;
+         orc_InvalidValueIds.push_back(orc_DescriptionId);
+         C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(orc_Content,
+                                                                 pc_Element->f64_Factor,
+                                                                 pc_Element->f64_Offset, c_Tmp,
+                                                                 false);
+         orc_InvalidValues.push_back(c_Tmp);
+         C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValue(orc_Content,
+                                                        *pc_Element);
+         C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(orc_Content,
+                                                                 pc_Element->f64_Factor,
+                                                                 pc_Element->f64_Offset, c_Tmp,
+                                                                 false);
+         orc_NewValues.push_back(c_Tmp);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt range of value to next valid value
+
+   \param[in,out]  orc_Content      Content to change
+   \param[in]      orc_Description  Description to use as reference
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValue(C_OSCNodeDataPoolContent & orc_Content,
+                                                    const C_OSCNodeDataPoolListElement & orc_Description)
+{
+   std::vector<float64> c_Values;
+   C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_Content, c_Values);
+   for (uint32 u32_ItVal = 0UL; u32_ItVal < c_Values.size(); ++u32_ItVal)
+   {
+      float64 f64_Val = C_OSCUtils::h_GetValueScaled(c_Values[u32_ItVal],
+                                                     orc_Description.f64_Factor,
+                                                     orc_Description.f64_Offset, false);
+      if (std::isnan(f64_Val) || std::isinf(f64_Val))
+      {
+         C_SyvDaItPaTreeModel::h_FixInvalidFloatValue(f64_Val);
+         f64_Val = C_OSCUtils::h_GetValueUnscaled(f64_Val, orc_Description.f64_Factor,
+                                                  orc_Description.f64_Offset);
+         C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_Val, orc_Content, u32_ItVal);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt range of value to next valid value
+
+   \param[out]  orf64_Value   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeModel::h_FixInvalidFloatValue(float64 & orf64_Value)
+{
+   if (std::isnan(orf64_Value))
+   {
+      orf64_Value = 0.0;
+   }
+   else
+   {
+      C_OSCUtils::h_RangeCheckFloat(orf64_Value);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize all node tree node
 
    \param[in,out]  opc_TreeNode     Tree node to initialize
@@ -2914,8 +3031,9 @@ void C_SyvDaItPaTreeModel::mh_InitAllNode(C_TblTreItem * const opc_TreeNode, con
       //Name
       if (pc_View != NULL)
       {
-         opc_TreeNode->c_Name = QString(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(ou32_ViewIndex + 1).arg(
-            pc_View->GetName());
+         opc_TreeNode->c_Name =
+            static_cast<QString>(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(ou32_ViewIndex + 1).arg(
+               pc_View->GetName());
       }
       //Icon
       opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_IconAllNode);
@@ -2923,8 +3041,7 @@ void C_SyvDaItPaTreeModel::mh_InitAllNode(C_TblTreItem * const opc_TreeNode, con
       opc_TreeNode->q_Enabled = true;
       opc_TreeNode->q_Selectable = false;
    }
-   //lint -e{429}  no memory leak because we never took ownership
-}
+} //lint !e429  //no memory leak because we never took ownership
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize node tree node
@@ -2963,8 +3080,7 @@ void C_SyvDaItPaTreeModel::mh_InitNode(C_TblTreItem * const opc_TreeNode, const 
          }
       }
    }
-   //lint -e{429}  no memory leak because we never took ownership
-}
+} //lint !e429  //no memory leak because we never took ownership
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize data pool tree node
@@ -2998,8 +3114,7 @@ void C_SyvDaItPaTreeModel::mh_InitDataPool(C_TblTreItem * const opc_TreeNode, co
          opc_TreeNode->q_Selectable = false;
       }
    }
-   //lint -e{429}  no memory leak because we never took ownership
-}
+} //lint !e429  //no memory leak because we never took ownership
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize list tree node
@@ -3028,7 +3143,8 @@ void C_SyvDaItPaTreeModel::mh_InitList(C_TblTreItem * const opc_TreeNode, const 
       if (pc_ListData != NULL)
       {
          //Name
-         opc_TreeNode->c_Name = QString("%1 (%2)").arg(pc_ListData->c_Name.c_str()).arg(pc_ListData->c_Elements.size());
+         opc_TreeNode->c_Name = static_cast<QString>("%1 (%2)").arg(pc_ListData->c_Name.c_str()).arg(
+            pc_ListData->c_Elements.size());
          //Icon
          opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_IconList);
          //State
@@ -3036,8 +3152,7 @@ void C_SyvDaItPaTreeModel::mh_InitList(C_TblTreItem * const opc_TreeNode, const 
          opc_TreeNode->q_Selectable = false;
       }
    }
-   //lint -e{429}  no memory leak because we never took ownership
-}
+} //lint !e429  //no memory leak because we never took ownership
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize element tree node
@@ -3068,7 +3183,8 @@ void C_SyvDaItPaTreeModel::mh_InitElement(C_TblTreItem * const opc_TreeNode, con
       if (pc_ElementData != NULL)
       {
          //Name
-         opc_TreeNode->c_Name = QString("%1 - %2").arg(ou32_ElementIndex + 1).arg(pc_ElementData->c_Name.c_str());
+         opc_TreeNode->c_Name = static_cast<QString>("%1 - %2").arg(ou32_ElementIndex + 1).arg(
+            pc_ElementData->c_Name.c_str());
          //Icon
          opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_IconParameter);
          //State
@@ -3076,8 +3192,7 @@ void C_SyvDaItPaTreeModel::mh_InitElement(C_TblTreItem * const opc_TreeNode, con
          opc_TreeNode->q_Selectable = false;
       }
    }
-   //lint -e{429}  no memory leak because we never took ownership
-}
+} //lint !e429  //no memory leak because we never took ownership
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get value to use for set (wrapper to handle data set or direct value)
@@ -3092,7 +3207,7 @@ void C_SyvDaItPaTreeModel::mh_InitElement(C_TblTreItem * const opc_TreeNode, con
 const C_OSCNodeDataPoolContent * C_SyvDaItPaTreeModel::m_GetSetValue(const uint32 ou32_DataIndex) const
 {
    const C_OSCNodeDataPoolContent * pc_Retval = NULL;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -3141,7 +3256,7 @@ const C_OSCNodeDataPoolContent * C_SyvDaItPaTreeModel::m_GetSetValue(const uint3
 bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
 {
    bool q_Retval = false;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -3266,7 +3381,7 @@ bool C_SyvDaItPaTreeModel::m_CheckListCRCIsChanged(const C_OSCNodeDataPoolListEl
    bool q_Retval = false;
    bool q_Read = true;
    //Check if read
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -3299,7 +3414,7 @@ bool C_SyvDaItPaTreeModel::m_CheckListCRCIsChanged(const C_OSCNodeDataPoolListEl
    if (q_Read == true)
    {
       uint32 u32_ItFinalIndex;
-      bool q_Found = m_GetListIndex(orc_Id, u32_ItFinalIndex);
+      const bool q_Found = m_GetListIndex(orc_Id, u32_ItFinalIndex);
 
       if ((q_Found == true) && (u32_ItFinalIndex < this->mc_ECUCRCValidStatus.size()))
       {
@@ -3325,7 +3440,7 @@ bool C_SyvDaItPaTreeModel::m_CheckListCRCIsChanged(const C_OSCNodeDataPoolListEl
 bool C_SyvDaItPaTreeModel::m_CheckElementIsChanged(const C_OSCNodeDataPoolListElementId & orc_Id) const
 {
    bool q_Retval = false;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -3396,7 +3511,7 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
            (c_ItAll != this->mpc_InvisibleRootItem->c_Children.end()) && (q_Found == false);
            ++c_ItAll)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          const C_TblTreItem * const pc_AllNode = dynamic_cast<const C_TblTreItem * const>(*c_ItAll);
          if (pc_AllNode != NULL)
          {
@@ -3404,7 +3519,7 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
             for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
                  (c_ItNode != pc_AllNode->c_Children.end()) && (q_Found == false); ++c_ItNode)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                const C_TblTreItem * const pc_Node = dynamic_cast<const C_TblTreItem * const>(*c_ItNode);
                if (pc_Node != NULL)
                {
@@ -3412,7 +3527,7 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
                   for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
                        (c_ItDp != pc_Node->c_Children.end()) && (q_Found == false); ++c_ItDp)
                   {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                      const C_TblTreItem * const pc_Dp = dynamic_cast<const C_TblTreItem * const>(*c_ItDp);
                      if (pc_Dp != NULL)
                      {
@@ -3421,7 +3536,7 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
                              (c_ItList != pc_Dp->c_Children.end()) && (q_Found == false);
                              ++c_ItList)
                         {
-                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
                            const C_TblTreItem * const pc_List = dynamic_cast<const C_TblTreItem * const>(*c_ItList);
                            if (pc_List != NULL)
                            {

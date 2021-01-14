@@ -144,12 +144,12 @@ QPointF C_SebBaseCopyPasteManager::mh_Min(const QPointF & orc_P1, const QPointF 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Consider this point for original position
 
-   \param[in] orc_P New point
+   \param[in] orc_Point New point
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebBaseCopyPasteManager::m_MinToOrgPos(const QPointF & orc_P)
+void C_SebBaseCopyPasteManager::m_MinToOrgPos(const QPointF & orc_Point)
 {
-   this->mc_OriginalPosition = mh_Min(this->mc_OriginalPosition, orc_P);
+   this->mc_OriginalPosition = mh_Min(this->mc_OriginalPosition, orc_Point);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

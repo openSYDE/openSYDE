@@ -42,14 +42,11 @@ public:
    ~C_CamMainWindow(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void closeEvent(QCloseEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
    virtual void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
    virtual void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
    virtual void dropEvent(QDropEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_CamMainWindow * mpc_Ui;
@@ -111,8 +108,12 @@ private:
    void m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Result);
    void m_OnDatabaseRemove(const QString & orc_File, const QString & orc_OrgPath, const bool oq_IsUpdate);
    void m_OnActivateDatabase(const QString & orc_File, const QString & orc_OrgPath, const bool oq_Active);
-   void m_OnOsyChangeBus(const QString & orc_File, const stw_types::uint32 ou32_BusIndex);
+   void m_OnOsyChangeBus(const QString & orc_File, const QString & orc_OrgPath, const stw_types::uint32 ou32_BusIndex);
    void m_OnCanDllConfigChange(void);
+   void m_CheckMessagesForLoadedDatabase(const QString & orc_DatabasePath);
+   void m_CheckForLastDatabaseLoaded(const QString & orc_DatabasePath);
+   void m_DisplayCheckMessagesDialog(const QString & orc_DatabasePath,
+                                     const std::vector<stw_types::uint32> & orc_Indices);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

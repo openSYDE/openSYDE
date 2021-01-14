@@ -728,8 +728,9 @@ const
             q_Retval = true;
             if (opc_CriticalDatapoolNamespaceNames != NULL)
             {
-               const QString c_Combined = QString("%1::%2").arg(rc_CheckedNode.c_Properties.c_Name.c_str()).arg(
-                  rc_CheckedDatapool.c_Name.c_str());
+               const QString c_Combined =
+                  static_cast<QString>("%1::%2").arg(rc_CheckedNode.c_Properties.c_Name.c_str()).arg(
+                     rc_CheckedDatapool.c_Name.c_str());
                opc_CriticalDatapoolNamespaceNames->push_back(c_Combined);
             }
          }
@@ -1396,6 +1397,9 @@ sint32 C_PuiSdHandlerNodeLogic::MoveDataPool(const uint32 ou32_NodeIndex, const 
             rc_UINode.c_UIDataPools.erase(rc_UINode.c_UIDataPools.begin() + ou32_SourceIndex);
             //Insert
             rc_UINode.c_UIDataPools.insert(rc_UINode.c_UIDataPools.begin() + ou32_TargetIndex, c_Data);
+
+            //Handle NVM
+            this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex].RecalculateAddress();
 
             // Update shared Datapool configuration
             this->mc_SharedDatapools.OnDatapoolMoved(C_OSCNodeDataPoolId(ou32_NodeIndex, ou32_SourceIndex),
@@ -4015,9 +4019,10 @@ void C_PuiSdHandlerNodeLogic::h_InitDataElement(const C_OSCNodeDataPool::E_Type 
    const QString c_Type = C_PuiSdHandlerNodeLogic::h_GetElementTypeName(ore_Type);
 
    //Translation: 1: Data element type
-   orc_OSCElement.c_Name = QString(QString("New%1").arg(c_Type)).toStdString().c_str();
+   orc_OSCElement.c_Name = static_cast<QString>(static_cast<QString>("New%1").arg(c_Type)).toStdString().c_str();
    //Translation: 1: Data element type
-   orc_OSCElement.c_Comment = QString(QString("%1 description").arg(c_Type)).toStdString().c_str();
+   orc_OSCElement.c_Comment =
+      static_cast<QString>(static_cast<QString>("%1 description").arg(c_Type)).toStdString().c_str();
    //Default access value
    if (ore_Type == C_OSCNodeDataPool::eDIAG)
    {

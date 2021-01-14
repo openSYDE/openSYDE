@@ -89,10 +89,7 @@ protected:
    void m_FileCountChanged(void);
    void m_SetApplicationState(const stw_types::uint32 ou32_Application, const stw_types::uint32 ou32_State) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
-   //lint -restore
 
    Ui::C_SyvUpUpdatePackageListNodeWidget * mpc_Ui;
    stw_types::uint32 mu32_ViewIndex;

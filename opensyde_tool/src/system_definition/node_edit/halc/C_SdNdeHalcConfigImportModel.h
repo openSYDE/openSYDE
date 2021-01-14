@@ -46,17 +46,17 @@ public:
    stw_types::sint32 Init(const stw_opensyde_core::C_OSCHalcConfig & orc_Config,
                           const stw_opensyde_core::C_OSCHalcConfigStandalone & orc_ImportConfig);
    void GetAdaptedConfiguration(stw_opensyde_core::C_OSCHalcConfig & orc_AdaptedConfig);
+   bool IsSelectionOfLinkedChannelsValid(std::vector<stw_types::uint32> & orc_DomainIndices,
+                                         std::vector<std::vector<stw_types::uint32> > & orc_MissingChannelIndices);
+   void CheckChannels(const std::vector<stw_types::uint32> & orc_DomainIndices,
+                      const std::vector<std::vector<stw_types::uint32> > & orc_ChannelIndices);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual stw_types::sintn columnCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
    virtual QVariant data(const QModelIndex & orc_Index, const stw_types::sintn osn_Role =
                             static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
    virtual bool setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                         const stw_types::sintn osn_Role) override;
    virtual Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;
-   //lint -restore
 
 private:
    void m_CheckChildren(C_SdNdeHalcConfigImportItem * const opc_TreeItem, const QModelIndex & orc_ItemIndex,
@@ -64,6 +64,8 @@ private:
    void m_CheckParent(const C_SdNdeHalcConfigImportItem * const opc_TreeItem, const QModelIndex & orc_ItemIndex,
                       QModelIndex & orc_StartIndex);
    void m_CleanUpLastModel(void);
+   QString m_CreateTooltipContent(const stw_types::uint32 ou32_DomainIndex,
+                                  const stw_types::uint32 ou32_ChannelIndex) const;
 
    stw_opensyde_core::C_OSCHalcConfig mc_ConfigCopy;
    stw_opensyde_core::C_OSCHalcConfigStandalone mc_ImportConfigCopy;

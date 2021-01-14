@@ -45,11 +45,8 @@ Q_SIGNALS:
    void SigStopDrag(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void startDrag(const Qt::DropActions oc_Actions) override;
    virtual QMimeData * mimeData(const QList<QListWidgetItem *> oc_Items) const override;
-   //lint -restore
 
 private:
    std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceInformation> mc_Data;

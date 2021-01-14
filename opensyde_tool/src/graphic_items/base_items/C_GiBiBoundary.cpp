@@ -65,9 +65,9 @@ C_GiBiBoundary::C_GiBiBoundary(const uint64 & oru64_ID, const float64 of64_Width
                        opc_Parent)
 {
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   QRectF c_Rect = QRectF(0.0, 0.0,
-                          std::max(mhf64_MinWidthBoundary, of64_Width),
-                          std::max(mhf64_MinHeightBoundary, of64_Height));
+   const QRectF c_Rect = QRectF(0.0, 0.0,
+                                std::max(mhf64_MinWidthBoundary, of64_Width),
+                                std::max(mhf64_MinHeightBoundary, of64_Height));
    QPen c_Pen;
    QBrush c_Brush;
 
@@ -133,8 +133,8 @@ bool C_GiBiBoundary::OpenStyleDialog(const bool oq_DarkMode)
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
-   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Boundary"), oq_DarkMode);
-   C_GiSyBoundaryWidget * pc_SettingsWidget = new C_GiSyBoundaryWidget(*pc_Dialog);
+   C_GiSyBaseWidget * const pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Boundary"), oq_DarkMode);
+   C_GiSyBoundaryWidget * const pc_SettingsWidget = new C_GiSyBoundaryWidget(*pc_Dialog);
 
    pc_SettingsWidget->SetBorderColor(this->GetBorderColor());
    pc_SettingsWidget->SetBackgroundColor(this->GetBackgroundColor());
@@ -155,8 +155,7 @@ bool C_GiBiBoundary::OpenStyleDialog(const bool oq_DarkMode)
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   return q_Retval;
+   return q_Retval; //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -169,7 +168,6 @@ bool C_GiBiBoundary::OpenStyleDialog(const bool oq_DarkMode)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiBoundary::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_GiBiBoundary * const pc_Item = dynamic_cast<const C_GiBiBoundary * const>(opc_GuidelineItem);
 
    if (pc_Item != NULL)

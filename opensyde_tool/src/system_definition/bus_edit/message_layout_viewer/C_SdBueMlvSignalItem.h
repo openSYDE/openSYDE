@@ -52,11 +52,8 @@ public:
    bool ContainsLeftResizeItemPoint(const QPointF & orc_Pos) const;
    bool ContainsRightResizeItemPoint(const QPointF & orc_Pos) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget) override;
-   //lint -restore
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -67,12 +64,9 @@ Q_SIGNALS:
    void SigChangeCursor(const Qt::CursorShape oe_Cursor);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call

@@ -68,9 +68,9 @@ public:
 
    //Bend line
    stw_types::sint32 BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
-                              const stw_types::sint32 * const opc_Index = NULL);
+                              const stw_types::sint32 * const ops32_Index = NULL);
    stw_types::sint32 RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
-                                    const stw_types::sint32 * const opc_Index = NULL) const;
+                                    const stw_types::sint32 * const ops32_Index = NULL) const;
 
    //lint -e{1735} Suppression, because default parameters are identical
    virtual void CopyFromManagerToScene(const QPointF * const opc_Pos = NULL) = 0;
@@ -103,8 +103,6 @@ protected:
    virtual stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * m_GetCopyPasteManager(void) = 0;
    virtual const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * m_GetCopyPasteManagerConst(void) const = 0;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
    virtual void focusOutEvent(QFocusEvent * const opc_Event) override;
    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent * const opc_Event) override;
@@ -113,7 +111,6 @@ protected:
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event) override;
-   //lint -restore
 
    virtual void m_AddTextElementToScene(C_GiBiTextElement * const opc_Item);
    virtual void m_AddLineArrowToScene(C_GiBiArrow * const opc_Item);

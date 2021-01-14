@@ -112,7 +112,7 @@ void C_SyvDaItDashboardProgressBarWidget::SetDisplayStyle(const C_PuiSvDbWidgetB
       break;
    }
 
-   SetBarMargins();
+   m_SetBarMargins();
    this->update();
 }
 
@@ -126,9 +126,7 @@ void C_SyvDaItDashboardProgressBarWidget::SetDisplayStyle(const C_PuiSvDbWidgetB
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Event)
 {
-   // Karsten Anfang
    // Variables
-
    QPainter c_Painter(this);
    QFont c_TextFont;
    QRect c_MinRect;
@@ -149,7 +147,7 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
    QFontMetrics c_TextFontMetric(c_TextFont);
 
    Q_UNUSED(opc_Event)
-   SetLabelColor(c_Painter, c_TextFont, c_ArrowPen, c_MinMaxPen, c_ValuePen); // Setting all Colors
+   m_SetLabelColor(c_Painter, c_TextFont, c_ArrowPen, c_MinMaxPen, c_ValuePen); // Setting all Colors
    c_ArrowPen.setJoinStyle(Qt::RoundJoin);                                    // To draw the arrow with round edges
    // Value for setting the value text to the right position
    f32_Value = static_cast<float32>(this->mpc_Ui->pc_ProgressBar->value()) -
@@ -800,7 +798,6 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
    default:
       break;
    }
-   // Karsten Ende
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -809,7 +806,7 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::AdjustFontToSize(void)
 {
-   SetBarMargins();
+   m_SetBarMargins();
 
    this->update();
 }
@@ -825,9 +822,8 @@ void C_SyvDaItDashboardProgressBarWidget::SetValue(const sintn osn_Value, const 
 {
    const sintn sn_Min = this->mpc_Ui->pc_ProgressBar->minimum();
 
-   // Karsten Anfang
    if (osn_Value < sn_Min)
-   // Necessary becausde osn_Value = -7905 when it should be 0
+   // Necessary because osn_Value = -7905 when it should be 0
    // setValue() doesn't take negative values
    {
       // Setting the shown value
@@ -838,7 +834,6 @@ void C_SyvDaItDashboardProgressBarWidget::SetValue(const sintn osn_Value, const 
       // Setting the value
       this->mpc_Ui->pc_ProgressBar->setValue(osn_Value);
    }
-   // Karsten Ende
 
    this->mc_Value = orc_Value;
    this->update();
@@ -855,7 +850,7 @@ void C_SyvDaItDashboardProgressBarWidget::SetMin(const sintn osn_Value, const QS
 {
    this->mc_MinValue = orc_Value;
    this->mpc_Ui->pc_ProgressBar->setMinimum(osn_Value);
-   SetBarMargins();
+   m_SetBarMargins();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -869,7 +864,7 @@ void C_SyvDaItDashboardProgressBarWidget::SetMax(const sintn osn_Value, const QS
 {
    this->mc_MaxValue = orc_Value;
    this->mpc_Ui->pc_ProgressBar->setMaximum(osn_Value);
-   SetBarMargins();
+   m_SetBarMargins();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1172,8 +1167,7 @@ float64 C_SyvDaItDashboardProgressBarWidget::mh_GetArc(const QPointF & orc_V1, c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Karsten Anfang
-void C_SyvDaItDashboardProgressBarWidget::SetLabelColor(QPainter & orc_Painter, QFont & orc_TextFont,
+void C_SyvDaItDashboardProgressBarWidget::m_SetLabelColor(QPainter & orc_Painter, QFont & orc_TextFont,
                                                         QPen & orc_ArrowPen, QPen & orc_MinMaxPen,
                                                         QPen & orc_ValuePen) const
 {
@@ -1215,7 +1209,7 @@ void C_SyvDaItDashboardProgressBarWidget::SetLabelColor(QPainter & orc_Painter, 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_SyvDaItDashboardProgressBarWidget::SetBarMargins()
+void C_SyvDaItDashboardProgressBarWidget::m_SetBarMargins()
 {
    QFont c_TextFont;
    QFontMetrics c_TextFontMetric(c_TextFont);
@@ -1500,4 +1494,4 @@ stw_opensyde_gui_logic::C_PuiSvDbProgressBar::E_Type C_SyvDaItDashboardProgressB
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Karsten Ende
+

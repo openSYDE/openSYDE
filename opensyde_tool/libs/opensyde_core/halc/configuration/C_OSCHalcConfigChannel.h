@@ -24,6 +24,7 @@ class C_OSCHalcConfigChannel
 {
 public:
    C_OSCHalcConfigChannel(void);
+   virtual ~C_OSCHalcConfigChannel();
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 

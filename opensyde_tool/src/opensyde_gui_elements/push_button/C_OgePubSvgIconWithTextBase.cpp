@@ -142,7 +142,7 @@ void C_OgePubSvgIconWithTextBase::paintEvent(QPaintEvent * const opc_Event)
       //=======
       if (this->isEnabled())
       {
-         C_OgePubSvgIconWithTextBase::h_DrawRectBorders(
+         C_OgePubSvgIconWithTextBase::mh_DrawRectBorders(
             this->rect(), c_Painter, this->msn_LeftBorderEnabledWidth, this->msn_TopBorderEnabledWidth,
             this->msn_RightBorderEnabledWidth, this->msn_BottomBorderEnabledWidth, this->mc_BorderColorEnabledLeft,
             this->mc_BorderColorEnabledTop, this->mc_BorderColorEnabledRight,
@@ -150,7 +150,7 @@ void C_OgePubSvgIconWithTextBase::paintEvent(QPaintEvent * const opc_Event)
       }
       else
       {
-         C_OgePubSvgIconWithTextBase::h_DrawRectBorders(
+         C_OgePubSvgIconWithTextBase::mh_DrawRectBorders(
             this->rect(), c_Painter, this->msn_LeftBorderDisabledWidth, this->msn_TopBorderDisabledWidth,
             this->msn_RightBorderDisabledWidth, this->msn_BottomBorderDisabledWidth, this->mc_BorderColorDisabledLeft,
             this->mc_BorderColorDisabledTop, this->mc_BorderColorDisabledRight,
@@ -250,13 +250,14 @@ void C_OgePubSvgIconWithTextBase::SetDarkMode(const bool oq_Active)
    \param[in]     orc_BorderColorBottom  Bottom border color
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubSvgIconWithTextBase::h_DrawRectBorders(const QRect & orc_RectOuter, QPainter & orc_Painter,
-                                                    const sintn osn_LeftBorderWidth, const sintn osn_TopBorderWidth,
-                                                    const sintn osn_RightBorderWidth, const sintn osn_BottomBorderWidth,
-                                                    const QColor & orc_BorderColorLeft,
-                                                    const QColor & orc_BorderColorTop,
-                                                    const QColor & orc_BorderColorRight,
-                                                    const QColor & orc_BorderColorBottom)
+void C_OgePubSvgIconWithTextBase::mh_DrawRectBorders(const QRect & orc_RectOuter, QPainter & orc_Painter,
+                                                     const sintn osn_LeftBorderWidth, const sintn osn_TopBorderWidth,
+                                                     const sintn osn_RightBorderWidth,
+                                                     const sintn osn_BottomBorderWidth,
+                                                     const QColor & orc_BorderColorLeft,
+                                                     const QColor & orc_BorderColorTop,
+                                                     const QColor & orc_BorderColorRight,
+                                                     const QColor & orc_BorderColorBottom)
 {
    //Points for an outer rectangle (the rectangle all points are drawn in)
    //And points for an inner rectange (the rectangle the content is in)

@@ -158,7 +158,7 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
 
    if (opc_Event->type() == QEvent::ToolTip)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
       if (pc_HelpEvent != NULL)
@@ -281,7 +281,7 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
    //Necessary to detect mouse move events over integrated widgets
    else if (opc_Event->type() == QEvent::HoverMove)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QHoverEvent * const pc_HoverEvent = dynamic_cast<QHoverEvent * const>(opc_Event);
 
       if (pc_HoverEvent != NULL)

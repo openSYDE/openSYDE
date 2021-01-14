@@ -40,16 +40,16 @@ public:
 protected:
    C_OSCParamSetFilerBase(void);
 
-   static stw_types::sint32 h_LoadNodeName(stw_scl::C_SCLString & orc_Name, C_OSCXMLParserBase & orc_XMLParser);
-   static void h_SaveNodeName(const stw_scl::C_SCLString & orc_Name, C_OSCXMLParserBase & orc_XMLParser);
-   static stw_types::sint32 h_LoadDataPoolInfos(std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
+   static stw_types::sint32 mh_LoadNodeName(stw_scl::C_SCLString & orc_Name, C_OSCXMLParserBase & orc_XMLParser);
+   static void mh_SaveNodeName(const stw_scl::C_SCLString & orc_Name, C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadDataPoolInfos(std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
+                                                 C_OSCXMLParserBase & orc_XMLParser, bool & orq_MissingOptionalContent);
+   static void mh_SaveDataPoolInfos(const std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
+                                    C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadDataPoolInfo(C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,
                                                 C_OSCXMLParserBase & orc_XMLParser, bool & orq_MissingOptionalContent);
-   static void h_SaveDataPoolInfos(const std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
+   static void mh_SaveDataPoolInfo(const C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,
                                    C_OSCXMLParserBase & orc_XMLParser);
-   static stw_types::sint32 h_LoadDataPoolInfo(C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,
-                                               C_OSCXMLParserBase & orc_XMLParser, bool & orq_MissingOptionalContent);
-   static void h_SaveDataPoolInfo(const C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,
-                                  C_OSCXMLParserBase & orc_XMLParser);
 
 private:
    static stw_types::uint16 mhu16_FileVersion;

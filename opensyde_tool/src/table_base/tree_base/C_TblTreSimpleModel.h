@@ -25,14 +25,10 @@ class C_TblTreSimpleModel :
 public:
    C_TblTreSimpleModel(QObject * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual QModelIndex index(const stw_types::sintn osn_Row, const stw_types::sintn osn_Column,
                              const QModelIndex & orc_Parent = QModelIndex()) const override;
    virtual QModelIndex parent(const QModelIndex & orc_Index) const override;
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
-   //lint -restore
 
 protected:
    C_TblTreSimpleItem * mpc_InvisibleRootItem;

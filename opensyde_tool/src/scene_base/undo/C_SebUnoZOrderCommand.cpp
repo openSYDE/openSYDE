@@ -76,7 +76,7 @@ C_SebUnoZOrderCommand::~C_SebUnoZOrderCommand()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoZOrderCommand::undo(void)
 {
-   this->ApplyZValues(this->mc_OldZValues);
+   this->m_ApplyZValues(this->mc_OldZValues);
    QUndoCommand::undo();
 }
 
@@ -86,7 +86,7 @@ void C_SebUnoZOrderCommand::undo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoZOrderCommand::redo(void)
 {
-   this->ApplyZValues(this->mc_NewZValues);
+   this->m_ApplyZValues(this->mc_NewZValues);
    QUndoCommand::redo();
 }
 
@@ -105,7 +105,6 @@ void C_SebUnoZOrderCommand::h_AdaptZOrder(const QGraphicsScene * const opc_Scene
                                           const QList<QGraphicsItem *> & orc_SelectedItems, const bool oq_BringToFront,
                                           QMap<QGraphicsItem *, float64> & orc_NewZValues)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_SebScene * const pc_Scene = dynamic_cast<const C_SebScene * const>(opc_Scene);
 
    if (pc_Scene != NULL)
@@ -126,7 +125,7 @@ void C_SebUnoZOrderCommand::h_AdaptZOrder(const QGraphicsScene * const opc_Scene
    \param[in] orc_Values New Z values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebUnoZOrderCommand::ApplyZValues(const std::vector<float64> & orc_Values) const
+void C_SebUnoZOrderCommand::m_ApplyZValues(const std::vector<float64> & orc_Values) const
 {
    const vector<QGraphicsItem *> c_AffectedItems = this->m_GetSceneItems();
 
@@ -134,8 +133,6 @@ void C_SebUnoZOrderCommand::ApplyZValues(const std::vector<float64> & orc_Values
    {
       for (uint32 u32_ItAffectedItem = 0; u32_ItAffectedItem < c_AffectedItems.size(); ++u32_ItAffectedItem)
       {
-         //lint -e{740}  no problem because of common base class
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          C_GiBiBase * const pc_GiBase = dynamic_cast<C_GiBiBase * const>(c_AffectedItems[u32_ItAffectedItem]);
          if (pc_GiBase != NULL)
          {
@@ -167,7 +164,6 @@ void C_SebUnoZOrderCommand::mh_CreateZValueMap(const QGraphicsScene * const opc_
 {
    if (oq_BringToFront)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_SebScene * const pc_Scene = dynamic_cast<const C_SebScene * const>(opc_Scene);
 
       if (pc_Scene != NULL)
@@ -216,7 +212,6 @@ float64 C_SebUnoZOrderCommand::mh_GetLowestUsedZValueList(const QGraphicsScene *
 {
    bool q_NothingFound = true;
    float64 f64_Retval = std::numeric_limits<float64>::max();
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_SebScene * const pc_Scene = dynamic_cast<const C_SebScene * const>(opc_Scene);
 
    if (pc_Scene != NULL)

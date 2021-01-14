@@ -159,6 +159,8 @@ sint32 C_OSCHalcDefContent::SetEnumValue(const stw_scl::C_SCLString & orc_Displa
             case eFLOAT64:
                this->SetValueAF64(rc_NewContent.GetValueAF64());
                break;
+            default:
+               break;
             }
          }
          else
@@ -194,6 +196,8 @@ sint32 C_OSCHalcDefContent::SetEnumValue(const stw_scl::C_SCLString & orc_Displa
                break;
             case eFLOAT64:
                this->SetValueF64(rc_NewContent.GetValueF64());
+               break;
+            default:
                break;
             }
          }
@@ -369,65 +373,15 @@ sint32 C_OSCHalcDefContent::SetBitmask(const stw_scl::C_SCLString & orc_DisplayN
    {
       bool q_Found = false;
 
+      //Step 1: update flag
       for (std::vector<C_OSCHalcDefContentBitmaskItem>::iterator c_ItBitmask = this->mc_BitmaskItems.begin();
            c_ItBitmask != this->mc_BitmaskItems.end(); ++c_ItBitmask)
       {
          if (orc_DisplayName == c_ItBitmask->c_Display)
          {
-            uint64 u64_CurrentValue = 0ULL;
             q_Found = true;
-            //Current value
-            switch (this->GetType())
-            {
-            case C_OSCNodeDataPoolContent::eUINT8:
-               u64_CurrentValue = static_cast<uint64>(this->GetValueU8());
-               break;
-            case C_OSCNodeDataPoolContent::eUINT16:
-               u64_CurrentValue = static_cast<uint64>(this->GetValueU16());
-               break;
-            case C_OSCNodeDataPoolContent::eUINT32:
-               u64_CurrentValue = static_cast<uint64>(this->GetValueU32());
-               break;
-            case C_OSCNodeDataPoolContent::eUINT64:
-               u64_CurrentValue = this->GetValueU64();
-               break;
-            default:
-               s32_Retval = C_CONFIG;
-               break;
-            }
-            if (s32_Retval == C_NO_ERR)
-            {
-               //Update value
-               //Step 1 - mask current value
-               u64_CurrentValue = u64_CurrentValue & (~(c_ItBitmask->u64_Value));
-               //Step 2 - add new value
-               if (oq_Value)
-               {
-                  u64_CurrentValue += c_ItBitmask->u64_Value;
-               }
-               //Update flag
-               c_ItBitmask->q_ApplyValueSetting = oq_Value;
-               //Set value
-               switch (this->GetType())
-               {
-               case C_OSCNodeDataPoolContent::eUINT8:
-                  this->SetValueU8(static_cast<uint8>(u64_CurrentValue));
-                  break;
-               case C_OSCNodeDataPoolContent::eUINT16:
-                  this->SetValueU16(static_cast<uint16>(u64_CurrentValue));
-                  break;
-               case C_OSCNodeDataPoolContent::eUINT32:
-                  this->SetValueU32(static_cast<uint32>(u64_CurrentValue));
-                  break;
-               case C_OSCNodeDataPoolContent::eUINT64:
-                  this->SetValueU64(static_cast<uint64>(u64_CurrentValue));
-                  break;
-               default:
-                  //Should not happen
-                  tgl_assert(false);
-                  break;
-               }
-            }
+            //Update flag
+            c_ItBitmask->q_ApplyValueSetting = oq_Value;
             //Stop after finding one
             break;
          }
@@ -435,6 +389,68 @@ sint32 C_OSCHalcDefContent::SetBitmask(const stw_scl::C_SCLString & orc_DisplayN
       if (q_Found == false)
       {
          s32_Retval = C_RANGE;
+      }
+      else
+      {
+         uint64 u64_CurrentValue = 0ULL;
+         //Current value
+         switch (this->GetType()) //lint !e788 not all enum constants used; this is unsigned only
+         {
+         case C_OSCNodeDataPoolContent::eUINT8:
+            u64_CurrentValue = static_cast<uint64>(this->GetValueU8());
+            break;
+         case C_OSCNodeDataPoolContent::eUINT16:
+            u64_CurrentValue = static_cast<uint64>(this->GetValueU16());
+            break;
+         case C_OSCNodeDataPoolContent::eUINT32:
+            u64_CurrentValue = static_cast<uint64>(this->GetValueU32());
+            break;
+         case C_OSCNodeDataPoolContent::eUINT64:
+            u64_CurrentValue = this->GetValueU64();
+            break;
+         default:
+            s32_Retval = C_CONFIG;
+            break;
+         }
+         if (s32_Retval == C_NO_ERR)
+         {
+            //Step 2: get initial value
+            for (std::vector<C_OSCHalcDefContentBitmaskItem>::iterator c_ItBitmask = this->mc_BitmaskItems.begin();
+                 c_ItBitmask != this->mc_BitmaskItems.end(); ++c_ItBitmask)
+            {
+               //Mask any used bits
+               u64_CurrentValue = u64_CurrentValue & (~(c_ItBitmask->u64_Value));
+            }
+            //Step 3: apply all active flags
+            for (std::vector<C_OSCHalcDefContentBitmaskItem>::iterator c_ItBitmask = this->mc_BitmaskItems.begin();
+                 c_ItBitmask != this->mc_BitmaskItems.end(); ++c_ItBitmask)
+            {
+               if (c_ItBitmask->q_ApplyValueSetting)
+               {
+                  u64_CurrentValue = u64_CurrentValue | c_ItBitmask->u64_Value;
+               }
+            }
+            //Step 4: update value
+            switch (this->GetType()) //lint !e788 not all enum constants used; this is unsigned only
+            {
+            case C_OSCNodeDataPoolContent::eUINT8:
+               this->SetValueU8(static_cast<uint8>(u64_CurrentValue));
+               break;
+            case C_OSCNodeDataPoolContent::eUINT16:
+               this->SetValueU16(static_cast<uint16>(u64_CurrentValue));
+               break;
+            case C_OSCNodeDataPoolContent::eUINT32:
+               this->SetValueU32(static_cast<uint32>(u64_CurrentValue));
+               break;
+            case C_OSCNodeDataPoolContent::eUINT64:
+               this->SetValueU64(static_cast<uint64>(u64_CurrentValue));
+               break;
+            default:
+               //Should not happen
+               tgl_assert(false);
+               break;
+            }
+         }
       }
    }
    else

@@ -27,11 +27,8 @@ class C_CamGenTableDelegate :
 public:
    C_CamGenTableDelegate(QObject * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                       const QModelIndex & orc_Index) const override;
-   //lint -restore
 
 private:
    static const QColor mhc_DefaultBackgroundColor;

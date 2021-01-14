@@ -106,7 +106,7 @@ void C_SyvDaItDashboardLabelWidget::SetValue(const QString & orc_Text) const
 {
    if (this->mq_ShowUnit == true)
    {
-      this->mpc_Ui->pc_LabelValue->setText(QString("%1 %2").arg(orc_Text).arg(this->mc_Unit));
+      this->mpc_Ui->pc_LabelValue->setText(static_cast<QString>("%1 %2").arg(orc_Text).arg(this->mc_Unit));
    }
    else
    {

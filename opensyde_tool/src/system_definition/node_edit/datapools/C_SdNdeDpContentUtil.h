@@ -8,8 +8,8 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SdNdeDpCONTENTUTIL_H
-#define C_SdNdeDpCONTENTUTIL_H
+#ifndef C_SDNDEDPCONTENTUTIL_H
+#define C_SDNDEDPCONTENTUTIL_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVariant>
@@ -67,14 +67,16 @@ public:
                                                        stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content);
    static void h_GetValuesAsScaledString(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
                                          const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset,
-                                         std::vector<QString> & orc_Output);
+                                         std::vector<QString> & orc_Output, const bool oq_AllowRangeAdaptation = true);
    static void h_GetValuesAsScaledCombinedString(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
                                                  const stw_types::float64 of64_Factor,
-                                                 const stw_types::float64 of64_Offset, QString & orc_Output);
+                                                 const stw_types::float64 of64_Offset, QString & orc_Output,
+                                                 const bool oq_AllowRangeAdaptation = true);
    static QString h_CombineString(const std::vector<QString> & orc_Input);
    static void h_GetValueAsScaledString(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
                                         const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset,
-                                        QString & orc_Output, const stw_types::uint32 ou32_Index);
+                                        QString & orc_Output, const stw_types::uint32 ou32_Index,
+                                        const bool oq_AllowRangeAdaptation = true);
    static void h_InitMax(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content);
    static void h_InitMin(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content);
    static QVariant h_ConvertContentToGeneric(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input,
@@ -82,7 +84,8 @@ public:
    static QVariant h_ConvertScaledContentToGeneric(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input,
                                                    const stw_types::float64 of64_Factor,
                                                    const stw_types::float64 of64_Offset,
-                                                   const stw_types::uint32 & oru32_Index);
+                                                   const stw_types::uint32 & oru32_Index,
+                                                   const bool oq_AllowRangeAdaptation = true);
    static stw_types::sint32 h_SetDataVariableFromGeneric(const QVariant & orc_Value,
                                                          stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Output,
                                                          const stw_types::uint32 & oru32_Index);

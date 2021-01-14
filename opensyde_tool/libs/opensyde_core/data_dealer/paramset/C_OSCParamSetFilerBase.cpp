@@ -288,7 +288,7 @@ C_OSCParamSetFilerBase::C_OSCParamSetFilerBase(void)
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetFilerBase::h_LoadNodeName(stw_scl::C_SCLString & orc_Name, C_OSCXMLParserBase & orc_XMLParser)
+sint32 C_OSCParamSetFilerBase::mh_LoadNodeName(stw_scl::C_SCLString & orc_Name, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -317,7 +317,7 @@ sint32 C_OSCParamSetFilerBase::h_LoadNodeName(stw_scl::C_SCLString & orc_Name, C
    \param[in,out] orc_XMLParser XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetFilerBase::h_SaveNodeName(const stw_scl::C_SCLString & orc_Name, C_OSCXMLParserBase & orc_XMLParser)
+void C_OSCParamSetFilerBase::mh_SaveNodeName(const stw_scl::C_SCLString & orc_Name, C_OSCXMLParserBase & orc_XMLParser)
 {
    if (orc_XMLParser.SelectNodeChild("name") == "name")
    {
@@ -348,9 +348,9 @@ void C_OSCParamSetFilerBase::h_SaveNodeName(const stw_scl::C_SCLString & orc_Nam
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetFilerBase::h_LoadDataPoolInfos(std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
-                                                   C_OSCXMLParserBase & orc_XMLParser,
-                                                   bool & orq_MissingOptionalContent)
+sint32 C_OSCParamSetFilerBase::mh_LoadDataPoolInfos(std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
+                                                    C_OSCXMLParserBase & orc_XMLParser,
+                                                    bool & orq_MissingOptionalContent)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -364,7 +364,7 @@ sint32 C_OSCParamSetFilerBase::h_LoadDataPoolInfos(std::vector<C_OSCParamSetData
          do
          {
             C_OSCParamSetDataPoolInfo c_Item;
-            s32_Retval = C_OSCParamSetFilerBase::h_LoadDataPoolInfo(c_Item, orc_XMLParser, orq_MissingOptionalContent);
+            s32_Retval = C_OSCParamSetFilerBase::mh_LoadDataPoolInfo(c_Item, orc_XMLParser, orq_MissingOptionalContent);
             if (s32_Retval == C_NO_ERR)
             {
                orc_DataPoolInfos.push_back(c_Item);
@@ -404,8 +404,8 @@ sint32 C_OSCParamSetFilerBase::h_LoadDataPoolInfos(std::vector<C_OSCParamSetData
    \param[in,out] orc_XMLParser     XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetFilerBase::h_SaveDataPoolInfos(const std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
-                                                 C_OSCXMLParserBase & orc_XMLParser)
+void C_OSCParamSetFilerBase::mh_SaveDataPoolInfos(const std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
+                                                  C_OSCXMLParserBase & orc_XMLParser)
 {
    //Avoid adding the same datapools twice
    if (orc_XMLParser.SelectNodeChild("datapools") != "datapools")
@@ -414,7 +414,7 @@ void C_OSCParamSetFilerBase::h_SaveDataPoolInfos(const std::vector<C_OSCParamSet
       for (uint32 u32_ItDataPool = 0; u32_ItDataPool < orc_DataPoolInfos.size(); ++u32_ItDataPool)
       {
          tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("datapool") == "datapool");
-         C_OSCParamSetFilerBase::h_SaveDataPoolInfo(orc_DataPoolInfos[u32_ItDataPool], orc_XMLParser);
+         C_OSCParamSetFilerBase::mh_SaveDataPoolInfo(orc_DataPoolInfos[u32_ItDataPool], orc_XMLParser);
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "datapools");
       }
@@ -445,8 +445,9 @@ void C_OSCParamSetFilerBase::h_SaveDataPoolInfos(const std::vector<C_OSCParamSet
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetFilerBase::h_LoadDataPoolInfo(C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,
-                                                  C_OSCXMLParserBase & orc_XMLParser, bool & orq_MissingOptionalContent)
+sint32 C_OSCParamSetFilerBase::mh_LoadDataPoolInfo(C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,
+                                                   C_OSCXMLParserBase & orc_XMLParser,
+                                                   bool & orq_MissingOptionalContent)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -546,8 +547,8 @@ sint32 C_OSCParamSetFilerBase::h_LoadDataPoolInfo(C_OSCParamSetDataPoolInfo & or
    \param[in,out] orc_XMLParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetFilerBase::h_SaveDataPoolInfo(const C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,
-                                                C_OSCXMLParserBase & orc_XMLParser)
+void C_OSCParamSetFilerBase::mh_SaveDataPoolInfo(const C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,
+                                                 C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeUint32("crc", orc_DataPoolInfo.u32_DataPoolCrc);
    orc_XMLParser.SetAttributeUint32("nvm-start-address", orc_DataPoolInfo.u32_NvMStartAddress);

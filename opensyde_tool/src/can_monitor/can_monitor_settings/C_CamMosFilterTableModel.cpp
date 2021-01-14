@@ -21,6 +21,7 @@
 #include "C_GtGetText.h"
 #include "C_CamProHandler.h"
 #include "C_CamDbHandler.h"
+#include "C_Uti.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -92,7 +93,7 @@ QVariant C_CamMosFilterTableModel::headerData(const sintn osn_Section, const Qt:
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
       {
@@ -206,14 +207,13 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
                   c_TempDatabase = " (" + c_FilterItem.c_DatabaseMatch + ")";
                }
 
-               c_Retval = mh_GetValueAsHex(static_cast<uint64>(c_FilterItem.u32_StartId)) +
-                          c_TempExtended + c_TempDatabase;
+               c_Retval = C_Uti::h_GetValueAsHex(c_FilterItem.u32_StartId) + c_TempExtended + c_TempDatabase;
             }
             else
             {
-               c_Retval = QString(C_GtGetText::h_GetText("From %1 to %2")).
-                          arg(mh_GetValueAsHex(static_cast<uint64>(c_FilterItem.u32_StartId)) + c_TempExtended).
-                          arg(mh_GetValueAsHex(static_cast<uint64>(c_FilterItem.u32_EndId)) + c_TempExtended);
+               c_Retval = static_cast<QString>(C_GtGetText::h_GetText("From %1 to %2")).
+                          arg(C_Uti::h_GetValueAsHex(c_FilterItem.u32_StartId) + c_TempExtended).
+                          arg(C_Uti::h_GetValueAsHex(c_FilterItem.u32_EndId) + c_TempExtended);
             }
             break;
          case eREMOVE:
@@ -504,19 +504,19 @@ sint32 C_CamMosFilterTableModel::h_EnumToColumn(const C_CamMosFilterTableModel::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Search in all loaded databases for messages with given CAN ID.
 
-   \param[in]     u32_CanId        message CAN ID
+   \param[in]     ou32_CanId        message CAN ID
 
    \return
    string <Database>::<MessageName> (empty string if not found)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_CamMosFilterTableModel::h_SearchMessageInDatabases(const uint32 u32_CanId)
+QString C_CamMosFilterTableModel::h_SearchMessageInDatabases(const uint32 ou32_CanId)
 {
    QString c_Return = "";
    QString c_Database = "";
    QString c_Message = "";
 
-   C_CamDbHandler::h_GetInstance()->FindMessageById(u32_CanId, c_Database, c_Message);
+   C_CamDbHandler::h_GetInstance()->FindMessageById(ou32_CanId, c_Database, c_Message);
 
    if ((c_Database != "") && (c_Message != ""))
    {

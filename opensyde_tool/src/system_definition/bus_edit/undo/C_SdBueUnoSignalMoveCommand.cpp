@@ -36,32 +36,40 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]     orc_SourceMessageId     Source message identification indices
-   \param[in]     oru32_SourceSignalIndex Source signal index
-   \param[in]     orc_TargetMessageId     Target message identification indices
-   \param[in]     oru32_TargetSignalIndex Target signal index
-   \param[in,out] opc_MessageSyncManager  Message sync manager to perform actions on
-   \param[in,out] opc_MessageTreeWidget   Message tree widget to perform actions on
-   \param[in,out] opc_Parent              Optional pointer to parent
+   \param[in]      orc_SourceMessageId       Source message identification indices
+   \param[in]      orc_SourceSignalIndex     Source signal indices
+   \param[in]      orc_TargetMessageId       Target message identification indices
+   \param[in]      orc_TargetSignalIndex     Target signal indices
+   \param[in,out]  opc_MessageSyncManager    Message sync manager to perform actions on
+   \param[in,out]  opc_MessageTreeWidget     Message tree widget to perform actions on
+   \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoSignalMoveCommand::C_SdBueUnoSignalMoveCommand(
-   const C_OSCCanMessageIdentificationIndices & orc_SourceMessageId, const uint32 & oru32_SourceSignalIndex,
-   const C_OSCCanMessageIdentificationIndices & orc_TargetMessageId, const uint32 & oru32_TargetSignalIndex,
-   C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_SourceMessageId,
+   const std::vector<uint32> & orc_SourceSignalIndex,
+   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_TargetMessageId,
+   const std::vector<uint32> & orc_TargetSignalIndex, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
    C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, QUndoCommand * const opc_Parent) :
-   C_SdBueUnoSignalAddDeleteBaseCommand(orc_SourceMessageId, oru32_SourceSignalIndex, 0U, C_OSCCanSignal::eMUX_DEFAULT,
-                                        0, opc_MessageSyncManager, opc_MessageTreeWidget, "Move Signal",
+   C_SdBueUnoSignalAddDeleteBaseCommand(orc_SourceMessageId, orc_SourceSignalIndex, std::vector<uint16>(),
+                                        std::vector<C_OSCCanSignal::E_MultiplexerType>(),
+                                        std::vector<uint16>(), opc_MessageSyncManager, opc_MessageTreeWidget, "Move Signal(s)",
                                         opc_Parent),
-   mu64_SourceUniqueId(0ULL),
-   mu32_SourceSignalIndex(oru32_SourceSignalIndex),
-   mu64_TargetUniqueId(0ULL),
-   mu32_TargetSignalIndex(oru32_TargetSignalIndex)
+   mc_SourceSignalIndex(orc_SourceSignalIndex),
+   mc_TargetSignalIndex(orc_TargetSignalIndex)
 {
    if (opc_MessageSyncManager != NULL)
    {
-      this->mu64_SourceUniqueId = opc_MessageSyncManager->GetUniqueId(orc_SourceMessageId);
-      this->mu64_TargetUniqueId = opc_MessageSyncManager->GetUniqueId(orc_TargetMessageId);
+      this->mc_SourceUniqueId.reserve(orc_SourceMessageId.size());
+      this->mc_TargetUniqueId.reserve(orc_TargetMessageId.size());
+      for (uint32 u32_ItMessage = 0UL; u32_ItMessage < orc_SourceMessageId.size(); ++u32_ItMessage)
+      {
+         this->mc_SourceUniqueId.push_back(opc_MessageSyncManager->GetUniqueId(orc_SourceMessageId[u32_ItMessage]));
+      }
+      for (uint32 u32_ItMessage = 0UL; u32_ItMessage < orc_TargetMessageId.size(); ++u32_ItMessage)
+      {
+         this->mc_TargetUniqueId.push_back(opc_MessageSyncManager->GetUniqueId(orc_TargetMessageId[u32_ItMessage]));
+      }
    }
 }
 
@@ -71,7 +79,8 @@ C_SdBueUnoSignalMoveCommand::C_SdBueUnoSignalMoveCommand(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoSignalMoveCommand::redo(void)
 {
-   this->m_Move(mu64_SourceUniqueId, mu32_SourceSignalIndex, mu64_TargetUniqueId, mu32_TargetSignalIndex);
+   //Correct order assumed
+   this->m_Move(mc_SourceUniqueId, mc_SourceSignalIndex, mc_TargetUniqueId, mc_TargetSignalIndex);
    C_SdBueUnoSignalAddDeleteBaseCommand::redo();
 }
 
@@ -81,30 +90,45 @@ void C_SdBueUnoSignalMoveCommand::redo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoSignalMoveCommand::undo(void)
 {
+   std::vector<uint64> c_SourceUniqueId = mc_SourceUniqueId;
+   std::vector<uint32> c_SourceSignalIndex = mc_SourceSignalIndex;
+   std::vector<uint64> c_TargetUniqueId = mc_TargetUniqueId;
+   std::vector<uint32> c_TargetSignalIndex = mc_TargetSignalIndex;
+
    C_SdBueUnoSignalAddDeleteBaseCommand::undo();
-   this->m_Move(mu64_TargetUniqueId, mu32_TargetSignalIndex, mu64_SourceUniqueId, mu32_SourceSignalIndex);
+   //Reverse order necessary
+   std::reverse(c_TargetUniqueId.begin(), c_TargetUniqueId.end());
+   std::reverse(c_SourceUniqueId.begin(), c_SourceUniqueId.end());
+   std::reverse(c_TargetSignalIndex.begin(), c_TargetSignalIndex.end());
+   std::reverse(c_SourceSignalIndex.begin(), c_SourceSignalIndex.end());
+   this->m_Move(c_TargetUniqueId, c_TargetSignalIndex, c_SourceUniqueId, c_SourceSignalIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move signal data
 
-   \param[in] orc_SourceUniqueId      Source message identification indices (referenced by unique ID)
-   \param[in] oru32_SourceSignalIndex Source signal index
-   \param[in] orc_TargetUniqueId      Target message identification indices (referenced by unique ID)
-   \param[in] oru32_TargetSignalIndex Target signal index
+   \param[in]  orc_SourceUniqueId      Source message identification indices (referenced by unique ID)
+   \param[in]  orc_SourceSignalIndex   Source signal index
+   \param[in]  orc_TargetUniqueId      Target message identification indices (referenced by unique ID)
+   \param[in]  orc_TargetSignalIndex   Target signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoSignalMoveCommand::m_Move(const uint64 & orc_SourceUniqueId, const uint32 & oru32_SourceSignalIndex,
-                                         const uint64 & orc_TargetUniqueId, const uint32 & oru32_TargetSignalIndex)
+void C_SdBueUnoSignalMoveCommand::m_Move(const std::vector<uint64> & orc_SourceUniqueId,
+                                         const std::vector<uint32> & orc_SourceSignalIndex,
+                                         const std::vector<uint64> & orc_TargetUniqueId,
+                                         const std::vector<uint32> & orc_TargetSignalIndex)
 {
    //Step 1: delete source (Internal save of data)
-   this->mu64_UniqueId = orc_SourceUniqueId;
-   this->mu32_SignalIndex = oru32_SourceSignalIndex;
-   this->Delete();
+   this->mc_UniqueId = orc_SourceUniqueId;
+   this->mc_SignalIndex = orc_SourceSignalIndex;
+   this->m_Delete();
    //Reset color in all cases
-   this->mc_UISignal.u8_ColorIndex = 0;
+   for (uint32 u32_ItSig = 0UL; u32_ItSig < this->mc_UISignal.size(); ++u32_ItSig)
+   {
+      this->mc_UISignal[u32_ItSig].u8_ColorIndex = 0;
+   }
    //Step 2: add target (Use internally stored data)
-   this->mu64_UniqueId = orc_TargetUniqueId;
-   this->mu32_SignalIndex = oru32_TargetSignalIndex;
-   this->Add();
+   this->mc_UniqueId = orc_TargetUniqueId;
+   this->mc_SignalIndex = orc_TargetSignalIndex;
+   this->m_Add();
 }

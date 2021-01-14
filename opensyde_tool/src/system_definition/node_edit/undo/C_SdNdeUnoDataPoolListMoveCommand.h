@@ -40,8 +40,8 @@ private:
    std::vector<stw_types::uint32> mc_SourceRows;
    std::vector<stw_types::uint32> mc_TargetRows;
 
-   void DoMoveRows(const std::vector<stw_types::uint32> & orc_SelectedIndices,
-                   const std::vector<stw_types::uint32> & orc_TargetIndices);
+   void m_DoMoveRows(const std::vector<stw_types::uint32> & orc_SelectedIndices,
+                     const std::vector<stw_types::uint32> & orc_TargetIndices);
    void m_MoveItems(const std::vector<stw_types::uint32> & orc_ContiguousIndices,
                     const stw_types::uint32 ou32_TargetIndex) const;
    void m_MoveItem(const stw_types::uint32 ou32_SourceIndex, const stw_types::uint32 ou32_TargetIndex) const;

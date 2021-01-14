@@ -41,7 +41,7 @@ private:
    static stw_scl::C_SCLString mhc_ErrorMessage;        // description of error which caused the import to fail
 
    static stw_types::sint32 mh_ReadFile(const stw_scl::C_SCLString & orc_File, Vector::DBC::Network & orc_Network);
-   static stw_types::sint32 mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieConverter::C_CIENode & orc_Node);
+   static void mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieConverter::C_CIENode & orc_Node);
    static stw_types::sint32 mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage,
                                           C_CieConverter::C_CIENode & orc_Node);
    static stw_types::sint32 mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMessage,
@@ -58,8 +58,8 @@ private:
    static stw_types::sint32 mh_GetAttributeDefinitions(const Vector::DBC::Network & orc_DbcNetwork);
    static stw_types::sint32 mh_GetTransmission(const Vector::DBC::Message & orc_DbcMessage,
                                                C_CieConverter::C_CIENodeMessage & orc_Message);
-   static stw_types::sint32 mh_CheckRange(stw_types::float64 of64_Value,
-                                          stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type oe_Datatype);
+   static stw_types::sint32 mh_CheckRange(const stw_types::float64 of64_Value,
+                                          const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type oe_Datatype);
    static stw_scl::C_SCLString mh_ReEscapeCriticalSymbols(const stw_scl::C_SCLString & orc_String);
 
 public:

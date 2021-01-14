@@ -33,8 +33,6 @@ public:
 
    QWidget * GetEditor(void);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QWidget * createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
                                   const QModelIndex & orc_Index) const override;
    virtual void setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const override;
@@ -44,7 +42,6 @@ public:
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                       const QModelIndex & orc_Index) const override;
    virtual void destroyEditor(QWidget * const opc_Editor, const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -69,10 +66,7 @@ Q_SIGNALS:
                         const stw_types::uint32 ou32_ValidLayers) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool eventFilter(QObject * const opc_Object, QEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    void m_SetNewEditor(QWidget * const opc_Editor);

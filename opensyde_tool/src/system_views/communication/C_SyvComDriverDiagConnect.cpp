@@ -18,6 +18,7 @@
 #include "stwerrors.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_SyvComDriverDiagConnect.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -194,20 +195,20 @@ void C_SyvComDriverDiagConnect::m_RunSetDiagnosticMode(void)
       case C_NO_ERR:
          break;
       case C_CONFIG:
-         this->mc_ErrorMessage = QString(C_GtGetText::h_GetText("Initialization was not finished."));
+         this->mc_ErrorMessage = static_cast<QString>(C_GtGetText::h_GetText("Initialization was not finished."));
          break;
       case C_NOACT:
          this->mc_ErrorMessage =
-            QString(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
+            static_cast<QString>(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
          break;
       case C_TIMEOUT:
-         this->mc_ErrorMessage = QString(C_GtGetText::h_GetText("At least one node is not responding!"));
+         this->mc_ErrorMessage = static_cast<QString>(C_GtGetText::h_GetText("At least one node is not responding!"));
          this->mc_ErrorMessageDetails =
-            QString(C_GtGetText::h_GetText("Affected node(s):\n%1")).arg(c_ErrorDetails);
+            static_cast<QString>(C_GtGetText::h_GetText("Affected node(s):\n%1")).arg(c_ErrorDetails);
          break;
       case C_BUSY:
-         this->mc_ErrorMessage = QString(C_GtGetText::h_GetText("Connecting to at least one node failed!"));
-         this->mc_ErrorMessageDetails = QString(C_GtGetText::h_GetText("Affected node(s):\n"
+         this->mc_ErrorMessage = static_cast<QString>(C_GtGetText::h_GetText("Connecting to at least one node failed!"));
+         this->mc_ErrorMessageDetails = static_cast<QString>(C_GtGetText::h_GetText("Affected node(s):\n"
                                                                        "%1\n"
                                                                        "\n"
                                                                        "Possible scenarios:\n"
@@ -217,17 +218,17 @@ void C_SyvComDriverDiagConnect::m_RunSetDiagnosticMode(void)
          break;
       case C_CHECKSUM:
          this->mc_ErrorMessage =
-            QString(C_GtGetText::h_GetText(
+            static_cast<QString>(C_GtGetText::h_GetText(
                        "The Datapool definition differs between client and node.\n"
                        "Generate the code for all listed nodes in the details again.\n"
                        "Tip: Also make sure the Datapools are initialized in the application."));
          this->mc_ErrorMessageDetails =
-            QString(C_GtGetText::h_GetText("Affected node(s) and Datapool(s):\n%1")).arg(
+            static_cast<QString>(C_GtGetText::h_GetText("Affected node(s) and Datapool(s):\n%1")).arg(
                c_ErrorDetails);
          break;
       case C_COM:
-         this->mc_ErrorMessage = QString(C_GtGetText::h_GetText("Service error response detected."));
-         this->mc_ErrorMessageDetails = QString(C_GtGetText::h_GetText("Affected node(s):\n"
+         this->mc_ErrorMessage = static_cast<QString>(C_GtGetText::h_GetText("Service error response detected."));
+         this->mc_ErrorMessageDetails = static_cast<QString>(C_GtGetText::h_GetText("Affected node(s):\n"
                                                                        "%1\n"
                                                                        "\n"
                                                                        "Possible scenario:\n"
@@ -235,19 +236,19 @@ void C_SyvComDriverDiagConnect::m_RunSetDiagnosticMode(void)
                                         .arg(c_ErrorDetails);
          break;
       case C_RD_WR:
-         this->mc_ErrorMessage = QString(C_GtGetText::h_GetText("Unexpected protocol response detected."));
-         this->mc_ErrorMessageDetails = QString(C_GtGetText::h_GetText("Possible scenario:\n"
+         this->mc_ErrorMessage = static_cast<QString>(C_GtGetText::h_GetText("Unexpected protocol response detected."));
+         this->mc_ErrorMessageDetails = static_cast<QString>(C_GtGetText::h_GetText("Possible scenario:\n"
                                                                        "If there are multiple nodes with the same node ID connected to the same bus"));
          break;
       case C_WARN:
-         this->mc_ErrorMessage = QString(C_GtGetText::h_GetText("Protocol error response detected."));
-         this->mc_ErrorMessageDetails = QString(C_GtGetText::h_GetText("Possible scenario:\n"
+         this->mc_ErrorMessage = static_cast<QString>(C_GtGetText::h_GetText("Protocol error response detected."));
+         this->mc_ErrorMessageDetails = static_cast<QString>(C_GtGetText::h_GetText("Possible scenario:\n"
                                                                        "- Node can currently not enter diagnostic session\n"
                                                                        "- If the node is in Flashloader (Try restarting the node to fix this error)"));
          break;
       default:
          this->mc_ErrorMessage =
-            QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(this->
+            static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(this->
                                                                                        ms32_OperationResult));
          break;
       }
@@ -297,7 +298,7 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
 
             // Show all error information
             this->mc_ErrorMessage =
-               QString(C_GtGetText::h_GetText("Not all cyclic transmission could be registered. (%1 failed)")).
+               static_cast<QString>(C_GtGetText::h_GetText("Not all cyclic transmission could be registered. (%1 failed)")).
                arg(
                   c_FailedIdRegisters.size());
 
@@ -325,16 +326,16 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
                         c_FailedNodesElementNumber.find(rc_Id.u32_NodeIndex);
 
                      // This information as title for all errors of this node
-                     this->mc_ErrorMessageDetails += "Node " + QString(pc_Node->c_Properties.c_Name.c_str()) + ":\n";
+                     this->mc_ErrorMessageDetails += "Node " + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) + ":\n";
 
                      if (c_ItFailedNodesElementNumber != c_FailedNodesElementNumber.end())
                      {
-                        this->mc_ErrorMessageDetails += QString("The node %1 can handle maximum %2 transmissions. ").
+                        this->mc_ErrorMessageDetails += static_cast<QString>("The node %1 can handle maximum %2 transmissions. ").
                                                         arg(pc_Node->c_Properties.c_Name.c_str()).arg(c_FailedNodesElementNumber[
                                                                                                          rc_Id.
                                                                                                          u32_NodeIndex] -
                                                                                                       1U);
-                        this->mc_ErrorMessageDetails += QString("Tried to register %1 transmissions.\n"
+                        this->mc_ErrorMessageDetails += static_cast<QString>("Tried to register %1 transmissions.\n"
                                                                 "To fix this adjust 'Max number of cyclic/event driven "
                                                                 "transmissions' in 'Code Generation Settings' of"
                                                                 " the node properties.\n\n").
@@ -349,11 +350,11 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
                this->mc_ErrorMessageDetails += "The initiating of the transmission of the element ";
                if (e_Type != C_OSCNodeDataPool::eCOM)
                {
-                  this->mc_ErrorMessageDetails += C_PuiSdHandler::h_GetInstance()->GetNamespace(rc_Id);
+                  this->mc_ErrorMessageDetails += C_PuiSdUtil::h_GetNamespace(rc_Id);
                }
                else
                {
-                  this->mc_ErrorMessageDetails += C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(rc_Id);
+                  this->mc_ErrorMessageDetails += C_PuiSdUtil::h_GetSignalNamespace(rc_Id);
                }
 
                this->mc_ErrorMessageDetails += " failed: " + c_FailedIdErrorDetails[un_Counter] + "\n";
@@ -365,17 +366,17 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
          break;
       case C_CONFIG:
          this->mc_ErrorMessage =
-            QString(C_GtGetText::h_GetText("System connection failed. Configuration error.")); //Many possibilities
+            static_cast<QString>(C_GtGetText::h_GetText("System connection failed. Configuration error.")); //Many possibilities
                                                                                                // for
                                                                                                // this error
          break;
       case C_COM:
          this->mc_ErrorMessage =
-            QString(C_GtGetText::h_GetText("Communication error. (%1)")).arg(c_ErrorDetails);
+            static_cast<QString>(C_GtGetText::h_GetText("Communication error. (%1)")).arg(c_ErrorDetails);
          break;
       default:
          this->mc_ErrorMessage =
-            QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(this->ms32_OperationResult));
+            static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(this->ms32_OperationResult));
          break;
       }
    }

@@ -106,7 +106,7 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
       const sintn sn_Major = static_cast<sintn>(this->mpc_OSCDataPool->au8_Version[0]);
       const sintn sn_Minor = static_cast<sintn>(this->mpc_OSCDataPool->au8_Version[1]);
       const sintn sn_Revision = static_cast<sintn>(this->mpc_OSCDataPool->au8_Version[2]);
-      const QString c_Version = QString("v%1.%2r%3")
+      const QString c_Version = static_cast<QString>("v%1.%2r%3")
                                 .arg(sn_Major, 2, 10, QChar('0'))
                                 .arg(sn_Minor, 2, 10, QChar('0'))
                                 .arg(sn_Revision, 2,  10, QChar('0'));
@@ -245,7 +245,7 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
             if (opc_SharedDatapoolId->u32_NodeIndex != this->mu32_NodeIndex)
             {
                // Add node as namespace
-               c_Text += QString(pc_Node->c_Properties.c_Name.c_str()) + QString("::");
+               c_Text += static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) + static_cast<QString>("::");
             }
 
             c_Text += pc_Node->c_DataPools[opc_SharedDatapoolId->u32_DataPoolIndex].c_Name.c_str();
@@ -459,7 +459,7 @@ void C_SdNdeDpProperties::m_OkClicked(void)
    if (C_OSCUtils::h_CheckValidCName(this->mpc_Ui->pc_LineEditDatapoolName->text().toStdString().c_str()) == false)
    {
       c_Details +=
-         QString(C_GtGetText::h_GetText("Name is empty or contains invalid characters. Choose another name."));
+         static_cast<QString>(C_GtGetText::h_GetText("Name is empty or contains invalid characters. Choose another name."));
       c_Details += "\n\n";
       // Do not accept
       q_Continue = false;
@@ -471,13 +471,13 @@ void C_SdNdeDpProperties::m_OkClicked(void)
    if (this->m_CheckDatapoolNameNotDuplicate(&c_ExistingDatapoolNames) == false)
    {
       c_Details +=
-         QString(C_GtGetText::h_GetText("A Datapool with the name \"%1\" already exists. Choose another name.\n")).
+         static_cast<QString>(C_GtGetText::h_GetText("A Datapool with the name \"%1\" already exists. Choose another name.\n")).
          arg(this->mpc_Ui->pc_LineEditDatapoolName->text());
       c_Details += C_GtGetText::h_GetText("Used Datapool names:\n");
       for (uint32 u32_ItExistingName = 0UL; u32_ItExistingName < c_ExistingDatapoolNames.size(); ++u32_ItExistingName)
       {
          const C_SCLString & rc_Name = c_ExistingDatapoolNames[u32_ItExistingName];
-         c_Details += QString("\"%1\", ").arg(rc_Name.c_str());
+         c_Details += static_cast<QString>("\"%1\", ").arg(rc_Name.c_str());
       }
       c_Details.chop(2); // remove last ", "
       c_Details += ".\n\n";
@@ -490,7 +490,7 @@ void C_SdNdeDpProperties::m_OkClicked(void)
    // Check application
    if (this->m_IsRelatedAppValid(s32_RelatedDataBlockIndex) == false)
    {
-      c_Details += QString(
+      c_Details += static_cast<QString>(
          C_GtGetText::h_GetText("The selected related application \"%1\" already owns a Datapool of protocol type %2. "
                                 "Maximum one COMM Datapool for each of OSI Layer 2, ECeS and ECoS is allowed."))
                    .arg(this->mpc_Ui->pc_ComboBoxApplication->currentText())
@@ -522,6 +522,7 @@ void C_SdNdeDpProperties::m_OkClicked(void)
          this->mpc_OSCDataPool->u32_NvMSize = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxSize->value());
          this->m_HandleDataPoolSafetyAdaptation();
          this->mpc_OSCDataPool->s32_RelatedDataBlockIndex = s32_RelatedDataBlockIndex;
+         // HALC datablock assignment is done afterwards
          this->mpc_OSCDataPool->q_ScopeIsPrivate =
             (this->mpc_Ui->pc_ComboBoxScope->currentIndex() != mhsn_INDEX_PUBLIC);
 
@@ -758,10 +759,10 @@ void C_SdNdeDpProperties::m_UpdateSizePrediction(void) const
 
          this->mpc_Ui->pc_LabelDataPoolReservation->setText(C_GtGetText::h_GetText("Resulting Node NVM Reservation: ") +
                                                             QString::number(u32_PercentageReservation) +
-                                                            QString("%") +
-                                                            QString(" (Node NVM size = ") +
+                                                            static_cast<QString>("%") +
+                                                            static_cast<QString>(" (Node NVM size = ") +
                                                             QString::number(pc_DevDef->u32_UserEepromSizeBytes) +
-                                                            QString(" Bytes)"));
+                                                            static_cast<QString>(" Bytes)"));
 
          // update the label with usage prediction
          if ((u32_ActSize > 0U) && (this->mpc_OSCDataPool != NULL))
@@ -775,7 +776,7 @@ void C_SdNdeDpProperties::m_UpdateSizePrediction(void) const
 
          this->mpc_Ui->pc_LabelDataPoolUsage->setText(C_GtGetText::h_GetText("Resulting Datapool Usage: ") +
                                                       QString::number(u32_PercentageUsage) +
-                                                      QString("%"));
+                                                      static_cast<QString>("%"));
       }
    }
 }

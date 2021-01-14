@@ -34,11 +34,8 @@ public:
 
    virtual QRectF boundingRect() const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget);
-   //lint -restore
 
    virtual void FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const;
    void AddConnectorToRegistry(void);
@@ -55,7 +52,7 @@ public:
 private:
    //Avoid call
    C_GiPort(const C_GiPort &);
-   C_GiPort & operator =(const C_GiPort &);
+   C_GiPort & operator =(const C_GiPort &); //lint !e1511 //we want to hide the base func.
 
    QGraphicsDropShadowEffect * mpc_Shadow;
    QVector<QPointF> mc_Points;

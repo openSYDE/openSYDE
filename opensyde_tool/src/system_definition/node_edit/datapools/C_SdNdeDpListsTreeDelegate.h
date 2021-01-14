@@ -30,10 +30,8 @@ public:
    C_SdNdeDpListsTreeDelegate(QObject * const opc_Parent = NULL);
 
    void SetDataPool(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex);
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
+
    virtual QSize sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    void SetMaximumHeight(const stw_types::sintn sn_Height);
 

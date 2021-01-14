@@ -115,7 +115,7 @@ void C_CieDbcImportNodeAssignmentWidget::InitStaticNames(void) const
 
    // file info group box
    this->mpc_Ui->pc_LabHeadingFileInfo->setText(C_GtGetText::h_GetText("Source File Information"));
-   this->mpc_Ui->pc_LabPathTitle->setText(C_GtGetText::h_GetText("Path"));
+   this->mpc_Ui->pc_LabPathTitle->setText(C_GtGetText::h_GetText("Path:"));
 
    // mapped messages
    this->mpc_Ui->pc_LabHeadingMapped->setText(C_GtGetText::h_GetText("Mapped Messages"));
@@ -349,7 +349,8 @@ void C_CieDbcImportNodeAssignmentWidget::m_InitNodes(const uint32 ou32_BusIndex,
    this->mpc_Ui->pc_LabNumberUnmapped->setVisible(q_UnmappedMessagesFound);
    if (q_UnmappedMessagesFound == true)
    {
-      this->mpc_Ui->pc_LabNumberUnmapped->setText(QString("(%1)").arg(orc_CIECommDef.c_UnmappedMessages.size()));
+      this->mpc_Ui->pc_LabNumberUnmapped->setText(static_cast<QString>("(%1)").arg(orc_CIECommDef.c_UnmappedMessages.
+                                                                                   size()));
 
       // fill combobox with all connected topology nodes
       this->mpc_Ui->pc_CbxAssignee->addItem(C_GtGetText::h_GetText("<ignore>"));
@@ -384,11 +385,11 @@ void C_CieDbcImportNodeAssignmentWidget::m_OnUnmappedCbxIndexChanged(const sint3
 
    Enable or disable specified combobox item in all subwidgets.
 
-   \param[in]       u32_Index    Combobox index of item that should be enabled/disabled
-   \param[in]       q_Enable     flag of enable or disable
+   \param[in]       ou32_Index    Combobox index of item that should be enabled/disabled
+   \param[in]       oq_Enable     flag of enable or disable
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieDbcImportNodeAssignmentWidget::m_UpdateComboboxEntries(const uint32 u32_Index, const bool q_Enable,
+void C_CieDbcImportNodeAssignmentWidget::m_UpdateComboboxEntries(const uint32 ou32_Index, const bool oq_Enable,
                                                                  C_CieDbcImportNodeAssignmentItemWidget * const opc_Sender)
 {
    std::vector<C_CieDbcImportNodeAssignmentItemWidget *>::const_iterator c_It;
@@ -398,7 +399,7 @@ void C_CieDbcImportNodeAssignmentWidget::m_UpdateComboboxEntries(const uint32 u3
       if (*c_It != opc_Sender) // skip the sender item
       {
          const C_CieDbcImportNodeAssignmentItemWidget & rc_CurEntry = **c_It;
-         rc_CurEntry.UpdateComboboxEntries(u32_Index, q_Enable);
+         rc_CurEntry.UpdateComboboxEntries(ou32_Index, oq_Enable);
       }
    }
 }

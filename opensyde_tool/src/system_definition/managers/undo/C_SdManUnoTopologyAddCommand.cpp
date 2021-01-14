@@ -121,12 +121,12 @@ C_SdManUnoTopologyAddCommand::~C_SdManUnoTopologyAddCommand(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddCommand::m_AddNew(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SdTopologyScene * const pc_Scene = dynamic_cast<C_SdTopologyScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
    {
-      const std::vector<stw_types::uint64> c_IDs = this->GetIDs();
+      const std::vector<stw_types::uint64> c_IDs = this->m_GetIDs();
       if (c_IDs.size() > 0)
       {
          C_GiNode * pc_Node;
@@ -176,9 +176,9 @@ void C_SdManUnoTopologyAddCommand::m_AddNew(void)
             pc_Scene->AddImage(this->mc_AdditionalInformation, this->mc_NewPos, &(c_IDs[0]));
             break;
          case E_ElementType::eBUS_CONNECTOR:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             pc_Node = dynamic_cast<C_GiNode *>(m_GetSceneItem(this->mu64_BusConnectorNodeID));
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             pc_Bus = dynamic_cast<C_GiLiBus *>(m_GetSceneItem(this->mu64_BusConnectorBusID));
             if ((pc_Node != NULL) && (pc_Bus != NULL))
             {

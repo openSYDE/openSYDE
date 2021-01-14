@@ -101,7 +101,7 @@ protected:
 private:
    //Avoid call
    C_SyvUpSequences(const C_SyvUpSequences &);
-   C_SyvUpSequences & operator =(const C_SyvUpSequences &);
+   C_SyvUpSequences & operator =(const C_SyvUpSequences &); //lint !e1511 //we want to hide the base func.
 
    static void mh_ThreadFunc(void * const opv_Instance);
    void m_ThreadFunc(void);

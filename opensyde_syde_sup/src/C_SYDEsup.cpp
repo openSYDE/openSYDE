@@ -73,20 +73,20 @@ C_SYDEsup::C_SYDEsup(void)
    * -l for path to log file (optional)
 
    \param[in]   osn_Argc     number of command line arguments
-   \param[in]   oapcn_Argv   command line arguments
+   \param[in]   oppcn_Argv   command line arguments
 
    \return
    eOK                        initialization worked
    eERR_PARSE_COMMAND_LINE    missing or invalid command line parameters or help requested
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * const oapcn_Argv[])
+C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * const * const oppcn_Argv)
 {
    C_SYDEsup::E_Result e_Return = eOK;
    sintn sn_Result;
    bool q_ParseError = false;
    bool q_ShowHelp = false;
-   const C_SCLString c_Version = h_GetApplicationVersion(oapcn_Argv[0]);
+   const C_SCLString c_Version = h_GetApplicationVersion(oppcn_Argv[0]);
    const C_SCLString c_BinaryHash = stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash();
 
    mq_Quiet = false;
@@ -125,7 +125,7 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    do
    {
       sintn sn_Index;
-      sn_Result = getopt_long(osn_Argc, oapcn_Argv, "hqp:i:z:l:", &ac_Options[0], &sn_Index);
+      sn_Result = getopt_long(osn_Argc, oppcn_Argv, "hqp:i:z:l:", &ac_Options[0], &sn_Index);
       if (sn_Result != -1)
       {
          switch (sn_Result)
@@ -592,12 +592,12 @@ C_SCLString C_SYDEsup::h_GetApplicationVersion(const C_SCLString & orc_FileName)
       {
          //reinterpret_cast required due to function interface
          if (VerQueryValueA(pu8_Buffer, "\\",
-                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e929
+                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e9176
                             &un_ValSize) != FALSE)
          {
-            c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16),
+            c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16U),
                                      pt_Info->dwFileVersionMS & 0x0000FFFFUL,
-                                     (pt_Info->dwFileVersionLS >> 16));
+                                     (pt_Info->dwFileVersionLS >> 16U));
          }
       }
       delete[] pu8_Buffer;
@@ -894,7 +894,6 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       c_Activity = "Update System";
       c_Error = "At least one feature of the openSYDE Flashloader is not available for NVM writing.";
       break;
-
    // general results (comment is corresponding core return value)
    case eOK: //C_NO_ERR
       // no error, everything worked fine (and user already got informed about success)
@@ -902,6 +901,9 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
    case eERR_UNKNOWN: //undocumented and unexpected result in called functions
       c_Activity = "SYDEsup";
       c_Error = "Unknown error occurred.";
+      break;
+   default:
+      tgl_assert(false); //all cases are expected to be handled explicitly
       break;
    }
 

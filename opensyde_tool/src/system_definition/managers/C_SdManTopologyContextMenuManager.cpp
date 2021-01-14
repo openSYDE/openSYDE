@@ -66,9 +66,9 @@ C_SdManTopologyContextMenuManager::C_SdManTopologyContextMenuManager() :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of all mpc_Action* and the Qt memory management
 C_SdManTopologyContextMenuManager::~C_SdManTopologyContextMenuManager()
 {
-   //lint -e{1540}  no memory leak because of the parent of all mpc_Action* and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

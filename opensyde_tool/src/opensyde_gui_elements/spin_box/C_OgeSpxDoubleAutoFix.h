@@ -33,11 +33,8 @@ public:
 
    stw_types::sintn GetLineEditWidth(void) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void fixup(QString & orc_String) const;
    virtual QValidator::State validate(QString & orc_Input, stw_types::sintn & orc_Pos) const override;
-   //lint -restore
 
 protected:
    virtual void m_Init(void) override;

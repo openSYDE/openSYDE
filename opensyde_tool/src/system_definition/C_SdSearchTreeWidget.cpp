@@ -118,9 +118,9 @@ C_SdSearchTreeWidget::C_SdSearchTreeWidget(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent all elements and the Qt memory management
 C_SdSearchTreeWidget::~C_SdSearchTreeWidget()
 {
-   //lint -e{1540}  no memory leak because of the parent all elements and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -819,8 +819,7 @@ void C_SdSearchTreeWidget::m_AddNodeResult(const QString & orc_NodeName, const u
 
    mpc_TreeItemRootNodes->addChild(pc_Item);
    mpc_TreeItemRootNodes->setHidden(false);
-   //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uint32 ou32_BusIndex,
@@ -852,8 +851,7 @@ void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uin
 
    mpc_TreeItemRootBusses->addChild(pc_Item);
    mpc_TreeItemRootBusses->setHidden(false);
-   //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName, const uint32 ou32_DataPoolIndex,
@@ -877,8 +875,7 @@ void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName,
 
    mpc_TreeItemRootDataPools->addChild(pc_Item);
    mpc_TreeItemRootDataPools->setHidden(false);
-   //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const uint32 ou32_ListIndex,
@@ -904,8 +901,7 @@ void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const u
 
    mpc_TreeItemRootLists->addChild(pc_Item);
    mpc_TreeItemRootLists->setHidden(false);
-   //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, const uint32 ou32_MessageIndex,
@@ -943,8 +939,7 @@ void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, c
 
    mpc_TreeItemRootMessages->addChild(pc_Item);
    mpc_TreeItemRootMessages->setHidden(false);
-   //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataElementName,
@@ -990,8 +985,7 @@ void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataEleme
 
    mpc_TreeItemRootDataElements->addChild(pc_Item);
    mpc_TreeItemRootDataElements->setHidden(false);
-   //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_ApplicationName,
@@ -1016,8 +1010,7 @@ void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_Applicatio
 
    mpc_TreeItemRootApplications->addChild(pc_Item);
    mpc_TreeItemRootApplications->setHidden(false);
-   //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Adding an entry for a found HALC element (domain or channel)
@@ -1080,8 +1073,7 @@ void C_SdSearchTreeWidget::m_AddHalcChannelResult(const QString & orc_HalcDomain
 
    mpc_TreeItemRootHalcChannels->addChild(pc_Item);
    mpc_TreeItemRootHalcChannels->setHidden(false);
-   //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Setup/restore starting state

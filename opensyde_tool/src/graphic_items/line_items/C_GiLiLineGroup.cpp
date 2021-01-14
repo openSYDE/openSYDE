@@ -78,9 +78,9 @@ C_GiLiLineGroup::C_GiLiLineGroup(const std::vector<QPointF> * const opc_Points, 
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mc_Points & mpc_LinePath and the Qt memory management
 C_GiLiLineGroup::~C_GiLiLineGroup(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mc_Points & mpc_LinePath and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -214,14 +214,14 @@ bool C_GiLiLineGroup::mh_Near(const float64 of64_Exact, const float64 of64_Eval)
 /*! \brief  Adds a bending point
 
    \param[in] orc_ScenePos Position of the bending point
-   \param[in] opc_Index    Optional specific index to add point add
+   \param[in] ops32_Index  Optional specific index to add point add
 
    \return
    -1: error
    else: index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const sint32 * const opc_Index)
+sint32 C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const sint32 * const ops32_Index)
 {
    const QVector<C_GiLiLineConnection *> & rc_VecLines = this->mpc_LinePath->GetLines();
 
@@ -232,7 +232,7 @@ sint32 C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const sint32 * co
 
    this->prepareGeometryChange();
 
-   if (opc_Index == NULL)
+   if (ops32_Index == NULL)
    {
       QVector<C_GiLiLineConnection *>::const_iterator pc_ItLine;
       float64 f64_ResultDist;
@@ -258,7 +258,7 @@ sint32 C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const sint32 * co
    }
    else
    {
-      s32_Retval = *opc_Index;
+      s32_Retval = *ops32_Index;
    }
 
    // save the position
@@ -286,14 +286,14 @@ sint32 C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const sint32 * co
 /*! \brief  Removes a bending point
 
    \param[in] orc_ScenePos Position of the bending point
-   \param[in] opc_Index    Optional specific index which point to remove
+   \param[in] ops32_Index  Optional specific index which point to remove
 
    \return
    -1: error
    else: index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiLiLineGroup::RemoveBend(const QPointF & orc_ScenePos, const sint32 * const opc_Index)
+sint32 C_GiLiLineGroup::RemoveBend(const QPointF & orc_ScenePos, const sint32 * const ops32_Index)
 {
    const QVector<C_GiLiInteractionPoint *> & rc_VecPoints = this->mc_Points;
 
@@ -301,7 +301,7 @@ sint32 C_GiLiLineGroup::RemoveBend(const QPointF & orc_ScenePos, const sint32 * 
 
    this->prepareGeometryChange();
 
-   if (opc_Index == NULL)
+   if (ops32_Index == NULL)
    {
       QVector<C_GiLiInteractionPoint *>::const_iterator pc_ItPoint;
       float64 f64_ResultDist;
@@ -323,7 +323,7 @@ sint32 C_GiLiLineGroup::RemoveBend(const QPointF & orc_ScenePos, const sint32 * 
    }
    else
    {
-      s32_Retval = *opc_Index;
+      s32_Retval = *ops32_Index;
    }
 
    if (s32_Retval >= 0)
@@ -678,7 +678,7 @@ QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const Q
    }
    c_Return = QGraphicsItemGroup::itemChange(oe_Change, c_Return);
 
-   switch (oe_Change)
+   switch (oe_Change) //lint !e788 //All other cases handled by call of parent
    {
    case ItemSelectedHasChanged:
       if (orc_Value == false)
@@ -694,7 +694,7 @@ QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const Q
       break;
    default:
       break;
-   } //lint !e788 //All other cases handled by call of parent
+   }
 
    return c_Return;
 }

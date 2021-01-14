@@ -33,6 +33,7 @@ public:
    };
 
    C_PuiSvReadDataConfiguration(void);
+   virtual ~C_PuiSvReadDataConfiguration(void);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
    stw_types::sint32 InitDefaultThreshold(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Min,

@@ -55,12 +55,8 @@ public:
    void SetErrorState(const bool oq_Error);
    void SetDisabledLook(const bool oq_Disabled);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget = NULL) override;
-   //lint -restore
 
    void HandleMouseMoveToolTip(const QPointF & orc_ScenePos);
 
@@ -75,10 +71,7 @@ Q_SIGNALS:
    void SigHideToolTip(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
-   //lint -restore
 
    bool mq_ErrorIconHovered;
 
@@ -95,7 +88,7 @@ private:
 
    //Avoid call
    C_GiTextElementBus(const C_GiTextElementBus &);
-   C_GiTextElementBus & operator =(const C_GiTextElementBus &);
+   C_GiTextElementBus & operator =(const C_GiTextElementBus &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

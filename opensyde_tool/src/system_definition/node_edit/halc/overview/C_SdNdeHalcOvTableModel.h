@@ -52,9 +52,6 @@ public:
    const stw_opensyde_core::C_OSCHalcDefChannelDef * MapRowToChannelDef(const stw_types::sint32 os32_Index) const;
    const stw_opensyde_core::C_OSCHalcConfigDomain * MapRowToDomain(const stw_types::sint32 os32_Index) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation, const stw_types::sintn osn_Role =
                                   static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
@@ -62,7 +59,6 @@ public:
    virtual QVariant data(const QModelIndex & orc_Index, const stw_types::sintn osn_Role =
                             static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
    virtual Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;
-   //lint -restore
 
    static E_Columns h_ColumnToEnum(const stw_types::sint32 & ors32_Column);
    static stw_types::sint32 h_EnumToColumn(const E_Columns & ore_Value);

@@ -496,8 +496,8 @@ sint32 C_PuiBsElementsFiler::h_LoadLineBase(C_PuiBsLineBase & orc_LineBase, C_OS
       {
          do
          {
-            QPointF c_Point(orc_XMLParser.GetAttributeFloat64("x"), orc_XMLParser.GetAttributeFloat64(
-                               "y"));
+            const QPointF c_Point(orc_XMLParser.GetAttributeFloat64("x"), orc_XMLParser.GetAttributeFloat64(
+                                     "y"));
             orc_LineBase.c_UIInteractionPoints.push_back(c_Point);
             c_Node = orc_XMLParser.SelectNodeNext("interaction-point");
          }
@@ -1010,11 +1010,8 @@ void C_PuiBsElementsFiler::mh_PixmapToString(const QPixmap & orc_Pixmap, QString
    //lint -e{10,40,522}  Qt feature
    QBuffer c_PixmapBuffer(&c_PixmapAsByteArray);
 
-   //lint -e{10,40,746,1013,1055}  Qt feature
    c_PixmapBuffer.open(QIODevice::WriteOnly);
-   //lint -e{40,1025,1703}  Qt feature
    orc_Pixmap.save(&c_PixmapBuffer, "PNG");
-   //lint -e{10,40,746,1013,1055}  Qt feature
    c_PixmapBuffer.close();
 
    orc_String = QString::fromUtf8(c_PixmapAsByteArray.toBase64());

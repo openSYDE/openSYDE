@@ -838,19 +838,21 @@ sint32 C_PuiSdHandlerData::m_VerifyLoadedSystemDefintion(void) const
 
    if (this->mc_UINodes.size() != this->mc_CoreDefinition.c_Nodes.size())
    {
-      osc_write_log_error("Verifying System Definition",
-                          QString("UI part does not match core part: Number of nodes (UI %1 vs. core %2).").
-                          arg(this->mc_UINodes.size()).
-                          arg(this->mc_CoreDefinition.c_Nodes.size()).toStdString().c_str());
+      osc_write_log_error(
+         "Verifying System Definition",
+         static_cast<QString>("UI part does not match core part: Number of nodes (UI %1 vs. core %2).").
+         arg(this->mc_UINodes.size()).
+         arg(this->mc_CoreDefinition.c_Nodes.size()).toStdString().c_str());
 
       s32_Return = C_CHECKSUM;
    }
    else if (this->mc_UIBuses.size() != this->mc_CoreDefinition.c_Buses.size())
    {
-      osc_write_log_error("Verifying System Definition",
-                          QString("UI part does not match core part: Number of buses (UI %1 vs. core %2).").
-                          arg(this->mc_UIBuses.size()).
-                          arg(this->mc_CoreDefinition.c_Buses.size()).toStdString().c_str());
+      osc_write_log_error(
+         "Verifying System Definition",
+         static_cast<QString>("UI part does not match core part: Number of buses (UI %1 vs. core %2).").
+         arg(this->mc_UIBuses.size()).
+         arg(this->mc_CoreDefinition.c_Buses.size()).toStdString().c_str());
 
       s32_Return = C_CHECKSUM;
    }
@@ -866,12 +868,13 @@ sint32 C_PuiSdHandlerData::m_VerifyLoadedSystemDefintion(void) const
 
          if (rc_UiNode.c_UIDataPools.size() != rc_OscNode.c_DataPools.size())
          {
-            osc_write_log_error("Verifying System Definition",
-                                QString("UI part does not match core part: Number of Datapools of node %1 "
-                                        "(UI %2 vs. core %3).").
-                                arg(rc_OscNode.c_Properties.c_Name.c_str()).
-                                arg(rc_UiNode.c_UIDataPools.size()).
-                                arg(rc_OscNode.c_DataPools.size()).toStdString().c_str());
+            osc_write_log_error(
+               "Verifying System Definition",
+               static_cast<QString>("UI part does not match core part: Number of Datapools of node %1 "
+                                    "(UI %2 vs. core %3).").
+               arg(rc_OscNode.c_Properties.c_Name.c_str()).
+               arg(rc_UiNode.c_UIDataPools.size()).
+               arg(rc_OscNode.c_DataPools.size()).toStdString().c_str());
 
             s32_Return = C_CHECKSUM;
          }
@@ -887,13 +890,14 @@ sint32 C_PuiSdHandlerData::m_VerifyLoadedSystemDefintion(void) const
 
                if (rc_UiDp.c_DataPoolLists.size() != rc_OscDp.c_Lists.size())
                {
-                  osc_write_log_error("Verifying System Definition",
-                                      QString("UI part does not match core part: Number of Datapool lists of "
-                                              "Datapool %1::%2 (UI %3 vs. core %4).").
-                                      arg(rc_OscNode.c_Properties.c_Name.c_str()).
-                                      arg(rc_OscDp.c_Name.c_str()).
-                                      arg(rc_UiDp.c_DataPoolLists.size()).
-                                      arg(rc_OscDp.c_Lists.size()).toStdString().c_str());
+                  osc_write_log_error(
+                     "Verifying System Definition",
+                     static_cast<QString>("UI part does not match core part: Number of Datapool lists of "
+                                          "Datapool %1::%2 (UI %3 vs. core %4).").
+                     arg(rc_OscNode.c_Properties.c_Name.c_str()).
+                     arg(rc_OscDp.c_Name.c_str()).
+                     arg(rc_UiDp.c_DataPoolLists.size()).
+                     arg(rc_OscDp.c_Lists.size()).toStdString().c_str());
 
                   s32_Return = C_CHECKSUM;
                }
@@ -909,14 +913,15 @@ sint32 C_PuiSdHandlerData::m_VerifyLoadedSystemDefintion(void) const
 
                      if (rc_UiList.c_DataPoolListElements.size() != rc_OscList.c_Elements.size())
                      {
-                        osc_write_log_error("Verifying System Definition",
-                                            QString("UI part does not match core part: Number of Datapool"
-                                                    " list elements of list %1::%2::%3 (UI %4 vs. core %5).").
-                                            arg(rc_OscNode.c_Properties.c_Name.c_str()).
-                                            arg(rc_OscDp.c_Name.c_str()).
-                                            arg(rc_OscList.c_Name.c_str()).
-                                            arg(rc_UiList.c_DataPoolListElements.size()).
-                                            arg(rc_OscList.c_Elements.size()).toStdString().c_str());
+                        osc_write_log_error(
+                           "Verifying System Definition",
+                           static_cast<QString>("UI part does not match core part: Number of Datapool"
+                                                " list elements of list %1::%2::%3 (UI %4 vs. core %5).").
+                           arg(rc_OscNode.c_Properties.c_Name.c_str()).
+                           arg(rc_OscDp.c_Name.c_str()).
+                           arg(rc_OscList.c_Name.c_str()).
+                           arg(rc_UiList.c_DataPoolListElements.size()).
+                           arg(rc_OscList.c_Elements.size()).toStdString().c_str());
 
                         s32_Return = C_CHECKSUM;
                      }
@@ -927,12 +932,13 @@ sint32 C_PuiSdHandlerData::m_VerifyLoadedSystemDefintion(void) const
 
          if (rc_UiNode.c_UICanProtocols.size() != rc_OscNode.c_ComProtocols.size())
          {
-            osc_write_log_error("Verifying System Definition",
-                                QString("UI part does not match core part: Number of CAN protocols of node %1 "
-                                        "(UI %2 vs. core %3).").
-                                arg(rc_OscNode.c_Properties.c_Name.c_str()).
-                                arg(rc_UiNode.c_UICanProtocols.size()).
-                                arg(rc_OscNode.c_ComProtocols.size()).toStdString().c_str());
+            osc_write_log_error(
+               "Verifying System Definition",
+               static_cast<QString>("UI part does not match core part: Number of CAN protocols of node %1 "
+                                    "(UI %2 vs. core %3).").
+               arg(rc_OscNode.c_Properties.c_Name.c_str()).
+               arg(rc_UiNode.c_UICanProtocols.size()).
+               arg(rc_OscNode.c_ComProtocols.size()).toStdString().c_str());
 
             s32_Return = C_CHECKSUM;
          }
@@ -948,12 +954,13 @@ sint32 C_PuiSdHandlerData::m_VerifyLoadedSystemDefintion(void) const
 
                if (rc_UiProtocol.c_ComMessages.size() != rc_OscProtocol.c_ComMessages.size())
                {
-                  osc_write_log_error("Verifying System Definition",
-                                      QString("UI part does not match core part: Number of message containers"
-                                              " of node %1 (UI %2 vs. core %3).").
-                                      arg(rc_OscNode.c_Properties.c_Name.c_str()).
-                                      arg(rc_UiProtocol.c_ComMessages.size()).
-                                      arg(rc_OscProtocol.c_ComMessages.size()).toStdString().c_str());
+                  osc_write_log_error(
+                     "Verifying System Definition",
+                     static_cast<QString>("UI part does not match core part: Number of message containers"
+                                          " of node %1 (UI %2 vs. core %3).").
+                     arg(rc_OscNode.c_Properties.c_Name.c_str()).
+                     arg(rc_UiProtocol.c_ComMessages.size()).
+                     arg(rc_OscProtocol.c_ComMessages.size()).toStdString().c_str());
 
                   s32_Return = C_CHECKSUM;
                }
@@ -968,13 +975,14 @@ sint32 C_PuiSdHandlerData::m_VerifyLoadedSystemDefintion(void) const
                      if (rc_UiProtocol.c_ComMessages[u32_MsgContainer].c_TxMessages.size() !=
                          rc_OscProtocol.c_ComMessages[u32_MsgContainer].c_TxMessages.size())
                      {
-                        osc_write_log_error("Verifying System Definition",
-                                            QString("UI part does not match core part: Number of Tx Messages"
-                                                    " of node %1.(UI %2 vs. core %3)").
-                                            arg(rc_OscNode.c_Properties.c_Name.c_str()).
-                                            arg(rc_UiProtocol.c_ComMessages[u32_MsgContainer].c_TxMessages.size()).
-                                            arg(rc_OscProtocol.c_ComMessages[u32_MsgContainer].c_TxMessages.size()).
-                                            toStdString().c_str());
+                        osc_write_log_error(
+                           "Verifying System Definition",
+                           static_cast<QString>("UI part does not match core part: Number of Tx Messages"
+                                                " of node %1.(UI %2 vs. core %3)").
+                           arg(rc_OscNode.c_Properties.c_Name.c_str()).
+                           arg(rc_UiProtocol.c_ComMessages[u32_MsgContainer].c_TxMessages.size()).
+                           arg(rc_OscProtocol.c_ComMessages[u32_MsgContainer].c_TxMessages.size()).
+                           toStdString().c_str());
 
                         s32_Return = C_CHECKSUM;
                      }
@@ -994,13 +1002,14 @@ sint32 C_PuiSdHandlerData::m_VerifyLoadedSystemDefintion(void) const
                            // Check signals
                            if (rc_UiMsg.c_Signals.size() != rc_OscMsg.c_Signals.size())
                            {
-                              osc_write_log_error("Verifying System Definition",
-                                                  QString("UI part does not match core part: Number of Tx Signals"
-                                                          " of node %1 in CAN message %2 (UI %3 vs. core %4).").
-                                                  arg(rc_OscNode.c_Properties.c_Name.c_str()).
-                                                  arg(rc_OscMsg.c_Name.c_str()).
-                                                  arg(rc_UiMsg.c_Signals.size()).
-                                                  arg(rc_OscMsg.c_Signals.size()).toStdString().c_str());
+                              osc_write_log_error(
+                                 "Verifying System Definition",
+                                 static_cast<QString>("UI part does not match core part: Number of Tx Signals"
+                                                      " of node %1 in CAN message %2 (UI %3 vs. core %4).").
+                                 arg(rc_OscNode.c_Properties.c_Name.c_str()).
+                                 arg(rc_OscMsg.c_Name.c_str()).
+                                 arg(rc_UiMsg.c_Signals.size()).
+                                 arg(rc_OscMsg.c_Signals.size()).toStdString().c_str());
 
                               s32_Return = C_CHECKSUM;
                            }
@@ -1011,13 +1020,14 @@ sint32 C_PuiSdHandlerData::m_VerifyLoadedSystemDefintion(void) const
                      if (rc_UiProtocol.c_ComMessages[u32_MsgContainer].c_RxMessages.size() !=
                          rc_OscProtocol.c_ComMessages[u32_MsgContainer].c_RxMessages.size())
                      {
-                        osc_write_log_error("Verifying System Definition",
-                                            QString("UI part does not match core part: Number of Rx Messages"
-                                                    " of node %1 (UI %2 vs. core %3).").
-                                            arg(rc_OscNode.c_Properties.c_Name.c_str()).
-                                            arg(rc_UiProtocol.c_ComMessages[u32_MsgContainer].c_RxMessages.size()).
-                                            arg(rc_OscProtocol.c_ComMessages[u32_MsgContainer].c_RxMessages.size()).
-                                            toStdString().c_str());
+                        osc_write_log_error(
+                           "Verifying System Definition",
+                           static_cast<QString>("UI part does not match core part: Number of Rx Messages"
+                                                " of node %1 (UI %2 vs. core %3).").
+                           arg(rc_OscNode.c_Properties.c_Name.c_str()).
+                           arg(rc_UiProtocol.c_ComMessages[u32_MsgContainer].c_RxMessages.size()).
+                           arg(rc_OscProtocol.c_ComMessages[u32_MsgContainer].c_RxMessages.size()).
+                           toStdString().c_str());
 
                         s32_Return = C_CHECKSUM;
                      }
@@ -1037,13 +1047,14 @@ sint32 C_PuiSdHandlerData::m_VerifyLoadedSystemDefintion(void) const
                            // Check signals
                            if (rc_UiMsg.c_Signals.size() != rc_OscMsg.c_Signals.size())
                            {
-                              osc_write_log_error("Verifying System Definition",
-                                                  QString("UI part does not match core part: Number of Rx Signals"
-                                                          " of node %1 in CAN message %2 (UI %3 vs. core %4).").
-                                                  arg(rc_OscNode.c_Properties.c_Name.c_str()).
-                                                  arg(rc_OscMsg.c_Name.c_str()).
-                                                  arg(rc_UiMsg.c_Signals.size()).
-                                                  arg(rc_OscMsg.c_Signals.size()).toStdString().c_str());
+                              osc_write_log_error(
+                                 "Verifying System Definition",
+                                 static_cast<QString>("UI part does not match core part: Number of Rx Signals"
+                                                      " of node %1 in CAN message %2 (UI %3 vs. core %4).").
+                                 arg(rc_OscNode.c_Properties.c_Name.c_str()).
+                                 arg(rc_OscMsg.c_Name.c_str()).
+                                 arg(rc_UiMsg.c_Signals.size()).
+                                 arg(rc_OscMsg.c_Signals.size()).toStdString().c_str());
 
                               s32_Return = C_CHECKSUM;
                            }

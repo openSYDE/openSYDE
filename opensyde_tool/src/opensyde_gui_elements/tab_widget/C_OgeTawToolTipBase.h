@@ -35,11 +35,8 @@ public:
                               const QString & orc_Content);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mouseMoveEvent(QMouseEvent * const opc_Event) override;
    virtual bool event(QEvent * const opc_Event) override;
-   //lint -restore
 
    void m_HideToolTip(void);
 

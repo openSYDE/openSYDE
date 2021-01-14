@@ -93,7 +93,7 @@ void C_SyvUpPackageListNodeParamSetsWidget::AddFile(const QString & orc_File)
    if (this->mq_StwFlashloader == false)
    {
       C_PuiSvNodeUpdateParamInfo c_ParamFileInfo;
-      if (this->GetParamsetFileInfo(orc_File, c_ParamFileInfo) == C_NO_ERR)
+      if (this->m_GetParamsetFileInfo(orc_File, c_ParamFileInfo) == C_NO_ERR)
       {
          C_SyvUpPackageListNodeItemParamSetWidget * const pc_AppWidget =
             new C_SyvUpPackageListNodeItemParamSetWidget(this->mu32_ViewIndex, this->mu32_NodeIndex,
@@ -103,7 +103,7 @@ void C_SyvUpPackageListNodeParamSetsWidget::AddFile(const QString & orc_File)
                                                          this);
 
          // add file
-         QFileInfo c_File(orc_File);
+         const QFileInfo c_File(orc_File);
 
          // Pre initialization of the size. If this is not set, the eliding of the path label will cause a
          // visible resizing
@@ -126,8 +126,7 @@ void C_SyvUpPackageListNodeParamSetsWidget::AddFile(const QString & orc_File)
          ++this->mu32_FileCount;
 
          this->m_FileCountChanged();
-         //lint -e{429}  no memory leak because of the parent of pc_AppWidget and the Qt memory management
-      }
+      } //lint !e429  //no memory leak because of the parent of pc_AppWidget and the Qt memory management
    }
 }
 
@@ -144,9 +143,8 @@ void C_SyvUpPackageListNodeParamSetsWidget::AdaptFile(const QString & orc_File,
    if (opc_App != NULL)
    {
       C_PuiSvNodeUpdateParamInfo c_ParamFileInfo;
-      if (this->GetParamsetFileInfo(orc_File, c_ParamFileInfo) == C_NO_ERR)
+      if (this->m_GetParamsetFileInfo(orc_File, c_ParamFileInfo) == C_NO_ERR)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          C_SyvUpPackageListNodeItemParamSetWidget * const pc_AppWidget =
             dynamic_cast<C_SyvUpPackageListNodeItemParamSetWidget *>(opc_App);
 
@@ -155,7 +153,7 @@ void C_SyvUpPackageListNodeParamSetsWidget::AdaptFile(const QString & orc_File,
          tgl_assert(pc_AppWidget != NULL);
          if (pc_AppWidget != NULL)
          {
-            QFileInfo c_File(orc_File);
+            const QFileInfo c_File(orc_File);
 
             pc_AppWidget->SetAppName(c_File.fileName());
             pc_AppWidget->SetParamInfo(c_ParamFileInfo);
@@ -212,7 +210,6 @@ void C_SyvUpPackageListNodeParamSetsWidget::PrepareExportConfig(C_SyvUpUpdatePac
 
          if (pc_Item != NULL)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
                dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -252,7 +249,7 @@ void C_SyvUpPackageListNodeParamSetsWidget::LoadImportConfig(const C_SyvUpUpdate
               ++un_FileCounter)
          {
             const QString c_Path = orc_Config.c_NodeConfigs[u32_ConfigCounter].c_ParamSetConfigs[un_FileCounter];
-            QFileInfo c_File(c_Path);
+            const QFileInfo c_File(c_Path);
 
             if (c_File.completeSuffix().toLower() == "syde_psi")
             {
@@ -302,7 +299,7 @@ bool C_SyvUpPackageListNodeParamSetsWidget::CheckMime(QStringList & orc_PathList
 
          do
          {
-            QFileInfo c_File(orc_PathList[sn_Counter]);
+            const QFileInfo c_File(orc_PathList[sn_Counter]);
 
             if (c_File.completeSuffix().toLower() == "syde_psi")
             {
@@ -368,14 +365,13 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetUpdatePackage(C_OSCSuSequences:
 
          if (pc_Item != NULL)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             C_SyvUpPackageListNodeItemParamSetWidget * const pc_App =
                dynamic_cast<C_SyvUpPackageListNodeItemParamSetWidget *>(pc_Item->widget());
 
             if (pc_App != NULL)
             {
                const QString c_Path = pc_App->GetAppAbsoluteFilePath();
-               QFileInfo c_File(c_Path);
+               const QFileInfo c_File(c_Path);
 
                // Check file
                if ((c_File.exists() == true) &&
@@ -386,8 +382,7 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetUpdatePackage(C_OSCSuSequences:
 
                   if (pc_App->GetState() != C_SyvUpUpdatePackageListNodeItemWidget::hu32_STATE_FINISHED)
                   {
-                     orc_ApplicationsToWrite.c_FilesToWriteToNvm.push_back(stw_scl::C_SCLString(
-                                                                              c_Path.toStdString().c_str()));
+                     orc_ApplicationsToWrite.c_FilesToWriteToNvm.push_back(c_Path.toStdString().c_str());
                   }
                   else
                   {
@@ -398,8 +393,7 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetUpdatePackage(C_OSCSuSequences:
                   if (opc_AllApplications != NULL)
                   {
                      // Fill vector with all applications independent of the state
-                     opc_AllApplications->c_FilesToWriteToNvm.push_back(stw_scl::C_SCLString(
-                                                                           c_Path.toStdString().c_str()));
+                     opc_AllApplications->c_FilesToWriteToNvm.push_back(c_Path.toStdString().c_str());
                   }
 
                   osc_write_log_info("Generate Update Package",
@@ -471,7 +465,7 @@ void C_SyvUpPackageListNodeParamSetsWidget::m_InitSpecificItem(const stw_opensyd
                                                       this->mc_DeviceType,
                                                       this->mq_FileBased, this->mq_StwFlashloader, this);
 
-      QFileInfo c_File(rc_FileInfo.GetPath());
+      const QFileInfo c_File(rc_FileInfo.GetPath());
       pc_AppWidget->SetAppFile(rc_FileInfo.GetPath(), false);
       pc_AppWidget->SetAppName(c_File.fileName());
       pc_AppWidget->SetAppNumber(u32_Counter);
@@ -481,8 +475,7 @@ void C_SyvUpPackageListNodeParamSetsWidget::m_InitSpecificItem(const stw_opensyd
 
       ++this->mu32_FileCount;
       this->mpc_Ui->pc_AppVerticalLayout->addWidget(pc_AppWidget);
-      //lint -e{429}  no memory leak because of the parent of pc_AppWidget and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_AppWidget and the Qt memory management
 
    this->mq_ShowAddButton = true;
 }
@@ -507,8 +500,8 @@ void C_SyvUpPackageListNodeParamSetsWidget::m_InitStaticNames(void) const
    C_NO_ERR    File read
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPackageListNodeParamSetsWidget::GetParamsetFileInfo(const QString & orc_File,
-                                                                  C_PuiSvNodeUpdateParamInfo & orc_ParamFileInfo)
+sint32 C_SyvUpPackageListNodeParamSetsWidget::m_GetParamsetFileInfo(const QString & orc_File,
+                                                                    C_PuiSvNodeUpdateParamInfo & orc_ParamFileInfo)
 {
    sint32 s32_Return = C_NOACT;
 
@@ -549,7 +542,7 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetParamsetFileInfo(const QString 
       }
       else
       {
-         QString c_Details = QString(C_GtGetText::h_GetText("File path: %1")).
+         QString c_Details = static_cast<QString>(C_GtGetText::h_GetText("File path: %1")).
                              arg(C_PuiUtil::h_GetAbsolutePathFromProject(orc_File)) + "\nReason: ";
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          switch (s32_ReadFileResult)
@@ -565,7 +558,8 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetParamsetFileInfo(const QString 
             c_Details += C_GtGetText::h_GetText("File has missing content. See log file for details.");
             break;
          default:
-            c_Details += QString(C_GtGetText::h_GetText("Unknown reason. Error code: %1")).arg(s32_ReadFileResult);
+            c_Details += static_cast<QString>(C_GtGetText::h_GetText("Unknown reason. Error code: %1")).arg(
+               s32_ReadFileResult);
             break;
          }
          c_Message.SetHeading(C_GtGetText::h_GetText("Update package configuration"));
@@ -581,16 +575,16 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetParamsetFileInfo(const QString 
       {
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_InfoDialog and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_InfoDialog and the Qt memory management
    else
    {
       // inform user that file already exists
       C_OgeWiCustomMessage c_Message(this);
       c_Message.SetHeading(C_GtGetText::h_GetText("Add file"));
       c_Message.SetDescription(
-         QString(C_GtGetText::h_GetText("The file %1 is already contained in the Update Package for this node "
-                                        "and therefore not added again.")).
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "The file %1 is already contained in the Update Package for this node "
+                                 "and therefore not added again.")).
          arg(C_PuiUtil::h_GetAbsolutePathFromProject(orc_File)));
       c_Message.Execute();
    }

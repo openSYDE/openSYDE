@@ -92,7 +92,6 @@ void C_SyvDaItTaModel::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Sty
 {
    switch (oe_Style)
    {
-   //TBD by Karsten: done
    case C_PuiSvDbWidgetBase::eOPENSYDE:
       if (oq_DarkMode == true)
       {
@@ -145,7 +144,7 @@ void C_SyvDaItTaModel::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Sty
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::InitMinMaxAndName(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
       dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
@@ -200,6 +199,9 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
                                                                                pc_ElementId->u32_DataPoolIndex,
                                                                                pc_ElementId->u32_ListIndex,
                                                                                pc_ElementId->u32_ElementIndex);
+                  const C_OSCNodeDataPool * pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+                     pc_ElementId->u32_NodeIndex, pc_ElementId->u32_DataPoolIndex);
+
                   tgl_assert(pc_OSCElement != NULL);
                   if (pc_OSCElement != NULL)
                   {
@@ -221,14 +223,25 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
 
                      if (rc_Config.c_DisplayName.compare("") == 0)
                      {
-                        if (pc_ElementId->GetUseArrayElementIndex())
+                        if (pc_Datapool != NULL)
                         {
-                           this->mc_Names.push_back(QString("%1[%2]").arg(pc_OSCElement->c_Name.c_str()).arg(
-                                                       pc_ElementId->GetArrayElementIndex()));
-                        }
-                        else
-                        {
-                           this->mc_Names.push_back(pc_OSCElement->c_Name.c_str());
+                           if (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC)
+                           {
+                              this->mc_Names.push_back(C_PuiSvHandler::h_GetShortNamespace(*pc_ElementId));
+                           }
+                           else
+                           {
+                              if (pc_ElementId->GetUseArrayElementIndex())
+                              {
+                                 this->mc_Names.push_back(static_cast<QString>("%1[%2]").
+                                                          arg(pc_OSCElement->c_Name.c_str()).
+                                                          arg(pc_ElementId->GetArrayElementIndex()));
+                              }
+                              else
+                              {
+                                 this->mc_Names.push_back(pc_OSCElement->c_Name.c_str());
+                              }
+                           }
                         }
                      }
                      else
@@ -292,7 +305,7 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::UpdateValue(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
       dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
@@ -328,7 +341,7 @@ void C_SyvDaItTaModel::UpdateValue(void)
                         }
                         else
                         {
-                           this->mc_UnscaledLastDataValues.resize(u32_ItConfig + 1);
+                           this->mc_UnscaledLastDataValues.resize(static_cast<uintn>(u32_ItConfig) + 1U);
                            this->mc_UnscaledLastDataValues[u32_ItConfig] = c_UnscaledValues;
                         }
                      }
@@ -363,7 +376,7 @@ void C_SyvDaItTaModel::UpdateError(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
       dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
@@ -462,13 +475,13 @@ QVariant C_SyvDaItTaModel::headerData(const sintn osn_Section, const Qt::Orienta
          switch (e_Col)
          {
          case eVALUE:
-            c_Retval = QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
+            c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
             break;
          case eBAR:
-            c_Retval = QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
+            c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
             break;
          default:
-            c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+            c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
             break;
          }
       }
@@ -495,7 +508,7 @@ sintn C_SyvDaItTaModel::rowCount(const QModelIndex & orc_Parent) const
 
    if (!orc_Parent.isValid())
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       const stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
          dynamic_cast<const stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
@@ -565,10 +578,10 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
             switch (e_Col)
             {
             case eNAME:
-               c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+               c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
                break;
             case eVALUE:
-               c_Retval = QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
+               c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
                break;
             default:
                break;
@@ -603,7 +616,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
          {
             if (pc_DataElementId->GetIsValid() == true)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               
                const stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
                   dynamic_cast<const stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
@@ -626,7 +639,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      case C_SyvDaItTaModel::eVALUE:
                         if (u32_Index < this->mc_Units.size())
                         {
-                           c_Retval = QString("%1 %2").arg(GetValue(u32_Index)).arg(mc_Units[u32_Index]);
+                           c_Retval = static_cast<QString>("%1 %2").arg(m_GetValue(u32_Index)).arg(mc_Units[u32_Index]);
                         }
                         break;
                      case C_SyvDaItTaModel::eBAR:
@@ -735,7 +748,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      switch (e_Col)
                      {
                      case C_SyvDaItTaModel::eBAR:
-                        c_Retval = this->GetPercentage(u32_Index);
+                        c_Retval = this->m_GetPercentage(u32_Index);
                         break;
                      default:
                         break;
@@ -824,7 +837,8 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                            {
                               if (u32_Index < this->mc_Units.size())
                               {
-                                 c_Retval = QString("%1 %2").arg(GetValue(u32_Index)).arg(mc_Units[u32_Index]);
+                                 c_Retval =
+                                    static_cast<QString>("%1 %2").arg(m_GetValue(u32_Index)).arg(mc_Units[u32_Index]);
                               }
                            }
                         }
@@ -1133,7 +1147,7 @@ const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItTaModel::GetDataPoolElementI
 
    if (this->mpc_Data != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       const C_GiSvDaTableBase * const pc_Table = dynamic_cast<const C_GiSvDaTableBase *>(this->mpc_Data);
       if (pc_Table != NULL)
       {
@@ -1162,7 +1176,7 @@ uint32 C_SyvDaItTaModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
 {
    uint32 u32_Retval = 0UL;
 
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
       dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
@@ -1193,7 +1207,7 @@ uint32 C_SyvDaItTaModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
             // use valid index
             if (ou32_SelectedIndex < m_GetSizeItems())
             {
-               s32_InsertAt = ou32_SelectedIndex + 1UL;
+               s32_InsertAt = static_cast<sint32>(ou32_SelectedIndex) + 1;
             }
             else
             {
@@ -1276,7 +1290,7 @@ uint32 C_SyvDaItTaModel::m_GetSizeItems(void) const
 {
    uint32 u32_Retval = 0UL;
 
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
       dynamic_cast<const stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
@@ -1303,7 +1317,7 @@ uint32 C_SyvDaItTaModel::m_GetSizeItems(void) const
 //-----------------------------------------------------------------------------
 void C_SyvDaItTaModel::m_DeleteItem(const uint32 ou32_Index)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
       dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
@@ -1377,7 +1391,7 @@ void C_SyvDaItTaModel::m_EndRemoveRows(const uint32 ou32_FirstIndex, const uint3
 //-----------------------------------------------------------------------------
 void C_SyvDaItTaModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
       dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
@@ -1476,7 +1490,7 @@ C_PuiSvDbNodeDataPoolListElementId C_SyvDaItTaModel::m_RemoveItem(const uint32 o
    \param[in] ou32_Index Data element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-float32 C_SyvDaItTaModel::GetPercentage(const uint32 ou32_Index) const
+float32 C_SyvDaItTaModel::m_GetPercentage(const uint32 ou32_Index) const
 {
    float32 f32_Retval = 0.0F;
 
@@ -1519,7 +1533,7 @@ float32 C_SyvDaItTaModel::GetPercentage(const uint32 ou32_Index) const
    \param[in] ou32_Index Data element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaItTaModel::GetValue(const uint32 ou32_Index) const
+QString C_SyvDaItTaModel::m_GetValue(const uint32 ou32_Index) const
 {
    QString c_Retval = "";
 

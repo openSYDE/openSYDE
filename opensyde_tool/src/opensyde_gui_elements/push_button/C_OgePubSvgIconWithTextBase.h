@@ -28,10 +28,7 @@ public:
    void SetDarkMode(const bool oq_Active);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
-   //lint -restore
 
    stw_types::sintn msn_RightBorderEnabledWidth;
    stw_types::sintn msn_TopBorderEnabledWidth;
@@ -64,12 +61,12 @@ private:
    stw_types::sint32 ms32_MarginInBetween;
    bool mq_Dark;
 
-   static void h_DrawRectBorders(const QRect & orc_RectOuter, QPainter & orc_Painter,
-                                 const stw_types::sintn osn_LeftBorderWidth, const stw_types::sintn osn_TopBorderWidth,
-                                 const stw_types::sintn osn_RightBorderWidth,
-                                 const stw_types::sintn osn_BottomBorderWidth, const QColor & orc_BorderColorLeft,
-                                 const QColor & orc_BorderColorTop, const QColor & orc_BorderColorRight,
-                                 const QColor & orc_BorderColorBottom);
+   static void mh_DrawRectBorders(const QRect & orc_RectOuter, QPainter & orc_Painter,
+                                  const stw_types::sintn osn_LeftBorderWidth, const stw_types::sintn osn_TopBorderWidth,
+                                  const stw_types::sintn osn_RightBorderWidth,
+                                  const stw_types::sintn osn_BottomBorderWidth, const QColor & orc_BorderColorLeft,
+                                  const QColor & orc_BorderColorTop, const QColor & orc_BorderColorRight,
+                                  const QColor & orc_BorderColorBottom);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -25,11 +25,12 @@ class C_SdBueUnoSignalDeleteCommand :
    public C_SdBueUnoSignalAddDeleteBaseCommand
 {
 public:
-   C_SdBueUnoSignalDeleteCommand(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                 const stw_types::uint32 & oru32_SignalIndex,
-                                 C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
-                                 stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
-                                 QUndoCommand * const opc_Parent = NULL);
+   C_SdBueUnoSignalDeleteCommand(
+      const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageId,
+      const std::vector<stw_types::uint32> & orc_SignalIndex,
+      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+      stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
+      QUndoCommand * const opc_Parent = NULL);
 
    virtual void redo(void);
    virtual void undo(void);

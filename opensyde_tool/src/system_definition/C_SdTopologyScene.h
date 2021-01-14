@@ -109,15 +109,12 @@ protected:
    virtual const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * m_GetCopyPasteManagerConst(void) const override;
    virtual stw_opensyde_gui_logic::C_SebUnoBaseManager * m_GetUndoManager(void) override;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
 
    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event) override;
-   //lint -restore
 
    void m_OpenContextMenu(const QPointF & orc_Pos);
 
@@ -160,7 +157,7 @@ protected:
 private:
    //Avoid call
    C_SdTopologyScene(const C_SdTopologyScene &);
-   C_SdTopologyScene & operator =(const C_SdTopologyScene &);
+   C_SdTopologyScene & operator =(const C_SdTopologyScene &); //lint !e1511 //we want to hide the base func.
 
    void m_SelectionChanged(void);
    void m_HandleArrowButton(const bool & orq_Selection);

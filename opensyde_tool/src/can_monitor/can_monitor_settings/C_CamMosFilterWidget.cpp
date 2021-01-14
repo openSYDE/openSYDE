@@ -293,9 +293,9 @@ void C_CamMosFilterWidget::m_OnAddClicked()
    c_FilterData.c_Name = C_Uti::h_GetUniqueNameQ(c_Names, c_ProposedName);
 
    // Pop up dialog (use scroll area widget as parent to make sure scroll bars are styled correctly)
-   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
-                                                           this->mpc_Ui->pc_ScrollAreaContents);
-   C_CamMosFilterPopup * pc_Dialog = new C_CamMosFilterPopup(c_FilterData, *c_New);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
+                                                                 this->mpc_Ui->pc_ScrollAreaContents);
+   C_CamMosFilterPopup * const pc_Dialog = new C_CamMosFilterPopup(c_FilterData, *c_New);
 
    Q_UNUSED(pc_Dialog)
 
@@ -348,9 +348,7 @@ void C_CamMosFilterWidget::m_OnAddClicked()
    {
       c_New->HideOverlay();
    }
-
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new filter widget (GUI only).
@@ -363,7 +361,7 @@ void C_CamMosFilterWidget::m_OnAddClicked()
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_AddFilterWidget(const C_CamProFilterData & orc_FilterData)
 {
-   C_CamMosFilterItemWidget * pc_NewItem = new C_CamMosFilterItemWidget(orc_FilterData, this);
+   C_CamMosFilterItemWidget * const pc_NewItem = new C_CamMosFilterItemWidget(orc_FilterData, this);
 
    // remember item
    this->mc_Entries.push_back(pc_NewItem);
@@ -382,7 +380,7 @@ void C_CamMosFilterWidget::m_AddFilterWidget(const C_CamProFilterData & orc_Filt
    connect(pc_NewItem, &C_CamMosFilterItemWidget::SigEnableFilter, this, &C_CamMosFilterWidget::m_ActivateFilter);
    connect(pc_NewItem, &C_CamMosFilterItemWidget::SigUpdateFilter, this,
            &C_CamMosFilterWidget::m_UpdateFilterConfiguration);
-}
+} //lint !e429  no memory leak because of the parent of pc_NewItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove existing filter widget.
@@ -638,5 +636,5 @@ void C_CamMosFilterWidget::m_OnExpand(const bool oq_Expand) const
 void C_CamMosFilterWidget::m_UpdateTitleFilterCount(void) const
 {
    this->mpc_Ui->pc_WiHeader->SetTitle(
-      QString(C_GtGetText::h_GetText("Receive Filter (%1)")).arg(this->mc_Entries.size()));
+      static_cast<QString>(C_GtGetText::h_GetText("Receive Filter (%1)")).arg(this->mc_Entries.size()));
 }

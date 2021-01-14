@@ -67,30 +67,39 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
    {
       c_Tmp = C_GtGetText::h_GetText("Standard (11 bit)");
    }
-   c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Type: %1\n")).arg(c_Tmp);
+   c_ToolTipContent += static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Type: %1\n")).arg(
+      c_Tmp);
    c_ToolTipContent +=
-      QString(QString("   ") +
-              C_GtGetText::h_GetText("CAN ID: 0x%1\n")).arg(QString("%1").arg(orc_Message.u32_CanId, 0, 16).toUpper());
+      static_cast<QString>(static_cast<QString>("   ") +
+                           C_GtGetText::h_GetText("CAN ID: 0x%1\n")).arg(static_cast<QString>("%1").arg(orc_Message.
+                                                                                                        u32_CanId, 0,
+                                                                                                        16).toUpper());
 
    c_ToolTipContent +=
-      QString(QString("   ") + C_GtGetText::h_GetText("DLC: %1 Bytes\n")).arg(orc_Message.u16_Dlc);
+      static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("DLC: %1 Bytes\n")).arg(
+         orc_Message.u16_Dlc);
    switch (orc_Message.e_TxMethod)
    {
    case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
-      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Tx-Method: On Event\n"));
+      c_ToolTipContent +=
+         static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Tx-Method: On Event\n"));
       break;
    case C_OSCCanMessage::eTX_METHOD_CYCLIC:
-      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Tx-Method: Cyclic\n"));
-      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Cycle Time: %1\n")).arg(
-         orc_Message.u32_CycleTimeMs);
+      c_ToolTipContent +=
+         static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Tx-Method: Cyclic\n"));
+      c_ToolTipContent +=
+         static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Cycle Time: %1\n")).arg(
+            orc_Message.u32_CycleTimeMs);
       break;
    case C_OSCCanMessage::eTX_METHOD_ON_CHANGE:
-      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Tx-Method: On Change\n"));
-      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Not earlier than: %1\n")).arg(
-         orc_Message.u16_DelayTimeMs);
       c_ToolTipContent +=
-         QString(QString("   ") +
-                 C_GtGetText::h_GetText("But not later than: %1\n")).arg(orc_Message.u32_CycleTimeMs);
+         static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Tx-Method: On Change\n"));
+      c_ToolTipContent +=
+         static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Not earlier than: %1\n")).arg(
+            orc_Message.u16_DelayTimeMs);
+      c_ToolTipContent +=
+         static_cast<QString>(static_cast<QString>("   ") +
+                              C_GtGetText::h_GetText("But not later than: %1\n")).arg(orc_Message.u32_CycleTimeMs);
       break;
    }
    return c_ToolTipContent;
@@ -142,31 +151,31 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
       c_ToolTipContent.append("\n");
    }
 
-   c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Min: "));
+   c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Min: "));
    if (C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_DpListElement.c_MinValue, f64_Value, 0UL) == C_NO_ERR)
    {
       c_ToolTipContent.append(QString::number(f64_Value));
    }
    c_ToolTipContent.append("\n");
 
-   c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Max: "));
+   c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Max: "));
    if (C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_DpListElement.c_MaxValue, f64_Value, 0UL) == C_NO_ERR)
    {
       c_ToolTipContent.append(QString::number(f64_Value));
    }
    c_ToolTipContent.append("\n");
 
-   c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Factor: "));
+   c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Factor: "));
    c_ToolTipContent.append(QString::number(orc_DpListElement.f64_Factor));
    c_ToolTipContent.append("\n");
 
-   c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Offset: "));
+   c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Offset: "));
    c_ToolTipContent.append(QString::number(orc_DpListElement.f64_Offset));
    c_ToolTipContent.append("\n");
 
    if (orc_DpListElement.c_DataSetValues.size() > 0UL)
    {
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Init Value: "));
+      c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Init Value: "));
       if (C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_DpListElement.c_DataSetValues[0UL],
                                                     f64_Value, 0UL) == C_NO_ERR)
       {
@@ -177,13 +186,13 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
    if (orc_DpListElement.c_Unit.IsEmpty() == false)
    {
       c_ToolTipContent.append("\n");
-      c_ToolTipContent.append(C_GtGetText::h_GetText("Unit: "));
+      c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Unit: "));
       c_ToolTipContent.append(orc_DpListElement.c_Unit.c_str());
    }
    c_ToolTipContent.append("\n");
 
    // Value type information
-   c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Byte Order: "));
+   c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Byte Order: "));
    if (orc_Signal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
    {
       c_ToolTipContent.append(C_GtGetText::h_GetText("Intel"));
@@ -194,32 +203,32 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
    }
    c_ToolTipContent.append("\n");
 
-   c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Type: "));
+   c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Type: "));
    c_ToolTipContent.append(C_SdTooltipUtil::h_ConvertTypeToNameSimplified(orc_DpListElement.c_MinValue.GetType()));
    c_ToolTipContent.append("\n");
 
-   c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Length: "));
+   c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Length: "));
    c_ToolTipContent.append(QString::number(orc_Signal.u16_ComBitLength));
    c_ToolTipContent.append(C_GtGetText::h_GetText(" Bit\n"));
 
    // Layout information
-   c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Message: "));
+   c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Message: "));
    c_ToolTipContent.append(orc_Message.c_Name.c_str());
    c_ToolTipContent.append("\n");
 
-   c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Start Bit: "));
+   c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Start Bit: "));
    c_ToolTipContent.append(QString::number(orc_Signal.u16_ComBitStart));
 
    if (orc_Signal.e_MultiplexerType != C_OSCCanSignal::eMUX_DEFAULT)
    {
       c_ToolTipContent.append("\n");
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Multiplexer Type: "));
+      c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Multiplexer Type: "));
 
       if (orc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
       {
          c_ToolTipContent.append(C_GtGetText::h_GetText("Multiplexed Signal"));
          c_ToolTipContent.append("\n");
-         c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Multiplexer Value: "));
+         c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Multiplexer Value: "));
          c_ToolTipContent.append(QString::number(orc_Signal.u16_MultiplexValue));
       }
       else

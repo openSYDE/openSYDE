@@ -147,6 +147,8 @@ void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
 
             this->mpc_Ui->pc_DoubleSpinBox->Init(orc_Min, orc_Max, of64_Factor, of64_Offset, ou32_Index);
             break;
+         default:
+            break;
          }
       }
       else
@@ -189,7 +191,7 @@ void C_OgeWiSpinBoxGroup::SetValue(const QVariant & orc_Value) const
    else
    {
       float64 f64_Value;
-      switch (orc_Value.type())
+      switch (orc_Value.type()) //lint !e788  //we do not need to handle all types here
       {
       case QVariant::Int:
          f64_Value = static_cast<float64>(orc_Value.toInt());
@@ -302,7 +304,7 @@ void C_OgeWiSpinBoxGroup::SetToolTipInformation(const QString & orc_Heading, con
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgeWiSpinBoxGroup::event(QEvent * const opc_Event)
 {
-   switch (opc_Event->type())
+   switch (opc_Event->type()) //lint !e788  //we do not need to handle all types here
    {
    case QEvent::ShortcutOverride:
       if (this->mq_DoubleMode == true)
@@ -474,7 +476,7 @@ void C_OgeWiSpinBoxGroup::m_Resize(const stw_types::sintn osn_Height) const
    Current spin button width
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_OgeWiSpinBoxGroup::GetSpinButtonWidth(void) const
+sintn C_OgeWiSpinBoxGroup::m_GetSpinButtonWidth(void) const
 {
    sintn sn_Retval;
    sintn sn_LineEditWidth;
@@ -507,7 +509,7 @@ void C_OgeWiSpinBoxGroup::m_InitDefault(void)
 /*! \brief   Init changed connections
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiSpinBoxGroup::m_InitConnections(void)
+void C_OgeWiSpinBoxGroup::m_InitConnections(void) const
 {
    if (this->mq_DoubleMode == true)
    {
@@ -525,7 +527,7 @@ void C_OgeWiSpinBoxGroup::m_InitConnections(void)
 /*! \brief   Deactivate any left over connections
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiSpinBoxGroup::m_DeactivateConnections(void)
+void C_OgeWiSpinBoxGroup::m_DeactivateConnections(void) const
 {
    if (this->mq_DoubleMode == true)
    {

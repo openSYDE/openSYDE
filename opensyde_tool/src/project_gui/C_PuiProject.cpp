@@ -72,12 +72,11 @@ sint32 C_PuiProject::Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecate
 {
    sint32 s32_Retval;
    const QFileInfo c_File(mc_Path);
-   QDir c_Directory(c_File.absolutePath());
+   const QDir c_Directory(c_File.absolutePath());
 
    if (c_Directory.mkpath(".") == true)
    {
       C_PuiProject::h_HandlePendingEvents();
-      //lint -e{40} Defined by project file
       s32_Retval = C_OSCProjectFiler::h_Save(*this,
                                              mc_Path.toStdString().c_str(),
                                              stw_opensyde_gui_logic::C_Uti::h_GetApplicationVersion(
@@ -274,7 +273,7 @@ void C_PuiProject::SetPath(const QString & orc_Path)
 {
    if (orc_Path != "")
    {
-      QFileInfo c_File(orc_Path);
+      const QFileInfo c_File(orc_Path);
       mc_Path = QDir::cleanPath(c_File.absoluteFilePath());
    }
    else
@@ -322,7 +321,7 @@ QString C_PuiProject::GetName(void) const
 
    if (this->mc_Path != "")
    {
-      QFileInfo c_File(this->mc_Path);
+      const QFileInfo c_File(this->mc_Path);
       c_Return = c_File.completeBaseName();
    }
 
@@ -450,7 +449,7 @@ uint32 C_PuiProject::m_CalcHashProject(void) const
       3. If failed: empty project (next recent projects are loaded afterwards)
 
    \param[out]  opu16_FileVersion   file version
-   \param[out]  rc_LoadedProject    project that was tried to load (if load fails, this->mc_Path gets overwritten)
+   \param[out]  orc_LoadedProject   project that was tried to load (if load fails, this->mc_Path gets overwritten)
 
   \return
    C_RD_WR  Problems accessing file system (e.g. no read access to file)
@@ -461,7 +460,7 @@ uint32 C_PuiProject::m_CalcHashProject(void) const
    C_OVERFLOW  node in system definition references a device not part of the device definitions
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiProject::LoadInitialProject(uint16 * const opu16_FileVersion, QString & rc_LoadedProject)
+sint32 C_PuiProject::LoadInitialProject(uint16 * const opu16_FileVersion, QString & orc_LoadedProject)
 {
    sint32 s32_Error;
 
@@ -491,7 +490,7 @@ sint32 C_PuiProject::LoadInitialProject(uint16 * const opu16_FileVersion, QStrin
 
    // Load it
    s32_Error = this->Load(opu16_FileVersion);
-   rc_LoadedProject = this->GetPath();
+   orc_LoadedProject = this->GetPath();
 
    if (s32_Error == C_NO_ERR)
    {
@@ -521,7 +520,7 @@ sint32 C_PuiProject::LoadInitialProject(uint16 * const opu16_FileVersion, QStrin
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::LoadEmpty(void)
 {
-   C_OSCProject c_Tmp;
+   const C_OSCProject c_Tmp;
 
    //Default values
    this->mc_Path = "";

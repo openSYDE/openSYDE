@@ -351,20 +351,22 @@ void C_OgeDashboardProgressBar::resizeEvent(QResizeEvent * const opc_Event)
    QProgressBar::resizeEvent(opc_Event);
    if (this->orientation() == Qt::Horizontal)
    {
-      QString c_Border = QString("stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"],"
-                                 "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"]::chunk,"
-                                 "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_BRIGHT\"],"
-                                 "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_BRIGHT\"]::chunk"
-                                 "{border-radius:%1px;}").arg((this->size().height() * 3) / 10);
+      QString c_Border =
+         static_cast<QString>("stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"],"
+                              "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"]::chunk,"
+                              "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_BRIGHT\"],"
+                              "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_BRIGHT\"]::chunk"
+                              "{border-radius:%1px;}").arg((this->size().height() * 3) / 10);
       this->setStyleSheet(c_Border);
    }
    else
    {
-      QString c_Border = QString("stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"],"
-                                 "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"]::chunk,"
-                                 "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_BRIGHT\"],"
-                                 "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_BRIGHT\"]::chunk"
-                                 "{border-radius:%1px;}").arg((this->size().width() * 25) / 1000);
+      QString c_Border =
+         static_cast<QString>("stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"],"
+                              "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"]::chunk,"
+                              "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_BRIGHT\"],"
+                              "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_BRIGHT\"]::chunk"
+                              "{border-radius:%1px;}").arg((this->size().width() * 25) / 1000);
       this->setStyleSheet(c_Border);
    }
 }

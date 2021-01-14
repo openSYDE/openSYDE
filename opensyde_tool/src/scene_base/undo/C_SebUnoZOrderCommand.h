@@ -42,7 +42,7 @@ private:
    std::vector<stw_types::float64> mc_OldZValues;
    const std::vector<stw_types::float64> mc_NewZValues;
 
-   void ApplyZValues(const std::vector<stw_types::float64> & orc_Values) const;
+   void m_ApplyZValues(const std::vector<stw_types::float64> & orc_Values) const;
    static void mh_CreateZValueMap(const QGraphicsScene * const opc_Scene, const QList<QGraphicsItem *> & orc_Items,
                                   const QList<QGraphicsItem *> & orc_SelectedItems, const bool oq_BringToFront,
                                   QMap<QGraphicsItem *,

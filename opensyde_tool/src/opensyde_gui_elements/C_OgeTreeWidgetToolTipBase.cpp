@@ -59,7 +59,7 @@ C_OgeTreeWidgetToolTipBase::C_OgeTreeWidgetToolTipBase(QWidget * const opc_Paren
 void C_OgeTreeWidgetToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    QTreeWidget::mouseMoveEvent(opc_Event);
-   this->CallAfterMouseMove(opc_Event);
+   this->m_CallAfterMouseMove(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ void C_OgeTreeWidgetToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgeTreeWidgetToolTipBase::event(QEvent * const opc_Event)
 {
-   return this->CallForEvent(opc_Event);
+   return this->m_CallForEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ bool C_OgeTreeWidgetToolTipBase::event(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgeTreeWidgetToolTipBase::eventFilter(QObject * const opc_Object, QEvent * const opc_Event)
 {
-   this->CallBeforeEventFilter(opc_Event);
+   this->m_CallBeforeEventFilter(opc_Event);
    return QTreeWidget::eventFilter(opc_Object, opc_Event);
 }
 

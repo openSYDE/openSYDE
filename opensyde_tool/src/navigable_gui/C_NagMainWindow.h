@@ -60,15 +60,12 @@ private Q_SLOTS:
                      const stw_types::sint32 os32_Flag);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
    virtual void closeEvent(QCloseEvent * const opc_Event) override;
    virtual void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
    virtual void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
    virtual void dropEvent(QDropEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    //Avoid call
@@ -84,7 +81,7 @@ private:
    void m_AdaptParameter(const stw_types::sint32 os32_Mode, stw_types::sint32 & ors32_SubMode,
                          stw_types::uint32 & oru32_Index, QString & orc_Name, QString & orc_SubItemName,
                          stw_types::uint32 & oru32_Flag, const bool oq_ChangeUseCase);
-   static void h_GetHeadingNames(const stw_types::sint32 os32_Mode, const stw_types::sint32 & ors32_SubMode,
+   static void mh_GetHeadingNames(const stw_types::sint32 os32_Mode, const stw_types::sint32 & ors32_SubMode,
                                  const stw_types::uint32 ou32_Index, QString & orc_SubMode, QString & orc_SubSubMode);
    void m_ShowSysDefItem(const stw_types::sint32 os32_SubMode, const stw_types::uint32 ou32_Index = 0U,
                          const QString & orc_Name = "", const QString & orc_SubName = "",

@@ -72,8 +72,8 @@ C_CieExportReportWidget::C_CieExportReportWidget(stw_opensyde_gui_elements::C_Og
    this->mrc_ParentDialog.SetWidget(this);
 
    // set main title
-   this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("%1 File Export")).arg(c_FileInfo.completeSuffix().
-                                                                                         toUpper()));
+   this->mrc_ParentDialog.SetTitle(
+      static_cast<QString>(C_GtGetText::h_GetText("%1 File Export")).arg(c_FileInfo.completeSuffix().toUpper()));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Report"));
 
    // connects
@@ -232,7 +232,7 @@ sint32 C_CieExportReportWidget::m_BuildReport(void)
    c_CompleteLog += C_GtGetText::h_GetText("Path:");
    c_CompleteLog += "</td>";
    c_CompleteLog += C_CieExportReportWidget::mhc_HTML_TABLE_DATA_START;
-   c_CompleteLog += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>").
+   c_CompleteLog += static_cast<QString>("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>").
                     arg(this->mc_FilePath).
                     arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                     arg(this->mc_FilePath);
@@ -243,21 +243,21 @@ sint32 C_CieExportReportWidget::m_BuildReport(void)
    c_CompleteLog += "</td>";
    c_CompleteLog += C_CieExportReportWidget::mhc_HTML_TABLE_DATA_START;
    //Add node mapping
-   c_CompleteLog += QString(C_GtGetText::h_GetText(c_Nodes.c_str()));
+   c_CompleteLog += static_cast<QString>(C_GtGetText::h_GetText(c_Nodes.c_str()));
    c_CompleteLog += "<br/>";
    //Translation: 1=Number of Tx messages, 2=Number of Rx messages
-   c_CompleteLog += QString(C_GtGetText::h_GetText("Messages: %1;")).arg(
+   c_CompleteLog += static_cast<QString>(C_GtGetText::h_GetText("Messages: %1;")).arg(
       this->mc_ExportStatistic.u32_NumOfMessages);
    //Translation: 1=Number of signals
-   c_CompleteLog += QString(C_GtGetText::h_GetText(" Signals: %1")).arg(
+   c_CompleteLog += static_cast<QString>(C_GtGetText::h_GetText(" Signals: %1")).arg(
       this->mc_ExportStatistic.u32_NumOfSignals);
    // add warnings
-   c_CompleteLog += QString(C_GtGetText::h_GetText(c_Warnings.c_str()));
+   c_CompleteLog += static_cast<QString>(C_GtGetText::h_GetText(c_Warnings.c_str()));
    c_CompleteLog += "<br/><br/>";
    c_CompleteLog += C_GtGetText::h_GetText("For detailed information see ");
    //Update log file
    C_OSCLoggingHandler::h_Flush();
-   c_CompleteLog += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
+   c_CompleteLog += static_cast<QString>("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
                     arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                     arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                     arg(C_GtGetText::h_GetText("log file"));

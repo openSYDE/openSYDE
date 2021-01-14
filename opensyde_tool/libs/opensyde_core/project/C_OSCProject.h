@@ -46,9 +46,6 @@ public:
    stw_scl::C_SCLString c_OpenSYDEVersion;    ///< openSYDE version used to save this project
    stw_scl::C_SCLString c_Template;           ///< Template this project is based on
    stw_scl::C_SCLString c_Version;            ///< project version
-
-protected:
-   static stw_types::sint32 mh_CheckTimeFormat(const stw_scl::C_SCLString & orc_Time);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

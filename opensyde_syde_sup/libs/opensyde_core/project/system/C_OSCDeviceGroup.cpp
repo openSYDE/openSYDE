@@ -104,11 +104,13 @@ bool C_OSCDeviceGroup::PreCheckDevice(const C_SCLString & orc_DeviceName, const 
 
    for (uint32 u32_ItDevice = 0U; u32_ItDevice < this->mc_Devices.size(); ++u32_ItDevice)
    {
-      if ((orc_DeviceName == this->mc_Devices[u32_ItDevice].c_DeviceName) ||
-          (orc_DeviceNameAlias == this->mc_Devices[u32_ItDevice].c_DeviceName) ||
-          (orc_DeviceName == this->mc_Devices[u32_ItDevice].c_DeviceNameAlias) ||
-          (orc_DeviceNameAlias == this->mc_Devices[u32_ItDevice].GetDisplayName()) ||
-          (orc_DevicePath.UpperCase() == this->mc_Devices[u32_ItDevice].c_FilePath.UpperCase()))
+      const C_OSCDeviceDefinition & rc_DeviceDefinition = this->mc_Devices[u32_ItDevice];
+
+      if ((orc_DeviceName == rc_DeviceDefinition.c_DeviceName) ||
+          (orc_DeviceNameAlias == rc_DeviceDefinition.c_DeviceName) ||
+          (orc_DeviceName == rc_DeviceDefinition.c_DeviceNameAlias) ||
+          (orc_DeviceNameAlias == rc_DeviceDefinition.GetDisplayName()) ||
+          (orc_DevicePath.UpperCase() == rc_DeviceDefinition.c_FilePath.UpperCase()))
       {
          q_IsEqual = true;
          break;
@@ -147,10 +149,10 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
       //Read in all devices in the list in order
       for (sintn sn_ItDevice = 0; sn_ItDevice < sn_NumDevices; ++sn_ItDevice)
       {
-         c_DevicePath = orc_Ini.ReadString(this->mc_GroupName, "Device" + C_SCLString(sn_ItDevice + 1), "");
+         c_DevicePath = orc_Ini.ReadString(this->mc_GroupName, "Device" + C_SCLString::IntToStr(sn_ItDevice + 1), "");
          if (c_DevicePath == "")
          {
-            osc_write_log_error("Load device descriptions", "Empty name of \"Device" + C_SCLString(
+            osc_write_log_error("Load device descriptions", "Empty name of \"Device" + C_SCLString::IntToStr(
                                    sn_ItDevice + 1) + "\" in device group \"" + this->mc_GroupName + "\".");
             s32_Return = C_RD_WR;
          }
@@ -160,7 +162,7 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
             C_OSCDeviceDefinition c_DeviceDefinition;
             if (TGL_FileExists(c_DevicePath) == 0)
             {
-               c_FullDevicePath = C_SCLString(orc_BasePath + c_DevicePath);
+               c_FullDevicePath = orc_BasePath + c_DevicePath;
             }
             else
             {

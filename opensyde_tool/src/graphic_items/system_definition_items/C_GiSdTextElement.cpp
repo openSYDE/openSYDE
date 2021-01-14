@@ -81,7 +81,7 @@ void C_GiSdTextElement::LoadData(void)
 
       this->m_LoadTextElementData(&rc_UITextElementData, false);
       //Object name for test
-      this->setObjectName(QString("Meta: %1").arg(rc_UITextElementData.c_UIText));
+      this->setObjectName(static_cast<QString>("Meta: %1").arg(rc_UITextElementData.c_UIText));
    }
 }
 

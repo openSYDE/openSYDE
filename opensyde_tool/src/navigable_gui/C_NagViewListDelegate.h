@@ -30,10 +30,8 @@ public:
 
    void SetListView(QListView * const opc_View);
    void RegisterExpand(const QModelIndex & orc_Index);
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
+
    virtual QSize sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const override;
-   //lint -restore
 
 private:
    QListView * mpc_View;

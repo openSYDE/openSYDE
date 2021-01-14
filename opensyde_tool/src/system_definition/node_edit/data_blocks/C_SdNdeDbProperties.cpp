@@ -43,6 +43,7 @@ const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V1 = 0;
 const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V2 = 1;
 const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V3 = 2;
 const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V4 = 3;
+const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V5 = 4;
 // when adding new versions do not forget to update mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -218,10 +219,12 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
+   this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V1, C_GtGetText::h_GetText("Version 1"));
    this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V2, C_GtGetText::h_GetText("Version 2"));
    this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V3, C_GtGetText::h_GetText("Version 3"));
    this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V4, C_GtGetText::h_GetText("Version 4"));
+   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V5, C_GtGetText::h_GetText("Version 5"));
    this->mpc_Ui->pc_LabelHeadingDatapools->setText(C_GtGetText::h_GetText("Owned Datapools"));
    this->mpc_Ui->pc_LabelDataPoolsEmpty->setText("No assigned Datapools, \nadd any via the '+' button");
    this->mpc_Ui->pc_CommentText->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
@@ -275,18 +278,20 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
                              "Absolute or relative to openSYDE.exe."));
    this->mpc_Ui->pc_LabelCodeStructure->SetToolTipInformation(
       C_GtGetText::h_GetText("Code Structure Version"),
-      QString(C_GtGetText::h_GetText("Version of structure for generated code. Which version to select depends on what "
+      static_cast<QString>(C_GtGetText::h_GetText("Version of structure for generated code. Which version to select depends on what "
                                      "your physical target supports. See target documentation for further information about "
                                      "supported versions.\n"
                                      " - %1: Compatibility mode for previous versions of provided tools \n"
                                      "   (might not take all supported project properties into account)\n"
                                      " - %2: Support of COMM messages with multiplexing\n"
                                      " - %3: Support for flexible placement of embedded RAM variables\n"
-                                     " - %4: Support for public scope of Datapool content"))
+                                     " - %4: Support for public scope of Datapool content\n"
+                                     " - %5: Optimization of sequences where the openSYDE server keeps a thread/process lock on "))
       .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V1))
       .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V2))
       .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V3))
-      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V4)));
+      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V4))
+      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V5)));
    this->mpc_Ui->pc_LabelIDE->SetToolTipInformation(
       C_GtGetText::h_GetText("IDE Call"),
       C_GtGetText::h_GetText("Command line IDE call. Absolute or relative to working directory. Make sure to escape "
@@ -359,8 +364,11 @@ void C_SdNdeDbProperties::ApplyNewData(C_OSCNodeApplication & orc_Application) c
    case mhsn_VERSION_INDEX_V4:
       orc_Application.u16_GenCodeVersion = 4U;
       break;
+   case mhsn_VERSION_INDEX_V5:
+      orc_Application.u16_GenCodeVersion = 5U;
+      break;
    default:
-      orc_Application.u16_GenCodeVersion = 4U;
+      orc_Application.u16_GenCodeVersion = 5U;
       tgl_assert(false); // combo box has unknown index should never happen
       break;
    }
@@ -404,9 +412,8 @@ void C_SdNdeDbProperties::HandleDataPools(const uint32 ou32_ApplicationIndex) co
                 (static_cast<uint32>(rc_DataPool.s32_RelatedDataBlockIndex) == ou32_ApplicationIndex))
             {
                //Unassign this one
-               tgl_assert(C_PuiSdHandler::h_GetInstance()->AssignDataPoolApplication(this->mu32_NodeIndex,
-                                                                                     u32_ItDataPool,
-                                                                                     -1) == C_NO_ERR);
+               tgl_assert(C_PuiSdHandler::h_GetInstance()->UnassignDataPoolApplication(this->mu32_NodeIndex,
+                                                                                       u32_ItDataPool) == C_NO_ERR);
             }
          }
       }
@@ -476,7 +483,7 @@ void C_SdNdeDbProperties::m_OkClicked(void)
       if (q_NameIsValid == false)
       {
          c_Details +=
-            QString(C_GtGetText::h_GetText("Name \"%1\" is invalid: ")).arg(this->mpc_Ui->pc_LineEditName->text());
+            static_cast<QString>(C_GtGetText::h_GetText("Name \"%1\" is invalid: ")).arg(this->mpc_Ui->pc_LineEditName->text());
          c_Details += "\n";
          c_Details += c_ErrorName;
          c_Details += "\n\n";
@@ -616,12 +623,12 @@ QString C_SdNdeDbProperties::m_CheckID(void) const
             QString c_Ids;
             for (uint32 u32_ItId = 0; u32_ItId < (c_UsedProcessIds.size() - 1UL); ++u32_ItId)
             {
-               c_Ids += QString("%1,").arg(c_UsedProcessIds[u32_ItId]);
+               c_Ids += static_cast<QString>("%1,").arg(c_UsedProcessIds[u32_ItId]);
             }
             c_Ids +=
                QString::number(c_UsedProcessIds[static_cast<std::vector<uint32>::size_type>(c_UsedProcessIds.size() -
                                                                                             1UL)]);
-            c_Return += QString(C_GtGetText::h_GetText("Already used Process IDs: %1")).arg(c_Ids);
+            c_Return += static_cast<QString>(C_GtGetText::h_GetText("Already used Process IDs: %1")).arg(c_Ids);
          }
       }
    }
@@ -880,9 +887,12 @@ void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Applic
    case 4U:
       this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V4);
       break;
+   case 5U:
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V5);
+      break;
    default:
       // latest is greatest
-      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V4);
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V5);
       break;
    }
 
@@ -987,7 +997,7 @@ void C_SdNdeDbProperties::m_OnClickOutput(void)
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
    const QString c_FolderName = this->m_GetDialogPath(
       C_PuiUtil::h_GetResolvedAbsPathFromDbProject(c_ProjectPath, this->mpc_Ui->pc_LineEditOutputFile->GetPath()));
-   const QString c_FilterName = QString(C_GtGetText::h_GetText("HEX file (*.hex);;Others (*.*)"));
+   const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("HEX file (*.hex);;Others (*.*)"));
 
    // Do not use QFileDialog::getOpenFileName because it does not support default suffix
    // File path check is done by h_AskUserToSaveRelativePath(), so no need to use C_OgeWiUtil::h_GetOpenFileName()
@@ -1021,7 +1031,7 @@ void C_SdNdeDbProperties::m_OnClickGenerator(void)
       C_PuiUtil::h_GetResolvedAbsPathFromExe(this->mpc_Ui->pc_LineEditCodeGenerator->GetPath(), c_ProjectPath);
    // if code generator line edit is empty this results in executable path - we use this as feature
 
-   const QString c_FilterName = QString(C_GtGetText::h_GetText("Executable (*.exe *.bat);;Others (*.*)"));
+   const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("Executable (*.exe *.bat);;Others (*.*)"));
 
    // File path check is done by h_AskUserToSaveRelativePath(), so no need to use C_OgeWiUtil::h_GetOpenFileName()
    QString c_FilePath = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Select Code Generator"),
@@ -1076,9 +1086,9 @@ void C_SdNdeDbProperties::m_OnClickIDE(void)
 {
    const QString c_ProjectPath =
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
-   const QString c_FilterName = QString(C_GtGetText::h_GetText("Executable (*.exe);;Others (*.*)"));
+   const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("Executable (*.exe);;Others (*.*)"));
    QString c_IDECall =
-      QString(C_PuiUtil::h_ResolvePlaceholderVariables(this->mpc_Ui->pc_LineEditIDE->text(), c_ProjectPath));
+      static_cast<QString>(C_PuiUtil::h_ResolvePlaceholderVariables(this->mpc_Ui->pc_LineEditIDE->text(), c_ProjectPath));
    QString c_Path;
    QString c_FolderName;
    QStringList c_SplittedString;
@@ -1130,7 +1140,7 @@ void C_SdNdeDbProperties::m_OnClickClearProject(void) const
    this->mpc_Ui->pc_LineEditIDE->SetDbProjectPath("");
    this->mpc_Ui->pc_LineEditCodeGenerator->SetPath("", "");
    this->mpc_Ui->pc_LineEditCodeGenerate->SetPath("", "");
-   this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V4); // latest is greatest
+   this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V5); // latest is greatest
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1204,7 +1214,7 @@ void C_SdNdeDbProperties::m_CleanUpDataPoolWidgets(void)
 void C_SdNdeDbProperties::m_UpdateOwnedDpsCount(void) const
 {
    //update owned dp count
-   this->mpc_Ui->pc_LabelHeadingDatapools->setText(QString(C_GtGetText::h_GetText("Owned Datapools (%1)")).arg(
+   this->mpc_Ui->pc_LabelHeadingDatapools->setText(static_cast<QString>(C_GtGetText::h_GetText("Owned Datapools (%1)")).arg(
                                                       this->mc_SelectedDataPools.size()));
 }
 
@@ -1303,8 +1313,7 @@ void C_SdNdeDbProperties::m_HandleAddDataPools(void)
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle revert to default code generator action

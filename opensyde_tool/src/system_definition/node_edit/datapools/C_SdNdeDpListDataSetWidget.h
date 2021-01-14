@@ -49,10 +49,7 @@ public:
    void SetModelViewManager(stw_opensyde_gui_logic::C_SdNdeDpListModelViewManager * const opc_Value) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_SdNdeDpListDataSetWidget * const mpc_Ui;
@@ -70,6 +67,8 @@ private:
    const stw_types::uint32 mu32_DataPoolIndex;
    const stw_types::uint32 mu32_ListIndex;
 
+   bool m_IsThereStillSpaceForDataSets(const stw_types::uint32 ou32_NumberOfNewDataSets);
+
    void m_InitButtonIcons(void) const;
    void m_OkClicked(void);
    void m_CancelClicked(void);
@@ -80,7 +79,8 @@ private:
    void m_OnDataSetSelectionChange(const stw_types::uint32 & oru32_SelectionCount) const;
    void m_SetupContextMenu(void);
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
-   void m_DoInsert(void) const;
+   void m_DoInsert(void);
+   void m_DoPaste(void);
    //Avoid call
    C_SdNdeDpListDataSetWidget(const C_SdNdeDpListDataSetWidget &);
    C_SdNdeDpListDataSetWidget & operator =(const C_SdNdeDpListDataSetWidget &);

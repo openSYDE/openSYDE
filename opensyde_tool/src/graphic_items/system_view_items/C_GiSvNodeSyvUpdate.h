@@ -76,7 +76,7 @@ private:
 
    //Avoid call
    C_GiSvNodeSyvUpdate(const C_GiSvNodeSyvUpdate &);
-   C_GiSvNodeSyvUpdate & operator =(const C_GiSvNodeSyvUpdate &);
+   C_GiSvNodeSyvUpdate & operator =(const C_GiSvNodeSyvUpdate &); //lint !e1511 //we want to hide the base func.
 
    void m_InitIcons(void);
    bool m_CheckAlwaysUpdate(void) const;

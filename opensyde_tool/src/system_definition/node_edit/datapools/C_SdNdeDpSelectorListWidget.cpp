@@ -12,20 +12,17 @@
 
 #include <QPainter>
 #include <QApplication>
-#include <QScrollBar>
 
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "constants.h"
 
 #include "C_SdNdeDpSelectorListWidget.h"
-#include "C_SdNdeDpSelectorItemWidget.h"
 #include "C_GtGetText.h"
 #include "C_OgePopUpDialog.h"
 #include "C_SdNdeDpProperties.h"
 #include "C_SdNdeDpSelectorAddWidget.h"
 #include "C_PuiSdHandler.h"
-#include "C_PuiSdNodeDataPool.h"
 #include "C_SdClipBoardHelper.h"
 #include "C_Uti.h"
 #include "C_PuiSdUtil.h"
@@ -61,42 +58,42 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpSelectorListWidget::C_SdNdeDpSelectorListWidget(QWidget * const opc_Parent) :
-   C_OgeHorizontalListWidget(opc_Parent),
+   QWidget(opc_Parent),
    mpc_ContextMenu(NULL),
    mpc_AddAction(NULL),
    mpc_EditAction(NULL),
    mpc_EditContentAction(NULL),
+   mpc_EditActionSeparator(NULL),
    mpc_DeleteAction(NULL),
+   mpc_DeleteActionSeparator(NULL),
    mpc_CopyAction(NULL),
    mpc_CutAction(NULL),
    mpc_PasteAction(NULL),
+   mpc_MoveActionSeparator(NULL),
    mpc_MoveLeftAction(NULL),
    mpc_MoveRightAction(NULL),
+   mpc_MoveUpAction(NULL),
+   mpc_MoveDownAction(NULL),
    mq_Selected(false),
-   mu32_NodeIndex(0),
+   msn_ItemsPerRow(3),
+   msn_ItemsPerViewPage(-1),
+   msn_RowsPerViewPage(-1),
+   msn_CountViewPages(1),
+   msn_CurrentViewPage(0),
+   msn_SelectedItemIndex(-1),
+   mu32_NodeIndex(0U),
    me_DataPoolType(stw_opensyde_core::C_OSCNodeDataPool::eDIAG),
+   me_ProtocolType(stw_opensyde_core::C_OSCCanProtocol::eLAYER2),
    mq_UsageViewActive(false),
    msn_ItemWidth(146),
    msn_ItemHeight(141),
    msn_HeightHint(141)
 {
-   this->msn_ItemsPerLine = 3;
-   this->setSelectionMode(QAbstractItemView::SingleSelection);
-   this->setUniformItemSizes(true);
-
-   this->setItemDelegate(&this->mc_Delegate);
+   // TODO BAY:
+   //this->setItemDelegate(&this->mc_Delegate);
 
    //Custom context menu
    m_SetupContextMenu();
-
-   connect(this, &C_SdNdeDpSelectorListWidget::itemClicked,
-           this, &C_SdNdeDpSelectorListWidget::m_ItemClicked);
-
-   connect(this, &C_SdNdeDpSelectorListWidget::itemDoubleClicked,
-           this, &C_SdNdeDpSelectorListWidget::m_ItemDoubleClicked);
-
-   connect(this, &C_SdNdeDpSelectorListWidget::itemSelectionChanged,
-           this, &C_SdNdeDpSelectorListWidget::m_SelectionChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -118,8 +115,8 @@ C_SdNdeDpSelectorListWidget::~C_SdNdeDpSelectorListWidget()
    \param[in] oq_UsageViewActive   Flag for showing usage bars for datapool
 
    \return
-   true   datapool added
-   false  no datapool added
+   true   Datapool added
+   false  no Datapool added
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpSelectorListWidget::SetTypeAndNode(const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_Type,
@@ -133,7 +130,7 @@ bool C_SdNdeDpSelectorListWidget::SetTypeAndNode(const stw_opensyde_core::C_OSCN
 
    this->m_InitFromData();
 
-   if (this->count() > 0)
+   if (this->mc_DpItems.size() > 0)
    {
       q_Return = true;
    }
@@ -151,18 +148,15 @@ bool C_SdNdeDpSelectorListWidget::SetTypeAndNode(const stw_opensyde_core::C_OSCN
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::SetSelected(const bool oq_Selected)
 {
-   QListWidgetItem * pc_Item;
    C_SdNdeDpSelectorItemWidget * pc_WidgetItem;
    sintn sn_Counter;
 
    if (oq_Selected == false)
    {
       // deactivate all items
-      for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+      for (sn_Counter = 0; sn_Counter < this->mc_DpItems.size(); ++sn_Counter)
       {
-         pc_Item = this->item(sn_Counter);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         pc_WidgetItem = dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
+         pc_WidgetItem = this->mc_DpItems.at(sn_Counter);
          if (pc_WidgetItem != NULL)
          {
             // ask before to improve performance
@@ -176,21 +170,19 @@ void C_SdNdeDpSelectorListWidget::SetSelected(const bool oq_Selected)
    }
    else if (this->mq_Selected == false) // only if no item is already active
    {
-      sintn sn_CurrentRow = currentRow();
-      if (sn_CurrentRow < 0)
+      sintn sn_CurrentView = this->GetCurrentItemIndex();
+      if (sn_CurrentView < 0)
       {
-         sn_CurrentRow = 0;
+         sn_CurrentView = 0;
       }
 
-      for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+      for (sn_Counter = 0; sn_Counter < this->mc_DpItems.size(); ++sn_Counter)
       {
          // activate the first item and deactivate all other items
-         pc_Item = this->item(sn_Counter);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         pc_WidgetItem = dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
+         pc_WidgetItem = this->mc_DpItems.at(sn_Counter);
          if (pc_WidgetItem != NULL)
          {
-            if (sn_Counter == sn_CurrentRow)
+            if (sn_Counter == sn_CurrentView)
             {
                pc_WidgetItem->SetSelected(true);
                this->mq_Selected = true;
@@ -228,7 +220,6 @@ bool C_SdNdeDpSelectorListWidget::SetActualDataPoolConflict(const stw_types::sin
 {
    bool q_Return = false;
    sintn sn_Counter;
-   QListWidgetItem * pc_Item;
    C_SdNdeDpSelectorItemWidget * pc_WidgetItem;
    const C_PuiSdSharedDatapools & rc_SharedDatapools = C_PuiSdHandler::h_GetInstance()->GetSharedDatapoolsConst();
 
@@ -237,11 +228,9 @@ bool C_SdNdeDpSelectorListWidget::SetActualDataPoolConflict(const stw_types::sin
    std::vector<C_OSCNodeDataPoolId> c_ChangedDatapools;
 
    // Search the active Widget
-   if (osn_DataPoolWidgetIndex < this->count())
+   if (osn_DataPoolWidgetIndex < this->mc_DpItems.size())
    {
-      pc_Item = this->item(osn_DataPoolWidgetIndex);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      pc_WidgetItem = dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
+      pc_WidgetItem = this->mc_DpItems.at(osn_DataPoolWidgetIndex);
       if (pc_WidgetItem != NULL)
       {
          //Avoid current row because on error change this widget does not necessarily have the focus
@@ -254,11 +243,9 @@ bool C_SdNdeDpSelectorListWidget::SetActualDataPoolConflict(const stw_types::sin
    c_ChangedDatapools.push_back(c_ActiveDatapool);
 
    // Check all Datapools for a conflict and deactivate the conflict state of the actual datapool
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (sn_Counter = 0; sn_Counter < this->mc_DpItems.size(); ++sn_Counter)
    {
-      pc_Item = this->item(sn_Counter);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      pc_WidgetItem = dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
+      pc_WidgetItem = this->mc_DpItems.at(sn_Counter);
       if (pc_WidgetItem != NULL)
       {
          uint32 u32_ChangedDpCounter;
@@ -293,10 +280,7 @@ bool C_SdNdeDpSelectorListWidget::SetActualDataPoolConflict(const stw_types::sin
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::UpdateActualDataPool(void)
 {
-   QListWidgetItem * pc_Item = this->item(this->currentRow());
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SdNdeDpSelectorItemWidget * pc_WidgetItem =
-      dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
+   C_SdNdeDpSelectorItemWidget * pc_WidgetItem = this->mc_DpItems.at(this->GetCurrentItemIndex());
 
    if (pc_WidgetItem != NULL)
    {
@@ -324,11 +308,9 @@ void C_SdNdeDpSelectorListWidget::UpdateActualDataPool(void)
                sintn sn_Counter;
 
                // Update all shared Datapools too
-               for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+               for (sn_Counter = 0; sn_Counter < this->mc_DpItems.size(); ++sn_Counter)
                {
-                  pc_Item = this->item(sn_Counter);
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-                  pc_WidgetItem = dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
+                  pc_WidgetItem = this->mc_DpItems.at(sn_Counter);
                   if (pc_WidgetItem != NULL)
                   {
                      // Update all relevant Datapools
@@ -361,12 +343,11 @@ void C_SdNdeDpSelectorListWidget::UpdateActualDataPool(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_AddDataPoolWidget(const uint32 ou32_DataPoolIndex)
 {
-   // TODO how to detect conflict of datapool?
-   QListWidgetItem * pc_Item = new QListWidgetItem(NULL, static_cast<sintn>(QListWidgetItem::ItemType::UserType));
    //lint -e{429}  no memory leak because of the parent of pc_ItemWidget and the Qt memory management
    C_SdNdeDpSelectorItemWidget * pc_ItemWidget = new C_SdNdeDpSelectorItemWidget(
       this->mq_UsageViewActive, this);
-   const sintn sn_Number = this->count() + 1;
+   const sintn sn_Index = this->mc_DpItems.size();
+   const sintn sn_Number = sn_Index + 1;
 
    pc_ItemWidget->SetNumber(sn_Number);
    pc_ItemWidget->SetData(C_OSCNodeDataPoolId(this->mu32_NodeIndex, ou32_DataPoolIndex));
@@ -375,18 +356,18 @@ void C_SdNdeDpSelectorListWidget::m_AddDataPoolWidget(const uint32 ou32_DataPool
    connect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigHideOtherToolTips, this,
            &C_SdNdeDpSelectorListWidget::SigHideOtherToolTips);
 
-   pc_Item->setSizeHint(pc_ItemWidget->size());
+   connect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigClicked,
+           this, &C_SdNdeDpSelectorListWidget::m_ItemClicked);
+   connect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigDoubleClicked,
+           this, &C_SdNdeDpSelectorListWidget::m_ItemDoubleClicked);
+   connect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigContextMenuRequested,
+           this, &C_SdNdeDpSelectorListWidget::m_OnItemCustomContextMenuRequested);
 
    this->m_AdaptSize(pc_ItemWidget->size());
+   pc_ItemWidget->setVisible(false);
 
-   this->addItem(pc_Item);
-   this->setItemWidget(pc_Item, pc_ItemWidget);
-
-   this->m_UpdateCounters();
-
-   Q_EMIT (this->SigListChanged());
-   //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
-}
+   this->mc_DpItems.push_back(pc_ItemWidget);
+}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates a datapool widget in the list
@@ -402,16 +383,16 @@ void C_SdNdeDpSelectorListWidget::m_AddDataPoolWidget(const uint32 ou32_DataPool
 void C_SdNdeDpSelectorListWidget::m_UpdateDataPoolWidget(const uint32 ou32_DataPoolIndex,
                                                          const sintn osn_DataPoolWidgetIndex) const
 {
-   C_SdNdeDpSelectorItemWidget * pc_WidgetItem;
-   QListWidgetItem * pc_Item;
-
-   // update the widget
-   pc_Item = this->item(osn_DataPoolWidgetIndex);
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   pc_WidgetItem = dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
-   if (pc_WidgetItem != NULL)
+   if (osn_DataPoolWidgetIndex < this->mc_DpItems.size())
    {
-      pc_WidgetItem->SetData(C_OSCNodeDataPoolId(this->mu32_NodeIndex, ou32_DataPoolIndex));
+      C_SdNdeDpSelectorItemWidget * pc_WidgetItem;
+
+      // update the widget
+      pc_WidgetItem = this->mc_DpItems.at(osn_DataPoolWidgetIndex);
+      if (pc_WidgetItem != NULL)
+      {
+         pc_WidgetItem->SetData(C_OSCNodeDataPoolId(this->mu32_NodeIndex, ou32_DataPoolIndex));
+      }
    }
 }
 
@@ -625,15 +606,15 @@ void C_SdNdeDpSelectorListWidget::Paste(void)
          if (c_OSCContent.e_Type == this->me_DataPoolType)
          {
             sint32 s32_LastIndex = 0;
-            if (this->currentIndex().isValid() == true)
+            if (this->GetCurrentItemIndex() >= 0)
             {
                //Add after current index
-               s32_LastIndex = static_cast<sint32>(this->currentRow()) + 1;
+               s32_LastIndex = static_cast<sint32>(this->GetCurrentItemIndex()) + 1;
             }
             else
             {
                //Add at end
-               s32_LastIndex = this->count();
+               s32_LastIndex = this->mc_DpItems.size();
             }
 
             this->m_AddNewDataPool(c_OSCContent, c_UIContent, s32_LastIndex, true, false);
@@ -679,42 +660,41 @@ const
       uint32 u32_DpCounter;
       sintn sn_TypeCounter = 0;
 
-      // check all datapools of the lists
+      // check all Datapools of the lists
       for (u32_DpCounter = 0; u32_DpCounter < pc_Node->c_DataPools.size(); ++u32_DpCounter)
       {
          if (pc_Node->c_DataPools[u32_DpCounter].e_Type == this->me_DataPoolType)
          {
-            // conflict detected, update the widget
-            C_SdNdeDpSelectorItemWidget * pc_WidgetItem;
-            QListWidgetItem * pc_Item;
-
-            // update the widget
-            pc_Item = this->item(sn_TypeCounter);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            pc_WidgetItem = dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
-            if (pc_WidgetItem != NULL)
+            if (sn_TypeCounter <= this->mc_DpItems.size())
             {
-               bool q_NameConflict;
-               bool q_NameInvalid;
-               bool q_IsErrorInListOrMessage;
-               //Check error for one datapool
-               pc_Node->CheckErrorDataPool(u32_DpCounter, &q_NameConflict, &q_NameInvalid, &q_IsErrorInListOrMessage,
-                                           NULL);
-               if (((q_NameConflict == false) && (q_NameInvalid == false)) && (q_IsErrorInListOrMessage == false))
+               // conflict detected, update the widget
+               C_SdNdeDpSelectorItemWidget * const pc_WidgetItem  = this->mc_DpItems.at(sn_TypeCounter);
+
+               // update the widget
+               if (pc_WidgetItem != NULL)
                {
-                  //No error
-                  pc_WidgetItem->SetStateConflict(false);
-               }
-               else
-               {
-                  //Error
-                  pc_WidgetItem->SetStateConflict(true);
-                  //Mark at least one error
-                  q_Return = true;
-                  //Add to invalid datapools list
-                  if (opc_InvalidDatapoolIndices != NULL)
+                  bool q_NameConflict;
+                  bool q_NameInvalid;
+                  bool q_IsErrorInListOrMessage;
+                  //Check error for one datapool
+                  pc_Node->CheckErrorDataPool(u32_DpCounter, &q_NameConflict, &q_NameInvalid, &q_IsErrorInListOrMessage,
+                                              NULL);
+                  if (((q_NameConflict == false) && (q_NameInvalid == false)) && (q_IsErrorInListOrMessage == false))
                   {
-                     opc_InvalidDatapoolIndices->push_back(u32_DpCounter);
+                     //No error
+                     pc_WidgetItem->SetStateConflict(false);
+                  }
+                  else
+                  {
+                     //Error
+                     pc_WidgetItem->SetStateConflict(true);
+                     //Mark at least one error
+                     q_Return = true;
+                     //Add to invalid datapools list
+                     if (opc_InvalidDatapoolIndices != NULL)
+                     {
+                        opc_InvalidDatapoolIndices->push_back(u32_DpCounter);
+                     }
                   }
                }
             }
@@ -751,10 +731,127 @@ void C_SdNdeDpSelectorListWidget::UpdateSizeHint(const sintn osn_MaxHeight)
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_SdNdeDpSelectorListWidget::sizeHint(void) const
 {
-   QSize c_Size = C_OgeHorizontalListWidget::sizeHint();
+   QSize c_Size = QWidget::sizeHint();
 
    c_Size.setHeight(this->msn_HeightHint);
    return c_Size;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the number of Datapool items
+
+   \return
+   Number of Datapool items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sintn C_SdNdeDpSelectorListWidget::GetItemCount(void) const
+{
+   return this->mc_DpItems.size();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the index of the current item
+
+   \return
+   Index of current index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sintn C_SdNdeDpSelectorListWidget::GetCurrentItemIndex(void) const
+{
+   return this->msn_SelectedItemIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the number of view pages
+
+   \return
+   Number of view pages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sintn C_SdNdeDpSelectorListWidget::GetViewPageCount(void) const
+{
+   return this->msn_CountViewPages;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the number of the current view page
+
+   \return
+   Number of current view page
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sintn C_SdNdeDpSelectorListWidget::GetCurrentViewPage(void) const
+{
+   return this->msn_CurrentViewPage;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the selected Datapool
+
+   \param[in]       ou32_Index     Index of Datapool item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::SetSelectedItem(const uint32 ou32_Index)
+{
+   if ((static_cast<sintn>(ou32_Index) < this->mc_DpItems.size()) &&
+       (static_cast<sintn>(ou32_Index) != this->msn_SelectedItemIndex))
+   {
+      this->msn_SelectedItemIndex = static_cast<sintn>(ou32_Index);
+      this->m_SelectionChanged();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the the new row number
+
+   The native row of the list is each item.
+
+   \param[in]  osn_ViewIndex       New view index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::SetCurrentViewPage(const sintn osn_ViewIndex)
+{
+   if ((osn_ViewIndex < this->msn_CountViewPages) &&
+       (osn_ViewIndex != this->msn_CountViewPages))
+   {
+      sintn sn_ItDp;
+      const sintn sn_FirstVisibleRow = osn_ViewIndex * this->msn_RowsPerViewPage;
+      const sintn sn_LastVisibleRow = ((osn_ViewIndex + 1) * this->msn_RowsPerViewPage) - 1;
+
+      for (sn_ItDp = 0; sn_ItDp < this->mc_DpItems.size(); ++sn_ItDp)
+      {
+         const sintn sn_Row = sn_ItDp / this->msn_ItemsPerRow;
+         const bool q_RowVisible = ((sn_Row >= sn_FirstVisibleRow) && (sn_Row <= sn_LastVisibleRow)) ? true : false;
+
+         this->mc_DpItems.at(sn_ItDp)->setVisible(q_RowVisible);
+      }
+
+      this->msn_CurrentViewPage = osn_ViewIndex;
+
+      Q_EMIT (this->SigListChanged());
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the line to the position of the item
+
+   \param[in]  ou32_Index   Item index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::ScrollToItem(const uint32 ou32_Index)
+{
+   sintn sn_ViewIndex;
+
+   if (this->msn_ItemsPerViewPage > 0)
+   {
+      sn_ViewIndex = static_cast<sintn>(ou32_Index) / this->msn_ItemsPerViewPage;
+   }
+   else
+   {
+      sn_ViewIndex = 0;
+   }
+
+   this->SetCurrentViewPage(sn_ViewIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -767,11 +864,11 @@ QSize C_SdNdeDpSelectorListWidget::sizeHint(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::paintEvent(QPaintEvent * const opc_Event)
 {
-   QListWidget::paintEvent(opc_Event);
+   QWidget::paintEvent(opc_Event);
 
-   if (this->count() == 0)
+   if (this->mc_DpItems.size() == 0)
    {
-      QPainter c_Painter(this->viewport());
+      QPainter c_Painter(this);
       // show a tip for adding a datapool
       QPen c_Pen = c_Painter.pen();
       QFont c_Font;
@@ -779,16 +876,16 @@ void C_SdNdeDpSelectorListWidget::paintEvent(QPaintEvent * const opc_Event)
 
       if (this->me_DataPoolType != C_OSCNodeDataPool::eHALC)
       {
-         c_Text = QString(C_GtGetText::h_GetText("No")) + QString(" ") +
+         c_Text = static_cast<QString>(C_GtGetText::h_GetText("No")) + static_cast<QString>(" ") +
                   C_PuiSdUtil::h_ConvertDataPoolTypeToString(this->me_DataPoolType) +
-                  QString(C_GtGetText::h_GetText(
+                  static_cast<QString>(C_GtGetText::h_GetText(
                              " Datapool is declared.\nAdd any via the '+' button."));
       }
       else
       {
-         c_Text = QString(C_GtGetText::h_GetText("No")) + QString(" ") +
+         c_Text = static_cast<QString>(C_GtGetText::h_GetText("No")) + static_cast<QString>(" ") +
                   C_PuiSdUtil::h_ConvertDataPoolTypeToString(this->me_DataPoolType) +
-                  QString(C_GtGetText::h_GetText(
+                  static_cast<QString>(C_GtGetText::h_GetText(
                              " Datapool is declared. \nHardware configuration is handled in tab 'Hardware Configurator'."));
       }
 
@@ -815,9 +912,14 @@ void C_SdNdeDpSelectorListWidget::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
-   QListWidget::resizeEvent(opc_Event);
+   QWidget::resizeEvent(opc_Event);
 
-   this->ScrollToItem(this->currentRow());
+   this->m_UpdateCounters();
+
+   if (this->GetCurrentItemIndex() >= 0)
+   {
+      this->ScrollToItem(static_cast<uint32>(this->GetCurrentItemIndex()));
+   }
 
    Q_EMIT (this->SigListChanged());
 }
@@ -836,7 +938,7 @@ void C_SdNdeDpSelectorListWidget::keyPressEvent(QKeyEvent * const opc_Event)
 
    if (this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC)
    {
-      const sintn sn_Row = this->currentRow();
+      const sintn sn_CurrentItemIndex = this->GetCurrentItemIndex();
       if (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == true)
       {
          switch (opc_Event->key())
@@ -850,24 +952,18 @@ void C_SdNdeDpSelectorListWidget::keyPressEvent(QKeyEvent * const opc_Event)
          case Qt::Key_Left:
             q_CallOrig = false;
             m_MoveLeft();
-            // scrolling
-            if (((sn_Row % this->msn_ItemsPerLine) == 0) &&
-                (this->msn_ActualLine >= 0))
-            {
-               // change of line not necessary, but scrolling to the line is necessary
-               this->SetActualLine(this->GetActualLine());
-            }
             break;
          case Qt::Key_Right:
             q_CallOrig = false;
             m_MoveRight();
-            // scrolling
-            if (((sn_Row % this->msn_ItemsPerLine) == (this->msn_ItemsPerLine - 1)) &&
-                (this->msn_ActualLine < this->msn_CountLines))
-            {
-               // change of line not necessary, but scrolling to the line is necessary
-               this->SetActualLine(this->GetActualLine());
-            }
+            break;
+         case Qt::Key_Up:
+            q_CallOrig = false;
+            m_MoveUp();
+            break;
+         case Qt::Key_Down:
+            q_CallOrig = false;
+            m_MoveDown();
             break;
          default:
             //Nothing to do
@@ -882,19 +978,38 @@ void C_SdNdeDpSelectorListWidget::keyPressEvent(QKeyEvent * const opc_Event)
             m_Delete(true);
             break;
          case Qt::Key_Left:
-            if (((sn_Row % this->msn_ItemsPerLine) == 0) &&
-                (this->msn_ActualLine > 0))
+            if (sn_CurrentItemIndex > 0)
             {
-               this->SetActualLine(this->GetActualLine() - 1);
-               this->setCurrentRow(sn_Row - 1);
+               const sintn sn_NewIndex = sn_CurrentItemIndex - 1;
+               this->ScrollToItem(sn_NewIndex);
+               this->SetSelectedItem(sn_NewIndex);
                q_CallOrig = false;
             }
             break;
          case Qt::Key_Right:
-            if (((sn_Row % this->msn_ItemsPerLine) == (this->msn_ItemsPerLine - 1)) &&
-                (this->msn_ActualLine < (this->msn_CountLines - 1)))
+            if (sn_CurrentItemIndex < (this->mc_DpItems.size() - 1))
             {
-               this->SetActualLine(this->GetActualLine() + 1);
+               const sintn sn_NewIndex = sn_CurrentItemIndex + 1;
+               this->ScrollToItem(sn_NewIndex);
+               this->SetSelectedItem(sn_NewIndex);
+               q_CallOrig = false;
+            }
+            break;
+         case Qt::Key_Up:
+            if (sn_CurrentItemIndex >= this->msn_ItemsPerRow)
+            {
+               const sintn sn_NewIndex = sn_CurrentItemIndex - this->msn_ItemsPerRow;
+               this->ScrollToItem(sn_NewIndex);
+               this->SetSelectedItem(sn_NewIndex);
+               q_CallOrig = false;
+            }
+            break;
+         case Qt::Key_Down:
+            if (sn_CurrentItemIndex < (this->mc_DpItems.size() - this->msn_ItemsPerRow))
+            {
+               const sintn sn_NewIndex = sn_CurrentItemIndex + this->msn_ItemsPerRow;
+               this->ScrollToItem(sn_NewIndex);
+               this->SetSelectedItem(sn_NewIndex);
                q_CallOrig = false;
             }
             break;
@@ -911,7 +1026,7 @@ void C_SdNdeDpSelectorListWidget::keyPressEvent(QKeyEvent * const opc_Event)
 
    if (q_CallOrig == true)
    {
-      QListWidget::keyPressEvent(opc_Event);
+      QWidget::keyPressEvent(opc_Event);
    }
 }
 
@@ -923,17 +1038,47 @@ void C_SdNdeDpSelectorListWidget::keyPressEvent(QKeyEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::focusInEvent(QFocusEvent * const opc_Event)
 {
-   QListWidget::focusInEvent(opc_Event);
+   QWidget::focusInEvent(opc_Event);
 
    this->SetSelected(true);
 
-   if ((this->currentRow() < 0) &&
-       (this->count() > 0))
+   if ((this->GetCurrentItemIndex() < 0) &&
+       (this->mc_DpItems.size() > 0))
    {
-      this->setCurrentRow(0);
+      this->SetSelectedItem(0);
    }
 
    Q_EMIT (this->SigWidgetFocused());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event
+
+   Updates the information about the count of columns and items per row
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::wheelEvent(QWheelEvent * const opc_Event)
+{
+   QWidget::wheelEvent(opc_Event);
+
+   if ((opc_Event->angleDelta().y() > 0) &&
+       (this->GetCurrentViewPage() > 0))
+   {
+      // wheel up
+      this->SetCurrentViewPage(this->GetCurrentViewPage() - 1);
+   }
+   else if ((opc_Event->angleDelta().y() < 0) &&
+            (this->GetCurrentViewPage() < (this->GetViewPageCount() - 1)))
+   {
+      // wheel down
+      this->SetCurrentViewPage(this->GetCurrentViewPage() + 1);
+   }
+   else
+   {
+      // nothing todo
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -948,12 +1093,9 @@ void C_SdNdeDpSelectorListWidget::m_UpdateNumbers(void) const
    sintn sn_Counter;
 
    // Update all visible numbers of the concrete widgets
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (sn_Counter = 0; sn_Counter < this->mc_DpItems.size(); ++sn_Counter)
    {
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_SdNdeDpSelectorItemWidget * const pc_WidgetItem =
-         dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
+      C_SdNdeDpSelectorItemWidget * const pc_WidgetItem = this->mc_DpItems.at(sn_Counter);
       if (pc_WidgetItem != NULL)
       {
          pc_WidgetItem->SetNumber(static_cast<uint32>(sn_Counter + 1));
@@ -961,21 +1103,22 @@ void C_SdNdeDpSelectorListWidget::m_UpdateNumbers(void) const
    }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorListWidget::m_DelegateStartPaint(void)
-{
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SdNdeDpSelectorItemWidget * const pc_ItemWidget =
-      dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(this->item(this->currentIndex().row())));
-
-   this->mc_Delegate.StartPaint(this->currentIndex().row(), pc_ItemWidget);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorListWidget::m_DelegateStopPaint(void)
-{
-   this->mc_Delegate.StopPaint();
-}
+// TODO BAY:
+////----------------------------------------------------------------------------------------------------------------------
+//void C_SdNdeDpSelectorListWidget::m_DelegateStartPaint(void)
+//{
+//
+//   C_SdNdeDpSelectorItemWidget * const pc_ItemWidget =
+//      dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(this->item(this->currentIndex().row())));
+//
+//   this->mc_Delegate.StartPaint(this->currentIndex().row(), pc_ItemWidget);
+//}
+//
+////----------------------------------------------------------------------------------------------------------------------
+//void C_SdNdeDpSelectorListWidget::m_DelegateStopPaint(void)
+//{
+//   this->mc_Delegate.StopPaint();
+//}
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Opens the add datapool dialog for configuring the shared datapool configuration
@@ -1049,8 +1192,7 @@ bool C_SdNdeDpSelectorListWidget::m_OpenShareDataPoolDialog(C_OSCNodeDataPool & 
 
       c_New->HideOverlay();
 
-      //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    else
    {
       q_Return = true;
@@ -1102,8 +1244,7 @@ bool C_SdNdeDpSelectorListWidget::m_OpenDataPoolDialog(C_OSCNodeDataPool & orc_O
       c_New->HideOverlay();
    }
 
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   return q_Return;
+   return q_Return;  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1126,7 +1267,7 @@ void C_SdNdeDpSelectorListWidget::m_AddNewDataPool(const C_OSCNodeDataPool & orc
                                                                 this->me_ProtocolType, oq_AllowNameAdaptation,
                                                                 oq_AllowDataAdaptation);
       // the new datapool will be at the end
-      sn_Row = this->count();
+      sn_Row = this->mc_DpItems.size();
 
       if ((s32_Return == C_NO_ERR) &&
           (oq_SharedDatapoolSelected == true) &&
@@ -1170,7 +1311,7 @@ void C_SdNdeDpSelectorListWidget::m_AddNewDataPool(const C_OSCNodeDataPool & orc
                                                                    this->me_ProtocolType, oq_AllowNameAdaptation,
                                                                    oq_AllowDataAdaptation);
          // the new datapool will be at the end
-         sn_Row = this->count();
+         sn_Row = this->mc_DpItems.size();
       }
    }
    else
@@ -1182,10 +1323,8 @@ void C_SdNdeDpSelectorListWidget::m_AddNewDataPool(const C_OSCNodeDataPool & orc
    if (s32_Return == C_NO_ERR)
    {
       this->m_InitFromData();
-      this->setCurrentRow(sn_Row);
-      this->m_UpdateCounters();
-
       // scroll to the position and set the item active
+      this->SetSelectedItem(sn_Row);
       this->ScrollToItem(sn_Row);
 
       Q_EMIT (this->SigListChanged());
@@ -1201,13 +1340,39 @@ void C_SdNdeDpSelectorListWidget::m_AddNewDataPool(const C_OSCNodeDataPool & orc
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
-   const QModelIndex c_Current = this->currentIndex();
+   this->m_OpenCustomContextMenu(orc_Pos, NULL);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
+
+   \param[in] orc_Pos Local context menu position
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::m_OnItemCustomContextMenuRequested(const QPoint & orc_Pos,
+                                                                     const stw_types::uint32 ou32_Index)
+{
+   if (static_cast<sintn>(ou32_Index) < this->mc_DpItems.size())
+   {
+      this->SetSelectedItem(ou32_Index);
+      this->m_OpenCustomContextMenu(orc_Pos, this->mc_DpItems.at(ou32_Index));
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
+
+   \param[in] orc_Pos   Local context menu position
+   \param[in] opc_Item  Pointer to clicked Datapool item. NULL if no specific item was clicked
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::m_OpenCustomContextMenu(const QPoint & orc_Pos,
+                                                          const C_SdNdeDpSelectorItemWidget * const opc_Item)
+{
    bool q_ShowContextMenu = true;
 
-   QListWidgetItem * const pc_Item = this->itemAt(orc_Pos);
-
    // add action shall be shown only if no item concrete was clicked
-   if ((c_Current.isValid() == true) && (c_Current.parent().isValid() == false) && (pc_Item != NULL))
+   if (opc_Item != NULL)
    {
       this->mpc_AddAction->setVisible(false);
 
@@ -1221,20 +1386,27 @@ void C_SdNdeDpSelectorListWidget::m_OnCustomContextMenuRequested(const QPoint & 
       this->mpc_PasteAction->setVisible(true);
       this->mpc_MoveLeftAction->setVisible(true);
       this->mpc_MoveRightAction->setVisible(true);
+      this->mpc_MoveUpAction->setVisible(true);
+      this->mpc_MoveDownAction->setVisible(true);
       this->mpc_MoveActionSeparator->setVisible(true);
 
       // actions depends on count of Datapools
-      if ((this->count() > 1) &&
+      if ((this->mc_DpItems.size() > 1) &&
           (this->me_DataPoolType != C_OSCNodeDataPool::eHALC))
       {
-         this->mpc_MoveLeftAction->setEnabled(this->currentRow() > 0);
-         this->mpc_MoveRightAction->setEnabled(this->currentRow() < (this->count() - 1));
+         this->mpc_MoveLeftAction->setEnabled(this->GetCurrentItemIndex() > 0);
+         this->mpc_MoveRightAction->setEnabled(this->GetCurrentItemIndex() < (this->mc_DpItems.size() - 1));
+         this->mpc_MoveUpAction->setEnabled(this->GetCurrentItemIndex() >= this->msn_ItemsPerRow);
+         this->mpc_MoveDownAction->setEnabled(this->GetCurrentItemIndex() <
+                                              (this->mc_DpItems.size() - this->msn_ItemsPerRow));
          this->mpc_MoveActionSeparator->setEnabled(true);
       }
       else
       {
          this->mpc_MoveLeftAction->setEnabled(false);
          this->mpc_MoveRightAction->setEnabled(false);
+         this->mpc_MoveUpAction->setEnabled(false);
+         this->mpc_MoveDownAction->setEnabled(false);
          this->mpc_MoveActionSeparator->setEnabled(false);
       }
 
@@ -1283,6 +1455,8 @@ void C_SdNdeDpSelectorListWidget::m_OnCustomContextMenuRequested(const QPoint & 
          this->mpc_CutAction->setVisible(false);
          this->mpc_MoveLeftAction->setVisible(false);
          this->mpc_MoveRightAction->setVisible(false);
+         this->mpc_MoveUpAction->setVisible(false);
+         this->mpc_MoveDownAction->setVisible(false);
          this->mpc_MoveActionSeparator->setVisible(false);
       }
    }
@@ -1337,6 +1511,16 @@ void C_SdNdeDpSelectorListWidget::m_SetupContextMenu(void)
                                                                 &C_SdNdeDpSelectorListWidget::m_MoveRight,
                                                                 static_cast<sintn>(Qt::CTRL) +
                                                                 static_cast<sintn>(Qt::Key_Right));
+   this->mpc_MoveUpAction = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
+                                                                "Move Up"), this,
+                                                             &C_SdNdeDpSelectorListWidget::m_MoveUp,
+                                                             static_cast<sintn>(Qt::CTRL) +
+                                                             static_cast<sintn>(Qt::Key_Up));
+   this->mpc_MoveDownAction = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
+                                                                  "Move Down"), this,
+                                                               &C_SdNdeDpSelectorListWidget::m_MoveDown,
+                                                               static_cast<sintn>(Qt::CTRL) +
+                                                               static_cast<sintn>(Qt::Key_Down));
 
    this->mpc_DeleteActionSeparator = this->mpc_ContextMenu->addSeparator();
 
@@ -1363,7 +1547,7 @@ void C_SdNdeDpSelectorListWidget::m_Edit(const bool oq_SelectName)
       // get the real datapool index
       const sint32 s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
                                                                                    this->me_DataPoolType,
-                                                                                   this->currentRow());
+                                                                                   this->GetCurrentItemIndex());
 
       if (s32_DpIndex >= 0)
       {
@@ -1400,7 +1584,7 @@ void C_SdNdeDpSelectorListWidget::m_Edit(const bool oq_SelectName)
                                                                 c_OSCDatapool, c_UIDataPool, true,
                                                                 this->me_ProtocolType) == C_NO_ERR)
                {
-                  this->m_UpdateDataPoolWidget(s32_DpIndex, this->currentRow());
+                  this->m_UpdateDataPoolWidget(s32_DpIndex, this->GetCurrentItemIndex());
                   Q_EMIT (this->SigDataPoolChanged());
                   //Update may be necessary for CRC option
                   if (c_OSCDatapool.e_Type == C_OSCNodeDataPool::eNVM)
@@ -1410,31 +1594,6 @@ void C_SdNdeDpSelectorListWidget::m_Edit(const bool oq_SelectName)
 
                   //Check
                   Q_EMIT (this->SigErrorCheck());
-               }
-
-               //Update HALC specific information
-               if (c_OSCDatapool.e_Type == C_OSCNodeDataPool::eHALC)
-               {
-                  // Update the separate datablock association of the HALC configuration
-                  sint32 s32_Error;
-                  const bool q_IsSet = (c_OSCDatapool.s32_RelatedDataBlockIndex >= 0);
-                  const uint32 u32_DataBlockIndex =
-                     (q_IsSet == true) ? static_cast<uint32>(c_OSCDatapool.s32_RelatedDataBlockIndex) : 0;
-
-                  if (c_OSCDatapool.q_IsSafety == true)
-                  {
-                     s32_Error = C_PuiSdHandler::h_GetInstance()->SetHALCConfigSafeDataBlock(this->mu32_NodeIndex,
-                                                                                             q_IsSet,
-                                                                                             u32_DataBlockIndex);
-                  }
-                  else
-                  {
-                     s32_Error = C_PuiSdHandler::h_GetInstance()->SetHALCConfigUnsafeDataBlock(this->mu32_NodeIndex,
-                                                                                               q_IsSet,
-                                                                                               u32_DataBlockIndex);
-                  }
-
-                  tgl_assert(s32_Error == C_NO_ERR);
                }
 
                if (q_IsDatapoolShared == true)
@@ -1450,15 +1609,11 @@ void C_SdNdeDpSelectorListWidget::m_Edit(const bool oq_SelectName)
             {
                sintn sn_WidgetCounter;
 
-               for (sn_WidgetCounter = 0U; sn_WidgetCounter < this->count(); ++sn_WidgetCounter)
+               for (sn_WidgetCounter = 0U; sn_WidgetCounter < this->mc_DpItems.size(); ++sn_WidgetCounter)
                {
-                  C_SdNdeDpSelectorItemWidget * pc_WidgetItem;
-                  QListWidgetItem * pc_Item;
-
                   // update all widgets in this case
-                  pc_Item = this->item(sn_WidgetCounter);
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-                  pc_WidgetItem = dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
+                  C_SdNdeDpSelectorItemWidget * const pc_WidgetItem = this->mc_DpItems.at(sn_WidgetCounter);
+
                   if (pc_WidgetItem != NULL)
                   {
                      pc_WidgetItem->UpdateData();
@@ -1476,7 +1631,7 @@ void C_SdNdeDpSelectorListWidget::m_Edit(const bool oq_SelectName)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_EditContent(void)
 {
-   Q_EMIT (this->SigOpenDataPoolContent(this->currentRow()));
+   Q_EMIT (this->SigOpenDataPoolContent(this->GetCurrentItemIndex()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1489,7 +1644,7 @@ void C_SdNdeDpSelectorListWidget::m_Copy(void) const
    {
       const sint32 s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
                                                                                    this->me_DataPoolType,
-                                                                                   this->currentRow());
+                                                                                   this->GetCurrentItemIndex());
 
       QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -1557,7 +1712,7 @@ void C_SdNdeDpSelectorListWidget::m_Delete(const bool oq_AskUser)
       sint32 s32_Return;
       const sint32 s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
                                                                                    this->me_DataPoolType,
-                                                                                   this->currentRow());
+                                                                                   this->GetCurrentItemIndex());
 
       QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -1567,12 +1722,18 @@ void C_SdNdeDpSelectorListWidget::m_Delete(const bool oq_AskUser)
          if (s32_Return == C_NO_ERR)
          {
             this->m_InitFromData();
-            if (this->count() > 0)
+
+            // Reset the index to avoid problems if the previous index had 0
+            this->msn_SelectedItemIndex = -1;
+
+            if (this->mc_DpItems.size() > 0)
             {
-               this->setCurrentRow(0);
+               this->SetSelectedItem(0U);
+               this->ScrollToItem(0U);
             }
             else
             {
+               this->SetCurrentViewPage(0);
                Q_EMIT (this->SigNoDataPoolSelected());
             }
             Q_EMIT (this->SigListChanged());
@@ -1592,7 +1753,7 @@ void C_SdNdeDpSelectorListWidget::m_Delete(const bool oq_AskUser)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_MoveLeft(void)
 {
-   sintn sn_Index = this->currentRow();
+   const sintn sn_Index = this->GetCurrentItemIndex();
 
    if (sn_Index > 0)
    {
@@ -1606,34 +1767,59 @@ void C_SdNdeDpSelectorListWidget::m_MoveLeft(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_MoveRight(void)
 {
-   sintn sn_Index = this->currentRow();
+   const sintn sn_Index = this->GetCurrentItemIndex();
 
-   if (sn_Index < (this->count() - 1))
+   if (sn_Index < (this->mc_DpItems.size() - 1))
    {
       this->m_MoveDatapool(sn_Index, (sn_Index + 1));
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot for click
-
-   Open the Datapool list edit widget
-   Problem: This signal is emitted in case of a double click to. See m_OnDoubleClickTimeout for more details
-
-   \param[in]  opc_Item    Datapool item which was clicked
+/*! \brief   Move selected item up by one row
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorListWidget::m_ItemClicked(QListWidgetItem * const opc_Item)
+void C_SdNdeDpSelectorListWidget::m_MoveUp(void)
 {
-   if (opc_Item != NULL)
+   const sintn sn_Index = this->GetCurrentItemIndex();
+
+   if (sn_Index >= this->msn_ItemsPerRow)
+   {
+      this->m_MoveDatapool(sn_Index, (sn_Index - this->msn_ItemsPerRow));
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move selected item down by one row
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::m_MoveDown(void)
+{
+   const sintn sn_Index = this->GetCurrentItemIndex();
+
+   if (sn_Index < (this->mc_DpItems.size() - this->msn_ItemsPerRow))
+   {
+      this->m_MoveDatapool(sn_Index, (sn_Index + this->msn_ItemsPerRow));
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for click
+
+   Select the Datapool
+
+   \param[in]  ou32_Index    Index of Datapool item which was clicked
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::m_ItemClicked(const uint32 ou32_Index)
+{
+   if (static_cast<sintn>(ou32_Index) < this->mc_DpItems.size())
    {
       // Item was clicked once
       QApplication::setOverrideCursor(Qt::WaitCursor);
 
-      this->setCurrentItem(opc_Item);
-
-      // update the visible "line"
-      this->msn_ActualLine = this->currentRow() / this->msn_ItemsPerLine;
+      this->SetSelectedItem(ou32_Index);
+      this->ScrollToItem(ou32_Index);
 
       QApplication::restoreOverrideCursor();
    }
@@ -1642,15 +1828,17 @@ void C_SdNdeDpSelectorListWidget::m_ItemClicked(QListWidgetItem * const opc_Item
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot for double click
 
-   Open the Datapool edit dialog
+   Open the Datapool content
 
-   \param[in]  opc_Item    Datapool item which was double clicked
+   \param[in]  ou32_Index    Index of Datapool item which was double clicked
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorListWidget::m_ItemDoubleClicked(QListWidgetItem * const opc_Item)
+void C_SdNdeDpSelectorListWidget::m_ItemDoubleClicked(const uint32 ou32_Index)
 {
-   Q_UNUSED(opc_Item)
-   Q_EMIT (this->SigOpenDataPoolContent(this->currentRow()));
+   if (static_cast<sintn>(ou32_Index) < this->mc_DpItems.size())
+   {
+      Q_EMIT (this->SigOpenDataPoolContent(ou32_Index));
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1660,7 +1848,7 @@ void C_SdNdeDpSelectorListWidget::m_MoveDatapool(const sintn osn_SourceIndex, co
    sint32 s32_SourceDpIndex;
    sint32 s32_TargetDpIndex;
 
-   if (osn_TargetIndexAdapted >= this->count())
+   if (osn_TargetIndexAdapted >= this->mc_DpItems.size())
    {
       // Move 'below' the end cause an invalid index. It equals the number of elements
       --osn_TargetIndexAdapted;
@@ -1684,7 +1872,7 @@ void C_SdNdeDpSelectorListWidget::m_MoveDatapool(const sintn osn_SourceIndex, co
       // reload data. swapping in the list is not possible without loosing the widget
       this->m_InitFromData(true);
 
-      this->setCurrentRow(osn_TargetIndexAdapted);
+      this->SetSelectedItem(osn_TargetIndexAdapted);
       this->ScrollToItem(osn_TargetIndexAdapted); // Sends signal SigListChanged too
 
       Q_EMIT (this->SigDataPoolChanged());
@@ -1707,7 +1895,7 @@ void C_SdNdeDpSelectorListWidget::m_InitFromData(const bool oq_Update)
 
       if (oq_Update == false)
       {
-         this->clear();
+         this->m_Clear();
       }
 
       // add all datapools to the lists
@@ -1728,34 +1916,63 @@ void C_SdNdeDpSelectorListWidget::m_InitFromData(const bool oq_Update)
             ++sn_TypeCounter;
          }
       }
+
+      this->m_UpdateCounters(true);
+
+      Q_EMIT (this->SigListChanged());
    }
 
    QApplication::restoreOverrideCursor();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clears all Datapool items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::m_Clear(void)
+{
+   sintn sn_ItDp;
+
+   for (sn_ItDp = 0; sn_ItDp < this->mc_DpItems.size(); ++sn_ItDp)
+   {
+      C_SdNdeDpSelectorItemWidget * const pc_ItemWidget = this->mc_DpItems.at(sn_ItDp);
+
+      disconnect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigUpdateErrorToolTip, this,
+                 &C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip);
+      disconnect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigHideOtherToolTips, this,
+                 &C_SdNdeDpSelectorListWidget::SigHideOtherToolTips);
+
+      disconnect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigClicked,
+                 this, &C_SdNdeDpSelectorListWidget::m_ItemClicked);
+      disconnect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigDoubleClicked,
+                 this, &C_SdNdeDpSelectorListWidget::m_ItemDoubleClicked);
+      disconnect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigContextMenuRequested,
+                 this, &C_SdNdeDpSelectorListWidget::m_OnItemCustomContextMenuRequested);
+
+      pc_ItemWidget->setParent(NULL);
+
+      delete pc_ItemWidget;
+   }
+
+   this->mc_DpItems.clear();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_SelectionChanged(void)
 {
-   const QList<QListWidgetItem *> & rc_Items = this->selectedItems();
-
-   if (rc_Items.count() > 0)
+   if ((this->msn_SelectedItemIndex >= 0) &&
+       (this->msn_SelectedItemIndex < this->mc_DpItems.size()))
    {
-      C_SdNdeDpSelectorItemWidget * pc_SelectedWidgetItem;
+      C_SdNdeDpSelectorItemWidget * const pc_SelectedWidgetItem = this->mc_DpItems.at(this->msn_SelectedItemIndex);
       sintn sn_Counter;
       QApplication::setOverrideCursor(Qt::WaitCursor);
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      pc_SelectedWidgetItem = dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(rc_Items[0]));
-
       Q_EMIT (this->SigWidgetFocused());
 
-      for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+      for (sn_Counter = 0; sn_Counter < this->mc_DpItems.size(); ++sn_Counter)
       {
          // search the item which was clicked and adapt the stylesheet
-         QListWidgetItem * const pc_Item = this->item(sn_Counter);
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         C_SdNdeDpSelectorItemWidget * const pc_WidgetItem =
-            dynamic_cast<C_SdNdeDpSelectorItemWidget *>(this->itemWidget(pc_Item));
+         C_SdNdeDpSelectorItemWidget * const pc_WidgetItem = this->mc_DpItems.at(sn_Counter);
          if (pc_WidgetItem != NULL)
          {
             if (pc_WidgetItem == pc_SelectedWidgetItem)
@@ -1775,12 +1992,17 @@ void C_SdNdeDpSelectorListWidget::m_SelectionChanged(void)
       }
 
       // update the visible "line"
-      this->msn_ActualLine = this->currentRow() / this->msn_ItemsPerLine;
+      this->SetCurrentViewPage(this->GetCurrentItemIndex() / this->msn_ItemsPerViewPage);
 
       QApplication::restoreOverrideCursor();
    }
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the size of the item widgets
+
+   \param[in]       orc_WidgetSize     Size of an item widget
+*/
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_AdaptSize(const QSize & orc_WidgetSize)
 {
@@ -1788,79 +2010,112 @@ void C_SdNdeDpSelectorListWidget::m_AdaptSize(const QSize & orc_WidgetSize)
    this->msn_ItemHeight = orc_WidgetSize.height();
    this->setMinimumHeight(this->msn_ItemHeight);
    this->setMinimumWidth(this->msn_ItemWidth + 10);
-   this->setGridSize(orc_WidgetSize);
-   this->doItemsLayout();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorListWidget::m_UpdateCounters(void)
+/*! \brief   Updates all counters, limits and layout variables
+
+   \param[in]       oq_ForceRearrageItems     Flag if arranging of the widgets is always necessary
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::m_UpdateCounters(const bool oq_ForceRearrageItems)
 {
-   // In this case a line (msn_ItemsPerLine) equals an entire view or page of the list.
+   bool q_ChangedLayout = false;
+
    // The minus one results from a unknown error in the switch between the number of displayed Datapools
    // The switch between three and two Datapools happens at the width 435 to 436.
    // Mathematically it should happen at 434 to 435
-   sintn sn_RealItemsPerLines = (this->width() - 1) / this->msn_ItemWidth;
-   sintn sn_CountRowPerView = this->msn_HeightHint / this->msn_ItemHeight;
+   sintn sn_RowsPerViewPage = this->msn_HeightHint / this->msn_ItemHeight;
+   sintn sn_ItemsPerRow = (this->width() - 1) / this->msn_ItemWidth;
+   sintn sn_CountViewPages;
 
-   if (sn_RealItemsPerLines < 1)
+   if (sn_ItemsPerRow < 1)
    {
-      sn_RealItemsPerLines = 1;
+      sn_ItemsPerRow = 1;
    }
-   if (sn_CountRowPerView < 1)
+   if (sn_RowsPerViewPage < 1)
    {
-      sn_CountRowPerView = 1;
-   }
-
-   // Items on each row
-   this->msn_ItemsPerLine = sn_RealItemsPerLines * sn_CountRowPerView;
-
-   if (this->msn_ItemsPerLine < 1)
-   {
-      this->msn_ItemsPerLine = 1;
+      sn_RowsPerViewPage = 1;
    }
 
-   // calculate the necessary rows
-   this->msn_CountLines = this->count() / this->msn_ItemsPerLine;
+   // Check for relevant check
+   if ((sn_RowsPerViewPage != this->msn_RowsPerViewPage) ||
+       (sn_ItemsPerRow != this->msn_ItemsPerRow))
+   {
+      q_ChangedLayout = true;
+   }
+   this->msn_RowsPerViewPage = sn_RowsPerViewPage;
+   this->msn_ItemsPerRow = sn_ItemsPerRow;
+   this->msn_ItemsPerViewPage = sn_RowsPerViewPage * sn_ItemsPerRow;
+
+   // Calculate page count
+   sn_CountViewPages = this->mc_DpItems.size() / this->msn_ItemsPerViewPage;
 
    // correct rounding error
-   if ((this->count() % this->msn_ItemsPerLine) > 0)
+   if ((this->mc_DpItems.size() % this->msn_ItemsPerViewPage) > 0)
    {
-      ++this->msn_CountLines;
+      ++sn_CountViewPages;
+   }
+   if (sn_CountViewPages < 1)
+   {
+      sn_CountViewPages = 1;
+   }
+   this->msn_CountViewPages = sn_CountViewPages;
+   if (sn_CountViewPages != this->msn_CountViewPages)
+   {
+      q_ChangedLayout = true;
    }
 
-   // Update the current line
-   this->msn_ActualLine = this->verticalScrollBar()->value();
+   // Check for change and adapt only in this case the widget arrangement
+   if ((q_ChangedLayout == true) ||
+       (oq_ForceRearrageItems == true))
+   {
+      this->m_RearrangeItems();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Rearranging the items in the layout
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::m_RearrangeItems(void)
+{
+   sintn sn_ItDp;
+   const sintn sn_FirstVisibleRow = this->msn_CurrentViewPage * this->msn_RowsPerViewPage;
+   const sintn sn_LastVisibleRow = ((this->msn_CurrentViewPage + 1) * this->msn_RowsPerViewPage) - 1;
+
+   // Update positions and visibility of all widgets
+   for (sn_ItDp = 0; sn_ItDp < this->mc_DpItems.size(); ++sn_ItDp)
+   {
+      const sintn sn_Row = sn_ItDp / this->msn_ItemsPerRow;
+      const sintn sn_Column = sn_ItDp % this->msn_ItemsPerRow;
+      const sintn sn_PosX = sn_Column * msn_ItemWidth;
+      const sintn sn_PosY = (sn_Row % this->msn_RowsPerViewPage) * msn_ItemHeight;
+      const bool q_RowVisible = ((sn_Row >= sn_FirstVisibleRow) && (sn_Row <= sn_LastVisibleRow)) ? true : false;
+
+      this->mc_DpItems.at(sn_ItDp)->setGeometry(QRect(QPoint(sn_PosX, sn_PosY),
+                                                      this->mc_DpItems.at(sn_ItDp)->size()));
+      this->mc_DpItems.at(sn_ItDp)->setVisible(q_RowVisible);
+   }
+
+   this->updateGeometry();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Trigger live update of error tooltip
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip(void) const
+void C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip(const uint32 ou32_Index) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SdNdeDpSelectorItemWidget * const pc_Sender =
-      dynamic_cast<C_SdNdeDpSelectorItemWidget * const>(this->sender());
-
-   if (pc_Sender != NULL)
+   if (static_cast<sintn>(ou32_Index) < this->mc_DpItems.size())
    {
-      //Search
-      uint32 u32_FoundIndex = 0UL;
-      bool q_Found = false;
-      for (sintn sn_ItDp = 0; sn_ItDp < this->count(); ++sn_ItDp)
-      {
-         if (this->sender() == this->itemWidget(this->item(sn_ItDp)))
-         {
-            q_Found = true;
-            u32_FoundIndex = static_cast<uint32>(sn_ItDp);
-         }
-      }
-      if (q_Found == true)
+      C_SdNdeDpSelectorItemWidget * const pc_Sender = this->mc_DpItems.at(ou32_Index);
+      if (pc_Sender != NULL)
       {
          const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
          const sint32 s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
                                                                                       this->me_DataPoolType,
-                                                                                      u32_FoundIndex);
+                                                                                      ou32_Index);
          if ((s32_DpIndex >= 0) && (pc_Node != NULL))
          {
             const uint32 u32_DataPoolIndex = static_cast<uint32>(s32_DpIndex);
@@ -1868,7 +2123,8 @@ void C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip(void) const
             bool q_NameInvalid;
             bool q_IsErrorInListOrMessage;
             std::vector<uint32> c_InvalidListIndices;
-            pc_Node->CheckErrorDataPool(u32_DataPoolIndex, &q_NameConflict, &q_NameInvalid, &q_IsErrorInListOrMessage,
+            pc_Node->CheckErrorDataPool(u32_DataPoolIndex, &q_NameConflict, &q_NameInvalid,
+                                        &q_IsErrorInListOrMessage,
                                         &c_InvalidListIndices);
             if (((q_NameConflict == false) && (q_NameInvalid == false)) && (q_IsErrorInListOrMessage == false))
             {
@@ -1914,7 +2170,7 @@ void C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip(void) const
                               this->mu32_NodeIndex, u32_DataPoolIndex, c_InvalidListIndices[u32_ItList]);
                         if (pc_List != NULL)
                         {
-                           c_Content += QString("%1\n").arg(pc_List->c_Name.c_str());
+                           c_Content += static_cast<QString>("%1\n").arg(pc_List->c_Name.c_str());
                         }
                      }
                      else
@@ -1929,7 +2185,7 @@ void C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip(void) const
                   }
                   if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidListIndices.size())
                   {
-                     c_Content += QString("+%1\n").arg(
+                     c_Content += static_cast<QString>("+%1\n").arg(
                         c_InvalidListIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
                   }
                   c_Content += "\n";

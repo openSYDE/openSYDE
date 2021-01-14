@@ -88,7 +88,7 @@ C_SyvDcConnectedNodeWidget::~C_SyvDcConnectedNodeWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDcConnectedNodeWidget::GetSerialNumberString(void) const
 {
-   return QString(C_OSCUtils::h_SerialNumberToString(&this->mc_Info.au8_SerialNumber[0]).c_str());
+   return static_cast<QString>(C_OSCUtils::h_SerialNumberToString(&this->mc_Info.au8_SerialNumber[0]).c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -166,13 +166,13 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
 
    if (this->mc_Info.q_SerialNumberValid == true)
    {
-      c_Name = QString(C_OSCUtils::h_SerialNumberToString(&this->mc_Info.au8_SerialNumber[0]).c_str());
+      c_Name = static_cast<QString>(C_OSCUtils::h_SerialNumberToString(&this->mc_Info.au8_SerialNumber[0]).c_str());
    }
    else
    {
       c_Name = C_GtGetText::h_GetText("Unknown");
    }
-   this->mpc_Ui->pc_LabelName->setText(QString("SN.: %1").arg(c_Name));
+   this->mpc_Ui->pc_LabelName->setText(static_cast<QString>("SN.: %1").arg(c_Name));
    if (this->mc_Info.q_NodeIdValid == true)
    {
       c_Id = QString::number(this->mc_Info.u8_NodeId);
@@ -188,7 +188,7 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
       c_Id += " / IP: " + C_Uti::h_IpAddressToString(this->mc_Info.au8_IpAddress);
    }
 
-   this->mpc_Ui->pc_LabelNodeId->setText(QString("Node-ID: %1").arg(c_Id));
+   this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>("Node-ID: %1").arg(c_Id));
 
    if (this->mc_Info.q_DeviceNameValid == true)
    {
@@ -198,7 +198,7 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
    {
       c_Device = C_GtGetText::h_GetText("Unknown");
    }
-   this->mpc_Ui->pc_LabelDeviceType->setText(QString("Type: %1").arg(c_Device));
+   this->mpc_Ui->pc_LabelDeviceType->setText(static_cast<QString>("Type: %1").arg(c_Device));
    //Resize
    this->resize(this->width(), sn_Height);
    this->setMinimumHeight(sn_Height);

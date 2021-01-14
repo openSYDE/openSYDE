@@ -19,6 +19,7 @@
 #include "C_GtGetText.h"
 #include "CSCLChecksums.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSvHandler.h"
 #include "C_PuiSvDashboard.h"
 #include "C_OSCNodeDataPoolContentUtil.h"
 
@@ -740,6 +741,31 @@ void C_PuiSvDashboard::GetAllWidgetItems(std::vector<const C_PuiSvDbWidgetBase *
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets all registered dashboard elements of all dashboard tabs
+
+   \param[in,out]  orc_Ids    Set with all registered elements. Will not be cleared when called
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::GetAllRegisteredDashboardElements(std::set<C_OSCNodeDataPoolListElementId> & orc_Ids) const
+{
+   std::vector<const C_PuiSvDbWidgetBase *> c_Widgets;
+   uint32 u32_WidgetCounter;
+
+   this->GetAllWidgetItems(c_Widgets);
+
+   for (u32_WidgetCounter = 0U; u32_WidgetCounter < c_Widgets.size(); ++u32_WidgetCounter)
+   {
+      const C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_WidgetCounter];
+      uint32 u32_ConfigCounter;
+
+      for (u32_ConfigCounter = 0U; u32_ConfigCounter < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ConfigCounter)
+      {
+         orc_Ids.insert(pc_Widget->c_DataPoolElementsConfig[u32_ConfigCounter].c_ElementId);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widget
 
    \param[in]  ou32_Index  Widget index
@@ -768,7 +794,6 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
    switch (oe_Type)
    {
    case C_PuiSvDbDataElement::eCHART:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_Chart = dynamic_cast<const C_PuiSvDbChart *>(opc_Value);
       if (opc_Chart != NULL)
       {
@@ -787,7 +812,6 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
       }
       break;
    case C_PuiSvDbDataElement::eLABEL:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_Label = dynamic_cast<const C_PuiSvDbLabel *>(opc_Value);
       if (opc_Label != NULL)
       {
@@ -806,7 +830,6 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
       }
       break;
    case C_PuiSvDbDataElement::ePARAM:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_ParamWidget = dynamic_cast<const C_PuiSvDbParam *>(opc_Value);
       if (opc_ParamWidget != NULL)
       {
@@ -825,7 +848,6 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
       }
       break;
    case C_PuiSvDbDataElement::ePIE_CHART:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_PieChart = dynamic_cast<const C_PuiSvDbPieChart *>(opc_Value);
       if (opc_PieChart != NULL)
       {
@@ -844,7 +866,6 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
       }
       break;
    case C_PuiSvDbDataElement::ePROGRESS_BAR:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_ProgressBar = dynamic_cast<const C_PuiSvDbProgressBar *>(opc_Value);
       if (opc_ProgressBar != NULL)
       {
@@ -863,7 +884,6 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
       }
       break;
    case C_PuiSvDbDataElement::eSLIDER:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_Slider = dynamic_cast<const C_PuiSvDbSlider *>(opc_Value);
       if (opc_Slider != NULL)
       {
@@ -882,7 +902,6 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
       }
       break;
    case C_PuiSvDbDataElement::eSPIN_BOX:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_SpinBox = dynamic_cast<const C_PuiSvDbSpinBox *>(opc_Value);
       if (opc_SpinBox != NULL)
       {
@@ -901,7 +920,6 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
       }
       break;
    case C_PuiSvDbDataElement::eTABLE:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_Table = dynamic_cast<const C_PuiSvDbTable *>(opc_Value);
       if (opc_Table != NULL)
       {
@@ -920,7 +938,6 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
       }
       break;
    case C_PuiSvDbDataElement::eTOGGLE:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_Toggle = dynamic_cast<const C_PuiSvDbToggle *>(opc_Value);
       if (opc_Toggle != NULL)
       {
@@ -959,7 +976,6 @@ void C_PuiSvDashboard::OnSyncNodeAdded(const uint32 ou32_Index)
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -996,7 +1012,6 @@ void C_PuiSvDashboard::OnSyncNodeHALC(const uint32 ou32_Index, const std::map<C_
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1031,7 +1046,6 @@ void C_PuiSvDashboard::OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1068,7 +1082,6 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, cons
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1106,7 +1119,6 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, cons
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1144,7 +1156,6 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_Node
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1183,7 +1194,6 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, 
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1223,7 +1233,6 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, 
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1264,7 +1273,6 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1472,7 +1480,6 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAdded(const uint32 ou32_Node
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1516,7 +1523,6 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_Node
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1688,7 +1694,6 @@ bool C_PuiSvDashboard::OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
       if (pc_Widget != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          C_PuiSvDbParam * const pc_ParamWidgets = dynamic_cast<C_PuiSvDbParam * const>(pc_Widget);
          if (pc_ParamWidgets != NULL)
          {
@@ -1793,7 +1798,6 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint3
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
       C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
       if (pc_Widget != NULL)
       {
@@ -1853,26 +1857,36 @@ void C_PuiSvDashboard::h_OnSyncNodeHALC(C_PuiSvDbNodeDataPoolListElementId & orc
    {
       if (orc_DataElementId.u32_NodeIndex == ou32_Index)
       {
-         C_OSCNodeDataPool::E_Type e_Type;
-         if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(ou32_Index, orc_DataElementId.u32_DataPoolIndex,
-                                                              e_Type) == C_NO_ERR)
+         const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                        C_PuiSvDbNodeDataPoolListElementId>::const_iterator c_It = orc_MapCurToNew.find(
+            orc_DataElementId);
+         if (c_It != orc_MapCurToNew.end())
          {
-            if (e_Type == C_OSCNodeDataPool::eHALC)
+            //Replace
+            orc_DataElementId = c_It->second;
+         }
+         else
+         {
+            if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_DataElementId.u32_NodeIndex,
+                                                                orc_DataElementId.u32_DataPoolIndex) != NULL)
             {
-               const std::map<C_PuiSvDbNodeDataPoolListElementId,
-                              C_PuiSvDbNodeDataPoolListElementId>::const_iterator c_It = orc_MapCurToNew.find(
-                  orc_DataElementId);
-               if (c_It != orc_MapCurToNew.end())
+               C_OSCNodeDataPool::E_Type e_Type;
+               if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(ou32_Index, orc_DataElementId.u32_DataPoolIndex,
+                                                                    e_Type) == C_NO_ERR)
                {
-                  //Replace
-                  orc_DataElementId = c_It->second;
+                  if (e_Type == C_OSCNodeDataPool::eHALC)
+                  {
+                     //Delete
+                     orc_DataElementId.MarkInvalid(C_OSCNodeDataPool::eHALC,
+                                                   C_GtGetText::h_GetText("Unknown HAL data element"));
+                  }
                }
-               else
-               {
-                  //Delete
-                  orc_DataElementId.MarkInvalid(C_OSCNodeDataPool::eHALC,
-                                                C_GtGetText::h_GetText("Unknown HAL data element"));
-               }
+            }
+            else
+            {
+               //Delete
+               orc_DataElementId.MarkInvalid(C_OSCNodeDataPool::eHALC,
+                                             C_GtGetText::h_GetText("Unknown HAL data element"));
             }
          }
       }
@@ -2358,7 +2372,6 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
    switch (oe_Type)
    {
    case C_PuiSvDbDataElement::eCHART:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_Chart = dynamic_cast<const C_PuiSvDbChart *>(opc_Box);
       if (opc_Chart != NULL)
       {
@@ -2377,7 +2390,6 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
       }
       break;
    case C_PuiSvDbDataElement::eLABEL:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_Label = dynamic_cast<const C_PuiSvDbLabel *>(opc_Box);
       if (opc_Label != NULL)
       {
@@ -2396,7 +2408,6 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
       }
       break;
    case C_PuiSvDbDataElement::ePARAM:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_ParamWidget = dynamic_cast<const C_PuiSvDbParam *>(opc_Box);
       if (opc_ParamWidget != NULL)
       {
@@ -2415,7 +2426,6 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
       }
       break;
    case C_PuiSvDbDataElement::ePIE_CHART:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_PieChart = dynamic_cast<const C_PuiSvDbPieChart *>(opc_Box);
       if (opc_PieChart != NULL)
       {
@@ -2434,7 +2444,6 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
       }
       break;
    case C_PuiSvDbDataElement::ePROGRESS_BAR:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_ProgressBar = dynamic_cast<const C_PuiSvDbProgressBar *>(opc_Box);
       if (opc_ProgressBar != NULL)
       {
@@ -2453,7 +2462,6 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
       }
       break;
    case C_PuiSvDbDataElement::eSLIDER:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_Slider = dynamic_cast<const C_PuiSvDbSlider *>(opc_Box);
       if (opc_Slider != NULL)
       {
@@ -2472,7 +2480,6 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
       }
       break;
    case C_PuiSvDbDataElement::eSPIN_BOX:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_SpinBox = dynamic_cast<const C_PuiSvDbSpinBox *>(opc_Box);
       if (opc_SpinBox != NULL)
       {
@@ -2491,7 +2498,6 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
       }
       break;
    case C_PuiSvDbDataElement::eTABLE:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_Table = dynamic_cast<const C_PuiSvDbTable *>(opc_Box);
       if (opc_Table != NULL)
       {
@@ -2510,7 +2516,6 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
       }
       break;
    case C_PuiSvDbDataElement::eTOGGLE:
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       opc_Toggle = dynamic_cast<const C_PuiSvDbToggle *>(opc_Box);
       if (opc_Toggle != NULL)
       {
@@ -2961,23 +2966,14 @@ C_PuiSvDbDataElement::E_Type C_PuiSvDashboard::h_GetWidgetType(const C_PuiSvDbWi
    C_PuiSvDbDataElement::E_Type e_Retval = C_PuiSvDbDataElement::eUNKNOWN;
    if (opc_Box != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_PuiSvDbChart * const pc_Charts = dynamic_cast<const C_PuiSvDbChart * const>(opc_Box);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_PuiSvDbLabel * const pc_Labels = dynamic_cast<const C_PuiSvDbLabel * const>(opc_Box);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_PuiSvDbParam * const pc_ParamWidgets = dynamic_cast<const C_PuiSvDbParam * const>(opc_Box);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_PuiSvDbPieChart * const pc_PieCharts = dynamic_cast<const C_PuiSvDbPieChart * const>(opc_Box);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_PuiSvDbProgressBar * const pc_ProgressBars = dynamic_cast<const C_PuiSvDbProgressBar * const>(opc_Box);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_PuiSvDbSpinBox * const pc_SpinBoxes = dynamic_cast<const C_PuiSvDbSpinBox * const>(opc_Box);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_PuiSvDbSlider * const pc_Sliders = dynamic_cast<const C_PuiSvDbSlider * const>(opc_Box);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_PuiSvDbTable * const pc_Tables = dynamic_cast<const C_PuiSvDbTable * const>(opc_Box);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_PuiSvDbToggle * const pc_Toggles = dynamic_cast<const C_PuiSvDbToggle * const>(opc_Box);
 
       if (pc_Charts != NULL)
@@ -3131,15 +3127,7 @@ void C_PuiSvDashboard::mh_MarkInvalid(C_PuiSvDbNodeDataPoolListElementId & orc_D
 
    if (pc_DataPool != NULL)
    {
-      QString c_Namespace;
-      if (orc_DataElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
-      {
-         c_Namespace = C_PuiSdHandler::h_GetInstance()->GetNamespace(orc_DataElementId);
-      }
-      else
-      {
-         c_Namespace = C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(orc_DataElementId);
-      }
+      QString c_Namespace = C_PuiSvHandler::h_GetNamespace(orc_DataElementId);
       orc_DataElementId.MarkInvalid(pc_DataPool->e_Type, c_Namespace);
    }
 }

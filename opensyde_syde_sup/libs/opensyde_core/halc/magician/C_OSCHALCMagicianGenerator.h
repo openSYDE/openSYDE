@@ -63,11 +63,13 @@ private:
                                                           const bool oq_IsSafe);
    static stw_types::sint32 mh_GenerateVariablesForVector(const std::vector<C_OSCHalcDefStruct> & orc_Definition,
                                                           const stw_scl::C_SCLString & orc_DomainSingularName,
+                                                          const bool oq_IsSafe,
                                                           const stw_types::uint32 ou32_NumChannels,
                                                           const bool oq_AddDataset, C_OSCNodeDataPoolList & orc_List);
    static stw_types::sint32 mh_GenerateVariablesForVectorElement(const std::vector<C_OSCHalcDefStruct> & orc_Definition,
                                                                  const stw_types::uint32 ou32_DefinitionElementIndex,
                                                                  const stw_scl::C_SCLString & orc_DomainSingularName,
+                                                                 const bool oq_IsSafe,
                                                                  const stw_types::uint32 ou32_NumChannels,
                                                                  const bool oq_AddDataset,
                                                                  C_OSCNodeDataPoolList & orc_List);
@@ -76,8 +78,8 @@ private:
                                                  const stw_types::uint32 ou32_ParameterIndexStruct,
                                                  const stw_types::uint32 ou32_ParameterIndexElement,
                                                  const stw_scl::C_SCLString & orc_DomainSingularName,
-                                                 const stw_types::uint32 ou32_NumChannels, const bool oq_AddDataset,
-                                                 C_OSCNodeDataPoolList & orc_List);
+                                                 const bool oq_IsSafe, const stw_types::uint32 ou32_NumChannels,
+                                                 const bool oq_AddDataset, C_OSCNodeDataPoolList & orc_List);
    static stw_types::sint32 mh_ConvertToDatapoolWithoutArray(const C_OSCHalcDefContent & orc_HALCContent,
                                                              C_OSCNodeDataPoolContent & orc_DpContent);
    static stw_types::sint32 mh_ConvertToDatapoolAndAssign(const C_OSCHalcDefContent & orc_HALCContent,
@@ -89,7 +91,6 @@ private:
    static void mh_InitList(C_OSCNodeDataPoolList & orc_List, const stw_scl::C_SCLString & orc_Name,
                            const bool oq_AddDataset = false);
    static void mh_CleanUpHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools);
-   stw_types::sint32 m_AssignHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

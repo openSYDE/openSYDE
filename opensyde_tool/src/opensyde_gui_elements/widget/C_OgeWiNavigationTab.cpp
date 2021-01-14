@@ -100,7 +100,7 @@ void C_OgeWiNavigationTab::SetActive(const bool oq_Active)
    }
    this->mq_Active = oq_Active;
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Active", oq_Active);
-   this->mpc_Ui->pc_FrameBottomLine->setStyleSheet(QString("background-color:rgba(%1,%2,%3,%4);").arg(
+   this->mpc_Ui->pc_FrameBottomLine->setStyleSheet(static_cast<QString>("background-color:rgba(%1,%2,%3,%4);").arg(
                                                       c_Color.red()).arg(c_Color.green()).arg(c_Color.blue()).arg(
                                                       c_Color.alpha()));
 }

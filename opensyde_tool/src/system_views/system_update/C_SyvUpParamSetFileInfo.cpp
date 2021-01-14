@@ -160,8 +160,8 @@ void C_SyvUpParamSetFileInfo::m_Comparison(const bool oq_OptionlContentMissing)
                                      rc_NoDp.c_Name.c_str(), C_GtGetText::h_GetText("Datapool name"), 1UL);
                rc_NoDp.CalcDefinitionHash(u32_DpHash);
                //Datapool CRC
-               this->m_CompareString(QString("0x%1").arg(rc_InDp.c_DataPoolInfo.u32_DataPoolCrc, 0, 16),
-                                     QString("0x%1").arg(u32_DpHash, 0, 16), C_GtGetText::h_GetText("Datapool CRC"),
+               this->m_CompareString(static_cast<QString>("0x%1").arg(rc_InDp.c_DataPoolInfo.u32_DataPoolCrc, 0, 16),
+                                     static_cast<QString>("0x%1").arg(u32_DpHash, 0, 16), C_GtGetText::h_GetText("Datapool CRC"),
                                      1UL);
                //Datapool NVM start address
                if (oq_OptionlContentMissing)
@@ -170,9 +170,9 @@ void C_SyvUpParamSetFileInfo::m_Comparison(const bool oq_OptionlContentMissing)
                }
                else
                {
-                  c_Value = QString("%1").arg(rc_NoDp.u32_NvMStartAddress);
+                  c_Value = static_cast<QString>("%1").arg(rc_NoDp.u32_NvMStartAddress);
                }
-               this->m_CompareString(QString("%1").arg(rc_InDp.c_DataPoolInfo.u32_NvMStartAddress),
+               this->m_CompareString(static_cast<QString>("%1").arg(rc_InDp.c_DataPoolInfo.u32_NvMStartAddress),
                                      c_Value, C_GtGetText::h_GetText("Datapool NVM start address"), 1UL);
                //Datapool NVM size
                if (oq_OptionlContentMissing)
@@ -181,9 +181,9 @@ void C_SyvUpParamSetFileInfo::m_Comparison(const bool oq_OptionlContentMissing)
                }
                else
                {
-                  c_Value = QString("%1").arg(rc_NoDp.u32_NvMSize);
+                  c_Value = static_cast<QString>("%1").arg(rc_NoDp.u32_NvMSize);
                }
-               this->m_CompareString(QString("%1").arg(rc_InDp.c_DataPoolInfo.u32_NvMSize),
+               this->m_CompareString(static_cast<QString>("%1").arg(rc_InDp.c_DataPoolInfo.u32_NvMSize),
                                      c_Value, C_GtGetText::h_GetText("Datapool NVM size"), 1UL);
                //Datapool version
                this->m_CompareString(C_SyvUpParamSetFileInfo::mh_GetVersionString(rc_InDp.c_DataPoolInfo.au8_Version[0],
@@ -209,8 +209,8 @@ void C_SyvUpParamSetFileInfo::m_Comparison(const bool oq_OptionlContentMissing)
                         this->m_CompareString(rc_InLi.c_Name.c_str(), rc_NoLi.c_Name.c_str(),
                                               C_GtGetText::h_GetText("List name"), 2UL);
                         //List elements
-                        this->m_CompareString(QString("%1").arg(rc_InLi.c_Elements.size()),
-                                              QString("%1").arg(rc_NoLi.c_Elements.size()),
+                        this->m_CompareString(static_cast<QString>("%1").arg(rc_InLi.c_Elements.size()),
+                                              static_cast<QString>("%1").arg(rc_NoLi.c_Elements.size()),
                                               C_GtGetText::h_GetText("Number of elements in list"), 2UL);
                         break;
                      }
@@ -244,7 +244,7 @@ void C_SyvUpParamSetFileInfo::m_ConvertToHtmlString(const bool oq_OptionlContent
    this->mc_ComparisonHtml.clear();
 
    //File information
-   this->mc_ComparisonHtml += "<h3>" + QString(C_GtGetText::h_GetText("Meta information")) + "</h3>";
+   this->mc_ComparisonHtml += "<h3>" + static_cast<QString>(C_GtGetText::h_GetText("Meta information")) + "</h3>";
    this->mc_ComparisonHtml += "<table>";
 
    if (oq_OptionlContentMissing)
@@ -314,9 +314,9 @@ void C_SyvUpParamSetFileInfo::m_ConvertToHtmlString(const bool oq_OptionlContent
    this->mc_ComparisonHtml += "</table>";
 
    //Comparison
-   this->mc_ComparisonHtml += "<h3>" + QString(C_GtGetText::h_GetText("Comparison result")) + "</h3>";
+   this->mc_ComparisonHtml += "<h3>" + static_cast<QString>(C_GtGetText::h_GetText("Comparison result")) + "</h3>";
    this->mc_ComparisonHtml += "<p>" +
-                              QString(C_GtGetText::h_GetText("Compare selected file with current SYSTEM DEFINITION.")) +
+                              static_cast<QString>(C_GtGetText::h_GetText("Compare selected file with current SYSTEM DEFINITION.")) +
                               "</p>";
    this->mc_ComparisonHtml += "<table>";
 
@@ -481,7 +481,7 @@ QString C_SyvUpParamSetFileInfo::mh_GetVersionString(const uint32 ou32_VersionBy
                                                      const uint32 ou32_VersionByte3)
 {
    const QString c_Retval =
-      QString("v%1.%2r%3").arg(ou32_VersionByte1, 2, 10, QChar('0')).arg(ou32_VersionByte2, 2, 10, QChar('0')).arg(
+      static_cast<QString>("v%1.%2r%3").arg(ou32_VersionByte1, 2, 10, QChar('0')).arg(ou32_VersionByte2, 2, 10, QChar('0')).arg(
          ou32_VersionByte3, 2, 10, QChar('0'));
 
    return c_Retval;

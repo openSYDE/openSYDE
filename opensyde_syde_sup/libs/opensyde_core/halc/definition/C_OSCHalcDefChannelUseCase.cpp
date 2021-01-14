@@ -40,6 +40,14 @@ C_OSCHalcDefChannelUseCase::C_OSCHalcDefChannelUseCase(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Destructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCHalcDefChannelUseCase::~C_OSCHalcDefChannelUseCase()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.

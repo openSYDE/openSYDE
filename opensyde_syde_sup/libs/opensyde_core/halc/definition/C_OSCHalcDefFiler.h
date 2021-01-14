@@ -31,9 +31,10 @@ public:
                                                std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability,
                                                const stw_types::uint32 ou32_NumChannels);
    static stw_types::sint32 h_CheckUseCaseValue(const C_OSCHalcDefDomain & orc_IODataDomain);
+   static stw_types::sint32 h_CheckDomainDisplayNames(const C_OSCHalcDefDomain & orc_IODataDomain);
 
 private:
-   static const stw_types::uint16 hu16_FILE_VERSION_1 = 1U;
+   static const stw_types::uint16 mhu16_FILE_VERSION_1 = 1U;
 
    C_OSCHalcDefFiler(void);
 
@@ -72,6 +73,11 @@ private:
    static stw_scl::C_SCLString mh_DomainCategoryEnumToString(const C_OSCHalcDefDomain::E_Category oe_Category);
    static stw_types::sint32 mh_DomainCategoryStringToEnum(const stw_scl::C_SCLString & orc_Category,
                                                           C_OSCHalcDefDomain::E_Category & ore_Category);
+   static void mh_GetAllNames(const std::vector<C_OSCHalcDefStruct> & orc_Values,
+                              std::vector<stw_scl::C_SCLString> & orc_Names);
+   static stw_types::sint32 mh_CheckDuplicateNames(const stw_scl::C_SCLString & orc_Section,
+                                                   const stw_scl::C_SCLString & orc_DomainSingularName,
+                                                   std::vector<stw_scl::C_SCLString> & orc_Names);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

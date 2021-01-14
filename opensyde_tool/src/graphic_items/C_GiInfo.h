@@ -44,11 +44,8 @@ public:
    void SetIconSize(const stw_types::sint32 os32_IconSize);
    void UpdateTransform(const QTransform & orc_Transform);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget) override;
-   //lint -restore
 
 private:
    QString mc_Text;

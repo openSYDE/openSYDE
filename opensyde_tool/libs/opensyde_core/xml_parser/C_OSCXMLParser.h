@@ -43,8 +43,8 @@ public:
 class C_OSCXMLParserBase
 {
 private:
-   C_OSCXMLParserBase(const C_OSCXMLParserBase & orc_Souce);               ///< not implemented -> prevent copying
-   C_OSCXMLParserBase & operator = (const C_OSCXMLParserBase & orc_Souce); ///< not implemented -> prevent assignment
+   C_OSCXMLParserBase(const C_OSCXMLParserBase & orc_Souce);               ///< not implemented: prevent copying
+   C_OSCXMLParserBase & operator = (const C_OSCXMLParserBase & orc_Souce); ///< not implemented: prevent assignment
 
    tinyxml2::XMLElement * mpc_CurrentNode;
 

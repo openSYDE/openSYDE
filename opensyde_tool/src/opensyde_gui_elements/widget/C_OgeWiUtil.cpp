@@ -110,7 +110,6 @@ void C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(QWidget * cons
    //Children
    for (stw_types::sint32 s32_ItChild = 0; s32_ItChild < opc_Widget->children().size(); ++s32_ItChild)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       QWidget * const pc_Wid = dynamic_cast<QWidget * const>(opc_Widget->children()[s32_ItChild]);
       if (pc_Wid != NULL)
       {
@@ -168,7 +167,7 @@ void C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(QPoint & orc_GlobalPosition
    if (oq_AddLogEntryForWindowSize)
    {
       osc_write_log_info("Setup main window screen",
-                         QString("Setup main window for screen width %1, height %2").arg(
+                         static_cast<QString>("Setup main window for screen width %1, height %2").arg(
                             pc_Desktop->geometry().width()).arg(pc_Desktop->
                                                                 geometry()
                                                                 .height()).toStdString().c_str());
@@ -249,8 +248,9 @@ sintn C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize
    sintn sn_Retval;
    static QMap<QString, sintn> hc_PreviousResults;
    //Find some way to uniquely identify the input parameter constellation
-   const QString c_CompleteInput = QString("%1,%2,%3,%4,%5").arg(orc_Font.toString()).arg(orc_Size.width()).arg(
-      orc_Size.height()).arg(orc_Text).arg(static_cast<float64>(of32_HeightScaling));
+   const QString c_CompleteInput =
+      static_cast<QString>("%1,%2,%3,%4,%5").arg(orc_Font.toString()).arg(orc_Size.width()).arg(
+         orc_Size.height()).arg(orc_Text).arg(static_cast<float64>(of32_HeightScaling));
    //Look up
    const QMap<QString, sintn>::const_iterator c_It = hc_PreviousResults.find(c_CompleteInput);
 
@@ -335,7 +335,6 @@ QWidget * C_OgeWiUtil::h_GetWidgetUnderNextPopUp(QWidget * const opc_Input)
          QWidget * pc_Parent = opc_Input->parentWidget();
          do
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             const stw_opensyde_gui_elements::C_OgePopUpDialog * const pc_PopUp =
                dynamic_cast<const stw_opensyde_gui_elements::C_OgePopUpDialog * const>(pc_Parent);
             if (pc_PopUp == NULL)
@@ -461,7 +460,7 @@ void C_OgeWiUtil::h_ShowPathInvalidError(QWidget * const opc_Parent, const QStri
 
    c_Message.SetHeading(C_GtGetText::h_GetText("Invalid Path"));
    c_Message.SetDescription(C_GtGetText::h_GetText("Path contains invalid characters."));
-   c_Message.SetDetails(QString(C_GtGetText::h_GetText("Path(s):\n%1")).arg(orc_InvalidPaths));
+   c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("Path(s):\n%1")).arg(orc_InvalidPaths));
    c_Message.SetCustomMinHeight(180, 250);
    c_Message.Execute();
 }

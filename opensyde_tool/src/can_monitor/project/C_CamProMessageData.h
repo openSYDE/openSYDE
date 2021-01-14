@@ -32,6 +32,8 @@ public:
 
    stw_scl::C_SCLString c_DataBaseFilePath;
    stw_scl::C_SCLString c_Name;
+   bool q_ContainsValidHash;
+   stw_types::uint32 u32_Hash;
    bool q_DoCyclicTrigger;
    stw_types::uint32 u32_CyclicTriggerTime;
    stw_scl::C_SCLString c_Key;

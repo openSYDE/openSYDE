@@ -69,9 +69,9 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
 
    InitStaticNames();
 
-   // splitter
-   this->mpc_Ui->pc_Splitter->setStretchFactor(0, 0);
-   this->mpc_Ui->pc_Splitter->setStretchFactor(1, 1);
+   // Splitter stretch: if there is more space stretch left widget (i.e. index 0)
+   this->mpc_Ui->pc_Splitter->setStretchFactor(0, 10);
+   this->mpc_Ui->pc_Splitter->setStretchFactor(1, 0);
 
    this->mpc_Ui->pc_NodePropWidget->SetNodeId(this->mu32_NodeIndex);
    this->mpc_Ui->pc_DataPoolEditWidget->SetNode(this->mu32_NodeIndex);
@@ -123,6 +123,8 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
    connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigCommDataPoolAdded, this,
            &C_SdNdeNodeEditWidget::m_ReloadDataPools);
    connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange, this,
+           &C_SdNdeNodeEditWidget::m_ReloadDataPools);
+   connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigOwnedDataPoolsChanged, this,
            &C_SdNdeNodeEditWidget::m_ReloadDataPools);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigOpenDataPool, this,
            &C_SdNdeNodeEditWidget::m_OpenDataPool);

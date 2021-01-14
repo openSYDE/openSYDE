@@ -224,25 +224,27 @@ void C_SyvDcWidget::CleanUp(void)
 void C_SyvDcWidget::InitText(void)
 {
    // set title
-   this->mpc_ParentDialog->SetSubTitle(QString(C_GtGetText::h_GetText("Device Configuration")));
+   this->mpc_ParentDialog->SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Device Configuration")));
 
-   this->mpc_Ui->pc_LabelHeadingReport->setText(QString(C_GtGetText::h_GetText("Report")));
-   this->mpc_Ui->pc_LabelHeadingBitrate->setText(QString(C_GtGetText::h_GetText("Settings")));
-   this->mpc_Ui->pc_LabelConfigurationMode->setText(QString(C_GtGetText::h_GetText("Configuration Mode")));
-   this->mpc_Ui->pc_PushButtonScan->setText(QString(C_GtGetText::h_GetText("Scan for Devices")));
-   this->mpc_Ui->pc_LabelStartScan->setText(QString(C_GtGetText::h_GetText("Click on \"Scan for Devices\" ...")));
-   this->mpc_Ui->pc_LabelNoExistingNodes->setText(QString(C_GtGetText::h_GetText("No valid Topology nodes found.")));
-   this->mpc_Ui->pc_LabelBitRate->setText(QString(C_GtGetText::h_GetText("Bitrate of Connected Devices")));
-   this->mpc_Ui->pc_PbBackToScan->setText(QString(C_GtGetText::h_GetText("Back to Scan")));
-   this->mpc_Ui->pc_LabelHeadingAssignment->setText(QString(C_GtGetText::h_GetText("Assignment")));
-   this->mpc_Ui->pc_LabelAssignment->setText(QString(C_GtGetText::h_GetText(
-                                                        "Assign all connected devices to Topology nodes via drag&drop"
-                                                        " and click on \"Configure Devices\".")));
-   this->mpc_Ui->pc_PushButtonConfigure->setText(QString(C_GtGetText::h_GetText("Configure Devices")));
-   this->mpc_Ui->pc_LabelProgressScan->setText(QString(C_GtGetText::h_GetText("Scan")));
-   this->mpc_Ui->pc_LabelProgressAssignmnet->setText(QString(C_GtGetText::h_GetText("Assignment")));
-   this->mpc_Ui->pc_LabelProgressConfiguration->setText(QString(C_GtGetText::h_GetText("Configuration")));
-   this->mpc_Ui->pc_LabelProgressFinished->setText(QString(C_GtGetText::h_GetText("Finished")));
+   this->mpc_Ui->pc_LabelHeadingReport->setText(static_cast<QString>(C_GtGetText::h_GetText("Report")));
+   this->mpc_Ui->pc_LabelHeadingBitrate->setText(static_cast<QString>(C_GtGetText::h_GetText("Settings")));
+   this->mpc_Ui->pc_LabelConfigurationMode->setText(static_cast<QString>(C_GtGetText::h_GetText("Configuration Mode")));
+   this->mpc_Ui->pc_PushButtonScan->setText(static_cast<QString>(C_GtGetText::h_GetText("Scan for Devices")));
+   this->mpc_Ui->pc_LabelStartScan->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                    "Click on \"Scan for Devices\" ...")));
+   this->mpc_Ui->pc_LabelNoExistingNodes->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                          "No valid Topology nodes found.")));
+   this->mpc_Ui->pc_LabelBitRate->setText(static_cast<QString>(C_GtGetText::h_GetText("Bitrate of Connected Devices")));
+   this->mpc_Ui->pc_PbBackToScan->setText(static_cast<QString>(C_GtGetText::h_GetText("Back to Scan")));
+   this->mpc_Ui->pc_LabelHeadingAssignment->setText(static_cast<QString>(C_GtGetText::h_GetText("Assignment")));
+   this->mpc_Ui->pc_LabelAssignment->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                     "Assign all connected devices to Topology nodes via drag&drop"
+                                                                     " and click on \"Configure Devices\".")));
+   this->mpc_Ui->pc_PushButtonConfigure->setText(static_cast<QString>(C_GtGetText::h_GetText("Configure Devices")));
+   this->mpc_Ui->pc_LabelProgressScan->setText(static_cast<QString>(C_GtGetText::h_GetText("Scan")));
+   this->mpc_Ui->pc_LabelProgressAssignmnet->setText(static_cast<QString>(C_GtGetText::h_GetText("Assignment")));
+   this->mpc_Ui->pc_LabelProgressConfiguration->setText(static_cast<QString>(C_GtGetText::h_GetText("Configuration")));
+   this->mpc_Ui->pc_LabelProgressFinished->setText(static_cast<QString>(C_GtGetText::h_GetText("Finished")));
    this->mpc_Ui->pc_ComboBoxConfigurationMode->clear();
 
    // Order is important!
@@ -359,50 +361,51 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
    case C_NO_ERR:
       break;
    case C_CONFIG:
-      c_Message = QString(C_GtGetText::h_GetText("Invalid SYSTEM DEFINITION/View configuration."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Invalid SYSTEM DEFINITION/View configuration."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_RD_WR:
       c_Message =
-         QString(C_GtGetText::h_GetText("Configured communication DLL does not exist or DLL could not be opened."));
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "Configured communication DLL does not exist or DLL could not be opened."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_OVERFLOW:
       c_Message =
-         QString(C_GtGetText::h_GetText(
-                    "Unknown transport protocol or unknown diagnostic server for at least one node."));
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "Unknown transport protocol or unknown diagnostic server for at least one node."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_NOACT:
-      c_Message = QString(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_COM:
       // TODO BAY: Adapt text in case of Ethernet
       c_Message =
-         QString(C_GtGetText::h_GetText(
-                    "CAN initialization failed. Check your PC CAN interface configuration "
-                    "(System View setup - double-click on PC)."));
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "CAN initialization failed. Check your PC CAN interface configuration "
+                                 "(System View setup - double-click on PC)."));
       c_MessageBox.SetCustomMinHeight(230, 230);
       break;
    case C_CHECKSUM:
-      c_Message = QString(C_GtGetText::h_GetText("Internal buffer overflow detected."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Internal buffer overflow detected."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_RANGE:
-      c_Message = QString(C_GtGetText::h_GetText("Routing configuration failed."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Routing configuration failed."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_UNKNOWN_ERR:
-      c_Message = QString(C_GtGetText::h_GetText("Wrapped error of internal function call."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Wrapped error of internal function call."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_WARN:
-      c_Message = QString(C_GtGetText::h_GetText("Internal error."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Internal error."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    default:
-      c_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    }
@@ -440,7 +443,7 @@ void C_SyvDcWidget::m_StartSearchProper(void)
    this->mpc_Ui->pc_ListWidgetConnectedNodesScan->setVisible(false);
    this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setVisible(false);
    this->mpc_Ui->pc_LabelStartScan->setText(C_GtGetText::h_GetText("Scanning for Devices..."));
-   this->mpc_Ui->pc_LabelHeadingFoundDevices->setText(QString(C_GtGetText::h_GetText("Connected Devices")));
+   this->mpc_Ui->pc_LabelHeadingFoundDevices->setText(static_cast<QString>(C_GtGetText::h_GetText("Connected Devices")));
 
    s32_Return = m_InitSequence();
 
@@ -452,7 +455,7 @@ void C_SyvDcWidget::m_StartSearchProper(void)
       if (s32_Return == C_NO_ERR)
       {
          //Bit rate
-         s32_Return = this->GetBitRateValue(this->mu32_TempBitrate);
+         s32_Return = this->m_GetBitRateValue(this->mu32_TempBitrate);
          if (s32_Return == C_NO_ERR)
          {
             //Set step
@@ -565,7 +568,8 @@ void C_SyvDcWidget::m_ScanFinished(void)
          this->mpc_Ui->pc_GroupBoxScan->setVisible(false);
          this->mpc_Ui->pc_GroupBoxAssignment->setVisible(true);
          m_InitAssignmentScreen();
-         this->mpc_Ui->pc_LabelStartScan->setText(QString(C_GtGetText::h_GetText("Click on \"Scan for Devices\" ...")));
+         this->mpc_Ui->pc_LabelStartScan->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                          "Click on \"Scan for Devices\" ...")));
          //Progress
          this->mpc_Ui->pc_BopperleScan->SetMainBopperleColor(mc_STYLE_GUIDE_COLOR_21, mc_STYLE_GUIDE_COLOR_13);
          this->mpc_Ui->pc_ProgressScan->SetProgress(100, false);
@@ -657,8 +661,8 @@ void C_SyvDcWidget::m_EnterScanErrorState(const QString & orc_Text) const
    //No drag
    this->mpc_Ui->pc_ListWidgetConnectedNodesScan->setDragEnabled(false);
    this->mpc_Ui->pc_GroupBoxStartScan->setVisible(false);
-   this->mpc_Ui->pc_LabelHeadingFoundDevices->setText(QString(C_GtGetText::h_GetText(
-                                                                 "Connected Devices (%1)")).arg(
+   this->mpc_Ui->pc_LabelHeadingFoundDevices->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                              "Connected Devices (%1)")).arg(
                                                          this->mc_FoundDevices.size()));
 }
 
@@ -806,7 +810,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
       else
       {
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-         c_Message.SetDescription(QString(C_GtGetText::h_GetText("Internal error FillDeviceConfig %1.")).
+         c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Internal error FillDeviceConfig %1.")).
                                   arg(C_Uti::h_StwError(s32_Result)));
          c_Message.SetCustomMinHeight(180, 180);
          c_Message.Execute();
@@ -815,7 +819,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
    else
    {
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-      c_Message.SetDescription(QString(C_GtGetText::h_GetText("Internal error starting configuration.")));
+      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Internal error starting configuration.")));
       c_Message.SetCustomMinHeight(180, 180);
       c_Message.Execute();
    }
@@ -894,13 +898,13 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const C_SyvDcDeviceConfiguation & o
       uint32 u32_NodeIndex;
 
       // Counter of devices
-      orc_Text += QString("%1 %2 %3 %4<br>").arg(
-         QString(C_GtGetText::h_GetText("Device")), QString::number(ou32_DeviceCounter),
-         QString(C_GtGetText::h_GetText("of")), QString::number(ou32_DeviceMaxCount));
+      orc_Text += static_cast<QString>("%1 %2 %3 %4<br>").arg(
+         static_cast<QString>(C_GtGetText::h_GetText("Device")), QString::number(ou32_DeviceCounter),
+         static_cast<QString>(C_GtGetText::h_GetText("of")), QString::number(ou32_DeviceMaxCount));
 
       // Serial number
       orc_Text += "SN.: " +
-                  QString(C_OSCUtils::h_SerialNumberToString(&orc_Config.au8_SerialNumber[0]).c_str()) +
+                  static_cast<QString>(C_OSCUtils::h_SerialNumberToString(&orc_Config.au8_SerialNumber[0]).c_str()) +
                   "<br>";
 
       if (this->mpc_DcSequences->GetNodeIndex(c_ServerId, u32_NodeIndex) == true)
@@ -914,8 +918,8 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const C_SyvDcDeviceConfiguation & o
             uint32 u32_EthCounter = 0U;
 
             // Get topology node name
-            orc_Text += QString(C_GtGetText::h_GetText("Topology Node: ")) +
-                        QString(pc_Node->c_Properties.c_Name.c_str()) + "<br>";
+            orc_Text += static_cast<QString>(C_GtGetText::h_GetText("Topology Node: ")) +
+                        static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) + "<br>";
 
             // Interface
             // Show the for configuration used interface first
@@ -1035,8 +1039,9 @@ void C_SyvDcWidget::m_ShowConfigInfoOfCanInterface(const C_OSCNodeComInterfaceSe
    {
       orc_Text += "<tr>";
       orc_Text += "<td width=\"40%\">" +
-                  QString(C_GtGetText::h_GetText("CAN-Bitrate: ")) + QString::number(ou32_Bitrate / 1000U) +
-                  QString(" kbit/s ") + "</td>";
+                  static_cast<QString>(C_GtGetText::h_GetText("CAN-Bitrate: ")) +
+                  QString::number(ou32_Bitrate / 1000U) +
+                  static_cast<QString>(" kbit/s ") + "</td>";
       orc_Text += "<td width=\"20%\">" +
                   this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETCANBITRATE, orc_ServerIdOnConfiguredBus,
                                                      orc_IntfSetting.e_InterfaceType,
@@ -1077,9 +1082,9 @@ void C_SyvDcWidget::m_ShowConfigInfoOfEthInterface(const C_OSCNodeComInterfaceSe
       c_DefaultGateway = C_Uti::h_IpAddressToString(orc_IpAddress.au8_DefaultGateway);
 
       orc_Text += "<tr>";
-      orc_Text += "<td width=\"40%\">" + QString(C_GtGetText::h_GetText("IP: ")) + c_IpAddress +
-                  QString(C_GtGetText::h_GetText(" (Sub-Net: ")) + c_NetMask +
-                  QString(C_GtGetText::h_GetText(", default gateway: ")) + c_DefaultGateway + ")</td>";
+      orc_Text += "<td width=\"40%\">" + static_cast<QString>(C_GtGetText::h_GetText("IP: ")) + c_IpAddress +
+                  static_cast<QString>(C_GtGetText::h_GetText(" (Sub-Net: ")) + c_NetMask +
+                  static_cast<QString>(C_GtGetText::h_GetText(", default gateway: ")) + c_DefaultGateway + ")</td>";
       orc_Text += "<td width=\"20%\">" + this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETIPADDRESS,
                                                                             orc_ServerIdOnConfiguredBus,
                                                                             orc_IntfSetting.e_InterfaceType,
@@ -1097,42 +1102,43 @@ void C_SyvDcWidget::m_ShowConfigInfoOfEthInterface(const C_OSCNodeComInterfaceSe
    \param[in]     orc_ServerIdOnUsedBus         Server ID of the node on the for the communication used interface
    \param[in]     orc_ServerIdOnConfiguredBus   Server ID of the node on the configured interface
    \param[in,out] orc_Text                      Result text for the interface
-   \param[in]     q_BusConnected                Flag if the interface is connected to a bus
-   \param[in]     q_Configured                  Flag if the interface was configured by the device configuration
+   \param[in]     oq_BusConnected               Flag if the interface is connected to a bus
+   \param[in]     oq_Configured                 Flag if the interface was configured by the device configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSettings & orc_IntfSetting,
                                                 const C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
                                                 const C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
-                                                QString & orc_Text, const bool q_BusConnected, const bool q_Configured)
+                                                QString & orc_Text, const bool oq_BusConnected,
+                                                const bool oq_Configured)
 {
-   orc_Text += QString(C_GtGetText::h_GetText("Interface: "));
+   orc_Text += static_cast<QString>(C_GtGetText::h_GetText("Interface: "));
 
    //Interface
    orc_Text += C_PuiSdUtil::h_GetInterfaceName(orc_IntfSetting.e_InterfaceType, orc_IntfSetting.u8_InterfaceNumber);
 
-   if (q_BusConnected == false)
+   if (oq_BusConnected == false)
    {
-      orc_Text += QString(C_GtGetText::h_GetText(" (skipped, not used)<br>"));
+      orc_Text += static_cast<QString>(C_GtGetText::h_GetText(" (skipped, not used)<br>"));
    }
-   else if (q_Configured == false)
+   else if (oq_Configured == false)
    {
-      orc_Text += QString(C_GtGetText::h_GetText(" (skipped, not configurable on this bus)<br>"));
+      orc_Text += static_cast<QString>(C_GtGetText::h_GetText(" (skipped, not configurable on this bus)<br>"));
    }
    else if ((this->m_AreAllInterfacesToConfigure() == false) &&
             (orc_ServerIdOnUsedBus != orc_ServerIdOnConfiguredBus))
    {
       // The interface shall not be configured, because it is not the used interface by the device configuration
       orc_Text +=
-         QString(C_GtGetText::h_GetText(
-                    " (skipped, connected to other bus. Config Mode: Only directly connected interfaces)<br>"));
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 " (skipped, connected to other bus. Config Mode: Only directly connected interfaces)<br>"));
    }
    else
    {
       // HTML row in table start (Table row)
       orc_Text += "<table width=\"100%\" style =\" margin-left:10px\">";
       orc_Text += "<tr>";
-      orc_Text += "<td width=\"40%\">" + QString(C_GtGetText::h_GetText("Node ID: ")) +
+      orc_Text += "<td width=\"40%\">" + static_cast<QString>(C_GtGetText::h_GetText("Node ID: ")) +
                   QString::number(static_cast<uint32>(orc_ServerIdOnConfiguredBus.u8_NodeIdentifier)) + "</td>";
       orc_Text += "<td width=\"20%\">" + this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETNODEID,
                                                                             orc_ServerIdOnConfiguredBus,
@@ -1223,8 +1229,8 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
             c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
             c_ConfirmationBox.SetDetails(c_Details);
             c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
-            c_ConfirmationBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                        "Power OFF all nodes manually and press \"Continue\".")));
+            c_ConfirmationBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                     "Power OFF all nodes manually and press \"Continue\".")));
             c_ConfirmationBox.SetCustomMinHeight(180, 270);
             c_ConfirmationBox.Execute();
          }
@@ -1282,10 +1288,10 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
             c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
             c_ConfirmationBox.SetDetails(c_Details);
             c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
-            c_ConfirmationBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                        "Turn ON all nodes manually, wait at least %1 "
-                                                        "second(s) due to Flashloader reset wait time"
-                                                        " and then press \"Continue\".")).
+            c_ConfirmationBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                     "Turn ON all nodes manually, wait at least %1 "
+                                                                     "second(s) due to Flashloader reset wait time"
+                                                                     " and then press \"Continue\".")).
                                              arg(u32_WaitTimeSec));
             c_ConfirmationBox.SetCustomMinHeight(200, 270);
             c_ConfirmationBox.Execute();
@@ -1507,19 +1513,19 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
             QString c_TopologyDeviceType = "NA";
 
             // Counter of devices
-            c_Text += QString("%1 %2 %3 %4<br>").arg(
-               QString(C_GtGetText::h_GetText("Device")), QString::number(u32_DeviceCounter + 1U),
-               QString(C_GtGetText::h_GetText("of")), QString::number(u32_DeviceTotal));
+            c_Text += static_cast<QString>("%1 %2 %3 %4<br>").arg(
+               static_cast<QString>(C_GtGetText::h_GetText("Device")), QString::number(u32_DeviceCounter + 1U),
+               static_cast<QString>(C_GtGetText::h_GetText("of")), QString::number(u32_DeviceTotal));
 
             // Serial number
             c_Text += "SN.: ";
             if (rc_Info.q_SerialNumberValid == true)
             {
-               c_Text += QString(C_OSCUtils::h_SerialNumberToString(&rc_Info.au8_SerialNumber[0]).c_str());
+               c_Text += static_cast<QString>(C_OSCUtils::h_SerialNumberToString(&rc_Info.au8_SerialNumber[0]).c_str());
             }
             else
             {
-               c_Text += QString(C_GtGetText::h_GetText("Not valid."));
+               c_Text += static_cast<QString>(C_GtGetText::h_GetText("Not valid."));
             }
             c_Text += "<br>";
 
@@ -1536,20 +1542,21 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
             }
 
             // Topology node name
-            c_Text += QString(C_GtGetText::h_GetText("Topology Node: ")) + c_TopologyNodeName;
+            c_Text += static_cast<QString>(C_GtGetText::h_GetText("Topology Node: ")) + c_TopologyNodeName;
 
             // Title of device type
             // HTML row in table start (Table row)
             c_Text += "<table width=\"100%\" style =\" margin-left:10px\">";
             c_Text += "<tr>";
-            c_Text += "<td width=\"40%\">" + QString(C_GtGetText::h_GetText("Get type from device")) + "</td>";
+            c_Text += "<td width=\"40%\">" + static_cast<QString>(C_GtGetText::h_GetText("Get type from device")) +
+                      "</td>";
             if (rc_Info.q_DeviceNameValid == true)
             {
-               c_Text += "<td width=\"20%\">" + QString(C_GtGetText::h_GetText("OK")) + "</td>";
+               c_Text += "<td width=\"20%\">" + static_cast<QString>(C_GtGetText::h_GetText("OK")) + "</td>";
             }
             else
             {
-               c_Text += "<td width=\"20%\">" + QString(C_GtGetText::h_GetText("NA")) + "</td>";
+               c_Text += "<td width=\"20%\">" + static_cast<QString>(C_GtGetText::h_GetText("NA")) + "</td>";
             }
             c_Text += "</tr>";
             c_Text += "</table>";
@@ -1557,14 +1564,15 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
             c_Text += "<table width=\"100%\" style =\" margin-left:20px\">";
             // Read device type
             c_Text += "<tr>";
-            c_Text += "<td width=\"40%\">" + QString(C_GtGetText::h_GetText("Read Type: ")) +
-                      QString(rc_Info.c_DeviceName.c_str()) +
+            c_Text += "<td width=\"40%\">" + static_cast<QString>(C_GtGetText::h_GetText("Read Type: ")) +
+                      static_cast<QString>(rc_Info.c_DeviceName.c_str()) +
                       "</td>";
             c_Text += "</tr>";
 
             // Expected device type
             c_Text += "<tr>";
-            c_Text += "<td width=\"40%\">" + QString(C_GtGetText::h_GetText("Expected Type: ")) + c_TopologyDeviceType +
+            c_Text += "<td width=\"40%\">" + static_cast<QString>(C_GtGetText::h_GetText("Expected Type: ")) +
+                      c_TopologyDeviceType +
                       "</td>";
             c_Text += "</tr>";
             c_Text += "</table>";
@@ -1572,14 +1580,14 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
             // Result
             c_Text += "<table width=\"100%\" style =\" margin-left:10px\">";
             c_Text += "<tr>";
-            c_Text += "<td width=\"40%\">" + QString(C_GtGetText::h_GetText("Verification")) + "</td>";
-            if (QString(rc_Info.c_DeviceName.c_str()) == c_TopologyDeviceType)
+            c_Text += "<td width=\"40%\">" + static_cast<QString>(C_GtGetText::h_GetText("Verification")) + "</td>";
+            if (static_cast<QString>(rc_Info.c_DeviceName.c_str()) == c_TopologyDeviceType)
             {
-               c_Text += "<td width=\"20%\">" + QString(C_GtGetText::h_GetText("OK")) + "</td>";
+               c_Text += "<td width=\"20%\">" + static_cast<QString>(C_GtGetText::h_GetText("OK")) + "</td>";
             }
             else
             {
-               c_Text += "<td width=\"20%\"><b>" + QString(C_GtGetText::h_GetText("FAILED")) + "</b></td>";
+               c_Text += "<td width=\"20%\"><b>" + static_cast<QString>(C_GtGetText::h_GetText("FAILED")) + "</b></td>";
             }
             c_Text += "</tr>";
 
@@ -1589,15 +1597,15 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
 
          if (os32_ActualResult != C_NO_ERR)
          {
-            c_Text += "<b>" + QString(C_GtGetText::h_GetText("Missing device(s):")) + "</b><br/>";
+            c_Text += "<b>" + static_cast<QString>(C_GtGetText::h_GetText("Missing device(s):")) + "</b><br/>";
             //Add missing STW devices
             m_HandleMissingDevices(this->mc_StwFlashloaderDeviceConfigurations, c_DeviceInfos, c_Text);
             //Add missing openSYDE devices
             m_HandleMissingDevices(this->mc_OpenSydeDeviceConfigurations, c_DeviceInfos, c_Text);
-            c_Text += QString(C_GtGetText::h_GetText("For more details see "));
+            c_Text += static_cast<QString>(C_GtGetText::h_GetText("For more details see "));
             //Update log file
             C_OSCLoggingHandler::h_Flush();
-            c_Text += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
+            c_Text += static_cast<QString>("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
                       arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                       arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                       arg(C_GtGetText::h_GetText("log file"));
@@ -1744,7 +1752,7 @@ QString C_SyvDcWidget::m_GetStateStringOfServerStep(const uint32 ou32_Step,
                                                     const uint8 ou8_InterfaceNumber)
 {
    // Default text if no concrete state is available
-   QString c_Text = QString(C_GtGetText::h_GetText("<b>Skipped</b> (prev. failure)"));
+   QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("<b>Skipped</b> (prev. failure)"));
 
    QMap<stw_opensyde_core::C_OSCProtocolDriverOsyNode, std::vector<C_ServerConfStepResult> >::const_iterator c_ItServer;
 
@@ -1764,11 +1772,11 @@ QString C_SyvDcWidget::m_GetStateStringOfServerStep(const uint32 ou32_Step,
             // State found
             if (rc_States[u32_StateCounter].s32_Result == C_NO_ERR)
             {
-               c_Text = QString(C_GtGetText::h_GetText("OK"));
+               c_Text = static_cast<QString>(C_GtGetText::h_GetText("OK"));
             }
             else
             {
-               c_Text = "<b>" + QString(C_GtGetText::h_GetText("FAILED")) + "</b>";
+               c_Text = "<b>" + static_cast<QString>(C_GtGetText::h_GetText("FAILED")) + "</b>";
             }
             break;
          }
@@ -1837,10 +1845,10 @@ void C_SyvDcWidget::m_InitScanScreen(void)
       this->mpc_Ui->pc_GroupBoxNoExistingNodes->setVisible(false);
       this->mpc_Ui->pc_ListWidgetExistingNodes->setVisible(true);
    }
-   c_Heading = QString(C_GtGetText::h_GetText("Topology Nodes (%1)")).arg(
+   c_Heading = static_cast<QString>(C_GtGetText::h_GetText("Topology Nodes (%1)")).arg(
       this->mpc_Ui->pc_ListWidgetExistingNodes->count());
    this->mpc_Ui->pc_LabelHeadingTopologyNodes->setText(c_Heading);
-   this->mpc_Ui->pc_LabelHeadingFoundDevices->setText(QString(C_GtGetText::h_GetText("Connected Devices")));
+   this->mpc_Ui->pc_LabelHeadingFoundDevices->setText(static_cast<QString>(C_GtGetText::h_GetText("Connected Devices")));
    //Progress
    this->mpc_Ui->pc_BopperleScan->SetMainBopperleColor(mc_STYLE_GUIDE_COLOR_21, mc_STYLE_GUIDE_COLOR_13);
    //Reset
@@ -1875,12 +1883,12 @@ void C_SyvDcWidget::m_InitAssignmentScreen(void) const
    QString c_Heading;
 
    this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->SetView(this->mu32_ViewIndex, true);
-   c_Heading = QString(C_GtGetText::h_GetText("Topology Nodes (%1)")).arg(
+   c_Heading = static_cast<QString>(C_GtGetText::h_GetText("Topology Nodes (%1)")).arg(
       this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->count());
    this->mpc_Ui->pc_LabelHeadingTopologyNodesAssignment->setText(c_Heading);
 
    this->mpc_Ui->pc_ListWidgetConnectedNodesAssignment->SetData(this->mc_FoundDevices);
-   c_Heading = QString(C_GtGetText::h_GetText("Connected Devices (%1)")).arg(this->mc_FoundDevices.size());
+   c_Heading = static_cast<QString>(C_GtGetText::h_GetText("Connected Devices (%1)")).arg(this->mc_FoundDevices.size());
    this->mpc_Ui->pc_LabelHeadingFoundDevicesAssignment->setText(c_Heading);
    m_AssignmentUpdateProgress();
 }
@@ -2005,7 +2013,7 @@ void C_SyvDcWidget::m_InitModeComboBox(void)
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDcWidget::m_GetComboBoxString(const uint32 ou32_Bitrate) const
 {
-   const QString c_Text = QString::number(ou32_Bitrate) + QString(" kbit/s");
+   const QString c_Text = QString::number(ou32_Bitrate) + static_cast<QString>(" kbit/s");
 
    return c_Text;
 }
@@ -2028,7 +2036,7 @@ void C_SyvDcWidget::m_OnBitRateChanged(void) const
 {
    uint32 u32_BitRate;
 
-   if (this->GetBitRateValue(u32_BitRate) == C_NO_ERR)
+   if (this->m_GetBitRateValue(u32_BitRate) == C_NO_ERR)
    {
       C_PuiSvHandler::h_GetInstance()->SetViewDeviceConfigSelectedBitRate(this->mu32_ViewIndex, u32_BitRate);
    }
@@ -2063,7 +2071,7 @@ void C_SyvDcWidget::m_OnDeviceConfigModeChanged(void) const
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcWidget::GetBitRateValue(uint32 & oru32_Value) const
+sint32 C_SyvDcWidget::m_GetBitRateValue(uint32 & oru32_Value) const
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -2117,13 +2125,14 @@ void C_SyvDcWidget::m_AssignmentUpdateProgress(void) const
 
    if (u32_AssignedItemCount == u32_OverallItemCount)
    {
-      c_Text = QString(C_GtGetText::h_GetText("All devices are assigned."));
+      c_Text = static_cast<QString>(C_GtGetText::h_GetText("All devices are assigned."));
       this->mpc_Ui->pc_PushButtonConfigure->setEnabled(true);
    }
    else
    {
-      c_Text = QString(C_GtGetText::h_GetText("Assigned Devices %1 of %2.")).arg(u32_AssignedItemCount).arg(
-         u32_OverallItemCount);
+      c_Text =
+         static_cast<QString>(C_GtGetText::h_GetText("Assigned Devices %1 of %2.")).arg(u32_AssignedItemCount).arg(
+            u32_OverallItemCount);
       this->mpc_Ui->pc_PushButtonConfigure->setEnabled(false);
    }
    this->mpc_Ui->pc_LabelAssignmentProgress->setText(c_Text);
@@ -2339,17 +2348,17 @@ void C_SyvDcWidget::m_Timer(void)
                q_ShowFinalErrorMessage = true;
                c_ErrorDescription = C_GtGetText::h_GetText("Error occurred during openSYDE device configuration.");
 
-               c_Text = QString(C_GtGetText::h_GetText("For more details see "));
+               c_Text = static_cast<QString>(C_GtGetText::h_GetText("For more details see "));
                //Update log file
                C_OSCLoggingHandler::h_Flush();
-               c_Text += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
+               c_Text += static_cast<QString>("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
                          arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                          arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                          arg(C_GtGetText::h_GetText("log file"));
                c_Text += "<br/>";
                c_Text += "<br/><br/><br/>" + mhc_REPORT_HIGHLIGHT_TAG_START;
-               c_Text += QString(C_GtGetText::h_GetText(
-                                    "Errors occurred during device configuration. Check report for details."));
+               c_Text += static_cast<QString>(C_GtGetText::h_GetText(
+                                                 "Errors occurred during device configuration. Check report for details."));
 
                c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/>";
 
@@ -2380,7 +2389,7 @@ void C_SyvDcWidget::m_Timer(void)
             {
                C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eINFORMATION);
 
-               c_Text +=  QString(C_GtGetText::h_GetText("Device Configuration successfully finished!"));
+               c_Text +=  static_cast<QString>(C_GtGetText::h_GetText("Device Configuration successfully finished!"));
                c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/><br/>";
                this->m_UpdateReportText(c_Text);
 
@@ -2395,8 +2404,8 @@ void C_SyvDcWidget::m_Timer(void)
                c_ErrorDescription = C_GtGetText::h_GetText("Error occurred during device configuration.");
 
                c_Text +=
-                  QString(C_GtGetText::h_GetText(
-                             "Errors occurred during device configuration. Check report for details."));
+                  static_cast<QString>(C_GtGetText::h_GetText(
+                                          "Errors occurred during device configuration. Check report for details."));
                c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/><br/>";
                this->m_UpdateReportText(c_Text);
             }
@@ -2468,9 +2477,9 @@ void C_SyvDcWidget::m_HandleConfigurationStarted(void)
    QString c_Temporary;
 
    c_Text = mhc_REPORT_HEADLINE_HTML_TAG_START;
-   c_Text += QString(C_GtGetText::h_GetText("Device Configuration"));
+   c_Text += static_cast<QString>(C_GtGetText::h_GetText("Device Configuration"));
    c_Text += mhc_REPORT_HEADLINE_HTML_TAG_END;
-   c_Temporary = "<p>" + QString(C_GtGetText::h_GetText("Waiting for results ...")) + "</p>";
+   c_Temporary = "<p>" + static_cast<QString>(C_GtGetText::h_GetText("Waiting for results ...")) + "</p>";
 
    this->m_UpdateReportText(c_Text, c_Temporary);
 }
@@ -2485,9 +2494,9 @@ void C_SyvDcWidget::m_HandleDeviceVerificationStart(void)
    QString c_Temporary;
 
    c_Text = mhc_REPORT_HEADLINE_HTML_TAG_START;
-   c_Text += QString(C_GtGetText::h_GetText("Device Type Verification"));
+   c_Text += static_cast<QString>(C_GtGetText::h_GetText("Device Type Verification"));
    c_Text += mhc_REPORT_HEADLINE_HTML_TAG_END;
-   c_Temporary = "<p>" + QString(C_GtGetText::h_GetText("Waiting for results ...")) + "</p>";
+   c_Temporary = "<p>" + static_cast<QString>(C_GtGetText::h_GetText("Waiting for results ...")) + "</p>";
 
    this->m_UpdateReportText(c_Text, c_Temporary);
 }
@@ -2521,8 +2530,9 @@ void C_SyvDcWidget::m_HandleMissingDevices(const std::vector<C_SyvDcDeviceConfig
       }
       if (q_Found == false)
       {
-         orc_ReportText += "<b>" + QString(C_GtGetText::h_GetText("SN.: %1")).arg(
-            QString(C_OSCUtils::h_SerialNumberToString(&rc_ExpectedDevice.au8_SerialNumber[0]).c_str())) + "</b><br/>";
+         orc_ReportText += "<b>" + static_cast<QString>(C_GtGetText::h_GetText("SN.: %1")).arg(
+            static_cast<QString>(C_OSCUtils::h_SerialNumberToString(&rc_ExpectedDevice.au8_SerialNumber[0]).c_str())) +
+                           "</b><br/>";
       }
    }
 }

@@ -104,7 +104,6 @@ void C_SebTopologyBaseScene::CheckAllItemsForChanges(void) const
    {
       if ((*c_ItItem)->type() == msn_GRAPHICS_ITEM_NODE)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          C_GiNode * const pc_Node = dynamic_cast<C_GiNode * const>(*c_ItItem);
          if (pc_Node != NULL)
          {
@@ -116,7 +115,6 @@ void C_SebTopologyBaseScene::CheckAllItemsForChanges(void) const
           ((*c_ItItem)->type() == msn_GRAPHICS_ITEM_CANBUS) ||
           ((*c_ItItem)->type() == msn_GRAPHICS_ITEM_ETHERNETBUS))
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus * const>(*c_ItItem);
          if (pc_Bus != NULL)
          {
@@ -356,9 +354,7 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
          u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSdDataElement::eBUS_CONNECTOR),
                                             u32_ItConnector);
          //Look for bus graphics item
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          pc_BusReferenced = dynamic_cast<C_GiLiBus *>(this->GetItemByID(c_CompleteBusConnectionData.u64_BusID));
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          pc_Node = dynamic_cast<C_GiNode *>(this->GetItemByID(c_CompleteBusConnectionData.u64_NodeID));
          if ((pc_Node != NULL) && ((pc_BusReferenced != NULL) &&
                                    (c_CompleteBusConnectionData.c_UIData.c_UINodeConnectionInteractionPoints.size() >
@@ -618,7 +614,6 @@ void C_SebTopologyBaseScene::m_AddBusConnectorBaseToScene(C_GiLiBusConnectorBase
 {
    if (opc_BusConnectorGraphicsItem != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_SebUnoTopBaseManager * const pc_UndoManager = dynamic_cast<C_SebUnoTopBaseManager *>(this->m_GetUndoManager());
       // Connections
       connect(opc_BusConnectorGraphicsItem, &C_GiLiBusConnector::SigHideToolTip, this,
@@ -645,7 +640,6 @@ void C_SebTopologyBaseScene::m_AddBusConnectorBaseToScene(C_GiLiBusConnectorBase
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_InitSceneUndoManager(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_SebUnoTopBaseManager * const pc_UndoManager = dynamic_cast<C_SebUnoTopBaseManager *>(this->m_GetUndoManager());
 
    if (pc_UndoManager != NULL)
@@ -667,8 +661,6 @@ void C_SebTopologyBaseScene::m_RestoreCursors(void) const
 
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
       C_GiBiCustomMouseItem * const pc_Item = dynamic_cast<C_GiBiCustomMouseItem *>(*c_ItItem);
       if (pc_Item != NULL)
       {
@@ -689,7 +681,6 @@ void C_SebTopologyBaseScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc
 {
    QGraphicsItem * const pc_Item = this->itemAt(opc_Event->scenePos(), QTransform());
    QGraphicsItem * const pc_ItemParent = C_SebUtil::h_GetHighestParent(pc_Item);
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiTextElementBus * const pc_BusText = dynamic_cast<C_GiTextElementBus * const>(pc_ItemParent);
 
    if (pc_BusText != NULL)

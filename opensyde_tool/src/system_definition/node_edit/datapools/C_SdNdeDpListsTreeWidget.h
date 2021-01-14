@@ -78,14 +78,11 @@ Q_SIGNALS:
    void SigSaveAs(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void dropEvent(QDropEvent * const opc_Event) override;
    virtual void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
    virtual void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
    virtual void selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager mc_UndoManager;

@@ -30,13 +30,14 @@ class C_SdBueUnoMessageBaseCommand :
    public QUndoCommand
 {
 public:
-   C_SdBueUnoMessageBaseCommand(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
-                                stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
-                                const QString & orc_Text = "", QUndoCommand * const opc_Parent = NULL);
+   C_SdBueUnoMessageBaseCommand(
+      const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageId,
+      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+      stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
+      const QString & orc_Text = "", QUndoCommand * const opc_Parent = NULL);
 
 protected:
-   stw_types::uint64 mu64_UniqueId;
+   std::vector<stw_types::uint64> mc_UniqueId;
    C_PuiSdNodeCanMessageSyncManager * const mpc_MessageSyncManager;
    stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const mpc_MessageTreeWidget;
 };

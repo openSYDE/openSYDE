@@ -142,8 +142,7 @@ void C_SyvDaItChartDataSelectorWidget::AddDataSerie(const stw_types::uint32 ou32
       this->m_DataItemSelected(ou32_DataPoolElementConfigIndex);
    }
 
-   //lint -e{429}  no memory leak because of the parent of pc_DataSerieItem and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_DataSerieItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Removes the current data serie

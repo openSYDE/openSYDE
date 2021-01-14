@@ -37,11 +37,11 @@ public:
                                               QUndoCommand * const opc_Parent = NULL);
 
 protected:
-   void Add(void);
-   void Delete(void);
-   void SetIndices(const std::vector<stw_types::uint32> & orc_Value);
-   void SetInitialData(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolList> & orc_OSCContent,
-                       const std::vector<C_PuiSdNodeDataPoolList> & orc_UIContent);
+   void m_Add(void);
+   void m_Delete(void);
+   void m_SetIndices(const std::vector<stw_types::uint32> & orc_Value);
+   void m_SetInitialData(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolList> & orc_OSCContent,
+                         const std::vector<C_PuiSdNodeDataPoolList> & orc_UIContent);
 
 private:
    std::vector<stw_types::uint32> mc_Indices;

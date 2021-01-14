@@ -100,13 +100,13 @@ bool C_SdNdeUnoDataPoolListPasteCommand::InitialSetup(const uint32 & oru32_First
                   {
                      c_Indices.push_back(oru32_FirstIndex + u32_NewIndices);
                   }
-                  this->SetIndices(c_Indices);
-                  this->SetInitialData(c_OSCContent, c_UIContent);
+                  this->m_SetIndices(c_Indices);
+                  this->m_SetInitialData(c_OSCContent, c_UIContent);
                }
                else
                {
                   C_OgeWiCustomMessage c_MessageBox(this->mpc_DataPoolListsTreeWidget);
-                  c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Only %1 lists allowed per Datapool.")).
+                  c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Only %1 lists allowed per Datapool.")).
                                               arg(mu32_NODE_DATA_POOL_LIST_MAX));
                   c_MessageBox.SetCustomMinHeight(180, 180);
                   c_MessageBox.Execute();
@@ -137,7 +137,7 @@ bool C_SdNdeUnoDataPoolListPasteCommand::InitialSetup(const uint32 & oru32_First
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListPasteCommand::redo(void)
 {
-   this->Add();
+   this->m_Add();
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand::redo();
 }
 
@@ -148,5 +148,5 @@ void C_SdNdeUnoDataPoolListPasteCommand::redo(void)
 void C_SdNdeUnoDataPoolListPasteCommand::undo(void)
 {
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand::undo();
-   this->Delete();
+   this->m_Delete();
 }

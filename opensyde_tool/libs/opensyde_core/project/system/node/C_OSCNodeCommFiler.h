@@ -76,8 +76,8 @@ private:
                                                             C_OSCCanSignal::E_MultiplexerType & ore_Type);
    static stw_scl::C_SCLString mh_NodeComMessageTxMethodToString(
       const C_OSCCanMessage::E_TxMethodType & ore_NodeComMessageTxMethod);
-   static stw_types::sint32 mh_StringToNodeComMessageTxMethod(const stw_scl::C_SCLString & orc_String,
-                                                              C_OSCCanMessage::E_TxMethodType & ore_Type);
+   static void mh_StringToNodeComMessageTxMethod(const stw_scl::C_SCLString & orc_String,
+                                                 C_OSCCanMessage::E_TxMethodType & ore_Type);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

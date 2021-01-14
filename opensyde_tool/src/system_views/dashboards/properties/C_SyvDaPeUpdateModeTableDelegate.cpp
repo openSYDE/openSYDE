@@ -78,7 +78,7 @@ QWidget * C_SyvDaPeUpdateModeTableDelegate::createEditor(QWidget * const opc_Par
       const C_PuiSvData * pc_View;
       const C_SyvDaPeUpdateModeTableModel::E_Columns e_Col = C_SyvDaPeUpdateModeTableModel::h_ColumnToEnum(
          orc_Index.column());
-      switch (e_Col)
+      switch (e_Col) //lint !e788 //not all columns need an editor
       {
       case C_SyvDaPeUpdateModeTableModel::eTRANSMISSION_MODE:
          pc_ComboBox = new C_OgeCbxTable(opc_Parent);
@@ -95,9 +95,12 @@ QWidget * C_SyvDaPeUpdateModeTableDelegate::createEditor(QWidget * const opc_Par
          {
             pc_ComboBox = new C_OgeCbxTable(opc_Parent);
             //Init
-            pc_ComboBox->addItem(QString(C_GtGetText::h_GetText("Fast (%1 ms)")).arg(pc_View->GetUpdateRateFast()));
-            pc_ComboBox->addItem(QString(C_GtGetText::h_GetText("Medium (%1 ms)")).arg(pc_View->GetUpdateRateMedium()));
-            pc_ComboBox->addItem(QString(C_GtGetText::h_GetText("Slow (%1 ms)")).arg(pc_View->GetUpdateRateSlow()));
+            pc_ComboBox->addItem(static_cast<QString>(C_GtGetText::h_GetText("Fast (%1 ms)")).arg(pc_View->
+                                                                                                  GetUpdateRateFast()));
+            pc_ComboBox->addItem(static_cast<QString>(C_GtGetText::h_GetText("Medium (%1 ms)")).arg(pc_View->
+                                                                                                    GetUpdateRateMedium()));
+            pc_ComboBox->addItem(static_cast<QString>(C_GtGetText::h_GetText("Slow (%1 ms)")).arg(pc_View->
+                                                                                                  GetUpdateRateSlow()));
             pc_ComboBox->ResizeViewToContents();
             pc_Retval = pc_ComboBox;
          }
@@ -165,15 +168,15 @@ void C_SyvDaPeUpdateModeTableDelegate::setEditorData(QWidget * const opc_Editor,
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QDoubleSpinBox * const pc_DoubleSpinBox = dynamic_cast<QDoubleSpinBox * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_OgeSpxInt64 * const pc_Int64SpinBox = dynamic_cast<C_OgeSpxInt64 * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QComboBox * const pc_ComboBox = dynamic_cast<QComboBox * const>(opc_Editor);
       const C_SyvDaPeUpdateModeTableModel::E_Columns e_Col = C_SyvDaPeUpdateModeTableModel::h_ColumnToEnum(
          orc_Index.column());
-      switch (e_Col)
+      switch (e_Col)  //lint !e788 //not all columns handled on purpose
       {
       case C_SyvDaPeUpdateModeTableModel::eTRANSMISSION_MODE:
       case C_SyvDaPeUpdateModeTableModel::eCYCLIC_INTERVAL:
@@ -186,7 +189,7 @@ void C_SyvDaPeUpdateModeTableDelegate::setEditorData(QWidget * const opc_Editor,
          if (pc_DoubleSpinBox != NULL)
          {
             const QVariant c_Data = orc_Index.data(static_cast<sintn>(Qt::EditRole));
-            switch (c_Data.type())
+            switch (c_Data.type()) //lint !e788 //not all types required
             {
             case QVariant::Double:
                pc_DoubleSpinBox->setValue(c_Data.toDouble());
@@ -234,15 +237,15 @@ void C_SyvDaPeUpdateModeTableDelegate::setModelData(QWidget * const opc_Editor, 
 {
    if (((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QDoubleSpinBox * const pc_DoubleSpinBox = dynamic_cast<QDoubleSpinBox * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_OgeSpxInt64Factor * const pc_Int64SpinBox = dynamic_cast<C_OgeSpxInt64Factor * const>(opc_Editor);
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       QComboBox * const pc_ComboBox = dynamic_cast<QComboBox * const>(opc_Editor);
       const C_SyvDaPeUpdateModeTableModel::E_Columns e_Col = C_SyvDaPeUpdateModeTableModel::h_ColumnToEnum(
          orc_Index.column());
-      switch (e_Col)
+      switch (e_Col) //lint !e788 //not all columns handled on purpose
       {
       case C_SyvDaPeUpdateModeTableModel::eTRANSMISSION_MODE:
       case C_SyvDaPeUpdateModeTableModel::eCYCLIC_INTERVAL:

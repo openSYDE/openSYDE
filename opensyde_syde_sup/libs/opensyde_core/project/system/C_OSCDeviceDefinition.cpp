@@ -13,6 +13,8 @@
 #include "precomp_headers.h"
 
 #include "C_OSCDeviceDefinition.h"
+#include "CSCLString.h"
+#include "TGLUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
@@ -79,6 +81,7 @@ void C_OSCDeviceDefinition::Clear(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+
 bool C_OSCDeviceDefinition::IsUpdateAvailable(const C_OSCSystemBus::E_Type oe_Type) const
 {
    bool q_Retval = false;
@@ -106,11 +109,14 @@ bool C_OSCDeviceDefinition::IsUpdateAvailable(const C_OSCSystemBus::E_Type oe_Ty
          q_Retval = false;
       }
       break;
+   default:
+      break;
    }
    return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+
 bool C_OSCDeviceDefinition::IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_Type) const
 {
    bool q_Retval = false;
@@ -137,10 +143,13 @@ bool C_OSCDeviceDefinition::IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_T
          q_Retval = false;
       }
       break;
+   default:
+      break;
    }
    return q_Retval;
 }
 //----------------------------------------------------------------------------------------------------------------------
+
 bool C_OSCDeviceDefinition::IsDiagnosisAvailable(const C_OSCSystemBus::E_Type oe_Type) const
 {
    bool q_Retval = false;
@@ -166,6 +175,8 @@ bool C_OSCDeviceDefinition::IsDiagnosisAvailable(const C_OSCSystemBus::E_Type oe
       {
          q_Retval = false;
       }
+      break;
+   default:
       break;
    }
    return q_Retval;

@@ -22,6 +22,8 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
+#include <map>
+
 #include "stwtypes.h"
 #include "C_OSCProtocolDriverOsyTpBase.h"
 #include "stw_can.h" //for CAN message type
@@ -58,6 +60,9 @@ private:
    //maximum service size including header (used in WriteMemoryByAddress):
    stw_types::uint16 mu16_MaxServiceSize;
 
+   std::map<stw_types::uint8, stw_types::uint8> mc_DataPoolMappingClientToServer;
+   std::map<stw_types::uint8, stw_types::uint8> mc_DataPoolMappingServerToClient;
+
    void m_LogServiceError(const stw_scl::C_SCLString & orc_Service, const stw_types::sint32 os32_ReturnCode,
                           const stw_types::uint8 ou8_NrCode) const;
 
@@ -84,9 +89,8 @@ private:
                                               const stw_types::uint16 ou16_ListIndex,
                                               const stw_types::uint16 ou16_ElementIndex,
                                               stw_types::uint8(&orau8_PackedId)[3]) const;
-   static void mh_UnpackDataPoolIdentifier(const stw_types::uint8(&orau8_PackedId)[3],
-                                           stw_types::uint8 & oru8_DataPoolIndex, stw_types::uint16 & oru16_ListIndex,
-                                           stw_types::uint16 & oru16_ElementIndex);
+   void m_UnpackDataPoolIdentifier(const stw_types::uint8(&orau8_PackedId)[3], stw_types::uint8 & oru8_DataPoolIndex,
+                                   stw_types::uint16 & oru16_ListIndex, stw_types::uint16 & oru16_ElementIndex) const;
    stw_types::sint32 m_RoutineControl(const stw_types::uint16 ou16_RoutineIdentifier,
                                       const stw_types::uint8 ou8_SubFunction,
                                       const std::vector<stw_types::uint8> & orc_SendData,
@@ -104,6 +108,9 @@ private:
    stw_types::sint32 m_HandleAsyncOsyReadDataPoolDataErrorEvent(
       const C_OSCProtocolDriverOsyService & orc_ReceivedService);
    stw_types::sint32 m_HandleAsyncOsyTunnelCanMessagesEvent(const C_OSCProtocolDriverOsyService & orc_ReceivedService);
+
+   stw_types::uint8 m_GetDataPoolIndexClientToServer(const stw_types::uint8 ou8_ClientDataPoolIndex) const;
+   stw_types::uint8 m_GetDataPoolIndexServerToClient(const stw_types::uint8 ou8_ServerDataPoolIndex) const;
 
    static void mh_ConvertVariableToNecessaryBytes(const stw_types::uint32 ou32_Variable,
                                                   std::vector<stw_types::uint8> & orc_Bytes);
@@ -264,6 +271,9 @@ public:
 
    C_OSCProtocolDriverOsyTpBase * GetTransportProtocol(void);
    void GetNodeIdentifiers(C_OSCProtocolDriverOsyNode & orc_ClientId, C_OSCProtocolDriverOsyNode & orc_ServerId) const;
+
+   void RegisterDataPoolMapping(const std::map<stw_types::uint8, stw_types::uint8> & orc_Mapping);
+   void ClearDataPoolMapping(void);
 
    static stw_scl::C_SCLString h_GetOpenSydeServiceErrorDetails(const stw_types::sint32 os32_FunctionResult,
                                                                 const stw_types::uint8 ou8_NrCode,

@@ -63,7 +63,7 @@ public:
                                 const C_PuiSvDbDataElementContent & orc_NewValue);
    void AddNewNvmValueIntoQueue(const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId,
                                 const C_PuiSvDbDataElementContent & orc_NewValue);
-   QString GetUnscaledValueAsScaledString(const stw_types::float64 f64_Value,
+   QString GetUnscaledValueAsScaledString(const stw_types::float64 of64_Value,
                                           const stw_types::uint32 ou32_IndexElement = 0UL) const;
    QString GetUnscaledValueInRangeAsScaledString(const stw_types::float64 of64_Value,
                                                  const stw_types::uint32 ou32_IndexElement = 0UL, stw_types::float64 * const opf64_Progress =
@@ -91,7 +91,7 @@ protected:
 
    virtual void m_DataPoolElementsChanged(void);
 
-   const QMap<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32> & GetMappingDpElementToDataSerie(void) const;
+   const QMap<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32> & m_GetMappingDpElementToDataSerie(void) const;
 
    const bool mq_ReadItem;
 

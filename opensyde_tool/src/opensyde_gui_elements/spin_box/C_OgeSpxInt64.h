@@ -42,11 +42,8 @@ public:
    QVariant GetMaximum(void) const;
    stw_types::uint64 GetStepWidth(void) const;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void stepBy(const stw_types::sintn osn_Steps) override;
-   virtual QValidator::State validate(QString & orc_Input, stw_types::sintn & orc_Pos) const override;
-   //lint -restore
+   virtual QValidator::State validate(QString & orc_Input, stw_types::sintn & orsn_Pos) const override;
 
    void SetIsUnsigned(const bool & orq_Value);
 
@@ -59,10 +56,7 @@ Q_SIGNALS:
    void SigMinMaxChanged(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual StepEnabled stepEnabled(void) const override;
-   //lint -restore
 
    QString m_PrepareSpinBoxValue(const QString & orc_Text) const;
    QString m_ExtractSpinBoxValue(const QString & orc_Text) const;

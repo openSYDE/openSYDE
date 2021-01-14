@@ -91,9 +91,9 @@ C_CamGenSigTableView::C_CamGenSigTableView(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} never took ownership of any button
 C_CamGenSigTableView::~C_CamGenSigTableView(void)
 {
-   //lint -e{1540} never took ownership of any button
 }
 
 //----------------------------------------------------------------------------------------------------------------------

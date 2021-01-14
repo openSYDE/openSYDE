@@ -59,7 +59,8 @@ void C_OSCXMLParserBase::m_Init(void)
    if (mc_Document.RootElement() == NULL)
    {
       //create header:
-      tinyxml2::XMLDeclaration * pc_Declaration = mc_Document.NewDeclaration("xml version=\"1.0\" encoding=\"utf-8\"");
+      tinyxml2::XMLDeclaration * const pc_Declaration = mc_Document.NewDeclaration(
+         "xml version=\"1.0\" encoding=\"utf-8\"");
       mc_Document.InsertFirstChild(pc_Declaration);
    }
 }
@@ -144,7 +145,8 @@ sint32 C_OSCXMLParser::SaveToFile(const C_SCLString & orc_FileName)
 {
    sint32 s32_Return = C_NO_ERR;
 
-   tinyxml2::XMLError e_Error = mc_Document.SaveFile(orc_FileName.c_str());
+   const tinyxml2::XMLError e_Error = mc_Document.SaveFile(orc_FileName.c_str());
+
    if (e_Error != tinyxml2::XML_SUCCESS)
    {
       s32_Return = C_NOACT;
@@ -189,7 +191,7 @@ C_SCLString C_OSCXMLParserBase::SelectNodeNext(const C_SCLString & orc_Name)
 {
    C_SCLString c_Name;
 
-   tinyxml2::XMLElement * pc_Save = mpc_CurrentNode;
+   tinyxml2::XMLElement * const pc_Save = mpc_CurrentNode;
 
    if (mpc_CurrentNode != NULL)
    {
@@ -480,7 +482,7 @@ bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name) const
 
    if (mpc_CurrentNode != NULL)
    {
-      tinyxml2::XMLError e_Error = mpc_CurrentNode->QueryBoolAttribute(orc_Name.c_str(), &q_Value);
+      const tinyxml2::XMLError e_Error = mpc_CurrentNode->QueryBoolAttribute(orc_Name.c_str(), &q_Value);
       if (e_Error != tinyxml2::XML_SUCCESS)
       {
          q_Value = false;
@@ -506,7 +508,7 @@ float32 C_OSCXMLParserBase::GetAttributeFloat32(const C_SCLString & orc_Name) co
 
    if (mpc_CurrentNode != NULL)
    {
-      tinyxml2::XMLError e_Error = mpc_CurrentNode->QueryFloatAttribute(orc_Name.c_str(), &f32_Value);
+      const tinyxml2::XMLError e_Error = mpc_CurrentNode->QueryFloatAttribute(orc_Name.c_str(), &f32_Value);
       if (e_Error != tinyxml2::XML_SUCCESS)
       {
          f32_Value = 0.0F;
@@ -532,7 +534,7 @@ float64 C_OSCXMLParserBase::GetAttributeFloat64(const C_SCLString & orc_Name) co
 
    if (mpc_CurrentNode != NULL)
    {
-      tinyxml2::XMLError e_Error = mpc_CurrentNode->QueryDoubleAttribute(orc_Name.c_str(), &f64_Value);
+      const tinyxml2::XMLError e_Error = mpc_CurrentNode->QueryDoubleAttribute(orc_Name.c_str(), &f64_Value);
       if (e_Error != tinyxml2::XML_SUCCESS)
       {
          f64_Value = 0.0;
@@ -736,7 +738,6 @@ void C_OSCXMLParserBase::SetAttributeSint64(const C_SCLString & orc_Name, const 
 {
    if (mpc_CurrentNode != NULL)
    {
-      //lint -e{970} // Interface expects specific type and using sint64 caused compiler warnings with some compilers
       mpc_CurrentNode->SetAttribute(orc_Name.c_str(), static_cast<int64_t>(os64_Value));
    }
 }
@@ -851,5 +852,5 @@ void C_OSCXMLParserString::SaveToString(C_SCLString & orc_String) const
 {
    tinyxml2::XMLPrinter c_Printer;
    this->mc_Document.Print(&c_Printer);
-   orc_String = C_SCLString(c_Printer.CStr());
+   orc_String = static_cast<C_SCLString>(c_Printer.CStr());
 }

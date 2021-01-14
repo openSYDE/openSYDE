@@ -67,7 +67,7 @@ void C_PuiSvDbWidgetBase::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current index for specifed element ID
+/*! \brief   Get current index for specified element ID
 
    \param[in]  orc_Id      Data element id
    \param[out] oru32_Index Data element index

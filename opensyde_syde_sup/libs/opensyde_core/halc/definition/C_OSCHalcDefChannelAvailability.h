@@ -23,6 +23,7 @@ class C_OSCHalcDefChannelAvailability
 {
 public:
    C_OSCHalcDefChannelAvailability(void);
+   virtual ~C_OSCHalcDefChannelAvailability();
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 

@@ -75,7 +75,7 @@ public:
       eERR_UNKNOWN                     = 100
    };
 
-   E_Result ParseCommandLine(const stw_types::sintn osn_Argc, stw_types::charn * const oapcn_Argv[]);
+   E_Result ParseCommandLine(const stw_types::sintn osn_Argc, stw_types::charn * const * const oppcn_Argv);
    E_Result Update(void) const;
    static void h_WriteLog(const stw_scl::C_SCLString & orc_Activity, const stw_scl::C_SCLString & orc_Text,
                           const bool & orq_IsError = false, const bool & orq_Quiet = false);

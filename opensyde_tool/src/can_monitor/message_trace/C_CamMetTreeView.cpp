@@ -14,6 +14,7 @@
 
 #include <QScrollBar>
 #include <QHeaderView>
+#include <QApplication>
 
 #include "stwerrors.h"
 #include "constants.h"
@@ -34,7 +35,7 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-//lint -e{970,909,923,1960} Required Qt interface
+//lint -emacro(*,Q_DECLARE_METATYPE)   //macro provided by Qt library; nothing we can do about messages
 Q_DECLARE_METATYPE(C_CamMetTreeLoggerData)
 
 const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_TIME_STAMP = 150;
@@ -333,7 +334,7 @@ void C_CamMetTreeView::SetTraceBufferSize(const uint32 ou32_Value)
    false    Displaying decimal
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamMetTreeView::GetDisplayAsHex()
+bool C_CamMetTreeView::GetDisplayAsHex() const
 {
    return this->mc_Model.GetDisplayAsHex();
 }
@@ -346,7 +347,7 @@ bool C_CamMetTreeView::GetDisplayAsHex()
    false    Displaying absolute timestamp
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamMetTreeView::GetDisplayTimestampRelative()
+bool C_CamMetTreeView::GetDisplayTimestampRelative() const
 {
    return this->mc_Model.GetDisplayTimestampRelative();
 }
@@ -692,7 +693,7 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
    Width of column in pixel
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamMetTreeView::sizeHintForColumn(sintn osn_Column) const
+sintn C_CamMetTreeView::sizeHintForColumn(const sintn osn_Column) const
 {
    sintn sn_Size;
    static const sintn hasn_Sizes[C_CamMetTreeModel::eCAN_COUNTER + 1] =

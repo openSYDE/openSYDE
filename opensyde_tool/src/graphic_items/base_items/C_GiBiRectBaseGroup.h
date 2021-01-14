@@ -50,12 +50,9 @@ public:
    virtual void SetTemporaryCursor(const QCursor & orc_TemporaryCursor) override;
    virtual void SetDefaultCursor(const QCursor & orc_Value) override;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
-   //lint -save -e1960 -e1735
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget = NULL) override;
-   //lint -restore
+
    virtual QRectF boundingRect() const;
    QRectF GetVisibleBoundingRect() const;
    virtual void FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const override;
@@ -82,15 +79,12 @@ Q_SIGNALS:
                           const QSizeF & orc_NewSize);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QVariant itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value) override;
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
 
    virtual bool sceneEventFilter(QGraphicsItem * const opc_Watched, QEvent * const opc_Event) override;
-   //lint -restore
 
    void m_SetBiggestItem(C_GiBiSizeableItem & orc_Item);
    virtual void m_ResizeUpdateItems(const stw_types::float64 of64_DiffWidth,
@@ -104,7 +98,7 @@ protected:
 private:
    //Avoid call
    C_GiBiRectBaseGroup(const C_GiBiRectBaseGroup &);
-   C_GiBiRectBaseGroup & operator =(const C_GiBiRectBaseGroup &);
+   C_GiBiRectBaseGroup & operator =(const C_GiBiRectBaseGroup &); //lint !e1511 //we want to hide the base func.
 
    void m_InitActionPoints(void);
    void m_UpdateActionPoints(void);

@@ -211,10 +211,10 @@ C_SyvUpUpdateWidget::~C_SyvUpUpdateWidget()
 void C_SyvUpUpdateWidget::InitText(void) const
 {
    // button text
-   this->mpc_Ui->pc_PbUpdate->setText(QString(C_GtGetText::h_GetText("Update System")));
-   this->mpc_Ui->pc_PbConnect->setText(QString(C_GtGetText::h_GetText("Enter Update Mode")));
-   this->mpc_Ui->pc_PbDisconnnect->setText(QString(C_GtGetText::h_GetText("Exit Update Mode")));
-   this->mpc_Ui->pc_PbCancel->setText(QString(C_GtGetText::h_GetText("Abort System Update")));
+   this->mpc_Ui->pc_PbUpdate->setText(static_cast<QString>(C_GtGetText::h_GetText("Update System")));
+   this->mpc_Ui->pc_PbConnect->setText(static_cast<QString>(C_GtGetText::h_GetText("Enter Update Mode")));
+   this->mpc_Ui->pc_PbDisconnnect->setText(static_cast<QString>(C_GtGetText::h_GetText("Exit Update Mode")));
+   this->mpc_Ui->pc_PbCancel->setText(static_cast<QString>(C_GtGetText::h_GetText("Abort System Update")));
 
    // tooltips
    this->mpc_Ui->pc_PbUpdate->SetToolTipInformation(C_GtGetText::h_GetText("Update System"),
@@ -546,64 +546,65 @@ sint32 C_SyvUpUpdateWidget::m_InitSequence(void)
    case C_NO_ERR:
       break;
    case C_CONFIG:
-      c_Message = QString(C_GtGetText::h_GetText("Invalid SYSTEM DEFINITION/View configuration."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Invalid SYSTEM DEFINITION/View configuration."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_RD_WR:
       c_Message =
-         QString(C_GtGetText::h_GetText("Configured communication DLL does not exist or DLL could not be opened."));
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "Configured communication DLL does not exist or DLL could not be opened."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_OVERFLOW:
       c_Message =
-         QString(C_GtGetText::h_GetText(
-                    "Unknown transport protocol or unknown diagnostic server for at least one node."));
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "Unknown transport protocol or unknown diagnostic server for at least one node."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_NOACT:
-      c_Message = QString(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_COM:
       if (q_IsEthernet)
       {
          c_Message =
-            QString(C_GtGetText::h_GetText(
-                       "Ethernet initialization failed. Check your Ethernet adapter settings in Windows system network configuration."));
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "Ethernet initialization failed. Check your Ethernet adapter settings in Windows system network configuration."));
          c_MessageBox.SetCustomMinHeight(180, 180);
       }
       else
       {
          c_Message =
-            QString(C_GtGetText::h_GetText(
-                       "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
-                       "double-click on PC)."));
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
+                                    "double-click on PC)."));
          c_MessageBox.SetCustomMinHeight(200, 200);
       }
       break;
    case C_CHECKSUM:
-      c_Message = QString(C_GtGetText::h_GetText("Internal buffer overflow detected."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Internal buffer overflow detected."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_RANGE:
-      c_Message = QString(C_GtGetText::h_GetText("Routing configuration failed."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Routing configuration failed."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_UNKNOWN_ERR:
-      c_Message = QString(C_GtGetText::h_GetText("Wrapped error of internal function call."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Wrapped error of internal function call."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_WARN:
-      c_Message = QString(C_GtGetText::h_GetText("Internal error."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Internal error."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_BUSY:
-      c_Message = QString(C_GtGetText::h_GetText(
-                             "System View is invalid. Action cannot be performed. Fix the issues and retry."));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText(
+                                          "System View is invalid. Action cannot be performed. Fix the issues and retry."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    default:
-      c_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    }
@@ -649,7 +650,7 @@ void C_SyvUpUpdateWidget::m_CleanUpSequence(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the state of the buttons depending on the update package and the view error state
 
-   \param[in]       os32_State     State of update package
+   \param[in]  os32_State  State of update package
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_UpdatePackageState(const sint32 os32_State)
@@ -769,7 +770,7 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
             const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
             if (pc_Node != NULL)
             {
-               const QString c_Text = QString(C_GtGetText::h_GetText("Update %1...")).arg(
+               const QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("Update %1...")).arg(
                   pc_Node->c_Properties.c_Name.c_str());
                this->mpc_ProgressLogContent->AddEntry(u32_NodeIndex, c_Text, true);
             }
@@ -846,7 +847,7 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
       }
       else if (this->me_Step == C_SyvUpSequences::eUPDATE_SYSTEM)
       {
-         switch (e_Step)
+         switch (e_Step) //lint !e788 //we do not handle all steps here
          {
          case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START: // The normal flash progress
          case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START:     // The normal flash progress
@@ -889,88 +890,97 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
       {
          const C_OSCSuSequences::C_OsyDeviceInformation & rc_Info = c_DeviceInformation[u32_Counter];
 
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText(
-                                             "openSYDE device information found for node with index %1")).arg(
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "openSYDE device information found for node with index %1")).arg(
                                      c_NodeIndexes
                                      [
                                         u32_Counter
                                      ]));
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Device name: %1")).arg(rc_Info.c_DeviceName.c_str()));
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Number of applications: %1")).arg(rc_Info.
-                                                                                                    c_Applications.
-                                                                                                    size()));
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Device name: %1")).arg(rc_Info.
+                                                                                                      c_DeviceName.c_str()));
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Number of applications: %1")).arg(rc_Info
+                                                                                                                 .
+                                                                                                                 c_Applications
+                                                                                                                 .
+                                                                                                                 size()));
 
          for (uint8 u8_Application = 0U; u8_Application < rc_Info.c_Applications.size(); u8_Application++)
          {
             this->m_UpdateReportText(
-               QString(C_GtGetText::h_GetText("Application %1")).arg(static_cast<uint32>(u8_Application)));
+               static_cast<QString>(C_GtGetText::h_GetText("Application %1")).arg(static_cast<uint32>(u8_Application)));
             this->m_UpdateReportText(
-               QString(C_GtGetText::h_GetText(" Name: %1")).arg(
+               static_cast<QString>(C_GtGetText::h_GetText(" Name: %1")).arg(
                   rc_Info.c_Applications[u8_Application].c_ApplicationName.c_str()));
             this->m_UpdateReportText(
-               QString(C_GtGetText::h_GetText(" Version: %1")).arg(
+               static_cast<QString>(C_GtGetText::h_GetText(" Version: %1")).arg(
                   rc_Info.c_Applications[u8_Application].c_ApplicationVersion.c_str()));
             this->m_UpdateReportText(
-               QString(C_GtGetText::h_GetText(" Build date: %1")).arg(
+               static_cast<QString>(C_GtGetText::h_GetText(" Build date: %1")).arg(
                   rc_Info.c_Applications[u8_Application].c_BuildDate.c_str()));
             this->m_UpdateReportText(
-               QString(C_GtGetText::h_GetText(" Build time: %1")).arg(
+               static_cast<QString>(C_GtGetText::h_GetText(" Build time: %1")).arg(
                   rc_Info.c_Applications[u8_Application].c_BuildTime.c_str()));
             this->m_UpdateReportText(
-               QString(C_GtGetText::h_GetText(" Block start address: 0x%1")).arg(
+               static_cast<QString>(C_GtGetText::h_GetText(" Block start address: 0x%1")).arg(
                   QString::number(rc_Info.c_Applications[u8_Application].u32_BlockStartAddress, 16).rightJustified(
                      8, '0')));
             this->m_UpdateReportText(
-               QString(C_GtGetText::h_GetText(" Block end address: 0x%1")).arg(
+               static_cast<QString>(C_GtGetText::h_GetText(" Block end address: 0x%1")).arg(
                   QString::number(rc_Info.c_Applications[u8_Application].u32_BlockEndAddress, 16).rightJustified(
                      8, '0')));
             this->m_UpdateReportText(
-               QString(C_GtGetText::h_GetText(" Signature valid: %1")).arg((rc_Info.c_Applications[u8_Application].
-                                                                            u8_SignatureValid == 0) ? "yes" : "no"));
-            this->m_UpdateReportText(QString(C_GtGetText::h_GetText(" Additional information: %1")).arg(
+               static_cast<QString>(C_GtGetText::h_GetText(" Signature valid: %1")).arg((rc_Info.c_Applications[
+                                                                                            u8_Application].
+                                                                                         u8_SignatureValid ==
+                                                                                         0) ? "yes" : "no"));
+            this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(" Additional information: %1")).arg(
                                         rc_Info.c_Applications[u8_Application].c_AdditionalInformation.c_str()));
          }
 
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Flashloader software version: V%1.%2r%3")).arg(
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Flashloader software version: V%1.%2r%3")).arg(
                                      QString::number(rc_Info.c_MoreInformation.au8_FlashloaderSoftwareVersion[0]).
                                      rightJustified(2, '0'),
                                      QString::number(rc_Info.c_MoreInformation.au8_FlashloaderSoftwareVersion[1]).
                                      rightJustified(2, '0'),
                                      QString::number(rc_Info.c_MoreInformation.au8_FlashloaderSoftwareVersion[2]).
                                      rightJustified(2, '0')));
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Flashloader protocol version: V%1.%2r%3")).arg(
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Flashloader protocol version: V%1.%2r%3")).arg(
                                      QString::number(rc_Info.c_MoreInformation.au8_FlashloaderProtocolVersion[1]).
                                      rightJustified(2, '0'),
                                      QString::number(rc_Info.c_MoreInformation.au8_FlashloaderProtocolVersion[1]).
                                      rightJustified(2, '0'),
                                      QString::number(rc_Info.c_MoreInformation.au8_FlashloaderProtocolVersion[2]).
                                      rightJustified(2, '0')));
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Protocol version: V%1.%2r%3")).arg(
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Protocol version: V%1.%2r%3")).arg(
                                      QString::number(rc_Info.c_MoreInformation.au8_ProtocolVersion[0]).rightJustified(2,
                                                                                                                       '0'),
                                      QString::number(rc_Info.c_MoreInformation.au8_ProtocolVersion[1]).rightJustified(2,
                                                                                                                       '0'),
                                      QString::number(rc_Info.c_MoreInformation.au8_ProtocolVersion[2]).rightJustified(2,
                                                                                                                       '0')));
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Flash count: %1")).arg(rc_Info.c_MoreInformation.
-                                                                                         u32_FlashCount));
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Flash count: %1")).arg(rc_Info.
+                                                                                                      c_MoreInformation.
+                                                                                                      u32_FlashCount));
          this->m_UpdateReportText(
-            QString(C_GtGetText::h_GetText("Device serial number: %1")).arg(
+            static_cast<QString>(C_GtGetText::h_GetText("Device serial number: %1")).arg(
                C_OSCUtils::h_SerialNumberToString(&rc_Info.c_MoreInformation.au8_EcuSerialNumber[0]).c_str()));
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Device article number: %1")).arg(rc_Info.
-                                                                                                   c_MoreInformation.
-                                                                                                   u32_EcuArticleNumber));
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Device article version: %1")).arg(
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Device article number: %1")).arg(rc_Info.
+                                                                                                                c_MoreInformation
+                                                                                                                .
+                                                                                                                u32_EcuArticleNumber));
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Device article version: %1")).arg(
                                      rc_Info.c_MoreInformation.c_EcuHardwareVersionNumber.c_str()));
          this->m_UpdateReportText(
-            QString(C_GtGetText::h_GetText("Flash fingerprint date: %1-%2-%3 (yy-mm-dd)")).arg(
+            static_cast<QString>(C_GtGetText::h_GetText("Flash fingerprint date: %1-%2-%3 (yy-mm-dd)")).arg(
                QString::number(static_cast<uint32>(
                                   rc_Info.c_MoreInformation.au8_FlashFingerprintDate[0])).rightJustified(2, '0'),
                QString::number(static_cast<uint32>(
                                   rc_Info.c_MoreInformation.au8_FlashFingerprintDate[1])).rightJustified(2, '0'),
                QString::number(static_cast<uint32>(
                                   rc_Info.c_MoreInformation.au8_FlashFingerprintDate[2])).rightJustified(2, '0')));
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Flash fingerprint time: %1:%2:%3")).arg(
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Flash fingerprint time: %1:%2:%3")).arg(
                                      QString::number(static_cast<uint32>(
                                                         rc_Info.c_MoreInformation.au8_FlashFingerprintTime[0])).
                                      rightJustified(2, '0'),
@@ -980,25 +990,27 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
                                      QString::number(static_cast<uint32>(
                                                         rc_Info.c_MoreInformation.au8_FlashFingerprintTime[2])).
                                      rightJustified(2, '0')));
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Flash fingerprint username: %1")).arg(
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Flash fingerprint username: %1")).arg(
                                      rc_Info.c_MoreInformation.c_FlashFingerprintUserName.c_str()));
 
          // Information about available flashloader features
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Available features:")));
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Available features:")));
          if (rc_Info.c_MoreInformation.c_AvailableFeatures.q_MaxNumberOfBlockLengthAvailable == true)
          {
-            this->m_UpdateReportText(QString(C_GtGetText::h_GetText(
-                                                " Maximum block size information available: 1 (%1 Bytes)")).arg(
+            this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                             " Maximum block size information available: 1 (%1 Bytes)")).arg(
                                         QString::number(rc_Info.c_MoreInformation.u16_MaxNumberOfBlockLength)));
          }
          else
          {
-            this->m_UpdateReportText(QString(C_GtGetText::h_GetText(" Maximum block size information available: 0")));
+            this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                             " Maximum block size information available: 0")));
          }
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText(" NVM writing available: %1")).arg(
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(" NVM writing available: %1")).arg(
                                      QString::number(rc_Info.c_MoreInformation.c_AvailableFeatures.
                                                      q_FlashloaderCanWriteToNvm)));
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText(" Ethernet2Ethernet routing supported: %1")).arg(
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          " Ethernet2Ethernet routing supported: %1")).arg(
                                      QString::number(rc_Info.c_MoreInformation.c_AvailableFeatures.
                                                      q_EthernetToEthernetRoutingSupported)));
       }
@@ -1046,7 +1058,8 @@ void C_SyvUpUpdateWidget::m_ReportStwFlashloaderInformationRead(void)
          C_SCLStringList c_Strings;
 
          this->m_UpdateReportText(
-            QString(C_GtGetText::h_GetText("STW Flashloader device information found for node with index %1")).arg(
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "STW Flashloader device information found for node with index %1")).arg(
                c_NodeIndexes[u32_Counter]));
 
          C_OSCSuSequences::h_StwFlashloaderInformationToText(c_DeviceInformation[u32_Counter], c_Strings);
@@ -1274,12 +1287,13 @@ void C_SyvUpUpdateWidget::m_Connect(void)
                c_MessageText =  C_GtGetText::h_GetText("Could not create target directory:\n") + c_ErrorPath;
                break;
             default:
-               c_MessageText = QString(C_GtGetText::h_GetText("Unknown: %1")).arg(C_Uti::h_StwError(s32_Return));
+               c_MessageText =
+                  static_cast<QString>(C_GtGetText::h_GetText("Unknown: %1")).arg(C_Uti::h_StwError(s32_Return));
                break;
             }
             c_CompleteMessageText =
-               QString(C_GtGetText::h_GetText("Enter update mode: Error on creating temporary"
-                                              " folder: %1")).arg(c_MessageText);
+               static_cast<QString>(C_GtGetText::h_GetText("Enter update mode: Error on creating temporary"
+                                                           " folder: %1")).arg(c_MessageText);
             this->m_UpdateReportText(c_CompleteMessageText);
             c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
             c_Message.SetDescription("Enter update mode: Error on creating temporary folder.");
@@ -1300,8 +1314,8 @@ void C_SyvUpUpdateWidget::m_Connect(void)
       }
       else
       {
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText(
-                                             "Activate Flashloader: Cannot start. Error on creation temporary files: %1")).
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Activate Flashloader: Cannot start. Error on creation temporary files: %1")).
                                   arg(C_Uti::h_StwError(s32_Return)));
       }
 
@@ -1321,7 +1335,7 @@ void C_SyvUpUpdateWidget::m_Connect(void)
          else
          {
             //Thread access possible
-            this->m_UpdateReportText(QString(
+            this->m_UpdateReportText(static_cast<QString>(
                                         C_GtGetText::h_GetText(
                                            "Activate Flashloader: Cannot start. Error on initialization: %1")).
                                      arg(C_Uti::h_StwError(s32_Return)));
@@ -1355,7 +1369,7 @@ void C_SyvUpUpdateWidget::m_Connect(void)
    }
    else
    {
-      this->m_UpdateReportText(QString(
+      this->m_UpdateReportText(static_cast<QString>(
                                   C_GtGetText::h_GetText(
                                      "Activate Flashloader: Cannot start. Error on initialization: %1")).
                                arg(C_Uti::h_StwError(s32_Return)));
@@ -1497,7 +1511,7 @@ void C_SyvUpUpdateWidget::m_Update(void)
                   {
                      m_HandleUpdateFailure();
 
-                     this->m_UpdateReportText(QString(
+                     this->m_UpdateReportText(static_cast<QString>(
                                                  C_GtGetText::h_GetText(
                                                     "Update System: Cannot start. Thread is still busy.")).
                                               arg(C_Uti::h_StwError(s32_Return)));
@@ -1508,8 +1522,8 @@ void C_SyvUpUpdateWidget::m_Update(void)
             {
                m_HandleUpdateFailure();
 
-               this->m_UpdateReportText(QString(C_GtGetText::h_GetText(
-                                                   "Update System: Cannot start. Error on System View.")));
+               this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                "Update System: Cannot start. Error on System View.")));
             }
 
             QApplication::restoreOverrideCursor();
@@ -1597,7 +1611,8 @@ void C_SyvUpUpdateWidget::m_DisconnectAction(const bool oq_ClearLogAndResetScene
       }
       else
       {
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Disconnect: Cannot start. Thread is still busy.")));
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Disconnect: Cannot start. Thread is still busy.")));
          this->m_CleanUpSequence();
       }
    }
@@ -1670,8 +1685,8 @@ void C_SyvUpUpdateWidget::m_Timer(void)
             }
             else
             {
-               this->m_UpdateReportText(QString(C_GtGetText::h_GetText(
-                                                   "Read Device information: Cannot start. Thread is still busy.")));
+               this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                "Read Device information: Cannot start. Thread is still busy.")));
             }
          }
          else
@@ -1926,7 +1941,9 @@ void C_SyvUpUpdateWidget::m_Timer(void)
          }
 
          this->mpc_Ui->pc_WiUpdateInformation->SetUpdateFinished();
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Update System: %1")).arg(c_Message));
+         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Update System: %1")).arg(c_Message));
+         //Update estimated time
+         this->m_UpdateUpdatePackageStatus();
 
          // Save the time of update
          this->mu32_UpdateTime = TGL_GetTickCount();
@@ -2215,7 +2232,7 @@ void C_SyvUpUpdateWidget::m_AddProgressLogConnectEntry(const uint32 ou32_NodeInd
       const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
       if (pc_Node != NULL)
       {
-         const QString c_Text = QString(C_GtGetText::h_GetText("Get status from %1...")).arg(
+         const QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("Get status from %1...")).arg(
             pc_Node->c_Properties.c_Name.c_str());
          this->mpc_ProgressLogContent->AddEntry(ou32_NodeIndex, c_Text, false);
       }
@@ -2304,17 +2321,7 @@ void C_SyvUpUpdateWidget::m_DiscardInfo(const uint32 ou32_NodeIndex)
 {
    this->mpc_Ui->pc_WiUpdateInformation->DiscardApplicationStatus(ou32_NodeIndex);
 
-   // Prepare the update package
-   this->mc_NodesToFlash.clear();
-   this->mc_NodesOrder.clear();
-   // Get the update package with the update configuration
-   this->mpc_Ui->pc_WiUpdateInformation->GetUpdatePackage(this->mc_NodesToFlash, this->mc_NodesOrder);
-   // Adapt paths of mc_NodesToFlash to the temporary folder
-   this->m_ReplaceOriginalWithTempPaths();
-
-   //Update summary widget with new info
-   this->mpc_Ui->pc_WiUpdateInformation->InitUpdatePackage(this->mc_NodesToFlash, this->mc_NodesOrder,
-                                                           m_GetIsFileBasedFlagForEach(), true);
+   this->m_UpdateUpdatePackageStatus();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2367,12 +2374,12 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionStart(const C_OSCSuSequences::E_Progres
 {
    bool q_Retval;
 
-   switch (oe_Step)
+   if (oe_Step == C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START)
    {
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START:
       q_Retval = true;
-      break;
-   default:
+   }
+   else
+   {
       q_Retval = false;
    }
    return q_Retval;
@@ -2392,7 +2399,7 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionSuccess(const C_OSCSuSequences::E_Progr
 {
    bool q_Retval;
 
-   switch (oe_Step)
+   switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FINISHED:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_FINISHED:
@@ -2418,7 +2425,7 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionFailure(const C_OSCSuSequences::E_Progr
 {
    bool q_Retval;
 
-   switch (oe_Step)
+   switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR:
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR:
@@ -2461,7 +2468,7 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAppStart(const C_OSCSuSequences::E_Progress
 {
    bool q_Retval;
 
-   switch (oe_Step)
+   switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_START:  // Application start state
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START: // Application start state
@@ -2495,7 +2502,7 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAppSuccess(const C_OSCSuSequences::E_Progre
 {
    bool q_Retval;
 
-   switch (oe_Step)
+   switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_FINISHED:  // Finished application state
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED: // Finished application state
@@ -2528,7 +2535,7 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateNodeStart(const C_OSCSuSequences::E_Progres
 {
    bool q_Retval;
 
-   switch (oe_Step)
+   switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_START: // Application start state
    case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_START: // Application start state
@@ -2554,7 +2561,7 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateNodeSuccess(const C_OSCSuSequences::E_Progr
 {
    bool q_Retval;
 
-   switch (oe_Step)
+   switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINISHED: // Finished application state
    case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FINISHED: // Finished application state
@@ -2580,7 +2587,7 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateFailure(const C_OSCSuSequences::E_ProgressS
 {
    bool q_Retval;
 
-   switch (oe_Step)
+   switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
@@ -2629,15 +2636,34 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAbort(const C_OSCSuSequences::E_ProgressSte
 {
    bool q_Retval;
 
-   switch (oe_Step)
+   if (oe_Step == C_OSCSuSequences::eUPDATE_SYSTEM_ABORTED)
    {
-   case C_OSCSuSequences::eUPDATE_SYSTEM_ABORTED:
       q_Retval = true;
-      break;
-   default:
+   }
+   else
+   {
       q_Retval = false;
    }
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update update package status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpUpdateWidget::m_UpdateUpdatePackageStatus()
+{
+   // Prepare the update package
+   this->mc_NodesToFlash.clear();
+   this->mc_NodesOrder.clear();
+   // Get the update package with the update configuration
+   this->mpc_Ui->pc_WiUpdateInformation->GetUpdatePackage(this->mc_NodesToFlash, this->mc_NodesOrder);
+   // Adapt paths of mc_NodesToFlash to the temporary folder
+   this->m_ReplaceOriginalWithTempPaths();
+
+   //Update summary widget with new info
+   this->mpc_Ui->pc_WiUpdateInformation->InitUpdatePackage(this->mc_NodesToFlash, this->mc_NodesOrder,
+                                                           m_GetIsFileBasedFlagForEach(), true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

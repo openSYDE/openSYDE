@@ -86,8 +86,7 @@ C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const o
       c_Color.setAlpha(128);
       pc_Shadow->setColor(c_Color);
       this->mpc_Ui->pc_GroupBoxPopUp->setGraphicsEffect(pc_Shadow);
-      //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
    //Deactivate debug info
    this->mpc_Ui->pc_GroupBoxTitle->setTitle("");
    //Overlay
@@ -121,13 +120,12 @@ C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const o
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-
+//lint -e{1540} Never took ownership of item
 C_OgePopUpDialog::~C_OgePopUpDialog()
 {
    //Overlay
    HideOverlay();
    delete this->mpc_Ui;
-   //lint -e{1540} Never took ownership of item
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -144,8 +142,6 @@ void C_OgePopUpDialog::SetWidget(QWidget * const opc_Widget)
       stw_types::sintn sn_Index;
 
       //save class name for help call
-      //lint -e{10,48,64,734,746,1013,1055,1960} Will be defined via moc compiler, PC lint unable to handle this
-      // construct
       this->mc_WidgetClassName = opc_Widget->metaObject()->className();
 
       opc_Widget->setParent(this);

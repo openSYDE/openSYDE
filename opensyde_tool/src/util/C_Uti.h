@@ -83,6 +83,8 @@ public:
                                      QString & orc_PathAbsolute, QString & orc_PathRelative);
    static QString h_ResolveProjIndependentPlaceholderVariables(const QString & orc_Path);
    static QString h_GetHashValueAsQString(void);
+   static QString h_GetValueAsHex(const stw_types::uint64 ou64_Value, const stw_types::uint8 ou8_FieldWidth = 0);
+   static QString h_GetValueAsHex(const stw_types::uint32 ou32_Value, const stw_types::uint8 ou8_FieldWidth = 0);
 
 private:
    C_Uti(void);

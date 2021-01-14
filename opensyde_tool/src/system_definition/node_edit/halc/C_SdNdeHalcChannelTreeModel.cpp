@@ -16,6 +16,7 @@
 #include "C_TblTreItem.h"
 
 #include "constants.h"
+#include "stwerrors.h"
 
 #include "TGLUtils.h"
 #include "C_SdUtil.h"
@@ -24,6 +25,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
+using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
@@ -50,6 +52,16 @@ C_SdNdeHalcChannelTreeModel::C_SdNdeHalcChannelTreeModel(QObject * const opc_Par
    C_TblTreModel(opc_Parent),
    mu32_NodeIndex(0)
 {
+   // initialize icons
+   if (this->mc_Icons.empty() == true)
+   {
+      // #icons = 3 (#categories) x 2 (domain vs channel) x 2 (linked vs. not linked) x 2 (valid vs. error) = 24
+      this->mc_Icons.resize(24);
+
+      this->m_InitIconsOfCategory(C_OSCHalcConfigDomain::eCA_INPUT);
+      this->m_InitIconsOfCategory(C_OSCHalcConfigDomain::eCA_OUTPUT);
+      this->m_InitIconsOfCategory(C_OSCHalcConfigDomain::eCA_OTHER);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,7 +128,7 @@ void C_SdNdeHalcChannelTreeModel::SetNode(const stw_types::uint32 ou32_NodeIndex
 
             if (pc_Domain->c_Channels.empty() == false)
             {
-               pc_DomainTreeItem->c_Name = QString("%1 (%2)").arg(pc_Domain->c_Name.c_str())
+               pc_DomainTreeItem->c_Name = static_cast<QString>("%1 (%2)").arg(pc_Domain->c_Name.c_str())
                                            .arg(pc_Domain->c_Channels.size());
             }
             else
@@ -191,7 +203,7 @@ void C_SdNdeHalcChannelTreeModel::UpdateChannelText(const uint32 ou32_DomainInde
 {
    if ((this->mpc_InvisibleRootItem != NULL) && (ou32_DomainIndex < this->mpc_InvisibleRootItem->c_Children.size()))
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
       C_TblTreItem * const pc_DomainItem =
          dynamic_cast<C_TblTreItem *>(this->mpc_InvisibleRootItem->c_Children[ou32_DomainIndex]);
 
@@ -308,13 +320,33 @@ void C_SdNdeHalcChannelTreeModel::Reset(const QModelIndexList & orc_Indexes)
    uint32 u32_DomainIndex = 0;
    uint32 u32_ChannelIndex;
    bool q_ChannelCase;
+   bool q_IsLinked;
 
    for (QModelIndexList::const_iterator c_ItIndex = orc_Indexes.begin(); c_ItIndex != orc_Indexes.end(); ++c_ItIndex)
    {
+      std::vector<uint32> c_LinkedChannelIndices;
       C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(*c_ItIndex, u32_DomainIndex, u32_ChannelIndex,
                                                               q_ChannelCase);
-      C_PuiSdHandler::h_GetInstance()->ResetHALCDomainChannelConfig(this->mu32_NodeIndex, u32_DomainIndex,
-                                                                    u32_ChannelIndex, q_ChannelCase);
+
+      // first: reset use case of all linked channels
+      C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex, u32_DomainIndex,
+                                                                    u32_ChannelIndex, q_ChannelCase, q_IsLinked, NULL,
+                                                                    &c_LinkedChannelIndices);
+      if (q_IsLinked == true)
+      {
+         for (std::vector<uint32>::const_iterator c_ItLinked = c_LinkedChannelIndices.begin();
+              c_ItLinked != c_LinkedChannelIndices.end(); ++c_ItLinked)
+         {
+            C_PuiSdHandler::h_GetInstance()->ResetHALCDomainChannelUseCase(this->mu32_NodeIndex, u32_DomainIndex,
+                                                                           *c_ItLinked, q_ChannelCase);
+         }
+      }
+
+      // finally reset channel
+      tgl_assert(C_PuiSdHandler::h_GetInstance()->
+                 ResetHALCDomainChannelConfig(this->mu32_NodeIndex, u32_DomainIndex,
+                                              u32_ChannelIndex, q_ChannelCase) == C_NO_ERR);
+
       this->UpdateChannelText(u32_DomainIndex, u32_ChannelIndex, q_ChannelCase);
    }
 
@@ -342,7 +374,7 @@ void C_SdNdeHalcChannelTreeModel::CheckError(const uint32 ou32_DomainIndex)
    {
       if ((this->mpc_InvisibleRootItem != NULL) && (ou32_DomainIndex < this->mpc_InvisibleRootItem->c_Children.size()))
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
          C_TblTreItem * const pc_DomainItem =
             dynamic_cast<C_TblTreItem *>(this->mpc_InvisibleRootItem->c_Children[ou32_DomainIndex]);
 
@@ -363,7 +395,7 @@ void C_SdNdeHalcChannelTreeModel::CheckError(const uint32 ou32_DomainIndex)
                C_TblTreItem * const pc_ChannelItem = pc_DomainItem->GetItem(u32_ItChannel);
 
                // channel icon
-               mh_SetIcon(pc_ChannelItem, pc_Domain->e_Category, false, q_Invalid, q_Linked);
+               pc_ChannelItem->c_Icon = this->m_GetIcon(pc_Domain->e_Category, false, q_Invalid, q_Linked);
                if (q_Invalid == true)
                {
                   q_AtLeastOneChannelInvalid = true;
@@ -373,8 +405,8 @@ void C_SdNdeHalcChannelTreeModel::CheckError(const uint32 ou32_DomainIndex)
             // check domain
             pc_Domain->c_DomainConfig.CheckConfigValid(&q_DomainNameInvalid);
             // domain icon
-            mh_SetIcon(pc_DomainItem, pc_Domain->e_Category, true,
-                       (q_DomainNameInvalid || q_AtLeastOneChannelInvalid), false);
+            pc_DomainItem->c_Icon = this->m_GetIcon(pc_Domain->e_Category, true,
+                                                    (q_DomainNameInvalid || q_AtLeastOneChannelInvalid), false);
 
             // update domain and channel visualization
             //lint -e{1793} Qt example
@@ -477,66 +509,189 @@ void C_SdNdeHalcChannelTreeModel::mh_SetChannelText(C_TblTreItem * const opc_Ite
 {
    if (opc_Item != NULL)
    {
-      opc_Item->c_Name = QString("%1  %2").arg(orc_ChannelID, orc_ChannelName);
-      opc_Item->c_ToolTipHeading = QString("%1 (%2)").arg(orc_ChannelName, orc_ChannelID);
+      opc_Item->c_Name = static_cast<QString>("%1  %2").arg(orc_ChannelID, orc_ChannelName);
+      opc_Item->c_ToolTipHeading = static_cast<QString>("%1 (%2)").arg(orc_ChannelName, orc_ChannelID);
       opc_Item->c_ToolTipContent = orc_Comment;
    }
-   //lint -e{429} no memory leak because of correct tree clean up
+}  //lint !e429  //no memory leak because of correct tree clean up
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize icon from file path
+
+   Don't call this too often. Calling for every channel was too time expensive.
+
+   \param[in]  oe_Category    Category
+   \param[in]  oq_DomainIcon  Domain icon
+   \param[in]  oq_Error       Error
+   \param[in]  oq_Linked      Linked
+
+   \return
+   Icon
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QIcon C_SdNdeHalcChannelTreeModel::mh_InitIcon(const C_OSCHalcDefDomain::E_Category oe_Category, const bool oq_Large,
+                                               const bool oq_Error, const bool oq_Linked)
+{
+   QIcon c_Icon;
+
+   QString c_IconPath = "://images/system_definition/NodeEdit/halc/";
+   QSize c_IconSize = QSize(16, 16);
+
+   switch (oe_Category)
+   {
+   case C_OSCHalcDefDomain::eCA_INPUT:
+      c_IconPath += "Input";
+      break;
+   case C_OSCHalcDefDomain::eCA_OUTPUT:
+      c_IconPath += "Output";
+      break;
+   case C_OSCHalcDefDomain::eCA_OTHER:
+      c_IconPath += "Other";
+      break;
+   }
+
+   c_IconPath += oq_Large ? "LargeCenter" : "Small";
+
+   c_IconPath += oq_Linked ? "Linked" : "";
+
+   if (oq_Error == true)
+   {
+      c_IconPath += "Error";
+
+      // use same icon for all modes & states
+      c_Icon = C_SdUtil::h_InitStaticIconSvg(c_IconPath + ".svg", c_IconSize);
+   }
+   else
+   {
+      c_Icon = C_SdUtil::h_InitStaticIconSvg(c_IconPath + "Inactive.svg", c_IconSize);
+      // use different colored icon for active state
+      c_Icon.addPixmap(QIcon(c_IconPath + "Active.svg").pixmap(c_IconSize), QIcon::Selected, QIcon::On);
+      c_Icon.addPixmap(QIcon(c_IconPath + "Active.svg").pixmap(c_IconSize), QIcon::Selected, QIcon::Off);
+      // "off" icon is used in branch-closed state
+   }
+
+   return c_Icon;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set item icon depending on properties
+/*! \brief  Get icon depending on properties
 
-   \param[in,out]  opc_Item      Item
-   \param[in]      oe_Category   Category (input, output, other)
-   \param[in]      oq_Large      Large (vs. small)
-   \param[in]      oq_Error      Error
-   \param[in]      oq_Linked     Linked
+   \param[in]  oe_Category    Category (input, output, other)
+   \param[in]  oq_DomainIcon  Domain icon
+   \param[in]  oq_Error       Error
+   \param[in]  oq_Linked      Linked
+
+   \return
+   Icon
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelTreeModel::mh_SetIcon(C_TblTreItem * const opc_Item,
-                                             const C_OSCHalcDefDomain::E_Category oe_Category, const bool oq_Large,
-                                             const bool oq_Error, const bool oq_Linked)
+QIcon C_SdNdeHalcChannelTreeModel::m_GetIcon(const C_OSCHalcDefDomain::E_Category oe_Category, const bool oq_Large,
+                                             const bool oq_Error, const bool oq_Linked) const
 {
-   if (opc_Item != NULL)
+   const uint32 u32_Index = this->m_GetIconIdentifier(oe_Category, oq_Large, oq_Error, oq_Linked);
+
+   tgl_assert(u32_Index < this->mc_Icons.size());
+   const QIcon & rc_Icon = this->mc_Icons[u32_Index];
+
+   return rc_Icon;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get icon index
+
+   Resulting order in vector:
+   0 Input small
+   1 Input small error
+   2 Input large
+   3 Input large error
+   4 Input small linked
+   5 Input small linked error
+   6 Output large
+    ... etc. ...
+
+   \param[in]  oe_Category    Category
+   \param[in]  oq_DomainIcon  Domain icon
+   \param[in]  oq_Error       Error
+   \param[in]  oq_Linked      Linked
+
+   \return
+   Icon identifier
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SdNdeHalcChannelTreeModel::m_GetIconIdentifier(const C_OSCHalcDefDomain::E_Category oe_Category,
+                                                        const bool oq_Large, const bool oq_Error,
+                                                        const bool oq_Linked) const
+{
+   uint32 u32_Return = 0;
+
+   switch (oe_Category)
    {
-      QString c_IconPath = "://images/system_definition/NodeEdit/halc/";
-      QIcon c_Icon;
-      QSize c_IconSize = QSize(16, 16);
-
-      switch (oe_Category)
-      {
-      case C_OSCHalcDefDomain::eCA_INPUT:
-         c_IconPath += "Input";
-         break;
-      case C_OSCHalcDefDomain::eCA_OUTPUT:
-         c_IconPath += "Output";
-         break;
-      case C_OSCHalcDefDomain::eCA_OTHER:
-         c_IconPath += "Other";
-         break;
-      }
-
-      c_IconPath += oq_Large ? "LargeCenter" : "Small";
-
-      c_IconPath += oq_Linked ? "Linked" : "";
-
-      if (oq_Error == true)
-      {
-         c_IconPath += "Error";
-
-         // use same icon for all modes & states
-         c_Icon = C_SdUtil::h_InitStaticIconSvg(c_IconPath + ".svg", c_IconSize);
-      }
-      else
-      {
-         c_Icon = C_SdUtil::h_InitStaticIconSvg(c_IconPath + "Inactive.svg", c_IconSize);
-         // use different colored icon for active state
-         c_Icon.addPixmap(QIcon(c_IconPath + "Active.svg").pixmap(c_IconSize), QIcon::Selected, QIcon::On);
-         c_Icon.addPixmap(QIcon(c_IconPath + "Active.svg").pixmap(c_IconSize), QIcon::Selected, QIcon::Off);
-         // "off" icon is used in branch-closed state
-      }
-
-      opc_Item->c_Icon = c_Icon;
+   case C_OSCHalcDefDomain::eCA_INPUT:
+      u32_Return = 0;
+      break;
+   case C_OSCHalcDefDomain::eCA_OUTPUT:
+      u32_Return = 6;
+      break;
+   case C_OSCHalcDefDomain::eCA_OTHER:
+      u32_Return = 12;
+      break;
    }
+
+   if (oq_Large == true)
+   {
+      u32_Return += 2;
+   }
+
+   if (oq_Linked == true)
+   {
+      u32_Return += 4;
+   }
+
+   if (oq_Error == true)
+   {
+      u32_Return += 1;
+   }
+
+   tgl_assert(u32_Return < this->mc_Icons.size());
+   if (u32_Return >= this->mc_Icons.size())
+   {
+      u32_Return = 0;
+   }
+
+   return u32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize icons of domain category
+
+   \param[in]  oe_Category    Category
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcChannelTreeModel::m_InitIconsOfCategory(const C_OSCHalcDefDomain::E_Category oe_Category)
+{
+   uint32 u32_Index;
+
+   // domain icon
+   u32_Index = this->m_GetIconIdentifier(oe_Category, true, false, false);
+   mc_Icons[u32_Index] = mh_InitIcon(oe_Category, true, false, false);
+
+   // domain icon error
+   u32_Index = m_GetIconIdentifier(oe_Category, true, true, false);
+   mc_Icons[u32_Index] = mh_InitIcon(oe_Category, true, true, false);
+
+   // channel icon
+   u32_Index = m_GetIconIdentifier(oe_Category, false, false, false);
+   mc_Icons[u32_Index] = mh_InitIcon(oe_Category, false, false, false);
+
+   // channel icon error
+   u32_Index = m_GetIconIdentifier(oe_Category, false, true, false);
+   mc_Icons[u32_Index] = mh_InitIcon(oe_Category, false, true, false);
+
+   // linked channel icon
+   u32_Index = m_GetIconIdentifier(oe_Category, false, false, true);
+   mc_Icons[u32_Index] = mh_InitIcon(oe_Category, false, false, true);
+
+   // linked channel icon error
+   u32_Index = m_GetIconIdentifier(oe_Category, false, true, true);
+   mc_Icons[u32_Index] = mh_InitIcon(oe_Category, false, true, true);
 }

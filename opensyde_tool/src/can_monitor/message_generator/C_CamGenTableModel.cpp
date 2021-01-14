@@ -159,6 +159,9 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
          case eKEY:
             c_Header = C_GtGetText::h_GetText("Key");
             break;
+         default:
+            tgl_assert(false);
+            break;
          }
          //Add spacing for sorting arrow
          c_Header += "    ";
@@ -198,11 +201,14 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
          case eKEY:
             c_Retval = C_GtGetText::h_GetText("Key");
             break;
+         default:
+            tgl_assert(false);
+            break;
          }
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
       {
@@ -238,6 +244,9 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
             break;
          case eKEY:
             c_Header = C_GtGetText::h_GetText("Configure key for triggering transmission of message.");
+            break;
+         default:
+            tgl_assert(false);
             break;
          }
          c_Retval = c_Header;
@@ -344,9 +353,9 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                   QString c_Offset;
                   if (pc_Message->u32_KeyPressOffset > 0UL)
                   {
-                     c_Offset = QString(" (+%1ms)").arg(pc_Message->u32_KeyPressOffset);
+                     c_Offset = static_cast<QString>(" (+%1ms)").arg(pc_Message->u32_KeyPressOffset);
                   }
-                  c_Retval = QString("%1%2").arg(pc_Message->c_Key.c_str()).arg(c_Offset);
+                  c_Retval = static_cast<QString>("%1%2").arg(pc_Message->c_Key.c_str()).arg(c_Offset);
                }
                break;
             case eRTR:
@@ -372,6 +381,9 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                   //For sorting!
                   c_Retval = pc_Message->GetExtended();
                }
+               break;
+            default:
+               tgl_assert(false);
                break;
             }
          }
@@ -414,7 +426,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                   {
                      c_Tmp += " ";
                   }
-                  c_Tmp += QString("%1").arg(pc_Message->c_Bytes[u16_It], 2, 16, QChar('0')).toUpper();
+                  c_Tmp += static_cast<QString>("%1").arg(pc_Message->c_Bytes[u16_It], 2, 16, QChar('0')).toUpper();
                }
                c_Retval = c_Tmp;
             }
@@ -432,7 +444,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
          }
          else if (osn_Role == msn_USER_ROLE_INTERACTION_ELEMENT_TYPE)
          {
-            switch (e_Col)
+            switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
             case eNAME:
             case eID:
@@ -451,9 +463,8 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                   (osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST))
          {
             QStringList c_Tmp;
-            switch (e_Col)
+            if (e_Col == eDLC)
             {
-            case eDLC:
                c_Tmp.append("0");
                c_Tmp.append("1");
                c_Tmp.append("2");
@@ -464,15 +475,15 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                c_Tmp.append("7");
                c_Tmp.append("8");
                c_Retval = c_Tmp;
-               break;
-            default:
+            }
+            else
+            {
                c_Retval = c_Tmp;
-               break;
             }
          }
          else if (osn_Role == msn_USER_ROLE_INTERACTION_IS_LINK)
          {
-            switch (e_Col)
+            switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
             case eKEY:
             case eMANUAL_TRIGGER:
@@ -485,7 +496,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
          }
          else if (osn_Role == msn_USER_ROLE_INTERACTION_USE_MIN_VALUE)
          {
-            switch (e_Col)
+            switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
             case eID:
             case eDLC:
@@ -499,10 +510,10 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
          }
          else if (osn_Role == msn_USER_ROLE_INTERACTION_MINIMUM_VALUE)
          {
-            switch (e_Col)
+            switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
             case eID:
-               c_Retval = mh_GetValueAsHex(0ULL);
+               c_Retval = C_Uti::h_GetValueAsHex(0ULL);
                break;
             case eDLC:
                c_Retval = 0;
@@ -517,7 +528,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
          }
          else if (osn_Role == msn_USER_ROLE_INTERACTION_USE_MAX_VALUE)
          {
-            switch (e_Col)
+            switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
             case eID:
             case eDLC:
@@ -531,16 +542,16 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
          }
          else if (osn_Role == msn_USER_ROLE_INTERACTION_MAXIMUM_VALUE)
          {
-            switch (e_Col)
+            switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
             case eID:
                if (pc_Message->GetExtended())
                {
-                  c_Retval = mh_GetValueAsHex(0x1FFFFFFFULL);
+                  c_Retval = C_Uti::h_GetValueAsHex(0x1FFFFFFFULL);
                }
                else
                {
-                  c_Retval = mh_GetValueAsHex(0x7FFULL);
+                  c_Retval = C_Uti::h_GetValueAsHex(0x7FFULL);
                }
                break;
             case eDLC:
@@ -575,6 +586,9 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                break;
             case eRTR:
                c_Retval = mh_GetBoolAsCheckStateVariant(pc_Message->GetRTR());
+               break;
+            default:
+               tgl_assert(false);
                break;
             }
          }
@@ -663,6 +677,9 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
             case eXTD:
                //Different handling for booleans
                break;
+            default:
+               tgl_assert(false);
+               break;
             }
             if (q_Continue == true)
             {
@@ -723,6 +740,9 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
                   q_UpdateCyclicMessage = true;
                   e_Selector = C_CamProMessageData::eGBODS_EXTENDED;
                   q_Continue = true;
+                  break;
+               default:
+                  tgl_assert(false);
                   break;
                }
                if (q_Continue == true)
@@ -826,6 +846,9 @@ Qt::ItemFlags C_CamGenTableModel::flags(const QModelIndex & orc_Index) const
          break;
       case eDATA:
          c_Retval = c_Retval | Qt::ItemIsEnabled;
+         break;
+      default:
+         tgl_assert(false);
          break;
       }
    }
@@ -949,6 +972,9 @@ sint32 C_CamGenTableModel::h_EnumToColumn(const C_CamGenTableModel::E_Columns oe
       break;
    case eMANUAL_TRIGGER:
       s32_Retval = 9;
+      break;
+   default:
+      tgl_assert(false);
       break;
    }
    return s32_Retval;

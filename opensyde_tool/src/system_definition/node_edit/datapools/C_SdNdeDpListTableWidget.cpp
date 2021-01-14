@@ -77,7 +77,6 @@ C_SdNdeDpListTableWidget::C_SdNdeDpListTableWidget(QWidget * const opc_Parent, Q
            &C_SdNdeDpListTableWidget::m_OnSizeChangePossible);
    connect(this->mpc_Ui->pc_TableView, &C_SdNdeDpListTableView::SigSelectionChanged, this,
            &C_SdNdeDpListTableWidget::m_OnSelectionChanged);
-   //lint -e{64,918,1025,1703} Qt interface
    connect(this->mpc_Ui->pc_TableView, &C_SdNdeDpListTableView::SigButtonChange, this,
            &C_SdNdeDpListTableWidget::m_OnButtonChange);
 }
@@ -364,12 +363,13 @@ void C_SdNdeDpListTableWidget::m_OnCRCOptionChange(const bool & orq_Value)
 {
    if (this->mpc_UndoStack != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       this->mpc_UndoStack->DoChangeListData(this->mu32_NodeIndex,
                                             this->mu32_DataPoolIndex,
                                             dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
                                                                                            mpc_TreeWidget),
-                                            this->mu32_ListIndex, QVariant(orq_Value), C_SdNdeDpUtil::eLIST_CRC);
+                                            this->mu32_ListIndex, static_cast<QVariant>(orq_Value),
+                                            C_SdNdeDpUtil::eLIST_CRC);
    }
 }
 

@@ -46,11 +46,15 @@ public:
    stw_types::sint32 FindDbcMessage(const QString & orc_File, const QString & orc_Message);
 
    //Get
-   const stw_opensyde_core::C_OSCCanMessage * GetOSCMessage(const QString & orc_File,
-                                                            const QString & orc_Message) const;
-   const stw_opensyde_core::C_OSCNodeDataPoolList * GetOSCList(const QString & orc_File,
-                                                               const QString & orc_Message) const;
-   const C_CieConverter::C_CIECanMessage * GetDbcMessage(const QString & orc_File, const QString & orc_Message) const;
+   const stw_opensyde_core::C_OSCCanMessage * GetOSCMessage(const QString & orc_File, const QString & orc_Message,
+                                                            const bool oq_UseHash,
+                                                            const stw_types::uint32 ou32_Hash) const;
+   const stw_opensyde_core::C_OSCNodeDataPoolList * GetOSCList(const QString & orc_File, const QString & orc_Message,
+                                                               const bool oq_UseHash,
+                                                               const stw_types::uint32 ou32_Hash) const;
+   const C_CieConverter::C_CIECanMessage * GetDbcMessage(const QString & orc_File, const QString & orc_Message,
+                                                         const bool oq_UseHash,
+                                                         const stw_types::uint32 ou32_Hash) const;
    const QMap<QString, C_CamDbDbc> & GetDBCFiles(void) const;
    const QMap<QString, C_CamDbOsy> & GetOSYFiles(void) const;
 
@@ -59,6 +63,10 @@ public:
    stw_types::sint32 SetOsyActive(const QString & orc_File, const bool oq_Active);
    stw_types::sint32 ReplaceOsyBusIndex(const QString & orc_File, const stw_types::uint32 ou32_BusIndex,
                                         bool & orq_Change);
+
+   //Util
+   bool CheckHashForMessage(const QString & orc_File, const QString & orc_Message,
+                            const stw_types::uint32 ou32_Hash) const;
 
    //Access
    static C_CamDbHandler * h_GetInstance(void);

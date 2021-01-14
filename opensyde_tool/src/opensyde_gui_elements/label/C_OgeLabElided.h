@@ -30,10 +30,7 @@ public:
    void SetFontForEliding(const QFont & orc_Font);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    QString mc_CompleteText;

@@ -62,7 +62,6 @@ void C_SyvDaItTaDelegate::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_
 {
    switch (oe_Style)
    {
-   //TBD by Karsten: done
    case C_PuiSvDbWidgetBase::eOPENSYDE:
       if (oq_DarkMode == true)
       {

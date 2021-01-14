@@ -87,7 +87,6 @@ C_SdTopologyWidget::C_SdTopologyWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Scene, &C_SebScene::SigTriggerUpdateTransform, this->mpc_Ui->pc_GraphicsView,
            &C_SebGraphicsView::UpdateTransform);
    // forwarding of this signal
-   //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(this->mpc_Scene, &C_SdTopologyScene::SigChangeMode, this, &C_SdTopologyWidget::SigChangeMode);
    connect(this->mpc_Scene, &C_SdTopologyScene::SigChanged, this, &C_SdTopologyWidget::SigChanged);
    connect(this->mpc_Scene, &C_SdTopologyScene::SigNodeDeleted, this, &C_SdTopologyWidget::SigNodeDeleted);

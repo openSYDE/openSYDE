@@ -63,7 +63,6 @@ C_GiBiLineBounding::C_GiBiLineBounding(const QVector<QPointF> & orc_Points, cons
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiLineBounding::C_GiBiLineBounding(const QLineF & orc_Line, const float64 & orf64_Width,
                                        const float64 & orf64_InteractionPointWidth) :
-   //lint -e{155}  C++11 feature
    mc_Points(
 {
    orc_Line.p1(), orc_Line.p2()
@@ -92,10 +91,10 @@ QPainterPath C_GiBiLineBounding::GetShape(void)
    //Construct values to identify
    for (uint32 u32_ItP = 0UL; u32_ItP < static_cast<uint32>(this->mc_Points.size()); ++u32_ItP)
    {
-      const QPointF & rc_P = this->mc_Points[u32_ItP];
-      c_Identity += QString::number(rc_P.x());
+      const QPointF & rc_Point = this->mc_Points[u32_ItP];
+      c_Identity += QString::number(rc_Point.x());
       c_Identity += ",";
-      c_Identity += QString::number(rc_P.y());
+      c_Identity += QString::number(rc_Point.y());
       c_Identity += ",";
    }
    c_Identity += QString::number(this->mf64_Width);
@@ -144,24 +143,24 @@ QPainterPath C_GiBiLineBounding::GetShape(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get vector with length of 1
 
-   \param[in]  orc_P    Point to evaluate
+   \param[in]  orc_Point    Point to evaluate
 
    \return
    Input vetor with length of 1
 */
 //----------------------------------------------------------------------------------------------------------------------
-QPointF C_GiBiLineBounding::h_GetNorm(const QPointF & orc_P)
+QPointF C_GiBiLineBounding::h_GetNorm(const QPointF & orc_Point)
 {
-   const float64 f64_Length = mh_GetLength(orc_P);
+   const float64 f64_Length = mh_GetLength(orc_Point);
    QPointF c_Retval;
 
    if (std::abs(f64_Length) > 0.0)
    {
-      c_Retval = QPointF(orc_P.x() / f64_Length, orc_P.y() / f64_Length);
+      c_Retval = QPointF(orc_Point.x() / f64_Length, orc_Point.y() / f64_Length);
    }
    else
    {
-      c_Retval = orc_P;
+      c_Retval = orc_Point;
    }
 
    return c_Retval;
@@ -170,16 +169,16 @@ QPointF C_GiBiLineBounding::h_GetNorm(const QPointF & orc_P)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set input vector to length
 
-   \param[in]  orc_P          Point to evaluate
+   \param[in]  orc_Point      Point to evaluate
    \param[in]  orf64_Length   Length to adapt to
 
    \return
    Input vetor with length of width
 */
 //----------------------------------------------------------------------------------------------------------------------
-QPointF C_GiBiLineBounding::h_AdaptVecToWidth(const QPointF & orc_P, const float64 & orf64_Length)
+QPointF C_GiBiLineBounding::h_AdaptVecToWidth(const QPointF & orc_Point, const float64 & orf64_Length)
 {
-   const QPointF c_Retval = h_GetNorm(orc_P);
+   const QPointF c_Retval = h_GetNorm(orc_Point);
 
    return QPointF(c_Retval.x() * orf64_Length, c_Retval.y() * orf64_Length);
 }
@@ -187,15 +186,15 @@ QPointF C_GiBiLineBounding::h_AdaptVecToWidth(const QPointF & orc_P, const float
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get vector perpendicular to original
 
-   \param[in]  orc_P    vector to get perpendicular for
+   \param[in]  orc_Point    vector to get perpendicular for
 
    \return
    Perpendicular vector
 */
 //----------------------------------------------------------------------------------------------------------------------
-QPointF C_GiBiLineBounding::h_GetPerpendicular(const QPointF & orc_P)
+QPointF C_GiBiLineBounding::h_GetPerpendicular(const QPointF & orc_Point)
 {
-   return QPointF(-orc_P.y(), orc_P.x());
+   return QPointF(-orc_Point.y(), orc_Point.x());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -241,31 +240,31 @@ void C_GiBiLineBounding::m_AppendLineBoundingPointsTop(const sint32 & ors32_Inde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set input vector to length of width
 
-   \param[in]  orc_P    Point to evaluate
+   \param[in]  orc_Point    Point to evaluate
 
    \return
    Input vetor with length of width
 */
 //----------------------------------------------------------------------------------------------------------------------
-QPointF C_GiBiLineBounding::m_AdaptVecToWidth(const QPointF & orc_P) const
+QPointF C_GiBiLineBounding::m_AdaptVecToWidth(const QPointF & orc_Point) const
 {
    const float64 f64_Factor = (this->mf64_Width + this->mf64_InteractionPointWidth) / 2.0;
 
-   return h_AdaptVecToWidth(orc_P, f64_Factor);
+   return h_AdaptVecToWidth(orc_Point, f64_Factor);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get length of vector
 
-   \param[in]  orc_P    Point to evaluate
+   \param[in]  orc_Point    Point to evaluate
 
    \return
    Length of input vector
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_GiBiLineBounding::mh_GetLength(const QPointF & orc_P)
+float64 C_GiBiLineBounding::mh_GetLength(const QPointF & orc_Point)
 {
-   const float64 f64_Retval = std::sqrt((orc_P.x() * orc_P.x()) + (orc_P.y() * orc_P.y()));
+   const float64 f64_Retval = std::sqrt((orc_Point.x() * orc_Point.x()) + (orc_Point.y() * orc_Point.y()));
 
    return f64_Retval;
 }

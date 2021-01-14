@@ -61,7 +61,7 @@ C_SdNdeUnoDasDataPoolListDeleteCommand::C_SdNdeUnoDasDataPoolListDeleteCommand(c
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListDeleteCommand::redo(void)
 {
-   this->Delete();
+   this->m_Delete();
    C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::redo();
 }
 
@@ -72,6 +72,6 @@ void C_SdNdeUnoDasDataPoolListDeleteCommand::redo(void)
 void C_SdNdeUnoDasDataPoolListDeleteCommand::undo(void)
 {
    C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::undo();
-   this->Add();
+   this->m_Add();
    this->mq_Initial = false;
 }

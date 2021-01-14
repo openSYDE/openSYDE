@@ -126,6 +126,8 @@ C_CamMosWidget::C_CamMosWidget(QWidget * const opc_Parent) :
            this, &C_CamMosWidget::SigActivateDatabase);
    connect(this->mpc_Ui->pc_WiDatabase, &C_CamMosDatabaseWidget::SigSetDatabaseOsySysDefBus,
            this, &C_CamMosWidget::SigSetDatabaseOsySysDefBus);
+   connect(this->mpc_Ui->pc_WiDatabase, &C_CamMosDatabaseWidget::SigNotifyMissingDataBase,
+           this, &C_CamMosWidget::SigNotifyMissingDataBase);
    connect(this->mpc_Ui->pc_WiLogging, &C_CamMosLoggingWidget::SigAddLogFileAsc,
            this, &C_CamMosWidget::SigAddLogFileAsc);
    connect(this->mpc_Ui->pc_WiLogging, &C_CamMosLoggingWidget::SigAddLogFileBlf,

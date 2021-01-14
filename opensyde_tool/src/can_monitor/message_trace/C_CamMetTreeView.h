@@ -58,8 +58,8 @@ public:
    void SetDisplayTimestampRelative(const bool oq_Value);
    void SetDisplayTimestampAbsoluteTimeOfDay(const bool oq_Value);
    void SetTraceBufferSize(const stw_types::uint32 ou32_Value);
-   bool GetDisplayAsHex(void);
-   bool GetDisplayTimestampRelative(void);
+   bool GetDisplayAsHex(void) const;
+   bool GetDisplayTimestampRelative(void) const;
 
    void SearchTrace(const QString & orc_SearchString, const bool oq_Next);
 
@@ -68,16 +68,13 @@ public:
    std::vector<stw_types::sint32> GetCurrentColumnWidths(void) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected);
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void drawBranches(QPainter * const opc_Painter, const QRect & orc_Rect,
                              const QModelIndex & orc_Index) const override;
-   virtual stw_types::sintn sizeHintForColumn(stw_types::sintn osn_Column) const override;
-   //lint -restore
+   virtual stw_types::sintn sizeHintForColumn(const stw_types::sintn osn_Column) const override;
 
 private:
    static const QString mhc_Stylesheet;

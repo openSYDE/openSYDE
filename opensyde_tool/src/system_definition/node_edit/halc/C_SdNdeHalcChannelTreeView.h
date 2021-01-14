@@ -50,11 +50,8 @@ Q_SIGNALS:
    void SigEditName(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    C_SdNdeHalcChannelTreeView(const C_SdNdeHalcChannelTreeView &);
@@ -63,6 +60,7 @@ private:
    stw_opensyde_gui_logic::C_SdNdeHalcChannelTreeModel mc_Model;
    stw_opensyde_gui_logic::C_SdNdeHalcChannelTreeDelegate mc_Delegate;
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
+   QAction * mpc_CopyAction;
 
    void m_SetupContextMenu(void);
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);

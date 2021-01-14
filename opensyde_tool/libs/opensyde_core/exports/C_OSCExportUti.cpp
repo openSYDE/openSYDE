@@ -357,7 +357,7 @@ C_SCLString C_OSCExportUti::h_FloatToStrCutZeroes(const float64 of64_Value, cons
    {
       // cut trailing zeros
       while ((c_Return.IsEmpty() == false) && (c_Return[c_Return.Length()] == '0') &&
-             (c_Return.Pos('.') != (c_Return.Length() - 1)))
+             (c_Return.Pos(".") != (c_Return.Length() - 1)))
       {
          c_Return.Delete(c_Return.Length(), 1);
       }

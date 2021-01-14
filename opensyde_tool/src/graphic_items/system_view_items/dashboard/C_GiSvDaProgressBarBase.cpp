@@ -78,9 +78,9 @@ C_GiSvDaProgressBarBase::C_GiSvDaProgressBarBase(const uint32 & oru32_ViewIndex,
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ProgressBarWidget and the Qt memory management
 C_GiSvDaProgressBarBase::~C_GiSvDaProgressBarBase(void)
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_ProgressBarWidget and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ void C_GiSvDaProgressBarBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style
 
    if (this->ms32_Index >= 0)
    {
-      const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+      const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
       if ((pc_Dashboard != NULL) &&
           (this->mpc_ProgressBarWidget != NULL))
       {
@@ -140,7 +140,7 @@ void C_GiSvDaProgressBarBase::ReInitializeSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::LoadData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -166,7 +166,7 @@ void C_GiSvDaProgressBarBase::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::UpdateData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -243,7 +243,7 @@ void C_GiSvDaProgressBarBase::ConnectionActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaProgressBarBase::CallProperties(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -332,8 +332,7 @@ bool C_GiSvDaProgressBarBase::CallProperties(void)
          {
             c_New->HideOverlay();
          }
-         //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-      }
+      } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    }
    return true;
 }
@@ -447,7 +446,8 @@ void C_GiSvDaProgressBarBase::m_UpdateStaticValues(void)
                                                            c_Scaling.f64_Offset, c_Text, u32_Index);
             this->mpc_ProgressBarWidget->SetMax(2000000, c_Text);
             //Update value
-            this->mpc_ProgressBarWidget->SetValue(static_cast<sintn>(f64_Value * 2000000.0), c_Value);
+            const float64 f64_Temp = f64_Value * 2000000.0;
+            this->mpc_ProgressBarWidget->SetValue(static_cast<sintn>(f64_Temp), c_Value);
          }
       }
       else

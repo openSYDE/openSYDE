@@ -61,7 +61,6 @@ void C_CamGenSigTableDelegate::setEditorData(QWidget * const opc_Editor, const Q
    //Call base for actual functionality
    C_CamTblDelegate::setEditorData(opc_Editor, orc_Index);
 
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    pc_LineEdit = dynamic_cast<C_TblEditLineEditBase *>(opc_Editor);
    if (pc_LineEdit != NULL)
    {
@@ -81,7 +80,9 @@ void C_CamGenSigTableDelegate::setEditorData(QWidget * const opc_Editor, const Q
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeCbxTableBase * C_CamGenSigTableDelegate::m_CreateComboBox(QWidget * const opc_Parent) const
 {
-   return new C_CamOgeCbxTable(opc_Parent);
+   C_CamOgeCbxTable * pc_Combobox = new C_CamOgeCbxTable(opc_Parent);
+
+   return pc_Combobox;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

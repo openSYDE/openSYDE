@@ -26,6 +26,7 @@ class C_PuiSvDbDataElementScaling
 {
 public:
    C_PuiSvDbDataElementScaling(void);
+   virtual ~C_PuiSvDbDataElementScaling();
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 

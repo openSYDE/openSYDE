@@ -220,7 +220,7 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
       Q_EMIT (this->SigBeforeOtherProjectLoad());
       C_PuiProject::h_GetInstance()->SetPath(orc_FilePath);
       s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
-      C_PopErrorHandling::mh_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
+      C_PopErrorHandling::h_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
 
       if (s32_Result == C_NO_ERR)
       {
@@ -255,7 +255,7 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
          s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
 
          // very unlikely, but the previous project could be corrupt -> check it and load empty project else
-         C_PopErrorHandling::mh_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
+         C_PopErrorHandling::h_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
          if (s32_Result == C_NO_ERR)
          {
             C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
@@ -294,7 +294,7 @@ void C_NagMainWidget::UpdateRecentProjects(void)
    if (c_Files.size() > 0)
    {
       this->mpc_Ui->pc_LabRecentProjects->setText(
-         QString(C_GtGetText::h_GetText("Recent Projects (%1)")).arg(c_Files.size()));
+         static_cast<QString>(C_GtGetText::h_GetText("Recent Projects (%1)")).arg(c_Files.size()));
       this->mpc_Ui->pc_GroupBoxNoRecentProj->setVisible(false);
       this->mpc_Ui->pc_TableView->setVisible(true);
       this->mpc_Ui->pc_TableView->UpdateData(c_Files, c_Projects);
@@ -328,8 +328,7 @@ void C_NagMainWidget::OnSaveProjAs(void)
       pc_Dialog->SaveUserSettings();
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initializes paths of disabled icons.
@@ -424,7 +423,7 @@ void C_NagMainWidget::m_UpdateCurrProjInfo(void)
    {
       //Current project
       const QString c_TooltipContent =
-         QString(C_GtGetText::h_GetText(
+         static_cast<QString>(C_GtGetText::h_GetText(
                     "Author: %1 \nCreated: %2 \nLast Modified: %3 (by %4) \nUsed openSYDE version: %5")).
          arg(C_PuiProject::h_GetInstance()->c_Author.c_str()).
          arg(C_PuiProject::h_GetTimeFormatted(C_PuiProject::h_GetInstance()->c_CreationTime).c_str()).
@@ -436,7 +435,7 @@ void C_NagMainWidget::m_UpdateCurrProjInfo(void)
                                                                           this->mpc_Ui->pc_LabelCurProjName->
                                                                           maximumWidth()));
       this->mpc_Ui->pc_LabelCurProjName->SetToolTipInformation(c_Name, c_TooltipContent);
-      Q_EMIT (this->SigNewApplicationName(QString("openSYDE - %1 (%2)").
+      Q_EMIT (this->SigNewApplicationName(static_cast<QString>("openSYDE - %1 (%2)").
                                           arg(c_Name).arg(C_PuiProject::h_GetInstance()->GetPath())));
    }
    else
@@ -446,7 +445,8 @@ void C_NagMainWidget::m_UpdateCurrProjInfo(void)
       this->mpc_Ui->pc_LabelCurProjName->SetToolTipInformation(C_GtGetText::h_GetText(
                                                                   "New project"),
                                                                C_GtGetText::h_GetText("This project is not yet saved."));
-      Q_EMIT (this->SigNewApplicationName(QString("openSYDE - ") + QString(C_GtGetText::h_GetText("New project"))));
+      Q_EMIT (this->SigNewApplicationName(static_cast<QString>("openSYDE - ") +
+                                          static_cast<QString>(C_GtGetText::h_GetText("New project"))));
    }
    //Always use version from current project
    this->mpc_Ui->pc_LabelVersion->setText(c_FontMetrics.elidedText(C_PuiProject::h_GetInstance()->c_Version.c_str(),
@@ -498,8 +498,7 @@ void C_NagMainWidget::m_AboutClicked()
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot function for new project button click.
@@ -529,7 +528,7 @@ void C_NagMainWidget::m_OnOpenProj(void)
    {
       QString c_Folder = "";
       const QString c_Suffix = "*.syde";
-      const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE project")) + " (" + c_Suffix + ")";
+      const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("openSYDE project")) + " (" + c_Suffix + ")";
 
       C_UsHandler::h_GetInstance()->GetMostRecentFolder(c_Folder);
 
@@ -556,7 +555,7 @@ void C_NagMainWidget::m_OnSaveProj(void)
    else
    {
       // save current existing project
-      C_PopErrorHandling::mh_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
+      C_PopErrorHandling::h_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
       this->UpdateRecentProjects();
    }
 }
@@ -666,5 +665,4 @@ void C_NagMainWidget::OpenColorPicker(void)
    {
       c_Popup->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_ColorWidget and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_ColorWidget and the Qt memory management

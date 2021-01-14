@@ -38,6 +38,7 @@ public:
    };
 
    C_PuiSvData(void);
+   virtual ~C_PuiSvData(void);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
    stw_types::uint32 CalcUpdateHash(void) const;
@@ -96,6 +97,7 @@ public:
                                                   QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
                                                        C_PuiSvReadDataConfiguration> & orc_Rails)
    const;
+   void GetAllRegisteredDashboardElements(std::set<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_Ids) const;
 
    stw_types::sint32 SetDashboardName(const stw_types::uint32 ou32_DashboardIndex, const QString & orc_Name);
    stw_types::sint32 SetDashboardComment(const stw_types::uint32 ou32_DashboardIndex, const QString & orc_Comment);

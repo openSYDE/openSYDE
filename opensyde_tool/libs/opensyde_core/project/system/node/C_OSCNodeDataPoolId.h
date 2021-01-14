@@ -25,6 +25,7 @@ class C_OSCNodeDataPoolId
 {
 public:
    C_OSCNodeDataPoolId(void);
+   virtual ~C_OSCNodeDataPoolId(void);
    C_OSCNodeDataPoolId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex);
 
    virtual bool operator < (const C_OSCNodeDataPoolId & orc_Cmp) const;

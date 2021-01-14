@@ -51,8 +51,8 @@ using namespace stw_types;
 
    Set up GUI with all elements.
 
-   \param[in,out]    opc_Parent     Optional pointer to parent
-   \param[in]        orc_Database   Database data
+   \param[in]      orc_Database  Database data
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseItemWidget::C_CamMosDatabaseItemWidget(const C_CamProDatabaseData & orc_Database,
@@ -68,7 +68,7 @@ C_CamMosDatabaseItemWidget::C_CamMosDatabaseItemWidget(const C_CamProDatabaseDat
 
    // initialize database
    this->mc_Database = orc_Database;
-   this->mc_FileTimeStamp = QDateTime(QFileInfo(C_CamUti::h_GetAbsPathFromProj(orc_Database.c_Name)).lastModified());
+   this->mc_FileTimeStamp = static_cast<QFileInfo>(C_CamUti::h_GetAbsPathFromProj(orc_Database.c_Name)).lastModified();
 
    // reset buses
    this->mc_Busses.clear();
@@ -142,7 +142,7 @@ C_CamMosDatabaseItemWidget::~C_CamMosDatabaseItemWidget()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set icon and tool tip depending on state.
 
-   \param[in]     oe_State
+   \param[in]  oe_State    State
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::SetState(const C_CamMosDatabaseItemWidget::E_LoadingState oe_State)
@@ -224,19 +224,19 @@ void C_CamMosDatabaseItemWidget::SetState(const C_CamMosDatabaseItemWidget::E_Lo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set bus index of database data.
 
-   \param[in]     u32_BusIndex        bus index
+   \param[in]  ou32_BusIndex   bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseItemWidget::SetBusIndex(const uint32 u32_BusIndex)
+void C_CamMosDatabaseItemWidget::SetBusIndex(const uint32 ou32_BusIndex)
 {
-   this->mc_Database.s32_BusIndex = static_cast<sint32>(u32_BusIndex);
+   this->mc_Database.s32_BusIndex = static_cast<sint32>(ou32_BusIndex);
    this->UpdateTooltip();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remember all buses of openSYDE system definition for future selection.
 
-   \param[in]     orc_Busses      buses
+   \param[in]  orc_Busses  buses
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::SetBusses(const std::vector<stw_opensyde_core::C_OSCSystemBus> & orc_Busses)
@@ -250,7 +250,7 @@ void C_CamMosDatabaseItemWidget::SetBusses(const std::vector<stw_opensyde_core::
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::UpdateTooltip(void) const
 {
-   QString c_AbsolutePath = C_CamUti::h_GetAbsPathFromProj(this->mc_Database.c_Name);
+   const QString c_AbsolutePath = C_CamUti::h_GetAbsPathFromProj(this->mc_Database.c_Name);
    QString c_ToolTipContent = c_AbsolutePath;
 
    if (this->mc_Database.c_Name != c_AbsolutePath)
@@ -261,22 +261,22 @@ void C_CamMosDatabaseItemWidget::UpdateTooltip(void) const
 
    if ((this->mc_Database.s32_BusIndex > -1) &&
        (this->mc_Database.s32_BusIndex < static_cast<sint32>(this->mc_Busses.size())) &&
-       (QFileInfo(c_AbsolutePath).suffix().compare("syde_sysdef", Qt::CaseInsensitive) == 0))
+       (static_cast<QFileInfo>(c_AbsolutePath).suffix().compare("syde_sysdef", Qt::CaseInsensitive) == 0))
    {
       c_ToolTipContent += "\n\n";
       c_ToolTipContent +=
-         QString(C_GtGetText::h_GetText("Bus: %1")).arg(
+         static_cast<QString>(C_GtGetText::h_GetText("Bus: %1")).arg(
             this->mc_Busses[this->mc_Database.s32_BusIndex].c_Name.c_str());
    }
 
-   this->mpc_Ui->pc_LabDatabase->SetToolTipInformation(QFileInfo(this->mc_Database.c_Name).fileName(),
+   this->mpc_Ui->pc_LabDatabase->SetToolTipInformation(static_cast<QFileInfo>(this->mc_Database.c_Name).fileName(),
                                                        c_ToolTipContent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update database name to react if relativeness changed.
 
-   \param[in]   orc_NewDatabaseName    new database path
+   \param[in]  orc_NewDatabaseName  new database path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::UpdateDatabasePathRelativeness(const QString & orc_NewDatabaseName)
@@ -301,7 +301,7 @@ void C_CamMosDatabaseItemWidget::CheckFile(void)
        (this->me_State == C_CamMosDatabaseItemWidget::eNOT_FOUND) ||
        (this->me_State == C_CamMosDatabaseItemWidget::eLOAD_ERROR))
    {
-      QFileInfo c_File(C_CamUti::h_GetAbsPathFromProj(this->mc_Database.c_Name));
+      const QFileInfo c_File(C_CamUti::h_GetAbsPathFromProj(this->mc_Database.c_Name));
       C_OgeWiCustomMessage c_Message(this);
 
       // check file existence
@@ -318,7 +318,8 @@ void C_CamMosDatabaseItemWidget::CheckFile(void)
                c_Message.SetType(C_OgeWiCustomMessage::eQUESTION);
                c_Message.SetHeading(C_GtGetText::h_GetText("File Changed"));
                c_Message.SetDescription(
-                  QString(C_GtGetText::h_GetText("Database %1 changed on disk. Do you want to reload this database?")).
+                  static_cast<QString>(C_GtGetText::h_GetText(
+                                          "Database %1 changed on disk. Do you want to reload this database?")).
                   arg(c_File.absoluteFilePath()));
                c_Message.SetOKButtonText(C_GtGetText::h_GetText("Reload"));
                c_Message.SetNOButtonText(C_GtGetText::h_GetText("Don't reload!"));
@@ -347,8 +348,9 @@ void C_CamMosDatabaseItemWidget::CheckFile(void)
          if (this->mq_AlreadyAskedUserDelete == false)
          {
             QString c_Details;
-            QString c_Description = QString(C_GtGetText::h_GetText("Could not find file %1. "
-                                                                   "Do you want to delete this database?")).arg(
+            QString c_Description = static_cast<QString>(C_GtGetText::h_GetText("Could not find file %1. "
+                                                                                "Do you want to delete this database?"))
+                                    .arg(
                c_File.absoluteFilePath());
             C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(
                c_File.absoluteFilePath(), c_Description, c_Details);
@@ -362,6 +364,10 @@ void C_CamMosDatabaseItemWidget::CheckFile(void)
             if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
             {
                q_Remove = true;
+            }
+            else
+            {
+               Q_EMIT (this->SigNotifyMissingDataBase(this->mc_Database.c_Name));
             }
 
             // reset flag
@@ -395,7 +401,7 @@ C_CamProDatabaseData C_CamMosDatabaseItemWidget::GetDatabaseData(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Browse for database path and check if already used
 
-   \param[in]    opc_Parent    pointer to parent (to integrate browse window correctly)
+   \param[in]  opc_Parent  pointer to parent (to integrate browse window correctly)
 
    \return
    new database path (empty if already existing or user canceled)
@@ -403,9 +409,10 @@ C_CamProDatabaseData C_CamMosDatabaseItemWidget::GetDatabaseData(void) const
 //----------------------------------------------------------------------------------------------------------------------
 QString C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(QWidget * const opc_Parent)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   const C_CamMosDatabaseItemWidget * pc_DatabaseItemWidget = dynamic_cast<C_CamMosDatabaseItemWidget *>(opc_Parent);
-   const QString c_Filter = QString(C_GtGetText::h_GetText("CAN Database File ")) + "(*.syde_sysdef | *.dbc | *.syde)";
+   const C_CamMosDatabaseItemWidget * const pc_DatabaseItemWidget =
+      dynamic_cast<C_CamMosDatabaseItemWidget *>(opc_Parent);
+   const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("CAN Database File ")) +
+                            "(*.syde_sysdef | *.dbc | *.syde)";
    QString c_Folder = "";
    QString c_Return = "";
    QFileDialog c_Dialog(opc_Parent, C_GtGetText::h_GetText("Select Database"), c_Folder, c_Filter);
@@ -414,7 +421,8 @@ QString C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(QWidget * const opc_
    if (pc_DatabaseItemWidget != NULL)
    {
       c_Folder =
-         QFileInfo(C_CamUti::h_GetAbsPathFromProj(pc_DatabaseItemWidget->GetDatabaseData().c_Name)).dir().absolutePath();
+         static_cast<QFileInfo>(C_CamUti::h_GetAbsPathFromProj(pc_DatabaseItemWidget->GetDatabaseData().c_Name)).dir().
+         absolutePath();
    }
 
    // second favorite location: last known database path
@@ -445,7 +453,7 @@ QString C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(QWidget * const opc_
       // "" is returned if user canceled
       if (c_Return != "")
       {
-         const QFileInfo c_FileInfo = QFileInfo(c_Return);
+         const QFileInfo c_FileInfo = static_cast<QFileInfo>(c_Return);
          // store new user settings
          C_UsHandler::h_GetInstance()->SetLastKnownDatabasePath(c_FileInfo.absoluteDir().absolutePath());
 
@@ -469,7 +477,7 @@ QString C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(QWidget * const opc_
 
    Make sure that input QFileInfo is valid (i.e. created with absolute and nonempty path).
 
-   \param[in]    orc_SydeFile   absolute path to .syde file
+   \param[in]  orc_SydeFile   absolute path to .syde file
 
    \return
    system definition path (always absolute)
@@ -485,7 +493,7 @@ QString C_CamMosDatabaseItemWidget::h_AdaptPathToSystemDefinitionIfNecessary(con
       QString c_SysdefFile =
          orc_SydeFile.absolutePath() + "/system_definition/" + orc_SydeFile.completeBaseName() + ".syde_sysdef";
 
-      if (QFileInfo(c_SysdefFile).exists() == true)
+      if (static_cast<QFileInfo>(c_SysdefFile).exists() == true)
       {
          c_Return = c_SysdefFile;
       }
@@ -494,7 +502,7 @@ QString C_CamMosDatabaseItemWidget::h_AdaptPathToSystemDefinitionIfNecessary(con
          // now try file version V2, i.e. system definition file is beneath .syde file
          c_SysdefFile = orc_SydeFile.absolutePath() + "/" + orc_SydeFile.completeBaseName() + ".syde_sysdef";
 
-         if (QFileInfo(c_SysdefFile).exists() == true)
+         if (static_cast<QFileInfo>(c_SysdefFile).exists() == true)
          {
             c_Return = c_SysdefFile;
          }
@@ -507,8 +515,8 @@ QString C_CamMosDatabaseItemWidget::h_AdaptPathToSystemDefinitionIfNecessary(con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if database is already used and inform user if so
 
-   \param[in]    opc_Parent         pointer to parent (to integrate browse window correctly)
-   \param[in]    orc_AbsolutePath   absolute path to new database
+   \param[in]  orc_AbsolutePath  absolute path to new database
+   \param[in]  opc_Parent        pointer to parent (to integrate browse window correctly)
 
    \retval true: database already used
    \retval false: database not present
@@ -528,7 +536,7 @@ bool C_CamMosDatabaseItemWidget::h_IsDatabaseAlreadyUsed(const QString & orc_Abs
          C_OgeWiCustomMessage c_Message(opc_Parent);
          c_Message.SetHeading(C_GtGetText::h_GetText("Database Loading"));
          c_Message.SetDescription(
-            QString(C_GtGetText::h_GetText("The database %1 is already used and not added again.")).
+            static_cast<QString>(C_GtGetText::h_GetText("The database %1 is already used and not added again.")).
             arg(orc_AbsolutePath));
          c_Message.Execute();
 
@@ -543,9 +551,9 @@ bool C_CamMosDatabaseItemWidget::h_IsDatabaseAlreadyUsed(const QString & orc_Abs
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append message warning to database delete request if necessary
 
-   \param[in]     orc_File        File to delete
-   \param[in,out] orc_Description Current description
-   \param[in,out] orc_Details     Current details
+   \param[in]      orc_File         File to delete
+   \param[in,out]  orc_Description  Current description
+   \param[in,out]  orc_Details      Current details
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(const QString & orc_File, QString & orc_Description,
@@ -579,11 +587,9 @@ void C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(const QString
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_OnSelectBus()
 {
-   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_CamMosDatabaseBusSelectionPopup * pc_Dialog =
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   C_CamMosDatabaseBusSelectionPopup * const pc_Dialog =
       new C_CamMosDatabaseBusSelectionPopup(this->mc_Busses, this->mc_Database, *c_New);
-
-   Q_UNUSED(pc_Dialog)
 
    //Resize
    c_New->SetSize(QSize(700, 400));
@@ -600,8 +606,7 @@ void C_CamMosDatabaseItemWidget::m_OnSelectBus()
    {
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot for browse button.
@@ -623,7 +628,8 @@ void C_CamMosDatabaseItemWidget::m_OnBrowse()
       {
          QString c_Details;
          C_OgeWiCustomMessage c_Message(this);
-         QString c_Description = QString(C_GtGetText::h_GetText("Do you really want to replace this database?"));
+         QString c_Description =
+            static_cast<QString>(C_GtGetText::h_GetText("Do you really want to replace this database?"));
          C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(
             C_CamUti::h_GetAbsPathFromProj(this->mc_Database.c_Name), c_Description, c_Details);
          // ask user to replace database
@@ -663,7 +669,7 @@ void C_CamMosDatabaseItemWidget::m_OnBrowse()
             // reset buses and bus index
             this->mc_Busses.clear();
             this->mc_Database.s32_BusIndex = -1;
-            this->mc_FileTimeStamp = QDateTime(QFileInfo(c_Name).lastModified()); // set new timestamp
+            this->mc_FileTimeStamp = static_cast<QFileInfo>(c_Name).lastModified(); // set new timestamp
 
             // update GUI
             this->m_SetMinimizedPath();
@@ -688,13 +694,20 @@ void C_CamMosDatabaseItemWidget::m_OnRemove()
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot for checkbox toggle.
+
+   \param[in]  orq_Checked    Checked
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_OnChxToggle(const bool & orq_Checked)
 {
    // inform list about check box toggle
-   Q_EMIT (this->SigEnableDatabase(this, orq_Checked));
-   this->mc_Database.q_Enabled = orq_Checked;
+   const bool q_Result = Q_EMIT (this->SigEnableDatabase(this, orq_Checked));
+
+   this->mc_Database.q_Enabled = q_Result;
+   if (q_Result != orq_Checked)
+   {
+      this->mpc_Ui->pc_CheckBox->setChecked(true);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -713,9 +726,7 @@ void C_CamMosDatabaseItemWidget::m_SetMinimizedPath(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Enable tool tip of checkbox.
 
-
-
-   \param[in]  oq_Enabled   tool tip content
+   \param[in]  oq_Enabled  tool tip content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_EnableCheckBoxTooltip(const bool oq_Enabled)
@@ -762,7 +773,7 @@ void C_CamMosDatabaseItemWidget::m_ButtonReleased(void)
 
     Here: Show or hide buttons
 
-   \param[in,out]    opc_Event   Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \retval  True   Event was recognized and processed
    \retval  False  Event ignored
@@ -785,7 +796,8 @@ bool C_CamMosDatabaseItemWidget::event(QEvent * const opc_Event)
       {
          // show select bus button only if openSYDE system definition and state ok
          // (its disabled anyway but tooltip would appear)
-         if ((QFileInfo(this->mc_Database.c_Name).suffix().compare("syde_sysdef", Qt::CaseInsensitive) == 0) &&
+         if ((static_cast<QFileInfo>(this->mc_Database.c_Name).suffix().compare("syde_sysdef",
+                                                                                Qt::CaseInsensitive) == 0) &&
              (this->me_State == eOK))
          {
             this->mpc_Ui->pc_PbSelectBus->setVisible(true);

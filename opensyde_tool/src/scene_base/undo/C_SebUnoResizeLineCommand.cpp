@@ -102,7 +102,6 @@ void C_SebUnoTopResizeLineCommand::m_UndoSingle(QGraphicsItem * const opc_Item) 
    {
       C_GiLiLineGroup * pc_LineGroup;
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       pc_LineGroup = dynamic_cast<C_GiLiLineGroup *>(opc_Item);
       if (pc_LineGroup != NULL)
       {
@@ -126,7 +125,6 @@ void C_SebUnoTopResizeLineCommand::m_RedoSingle(QGraphicsItem * const opc_Item) 
    {
       C_GiLiLineGroup * pc_LineGroup;
 
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       pc_LineGroup = dynamic_cast<C_GiLiLineGroup *>(opc_Item);
       if (pc_LineGroup != NULL)
       {

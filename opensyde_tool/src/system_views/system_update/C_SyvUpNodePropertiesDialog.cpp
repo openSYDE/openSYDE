@@ -346,12 +346,12 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
                      const C_XFLECUInformation & rc_FileInfo = this->mpc_HexFileInfos->at(u32_ItFile);
                      const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItFile];
 
-                     const QString c_Column1TagStart = QString("<td style=\"padding: 0 9px 0 18px;\">");
-                     const QString c_ColumnContentTagStart = QString(
+                     const QString c_Column1TagStart = static_cast<QString>("<td style=\"padding: 0 9px 0 18px;\">");
+                     const QString c_ColumnContentTagStart = static_cast<QString>(
                         "<td valign=\"middle\" style=\"padding: 0 9px 0 9px;\">");
                      const QString c_FileProjectName = rc_FileInfo.acn_ProjectName;
                      const QString c_FileVersion = rc_FileInfo.acn_ProjectVersion;
-                     const QString c_FileBuild = QString(rc_FileInfo.acn_Date) + " " + rc_FileInfo.acn_Time;
+                     const QString c_FileBuild = static_cast<QString>(rc_FileInfo.acn_Date) + " " + rc_FileInfo.acn_Time;
                      QString c_DeviceProjectName = C_GtGetText::h_GetText("<b>Missing</b>");
                      QString c_DeviceVersion = C_GtGetText::h_GetText("<b>Missing</b>");
                      QString c_DeviceBuild = C_GtGetText::h_GetText("<b>Missing</b>");
@@ -430,7 +430,7 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
                                  //Apply
                                  c_DeviceProjectName = rc_STWDeviceInfo.acn_ProjectName;
                                  c_DeviceVersion = rc_STWDeviceInfo.acn_ProjectVersion;
-                                 c_DeviceBuild = QString(rc_STWDeviceInfo.acn_Date) + " " + rc_STWDeviceInfo.acn_Time;
+                                 c_DeviceBuild = static_cast<QString>(rc_STWDeviceInfo.acn_Date) + " " + rc_STWDeviceInfo.acn_Time;
                                  //Highlighting
                                  if (c_FileProjectName.compare(c_DeviceProjectName) != 0)
                                  {
@@ -513,7 +513,7 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
                      c_Content += "<table>";
                      c_Content += "<tr>";
                      c_Content += "<td valign=\"middle\">";
-                     c_Content += QString("#%1 - %2 ").arg(u32_ItFile + 1).arg(rc_Application.c_Name.c_str());
+                     c_Content += static_cast<QString>("#%1 - %2 ").arg(u32_ItFile + 1).arg(rc_Application.c_Name.c_str());
                      c_Content += "</td>";
                      c_Content += "<td valign=\"middle\">";
                      //Image
@@ -648,7 +648,7 @@ void C_SyvUpNodePropertiesDialog::m_InitFlashloaderTable(void) const
    c_Content += "<p>";
    for (sint32 s32_ItString = 0; s32_ItString < c_List.Strings.GetLength(); ++s32_ItString)
    {
-      c_Content += QString(c_List.Strings[s32_ItString].c_str()) + "<br/>";
+      c_Content += static_cast<QString>(c_List.Strings[s32_ItString].c_str()) + "<br/>";
    }
    c_Content += "</p>";
 

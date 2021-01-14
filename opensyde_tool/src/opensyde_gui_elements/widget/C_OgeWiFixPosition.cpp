@@ -108,5 +108,4 @@ void C_OgeWiFixPosition::m_ApplyShadow()
    c_Color.setAlpha(128);
    pc_Shadow->setColor(c_Color);
    this->mpc_Ui->pc_GroupBox->setGraphicsEffect(pc_Shadow);
-   //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management

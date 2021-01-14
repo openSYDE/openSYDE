@@ -31,12 +31,9 @@ public:
    void SetDarkMode(const bool oq_Active);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool event(QEvent * const opc_Event) override;
    virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QMouseEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    QIcon mc_Default;

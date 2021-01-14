@@ -107,7 +107,7 @@ QGraphicsItem * C_SebUnoBaseCommand::m_GetSceneItem(const uint64 & oru64_ID) con
 {
    QGraphicsItem * pc_Retval;
 
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    const stw_opensyde_gui::C_SebScene * const pc_DetailedScene =
       dynamic_cast<const stw_opensyde_gui::C_SebScene * const>(mpc_Scene);
 
@@ -163,7 +163,7 @@ bool C_SebUnoBaseCommand::m_MergePossible(const C_SebUnoBaseCommand * const opc_
    All unique IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<uint64> C_SebUnoBaseCommand::GetIDs(void) const
+const std::vector<uint64> C_SebUnoBaseCommand::m_GetIDs(void) const
 {
    return this->mc_IDs;
 }

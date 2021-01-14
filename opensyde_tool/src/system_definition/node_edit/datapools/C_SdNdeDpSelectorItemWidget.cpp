@@ -98,8 +98,12 @@ C_SdNdeDpSelectorItemWidget::C_SdNdeDpSelectorItemWidget(const bool oq_UsageView
       this->mpc_UsageBar = new C_SdNdeDpSelectorItemUsageWidget(this);
    }
 
+   this->setContextMenuPolicy(Qt::CustomContextMenu);
+
    connect(this->mpc_LabelStateImg, &C_OgeLabToolTipBase::SigLastChanceToUpdateToolTip, this,
-           &C_SdNdeDpSelectorItemWidget::SigUpdateErrorToolTip);
+           &C_SdNdeDpSelectorItemWidget::m_UpdateErrorToolTip);
+   connect(this, &C_SdNdeDpSelectorItemWidget::customContextMenuRequested, this,
+           &C_SdNdeDpSelectorItemWidget::m_OnCustomContextMenuRequested);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -242,7 +246,7 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
       // Tooltip
       c_ToolTipText = this->mpc_Ui->pc_TextEditDpComment->toPlainText();
       c_ToolTipText += C_GtGetText::h_GetText("\n\nVersion: ");
-      c_ToolTipText += QString("v%1.%2r%3").
+      c_ToolTipText += static_cast<QString>("v%1.%2r%3").
                        arg(pc_OSCDataPool->au8_Version[0], 2, 10, QChar('0')).
                        arg(pc_OSCDataPool->au8_Version[1], 2, 10, QChar('0')).
                        arg(pc_OSCDataPool->au8_Version[2], 2, 10, QChar('0'));
@@ -301,7 +305,7 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
       }
       else
       {
-         c_ToolTipText += C_GtGetText::h_GetText("Not Assigned");
+         c_ToolTipText += C_GtGetText::h_GetText("<not assigned>");
       }
       c_ToolTipText += "\n\n";
 
@@ -350,11 +354,11 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
          this->mpc_Ui->pc_LabelUsage->setText(c_Label);
 
          // udpate the tool tip
-         c_TextUsage = "   " + QString("%1% %2 (%3 / %4)\n").arg(QString::number(u32_PercentageUsed),
+         c_TextUsage = "   " + static_cast<QString>("%1% %2 (%3 / %4)\n").arg(QString::number(u32_PercentageUsed),
                                                                  C_GtGetText::h_GetText("used by parameters"),
                                                                  C_Uti::h_GetByteCountAsString(this->mu32_Used),
                                                                  C_Uti::h_GetByteCountAsString(this->mu32_Size));
-         c_TextReservation = "   " + QString("%1% %2 (%3 / %4)").arg(QString::number(u32_PercentageReserved),
+         c_TextReservation = "   " + static_cast<QString>("%1% %2 (%3 / %4)").arg(QString::number(u32_PercentageReserved),
                                                                      C_GtGetText::h_GetText("reserved by lists"),
                                                                      C_Uti::h_GetByteCountAsString(this->mu32_Reserved),
                                                                      C_Uti::h_GetByteCountAsString(this->mu32_Size));
@@ -542,6 +546,42 @@ stw_types::uint32 C_SdNdeDpSelectorItemWidget::GetDataPoolReservedSize(void) con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden mouse press event
+
+   Selecting or unselecting the widget
+
+   \param[in,out]  opc_Event  Pointer to mouse event
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorItemWidget::mousePressEvent(QMouseEvent * const opc_Event)
+{
+   if (opc_Event->buttons() == static_cast<sintn>(Qt::LeftButton))
+   {
+      Q_EMIT (this->SigClicked(this->mu32_Number - 1U));
+   }
+
+   QWidget::mousePressEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten double click event
+
+   Open version edit on double click
+
+   \param[in,out] opc_Event Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorItemWidget::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
+{
+   if (opc_Event->buttons() == static_cast<sintn>(Qt::LeftButton))
+   {
+      Q_EMIT (this->SigDoubleClicked(this->mu32_Number - 1U));
+   }
+
+   QWidget::mouseDoubleClickEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   On Show Event
 
    \param[in,out] opc_Event  Pointer to paint event
@@ -649,7 +689,7 @@ void C_SdNdeDpSelectorItemWidget::m_UpdateLabel(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorItemWidget::m_UpdateName(void) const
 {
-   this->mpc_Ui->pc_TextEditDpName->setText(QString("#") + QString::number(this->mu32_Number) + QString(" - ") +
+   this->mpc_Ui->pc_TextEditDpName->setText(static_cast<QString>("#") + QString::number(this->mu32_Number) + static_cast<QString>(" - ") +
                                             this->mc_Name);
 }
 
@@ -676,4 +716,24 @@ void C_SdNdeDpSelectorItemWidget::m_SetSelectColor(const bool oq_Active)
       // reset stylesheet
       this->setStyleSheet("");
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends a signal for updating the error tool tip
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorItemWidget::m_UpdateErrorToolTip(void)
+{
+   Q_EMIT (this->SigUpdateErrorToolTip(this->mu32_Number - 1U));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
+
+   \param[in] orc_Pos Local context menu position
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorItemWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
+{
+   Q_EMIT (this->SigContextMenuRequested(this->mapToParent(orc_Pos), this->mu32_Number - 1U));
 }

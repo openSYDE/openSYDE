@@ -81,9 +81,9 @@ C_GiSvDaParam::C_GiSvDaParam(const uint32 & oru32_ViewIndex, const uint32 & oru3
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} Either handled by Qt parent handling or not owned by this class in the first place
 C_GiSvDaParam::~C_GiSvDaParam(void)
 {
-   //lint -e{1540} Either handled by Qt parent handling or not owned by this class in the first place
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ void C_GiSvDaParam::ReInitializeSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::LoadData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -164,7 +164,7 @@ void C_GiSvDaParam::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::UpdateData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if (pc_Dashboard != NULL)
    {
@@ -488,7 +488,7 @@ sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNode
                     --u32_ItElement)
                {
                   const C_PuiSvDbNodeDataElementConfig & rc_Config =
-                     pc_Param->c_DataPoolElementsConfig[u32_ItElement - 1UL];
+                     pc_Param->c_DataPoolElementsConfig[static_cast<uintn>(u32_ItElement) - 1U];
                   //Each found list
                   for (uint32 u32_ItListId = 0; u32_ItListId < orc_ListIds.size(); ++u32_ItListId)
                   {
@@ -518,13 +518,15 @@ sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNode
                   //Handle expansion (back to front!)
                   for (uint32 u32_ItExpansion = c_Copy.c_ExpandedItems.size(); u32_ItExpansion > 0UL; --u32_ItExpansion)
                   {
-                     const C_PuiSvDbExpandedTreeIndex & rc_Expanded = c_Copy.c_ExpandedItems[u32_ItExpansion - 1UL];
+                     const C_PuiSvDbExpandedTreeIndex & rc_Expanded =
+                        c_Copy.c_ExpandedItems[static_cast<uintn>(u32_ItExpansion) - 1U];
                      if (((rc_Expanded.c_ExpandedId.u32_NodeIndex == rc_ListId.u32_NodeIndex) &&
                           (rc_Expanded.c_ExpandedId.u32_DataPoolIndex == rc_ListId.u32_DataPoolIndex)) &&
                          (rc_Expanded.c_ExpandedId.u32_ListIndex == rc_ListId.u32_ListIndex))
                      {
                         //New item at current position
-                        c_Copy.c_ExpandedItems.erase(c_Copy.c_ExpandedItems.begin() + (u32_ItExpansion - 1UL));
+                        c_Copy.c_ExpandedItems.erase(c_Copy.c_ExpandedItems.begin() +
+                                                     (static_cast<sintn>(u32_ItExpansion) - 1));
                      }
                   }
                }

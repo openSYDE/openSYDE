@@ -121,7 +121,7 @@ void C_SdNdeDpListArrayEditWidget::InitStaticNames(void) const
          if (pc_DataSet != NULL)
          {
             //Translation: 1: data set name
-            c_EditType = QString(C_GtGetText::h_GetText("Dataset Value"));
+            c_EditType = static_cast<QString>(C_GtGetText::h_GetText("Dataset Value"));
          }
          break;
       default:
@@ -130,11 +130,11 @@ void C_SdNdeDpListArrayEditWidget::InitStaticNames(void) const
       }
 
       //Translation: 1: Data element type, 2: Data element name, 3: Value type
-      this->mrc_Parent.SetTitle(QString(C_GtGetText::h_GetText("%1 %2 (%3)")).arg(c_Type).arg(
+      this->mrc_Parent.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("%1 %2 (%3)")).arg(c_Type).arg(
                                    pc_Element->c_Name.c_str()).arg(c_EditType));
    }
 
-   this->mrc_Parent.SetSubTitle(QString(C_GtGetText::h_GetText("Array Editor")));
+   this->mrc_Parent.SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Array Editor")));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -10,8 +10,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <ctime> //lint !e829 //this module is specifically for Windows targets; no trouble with unspecified
+//lint -estring(829,*ctime*)  //this module is specifically for Windows targets; no trouble with unspecified
 // behavior expected
+#include <ctime>
 
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -67,7 +68,7 @@ C_OSCComMessageLoggerFileAsc::~C_OSCComMessageLoggerFileAsc(void)
 {
    if (this->mc_File.is_open() == true)
    {
-      C_SCLString c_EndLine = "End TriggerBlock";
+      const C_SCLString c_EndLine = "End TriggerBlock";
       this->mc_File.write(c_EndLine.c_str(), c_EndLine.Length());
       this->mc_File.close();
    }
@@ -299,9 +300,9 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetAscTimeString(void)
    C_SCLString c_Temp;
 
    // Getting weekday
-   std::time_t s32_Time = std::time(NULL);
-   std::tm t_Time = *std::localtime(&s32_Time);
-   uint32 u32_TimeMs = TGL_GetTickCount();
+   const std::time_t s32_Time = std::time(NULL);
+   const std::tm t_Time = *std::localtime(&s32_Time);
+   const uint32 u32_TimeMs = TGL_GetTickCount();
 
    c_Result += mh_GetDay(t_Time.tm_wday) + " ";
    c_Result += mh_GetMonth(t_Time.tm_mon) + " ";

@@ -36,7 +36,7 @@ public:
    void SetMaximumCustom(const stw_types::sintn osn_Value, const bool oq_ShowSpecial = false,
                          const stw_types::sintn osn_SpecialValue = 0);
    // The access have to be changed because in base class it's protected but we need a public one
-   //lint -save -e1768 -e1960
+   //lint -save -e1768
    virtual QString textFromValue(const stw_types::sintn osn_Value) const override;
    //lint -restore
 
@@ -64,10 +64,7 @@ protected:
    virtual QString m_GetMinimumString(void) const override;
    virtual QString m_GetMaximumString(void) const override;
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool event(QEvent * const opc_Event) override;
-   //lint -restore
 
    virtual bool m_IsEnabled(void) const override;
    virtual QString m_GetMinimumRawString(void) const override;

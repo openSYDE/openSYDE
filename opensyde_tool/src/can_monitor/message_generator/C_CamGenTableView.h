@@ -50,7 +50,7 @@ public:
    void SaveUserSettings(void) const;
    void LoadUserSettings(void);
 
-   void RemoveMessagesForFile(const QString & orc_File);
+   void RemoveMessagesForFile(const QString & orc_File, const std::vector<stw_types::uint32> * const opc_Indices);
    void SetCommunicationStarted(const bool oq_Active);
    void SetCyclicActive(const bool oq_Active);
    void UpdateMessageData(const stw_types::uint32 ou32_MessageIndex);
@@ -69,14 +69,11 @@ Q_SIGNALS:
    void SigSelected(const stw_types::uint32 ou32_NumSelectedItems, const stw_types::uint32 ou32_Row);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected) override;
    virtual stw_types::sintn sizeHintForColumn(stw_types::sintn osn_Column) const override;
-   //lint -restore
 
 private:
    bool mq_CommunicationActive; ///< True if message trace is currently running
@@ -96,8 +93,8 @@ private:
    std::vector<stw_types::uint32> m_GetSelectedRows(void) const;
    void m_SetupContextMenu(void);
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
-   void SelectRange(const std::vector<stw_types::uint32> & orc_Items);
-   void SelectAndScrollToRow(const stw_types::uint32 ou32_Row);
+   void m_SelectRange(const std::vector<stw_types::uint32> & orc_Items);
+   void m_SelectAndScrollToRow(const stw_types::uint32 ou32_Row);
    void m_RepositionButtons(void);
    void m_HandleLinkClicked(const QModelIndex & orc_Index);
    void m_StopCyclicCommunication(const std::vector<stw_types::uint32> & orc_Items);

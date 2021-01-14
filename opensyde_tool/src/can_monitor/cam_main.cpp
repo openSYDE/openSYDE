@@ -64,7 +64,7 @@ sintn main(sintn osn_Argc, charn * oapcn_Argv[])
       stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToFileActive(true);
       stw_opensyde_core::C_OSCLoggingHandler::h_SetCompleteLogFileLocation(c_FilePath.toStdString().c_str());
 
-      osc_write_log_info("Startup", QString("Starting openSYDE CAN Monitor(MD5-Checksum: " +
+      osc_write_log_info("Startup", static_cast<QString>("Starting openSYDE CAN Monitor(MD5-Checksum: " +
                                             c_BinaryHash +
                                             ")").toStdString().c_str());
    }
@@ -76,7 +76,7 @@ sintn main(sintn osn_Argc, charn * oapcn_Argv[])
       const QString c_TranslationLoacation = stw_opensyde_gui_logic::C_Uti::h_GetExePath() + "/Translations";
       //Set language (THIRD)
       //stw_opensyde_core::C_OSCGetText::h_SetLanguage("en_US");
-      stw_opensyde_gui_logic::C_PopErrorHandling::mh_GetTextInitializeErr(
+      stw_opensyde_gui_logic::C_PopErrorHandling::h_GetTextInitializeErr(
          stw_opensyde_gui_logic::C_GtGetText::h_Initialize(c_TranslationLoacation.toStdString().c_str(), "en_US"));
    }
    {

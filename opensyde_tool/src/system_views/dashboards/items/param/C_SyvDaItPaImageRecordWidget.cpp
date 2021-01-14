@@ -151,14 +151,14 @@ C_SyvDaItPaImageRecordWidget::~C_SyvDaItPaImageRecordWidget()
 void C_SyvDaItPaImageRecordWidget::InitText(void)
 {
    // set title
-   this->mpc_ParentDialog->SetTitle(QString(C_GtGetText::h_GetText("Parametrization")));
-   this->mpc_ParentDialog->SetSubTitle(QString(C_GtGetText::h_GetText("Record Parameter Set from System")));
+   this->mpc_ParentDialog->SetTitle(static_cast<QString>(C_GtGetText::h_GetText("Parametrization")));
+   this->mpc_ParentDialog->SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Record Parameter Set from System")));
 
-   this->mpc_Ui->pc_LabelFinished->setText(QString(C_GtGetText::h_GetText("Finished")));
-   this->mpc_Ui->pc_LabelSelectFile->setText(QString(C_GtGetText::h_GetText("File")));
-   this->mpc_Ui->pc_LabelRead->setText(QString(C_GtGetText::h_GetText("Read")));
-   this->mpc_Ui->pc_LabelConfirm->setText(QString(C_GtGetText::h_GetText("Confirm")));
-   this->mpc_Ui->pc_LabelValidateFile->setText(QString(C_GtGetText::h_GetText("Validate File(s)")));
+   this->mpc_Ui->pc_LabelFinished->setText(static_cast<QString>(C_GtGetText::h_GetText("Finished")));
+   this->mpc_Ui->pc_LabelSelectFile->setText(static_cast<QString>(C_GtGetText::h_GetText("File")));
+   this->mpc_Ui->pc_LabelRead->setText(static_cast<QString>(C_GtGetText::h_GetText("Read")));
+   this->mpc_Ui->pc_LabelConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Confirm")));
+   this->mpc_Ui->pc_LabelValidateFile->setText(static_cast<QString>(C_GtGetText::h_GetText("Validate File(s)")));
 
    this->mpc_Ui->pc_LabelHeadingSelectFile->setText(C_GtGetText::h_GetText("File"));
    this->mpc_Ui->pc_LabelStepDescription->setText(
@@ -173,8 +173,8 @@ void C_SyvDaItPaImageRecordWidget::InitText(void)
          "Attention: Recording for multiple nodes will result in one file per node."
          " Name format: \"<SelectedPathAndFileName>_<NodeName>.syde_psi\""));
 
-   this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Read Parameters")));
-   this->mpc_Ui->pc_CbConfirm->setText(QString(C_GtGetText::h_GetText(
+   this->mpc_Ui->pc_PbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Read Parameters")));
+   this->mpc_Ui->pc_CbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText(
                                                   "Confirmed, all required parameter lists are included")));
 
    this->mpc_Ui->pc_PushButtonBrowse->SetToolTipInformation(
@@ -218,7 +218,6 @@ C_OSCParamSetInterpretedFileInfoData C_SyvDaItPaImageRecordWidget::h_GetFileInfo
    c_Retval.c_Creator = c_Name.toStdString().c_str();
    c_Retval.c_DateTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss").toStdString().c_str();
    c_Retval.c_ToolName = "openSYDE";
-   //lint -e{40} Defined by project file
    c_Retval.c_ToolVersion = C_Uti::h_GetApplicationVersion().toStdString().c_str();
    c_Retval.c_ProjectName = C_PuiProject::h_GetInstance()->GetName().toStdString().c_str();
    c_Retval.c_ProjectVersion = C_PuiProject::h_GetInstance()->c_Version;
@@ -438,7 +437,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
             {
                C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
-               c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("File path contains invalid characters.")));
+               c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("File path contains invalid characters.")));
                c_MessageBox.SetCustomMinHeight(180, 180);
                c_MessageBox.Execute();
             }
@@ -447,10 +446,10 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
          {
             C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
             c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
-            c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
+            c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
                                                    "The specified file has the wrong extension, use: \"%1\".")).arg(
                                            C_SyvDaItPaImageRecordWidget::mhc_FILE_EXTENSION));
-            c_MessageBox.SetDetails(QString("Invalid extension: \"%1\"").arg("." + c_BaseInfo.completeSuffix()));
+            c_MessageBox.SetDetails(static_cast<QString>("Invalid extension: \"%1\"").arg("." + c_BaseInfo.completeSuffix()));
             c_MessageBox.SetCustomMinHeight(180, 250);
             c_MessageBox.Execute();
          }
@@ -460,7 +459,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
          C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
          c_MessageBox.SetDescription(C_GtGetText::h_GetText("The specified directory does not exist."));
-         c_MessageBox.SetDetails(QString("Invalid path: \"%1\"").arg(this->mc_FilePath));
+         c_MessageBox.SetDetails(static_cast<QString>("Invalid path: \"%1\"").arg(this->mc_FilePath));
          c_MessageBox.SetCustomMinHeight(180, 250);
          c_MessageBox.Execute();
       }
@@ -620,7 +619,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(const QString & orc_Comm
                                                   "parameter lists are listed below. If yes, check "
                                                   "\"All required parameter lists are included\" "
                                                   "and click \"Validate File(s)\"."));
-                        this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Validate File(s)")));
+                        this->mpc_Ui->pc_PbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Validate File(s)")));
                         this->mpc_Ui->pc_CbConfirm->setVisible(true);
                         this->mpc_Ui->pc_CbConfirm->setEnabled(true);
 
@@ -698,7 +697,7 @@ sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(const QString & or
          c_ErrorText = "Could not write to file (e.g. missing write permissions or missing directory).";
          break;
       default:
-         c_ErrorText = QString("Creating file failed with unknown reason (%1).").arg(s32_Return);
+         c_ErrorText = static_cast<QString>("Creating file failed with unknown reason (%1).").arg(s32_Return);
          break;
       }
 
@@ -775,7 +774,7 @@ sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
                              " specified file is present but structure is invalid (e.g. invalid XML file)";
                break;
             default:
-               c_ErrorText = QString("Read back of file failed with unknown reason (%1).").arg(s32_Return);
+               c_ErrorText = static_cast<QString>("Read back of file failed with unknown reason (%1).").arg(s32_Return);
                break;
             }
 
@@ -835,7 +834,7 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
             // Node name
             if (oq_IsConfirm == false)
             {
-               c_Text += "<div>" + QString(C_GtGetText::h_GetText("Path: %1")).arg(c_PathHtml) + "</div>";
+               c_Text += "<div>" + static_cast<QString>(C_GtGetText::h_GetText("Path: %1")).arg(c_PathHtml) + "</div>";
             }
             if (oq_IsConfirm == true)
             {
@@ -843,10 +842,10 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
             }
             else
             {
-               c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
+               c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
             }
-            c_Text += QString(C_GtGetText::h_GetText("Node")) + " - " +
-                      QString(pc_OSCNode->c_Properties.c_Name.c_str());
+            c_Text += static_cast<QString>(C_GtGetText::h_GetText("Node")) + " - " +
+                      static_cast<QString>(pc_OSCNode->c_Properties.c_Name.c_str());
             if (oq_IsConfirm == true)
             {
                c_Text += "</u>";
@@ -879,14 +878,14 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
                   {
                      if (oq_IsConfirm == true)
                      {
-                        c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
+                        c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
                      }
                      else
                      {
-                        c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
+                        c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
                      }
-                     c_Text += QString(C_GtGetText::h_GetText("DataPool")) +
-                               " - " + QString(pc_OSCDataPool->c_Name.c_str()) + "</div>";
+                     c_Text += static_cast<QString>(C_GtGetText::h_GetText("DataPool")) +
+                               " - " + static_cast<QString>(pc_OSCDataPool->c_Name.c_str()) + "</div>";
                   }
                }
 
@@ -895,14 +894,14 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
                   // Listname
                   if (oq_IsConfirm == true)
                   {
-                     c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
+                     c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
                   }
                   else
                   {
-                     c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(3UL));
+                     c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(3UL));
                   }
-                  c_Text += QString(C_GtGetText::h_GetText("List")) +
-                            " - " + QString(pc_OSCList->c_Name.c_str()) + "</div>";
+                  c_Text += static_cast<QString>(C_GtGetText::h_GetText("List")) +
+                            " - " + static_cast<QString>(pc_OSCList->c_Name.c_str()) + "</div>";
                }
             }
          }
@@ -988,7 +987,7 @@ void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
          c_ErrorText = "Path does not match the path of the preceding function calls.";
          break;
       default:
-         c_ErrorText = QString("Validating file failed with unknown reason (%1).").arg(s32_Return);
+         c_ErrorText = static_cast<QString>("Validating file failed with unknown reason (%1).").arg(s32_Return);
          break;
       }
 
@@ -1156,8 +1155,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReportError(const QString & orc_FunctionNam
 
    osc_write_log_info("Write NVM parameters", c_Text.toStdString().c_str());
 
-   c_Message.SetDescription(QString(C_GtGetText::h_GetText("Function %1 ended with error.")).arg(orc_FunctionName));
-   c_Message.SetDetails(QString(C_GtGetText::h_GetText("Error code:\n %1 \nError text: \n %2"))
+   c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Function %1 ended with error.")).arg(orc_FunctionName));
+   c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("Error code:\n %1 \nError text: \n %2"))
                         .arg(os32_ErrorCode).arg(orc_ErrorText));
    c_Message.SetCustomMinHeight(180, 350);
    c_Message.Execute();
@@ -1235,7 +1234,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
             C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
+         c_Details = static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
          break;
       }
       break;
@@ -1249,7 +1248,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
    }
 
    C_OSCLoggingHandler::h_Flush();
-   c_Details += QString(C_GtGetText::h_GetText("See log file for details: ")) +
+   c_Details += static_cast<QString>(C_GtGetText::h_GetText("See log file for details: ")) +
                 C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
 
    c_Message.SetType(C_OgeWiCustomMessage::eERROR);

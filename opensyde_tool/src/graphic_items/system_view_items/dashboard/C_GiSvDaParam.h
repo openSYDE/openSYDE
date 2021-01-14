@@ -89,7 +89,7 @@ private:
 
    //Avoid call
    C_GiSvDaParam(const C_GiSvDaParam &);
-   C_GiSvDaParam & operator =(const C_GiSvDaParam &);
+   C_GiSvDaParam & operator =(const C_GiSvDaParam &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

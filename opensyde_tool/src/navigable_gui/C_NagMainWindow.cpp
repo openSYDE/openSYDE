@@ -273,7 +273,7 @@ void C_NagMainWindow::m_ChangeUseCase(const sint32 os32_Mode, const sint32 os32_
    QString c_SubItemName;
 
    //Get appropriate default heading
-   C_NagMainWindow::h_GetHeadingNames(os32_Mode, os32_SubIndex, 0UL, c_Name, c_SubItemName);
+   C_NagMainWindow::mh_GetHeadingNames(os32_Mode, os32_SubIndex, 0UL, c_Name, c_SubItemName);
 
    //Change use-case
    q_Worked = m_ChangeMode(os32_Mode, os32_SubIndex, 0U, c_Name, c_SubItemName, 0U, oq_ChangeUseCase);
@@ -355,7 +355,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    {
       if (this->mq_StartView == false)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_SdHandlerWidget * pc_Handler = dynamic_cast<C_SdHandlerWidget *>(this->mpc_ActiveWidget);
 
          //SD is active
@@ -364,7 +364,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
             pc_Handler->CallHelp();
          }
 
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_SyvHandlerWidget * pc_HandlerSv = dynamic_cast<C_SyvHandlerWidget *>(this->mpc_ActiveWidget);
 
          //SV is active
@@ -399,7 +399,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
          }
          else
          {
-            C_PopErrorHandling::mh_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
+            C_PopErrorHandling::h_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
             this->mpc_MainWidget->UpdateRecentProjects();
          }
       }
@@ -636,7 +636,7 @@ void C_NagMainWindow::m_LoadInitialProject(void)
    // Initial load (command line or first recent project)
    const sint32 s32_Error = C_PuiProject::h_GetInstance()->LoadInitialProject(&u16_Version, c_LoadedProject);
 
-   C_PopErrorHandling::mh_ProjectLoadErr(s32_Error, c_LoadedProject, this->mpc_MainWidget, u16_Version);
+   C_PopErrorHandling::h_ProjectLoadErr(s32_Error, c_LoadedProject, this->mpc_MainWidget, u16_Version);
 
    // Handle use case switch
    this->m_ProjectLoaded(C_PuiProject::h_GetInstance()->GetSwitchUseCaseFlag());
@@ -799,7 +799,7 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
       }
 
       //Get names (last as indices need to be up to date)
-      C_NagMainWindow::h_GetHeadingNames(os32_Mode, ors32_SubMode, oru32_Index, orc_Name, orc_SubItemName);
+      C_NagMainWindow::mh_GetHeadingNames(os32_Mode, ors32_SubMode, oru32_Index, orc_Name, orc_SubItemName);
    }
 }
 
@@ -813,8 +813,8 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
    \param[in,out]  orc_SubSubMode   Sub sub mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::h_GetHeadingNames(const sint32 os32_Mode, const sint32 & ors32_SubMode, const uint32 ou32_Index,
-                                        QString & orc_SubMode, QString & orc_SubSubMode)
+void C_NagMainWindow::mh_GetHeadingNames(const sint32 os32_Mode, const sint32 & ors32_SubMode, const uint32 ou32_Index,
+                                         QString & orc_SubMode, QString & orc_SubSubMode)
 {
    if (os32_Mode == ms32_MODE_SYSDEF)
    {
@@ -875,7 +875,7 @@ void C_NagMainWindow::h_GetHeadingNames(const sint32 os32_Mode, const sint32 & o
 void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
                                        const QString & orc_SubName, const uint32 ou32_Flag)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SdHandlerWidget * pc_Handler = dynamic_cast<C_SdHandlerWidget *>(this->mpc_ActiveWidget);
 
    // Special case: Restore last screen when coming from main
@@ -929,7 +929,7 @@ void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 o
 void C_NagMainWindow::m_ShowSysViewItem(sint32 & ors32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
                                         const QString & orc_SubSubModeName, const uint32 ou32_Flag)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_SyvHandlerWidget * pc_Handler = dynamic_cast<C_SyvHandlerWidget *>(this->mpc_ActiveWidget);
 
    // Special case: Handle system view PC reconnect
@@ -1409,7 +1409,7 @@ bool C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
       this->mpc_Ui->pc_NaviBar->LoadUserSettings();
    }
 
-   osc_write_log_performance_stop(u16_TimerId, QString("Switch to mode %1 submode %2 index %3")
+   osc_write_log_performance_stop(u16_TimerId, static_cast<QString>("Switch to mode %1 submode %2 index %3")
                                   .arg(this->ms32_Mode).arg(this->ms32_SubMode).arg(
                                      this->mu32_Index).toStdString().c_str());
 

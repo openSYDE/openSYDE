@@ -65,15 +65,15 @@ protected:
    virtual void focusOutEvent(QFocusEvent * const opc_Event) override;
 
    void m_Resize(const stw_types::sintn osn_Height = 30) const;
-   stw_types::sintn GetSpinButtonWidth(void) const;
+   stw_types::sintn m_GetSpinButtonWidth(void) const;
 
 private:
    Ui::C_OgeWiSpinBoxGroup * mpc_Ui;
    bool mq_DoubleMode;
 
    void m_InitDefault(void);
-   void m_InitConnections(void);
-   void m_DeactivateConnections(void);
+   void m_InitConnections(void) const;
+   void m_DeactivateConnections(void) const;
 
    //Avoid call
    C_OgeWiSpinBoxGroup(const C_OgeWiSpinBoxGroup &);

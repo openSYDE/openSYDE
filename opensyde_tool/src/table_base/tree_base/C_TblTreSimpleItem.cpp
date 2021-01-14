@@ -167,7 +167,6 @@ sint32 C_TblTreSimpleItem::h_GetIndex(const std::vector<C_TblTreSimpleItem *> & 
 
    if (opc_Item != NULL)
    {
-      //lint -e{10,26,50,64,119,155,1024,1703} C++11 construct
       const std::vector<C_TblTreSimpleItem *>::const_iterator c_It = std::find_if(
          orc_Vector.begin(),
          orc_Vector.end(),

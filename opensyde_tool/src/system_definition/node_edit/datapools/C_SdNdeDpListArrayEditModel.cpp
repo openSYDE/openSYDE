@@ -148,7 +148,7 @@ QVariant C_SdNdeDpListArrayEditModel::headerData(const sintn osn_Section, const 
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
       else
       {
@@ -163,7 +163,7 @@ QVariant C_SdNdeDpListArrayEditModel::headerData(const sintn osn_Section, const 
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
       }
       else
       {
@@ -280,7 +280,7 @@ QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const 
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
-         c_Retval = QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
+         c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
       }
       else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
       {

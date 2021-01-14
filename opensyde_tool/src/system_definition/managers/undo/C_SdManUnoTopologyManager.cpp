@@ -574,8 +574,7 @@ void C_SdManUnoTopologyManager::m_MergeWithPrev(QUndoCommand * const opc_Command
          this->undo();
       }
    }
-   //lint -e{429}  never took ownership of any of these objects in this function
-}
+}  //lint !e429  //never took ownership of any of these objects in this function
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::m_OnErrorChange(void)

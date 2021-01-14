@@ -62,11 +62,8 @@ Q_SIGNALS:
                   const QString & orc_Name, const QString & orc_SubSubMode);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool event(QEvent * const opc_Event) override;
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
-   //lint -restore
 
 private:
    Ui::C_NagViewItem * mpc_Ui;
@@ -74,9 +71,9 @@ private:
    bool mq_Active;
    bool mq_IgnoreActiveOnExpand;
    stw_types::uint32 mu32_ViewIndex;
-   static const stw_types::sintn hsn_SizeTop;
-   static const stw_types::sintn hsn_SizeSub;
-   static const stw_types::sintn hsn_FixSizeBottom;
+   static const stw_types::sintn mhsn_SizeTop;
+   static const stw_types::sintn mhsn_SizeSub;
+   static const stw_types::sintn mhsn_FixSizeBottom;
    bool mq_ButtonPressed;
 
    //Avoid call

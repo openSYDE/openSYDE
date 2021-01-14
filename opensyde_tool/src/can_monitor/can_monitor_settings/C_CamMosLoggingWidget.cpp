@@ -127,10 +127,8 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_LeFolder, &C_CamOgeLeFilePath::editingFinished,
            this, &C_CamMosLoggingWidget::m_OnFolderEdited);
    connect(this->mpc_Ui->pc_LeFile, &C_OgeLeDark::editingFinished, this, &C_CamMosLoggingWidget::m_OnFileNameEdited);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_CbxOverwrite, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
            this, &C_CamMosLoggingWidget::m_OnOverwriteModeSelected);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_CbxFormat, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
            this, &C_CamMosLoggingWidget::m_OnFormatSelected);
    connect(this->mpc_Ui->pc_PubBrowse, &C_CamOgePubDarkBrowse::clicked, this, &C_CamMosLoggingWidget::m_OnBrowse);
@@ -506,7 +504,7 @@ void C_CamMosLoggingWidget::m_CheckAndStartLogging()
          {
             C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eWARNING);
             c_Message.SetHeading(C_GtGetText::h_GetText("Log file overwrite"));
-            c_Message.SetDescription(QString(C_GtGetText::h_GetText("The log file %1 already exists. "
+            c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("The log file %1 already exists. "
                                                                     "Do you want to overwrite the file?")).
                                      arg(c_FileInfo.absoluteFilePath()));
             c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));

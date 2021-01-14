@@ -30,18 +30,12 @@ class C_OgeCbxToolTipBase :
 public:
    C_OgeCbxToolTipBase(QWidget * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool event(QEvent * const opc_Event) override;
-   //lint -restore
 
    void SetItemState(const stw_types::sint32 os32_Index, const bool oq_Status) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
-   //lint -restore
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

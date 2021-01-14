@@ -97,7 +97,7 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
    this->mpc_ParentDialog->SetWidget(this);
 
    // init static names
-   this->mpc_ParentDialog->SetTitle(QString(C_GtGetText::h_GetText("%1 Widget")).arg(orc_Name));
+   this->mpc_ParentDialog->SetTitle(static_cast<QString>(C_GtGetText::h_GetText("%1 Widget")).arg(orc_Name));
    this->InitStaticNames();
 
    //Factor needs to be above zero
@@ -169,7 +169,6 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
    }
 
    //Spin box
-   //lint -e{10,530,747,1015,1013}  c++11 feature
    this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64>::lowest());
    this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMaximumCustom(std::numeric_limits<float64>::max());
 
@@ -232,34 +231,42 @@ void C_SyvDaPeBase::InitStaticNames(void)
    this->mpc_Ui->pc_ComboBoxTheme->addItem(C_GtGetText::h_GetText("Skeuomorphic"));
 
    //Tool tips
-   this->mpc_Ui->pc_LabelTheme->SetToolTipInformation(C_GtGetText::h_GetText("Theme"),
-                                                      C_GtGetText::h_GetText(
-                                                         "General display style of the widget"
-                                                         " grouped into different common themes"));
-   this->mpc_Ui->pc_LabelDataElement->SetToolTipInformation(C_GtGetText::h_GetText("Data Element"),
-                                                            C_GtGetText::h_GetText(
-                                                               "The currently selected data element defined in the SYSTEM DEFINITION"));
-   this->mpc_Ui->pc_LabelUpdateModeHeading->SetToolTipInformation(C_GtGetText::h_GetText("Update Mode"),
-                                                                  C_GtGetText::h_GetText(
-                                                                     "The rate at which the data element value is requested,"
-                                                                     " once the dashboard is connected"));
-   this->mpc_Ui->pc_CheckBoxDefaultScaling->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                                     "Use the default values of SYSTEM DEFINITION"),
-                                                                  C_GtGetText::h_GetText(
-                                                                     "Option to either use the scaling defined in the SYSTEM DEFINITION\n"
-                                                                     "or define a custom scaling just for this occurrence of this data element"));
+   this->mpc_Ui->pc_LabelTheme->SetToolTipInformation(
+      C_GtGetText::h_GetText("Theme"),
+      C_GtGetText::h_GetText("General display style of the widget grouped into different common themes"));
+   this->mpc_Ui->pc_LabelDataElement->SetToolTipInformation(
+      C_GtGetText::h_GetText("Data Element"),
+      C_GtGetText::h_GetText("The currently selected data element defined in the SYSTEM DEFINITION"));
+   this->mpc_Ui->pc_LabelUpdateModeHeading->SetToolTipInformation(
+      C_GtGetText::h_GetText("Update Mode"),
+      C_GtGetText::h_GetText("The rate at which the data element value is requested,"
+                             " once the dashboard is connected"));
+   this->mpc_Ui->pc_CheckBoxDefaultScaling->SetToolTipInformation(
+      C_GtGetText::h_GetText("Use the default values of SYSTEM DEFINITION"),
+      C_GtGetText::h_GetText("Option to either use the scaling defined in the SYSTEM DEFINITION\n"
+                             "or define a custom scaling just for this occurrence of this data element"));
+   this->mpc_Ui->pc_PushButtonClearDataElement->SetToolTipInformation(
+      C_GtGetText::h_GetText("Clear Data Element"),
+      C_GtGetText::h_GetText("Remove currently selected data element."));
+   this->mpc_Ui->pc_PushButtonDataElement->SetToolTipInformation(
+      C_GtGetText::h_GetText("Browse Data Element"),
+      C_GtGetText::h_GetText("Select a data element from list of all data elements."));
+   this->mpc_Ui->pc_PushButtonUpdateModeConfigure->SetToolTipInformation(
+      C_GtGetText::h_GetText("Configure Update Mode"),
+      C_GtGetText::h_GetText("Configure transmission mode, cycle intervals and change threshold."));
 
    //Tool tip content partly adapted from Vector CANdb++ Documentation
    {
-      const QString c_PhysicalValueInfo = C_GtGetText::h_GetText("The raw value of a data element is the value as it is transmitted in the network."
-                                                                 "\nThe physical value of a data element is the value of the physical quantity (e.g. speed, "
-                                                                 "\nrpm, temperature, etc.) that represents the data element."
-                                                                 "\nThe following conversion formula is used to transform the raw value "
-                                                                 "\nto a physical value or in the reverse direction:"
-                                                                 "\n\n[Physical value] = ([Raw value] * [Factor]) + [Offset]");
+      const QString c_PhysicalValueInfo =
+         C_GtGetText::h_GetText("The raw value of a data element is the value as it is transmitted in the network."
+                                "\nThe physical value of a data element is the value of the physical quantity (e.g. speed, "
+                                "\nrpm, temperature, etc.) that represents the data element."
+                                "\nThe following conversion formula is used to transform the raw value "
+                                "\nto a physical value or in the reverse direction:"
+                                "\n\n[Physical value] = ([Raw value] * [Factor]) + [Offset]");
       QString c_InfoText =  C_GtGetText::h_GetText("Unit of the data elements physical quantity\n\n");
-      this->mpc_Ui->pc_LabelUnit->SetToolTipInformation(C_GtGetText::h_GetText("Unit"), c_InfoText.append(
-                                                           c_PhysicalValueInfo));
+      this->mpc_Ui->pc_LabelUnit->SetToolTipInformation(C_GtGetText::h_GetText("Unit"),
+                                                        c_InfoText.append(c_PhysicalValueInfo));
       this->mpc_Ui->pc_LabelFactor->SetToolTipInformation(C_GtGetText::h_GetText("Factor"),
                                                           c_PhysicalValueInfo);
       this->mpc_Ui->pc_LabelOffset->SetToolTipInformation(C_GtGetText::h_GetText("Offset"),
@@ -279,8 +286,7 @@ void C_SyvDaPeBase::SetWidget(QWidget * const opc_Widget)
    {
       opc_Widget->setParent(this);
       this->mpc_Ui->pc_VerticalLayoutDesign->insertWidget(1, opc_Widget, 1);
-      //lint -e{429}  no memory leak because of the parent of pc_Layout and the Qt memory management
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Layout and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -291,17 +297,24 @@ void C_SyvDaPeBase::SetWidget(QWidget * const opc_Widget)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::SetWriteMode(const C_PuiSvDbWidgetBase::E_WriteMode oe_WriteMode) const
 {
-   switch (oe_WriteMode)
+   if (this->mc_DataElement.GetIsValid() == true)
    {
-   case C_PuiSvDbWidgetBase::eWM_MANUAL:
+      switch (oe_WriteMode)
+      {
+      case C_PuiSvDbWidgetBase::eWM_MANUAL:
+         this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_MANUAL);
+         break;
+      case C_PuiSvDbWidgetBase::eWM_ON_CHANGE:
+         this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_ON_CHANGE);
+         break;
+      default:
+         this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_MANUAL);
+         break;
+      }
+   }
+   else
+   {
       this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_MANUAL);
-      break;
-   case C_PuiSvDbWidgetBase::eWM_ON_CHANGE:
-      this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_ON_CHANGE);
-      break;
-   default:
-      this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_MANUAL);
-      break;
    }
 }
 
@@ -376,7 +389,7 @@ float64 C_SyvDaPeBase::h_GetFixIconOffset(void)
 void C_SyvDaPeBase::h_GetIdealItemRect(QPointF & orc_ItemPos, QSizeF & orc_ItemSize,
                                        const QGraphicsItem * const opc_Item)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+
    const C_GiSvDaRectBaseGroup * const pc_GiItem = dynamic_cast<const C_GiSvDaRectBaseGroup * const>(opc_Item);
 
    if (pc_GiItem != NULL)
@@ -662,8 +675,7 @@ void C_SyvDaPeBase::m_Browse(void)
       pc_Dialog->SaveUserSettings();
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle clear data element button
@@ -805,8 +817,7 @@ void C_SyvDaPeBase::m_Configuration(void) const
       c_New->HideOverlay();
    }
 
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get default display name
@@ -828,17 +839,29 @@ QString C_SyvDaPeBase::m_GetDefaultDisplayName(const C_PuiSvDbNodeDataPoolListEl
                                                                     this->mc_DataElement.u32_DataPoolIndex,
                                                                     this->mc_DataElement.u32_ListIndex,
                                                                     this->mc_DataElement.u32_ElementIndex);
-
+      const C_OSCNodeDataPool * pc_Datapool =
+         C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_Id.u32_NodeIndex,
+                                                         orc_Id.u32_DataPoolIndex);
       if (pc_Element != NULL)
       {
-         const QString c_Name = pc_Element->c_Name.c_str();
-         if (orc_Id.GetUseArrayElementIndex())
+         if (pc_Datapool != NULL)
          {
-            c_Retval = QString("%1[%2]").arg(c_Name).arg(orc_Id.GetArrayElementIndex());
-         }
-         else
-         {
-            c_Retval = c_Name;
+            if (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC)
+            {
+               c_Retval = C_PuiSvHandler::h_GetShortNamespace(orc_Id);
+            }
+            else
+            {
+               QString c_ElementName = pc_Element->c_Name.c_str();
+               if (orc_Id.GetUseArrayElementIndex())
+               {
+                  c_Retval = static_cast<QString>("%1[%2]").arg(c_ElementName).arg(orc_Id.GetArrayElementIndex());
+               }
+               else
+               {
+                  c_Retval = c_ElementName;
+               }
+            }
          }
       }
    }
@@ -904,8 +927,20 @@ void C_SyvDaPeBase::m_InitNoDataElement(void) const
 
    //Scaling
    this->mpc_Ui->pc_CheckBoxDefaultScaling->setChecked(true);
+   this->mpc_Ui->pc_CheckBoxDefaultScaling->setEnabled(false);
    this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setVisible(true);
    m_OnUseDefaultScalingChange();
+
+   //Write mode
+   if (this->mq_ReadElement == false)
+   {
+      this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_MANUAL);
+      this->mpc_Ui->pc_ComboBoxTransmissionMode->setEnabled(false);
+   }
+   else
+   {
+      this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setEnabled(false);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -944,6 +979,17 @@ void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId &
       this->mpc_Ui->pc_LabelUpdateMode->setText(c_UpdateModeInfo);
       this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setVisible(
          orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+
+      // Adapt UI
+      this->mpc_Ui->pc_CheckBoxDefaultScaling->setEnabled(true);
+      if (this->mq_ReadElement == false)
+      {
+         this->mpc_Ui->pc_ComboBoxTransmissionMode->setEnabled(true);
+      }
+      else
+      {
+         this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setEnabled(true);
+      }
    }
    else
    {

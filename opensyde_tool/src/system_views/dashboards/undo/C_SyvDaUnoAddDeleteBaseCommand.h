@@ -36,18 +36,18 @@ protected:
    virtual void m_Restore(void);
    void m_RestoreReadRailsOnly(void);
 
-   virtual stw_types::sint32 GetBoundaryType(void) const;
-   virtual stw_types::sint32 GetImageType(void) const;
-   virtual stw_types::sint32 GetLineArrowType(void) const;
-   virtual stw_types::sint32 GetTextElementType(void) const;
+   virtual stw_types::sint32 m_GetBoundaryType(void) const;
+   virtual stw_types::sint32 m_GetImageType(void) const;
+   virtual stw_types::sint32 m_GetLineArrowType(void) const;
+   virtual stw_types::sint32 m_GetTextElementType(void) const;
 
-   void SetDataPositionOffset(const QPointF & orc_NewPos);
-   void SetDataZOffset(const stw_types::float64 of64_HighestUsedZValue);
+   void m_SetDataPositionOffset(const QPointF & orc_NewPos);
+   void m_SetDataZOffset(const stw_types::float64 of64_HighestUsedZValue);
 
-   C_PuiSvDashboard GetDataBackup(void) const;
-   stw_types::sint32 GetStoredReadRailCount(void) const;
-   stw_types::sint32 AddReadRailToInternalBackup(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
-                                                 const C_PuiSvReadDataConfiguration & orc_Value);
+   C_PuiSvDashboard m_GetDataBackup(void) const;
+   stw_types::sint32 m_GetStoredReadRailCount(void) const;
+   stw_types::sint32 m_AddReadRailToInternalBackup(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
+                                                   const C_PuiSvReadDataConfiguration & orc_Value);
 
 private:
    QMap<C_PuiBsTemporaryDataID, stw_types::uint64> mc_MapTypeAndIndexToID;

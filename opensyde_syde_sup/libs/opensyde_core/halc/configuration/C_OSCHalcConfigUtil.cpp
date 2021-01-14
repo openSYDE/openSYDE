@@ -82,7 +82,7 @@ void C_OSCHalcConfigUtil::h_GetConfigStandalone(const stw_opensyde_core::C_OSCHa
 
          {
             // Add the standalone domain
-            C_OSCHalcConfigStandaloneDomain c_StandaloneDomain(*pc_Domain, c_ChannelIds);
+            const C_OSCHalcConfigStandaloneDomain c_StandaloneDomain(*pc_Domain, c_ChannelIds);
             orc_ConfigStandalone.c_Domains.push_back(c_StandaloneDomain);
          }
       }
@@ -95,6 +95,8 @@ void C_OSCHalcConfigUtil::h_GetConfigStandalone(const stw_opensyde_core::C_OSCHa
    \param[in]       orc_Config            HALC configuration as source
    \param[in]       ou32_DomainIndex      Index of domain in orc_Config
    \param[in]       ou32_ChannelIndex     Index of channel in domain with index ou32_DomainIndex
+   \param[in]       oq_DomainOnly         Flag if the domain should be returned, not the concrete channel
+                                          When true, ou32_ChannelIndex is not relevant
    \param[out]      orc_ConfigStandalone  Standalone HALC configuration as result with the configuration of orc_Config
 
    \retval   C_NO_ERR   Stand alone configuration prepared
@@ -103,6 +105,7 @@ void C_OSCHalcConfigUtil::h_GetConfigStandalone(const stw_opensyde_core::C_OSCHa
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(const stw_opensyde_core::C_OSCHalcConfig & orc_Config,
                                                          const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
+                                                         const bool oq_DomainOnly,
                                                          C_OSCHalcConfigStandalone & orc_ConfigStandalone)
 {
    sint32 s32_Return = C_RANGE;
@@ -113,8 +116,9 @@ sint32 C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(const stw_opensyde_core
 
       if (pc_Domain != NULL)
       {
-         if ((ou32_ChannelIndex < pc_Domain->c_Channels.size()) &&
-             (ou32_ChannelIndex < pc_Domain->c_ChannelConfigs.size()) &&
+         if (((oq_DomainOnly == true) ||
+              ((ou32_ChannelIndex < pc_Domain->c_Channels.size()) &&
+               (ou32_ChannelIndex < pc_Domain->c_ChannelConfigs.size()))) &&
              (pc_Domain->c_Channels.size() == pc_Domain->c_ChannelConfigs.size()))
          {
             uint32 u32_Parameter;
@@ -126,42 +130,55 @@ sint32 C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(const stw_opensyde_core
             orc_ConfigStandalone.c_DeviceType = orc_Config.c_DeviceName;
             orc_ConfigStandalone.u32_DefinitionContentVersion = orc_Config.u32_ContentVersion;
 
-            // Channel Id
-            c_ChannelIds.resize(1);
-            c_ChannelIds[0].c_ParameterIds.resize(pc_Domain->c_ChannelValues.c_Parameters.size());
-
-            // Get the Id of the parameters
-            for (u32_Parameter = 0UL; u32_Parameter < pc_Domain->c_ChannelValues.c_Parameters.size(); ++u32_Parameter)
+            // Channel Id with the channel parameters
+            if (oq_DomainOnly == false)
             {
-               c_ChannelIds[0].c_ParameterIds[u32_Parameter] =
-                  pc_Domain->c_ChannelValues.c_Parameters[u32_Parameter].c_Id;
+               c_ChannelIds.resize(1);
+               c_ChannelIds[0].c_ParameterIds.resize(pc_Domain->c_ChannelValues.c_Parameters.size());
+
+               // Get the Id of the parameters
+               for (u32_Parameter = 0UL; u32_Parameter < pc_Domain->c_ChannelValues.c_Parameters.size();
+                    ++u32_Parameter)
+               {
+                  c_ChannelIds[0].c_ParameterIds[u32_Parameter] =
+                     pc_Domain->c_ChannelValues.c_Parameters[u32_Parameter].c_Id;
+               }
             }
 
             {
                // Add the standalone domain
                C_OSCHalcConfigStandaloneDomain c_StandaloneDomain(*pc_Domain, c_ChannelIds);
 
-               // Remove the not necessary channels of the original configuration
-               if ((c_StandaloneDomain.c_ChannelConfigs.size() > 1) &&
-                   (ou32_ChannelIndex < (c_StandaloneDomain.c_ChannelConfigs.size() - 1UL)))
+               if (oq_DomainOnly == false)
                {
-                  const uint32 u32_NextIndex = (ou32_ChannelIndex + 1UL);
-                  c_StandaloneDomain.c_ChannelConfigs.erase(
-                     c_StandaloneDomain.c_ChannelConfigs.begin() + u32_NextIndex,
-                     c_StandaloneDomain.c_ChannelConfigs.begin() + c_StandaloneDomain.c_ChannelConfigs.size());
-                  c_StandaloneDomain.c_Channels.erase(
-                     c_StandaloneDomain.c_Channels.begin() + u32_NextIndex,
-                     c_StandaloneDomain.c_Channels.begin() + c_StandaloneDomain.c_Channels.size());
+                  // Remove the not necessary channels of the original configuration
+                  if ((c_StandaloneDomain.c_ChannelConfigs.size() > 1) &&
+                      (ou32_ChannelIndex < (c_StandaloneDomain.c_ChannelConfigs.size() - 1UL)))
+                  {
+                     const uint32 u32_NextIndex = (ou32_ChannelIndex + 1UL);
+                     c_StandaloneDomain.c_ChannelConfigs.erase(
+                        c_StandaloneDomain.c_ChannelConfigs.begin() + u32_NextIndex,
+                        c_StandaloneDomain.c_ChannelConfigs.begin() + c_StandaloneDomain.c_ChannelConfigs.size());
+                     c_StandaloneDomain.c_Channels.erase(
+                        c_StandaloneDomain.c_Channels.begin() + u32_NextIndex,
+                        c_StandaloneDomain.c_Channels.begin() + c_StandaloneDomain.c_Channels.size());
+                  }
+                  if ((c_StandaloneDomain.c_ChannelConfigs.size() > 1) &&
+                      (ou32_ChannelIndex > 0UL))
+                  {
+                     c_StandaloneDomain.c_ChannelConfigs.erase(c_StandaloneDomain.c_ChannelConfigs.begin(),
+                                                               c_StandaloneDomain.c_ChannelConfigs.begin() +
+                                                               ou32_ChannelIndex);
+                     c_StandaloneDomain.c_Channels.erase(c_StandaloneDomain.c_Channels.begin(),
+                                                         c_StandaloneDomain.c_Channels.begin() +
+                                                         ou32_ChannelIndex);
+                  }
                }
-               if ((c_StandaloneDomain.c_ChannelConfigs.size() > 1) &&
-                   (ou32_ChannelIndex > 0UL))
+               else
                {
-                  c_StandaloneDomain.c_ChannelConfigs.erase(c_StandaloneDomain.c_ChannelConfigs.begin(),
-                                                            c_StandaloneDomain.c_ChannelConfigs.begin() +
-                                                            ou32_ChannelIndex);
-                  c_StandaloneDomain.c_Channels.erase(c_StandaloneDomain.c_Channels.begin(),
-                                                      c_StandaloneDomain.c_Channels.begin() +
-                                                      ou32_ChannelIndex);
+                  // Remove the original configuration of all channels
+                  c_StandaloneDomain.c_ChannelConfigs.clear();
+                  c_StandaloneDomain.c_Channels.clear();
                }
 
                orc_ConfigStandalone.c_Domains.push_back(c_StandaloneDomain);

@@ -121,8 +121,7 @@ void C_SyvUpPackageListNodeItemParamSetWidget::ViewFileInfo(void)
       {
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_InfoDialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_InfoDialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -212,7 +211,7 @@ void C_SyvUpPackageListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_
       }
       else
       {
-         QString c_Details = QString(C_GtGetText::h_GetText("File path: %1")).arg(this->GetAppAbsoluteFilePath()) +
+         QString c_Details = static_cast<QString>(C_GtGetText::h_GetText("File path: %1")).arg(this->GetAppAbsoluteFilePath()) +
                              "\nReason: ";
          //New file cannot be read
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
@@ -229,7 +228,7 @@ void C_SyvUpPackageListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_
             c_Details += C_GtGetText::h_GetText("File has missing content. See log file for details.");
             break;
          default:
-            c_Details += QString(C_GtGetText::h_GetText("Unknown reason. Error code: %1")).arg(s32_ReadResult);
+            c_Details += static_cast<QString>(C_GtGetText::h_GetText("Unknown reason. Error code: %1")).arg(s32_ReadResult);
             break;
          }
 
@@ -246,6 +245,5 @@ void C_SyvUpPackageListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_
       {
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_InfoDialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_InfoDialog and the Qt memory management
 }

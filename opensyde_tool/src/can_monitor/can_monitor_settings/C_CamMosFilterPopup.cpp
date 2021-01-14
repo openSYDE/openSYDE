@@ -18,6 +18,7 @@
 #include "stwerrors.h"
 #include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
+#include "C_Uti.h"
 #include "TGLUtils.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_CamProHandler.h"
@@ -102,7 +103,6 @@ C_CamMosFilterPopup::C_CamMosFilterPopup(const stw_opensyde_gui_logic::C_CamProF
    // connects
    connect(this->mpc_Ui->pc_PushButtonSave, &C_OgePubDialog::clicked, this, &C_CamMosFilterPopup::m_OnOk);
    connect(this->mpc_Ui->pc_PushButtonCancel, &C_OgePubCancel::clicked, this, &C_CamMosFilterPopup::m_OnCancel);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxType,
            static_cast<void (C_OgeCbxText::*)(sintn)>(&C_OgeCbxText::currentIndexChanged),
            this, &C_CamMosFilterPopup::m_OnTypeChanged);
@@ -397,9 +397,9 @@ void C_CamMosFilterPopup::m_UpdateSettingsSection(const C_CamProFilterItemData &
 
    // message IDs
    // second parameter of int type is important for line edit data handling
-   this->mpc_Ui->pc_LeCanIdStart->SetFromVariant(mh_GetValueAsHex(orc_FilterItemData.u32_StartId),
+   this->mpc_Ui->pc_LeCanIdStart->SetFromVariant(C_Uti::h_GetValueAsHex(orc_FilterItemData.u32_StartId),
                                                  static_cast<uint64>(orc_FilterItemData.u32_StartId));
-   this->mpc_Ui->pc_LeCanIdEnd->SetFromVariant(mh_GetValueAsHex(orc_FilterItemData.u32_EndId),
+   this->mpc_Ui->pc_LeCanIdEnd->SetFromVariant(C_Uti::h_GetValueAsHex(orc_FilterItemData.u32_EndId),
                                                static_cast<uint64>(orc_FilterItemData.u32_EndId));
 
    // ID min/max (for tool tip in initial case)
@@ -488,9 +488,9 @@ void C_CamMosFilterPopup::m_UpdateLineEdits(const uint32 ou32_RowIndex) const
    {
       const C_CamProFilterItemData c_FilterItem = c_Data[ou32_RowIndex];
 
-      this->mpc_Ui->pc_LeCanIdStart->SetFromVariant(mh_GetValueAsHex(c_FilterItem.u32_StartId),
+      this->mpc_Ui->pc_LeCanIdStart->SetFromVariant(C_Uti::h_GetValueAsHex(c_FilterItem.u32_StartId),
                                                     static_cast<uint64>(c_FilterItem.u32_StartId));
-      this->mpc_Ui->pc_LeCanIdEnd->SetFromVariant(mh_GetValueAsHex(c_FilterItem.u32_EndId),
+      this->mpc_Ui->pc_LeCanIdEnd->SetFromVariant(C_Uti::h_GetValueAsHex(c_FilterItem.u32_EndId),
                                                   static_cast<uint64>(c_FilterItem.u32_EndId));
    }
 }
@@ -663,7 +663,7 @@ void C_CamMosFilterPopup::m_OnTypeChanged(const sint32 os32_NewType) const
       if (s32_CurrentRowIndex < c_Data.size())
       {
          const C_CamProFilterItemData c_FilterItem = c_Data[s32_CurrentRowIndex];
-         this->mpc_Ui->pc_LeCanIdEnd->SetFromVariant(mh_GetValueAsHex(c_FilterItem.u32_EndId),
+         this->mpc_Ui->pc_LeCanIdEnd->SetFromVariant(C_Uti::h_GetValueAsHex(c_FilterItem.u32_EndId),
                                                      static_cast<uint64>(c_FilterItem.u32_EndId));
       }
 
@@ -870,7 +870,7 @@ void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
          {
             //Get data
             const C_CieConverter::C_CIECanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetDbcMessage(
-               c_MessagePath, c_MessageName);
+               c_MessagePath, c_MessageName, false, 0UL);
 
             // Update message of given CAN ID
             if (pc_Message != NULL)
@@ -886,7 +886,7 @@ void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
             {
                //Get data
                const C_OSCCanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetOSCMessage(
-                  c_MessagePath, c_MessageName);
+                  c_MessagePath, c_MessageName, false, 0UL);
 
                // Update message of given CAN ID
                if (pc_Message != NULL)
@@ -903,8 +903,7 @@ void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
       pc_Dialog->SaveUserSettings();
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Return row index of currently selected row.
@@ -925,7 +924,7 @@ sint32 C_CamMosFilterPopup::m_GetCurrentSelectedRowIndex(void) const
 void C_CamMosFilterPopup::m_UpdateTitleFilterItemCount(void) const
 {
    this->mpc_Ui->pc_LabelFilterItems->setText(
-      QString(C_GtGetText::h_GetText("Filter Items (%1)")).arg(this->mpc_TableModel->rowCount()));
+      static_cast<QString>(C_GtGetText::h_GetText("Filter Items (%1)")).arg(this->mpc_TableModel->rowCount()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -950,7 +949,7 @@ void C_CamMosFilterPopup::m_SetMessageDataFromDatabase(const uint32 ou32_CanId, 
 
    // set information in line edit and check box to use line edits min/max handling
    this->mpc_Ui->pc_CheckBoxExtended->setChecked(oq_IsExtended);
-   this->mpc_Ui->pc_LeCanIdStart->setText(mh_GetValueAsHex(ou32_CanId));
+   this->mpc_Ui->pc_LeCanIdStart->setText(C_Uti::h_GetValueAsHex(ou32_CanId));
 
    // trigger change
    this->m_OnStartIdEdited();
@@ -961,18 +960,4 @@ void C_CamMosFilterPopup::m_SetMessageDataFromDatabase(const uint32 ou32_CanId, 
    {
       this->mpc_Ui->pc_CheckBoxExtended->setChecked(q_WasExtended);
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Convert int value to string.
-
-   \param[in]  ou32_Value  Value
-
-   \return
-   Hex value string
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_CamMosFilterPopup::mh_GetValueAsHex(const uint32 ou32_Value)
-{
-   return "0x" + QString("%1").arg(ou32_Value, 0, 16).toUpper();
 }

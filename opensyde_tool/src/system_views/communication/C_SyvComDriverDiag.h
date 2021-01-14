@@ -156,6 +156,9 @@ private:
 
    std::set<stw_types::uint32> mc_DiagNodes;         ///< Nodes which has used datapool elements
    std::set<stw_types::uint32> mc_DefectNodeIndices; ///< Nodes which could not be reached on start
+   // Read metadata of all active nodes and its Datapools. First layer are the active
+   // nodes, second layer are the Datapools
+   std::vector<std::list<stw_opensyde_core::C_OSCProtocolDriverOsy::C_DataPoolMetaData> > mc_ReadDatapoolMetadata;
 
    const stw_types::uint32 mu32_ViewIndex;
    stw_can::C_CAN * mpc_CanDllDispatcher;
@@ -170,9 +173,14 @@ private:
    stw_types::sint32 m_InitDataDealer(void);
    stw_types::sint32 m_StartRoutingDiag(QString & orc_ErrorDetails, std::set<stw_types::uint32> & orc_ErrorActiveNodes);
    stw_types::sint32 m_StartDiagServers(QString & orc_ErrorDetails);
-   static stw_types::sint32 mh_CheckDatapools(const stw_opensyde_core::C_OSCNode * const opc_Node,
-                                              stw_opensyde_core::C_OSCDiagProtocolBase * const opc_Protocol,
-                                              QString & orc_ErrorDetails);
+   stw_types::sint32 m_GetAllDatapoolMetadata(const stw_types::uint32 ou32_ActiveNodeIndex, QString & orc_ErrorDetails);
+   stw_types::sint32 m_CheckOsyDatapoolsAndCreateMapping(const stw_types::uint32 ou32_ActiveNodeIndex,
+                                                         QString & orc_ErrorDetails);
+   stw_types::sint32 m_GetReadDatapoolMetadata(const stw_types::uint32 ou32_ActiveNodeIndex,
+                                               const stw_scl::C_SCLString & orc_DatapoolName,
+                                               stw_types::uint32 & oru32_ServerDatapoolIndex,
+                                               stw_opensyde_core::C_OSCProtocolDriverOsy::C_DataPoolMetaData & orc_Metadata)
+   const;
 
    stw_types::sint32 m_Cycle(void);
    static void mh_ThreadFunc(void * const opv_Instance);
@@ -185,7 +193,7 @@ private:
 
    //Avoid call
    C_SyvComDriverDiag(const C_SyvComDriverDiag &);
-   C_SyvComDriverDiag & operator =(const C_SyvComDriverDiag &);
+   C_SyvComDriverDiag & operator =(const C_SyvComDriverDiag &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

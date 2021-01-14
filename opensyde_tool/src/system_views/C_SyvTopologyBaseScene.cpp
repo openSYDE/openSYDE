@@ -100,7 +100,7 @@ void C_SyvTopologyBaseScene::Load(void)
             QGraphicsItem * const pc_CurItemParent = C_SebUtil::h_GetHighestParent(*c_ItItem);
             if (pc_CurItemParent != NULL)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               
                C_GiLiBus * const pc_CurBus = dynamic_cast<C_GiLiBus *>(pc_CurItemParent);
                if (pc_CurBus != NULL)
                {
@@ -497,7 +497,7 @@ C_GiLiBus * C_SyvTopologyBaseScene::m_CheckBusState(void) const
    QList<QGraphicsItem *>::const_iterator c_ItItem;
    for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      
       C_GiLiBus * const pc_Item = dynamic_cast<C_GiLiBus *>(*c_ItItem);
       if (pc_Item != NULL)
       {
@@ -515,7 +515,7 @@ C_GiLiBus * C_SyvTopologyBaseScene::m_CheckBusState(void) const
       }
       else
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiLiBusConnector * const pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(*c_ItItem);
          if (pc_BusConnector != NULL)
          {
@@ -553,8 +553,7 @@ void C_SyvTopologyBaseScene::m_AddPcBusConnector(const C_GiLiBus * const opc_Bus
    //Initial points
    if (orc_LineData.c_UIInteractionPoints.size() == 0)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      //lint -e{740}  no problem because of common base class
+      
       const QGraphicsItem * const pc_GI = dynamic_cast<const QGraphicsItem * const>(opc_Pc);
       const QPointF c_BottomCenter = mh_GetInitialConnectionPoint(pc_GI);
       c_UIInteractionPoints.push_back(c_BottomCenter);
@@ -626,7 +625,7 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
       QList<QGraphicsItem *>::const_iterator c_ItItem;
       for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiSvPcBusConnector * const pc_Item = dynamic_cast<C_GiSvPcBusConnector *>(*c_ItItem);
          if (pc_Item != NULL)
          {
@@ -657,7 +656,7 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
       {
          for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             C_GiLiBus * const pc_Item = dynamic_cast<C_GiLiBus *>(*c_ItItem);
             if (pc_Item != NULL)
             {
@@ -679,7 +678,7 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
       //Search for existing bus connection
       for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          C_GiSvPcBusConnector * const pc_PcConnector = dynamic_cast<C_GiSvPcBusConnector *>(*c_ItItem);
          if (pc_PcConnector != NULL)
          {
@@ -693,8 +692,7 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
                if (q_Disabled == true)
                {
                   const C_GiBiConnectableItem * const pc_PC = pc_PcConnector->GetGenericPositionItem();
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-                  //lint -e{740}  no problem because of common base class
+                  
                   const QGraphicsItem * const pc_GraphicsItem = dynamic_cast<const QGraphicsItem * const>(pc_PC);
                   if (pc_LastBus != NULL)
                   {
@@ -728,7 +726,7 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
          //Search pc item
          for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             C_GiSvPc * const pc_Item = dynamic_cast<C_GiSvPc *>(*c_ItItem);
             if (pc_Item != NULL)
             {

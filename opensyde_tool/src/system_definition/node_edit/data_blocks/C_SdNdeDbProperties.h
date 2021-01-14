@@ -48,10 +48,7 @@ public:
    void HandleDataPools(const stw_types::uint32 ou32_ApplicationIndex) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   //lint -restore
 
 private:
    Ui::C_SdNdeDbProperties * mpc_Ui;
@@ -66,6 +63,7 @@ private:
    static const stw_types::sintn mhsn_VERSION_INDEX_V2;
    static const stw_types::sintn mhsn_VERSION_INDEX_V3;
    static const stw_types::sintn mhsn_VERSION_INDEX_V4;
+   static const stw_types::sintn mhsn_VERSION_INDEX_V5;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);

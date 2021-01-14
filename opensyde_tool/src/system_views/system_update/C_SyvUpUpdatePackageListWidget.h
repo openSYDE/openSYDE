@@ -78,12 +78,9 @@ Q_SIGNALS:
    void SigStartCheck(const bool oq_Active);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
-   //lint -restore
 
    virtual void m_MoveItem(const stw_types::sintn osn_SourceIndex, const stw_types::sintn osn_TargetIndex) override;
    virtual void m_UpdateNumbers(void) const override;

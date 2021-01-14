@@ -75,14 +75,10 @@ void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, 
    for (std::vector<QGraphicsItem *>::iterator c_ItRelatedItem = c_RelatedItems.begin();
         c_ItRelatedItem != c_RelatedItems.end(); ++c_ItRelatedItem)
    {
-      //lint -e{740}  no problem because of common base class
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       pc_Unique = dynamic_cast<C_GiUnique *>(*c_ItRelatedItem);
       if (pc_Unique != NULL)
       {
          const uint64 u64_CurUniqueID = pc_Unique->GetID();
-         //lint -e{740}  no problem because of common base class
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          pc_Data = dynamic_cast<C_PuiBsDataElement *>(*c_ItRelatedItem);
          if (pc_Data != NULL)
          {
@@ -95,14 +91,13 @@ void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, 
 
                //Backup scene data internally
                //Line arrow
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                pc_LineArrow = dynamic_cast<C_GiBiArrow *>(*c_ItRelatedItem);
                if (pc_LineArrow != NULL)
                {
                   if (u32_Index < orc_AllElements.c_LineArrows.size())
                   {
                      orc_Storage.c_LineArrows.push_back(orc_AllElements.c_LineArrows[u32_Index]);
-                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->GetLineArrowType(),
+                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->m_GetLineArrowType(),
                                                                            orc_Storage.c_LineArrows.size()
                                                                            -
                                                                            1UL),
@@ -110,14 +105,13 @@ void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, 
                   }
                }
                //Boundary
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                pc_Boundary = dynamic_cast<C_GiBiBoundary *>(*c_ItRelatedItem);
                if (pc_Boundary != NULL)
                {
                   if (u32_Index < orc_AllElements.c_Boundaries.size())
                   {
                      orc_Storage.c_Boundaries.push_back(orc_AllElements.c_Boundaries[u32_Index]);
-                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->GetBoundaryType(),
+                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->m_GetBoundaryType(),
                                                                            orc_Storage.c_Boundaries.size()
                                                                            -
                                                                            1UL),
@@ -125,28 +119,26 @@ void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, 
                   }
                }
                //Image
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                pc_Image = dynamic_cast<C_GiBiImageGroup *>(*c_ItRelatedItem);
                if (pc_Image != NULL)
                {
                   if (u32_Index < orc_AllElements.c_Images.size())
                   {
                      orc_Storage.c_Images.push_back(orc_AllElements.c_Images[u32_Index]);
-                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->GetImageType(),
+                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->m_GetImageType(),
                                                                            orc_Storage.c_Images.size() -
                                                                            1UL),
                                                     u64_CurUniqueID);
                   }
                }
                //Text element
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                pc_TextElement = dynamic_cast<C_GiBiTextElement *>(*c_ItRelatedItem);
                if (pc_TextElement != NULL)
                {
                   if (u32_Index < orc_AllElements.c_TextElements.size())
                   {
                      orc_Storage.c_TextElements.push_back(orc_AllElements.c_TextElements[u32_Index]);
-                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->GetTextElementType(),
+                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->m_GetTextElementType(),
                                                                            orc_Storage.c_TextElements.
                                                                            size() - 1UL),
                                                     u64_CurUniqueID);

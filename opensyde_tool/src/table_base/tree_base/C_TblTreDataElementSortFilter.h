@@ -31,11 +31,8 @@ public:
    void SetFilter(const QString & orc_Text);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual bool filterAcceptsRow(const stw_types::sintn osn_SourceRow,
                                  const QModelIndex & orc_SourceParent) const override;
-   //lint -restore
 
 private:
    bool m_Contains(const QModelIndex & orc_Index) const;

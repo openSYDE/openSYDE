@@ -123,7 +123,6 @@ sintn C_GiLiBusConnector::type(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::DeleteConnection(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiPort * const pc_Port = dynamic_cast<C_GiPort *>(this->mpc_GenericPositionItem);
 
    if (pc_Port != NULL)
@@ -142,9 +141,7 @@ void C_GiLiBusConnector::DeleteConnection(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::SetPoints(const std::vector<QPointF> & orc_ScenePos)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem);
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiNode * const pc_LastNode = dynamic_cast<C_GiNode *>(this->mpc_LastKnownGenericSignalItem);
    const sint32 s32_Index = C_GiLiBusConnector::mh_GetGenericInteractionIndex();
 
@@ -173,7 +170,6 @@ void C_GiLiBusConnector::SetPoints(const std::vector<QPointF> & orc_ScenePos)
 //----------------------------------------------------------------------------------------------------------------------
 const C_GiNode * C_GiLiBusConnector::GetNodeItem(void) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    return dynamic_cast<const C_GiNode *>(mpc_GenericSignalItem);
 }
 
@@ -185,7 +181,6 @@ const C_GiNode * C_GiLiBusConnector::GetNodeItem(void) const
 //----------------------------------------------------------------------------------------------------------------------
 C_GiNode * C_GiLiBusConnector::GetNodeItem(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    return dynamic_cast<C_GiNode *>(mpc_GenericSignalItem);
 }
 
@@ -199,7 +194,6 @@ void C_GiLiBusConnector::UpdateData(C_PuiSdNodeConnection * const opc_UIConnecti
 {
    if (opc_UIConnection != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_GiNode * const pc_Node = dynamic_cast<const C_GiNode *>(this->mpc_GenericSignalItem);
       //ID
       if (pc_Node != NULL)
@@ -228,7 +222,6 @@ void C_GiLiBusConnector::UpdateData(C_PuiSdNodeConnection * const opc_UIConnecti
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::GenerateHint(void)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_GiNode * const pc_Node = dynamic_cast<const C_GiNode *>(this->mpc_GenericSignalItem);
 
    if ((pc_Node != NULL) && (this->GetBusItem() != NULL))
@@ -258,8 +251,8 @@ void C_GiLiBusConnector::GenerateHint(void)
             this->SetDefaultToolTipHeading(c_Hint);
 
             //content
-            c_Hint = QString(C_GtGetText::h_GetText(
-                                "%1 connected to %2 (Interface: %3, Node ID: %4%5)")).arg(
+            c_Hint = static_cast<QString>(C_GtGetText::h_GetText(
+                                             "%1 connected to %2 (Interface: %3, Node ID: %4%5)")).arg(
                pc_Node->GetText(),            //Node name
                this->GetBusItem()->GetName(), //Bus name
                C_PuiSdUtil::h_GetInterfaceName(this->GetBusItem()->GetType(),
@@ -283,7 +276,6 @@ void C_GiLiBusConnector::GenerateHint(void)
 const C_PuiSdNodeConnectionId * C_GiLiBusConnector::GetConnectionData(void) const
 {
    const C_PuiSdNodeConnectionId * pc_Retval = NULL;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_GiNode * const pc_Node = dynamic_cast<const C_GiNode *>(this->mpc_GenericSignalItem);
 
    if (pc_Node != NULL)
@@ -302,7 +294,6 @@ const C_PuiSdNodeConnectionId * C_GiLiBusConnector::GetConnectionData(void) cons
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::ChangeInterface(const uint8 & oru8_NewInterface, const uint8 & oru8_NodeId)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem);
 
    if (pc_Node != NULL)
@@ -388,7 +379,6 @@ void C_GiLiBusConnector::Reconnect(const stw_opensyde_gui::C_GiLiBus * const opc
    this->m_SetBus(opc_LastBus);
    if (this->GetBusItem() != NULL)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem);
       //Update data
       C_PuiSdNodeConnectionId c_NodeConn;
@@ -415,7 +405,6 @@ void C_GiLiBusConnector::Reconnect(const stw_opensyde_gui::C_GiLiBus * const opc
 //----------------------------------------------------------------------------------------------------------------------
 const C_GiPort * C_GiLiBusConnector::GetPortItem(void) const
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    return dynamic_cast<const C_GiPort *>(mpc_GenericPositionItem);
 }
 
@@ -439,7 +428,6 @@ void C_GiLiBusConnector::m_OnInteractionPointMove(void)
             {
                //Restore
                //Node
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                m_UpdateGenericItem(dynamic_cast<C_GiNode *>(this->mpc_LastKnownGenericSignalItem));
                //Port
                if (this->mpc_GenericPositionItem != NULL)
@@ -447,7 +435,6 @@ void C_GiLiBusConnector::m_OnInteractionPointMove(void)
                   //If changed port unregister of starting point
                   if (this->mpc_GenericPositionItem != this->mpc_LastKnownGenericPositionItem)
                   {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                      C_GiPort * const pc_Port = dynamic_cast<C_GiPort *>(this->mpc_GenericPositionItem);
                      if (pc_Port != NULL)
                      {
@@ -458,7 +445,6 @@ void C_GiLiBusConnector::m_OnInteractionPointMove(void)
                this->mpc_GenericPositionItem = this->mpc_LastKnownGenericPositionItem;
                if (this->mpc_GenericPositionItem != NULL)
                {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                   C_GiPort * const pc_Port = dynamic_cast<C_GiPort *>(this->mpc_GenericPositionItem);
                   if (pc_Port != NULL)
                   {
@@ -474,7 +460,6 @@ void C_GiLiBusConnector::m_OnInteractionPointMove(void)
                {
                   if (this->mpc_GenericPositionItem != this->mpc_LastKnownGenericPositionItem)
                   {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                      C_GiPort * const pc_Port = dynamic_cast<C_GiPort *>(this->mpc_LastKnownGenericPositionItem);
                      if (pc_Port != NULL)
                      {
@@ -484,7 +469,6 @@ void C_GiLiBusConnector::m_OnInteractionPointMove(void)
                   }
                   else
                   {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                      C_GiPort * const pc_Port = dynamic_cast<C_GiPort *>(this->mpc_LastKnownGenericPositionItem);
                      if (pc_Port != NULL)
                      {
@@ -515,7 +499,6 @@ void C_GiLiBusConnector::m_OnIterationGenericInteractionPointMove(QGraphicsItem 
                                                                   const QPointF & orc_CurPos,
                                                                   bool & orq_RestoreMouseCursor)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(opc_HighestParentItem);
 
    if (pc_Node != NULL)
@@ -553,8 +536,6 @@ void C_GiLiBusConnector::m_OnIterationGenericInteractionPointMove(QGraphicsItem 
    {
       if (opc_HighestParentItem != this)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         //lint -e{740}  no problem because of common base class
          C_GiBiCustomMouseItem * const pc_Other = dynamic_cast<C_GiBiCustomMouseItem *>(opc_HighestParentItem);
          if (((pc_Other != NULL) && (orq_RestoreMouseCursor == true)) &&
              (opc_HighestParentItem->isUnderMouse() == true))
@@ -579,7 +560,6 @@ void C_GiLiBusConnector::m_OnIterationGenericInteractionPointMove(QGraphicsItem 
 bool C_GiLiBusConnector::m_OnGenericInteractionPointMouseRelease(const QPointF & orc_ScenePos)
 {
    bool q_Retval = true;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem);
 
    if (pc_Node != NULL)
@@ -615,7 +595,6 @@ void C_GiLiBusConnector::m_OnBusChange(const QPointF & orc_ScenePos)
    {
       s32_Interface = static_cast<sint32>(pc_Id->u8_InterfaceNumber);
    }
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    Q_EMIT this->ShowReconnectContextMenu(orc_ScenePos, dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem),
                                          this->GetBusItem(), s32_Interface, this);
 }
@@ -650,9 +629,7 @@ void C_GiLiBusConnector::m_InitConnector(C_GiNode * const opc_NodeItem, const QP
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::m_UpdatePort(const QPointF & orc_Pos)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiPort * const pc_LastPort = dynamic_cast<C_GiPort *>(this->mpc_GenericPositionItem);
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem);
 
    if (pc_Node != NULL)
@@ -671,7 +648,6 @@ void C_GiLiBusConnector::m_UpdatePort(const QPointF & orc_Pos)
       if ((this->mpc_GenericPositionItem != NULL) &&
           (this->mpc_GenericPositionItem != this->mpc_LastKnownGenericPositionItem))
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          C_GiPort * const pc_NewPort = dynamic_cast<C_GiPort *>(this->mpc_GenericPositionItem);
          if (pc_NewPort != NULL)
          {

@@ -52,11 +52,11 @@ C_OgeSpxInt64::C_OgeSpxInt64(QWidget * const opc_Parent, const bool & orq_IsUnsi
    m_ResetMinMax();
    if (this->mq_IsUnsigned == true)
    {
-      this->SetValue(QVariant(0ULL), false);
+      this->SetValue(static_cast<QVariant>(0ULL), false);
    }
    else
    {
-      this->SetValue(QVariant(0LL), false);
+      this->SetValue(static_cast<QVariant>(0LL), false);
    }
    connect(this, &C_OgeSpxInt64::editingFinished, this, &C_OgeSpxInt64::SigValueChanged);
 }
@@ -376,8 +376,8 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Validate current input string
 
-   \param[in,out]  orc_Input  Input string
-   \param[in,out]  orc_Pos    Position
+   \param[in,out]  orc_Input   Input string
+   \param[in,out]  orsn_Pos    Position
 
    \return
    Invalid      Unusable
@@ -385,7 +385,7 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
    Acceptable   Completely valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orc_Pos) const
+QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orsn_Pos) const
 {
    QValidator::State e_Retval;
    if (((orc_Input.compare("") == 0) || (orc_Input.compare("+") == 0)) || (orc_Input.compare("-") == 0))
@@ -400,7 +400,7 @@ QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orc_Pos) 
       bool q_IsOverMaximum;
       const QString c_ValueOnly = this->m_ExtractSpinBoxValue(orc_Input);
 
-      Q_UNUSED(orc_Pos)
+      Q_UNUSED(orsn_Pos)
       if (this->mq_IsUnsigned == true)
       {
          const uint64 u64_Test = c_ValueOnly.toULongLong(pc_Result);
@@ -512,7 +512,7 @@ QString C_OgeSpxInt64::m_PrepareSpinBoxValue(const QString & orc_Text) const
    }
    else
    {
-      c_Retval = QString("%1 %2").arg(orc_Text, this->mc_Suffix);
+      c_Retval = static_cast<QString>("%1 %2").arg(orc_Text, this->mc_Suffix);
    }
    return c_Retval;
 }
@@ -633,13 +633,11 @@ void C_OgeSpxInt64::m_ResetMinMax(void)
    //Init default min max and default value
    if (this->mq_IsUnsigned == true)
    {
-      //lint -e{530,10,1015,1013}  c++11 feature
       this->mc_Minimum = std::numeric_limits<uint64>::lowest();
       this->mc_Maximum = std::numeric_limits<uint64>::max();
    }
    else
    {
-      //lint -e{530,10,1015,1013}  c++11 feature
       this->mc_Minimum = std::numeric_limits<sint64>::lowest();
       this->mc_Maximum = std::numeric_limits<sint64>::max();
    }

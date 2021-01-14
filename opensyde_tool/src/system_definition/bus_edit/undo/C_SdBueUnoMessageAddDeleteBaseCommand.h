@@ -29,23 +29,23 @@ class C_SdBueUnoMessageAddDeleteBaseCommand :
    public C_SdBueUnoMessageBaseCommand
 {
 public:
-   C_SdBueUnoMessageAddDeleteBaseCommand(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                         C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, stw_opensyde_gui::
-                                         C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
-                                         const QString & orc_Text = "",
-                                         QUndoCommand * const opc_Parent = NULL);
+   C_SdBueUnoMessageAddDeleteBaseCommand(
+      const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageId,
+      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, stw_opensyde_gui::
+      C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
+      const QString & orc_Text = "", QUndoCommand * const opc_Parent = NULL);
 
 protected:
    //Avoid using the message index under all circumstances!!!!!
-   stw_opensyde_core::C_OSCCanMessageIdentificationIndices mc_LastMessageId;
-   stw_opensyde_core::C_OSCCanMessage mc_Message;
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> mc_OSCSignalCommons;
-   std::vector<C_PuiSdNodeDataPoolListElement> mc_UISignalCommons;
-   std::vector<C_PuiSdNodeCanSignal> mc_UISignals;
-   std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> mc_MatchingIds;
+   std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> mc_LastMessageId;
+   std::vector<stw_opensyde_core::C_OSCCanMessage> mc_Message;
+   std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> > mc_OSCSignalCommons;
+   std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > mc_UISignalCommons;
+   std::vector<std::vector<C_PuiSdNodeCanSignal> > mc_UISignals;
+   std::vector<std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> > mc_MatchingIds;
 
-   void Add(void);
-   void Delete(void);
+   void m_Add(void);
+   void m_Delete(void);
 
 private:
    void m_Store(void);

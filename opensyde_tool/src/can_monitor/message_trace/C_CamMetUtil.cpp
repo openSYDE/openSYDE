@@ -76,7 +76,7 @@ std::vector<sintn> C_CamMetUtil::h_GetMultiplexerOrder(const std::vector<C_OSCCo
    else: found multiplexer value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMetUtil::mh_GetMultiplexerValue(const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals)
+sint32 C_CamMetUtil::h_GetMultiplexerValue(const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals)
 {
    sint32 s32_Value = -1;
 
@@ -103,8 +103,8 @@ sint32 C_CamMetUtil::mh_GetMultiplexerValue(const std::vector<C_OSCComMessageLog
    else: valid row (of message index)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMetUtil::mh_GetRowForMultiplexerValue(const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals,
-                                                  const sint32 os32_MultiplexerValue)
+sint32 C_CamMetUtil::h_GetRowForMultiplexerValue(const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals,
+                                                 const sint32 os32_MultiplexerValue)
 {
    sint32 s32_Retval = -1;
    const std::vector<sintn> c_MuxValues = C_CamMetUtil::h_GetMultiplexerOrder(orc_Signals);

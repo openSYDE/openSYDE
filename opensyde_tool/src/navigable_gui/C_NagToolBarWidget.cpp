@@ -162,7 +162,7 @@ void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget *
       // configure the button
       pc_Button->setMinimumSize(77 + static_cast<sintn>(mh_GetButtonStringWidth((*pc_ItFuncName).c_ButtonText)), 40);
       //Add space because of spacing issue between icon and text
-      pc_Button->setText(QString(' ') + (*pc_ItFuncName).c_ButtonText);
+      pc_Button->setText(static_cast<QString>(' ') + (*pc_ItFuncName).c_ButtonText);
       pc_Button->SetToolTipInformation((*pc_ItFuncName).c_ToolTipHeading, (*pc_ItFuncName).c_ToolTipContent);
       //Fix minimum size depending on text current space only
       connect(pc_Button, &C_OgePubToolBar::SigClickedWithIndex, this, &C_NagToolBarWidget::m_BtnClicked);
@@ -186,8 +186,7 @@ void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget *
       // add the groupbox to the main layout
       this->mpc_Ui->pc_HorizontalLayout->insertWidget(sn_LayoutIndex, pc_GroupBox);
       ++sn_LayoutIndex;
-      //lint -e{429}  no memory leak because of parent of pc_GroupBox and pc_GroupBoxLayout and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of parent of pc_GroupBox and pc_GroupBoxLayout and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -331,7 +330,7 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
          }
          else
          {
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            
             QKeyEvent * const pc_KeyEvent = dynamic_cast<QKeyEvent *>(opc_Event);
             if (pc_KeyEvent != NULL)
             {
@@ -362,7 +361,7 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
       }
       else if (opc_Event->type() == QEvent::KeyPress)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          QKeyEvent * const pc_KeyEvent = dynamic_cast<QKeyEvent *>(opc_Event);
          if (pc_KeyEvent != NULL)
          {
@@ -471,7 +470,6 @@ void C_NagToolBarWidget::m_BtnClicked(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_TriggerHelp(void)
 {
-   //lint -e{10,48,64,746,1013,1055} Will be defined via moc compiler, PC lint unable to handle this construct
    stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->metaObject()->className());
 }
 

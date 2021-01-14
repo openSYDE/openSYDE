@@ -364,7 +364,7 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
       {
          C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_Box.SetHeading(C_GtGetText::h_GetText("Device Assignment"));
-         c_Box.SetDescription(QString(C_GtGetText::h_GetText(
+         c_Box.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
                                          "Device type does not match. Expected \"%1\", dropped: \"%2\"")).arg(this->
                                                                                                               mc_DeviceName).arg(
                                  c_DroppedDevice));
@@ -396,7 +396,7 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
    {
       QString c_Ids;
       //Translation: 1: Node name
-      this->mpc_Ui->pc_LabelName->setText(QString(C_GtGetText::h_GetText("%1")).arg(
+      this->mpc_Ui->pc_LabelName->setText(static_cast<QString>(C_GtGetText::h_GetText("%1")).arg(
                                              pc_Node->c_Properties.c_Name.c_str()));
 
       for (uint32 u32_ItInt = 0; u32_ItInt < pc_Node->c_Properties.c_ComInterfaces.size(); ++u32_ItInt)
@@ -418,22 +418,22 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
             {
                if (rc_Interface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
                {
-                  c_Ids += QString(", Node-ID: %1").arg(rc_Interface.u8_NodeID);
+                  c_Ids += static_cast<QString>(", Node-ID: %1").arg(rc_Interface.u8_NodeID);
                   c_Ids += " / IP: ";
                   c_Ids += C_Uti::h_IpAddressToString(rc_Interface.c_Ip.au8_IpAddress);
                }
                else
                {
-                  c_Ids += QString(", %1").arg(rc_Interface.u8_NodeID);
+                  c_Ids += static_cast<QString>(", %1").arg(rc_Interface.u8_NodeID);
                }
                s32_Return = C_CONFIG;
             }
          }
       }
       //Translation: 1: Node ID
-      this->mpc_Ui->pc_LabelNodeId->setText(QString(C_GtGetText::h_GetText("Node-ID: %1")).arg(c_Ids));
+      this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>(C_GtGetText::h_GetText("Node-ID: %1")).arg(c_Ids));
       //Translation: 1: Node type
-      this->mpc_Ui->pc_LabelDeviceType->setText(QString(C_GtGetText::h_GetText("Type: %1")).arg(pc_Node->c_DeviceType.
+      this->mpc_Ui->pc_LabelDeviceType->setText(static_cast<QString>(C_GtGetText::h_GetText("Type: %1")).arg(pc_Node->c_DeviceType.
                                                                                                 c_str()));
    }
    //Resize

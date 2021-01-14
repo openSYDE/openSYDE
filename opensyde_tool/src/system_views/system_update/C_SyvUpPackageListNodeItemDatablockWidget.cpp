@@ -132,8 +132,7 @@ void C_SyvUpPackageListNodeItemDatablockWidget::ViewFileInfo(void)
       {
          c_New->HideOverlay();
       }
-      //lint -e{429}  no memory leak because of the parent of pc_InfoDialog and the Qt memory management
-   }
+   }  //lint !e429  //no memory leak because of the parent of pc_InfoDialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -269,7 +268,7 @@ void C_SyvUpPackageListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq
                         c_Message.SetDescription(C_GtGetText::h_GetText("Device type of selected HEX file does not "
                                                                         "match the node type."));
                         c_Message.SetDetails(
-                           QString(C_GtGetText::h_GetText("Device type of %1 does not match node type %2."))
+                           static_cast<QString>(C_GtGetText::h_GetText("Device type of %1 does not match node type %2."))
                            .arg(this->mc_AppDeviceType.trimmed(), this->mc_NodeDeviceType.trimmed()));
                         c_Message.SetCustomMinHeight(230, 250);
                         c_Message.Execute();
@@ -300,7 +299,7 @@ void C_SyvUpPackageListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq
          }
          else
          {
-            const QString c_Details = QString(C_GtGetText::h_GetText("File path: %1")).arg(this->mc_AbsoluteFilePath);
+            const QString c_Details = static_cast<QString>(C_GtGetText::h_GetText("File path: %1")).arg(this->mc_AbsoluteFilePath);
             // Invalid file
             C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
             c_Message.SetHeading(C_GtGetText::h_GetText("Update Package configuration"));

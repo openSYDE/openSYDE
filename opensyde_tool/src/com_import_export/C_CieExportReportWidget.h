@@ -38,10 +38,7 @@ public:
                                     const stw_opensyde_gui_logic::C_CieExportDbc::C_ExportStatistic & orc_ExportStatistic, const stw_scl::C_SCLStringList & orc_Warnings);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   //lint -restore
 
 private:
    Ui::C_CieExportReportWidget * mpc_Ui;

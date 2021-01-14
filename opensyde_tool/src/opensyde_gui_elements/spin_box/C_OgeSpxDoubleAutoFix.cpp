@@ -243,7 +243,7 @@ QString C_OgeSpxDoubleAutoFix::m_PrepareSpinBoxValue(const QString & orc_Text) c
    }
    else
    {
-      c_Retval = QString("%1 %2").arg(orc_Text, this->suffix());
+      c_Retval = static_cast<QString>("%1 %2").arg(orc_Text, this->suffix());
    }
    return c_Retval;
 }

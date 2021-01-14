@@ -35,6 +35,8 @@
 #include "C_RtfExportWidget.h"
 #include "C_PopUtil.h"
 #include "C_PuiUtil.h"
+#include "C_OgePopUpDialog.h"
+#include "C_SdCodeGenerationDialog.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -209,13 +211,13 @@ void C_SdHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
       {
          this->mpc_Topology->SaveToData();
       }
-      this->GenerateCode();
+      this->m_GenerateCode();
       break;
    case mhu32_USER_INPUT_FUNC_IMPORT:
-      this->Import();
+      this->m_Import();
       break;
    case mhu32_USER_INPUT_FUNC_EXPORT:
-      this->Export();
+      this->m_Export();
       break;
    case mhu32_USER_INPUT_FUNC_RTF_EXPORT:
       //Trigger CRC update
@@ -223,7 +225,7 @@ void C_SdHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
       {
          this->mpc_Topology->SaveToData();
       }
-      this->RtfExport();
+      this->m_RtfExport();
       break;
    default:
       break;
@@ -264,7 +266,7 @@ void C_SdHandlerWidget::Save(void)
       else
       {
          //Save to file
-         C_PopErrorHandling::mh_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
+         C_PopErrorHandling::h_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
 
          Q_EMIT this->SigDataChanged(false, true, ms32_MODE_SYSDEF);
 
@@ -508,6 +510,12 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigErrorChange, this, &C_SdHandlerWidget::m_ErrorChange);
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigNameChanged, this, &C_SdHandlerWidget::SigNameChanged);
 
+         //Buttons
+         Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, true));
+         Q_EMIT (this->SigSetToolTipForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE,
+                                                     this->mc_TOOLTIP_GENERAT_CODE_HEADING,
+                                                     this->mc_TOOLTIP_GENERAT_CODE_CONTENT_NODE));
+
          // show button for DBC file export and messages import
          if (pc_Bus->e_Type == C_OSCSystemBus::E_Type::eCAN) // Ethernet is not supported yet
          {
@@ -653,14 +661,24 @@ void C_SdHandlerWidget::m_ErrorChange(void)
 /*! \brief   Handle generate code action
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::GenerateCode(void) const
+void C_SdHandlerWidget::m_GenerateCode(void) const
 {
    //Check for changes
    if (C_ImpUtil::h_CheckProjForCodeGeneration(this->parentWidget()) == true)
    {
+      QPointer<C_OgePopUpDialog> const c_PopUpDialog = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
+      C_SdCodeGenerationDialog * const pc_CodeGenerationDialog = new C_SdCodeGenerationDialog(*c_PopUpDialog);
+      // Resize
+      c_PopUpDialog->SetSize(QSize(1000, 700));
       if (this->ms32_SubMode == ms32_SUBMODE_SYSDEF_TOPOLOGY)
       {
-         C_ImpUtil::h_ExportCodeAll(this->parentWidget());
+         std::vector<uint32> c_Indices;
+         c_Indices.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize());
+         for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+         {
+            c_Indices.push_back(u32_ItNode);
+         }
+         pc_CodeGenerationDialog->PrepareDialog(c_Indices);
       }
       else if (this->ms32_SubMode == ms32_SUBMODE_SYSDEF_NODEEDIT)
       {
@@ -668,12 +686,37 @@ void C_SdHandlerWidget::GenerateCode(void) const
          const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_Index);
          tgl_assert(pc_Node != NULL);
          c_Indices.push_back(this->mu32_Index);
-         C_ImpUtil::h_ExportCodeNodes(c_Indices, this->parentWidget());
+         pc_CodeGenerationDialog->PrepareDialog(c_Indices);
+      }
+      else if (this->ms32_SubMode == ms32_SUBMODE_SYSDEF_BUSEDIT)
+      {
+         std::vector<uint32> c_Indices;
+         std::vector<uint32> c_NodeIndexes;
+         std::vector<uint32> c_InterfaceIndexes;
+         C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_Index,
+                                                                                            c_NodeIndexes,
+                                                                                            c_InterfaceIndexes);
+         for (uint32 u32_Counter = 0; u32_Counter < c_NodeIndexes.size(); u32_Counter++)
+         {
+            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndexes
+                                                                                               .at(u32_Counter));
+            tgl_assert(pc_Node != NULL);
+            c_Indices.push_back(c_NodeIndexes.at(u32_Counter));
+         }
+         pc_CodeGenerationDialog->PrepareDialog(c_Indices);
       }
       else
       {
          //Unexpected
          tgl_assert(false);
+      }
+
+      if (c_PopUpDialog->exec() == static_cast<sintn>(QDialog::Accepted))
+      {
+         std::vector<uint32> c_NodeIndices;
+         std::vector< std::vector<uint32> > c_AppIndicesPerNode;
+         pc_CodeGenerationDialog->GetCheckedItems(c_NodeIndices, c_AppIndicesPerNode);
+         C_ImpUtil::h_ExportCode(c_NodeIndices, c_AppIndicesPerNode, this->parentWidget());
       }
    }
 }
@@ -682,7 +725,7 @@ void C_SdHandlerWidget::GenerateCode(void) const
 /*! \brief   Call for (DBC file) export functionality.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::Export(void)
+void C_SdHandlerWidget::m_Export(void)
 {
    std::set<uint32> c_CanMessageIds; // to count CAN messages
    uint32 u32_NumOfInputSignals = 0;
@@ -836,7 +879,7 @@ void C_SdHandlerWidget::Export(void)
 /*! \brief  Call for DBC/EDS/DCF import functionality.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::Import(void)
+void C_SdHandlerWidget::m_Import(void)
 {
    // only available on bus edit
    tgl_assert(this->mpc_ActBusEdit != NULL);
@@ -850,7 +893,7 @@ void C_SdHandlerWidget::Import(void)
 /*! \brief   Call for (RTF file) documentation functionality.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::RtfExport(void)
+void C_SdHandlerWidget::m_RtfExport(void)
 {
    // check for unsaved data and start the export dialog later (only saved items are exported to RTF file)
    if (C_PopUtil::h_AskUserToContinue(this, false) == true)
@@ -878,11 +921,11 @@ void C_SdHandlerWidget::RtfExport(void)
 
          c_PopUpDialog->SetSize(c_SizeImportReport);
 
-         stw_scl::C_SCLString c_RtfPath = stw_scl::C_SCLString(
+         stw_scl::C_SCLString c_RtfPath = static_cast<stw_scl::C_SCLString>(
             C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownRtfPath().toStdString().c_str());
-         stw_scl::C_SCLString c_CompanyName = stw_scl::C_SCLString(
+         stw_scl::C_SCLString c_CompanyName = static_cast<stw_scl::C_SCLString>(
             C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownRtfCompanyName().toStdString().c_str());
-         stw_scl::C_SCLString c_CompanyLogoPath = stw_scl::C_SCLString(
+         stw_scl::C_SCLString c_CompanyLogoPath = static_cast<stw_scl::C_SCLString>(
             C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownRtfCompanyLogoPath().toStdString().c_str());
 
          if (c_RtfPath == "")
@@ -911,11 +954,11 @@ void C_SdHandlerWidget::RtfExport(void)
          {
             // save inputs as user settings
             pc_DialogExportReport->GetRtfPath(c_RtfPath);
-            C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownRtfPath(QString(c_RtfPath.c_str()));
+            C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownRtfPath(static_cast<QString>(c_RtfPath.c_str()));
             pc_DialogExportReport->GetCompanyName(c_CompanyName);
-            C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownRtfCompanyName(QString(c_CompanyName.c_str()));
+            C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownRtfCompanyName(static_cast<QString>(c_CompanyName.c_str()));
             pc_DialogExportReport->GetCompanyLogoPath(c_CompanyLogoPath);
-            C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownRtfCompanyLogoPath(QString(
+            C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownRtfCompanyLogoPath(static_cast<QString>(
                                                                                           c_CompanyLogoPath.c_str()));
             C_UsHandler::h_GetInstance()->Save();
 
@@ -927,11 +970,11 @@ void C_SdHandlerWidget::RtfExport(void)
                                                                    c_Warnings, c_Error);
             if (s32_Return == C_NO_ERR)
             {
-               QString c_Details = QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
+               QString c_Details = static_cast<QString>("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
                                    arg(C_GtGetText::h_GetText("File saved at ")).
-                                   arg(QString(c_RtfPath.c_str())).
+                                   arg(static_cast<QString>(c_RtfPath.c_str())).
                                    arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                                   arg(QString(c_RtfPath.c_str()));
+                                   arg(static_cast<QString>(c_RtfPath.c_str()));
                C_OgeWiCustomMessage c_MessageResult(this);
                c_MessageResult.SetHeading(C_GtGetText::h_GetText("RTF File Export"));
                c_MessageResult.SetDescription(C_GtGetText::h_GetText("RTF document successfully created."));
@@ -965,8 +1008,7 @@ void C_SdHandlerWidget::RtfExport(void)
          {
             c_PopUpDialog->HideOverlay();
          }
-         //lint -e{429}  no memory leak because of the parent of pc_DialogExportReport and the Qt memory management
-      }
+      }  //lint !e429  //no memory leak because of the parent of pc_DialogExportReport and the Qt memory management
    }
 }
 
@@ -993,7 +1035,9 @@ void C_SdHandlerWidget::CallHelp(void)
       }
       else if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TabIndexHalc)
       {
-         // TODO: HALC Manual
+         // TabIndex == HALC
+         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+            "stw_opensyde_gui::C_SdNdeHalcChannelWidget");
       }
       else
       {

@@ -25,10 +25,11 @@ class C_SdBueUnoMessageDeleteCommand :
    public C_SdBueUnoMessageAddDeleteBaseCommand
 {
 public:
-   C_SdBueUnoMessageDeleteCommand(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                  C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
-                                  stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
-                                  QUndoCommand * const opc_Parent = NULL);
+   C_SdBueUnoMessageDeleteCommand(
+      const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageId,
+      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+      stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
+      QUndoCommand * const opc_Parent = NULL);
 
    virtual void redo(void);
    virtual void undo(void);

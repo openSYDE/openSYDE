@@ -103,7 +103,6 @@ bool C_OSCSuSequences::m_IsNodeActive(const uint32 ou32_NodeIndex, const uint32 
       }
    }
    return q_Return;
-   //lint -e{1763} False positive; we do not provide write access to class elements
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -239,7 +238,7 @@ sint32 C_OSCSuSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_S
    sint32 s32_Return = C_NO_ERR;
 
    //add node information:
-   bool q_Return = this->m_ReportProgress(eXFL_PROGRESS, C_NO_ERR, ou8_Progress, mc_CurrentNode, orc_Text);
+   const bool q_Return = this->m_ReportProgress(eXFL_PROGRESS, C_NO_ERR, ou8_Progress, mc_CurrentNode, orc_Text);
 
    if (q_Return == true)
    {
@@ -305,7 +304,7 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
       u32_Return = c_Files[u32_File]->LoadFromFile(orc_FilesToFlash[u32_File].c_str());
       if (u32_Return != stw_hex_file::NO_ERR)
       {
-         C_SCLString c_ErrorText = c_Files[u32_File]->ErrorCodeToErrorText(u32_Return);
+         const C_SCLString c_ErrorText = c_Files[u32_File]->ErrorCodeToErrorText(u32_Return);
          (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR, C_RD_WR, 0U, mc_CurrentNode,
                                 "Opening HEX file. Reason: " + c_ErrorText + ".");
          s32_Return = C_RD_WR;
@@ -394,10 +393,11 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
                }
                if (q_IsSame == false)
                {
-                  C_SCLString c_ErrorText = "Device names of device and HEX file " + orc_FilesToFlash[u32_File] +
-                                            " do not match. Device reported: \"" + c_DeviceName.Trim().UpperCase() +
-                                            "\". HEX file contains: \"" +
-                                            c_DeviceNameHexFile.Trim().UpperCase() + "\".";
+                  const C_SCLString c_ErrorText = "Device names of device and HEX file " + orc_FilesToFlash[u32_File] +
+                                                  " do not match. Device reported: \"" +
+                                                  c_DeviceName.Trim().UpperCase() +
+                                                  "\". HEX file contains: \"" +
+                                                  c_DeviceNameHexFile.Trim().UpperCase() + "\".";
                   (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR, C_OVERFLOW, 10U,
                                          mc_CurrentNode, c_ErrorText);
                   s32_Return = C_OVERFLOW;
@@ -840,7 +840,8 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
    sintn sn_Return;
    uint32 u32_TotalNumberOfBytes = 0U;
    uint32 u32_TotalNumberOfBytesFlashed = 0U;
-   FILE * pt_File;
+
+   std::FILE * pt_File;
    uint32 u32_MaxBlockLength = 0U;
    uint8 u8_NrCode;
    uint32 u32_TransferCrc = 0xFFFFFFFFU;
@@ -848,7 +849,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
 
    (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START, C_NO_ERR, 0U, mc_CurrentNode,
                           "Transferring file ...");
-   pt_File = fopen(orc_FileToFlash.c_str(), "rb");
+   pt_File = std::fopen(orc_FileToFlash.c_str(), "rb");
    if (pt_File == NULL)
    {
       s32_Return = C_RD_WR;
@@ -860,7 +861,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
       if (sn_Return != 0)
       {
          s32_Return = C_RD_WR;
-         (void)fclose(pt_File);
+         (void)std::fclose(pt_File);
          pt_File = NULL;
       }
       else
@@ -869,7 +870,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
          if (sn_Return < 0)
          {
             s32_Return = C_RD_WR;
-            (void)fclose(pt_File);
+            (void)std::fclose(pt_File);
             pt_File = NULL;
          }
          else
@@ -916,7 +917,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
 
       if ((s32_Return != C_NO_ERR) && (pt_File != NULL))
       {
-         (void)fclose(pt_File);
+         (void)std::fclose(pt_File);
          pt_File = NULL;
       }
    }
@@ -965,7 +966,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
             }
 
             //lint -e{449,668}  //file cannot be NULL if we get here
-            sn_Return = fread(&c_Data[0], 1U, c_Data.size(), pt_File);
+            sn_Return = std::fread(&c_Data[0], 1U, c_Data.size(), pt_File);
             if (sn_Return != static_cast<sintn>(c_Data.size()))
             {
                //it's not ideal that we have to abort in the middle of the procedure
@@ -1010,7 +1011,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
       // File is not necessary anymore. Close it.
       if (pt_File != NULL)
       {
-         (void)fclose(pt_File);
+         (void)std::fclose(pt_File);
       }
    }
 
@@ -1708,10 +1709,8 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                   c_Files[u16_File] = TGL_ExtractFileName(c_Files[u16_File]).LowerCase();
                }
                //get same names next to each other:
-               //lint -e{864} Call as expected by interface
                std::sort(c_Files.begin(), c_Files.end());
                //remove duplicates:
-               //lint -e{864} Call as expected by interface
                c_Files.erase(std::unique(c_Files.begin(), c_Files.end()), c_Files.end());
                if (c_Files.size() != orc_ApplicationsToWrite[u16_Node].c_FilesToFlash.size())
                {
@@ -2027,7 +2026,7 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
          // is not possible via Ethernet; it really has to react to RequestProgramming
          if (this->mpc_SystemDefinition->c_Buses[this->mu32_ActiveBusIndex].e_Type == C_OSCSystemBus::eCAN)
          {
-            uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+            const uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
             uint32 u32_WaitTime = this->GetMinimumFlashloaderResetWaitTime(C_OSCComDriverFlash::eNO_CHANGES_CAN);
 
             if (u32_WaitTime < u32_SCAN_TIME_MS)
@@ -2204,7 +2203,7 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
 
                if (q_IsActive == true)
                {
-                  const bool q_IsNodeReachable = this->mq_IsNodeReachable(u16_Node);
+                  const bool q_IsNodeReachable = this->m_IsNodeReachable(u16_Node);
 
                   (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START, C_NO_ERR, 30U, mc_CurrentNode,
                                          "Checking node state ...");
@@ -2548,7 +2547,7 @@ sint32 C_OSCSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
          }
          else
          {
-            const bool q_IsNodeReachable = this->mq_IsNodeReachable(u16_Node);
+            const bool q_IsNodeReachable = this->m_IsNodeReachable(u16_Node);
 
             if (q_IsNodeReachable == true)
             {
@@ -3005,7 +3004,7 @@ sint32 C_OSCSuSequences::ResetSystem(void)
       {
          for (uint32 u32_Node = 0U; u32_Node < this->mpc_SystemDefinition->c_Nodes.size(); u32_Node++)
          {
-            const bool q_IsNodeReachable = this->mq_IsNodeReachable(u32_Node);
+            const bool q_IsNodeReachable = this->m_IsNodeReachable(u32_Node);
 
             if (q_IsNodeReachable == true)
             {
@@ -3169,7 +3168,7 @@ void C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
       orc_Text.Add(" Block end address: 0x" +
                    C_SCLString::IntToHex(static_cast<sint64>(orc_Info.c_Applications[u8_Application].
                                                              u32_BlockEndAddress), 8U));
-      orc_Text.Add(C_SCLString(" Signature valid: ") +
+      orc_Text.Add(static_cast<C_SCLString>(" Signature valid: ") +
                    ((orc_Info.c_Applications[u8_Application].u8_SignatureValid == 0) ? "yes" : "no"));
       orc_Text.Add(" Additional information: " + orc_Info.c_Applications[u8_Application].c_AdditionalInformation);
    }
@@ -3286,9 +3285,9 @@ void C_OSCSuSequences::h_StwFlashloaderInformationToText(const C_XflDeviceInform
    if (orc_Info.c_BasicInformation.q_ProtocolVersionValid == true)
    {
       c_Line.PrintFormatted("V%x.%x%xr%x\n",
-                            static_cast<uint8>((orc_Info.c_BasicInformation.u16_ProtocolVersion >> 12) & 0x0FU),
-                            static_cast<uint8>((orc_Info.c_BasicInformation.u16_ProtocolVersion >> 8) & 0x0FU),
-                            static_cast<uint8>((orc_Info.c_BasicInformation.u16_ProtocolVersion >> 4) & 0x0FU),
+                            static_cast<uint8>((orc_Info.c_BasicInformation.u16_ProtocolVersion >> 12U) & 0x0FU),
+                            static_cast<uint8>((orc_Info.c_BasicInformation.u16_ProtocolVersion >> 8U) & 0x0FU),
+                            static_cast<uint8>((orc_Info.c_BasicInformation.u16_ProtocolVersion >> 4U) & 0x0FU),
                             static_cast<uint8>((orc_Info.c_BasicInformation.u16_ProtocolVersion) & 0x0FU));
    }
    else
@@ -3744,8 +3743,8 @@ sint32 C_OSCSuSequences::mh_CopyFile(const C_SCLString & orc_SourceFile, const C
    {
       c_Input << &std::noskipws;
 
-      std::istream_iterator<uint8> c_Begin(c_Input);
-      std::istream_iterator<uint8> c_End;
+      const std::istream_iterator<uint8> c_Begin(c_Input);
+      const std::istream_iterator<uint8> c_End;
 
       std::fstream c_Output(orc_TargetFile.c_str(), std::fstream::out | std::fstream::trunc | std::fstream::binary);
       if (c_Output.fail() == true)
@@ -3759,7 +3758,7 @@ sint32 C_OSCSuSequences::mh_CopyFile(const C_SCLString & orc_SourceFile, const C
       }
       else
       {
-         std::ostream_iterator<uint8> c_Begin2(c_Output);
+         const std::ostream_iterator<uint8> c_Begin2(c_Output);
          try
          {
             std::copy(c_Begin, c_End, c_Begin2);

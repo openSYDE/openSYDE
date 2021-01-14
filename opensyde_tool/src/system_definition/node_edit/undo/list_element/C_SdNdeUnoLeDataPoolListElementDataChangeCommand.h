@@ -48,8 +48,8 @@ private:
    void m_Change(QVariant & orc_PreviousData, const QVariant & orc_NewData);
    void m_ApplyAutoMin(void);
    void m_ApplyAutoMax(void);
-   stw_opensyde_core::C_OSCNodeDataPoolContent GetCurrentTypeMinGeneric(void) const;
-   stw_opensyde_core::C_OSCNodeDataPoolContent GetCurrentTypeMaxGeneric(void) const;
+   stw_opensyde_core::C_OSCNodeDataPoolContent m_GetCurrentTypeMinGeneric(void) const;
+   stw_opensyde_core::C_OSCNodeDataPoolContent m_GetCurrentTypeMaxGeneric(void) const;
    void m_CopySingleValueToArrayIndex(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Single,
                                       const stw_types::uint32 & oru32_ArrayIndex,
                                       stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Output) const;

@@ -54,7 +54,7 @@ private:
 
    //Avoid call
    C_GiSvDaToggleBase(const C_GiSvDaToggleBase &);
-   C_GiSvDaToggleBase & operator =(const C_GiSvDaToggleBase &);
+   C_GiSvDaToggleBase & operator =(const C_GiSvDaToggleBase &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -34,10 +34,12 @@ public:
    static stw_scl::C_SCLString h_CombineVariableName(const stw_scl::C_SCLString & orc_Domain,
                                                      const stw_scl::C_SCLString & orc_ParameterName);
    static C_OSCNodeDataPoolListElement h_GetChanNumVariable(const stw_scl::C_SCLString & orc_DomainSingularName,
+                                                            const bool oq_IsSafe,
                                                             const stw_types::uint32 ou32_NumChannels,
                                                             const bool oq_AddDataset);
    static stw_scl::C_SCLString h_GetChanNumVariableName(const stw_scl::C_SCLString & orc_DomainSingularName);
    static C_OSCNodeDataPoolListElement h_GetUseCaseVariable(const stw_scl::C_SCLString & orc_DomainSingularName,
+                                                            const bool oq_IsSafe,
                                                             const stw_types::uint32 ou32_NumChannels,
                                                             const bool oq_AddDataset);
    static stw_scl::C_SCLString h_GetUseCaseVariableName(const stw_scl::C_SCLString & orc_DomainSingularName);

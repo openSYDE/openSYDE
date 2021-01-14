@@ -105,10 +105,10 @@ void C_SdNdeUnoDasDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
       switch (this->me_DataChangeType)
       {
       case C_SdNdeDpUtil::eDATA_SET_NAME:
-         orc_PreviousData = QString(c_OSCData.c_Name.c_str());
+         orc_PreviousData = static_cast<QString>(c_OSCData.c_Name.c_str());
          break;
       case C_SdNdeDpUtil::eDATA_SET_COMMENT:
-         orc_PreviousData = QString(c_OSCData.c_Comment.c_str());
+         orc_PreviousData = static_cast<QString>(c_OSCData.c_Comment.c_str());
          break;
       default:
          break;

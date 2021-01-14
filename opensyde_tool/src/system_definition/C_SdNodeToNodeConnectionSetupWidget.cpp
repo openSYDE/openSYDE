@@ -986,8 +986,9 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode1(void) const
       {
          C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eERROR);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Datapool add"));
-         c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Node %1 cannot create %2 more COMM Datapool(s) "
-                                                                    "without exceeding the limit of %3 Datapools.")).
+         c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                             "Node %1 cannot create %2 more COMM Datapool(s) "
+                                                             "without exceeding the limit of %3 Datapools.")).
                                      arg(pc_OscNode->c_Properties.c_Name.c_str()).
                                      arg(u32_DatapoolsToAdd).
                                      arg(mu32_NODE_DATA_POOL_MAX));
@@ -1084,8 +1085,9 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode2(void) const
       {
          C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eERROR);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Datapool add"));
-         c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Node %1 cannot create %2 more COMM Datapool(s) "
-                                                                    "without exceeding the limit of %3 Datapools.")).
+         c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                             "Node %1 cannot create %2 more COMM Datapool(s) "
+                                                             "without exceeding the limit of %3 Datapools.")).
                                      arg(pc_OscNode->c_Properties.c_Name.c_str()).
                                      arg(u32_DatapoolsToAdd).
                                      arg(mu32_NODE_DATA_POOL_MAX));

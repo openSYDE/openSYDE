@@ -211,7 +211,7 @@ void C_SdNdeDpListEditWidget::m_UpdateButtonTooltips(const uint32 ou32_NodeIndex
    {
       this->mpc_Ui->pc_PubNext->
       SetToolTipInformation(C_GtGetText::h_GetText("Go to Next Datapool"),
-                            QString(C_GtGetText::h_GetText("#%1 %2 (%3)")).
+                            static_cast<QString>(C_GtGetText::h_GetText("#%1 %2 (%3)")).
                             arg(C_PuiSdHandler::h_GetInstance()->GetDataPoolTypeIndex(ou32_NodeIndex, s32_Next) + 1).
                             arg(pc_Dp->c_Name.c_str()).
                             arg(C_PuiSdUtil::h_ConvertDataPoolTypeToString(pc_Dp->e_Type)));
@@ -223,7 +223,7 @@ void C_SdNdeDpListEditWidget::m_UpdateButtonTooltips(const uint32 ou32_NodeIndex
    {
       this->mpc_Ui->pc_PubPrevious->
       SetToolTipInformation(C_GtGetText::h_GetText("Go to Previous Datapool"),
-                            QString(C_GtGetText::h_GetText("#%1 %2 (%3)")).
+                            static_cast<QString>(C_GtGetText::h_GetText("#%1 %2 (%3)")).
                             arg(C_PuiSdHandler::h_GetInstance()->GetDataPoolTypeIndex(ou32_NodeIndex, s32_Prev) + 1).
                             arg(pc_Dp->c_Name.c_str()).
                             arg(C_PuiSdUtil::h_ConvertDataPoolTypeToString(pc_Dp->e_Type)));

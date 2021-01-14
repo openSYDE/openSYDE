@@ -45,8 +45,7 @@ C_CamOgeCbxTable::C_CamOgeCbxTable(QWidget * const opc_Parent) :
    C_OgeCbxIconDelegate * const pc_ItemDelegate = new C_OgeCbxIconDelegate();
 
    this->setItemDelegate(pc_ItemDelegate);
-   //lint -e{429}  no memory leak because of the parent all elements and the Qt memory management
-}
+} //lint !e429  no memory leak because of the parent all elements and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor

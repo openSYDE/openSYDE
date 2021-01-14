@@ -30,10 +30,7 @@ class C_OgeSpxDoubleDynamicDecimalsBase :
 public:
    C_OgeSpxDoubleDynamicDecimalsBase(QWidget * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual QString textFromValue(const stw_types::float64 of64_Value) const override;
-   //lint -restore
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

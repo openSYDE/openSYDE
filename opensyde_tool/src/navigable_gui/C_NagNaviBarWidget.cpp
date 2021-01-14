@@ -549,8 +549,10 @@ void C_NagNaviBarWidget::m_NodesChanged(void) const
    std::vector<QString> c_Nodes;
 
    //Update node count
-   this->mpc_Ui->pc_LabelNodes->setText(QString(C_GtGetText::h_GetText("Nodes (%1)")).arg(C_PuiSdHandler::h_GetInstance()
-                                                                                          ->GetOSCNodesSize()));
+   this->mpc_Ui->pc_LabelNodes->setText(
+      static_cast<QString>(C_GtGetText::h_GetText("Nodes (%1)")).arg(C_PuiSdHandler::
+                                                                     h_GetInstance()
+                                                                     ->GetOSCNodesSize()));
 
    c_Nodes.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize());
    //add new nodes
@@ -576,8 +578,10 @@ void C_NagNaviBarWidget::m_BussesChanged(void) const
    std::vector<QString> c_Buses;
 
    //Update bus count
-   this->mpc_Ui->pc_LabelBuses->setText(QString(C_GtGetText::h_GetText("Buses (%1)")).arg(C_PuiSdHandler::h_GetInstance()
-                                                                                          ->GetOSCBusesSize()));
+   this->mpc_Ui->pc_LabelBuses->setText(
+      static_cast<QString>(C_GtGetText::h_GetText("Buses (%1)")).arg(C_PuiSdHandler::
+                                                                     h_GetInstance()
+                                                                     ->GetOSCBusesSize()));
 
    c_Buses.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize());
    //add new nodes
@@ -615,7 +619,7 @@ void C_NagNaviBarWidget::m_OpenCanMonitor(void)
    // Adapted working directory is necessary for the stwpeak2.ini
    bool q_Temp = QProcess::startDetached(c_ExecutablePath, QStringList(),
                                          C_Uti::h_GetExePath() + "/CAN_Monitor");
-   QString c_ErrorMsg = QString(
+   QString c_ErrorMsg = static_cast<QString>(
       "Could not start openSYDE CAN Monitor. Reason: Most likely due to insufficient permissions or the executable"
       " \"%1\" is missing.").arg(c_ExecutablePath);
 
@@ -627,8 +631,8 @@ void C_NagNaviBarWidget::m_OpenCanMonitor(void)
                                         C_GtGetText::h_GetText(
                                            "Could not start openSYDE CAN Monitor. Reason: Most likely due to insufficient permissions or the executable is missing."));
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open openSYDE CAN Monitor"));
-      c_MessageBox.SetDetails(QString(C_GtGetText::h_GetText(
-                                         "Executable path: \n%1")).arg(c_ExecutablePath));
+      c_MessageBox.SetDetails(static_cast<QString>(C_GtGetText::h_GetText(
+                                                      "Executable path: \n%1")).arg(c_ExecutablePath));
       c_MessageBox.SetCustomMinHeight(230, 270);
       c_MessageBox.Execute();
    }

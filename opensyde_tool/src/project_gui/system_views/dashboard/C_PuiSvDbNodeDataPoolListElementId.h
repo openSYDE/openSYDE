@@ -47,11 +47,12 @@ public:
                                          stw_opensyde_core::C_OSCNodeDataPool::eDIAG,
                                       const QString & orc_InvalidNamePlaceholder = "");
 
-   //lint -e{1511} Hiding of original operators is intended
-   virtual bool operator < (const C_OSCNodeDataPoolId & orc_Cmp) const;
-   //lint -e{1511} Hiding of original operators is intended
-   virtual bool operator == (const C_OSCNodeDataPoolId & orc_Cmp) const;
+   virtual bool operator < (const C_OSCNodeDataPoolId & orc_Cmp) const;  //lint !e1511  //Hiding of original operators
+                                                                         // is intended
+   virtual bool operator == (const C_OSCNodeDataPoolId & orc_Cmp) const; //lint !e1511  //Hiding of original operators
+                                                                         // is intended
 
+   bool CheckSameDataElement(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_OtherId) const;
    bool CheckSameDataElement(const C_PuiSvDbNodeDataPoolListElementId & orc_OtherId) const;
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
@@ -65,6 +66,8 @@ public:
    //Simple getter & setter
    E_Type GetType(void) const;
    void SetType(const E_Type oe_Type);
+   QString GetHalChannelName(void) const;
+   void SetHalChannelName(const QString & orc_Value);
 
    stw_types::uint32 GetArrayElementIndex(void) const;
    stw_types::uint32 GetArrayElementIndexOrZero(void) const;
@@ -80,6 +83,7 @@ private:
    ///< to system view synchronisation engine
    stw_opensyde_core::C_OSCNodeDataPool::E_Type me_InvalidTypePlaceholder; ///< Type used in case of invalid
    QString mc_InvalidNamePlaceholder;                                      ///< Name used in case of invalid
+   QString mc_HalChannelName;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

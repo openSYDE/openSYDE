@@ -69,11 +69,8 @@ public:
    C_GiTextElementBus * GetTextElementBus(void);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
-   //lint -restore
 
    C_GiTextElementBus * mpc_TextElementName;
 
@@ -87,7 +84,7 @@ Q_SIGNALS:
 private:
    //Avoid call
    C_GiLiBus(const C_GiLiBus &);
-   C_GiLiBus & operator =(const C_GiLiBus &);
+   C_GiLiBus & operator =(const C_GiLiBus &); //lint !e1511 //we want to hide the base func.
 
    void m_BusWasMoved(const stw_types::sint32 & ors32_LineIndex, const QPointF & orc_PositionDifference);
    void m_UpdateTextElementName(void);

@@ -130,7 +130,7 @@ void C_OgeLeFilePathBase::InsertVariable(const QString & orc_Variable)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePathBase::UpdateText(void)
 {
-   this->setText(QString(this->mc_Path));
+   this->setText(this->mc_Path);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ void C_OgeLeFilePathBase::UpdateText(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePathBase::focusInEvent(QFocusEvent * const opc_Event)
 {
-   this->setText(QString(this->mc_Path));
+   this->setText(this->mc_Path);
    C_OgeLeToolTipBase::focusInEvent(opc_Event);
 }
 

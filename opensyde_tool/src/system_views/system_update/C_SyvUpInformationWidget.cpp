@@ -95,8 +95,7 @@ C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_WidgetUpdateSummarySmall, &C_SyvUpSummaryWidgetSmall::SigHideSmallSummaryWidget,
            this, &C_SyvUpInformationWidget::m_HideSmallUpdateSummary);
 
-   //lint -e{429}  no memory leak because of the parent of pc_Button and the Qt memory management
-}
+}  //lint !e429  //no memory leak because of the parent of pc_Button and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
@@ -628,7 +627,7 @@ void C_SyvUpInformationWidget::m_UpdateTime(void) const
    const uint64 u64_ElapsedMin = (u64_ElapsedMs / 60000ULL) % 60ULL;
    const uint64 u64_ElapsedH = u64_ElapsedMs / 3600000ULL;
 
-   const QString c_Time = QString("%1:%2:%3").arg(u64_ElapsedH, 2, 10, QChar('0')).
+   const QString c_Time = static_cast<QString>("%1:%2:%3").arg(u64_ElapsedH, 2, 10, QChar('0')).
                           arg(u64_ElapsedMin, 2, 10, QChar('0')).arg(u64_ElapsedS, 2, 10, QChar('0'));
 
    this->mpc_Ui->pc_WidgetUpdateSummary->SetElapsedTime(c_Time);
@@ -686,10 +685,10 @@ void C_SyvUpInformationWidget::m_UpdateDataTransfer(const uint64 & oru64_Overall
       c_Complete = QString::number(f64_OverallFilesSize, 'f', 1);
    }
    //Translation: 1:Flashed bytes, 2:File size, 3: File size unit
-   c_Value = QString("%1 %3/%2 %3").arg(c_Progress).arg(c_Complete).arg(c_Unit);
+   c_Value = static_cast<QString>("%1 %3/%2 %3").arg(c_Progress).arg(c_Complete).arg(c_Unit);
 
    //Translation: 1:File progress
-   this->mc_DataRateAbsoluteBytes = QString(C_GtGetText::h_GetText("Data transfer %1")).arg(c_Value);
+   this->mc_DataRateAbsoluteBytes = static_cast<QString>(C_GtGetText::h_GetText("Data transfer %1")).arg(c_Value);
 
    m_UpdateLabel();
 }
@@ -717,7 +716,7 @@ void C_SyvUpInformationWidget::m_UpdateLabel(void) const
    }
    else
    {
-      this->mpc_Ui->pc_WidgetUpdateSummary->SetDataTransfer(QString("%1\n%2").arg(this->mc_EstimatedTime).arg(
+      this->mpc_Ui->pc_WidgetUpdateSummary->SetDataTransfer(static_cast<QString>("%1\n%2").arg(this->mc_EstimatedTime).arg(
                                                                c_DataRateCombined));
    }
 
@@ -748,7 +747,7 @@ void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesC
 
             if (u64_WaitingTimeMin == 0ULL)
             {
-               this->mc_EstimatedTime = QString(C_GtGetText::h_GetText(
+               this->mc_EstimatedTime = static_cast<QString>(C_GtGetText::h_GetText(
                                                    "Estimated waiting time less than one minute."));
             }
             else
@@ -758,13 +757,13 @@ void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesC
                const uint64 u64_WaitingTimeH = (u64_WaitingTimeMin + 1ULL) / 60ULL;
                if (u64_WaitingTimeH == 0ULL)
                {
-                  this->mc_EstimatedTime = QString(C_GtGetText::h_GetText("Estimated waiting time %1 min.")).arg(
+                  this->mc_EstimatedTime = static_cast<QString>(C_GtGetText::h_GetText("Estimated waiting time %1 min.")).arg(
                      u64_WaitingTimeMin + 1ULL);
                }
                else
                {
                   this->mc_EstimatedTime =
-                     QString(C_GtGetText::h_GetText("Estimated waiting time %1 h %2 min.")).arg(
+                     static_cast<QString>(C_GtGetText::h_GetText("Estimated waiting time %1 h %2 min.")).arg(
                         u64_WaitingTimeH).arg((u64_WaitingTimeMin + 1ULL) % 60ULL);
                }
             }
@@ -831,7 +830,7 @@ void C_SyvUpInformationWidget::m_UpdateDataRate()
          c_DataTransferRate = QString::number(f64_NumberOfFlashedBytesThisSecond, 'f', 0);
       }
       this->mc_DataRateBytesPerSecond =
-         QString(C_GtGetText::h_GetText("%1 %2/s")).arg(c_DataTransferRate).arg(c_Unit);
+         static_cast<QString>(C_GtGetText::h_GetText("%1 %2/s")).arg(c_DataTransferRate).arg(c_Unit);
 
       m_UpdateLabel();
    }

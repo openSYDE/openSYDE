@@ -28,6 +28,7 @@
 #include "C_SyvDaPeUpdateModeConfiguration.h"
 #include "C_OSCNodeDataPoolListElement.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -81,6 +82,9 @@ C_GiSvDaChartBase::C_GiSvDaChartBase(const uint32 & oru32_ViewIndex, const uint3
    mpc_ChartWidget = new C_SyvDaItChartWidget(oru32_ViewIndex, mhu32_MaximumDataElements);
    this->mpc_Widget->SetWidget(this->mpc_ChartWidget);
 
+   connect(this->mpc_ChartWidget, &C_SyvDaItChartWidget::SigChartDataChanged,
+           this, &C_GiSvDaChartBase::m_SetChangedChartData);
+
    //Activate child handles its own events for combo box pop up
    this->setHandlesChildEvents(false);
 }
@@ -91,9 +95,9 @@ C_GiSvDaChartBase::C_GiSvDaChartBase(const uint32 & oru32_ViewIndex, const uint3
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaChartBase::~C_GiSvDaChartBase(void)
+C_GiSvDaChartBase::~C_GiSvDaChartBase(void) //lint !e1540  //no memory leak because of the parent of mpc_ChartWidget by
+                                            // SetWidget and the Qt memory management
 {
-   //lint -e{1540}  no memory leak because of the parent of mpc_ChartWidget by SetWidget and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -139,7 +143,7 @@ void C_GiSvDaChartBase::ReInitializeSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::LoadData(void)
 {
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
+   const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
 
    if ((pc_Dashboard != NULL) &&
        (this->mpc_ChartWidget != NULL))
@@ -288,7 +292,7 @@ bool C_GiSvDaChartBase::CallProperties(void)
 
             if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
             {
-               QString c_Name;
+               QString c_WidgetName;
                C_PuiSvDbNodeDataElementConfig c_Tmp;
 
                c_Tmp.c_ElementId = c_ElementId;
@@ -308,17 +312,31 @@ bool C_GiSvDaChartBase::CallProperties(void)
                         c_ElementId.u32_NodeIndex, c_ElementId.u32_DataPoolIndex, c_ElementId.u32_ListIndex,
                         c_ElementId.u32_ElementIndex);
 
+                  const C_OSCNodeDataPool * pc_Datapool =
+                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(c_ElementId.u32_NodeIndex,
+                                                                     c_ElementId.u32_DataPoolIndex);
+
                   if (pc_OscElement != NULL)
                   {
-                     c_Name = pc_OscElement->c_Name.c_str();
+                     if (pc_Datapool != NULL)
+                     {
+                        if (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC)
+                        {
+                           c_WidgetName = C_PuiSvHandler::h_GetShortNamespace(c_ElementId);
+                        }
+                        else
+                        {
+                           c_WidgetName = pc_OscElement->c_Name.c_str();
+                        }
+                     }
                   }
                }
                else
                {
-                  c_Name = c_Tmp.c_DisplayName;
+                  c_WidgetName = c_Tmp.c_DisplayName;
                }
 
-               this->mpc_ChartWidget->SetScaling(u32_ConfigIndex, c_Name, c_Tmp.c_ElementScaling);
+               this->mpc_ChartWidget->SetScaling(u32_ConfigIndex, c_WidgetName, c_Tmp.c_ElementScaling);
 
                tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(c_Tmp.c_ElementId) == C_NO_ERR);
                tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
@@ -332,8 +350,7 @@ bool C_GiSvDaChartBase::CallProperties(void)
             {
                c_New->HideOverlay();
             }
-            //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-         }
+         } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
       }
    }
    return true;
@@ -490,10 +507,9 @@ void C_GiSvDaChartBase::m_UpdateErrorIcon(void)
                {
                   if (c_ItSigError.key() == c_Id)
                   {
-                     const QString c_Text = QString(C_GtGetText::h_GetText("%1 had invalid DLC %2.")).arg(
-                        C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(c_ItSigError.key())).arg(QString::number(
-                                                                                                        c_ItSigError
-                                                                                                        .value()));
+                     const QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("%1 had invalid DLC %2.")).
+                                            arg(C_PuiSdUtil::h_GetSignalNamespace(c_ItSigError.key())).
+                                            arg(QString::number(c_ItSigError.value()));
                      //Set error
                      this->mpc_ChartWidget->UpdateError(u32_ItItem, c_Text, false, true);
                      //Signal error
@@ -578,6 +594,8 @@ void C_GiSvDaChartBase::m_AddNewDataElement(void)
 
                if (this->mpc_ChartWidget != NULL)
                {
+                  tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(
+                                c_DataElements[u32_Counter]) == C_NO_ERR);
                   if (this->mpc_ChartWidget->AddNewDataSerie(c_DataElements[u32_Counter], c_Scaling) != C_NO_ERR)
                   {
                      break;
@@ -585,13 +603,16 @@ void C_GiSvDaChartBase::m_AddNewDataElement(void)
 
                   this->m_RegisterDataElementRail(c_DataElements[u32_Counter]);
 
+                  // Apply to the project data
+                  tgl_assert(this->m_SetChangedChartData() == C_NO_ERR);
+
                   this->RegisterDataPoolElement(c_DataElements[u32_Counter], c_Scaling);
                }
             }
          }
       }
       //Signal for error change
-      Q_EMIT this->SigDataElementsChanged();
+      Q_EMIT (this->SigDataElementsChanged());
       //Cursor
       QApplication::restoreOverrideCursor();
    }
@@ -606,8 +627,7 @@ void C_GiSvDaChartBase::m_AddNewDataElement(void)
       pc_Dialog->SaveUserSettings();
       c_New->HideOverlay();
    }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-}
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::m_RemoveDataElement(void)
@@ -623,6 +643,9 @@ void C_GiSvDaChartBase::m_RemoveDataElement(void)
       {
          const C_PuiSvData * pc_View;
 
+         // Apply to the project data
+         tgl_assert(this->m_SetChangedChartData() == C_NO_ERR);
+
          this->RemoveDataPoolElement(c_ElementId);
 
          //Remove read rail assignments as necessary
@@ -636,7 +659,7 @@ void C_GiSvDaChartBase::m_RemoveDataElement(void)
                                                                                c_ElementId) == C_NO_ERR);
          }
          //Signal for error change
-         Q_EMIT this->SigDataElementsChanged();
+         Q_EMIT (this->SigDataElementsChanged());
       }
    }
 }
@@ -672,4 +695,41 @@ void C_GiSvDaChartBase::m_RegisterDataElementRail(
                                                               c_Config);
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply new chart content
+
+   WARNING: Data element changes have to trigger RegisterDataElement
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_GiSvDaChartBase::m_SetChangedChartData(void)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if ((this->ms32_Index >= 0) &&
+       (this->mpc_ChartWidget != NULL))
+   {
+      const C_PuiSvDbChart & rc_Data = this->mpc_ChartWidget->GetData();
+
+      tgl_assert(rc_Data.c_DataPoolElementsActive.size() ==
+                 rc_Data.c_DataPoolElementsConfig.size());
+      for (uint32 u32_ItEl = 0UL; u32_ItEl < rc_Data.c_DataPoolElementsConfig.size(); ++u32_ItEl)
+      {
+         const C_PuiSvDbNodeDataElementConfig & rc_Config = rc_Data.c_DataPoolElementsConfig[u32_ItEl];
+         tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(rc_Config.c_ElementId) == C_NO_ERR);
+      }
+      s32_Retval = C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
+                                                                       static_cast<uint32>(this->ms32_Index),
+                                                                       &rc_Data, C_PuiSvDbDataElement::eCHART);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
 }

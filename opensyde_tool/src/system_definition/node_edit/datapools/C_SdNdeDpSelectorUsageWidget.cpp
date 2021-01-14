@@ -303,7 +303,7 @@ bool C_SdNdeDpSelectorUsageWidget::event(QEvent * const opc_Event)
 
       if (this->mpc_ToolTip->isVisible() == false)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         
          QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
          if (pc_HelpEvent != NULL)
@@ -364,7 +364,7 @@ void C_SdNdeDpSelectorUsageWidget::m_UpdateTooltip(const sintn osn_MouseX)
 {
    if (this->mpc_ToolTip != NULL)
    {
-      QString c_Text = QString("%1% %2 (%3 / %4)");
+      QString c_Text = static_cast<QString>("%1% %2 (%3 / %4)");
       QString c_DatapoolName;
       uint32 u32_UsedSize = 0U;
       float32 f32_ShowPercentage = 0.0F;

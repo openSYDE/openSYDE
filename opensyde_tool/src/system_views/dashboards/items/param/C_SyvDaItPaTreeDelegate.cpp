@@ -118,7 +118,7 @@ QWidget * C_SyvDaItPaTreeDelegate::createEditor(QWidget * const opc_Parent, cons
                   for (uint32 u32_ItDataSet = 0UL; u32_ItDataSet < pc_List->c_DataSets.size(); ++u32_ItDataSet)
                   {
                      const C_OSCNodeDataPoolDataSet & rc_DataSet = pc_List->c_DataSets[u32_ItDataSet];
-                     pc_ComboBox->addItem(QString(C_GtGetText::h_GetText("Dataset \"%1\"")).arg(
+                     pc_ComboBox->addItem(static_cast<QString>(C_GtGetText::h_GetText("Dataset \"%1\"")).arg(
                                              rc_DataSet.c_Name.c_str()));
                   }
                   pc_Retval = pc_ComboBox;
@@ -221,7 +221,7 @@ void C_SyvDaItPaTreeDelegate::setEditorData(QWidget * const opc_Editor, const QM
             }
             else if (u32_ValidLayers == 3UL)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               
                QComboBox * const pc_ComboBox = dynamic_cast<QComboBox * const>(opc_Editor);
                if (pc_ComboBox != NULL)
                {
@@ -273,7 +273,7 @@ void C_SyvDaItPaTreeDelegate::setModelData(QWidget * const opc_Editor, QAbstract
             }
             else if (u32_ValidLayers == 3UL)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               
                QComboBox * const pc_ComboBox = dynamic_cast<QComboBox * const>(opc_Editor);
                if (pc_ComboBox != NULL)
                {
@@ -362,7 +362,7 @@ void C_SyvDaItPaTreeDelegate::destroyEditor(QWidget * const opc_Editor, const QM
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeDelegate::eventFilter(QObject * const opc_Object, QEvent * const opc_Event)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   
    C_OgeCbxParam * pc_ComboBox = dynamic_cast<C_OgeCbxParam *>(opc_Object);
    bool q_Return = false;
 

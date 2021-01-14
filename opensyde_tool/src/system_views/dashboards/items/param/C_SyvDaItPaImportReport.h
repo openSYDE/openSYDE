@@ -45,12 +45,11 @@ public:
    void InitStaticNames(void) const;
    void GetOutput(std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_OutputListIds,
                   std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> & orc_OutputContent) const;
+   void GetFloatRangeCheckResults(std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds,
+                                  std::vector<QString> & orc_InvalidValues, std::vector<QString> & orc_NewValues) const;
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   //lint -restore
 
 private:
    Ui::C_SyvDaItPaImportReport * mpc_Ui;
@@ -67,6 +66,9 @@ private:
    const stw_types::uint32 mu32_ValidLayers;
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> mc_OutputListIds;
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> mc_OutputContent;
+   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> mc_FloatRangeCheckInvalidValueIds;
+   std::vector<QString> mc_FloatRangeCheckInvalidValues;
+   std::vector<QString> mc_FloatRangeCheckNewValues;
    static const QString mhc_HTML_TABLE_HEADER_START;
    static const QString mhc_HTML_TABLE_DATA_START;
 

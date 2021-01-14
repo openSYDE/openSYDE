@@ -76,7 +76,6 @@ void C_GiArrowCursorButton::DetachNode(void)
 {
    if (mpc_ConnectedNode != NULL)
    {
-      //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
       disconnect(mpc_ConnectedNode, &C_GiNode::SigChangedGraphic, this, &C_GiArrowCursorButton::m_OnNodeChange);
       mpc_ConnectedNode = NULL;
    }
@@ -99,7 +98,6 @@ void C_GiArrowCursorButton::AttachToNode(const C_GiNode * const opc_Node)
       if (opc_Node->GetValid() == true)
       {
          mpc_ConnectedNode = opc_Node;
-         //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
          connect(mpc_ConnectedNode, &C_GiNode::SigChangedGraphic, this, &C_GiArrowCursorButton::m_OnNodeChange);
          m_OnNodeChange();
       }
