@@ -18,7 +18,7 @@
 #include "constants.h"
 #include "C_GtGetText.h"
 #include "C_OSCLoggingHandler.h"
-#include "C_OgeFrameSeparator.h"
+#include "C_OgeFraSeparator.h"
 #include "C_OgeLabProgressLogItem.h"
 
 #include "C_SyvUpProgressLog.h"
@@ -54,7 +54,8 @@ using namespace stw_opensyde_gui_elements;
 C_SyvUpProgressLog::C_SyvUpProgressLog(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvUpProgressLog),
-   mpc_LogHyperlink(NULL)
+   mpc_LogHyperlink(NULL),
+   mpc_ContextMenu(NULL)
 {
    this->mpc_Ui->setupUi(this);
    this->mpc_Ui->pc_ScrollArea->DeactivateScrollbarResize();
@@ -76,11 +77,11 @@ C_SyvUpProgressLog::C_SyvUpProgressLog(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ContextMenu and the Qt memory management
 C_SyvUpProgressLog::~C_SyvUpProgressLog(void)
 {
    Clear();
    delete mpc_Ui;
-   //lint -e{1579}  Clean up in clear function
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -279,7 +280,8 @@ void C_SyvUpProgressLog::AddLogHyperlink(void)
       //Update log file
       C_OSCLoggingHandler::h_Flush();
       //Configure
-      this->mpc_LogHyperlink->setText(static_cast<QString>("%1<a href=\"file:\\\\\\%2\"><span style=\"color: %3;\">%4</span></a>.").
+      this->mpc_LogHyperlink->setText(static_cast<QString>(
+                                         "%1<a href=\"file:\\\\\\%2\"><span style=\"color: %3;\">%4</span></a>.").
                                       arg(C_GtGetText::h_GetText("For more information see ")).
                                       arg(c_LogFilePath).
                                       arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
@@ -347,7 +349,7 @@ void C_SyvUpProgressLog::m_OpenLink(void) const
 {
    const QString c_LogFilePath = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
 
-   QDesktopServices::openUrl(QUrl(static_cast<QString>("file:%1").arg(c_LogFilePath)));
+   QDesktopServices::openUrl(static_cast<QUrl>(static_cast<QString>("file:%1").arg(c_LogFilePath)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -385,7 +387,7 @@ void C_SyvUpProgressLog::m_SetupContextMenu(void)
 void C_SyvUpProgressLog::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    m_SetupContextMenu(); // setup the custom menu here to have real "is-read-only" information
-   QPoint c_PosGlobal = this->mpc_LogHyperlink->mapToGlobal(orc_Pos);
+   const QPoint c_PosGlobal = this->mpc_LogHyperlink->mapToGlobal(orc_Pos);
 
    this->mpc_ContextMenu->popup(c_PosGlobal);
 }

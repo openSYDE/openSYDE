@@ -23,6 +23,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
+using namespace stw_scl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
@@ -53,7 +54,7 @@ using namespace stw_opensyde_core;
                IO file could not be loaded
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefFiler::h_LoadFile(C_OSCHalcDefBase & orc_IOData, const stw_scl::C_SCLString & orc_Path)
+sint32 C_OSCHalcDefFiler::h_LoadFile(C_OSCHalcDefBase & orc_IOData, const C_SCLString & orc_Path)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -111,7 +112,7 @@ sint32 C_OSCHalcDefFiler::h_LoadFile(C_OSCHalcDefBase & orc_IOData, const stw_sc
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefFiler::h_SaveFile(const C_OSCHalcDefBase & orc_IOData, const stw_scl::C_SCLString & orc_Path)
+sint32 C_OSCHalcDefFiler::h_SaveFile(const C_OSCHalcDefBase & orc_IOData, const C_SCLString & orc_Path)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -128,7 +129,7 @@ sint32 C_OSCHalcDefFiler::h_SaveFile(const C_OSCHalcDefBase & orc_IOData, const 
    }
    if (s32_Retval == C_NO_ERR)
    {
-      const stw_scl::C_SCLString c_Folder = TGL_ExtractFilePath(orc_Path);
+      const C_SCLString c_Folder = TGL_ExtractFilePath(orc_Path);
       if (TGL_DirectoryExists(c_Folder) == false)
       {
          if (TGL_CreateDirectory(c_Folder) != 0)
@@ -186,9 +187,9 @@ sint32 C_OSCHalcDefFiler::h_LoadData(C_OSCHalcDefBase & orc_IOData, C_OSCXMLPars
       if (s32_Retval == C_NO_ERR)
       {
          osc_write_log_info("Loading HALC definition", "Value of \"file-version\": " +
-                            stw_scl::C_SCLString::IntToStr(u16_FileVersion));
+                            C_SCLString::IntToStr(u16_FileVersion));
          //Check file version
-         if (u16_FileVersion != hu16_FILE_VERSION_1)
+         if (u16_FileVersion != mhu16_FILE_VERSION_1)
          {
             osc_write_log_error("Loading HALC definition",
                                 "Version defined by \"file-version\" is not supported.");
@@ -246,7 +247,7 @@ sint32 C_OSCHalcDefFiler::h_LoadData(C_OSCHalcDefBase & orc_IOData, C_OSCXMLPars
    }
    if (s32_Retval == C_NO_ERR)
    {
-      stw_scl::C_SCLString c_DomainNode = orc_XMLParser.SelectNodeChild("domain");
+      C_SCLString c_DomainNode = orc_XMLParser.SelectNodeChild("domain");
       if (c_DomainNode == "domain")
       {
          do
@@ -292,12 +293,12 @@ sint32 C_OSCHalcDefFiler::h_SaveData(const C_OSCHalcDefBase & orc_IOData, C_OSCX
 
    //File version
    tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("file-version") == "file-version");
-   orc_XMLParser.SetNodeContent(stw_scl::C_SCLString::IntToStr(hu16_FILE_VERSION_1));
+   orc_XMLParser.SetNodeContent(C_SCLString::IntToStr(mhu16_FILE_VERSION_1));
    //Return
    orc_XMLParser.SelectNodeParent();
    //Content version
    tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("content-version") == "content-version");
-   orc_XMLParser.SetNodeContent(stw_scl::C_SCLString::IntToStr(orc_IOData.u32_ContentVersion));
+   orc_XMLParser.SetNodeContent(C_SCLString::IntToStr(orc_IOData.u32_ContentVersion));
    //Return
    orc_XMLParser.SelectNodeParent();
    //Device
@@ -333,11 +334,11 @@ sint32 C_OSCHalcDefFiler::h_SaveData(const C_OSCHalcDefBase & orc_IOData, C_OSCX
    C_CONFIG    string invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefFiler::h_LoadAvailability(const stw_scl::C_SCLString & orc_AvailabilityString,
+sint32 C_OSCHalcDefFiler::h_LoadAvailability(const C_SCLString & orc_AvailabilityString,
                                              std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability,
                                              const uint32 ou32_NumChannels)
 {
-   std::vector<stw_scl::C_SCLString> c_SubElements;
+   std::vector<C_SCLString> c_SubElements;
    sint32 s32_Retval = C_OSCHalcDefFiler::mh_SplitAvailabilityString(orc_AvailabilityString, c_SubElements);
 
    orc_Availability.clear();
@@ -380,18 +381,14 @@ sint32 C_OSCHalcDefFiler::h_CheckUseCaseValue(const C_OSCHalcDefDomain & orc_IOD
                if (rc_UseCase.c_Value == rc_OtherUseCase.c_Value)
                {
                   osc_write_log_error("Loading HALC definition",
-                                      stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                              "Duplicate value found in \"value\" attribute of \"channel-use-case\" section.")
-                                                           .c_str()));
+                                      "Duplicate value found in \"value\" attribute of \"channel-use-case\" section.");
                   s32_Retval = C_CONFIG;
                }
             }
             else
             {
                osc_write_log_error("Loading HALC definition",
-                                   stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                           "\"value\" attribute of \"channel-use-case\" section is of different types.")
-                                                        .c_str()));
+                                   "\"value\" attribute of \"channel-use-case\" section is of different types.");
                s32_Retval = C_CONFIG;
             }
          }
@@ -415,7 +412,7 @@ sint32 C_OSCHalcDefFiler::h_CheckDomainDisplayNames(const C_OSCHalcDefDomain & o
 {
    sint32 s32_Retval;
 
-   std::vector<stw_scl::C_SCLString> c_Names;
+   std::vector<C_SCLString> c_Names;
 
    C_OSCHalcDefFiler::mh_GetAllNames(orc_IODataDomain.c_ChannelValues.c_Parameters, c_Names);
    C_OSCHalcDefFiler::mh_GetAllNames(orc_IODataDomain.c_DomainValues.c_Parameters, c_Names);
@@ -470,7 +467,7 @@ C_OSCHalcDefFiler::C_OSCHalcDefFiler(void)
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefFiler::mh_SaveFile(const C_OSCHalcDefBase & orc_IOData, const stw_scl::C_SCLString & orc_Path)
+sint32 C_OSCHalcDefFiler::mh_SaveFile(const C_OSCHalcDefBase & orc_IOData, const C_SCLString & orc_Path)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -487,7 +484,7 @@ sint32 C_OSCHalcDefFiler::mh_SaveFile(const C_OSCHalcDefBase & orc_IOData, const
    }
    if (s32_Retval == C_NO_ERR)
    {
-      const stw_scl::C_SCLString c_Folder = TGL_ExtractFilePath(orc_Path);
+      const C_SCLString c_Folder = TGL_ExtractFilePath(orc_Path);
       if (TGL_DirectoryExists(c_Folder) == false)
       {
          if (TGL_CreateDirectory(c_Folder) != 0)
@@ -722,18 +719,11 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
                                                          u32_LongestConstVarNameOffset))
          {
             osc_write_log_error("Loading HALC definition",
-                                stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                        "Content of domain \"singular-name\" (or \"name\" if not existing) node is too long, maximum allowed characters: ")
-                                                     +
-                                                     stw_scl::C_SCLString::IntToStr(C_OSCHalcDefStructFiler::
-                                                                                    hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH
-                                                                                    -
-                                                                                    u32_LongestConstVarNameOffset)
-                                                     +
-                                                     " (Current: " +
-                                                     stw_scl::C_SCLString::IntToStr(orc_IODataDomain.c_SingularName.
-                                                                                    Length()) +
-                                                     ")."));
+                                "Content of domain \"singular-name\" (or \"name\" if not existing) node is too long, maximum allowed characters: " +
+                                C_SCLString::IntToStr(
+                                   C_OSCHalcDefStructFiler::hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH -
+                                   u32_LongestConstVarNameOffset) +
+                                " (Current: " + C_SCLString::IntToStr(orc_IODataDomain.c_SingularName.Length()) + ").");
             s32_Retval = C_CONFIG;
          }
       }
@@ -916,11 +906,8 @@ sint32 C_OSCHalcDefFiler::mh_CheckDefaultUseCase(const C_OSCHalcDefDomain & orc_
                else
                {
                   osc_write_log_error("Loading HALC definition",
-                                      stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                              "Ambiguous default in attribute \"is-default-for\" for use-case index ")
-                                                           +
-                                                           stw_scl::C_SCLString::IntToStr(u32_ItUseCase) +
-                                                           ".").c_str());
+                                      "Ambiguous default in attribute \"is-default-for\" for use-case index "  +
+                                      C_SCLString::IntToStr(u32_ItUseCase) + ".");
                   s32_Retval = C_CONFIG;
                   break;
                }
@@ -930,10 +917,8 @@ sint32 C_OSCHalcDefFiler::mh_CheckDefaultUseCase(const C_OSCHalcDefDomain & orc_
       if (q_FoundOne == false)
       {
          osc_write_log_error("Loading HALC definition",
-                             stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                     "Could not find default in attribute \"is-default-for\" for channel index ")
-                                                  +
-                                                  stw_scl::C_SCLString::IntToStr(u32_ItChannel) + ".").c_str());
+                             "Could not find default in attribute \"is-default-for\" for channel index " +
+                             C_SCLString::IntToStr(u32_ItChannel) + ".");
          s32_Retval = C_CONFIG;
          break;
       }
@@ -961,10 +946,9 @@ sint32 C_OSCHalcDefFiler::mh_CheckDefaultUseCase(const C_OSCHalcDefDomain & orc_
          if (q_DefaultAvailable == false)
          {
             osc_write_log_error("Loading HALC definition",
-                                stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                        "Default in attribute \"is-default-for\" of use-case index ") +
-                                                     stw_scl::C_SCLString::IntToStr(u32_ItUseCase) +
-                                                     " is not available for this use-case.").c_str());
+                                "Default in attribute \"is-default-for\" of use-case index " +
+                                C_SCLString::IntToStr(u32_ItUseCase) +
+                                " is not available for this use-case.");
             s32_Retval = C_CONFIG;
          }
       }
@@ -1005,7 +989,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadChannels(std::vector<C_OSCHalcDefChannelDef> & 
       }
       if ((u32_ExpectedCount > 0UL) && (s32_Retval == C_NO_ERR))
       {
-         stw_scl::C_SCLString c_NodeChannel = orc_XMLParser.SelectNodeChild("channel");
+         C_SCLString c_NodeChannel = orc_XMLParser.SelectNodeChild("channel");
          if (c_NodeChannel == "channel")
          {
             do
@@ -1041,12 +1025,9 @@ sint32 C_OSCHalcDefFiler::mh_LoadChannels(std::vector<C_OSCHalcDefChannelDef> & 
          //Check
          if (u32_ExpectedCount != orc_Channels.size())
          {
-            const stw_scl::C_SCLString c_Error = stw_scl::C_SCLString("Expected ") +
-                                                 stw_scl::C_SCLString::IntToStr(u32_ExpectedCount) +
-                                                 stw_scl::C_SCLString(
-               " channels, got ") + stw_scl::C_SCLString::IntToStr(
-               orc_Channels.size()) + stw_scl::C_SCLString(" channels");
-            osc_write_log_error("Loading HALC definition", c_Error.c_str());
+            const C_SCLString c_Error = "Expected " + C_SCLString::IntToStr(u32_ExpectedCount) +
+                                        " channels, got " + C_SCLString::IntToStr(orc_Channels.size()) + " channels";
+            osc_write_log_error("Loading HALC definition", c_Error);
             s32_Retval = C_CONFIG;
          }
       }
@@ -1086,7 +1067,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadChannelUseCases(std::vector<C_OSCHalcDefChannel
    {
       C_OSCNodeDataPoolContent c_Value;
       //Necessary later so get before checking if it exists, but algorithm should abort when this is the case
-      const stw_scl::C_SCLString c_TypeStr = orc_XMLParser.GetAttributeString("type");
+      const C_SCLString c_TypeStr = orc_XMLParser.GetAttributeString("type");
       c_Value.SetArray(false);
       if (orc_XMLParser.AttributeExists("type"))
       {
@@ -1101,7 +1082,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadChannelUseCases(std::vector<C_OSCHalcDefChannel
       }
       if (s32_Retval == C_NO_ERR)
       {
-         stw_scl::C_SCLString c_NodeChannel = orc_XMLParser.SelectNodeChild("channel-use-case");
+         C_SCLString c_NodeChannel = orc_XMLParser.SelectNodeChild("channel-use-case");
          if (c_NodeChannel == "channel-use-case")
          {
             do
@@ -1213,13 +1194,13 @@ sint32 C_OSCHalcDefFiler::mh_LoadChannelUseCases(std::vector<C_OSCHalcDefChannel
    C_CONFIG    string invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefFiler::mh_SplitAvailabilityString(const stw_scl::C_SCLString & orc_AvailabilityString,
-                                                     std::vector<stw_scl::C_SCLString> & orc_SubElements)
+sint32 C_OSCHalcDefFiler::mh_SplitAvailabilityString(const C_SCLString & orc_AvailabilityString,
+                                                     std::vector<C_SCLString> & orc_SubElements)
 {
    sint32 s32_Retval = C_NO_ERR;
    bool q_IgnoreComma = false;
 
-   stw_scl::C_SCLString c_CurSubElement;
+   C_SCLString c_CurSubElement;
 
    orc_SubElements.clear();
 
@@ -1310,15 +1291,15 @@ sint32 C_OSCHalcDefFiler::mh_SplitAvailabilityString(const stw_scl::C_SCLString 
    C_CONFIG    string invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefFiler::mh_ParseAvailabilityStringSubElements(
-   const std::vector<stw_scl::C_SCLString> & orc_SubElements,
-   std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability, const uint32 ou32_NumChannels)
+sint32 C_OSCHalcDefFiler::mh_ParseAvailabilityStringSubElements(const std::vector<C_SCLString> & orc_SubElements,
+                                                                std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability,
+                                                                const uint32 ou32_NumChannels)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    for (uint32 u32_ItSubStr = 0UL; (u32_ItSubStr < orc_SubElements.size()) && (s32_Retval == C_NO_ERR); ++u32_ItSubStr)
    {
-      const stw_scl::C_SCLString & rc_CurSubStr = orc_SubElements[u32_ItSubStr];
+      const C_SCLString & rc_CurSubStr = orc_SubElements[u32_ItSubStr];
       if (rc_CurSubStr == "all")
       {
          for (uint32 u32_ItChannel = 0UL; u32_ItChannel < ou32_NumChannels; ++u32_ItChannel)
@@ -1330,7 +1311,7 @@ sint32 C_OSCHalcDefFiler::mh_ParseAvailabilityStringSubElements(
       }
       else
       {
-         stw_scl::C_SCLString c_Number;
+         C_SCLString c_Number;
          std::vector<sintn> c_FoundNumbers;
          bool q_IsGroupSection = false;
          bool q_LastNumDeclaredSection = false;
@@ -1351,10 +1332,8 @@ sint32 C_OSCHalcDefFiler::mh_ParseAvailabilityStringSubElements(
                   if (q_LastNumDeclaredSection)
                   {
                      osc_write_log_error("Loading HALC definition",
-                                         stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                                 "\"availability\" attribute contains unexpected character sequence with multiple '-' characters:\"")
-                                                              +
-                                                              rc_CurSubStr + "\"").c_str());
+                                         "\"availability\" attribute contains unexpected character sequence with multiple '-' characters:\"" +
+                                         rc_CurSubStr + "\"");
                      s32_Retval = C_CONFIG;
                   }
                   else
@@ -1380,10 +1359,8 @@ sint32 C_OSCHalcDefFiler::mh_ParseAvailabilityStringSubElements(
                else
                {
                   osc_write_log_error("Loading HALC definition",
-                                      stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                              "\"availability\" attribute contains unexpected character '")
-                                                           +
-                                                           stw_scl::C_SCLString(cn_CurChar) + "'").c_str());
+                                      "\"availability\" attribute contains unexpected character '" +
+                                      C_SCLString::IntToStr(cn_CurChar) + "'");
                   s32_Retval = C_CONFIG;
                }
             }
@@ -1436,11 +1413,8 @@ sint32 C_OSCHalcDefFiler::mh_CheckAvailability(const std::vector<C_OSCHalcDefCha
             if (rc_Availability.u32_ValueIndex == rc_OtherAvailability.u32_ValueIndex)
             {
                osc_write_log_error("Loading HALC definition",
-                                   stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                           "\"availability\" attribute contains duplicate usage of channel index ")
-                                                        +
-                                                        stw_scl::C_SCLString::IntToStr(rc_OtherAvailability.
-                                                                                       u32_ValueIndex) + "").c_str());
+                                   "\"availability\" attribute contains duplicate usage of channel index " +
+                                   C_SCLString::IntToStr(rc_OtherAvailability.u32_ValueIndex));
                s32_Retval = C_CONFIG;
             }
          }
@@ -1461,7 +1435,7 @@ sint32 C_OSCHalcDefFiler::mh_CheckAvailability(const std::vector<C_OSCHalcDefCha
    C_CONFIG    string invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefFiler::mh_ConvertStringToNumber(const stw_scl::C_SCLString & orc_Number, sintn & orsn_Number)
+sint32 C_OSCHalcDefFiler::mh_ConvertStringToNumber(const C_SCLString & orc_Number, sintn & orsn_Number)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -1472,10 +1446,8 @@ sint32 C_OSCHalcDefFiler::mh_ConvertStringToNumber(const stw_scl::C_SCLString & 
    catch (...)
    {
       osc_write_log_error("Loading HALC definition",
-                          stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                  "\"availability\" attribute contains unexpected character sequence \"")
-                                               +
-                                               orc_Number + "\"").c_str());
+                          "\"availability\" attribute contains unexpected character sequence \"" +
+                          orc_Number + "\"");
       s32_Retval = C_CONFIG;
    }
    return s32_Retval;
@@ -1494,10 +1466,8 @@ sint32 C_OSCHalcDefFiler::mh_ConvertStringToNumber(const stw_scl::C_SCLString & 
    C_CONFIG    string invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefFiler::mh_HandleNumberSection(stw_scl::C_SCLString & orc_Number,
-                                                 std::vector<sintn> & orc_FoundNumbers,
-                                                 bool & orq_LastNumDeclaredSection,
-                                                 const stw_scl::C_SCLString & orc_Section)
+sint32 C_OSCHalcDefFiler::mh_HandleNumberSection(C_SCLString & orc_Number, std::vector<sintn> & orc_FoundNumbers,
+                                                 bool & orq_LastNumDeclaredSection, const C_SCLString & orc_Section)
 {
    sint32 s32_Retval;
    sintn sn_NumberTmp = 0;
@@ -1525,20 +1495,16 @@ sint32 C_OSCHalcDefFiler::mh_HandleNumberSection(stw_scl::C_SCLString & orc_Numb
             else
             {
                osc_write_log_error("Loading HALC definition",
-                                   stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                           "\"availability\" attribute contains invalid usage of '-' character in \"")
-                                                        +
-                                                        orc_Section + "\"").c_str());
+                                   "\"availability\" attribute contains invalid usage of '-' character in \"" +
+                                   orc_Section + "\"");
                s32_Retval = C_CONFIG;
             }
          }
          else
          {
             osc_write_log_error("Loading HALC definition",
-                                stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                        "\"availability\" attribute contains confusing usage of '-' character in \"")
-                                                     +
-                                                     orc_Section + "\"").c_str());
+                                "\"availability\" attribute contains confusing usage of '-' character in \"" +
+                                orc_Section + "\"");
             s32_Retval = C_CONFIG;
          }
       }
@@ -1577,11 +1543,10 @@ sint32 C_OSCHalcDefFiler::mh_HandleNumberSectionEnd(const std::vector<sintn> & o
       if (orc_FoundNumbers[u32_ItNum] >= static_cast<sintn>(ou32_NumChannels))
       {
          osc_write_log_error("Loading HALC definition",
-                             stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                     "\"availability\" attribute has number ") +
-                                                  stw_scl::C_SCLString::IntToStr(orc_FoundNumbers[u32_ItNum]) +
-                                                  " which is out of range of number of channels: " +
-                                                  stw_scl::C_SCLString::IntToStr(ou32_NumChannels)).c_str());
+                             "\"availability\" attribute has number " +
+                             C_SCLString::IntToStr(orc_FoundNumbers[u32_ItNum]) +
+                             " which is out of range of number of channels: " +
+                             C_SCLString::IntToStr(ou32_NumChannels));
          s32_Retval = C_CONFIG;
       }
    }
@@ -1636,10 +1601,11 @@ sint32 C_OSCHalcDefFiler::mh_HandleNumberSectionEnd(const std::vector<sintn> & o
    Availability string
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHalcDefFiler::mh_GetAvailabilityString(
+C_SCLString C_OSCHalcDefFiler::mh_GetAvailabilityString(
    const std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability)
 {
-   stw_scl::C_SCLString c_Retval;
+   C_SCLString c_Retval;
+
    for (uint32 u32_ItAva = 0UL; u32_ItAva < orc_Availability.size(); ++u32_ItAva)
    {
       const C_OSCHalcDefChannelAvailability & rc_Avail = orc_Availability[u32_ItAva];
@@ -1649,16 +1615,16 @@ stw_scl::C_SCLString C_OSCHalcDefFiler::mh_GetAvailabilityString(
       }
       if (rc_Avail.c_DependentValues.size() == 0UL)
       {
-         c_Retval += stw_scl::C_SCLString::IntToStr(rc_Avail.u32_ValueIndex);
+         c_Retval += C_SCLString::IntToStr(rc_Avail.u32_ValueIndex);
       }
       else
       {
          c_Retval += "{";
-         c_Retval += stw_scl::C_SCLString::IntToStr(rc_Avail.u32_ValueIndex);
+         c_Retval += C_SCLString::IntToStr(rc_Avail.u32_ValueIndex);
          for (uint32 u32_ItDep = 0UL; u32_ItDep < rc_Avail.c_DependentValues.size(); ++u32_ItDep)
          {
             c_Retval += ",";
-            c_Retval += stw_scl::C_SCLString::IntToStr(rc_Avail.c_DependentValues[u32_ItDep]);
+            c_Retval += C_SCLString::IntToStr(rc_Avail.c_DependentValues[u32_ItDep]);
          }
          c_Retval += "}";
       }
@@ -1717,9 +1683,10 @@ sint32 C_OSCHalcDefFiler::mh_SaveUseCase(const C_OSCHalcDefChannelUseCase & orc_
    string representation of oe_Category
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHalcDefFiler::mh_DomainCategoryEnumToString(const C_OSCHalcDefDomain::E_Category oe_Category)
+C_SCLString C_OSCHalcDefFiler::mh_DomainCategoryEnumToString(const C_OSCHalcDefDomain::E_Category oe_Category)
 {
-   stw_scl::C_SCLString c_Retval;
+   C_SCLString c_Retval;
+
    switch (oe_Category)
    {
    case C_OSCHalcDefDomain::eCA_INPUT:
@@ -1730,6 +1697,8 @@ stw_scl::C_SCLString C_OSCHalcDefFiler::mh_DomainCategoryEnumToString(const C_OS
       break;
    case C_OSCHalcDefDomain::eCA_OTHER:
       c_Retval = "other";
+      break;
+   default:
       break;
    }
    return c_Retval;
@@ -1746,7 +1715,7 @@ stw_scl::C_SCLString C_OSCHalcDefFiler::mh_DomainCategoryEnumToString(const C_OS
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefFiler::mh_DomainCategoryStringToEnum(const stw_scl::C_SCLString & orc_Category,
+sint32 C_OSCHalcDefFiler::mh_DomainCategoryStringToEnum(const C_SCLString & orc_Category,
                                                         C_OSCHalcDefDomain::E_Category & ore_Category)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1778,7 +1747,7 @@ sint32 C_OSCHalcDefFiler::mh_DomainCategoryStringToEnum(const stw_scl::C_SCLStri
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCHalcDefFiler::mh_GetAllNames(const std::vector<C_OSCHalcDefStruct> & orc_Values,
-                                       std::vector<stw_scl::C_SCLString> & orc_Names)
+                                       std::vector<C_SCLString> & orc_Names)
 {
    for (uint32 u32_ItVal = 0UL; u32_ItVal < orc_Values.size(); ++u32_ItVal)
    {
@@ -1807,9 +1776,9 @@ void C_OSCHalcDefFiler::mh_GetAllNames(const std::vector<C_OSCHalcDefStruct> & o
    C_CONFIG    IO definition content is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefFiler::mh_CheckDuplicateNames(const stw_scl::C_SCLString & orc_Section,
-                                                 const stw_scl::C_SCLString & orc_DomainSingularName,
-                                                 std::vector<stw_scl::C_SCLString> & orc_Names)
+sint32 C_OSCHalcDefFiler::mh_CheckDuplicateNames(const C_SCLString & orc_Section,
+                                                 const C_SCLString & orc_DomainSingularName,
+                                                 std::vector<C_SCLString> & orc_Names)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -1820,18 +1789,13 @@ sint32 C_OSCHalcDefFiler::mh_CheckDuplicateNames(const stw_scl::C_SCLString & or
       {
          if (u32_ItName1 != u32_ItName2)
          {
-            const stw_scl::C_SCLString & rc_Name = orc_Names[u32_ItName2];
+            const C_SCLString & rc_Name = orc_Names[u32_ItName2];
             if (orc_Names[u32_ItName1] == rc_Name)
             {
                s32_Retval = C_CONFIG;
                osc_write_log_error("Loading HALC definition",
-                                   stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                           "Duplicate display name found in domain \"") +
-                                                        orc_DomainSingularName + "\", section \"" + orc_Section +
-                                                        "\": \"" +
-                                                        orc_Names[u32_ItName1] +
-                                                        "\"")
-                                   .c_str());
+                                   "Duplicate display name found in domain \"" + orc_DomainSingularName +
+                                   "\", section \"" + orc_Section + "\": \"" + orc_Names[u32_ItName1] + "\"");
             }
          }
       }

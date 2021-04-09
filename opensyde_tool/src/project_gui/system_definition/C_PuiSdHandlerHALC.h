@@ -58,7 +58,9 @@ public:
                                                                                const stw_opensyde_core::C_OSCHalcDefDomain::E_VariableSelector oe_Selector,
                                                                                const stw_types::uint32 ou32_Index) const;
    const stw_opensyde_core::C_OSCNodeDataPool * GetHALCDatapool(const stw_types::uint32 ou32_NodeIndex,
-                                                                const bool oq_SafeDatapool);
+                                                                const bool oq_SafeDatapool) const;
+   stw_opensyde_core::C_OSCHalcDefDomain::E_Category GetDomainCategoryFromDpId(
+      const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id, const stw_types::uint32 ou32_ArrayIndex);
 
    //Set
    stw_types::sint32 ClearHALCConfig(const stw_types::uint32 ou32_NodeIndex);

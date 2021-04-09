@@ -626,7 +626,7 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
    {
       //Check if active line is at border
       if ((this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex()) ||
-          (this->msn_ActiveItemIndex == (m_GetBusInteractionIndex() - 1)))
+          (this->msn_ActiveItemIndex == static_cast<sintn>(m_GetBusInteractionIndex() - 1)))
       {
          if (((this->mpc_GenericPositionItem != NULL) && (this->GetBusItem() != NULL)) &&
              (this->mpc_GenericSignalItem != NULL))
@@ -692,7 +692,7 @@ sint32 C_GiLiBusConnectorBase::m_GetBusInteractionIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_UpdatePointBus(void)
 {
-   C_GiLiLineConnection * pc_Conn = m_GetCurrentConn();
+   const C_GiLiLineConnection * const pc_Conn = m_GetCurrentConn();
 
    if (pc_Conn != NULL)
    {
@@ -875,7 +875,7 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
                   //Stop after connectable item found under cursor
                   if (q_RestoreMouseCursor == false)
                   {
-                     //lint -e{1960} Loop has to stop here
+                     //lint -e{9011} Loop has to stop here
                      break;
                   }
                }

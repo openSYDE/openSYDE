@@ -61,12 +61,12 @@ stw_types::sint32 C_OSCParamSetInterpretedNodeFiler::h_LoadInterpretedNode(C_OSC
                                                                            C_OSCXMLParserBase & orc_XMLParser,
                                                                            bool & orq_MissingOptionalContent)
 {
-   stw_types::sint32 s32_Retval = C_OSCParamSetFilerBase::h_LoadNodeName(orc_Node.c_Name, orc_XMLParser);
+   stw_types::sint32 s32_Retval = C_OSCParamSetFilerBase::mh_LoadNodeName(orc_Node.c_Name, orc_XMLParser);
    if (s32_Retval == C_NO_ERR)
    {
       std::vector<C_OSCParamSetDataPoolInfo> c_DataPoolInfos;
-      s32_Retval = C_OSCParamSetFilerBase::h_LoadDataPoolInfos(c_DataPoolInfos, orc_XMLParser,
-                                                               orq_MissingOptionalContent);
+      s32_Retval = C_OSCParamSetFilerBase::mh_LoadDataPoolInfos(c_DataPoolInfos, orc_XMLParser,
+                                                                orq_MissingOptionalContent);
       if (s32_Retval == C_NO_ERR)
       {
          s32_Retval = C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(orc_Node.c_DataPools, c_DataPoolInfos,
@@ -91,7 +91,7 @@ void C_OSCParamSetInterpretedNodeFiler::h_SaveInterpretedNode(const C_OSCParamSe
                                                               C_OSCXMLParserBase & orc_XMLParser)
 {
    std::vector<C_OSCParamSetDataPoolInfo> c_Infos;
-   C_OSCParamSetFilerBase::h_SaveNodeName(orc_Node.c_Name, orc_XMLParser);
+   C_OSCParamSetFilerBase::mh_SaveNodeName(orc_Node.c_Name, orc_XMLParser);
    //Extract data pool info
    c_Infos.reserve(orc_Node.c_DataPools.size());
    for (uint32 u32_ItDataPool = 0; u32_ItDataPool < orc_Node.c_DataPools.size(); ++u32_ItDataPool)
@@ -99,7 +99,7 @@ void C_OSCParamSetInterpretedNodeFiler::h_SaveInterpretedNode(const C_OSCParamSe
       const C_OSCParamSetInterpretedDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
       c_Infos.push_back(rc_DataPool.c_DataPoolInfo);
    }
-   C_OSCParamSetFilerBase::h_SaveDataPoolInfos(c_Infos, orc_XMLParser);
+   C_OSCParamSetFilerBase::mh_SaveDataPoolInfos(c_Infos, orc_XMLParser);
    C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPools(orc_Node.c_DataPools, orc_XMLParser);
 }
 
@@ -524,15 +524,13 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(C_OSCParamSetInterprete
       s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolElementType(orc_Element.c_NvmValue, orc_XMLParser);
       if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("value") == "value"))
       {
-         stw_scl::C_SCLString c_Error;
+         C_SCLString c_Error;
          s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(orc_Element.c_NvmValue, orc_XMLParser, true,
                                                                          &c_Error);
          if (s32_Retval != C_NO_ERR)
          {
             osc_write_log_error("Loading Dataset data",
-                                stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                        "Invalid content of \"element\".\"value\" node: ") +
-                                                     c_Error).c_str());
+                                "Invalid content of \"element\".\"value\" node: " +  c_Error);
             s32_Retval = C_CONFIG;
          }
          //Return

@@ -120,6 +120,11 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const st
          this->mpc_Ui->pc_WidgetTab->SetText(pc_Dashboard->GetName());
          this->mpc_Ui->pc_WidgetTab->SetToolTip(pc_Dashboard->GetName(), pc_Dashboard->GetComment());
          this->mpc_Ui->pc_WidgetTab->SetActive(pc_Dashboard->GetActive());
+         // otherwise TabIcon is always set in TearOffWidget
+         if (pc_Dashboard->GetType() == C_PuiSvDashboard::eSCENE)
+         {
+            this->mpc_Ui->pc_WidgetTab->SetTabIconVisibility(false);
+         }
       }
    }
 
@@ -151,8 +156,7 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const st
            &C_SyvDaTearOffWidget::SigDataPoolRead);
    connect(this->mpc_Dashboard, &C_SyvDaDashboardWidget::SigNvmReadList, this,
            &C_SyvDaTearOffWidget::SigNvmReadList);
-
-}  //lint !e429  //no memory leak because of the parent of pc_Layout and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Layout and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default destructor
@@ -160,10 +164,10 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const st
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_Dashboard and the Qt memory management
 C_SyvDaTearOffWidget::~C_SyvDaTearOffWidget()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_Dashboard and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -185,7 +189,7 @@ void C_SyvDaTearOffWidget::InitText(void) const
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvDaTearOffWidget::GetIndex(void) const
 {
-   return this->mpc_Dashboard->GetDataIndex();
+   return this->mpc_Dashboard->GetDashboardIndex();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -196,7 +200,7 @@ uint32 C_SyvDaTearOffWidget::GetIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetDataIndex(const uint32 ou32_Value)
 {
-   this->mpc_Dashboard->SetDataIndex(ou32_Value);
+   this->mpc_Dashboard->SetDashboardIndex(ou32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -318,24 +322,6 @@ void C_SyvDaTearOffWidget::HandleManualOperationFinished(const sint32 os32_Resul
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal all widgets which read rail element ID registrations failed
-
-   \param[in]      orc_FailedIdRegisters     Failed IDs
-   \param[in,out]  orc_FailedIdErrorDetails  Error details for element IDs which failed registration (if any)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaTearOffWidget::SetErrorForFailedCyclicElementIdRegistrations(
-   const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-   const std::vector<QString> & orc_FailedIdErrorDetails) const
-{
-   if (this->mpc_Dashboard != NULL)
-   {
-      this->mpc_Dashboard->SetErrorForFailedCyclicElementIdRegistrations(orc_FailedIdRegisters,
-                                                                         orc_FailedIdErrorDetails);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Registers all relevant dashboard widgets at the associated data dealer
 
    \param[in]  orc_ComDriver  Com driver containing information about all data dealer
@@ -431,7 +417,7 @@ void C_SyvDaTearOffWidget::closeEvent(QCloseEvent * const opc_Event)
    \param[in]  oq_Active   New active flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaTearOffWidget::m_OnActiveChange(C_OgeWiDashboardTab * const opc_Source, const bool oq_Active)
+void C_SyvDaTearOffWidget::m_OnActiveChange(const C_OgeWiDashboardTab * const opc_Source, const bool oq_Active)
 {
    if (this->mpc_Dashboard != NULL)
    {
@@ -440,7 +426,7 @@ void C_SyvDaTearOffWidget::m_OnActiveChange(C_OgeWiDashboardTab * const opc_Sour
       Q_UNUSED(opc_Source)
       if (pc_View != NULL)
       {
-         const stw_types::uint32 u32_DataIndex = this->mpc_Dashboard->GetDataIndex();
+         const stw_types::uint32 u32_DataIndex = this->mpc_Dashboard->GetDashboardIndex();
          if (C_PuiSvHandler::h_GetInstance()->SetDashboardActive(this->mpc_Dashboard->GetViewIndex(), u32_DataIndex,
                                                                  oq_Active) == C_NO_ERR)
          {
@@ -456,7 +442,7 @@ void C_SyvDaTearOffWidget::m_OnActiveChange(C_OgeWiDashboardTab * const opc_Sour
    \param[in]  opc_Source  Signal source widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaTearOffWidget::m_OnCopy(C_OgeWiDashboardTab * const opc_Source) const
+void C_SyvDaTearOffWidget::m_OnCopy(const C_OgeWiDashboardTab * const opc_Source) const
 {
    Q_UNUSED(opc_Source)
    if (this->mpc_Dashboard != NULL)
@@ -468,7 +454,7 @@ void C_SyvDaTearOffWidget::m_OnCopy(C_OgeWiDashboardTab * const opc_Source) cons
 
       if (pc_View != NULL)
       {
-         const C_PuiSvDashboard * pc_Dashboard = pc_View->GetDashboard(this->mpc_Dashboard->GetDataIndex());
+         const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mpc_Dashboard->GetDashboardIndex());
          if (pc_Dashboard != NULL)
          {
             QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_Rails;
@@ -489,13 +475,12 @@ void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_So
 {
    if ((this->mpc_Dashboard != NULL) && (opc_Source != NULL))
    {
-      const uint32 u32_DashboardIndex = this->mpc_Dashboard->GetDataIndex();
+      const uint32 u32_DashboardIndex = this->mpc_Dashboard->GetDashboardIndex();
 
       // show popup dialog
-      QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-      C_SyvDaDashboardTabProperties * pc_Dialog = new C_SyvDaDashboardTabProperties(*c_New, "Dashboard Tab",
-                                                                                    u32_DashboardIndex,
-                                                                                    mpc_Dashboard->GetViewIndex());
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+      C_SyvDaDashboardTabProperties * const pc_Dialog =
+         new C_SyvDaDashboardTabProperties(*c_New, "Dashboard Tab", u32_DashboardIndex, mpc_Dashboard->GetViewIndex());
 
       if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
       {
@@ -517,7 +502,7 @@ void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_So
       {
          c_New->HideOverlay();
       }
-   }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

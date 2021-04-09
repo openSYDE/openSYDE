@@ -383,7 +383,7 @@ void C_CamMainWindow::dropEvent(QDropEvent * const opc_Event)
       }
       else
       {
-         QFileInfo c_FileInfo(c_FilePath);
+         const QFileInfo c_FileInfo(c_FilePath);
 
          // drop of project file
          if (c_FileInfo.suffix().compare("syde_cam", Qt::CaseInsensitive) == 0)
@@ -528,6 +528,9 @@ sint32 C_CamMainWindow::m_InitCan(sint32 & ors32_Bitrate)
    QString c_DllPath;
    sint32 s32_Return = C_RD_WR;
    QFileInfo c_File;
+
+   // Initialize
+   ors32_Bitrate = 0;
 
    // Get absolute DLL path (resolve variables and make absolute if it is relative ant not empty)
    c_DllPath = C_CamProHandler::h_GetInstance()->GetCANDllPath();
@@ -720,7 +723,7 @@ bool C_CamMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
       if (opc_Mime->hasUrls() == true)
       {
          QStringList c_PathList;
-         QList<QUrl> c_UrlList = opc_Mime->urls();
+         const QList<QUrl> c_UrlList = opc_Mime->urls();
 
          // extract the local paths of the files
          for (sintn sn_It = 0; sn_It < c_UrlList.size(); ++sn_It)
@@ -757,7 +760,7 @@ bool C_CamMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::mh_ThreadFunc(void * const opv_Instance)
 {
-   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
    C_CamMainWindow * const pc_Instance = reinterpret_cast<C_CamMainWindow * const>(opv_Instance);
 
    tgl_assert(pc_Instance != NULL);
@@ -819,7 +822,7 @@ void C_CamMainWindow::m_OnExpandSettings(const bool oq_Expand)
 /*! \brief  Handle double click of settings splitter.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_OnSettingsSplitterHandleDoubleClick(void)
+void C_CamMainWindow::m_OnSettingsSplitterHandleDoubleClick(void) const
 {
    // toggle splitter expanded state
    this->mpc_Ui->pc_SettingsWidget->ExpandSettings(!C_UsHandler::h_GetInstance()->GetSettingsAreExpanded());
@@ -879,7 +882,8 @@ void C_CamMainWindow::m_OnSettingsSplitterMoved(const sint32 & ors32_Pos, const 
       else
       {
          this->mpc_Ui->pc_SplitterSettings->SetSecondSegment(
-            std::max(mhs32_SettingsSplitterMax, this->mpc_Ui->pc_SplitterSettings->width() - ors32_Pos));
+            std::max(mhs32_SettingsSplitterMax,
+                     static_cast<sint32>(this->mpc_Ui->pc_SplitterSettings->width()) - ors32_Pos));
       }
    }
 }
@@ -925,7 +929,7 @@ void C_CamMainWindow::m_OnExpandMessageGen(const bool oq_Expand)
 /*! \brief  Handle double click of message generator splitter.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_OnMessageGenSplitterHandleDoubleClick()
+void C_CamMainWindow::m_OnMessageGenSplitterHandleDoubleClick(void) const
 {
    // toggle splitter expanded state
    this->mpc_Ui->pc_GeneratorWidget->ExpandMessageGen(!C_UsHandler::h_GetInstance()->GetMessageGenIsExpanded());
@@ -985,7 +989,8 @@ void C_CamMainWindow::m_OnMessageGenSplitterMoved(const sint32 & ors32_Pos, cons
       else
       {
          this->mpc_Ui->pc_SplitterMessageGen->SetSecondSegment(
-            std::max(mhs32_MessageGenSplitterMax, this->mpc_Ui->pc_SplitterMessageGen->height() - ors32_Pos));
+            std::max(mhs32_MessageGenSplitterMax,
+                     static_cast<sint32>(this->mpc_Ui->pc_SplitterMessageGen->height()) - ors32_Pos));
       }
    }
 }
@@ -1056,7 +1061,7 @@ void C_CamMainWindow::m_RemoveAllCyclicMessages(void)
 /*! \brief  Handle remove the old configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_OnClearOldConfiguration(void)
+void C_CamMainWindow::m_OnClearOldConfiguration(void) const
 {
    this->mpc_Ui->pc_SettingsWidget->ClearConfiguration();
 }
@@ -1139,7 +1144,7 @@ void C_CamMainWindow::m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Resu
                //Check if already known
                if (C_CamDbHandler::h_GetInstance()->GetContainsOsy(this->mc_CurrentLoadedFileOrg) == false)
                {
-                  stw_opensyde_core::C_OSCSystemDefinition c_Tmp;
+                  const stw_opensyde_core::C_OSCSystemDefinition c_Tmp;
                   stw_opensyde_core::C_OSCComMessageLoggerOsySysDefConfig c_SystemDefinition(c_Tmp, 0UL);
                   if (pc_MessageMonitor->GetOsySysDef(this->mc_CurrentLoadedFile.toStdString().c_str(),
                                                       c_SystemDefinition) == C_NO_ERR)
@@ -1347,7 +1352,8 @@ void C_CamMainWindow::m_DisplayCheckMessagesDialog(const QString & orc_DatabaseP
          if (pc_Message != NULL)
          {
             const QString c_MessageName = C_CamProHandler::h_GetCompleteMessageName(*pc_Message);
-            c_Entry = static_cast<QString>("%1 (%2)\n").arg(c_MessageName).arg(C_Uti::h_GetValueAsHex(pc_Message->u32_Id));
+            c_Entry = static_cast<QString>("%1 (%2)\n").arg(c_MessageName).arg(C_Uti::h_GetValueAsHex(
+                                                                                  pc_Message->u32_Id));
          }
          c_Details.append(c_Entry);
       }

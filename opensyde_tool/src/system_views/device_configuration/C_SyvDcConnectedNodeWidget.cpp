@@ -54,9 +54,9 @@ C_SyvDcConnectedNodeWidget::C_SyvDcConnectedNodeWidget(QListWidgetItem * const o
    mpc_ListWidgetItem(opc_Item),
    mc_Info(orc_Info)
 {
-   const QPixmap c_Device = QPixmap("://images/system_views/DeviceSmall.svg").scaled(QSize(16, 16),
-                                                                                     Qt::KeepAspectRatio,
-                                                                                     Qt::SmoothTransformation);
+   const QPixmap c_Device =
+      static_cast<QPixmap>("://images/system_views/DeviceSmall.svg").scaled(QSize(16, 16), Qt::KeepAspectRatio,
+                                                                            Qt::SmoothTransformation);
 
    mpc_Ui->setupUi(this);
 
@@ -73,10 +73,10 @@ C_SyvDcConnectedNodeWidget::C_SyvDcConnectedNodeWidget(QListWidgetItem * const o
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} Never took ownership of mpc_ListWidgetItem
 C_SyvDcConnectedNodeWidget::~C_SyvDcConnectedNodeWidget(void)
 {
    delete mpc_Ui;
-   //lint -e{1740} Never took ownership of mpc_ListWidgetItem
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -106,7 +106,6 @@ void C_SebUnoResizeRectangleCommand::m_UndoSingle(QGraphicsItem * const opc_Item
    {
       C_GiBiRectBaseGroup * pc_RectBase;
 
-      
       pc_RectBase = dynamic_cast<C_GiBiRectBaseGroup *>(opc_Item);
       if (pc_RectBase != NULL)
       {
@@ -127,7 +126,6 @@ void C_SebUnoResizeRectangleCommand::m_RedoSingle(QGraphicsItem * const opc_Item
    {
       C_GiBiRectBaseGroup * pc_RectBase;
 
-      
       pc_RectBase = dynamic_cast<C_GiBiRectBaseGroup *>(opc_Item);
       if (pc_RectBase != NULL)
       {

@@ -81,6 +81,7 @@ C_OSCFlashProtocolStwFlashloader::~C_OSCFlashProtocolStwFlashloader(void)
    else        abort operation (not honored at each position)
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{8001,8011}  //name of function dictated by base class
 sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Progress1_1000,
                                                             const C_SCLString & orc_AdditionalText)
 {
@@ -103,6 +104,7 @@ sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Pr
    \param[in]   ou8_Type          type of reported status (see gu8_DL_REPORT_STATUS_TYPE_* constants)
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{8001,8011}  //name of function dictated by base class
 void C_OSCFlashProtocolStwFlashloader::TRG_ReportStatus(const C_SCLString & orc_Text, const uint8 ou8_Type)
 {
    if (pr_ReportProgress != NULL)

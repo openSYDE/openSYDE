@@ -80,6 +80,8 @@ private:
    static stw_types::sint32 mh_LoadPc(C_PuiSvPc & orc_Pc, stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadCharts(std::vector<C_PuiSvDbChart> & orc_Widgets,
                                           stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadTabChart(C_PuiSvDbTabChart & orc_Widget,
+                                            stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadLabels(std::vector<C_PuiSvDbLabel> & orc_Widgets,
                                           stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadParams(std::vector<C_PuiSvDbParam> & orc_Widgets,
@@ -104,6 +106,9 @@ private:
                                               stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & orc_Id,
                               stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadTabChartScreenRegion(std::vector<std::array<stw_types::float64,
+                                                                               4> > & orc_ScreenRegion,
+                                                        stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadParamDataSetIndices(std::vector<stw_types::sint32> & orc_Values,
                                                        stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadParamValues(std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> & orc_Values,
@@ -118,6 +123,7 @@ private:
                                                  C_PuiSvDbWidgetBase::E_WriteMode & ore_Mode);
    static stw_types::sint32 mh_StringToDisplayStyle(const QString & orc_String,
                                                     C_PuiSvDbWidgetBase::E_Style & ore_Style);
+   static stw_types::sint32 mh_StringToTabType(const QString & orc_String, C_PuiSvDashboard::E_TabType & ore_TabType);
    static stw_types::sint32 mh_StringToToggleType(const QString & orc_String, C_PuiSvDbToggle::E_Type & ore_Type);
    static stw_types::sint32 mh_StringToSpinBoxType(const QString & orc_String, C_PuiSvDbSpinBox::E_Type & ore_Type);
    static stw_types::sint32 mh_StringToLabelType(const QString & orc_String, C_PuiSvDbLabel::E_Type & ore_Type);
@@ -132,6 +138,10 @@ private:
                                                   C_PuiSvDbNodeDataPoolListElementId::E_Type & ore_Type);
    static stw_types::sint32 mh_StringToChartSettingZoomMode(const QString & orc_String,
                                                             C_PuiSvDbChart::E_SettingZoomMode & ore_ZoomMode);
+   static stw_types::sint32 mh_StringToTabChartSettingZoomMode(const QString & orc_String,
+                                                               C_PuiSvDbTabChart::E_SettingZoomMode & ore_ZoomMode);
+   static stw_types::sint32 mh_StringToTabChartSettingYAxisMode(const QString & orc_String,
+                                                                C_PuiSvDbTabChart::E_SettingYAxisMode & ore_YAxisMode);
    static void mh_SaveNodeActiveFlags(const std::vector<stw_types::uint8> & orc_NodeActiveFlags,
                                       stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveNodeUpdateInformation(const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation,
@@ -148,6 +158,8 @@ private:
    static void mh_SavePc(const C_PuiSvPc & orc_Pc, stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveCharts(const std::vector<C_PuiSvDbChart> & orc_Widgets,
                              stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static void mh_SaveTabChart(const C_PuiSvDbTabChart & orc_Widget,
+                               stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveLabels(const std::vector<C_PuiSvDbLabel> & orc_Widgets,
                              stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveParams(const std::vector<C_PuiSvDbParam> & orc_Widgets,
@@ -174,10 +186,13 @@ private:
                               stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveDataElement(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
                                   stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static void mh_SaveTabChartScreenRegion(const std::vector<std::array<stw_types::float64, 4> > & orc_ScreenRegion,
+                                           stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static QString mh_DeviceConfigModeToString(const C_PuiSvData::E_DeviceConfigurationMode oe_Mode);
    static QString mh_WriteModeToString(const C_PuiSvDbWidgetBase::E_WriteMode oe_Mode);
    static QString mh_DisplayStyleToString(const C_PuiSvDbWidgetBase::E_Style oe_Style);
    static QString mh_ToggleTypeToString(const C_PuiSvDbToggle::E_Type oe_Type);
+   static QString mh_TabTypeToString(const C_PuiSvDashboard::E_TabType oe_Type);
    static QString mh_SpinBoxTypeToString(const C_PuiSvDbSpinBox::E_Type oe_Type);
    static QString mh_LabelTypeToString(const C_PuiSvDbLabel::E_Type oe_Type);
    static QString mh_SliderTypeToString(const C_PuiSvDbSlider::E_Type oe_Type);
@@ -187,6 +202,8 @@ private:
    static QString mh_SourceTypeToString(const C_PuiSvDbNodeDataPoolListElementId::E_Type oe_Type);
    static C_PuiSvData::E_DeviceConfigurationMode mh_StringToDeviceConfigMode(const QString & orc_Input);
    static QString mh_ChartZoomModeToString(const C_PuiSvDbChart::E_SettingZoomMode oe_ZoomMode);
+   static QString mh_TabChartZoomModeToString(const C_PuiSvDbTabChart::E_SettingZoomMode oe_ZoomMode);
+   static QString mh_TabChartYAxisModeToString(const C_PuiSvDbTabChart::E_SettingYAxisMode oe_YAxisMode);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

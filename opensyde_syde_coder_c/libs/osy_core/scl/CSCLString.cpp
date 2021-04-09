@@ -149,7 +149,7 @@ C_SCLString::C_SCLString(const wchar_t * const opwcn_InitValue)
 {
    charn * pcn_Chars;
    size_t un_Return;
-   size_t un_Size = wcslen(opwcn_InitValue) + 1U;
+   const size_t un_Size = wcslen(opwcn_InitValue) + 1U;
 
    pcn_Chars = new charn[un_Size];
    un_Return = std::wcstombs(pcn_Chars, opwcn_InitValue, un_Size);
@@ -879,7 +879,7 @@ C_SCLString C_SCLString::Trim(void) const
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::TrimLeft(void) const
 {
-   std::string::size_type un_Pos = c_String.find_first_not_of(" \t\r\n\v\f");
+   const std::string::size_type un_Pos = c_String.find_first_not_of(" \t\r\n\v\f");
 
    if (un_Pos != std::string::npos)
    {
@@ -927,7 +927,7 @@ C_SCLString C_SCLString::LowerCase(void) const
 {
    C_SCLString c_Result;
    uint32 u32_Index;
-   uint32 u32_Length = this->Length(); //remember to improve performance
+   const uint32 u32_Length = this->Length(); //remember to improve performance
    const charn * pcn_Str;
 
    c_Result = (*this);
@@ -953,7 +953,7 @@ C_SCLString C_SCLString::UpperCase(void) const
 {
    C_SCLString c_Result;
    uint32 u32_Index;
-   uint32 u32_Length = this->Length(); //remember to improve performance
+   const uint32 u32_Length = this->Length(); //remember to improve performance
    const charn * pcn_Str;
 
    c_Result = (*this);
@@ -1472,7 +1472,7 @@ C_SCLString C_SCLString::IntToHex(const sint8 os8_Value, const uint32 ou32_Digit
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::FloatToStr(const float32 of32_Value)
 {
-   C_SCLString c_Text(static_cast<float64>(of32_Value));
+   const C_SCLString c_Text(static_cast<float64>(of32_Value));
 
    return c_Text;
 }
@@ -1491,7 +1491,7 @@ C_SCLString C_SCLString::FloatToStr(const float32 of32_Value)
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::FloatToStr(const float64 of64_Value)
 {
-   C_SCLString c_Text(of64_Value);
+   const C_SCLString c_Text(of64_Value);
 
    return c_Text;
 }
@@ -1563,7 +1563,7 @@ uint32 C_SCLString::LastDelimiter(const C_SCLString & orc_Delimiters) const
 {
    sint32 s32_Pos;
    uint32 u32_Return = 0U;
-   uint32 u32_Length = this->Length();
+   const uint32 u32_Length = this->Length();
 
    if (u32_Length > 0U)
    {

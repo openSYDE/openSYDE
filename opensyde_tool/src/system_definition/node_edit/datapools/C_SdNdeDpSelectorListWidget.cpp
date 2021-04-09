@@ -30,6 +30,7 @@
 #include "C_SdUtil.h"
 #include "TGLUtils.h"
 #include "C_PuiSdSharedDatapools.h"
+#include "C_OSCLoggingHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -102,9 +103,9 @@ C_SdNdeDpSelectorListWidget::C_SdNdeDpSelectorListWidget(QWidget * const opc_Par
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parents of mpc_ContextMenu and the Qt memory management
 C_SdNdeDpSelectorListWidget::~C_SdNdeDpSelectorListWidget()
 {
-   //lint -e{429,1540}  no memory leak because of the parent of mpc_ContextMenu and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -344,7 +345,7 @@ void C_SdNdeDpSelectorListWidget::UpdateActualDataPool(void)
 void C_SdNdeDpSelectorListWidget::m_AddDataPoolWidget(const uint32 ou32_DataPoolIndex)
 {
    //lint -e{429}  no memory leak because of the parent of pc_ItemWidget and the Qt memory management
-   C_SdNdeDpSelectorItemWidget * pc_ItemWidget = new C_SdNdeDpSelectorItemWidget(
+   C_SdNdeDpSelectorItemWidget * const pc_ItemWidget = new C_SdNdeDpSelectorItemWidget(
       this->mq_UsageViewActive, this);
    const sintn sn_Index = this->mc_DpItems.size();
    const sintn sn_Number = sn_Index + 1;
@@ -367,7 +368,7 @@ void C_SdNdeDpSelectorListWidget::m_AddDataPoolWidget(const uint32 ou32_DataPool
    pc_ItemWidget->setVisible(false);
 
    this->mc_DpItems.push_back(pc_ItemWidget);
-}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates a datapool widget in the list
@@ -428,7 +429,7 @@ const
          {
             if (c_Group[u32_DpIdCounter] != orc_AdaptedDatapool)
             {
-               C_OSCNode * pc_SyncNode = C_PuiSdHandler::h_GetInstance()->GetOSCNode(
+               C_OSCNode * const pc_SyncNode = C_PuiSdHandler::h_GetInstance()->GetOSCNode(
                   c_Group[u32_DpIdCounter].u32_NodeIndex);
 
                tgl_assert(pc_SyncNode != NULL);
@@ -464,16 +465,25 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
          C_PuiSdNodeDataPool c_UIDataPool;
          bool q_SharedDatapoolSelected = false;
          C_OSCNodeDataPoolId c_SharedDatapoolId;
+         bool q_ShareNewDatapool = false;
 
          // the type must be initialized
          c_NewDatapool.c_Name = C_PuiSdHandler::h_GetInstance()->GetUniqueDataPoolName(this->mu32_NodeIndex,
                                                                                        c_NewDatapool.c_Name);
          c_NewDatapool.e_Type = this->me_DataPoolType;
 
-         // Open the shared Datapool dialog only if the Datapool is not a Com Datapool
-         // No sharing between Com Datapools
+         // ask for sharing if possible
+         // (only if the Datapool is DIAG or NVM Datapool - no sharing between COMM and HAL Datapools)
+         if ((this->me_DataPoolType == C_OSCNodeDataPool::eDIAG) ||
+             (this->me_DataPoolType == C_OSCNodeDataPool::eNVM))
+         {
+            q_ShareNewDatapool =
+               this->m_OpenShareDataPoolDialog(c_NewDatapool, q_SharedDatapoolSelected, c_SharedDatapoolId);
+         }
+
          if ((this->me_DataPoolType == C_OSCNodeDataPool::eCOM) ||
-             (this->m_OpenShareDataPoolDialog(c_NewDatapool, q_SharedDatapoolSelected, c_SharedDatapoolId) == true))
+             (this->me_DataPoolType == C_OSCNodeDataPool::eHALC) ||
+             (q_ShareNewDatapool == true))
          {
             const C_OSCNodeDataPoolId * opc_SharedDatapoolId = NULL;
 
@@ -546,6 +556,7 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::Paste(void)
 {
+   const uint16 u16_TimerId = osc_write_log_performance_start();
    C_OSCNodeDataPool c_OSCContent;
    C_PuiSdNodeDataPool c_UIContent;
    sint32 s32_Return;
@@ -637,6 +648,7 @@ void C_SdNdeDpSelectorListWidget::Paste(void)
          QApplication::restoreOverrideCursor();
       }
    }
+   osc_write_log_performance_stop(u16_TimerId, "Paste datapool");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -676,10 +688,13 @@ const
                   bool q_NameConflict;
                   bool q_NameInvalid;
                   bool q_IsErrorInListOrMessage;
+                  bool q_NumberOfListsOrElementsInvalid;
                   //Check error for one datapool
                   pc_Node->CheckErrorDataPool(u32_DpCounter, &q_NameConflict, &q_NameInvalid, &q_IsErrorInListOrMessage,
-                                              NULL);
-                  if (((q_NameConflict == false) && (q_NameInvalid == false)) && (q_IsErrorInListOrMessage == false))
+                                              &q_NumberOfListsOrElementsInvalid, NULL);
+
+                  if (((q_NameConflict == false) && (q_NameInvalid == false)) && (q_IsErrorInListOrMessage == false) &&
+                      (q_NumberOfListsOrElementsInvalid == false))
                   {
                      //No error
                      pc_WidgetItem->SetStateConflict(false);
@@ -879,14 +894,14 @@ void C_SdNdeDpSelectorListWidget::paintEvent(QPaintEvent * const opc_Event)
          c_Text = static_cast<QString>(C_GtGetText::h_GetText("No")) + static_cast<QString>(" ") +
                   C_PuiSdUtil::h_ConvertDataPoolTypeToString(this->me_DataPoolType) +
                   static_cast<QString>(C_GtGetText::h_GetText(
-                             " Datapool is declared.\nAdd any via the '+' button."));
+                                          " Datapool is declared.\nAdd any via the '+' button."));
       }
       else
       {
          c_Text = static_cast<QString>(C_GtGetText::h_GetText("No")) + static_cast<QString>(" ") +
                   C_PuiSdUtil::h_ConvertDataPoolTypeToString(this->me_DataPoolType) +
                   static_cast<QString>(C_GtGetText::h_GetText(
-                             " Datapool is declared. \nHardware configuration is handled in tab 'Hardware Configurator'."));
+                                          " Datapool is declared. \nHardware configuration is handled in tab 'Hardware Configurator'."));
       }
 
       // configure color
@@ -1172,7 +1187,7 @@ bool C_SdNdeDpSelectorListWidget::m_OpenShareDataPoolDialog(C_OSCNodeDataPool & 
    if (q_DatapoolFound == true)
    {
       // At least one Datapool of the same type exists, show the dialog
-      QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
       C_SdNdeDpSelectorAddWidget * const pc_Dialog = new C_SdNdeDpSelectorAddWidget(*c_New,
                                                                                     this->mu32_NodeIndex,
                                                                                     orc_OSCDataPool);
@@ -1191,8 +1206,7 @@ bool C_SdNdeDpSelectorListWidget::m_OpenShareDataPoolDialog(C_OSCNodeDataPool & 
       }
 
       c_New->HideOverlay();
-
-   }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    else
    {
       q_Return = true;
@@ -1226,7 +1240,7 @@ bool C_SdNdeDpSelectorListWidget::m_OpenDataPoolDialog(C_OSCNodeDataPool & orc_O
 {
    bool q_Return = false;
 
-   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_SdNdeDpProperties * const pc_Dialog =
       new C_SdNdeDpProperties(*c_New, &orc_OSCDataPool, &orc_UiDataPool, &this->me_ProtocolType,
                               os32_DataPoolIndex, this->mu32_NodeIndex, oq_SelectName, oq_ShowApplicationSection,
@@ -1244,7 +1258,7 @@ bool C_SdNdeDpSelectorListWidget::m_OpenDataPoolDialog(C_OSCNodeDataPool & orc_O
       c_New->HideOverlay();
    }
 
-   return q_Return;  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+   return q_Return; //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1640,7 +1654,9 @@ void C_SdNdeDpSelectorListWidget::m_EditContent(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_Copy(void) const
 {
-   if (this->me_DataPoolType != C_OSCNodeDataPool::eCOM)
+   const uint16 u16_TimerId = osc_write_log_performance_start();
+
+   if ((this->me_DataPoolType == C_OSCNodeDataPool::eDIAG) || (this->me_DataPoolType == C_OSCNodeDataPool::eNVM))
    {
       const sint32 s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
                                                                                    this->me_DataPoolType,
@@ -1662,6 +1678,8 @@ void C_SdNdeDpSelectorListWidget::m_Copy(void) const
 
       QApplication::restoreOverrideCursor();
    }
+
+   osc_write_log_performance_stop(u16_TimerId, "Copy datapool");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1709,6 +1727,8 @@ void C_SdNdeDpSelectorListWidget::m_Delete(const bool oq_AskUser)
 
    if (q_Continue == true)
    {
+      //starting timer for performance measurement here, so the delay for waiting for user to confirm does not count
+      const uint16 u16_TimerId = osc_write_log_performance_start();
       sint32 s32_Return;
       const sint32 s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
                                                                                    this->me_DataPoolType,
@@ -1744,6 +1764,7 @@ void C_SdNdeDpSelectorListWidget::m_Delete(const bool oq_AskUser)
       }
 
       QApplication::restoreOverrideCursor();
+      osc_write_log_performance_stop(u16_TimerId, "Delete datapool");
    }
 }
 
@@ -1844,6 +1865,7 @@ void C_SdNdeDpSelectorListWidget::m_ItemDoubleClicked(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_MoveDatapool(const sintn osn_SourceIndex, const sintn osn_TargetIndex)
 {
+   const uint16 u16_TimerId = osc_write_log_performance_start();
    sintn osn_TargetIndexAdapted = osn_TargetIndex;
    sint32 s32_SourceDpIndex;
    sint32 s32_TargetDpIndex;
@@ -1879,6 +1901,8 @@ void C_SdNdeDpSelectorListWidget::m_MoveDatapool(const sintn osn_SourceIndex, co
    }
 
    QApplication::restoreOverrideCursor();
+
+   osc_write_log_performance_stop(u16_TimerId, "Move datapool");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2113,20 +2137,21 @@ void C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip(const uint32 ou32_Ind
       if (pc_Sender != NULL)
       {
          const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         const sint32 s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
-                                                                                      this->me_DataPoolType,
-                                                                                      ou32_Index);
+         const sint32 s32_DpIndex =
+            C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex, this->me_DataPoolType, ou32_Index);
          if ((s32_DpIndex >= 0) && (pc_Node != NULL))
          {
             const uint32 u32_DataPoolIndex = static_cast<uint32>(s32_DpIndex);
             bool q_NameConflict;
             bool q_NameInvalid;
             bool q_IsErrorInListOrMessage;
+            bool q_NumberOfListsOrElementsInvalid;
             std::vector<uint32> c_InvalidListIndices;
             pc_Node->CheckErrorDataPool(u32_DataPoolIndex, &q_NameConflict, &q_NameInvalid,
-                                        &q_IsErrorInListOrMessage,
+                                        &q_IsErrorInListOrMessage, &q_NumberOfListsOrElementsInvalid,
                                         &c_InvalidListIndices);
-            if (((q_NameConflict == false) && (q_NameInvalid == false)) && (q_IsErrorInListOrMessage == false))
+            if (((q_NameConflict == false) && (q_NameInvalid == false)) && (q_IsErrorInListOrMessage == false) &&
+                (q_NumberOfListsOrElementsInvalid == false))
             {
                pc_Sender->SetErrorToolTip(C_GtGetText::h_GetText("No error found!"), "");
             }
@@ -2149,47 +2174,56 @@ void C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip(const uint32 ou32_Ind
                }
                if (q_IsErrorInListOrMessage == true)
                {
-                  if (this->me_DataPoolType != C_OSCNodeDataPool::eCOM)
-                  {
-                     c_Content += C_GtGetText::h_GetText("Lists:\n");
-                  }
-                  else
-                  {
-                     c_Content += C_GtGetText::h_GetText("Interfaces:\n");
-                  }
-
-                  for (uint32 u32_ItList = 0;
-                       (u32_ItList < c_InvalidListIndices.size()) &&
-                       (u32_ItList < mu32_TOOL_TIP_MAXIMUM_ITEMS);
-                       ++u32_ItList)
+                  if (c_InvalidListIndices.size() > 0)
                   {
                      if (this->me_DataPoolType != C_OSCNodeDataPool::eCOM)
                      {
-                        const C_OSCNodeDataPoolList * const pc_List =
-                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
-                              this->mu32_NodeIndex, u32_DataPoolIndex, c_InvalidListIndices[u32_ItList]);
-                        if (pc_List != NULL)
-                        {
-                           c_Content += static_cast<QString>("%1\n").arg(pc_List->c_Name.c_str());
-                        }
+                        c_Content += C_GtGetText::h_GetText("Lists:\n");
                      }
                      else
                      {
-                        // In case of a COMM Datapool the values in c_InvalidListIndices equals not the list index,
-                        // the values equals the interface index
-                        const QString c_InterfaceName =
-                           C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
-                                                           static_cast<uint8>(c_InvalidListIndices[u32_ItList]));
-                        c_Content += c_InterfaceName + "\n";
+                        c_Content += C_GtGetText::h_GetText("Interfaces:\n");
                      }
+
+                     for (uint32 u32_ItList = 0;
+                          (u32_ItList < c_InvalidListIndices.size()) &&
+                          (u32_ItList < mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                          ++u32_ItList)
+                     {
+                        if (this->me_DataPoolType != C_OSCNodeDataPool::eCOM)
+                        {
+                           const C_OSCNodeDataPoolList * const pc_List =
+                              C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+                                 this->mu32_NodeIndex, u32_DataPoolIndex, c_InvalidListIndices[u32_ItList]);
+                           if (pc_List != NULL)
+                           {
+                              c_Content += static_cast<QString>("%1\n").arg(pc_List->c_Name.c_str());
+                           }
+                        }
+                        else
+                        {
+                           // In case of a COMM Datapool the values in c_InvalidListIndices equals not the list index,
+                           // the values equals the interface index
+                           const QString c_InterfaceName =
+                              C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
+                                                              static_cast<uint8>(c_InvalidListIndices[u32_ItList]));
+                           c_Content += c_InterfaceName + "\n";
+                        }
+                     }
+                     if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidListIndices.size())
+                     {
+                        c_Content +=
+                           static_cast<QString>("+%1\n").arg(static_cast<uint32>(c_InvalidListIndices.size()) -
+                                                             mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                     }
+                     c_Content += "\n";
                   }
-                  if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidListIndices.size())
-                  {
-                     c_Content += static_cast<QString>("+%1\n").arg(
-                        c_InvalidListIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
-                  }
-                  c_Content += "\n";
                }
+               if (q_NumberOfListsOrElementsInvalid == true)
+               {
+                  c_Content += C_GtGetText::h_GetText("The number of lists or elements in the data pool is invalid.\n");
+               }
+
                pc_Sender->SetErrorToolTip(c_Heading, c_Content);
             }
          }

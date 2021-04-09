@@ -107,7 +107,6 @@ QGraphicsItem * C_SebUnoBaseCommand::m_GetSceneItem(const uint64 & oru64_ID) con
 {
    QGraphicsItem * pc_Retval;
 
-   
    const stw_opensyde_gui::C_SebScene * const pc_DetailedScene =
       dynamic_cast<const stw_opensyde_gui::C_SebScene * const>(mpc_Scene);
 

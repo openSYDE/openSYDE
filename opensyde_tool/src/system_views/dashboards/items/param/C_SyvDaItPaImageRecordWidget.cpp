@@ -137,11 +137,11 @@ C_SyvDaItPaImageRecordWidget::C_SyvDaItPaImageRecordWidget(stw_opensyde_gui_elem
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ParentDialog and the Qt memory management
 C_SyvDaItPaImageRecordWidget::~C_SyvDaItPaImageRecordWidget()
 {
    //Clean up
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_ParentDialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ void C_SyvDaItPaImageRecordWidget::InitText(void)
 
    this->mpc_Ui->pc_PbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Read Parameters")));
    this->mpc_Ui->pc_CbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText(
-                                                  "Confirmed, all required parameter lists are included")));
+                                                               "Confirmed, all required parameter lists are included")));
 
    this->mpc_Ui->pc_PushButtonBrowse->SetToolTipInformation(
       C_GtGetText::h_GetText("Browse"),
@@ -251,7 +251,7 @@ void C_SyvDaItPaImageRecordWidget::keyPressEvent(QKeyEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_OnBrowse(void)
 {
-   QString c_Folder = C_Uti::h_GetAbsolutePathFromExe(this->mpc_Ui->pc_LineEditPath->GetPath());
+   const QString c_Folder = C_Uti::h_GetAbsolutePathFromExe(this->mpc_Ui->pc_LineEditPath->GetPath());
 
    const QString c_Path =
       C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select File for Parameter Set Image"),
@@ -437,7 +437,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
             {
                C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
-               c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("File path contains invalid characters.")));
+               c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                   "File path contains invalid characters.")));
                c_MessageBox.SetCustomMinHeight(180, 180);
                c_MessageBox.Execute();
             }
@@ -447,9 +448,10 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
             C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
             c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
             c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                   "The specified file has the wrong extension, use: \"%1\".")).arg(
+                                                                "The specified file has the wrong extension, use: \"%1\".")).arg(
                                            C_SyvDaItPaImageRecordWidget::mhc_FILE_EXTENSION));
-            c_MessageBox.SetDetails(static_cast<QString>("Invalid extension: \"%1\"").arg("." + c_BaseInfo.completeSuffix()));
+            c_MessageBox.SetDetails(static_cast<QString>("Invalid extension: \"%1\"").arg("." +
+                                                                                          c_BaseInfo.completeSuffix()));
             c_MessageBox.SetCustomMinHeight(180, 250);
             c_MessageBox.Execute();
          }
@@ -619,7 +621,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(const QString & orc_Comm
                                                   "parameter lists are listed below. If yes, check "
                                                   "\"All required parameter lists are included\" "
                                                   "and click \"Validate File(s)\"."));
-                        this->mpc_Ui->pc_PbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Validate File(s)")));
+                        this->mpc_Ui->pc_PbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                                    "Validate File(s)")));
                         this->mpc_Ui->pc_CbConfirm->setVisible(true);
                         this->mpc_Ui->pc_CbConfirm->setEnabled(true);
 
@@ -842,7 +845,7 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
             }
             else
             {
-               c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
+               c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(1UL));
             }
             c_Text += static_cast<QString>(C_GtGetText::h_GetText("Node")) + " - " +
                       static_cast<QString>(pc_OSCNode->c_Properties.c_Name.c_str());
@@ -878,11 +881,11 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
                   {
                      if (oq_IsConfirm == true)
                      {
-                        c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
+                        c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(1UL));
                      }
                      else
                      {
-                        c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
+                        c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(2UL));
                      }
                      c_Text += static_cast<QString>(C_GtGetText::h_GetText("DataPool")) +
                                " - " + static_cast<QString>(pc_OSCDataPool->c_Name.c_str()) + "</div>";
@@ -894,11 +897,11 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
                   // Listname
                   if (oq_IsConfirm == true)
                   {
-                     c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
+                     c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(2UL));
                   }
                   else
                   {
-                     c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(3UL));
+                     c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(3UL));
                   }
                   c_Text += static_cast<QString>(C_GtGetText::h_GetText("List")) +
                             " - " + static_cast<QString>(pc_OSCList->c_Name.c_str()) + "</div>";
@@ -1155,7 +1158,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReportError(const QString & orc_FunctionNam
 
    osc_write_log_info("Write NVM parameters", c_Text.toStdString().c_str());
 
-   c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Function %1 ended with error.")).arg(orc_FunctionName));
+   c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Function %1 ended with error.")).arg(
+                               orc_FunctionName));
    c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("Error code:\n %1 \nError text: \n %2"))
                         .arg(os32_ErrorCode).arg(orc_ErrorText));
    c_Message.SetCustomMinHeight(180, 350);
@@ -1178,7 +1182,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
    QString c_Details = "";
    QString c_Description;
    C_OgeWiCustomMessage c_Message(this);
-   sint32 s32_Return = this->mrc_ComDriver.GetPollResultNRC(u8_NRC);
+   const sint32 s32_Return = this->mrc_ComDriver.GetPollResultNRC(u8_NRC);
 
    tgl_assert(s32_Return == C_NO_ERR);
 
@@ -1234,7 +1238,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
             C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
+         c_Details =
+            static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
          break;
       }
       break;

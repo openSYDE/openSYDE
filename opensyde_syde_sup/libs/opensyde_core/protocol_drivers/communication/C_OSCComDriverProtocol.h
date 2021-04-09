@@ -223,7 +223,7 @@ private:
 
    //Avoid call
    C_OSCComDriverProtocol(const C_OSCComDriverProtocol &);
-   C_OSCComDriverProtocol & operator =(const C_OSCComDriverProtocol &);
+   C_OSCComDriverProtocol & operator =(const C_OSCComDriverProtocol &); //lint !e1511 //we want to hide the base func.
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -11,6 +11,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 
+#include "CSCLString.h"
 #include "C_OSCHalcDefDomain.h"
 #include "C_OSCHalcConfigChannel.h"
 
@@ -31,6 +32,11 @@ public:
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
    void CheckChannelNameUnique(const stw_types::uint32 ou32_ChannelIndex, bool * const opq_NameConflict) const;
+   stw_types::sint32 CheckChannelLinked(const stw_types::uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
+                                        bool & orq_IsLinked,
+                                        std::vector<stw_scl::C_SCLString> * const opc_LinkedChannelNames,
+                                        std::vector<stw_types::uint32> * const opc_LinkedChannelIndices,
+                                        const stw_types::uint32 * const opu32_UseCaseIndex) const;
    stw_types::sint32 ResetChannelToDefault(const stw_types::uint32 ou32_ChannelIndex);
    stw_types::sint32 ResetChannelUseCase(const stw_types::uint32 ou32_ChannelIndex);
    void ResetDomainToDefault(void);
@@ -50,8 +56,8 @@ private:
    static void mh_AddParameters(const std::vector<C_OSCHalcDefStruct> & orc_Parameters,
                                 std::vector<C_OSCHalcConfigParameterStruct> & orc_ParamConfig);
    static C_OSCHalcConfigChannel mh_InitConfigFromName(const stw_scl::C_SCLString & orc_Name);
-   C_OSCHalcConfigChannel m_InitChannelConfig(const stw_types::uint32 ou32_ChannelIndex);
-   stw_types::uint32 m_InitChannelUseCase(const stw_types::uint32 ou32_ChannelIndex);
+   C_OSCHalcConfigChannel m_InitChannelConfig(const stw_types::uint32 ou32_ChannelIndex) const;
+   stw_types::uint32 m_InitChannelUseCase(const stw_types::uint32 ou32_ChannelIndex) const;
    void m_InitDomainConfig(void);
 };
 

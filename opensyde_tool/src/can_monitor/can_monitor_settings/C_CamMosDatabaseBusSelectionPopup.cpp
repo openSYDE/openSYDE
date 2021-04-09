@@ -309,7 +309,6 @@ void C_CamMosDatabaseBusSelectionPopup::m_OkClicked(void)
    if ((c_Messages.size() > 0) && (this->mpc_Ui->pc_CbxBus->currentIndex() != this->mc_Database.s32_BusIndex))
    {
       QString c_Details;
-      C_OgeWiCustomMessage::E_Outputs e_Output;
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
       c_Message.SetHeading(C_GtGetText::h_GetText("openSYDE database re-import"));
       c_Message.SetDescription(C_GtGetText::h_GetText(
@@ -324,17 +323,9 @@ void C_CamMosDatabaseBusSelectionPopup::m_OkClicked(void)
          c_Details.append("\n");
       }
       c_Message.SetDetails(c_Details);
-      e_Output = c_Message.Execute();
-      switch (e_Output)
+      if (c_Message.Execute() == C_OgeWiCustomMessage::eYES) // return to dialog on cancel
       {
-      case C_OgeWiCustomMessage::eYES:
          this->mrc_ParentDialog.accept();
-         break;
-      case C_OgeWiCustomMessage::eNO:
-         //Return to dialog
-         break;
-      default:
-         break;
       }
    }
    else

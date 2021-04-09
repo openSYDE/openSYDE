@@ -98,12 +98,21 @@ private:
    QString mc_IconParameter;
    QString mc_IconSignal;
    QString mc_IconVariable;
+   QString mc_IconHALInput;
+   QString mc_IconHALOutput;
+   QString mc_IconHALOther;
    QString mc_IconParameterWarning;
    QString mc_IconSignalWarning;
    QString mc_IconVariableWarning;
+   QString mc_IconHALInputWarning;
+   QString mc_IconHALOutputWarning;
+   QString mc_IconHALOtherWarning;
    QString mc_IconParameterError;
    QString mc_IconSignalError;
    QString mc_IconVariableError;
+   QString mc_IconHALInputError;
+   QString mc_IconHALOutputError;
+   QString mc_IconHALOtherError;
 
    QColor mc_TextColor;
 

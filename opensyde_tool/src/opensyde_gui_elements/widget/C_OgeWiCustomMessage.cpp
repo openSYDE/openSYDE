@@ -82,11 +82,9 @@ C_OgeWiCustomMessage::C_OgeWiCustomMessage(QWidget * const opc_Parent, const E_T
    QDialog(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiCustomMessage),
    mq_Pressed(false),
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-   ms32_MinHeight(QWIDGETSIZE_MAX),
-   ms32_MaxHeight(QWIDGETSIZE_MAX)
-   //lint -restore
+   // we can not change Qt constant but it is still better than using the hard coded magic number 16777215
+   ms32_MinHeight(QWIDGETSIZE_MAX) /*lint !e893 !e9130 !e9136*/,
+   ms32_MaxHeight(QWIDGETSIZE_MAX) //lint !e893 !e9130 !e9136
 {
    mpc_Ui->setupUi(this);
 
@@ -112,7 +110,7 @@ C_OgeWiCustomMessage::C_OgeWiCustomMessage(QWidget * const opc_Parent, const E_T
       c_Color.setAlpha(180);
       pc_Shadow->setColor(c_Color);
       this->mpc_Ui->pc_GroupBoxBackground->setGraphicsEffect(pc_Shadow);
-   }  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
 
    // Mouse Events for Box moving
    connect(this->mpc_Ui->pc_GroupBoxBackground, &C_OgeGbxMouseMove::SigMousePress, this,
@@ -270,8 +268,7 @@ void C_OgeWiCustomMessage::m_InitButtons(void)
            &C_OgeWiCustomMessage::m_ExpandCollapseDetails);
 
    // Make the buttons behave similar to QToolButtonBox or QMessageBox
-   me_Output = E_Outputs::eINVALID; // gets overwritten by a valid value like eOK or eNO when box is closed (by
-                                    // button-click)
+   me_Output = E_Outputs::eCANCEL; // gets overwritten when box is closed (by button-click)
    connect(this->mpc_Ui->pc_ButtonOk, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_OKClicked);
    connect(this->mpc_Ui->pc_ButtonNo, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_NOClicked);
    connect(this->mpc_Ui->pc_ButtonCancel, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_CancelClicked);
@@ -298,17 +295,15 @@ void C_OgeWiCustomMessage::m_SetMessageType(const E_Type & ore_MessageType)
    switch (ore_MessageType)
    {
    case E_Type::eERROR:
-      mc_PixmapIcon = QPixmap(":/images/Error_Icon_MessageBox.svg");
+      mc_PixmapIcon = static_cast<QPixmap>(":/images/Error_Icon_MessageBox.svg");
       mc_TypeString = "ERROR";
       break;
-
    case E_Type::eINFORMATION:
-      mc_PixmapIcon = QPixmap(":/images/Info_Icon_MessageBox.svg");
+      mc_PixmapIcon = static_cast<QPixmap>(":/images/Info_Icon_MessageBox.svg");
       mc_TypeString = "INFORMATION";
       break;
-
    case E_Type::eQUESTION:
-      mc_PixmapIcon = QPixmap(":/images/Question_Icon_MessageBox.svg");
+      mc_PixmapIcon = static_cast<QPixmap>(":/images/Question_Icon_MessageBox.svg");
       mc_TypeString = "QUESTION";
 
       // show the Cancel and NO Button and change text of OK button
@@ -319,9 +314,9 @@ void C_OgeWiCustomMessage::m_SetMessageType(const E_Type & ore_MessageType)
          this->mpc_Ui->pc_ButtonCancel->show();
       }
       break;
-
    case E_Type::eWARNING:
-      mc_PixmapIcon = QPixmap(":/images/Warning_Icon_MessageBox.svg");
+   default:
+      mc_PixmapIcon = static_cast<QPixmap>(":/images/Warning_Icon_MessageBox.svg");
       mc_TypeString = "WARNING";
       break;
    }
@@ -630,6 +625,6 @@ void C_OgeWiCustomMessage::SetCustomMinHeight(const sint32 & ors32_MinHeight, co
    this->m_Size();
 
    // reset maximum height of details field so it can use the whole space
-   //lint -e1960 we can not change Qt constant but it is still better than using the hard coded magic number 16777215
-   this->mpc_Ui->pc_TebDetails->setMaximumHeight(QWIDGETSIZE_MAX);
+   this->mpc_Ui->pc_TebDetails->setMaximumHeight(QWIDGETSIZE_MAX); //lint !e893 !e9130 !e9136
+   // we can not change Qt constant but it is still better than using the hard coded magic number 16777215
 }

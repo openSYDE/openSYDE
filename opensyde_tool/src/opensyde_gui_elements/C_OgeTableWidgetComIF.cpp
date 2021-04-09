@@ -302,7 +302,8 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
          m_HandleMouseMoveToolTip(this->mapToGlobal(pc_HoverEvent->pos()));
 
          // check if an IP address cell was hovered
-         QModelIndex c_Index = this->indexAt(this->viewport()->mapFromGlobal(this->mapToGlobal(pc_HoverEvent->pos())));
+         const QModelIndex c_Index =
+            this->indexAt(this->viewport()->mapFromGlobal(this->mapToGlobal(pc_HoverEvent->pos())));
          if (c_Index.isValid())
          {
             QLabel * const pc_Label = dynamic_cast<QLabel * const>(this->cellWidget(c_Index.row(), c_Index.column()));

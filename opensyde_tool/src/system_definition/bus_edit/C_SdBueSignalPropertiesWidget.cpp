@@ -91,10 +91,10 @@ C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the mpc_MessageSyncManager because of handling it on an other position
 C_SdBueSignalPropertiesWidget::~C_SdBueSignalPropertiesWidget(void)
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the mpc_MessageSyncManager because of handling it on an other position
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -562,11 +562,11 @@ void C_SdBueSignalPropertiesWidget::mh_AdaptValueToSignalLength(const uint16 ou1
 
    c_Min.SetArray(false);
    c_Min.SetType(orc_Content.GetType());
-   tgl_assert(mh_InitMin(c_Min, ou16_BitLength) == C_NO_ERR);
+   C_SdNdeDpContentUtil::h_InitMinForSignal(c_Min, ou16_BitLength);
 
    c_Max.SetArray(false);
    c_Max.SetType(orc_Content.GetType());
-   tgl_assert(mh_InitMax(c_Max, ou16_BitLength) == C_NO_ERR);
+   C_SdNdeDpContentUtil::h_InitMaxForSignal(c_Max, ou16_BitLength);
 
    if (orc_Content < c_Min)
    {
@@ -633,10 +633,7 @@ sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const 
       {
          c_Min.SetArray(false);
          c_Min.SetType(orc_Content.GetType());
-         if (mh_InitMin(c_Min, ou16_BitLength) != C_NO_ERR)
-         {
-            C_SdNdeDpContentUtil::h_InitMin(c_Min);
-         }
+         C_SdNdeDpContentUtil::h_InitMinForSignal(c_Min, ou16_BitLength);
       }
       if (opc_Max != NULL)
       {
@@ -646,10 +643,7 @@ sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const 
       {
          c_Max.SetArray(false);
          c_Max.SetType(orc_Content.GetType());
-         if (mh_InitMax(c_Max, ou16_BitLength) != C_NO_ERR)
-         {
-            C_SdNdeDpContentUtil::h_InitMax(c_Max);
-         }
+         C_SdNdeDpContentUtil::h_InitMaxForSignal(c_Max, ou16_BitLength);
       }
       opc_Widget->Init(c_Min, c_Max, of64_Factor, of64_Offset);
       opc_Widget->SetValue(C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(orc_Content, of64_Factor,
@@ -658,351 +652,6 @@ sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const 
    else
    {
       s32_Retval = C_RANGE;
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set content to minimum allowed value
-
-   \param[in,out]  orc_Content      Content to set
-   \param[in]      ou16_BitLength   Signal bit length
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueSignalPropertiesWidget::mh_InitMin(C_OSCNodeDataPoolContent & orc_Content, const uint16 ou16_BitLength)
-{
-   sint32 s32_Retval = C_NO_ERR;
-   bool q_IsUnsigned = false;
-   bool q_IsSigned = false;
-   bool q_IsFloat = false;
-
-   //Check type is realistic for number of bits
-   switch (orc_Content.GetType())
-   {
-   case C_OSCNodeDataPoolContent::eUINT8:
-      if (ou16_BitLength > 8)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsUnsigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eUINT16:
-      if (ou16_BitLength > 16)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsUnsigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eUINT32:
-      if (ou16_BitLength > 32)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsUnsigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eUINT64:
-      if (ou16_BitLength > 64)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsUnsigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eSINT8:
-      if (ou16_BitLength > 8)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsSigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eSINT16:
-      if (ou16_BitLength > 16)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsSigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eSINT32:
-      if (ou16_BitLength > 32)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsSigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eSINT64:
-      if (ou16_BitLength > 64)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsSigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eFLOAT32:
-      if (ou16_BitLength > 32)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsFloat = true;
-      break;
-   case C_OSCNodeDataPoolContent::eFLOAT64:
-      if (ou16_BitLength > 64)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsFloat = true;
-      break;
-   default:
-      s32_Retval = C_RANGE;
-      break;
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      //Unsigned
-      if (q_IsUnsigned == true)
-      {
-         switch (orc_Content.GetType())
-         {
-         case C_OSCNodeDataPoolContent::eUINT8:
-            orc_Content.SetValueU8(0);
-            break;
-         case C_OSCNodeDataPoolContent::eUINT16:
-            orc_Content.SetValueU16(0);
-            break;
-         case C_OSCNodeDataPoolContent::eUINT32:
-            orc_Content.SetValueU32(0);
-            break;
-         case C_OSCNodeDataPoolContent::eUINT64:
-            orc_Content.SetValueU64(0ULL);
-            break;
-         default:
-            s32_Retval = C_CONFIG;
-            break;
-         }
-      }
-      //Signed
-      if (q_IsSigned == true)
-      {
-         uint64 u64_Max = 0;
-
-         //We need exactly one more than half of the unsigned maximum
-         if (ou16_BitLength > 0U)
-         {
-            u64_Max += 1ULL << (static_cast<uint64>(ou16_BitLength) - 1ULL);
-         }
-
-         switch (orc_Content.GetType())
-         {
-         case C_OSCNodeDataPoolContent::eSINT8:
-            orc_Content.SetValueS8(-static_cast<sint8>(u64_Max));
-            break;
-         case C_OSCNodeDataPoolContent::eSINT16:
-            orc_Content.SetValueS16(-static_cast<sint16>(u64_Max));
-            break;
-         case C_OSCNodeDataPoolContent::eSINT32:
-            orc_Content.SetValueS32(-static_cast<sint32>(u64_Max));
-            break;
-         case C_OSCNodeDataPoolContent::eSINT64:
-            orc_Content.SetValueS64(-static_cast<sint64>(u64_Max));
-            break;
-         default:
-            s32_Retval = C_CONFIG;
-            break;
-         }
-      }
-      //Float
-      if (q_IsFloat == true)
-      {
-         switch (orc_Content.GetType())
-         {
-         case C_OSCNodeDataPoolContent::eFLOAT32:
-            orc_Content.SetValueF32(-std::numeric_limits<float32>::max());
-            break;
-         case C_OSCNodeDataPoolContent::eFLOAT64:
-            orc_Content.SetValueF64(-std::numeric_limits<float64>::max());
-            break;
-         default:
-            s32_Retval = C_CONFIG;
-            break;
-         }
-      }
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set content to maximum allowed value
-
-   \param[in,out]  orc_Content      Content to set
-   \param[in]      ou16_BitLength   Signal bit length
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueSignalPropertiesWidget::mh_InitMax(C_OSCNodeDataPoolContent & orc_Content, const uint16 ou16_BitLength)
-{
-   sint32 s32_Retval = C_NO_ERR;
-   bool q_IsUnsigned = false;
-   bool q_IsSigned = false;
-   bool q_IsFloat = false;
-
-   //Check type is realistic for number of bits
-   switch (orc_Content.GetType())
-   {
-   case C_OSCNodeDataPoolContent::eUINT8:
-      if (ou16_BitLength > 8)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsUnsigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eUINT16:
-      if (ou16_BitLength > 16)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsUnsigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eUINT32:
-      if (ou16_BitLength > 32)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsUnsigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eUINT64:
-      if (ou16_BitLength > 64)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsUnsigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eSINT8:
-      if (ou16_BitLength > 8)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsSigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eSINT16:
-      if (ou16_BitLength > 16)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsSigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eSINT32:
-      if (ou16_BitLength > 32)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsSigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eSINT64:
-      if (ou16_BitLength > 64)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsSigned = true;
-      break;
-   case C_OSCNodeDataPoolContent::eFLOAT32:
-      if (ou16_BitLength > 32)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsFloat = true;
-      break;
-   case C_OSCNodeDataPoolContent::eFLOAT64:
-      if (ou16_BitLength > 64)
-      {
-         s32_Retval = C_RANGE;
-      }
-      q_IsFloat = true;
-      break;
-   default:
-      s32_Retval = C_RANGE;
-      break;
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      //Unsigned
-      if (q_IsUnsigned == true)
-      {
-         uint64 u64_Max = 0;
-
-         for (uint16 u16_ItBit = 0; u16_ItBit < ou16_BitLength; ++u16_ItBit)
-         {
-            u64_Max += 1ULL << static_cast<uint64>(u16_ItBit);
-         }
-
-         switch (orc_Content.GetType())
-         {
-         case C_OSCNodeDataPoolContent::eUINT8:
-            orc_Content.SetValueU8(static_cast<uint8>(u64_Max));
-            break;
-         case C_OSCNodeDataPoolContent::eUINT16:
-            orc_Content.SetValueU16(static_cast<uint16>(u64_Max));
-            break;
-         case C_OSCNodeDataPoolContent::eUINT32:
-            orc_Content.SetValueU32(static_cast<uint32>(u64_Max));
-            break;
-         case C_OSCNodeDataPoolContent::eUINT64:
-            orc_Content.SetValueU64(u64_Max);
-            break;
-         default:
-            s32_Retval = C_CONFIG;
-            break;
-         }
-      }
-      //Signed
-      if (q_IsSigned == true)
-      {
-         uint64 u64_Max = 0;
-
-         //We need exactly one more than half of the unsigned maximum
-         if (ou16_BitLength > 0U)
-         {
-            u64_Max += 1ULL << (static_cast<uint64>(ou16_BitLength) - 1ULL);
-         }
-
-         switch (orc_Content.GetType())
-         {
-         case C_OSCNodeDataPoolContent::eSINT8:
-            orc_Content.SetValueS8(static_cast<sint8>(u64_Max - 1U));
-            break;
-         case C_OSCNodeDataPoolContent::eSINT16:
-            orc_Content.SetValueS16(static_cast<sint16>(u64_Max - 1U));
-            break;
-         case C_OSCNodeDataPoolContent::eSINT32:
-            orc_Content.SetValueS32(static_cast<sint32>(u64_Max - 1UL));
-            break;
-         case C_OSCNodeDataPoolContent::eSINT64:
-            orc_Content.SetValueS64(static_cast<sint64>(u64_Max - 1ULL));
-            break;
-         default:
-            s32_Retval = C_CONFIG;
-            break;
-         }
-      }
-      //Float
-      if (q_IsFloat == true)
-      {
-         switch (orc_Content.GetType())
-         {
-         case C_OSCNodeDataPoolContent::eFLOAT32:
-            orc_Content.SetValueF32(std::numeric_limits<float32>::max());
-            break;
-         case C_OSCNodeDataPoolContent::eFLOAT64:
-            orc_Content.SetValueF64(std::numeric_limits<float64>::max());
-            break;
-         default:
-            s32_Retval = C_CONFIG;
-            break;
-         }
-      }
    }
    return s32_Retval;
 }
@@ -1776,7 +1425,7 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
          orc_Changes.push_back(eCHA_MIN);
          orc_Changes.push_back(eCHA_MAX);
          //Restricted values
-         //lint -e{1960} If due to rounding a inaccuracy exists, it is good that the comparison fails. It will be reset.
+         //lint -e{9137} If due to rounding a inaccuracy exists, it is good that the comparison fails. It will be reset.
          if (((pc_Message != NULL) && (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE)) ||
              (this->mc_DataUiSignalCommon.q_AutoMinMaxActive == false) ||
              (this->mc_DataOSCSignalCommon.f64_Factor != 1.0) ||
@@ -1885,7 +1534,8 @@ void C_SdBueSignalPropertiesWidget::m_HandleMinValueRange()
 {
    if (this->mc_DataUiSignalCommon.q_AutoMinMaxActive == true)
    {
-      mh_InitMin(this->mc_DataOSCSignalCommon.c_MinValue, this->mc_DataOSCSignal.u16_ComBitLength);
+      C_SdNdeDpContentUtil::h_InitMinForSignal(this->mc_DataOSCSignalCommon.c_MinValue,
+                                               this->mc_DataOSCSignal.u16_ComBitLength);
    }
    else
    {
@@ -1902,7 +1552,8 @@ void C_SdBueSignalPropertiesWidget::m_HandleMaxValueRange()
 {
    if (this->mc_DataUiSignalCommon.q_AutoMinMaxActive == true)
    {
-      mh_InitMax(this->mc_DataOSCSignalCommon.c_MaxValue, this->mc_DataOSCSignal.u16_ComBitLength);
+      C_SdNdeDpContentUtil::h_InitMaxForSignal(this->mc_DataOSCSignalCommon.c_MaxValue,
+                                               this->mc_DataOSCSignal.u16_ComBitLength);
    }
    else
    {
@@ -2368,7 +2019,7 @@ void C_SdBueSignalPropertiesWidget::m_SendSignalForChange(const C_SdBueSignalPro
 /*! \brief  Connect all update functions
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_ConnectAll(void)
+void C_SdBueSignalPropertiesWidget::m_ConnectAll(void) const
 {
    //Special
    connect(this->mpc_Ui->pc_LineEditName, &QLineEdit::textChanged, this,
@@ -2426,7 +2077,7 @@ void C_SdBueSignalPropertiesWidget::m_ConnectAll(void)
 /*! \brief  Disconnect all update functions
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_DisconnectAll(void)
+void C_SdBueSignalPropertiesWidget::m_DisconnectAll(void) const
 {
    //Special
    disconnect(this->mpc_Ui->pc_LineEditName, &QLineEdit::textChanged, this,

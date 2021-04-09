@@ -106,6 +106,8 @@ private:
    void m_SelectRow(const stw_types::sint32 os32_Row, const QItemSelectionModel::SelectionFlags & orc_Flags);
    void m_HandleCheckChange(const QModelIndex & orc_Index);
    void m_RegisterAllCyclicMessages(void);
+   void m_Report(const stw_opensyde_gui_elements::C_OgeWiCustomMessage::E_Type oe_Type, const QString & orc_Heading,
+                 const QString & orc_Description);
 
    //Avoid call
    C_CamGenTableView(const C_CamGenTableView &);

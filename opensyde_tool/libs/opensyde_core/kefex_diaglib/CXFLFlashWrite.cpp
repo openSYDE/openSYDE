@@ -10,13 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
 
-#include "DiagLib_config.h"  //diaglib configuration
+#include "DiagLib_config.h" //diaglib configuration
 
 #include <string.h>
 #include <limits.h> //for UCHAR_MAX
@@ -60,9 +60,9 @@ static const uint16 mu16_PROTOCOL_VERSION_3_00 = 0x3000U;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 void C_XFLFlashWrite::m_InitProtocol(const C_XFLFlashWriteParameters & orc_Params)
 {
-   CfgSetFlashId       (orc_Params.u32_SendID, orc_Params.u32_ReceiveID);
-   CfgSetXtdId         (orc_Params.q_XtdID);
-   CfgSetLocalId       (mu8_ActualLocalID);
+   CfgSetFlashId(orc_Params.u32_SendID, orc_Params.u32_ReceiveID);
+   CfgSetXtdId(orc_Params.q_XtdID);
+   CfgSetLocalId(mu8_ActualLocalID);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,6 +70,7 @@ void C_XFLFlashWrite::m_InitProtocol(const C_XFLFlashWriteParameters & orc_Param
 sint32 C_XFLFlashWrite::m_Wakeup(const C_XFLWakeupParameters & orc_Params)
 {
    sint32 s32_Return;
+
    s32_Return = PerformWakeup(orc_Params, &mu8_ActualLocalID);
    if (s32_Return == C_NO_ERR)
    {
@@ -85,7 +86,8 @@ void C_XFLFlashWrite::m_FlashingFinished(const E_XFLFlashFinishedAction oe_Actio
 {
    uint32 u32_Action;
    sint32 s32_Return;
-   E_XFLFlashFinishedAction eAction;
+   E_XFLFlashFinishedAction e_Action;
+
    if (oe_Action == eXFL_FLASH_FINISHED_ACTION_ASK_USER)
    {
       s32_Return = TRG_UserInteraction(eXFL_USER_INTERACTION_REASON_FINISHED, TGL_LoadStr(STR_FM_FLASHING_FINISHED),
@@ -95,14 +97,14 @@ void C_XFLFlashWrite::m_FlashingFinished(const E_XFLFlashFinishedAction oe_Actio
          u32_Action = static_cast<uint32>(eXFL_FLASH_FINISHED_ACTION_NONE);
       }
 
-      eAction = static_cast<E_XFLFlashFinishedAction>(u32_Action);
+      e_Action = static_cast<E_XFLFlashFinishedAction>(u32_Action);
    }
    else
    {
-      eAction = oe_Action;
+      e_Action = oe_Action;
    }
 
-   switch (eAction)
+   switch (e_Action)
    {
    case eXFL_FLASH_FINISHED_ACTION_NODE_RETURN:
       NodeReturn();
@@ -131,7 +133,6 @@ void C_XFLFlashWrite::m_FlashingFinished(const E_XFLFlashFinishedAction oe_Actio
       break;
    case eXFL_FLASH_FINISHED_ACTION_ASK_USER: //no break (already checked above)
    default:
-      tgl_assert(false);
       break;
    }
    this->TRG_ReportStatus(TGL_LoadStr(STR_FM_FINISHED), gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
@@ -158,7 +159,7 @@ sint32 C_XFLFlashWrite::m_GetVersionNumber(uint8 & oru8_Version, bool & orq_Sect
       TRG_ReportStatus(c_Text, gu8_DL_REPORT_STATUS_TYPE_ERROR);
       return -1;
    }
-   switch(u8_DLC)
+   switch (u8_DLC)
    {
    case 1U:
       oru8_Version = 0U;
@@ -167,7 +168,7 @@ sint32 C_XFLFlashWrite::m_GetVersionNumber(uint8 & oru8_Version, bool & orq_Sect
       oru8_Version = 1U;
       u32_Version = static_cast<uint32>(((static_cast<uint16>(au8_Version[0]) - 48U) * 100U) +
                                         ((static_cast<uint16>(au8_Version[1]) - 48U) * 10U) +
-                                         (static_cast<uint16>(au8_Version[2]) - 48U));
+                                        (static_cast<uint16>(au8_Version[2]) - 48U));
       if (u32_Version >= 202U)
       {
          orq_SectorBasedCRCsSupported = true;
@@ -205,6 +206,7 @@ sint32 C_XFLFlashWrite::m_WriteBlockBasedChecksums(void)
    sint32 s32_Return;
    sint32 s32_Index;
    uint32 u32_CheckSum;
+
    SCLDynamicArray<C_XFLChecksumBlock> c_Blocks;
 
    s32_Return = GetBlockAddressesAll(c_Blocks);
@@ -245,7 +247,7 @@ sint32 C_XFLFlashWrite::m_WriteBlockBasedChecksums(void)
 sint32 C_XFLFlashWrite::ExecuteWrite(const C_XFLFlashWriteParameters & orc_Params)
 {
    sint32 s32_Return;
-   uint8  u8_FlashloaderVersion;
+   uint8 u8_FlashloaderVersion;
    bool q_CRCsSupported = false;
    C_SCLString c_Text;
    uint32 u32_StartTime;
@@ -272,7 +274,8 @@ sint32 C_XFLFlashWrite::ExecuteWrite(const C_XFLFlashWriteParameters & orc_Param
       return C_CONFIG;
    }
 
-   mu8_ActualLocalID = orc_Params.c_WakeupConfig.u8_LocalID; //copied as it might change during the process when doing wakeup with SNR
+   mu8_ActualLocalID = orc_Params.c_WakeupConfig.u8_LocalID; //copied as it might change during the process when doing
+                                                             // wakeup with SNR
 
    u32_StartTime = TGL_GetTickCount();
 
@@ -322,9 +325,9 @@ sint32 C_XFLFlashWrite::ExecuteWrite(const C_XFLFlashWriteParameters & orc_Param
    else
    {
       c_Text.PrintFormatted(TGL_LoadStr(STR_FM_FL_PROTOCOL_VERSION).c_str(),
-                            static_cast<uint8>((u16_ProtocolVersion >> 12) & 0x0FU),
-                            static_cast<uint8>((u16_ProtocolVersion >> 8) & 0x0FU),
-                            static_cast<uint8>((u16_ProtocolVersion >> 4) & 0x0FU),
+                            static_cast<uint8>((u16_ProtocolVersion >> 12U) & 0x0FU),
+                            static_cast<uint8>((u16_ProtocolVersion >> 8U) & 0x0FU),
+                            static_cast<uint8>((u16_ProtocolVersion >> 4U) & 0x0FU),
                             static_cast<uint8>((u16_ProtocolVersion) & 0x0FU));
       TRG_ReportStatus(c_Text, gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
    }
@@ -335,7 +338,7 @@ sint32 C_XFLFlashWrite::ExecuteWrite(const C_XFLFlashWriteParameters & orc_Param
       return C_NOACT;
    }
 
-   u8_ChecksumType = 0U; //default: no checksums supported
+   u8_ChecksumType = 0U;         //default: no checksums supported
    c_FingerPrintIndexes.Clear(); //default: no finger printing supported
    mt_AvailableServices.Clear(); //default: no services available ...
 
@@ -348,8 +351,8 @@ sint32 C_XFLFlashWrite::ExecuteWrite(const C_XFLFlashWriteParameters & orc_Param
       s32_Return = GetImplementationInformationServices(mt_AvailableServices);
       if (s32_Return != C_NO_ERR)
       {
-          TRG_ReportStatus(TGL_LoadStr(STR_FM_ERR_READ_IMPL_INFO), gu8_DL_REPORT_STATUS_TYPE_ERROR);
-          return C_NOACT;
+         TRG_ReportStatus(TGL_LoadStr(STR_FM_ERR_READ_IMPL_INFO), gu8_DL_REPORT_STATUS_TYPE_ERROR);
+         return C_NOACT;
       }
 
       //"parse" availabality of features:
@@ -522,14 +525,14 @@ sint32 C_XFLFlashWrite::ExecuteWrite(const C_XFLFlashWriteParameters & orc_Param
    else               trouble
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_XFLFlashWrite::m_WriteFlashChecksums(const uint8 ou8_Mode,
-                                              const C_XFLWakeupParameters & orc_WakeupConfig)
+sint32 C_XFLFlashWrite::m_WriteFlashChecksums(const uint8 ou8_Mode, const C_XFLWakeupParameters & orc_WakeupConfig)
 {
    sint32 s32_Block;
    uint16 u16_Dummy;
    sint32 s32_Return = C_NO_ERR;
    C_XFLWakeupParameters c_WakeupParams;
    C_XFLChecksumAreas c_CRCs;
+
    switch (ou8_Mode)
    {
    case 1U: //sector based
@@ -597,7 +600,7 @@ sint32 C_XFLFlashWrite::m_WriteFlashChecksums(const uint8 ou8_Mode,
                //So for the user this could just be an information.
                //So we do not return an error if we only have this type of information.
                TRG_ReportStatus("Information: flash checksum of block " + C_SCLString::IntToStr(s32_Block) +
-                               " does not match the flash contents !", gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
+                                " does not match the flash contents !", gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
             }
             else
             {
@@ -740,8 +743,9 @@ sint32 C_XFLFlashWrite::m_SetAutoSectors(C_HexFile & orc_HexFile, const bool oq_
          //did the line occupy any defined memory range ?
          if ((q_FoundStartSector == false) || (q_FoundEndSector == false))
          {
-            c_Text.PrintFormatted("Error: Hex file data occupies unavailable memory !\n Data from 0x%X to 0x%X does not fit into an available flash sector !",
-                                  u32_StartAddress, u32_EndAddress);
+            c_Text.PrintFormatted(
+               "Error: Hex file data occupies unavailable memory !\n Data from 0x%X to 0x%X does not fit into an available flash sector !",
+               u32_StartAddress, u32_EndAddress);
             TRG_ReportStatus(c_Text, gu8_DL_REPORT_STATUS_TYPE_ERROR);
             return C_OVERFLOW;
          }
@@ -760,13 +764,12 @@ sint32 C_XFLFlashWrite::m_SetSectorsToErase(C_HexFile & orc_HexFile, const C_SCL
                                             C_XFLFlashInformation & orc_FlashInfo,
                                             const stw_types::uint16 ou16_ProtocolVersion)
 {
-   sint32 i;
    sint32 s32_Return;
-   uint16 u16_NumSectorsTotal = static_cast<uint16>(mau8_SectorsToErase.GetLength());
+   const uint16 u16_NumSectorsTotal = static_cast<uint16>(mau8_SectorsToErase.GetLength());
 
-   for (i = 0; i < mau8_SectorsToErase.GetLength(); i++)
+   for (sint32 s32_Sector = 0; s32_Sector < mau8_SectorsToErase.GetLength(); s32_Sector++)
    {
-      mau8_SectorsToErase[i] = 0U;
+      mau8_SectorsToErase[s32_Sector] = 0U;
    }
 
    //do some plausibility checks:
@@ -774,13 +777,13 @@ sint32 C_XFLFlashWrite::m_SetSectorsToErase(C_HexFile & orc_HexFile, const C_SCL
    {
       switch (orc_Params.e_EraseMode)
       {
-      case eXFL_ERASE_MODE_USER_DEFINED:  //no break
-      case eXFL_ERASE_MODE_AUTOMATIC:     //no break
-         break; //valid
+      case eXFL_ERASE_MODE_USER_DEFINED: //no break
+      case eXFL_ERASE_MODE_AUTOMATIC:    //no break
+         break;                          //valid
       case eXFL_ERASE_MODE_C_APPLICATION:
          //issue a warning, that this might not be a very good selection:
          TRG_ReportStatus(TGL_LoadStr(STR_FDL_HINT_USE_AUTO_MODE), gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
-         break; //valid
+         break;                             //valid
       case eXFL_ERASE_MODE_CANOPEN_CONFIG:  //no break
       case eXFL_ERASE_MODE_IEC_APPLICATION: //no break
       case eXFL_ERASE_MODE_IEC_RUN_TIME_SYSTEM:
@@ -813,9 +816,9 @@ sint32 C_XFLFlashWrite::m_SetSectorsToErase(C_HexFile & orc_HexFile, const C_SCL
       }
       else
       {
-         for (i = 1; i < u16_NumSectorsTotal; i++) //erase everything except sector 0
+         for (uint16 u16_Sector = 1; u16_Sector < u16_NumSectorsTotal; u16_Sector++) //erase everything except sector 0
          {
-            mau8_SectorsToErase[i] = 1U;
+            mau8_SectorsToErase[u16_Sector] = 1U;
          }
          if (orc_Params.q_DivertStream == true) //BBB -> don't erase parameter blocks
          {
@@ -844,7 +847,7 @@ sint32 C_XFLFlashWrite::m_SetSectorsToErase(C_HexFile & orc_HexFile, const C_SCL
    case eXFL_ERASE_MODE_IEC_APPLICATION:
       switch (u16_NumSectorsTotal)
       {
-      case 7U:  //512kB Intel Flash
+      case 7U: //512kB Intel Flash
          mau8_SectorsToErase[5] = 1U;
          mau8_SectorsToErase[6] = 1U;
          break;
@@ -874,7 +877,7 @@ sint32 C_XFLFlashWrite::m_SetSectorsToErase(C_HexFile & orc_HexFile, const C_SCL
    case eXFL_ERASE_MODE_IEC_RUN_TIME_SYSTEM:
       switch (u16_NumSectorsTotal)
       {
-      case 7U:  //512kB Intel Flash
+      case 7U:                       //512kB Intel Flash
          if (orc_DeviceID == "MICR") //ESX micro RTS is also in sectors 1 and 2
          {
             mau8_SectorsToErase[1] = 1U;
@@ -931,15 +934,14 @@ sint32 C_XFLFlashWrite::m_SetUserDefinedSectors(const C_SCLString & orc_Sectors)
    uint16 u16_Index;
    uint16 u16_Value;
    uint16 u16_Value2;
-   uint32 i;
-   uint16 j;
    C_SCLString c_Help;
    C_SCLString c_Help2;
-   C_SCLStringList * pc_Strings;
+   C_SCLStringList c_Strings;
    charn * pcn_String;
-   for (i = 0; i < static_cast<uint32>(mau8_SectorsToErase.GetLength()); i++)
+
+   for (uint32 u32_Sector = 0; u32_Sector < static_cast<uint32>(mau8_SectorsToErase.GetLength()); u32_Sector++)
    {
-      mau8_SectorsToErase[i] = 0U; //first set all sectors to not being erased
+      mau8_SectorsToErase[u32_Sector] = 0U; //first set all sectors to not being erased
    }
 
    //Code could be cleaned up by using C_SCLString::Tokenize.
@@ -947,40 +949,39 @@ sint32 C_XFLFlashWrite::m_SetUserDefinedSectors(const C_SCLString & orc_Sectors)
    pcn_String = new charn[static_cast<uintn>(orc_Sectors.Length() + 1)];
    (void)memcpy(pcn_String, orc_Sectors.c_str(), orc_Sectors.Length());
    pcn_String[orc_Sectors.Length()] = '\0'; //terminate target string ...
-   u16_Index = 0U; //index of last "start of string"
-   pc_Strings = new C_SCLStringList();
-   for (i = 0U; i < orc_Sectors.Length(); i++)
+   u16_Index = 0U;                          //index of last "start of string"
+   for (uint32 u32_Sector = 0U; u32_Sector < orc_Sectors.Length(); u32_Sector++)
    {
-      if (pcn_String[i] == ',')
+      if (pcn_String[u32_Sector] == ',')
       {
-         pcn_String[i] = '\0'; //separate tokens by terminating with "0"
+         pcn_String[u32_Sector] = '\0'; //separate tokens by terminating with "0"
 
          c_Help = (static_cast<C_SCLString>(&pcn_String[u16_Index])).Trim();
          if (c_Help != "") //ignore "empty" commas
          {
-            (void)pc_Strings->Add(c_Help);
+            (void)c_Strings.Add(c_Help);
          }
-         u16_Index = static_cast<uint16>(i + 1);
+         u16_Index = static_cast<uint16>(u32_Sector + 1);
       }
    }
    //get last token:
    c_Help = (static_cast<C_SCLString>(&pcn_String[u16_Index])).Trim();
    if (c_Help != "") //ignore "empty" commas
    {
-      (void)pc_Strings->Add(c_Help);
+      (void)c_Strings.Add(c_Help);
    }
 
-   delete []pcn_String;
+   delete[] pcn_String;
 
    //now go through list of all tokens:
-   for (i = 0U; i < pc_Strings->GetCount(); i++)
+   for (uint32 u32_Sector = 0U; u32_Sector < c_Strings.GetCount(); u32_Sector++)
    {
-      if (pc_Strings->Strings[i].Pos("-") != 0)
+      if (c_Strings.Strings[u32_Sector].Pos("-") != 0)
       {
          //it's a "from - to" area
-         c_Help  = pc_Strings->Strings[i].SubString(1U, pc_Strings->Strings[i].Pos("-") - 1U).Trim();
-         c_Help2 = pc_Strings->Strings[i].SubString(pc_Strings->Strings[i].Pos("-") + 1U,
-                                                    pc_Strings->Strings[i].Length()).Trim();
+         c_Help  = c_Strings.Strings[u32_Sector].SubString(1U, c_Strings.Strings[u32_Sector].Pos("-") - 1U).Trim();
+         c_Help2 = c_Strings.Strings[u32_Sector].SubString(c_Strings.Strings[u32_Sector].Pos("-") + 1U,
+                                                           c_Strings.Strings[u32_Sector].Length()).Trim();
          try
          {
             u16_Value  = static_cast<uint16>(c_Help.ToInt());
@@ -988,18 +989,16 @@ sint32 C_XFLFlashWrite::m_SetUserDefinedSectors(const C_SCLString & orc_Sectors)
          }
          catch (...)
          {
-            delete pc_Strings;
             return -1;
          }
          if ((u16_Value2 < u16_Value) || (u16_Value >= static_cast<uint16>(mau8_SectorsToErase.GetLength())))
          {
             TRG_ReportStatus(TGL_LoadStr(STR_FDL_ERR_SEC_ERASE_INV2), gu8_DL_REPORT_STATUS_TYPE_ERROR);
-            delete pc_Strings;
             return -1;
          }
-         for (j = u16_Value; j <= u16_Value2; j++)
+         for (uint16 u16_IndexValue = u16_Value; u16_IndexValue <= u16_Value2; u16_IndexValue++)
          {
-            mau8_SectorsToErase[j] = 1U;
+            mau8_SectorsToErase[u16_IndexValue] = 1U;
          }
       }
       else
@@ -1007,23 +1006,20 @@ sint32 C_XFLFlashWrite::m_SetUserDefinedSectors(const C_SCLString & orc_Sectors)
          //simple value
          try
          {
-            u16_Value = static_cast<uint16>(pc_Strings->Strings[i].ToInt());
+            u16_Value = static_cast<uint16>(c_Strings.Strings[u32_Sector].ToInt());
          }
          catch (...)
          {
-            delete pc_Strings;
             return -1;
          }
          if (u16_Value >= static_cast<uint16>(mau8_SectorsToErase.GetLength()))
          {
             TRG_ReportStatus(TGL_LoadStr(STR_FDL_ERR_SEC_ERASE_INV2), gu8_DL_REPORT_STATUS_TYPE_ERROR);
-            delete pc_Strings;
             return -1;
          }
          mau8_SectorsToErase[u16_Value] = 1U;
       }
    }
-   delete pc_Strings;
    return C_NO_ERR;
 }
 
@@ -1079,7 +1075,6 @@ sint32 C_XFLFlashWrite::m_WriteStartFingerPrint(const C_XFLFingerPrintSupportedI
       {
          TRG_ReportStatus(TGL_LoadStr(STR_FDL_ERR_RD_USER_NAME), gu8_DL_REPORT_STATUS_TYPE_WARNING);
          c_UserName = "unknown";
-
       }
       TRG_ReportStatus(TGL_LoadStr(STR_FDL_TXT_REC_USER_N_P1) + c_UserName + TGL_LoadStr(STR_FDL_TXT_REC_USER_N_P2),
                        gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
@@ -1110,7 +1105,6 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
                                           const C_XFLFlashWriteParameters & orc_Params,
                                           const stw_types::uint16 ou16_ProtocolVersion)
 {
-   sint32 i;
    sint32 s32_Return2;
    uint32 u32_LineCount = 0U;
    uint16 u16_NumSentNow;
@@ -1217,7 +1211,7 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
       }
 
       m_ReportVerboseStatus(TGL_LoadStr(STR_FDL_TXT_CHG_HEX_REC_LENGTH) +
-                              C_SCLString::IntToStr(u8_RecordLength) + ")");
+                            C_SCLString::IntToStr(u8_RecordLength) + ")");
 
       u32_Return = c_HexFile.Optimize(u8_RecordLength);
       if (u32_Return != NO_ERR)
@@ -1231,7 +1225,7 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
       if (orc_Params.u8_HexRecordLength != 0U)
       {
          m_ReportVerboseStatus(TGL_LoadStr(STR_FDL_TXT_DO_CHG_HEX_REC_LENGTH) +
-                                 C_SCLString::IntToStr(orc_Params.u8_HexRecordLength));
+                               C_SCLString::IntToStr(orc_Params.u8_HexRecordLength));
 
          u32_Return = c_HexFile.Optimize(orc_Params.u8_HexRecordLength);
          if (u32_Return != static_cast<uint32>(C_NO_ERR))
@@ -1250,40 +1244,40 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
    }
 
    c_Text = TGL_LoadStr(STR_FDL_SEC_ERASE) + " ";
-   for (i = 0; i < mau8_SectorsToErase.GetLength(); i++)
+   for (sint32 s32_Sector = 0; s32_Sector < mau8_SectorsToErase.GetLength(); s32_Sector++)
    {
-      if (mau8_SectorsToErase[i] == 1U)
+      if (mau8_SectorsToErase[s32_Sector] == 1U)
       {
-         c_Text = c_Text + C_SCLString::IntToStr(i) + " ";
+         c_Text = c_Text + C_SCLString::IntToStr(s32_Sector) + " ";
       }
    }
    TRG_ReportStatus(c_Text, gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
    TRG_ReportStatus(TGL_LoadStr(STR_FDL_ERASING), gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
    u32_OldTimeTotal = TGL_GetTickCount();
 
-   for (i = 0; i < mau8_SectorsToErase.GetLength(); i++)
+   for (sint32 s32_Sector = 0; s32_Sector < mau8_SectorsToErase.GetLength(); s32_Sector++)
    {
-      if (mau8_SectorsToErase[i] == 1U)
+      if (mau8_SectorsToErase[s32_Sector] == 1U)
       {
-         c_Text = TGL_LoadStr(STR_FDL_ERASING_SECTOR) + " " + C_SCLString::IntToStr(i);
+         c_Text = TGL_LoadStr(STR_FDL_ERASING_SECTOR) + " " + C_SCLString::IntToStr(s32_Sector);
          TRG_ReportStatus("<<<CLRLINE", gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
          TRG_ReportStatus(c_Text, gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
 
          if (ou16_ProtocolVersion >= mu16_PROTOCOL_VERSION_3_00)
          {
             //pass erase timeout read with ::ReadFlashInformation
-            s32_Return = this->EraseSector(static_cast<uint16>(i),
-                                           t_FlashInfo.GetEraseTimeByLinearSectorNumber(static_cast<uint16>(i)));
+            s32_Return = this->EraseSector(static_cast<uint16>(s32_Sector),
+                                           t_FlashInfo.GetEraseTimeByLinearSectorNumber(static_cast<uint16>(s32_Sector)));
          }
          else
          {
             //use default timeout
-            s32_Return = this->EraseSector(static_cast<uint16>(i));
+            s32_Return = this->EraseSector(static_cast<uint16>(s32_Sector));
          }
          if (s32_Return != C_NO_ERR)
          {
-            c_Text = TGL_LoadStr(STR_FDL_ERR_ERASE) + " " + C_SCLString::IntToStr(i)
-                     + ": " + C_XFLActions::XFLProtocolErrorToText(s32_Return, GetLastXFLError());
+            c_Text = TGL_LoadStr(STR_FDL_ERR_ERASE) + " " + C_SCLString::IntToStr(s32_Sector) +
+                     ": " + C_XFLActions::XFLProtocolErrorToText(s32_Return, GetLastXFLError());
             TRG_ReportStatus(c_Text, gu8_DL_REPORT_STATUS_TYPE_ERROR);
             return -1;
          }
@@ -1304,8 +1298,8 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
    s32_Return = ProgFlash();
    if (s32_Return != C_NO_ERR)
    {
-       TRG_ReportStatus(TGL_LoadStr(STR_FDL_ERR_ENTER_PROG_MODE), gu8_DL_REPORT_STATUS_TYPE_ERROR);
-       return -1;
+      TRG_ReportStatus(TGL_LoadStr(STR_FDL_ERR_ENTER_PROG_MODE), gu8_DL_REPORT_STATUS_TYPE_ERROR);
+      return -1;
    }
 
    {
@@ -1316,7 +1310,7 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
       if (s32_Size != -1)
       {
          m_ReportVerboseStatus(TGL_LoadStr(STR_FILESIZE) + " " + C_SCLString::IntToStr(s32_Size) +
-                                 TGL_LoadStr(STR_FDL_BYTES));
+                               TGL_LoadStr(STR_FDL_BYTES));
          TGL_FileAgeString(orc_Params.c_HexFile, c_Text);
          m_ReportVerboseStatus(TGL_LoadStr(STR_TIMESTAMP) + " " + c_Text);
       }
@@ -1336,7 +1330,7 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
       u32_OldTime = TGL_GetTickCount();
       u32_NumSentProgress = 0U;
 
-      for(;;)
+      for (;;)
       {
          //send 5 lines per call; bigger blocks might result in the callbacks not executed for a long time with slow
          // communication bitrates
@@ -1382,7 +1376,7 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
          //do not update too often; might cause flickering in the application
          if (((TGL_GetTickCount() - u32_OldTime) > 750U) || (u32_LineCount == u32_NumLinesTotal))
          {
-            uint32 u32_Diff = TGL_GetTickCount() - u32_OldTime;
+            const uint32 u32_Diff = TGL_GetTickCount() - u32_OldTime;
 
             c_Text.PrintFormatted("%s %d / %d", TGL_LoadStr(STR_FM_LINE).c_str(), u32_LineCount, u32_NumLinesTotal);
             TRG_ReportStatus("<<<CLRLINE", gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
@@ -1392,7 +1386,7 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
             if (u32_Diff != 0U)
             {
                f32_Rate = ((((static_cast<float32>(u32_NumSentProgress)) / 1024.0F) /
-                             (static_cast<float32>(u32_Diff))) * 1000.0F);
+                            (static_cast<float32>(u32_Diff))) * 1000.0F);
                c_Text.PrintFormatted("%s %d / %d at %2.2fkB/s", TGL_LoadStr(STR_FDL_BYTE).c_str(), u32_NumBytesFlashed,
                                      u32_NumBytesTotal, f32_Rate);
             }
@@ -1462,6 +1456,7 @@ void C_XFLFlashWrite::m_ReportVerboseStatus(const C_SCLString & orc_StatusText)
 sint32 C_XFLFlashWrite::m_WriteFingerPrintCheckSum(const bool oq_FingerPrintAvailable, const uint32 ou32_Checksum)
 {
    sint32 s32_Return;
+
    if (oq_FingerPrintAvailable == false)
    {
       return C_NO_ERR; //nothing to do ...
@@ -1495,14 +1490,15 @@ sint32 C_XFLFlashWrite::m_WriteFingerPrintCheckSum(const bool oq_FingerPrintAvai
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWrite::m_ScanDeviceIDFromHexFile(const uint32 ou32_StartAddress,
-                                                    const bool oq_FailIfNotFoundAtStartAddress,
-                                                    C_XFLHexFile & orc_HexFile, C_SCLString & orc_DeviceID) const
+                                                  const bool oq_FailIfNotFoundAtStartAddress,
+                                                  C_XFLHexFile & orc_HexFile, C_SCLString & orc_DeviceID) const
 {
    sint32 s32_Return;
    sint32 s32_Index;
    C_SCLString c_DeviceID = "";
    C_SCLString c_Help;
-   SCLDynamicArray <C_XFLECUInformation> ac_InfoBlocks;
+
+   SCLDynamicArray<C_XFLECUInformation> ac_InfoBlocks;
    s32_Return = orc_HexFile.GetECUInformationBlocks(ac_InfoBlocks, ou32_StartAddress, oq_FailIfNotFoundAtStartAddress,
                                                     oq_FailIfNotFoundAtStartAddress, true);
    if ((s32_Return != C_NO_ERR) || (ac_InfoBlocks.GetLength() == 0))
@@ -1569,7 +1565,7 @@ sint32 C_XFLFlashWrite::m_DoDeviceIDXCheck(C_XFLHexFile & orc_HexFile, const C_S
                                            const C_XFLFlashWriteParameters & orc_Params,
                                            const uint16 ou16_ProtocolVersion)
 {
-   SCLDynamicArray<uint32> u32_StartAddresses;
+   SCLDynamicArray<uint32> c_StartAddresses;
    uint32 u32_StartAddress = 0U;
    bool q_ExactAddressRequired;
    sint32 s32_Return;
@@ -1599,15 +1595,15 @@ sint32 C_XFLFlashWrite::m_DoDeviceIDXCheck(C_XFLHexFile & orc_HexFile, const C_S
       m_ReportVerboseStatus(TGL_LoadStr(STR_FDL_TXT_ID_CHECKING));
       if (mt_AvailableServices.q_GetDeviceInfoAddress == true)
       {
-         s32_Return = GetDeviceInfoAddresses(u32_StartAddresses, ou16_ProtocolVersion);
-         if ((s32_Return != C_NO_ERR) || (u32_StartAddresses.GetLength() == 0))
+         s32_Return = GetDeviceInfoAddresses(c_StartAddresses, ou16_ProtocolVersion);
+         if ((s32_Return != C_NO_ERR) || (c_StartAddresses.GetLength() == 0))
          {
             m_ReportVerboseStatus(TGL_LoadStr(STR_FDL_TXT_ID_CHECK_NODE_HEX));
          }
          else
          {
             //first one is used for this purpose:
-            u32_StartAddress = u32_StartAddresses[0];
+            u32_StartAddress = c_StartAddresses[0];
          }
       }
       else
@@ -1621,8 +1617,8 @@ sint32 C_XFLFlashWrite::m_DoDeviceIDXCheck(C_XFLHexFile & orc_HexFile, const C_S
       m_ReportVerboseStatus(TGL_LoadStr(STR_FDL_TXT_ID_CHECKING));
       if (mt_AvailableServices.q_GetDeviceInfoAddress == true)
       {
-         s32_Return = GetDeviceInfoAddresses(u32_StartAddresses, ou16_ProtocolVersion);
-         if ((s32_Return != C_NO_ERR) || (u32_StartAddresses.GetLength() == 0))
+         s32_Return = GetDeviceInfoAddresses(c_StartAddresses, ou16_ProtocolVersion);
+         if ((s32_Return != C_NO_ERR) || (c_StartAddresses.GetLength() == 0))
          {
             TRG_ReportStatus(TGL_LoadStr(STR_FDL_ERR_ID_CHECK_RD_NODE),
                              gu8_DL_REPORT_STATUS_TYPE_ERROR);
@@ -1631,7 +1627,7 @@ sint32 C_XFLFlashWrite::m_DoDeviceIDXCheck(C_XFLHexFile & orc_HexFile, const C_S
          else
          {
             //first one is used for this purpose:
-            u32_StartAddress = u32_StartAddresses[0];
+            u32_StartAddress = c_StartAddresses[0];
          }
       }
       else
@@ -1649,7 +1645,7 @@ sint32 C_XFLFlashWrite::m_DoDeviceIDXCheck(C_XFLHexFile & orc_HexFile, const C_S
    if (s32_Return == C_NO_ERR) //maybe there was already an error getting the address with the ...._THEN_FAIL option
    {
       s32_Return = this->m_ScanDeviceIDFromHexFile(u32_StartAddress, q_ExactAddressRequired, orc_HexFile,
-                                                     c_DeviceIDHexFile);
+                                                   c_DeviceIDHexFile);
       switch (s32_Return)
       {
       case C_NO_ERR:
@@ -1752,10 +1748,10 @@ sint32 C_XFLFlashWrite::TRG_UserInteraction(const E_XFLUserInteractionReason oe_
    (void)oe_Reason;
    (void)orc_MessageText;
    (void)oru32_AdditionalValue;
-   TRG_ReportStatus("CXFLDownload configuration error: Configuration requires user interaction, but TRG_UserInteraction is not overloaded !",
-                    gu8_DL_REPORT_STATUS_TYPE_ERROR);
+   TRG_ReportStatus(
+      "CXFLDownload configuration error: Configuration requires user interaction, but TRG_UserInteraction is not overloaded !",
+      gu8_DL_REPORT_STATUS_TYPE_ERROR);
    return C_CONFIG;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-

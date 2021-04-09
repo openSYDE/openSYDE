@@ -37,12 +37,14 @@ public:
 
    static bool h_IsScalingActive(const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset);
    static stw_types::float64 h_GetValueScaled(const stw_types::float64 of64_Value, const stw_types::float64 of64_Factor,
-                                              const stw_types::float64 of64_Offset);
+                                              const stw_types::float64 of64_Offset,
+                                              const bool oq_AllowRangeAdaptation = true);
    static stw_types::float64 h_GetValueUnscaled(const stw_types::float64 of64_Value,
                                                 const stw_types::float64 of64_Factor,
                                                 const stw_types::float64 of64_Offset);
    static stw_scl::C_SCLString h_SerialNumberToString(const stw_types::uint8 * const opu8_SerialNumber);
    static void h_FileToString(const stw_scl::C_SCLString & orc_FilePath, stw_scl::C_SCLString & orc_OutputString);
+   static void h_RangeCheckFloat(stw_types::float64 & orf64_Value);
 
 private:
    static const stw_types::float64 mhf64_Epsilon;

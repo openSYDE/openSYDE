@@ -340,35 +340,37 @@ void C_SdBueMessageSignalEditWidget::SelectName(void) const
 void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected, QString & orc_MessageName,
                                                       bool & orq_SignalSelected, QString & orc_SignalName) const
 {
-   orq_MessageSelected = this->mpc_Ui->pc_MsgPropertiesWidget->isVisible();
-   orq_SignalSelected = this->mpc_Ui->pc_SigPropertiesWidget->isVisible();
-   if (orq_MessageSelected == true)
+   // do not use visibility of signal/message properties widget here, because they might be already invisible
+   orq_MessageSelected = false;
+   orq_SignalSelected = false;
+
+   // check if message is selected (matching IDs vector is empty if signal is selected)
+   const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingIds =
+      this->mpc_Ui->pc_MsgPropertiesWidget->GetMatchingMessageIds();
+   if (c_MatchingIds.size() > 0UL)
    {
-      const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingIds =
-         this->mpc_Ui->pc_MsgPropertiesWidget->GetMatchingMessageIds();
-      if (c_MatchingIds.size() > 0UL)
+      const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MatchingIds[0]);
+      if (pc_Message != NULL)
       {
-         const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MatchingIds[0]);
-         if (pc_Message != NULL)
-         {
-            orc_MessageName = pc_Message->c_Name.c_str();
-         }
+         orc_MessageName = pc_Message->c_Name.c_str();
+         orq_MessageSelected = true;
       }
    }
-   if (orq_SignalSelected == true)
+
+   // if no message is selected, check for signal selection
+   if (orq_MessageSelected == false)
    {
       const C_OSCCanMessageIdentificationIndices c_Id = this->mpc_Ui->pc_SigPropertiesWidget->GetMessageId();
       const uint32 u32_SignalIndex = this->mpc_Ui->pc_SigPropertiesWidget->GetSignalIndex();
       const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_Id);
       const C_OSCNodeDataPoolListElement * const pc_Signal =
          C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_Id, u32_SignalIndex);
-      if (pc_Message != NULL)
+      if ((pc_Message != NULL) && (pc_Signal != NULL))
       {
          orc_MessageName = pc_Message->c_Name.c_str();
-      }
-      if (pc_Signal != NULL)
-      {
          orc_SignalName = pc_Signal->c_Name.c_str();
+         orq_MessageSelected = false;
+         orq_SignalSelected = true;
       }
    }
 }
@@ -386,7 +388,7 @@ void C_SdBueMessageSignalEditWidget::RefreshColors(void) const
 /*! \brief   Reconnect update signals for fields which signal changes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::ConnectAllChanges(void)
+void C_SdBueMessageSignalEditWidget::ConnectAllChanges(void) const
 {
    this->mpc_Ui->pc_MsgPropertiesWidget->ConnectAllChanges();
 }
@@ -395,7 +397,7 @@ void C_SdBueMessageSignalEditWidget::ConnectAllChanges(void)
 /*! \brief   Disconnect update signals for fields which signal changes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::DisconnectAllChanges(void)
+void C_SdBueMessageSignalEditWidget::DisconnectAllChanges(void) const
 {
    this->mpc_Ui->pc_MsgPropertiesWidget->DisconnectAllChanges();
 }

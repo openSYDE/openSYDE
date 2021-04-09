@@ -12,11 +12,10 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
-#include <QTimer>
 
 #include "stwtypes.h"
 
-#include "C_SyvDaDashboardScene.h"
+#include "C_SyvDaDashboardContentBaseWidget.h"
 #include "C_SyvComDriverDiag.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -38,13 +37,13 @@ class C_SyvDaDashboardWidget :
    Q_OBJECT
 
 public:
-   explicit C_SyvDaDashboardWidget(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_DataIndex,
+   explicit C_SyvDaDashboardWidget(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_DashboardIndex,
                                    const QString & orc_Name, const bool oq_Window, QWidget * const opc_Parent = NULL);
    ~C_SyvDaDashboardWidget();
 
    stw_types::uint32 GetViewIndex(void) const;
-   stw_types::uint32 GetDataIndex(void) const;
-   void SetDataIndex(const stw_types::uint32 ou32_Value);
+   stw_types::uint32 GetDashboardIndex(void) const;
+   void SetDashboardIndex(const stw_types::uint32 ou32_Value);
    QString GetName(void) const;
 
    void SetEditMode(const bool oq_Active);
@@ -57,11 +56,8 @@ public:
    void UpdateShowValues(void) const;
    void UpdateTransmissionConfiguration(void) const;
    void HandleManualOperationFinished(const stw_types::sint32 os32_Result, const stw_types::uint8 ou8_NRC) const;
-   void SetErrorForFailedCyclicElementIdRegistrations(
-      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-      const std::vector<QString> & orc_FailedIdErrorDetails) const;
 
-   void SetSceneFocus(void) const;
+   void SetFocus(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -75,19 +71,18 @@ Q_SIGNALS:
    void SigDataPoolRead(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Index);
    void SigNvmReadList(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id);
 
-protected:
-   virtual void showEvent(QShowEvent * const opc_Event) override;
-
 private:
    //Avoid call
    C_SyvDaDashboardWidget(const C_SyvDaDashboardWidget &);
    C_SyvDaDashboardWidget & operator =(const C_SyvDaDashboardWidget &);
 
-   QTimer mc_UpdateTimer;
+   void m_InitSceneWidget(void);
+   void m_InitChartWidget(void);
+
    Ui::C_SyvDaDashboardWidget * mpc_Ui;
-   C_SyvDaDashboardScene * mpc_Scene;
+   C_SyvDaDashboardContentBaseWidget * mpc_Content; // Pointer to scene or chart
    const stw_types::uint32 mu32_ViewIndex;
-   stw_types::uint32 mu32_DataIndex;
+   stw_types::uint32 mu32_DashboardIndex;
    const QString mc_Name;
 };
 }

@@ -291,7 +291,7 @@ void C_SyvDaPeProgressBar::m_FillAlignmentComboBox(const sintn osn_Type) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::m_UpdatePreview(void)
 {
-   C_GiSvDaProgressBarBase * pc_Item = new C_GiSvDaProgressBarBase(0UL, 0UL, -1L, 0ULL, NULL);
+   C_GiSvDaProgressBarBase * const pc_Item = new C_GiSvDaProgressBarBase(0UL, 0UL, -1L, 0ULL, NULL);
    const QSizeF c_ItemSize(240.0, 100.0);
    //Do not use view center
    const QPointF c_ItemPos(6.0, 30.0);

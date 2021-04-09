@@ -209,7 +209,6 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
             c_Ids.push_back(c_CurrentMessageId);
          }
          {
-
             C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
                dynamic_cast<C_SdBueMessageSelectorTreeWidget * const>(opc_MessageTreeWidget);
             C_SdBueUnoMessageAddCommand * const pc_AddCommand = new C_SdBueUnoMessageAddCommand(c_Ids,
@@ -289,7 +288,6 @@ void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndice
             ++u32_CurrentSignalIndex;
          }
          {
-
             C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
                dynamic_cast<C_SdBueMessageSelectorTreeWidget * const>(opc_MessageTreeWidget);
             C_SdBueUnoSignalAddCommand * const pc_AddCommand = new C_SdBueUnoSignalAddCommand(c_MessageId,
@@ -339,7 +337,6 @@ void C_SdBueUnoManager::DoDeleteMessages(
          }
       }
       {
-
          C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
             dynamic_cast<C_SdBueMessageSelectorTreeWidget * const>(opc_MessageTreeWidget);
          new C_SdBueUnoMessageDeleteCommand(c_AllMessages, opc_MessageSyncManager, pc_MessageTreeWidget, pc_Parent);
@@ -402,7 +399,6 @@ void C_SdBueUnoManager::DoDeleteSignals(const std::vector<C_OSCCanMessageIdentif
 
       if (pc_Parent != NULL)
       {
-
          C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
             dynamic_cast<C_SdBueMessageSelectorTreeWidget * const>(opc_MessageTreeWidget);
          new C_SdBueUnoSignalDeleteCommand(orc_MessageId, orc_SignalIndex,

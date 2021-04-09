@@ -39,7 +39,7 @@ public:
 private:
    //Avoid call
    C_SdBueMlvBorderItem(const C_SdBueMlvBorderItem &);
-   C_SdBueMlvBorderItem & operator =(const C_SdBueMlvBorderItem &);
+   C_SdBueMlvBorderItem & operator =(const C_SdBueMlvBorderItem &); //lint !e1511 //we want to hide the base function
 
    const QString mc_Title;
    QColor mc_BackgroundColorInactive;

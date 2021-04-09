@@ -43,10 +43,10 @@ public:
                                                  const C_OSCNodeDataPoolContent::E_Type oe_Type,
                                                  const stw_scl::C_SCLString & orc_ArrayPos = "0");
 
-   static stw_scl::C_SCLString h_FloatToStrCutZeroes(const stw_types::float64 of64_Value,
-                                                     const bool oq_MakePrecise = false);
-   static stw_scl::C_SCLString h_FloatToStrCutZeroes(const stw_types::float32 of32_Value,
-                                                     const bool oq_MakePrecise = false);
+   static stw_scl::C_SCLString h_FloatToStrG(const stw_types::float32 of32_Value,  bool * const opq_InfOrNan = NULL);
+   static stw_scl::C_SCLString h_FloatToStrG(const stw_types::float64 of64_Value, bool * const opq_InfOrNan = NULL);
+   static bool h_CheckInfOrNan(const stw_scl::C_SCLString & orc_String);
+   static void h_AddDecimalPointIfNone(stw_scl::C_SCLString & orc_FloatString);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

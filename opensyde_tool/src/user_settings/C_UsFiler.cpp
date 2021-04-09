@@ -179,6 +179,7 @@ void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    const QString c_NodeIdDatapoolCount = static_cast<QString>("%1Datapool_count").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedDatapoolName = static_cast<QString>("%1Selected_datapool_name").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedProtocol = static_cast<QString>("%1Selected_protocol").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedInterface = static_cast<QString>("%1Selected_interface").arg(orc_NodeIdBase);
    const QList<QString> c_DatapoolKeyList = orc_Node.GetDatapoolKeysInternal();
    sintn sn_ItDatapool = 0;
 
@@ -194,6 +195,11 @@ void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
                         c_NodeIdSelectedProtocol.toStdString().c_str(),
                         static_cast<sintn>(orc_Node.GetSelectedProtocol()));
+
+   //Selected interface
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        c_NodeIdSelectedInterface.toStdString().c_str(),
+                        static_cast<sintn>(orc_Node.GetSelectedInterface()));
 
    //Selected HALC domain & channel
    orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_NodeIdSelectedHALCDomain.toStdString().c_str(),
@@ -1023,6 +1029,7 @@ void C_UsFiler::mh_LoadNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    QString c_Tmp;
 
    stw_opensyde_core::C_OSCCanProtocol::E_Type e_Tmp;
+   uint32 u32_Tmp;
    std::vector<sint32> c_Columns;
 
    const QString c_HALCOvColumnId = static_cast<QString>("%1HALCOverview").arg(orc_NodeIdBase);
@@ -1032,17 +1039,20 @@ void C_UsFiler::mh_LoadNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    const QString c_NodeIdDatapoolCount = static_cast<QString>("%1Datapool_count").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedDatapoolName = static_cast<QString>("%1Selected_datapool_name").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedProtocol = static_cast<QString>("%1Selected_protocol").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedInterface = static_cast<QString>("%1Selected_interface").arg(orc_NodeIdBase);
 
    //Selected datapool name
    c_Tmp = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
                               c_NodeIdSelectedDatapoolName.toStdString().c_str(), "").c_str();
    orc_UserSettings.SetProjSdNodeSelectedDatapoolName(orc_NodeName, c_Tmp);
    //Selected protocol
-   e_Tmp = static_cast<stw_opensyde_core::C_OSCCanProtocol::E_Type>(orc_Ini.ReadInteger(
-                                                                       orc_SectionName.toStdString().c_str(),
-                                                                       c_NodeIdSelectedProtocol.toStdString().c_str(),
-                                                                       0));
+   e_Tmp = static_cast<stw_opensyde_core::C_OSCCanProtocol::E_Type>(
+      orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(), c_NodeIdSelectedProtocol.toStdString().c_str(), 0));
    orc_UserSettings.SetProjSdNodeSelectedProtocol(orc_NodeName, e_Tmp);
+   //Selected interface
+   u32_Tmp = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                 c_NodeIdSelectedInterface.toStdString().c_str(), 0);
+   orc_UserSettings.SetProjSdNodeSelectedInterface(orc_NodeName, u32_Tmp);
    //Selected HALC domain & channel
    c_Tmp = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
                               c_NodeIdSelectedHALCDomain.toStdString().c_str(), "").c_str();

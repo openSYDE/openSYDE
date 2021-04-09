@@ -19,6 +19,7 @@
 #include "stwerrors.h"
 #include "TGLUtils.h"
 #include "C_PuiUtil.h"
+#include "C_GtGetText.h"
 #include "C_PuiSvData.h"
 #include "C_PuiSdUtil.h"
 #include "CSCLChecksums.h"
@@ -844,6 +845,33 @@ sint32 C_PuiSvData::SetDashboardComment(const uint32 ou32_DashboardIndex, const 
    {
       C_PuiSvDashboard & rc_Dashboard = this->mc_Dashboards[ou32_DashboardIndex];
       rc_Dashboard.SetComment(orc_Comment);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dashboard type
+
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oe_Type              Type
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::SetDashboardType(const uint32 ou32_DashboardIndex, const C_PuiSvDashboard::E_TabType oe_Type)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_DashboardIndex < this->mc_Dashboards.size())
+   {
+      C_PuiSvDashboard & rc_Dashboard = this->mc_Dashboards[ou32_DashboardIndex];
+      rc_Dashboard.SetType(oe_Type);
    }
    else
    {
@@ -1990,16 +2018,18 @@ sint32 C_PuiSvData::InsertDashboard(const uint32 ou32_Index, const C_PuiSvDashbo
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
                if (rc_Config.c_ElementId.GetIsValid() == true)
                {
-                  QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
-                       C_PuiSvReadDataConfiguration>::const_iterator c_ItReadItem = this->mc_ReadRailAssignments.find(
-                     rc_Config.c_ElementId);
+                  const QMap<C_OSCNodeDataPoolListElementId,
+                             C_PuiSvReadDataConfiguration>::const_iterator c_ItReadItem =
+                     this->mc_ReadRailAssignments.find(
+                        rc_Config.c_ElementId);
                   if (c_ItReadItem == this->mc_ReadRailAssignments.end())
                   {
                      const C_OSCNodeDataPoolListElement * const pc_Element =
-                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
-                                                                                   rc_Config.c_ElementId.u32_DataPoolIndex,
-                                                                                   rc_Config.c_ElementId.u32_ListIndex,
-                                                                                   rc_Config.c_ElementId.u32_ElementIndex);
+                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                           rc_Config.c_ElementId.u32_NodeIndex,
+                           rc_Config.c_ElementId.u32_DataPoolIndex,
+                           rc_Config.c_ElementId.u32_ListIndex,
+                           rc_Config.c_ElementId.u32_ElementIndex);
                      if (pc_Element != NULL)
                      {
                         C_PuiSvReadDataConfiguration c_RailConfig;
@@ -2802,6 +2832,25 @@ void C_PuiSvData::FixInvalidRailConfig(void)
          //Important iterator step
          ++c_ItReadItem;
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle compatibility chart
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::HandleCompatibilityChart(void)
+{
+   std::vector<C_PuiSvDashboard> c_NewDashboards;
+
+   for (C_PuiSvDashboard & rc_Dashboard : this->mc_Dashboards)
+   {
+      rc_Dashboard.HandleCompatibilityChart(c_NewDashboards);
+   }
+   this->mc_Dashboards.reserve(this->mc_Dashboards.size() + c_NewDashboards.size());
+   for (const C_PuiSvDashboard & rc_Dashboard : c_NewDashboards)
+   {
+      this->mc_Dashboards.push_back(rc_Dashboard);
    }
 }
 

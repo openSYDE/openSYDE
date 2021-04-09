@@ -47,13 +47,26 @@ using namespace stw_scl;
    Initializes class elements
 */
 //----------------------------------------------------------------------------------------------------------------------
+C_OSCProtocolDriverOsy::C_ListOfFeatures::C_ListOfFeatures(void)
+{
+   q_FlashloaderCanWriteToNvm = false;
+   q_MaxNumberOfBlockLengthAvailable = false;
+   q_EthernetToEthernetRoutingSupported = false;
+   q_FileBasedTransferExitResultAvailable = false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set up class
+
+   Initializes class elements
+*/
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsy::C_OSCProtocolDriverOsy(void) :
    mpr_OnOsyTunnelCanMessageReceived(NULL),
    mpv_OnAsyncTunnelCanMessageInstance(NULL),
    mpr_OnOsyWaitTime(NULL),
    mpv_OnOsyWaitTimeInstance(NULL),
    mpc_TransportProtocol(NULL),
-   //lint -e{1938}  //constant is initialized as it's in the same translation unit
    mu32_TimeoutPollingMs(hu32_DEFAULT_TIMEOUT),
    mu16_MaxServiceSize(C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE)
 {
@@ -66,6 +79,7 @@ C_OSCProtocolDriverOsy::C_OSCProtocolDriverOsy(void) :
 C_OSCProtocolDriverOsy::~C_OSCProtocolDriverOsy(void)
 {
    mpc_TransportProtocol = NULL;
+   mpr_OnOsyTunnelCanMessageReceived = NULL;
    mpv_OnAsyncTunnelCanMessageInstance = NULL;
    mpr_OnOsyWaitTime = NULL;
    mpv_OnOsyWaitTimeInstance = NULL;
@@ -419,7 +433,7 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
                   const uint32 u32_NumberOfBytes = opc_ExpectedErrData->size();
 
                   // Enough bytes for comparing?
-                  if (orc_Service.c_Data.size() >= (u32_NumberOfBytes + 3U))
+                  if (orc_Service.c_Data.size() >= static_cast<size_t>(u32_NumberOfBytes + 3U))
                   {
                      // Check all bytes for
                      for (u32_Counter = 0U; u32_Counter < u32_NumberOfBytes; ++u32_Counter)
@@ -701,6 +715,48 @@ sint32 C_OSCProtocolDriverOsy::m_ReadDataByIdentifier(const uint16 ou16_Identifi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: read string data identifier
+
+   Allows to perform a ReadDataByIdentifier service with only an (non-terminated) string expected as response.
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   \param[in]  ou16_DataIdentifier      data identifier to read
+   \param[out] orc_String               read result text
+   \param[out] oru8_NrCode              negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::m_ReadStringDataIdentifier(const uint16 ou16_DataIdentifier, C_SCLString & orc_String,
+                                                          stw_types::uint8 & oru8_NrCode)
+{
+   sint32 s32_Return;
+
+   std::vector<uint8> c_Data;
+
+   s32_Return = m_ReadDataByIdentifier(ou16_DataIdentifier, 0U, false, c_Data, oru8_NrCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      //extract text:
+      std::vector<charn> c_Text;
+      c_Text.resize(c_Data.size() + 1); //plus 1 for termination
+      c_Text[c_Text.size() - 1] = '\0'; //add termination
+      (void)std::memcpy(&c_Text[0], &c_Data[0], c_Data.size());
+      orc_String = &c_Text[0];
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   WriteDataByIdentifier utility wrapper
 
    Send WriteDataByIdentifier request and wait for response.
@@ -802,7 +858,6 @@ sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(uint8 (&orau8_SerialNumber
    s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_ECU_SERIAL_NUMBER, 6U, true, c_Snr, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      //lint -e{420} //std::vector reference returned by [] is guaranteed to have linear data in memory
       (void)std::memcpy(&orau8_SerialNumber[0], &c_Snr[0], 6);
    }
    if (opu8_NrCode != NULL)
@@ -883,20 +938,10 @@ sint32 C_OSCProtocolDriverOsy::OsyReadHardwareVersionNumber(C_SCLString & orc_Ha
 
 {
    sint32 s32_Return;
-
-   std::vector<uint8> c_Data;
    uint8 u8_NrErrorCode = 0U;
 
-   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_VERSION, 0U, false, c_Data, u8_NrErrorCode);
-   if (s32_Return == C_NO_ERR)
-   {
-      //extract text:
-      std::vector<charn> c_Text;
-      c_Text.resize(c_Data.size() + 1); //plus 1 for termination
-      c_Text[c_Text.size() - 1] = '\0'; //add termination
-      (void)std::memcpy(&c_Text[0], &c_Data[0], c_Data.size());
-      orc_HardwareVersionNumber = &c_Text[0];
-   }
+   s32_Return = m_ReadStringDataIdentifier(mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_VERSION, orc_HardwareVersionNumber,
+                                           u8_NrErrorCode);
    if (opu8_NrCode != NULL)
    {
       (*opu8_NrCode) = u8_NrErrorCode;
@@ -940,6 +985,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadListOfFeatures(C_ListOfFeatures & orc_List
       orc_ListOfFeatures.q_FlashloaderCanWriteToNvm        = ((c_Data[7] & 0x01U) == 0x01U) ? true : false;
       orc_ListOfFeatures.q_MaxNumberOfBlockLengthAvailable = ((c_Data[7] & 0x02U) == 0x02U) ? true : false;
       orc_ListOfFeatures.q_EthernetToEthernetRoutingSupported = ((c_Data[7] & 0x04U) == 0x04U) ? true : false;
+      orc_ListOfFeatures.q_FileBasedTransferExitResultAvailable = ((c_Data[7] & 0x08U) == 0x08U) ? true : false;
       //we don't know anything about the meaning of the rest of the bits as we have no crystal ball
    }
    if (opu8_NrCode != NULL)
@@ -1020,20 +1066,9 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMaxNumberOfBlockLength(uint16 & oru16_MaxN
 sint32 C_OSCProtocolDriverOsy::OsyReadDeviceName(C_SCLString & orc_DeviceName, stw_types::uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
-
-   std::vector<uint8> c_Data;
    uint8 u8_NrErrorCode = 0U;
 
-   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_DEVICE_NAME, 0U, false, c_Data, u8_NrErrorCode);
-   if (s32_Return == C_NO_ERR)
-   {
-      //extract text:
-      std::vector<charn> c_Text;
-      c_Text.resize(c_Data.size() + 1); //plus 1 for termination
-      c_Text[c_Text.size() - 1] = '\0'; //add termination
-      (void)std::memcpy(&c_Text[0], &c_Data[0], c_Data.size());
-      orc_DeviceName = &c_Text[0];
-   }
+   s32_Return = m_ReadStringDataIdentifier(mhu16_OSY_DI_DEVICE_NAME, orc_DeviceName, u8_NrErrorCode);
    if (opu8_NrCode != NULL)
    {
       (*opu8_NrCode) = u8_NrErrorCode;
@@ -1067,20 +1102,9 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDeviceName(C_SCLString & orc_DeviceName, s
 sint32 C_OSCProtocolDriverOsy::OsyReadApplicationName(C_SCLString & orc_ApplicationName, uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
-
-   std::vector<uint8> c_Data;
    uint8 u8_NrErrorCode = 0U;
 
-   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_APPLICATION_NAME, 0U, false, c_Data, u8_NrErrorCode);
-   if (s32_Return == C_NO_ERR)
-   {
-      //extract text:
-      std::vector<charn> c_Text;
-      c_Text.resize(c_Data.size() + 1); //plus 1 for termination
-      c_Text[c_Text.size() - 1] = '\0'; //add termination
-      (void)std::memcpy(&c_Text[0], &c_Data[0], c_Data.size());
-      orc_ApplicationName = &c_Text[0];
-   }
+   s32_Return = m_ReadStringDataIdentifier(mhu16_OSY_DI_APPLICATION_NAME, orc_ApplicationName, u8_NrErrorCode);
    if (opu8_NrCode != NULL)
    {
       (*opu8_NrCode) = u8_NrErrorCode;
@@ -1115,20 +1139,9 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationVersion(C_SCLString & orc_Appli
                                                          uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
-
-   std::vector<uint8> c_Data;
    uint8 u8_NrErrorCode = 0U;
 
-   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_APPLICATION_VERSION, 0U, false, c_Data, u8_NrErrorCode);
-   if (s32_Return == C_NO_ERR)
-   {
-      //extract text:
-      std::vector<charn> c_Text;
-      c_Text.resize(c_Data.size() + 1); //plus 1 for termination
-      c_Text[c_Text.size() - 1] = '\0'; //add termination
-      (void)std::memcpy(&c_Text[0], &c_Data[0], c_Data.size());
-      orc_ApplicationVersion = &c_Text[0];
-   }
+   s32_Return = m_ReadStringDataIdentifier(mhu16_OSY_DI_APPLICATION_VERSION, orc_ApplicationVersion, u8_NrErrorCode);
    if (opu8_NrCode != NULL)
    {
       (*opu8_NrCode) = u8_NrErrorCode;
@@ -1182,7 +1195,6 @@ sint32 C_OSCProtocolDriverOsy::OsyReadBootSoftwareIdentification(uint8 (&orau8_V
       }
       else
       {
-         //lint -e{420} //sub-function reported we have enough bytes; no problem
          (void)std::memcpy(&orau8_Version[0], &c_Data[1], 3U);
       }
    }
@@ -1273,9 +1285,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationSoftwareFingerprint(uint8 (&ora
    if (s32_Return == C_NO_ERR)
    {
       std::vector<charn> c_Text;
-      //lint -e{420} //sub-function reported we have enough bytes; no problem
       (void)std::memcpy(&orau8_Date[0], &c_Data[0], 3U);
-      //lint -e{420} //sub-function reported we have enough bytes; no problem
       (void)std::memcpy(&orau8_Time[0], &c_Data[3], 3U);
       //extract text:
       c_Text.resize(c_Data.size() - 6); //minus 7 for date, time and length of username, plus 1 for termination
@@ -1288,6 +1298,43 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationSoftwareFingerprint(uint8 (&ora
       (*opu8_NrCode) = u8_NrErrorCode;
    }
    m_LogServiceError("ReadDataByIdentifier::ApplicationSoftwareFingerprint", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadFileBasedTransferExitResult service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   \param[out] orc_TransferExitResult   read result text
+   \param[out] opu8_NrCode              if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyReadFileBasedTransferExitResult(C_SCLString & orc_TransferExitResult,
+                                                                  uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+   uint8 u8_NrErrorCode = 0U;
+
+   s32_Return = m_ReadStringDataIdentifier(mhu16_OSY_DI_FILE_BASED_TRANSFER_EXIT_RESULT, orc_TransferExitResult,
+                                           u8_NrErrorCode);
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::FileBasedTransferExitResult", s32_Return, u8_NrErrorCode);
 
    return s32_Return;
 }
@@ -1331,9 +1378,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteApplicationSoftwareFingerprint(const uint
    }
 
    c_Data.resize(7U + static_cast<uintn>(c_UserName.Length()));
-   //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
    (void)std::memcpy(&c_Data[0], &orau8_Date[0], 3U);
-   //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
    (void)std::memcpy(&c_Data[3], &orau8_Time[0], 3U);
    c_Data[6] = static_cast<uint8>(orc_UserName.Length());
    (void)std::memcpy(&c_Data[7], orc_UserName.c_str(), orc_UserName.Length());
@@ -1420,7 +1465,6 @@ sint32 C_OSCProtocolDriverOsy::OsyReadProtocolVersion(uint8 (&orau8_Version)[3],
    s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_PROTOCOL_VERSION, 3U, true, c_Data, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      //lint -e{420} //sub-function reported we have enough bytes; no problem
       (void)std::memcpy(&orau8_Version[0], &c_Data[0], 3U);
    }
    if (opu8_NrCode != NULL)
@@ -1464,7 +1508,6 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashloaderProtocolVersion(uint8 (&orau8_V
    s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_FLASHLOADER_PROTOCOL_VERSION, 3U, true, c_Data, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      //lint -e{420} //sub-function reported we have enough bytes; no problem
       (void)std::memcpy(&orau8_Version[0], &c_Data[0], 3U);
    }
    if (opu8_NrCode != NULL)
@@ -1553,7 +1596,6 @@ sint32 C_OSCProtocolDriverOsy::OsyReadProtocolDriverImplementationVersion(uint8 
                                        u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      //lint -e{420} //called function only returns C_NO_ERR if it was able to read the expected number of bytes
       (void)std::memcpy(&orau8_Version[0], &c_Data[0], 3U);
    }
    if (opu8_NrCode != NULL)
@@ -1618,9 +1660,9 @@ void C_OSCProtocolDriverOsy::m_UnpackDataPoolIdentifier(const uint8 (&orau8_Pack
                                (static_cast<uint32>(orau8_PackedId[1]) << 8U) +
                                static_cast<uint32>(orau8_PackedId[2]);
 
-   const uint8 u8_ServerDataPoolIndex = static_cast<uint8>(u32_PackedId >> 18) & 0x1FU;
+   const uint8 u8_ServerDataPoolIndex = static_cast<uint8>(u32_PackedId >> 18U) & 0x1FU;
 
-   oru16_ListIndex = static_cast<uint16>(u32_PackedId >> 11) & 0x7FU;
+   oru16_ListIndex = static_cast<uint16>(u32_PackedId >> 11U) & 0x7FU;
    oru16_ElementIndex = static_cast<uint16>(u32_PackedId) & 0x7FFU;
 
    oru8_DataPoolIndex = this->m_GetDataPoolIndexServerToClient(u8_ServerDataPoolIndex);
@@ -2893,7 +2935,7 @@ sint32 C_OSCProtocolDriverOsy::SetNodeIdentifiers(const C_OSCProtocolDriverOsyNo
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpBase * C_OSCProtocolDriverOsy::GetTransportProtocol(void)
 {
-   return mpc_TransportProtocol;
+   return mpc_TransportProtocol; //lint !e1535  TP is still owned by us; caller is responsible not to mess things up
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3351,8 +3393,6 @@ sint32 C_OSCProtocolDriverOsy::m_SecurityAccess(const uint8 ou8_SubFunction, con
          c_Request.c_Data.resize(2U + static_cast<uintn>(ou16_SendPayloadSize));
          c_Request.c_Data[0] = mhu8_OSY_SI_SECURITY_ACCESS;
          c_Request.c_Data[1] = ou8_SubFunction;
-         //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
-         //lint -e{420} //std::vector reference returned by [] is linear; we allocated enough memory
          (void)std::memcpy(&c_Request.c_Data[2], &orc_SendData[0], ou16_SendPayloadSize);
       }
 
@@ -3613,7 +3653,6 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyTunnelCanMessagesEvent(
 
          // Fill the struct
          c_CanMessage.u8_DLC = orc_ReceivedService.c_Data[5];
-         //lint -e{420} //std::vector reference returned by [] is linear; we checked for enough memory
          (void)std::memcpy(&c_CanMessage.au8_Data[0], &orc_ReceivedService.c_Data[6], 8U);
          c_CanMessage.u64_TimeStamp = stw_tgl::TGL_GetTickCountUS();
 
@@ -4273,7 +4312,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMemoryByAddress(const uint32 ou32_MemoryAd
          uint8 u8_MemoryAddressByteCount;
          uint8 u8_MemorySizeByteCount;
          const uint32 u32_MemoryAddress = ou32_MemoryAddress + u32_ReadIndex;
-         uint32 u32_Size = (orc_DataRecord.size() - u32_ReadIndex);
+         uint32 u32_Size = static_cast<uint32>(orc_DataRecord.size() - u32_ReadIndex);
          if (u32_Size > u32_BlockSize)
          {
             u32_Size = u32_BlockSize;
@@ -4394,7 +4433,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32 ou32_MemoryA
          uint8 u8_MemoryAddressByteCount;
          uint8 u8_MemorySizeByteCount;
          const uint32 u32_MemoryAddress = ou32_MemoryAddress + u32_WriteIndex;
-         uint32 u32_Size = (orc_DataRecord.size() - u32_WriteIndex);
+         uint32 u32_Size = static_cast<uint32>(orc_DataRecord.size() - u32_WriteIndex);
          if (u32_Size > u32_BlockSize)
          {
             u32_Size = u32_BlockSize;
@@ -4420,7 +4459,6 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32 ou32_MemoryA
          (void)std::memcpy(&c_Request.c_Data[static_cast<size_t>(2) + u8_MemoryAddressByteCount], &c_MemorySize[0],
                            c_MemorySize.size());
          //Data part
-         //lint -e{669,670} //std::vector reference returned by [] is guaranteed to have linear data in memory
          (void)std::memcpy(
             &c_Request.c_Data[static_cast<size_t>(2) + u8_MemoryAddressByteCount + u8_MemorySizeByteCount],
             &orc_DataRecord[u32_WriteIndex], u32_Size);
@@ -4902,13 +4940,11 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
       {
          c_Text.resize(11U + 1U);           //plus 1 for termination
          c_Text[c_Text.size() - 1U] = '\0'; //add termination
-         //lint -e{419,420} //std::vector reference returned by [] is linear; we allocated enough memory
          (void)std::memcpy(&c_Text[0], &c_ReceiveData[un_Counter + 1U], 11U);
          orc_BlockInfo.c_BuildDate = &c_Text[0];
          un_Counter += (11U + 1U);
          c_Text.resize(8U + 1U);            //plus 1 for termination
          c_Text[c_Text.size() - 1U] = '\0'; //add termination
-         //lint -e{419,420} //std::vector reference returned by [] is linear; we allocated enough memory
          (void)std::memcpy(&c_Text[0], &c_ReceiveData[un_Counter], 8U);
          orc_BlockInfo.c_BuildTime = &c_Text[0];
          un_Counter += 8U;

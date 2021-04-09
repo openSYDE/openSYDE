@@ -298,7 +298,8 @@ void C_CamMosDatabaseSelectionPopup::m_UpdateSelection(const sintn osn_Selection
       {
          if (osn_SelectionCount > 1)
          {
-            this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText("%1 selected messages")).arg(
+            this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                             "%1 selected messages")).arg(
                                                         osn_SelectionCount));
          }
          else

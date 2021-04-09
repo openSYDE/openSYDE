@@ -29,9 +29,9 @@ public:
 
    // things that don't emit signals
    void SetHsv(const stw_types::sintn osn_Hue, const stw_types::sintn osn_Sat, const stw_types::sintn osn_Value);
-   QColor SetRgb(const QRgb oun_Rgb);
+   QColor SetRgb(const stw_types::uintn oun_Rgb); // see QRgb
    QColor CurrentColor(void) const;
-   void SetCurrentColor(const QColor & rc_Color);
+   void SetCurrentColor(const QColor & orc_Color);
    void SetCurrentAlpha(const stw_types::sintn osn_Alpha);
 
    //The signals keyword is necessary for Qt signal slot functionality

@@ -22,6 +22,21 @@
         <string/>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="stw_opensyde_gui_elements::C_OgeGbxToolTip" name="mpc_GroupBox">
           <property name="title">
@@ -32,16 +47,16 @@
             <number>12</number>
            </property>
            <property name="leftMargin">
-            <number>10</number>
+            <number>5</number>
            </property>
            <property name="topMargin">
-            <number>17</number>
-           </property>
-           <property name="rightMargin">
             <number>10</number>
            </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
            <property name="bottomMargin">
-            <number>19</number>
+            <number>10</number>
            </property>
            <item>
             <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingToolTip" name="mpc_Heading">

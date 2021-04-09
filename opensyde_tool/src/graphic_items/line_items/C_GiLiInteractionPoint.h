@@ -50,7 +50,7 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void PointChanged(const stw_types::sint32 & ors32_PointIndex);
+   void SigPointChanged(const stw_types::sint32 & ors32_PointIndex);
 
 protected:
    virtual QVariant itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value) override;

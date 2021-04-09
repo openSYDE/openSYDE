@@ -794,7 +794,7 @@ const C_PuiSdNodeDataPool * C_PuiSdHandlerBusLogic::GetUiCanDataPool(const uint3
    if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
       const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
-      const C_OSCCanProtocol * pc_CanProtocol = rc_OSCNode.GetCANProtocolConst(ore_ComType, oru32_DatapoolIndex);
+      const C_OSCCanProtocol * const pc_CanProtocol = rc_OSCNode.GetCANProtocolConst(ore_ComType, oru32_DatapoolIndex);
       if (pc_CanProtocol != NULL)
       {
          const C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
@@ -1061,7 +1061,8 @@ const C_OSCNodeDataPoolList * C_PuiSdHandlerBusLogic::GetOSCCanDataPoolList(cons
                                                                             const bool & orq_MessageIsTx) const
 {
    const C_OSCNodeDataPoolList * pc_Retval = NULL;
-   const C_OSCNodeDataPool * pc_DataPool = this->GetOSCCanDataPool(oru32_NodeIndex, ore_ComType, ou32_DatapoolIndex);
+   const C_OSCNodeDataPool * const pc_DataPool = this->GetOSCCanDataPool(oru32_NodeIndex, ore_ComType,
+                                                                         ou32_DatapoolIndex);
 
    if (pc_DataPool != NULL)
    {
@@ -1941,7 +1942,6 @@ sint32 C_PuiSdHandlerBusLogic::AddCanSignal(const C_OSCCanMessageIdentificationI
 
    \return
    C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -1950,7 +1950,7 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificati
                                                const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
                                                const C_PuiSdNodeCanSignal & orc_UISignal)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   const sint32 s32_Retval = C_NO_ERR;
 
    tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
@@ -2050,13 +2050,12 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificati
 
    \return
    C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                const uint32 & oru32_SignalIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   const sint32 s32_Retval = C_NO_ERR;
 
    tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
@@ -2606,7 +2605,8 @@ const C_PuiSdNodeDataPoolList * C_PuiSdHandlerBusLogic::m_GetUiCanDataPoolList(c
                                                                                const bool & orq_MessageIsTx) const
 {
    const C_PuiSdNodeDataPoolList * pc_Retval = NULL;
-   const C_OSCNodeDataPool * pc_OSCDataPool = this->GetOSCCanDataPool(oru32_NodeIndex, ore_ComType, ou32_DatapoolIndex);
+   const C_OSCNodeDataPool * const pc_OSCDataPool = this->GetOSCCanDataPool(oru32_NodeIndex, ore_ComType,
+                                                                            ou32_DatapoolIndex);
 
    if (pc_OSCDataPool != NULL)
    {
@@ -2615,8 +2615,8 @@ const C_PuiSdNodeDataPoolList * C_PuiSdHandlerBusLogic::m_GetUiCanDataPoolList(c
       if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, oru32_InterfaceIndex, orq_MessageIsTx,
                                               u32_Index) == C_NO_ERR)
       {
-         const C_PuiSdNodeDataPool * pc_UIDataPool = this->GetUiCanDataPool(oru32_NodeIndex, ore_ComType,
-                                                                            ou32_DatapoolIndex);
+         const C_PuiSdNodeDataPool * const pc_UIDataPool = this->GetUiCanDataPool(oru32_NodeIndex, ore_ComType,
+                                                                                  ou32_DatapoolIndex);
 
          if (pc_UIDataPool != NULL)
          {

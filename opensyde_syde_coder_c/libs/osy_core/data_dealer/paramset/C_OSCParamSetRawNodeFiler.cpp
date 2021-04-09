@@ -60,11 +60,11 @@ stw_types::sint32 C_OSCParamSetRawNodeFiler::h_LoadRawNode(C_OSCParamSetRawNode 
                                                            C_OSCXMLParserBase & orc_XMLParser,
                                                            bool & orq_MissingOptionalContent)
 {
-   stw_types::sint32 s32_Retval = C_OSCParamSetFilerBase::h_LoadNodeName(orc_Node.c_Name, orc_XMLParser);
+   stw_types::sint32 s32_Retval = C_OSCParamSetFilerBase::mh_LoadNodeName(orc_Node.c_Name, orc_XMLParser);
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = C_OSCParamSetFilerBase::h_LoadDataPoolInfos(orc_Node.c_DataPools, orc_XMLParser,
-                                                               orq_MissingOptionalContent);
+      s32_Retval = C_OSCParamSetFilerBase::mh_LoadDataPoolInfos(orc_Node.c_DataPools, orc_XMLParser,
+                                                                orq_MissingOptionalContent);
       if (s32_Retval == C_NO_ERR)
       {
          s32_Retval = C_OSCParamSetRawNodeFiler::mh_LoadEntries(orc_Node.c_Entries, orc_XMLParser);
@@ -87,8 +87,8 @@ stw_types::sint32 C_OSCParamSetRawNodeFiler::h_LoadRawNode(C_OSCParamSetRawNode 
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetRawNodeFiler::h_SaveRawNode(const C_OSCParamSetRawNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser)
 {
-   C_OSCParamSetFilerBase::h_SaveNodeName(orc_Node.c_Name, orc_XMLParser);
-   C_OSCParamSetFilerBase::h_SaveDataPoolInfos(orc_Node.c_DataPools, orc_XMLParser);
+   C_OSCParamSetFilerBase::mh_SaveNodeName(orc_Node.c_Name, orc_XMLParser);
+   C_OSCParamSetFilerBase::mh_SaveDataPoolInfos(orc_Node.c_DataPools, orc_XMLParser);
    C_OSCParamSetRawNodeFiler::mh_SaveEntries(orc_Node.c_Entries, orc_XMLParser);
 }
 

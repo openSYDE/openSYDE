@@ -78,10 +78,10 @@ C_SyvSeScene::C_SyvSeScene(const uint32 ou32_ViewIndex, QObject * const opc_Pare
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} never took ownership of selected bus connector
 C_SyvSeScene::~C_SyvSeScene(void)
 {
    this->PrepareToClose();
-   //lint -e{1579}  never took ownership of selected bus connector
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -117,7 +117,6 @@ void C_SyvSeScene::SetEditMode(const bool oq_Active)
    // inform the items
    for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-
       C_GiSvNodeSyvSetup * const pc_Node = dynamic_cast<C_GiSvNodeSyvSetup *>(*c_ItItem);
 
       C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(*c_ItItem);
@@ -152,7 +151,6 @@ void C_SyvSeScene::Save(void) const
    // inform the items
    for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-
       C_GiSvNodeSyvSetup * const pc_Node = dynamic_cast<C_GiSvNodeSyvSetup *>(*c_ItItem);
 
       C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(*c_ItItem);
@@ -194,7 +192,6 @@ void C_SyvSeScene::ReloadViewData(void)
 
    for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-
       C_GiSvNodeSyvSetup * const pc_Node = dynamic_cast<C_GiSvNodeSyvSetup *>(*c_ItItem);
 
       C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(*c_ItItem);
@@ -222,7 +219,6 @@ void C_SyvSeScene::ReloadViewData(void)
                for (QList<QGraphicsItem *>::const_iterator c_ItItem2 = rc_Items.begin(); c_ItItem2 != rc_Items.end();
                     ++c_ItItem2)
                {
-
                   C_GiLiBus * const pc_PcBus = dynamic_cast<C_GiLiBus *>(*c_ItItem2);
                   if (pc_PcBus != NULL)
                   {
@@ -258,7 +254,6 @@ void C_SyvSeScene::ReloadViewData(void)
             for (QList<QGraphicsItem *>::const_iterator c_ItItem2 = rc_Items.begin(); c_ItItem2 != rc_Items.end();
                  ++c_ItItem2)
             {
-
                C_GiLiBus * const pc_PcBus = dynamic_cast<C_GiLiBus *>(*c_ItItem2);
 
                C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(*c_ItItem2);
@@ -317,7 +312,6 @@ void C_SyvSeScene::SetAllNodesConnected(const bool oq_Connected)
 
    for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-
       C_GiSvNodeSyvSetup * const pc_Node = dynamic_cast<C_GiSvNodeSyvSetup *>(*c_ItItem);
 
       if (pc_Node != NULL)
@@ -435,7 +429,6 @@ C_GiNode * C_SyvSeScene::m_CreateNode(const sint32 & ors32_Index, const uint64 &
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
 {
-
    const C_GiSvNodeSyvSetup * const pc_SystemNode =
       dynamic_cast<const C_GiSvNodeSyvSetup * const>(opc_NodeGraphicsItem);
 
@@ -530,7 +523,6 @@ void C_SyvSeScene::m_Edit(QGraphicsItem * const opc_GraphicsItem) const
 {
    if (opc_GraphicsItem != NULL)
    {
-
       C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc * const>(opc_GraphicsItem);
 
       if (pc_Pc != NULL)
@@ -560,13 +552,11 @@ void C_SyvSeScene::m_SelectionChanged(void)
       // triggered by signal selectionChanged
       if (c_SelectedItems.size() == 1)
       {
-
-         C_GiBiRectBaseGroup * pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(c_SelectedItems[0]);
+         C_GiBiRectBaseGroup * const pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(c_SelectedItems[0]);
 
          // check if the only one selected item is a resizable rectangle based item
          if (pc_Item != NULL)
          {
-
             C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(pc_Item);
             if (pc_Pc != NULL)
             {
@@ -594,15 +584,14 @@ void C_SyvSeScene::m_SelectionChanged(void)
          {
             // check if the only one selected item is a resizable rectangle based item
 
-            C_GiBiRectBaseGroup * pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(*c_ItItem);
+            C_GiBiRectBaseGroup * const pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(*c_ItItem);
             if (pc_Item != NULL)
             {
                pc_Item->SetResizing(false);
             }
             else
             {
-
-               C_GiLiLineGroup * pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(*c_ItItem);
+               C_GiLiLineGroup * const pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(*c_ItItem);
                if (pc_LineItem != NULL)
                {
                   pc_LineItem->SetResizing(false);
@@ -627,9 +616,9 @@ void C_SyvSeScene::m_SelectionChanged(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_OnPcBusConnectionStartConnect(const C_GiLiBusConnectorBase::E_ConnectState & ore_ConnectState,
-                                                   QGraphicsItem * const opc_Item,
+                                                   const QGraphicsItem * const opc_Item,
                                                    const C_OSCSystemBus::E_Type * const opc_Type,
-                                                   C_GiLiBusConnectorBase * const opc_Connector) const
+                                                   const C_GiLiBusConnectorBase * const opc_Connector) const
 {
    Q_UNUSED(opc_Item)
    Q_UNUSED(opc_Type)
@@ -644,11 +633,9 @@ void C_SyvSeScene::m_OnPcBusConnectionStartConnect(const C_GiLiBusConnectorBase:
 
          for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
          {
-
             C_GiBiCustomMouseItem * const pc_Item = dynamic_cast<C_GiBiCustomMouseItem *>(*c_ItItem);
             if (pc_Item != NULL)
             {
-
                if (dynamic_cast<C_GiSvPc *>(*c_ItItem) == NULL)
                {
                   //Is not pc
@@ -669,18 +656,16 @@ void C_SyvSeScene::m_OnPcBusConnectionStartConnect(const C_GiLiBusConnectorBase:
 
          for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
          {
-
             C_GiBiCustomMouseItem * const pc_Item = dynamic_cast<C_GiBiCustomMouseItem *>(*c_ItItem);
             if (pc_Item != NULL)
             {
-
                C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(*c_ItItem);
                //Is bus
                if (pc_Bus != NULL)
                {
-                  bool q_Disabled = C_PuiSvHandler::h_GetInstance()->CheckBusDisabled(this->mu32_ViewIndex,
-                                                                                      static_cast<uint32>(pc_Bus->
-                                                                                                          GetIndex()));
+                  const bool q_Disabled =
+                     C_PuiSvHandler::h_GetInstance()->CheckBusDisabled(this->mu32_ViewIndex,
+                                                                       static_cast<uint32>(pc_Bus->GetIndex()));
                   if (q_Disabled == false)
                   {
                      pc_Item->SetTemporaryCursor(Qt::CrossCursor);

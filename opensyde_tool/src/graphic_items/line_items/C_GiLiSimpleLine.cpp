@@ -138,7 +138,7 @@ QColor C_GiLiSimpleLine::GetColor() const
 QPointF C_GiLiSimpleLine::GetPos(void) const
 {
    QPointF c_Pos;
-   QLineF c_Line = this->line();
+   const QLineF c_Line = this->line();
 
    // Which point is most top?
    if (c_Line.p1().y() < c_Line.p2().y())

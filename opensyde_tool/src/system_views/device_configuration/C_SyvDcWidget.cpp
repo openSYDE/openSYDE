@@ -894,7 +894,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const C_SyvDcDeviceConfiguation & o
    if ((this->mpc_DcSequences != NULL) &&
        (orc_Config.c_NodeIds.size() > 0))
    {
-      C_OSCProtocolDriverOsyNode c_ServerId(this->mu8_BusId, orc_Config.c_NodeIds[0]);
+      const C_OSCProtocolDriverOsyNode c_ServerId(this->mu8_BusId, orc_Config.c_NodeIds[0]);
       uint32 u32_NodeIndex;
 
       // Counter of devices
@@ -1284,7 +1284,7 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
          if (q_Manual == true)
          {
             C_OgeWiCustomMessage c_ConfirmationBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
-            const uint32 u32_WaitTimeSec = (u32_WaitTime / 1000U) + (((u32_WaitTime % 1000U) == 0U) ? 0U : 1U);
+            const uint32 u32_WaitTimeSec = (u32_WaitTime / 1000UL) + (((u32_WaitTime % 1000UL) == 0UL) ? 0UL : 1UL);
             c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
             c_ConfirmationBox.SetDetails(c_Details);
             c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
@@ -1507,7 +1507,7 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
          for (u32_DeviceCounter = 0U; u32_DeviceCounter < c_DeviceInfos.size(); ++u32_DeviceCounter)
          {
             const C_SyvDcDeviceInformation & rc_Info = c_DeviceInfos[u32_DeviceCounter];
-            C_OSCProtocolDriverOsyNode c_ServerId(this->mu8_BusId, rc_Info.u8_NodeId);
+            const C_OSCProtocolDriverOsyNode c_ServerId(this->mu8_BusId, rc_Info.u8_NodeId);
             uint32 u32_NodeIndex;
             QString c_TopologyNodeName = "NA";
             QString c_TopologyDeviceType = "NA";
@@ -1711,7 +1711,7 @@ void C_SyvDcWidget::m_UpdateStateOfOpenSydeConfig(const uint32 ou32_Step, const 
    const C_OSCProtocolDriverOsyNode c_Server(ou8_BusIdentifier, ou8_NodeIdentifier);
 
    QMap<stw_opensyde_core::C_OSCProtocolDriverOsyNode, std::vector<C_ServerConfStepResult> >::iterator c_ItServer;
-   C_ServerConfStepResult c_Result(ou32_Step, ou8_InterfaceType, ou8_InterfaceNumber, os32_Result);
+   const C_ServerConfStepResult c_Result(ou32_Step, ou8_InterfaceType, ou8_InterfaceNumber, os32_Result);
 
    c_ItServer = this->mc_ServerStates.find(c_Server);
 
@@ -1916,7 +1916,7 @@ void C_SyvDcWidget::m_InitBitRateComboBox(void)
       std::vector<uint32> c_ConnectedInterfaces;
       std::vector<uint32> c_SupportedBitrates;
       uint32 u32_BitrateCounter;
-      uint32 u32_CurrentSetBitrate = pc_View->GetDeviceConfigSelectedBitRate();
+      const uint32 u32_CurrentSetBitrate = pc_View->GetDeviceConfigSelectedBitRate();
       const QString c_CurrentSetBitrate = this->m_GetComboBoxString(u32_CurrentSetBitrate);
       bool q_CurrentSetBitrateFound = false;
       std::vector<uint8> c_ActiveNodes = pc_View->GetNodeActiveFlags();

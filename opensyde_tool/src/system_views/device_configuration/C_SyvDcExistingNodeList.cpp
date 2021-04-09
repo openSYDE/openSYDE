@@ -110,7 +110,6 @@ void C_SyvDcExistingNodeList::ConnectSerialNumber(const uint32 ou32_NodeIndex, c
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
-      
       const C_SyvDcExistingNodeWidget * const pc_Widget =
          dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
       if ((pc_Widget != NULL) && (pc_Widget->CompareIndex(ou32_NodeIndex) == true))
@@ -132,7 +131,6 @@ void C_SyvDcExistingNodeList::DisconnectSerialNumber(const uint32 ou32_NodeIndex
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
-      
       const C_SyvDcExistingNodeWidget * const pc_Widget =
          dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
       if ((pc_Widget != NULL) && (pc_Widget->CompareIndex(ou32_NodeIndex) == true))
@@ -155,7 +153,6 @@ uint32 C_SyvDcExistingNodeList::GetAssignmentCount(void) const
 
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
-      
       const C_SyvDcExistingNodeWidget * const pc_Widget =
          dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
       if ((pc_Widget != NULL) && (pc_Widget->IsAssigned() == true))
@@ -178,7 +175,6 @@ std::vector<C_SyvDcDeviceConfiguation> C_SyvDcExistingNodeList::GetConfigs(void)
    std::vector<C_SyvDcDeviceConfiguation> c_Retval;
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
-      
       const C_SyvDcExistingNodeWidget * const pc_Widget =
          dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
       if (pc_Widget != NULL)
@@ -201,7 +197,6 @@ void C_SyvDcExistingNodeList::StartDrag(const QString & orc_DeviceName, const bo
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
-      
       const C_SyvDcExistingNodeWidget * const pc_Widget =
          dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
       if (pc_Widget != NULL)
@@ -219,7 +214,6 @@ void C_SyvDcExistingNodeList::StopDrag(void) const
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
-      
       const C_SyvDcExistingNodeWidget * const pc_Widget =
          dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
       if (pc_Widget != NULL)

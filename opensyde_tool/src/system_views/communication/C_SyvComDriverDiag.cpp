@@ -97,7 +97,7 @@ C_SyvComDriverDiag::~C_SyvComDriverDiag(void)
    }
 
    //let base class know we are about to die:
-   this->PrepareForDestruction();
+   C_OSCComDriverProtocol::PrepareForDestruction();
 
    for (uint32 u32_ItDiagProtocol = 0; u32_ItDiagProtocol < this->mc_DiagProtocols.size(); ++u32_ItDiagProtocol)
    {
@@ -328,16 +328,19 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
 
          if (s32_Return != C_NO_ERR)
          {
-            osc_write_log_warning("Asynchronous communication",
-                                  static_cast<QString>("Node \"%1\" - DataPoolSetEventDataRate - error: %2\n"
-                                          "C_RANGE    parameter out of range (checked by client-side function)\n"
-                                          "C_TIMEOUT  expected response not received within timeout\n"
-                                          "C_NOACT    could not send request (e.g. Tx buffer full)\n"
-                                          "C_CONFIG   pre-requisites not correct; e.g. driver not initialized\n"
-                                          "C_WARN     error response\n"
-                                          "C_RD_WR    malformed protocol response\n").arg(static_cast<QString>(m_GetActiveNodeName(
-                                                                                                     u16_Node).c_str())).arg(
-                                     C_Uti::h_StwError(s32_Return)).toStdString().c_str());
+            osc_write_log_warning(
+               "Asynchronous communication",
+               static_cast<QString>("Node \"%1\" - DataPoolSetEventDataRate - error: %2\n"
+                                    "C_RANGE    parameter out of range (checked by client-side function)\n"
+                                    "C_TIMEOUT  expected response not received within timeout\n"
+                                    "C_NOACT    could not send request (e.g. Tx buffer full)\n"
+                                    "C_CONFIG   pre-requisites not correct; e.g. driver not initialized\n"
+                                    "C_WARN     error response\n"
+                                    "C_RD_WR    malformed protocol response\n").arg(static_cast<QString>(
+                                                                                       m_GetActiveNodeName(
+                                                                                          u16_Node)
+                                                                                       .c_str())).arg(
+                  C_Uti::h_StwError(s32_Return)).toStdString().c_str());
             s32_Return = C_COM;
             orc_ErrorDetails += m_GetActiveNodeName(u16_Node).c_str();
             break;
@@ -378,7 +381,7 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                }
                else
                {
-                  ++c_ItNodesElementNumber->second;
+                  c_ItNodesElementNumber->second = c_ItNodesElementNumber->second + 1;
                }
             }
 
@@ -400,9 +403,9 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                c_Threshold.resize(4, 0U);
                //finally compose the uint32:
                u32_Threshold = c_Threshold[0] +
-                               (static_cast<uint32>(c_Threshold[1]) << 8) +
-                               (static_cast<uint32>(c_Threshold[2]) << 16) +
-                               (static_cast<uint32>(c_Threshold[3]) << 24);
+                               (static_cast<uint32>(c_Threshold[1]) << 8U) +
+                               (static_cast<uint32>(c_Threshold[2]) << 16U) +
+                               (static_cast<uint32>(c_Threshold[3]) << 24U);
 
                s32_Return = this->mc_DiagProtocols[u32_ActiveNodeIndex]->DataPoolReadChangeDriven(
                   static_cast<uint8>(c_It.key().u32_DataPoolIndex), static_cast<uint16>(c_It.key().u32_ListIndex),
@@ -477,7 +480,8 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                      break;
                   default:
                      c_AdditionalInfo =
-                        static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NegResponseCode,
+                        static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(
+                                                                                                 u8_NegResponseCode,
                                                                                                  16));
                      break;
                   }
@@ -569,7 +573,6 @@ sint32 C_SyvComDriverDiag::StopDiagnosisServer(void)
 
       for (u32_Counter = 0U; u32_Counter < this->mc_DiagProtocols.size(); ++u32_Counter)
       {
-         
          C_OSCDiagProtocolKfx * const pc_DiagProtocolKfx =
             dynamic_cast<C_OSCDiagProtocolKfx *>(this->mc_DiagProtocols[u32_Counter]);
 
@@ -890,7 +893,7 @@ sint32 C_SyvComDriverDiag::PollSafeNvmReadValues(const uint32 ou32_NodeIndex)
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComDriverDiag::GetPollNvmSafeReadValuesOutput(const C_OSCNode * & orpc_ParamNodeValues) const
+sint32 C_SyvComDriverDiag::GetPollNvmSafeReadValuesOutput(const C_OSCNode * (&orpc_ParamNodeValues)) const
 {
    return this->mc_PollingThread.GetNvmSafeReadValuesOutput(orpc_ParamNodeValues);
 }
@@ -1423,7 +1426,6 @@ sint32 C_SyvComDriverDiag::m_StartRoutingSpecific(const uint32 ou32_ActiveNode, 
 
    if (opc_Node->c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_KEFEX)
    {
-      
       C_OSCDiagProtocolKfx * const pc_DiagProtocolKfx =
          dynamic_cast<C_OSCDiagProtocolKfx * const>(this->mc_DiagProtocols[ou32_ActiveNode]);
 
@@ -1462,7 +1464,6 @@ void C_SyvComDriverDiag::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
        (this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]].c_Properties.e_DiagnosticServer ==
         C_OSCNodeProperties::eDS_KEFEX))
    {
-      
       C_OSCDiagProtocolKfx * const pc_DiagProtocolKfx =
          dynamic_cast<C_OSCDiagProtocolKfx * const>(this->mc_DiagProtocols[ou32_ActiveNode]);
 
@@ -1775,6 +1776,7 @@ sint32 C_SyvComDriverDiag::m_InitDiagProtocol(void)
                pc_DiagProtocol = pc_DiagProtocolKefex;
                this->m_InitDiagProtocolKfx(pc_DiagProtocolKefex);
                break;
+            case C_OSCNodeProperties::eDS_NONE:
             default:
                osc_write_log_error("Initializing diagnostic protocol", "Unknown diagnostic protocol");
                s32_Retval = C_OVERFLOW;
@@ -2091,7 +2093,7 @@ sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveNode
    uint32 u32_ItDataPool;
    sint32 s32_Return = C_NO_ERR;
 
-   for (u32_ItDataPool = 0U; u32_ItDataPool < mu32_NODE_DATA_POOL_MAX; ++u32_ItDataPool)
+   for (u32_ItDataPool = 0U; u32_ItDataPool < C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE; ++u32_ItDataPool)
    {
       uint8 u8_ErrorCode;
       C_OSCProtocolDriverOsy::C_DataPoolMetaData c_Metadata;
@@ -2129,7 +2131,8 @@ sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveNode
          {
             // Service error
             c_ErrorReason = "The read of the Datapool meta data"
-                            " failed with error " + static_cast<QString>(C_OSCLoggingHandler::h_StwError(s32_Return).c_str());
+                            " failed with error " +
+                            static_cast<QString>(C_OSCLoggingHandler::h_StwError(s32_Return).c_str());
          }
 
          if (c_ErrorReason != "")
@@ -2185,7 +2188,6 @@ sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::
    sint32 s32_Retval = C_CONFIG;
    QString c_DataPoolErrorString = "";
 
-   
    stw_opensyde_core::C_OSCDiagProtocolOsy * const pc_Protocol =
       dynamic_cast<C_OSCDiagProtocolOsy *>(this->mc_DiagProtocols[ou32_ActiveNodeIndex]);
    const uint32 u32_NodeIndex = this->mc_ActiveNodesIndexes[ou32_ActiveNodeIndex];
@@ -2453,7 +2455,7 @@ sint32 C_SyvComDriverDiag::m_Cycle(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::mh_ThreadFunc(void * const opv_Instance)
 {
-   //lint -e{925,9079}  This class is the only one which registers itself at the caller of this function. It must match.
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
    C_SyvComDriverDiag * const pc_ComDriver = reinterpret_cast<C_SyvComDriverDiag * const>(opv_Instance);
 
    tgl_assert(pc_ComDriver != NULL);

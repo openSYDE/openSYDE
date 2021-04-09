@@ -193,14 +193,9 @@ void C_GiSvNodeSyvSetup::m_InitCheckBox(void)
 
    this->mpc_CheckBox = new C_GiCheckBox(QRect(9, 9, s32_IconSize, s32_IconSize));
 
-   if (this->mpc_CheckBox != NULL)
-   {
-      this->mpc_CheckBox->setZValue(mf64_ZORDER_INIT_NODE + 1.0);
-
-      this->mpc_CheckBox->SetChecked(false);
-      this->SetDrawWhiteFilter(false);
-
-      this->addToGroup(this->mpc_CheckBox);
-      this->mpc_CheckBox->setVisible(false);
-   }
+   this->mpc_CheckBox->setZValue(mf64_ZORDER_INIT_NODE + 1.0);
+   this->mpc_CheckBox->SetChecked(false);
+   this->SetDrawWhiteFilter(false);
+   this->addToGroup(this->mpc_CheckBox);
+   this->mpc_CheckBox->setVisible(false);
 }

@@ -9,7 +9,7 @@
    Concurrent access to the DLL from multiple threads is blocked by a critical section.
 
    The public functions are directly rerouted to the corresponding DLL functions.
-   A return value of STWERRORS::C_NOACT signals that the requested function is not available in the loaded DLL.
+   A return value of stw_errors::C_NOACT signals that the requested function is not available in the loaded DLL.
 
    For a detailed description of the underlying DLL-functions cf. the STW-comm-DLL specification.
 

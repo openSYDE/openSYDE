@@ -363,12 +363,10 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
             const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
             if (u32_Index < this->mc_MessageIds.size())
             {
-               const C_OSCCanMessage * pc_Message;
-               switch (e_Col)
+               if (e_Col == eEXTENDED)
                {
-               case eEXTENDED:
-                  pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(
-                     this->mc_MessageIds[u32_Index]);
+                  const C_OSCCanMessage * const pc_Message =
+                     C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageIds[u32_Index]);
                   if (pc_Message != NULL)
                   {
                      if (pc_Message->q_IsExtended == true)
@@ -380,9 +378,6 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                         c_Retval = static_cast<sintn>(Qt::Unchecked);
                      }
                   }
-                  break;
-               default:
-                  break;
                }
             }
          }
@@ -528,15 +523,14 @@ Qt::ItemFlags C_SdBueMessageTableModel::flags(const QModelIndex & orc_Index) con
       //Each item
       c_Retval = QAbstractTableModel::flags(orc_Index);
       //Add edit
-      switch (e_Col)
+      if (e_Col == eEXTENDED)
       {
-      case eEXTENDED:
          //Check box
          c_Retval = c_Retval | Qt::ItemIsUserCheckable;
-         break;
-      default:
+      }
+      else
+      {
          //Nothing to add
-         break;
       }
    }
    else

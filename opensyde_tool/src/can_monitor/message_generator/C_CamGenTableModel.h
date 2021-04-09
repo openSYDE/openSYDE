@@ -15,6 +15,7 @@
 #include "stwtypes.h"
 #include "C_TblModelAction.h"
 #include "C_CamProMessageData.h"
+#include "C_OgeWiCustomMessage.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -73,6 +74,8 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigItemCheck(const QModelIndex & orc_Index);
+   void SigReport(const stw_opensyde_gui_elements::C_OgeWiCustomMessage::E_Type oe_Type, const QString & orc_Heading,
+                  const QString & orc_Description);
    void SigUpdateMessageDLC(const stw_types::uint32 ou32_MessageIndex);
    void SigRegisterCyclicMessage(const stw_types::uint32 ou32_MessageIndex, const bool oq_Active);
 
@@ -88,6 +91,8 @@ private:
                                                    const std::vector<C_CamProMessageData> & orc_Data);
 
    void m_CheckAndHandleRegisterCyclicMessage(const stw_types::uint32 ou32_MessageIndex, const bool oq_Active);
+   void m_SpecialXtdFlagSetHandling(const stw_types::sintn osn_Row, const stw_types::uint32 ou32_Index,
+                                    const stw_types::sintn osn_Role);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

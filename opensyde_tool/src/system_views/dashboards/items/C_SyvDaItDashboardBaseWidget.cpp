@@ -54,10 +54,10 @@ C_SyvDaItDashboardBaseWidget::C_SyvDaItDashboardBaseWidget(QWidget * const opc_P
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_Widget and the Qt memory management
 C_SyvDaItDashboardBaseWidget::~C_SyvDaItDashboardBaseWidget(void)
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_Widget and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

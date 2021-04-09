@@ -77,7 +77,7 @@ C_SCLString C_OSCExportCommunicationStack::h_GetFileName(const uint8 ou8_Interfa
    // assemble filename
    // add Datapool name + protocol name + node index
    const C_SCLString c_Text = "comm_" + mh_GetProtocolNameByType(ore_ProtocolType).LowerCase() + "_can" +
-                              C_SCLString::IntToStr(ou8_InterfaceIndex + 1L);
+                              C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U);
 
    return c_Text;
 }
@@ -97,7 +97,8 @@ C_SCLString C_OSCExportCommunicationStack::h_GetConfigurationName(const uint8 ou
                                                                   const C_OSCCanProtocol::E_Type & ore_ProtocolType)
 {
    const C_SCLString c_Name = "gt_comm_" + mh_GetProtocolNameByType(ore_ProtocolType).LowerCase() + "_can" +
-                              C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_ProtocolConfiguration";
+                              C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) +
+                              "_ProtocolConfiguration";
 
    return c_Name;
 }
@@ -181,14 +182,25 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
 
    if (s32_Retval == C_NO_ERR)
    {
-      // make sure version is known and application is programmable
-      if ((c_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION) ||
-          (c_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION))
+      // make sure application is programmable
+      if (c_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
       {
          osc_write_log_error("Creating source code",
                              "Did not generate code for application \"" + c_Application.c_Name +
-                             "\" because code format version is unknown or application is not programmable.");
+                             "\" because application is not programmable.");
          s32_Retval = C_NOACT;
+      }
+      else
+      {
+         // make sure version is known
+         if (c_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
+         {
+            osc_write_log_error("Creating source code",
+                                "Did not generate code for application \"" + c_Application.c_Name +
+                                "\" because code format version \"" +
+                                C_SCLString::IntToStr(c_Application.u16_GenCodeVersion) + "\" is unknown.");
+            s32_Retval = C_NOACT;
+         }
       }
    }
 
@@ -403,7 +415,7 @@ void C_OSCExportCommunicationStack::mh_AddHeader(const C_SCLString & orc_ExportT
       orc_Data.Append("");
       orc_Data.Append("   Defines the communication configuration for protocol type " +
                       mh_GetProtocolNameByType(ore_Protocol) + " on CAN interface " +
-                      C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + ".");
+                      C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) + ".");
       orc_Data.Append("");
       orc_Data.Append(C_OSCExportUti::h_GetCreationToolInfo(orc_ExportToolInfo));
    }
@@ -491,11 +503,12 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
       {
          const C_SCLString c_Name = orc_ComMessage.c_TxMessages[u16_MessageIndex].c_Name.UpperCase();
          orc_Data.Append("#define COMM_" + c_ProtocolName + "_CAN" +
-                         C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_TX_MSG_INDEX_" + c_Name + " (" +
+                         C_SCLString::IntToStr(
+                            static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_TX_MSG_INDEX_" + c_Name + " (" +
                          C_SCLString::IntToStr(u16_MessageIndex) + "U)");
       }
       orc_Data.Append("#define COMM_" + c_ProtocolName + "_CAN" +
-                      C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_NUMBER_OF_TX_MSGS (" +
+                      C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_NUMBER_OF_TX_MSGS (" +
                       C_SCLString::IntToStr(orc_ComMessage.c_TxMessages.size()) + "U)");
       orc_Data.Append("");
 
@@ -504,11 +517,12 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
       {
          const C_SCLString c_Name = orc_ComMessage.c_RxMessages[u16_MessageIndex].c_Name.UpperCase();
          orc_Data.Append("#define COMM_" + c_ProtocolName + "_CAN" +
-                         C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_RX_MSG_INDEX_" + c_Name + " (" +
+                         C_SCLString::IntToStr(
+                            static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_RX_MSG_INDEX_" + c_Name + " (" +
                          C_SCLString::IntToStr(u16_MessageIndex) + "U)");
       }
       orc_Data.Append("#define COMM_" + c_ProtocolName + "_CAN" +
-                      C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_NUMBER_OF_RX_MSGS (" +
+                      C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_NUMBER_OF_RX_MSGS (" +
                       C_SCLString::IntToStr(orc_ComMessage.c_RxMessages.size()) + "U)");
       orc_Data.Append("");
 
@@ -539,14 +553,16 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
                for (c_ItValue = c_MultiplexerValues.begin(); c_ItValue != c_MultiplexerValues.end(); ++c_ItValue)
                {
                   orc_Data.Append("#define COMM_" + c_ProtocolName + "_CAN" +
-                                  C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_TX_MSG_MUX_INDEX_" + c_Name +
+                                  C_SCLString::IntToStr(
+                                     static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_TX_MSG_MUX_INDEX_" + c_Name +
                                   "_VALUE_" + C_SCLString::IntToStr(*c_ItValue) + " (" +
                                   C_SCLString::IntToStr(u16_ValueIndex) + "U)");
                   u16_ValueIndex++;
                }
 
                orc_Data.Append("#define COMM_" + c_ProtocolName + "_CAN" +
-                               C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_TX_MSG_" + c_Name + "_NUM_MUX_MSGS" +
+                               C_SCLString::IntToStr(
+                                  static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_TX_MSG_" + c_Name + "_NUM_MUX_MSGS" +
                                " (" +  C_SCLString::IntToStr(c_MultiplexerValues.size()) + "U)");
                orc_Data.Append("");
             }
@@ -576,14 +592,16 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
                for (c_ItValue = c_MultiplexerValues.begin(); c_ItValue != c_MultiplexerValues.end(); ++c_ItValue)
                {
                   orc_Data.Append("#define COMM_" + c_ProtocolName + "_CAN" +
-                                  C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_RX_MSG_MUX_INDEX_" + c_Name +
+                                  C_SCLString::IntToStr(
+                                     static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_RX_MSG_MUX_INDEX_" + c_Name +
                                   "_VALUE_" + C_SCLString::IntToStr(*c_ItValue) + " (" +
                                   C_SCLString::IntToStr(u16_ValueIndex) + "U)");
                   u16_ValueIndex++;
                }
 
                orc_Data.Append("#define COMM_" + c_ProtocolName + "_CAN" +
-                               C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_RX_MSG_" + c_Name + "_NUM_MUX_MSGS" +
+                               C_SCLString::IntToStr(
+                                  static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_RX_MSG_" + c_Name + "_NUM_MUX_MSGS" +
                                " (" +  C_SCLString::IntToStr(c_MultiplexerValues.size()) + "U)");
                orc_Data.Append("");
             }
@@ -657,13 +675,13 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_status mat_StatusTx[COMM_" +
                          c_ProtocolName + "_CAN" +
-                         C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_NUMBER_OF_TX_MSGS];");
+                         C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_NUMBER_OF_TX_MSGS];");
       }
       else
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_status_private mat_StatusTx[COMM_" +
                          c_ProtocolName + "_CAN" +
-                         C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_NUMBER_OF_TX_MSGS];");
+                         C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_NUMBER_OF_TX_MSGS];");
       }
    }
 
@@ -674,13 +692,13 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_status mat_StatusRx[COMM_" +
                          c_ProtocolName + "_CAN" +
-                         C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_NUMBER_OF_RX_MSGS];");
+                         C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_NUMBER_OF_RX_MSGS];");
       }
       else
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_status_private mat_StatusRx[COMM_" +
                          c_ProtocolName + "_CAN" +
-                         C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_NUMBER_OF_RX_MSGS];");
+                         C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) + "_NUMBER_OF_RX_MSGS];");
       }
    }
 
@@ -777,10 +795,10 @@ void C_OSCExportCommunicationStack::mh_AddCGlobalVariables(C_SCLStringList & orc
    orc_Data.Append("      OSY_COM_CONFIG_MAGIC,  ///< identification of valid comm configuration");
    orc_Data.Append("      OSY_COM_CONFIG_DEFINITION_VERSION,  ///< configuration version");
    orc_Data.Append("      COMM_" + c_ProtocolName + "_CAN" +
-                   C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) +
+                   C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) +
                    "_NUMBER_OF_TX_MSGS,  ///< number of Tx messages in this configuration");
    orc_Data.Append("      COMM_" + c_ProtocolName + "_CAN" +
-                   C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) +
+                   C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) +
                    "_NUMBER_OF_RX_MSGS,  ///< number of Rx messages in this configuration");
    if (oq_TxMessagesPresent == true)
    {
@@ -999,7 +1017,7 @@ void C_OSCExportCommunicationStack::mh_AddMessageDefinitions(C_SCLStringList & o
    }
 
    orc_Data.Append("static const T_osy_com_message_definition mat_Messages" + c_TxRxString + "[COMM_" +
-                   c_ProtocolName + "_CAN" + C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) +
+                   c_ProtocolName + "_CAN" + C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) +
                    "_NUMBER_OF_" + c_TxRxString.UpperCase() + "_MSGS] =");
    orc_Data.Append("{");
 
@@ -1090,7 +1108,7 @@ void C_OSCExportCommunicationStack::mh_AddMessageDefinitions(C_SCLStringList & o
       else
       {
          c_Text += C_SCLString::IntToStr(u32_MessageCounterGap) + "U, " + //message counter gap
-                   C_SCLString("&mat_") + rc_Message.c_Name + "[0] }";    // pointer to signals
+                   "&mat_" + rc_Message.c_Name + "[0] }";                 // pointer to signals
       }
 
       if (u16_MessageIndex != (u16_MessageCount - 1U))
@@ -1266,7 +1284,8 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetMagicName(const C_SCLString & o
 {
    const C_SCLString c_ProtocolName = mh_GetProtocolNameByType(ore_Protocol).UpperCase();
    const C_SCLString c_MagicName = "COMM_" + c_ProtocolName + "_CAN" +
-                                   C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_PROJECT_ID_" + orc_ProjectId;
+                                   C_SCLString::IntToStr(static_cast<uint32>(ou8_InterfaceIndex) + 1U) +
+                                   "_PROJECT_ID_" + orc_ProjectId;
 
    return c_MagicName;
 }
@@ -1313,17 +1332,17 @@ void C_OSCExportCommunicationStack::mh_ConvertSignalsToStrings(C_SCLStringList &
    itself.
 
    \param[in]   orc_Message            CAN message data for signal information
-   \param[in]   u32_MultiplexerIndex   Index of multiplexer signal in orc_Message
+   \param[in]   ou32_MultiplexerIndex  Index of multiplexer signal in orc_Message
    \param[out]  orc_SignalsPerValue    Signals sorted by multiplexer values (see description)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_GroupSignalsByMuxValue(const C_OSCCanMessage & orc_Message,
-                                                              const uint32 u32_MultiplexerIndex, std::map<sint32,
-                                                                                                          std::vector<C_OSCCanSignal> > & orc_SignalsPerValue)
+                                                              const uint32 ou32_MultiplexerIndex, std::map<sint32,
+                                                                                                           std::vector<C_OSCCanSignal> > & orc_SignalsPerValue)
 {
-   if (u32_MultiplexerIndex < orc_Message.c_Signals.size())
+   if (ou32_MultiplexerIndex < orc_Message.c_Signals.size())
    {
-      const C_OSCCanSignal & rc_MultiplexerSignal = orc_Message.c_Signals[u32_MultiplexerIndex];
+      const C_OSCCanSignal & rc_MultiplexerSignal = orc_Message.c_Signals[ou32_MultiplexerIndex];
       std::set<uint16> c_MultiplexValues;
       std::set<uint16>::const_iterator c_ItValue;
 
@@ -1350,6 +1369,8 @@ void C_OSCExportCommunicationStack::mh_GroupSignalsByMuxValue(const C_OSCCanMess
             // if key does not already exist something went really wrong
             tgl_assert(orc_SignalsPerValue.count(rc_Signal.u16_MultiplexValue) == 1);
             orc_SignalsPerValue[rc_Signal.u16_MultiplexValue].push_back(rc_Signal);
+            break;
+         default:
             break;
          }
       }

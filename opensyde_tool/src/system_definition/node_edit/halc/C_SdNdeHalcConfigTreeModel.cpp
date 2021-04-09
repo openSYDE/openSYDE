@@ -118,6 +118,9 @@ QVariant C_SdNdeHalcConfigTreeModel::headerData(const sintn osn_Section, const Q
          case eDESCRIPTION:
             c_Retval = C_GtGetText::h_GetText("Description");
             break;
+         default:
+            tgl_assert(false);
+            break;
          }
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
@@ -133,6 +136,9 @@ QVariant C_SdNdeHalcConfigTreeModel::headerData(const sintn osn_Section, const Q
          case eDESCRIPTION:
             c_Retval = C_GtGetText::h_GetText("Description");
             break;
+         default:
+            tgl_assert(false);
+            break;
          }
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
@@ -147,6 +153,9 @@ QVariant C_SdNdeHalcConfigTreeModel::headerData(const sintn osn_Section, const Q
             break;
          case eDESCRIPTION:
             c_Retval = C_GtGetText::h_GetText("Description of this parameter.");
+            break;
+         default:
+            tgl_assert(false);
             break;
          }
       }
@@ -235,17 +244,23 @@ QVariant C_SdNdeHalcConfigTreeModel::data(const QModelIndex & orc_Index, const s
                      c_Retval = mh_ConvertBitmasksToBitArray(pc_ParameterElement->c_Value);
                   }
                   break;
+               default:
+                  tgl_assert(false);
+                  break;
                }
                break;
             case eDESCRIPTION:
                c_Retval = pc_ParameterElement->c_Comment.c_str();
+               break;
+            default:
+               tgl_assert(false);
                break;
             }
          }
       }
       else if ((osn_Role == msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST) && (e_Col == eVALUE))
       {
-         const C_OSCHalcDefElement * pc_DefElement = this->m_GetDefParameterElement(orc_Index);
+         const C_OSCHalcDefElement * const pc_DefElement = this->m_GetDefParameterElement(orc_Index);
          if (pc_DefElement != NULL)
          {
             // Set generic spin box parameters
@@ -303,6 +318,9 @@ QVariant C_SdNdeHalcConfigTreeModel::data(const QModelIndex & orc_Index, const s
             case C_OSCHalcDefContent::eCT_BIT_MASK:
                c_Retval = static_cast<sintn>(eURIEL_MULTI_SELECT_COMBO_BOX);
                break;
+            default:
+               tgl_assert(false);
+               break;
             }
          }
       }
@@ -346,7 +364,7 @@ bool C_SdNdeHalcConfigTreeModel::setData(const QModelIndex & orc_Index, const QV
                                                                         q_Tmp, NULL, &c_LinkedChannels) == C_NO_ERR)
       {
          // get parameter data (of parameter itself or of parameter element)
-         const C_OSCHalcConfigParameter * pc_ParameterElement = m_GetParameterElement(orc_Index);
+         const C_OSCHalcConfigParameter * const pc_ParameterElement = m_GetParameterElement(orc_Index);
          if (pc_ParameterElement != NULL)
          {
             uint32 u32_ParameterIndex;
@@ -453,8 +471,10 @@ bool C_SdNdeHalcConfigTreeModel::setData(const QModelIndex & orc_Index, const QV
                   }
                }
                break;
+            default:
+               tgl_assert(false);
+               break;
             }
-            //lint -e{1793} Qt example
             Q_EMIT (this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role));
          }
       }
@@ -543,7 +563,7 @@ void C_SdNdeHalcConfigTreeModel::SetHalcChannelUseCase(const uint32 ou32_DomainI
    }
 
    // get domain
-   const C_OSCHalcConfigDomain * pc_Domain =
+   const C_OSCHalcConfigDomain * const pc_Domain =
       C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(mu32_NodeIndex, mu32_DomainIndex);
 
    if (pc_Domain != NULL)
@@ -660,11 +680,10 @@ bool C_SdNdeHalcConfigTreeModel::mh_GetParameterElementIndexe(const QModelIndex 
    if (orc_Index.isValid() == true)
    {
       // Decode model index: parent or child?
-      //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreItem * const pc_CurrentItem = static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
       if (pc_CurrentItem != NULL)
       {
-         
          const C_TblTreItem * const pc_Parent = dynamic_cast<const C_TblTreItem * const>(pc_CurrentItem->pc_Parent);
          if ((pc_Parent != NULL) && (pc_Parent->pc_Parent != NULL))
          {
@@ -704,10 +723,10 @@ const C_OSCHalcConfigParameter * C_SdNdeHalcConfigTreeModel::m_GetParameterEleme
    const C_OSCHalcConfigParameter * pc_Return = NULL;
 
    uint32 u32_ParameterIndex;
-   uint32 u32_ParameterElementIndex;
+   uint32 u32_ParameterElementIndex = 0U;
    const bool q_IsParameterElement = mh_GetParameterElementIndexe(orc_Index, u32_ParameterIndex,
                                                                   u32_ParameterElementIndex);
-   const C_OSCHalcConfigParameterStruct * pc_Parameter =
+   const C_OSCHalcConfigParameterStruct * const pc_Parameter =
       C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelParameterConfigStructData(mu32_NodeIndex, mu32_DomainIndex,
                                                                                      mu32_ChannelIndex,
                                                                                      u32_ParameterIndex,
@@ -757,10 +776,10 @@ const C_OSCHalcDefElement * C_SdNdeHalcConfigTreeModel::m_GetDefParameterElement
    const C_OSCHalcDefElement * pc_Return = NULL;
 
    uint32 u32_ParameterIndex;
-   uint32 u32_ParameterElementIndex;
+   uint32 u32_ParameterElementIndex = 0U;
    const bool q_IsParameterElement = mh_GetParameterElementIndexe(orc_Index, u32_ParameterIndex,
                                                                   u32_ParameterElementIndex);
-   const C_OSCHalcDefStruct * pc_DefElement =
+   const C_OSCHalcDefStruct * const pc_DefElement =
       C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileVariableData(mu32_NodeIndex, mu32_DomainIndex,
                                                                      C_OSCHalcDefDomain::eVA_PARAM,
                                                                      u32_ParameterIndex);

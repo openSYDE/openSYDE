@@ -73,15 +73,34 @@ C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & 
    {
       // No restriction of a defined timeout time due to not known cycle time
       this->mpc_Ui->pc_SpinBoxTimeout->SetMinimumCustom(1);
+
+      //maximum permitted RX timeout is limited by:
+      //* 3x maximum cycle time + 10  (3 * 50000 + 10)
+      //* uint16 variable used in openSYDE server -> 65535
+      this->mpc_Ui->pc_SpinBoxTimeout->SetMaximumCustom(65535);
    }
    else
    {
       // In case of a not on event message, the timeout time can not be disabled
       //lint -e{1938}  static const is guaranteed preinitialized before main
       this->mpc_Ui->pc_ComboBoxTimeoutActive->SetItemState(mhs32_IndexDisabled, false);
+
       this->mpc_Ui->pc_SpinBoxTimeout->SetMinimumCustom(ou32_LastKnownCycleTimeValue);
+
+      // The maximum cycle time is further limited by the effect the cycle time has on the permitted ECeS TX gap.
+      // The TX-gap is a uint8 on the ECU sude and is calculated as "(timeout/cycletime) = 1".
+      // In practice is makes no sense to send a message in high intervals but to check only after a long time.
+      // So we do limit the timeout to (cycle-time * 100);
+      // Even the 100 is way over what makes sense in a real application.
+      // To keep complexity low we also apply this to non-ECeS.
+      sintn sn_MaxCycleTime = static_cast<sintn>(ou32_LastKnownCycleTimeValue * 100);
+      if (sn_MaxCycleTime > 65535)
+      {
+         //limit to 16 bit
+         sn_MaxCycleTime = 65535;
+      }
+      this->mpc_Ui->pc_SpinBoxTimeout->SetMaximumCustom(sn_MaxCycleTime);
    }
-   this->mpc_Ui->pc_SpinBoxTimeout->SetMaximumCustom(150010); // 3x maximum cycle time + 10
 
    //Title
    this->mpc_ParentDialog->SetTitle(orc_NameForTitle);

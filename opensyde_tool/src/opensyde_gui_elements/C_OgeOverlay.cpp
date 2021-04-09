@@ -55,7 +55,7 @@ C_OgeOverlay::C_OgeOverlay(QWidget * const opc_Parent, QWidget * const opc_Effec
    ((mhpc_TopWidget != NULL) && (opc_EffectTargetChild == NULL)) // no effect target given
    {
       //lint -e{1938} Global variable access necessary in this case
-      QPoint c_ParentPos = mhpc_TopWidget->mapToGlobal(mhpc_TopWidget->pos());
+      const QPoint c_ParentPos = mhpc_TopWidget->mapToGlobal(mhpc_TopWidget->pos());
       //lint -e{1938} Global variable access necessary in this case
       this->setParent(mhpc_TopWidget);
       //lint -e{1938} Global variable access necessary in this case
@@ -70,7 +70,7 @@ C_OgeOverlay::C_OgeOverlay(QWidget * const opc_Parent, QWidget * const opc_Effec
       QWidget * const pc_ParentOfAllParents = C_OgeWiUtil::h_GetWidgetUnderNextPopUp(opc_EffectTargetChild);
       if (pc_ParentOfAllParents != NULL)
       {
-         QPoint c_ParentPos = pc_ParentOfAllParents->mapToGlobal(pc_ParentOfAllParents->pos());
+         const QPoint c_ParentPos = pc_ParentOfAllParents->mapToGlobal(pc_ParentOfAllParents->pos());
          this->setParent(pc_ParentOfAllParents);
          this->setGeometry(c_ParentPos.x(),
                            c_ParentPos.y(),

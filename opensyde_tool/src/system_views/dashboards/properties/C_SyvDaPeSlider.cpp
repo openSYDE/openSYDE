@@ -216,7 +216,7 @@ void C_SyvDaPeSlider::m_UpdatePreview(void)
    const QSize c_ViewSize = C_SyvDaPeBase::h_GetSceneViewSize();
    //Also include the fix offset to the right
    const float64 f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
-   C_GiSvDaSliderBase * pc_Item = new C_GiSvDaSliderBase(0UL, 0UL, -1L, 0ULL, NULL);
+   C_GiSvDaSliderBase * const pc_Item = new C_GiSvDaSliderBase(0UL, 0UL, -1L, 0ULL, NULL);
    //Do not use view center
    const QSizeF c_ItemSize((static_cast<float64>(c_ViewSize.width()) / 1.2) + f64_IconOffset,
                            static_cast<float64>(c_ViewSize.height()) / 5.0);
@@ -235,5 +235,4 @@ void C_SyvDaPeSlider::m_UpdatePreview(void)
    // add item
    this->mrc_ParentDialog.GetPreviewScene()->addItem(pc_Item);
    this->mrc_ParentDialog.GetPreviewScene()->clearSelection();
-
 } //lint !e429  //no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management

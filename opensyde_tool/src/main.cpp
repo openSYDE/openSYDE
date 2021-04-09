@@ -54,6 +54,8 @@ using namespace stw_types;
 //----------------------------------------------------------------------------------------------------------------------
 sintn main(sintn osn_Argc, charn * oapcn_Argv[])
 {
+   const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
+
    // turn on the DPI support**
    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
@@ -68,9 +70,9 @@ sintn main(sintn osn_Argc, charn * oapcn_Argv[])
       stw_opensyde_core::C_OSCLoggingHandler::h_SetCompleteLogFileLocation(c_FilePath.toStdString().c_str());
 
       osc_write_log_info("Startup", static_cast<QString>("Starting openSYDE Version: " +
-                                            stw_opensyde_gui_logic::C_Uti::h_GetApplicationVersion() +
-                                            ", MD5-Checksum: " +
-                                            c_ExeHash).toStdString().c_str());
+                                                         stw_opensyde_gui_logic::C_Uti::h_GetApplicationVersion() +
+                                                         ", MD5-Checksum: " +
+                                                         c_ExeHash).toStdString().c_str());
    }
    {
       //Set stylesheet (SECOND)
@@ -85,7 +87,7 @@ sintn main(sintn osn_Argc, charn * oapcn_Argv[])
    }
    {
       //Application (FOURTH)
-      stw_opensyde_gui::C_NagMainWindow c_Window;
+      stw_opensyde_gui::C_NagMainWindow c_Window(u16_Timer);
 
       c_Window.show();
 

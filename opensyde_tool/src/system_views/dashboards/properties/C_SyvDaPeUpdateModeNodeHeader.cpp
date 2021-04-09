@@ -89,8 +89,10 @@ C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const stw_types::ui
    if (pc_Node != NULL)
    {
       //Translation: 1: Node name
-      this->mpc_Ui->pc_LabelListName->setText(static_cast<QString>(C_GtGetText::h_GetText("Node - %1")).arg(pc_Node->c_Properties.
-                                                                                               c_Name.c_str()));
+      this->mpc_Ui->pc_LabelListName->setText(static_cast<QString>(C_GtGetText::h_GetText("Node - %1")).arg(pc_Node->
+                                                                                                            c_Properties
+                                                                                                            .
+                                                                                                            c_Name.c_str()));
    }
    this->UpdateCount();
 

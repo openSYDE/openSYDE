@@ -103,9 +103,8 @@ void C_SdNdeDbListWidget::SetIndex(const stw_types::uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
 {
-   QListWidgetItem * pc_Item = new QListWidgetItem(NULL, static_cast<sintn>(QListWidgetItem::ItemType::UserType));
-   C_SdNdeDbWidget * pc_ItemWidget = new C_SdNdeDbWidget(ou32_NodeIndex, ou32_ApplicationIndex,
-                                                         this);
+   QListWidgetItem * const pc_Item = new QListWidgetItem(NULL, static_cast<sintn>(QListWidgetItem::ItemType::UserType));
+   C_SdNdeDbWidget * const pc_ItemWidget = new C_SdNdeDbWidget(ou32_NodeIndex, ou32_ApplicationIndex, this);
 
    //signal to handle "there are no data blocks declared..." label
    Q_EMIT this->SigAppDisplay();
@@ -131,7 +130,7 @@ void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint
            &C_SdNdeDbListWidget::SigOpenDataPool);
    connect(pc_ItemWidget, &C_SdNdeDbWidget::SigOwnedDataPoolsChanged, this,
            &C_SdNdeDbListWidget::SigOwnedDataPoolsChanged);
-}  //lint !e429  //no memory leak because of the parent of pc_Item by calling addItem and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item by calling addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update applications
@@ -232,8 +231,7 @@ void C_SdNdeDbListWidget::dropEvent(QDropEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::startDrag(const Qt::DropActions oc_SupportedActions)
 {
-
-   C_SdNdeDbWidget * pc_ItemWidget =
+   C_SdNdeDbWidget * const pc_ItemWidget =
       dynamic_cast<C_SdNdeDbWidget *>(this->itemWidget(this->item(this->currentIndex().row())));
 
    this->mc_Delegate.StartPaint(this->currentIndex().row(), pc_ItemWidget);

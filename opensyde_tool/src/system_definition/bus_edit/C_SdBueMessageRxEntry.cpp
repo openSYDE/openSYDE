@@ -201,7 +201,7 @@ void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32 ou3
          pc_Entry->SetTxMethodOnEvent(this->mq_TxMethodOnEvent);
          this->mpc_Ui->pc_VerticalLayout->insertWidget(this->mpc_Ui->pc_VerticalLayout->count() - 1, pc_Entry);
          this->mc_Entries.push_back(pc_Entry);
-      }
+      } //lint !e429 //cleanup handled by Qt engine
    }
 }
 
@@ -214,11 +214,17 @@ void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32 ou3
 void C_SdBueMessageRxEntry::SetLastKnownCycleTimeValue(const uint32 ou32_Value)
 {
    this->mu32_LastKnownCycleTimeValue = ou32_Value;
+
    this->mu32_AutoReceiveTimeoutValue = (this->mu32_LastKnownCycleTimeValue * 3UL) + 10UL;
+   //limit to a maximum of 65535 so it can fit into 16bit:
+   if (this->mu32_AutoReceiveTimeoutValue > 65535U)
+   {
+      this->mu32_AutoReceiveTimeoutValue = 65535U;
+   }
 
    if (this->mq_HasChildren == false)
    {
-      m_UpdateAutoReceiveTimeoutValue();
+      m_UpdateAndAdaptRxTimeoutValue();
 
       // Update Link Text
       this->m_UpdateTimeoutLink();
@@ -444,6 +450,9 @@ void C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged(const sintn osn_CheckState)
             break;
          case Qt::Checked:
             this->m_ToggleSubItems(true);
+            break;
+         default:
+            tgl_assert(false);
             break;
          }
       }
@@ -684,10 +693,7 @@ void C_SdBueMessageRxEntry::m_OnTimeoutConfigLinkClicked(void)
             Q_EMIT (this->SigNodeReceiveTimeoutMode(this->mu32_NodeIndex, this->mu32_InterfaceIndex,
                                                     this->mu32_DatapoolIndex, this->me_ReceiveTimeoutMode));
 
-            if (this->me_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO)
-            {
-               this->m_UpdateAutoReceiveTimeoutValue();
-            }
+            this->m_UpdateAndAdaptRxTimeoutValue();
             // Update Link Text
             this->m_UpdateTimeoutLink();
          }
@@ -710,7 +716,7 @@ void C_SdBueMessageRxEntry::m_OnTimeoutConfigLinkClicked(void)
       {
          c_New->HideOverlay();
       }
-   }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -729,15 +735,37 @@ void C_SdBueMessageRxEntry::m_HandleInactiveStates(void) const
 /*! \brief   Update automatic receive timeout value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxEntry::m_UpdateAutoReceiveTimeoutValue(void)
+void C_SdBueMessageRxEntry::m_UpdateAndAdaptRxTimeoutValue(void)
 {
    if ((this->mpc_Ui->pc_CheckBoxActive->isChecked() == true) &&
-       (this->me_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO) &&
        (this->mq_HasChildren == false))
    {
-      this->mu32_ReceiveTimeoutValue = this->mu32_AutoReceiveTimeoutValue;
-      Q_EMIT (this->SigNodeReceiveTimeout(this->mu32_NodeIndex, this->mu32_InterfaceIndex, this->mu32_DatapoolIndex,
-                                          this->mu32_ReceiveTimeoutValue));
+      bool q_DoEmit = false;
+
+      if (this->me_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO)
+      {
+         this->mu32_ReceiveTimeoutValue = this->mu32_AutoReceiveTimeoutValue;
+         q_DoEmit = true;
+      }
+      else if (this->me_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM)
+      {
+         //we need to limit the maximum to cycle_time * 100 to prevent "TxGap" overflow (only has uint8)
+         if (this->mu32_ReceiveTimeoutValue > (this->mu32_LastKnownCycleTimeValue * 100U))
+         {
+            this->mu32_ReceiveTimeoutValue = this->mu32_LastKnownCycleTimeValue * 100U;
+            q_DoEmit = true;
+         }
+      }
+      else
+      {
+         //nothing to do ...
+      }
+
+      if (q_DoEmit == true)
+      {
+         Q_EMIT (this->SigNodeReceiveTimeout(this->mu32_NodeIndex, this->mu32_InterfaceIndex, this->mu32_DatapoolIndex,
+                                             this->mu32_ReceiveTimeoutValue));
+      }
    }
 }
 
@@ -758,18 +786,18 @@ void C_SdBueMessageRxEntry::m_UpdateTimeoutLink(void) const
    }
    else
    {
-      c_LinkText += QString::number(this->mu32_ReceiveTimeoutValue);
-      c_LinkText += " ms ";
-
       if (this->me_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO)
       {
-         c_LinkText += C_GtGetText::h_GetText("(Auto)");
+         c_LinkText += QString::number(this->mu32_AutoReceiveTimeoutValue);
+         c_LinkText += C_GtGetText::h_GetText(" ms (Auto)");
       }
       else
       {
-         c_LinkText += C_GtGetText::h_GetText("(Custom)");
+         c_LinkText += QString::number(this->mu32_ReceiveTimeoutValue);
+         c_LinkText += C_GtGetText::h_GetText(" ms (Custom)");
       }
    }
 
-   this->mpc_Ui->pc_LabelTimeoutLink->setText(static_cast<QString>(C_Uti::h_GetLink(c_LinkText, mc_STYLE_GUIDE_COLOR_6, "Link")));
+   this->mpc_Ui->pc_LabelTimeoutLink->setText(static_cast<QString>(C_Uti::h_GetLink(c_LinkText, mc_STYLE_GUIDE_COLOR_6,
+                                                                                    "Link")));
 }

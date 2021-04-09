@@ -239,7 +239,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
       if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
       {
          C_OSCCanMessageIdentificationIndices c_MessageId;
-         uint32 u32_SignalIndex;
+         uint32 u32_SignalIndex = 0U;
          if (this->ConvertRowToSignal(orc_Index.row(), c_MessageId, u32_SignalIndex) == C_NO_ERR)
          {
             const C_OSCCanMessage * pc_Message;
@@ -259,7 +259,8 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                if (pc_Message != NULL)
                {
                   c_Retval =
-                     static_cast<QString>("%1 (0x%2)").arg(pc_Message->c_Name.c_str(), QString::number(pc_Message->u32_CanId, 16));
+                     static_cast<QString>("%1 (0x%2)").arg(pc_Message->c_Name.c_str(),
+                                                           QString::number(pc_Message->u32_CanId, 16));
                }
                break;
             case eMULTIPLEXING:
@@ -414,15 +415,13 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
       else if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
       {
          C_OSCCanMessageIdentificationIndices c_MessageId;
-         uint32 u32_SignalIndex;
-         switch (e_Col)
+         uint32 u32_SignalIndex = 0U;
+         if (e_Col == eAUTO_MIN_MAX)
          {
-         case eAUTO_MIN_MAX:
             if (this->ConvertRowToSignal(orc_Index.row(), c_MessageId, u32_SignalIndex) == C_NO_ERR)
             {
                const C_PuiSdNodeDataPoolListElement * const pc_UiSignalCommon =
-                  C_PuiSdHandler::h_GetInstance()->GetUiCanDataPoolListElement(c_MessageId,
-                                                                               u32_SignalIndex);
+                  C_PuiSdHandler::h_GetInstance()->GetUiCanDataPoolListElement(c_MessageId, u32_SignalIndex);
                if (pc_UiSignalCommon != NULL)
                {
                   if (pc_UiSignalCommon->q_AutoMinMaxActive == true)
@@ -435,9 +434,6 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   }
                }
             }
-            break;
-         default:
-            break;
          }
       }
       else if (osn_Role == msn_USER_ROLE_ICON)
@@ -463,8 +459,9 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                            c_MessageId.u32_DatapoolIndex,
                            c_MessageId.q_MessageIsTx);
                      QStringList c_Tmp;
-                     const bool q_SignalValid = !pc_Message->CheckErrorSignal(pc_List, u32_SignalIndex, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                                                 c_MessageId.e_ComProtocol));
+                     const bool q_SignalValid = !pc_Message->CheckErrorSignal(
+                        pc_List, u32_SignalIndex, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                           c_MessageId.e_ComProtocol));
                      c_Tmp.push_back(QString::number(20));
                      if (q_SignalValid == false)
                      {
@@ -566,15 +563,14 @@ Qt::ItemFlags C_SdBueSignalTableModel::flags(const QModelIndex & orc_Index) cons
       //Each item
       c_Retval = QAbstractTableModel::flags(orc_Index);
       //Add edit
-      switch (e_Col)
+      if (e_Col == eAUTO_MIN_MAX)
       {
-      case eAUTO_MIN_MAX:
          //Check box
          c_Retval = c_Retval | Qt::ItemIsUserCheckable;
-         break;
-      default:
+      }
+      else
+      {
          //Nothing to add
-         break;
       }
    }
    else

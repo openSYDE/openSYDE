@@ -85,7 +85,6 @@ C_SyvDaUnoAddCommand::~C_SyvDaUnoAddCommand(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddCommand::m_AddNew(void)
 {
-   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -101,7 +100,6 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
          C_PuiSvDbSpinBox c_SpinBoxData;
          C_PuiSvDbSlider c_SliderData;
          C_PuiSvDbProgressBar c_ProgressBarData;
-         C_PuiSvDbChart c_ChartData;
          C_PuiSvDbTable c_TableData;
          C_PuiSvDbToggle c_ToggleData;
          C_PuiBsLineArrow c_LineArrowData;
@@ -183,16 +181,6 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             c_ProgressBarData.e_Alignment = C_PuiSvDbProgressBar::eLEFT;
             c_InitialData.AddWidget(&c_ProgressBarData, this->me_Type);
             break;
-         case C_PuiSvDbDataElement::eCHART:
-            //Theme
-            mh_DecodeTheme(c_ChartData, this->mc_AdditionalInformation);
-            //Specific settings
-            c_ChartData.f64_ZOrder = this->mf64_ZValue;
-            c_ChartData.c_UIPosition = mc_NewPos;
-            c_ChartData.f64_Height = 300.0;
-            c_ChartData.f64_Width = 600.0;
-            c_InitialData.AddWidget(&c_ChartData, this->me_Type);
-            break;
          case C_PuiSvDbDataElement::eTOGGLE:
             //Theme
             mh_DecodeTheme(c_ToggleData, this->mc_AdditionalInformation);
@@ -227,7 +215,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
          case C_PuiSvDbDataElement::eIMAGE:
             if (this->mc_AdditionalInformation.compare("") != 0)
             {
-               QPixmap c_Image(this->mc_AdditionalInformation);
+               const QPixmap c_Image(this->mc_AdditionalInformation);
                c_ImageData.c_UIPosition = mc_NewPos;
                c_ImageData.f64_Height = static_cast<float64>(c_Image.height());
                c_ImageData.f64_Width = static_cast<float64>(c_Image.width());
@@ -236,7 +224,9 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
                c_InitialData.AddImage(c_ImageData);
             }
             break;
+         case C_PuiSvDbDataElement::eCHART: // do not create deprecated chart
          case C_PuiSvDbDataElement::eUNKNOWN:
+         case C_PuiSvDbDataElement::eTAB_CHART:
          default:
             //No element to create
             break;

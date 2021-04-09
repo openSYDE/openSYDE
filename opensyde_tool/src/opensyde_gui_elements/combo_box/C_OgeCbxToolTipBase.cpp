@@ -135,9 +135,7 @@ void C_OgeCbxToolTipBase::SetItemState(const stw_types::sint32 os32_Index, const
          if (pc_Item != NULL)
          {
             Qt::ItemFlags c_Flags;
-            //lint -e{730,746,1013,1055} Use clean Qt interface
             c_Flags.setFlag(Qt::ItemIsEnabled, oq_Status);
-            //lint -e{730,746,1013,1055} Use clean Qt interface
             c_Flags.setFlag(Qt::ItemIsSelectable, oq_Status);
             //Disable
             pc_Item->setFlags(c_Flags);

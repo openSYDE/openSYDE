@@ -54,7 +54,7 @@ C_NagUseCaseWidget::C_NagUseCaseWidget(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_NagUseCaseWidget::~C_NagUseCaseWidget()
+C_NagUseCaseWidget::~C_NagUseCaseWidget(void)
 {
 }
 
@@ -90,6 +90,7 @@ QVector<C_NagToolBarButtonProperties> C_NagUseCaseWidget::GetVecToolBarFuncNames
    \param[in]  ou32_FuncNumber   Number of function
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_NagUseCaseWidget::UserInputFunc(const uint32 ou32_FuncNumber)
 {
    // empty implementation if the derived class doesn't need function
@@ -104,6 +105,7 @@ void C_NagUseCaseWidget::UserInputFunc(const uint32 ou32_FuncNumber)
    implementation must override this function if necessary.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_NagUseCaseWidget::Save(void)
 {
    // nothing to do here
@@ -121,6 +123,7 @@ void C_NagUseCaseWidget::Save(void)
    \param[in]  os32_Flag            Optional flag for further information
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_NagUseCaseWidget::OpenDetail(const sint32 os32_Index, const sint32 os32_SubIndex, const sint32 os32_SubSubIndex,
                                     const sint32 os32_SubSubSubIndex, const stw_types::sint32 os32_Flag)
 {
@@ -161,6 +164,7 @@ bool C_NagUseCaseWidget::PrepareToClose(void)
    \param[in]  ou32_Flag      Flag for special functionality
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_NagUseCaseWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_Index, const uint32 ou32_Flag)
 {
    // empty implementation if the derived class doesn't need function
@@ -192,6 +196,7 @@ bool C_NagUseCaseWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
 /*! \brief   Handle generic push button icon press
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_NagUseCaseWidget::OnPushButtonIconPress(void)
 {
    // nothing to do here
@@ -218,7 +223,7 @@ void C_NagUseCaseWidget::SaveAs(void)
       pc_Dialog->SaveUserSettings();
       c_New->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle open color picker action
@@ -243,4 +248,4 @@ void C_NagUseCaseWidget::OpenColorPicker(void)
    {
       c_Popup->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_ColorWidget and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_ColorWidget and the Qt memory management

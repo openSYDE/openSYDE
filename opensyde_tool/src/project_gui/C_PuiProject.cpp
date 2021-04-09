@@ -500,10 +500,6 @@ sint32 C_PuiProject::LoadInitialProject(uint16 * const opu16_FileVersion, QStrin
    }
    else
    {
-      // Make sure to remove project from recent projects
-      C_UsHandler::h_GetInstance()->RemoveOfRecentProjects(this->GetPath());
-      C_UsHandler::h_GetInstance()->Save();
-
       // Load empty project on fail (User feedback for error and next try with recent projects is done by main window)
       this->LoadEmpty();
 

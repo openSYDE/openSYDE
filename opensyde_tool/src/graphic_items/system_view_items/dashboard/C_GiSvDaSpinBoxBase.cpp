@@ -359,7 +359,7 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
          {
             c_New->HideOverlay();
          }
-      }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+      } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    }
    return true;
 }

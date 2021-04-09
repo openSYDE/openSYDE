@@ -106,10 +106,10 @@ C_NagToolBarWidget::C_NagToolBarWidget(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because mpc_ActUseCaseWidget is not created and removed here
 C_NagToolBarWidget::~C_NagToolBarWidget()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because mpc_ActUseCaseWidget is not created and removed here
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget *
       // add the groupbox to the main layout
       this->mpc_Ui->pc_HorizontalLayout->insertWidget(sn_LayoutIndex, pc_GroupBox);
       ++sn_LayoutIndex;
-   }  //lint !e429  //no memory leak because of parent of pc_GroupBox and pc_GroupBoxLayout and the Qt memory management
+   } //lint !e429  //no memory leak because of parent of pc_GroupBox and pc_GroupBoxLayout and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -330,7 +330,6 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
          }
          else
          {
-            
             QKeyEvent * const pc_KeyEvent = dynamic_cast<QKeyEvent *>(opc_Event);
             if (pc_KeyEvent != NULL)
             {
@@ -361,7 +360,6 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
       }
       else if (opc_Event->type() == QEvent::KeyPress)
       {
-         
          QKeyEvent * const pc_KeyEvent = dynamic_cast<QKeyEvent *>(opc_Event);
          if (pc_KeyEvent != NULL)
          {
@@ -510,7 +508,7 @@ void C_NagToolBarWidget::m_ShowBackgroundOfBtn(const uint32 ou32_Index, const bo
    if ((oq_Enable == false) && (ou32_Index == 1U))
    {
       QIcon c_IconEdit("://images/IconEditActive.svg");
-      c_IconEdit.addPixmap(QPixmap("://src/images/IconEditDisabled.svg"), QIcon::Disabled);
+      c_IconEdit.addPixmap(static_cast<QPixmap>("://src/images/IconEditDisabled.svg"), QIcon::Disabled);
       this->m_SetIconForBtn(1U, c_IconEdit);
    }
 }

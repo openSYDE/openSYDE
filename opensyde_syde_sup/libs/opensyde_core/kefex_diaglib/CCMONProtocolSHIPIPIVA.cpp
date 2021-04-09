@@ -12,8 +12,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
@@ -45,20 +45,26 @@ using namespace stw_can;
 //Defines of the jobs low byte for IVA functions (command low byte of the CAN messages)
 #define JOB_LB_IVA_LOGON                 (static_cast<uint8>(0x01U)) ///< Command low byte for Job "Log On"
 #define JOB_LB_IVA_LOGOFF                (static_cast<uint8>(0x02U)) ///< Command low byte for Job "Log Off"
-#define JOB_LB_IVA_SERVICE_READ          (static_cast<uint8>(0x03U)) ///< Command low byte for Job "Service Read Funktionen"
-#define JOB_LB_IVA_SERVICE_WRITE         (static_cast<uint8>(0x04U)) ///< Command low byte for Job "Service Write Funktionen"
+#define JOB_LB_IVA_SERVICE_READ          (static_cast<uint8>(0x03U)) ///< Command low byte for Job "Service Read
+                                                                     // Funktionen"
+#define JOB_LB_IVA_SERVICE_WRITE         (static_cast<uint8>(0x04U)) ///< Command low byte for Job "Service Write
+                                                                     // Funktionen"
 #define JOB_LB_IVA_READ_INDEX_EXPEDITED  (static_cast<uint8>(0x10U)) ///< Command low byte for Job "Read Index Data"
 #define JOB_LB_IVA_WRITE_INDEX_EXPEDITED (static_cast<uint8>(0x11U)) ///< Command low byte for Job "Write Index Data"
 #define JOB_LB_IVA_READ_INDEX_SEG_START  (static_cast<uint8>(0x12U)) ///< Command low byte for Job "Read Index Segment"
 #define JOB_LB_IVA_READ_INDEX_SEG_FLOW   (static_cast<uint8>(0x13U)) ///< Command low byte for Job "Read Index Flow"
-#define JOB_LB_IVA_WRITE_INDEX_SEG_START (static_cast<uint8>(0x14U)) ///< Command low byte for Job "Write Index Segment Start"
-#define JOB_LB_IVA_WRITE_INDEX_SEG_DATA  (static_cast<uint8>(0x15U)) ///< Command low byte for Job "Write Index Segment Data"
+#define JOB_LB_IVA_WRITE_INDEX_SEG_START (static_cast<uint8>(0x14U)) ///< Command low byte for Job "Write Index Segment
+                                                                     // Start"
+#define JOB_LB_IVA_WRITE_INDEX_SEG_DATA  (static_cast<uint8>(0x15U)) ///< Command low byte for Job "Write Index Segment
+                                                                     // Data"
 #define JOB_LB_IVA_READ_EEP_EXPEDITED    (static_cast<uint8>(0x20U)) ///< Command low byte for Job "Read Eeprom Data"
 #define JOB_LB_IVA_WRITE_EEP_EXPEDITED   (static_cast<uint8>(0x21U)) ///< Command low byte for Job "Write Eeprom Data"
 #define JOB_LB_IVA_READ_EEP_SEG_START    (static_cast<uint8>(0x22U)) ///< Command low byte for Job "Read Eeprom Segment"
 #define JOB_LB_IVA_READ_EEP_SEG_FLOW     (static_cast<uint8>(0x23U)) ///< Command low byte for Job "Read Eeprom Flow"
-#define JOB_LB_IVA_WRITE_EEP_SEG_START   (static_cast<uint8>(0x24U)) ///< Command low byte for Job "Write Eeprom Segment Start"
-#define JOB_LB_IVA_WRITE_EEP_SEG_DATA    (static_cast<uint8>(0x25U)) ///< Command low byte for Job "Write Eeprom Segment Data"
+#define JOB_LB_IVA_WRITE_EEP_SEG_START   (static_cast<uint8>(0x24U)) ///< Command low byte for Job "Write Eeprom Segment
+                                                                     // Start"
+#define JOB_LB_IVA_WRITE_EEP_SEG_DATA    (static_cast<uint8>(0x25U)) ///< Command low byte for Job "Write Eeprom Segment
+                                                                     // Data"
 #define JOB_LB_IVA_UPDATE_LIST_CHECKSUM  (static_cast<uint8>(0x50U)) ///< Command low byte for Job "Update Chacksum"
 #define JOB_LB_IVA_CHECK_LIST_CHECKSUM   (static_cast<uint8>(0x51U)) ///< Command low byte for Job "Check Checksum"
 #define JOB_LB_IVA_WRITE_LIST_DEFAULT    (static_cast<uint8>(0x60U)) ///< Command low byte for Job "Write List Default"
@@ -71,10 +77,14 @@ using namespace stw_can;
 #define IVA_SERVICE_DEVICE_TYPE3  (static_cast<uint16>(0x0005U)) ///< Service: Device Name 3. Part
 #define IVA_SERVICE_DEVICE_TYPE4  (static_cast<uint16>(0x0006U)) ///< Service: Device Name4. Part
 #define IVA_SERVICE_OD_VER        (static_cast<uint16>(0x0007U)) ///< Service: Version of the objekt directory
-#define IVA_SERVICE_BSMAX_SERVER  (static_cast<uint16>(0x0008U)) ///< Service: Max. Numbers of Blocks for segmented write access
-#define IVA_SERVICE_STMIN_SERVER  (static_cast<uint16>(0x0009U)) ///< Service: Min. time beween the CAN messages for segmented write access
-#define IVA_SERVICE_BSMAX_CLIENT  (static_cast<uint16>(0x000AU)) ///< Service: Max. Numbers of Blocks for segmented read access
-#define IVA_SERVICE_STMIN_CLIENT  (static_cast<uint16>(0x000BU)) ///< Service: Min. time beween the CAN messages for segmented read access
+#define IVA_SERVICE_BSMAX_SERVER  (static_cast<uint16>(0x0008U)) ///< Service: Max. Numbers of Blocks for segmented
+                                                                 // write access
+#define IVA_SERVICE_STMIN_SERVER  (static_cast<uint16>(0x0009U)) ///< Service: Min. time beween the CAN messages for
+                                                                 // segmented write access
+#define IVA_SERVICE_BSMAX_CLIENT  (static_cast<uint16>(0x000AU)) ///< Service: Max. Numbers of Blocks for segmented read
+                                                                 // access
+#define IVA_SERVICE_STMIN_CLIENT  (static_cast<uint16>(0x000BU)) ///< Service: Min. time beween the CAN messages for
+                                                                 // segmented read access
 
 #define CA_NO_ERR        (0)
 #define CA_UNKNOWN_ERR   (1)
@@ -92,50 +102,51 @@ using namespace stw_can;
 //SHIP-IP! constants:
 //sip_application_constants.h
 //access types:
-#define SIP_APP_AAT_READ                     (0x00)  // read server access
-#define SIP_APP_AAT_WRITE                    (0x01)  // write server access
-#define SIP_APP_AAT_WRITE_QUOTED             (0x02)  // write server access and quote payload
-#define SIP_APP_AAT_READ_CYCLIC              (0x03)  // install/response cyclic transfer
-#define SIP_APP_AAT_READ_STOP                (0x04)  // stop specific cyclic transfer
-#define SIP_APP_AAT_READ_STOP_ALL            (0x05)  // stop all cyclic transfers
-#define SIP_APP_AAT_DEFINE_DYNAMIC_SERVICE   (0x06)  // define new service on server
-#define SIP_APP_AAT_READ_MEMORY              (0x10)  // read from memory
-#define SIP_APP_AAT_WRITE_MEMORY             (0x11)  // write to memory
-#define SIP_APP_AAT_READ_OD                  (0x20)  // read from object dictionary
-#define SIP_APP_AAT_WRITE_OD                 (0x21)  // write to object dictionary
+#define SIP_APP_AAT_READ                     (0x00) // read server access
+#define SIP_APP_AAT_WRITE                    (0x01) // write server access
+#define SIP_APP_AAT_WRITE_QUOTED             (0x02) // write server access and quote payload
+#define SIP_APP_AAT_READ_CYCLIC              (0x03) // install/response cyclic transfer
+#define SIP_APP_AAT_READ_STOP                (0x04) // stop specific cyclic transfer
+#define SIP_APP_AAT_READ_STOP_ALL            (0x05) // stop all cyclic transfers
+#define SIP_APP_AAT_DEFINE_DYNAMIC_SERVICE   (0x06) // define new service on server
+#define SIP_APP_AAT_READ_MEMORY              (0x10) // read from memory
+#define SIP_APP_AAT_WRITE_MEMORY             (0x11) // write to memory
+#define SIP_APP_AAT_READ_OD                  (0x20) // read from object dictionary
+#define SIP_APP_AAT_WRITE_OD                 (0x21) // write to object dictionary
 
 //error codes:
-#define SIP_APP_ERR_NO_ERR                   (0x00)   // everything allright
-#define SIP_APP_ERR_UNEXPECTED_FLAG          (0x80)   // AREQ wrong, AERF set
-#define SIP_APP_ERR_ACCESS_TYPE              (0x81)   // requested access type not available
-#define SIP_APP_ERR_SERVICE_AREA             (0x82)   // requested service area not available
-#define SIP_APP_ERR_SERVICE_NAME             (0x83)   // requested service name not available
-#define SIP_APP_ERR_SERVICE_PARA             (0x84)   // requested service parameter not available
-#define SIP_APP_ERR_READ_WRITE               (0x85)   // trying to write a read only service or vice versa
-#define SIP_APP_ERR_DYNAMIC_OVERFLOW         (0x86)   // out of resources - can not configure requested dynamic service
-#define SIP_APP_ERR_CYCLIC_OVERFLOW          (0x87)   // out of resources - cannot configure requested cyclic service
-#define SIP_APP_ERR_DATASIZE                 (0x88)   // data length error (payload size inconsistent with access type or actual service to be executed)
-#define SIP_APP_ERR_SERVICE                  (0x89)   // service error – cannot handle service
-#define SIP_APP_ERR_SERVICE_ALIT             (0x90)   // location information target wrong
+#define SIP_APP_ERR_NO_ERR                   (0x00) // everything allright
+#define SIP_APP_ERR_UNEXPECTED_FLAG          (0x80) // AREQ wrong, AERF set
+#define SIP_APP_ERR_ACCESS_TYPE              (0x81) // requested access type not available
+#define SIP_APP_ERR_SERVICE_AREA             (0x82) // requested service area not available
+#define SIP_APP_ERR_SERVICE_NAME             (0x83) // requested service name not available
+#define SIP_APP_ERR_SERVICE_PARA             (0x84) // requested service parameter not available
+#define SIP_APP_ERR_READ_WRITE               (0x85) // trying to write a read only service or vice versa
+#define SIP_APP_ERR_DYNAMIC_OVERFLOW         (0x86) // out of resources - can not configure requested dynamic service
+#define SIP_APP_ERR_CYCLIC_OVERFLOW          (0x87) // out of resources - cannot configure requested cyclic service
+#define SIP_APP_ERR_DATASIZE                 (0x88) // data length error (payload size inconsistent with access type or
+                                                    // actual service to be executed)
+#define SIP_APP_ERR_SERVICE                  (0x89) // service error ? cannot handle service
+#define SIP_APP_ERR_SERVICE_ALIT             (0x90) // location information target wrong
 
 //memory types
-#define SIP_APP_MEM_TYPE_EEPROM              (0x00)   // target memory: EEPROM
-#define SIP_APP_MEM_TYPE_FLASH               (0x01)   // target memory: FLASH
+#define SIP_APP_MEM_TYPE_EEPROM              (0x00) // target memory: EEPROM
+#define SIP_APP_MEM_TYPE_FLASH               (0x01) // target memory: FLASH
 //no more defined for now
 
-#define SIP_APP_MEM_EEP_INDEX_SYSTEM         (0x00)   // index of system EEPROM
-#define SIP_APP_MEM_EEP_INDEX_USER           (0x01)   // index of user EEPROM
+#define SIP_APP_MEM_EEP_INDEX_SYSTEM         (0x00) // index of system EEPROM
+#define SIP_APP_MEM_EEP_INDEX_USER           (0x01) // index of user EEPROM
 
 //object dictionary types
-#define SIP_APP_OBJECT_DICTIONARY_TYPE_IV    (0x00)   // IV as used at STW for system EEPROM mapping
+#define SIP_APP_OBJECT_DICTIONARY_TYPE_IV    (0x00) // IV as used at STW for system EEPROM mapping
 //no more defined for now
 
 //sip_tp_can_constants.h
-#define SIP_TPC_MSG_POS_NSID              (23)    // Server ID
-#define SIP_TPC_MSG_POS_TCRQ              (22)    // CAN request flag
-#define SIP_TPC_MSG_POS_TCFT              (19)    // CAN frame type
-#define SIP_TPC_MSG_POS_ADS_SINGLE        (16)    // Data size single frame
-#define SIP_TPC_MSG_POS_ADS_SEGMENTED     (8)     // Data size segmented first frame
+#define SIP_TPC_MSG_POS_NSID              (23) // Server ID
+#define SIP_TPC_MSG_POS_TCRQ              (22) // CAN request flag
+#define SIP_TPC_MSG_POS_TCFT              (19) // CAN frame type
+#define SIP_TPC_MSG_POS_ADS_SINGLE        (16) // Data size single frame
+#define SIP_TPC_MSG_POS_ADS_SEGMENTED     (8)  // Data size segmented first frame
 
 #define SIP_TPC_SEGMENTED_FIRST_MAX_DATA_SIZE            (9)
 
@@ -146,32 +157,36 @@ using namespace stw_can;
 
 #define SIP_TPC_TCRQ_IS_REQUEST        (0)
 
-#define SIP_TPC_MASK_NSID               (0x03FUL << (SIP_TPC_MSG_POS_NSID)) // last six bit = server id (NSID)
-#define SIP_TPC_MASK_TCRQ               (0x001UL << (SIP_TPC_MSG_POS_TCRQ)) // TCRQ mask
-#define SIP_TPC_MASK_TCFT               (0x003UL << (SIP_TPC_MSG_POS_TCFT)) // CAN frame type mask
-#define SIP_TPC_MASK_ADS_SINGLE_SEGCON  (0x007UL << (SIP_TPC_MSG_POS_ADS_SINGLE)) // Data size mask of frame expedited single
-#define SIP_TPC_MASK_ADS_SEGMENTED      (0x7FFUL << (SIP_TPC_MSG_POS_ADS_SEGMENTED)) // Data size mask of frame segmented first
+#define SIP_TPC_MASK_NSID               (0x03FUL << (SIP_TPC_MSG_POS_NSID))          // last six bit = server id (NSID)
+#define SIP_TPC_MASK_TCRQ               (0x001UL << (SIP_TPC_MSG_POS_TCRQ))          // TCRQ mask
+#define SIP_TPC_MASK_TCFT               (0x003UL << (SIP_TPC_MSG_POS_TCFT))          // CAN frame type mask
+#define SIP_TPC_MASK_ADS_SINGLE_SEGCON  (0x007UL << (SIP_TPC_MSG_POS_ADS_SINGLE))    // Data size mask of frame
+                                                                                     // expedited single
+#define SIP_TPC_MASK_ADS_SEGMENTED      (0x7FFUL << (SIP_TPC_MSG_POS_ADS_SEGMENTED)) // Data size mask of frame
+                                                                                     // segmented first
 
 #define SIP_TPC_ERROR_NO_ERROR          (0U)
-#define SIP_TPC_ERROR_INVALID_DATA_SIZE (1U)  //segmented transfer first frame with too little data -> use single frame
-#define SIP_TPC_ERROR_STATE             (2U)  //segmented first received when expecting segmented consecutive
+#define SIP_TPC_ERROR_INVALID_DATA_SIZE (1U) //segmented transfer first frame with too little data -> use single frame
+#define SIP_TPC_ERROR_STATE             (2U) //segmented first received when expecting segmented consecutive
                                              //-> receiver still shall try to handle new incoming segmented transfer
                                              //or: segmented consecutive frame received when not expecting it
-#define SIP_TPC_ERROR_DLC               (3U)  //not enough data bytes in message
-#define SIP_TPC_ERROR_BLOCK_COUNTER     (4U)  //wrong block counter detected in segmented consecutive frame
-#define SIP_TPC_ERROR_FRAME_TYPE        (5U)  //unknown frame type received
+#define SIP_TPC_ERROR_DLC               (3U) //not enough data bytes in message
+#define SIP_TPC_ERROR_BLOCK_COUNTER     (4U) //wrong block counter detected in segmented consecutive frame
+#define SIP_TPC_ERROR_FRAME_TYPE        (5U) //unknown frame type received
 
 //SIP eleven specific constants (note that some constants from TPC are reused)
-#define SIP_TPC11_MSG_POS_NSID              (1U)    // Server ID (in ID)
-#define SIP_TPC11_MSG_POS_TCFT              (5U)    // CAN frame type (in DB0)
+#define SIP_TPC11_MSG_POS_NSID              (1U) // Server ID (in ID)
+#define SIP_TPC11_MSG_POS_TCFT              (5U) // CAN frame type (in DB0)
 
 #define SIP_TPC11_SEGMENTED_FIRST_MAX_DATA_SIZE  (6U)
 
 #define SIP_TPC11_MASK_NSID               (0x03FUL << (SIP_TPC11_MSG_POS_NSID)) // last six bit = server id (NSID)
 #define SIP_TPC11_MASK_TCRQ               (0x001UL)                             // TCRQ mask
 #define SIP_TPC11_MASK_TCFT               (0x007UL << (SIP_TPC11_MSG_POS_TCFT)) // CAN frame type mask
-#define SIP_TPC11_MASK_ADS_SINGLE_SEGCON  (0x007UL)                             // Data size mask of frame expedited single
-#define SIP_TPC11_MASK_ADS_SEGMENTED_MSB  (0x007UL)                            // Data size mask of frame segmented first upper three bits
+#define SIP_TPC11_MASK_ADS_SINGLE_SEGCON  (0x007UL)                             // Data size mask of frame expedited
+                                                                                // single
+#define SIP_TPC11_MASK_ADS_SEGMENTED_MSB  (0x007UL)                             // Data size mask of frame segmented
+                                                                                // first upper three bits
 
 //sip_services_target_constants.h
 // -- Application service area (ASA) defines
@@ -452,7 +467,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
    C_SCLString c_Help;
    bool q_IsError;
    uint8 u8_Service;
-   uint8  u8_Loop;
+   uint8 u8_Loop;
 
    c_Text = "";
 
@@ -482,9 +497,9 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             }
             else
             {
-               c_Help = " LOGON REQ  CHK " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                       "  VER " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
-                       "  NUMVARS " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+               c_Help = " LOGON REQ  CHK " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                        "  VER " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
+                        "  NUMVARS " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
             }
             c_Text += c_Help;
             break;
@@ -507,7 +522,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = " SERVICE_READ REQ  INDEX " +
-                                        m_IVAServiceIndexToString(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAServiceIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             c_Text += c_Help;
             break;
@@ -519,7 +534,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = " SERVICE_WRITE REQ  INDEX " +
-                            m_IVAServiceIndexToString(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) + "  DATA [";
+                        m_IVAServiceIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) + "  DATA [";
                for (u8_Loop = 4U; u8_Loop < orc_Msg.u8_DLC; u8_Loop++)
                {
                   c_Help += m_GetByteAsStringFormat(orc_Msg.au8_Data[u8_Loop]);
@@ -540,7 +555,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = m_KFXTextAndIndexToString(" READ_INDEX_EXP REQ ",
-                                                    m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                                                  mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             c_Text += c_Help;
             break;
@@ -552,17 +567,17 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = m_KFXTextAndIndexToString(" WRITE_INDEX_EXP REQ ",
-                            m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) + "  VALUE ";
+                                                  mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) + "  VALUE ";
                switch (orc_Msg.u8_DLC)
                {
                case 5U:
                   c_Help += m_GetByteAsStringFormat(orc_Msg.au8_Data[4]);
                   break;
                case 6U:
-                  c_Help += m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+                  c_Help += m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
                   break;
                case 8U:
-                  c_Help += m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                  c_Help += m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
                   break;
                default:
                   return "";
@@ -578,8 +593,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = m_KFXTextAndIndexToString(" READ_INDEX_SEG_STA REQ ",
-                                            m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                                     "  NUMBYTES " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                                                  mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                        "  NUMBYTES " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             }
             c_Text += c_Help;
             break;
@@ -591,8 +606,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = m_KFXTextAndIndexToString(" READ_INDEX_SEG_FLO REQ ",
-                                            m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                                     "  NUMLEFT " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                                                  mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                        "  NUMLEFT " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             }
             c_Text += c_Help;
             break;
@@ -604,8 +619,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = m_KFXTextAndIndexToString(" WRITE_INDEX_SEG_STA REQ ",
-                                                m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                                     "  NUMBYTES " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                                                  mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                        "  NUMBYTES " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             }
             c_Text += c_Help;
             break;
@@ -637,7 +652,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = " READ_EEP_EXP REQ  ADDRESS " +
-                        m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  NUMBYTES " +
+                        m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  NUMBYTES " +
                         m_GetByteAsStringFormat(orc_Msg.au8_Data[6]);
             }
             c_Text += c_Help;
@@ -650,7 +665,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = " WRITE_EEP_EXP REQ  ADDRESS " +
-                        m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  DATA [";
+                        m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  DATA [";
                if (orc_Msg.u8_DLC == 7U)
                {
                   c_Help += m_GetByteAsStringFormat(orc_Msg.au8_Data[6]);
@@ -672,8 +687,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = " READ_EEP_SEG_STA REQ  ADDRESS " +
-                        m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  NUMBYTES " +
-                        m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                        m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  NUMBYTES " +
+                        m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
             }
             c_Text += c_Help;
             break;
@@ -685,8 +700,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = " READ_EEP_SEG_FLO REQ  ADDRESS " +
-                        m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  NUMLEFT " +
-                        m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                        m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  NUMLEFT " +
+                        m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
             }
             c_Text += c_Help;
             break;
@@ -698,8 +713,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = " WRITE_EEP_SEG_STA REQ  ADDRESS " +
-                        m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  NUMBYTES " +
-                        m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                        m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  NUMBYTES " +
+                        m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
             }
             c_Text += c_Help;
             break;
@@ -780,15 +795,15 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             {
                if (q_IsError == false)
                {
-                  c_Help = " LOGON RSP  CHK " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                          "  VER " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
-                          "  NUMVARS " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                  c_Help = " LOGON RSP  CHK " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                           "  VER " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
+                           "  NUMVARS " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
                }
                else
                {
-                  c_Help = " LOGON RSP  ERR " + m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                          "  VER " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
-                          "  NUMVARS " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                  c_Help = " LOGON RSP  ERR " + m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                           "  VER " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
+                           "  NUMVARS " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
                }
             }
             c_Text += c_Help;
@@ -800,7 +815,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             }
             else if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
-               c_Help = " LOGOFF RSP  ERR " + m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+               c_Help = " LOGOFF RSP  ERR " + m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else
             {
@@ -812,12 +827,12 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
                c_Help = " SERVICE_READ RSP  ERR " +
-                        m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if ((orc_Msg.u8_DLC >= 5U) && (q_IsError == false))
             {
                c_Help = " SERVICE_READ RSP  INDEX " +
-                        m_IVAServiceIndexToString(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) + "  DATA [";
+                        m_IVAServiceIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) + "  DATA [";
                for (u8_Loop = 4U; u8_Loop < orc_Msg.u8_DLC; u8_Loop++)
                {
                   c_Help += m_GetByteAsStringFormat(orc_Msg.au8_Data[u8_Loop]);
@@ -840,12 +855,12 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
                if (q_IsError == true)
                {
                   c_Help = " SERVICE_WRITE RSP  ERR " +
-                                           m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                           m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
                else
                {
                   c_Help = " SERVICE_WRITE RSP  INDEX " +
-                                           m_IVAServiceIndexToString(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                           m_IVAServiceIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
             }
             else
@@ -858,23 +873,23 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
                c_Help = " READ_INDEX_EXP RSP  ERR " +
-                        m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if ((orc_Msg.u8_DLC >= 5U) && (q_IsError == false))
             {
                c_Help = m_KFXTextAndIndexToString(" READ_INDEX_EXP RSP ",
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                                       "  VALUE ";
+                                                  mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                        "  VALUE ";
                switch (orc_Msg.u8_DLC)
                {
                case 5U:
                   c_Help += m_GetByteAsStringFormat(orc_Msg.au8_Data[4]);
                   break;
                case 6U:
-                  c_Help += m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+                  c_Help += m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
                   break;
                case 8U:
-                  c_Help += m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                  c_Help += m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
                   break;
                default:
                   return "";
@@ -896,12 +911,12 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
                if (q_IsError == true)
                {
                   c_Help = " WRITE_INDEX_EXP RSP  ERR " +
-                                           m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                           m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
                else
                {
                   c_Help = m_KFXTextAndIndexToString(" WRITE_INDEX_EXP RSP ",
-                                                       m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                                                     mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
             }
             c_Text += c_Help;
@@ -916,12 +931,12 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
                if (q_IsError == true)
                {
                   c_Help = " READ_INDEX_SEG_DAT RSP  ERR " +
-                                           m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                           m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
                else
                {
                   c_Help = " READ_INDEX_SEG_DAT RSP  BLK " +
-                                           m_GetByteAsStringFormat(orc_Msg.au8_Data[2]) + "  DATA [";
+                           m_GetByteAsStringFormat(orc_Msg.au8_Data[2]) + "  DATA [";
                   for (u8_Loop = 3U; u8_Loop < orc_Msg.u8_DLC; u8_Loop++)
                   {
                      c_Help += m_GetByteAsStringFormat(orc_Msg.au8_Data[u8_Loop]);
@@ -934,8 +949,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
 
                   if (orc_Msg.u8_DLC == 4U) //could also be a first response containg the address !
                   {
-                     c_Help += m_KFXTextAndIndexToString(" (OR:", m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                                                           ")";
+                     c_Help += m_KFXTextAndIndexToString(" (OR:", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                               ")";
                   }
                }
             }
@@ -945,13 +960,13 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
                c_Help = " WRITE_INDEX_SEG_FLO RSP  ERR " +
-                                        m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if ((orc_Msg.u8_DLC == 8U) && (q_IsError == false))
             {
                c_Help = " WRITE_INDEX_SEG_FLO RSP  INDEX " +
-                                        m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                                      "  NUMLEFT " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                        m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                        "  NUMLEFT " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             }
             else
             {
@@ -963,13 +978,13 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
                c_Help = " WRITE_INDEX_SEG_FIN RSP  ERR " +
-                                        m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if ((orc_Msg.u8_DLC == 8U) && (q_IsError == false))
             {
                c_Help = " WRITE_INDEX_SEG_FIN RSP  INDEX " +
-                                        m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                                     "  NUMTOTAL " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                        m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                        "  NUMTOTAL " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             }
             else
             {
@@ -981,12 +996,12 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
                c_Help = " READ_EEP_EXP RSP  ERR " +
-                        m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if ((orc_Msg.u8_DLC >= 7) && (q_IsError == false))
             {
                c_Help = " READ_EEP_EXP RSP  ADDRESS " +
-                                        m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  DATA [";
+                        m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  DATA [";
                if (orc_Msg.u8_DLC == 7U)
                {
                   c_Help += m_GetByteAsStringFormat(orc_Msg.au8_Data[6]) + "]";
@@ -1007,7 +1022,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
                c_Help = " WRITE_EEP_EXP RSP  ERR " +
-                                        m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if (orc_Msg.u8_DLC < 7U)
             {
@@ -1016,7 +1031,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             else
             {
                c_Help = " WRITE_EEP_EXP RSP  ADDRESS " +
-                        m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  DATA ";
+                        m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + "  DATA ";
                if (orc_Msg.u8_DLC == 7U)
                {
                   c_Help += m_GetByteAsStringFormat(orc_Msg.au8_Data[6]);
@@ -1039,12 +1054,12 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
                if (q_IsError == true)
                {
                   c_Help = " READ_EEP_SEG_DAT RSP  ERR " +
-                                           m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                           m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
                else
                {
                   c_Help = " READ_EEP_SEG_DAT RSP  BLK " +
-                                           m_GetByteAsStringFormat(orc_Msg.au8_Data[2]) + "  DATA [";
+                           m_GetByteAsStringFormat(orc_Msg.au8_Data[2]) + "  DATA [";
                   for (u8_Loop = 3U; u8_Loop < orc_Msg.u8_DLC; u8_Loop++)
                   {
                      c_Help += m_GetByteAsStringFormat(orc_Msg.au8_Data[u8_Loop]);
@@ -1059,7 +1074,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
                   if (orc_Msg.u8_DLC == 6U) //could also be a first response containg the address !
                   {
                      c_Help += " (OR: ADDRESS " +
-                               m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + ")";
+                               m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) + ")";
                   }
                }
             }
@@ -1069,13 +1084,13 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
                c_Help = " WRITE_EEP_SEG_FLO RSP  ERR " +
-                                        m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if ((orc_Msg.u8_DLC == 8U) && (q_IsError == false))
             {
                c_Help = " WRITE_EEP_SEG_FLO RSP  ADDRESS " +
-                                        m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) +
-                                      "  NUMLEFT " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                        m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) +
+                        "  NUMLEFT " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
             }
             else
             {
@@ -1087,13 +1102,13 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
                c_Help = " WRITE_EEP_SEG_FIN RSP  ERR " +
-                                        m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if ((orc_Msg.u8_DLC == 8U) && (q_IsError == false))
             {
                c_Help = " WRITE_EEP_SEG_FIN RSP  ADDRESS " +
-                                        m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) +
-                                     "  NUMTOTAL " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                        m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[2])) +
+                        "  NUMTOTAL " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
             }
             else
             {
@@ -1105,7 +1120,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
                c_Help = " UPD_LIST_CHECK RSP  ERR " +
-                                        m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if ((orc_Msg.u8_DLC == 3U) && (q_IsError == false))
             {
@@ -1120,7 +1135,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
          case JOB_LB_IVA_CHECK_LIST_CHECKSUM:
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
-               c_Help = " CHK_LIST_CHECK RSP  ERR " + m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+               c_Help = " CHK_LIST_CHECK RSP  ERR " +
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if ((orc_Msg.u8_DLC == 3U) && (q_IsError == false))
             {
@@ -1136,13 +1152,13 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
             if ((orc_Msg.u8_DLC == 4U) && (q_IsError == true))
             {
                c_Help = " WRITE_LIST_DEFAULT RSP  ERR " +
-                                        m_IVAGetErrorFromCode(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                        m_IVAGetErrorFromCode(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
             }
             else if ((orc_Msg.u8_DLC == 4U) && (q_IsError == false))
             {
                c_Help = " WRITE_LIST_DEFAULT RSP  IDX " +
-                                        m_GetByteAsStringFormat(orc_Msg.au8_Data[2]) + "  OK " +
-                                        m_GetByteAsStringFormat(orc_Msg.au8_Data[3]);
+                        m_GetByteAsStringFormat(orc_Msg.au8_Data[2]) + "  OK " +
+                        m_GetByteAsStringFormat(orc_Msg.au8_Data[3]);
             }
             else
             {
@@ -1175,6 +1191,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_IVAGetErrorFromCode(const uint16 ou16_ErrorCode) const
 {
    C_SCLString c_Error;
+
    switch (ou16_ErrorCode)
    {
    case CA_NO_ERR:
@@ -1225,6 +1242,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_IVAGetErrorFromCode(const uint16 ou16_E
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_IVAServiceIndexToString(const uint16 ou16_ServiceIndex) const
 {
    C_SCLString c_Index;
+
    switch (ou16_ServiceIndex)
    {
    case IVA_SERVICE_PROT_VER:
@@ -1291,7 +1309,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPMessageToString(const T_STWCAN_Msg_R
 
    //request or response ?
    q_IsRequest = ((orc_Msg.u32_ID & SIP_TPC_MASK_TCRQ) ==
-           (static_cast<uint32>(SIP_TPC_TCRQ_IS_REQUEST) << SIP_TPC_MSG_POS_TCRQ));
+                  (static_cast<uint32>(SIP_TPC_TCRQ_IS_REQUEST) << SIP_TPC_MSG_POS_TCRQ));
 
    //which frame type ?
    u8_TCFrameType = static_cast<uint8>((orc_Msg.u32_ID & SIP_TPC_MASK_TCFT) >> SIP_TPC_MSG_POS_TCFT);
@@ -1311,7 +1329,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPMessageToString(const T_STWCAN_Msg_R
    case SIP_TPC_TCFT_EXPEDITED_SINGLE:
       c_Text += " SF";
 
-      u16_DataSize = static_cast<uint16>((orc_Msg.u32_ID & SIP_TPC_MASK_ADS_SINGLE_SEGCON) >> SIP_TPC_MSG_POS_ADS_SINGLE);
+      u16_DataSize =
+         static_cast<uint16>((orc_Msg.u32_ID & SIP_TPC_MASK_ADS_SINGLE_SEGCON) >> SIP_TPC_MSG_POS_ADS_SINGLE);
       if (orc_Msg.u8_DLC < (u16_DataSize + 1))
       {
          c_Text += " (*DLC Error*)";
@@ -1322,14 +1341,15 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPMessageToString(const T_STWCAN_Msg_R
          u16_DataSize = static_cast<uint16>(u16_DataSize + 3U);
 
          c_Text += " SIZE " + m_GetWordAsStringFormat(u16_DataSize) + "  ";
-         c_Text += m_SIPGetApplData(static_cast<uint8>(orc_Msg.u32_ID >> 8), static_cast<uint8>(orc_Msg.u32_ID),
+         c_Text += m_SIPGetApplData(static_cast<uint8>(orc_Msg.u32_ID >> 8U), static_cast<uint8>(orc_Msg.u32_ID),
                                     &orc_Msg.au8_Data[0], static_cast<uint8>(u16_DataSize), q_IsRequest);
       }
       break;
    case SIP_TPC_TCFT_SEGMENTED_FIRST:
       c_Text += " FF";
 
-      u16_DataSize = static_cast<uint16>((orc_Msg.u32_ID & SIP_TPC_MASK_ADS_SEGMENTED) >> SIP_TPC_MSG_POS_ADS_SEGMENTED);
+      u16_DataSize =
+         static_cast<uint16>((orc_Msg.u32_ID & SIP_TPC_MASK_ADS_SEGMENTED) >> SIP_TPC_MSG_POS_ADS_SEGMENTED);
       if (u16_DataSize <= SIP_TPC_SEGMENTED_FIRST_MAX_DATA_SIZE)
       {
          //baka: we don't need a segmented transfer for that !
@@ -1349,14 +1369,14 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPMessageToString(const T_STWCAN_Msg_R
    case SIP_TPC_TCFT_SEGMENTED_CONSECUTIVE:
       c_Text += " CF";
       u8_TCBlockCounter =
-                   static_cast<uint8>((orc_Msg.u32_ID & SIP_TPC_MASK_ADS_SINGLE_SEGCON) >> SIP_TPC_MSG_POS_ADS_SINGLE);
+         static_cast<uint8>((orc_Msg.u32_ID & SIP_TPC_MASK_ADS_SINGLE_SEGCON) >> SIP_TPC_MSG_POS_ADS_SINGLE);
       //we accept all DLCs as we do not know how many bytes of the payload are expected ...
       c_Text += " BLK " + m_GetValueDecHex(u8_TCBlockCounter) + "  DATA [";
-      c_Text += (m_GetByteAsStringFormat(static_cast<uint8>(orc_Msg.u32_ID >> 8)) + ",");
+      c_Text += (m_GetByteAsStringFormat(static_cast<uint8>(orc_Msg.u32_ID >> 8U)) + ",");
       c_Text += (m_GetByteAsStringFormat(static_cast<uint8>(orc_Msg.u32_ID)));
       if (orc_Msg.u8_DLC > 0U)
       {
-          c_Text += ",";
+         c_Text += ",";
       }
       for (s32_Loop = 0; s32_Loop < orc_Msg.u8_DLC; s32_Loop++)
       {
@@ -1369,7 +1389,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPMessageToString(const T_STWCAN_Msg_R
       c_Text += "]";
       break;
    case SIP_TPC_TCFT_ERROR:
-      c_Text += " EF  ERROR (" + m_SIPGetTPErrorFromCode(static_cast<uint8>(orc_Msg.u32_ID >> 8)) + ")";
+      c_Text += " EF  ERROR (" + m_SIPGetTPErrorFromCode(static_cast<uint8>(orc_Msg.u32_ID >> 8U)) + ")";
       break;
    default:
       c_Text += " (*TP Error: undefined Frame Type*)";
@@ -1431,7 +1451,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIP11MessageToString(const T_STWCAN_Msg
    case SIP_TPC_TCFT_SEGMENTED_FIRST:
       c_Text += " FF";
 
-      u16_DataSize = static_cast<uint16>((orc_Msg.au8_Data[0] & SIP_TPC11_MASK_ADS_SEGMENTED_MSB) + orc_Msg.au8_Data[1]);
+      u16_DataSize =
+         static_cast<uint16>((orc_Msg.au8_Data[0] & SIP_TPC11_MASK_ADS_SEGMENTED_MSB) + orc_Msg.au8_Data[1]);
 
       if (u16_DataSize <= SIP_TPC11_SEGMENTED_FIRST_MAX_DATA_SIZE)
       {
@@ -1490,11 +1511,12 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
 {
    C_SCLString c_Text;
    uint8 u8_Index;
-   bool q_AERF;    //error flag
-   bool q_ACLI;    //contains location information
-   uint8 u8_AAT;   //access type
-   uint8 u8_ALIT;  //location information type
-   uint8 u8_ALII;  //location information index
+   bool q_AERF;   //error flag
+   bool q_ACLI;   //contains location information
+   uint8 u8_AAT;  //access type
+   uint8 u8_ALIT; //location information type
+   uint8 u8_ALII; //location information index
+
    SCLDynamicArray<C_CMONProtocolSIPPayload> * pc_Payload;
    uint8 u8_NumBytes;
    uint8 u8_ASH_Byte1;
@@ -1573,7 +1595,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
                }
                else
                {
-                  c_Text += "  TIME " + m_GetWordAsStringFormat(m_BytesToWordLowHigh(&pu8_ASH_Byte2[2])) + "ms";
+                  c_Text += "  TIME " + m_GetWordAsStringFormat(mh_BytesToWordLowHigh(&pu8_ASH_Byte2[2])) + "ms";
                }
             }
             else
@@ -1614,7 +1636,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
       {
          c_Text += (" " + m_SIPGetMemoryRWTypeAndIndex(static_cast<uint8>((u8_ASH_Byte1) >> 5),
                                                        static_cast<uint8>((u8_ASH_Byte1) & 0x1FU)) +
-                    " ADD " + m_GetValueDecHex(m_BytesToDwordLowHigh(&pu8_ASH_Byte2[0])));
+                    " ADD " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&pu8_ASH_Byte2[0])));
          if (oq_IsRequest == true)
          {
             //add size:
@@ -1624,7 +1646,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
             }
             else
             {
-               c_Text += (" SIZE " + m_GetValueDecHex(m_BytesToWordLowHigh(&pu8_ASH_Byte2[4])));
+               c_Text += (" SIZE " + m_GetValueDecHex(mh_BytesToWordLowHigh(&pu8_ASH_Byte2[4])));
             }
          }
          else
@@ -1656,7 +1678,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
             }
             else
             {
-              //nothing to do ...
+               //nothing to do ...
             }
          }
       }
@@ -1670,7 +1692,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
       {
          c_Text += (" " + m_SIPGetMemoryRWTypeAndIndex(static_cast<uint8>((u8_ASH_Byte1) >> 5),
                                                        static_cast<uint8>((u8_ASH_Byte1) & 0x1FU)) +
-                    " ADD " + m_GetValueDecHex(m_BytesToDwordLowHigh(&pu8_ASH_Byte2[0])));
+                    " ADD " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&pu8_ASH_Byte2[0])));
          if (oq_IsRequest == true)
          {
             //add size:
@@ -1680,7 +1702,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
             }
             else
             {
-               c_Text += (" SIZE " + m_GetValueDecHex(m_BytesToWordLowHigh(&pu8_ASH_Byte2[4])));
+               c_Text += (" SIZE " + m_GetValueDecHex(mh_BytesToWordLowHigh(&pu8_ASH_Byte2[4])));
 
                //add data:
                if (u8_NumBytes > 8U)
@@ -1722,7 +1744,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
       }
       else
       {
-         c_Text += (" " + m_SIPGetODRWTypeAndIndex(u8_ASH_Byte1, m_BytesToWordLowHigh(&pu8_ASH_Byte2[0])));
+         c_Text += (" " + m_SIPGetODRWTypeAndIndex(u8_ASH_Byte1, mh_BytesToWordLowHigh(&pu8_ASH_Byte2[0])));
          if (oq_IsRequest == true)
          {
             //add size:
@@ -1732,7 +1754,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
             }
             else
             {
-               c_Text += (" SIZE " + m_GetValueDecHex(m_BytesToWordLowHigh(&pu8_ASH_Byte2[2])));
+               c_Text += (" SIZE " + m_GetValueDecHex(mh_BytesToWordLowHigh(&pu8_ASH_Byte2[2])));
             }
          }
          else
@@ -1776,7 +1798,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
       }
       else
       {
-         c_Text += (" " + m_SIPGetODRWTypeAndIndex(u8_ASH_Byte1, m_BytesToWordLowHigh(&pu8_ASH_Byte2[0])));
+         c_Text += (" " + m_SIPGetODRWTypeAndIndex(u8_ASH_Byte1, mh_BytesToWordLowHigh(&pu8_ASH_Byte2[0])));
          if (oq_IsRequest == true)
          {
             //add size:
@@ -1786,7 +1808,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
             }
             else
             {
-               c_Text += (" SIZE " + m_GetValueDecHex(m_BytesToWordLowHigh(&pu8_ASH_Byte2[2])));
+               c_Text += (" SIZE " + m_GetValueDecHex(mh_BytesToWordLowHigh(&pu8_ASH_Byte2[2])));
 
                //add data:
                if (u8_NumBytes > 6U)
@@ -1868,6 +1890,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetAppErrorFromCode(const uint8 ou8_ErrorCode) const
 {
    C_SCLString c_Error;
+
    switch (ou8_ErrorCode)
    {
    case SIP_APP_ERR_NO_ERR:
@@ -1918,6 +1941,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetAppErrorFromCode(const uint8 ou8_
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetTPErrorFromCode(const uint8 ou8_ErrorCode) const
 {
    C_SCLString c_Error;
+
    switch (ou8_ErrorCode)
    {
    case SIP_TPC_ERROR_NO_ERROR:
@@ -1950,6 +1974,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetTPErrorFromCode(const uint8 ou8_E
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetAccessType(const uint8 ou8_AccessType) const
 {
    C_SCLString c_Type;
+
    switch (ou8_AccessType)
    {
    case SIP_APP_AAT_READ:
@@ -1998,6 +2023,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetMemoryRWTypeAndIndex(const uint8 
                                                                     const uint8 ou8_MemIndex) const
 {
    C_SCLString c_Help;
+
    //memory types
    switch (ou8_MemType)
    {
@@ -2040,9 +2066,10 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetMemoryRWTypeAndIndex(const uint8 
 //----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetODRWTypeAndIndex(const uint8 ou8_ODType,
-                                                                  const uint16 ou16_VariableIndex) const
+                                                                const uint16 ou16_VariableIndex) const
 {
    C_SCLString c_Help;
+
    //ID types
    switch (ou8_ODType)
    {
@@ -2050,7 +2077,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetODRWTypeAndIndex(const uint8 ou8_
       c_Help = "OD IVA";
       //variable index
       c_Help += (" LIS" + m_GetByteAsStringFormat(static_cast<uint8>((ou16_VariableIndex & 0xFC00U) >> 10)) + ".VAR" +
-                          m_GetWordAsStringFormat(static_cast<uint16>(ou16_VariableIndex & 0x3FFU)));
+                 m_GetWordAsStringFormat(static_cast<uint16>(ou16_VariableIndex & 0x3FFU)));
       break;
    default:
       //we don't know about the variable index format ...
@@ -2091,6 +2118,7 @@ C_SCLString C_CMONProtocolSIPPayload::Decode(const uint8 * const opu8_Data, cons
    uint32 u32_Value;
    sint32 s32_Value;
    bool q_AddAsArray = false;
+
    if (q_Signed == false)
    {
       switch (u8_Size)
@@ -2099,13 +2127,13 @@ C_SCLString C_CMONProtocolSIPPayload::Decode(const uint8 * const opu8_Data, cons
          u32_Value = (*opu8_Data);
          break;
       case 2:
-         u32_Value = static_cast<uint16>(opu8_Data[0] + ((static_cast<uint16>(opu8_Data[1])) << 8));
+         u32_Value = static_cast<uint16>(opu8_Data[0] + ((static_cast<uint16>(opu8_Data[1])) << 8U));
          break;
       case 4:
          u32_Value =   static_cast<uint32>(opu8_Data[0] +
-                     ((static_cast<uint32>(opu8_Data[1])) << 8) +
-                     ((static_cast<uint32>(opu8_Data[2])) << 16) +
-                     ((static_cast<uint32>(opu8_Data[3])) << 24));
+                                           ((static_cast<uint32>(opu8_Data[1])) << 8U) +
+                                           ((static_cast<uint32>(opu8_Data[2])) << 16U) +
+                                           ((static_cast<uint32>(opu8_Data[3])) << 24U));
          break;
       default:
          u32_Value = 0U;
@@ -2134,13 +2162,13 @@ C_SCLString C_CMONProtocolSIPPayload::Decode(const uint8 * const opu8_Data, cons
          s32_Value = (*opu8_Data);
          break;
       case 2U:
-         s32_Value = static_cast<sint16>(opu8_Data[0] + ((static_cast<uint16>(opu8_Data[1])) << 8));
+         s32_Value = static_cast<sint16>(opu8_Data[0] + ((static_cast<uint16>(opu8_Data[1])) << 8U));
          break;
       case 4U:
          s32_Value =   static_cast<sint32>(opu8_Data[0] +
-                     ((static_cast<uint32>(opu8_Data[1])) << 8) +
-                     ((static_cast<uint32>(opu8_Data[2])) << 16) +
-                     ((static_cast<uint32>(opu8_Data[3])) << 24));
+                                           ((static_cast<uint32>(opu8_Data[1])) << 8U) +
+                                           ((static_cast<uint32>(opu8_Data[2])) << 16U) +
+                                           ((static_cast<uint32>(opu8_Data[3])) << 24U));
          break;
       default:
          q_AddAsArray = true;
@@ -2171,7 +2199,6 @@ C_SCLString C_CMONProtocolSIPPayload::Decode(const uint8 * const opu8_Data, cons
 
    if (q_AddAsArray == true)
    {
-
       uint8 u8_Index;
       c_Text += "[";
       for (u8_Index = 0U; u8_Index < u8_Size; u8_Index++)
@@ -2230,78 +2257,131 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
    hmc_Services[SIP_ASA_PROTOCOL].c_ShortName = "PROTOCOL";
    hmc_Services[SIP_ASA_PROTOCOL].c_ASNs.SetLength(SIP_ASN_PROT_SERVICE_VERSION + 1);
    hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_VERSION].Set("VERSION", SIP_ASP_PROT_VERSION_GET + 1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_VERSION].c_ASPs[SIP_ASP_PROT_VERSION_GET].Set("GET", SIP_PSIZE_PROT_VERSION_GET);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_VERSION].c_ASPs[SIP_ASP_PROT_VERSION_GET].Set("GET",
+                                                                                                    SIP_PSIZE_PROT_VERSION_GET);
    hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_VERSION].c_ASPs[SIP_ASP_PROT_VERSION_GET].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_VERSION].c_ASPs[SIP_ASP_PROT_VERSION_GET].c_Payload[0].Set("VERSION", 2, false);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXBUFFERSIZE].Set("MAXBUFFERSIZE", SIP_ASP_PROT_MAXBUFFERSIZE_GET + 1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXBUFFERSIZE].c_ASPs[SIP_ASP_PROT_MAXBUFFERSIZE_GET].Set("GET", SIP_PSIZE_PROT_MAXBUFFERSIZE_GET);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXBUFFERSIZE].c_ASPs[SIP_ASP_PROT_MAXBUFFERSIZE_GET].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXBUFFERSIZE].c_ASPs[SIP_ASP_PROT_MAXBUFFERSIZE_GET].c_Payload[0].Set("SIZE", 2, false);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMCYCLICTRANSMISSIONS].Set("MAXNUMCYCLICTRANSMISSIONS", SIP_ASP_PROT_MAXNUMCYCLICTRANSMISSIONS_GET + 1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMCYCLICTRANSMISSIONS].c_ASPs[SIP_ASP_PROT_MAXNUMCYCLICTRANSMISSIONS_GET].Set("GET", SIP_PSIZE_PROT_MAXNUMCYCLICTRANSMISSIONS_GET);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMCYCLICTRANSMISSIONS].c_ASPs[SIP_ASP_PROT_MAXNUMCYCLICTRANSMISSIONS_GET].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMCYCLICTRANSMISSIONS].c_ASPs[SIP_ASP_PROT_MAXNUMCYCLICTRANSMISSIONS_GET].c_Payload[0].Set("NUM", 2, false);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMDYNAMICCONFIGURATIONS].Set("MAXNUMDYNAMICCONFIGURATIONS", SIP_ASP_PROT_MAXNUMDYNAMICCONFIGURATIONS_GET + 1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMDYNAMICCONFIGURATIONS].c_ASPs[SIP_ASP_PROT_MAXNUMDYNAMICCONFIGURATIONS_GET].Set("GET", SIP_PSIZE_PROT_MAXNUMDYNAMICCONFIGURATIONS_GET);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMDYNAMICCONFIGURATIONS].c_ASPs[SIP_ASP_PROT_MAXNUMDYNAMICCONFIGURATIONS_GET].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMDYNAMICCONFIGURATIONS].c_ASPs[SIP_ASP_PROT_MAXNUMDYNAMICCONFIGURATIONS_GET].c_Payload[0].Set("NUM", 2, false);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_VERSION].c_ASPs[SIP_ASP_PROT_VERSION_GET].c_Payload[0].Set(
+      "VERSION", 2, false);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXBUFFERSIZE].Set("MAXBUFFERSIZE",
+                                                                         SIP_ASP_PROT_MAXBUFFERSIZE_GET + 1);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXBUFFERSIZE].c_ASPs[SIP_ASP_PROT_MAXBUFFERSIZE_GET].Set("GET",
+                                                                                                                SIP_PSIZE_PROT_MAXBUFFERSIZE_GET);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXBUFFERSIZE].c_ASPs[SIP_ASP_PROT_MAXBUFFERSIZE_GET].c_Payload.
+   SetLength(1);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXBUFFERSIZE].c_ASPs[SIP_ASP_PROT_MAXBUFFERSIZE_GET].c_Payload[0]
+   .Set("SIZE", 2, false);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMCYCLICTRANSMISSIONS].Set("MAXNUMCYCLICTRANSMISSIONS",
+                                                                                     SIP_ASP_PROT_MAXNUMCYCLICTRANSMISSIONS_GET +
+                                                                                     1);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMCYCLICTRANSMISSIONS].c_ASPs[
+      SIP_ASP_PROT_MAXNUMCYCLICTRANSMISSIONS_GET].Set("GET", SIP_PSIZE_PROT_MAXNUMCYCLICTRANSMISSIONS_GET);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMCYCLICTRANSMISSIONS].c_ASPs[
+      SIP_ASP_PROT_MAXNUMCYCLICTRANSMISSIONS_GET].c_Payload.SetLength(1);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMCYCLICTRANSMISSIONS].c_ASPs[
+      SIP_ASP_PROT_MAXNUMCYCLICTRANSMISSIONS_GET].c_Payload[0].Set("NUM", 2, false);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMDYNAMICCONFIGURATIONS].Set("MAXNUMDYNAMICCONFIGURATIONS",
+                                                                                       SIP_ASP_PROT_MAXNUMDYNAMICCONFIGURATIONS_GET +
+                                                                                       1);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMDYNAMICCONFIGURATIONS].c_ASPs[
+      SIP_ASP_PROT_MAXNUMDYNAMICCONFIGURATIONS_GET].Set("GET", SIP_PSIZE_PROT_MAXNUMDYNAMICCONFIGURATIONS_GET);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMDYNAMICCONFIGURATIONS].c_ASPs[
+      SIP_ASP_PROT_MAXNUMDYNAMICCONFIGURATIONS_GET].c_Payload.SetLength(1);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_MAXNUMDYNAMICCONFIGURATIONS].c_ASPs[
+      SIP_ASP_PROT_MAXNUMDYNAMICCONFIGURATIONS_GET].c_Payload[0].Set("NUM", 2, false);
    hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_PARAMETER].Set("PARAMETER", SIP_ASP_PROT_PARAMETER_BITRATE + 1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_PARAMETER].c_ASPs[SIP_ASP_PROT_PARAMETER_BITRATE].Set("BITRATE", SIP_PSIZE_PROT_PARAMETER_BITRATE);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_PARAMETER].c_ASPs[SIP_ASP_PROT_PARAMETER_BITRATE].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_PARAMETER].c_ASPs[SIP_ASP_PROT_PARAMETER_BITRATE].c_Payload[0].Set("BITRATE", 4, false);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_SERVICE_VERSION].Set("SERVICE_VERSION", SIP_ASP_PROT_SERVICE_VERSION_GET + 1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_SERVICE_VERSION].c_ASPs[SIP_ASP_PROT_SERVICE_VERSION_GET].Set("GET", SIP_PSIZE_PROT_SERVICE_VERSION_GET);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_SERVICE_VERSION].c_ASPs[SIP_ASP_PROT_SERVICE_VERSION_GET].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_SERVICE_VERSION].c_ASPs[SIP_ASP_PROT_SERVICE_VERSION_GET].c_Payload[0].Set("VERSION", 2, false);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_PARAMETER].c_ASPs[SIP_ASP_PROT_PARAMETER_BITRATE].Set("BITRATE",
+                                                                                                            SIP_PSIZE_PROT_PARAMETER_BITRATE);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_PARAMETER].c_ASPs[SIP_ASP_PROT_PARAMETER_BITRATE].c_Payload.
+   SetLength(1);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_PARAMETER].c_ASPs[SIP_ASP_PROT_PARAMETER_BITRATE].c_Payload[0].Set(
+      "BITRATE", 4, false);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_SERVICE_VERSION].Set("SERVICE_VERSION",
+                                                                           SIP_ASP_PROT_SERVICE_VERSION_GET + 1);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_SERVICE_VERSION].c_ASPs[SIP_ASP_PROT_SERVICE_VERSION_GET].Set(
+      "GET", SIP_PSIZE_PROT_SERVICE_VERSION_GET);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_SERVICE_VERSION].c_ASPs[SIP_ASP_PROT_SERVICE_VERSION_GET].
+   c_Payload.SetLength(1);
+   hmc_Services[SIP_ASA_PROTOCOL].c_ASNs[SIP_ASN_PROT_SERVICE_VERSION].c_ASPs[SIP_ASP_PROT_SERVICE_VERSION_GET].
+   c_Payload[0].Set("VERSION", 2, false);
 
    hmc_Services[SIP_ASA_APPLICATION].c_ShortName = "APPLICATION";
    hmc_Services[SIP_ASA_APPLICATION].c_ASNs.SetLength(SIP_ASN_APP_DESTROY + 1);
    hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_VERSION].Set("VERSION", SIP_ASP_APP_VERSION_GET + 1);
-   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_VERSION].c_ASPs[SIP_ASP_APP_VERSION_GET].Set("GET", SIP_PSIZE_APP_VERSION_GET);
+   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_VERSION].c_ASPs[SIP_ASP_APP_VERSION_GET].Set("GET",
+                                                                                                     SIP_PSIZE_APP_VERSION_GET);
    hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_VERSION].c_ASPs[SIP_ASP_APP_VERSION_GET].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_VERSION].c_ASPs[SIP_ASP_APP_VERSION_GET].c_Payload[0].Set("VERSION", 2, false);
+   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_VERSION].c_ASPs[SIP_ASP_APP_VERSION_GET].c_Payload[0].Set(
+      "VERSION", 2, false);
    hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_BIOS].Set("BIOS", SIP_ASP_APP_BIOS_VERSION + 1);
-   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_BIOS].c_ASPs[SIP_ASP_APP_BIOS_VERSION].Set("VERSION", SIP_PSIZE_APP_BIOS_VERSION);
+   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_BIOS].c_ASPs[SIP_ASP_APP_BIOS_VERSION].Set("VERSION",
+                                                                                                   SIP_PSIZE_APP_BIOS_VERSION);
    hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_BIOS].c_ASPs[SIP_ASP_APP_BIOS_VERSION].c_Payload.SetLength(3);
-   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_BIOS].c_ASPs[SIP_ASP_APP_BIOS_VERSION].c_Payload[0].Set("MA", 1, false);
-   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_BIOS].c_ASPs[SIP_ASP_APP_BIOS_VERSION].c_Payload[1].Set("MI", 1, false);
-   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_BIOS].c_ASPs[SIP_ASP_APP_BIOS_VERSION].c_Payload[2].Set("REL", 2, false);
+   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_BIOS].c_ASPs[SIP_ASP_APP_BIOS_VERSION].c_Payload[0].Set("MA", 1,
+                                                                                                                false);
+   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_BIOS].c_ASPs[SIP_ASP_APP_BIOS_VERSION].c_Payload[1].Set("MI", 1,
+                                                                                                                false);
+   hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_BIOS].c_ASPs[SIP_ASP_APP_BIOS_VERSION].c_Payload[2].Set("REL",
+                                                                                                                2,
+                                                                                                                false);
    hmc_Services[SIP_ASA_APPLICATION].c_ASNs[SIP_ASN_APP_DESTROY].Set("DESTROY", 0, "CH", 0);
 
    hmc_Services[SIP_ASA_SYSTEM].c_ShortName = "SYSTEM";
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs.SetLength(SIP_ASN_SYS_ADC_FILTER + 1);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].Set("INFO", SIP_ASP_SYS_INFO_STATUS_INIT + 1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_SERIAL_NUMBER].Set("SERIAL_NUM", SIP_PSIZE_SYS_INFO_SERIAL_NUMBER);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_SERIAL_NUMBER].Set("SERIAL_NUM",
+                                                                                                    SIP_PSIZE_SYS_INFO_SERIAL_NUMBER);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_SERIAL_NUMBER].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_SERIAL_NUMBER].c_Payload[0].Set("SNR", 6, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_ARTICLE_NUMBER].Set("ARTICLE_NUM", SIP_PSIZE_SYS_INFO_ARTICLE_NUMBER);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_SERIAL_NUMBER].c_Payload[0].Set("SNR",
+                                                                                                                 6,
+                                                                                                                 false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_ARTICLE_NUMBER].Set("ARTICLE_NUM",
+                                                                                                     SIP_PSIZE_SYS_INFO_ARTICLE_NUMBER);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_ARTICLE_NUMBER].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_ARTICLE_NUMBER].c_Payload[0].Set("NUM", 4, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_DEVICE_ID].Set("DEVICE_ID", SIP_PSIZE_SYS_INFO_DEVICE_ID);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_ARTICLE_NUMBER].c_Payload[0].Set("NUM",
+                                                                                                                  4,
+                                                                                                                  false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_DEVICE_ID].Set("DEVICE_ID",
+                                                                                                SIP_PSIZE_SYS_INFO_DEVICE_ID);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_DEVICE_ID].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_DEVICE_ID].c_Payload[0].Set("ID", 17, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_RAM_SIZE].Set("RAM_SIZE", SIP_PSIZE_SYS_INFO_RAM_SIZE);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_DEVICE_ID].c_Payload[0].Set("ID", 17,
+                                                                                                             false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_RAM_SIZE].Set("RAM_SIZE",
+                                                                                               SIP_PSIZE_SYS_INFO_RAM_SIZE);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_RAM_SIZE].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_RAM_SIZE].c_Payload[0].Set("SIZE_KB", 4, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_ROM_SIZE].Set("ROM_SIZE", SIP_PSIZE_SYS_INFO_ROM_SIZE);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_RAM_SIZE].c_Payload[0].Set("SIZE_KB",
+                                                                                                            4, false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_ROM_SIZE].Set("ROM_SIZE",
+                                                                                               SIP_PSIZE_SYS_INFO_ROM_SIZE);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_ROM_SIZE].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_ROM_SIZE].c_Payload[0].Set("SIZE_KB", 4, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_EEPROM_SIZE].Set("EEPROM_SIZE", SIP_PSIZE_SYS_INFO_EEPROM_SIZE);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_ROM_SIZE].c_Payload[0].Set("SIZE_KB",
+                                                                                                            4, false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_EEPROM_SIZE].Set("EEPROM_SIZE",
+                                                                                                  SIP_PSIZE_SYS_INFO_EEPROM_SIZE);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_EEPROM_SIZE].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_EEPROM_SIZE].c_Payload[0].Set("SIZE_B", 4, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_STATUS_INIT].Set("STATUS_INIT", SIP_PSIZE_SYS_INFO_STATUS_INIT);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_EEPROM_SIZE].c_Payload[0].Set("SIZE_B",
+                                                                                                               4,
+                                                                                                               false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_STATUS_INIT].Set("STATUS_INIT",
+                                                                                                  SIP_PSIZE_SYS_INFO_STATUS_INIT);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_STATUS_INIT].c_Payload.SetLength(2);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_STATUS_INIT].c_Payload[0].Set("STATUS", 1, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_STATUS_INIT].c_Payload[1].Set("INFORMATION", 4, false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_STATUS_INIT].c_Payload[0].Set("STATUS",
+                                                                                                               1,
+                                                                                                               false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_INFO].c_ASPs[SIP_ASP_SYS_INFO_STATUS_INIT].c_Payload[1].Set(
+      "INFORMATION", 4, false);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RESET].Set("RESET", SIP_ASP_SYS_RESET_EXECUTE + 1);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RESET].c_ASPs[SIP_ASP_SYS_RESET_EXECUTE].Set("EXECUTE", 0);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].Set("IGNITION", SIP_ASP_SYS_IGNITION_STATUS + 1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].c_ASPs[SIP_ASP_SYS_IGNITION_CONFIG].Set("ONOFF", SIP_PSIZE_SYS_IGNITION_CONFIG);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].c_ASPs[SIP_ASP_SYS_IGNITION_CONFIG].Set("ONOFF",
+                                                                                                     SIP_PSIZE_SYS_IGNITION_CONFIG);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].c_ASPs[SIP_ASP_SYS_IGNITION_CONFIG].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].c_ASPs[SIP_ASP_SYS_IGNITION_CONFIG].c_Payload[0].Set("STATE", 1, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].c_ASPs[SIP_ASP_SYS_IGNITION_STATUS].Set("ONOFF", SIP_PSIZE_SYS_IGNITION_STATUS);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].c_ASPs[SIP_ASP_SYS_IGNITION_CONFIG].c_Payload[0].Set(
+      "STATE", 1, false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].c_ASPs[SIP_ASP_SYS_IGNITION_STATUS].Set("ONOFF",
+                                                                                                     SIP_PSIZE_SYS_IGNITION_STATUS);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].c_ASPs[SIP_ASP_SYS_IGNITION_STATUS].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].c_ASPs[SIP_ASP_SYS_IGNITION_STATUS].c_Payload[0].Set("STATUS", 1, false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_IGNITION].c_ASPs[SIP_ASP_SYS_IGNITION_STATUS].c_Payload[0].Set(
+      "STATUS", 1, false);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_BEEPER].Set("BEEPER", 0, "CH", SIP_PSIZE_SYS_BEEPER);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_BEEPER].c_Payload.SetLength(2);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_BEEPER].c_Payload[0].Set("ONOFF", 1, false);
@@ -2310,52 +2390,82 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_LED].c_Payload.SetLength(2);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_LED].c_Payload[0].Set("ONOFF", 1, false);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_LED].c_Payload[1].Set("COLOR", 2, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].Set("TEMPERATURE", SIP_ASP_SYS_TEMPERATURE); // ASPE service! SYSTEM 0, CPU 1, free channels 2-250
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_SYSTEM].Set("SYSTEM", SIP_PSIZE_SYS_TEMPERATURE_SYSTEM);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_SYSTEM].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_SYSTEM].c_Payload[0].Set("TEMPERATURE_1_10_C", 2, true);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_CPU].Set("CPU", SIP_PSIZE_SYS_TEMPERATURE_CPU);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_CPU].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_CPU].c_Payload[0].Set("TEMPERATURE_1_10_C", 2, true);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].Set("TEMPERATURE", SIP_ASP_SYS_TEMPERATURE); // ASPE
+                                                                                                             // service!
+                                                                                                             // SYSTEM
+                                                                                                             // 0, CPU
+                                                                                                             // 1, free
+                                                                                                             // channels
+                                                                                                             // 2-250
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_SYSTEM].Set("SYSTEM",
+                                                                                                           SIP_PSIZE_SYS_TEMPERATURE_SYSTEM);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_SYSTEM].c_Payload.
+   SetLength(1);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_SYSTEM].c_Payload[0].Set(
+      "TEMPERATURE_1_10_C", 2, true);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_CPU].Set("CPU",
+                                                                                                        SIP_PSIZE_SYS_TEMPERATURE_CPU);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_CPU].c_Payload.SetLength(
+      1);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_TEMPERATURE].c_ASPs[SIP_ASP_SYS_TEMPERATURE_CPU].c_Payload[0].Set(
+      "TEMPERATURE_1_10_C", 2, true);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RELAY].Set("RELAY", 0, "CH", SIP_PSIZE_SYS_RELAY);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RELAY].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RELAY].c_Payload[0].Set("ONOFF", 1, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_SENSOR_SUPPLY].Set("SENSOR_SUPPLY", 0, "CH", SIP_PSIZE_SYS_SENSOR_SUPPLY);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_SENSOR_SUPPLY].Set("SENSOR_SUPPLY", 0, "CH",
+                                                                      SIP_PSIZE_SYS_SENSOR_SUPPLY);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_SENSOR_SUPPLY].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_SENSOR_SUPPLY].c_Payload[0].Set("VOLTAGE_mV", 4, true);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_BUTTON].Set("BUTTON", 0, "CH", SIP_PSIZE_SYS_BUTTON);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_BUTTON].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_BUTTON].c_Payload[0].Set("ONOFF", 1, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_VALUE_SCALED_32BIT].Set("ADC_VALUE_SCALED_32BIT", 0, "CH", SIP_PSIZE_SYS_ADC_VALUE_SCALED_32BIT);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_VALUE_SCALED_32BIT].Set("ADC_VALUE_SCALED_32BIT", 0, "CH",
+                                                                               SIP_PSIZE_SYS_ADC_VALUE_SCALED_32BIT);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_VALUE_SCALED_32BIT].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_VALUE_SCALED_32BIT].c_Payload[0].Set("VALUE", 4, true);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].Set("DIAG", SIP_ASP_SYS_DIAG_LAST_RESET_REASON + 1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_VOLTAGE_UNDER].Set("VOLTAGE_UNDER", SIP_PSIZE_SYS_DIAG_VOLTAGE_UNDER);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_VOLTAGE_UNDER].Set("VOLTAGE_UNDER",
+                                                                                                    SIP_PSIZE_SYS_DIAG_VOLTAGE_UNDER);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_VOLTAGE_UNDER].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_VOLTAGE_UNDER].c_Payload[0].Set("UNDERVOLTAGE", 1, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_VOLTAGE_OVER].Set("VOLTAGE_OVER", SIP_PSIZE_SYS_DIAG_VOLTAGE_OVER);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_VOLTAGE_UNDER].c_Payload[0].Set(
+      "UNDERVOLTAGE", 1, false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_VOLTAGE_OVER].Set("VOLTAGE_OVER",
+                                                                                                   SIP_PSIZE_SYS_DIAG_VOLTAGE_OVER);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_VOLTAGE_OVER].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_VOLTAGE_OVER].c_Payload[0].Set("OVERVOLTAGE", 1, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_LAST_RESET_REASON].Set("LAST_RESET_REASON", SIP_PSIZE_SYS_DIAG_LAST_RESET_REASON);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_LAST_RESET_REASON].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_LAST_RESET_REASON].c_Payload[0].Set("STATUS", 4, false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_VOLTAGE_OVER].c_Payload[0].Set(
+      "OVERVOLTAGE", 1, false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_LAST_RESET_REASON].Set(
+      "LAST_RESET_REASON", SIP_PSIZE_SYS_DIAG_LAST_RESET_REASON);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_LAST_RESET_REASON].c_Payload.SetLength(
+      1);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_DIAG].c_ASPs[SIP_ASP_SYS_DIAG_LAST_RESET_REASON].c_Payload[0].Set(
+      "STATUS", 4, false);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_CALIBRATION].Set("ADC_CALIBRATION", 0, "CH", 0);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_CALIBRATION_STATE].Set("ADC_CALIBRATION_STATE", 0, "CH", SIP_PSIZE_SYS_ADC_CALIBRATION_STATE);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_CALIBRATION_STATE].Set("ADC_CALIBRATION_STATE", 0, "CH",
+                                                                              SIP_PSIZE_SYS_ADC_CALIBRATION_STATE);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_CALIBRATION_STATE].c_Payload.SetLength(2);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_CALIBRATION_STATE].c_Payload[0].Set("STATE", 1, false);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_CALIBRATION_STATE].c_Payload[1].Set("USED", 1, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_VALUE_16BIT].Set("ADC_VALUE_16BIT", 0, "CH", SIP_PSIZE_SYS_ADC_VALUE_16BIT);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_VALUE_16BIT].Set("ADC_VALUE_16BIT", 0, "CH",
+                                                                        SIP_PSIZE_SYS_ADC_VALUE_16BIT);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_VALUE_16BIT].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_ADC_VALUE_16BIT].c_Payload[0].Set("VALUE", 2, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RELAY_ERROR_COUNTERS].Set("RELAY_ERROR_COUNTERS", 0, "CH", SIP_PSIZE_SYS_RELAY_ERROR_COUNTERS);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RELAY_ERROR_COUNTERS].Set("RELAY_ERROR_COUNTERS", 0, "CH",
+                                                                             SIP_PSIZE_SYS_RELAY_ERROR_COUNTERS);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RELAY_ERROR_COUNTERS].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RELAY_ERROR_COUNTERS].c_Payload[0].Set("ERROR_COUNTERS", 8, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RELAY_RESET_ERROR_COUNTERS].Set("RELAY_RESET_ERROR_COUNTERS", 0, "CH", 0);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_COUNT].Set("COMPONENT_COUNT", SIP_ASP_SYS_COMPONENT_COUNT_GET + 1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_COUNT].c_ASPs[SIP_ASP_SYS_COMPONENT_COUNT_GET].Set("GET", SIP_PSIZE_SYS_COMPONENT_COUNT_GET);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_COUNT].c_ASPs[SIP_ASP_SYS_COMPONENT_COUNT_GET].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_COUNT].c_ASPs[SIP_ASP_SYS_COMPONENT_COUNT_GET].c_Payload[0].Set("NUMBER_OF_COMPONENTS", 1, false);
-   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_VERSION].Set("COMPONENT_VERSION", 0, "CH", SIP_PSIZE_SYS_COMPONENT_VERSION);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_RELAY_RESET_ERROR_COUNTERS].Set("RELAY_RESET_ERROR_COUNTERS", 0,
+                                                                                   "CH", 0);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_COUNT].Set("COMPONENT_COUNT",
+                                                                        SIP_ASP_SYS_COMPONENT_COUNT_GET + 1);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_COUNT].c_ASPs[SIP_ASP_SYS_COMPONENT_COUNT_GET].Set("GET",
+                                                                                                                SIP_PSIZE_SYS_COMPONENT_COUNT_GET);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_COUNT].c_ASPs[SIP_ASP_SYS_COMPONENT_COUNT_GET].c_Payload.
+   SetLength(1);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_COUNT].c_ASPs[SIP_ASP_SYS_COMPONENT_COUNT_GET].c_Payload[0]
+   .Set("NUMBER_OF_COMPONENTS", 1, false);
+   hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_VERSION].Set("COMPONENT_VERSION", 0, "CH",
+                                                                          SIP_PSIZE_SYS_COMPONENT_VERSION);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_VERSION].c_Payload.SetLength(2);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_VERSION].c_Payload[0].Set("NAME", 20, false);
    hmc_Services[SIP_ASA_SYSTEM].c_ASNs[SIP_ASN_SYS_COMPONENT_VERSION].c_Payload[1].Set("VERSION", 15, false);
@@ -2390,7 +2500,8 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
    hmc_Services[SIP_ASA_INPUT].c_ASNs[SIP_ASN_I_EVENT_COUNTER].Set("EVENT_COUNTER", 0, "CH", SIP_PSIZE_I_EVENT_COUNTER);
    hmc_Services[SIP_ASA_INPUT].c_ASNs[SIP_ASN_I_EVENT_COUNTER].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_INPUT].c_ASNs[SIP_ASN_I_EVENT_COUNTER].c_Payload[0].Set("VALUE", 2, false);
-   hmc_Services[SIP_ASA_INPUT].c_ASNs[SIP_ASN_I_TEST_COMPARATOR].Set("TEST_COMPARATOR", 0, "CH", SIP_PSIZE_I_TEST_COMPARATOR);
+   hmc_Services[SIP_ASA_INPUT].c_ASNs[SIP_ASN_I_TEST_COMPARATOR].Set("TEST_COMPARATOR", 0, "CH",
+                                                                     SIP_PSIZE_I_TEST_COMPARATOR);
    hmc_Services[SIP_ASA_INPUT].c_ASNs[SIP_ASN_I_TEST_COMPARATOR].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_INPUT].c_ASNs[SIP_ASN_I_TEST_COMPARATOR].c_Payload[0].Set("STATUS", 1, false);
    hmc_Services[SIP_ASA_INPUT].c_ASNs[SIP_ASN_I_VALUE_UNSCALED].Set("VALUE", 0, "CH", SIP_PSIZE_I_VALUE_UNSCALED);
@@ -2419,7 +2530,8 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_VOLTAGE].Set("VOLTAGE", 0, "CH", SIP_PSIZE_O_VOLTAGE);
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_VOLTAGE].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_VOLTAGE].c_Payload[0].Set("VOLTAGE_mV", 4, true);
-   hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_CONTROL_PARAMETER].Set("CONTROL_PARAMETER", 0, "CH", SIP_PSIZE_O_CONTROL_PARAMETER);
+   hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_CONTROL_PARAMETER].Set("CONTROL_PARAMETER", 0, "CH",
+                                                                        SIP_PSIZE_O_CONTROL_PARAMETER);
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_CONTROL_PARAMETER].c_Payload.SetLength(5);
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_CONTROL_PARAMETER].c_Payload[0].Set("SETPOINT", 4, true);
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_CONTROL_PARAMETER].c_Payload[1].Set("P_VALUE_mKR", 4, true);
@@ -2430,7 +2542,8 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_EVENT_ERROR].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_EVENT_ERROR].c_Payload[0].Set("VALUE", 2, false);
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_STATE_RESET].Set("STATE_RESET", 0, "CH", 0);
-   hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_OVERCURRENT_TESTMODE].Set("OVERCURRENT_TESTMODE", 0, "CH", SIP_PSIZE_O_OVERCURRENT_TESTMODE);
+   hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_OVERCURRENT_TESTMODE].Set("OVERCURRENT_TESTMODE", 0, "CH",
+                                                                           SIP_PSIZE_O_OVERCURRENT_TESTMODE);
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_OVERCURRENT_TESTMODE].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_OUTPUT].c_ASNs[SIP_ASN_O_OVERCURRENT_TESTMODE].c_Payload[0].Set("FUNCTION", 1, false);
 
@@ -2489,35 +2602,59 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
    hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST].c_Payload[3].Set("SIZE", 4, false);
    hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST].c_Payload[4].Set("MODE", 1, false);
    hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].Set("INFO", SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION + 1);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].Set("FLASH_LOADER_VERSION", SIP_PSIZE_MEM_INFO_FLASH_LOADER_VERSION);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].c_Payload.SetLength(4);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].c_Payload[0].Set("MAJORVERSION", 1, false);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].c_Payload[1].Set("MINORVERSION1", 1, false);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].c_Payload[2].Set("MINORVERSION2", 1, false);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].c_Payload[3].Set("RELEASE", 2, false);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST_FAILURE_DETAILS].Set("TEST_FAILURE_DETAILS", SIP_ASP_MEM_TEST_FAILURE_DETAILS_GET + 1);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST_FAILURE_DETAILS].c_ASPs[SIP_ASP_MEM_TEST_FAILURE_DETAILS_GET].Set("GET", SIP_PSIZE_MEM_TEST_FAILURE_DETAILS_GET);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST_FAILURE_DETAILS].c_ASPs[SIP_ASP_MEM_TEST_FAILURE_DETAILS_GET].c_Payload.SetLength(2);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST_FAILURE_DETAILS].c_ASPs[SIP_ASP_MEM_TEST_FAILURE_DETAILS_GET].c_Payload[0].Set("FAILURE_REASON", 1, false);
-   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST_FAILURE_DETAILS].c_ASPs[SIP_ASP_MEM_TEST_FAILURE_DETAILS_GET].c_Payload[1].Set("ADDRESS", 4, false);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].Set(
+      "FLASH_LOADER_VERSION", SIP_PSIZE_MEM_INFO_FLASH_LOADER_VERSION);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].c_Payload.
+   SetLength(4);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].c_Payload[0].Set(
+      "MAJORVERSION", 1, false);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].c_Payload[1].Set(
+      "MINORVERSION1", 1, false);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].c_Payload[2].Set(
+      "MINORVERSION2", 1, false);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_INFO].c_ASPs[SIP_ASP_MEM_INFO_FLASH_LOADER_VERSION].c_Payload[3].Set(
+      "RELEASE", 2, false);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST_FAILURE_DETAILS].Set("TEST_FAILURE_DETAILS",
+                                                                             SIP_ASP_MEM_TEST_FAILURE_DETAILS_GET + 1);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST_FAILURE_DETAILS].c_ASPs[SIP_ASP_MEM_TEST_FAILURE_DETAILS_GET].
+   Set("GET", SIP_PSIZE_MEM_TEST_FAILURE_DETAILS_GET);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST_FAILURE_DETAILS].c_ASPs[SIP_ASP_MEM_TEST_FAILURE_DETAILS_GET].
+   c_Payload.SetLength(2);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST_FAILURE_DETAILS].c_ASPs[SIP_ASP_MEM_TEST_FAILURE_DETAILS_GET].
+   c_Payload[0].Set("FAILURE_REASON", 1, false);
+   hmc_Services[SIP_ASA_MEMORY].c_ASNs[SIP_ASN_MEM_TEST_FAILURE_DETAILS].c_ASPs[SIP_ASP_MEM_TEST_FAILURE_DETAILS_GET].
+   c_Payload[1].Set("ADDRESS", 4, false);
 
    hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ShortName = "IVA";
    hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs.SetLength(SIP_ASN_IVA_DEFAULTS + 1);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].Set("SERVICE", SIP_ASP_IVA_SERVICE_OBJECT_DICTIONARY_VERSION + 1);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGON].Set("LOGON", SIP_PSIZE_IVA_SERVICE_LOGON);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGON].c_Payload.SetLength(3);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGON].c_Payload[0].Set("CHECKSUM", 2, false);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGON].c_Payload[1].Set("VERSION", 2, false);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGON].c_Payload[2].Set("NUM_BYTES", 2, false);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGOFF].Set("LOGOFF", 0);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_OBJECT_DICTIONARY_VERSION].Set("OD_VERSION", SIP_PSIZE_IVA_SERVICE_OBJECT_DICTIONARY_VERSION);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_OBJECT_DICTIONARY_VERSION].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_OBJECT_DICTIONARY_VERSION].c_Payload[0].Set("VERSION", 2, false);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_CHECKSUM_CHECK].Set("CHECKSUM_CHECK", 0, "LIST", SIP_PSIZE_IVA_CHECKSUM_CHECK);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].Set("SERVICE",
+                                                                               SIP_ASP_IVA_SERVICE_OBJECT_DICTIONARY_VERSION +
+                                                                               1);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGON].Set(
+      "LOGON", SIP_PSIZE_IVA_SERVICE_LOGON);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGON].c_Payload.
+   SetLength(3);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGON].c_Payload[0
+   ].Set("CHECKSUM", 2, false);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGON].c_Payload[1
+   ].Set("VERSION", 2, false);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGON].c_Payload[2
+   ].Set("NUM_BYTES", 2, false);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[SIP_ASP_IVA_SERVICE_LOGOFF].Set(
+      "LOGOFF", 0);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[
+      SIP_ASP_IVA_SERVICE_OBJECT_DICTIONARY_VERSION].Set("OD_VERSION", SIP_PSIZE_IVA_SERVICE_OBJECT_DICTIONARY_VERSION);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[
+      SIP_ASP_IVA_SERVICE_OBJECT_DICTIONARY_VERSION].c_Payload.SetLength(1);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_SERVICE].c_ASPs[
+      SIP_ASP_IVA_SERVICE_OBJECT_DICTIONARY_VERSION].c_Payload[0].Set("VERSION", 2, false);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_CHECKSUM_CHECK].Set("CHECKSUM_CHECK", 0, "LIST",
+                                                                                      SIP_PSIZE_IVA_CHECKSUM_CHECK);
    hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_CHECKSUM_CHECK].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_CHECKSUM_CHECK].c_Payload[0].Set("OK", 1, false);
    hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_CHECKSUM_UPDATE].Set("CHECKSUM_UPDATE", 0, "LIST", 0);
-   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_DEFAULTS].Set("DEFAULTS", 0, "LIST", SIP_PSIZE_IVA_DEFAULTS);
+   hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_DEFAULTS].Set("DEFAULTS", 0, "LIST",
+                                                                                SIP_PSIZE_IVA_DEFAULTS);
    hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_DEFAULTS].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_INDEX_VARIABLE_ACCESS].c_ASNs[SIP_ASN_IVA_DEFAULTS].c_Payload[0].Set("SET_INDEX", 1, false);
 
@@ -2526,7 +2663,8 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
 
    hmc_Services[SIP_ASA_SUPERVISOR].c_ShortName = "SUPERVISOR";
    hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs.SetLength(SIP_ASN_SSV_ERROR_REACTION + 1);
-   hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_INIT_VOLTAGE].Set("INIT_VOLTAGE", 0, "CH", SIP_PSIZE_SSV_INIT_VOLTAGE);
+   hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_INIT_VOLTAGE].Set("INIT_VOLTAGE", 0, "CH",
+                                                                         SIP_PSIZE_SSV_INIT_VOLTAGE);
    hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_INIT_VOLTAGE].c_Payload.SetLength(3);
    hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_INIT_VOLTAGE].c_Payload[0].Set("VOLTAGE_TYPE", 1, false);
    hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_INIT_VOLTAGE].c_Payload[1].Set("VOLTAGE_MAX", 4, false);
@@ -2535,13 +2673,15 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
    hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_STATUS].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_STATUS].c_Payload[0].Set("STATUS", 4, false);
    hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_TEST_TIME].Set("TEST_TIME", 0, "CH", 0);
-   hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_ERROR_REACTION].Set("ERROR_REACTION", 0, "CH", SIP_PSIZE_SSV_ERROR_REACTION);
+   hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_ERROR_REACTION].Set("ERROR_REACTION", 0, "CH",
+                                                                           SIP_PSIZE_SSV_ERROR_REACTION);
    hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_ERROR_REACTION].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_SUPERVISOR].c_ASNs[SIP_ASN_SSV_ERROR_REACTION].c_Payload[0].Set("REACTION", 1, false);
 
    hmc_Services[SIP_ASA_REAL_TIME_CLOCK].c_ShortName = "REAL_TIME_CLOCK";
    hmc_Services[SIP_ASA_REAL_TIME_CLOCK].c_ASNs.SetLength(SIP_ASN_RTC_TIME_DATE + 1);
-   hmc_Services[SIP_ASA_REAL_TIME_CLOCK].c_ASNs[SIP_ASN_RTC_TIME_DATE].Set("TIME_DATE", 0, "CH", SIP_PSIZE_RTC_TIME_DATE);
+   hmc_Services[SIP_ASA_REAL_TIME_CLOCK].c_ASNs[SIP_ASN_RTC_TIME_DATE].Set("TIME_DATE", 0, "CH",
+                                                                           SIP_PSIZE_RTC_TIME_DATE);
    hmc_Services[SIP_ASA_REAL_TIME_CLOCK].c_ASNs[SIP_ASN_RTC_TIME_DATE].c_Payload.SetLength(6);
    hmc_Services[SIP_ASA_REAL_TIME_CLOCK].c_ASNs[SIP_ASN_RTC_TIME_DATE].c_Payload[0].Set("SECOND", 1, false);
    hmc_Services[SIP_ASA_REAL_TIME_CLOCK].c_ASNs[SIP_ASN_RTC_TIME_DATE].c_Payload[1].Set("MINUTE", 1, false);
@@ -2563,13 +2703,17 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
    hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_STATUS].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_STATUS].c_Payload[0].Set("DATA", 4, false);
    hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_SETUP].Set("SETUP", SIP_ASP_BGF_SETUP_COUNT + 1);
-   hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_SETUP].c_ASPs[SIP_ASP_BGF_SETUP_COUNT].Set("COUNT", SIP_PSIZE_BGF_SETUP_COUNT);
-   hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_SETUP].c_ASPs[SIP_ASP_BGF_SETUP_COUNT].c_Payload.SetLength(1);
-   hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_SETUP].c_ASPs[SIP_ASP_BGF_SETUP_COUNT].c_Payload[0].Set("COUNT", 1, false);
+   hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_SETUP].c_ASPs[SIP_ASP_BGF_SETUP_COUNT].Set("COUNT",
+                                                                                                           SIP_PSIZE_BGF_SETUP_COUNT);
+   hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_SETUP].c_ASPs[SIP_ASP_BGF_SETUP_COUNT].c_Payload.
+   SetLength(1);
+   hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_SETUP].c_ASPs[SIP_ASP_BGF_SETUP_COUNT].c_Payload[0].Set(
+      "COUNT", 1, false);
    hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_NAME].Set("NAME", 0, "CH", SIP_PSIZE_BGF_NAME);
    hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_NAME].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_NAME].c_Payload[0].Set("NAME_OF_FUNCTION", 22, false);
-   hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_PARAMETER].Set("PARAMETER", 0, "CH", SIP_PSIZE_BGF_PARAMETER);
+   hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_PARAMETER].Set("PARAMETER", 0, "CH",
+                                                                               SIP_PSIZE_BGF_PARAMETER);
    hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_PARAMETER].c_Payload.SetLength(1);
    hmc_Services[SIP_ASA_BACKGROUND_FUNCTION].c_ASNs[SIP_ASN_BGF_PARAMETER].c_Payload[0].Set("PARAMETERS", 92, false);
 
@@ -2591,8 +2735,8 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
 //----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPDecodeData(const SCLDynamicArray<C_CMONProtocolSIPPayload> & orc_Payload,
-                                                         const uint8 ou8_NumBytesInPayload,
-                                                         const uint8 * const opu8_Payload) const
+                                                       const uint8 ou8_NumBytesInPayload,
+                                                       const uint8 * const opu8_Payload) const
 {
    //decode opu8_Payload
    uint8 u8_Payload;
@@ -2620,11 +2764,11 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPDecodeData(const SCLDynamicArray<C_C
       c_Text += "  DATA [";
       for (u8_Index = static_cast<uint8>(u16_Offset); u8_Index < ou8_NumBytesInPayload; u8_Index++)
       {
-        c_Text += (m_GetByteAsStringFormat(opu8_Payload[u8_Index]));
-        if (u8_Index != (ou8_NumBytesInPayload - 1))
-        {
-           c_Text += ",";
-        }
+         c_Text += (m_GetByteAsStringFormat(opu8_Payload[u8_Index]));
+         if (u8_Index != (ou8_NumBytesInPayload - 1))
+         {
+            c_Text += ",";
+         }
       }
       c_Text += "]";
    }
@@ -2638,11 +2782,12 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPDecodeData(const SCLDynamicArray<C_C
 //\param[out] oppc_Payload             address of pointer to payload description
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPDecodeSFFFReadWriteHeader(const uint8 ou8_ASA, const uint8 ou8_ASN,
                                                                       const uint8 ou8_ASP,
-                                                               SCLDynamicArray<C_CMONProtocolSIPPayload> ** const oppc_Payload
-                                                               ) const
+                                                                      SCLDynamicArray<C_CMONProtocolSIPPayload> ** const oppc_Payload)
+const
 {
    C_SCLString c_Text;
    static SCLDynamicArray<C_CMONProtocolSIPPayload> hc_Dummy; //dummy with no entries
+
    (*oppc_Payload) = &hc_Dummy;
    if (ou8_ASA < hmc_Services.GetLength())
    {
@@ -2673,7 +2818,6 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPDecodeSFFFReadWriteHeader(const uint
                c_Text += ("SP" + m_GetByteAsStringFormat(ou8_ASP));
             }
          }
-
       }
       else
       {
@@ -2693,4 +2837,3 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPDecodeSFFFReadWriteHeader(const uint
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-

@@ -71,7 +71,7 @@ C_OgeContextMenu::C_OgeContextMenu(QWidget * const opc_Parent) :
       c_Color.setAlpha(110); // lower than for tool-tip because blur-radius is needed to be small
       pc_Shadow->setColor(c_Color);
       this->setGraphicsEffect(pc_Shadow);
-   }  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

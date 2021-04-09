@@ -234,7 +234,6 @@ bool C_CamTitleBarWidget::HandleProjectComparison(void)
          q_Continue = true;
          break;
       case C_OgeWiCustomMessage::eCANCEL:
-      case C_OgeWiCustomMessage::eINVALID:
          q_Continue = false;
          break;
       default:
@@ -366,7 +365,6 @@ void C_CamTitleBarWidget::m_ShowAbout(void)
    {
       c_New->HideOverlay();
    }
-
 } //lint !e429  no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -420,7 +418,8 @@ void C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
          static_cast<QString>("file:\\\\\\") + C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Project save"));
-      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("For more details see log file %1")).arg(c_Log));
+      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("For more details see log file %1")).arg(
+                                  c_Log));
 
       //Update log file
       C_OSCLoggingHandler::h_Flush();
@@ -526,7 +525,7 @@ void C_CamTitleBarWidget::m_RemapOnSaveAs(const QString & orc_NewFileName) const
       // if path was relative before try to make it relative to new project path
       if (c_Info.isRelative() == true)
       {
-         QDir c_Dir = QFileInfo(orc_NewFileName).dir();
+         const QDir c_Dir = static_cast<QFileInfo>(orc_NewFileName).dir();
          c_NewName = c_Dir.relativeFilePath(c_NewName);
       }
 
@@ -550,14 +549,14 @@ void C_CamTitleBarWidget::m_SetButtonsText(const bool oq_IconOnly) const
 
    if (oq_IconOnly == true)
    {
-      uint32 u32_SmallMaximumSize = 34;
+      const uint32 u32_SmallMaximumSize = 34;
       this->mpc_Ui->pc_PushButtonNew->setText(C_GtGetText::h_GetText(""));
       this->mpc_Ui->pc_ToolButtonLoad->setText(C_GtGetText::h_GetText(""));
       this->mpc_Ui->pc_PushButtonSaveAs->setText(C_GtGetText::h_GetText(""));
       this->mpc_Ui->pc_PushButtonSave->setText(C_GtGetText::h_GetText(""));
 
       this->mpc_Ui->pc_PushButtonNew->setMaximumWidth(u32_SmallMaximumSize);
-      this->mpc_Ui->pc_ToolButtonLoad->setMaximumWidth(2 * u32_SmallMaximumSize + 6);
+      this->mpc_Ui->pc_ToolButtonLoad->setMaximumWidth((2 * u32_SmallMaximumSize) + 6);
       this->mpc_Ui->pc_PushButtonSaveAs->setMaximumWidth(u32_SmallMaximumSize);
       this->mpc_Ui->pc_PushButtonSave->setMaximumWidth(u32_SmallMaximumSize);
    }
@@ -568,10 +567,11 @@ void C_CamTitleBarWidget::m_SetButtonsText(const bool oq_IconOnly) const
       this->mpc_Ui->pc_PushButtonSaveAs->setText(C_GtGetText::h_GetText("Save Project As"));
       this->mpc_Ui->pc_PushButtonSave->setText(C_GtGetText::h_GetText("Save Project"));
 
-      this->mpc_Ui->pc_PushButtonNew->setMaximumWidth(QWIDGETSIZE_MAX);
-      this->mpc_Ui->pc_ToolButtonLoad->setMaximumWidth(QWIDGETSIZE_MAX);
-      this->mpc_Ui->pc_PushButtonSaveAs->setMaximumWidth(QWIDGETSIZE_MAX);
-      this->mpc_Ui->pc_PushButtonSave->setMaximumWidth(QWIDGETSIZE_MAX);
+      // we cannot change Qt constant but it is still better than using the hard coded magic number 16777215
+      this->mpc_Ui->pc_PushButtonNew->setMaximumWidth(QWIDGETSIZE_MAX);    //lint !e893 !e9130 !e9136
+      this->mpc_Ui->pc_ToolButtonLoad->setMaximumWidth(QWIDGETSIZE_MAX);   //lint !e893 !e9130 !e9136
+      this->mpc_Ui->pc_PushButtonSaveAs->setMaximumWidth(QWIDGETSIZE_MAX); //lint !e893 !e9130 !e9136
+      this->mpc_Ui->pc_PushButtonSave->setMaximumWidth(QWIDGETSIZE_MAX);   //lint !e893 !e9130 !e9136
    }
 }
 

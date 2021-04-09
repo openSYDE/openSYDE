@@ -124,7 +124,6 @@ C_GiLiBusConnector * C_SdManUnoTopologyReconnectBaseCommand::m_GetBusConnector(v
 
    if (c_Items.size() > 0)
    {
-      
       pc_Retval = dynamic_cast<C_GiLiBusConnector *>(c_Items[0]);
    }
    return pc_Retval;

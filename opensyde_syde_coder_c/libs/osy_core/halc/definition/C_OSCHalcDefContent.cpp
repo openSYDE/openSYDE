@@ -159,6 +159,8 @@ sint32 C_OSCHalcDefContent::SetEnumValue(const stw_scl::C_SCLString & orc_Displa
             case eFLOAT64:
                this->SetValueAF64(rc_NewContent.GetValueAF64());
                break;
+            default:
+               break;
             }
          }
          else
@@ -194,6 +196,8 @@ sint32 C_OSCHalcDefContent::SetEnumValue(const stw_scl::C_SCLString & orc_Displa
                break;
             case eFLOAT64:
                this->SetValueF64(rc_NewContent.GetValueF64());
+               break;
+            default:
                break;
             }
          }
@@ -390,7 +394,7 @@ sint32 C_OSCHalcDefContent::SetBitmask(const stw_scl::C_SCLString & orc_DisplayN
       {
          uint64 u64_CurrentValue = 0ULL;
          //Current value
-         switch (this->GetType())
+         switch (this->GetType()) //lint !e788 not all enum constants used; this is unsigned only
          {
          case C_OSCNodeDataPoolContent::eUINT8:
             u64_CurrentValue = static_cast<uint64>(this->GetValueU8());
@@ -427,7 +431,7 @@ sint32 C_OSCHalcDefContent::SetBitmask(const stw_scl::C_SCLString & orc_DisplayN
                }
             }
             //Step 4: update value
-            switch (this->GetType())
+            switch (this->GetType()) //lint !e788 not all enum constants used; this is unsigned only
             {
             case C_OSCNodeDataPoolContent::eUINT8:
                this->SetValueU8(static_cast<uint8>(u64_CurrentValue));

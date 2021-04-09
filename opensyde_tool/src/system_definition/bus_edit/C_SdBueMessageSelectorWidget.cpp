@@ -114,10 +114,10 @@ C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_P
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ContextMenu and the Qt memory management
 C_SdBueMessageSelectorWidget::~C_SdBueMessageSelectorWidget()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_ContextMenu and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -188,9 +188,11 @@ void C_SdBueMessageSelectorWidget::InitFromData(void) const
    this->mpc_Ui->pc_MessageTreeWidget->InitFromData();
 
    //Text
-   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(this->mpc_Ui->
-                                                                                                   pc_MessageTreeWidget
-                                                                                                   ->topLevelItemCount()));
+   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(this->
+                                                                                                                mpc_Ui->
+                                                                                                                pc_MessageTreeWidget
+                                                                                                                ->
+                                                                                                                topLevelItemCount()));
 
    //Handle visibility
    if (this->mpc_Ui->pc_MessageTreeWidget->topLevelItemCount() > 0)
@@ -344,6 +346,18 @@ void C_SdBueMessageSelectorWidget::SelectSignal(const C_OSCCanMessageIdentificat
                                                 const uint32 & oru32_SignalIndex) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->SelectSignal(orc_MessageId, oru32_SignalIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Return information if message/signal selection is empty
+
+   \retval true   no message or signal is selected
+   \retval false  there is at least one message or signal selected
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdBueMessageSelectorWidget::IsSelectionEmpty(void) const
+{
+   return (this->mpc_Ui->pc_MessageTreeWidget->selectedItems().size() == 0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -644,8 +658,8 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
    {
       if (this->mpc_Ui->pc_MessageTreeWidget->CheckIfAnyNodeConnected() == true)
       {
-         QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
-         sint32 s32_Level = this->mpc_Ui->pc_MessageTreeWidget->GetLevelOfPos(c_PosGlobal);
+         const QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
+         const sint32 s32_Level = this->mpc_Ui->pc_MessageTreeWidget->GetLevelOfPos(c_PosGlobal);
          bool q_ShowContextMenu = true;
 
          if (s32_Level == 1) // Message level
@@ -736,9 +750,11 @@ void C_SdBueMessageSelectorWidget::m_OnMessageCountChanged(void)
    Q_EMIT (this->SigMessageCountChanged());
 
    //Text
-   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(this->mpc_Ui->
-                                                                                                   pc_MessageTreeWidget
-                                                                                                   ->topLevelItemCount()));
+   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(this->
+                                                                                                                mpc_Ui->
+                                                                                                                pc_MessageTreeWidget
+                                                                                                                ->
+                                                                                                                topLevelItemCount()));
 
    //Handle visibility
    if (this->mpc_Ui->pc_MessageTreeWidget->topLevelItemCount() > 0)

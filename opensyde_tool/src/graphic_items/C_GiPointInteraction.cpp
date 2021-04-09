@@ -49,7 +49,7 @@ C_GiPointInteraction::C_GiPointInteraction(QGraphicsItem * const opc_Parent) :
    this->setFlag(ItemSendsGeometryChanges);
 
    this->setPen(Qt::NoPen);
-   this->setBrush(QBrush(mc_STYLE_GUIDE_COLOR_21));
+   this->setBrush(static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_21));
    this->setRect(-(mf64_INTERACTION_POINT_WIDTH / 2.0), -(mf64_INTERACTION_POINT_WIDTH / 2.0),
                  mf64_INTERACTION_POINT_WIDTH, mf64_INTERACTION_POINT_WIDTH);
 

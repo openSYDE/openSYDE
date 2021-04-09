@@ -106,7 +106,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="frame_3">
+           <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame_3">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -480,7 +480,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="frame">
+           <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -1040,7 +1040,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="frame_2">
+           <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame_2">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -1442,9 +1442,9 @@
    <header>C_OgeLabHeadingGroupBold.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFrameSeparator</class>
+   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFrameSeparator.h</header>
+   <header>C_OgeFraSeparator.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

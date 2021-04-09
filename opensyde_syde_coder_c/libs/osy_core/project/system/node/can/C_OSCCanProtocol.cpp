@@ -291,7 +291,7 @@ const C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElementConst(co
                                                                               const uint32 ou32_SignalIndex) const
 {
    const C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   const C_OSCNodeDataPoolList * pc_List = h_GetComListConst(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
+   const C_OSCNodeDataPoolList * const pc_List = h_GetComListConst(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
 
    if ((pc_List != NULL) && (ou32_InterfaceIndex < this->c_ComMessages.size()))
    {
@@ -334,7 +334,7 @@ C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElement(C_OSCNodeData
                                                                    const uint32 ou32_SignalIndex) const
 {
    C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   C_OSCNodeDataPoolList * pc_List = h_GetComList(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
+   C_OSCNodeDataPoolList * const pc_List = h_GetComList(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
 
    if ((pc_List != NULL) && (ou32_InterfaceIndex < this->c_ComMessages.size()))
    {
@@ -400,6 +400,8 @@ uint32 C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(const E_Type oe_Ty
    case C_OSCCanProtocol::eECES:
       u32_Retval = 2UL;
       break;
+   case C_OSCCanProtocol::eLAYER2:
+   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
    default:
       u32_Retval = 0UL;
       break;

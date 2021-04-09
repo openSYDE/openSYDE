@@ -354,7 +354,7 @@ void C_GiSvDaProgressBarBase::UpdateTypePe(const C_PuiSvDbProgressBar::E_Type oe
    if (this->mpc_ProgressBarWidget != NULL)
    {
       // helping value to remember the old type
-      stw_opensyde_gui_logic::C_PuiSvDbProgressBar::E_Type e_TypeOld = mpc_ProgressBarWidget->GetType();
+      const C_PuiSvDbProgressBar::E_Type e_TypeOld = mpc_ProgressBarWidget->GetType();
       this->mpc_ProgressBarWidget->SetDisplayStyle(this->me_Style, oe_Type, oe_Alignment, this->mq_DarkMode);
       this->mpc_ProgressBarWidget->SetShowMinMax(oq_ShowMinMax);
       // setting up the size of the progressbar on type-change

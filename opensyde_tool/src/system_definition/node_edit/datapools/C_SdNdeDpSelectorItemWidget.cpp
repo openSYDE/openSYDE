@@ -63,6 +63,7 @@ C_SdNdeDpSelectorItemWidget::C_SdNdeDpSelectorItemWidget(const bool oq_UsageView
    mq_UsageViewActive(oq_UsageViewActive),
    mu32_Size(0U),
    mu32_Used(0U),
+   mu32_Reserved(0U),
    mu32_Number(0U),
    mc_Name("")
 {
@@ -115,7 +116,12 @@ C_SdNdeDpSelectorItemWidget::C_SdNdeDpSelectorItemWidget(const bool oq_UsageView
 C_SdNdeDpSelectorItemWidget::~C_SdNdeDpSelectorItemWidget()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_LabelStateImg and the Qt memory management
+
+   //Qt element destruction handled by Qt engine; only NULL here
+   mpc_LabelStateImg = NULL;
+   mpc_LabelShareImg = NULL;
+   mpc_LabelShareImgHovered = NULL;
+   mpc_UsageBar = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -355,13 +361,20 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
 
          // udpate the tool tip
          c_TextUsage = "   " + static_cast<QString>("%1% %2 (%3 / %4)\n").arg(QString::number(u32_PercentageUsed),
-                                                                 C_GtGetText::h_GetText("used by parameters"),
-                                                                 C_Uti::h_GetByteCountAsString(this->mu32_Used),
-                                                                 C_Uti::h_GetByteCountAsString(this->mu32_Size));
-         c_TextReservation = "   " + static_cast<QString>("%1% %2 (%3 / %4)").arg(QString::number(u32_PercentageReserved),
-                                                                     C_GtGetText::h_GetText("reserved by lists"),
-                                                                     C_Uti::h_GetByteCountAsString(this->mu32_Reserved),
-                                                                     C_Uti::h_GetByteCountAsString(this->mu32_Size));
+                                                                              C_GtGetText::h_GetText(
+                                                                                 "used by parameters"),
+                                                                              C_Uti::h_GetByteCountAsString(this->
+                                                                                                            mu32_Used),
+                                                                              C_Uti::h_GetByteCountAsString(this->
+                                                                                                            mu32_Size));
+         c_TextReservation = "   " + static_cast<QString>("%1% %2 (%3 / %4)").arg(QString::number(
+                                                                                     u32_PercentageReserved),
+                                                                                  C_GtGetText::h_GetText(
+                                                                                     "reserved by lists"),
+                                                                                  C_Uti::h_GetByteCountAsString(this->
+                                                                                                                mu32_Reserved),
+                                                                                  C_Uti::h_GetByteCountAsString(this->
+                                                                                                                mu32_Size));
 
          c_ToolTipText += "NVM Statistics:\n" + c_TextUsage + c_TextReservation;
       }
@@ -689,7 +702,8 @@ void C_SdNdeDpSelectorItemWidget::m_UpdateLabel(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorItemWidget::m_UpdateName(void) const
 {
-   this->mpc_Ui->pc_TextEditDpName->setText(static_cast<QString>("#") + QString::number(this->mu32_Number) + static_cast<QString>(" - ") +
+   this->mpc_Ui->pc_TextEditDpName->setText(static_cast<QString>("#") + QString::number(
+                                               this->mu32_Number) + static_cast<QString>(" - ") +
                                             this->mc_Name);
 }
 

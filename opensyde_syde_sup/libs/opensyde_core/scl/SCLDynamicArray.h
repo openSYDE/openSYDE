@@ -55,8 +55,8 @@ public:
    virtual ~SCLDynamicArray(void);
 
    //Note: put the const function first here as a workaround for problems in PC-Lint 9.00k in combination with -ctc
-   const T & operator [](stw_types::sint32 os32_Index) const;
-   T & operator [](stw_types::sint32 os32_Index);
+   const T & operator [](const stw_types::sint32 os32_Index) const;
+   T & operator [](const stw_types::sint32 os32_Index);
 
    SCLDynamicArray & operator =(const SCLDynamicArray<T> & orc_Src);
 

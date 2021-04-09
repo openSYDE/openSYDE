@@ -619,7 +619,7 @@ bool C_SyvUpUpdatePackageListNodeItemWidget::event(QEvent * const opc_Event)
 void C_SyvUpUpdatePackageListNodeItemWidget::m_LoadFileInformation(bool & orq_FileExists, bool & orq_FlashwareWarning,
                                                                    bool & orq_TriggerRemove)
 {
-   QFileInfo c_FileInfo(this->mc_AbsoluteFilePath);
+   const QFileInfo c_FileInfo(this->mc_AbsoluteFilePath);
 
    orq_FlashwareWarning = false;
    orq_TriggerRemove = false;
@@ -633,7 +633,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::m_LoadFileInformation(bool & orq_Fi
    if (orq_FileExists == true)
    {
       float64 f64_SizeFloat;
-      QDateTime c_DateTime = c_FileInfo.lastModified();
+      const QDateTime c_DateTime = c_FileInfo.lastModified();
 
       // File size in kB
       f64_SizeFloat = std::ceil(static_cast<float64>(c_FileInfo.size()) / 1024.0);
@@ -713,7 +713,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::m_UpdateAbsolutePath(void)
 void C_SyvUpUpdatePackageListNodeItemWidget::m_UpdateTitle(void)
 {
    this->mc_Title = static_cast<QString>("#%1 - %2").arg(QString::number(this->mu32_Number + 1U),
-                                            this->mc_Name);
+                                                         this->mc_Name);
 
    this->mpc_Ui->pc_LabelTitle->setText(C_Uti::h_AdaptStringToSize(this->mc_Title,
                                                                    this->mpc_Ui->pc_LabelTitle->fontMetrics(),

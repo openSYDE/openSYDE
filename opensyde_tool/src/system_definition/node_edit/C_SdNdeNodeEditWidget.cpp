@@ -178,11 +178,6 @@ bool C_SdNdeNodeEditWidget::WasChanged(void) const
 void C_SdNdeNodeEditWidget::Save(void) const
 {
    this->mpc_Ui->pc_NodePropWidget->SaveToData();
-
-   if (this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex() == hsn_TabIndexHalc)
-   {
-      this->mpc_Ui->pc_TabHalc->Save();
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

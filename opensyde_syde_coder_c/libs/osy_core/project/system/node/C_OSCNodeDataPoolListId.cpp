@@ -83,7 +83,6 @@ bool C_OSCNodeDataPoolListId::operator <(const C_OSCNodeDataPoolId & orc_Cmp) co
       }
       else if (this->u32_DataPoolIndex == orc_Cmp.u32_DataPoolIndex)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          const C_OSCNodeDataPoolListId * const pc_NonBase =
             dynamic_cast<const C_OSCNodeDataPoolListId *>(&orc_Cmp);
          //Not current class, assume base comparison is correct
@@ -133,7 +132,6 @@ bool C_OSCNodeDataPoolListId::operator ==(const C_OSCNodeDataPoolId & orc_Cmp) c
 
    if (q_Return == true)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_OSCNodeDataPoolListId * const pc_NonBase =
          dynamic_cast<const C_OSCNodeDataPoolListId *>(&orc_Cmp);
       //Not current class, assume base comparison is correct

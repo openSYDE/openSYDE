@@ -100,6 +100,11 @@ const QColor mc_STYLE_GUIDE_COLOR_3001 = QColor(73, 73, 133);
 const QColor mc_STYLE_GUIDE_COLOR_5413 = QColor(126, 126, 188);
 const QColor mc_STYLE_GUIDE_COLOR_LINK = mc_STYLE_GUIDE_COLOR_4;
 
+const QColor mc_STYLE_GUIDE_COLOR_CH1 = QColor(126, 199, 98);
+const QColor mc_STYLE_GUIDE_COLOR_CH2 = QColor(90, 90, 201);
+const QColor mc_STYLE_GUIDE_COLOR_CH3 = QColor(92, 92, 92);
+const QColor mc_STYLE_GUIDE_COLOR_CH4 = QColor(140, 140, 141);
+
 //Style guide colors (design studio) for dynamic stylesheets
 const QString mc_STYLESHEET_GUIDE_COLOR_0 = "rgb(255, 255, 255)";
 const QString mc_STYLESHEET_GUIDE_COLOR_4 = "rgb(57, 57, 109)";
@@ -157,9 +162,6 @@ const stw_types::uint8 mu8_MAX_NODE_ID_STW = static_cast<stw_types::uint8> (254)
 const stw_types::uint32 mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN = 0x101U;
 const stw_types::uint32 mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX = 0x17FU;
 const stw_types::uint32 mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX = 48U;
-const stw_types::uint32 mu32_NODE_DATA_POOL_MAX = 32U;
-const stw_types::uint32 mu32_NODE_DATA_POOL_LIST_MAX = 128U;
-const stw_types::uint32 mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX = 2048U;
 //Data set restrictions
 const stw_types::uint32 mu32_NODE_DATA_SET_PER_LIST_MAX = 16U;
 

@@ -133,7 +133,7 @@ void C_SCLChecksums::CalcCRC16STW(const void * const opv_Start, const uint32 ou3
 
    for (u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
    {
-      oru16_CRC = static_cast<uint16>(mau16_CRC_TABLE[oru16_CRC >> 8] ^ (static_cast<uint16>(oru16_CRC << 8)) ^
+      oru16_CRC = static_cast<uint16>(mau16_CRC_TABLE[oru16_CRC >> 8U] ^ (static_cast<uint16>(oru16_CRC << 8U)) ^
                                       pu8_Data[u32_Index]);
    }
 }
@@ -159,8 +159,8 @@ void C_SCLChecksums::CalcCRC16(const void * const opv_Start, const uint32 ou32_N
 
    for (u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
    {
-      u8_Index = static_cast<uint8>(oru16_CRC >> 8) ^ pu8_Data[u32_Index];
-      oru16_CRC = static_cast<uint16>((static_cast<uint16>(oru16_CRC << 8)) ^ mau16_CRC_TABLE[u8_Index]);
+      u8_Index = static_cast<uint8>(oru16_CRC >> 8U) ^ pu8_Data[u32_Index];
+      oru16_CRC = static_cast<uint16>((static_cast<uint16>(oru16_CRC << 8U)) ^ mau16_CRC_TABLE[u8_Index]);
    }
 }
 
@@ -182,7 +182,7 @@ void C_SCLChecksums::CalcCRC32(const void * const opv_Start, const uint32 ou32_N
 
    for (u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
    {
-      oru32_CRC = (mau32_CRC_TABLE[((oru32_CRC) ^ (pu8_Data[u32_Index])) & 0xffU] ^ ((oru32_CRC) >> 8));
+      oru32_CRC = (mau32_CRC_TABLE[((oru32_CRC) ^ (pu8_Data[u32_Index])) & 0xFFU] ^ ((oru32_CRC) >> 8U));
    }
 }
 
@@ -238,10 +238,10 @@ sint32 C_SCLChecksums::CalcCRC32TriCore(const void * const opv_Start, const uint
          }
 
          u32_Value = static_cast<uint32>(pu8_Data[u32_IndexWord * 4]) +
-                     ((static_cast<uint32>(pu8_Data[(u32_IndexWord * 4) + 1])) << 8) +
-                     ((static_cast<uint32>(pu8_Data[(u32_IndexWord * 4) + 2])) << 16) +
-                     ((static_cast<uint32>(pu8_Data[(u32_IndexWord * 4) + 3])) << 24);
-         oru32_CRC = (u32_Value) ^ ((oru32_CRC << 1) | u32_Tmp1);
+                     ((static_cast<uint32>(pu8_Data[(u32_IndexWord * 4) + 1])) << 8U) +
+                     ((static_cast<uint32>(pu8_Data[(u32_IndexWord * 4) + 2])) << 16U) +
+                     ((static_cast<uint32>(pu8_Data[(u32_IndexWord * 4) + 3])) << 24U);
+         oru32_CRC = (u32_Value) ^ ((oru32_CRC << 1U) | u32_Tmp1);
       }
    }
 

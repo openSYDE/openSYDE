@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>styles/Charts.qss</file>
         <file>styles/CheckBox.qss</file>
         <file>styles/Color.qss</file>
         <file>styles/ComboBox.qss</file>
@@ -131,14 +130,6 @@
         <file>images/system_views/dashboards/SpinBoxStw2.png</file>
         <file>images/system_views/dashboards/SpinBoxStw2Dark.png</file>
         <file>images/system_views/dashboards/SpinBoxStwDark.png</file>
-        <file>images/system_views/dashboards/TDChartFlat.png</file>
-        <file>images/system_views/dashboards/TDChartFlatDark.png</file>
-        <file>images/system_views/dashboards/TDChartSkeu.png</file>
-        <file>images/system_views/dashboards/TDChartSkeuDark.png</file>
-        <file>images/system_views/dashboards/TDChartStw.png</file>
-        <file>images/system_views/dashboards/TDChartStw2.png</file>
-        <file>images/system_views/dashboards/TDChartStw2Dark.png</file>
-        <file>images/system_views/dashboards/TDChartStwDark.png</file>
         <file>images/system_views/dashboards/ToggleFlat.png</file>
         <file>images/system_views/dashboards/ToggleFlatDark.png</file>
         <file>images/system_views/dashboards/ToggleSkeu.png</file>
@@ -377,6 +368,7 @@
         <file>images/main_page_and_navi_bar/Icon_delete_navi_bar_hover.svg</file>
         <file>images/system_views/dashboards/icons/IconUpdateValueRead.svg</file>
         <file>images/system_views/dashboards/icons/IconUpdateValueReadCancel.svg</file>
+        <file>images/system_views/dashboards/icons/IconUpdateValueReadCancelDisabled.svg</file>
         <file>images/system_views/dashboards/icons/IconUpdateValueWrite.svg</file>
         <file>images/system_views/dashboards/icons/IconUpdateValueWriteCancel.svg</file>
         <file>images/system_views/dashboards/icons/IconUpdateValueReadDisabled.svg</file>
@@ -590,5 +582,84 @@
         <file>images/system_definition/NodeEdit/lists/NextArrowEnabled.svg</file>
         <file>images/system_definition/NodeEdit/lists/DatapoolOverview.svg</file>
         <file>images/IconCloseList.svg</file>
+        <file>images/system_definition/NodeEdit/halc/OtherLargeWarning.svg</file>
+        <file>images/system_definition/NodeEdit/halc/OtherSmallWarning.svg</file>
+        <file>images/RadioButtonDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconArrowBottomDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconCursorMode.svg</file>
+        <file>images/system_definition/IconParameterInactive.svg</file>
+        <file>images/system_definition/IconVariableInactive.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconChartTab.svg</file>
+        <file>images/IconAddDisabledDarkMode.svg</file>
+        <file>images/CheckBoxTinyActive.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconFitX.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconFitXDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconFitXY.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconFitXYDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconFitY.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconFitYDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconPause.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconPauseDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconPauseDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconPlay.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconPlayDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconPlayDisabled.svg</file>
+        <file>images/system_views/dashboards/icons/IconUpdateValueReadCancelDark.svg</file>
+        <file>images/system_views/dashboards/icons/IconUpdateValueReadDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconFitXDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconFitXYDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconFitYDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomAdjustX.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomAdjustXDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomAdjustXDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomAdjustXY.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomAdjustXYDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomAdjustXYDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomAdjustY.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomAdjustYDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomAdjustYDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXYMinus.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXYMinusDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXYPlus.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXYPlusDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomSelection.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomSelectionDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomSelectionDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXMinus.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXMinusDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXPlus.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXPlusDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepYMinus.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepYMinusDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepYPlus.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepYPlusDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXMinusDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXPlusDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXYMinusDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepXYPlusDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepYMinusDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconZoomStepYPlusDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconChartOptions.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconChartOptionsDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconChartOptionsDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconChartToggleSamples.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconChartToggleSamplesDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconShowSeveralYAxis.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconShowSeveralYAxisDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconCursorMeasurement.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconCursorMeasurementDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconCursorMeasurementDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconCursorDifference.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconCursorDifferenceDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconCursorDifferenceDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconChartTabDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconArrowBottom.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconArrowBottomDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconUpdateValue.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconUpdateValueCancel.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconUpdateValueDark.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconUpdateValueDarkCancel.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconUpdateValueDisabled.svg</file>
+        <file>images/system_views/dashboards/tab_chart/IconUpdateValueDisabledCancel.svg</file>
     </qresource>
 </RCC>

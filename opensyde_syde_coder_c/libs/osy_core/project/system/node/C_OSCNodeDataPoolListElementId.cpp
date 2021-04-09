@@ -88,7 +88,6 @@ bool C_OSCNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & orc_
       }
       else if (this->u32_DataPoolIndex == orc_Cmp.u32_DataPoolIndex)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          const C_OSCNodeDataPoolListId * const pc_NonBaseList =
             dynamic_cast<const C_OSCNodeDataPoolListId *>(&orc_Cmp);
          //Not current class, assume base comparison is correct
@@ -100,7 +99,6 @@ bool C_OSCNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & orc_
             }
             else if (this->u32_ListIndex == pc_NonBaseList->u32_ListIndex)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                const C_OSCNodeDataPoolListElementId * const pc_NonBaseElement =
                   dynamic_cast<const C_OSCNodeDataPoolListElementId *>(&orc_Cmp);
                //Not current class, assume base comparison is correct
@@ -160,7 +158,6 @@ bool C_OSCNodeDataPoolListElementId::operator ==(const C_OSCNodeDataPoolId & orc
 
    if (q_Return == true)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       const C_OSCNodeDataPoolListElementId * const pc_NonBase =
          dynamic_cast<const C_OSCNodeDataPoolListElementId *>(&orc_Cmp);
       //Not current class, assume base comparison is correct

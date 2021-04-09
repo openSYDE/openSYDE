@@ -42,7 +42,9 @@ private:
    public:
       C_TcpConnection(void);
 
-      SOCKET un_Socket;                  ///< client socket
+      //lint -save -e8080 //using type expected by the library for compatibility
+      SOCKET un_Socket; ///< client socket
+      //lint -restore
       stw_types::uint8 au8_IpAddress[4]; ///< server's IP (remembered for reconnecting)
    };
 

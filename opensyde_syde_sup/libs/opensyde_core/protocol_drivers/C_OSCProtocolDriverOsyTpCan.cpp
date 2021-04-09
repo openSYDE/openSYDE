@@ -226,7 +226,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFirstFrame(const T_STWCAN_Ms
       const uint16 u16_ServiceSize = static_cast<uint16>(static_cast<uint16>(u8_Size) << 8U) +
                                      orc_CanMessage.au8_Data[1];
       mc_RxService.c_ServiceData.c_Data.resize(u16_ServiceSize);
-      //lint -e{419} //std::vector reference returned by [] is guaranteed to have linear data in memory
       (void)std::memcpy(&mc_RxService.c_ServiceData.c_Data[0], &orc_CanMessage.au8_Data[2], 6U);
       mc_RxService.u16_TransmissionIndex = 6U;
       mc_RxService.u8_SequenceNumber = 1U;
@@ -447,7 +446,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_STW
          }
          else if (orc_CanMessage.u8_DLC == 8U)
          {
-            //lint -e{419} //std::vector reference returned by [] is guaranteed to have linear data in memory
             (void)std::memcpy(&mc_RxService.c_ServiceData.c_Data[mc_RxService.u16_TransmissionIndex],
                               &orc_CanMessage.au8_Data[1], 7U);
             mc_RxService.u16_TransmissionIndex += 7U;
@@ -527,7 +525,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const 
          //get total size:
          const uint16 u16_ServiceSize = orc_CanMessage.au8_Data[1];
          mc_RxService.c_ServiceData.c_Data.resize(u16_ServiceSize);
-         //lint -e{419} //std::vector reference returned by [] is guaranteed to have linear data in memory
          (void)memcpy(&mc_RxService.c_ServiceData.c_Data[0], &orc_CanMessage.au8_Data[2], 6U);
          mc_RxService.u16_TransmissionIndex = 6U;
          mc_RxService.u8_SequenceNumber = 1U;
@@ -564,7 +561,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const 
          }
          else if (orc_CanMessage.u8_DLC == 8U)
          {
-            //lint -e{419} //std::vector reference returned by [] is guaranteed to have linear data in memory
             (void)memcpy(&mc_RxService.c_ServiceData.c_Data[mc_RxService.u16_TransmissionIndex],
                          &orc_CanMessage.au8_Data[1], 7U);
             mc_RxService.u16_TransmissionIndex += 7U;
@@ -740,7 +736,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
 
                   t_TxMsg.au8_Data[0] = mhu8_ISO15765_N_PCI_OMF;
                   t_TxMsg.au8_Data[1] = static_cast<uint8>(un_CountBytes & 0xFFU);
-                  //lint -e{420} //std::vector reference returned by [] is guaranteed to have linear data in memory
                   (void)std::memcpy(&t_TxMsg.au8_Data[2], &mc_TxService.c_ServiceData.c_Data[0], 6U);
                   s32_Return = mpc_CanDispatcher->CAN_Send_Msg(t_TxMsg);
 
@@ -801,7 +796,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
                   t_TxMsg.au8_Data[0] = static_cast<uint8>(mhu8_ISO15765_N_PCI_FF +
                                                            ((mc_TxService.c_ServiceData.c_Data.size() >> 8U) & 0x0FU));
                   t_TxMsg.au8_Data[1] = static_cast<uint8>(mc_TxService.c_ServiceData.c_Data.size() & 0xFFU);
-                  //lint -e{420} //std::vector reference returned by [] is guaranteed to have linear data in memory
                   (void)std::memcpy(&t_TxMsg.au8_Data[2], &mc_TxService.c_ServiceData.c_Data[0], 6U);
                   mc_TxService.u16_TransmissionIndex = 6U;
                   mc_TxService.u8_SequenceNumber = 1U;

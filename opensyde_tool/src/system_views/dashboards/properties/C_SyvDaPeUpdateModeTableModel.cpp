@@ -205,14 +205,15 @@ QVariant C_SyvDaPeUpdateModeTableModel::headerData(const sintn osn_Section, cons
             c_Retval = C_GtGetText::h_GetText("Parent Datapool name from SYSTEM DEFINITION");
             break;
          case eTRANSMISSION_MODE:
-            c_Retval = C_GtGetText::h_GetText("Used transmission mode:\n"
-                                              "\"Cyclic\": transmit in fix time interval\n"
-                                              "\"On Change\": transmit in fix time interval or earlier if change detected\n"
-                                              "\"On Trigger\": Transmission is initiated by device application");
+            c_Retval = C_GtGetText::h_GetText(
+               "Used transmission mode:\n"
+               "\"Cyclic\": transmit in fixed time interval\n"
+               "\"On Change\": transmit in fixed time interval or earlier if change detected\n"
+               "\"On Trigger\": transmit if the user clicks the corresponding button");
             break;
          case eCYCLIC_INTERVAL:
             c_Retval = C_GtGetText::h_GetText(
-               "Fix time interval for transmission.\n"
+               "Fixed time interval for transmission.\n"
                "Only necessary if transmission mode is \"On Change\" or \"Cyclic\"");
             break;
          case eTHRESHOLD:
@@ -915,7 +916,7 @@ void C_SyvDaPeUpdateModeTableModel::m_Init(const uint32 ou32_NodeIndex)
             for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
             {
                const C_PuiSvDbWidgetBase * const pc_CurWidget = c_Widgets[u32_ItWidget];
-               
+
                if (((pc_CurWidget != NULL) && (pc_CurWidget->IsReadElement() == true)) &&
                    (dynamic_cast<const C_PuiSvDbParam * const>(pc_CurWidget) == NULL))
                {

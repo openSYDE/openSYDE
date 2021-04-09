@@ -48,7 +48,7 @@ public:
    void SetSubTitle(const QString & orc_Str);
 
    void HandleMousePressEvent(const QMouseEvent * const opc_Event);
-   void HandleMouseReleaseEvent(QMouseEvent * const opc_Event);
+   void HandleMouseReleaseEvent(const QMouseEvent * const opc_Event);
    void HandleMouseMoveEvent(const QMouseEvent * const opc_Event);
    void SetSize(const QSize & orc_Size);
    void ApplyMaximumSize(const QWidget * const opc_Widget = NULL);

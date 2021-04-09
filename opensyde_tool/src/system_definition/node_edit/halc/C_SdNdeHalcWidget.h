@@ -41,7 +41,6 @@ public:
    void SaveUserSettings(void) const;
    void InitStaticNames(void) const;
    void SetNode(const stw_types::uint32 ou32_NodeIndex);
-   void Save(void);
    void ShowChannel(const stw_types::uint32 ou32_DomainIndex, const stw_types::sint32 os32_ChannelIndex) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -52,13 +51,11 @@ Q_SIGNALS:
    void SigHalcDataPoolChanged(void) const;
 
 protected:
-   virtual void hideEvent(QHideEvent * const opc_Event) override;
    virtual void showEvent(QShowEvent * const opc_Event) override;
 
 private:
    Ui::C_SdNdeHalcWidget * mpc_Ui;
    stw_types::uint32 mu32_NodeIndex;
-   bool mq_HalcDescriptionSelected;
 
    static const QString mhc_CONFIG_FILE_TYPE;
 
@@ -72,7 +69,7 @@ private:
    void m_OnCleanUpClicked(void) const;
    void m_OnSelectClicked(void);
    void m_OnUpdateClicked(void);
-   void m_RunDatapoolMagician(void);
+   void m_RunDatapoolMagician(void) const;
    void m_OnOverviewClicked(void) const;
    void m_ShowOverview(const bool oq_Show) const;
    void m_OnChannelSelected(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,

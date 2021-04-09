@@ -66,8 +66,9 @@ C_SdNdeHalcConfigImportView::~C_SdNdeHalcConfigImportView(void)
    \param[in]       orc_Config         HALC configuration of the current node
    \param[in]       orc_ImportConfig   Imported HALC configuration for updating
 
-   \retval   C_NO_ERR  No errors, model is initialized
-   \retval   C_NOACT   No domains does match (Id does not match), nothing to import
+   \retval   C_NO_ERR   No errors, model is initialized
+   \retval   C_NOACT    No domains does match (Id does not match), nothing to import
+   \retval   C_CHECKSUM Configuration is not compatible
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeHalcConfigImportView::Init(const C_OSCHalcConfig & orc_Config,

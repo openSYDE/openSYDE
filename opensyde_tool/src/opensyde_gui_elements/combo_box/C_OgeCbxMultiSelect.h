@@ -45,8 +45,6 @@ public:
    virtual void showPopup();
    virtual void hidePopup();
 
-   void SelectItem(const stw_types::uint32 u32_Index);
-
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 Q_SIGNALS:

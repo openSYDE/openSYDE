@@ -117,23 +117,6 @@ sintn C_GiArrowCursorButton::type() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal for update of current scaling
-
-   \param[in] orc_Transform Current scaling
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiArrowCursorButton::UpdateTransform(const QTransform & orc_Transform) const
-{
-   Q_UNUSED(orc_Transform)
-   //Not necessary with new connect icon (also make function not const anymore
-   //if (orc_Transform.isInvertible() == true)
-   //{
-   //   this->prepareGeometryChange();
-   //   this->setTransform(orc_Transform.inverted());
-   //}
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle tool tip generation
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -159,12 +142,12 @@ void C_GiArrowCursorButton::mousePressEvent(QGraphicsSceneMouseEvent * const opc
    if (mpc_ConnectedNode !=  NULL)
    {
       //Attach to node center
-      Q_EMIT this->StartConnector(mpc_ConnectedNode->mapToScene(
-                                     mpc_ConnectedNode->boundingRect().center()), opc_Event->scenePos());
+      Q_EMIT (this->SigStartConnector(mpc_ConnectedNode->mapToScene(
+                                         mpc_ConnectedNode->boundingRect().center()), opc_Event->scenePos()));
    }
    else
    {
-      Q_EMIT this->StartConnector(opc_Event->scenePos(), opc_Event->scenePos());
+      Q_EMIT (this->SigStartConnector(opc_Event->scenePos(), opc_Event->scenePos()));
    }
    QGraphicsSvgItem::mousePressEvent(opc_Event);
 }

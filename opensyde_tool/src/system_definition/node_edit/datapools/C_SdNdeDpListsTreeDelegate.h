@@ -33,7 +33,7 @@ public:
 
    virtual QSize sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const override;
 
-   void SetMaximumHeight(const stw_types::sintn sn_Height);
+   void SetMaximumHeight(const stw_types::sintn osn_Height);
 
 private:
    stw_types::uint32 mu32_NodeIndex;

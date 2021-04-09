@@ -26,6 +26,7 @@
 #include "C_PuiSdHandler.h"
 #include "C_OgePopUpDialog.h"
 #include "C_GiSvDaTableBase.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_SyvDaPeDataElementBrowse.h"
 #include "C_SyvDaPeUpdateModeConfiguration.h"
 
@@ -333,7 +334,7 @@ bool C_GiSvDaTableBase::CallProperties(void)
                {
                   c_New->HideOverlay();
                }
-            }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+            } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
          }
       }
    }
@@ -657,7 +658,7 @@ bool C_GiSvDaTableBase::CheckItemError(const C_PuiSvDbNodeDataPoolListElementId 
                                        QString & orc_Content, bool & orq_IsTransmissionError) const
 {
    bool q_Retval = false;
-   const QMap<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId,
+   const QMap<C_PuiSvDbNodeDataPoolListElementId,
               QString>::const_iterator c_It = this->mc_CommmunicationErrors.find(orc_DataPoolElementId);
 
    if (c_It != this->mc_CommmunicationErrors.end())
@@ -668,7 +669,7 @@ bool C_GiSvDaTableBase::CheckItemError(const C_PuiSvDbNodeDataPoolListElementId 
 
    if (orc_DataPoolElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL)
    {
-      QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, stw_types::uint8>::const_iterator c_ItInvalidDlc =
+      const QMap<C_OSCNodeDataPoolListElementId, stw_types::uint8>::const_iterator c_ItInvalidDlc =
          this->mc_InvalidDlcSignals.find(orc_DataPoolElementId);
       if (c_ItInvalidDlc != this->mc_InvalidDlcSignals.end())
       {
@@ -777,7 +778,7 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
          pc_Dialog->SaveUserSettings();
          c_New->HideOverlay();
       }
-   }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

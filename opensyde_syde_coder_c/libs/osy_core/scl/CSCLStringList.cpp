@@ -369,7 +369,7 @@ C_SCLString C_SCLStringList::Values(const C_SCLString & orc_Key) const
 {
    sint32 s32_Index;
    C_SCLString c_Help = "";
-   C_SCLString c_Search = orc_Key.UpperCase() + "=";
+   const C_SCLString c_Search = orc_Key.UpperCase() + "=";
 
    for (s32_Index = 0; s32_Index < Strings.GetLength(); s32_Index++)
    {
@@ -404,7 +404,7 @@ sint32 C_SCLStringList::IndexOfName(const C_SCLString & orc_Name) const
 {
    bool q_Found = false;
    sint32 s32_Index;
-   C_SCLString c_Search = orc_Name.UpperCase();
+   const C_SCLString c_Search = orc_Name.UpperCase();
    C_SCLString c_Remainder;
    uint32 u32_Pos;
 

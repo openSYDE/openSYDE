@@ -433,6 +433,7 @@ void C_GiLiLineGroup::SetDefaultCursor(const QCursor & orc_Value)
    \param[in] opc_GuidelineItem Detailed input parameter description
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_GiLiLineGroup::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 {
    Q_UNUSED(opc_GuidelineItem)
@@ -461,7 +462,7 @@ void C_GiLiLineGroup::m_InitPoint(const sint32 & ors32_Index, const QPointF & or
    mc_Points[ors32_Index]->setPos(this->mapFromScene(c_AdaptedScenePos));
 
    //Update line when interaction point moving
-   connect(mc_Points[ors32_Index], &C_GiLiInteractionPoint::PointChanged, this,
+   connect(mc_Points[ors32_Index], &C_GiLiInteractionPoint::SigPointChanged, this,
            &C_GiLiLineGroup::OnPointChange);
 
    //Update Point Index
@@ -509,7 +510,7 @@ void C_GiLiLineGroup::m_RemovePointAt(const stw_types::sint32 & ors32_Index)
       if (ors32_Index < mc_Points.size())
       {
          //Update line when interaction point moving
-         disconnect(mc_Points[ors32_Index], &C_GiLiInteractionPoint::PointChanged, this,
+         disconnect(mc_Points[ors32_Index], &C_GiLiInteractionPoint::SigPointChanged, this,
                     &C_GiLiLineGroup::OnPointChange);
 
          //Remove
@@ -608,7 +609,7 @@ QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const Q
          for (sint32 s32_Counter = 0; s32_Counter < this->mc_Points.size(); ++s32_Counter)
          {
             if ((s32_Counter != this->msn_ActiveItemIndex) &&
-                (s32_Counter != (this->msn_ActiveItemIndex + 1L)))
+                (s32_Counter != static_cast<sint32>(this->msn_ActiveItemIndex + 1L)))
             {
                this->UpdatePoint(s32_Counter, this->mc_Points[s32_Counter]->scenePos() - c_Delta, true);
             }
@@ -653,7 +654,7 @@ QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const Q
             for (sint32 s32_Counter = 0; s32_Counter < this->mc_Points.size(); ++s32_Counter)
             {
                if ((s32_Counter != this->msn_ActiveItemIndex) &&
-                   (s32_Counter != (this->msn_ActiveItemIndex + 1L)))
+                   (s32_Counter != static_cast<sint32>(this->msn_ActiveItemIndex + 1L)))
                {
                   this->UpdatePoint(s32_Counter, this->mc_Points[s32_Counter]->scenePos() - c_Delta, true);
                }
@@ -712,7 +713,7 @@ void C_GiLiLineGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event
    {
       if (this->me_ActiveResizeMode != eALL)
       {
-         QPointF c_Pos = opc_Event->scenePos();
+         const QPointF c_Pos = opc_Event->scenePos();
          sint32 s32_Counter;
          bool q_FoundPoint = false;
 
@@ -724,8 +725,6 @@ void C_GiLiLineGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event
                this->me_ActiveResizeMode = ePOINT;
                this->msn_ActiveItemIndex = s32_Counter;
                q_FoundPoint = true;
-
-               Q_EMIT this->ClickActive(s32_Counter, true, c_Pos);
                break;
             }
          }
@@ -783,7 +782,6 @@ void C_GiLiLineGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Eve
 {
    if (this->me_ActiveResizeMode == ePOINT)
    {
-      Q_EMIT this->ClickActive(this->msn_ActiveItemIndex, false, opc_Event->scenePos());
       Q_EMIT this->SigItemWasResized(this->msn_ActiveItemIndex,
                                      this->mc_Points[this->msn_ActiveItemIndex]->pos() - this->mc_LastKnownPosition);
    }
@@ -1070,7 +1068,7 @@ void C_GiLiLineGroup::FindClosestConnection(const QPointF & orc_ScenePoint, sint
             if (f64_CurDist < f64_Best)
             {
                f64_Best = f64_CurDist;
-               if (rc_Lines.size() > (s32_ItPoint - 1))
+               if (static_cast<sint32>(rc_Lines.size()) > (s32_ItPoint - 1))
                {
                   ors32_Index = s32_ItPoint - 1;
                }
@@ -1210,7 +1208,7 @@ void C_GiLiLineGroup::paint(QPainter * const opc_Painter, const QStyleOptionGrap
    /* Draw bounding */
    if ((this->isSelected()) && (this->me_ActiveResizeMode == eALL))
    {
-      opc_Painter->setPen(QPen(mc_STYLE_GUIDE_COLOR_21));
+      opc_Painter->setPen(static_cast<QPen>(mc_STYLE_GUIDE_COLOR_21));
       opc_Painter->setBrush(Qt::NoBrush);
       opc_Painter->drawPath(this->shape());
    }

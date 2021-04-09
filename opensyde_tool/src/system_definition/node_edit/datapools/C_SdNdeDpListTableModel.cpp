@@ -731,16 +731,8 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                                                                           this->mu32_DataPoolIndex,
                                                                           e_DataPoolType) == C_NO_ERR)
                      {
-                        QString c_Name;
-                        if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eDIAG)
-                        {
-                           c_Name = C_GtGetText::h_GetText("Variable");
-                        }
-                        else
-                        {
-                           c_Name = C_GtGetText::h_GetText("Parameter");
-                        }
-                        c_Retval = static_cast<QString>(C_GtGetText::h_GetText("%1 has invalid content")).arg(c_Name);
+                        c_Retval = static_cast<QString>(C_GtGetText::h_GetText("%1 has invalid content")).
+                                   arg(C_PuiSdHandlerNodeLogic::h_GetElementTypeName(e_DataPoolType));
                      }
                   }
                }
@@ -805,15 +797,8 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                                                                              e_DataPoolType) == C_NO_ERR)
                         {
                            QString c_Output;
-                           QString c_Name;
-                           if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eDIAG)
-                           {
-                              c_Name = C_GtGetText::h_GetText("Variable");
-                           }
-                           else
-                           {
-                              c_Name = C_GtGetText::h_GetText("Parameter");
-                           }
+                           const QString c_Name = C_PuiSdHandlerNodeLogic::h_GetElementTypeName(e_DataPoolType);
+
                            if (((q_NameConflict == true) || (q_NameInvalid == true)) || (q_MinOverMax == true))
                            {
                               c_Output += C_GtGetText::h_GetText("Invalid properties:\n");
@@ -1253,13 +1238,14 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                                                                     e_DataPoolType) == C_NO_ERR)
                {
                   c_Tmp.push_back(QString::number(16)); // icon size
-                  if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eDIAG)
-                  {
-                     c_Tmp.push_back(":/images/system_definition/IconVariable.svg");
-                  }
-                  else
+                  if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eNVM)
                   {
                      c_Tmp.push_back(":/images/system_definition/IconParameter.svg");
+                  }
+                  else // DIAG Datapool
+                  {
+                     c_Tmp.push_back(":/images/system_definition/IconVariable.svg");
+                     //no extra handling for COMM & HAL Datapools because they do not use this list visualization
                   }
                }
                break;
@@ -1476,7 +1462,6 @@ bool C_SdNdeDpListTableModel::setData(const QModelIndex & orc_Index, const QVari
          {
             //Unknown data change
          }
-         //lint -e{1793} Qt example
          Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
       }
    }

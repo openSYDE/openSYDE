@@ -103,8 +103,18 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
    this->mpc_Ui->pc_SpinBoxCycleTime->SetMaximumCustom(50000);
 
    //Initial setup
-   m_OnExtendedChange(this->mpc_Ui->pc_CheckBoxExtendedType->isChecked());
    m_OnTxMethodChange(this->mpc_Ui->pc_ComboBoxTxMethod->currentIndex());
+   m_OnExtendedChange(this->mpc_Ui->pc_CheckBoxExtendedType->isChecked());
+
+   //We do want the SpinBoxes to emit "valueChanged" on button clicks immediately but
+   // for changes through keyboard only after enter or when the field is left.
+   //This prevents problems premature triggering of automatic calculations or checkn when the user enters a value
+   // manually and is not finished yet.
+   this->mpc_Ui->pc_SpinBoxCycleTime->setKeyboardTracking(false);
+   this->mpc_Ui->pc_SpinBoxLater->setKeyboardTracking(false);
+   this->mpc_Ui->pc_SpinBoxEarly->setKeyboardTracking(false);
+   this->mpc_Ui->pc_SpinBoxId->setKeyboardTracking(false);
+   //Do not deactivate keyboard tracking for DLC SpinEdit; it only has digit anyway
 
    // connects
    // These elements have multiple connects to different slots
@@ -115,9 +125,9 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
                                                              sintn)>(&C_OgeCbxText::currentIndexChanged), this,
            &C_SdBueMessagePropertiesWidget::m_OnTxMethodChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxLater, static_cast<void (QSpinBox::*)(
-                                                         sintn)>(&C_OgeSpxNumber::valueChanged), this,
+   connect(this->mpc_Ui->pc_SpinBoxLater, static_cast<void (QSpinBox::*)(sintn)>(&C_OgeSpxNumber::valueChanged), this,
            &C_SdBueMessagePropertiesWidget::m_SyncCycleToLater);
+
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxCycleTime, static_cast<void (QSpinBox::*)(
                                                              sintn)>(&C_OgeSpxNumber::valueChanged), this,
@@ -130,11 +140,10 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-//lint -e{1540}  no memory leak because the ownership of these objects was never transfered to this class
+//lint -e{1540}  no memory leak because the ownership of these objects was never transferred to this class
 C_SdBueMessagePropertiesWidget::~C_SdBueMessagePropertiesWidget(void)
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
 }
 
 //----------------------------------------------------------------------------------------------------------------------

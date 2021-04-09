@@ -79,6 +79,10 @@ public:
                                         const bool oq_AllowRangeAdaptation = true);
    static void h_InitMax(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content);
    static void h_InitMin(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content);
+   static void h_InitMaxForSignal(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
+                                  const stw_types::uint16 ou16_BitLength);
+   static void h_InitMinForSignal(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
+                                  const stw_types::uint16 ou16_BitLength);
    static QVariant h_ConvertContentToGeneric(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input,
                                              const stw_types::uint32 & oru32_Index);
    static QVariant h_ConvertScaledContentToGeneric(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input,

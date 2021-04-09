@@ -45,7 +45,6 @@ public:
 
    enum E_Outputs
    {
-      eINVALID = -1,
       eNO = 0,
       eOK = 1,
       eCANCEL = 2,

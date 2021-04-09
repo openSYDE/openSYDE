@@ -268,7 +268,7 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
       pc_OSCNodeData = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_CurIndex);
       if ((pc_UINodeData != NULL) && (pc_OSCNodeData != NULL))
       {
-         std::vector<C_PuiSdNodeConnection> c_UIBusConnections = pc_UINodeData->c_UIBusConnections;
+         const std::vector<C_PuiSdNodeConnection> c_UIBusConnections = pc_UINodeData->c_UIBusConnections;
          //create
          pc_Node = this->m_CreateNode(u32_CurIndex, u64_CurUniqueID, pc_UINodeData->f64_Width,
                                       pc_UINodeData->f64_Height,
@@ -348,7 +348,7 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
       for (uint32 u32_ItConnector = 0; u32_ItConnector < opc_AdditionalConnectionData->size();
            ++u32_ItConnector)
       {
-         C_PuiSdCompleteBusConnectionData c_CompleteBusConnectionData =
+         const C_PuiSdCompleteBusConnectionData c_CompleteBusConnectionData =
             (*opc_AdditionalConnectionData)[u32_ItConnector];
          //ID
          u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSdDataElement::eBUS_CONNECTOR),
@@ -377,7 +377,7 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
                            u8_InterfaceNumber);
                      if (pc_ComInterface != NULL)
                      {
-                        C_GiLiBusConnector * pc_GraphicsConnector = new C_GiLiBusConnector(
+                        C_GiLiBusConnector * const pc_GraphicsConnector = new C_GiLiBusConnector(
                            u64_CurUniqueID, c_CompleteBusConnectionData.c_UIData.c_UINodeConnectionInteractionPoints,
                            pc_Node, pc_BusReferenced);
 
@@ -401,7 +401,7 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
         u32_Item < C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.size();
         ++u32_Item)
    {
-      C_PuiBsBoundary * pc_UIBoundaryData = &C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries[u32_Item];
+      C_PuiBsBoundary * const pc_UIBoundaryData = &C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries[u32_Item];
       C_GiSdBoundary * pc_Item;
 
       //ID
@@ -464,7 +464,7 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
         u32_Item < C_PuiSdHandler::h_GetInstance()->c_Elements.c_Images.size();
         ++u32_Item)
    {
-      C_PuiBsImage * pc_UIImageData = &C_PuiSdHandler::h_GetInstance()->c_Elements.c_Images[u32_Item];
+      C_PuiBsImage * const pc_UIImageData = &C_PuiSdHandler::h_GetInstance()->c_Elements.c_Images[u32_Item];
       C_GiSdImageGroup * pc_Item;
 
       //ID

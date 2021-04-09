@@ -236,8 +236,7 @@ void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeI
 
    this->mu32_NodeIndex = ou32_NodeIndex;
    //Even if this widget isn't visible, its index is still used
-   // TODO BAY: Adapt initial protocol by US
-   this->m_SetProtocol(oe_Protocol);
+   this->m_SetProtocol(oe_Protocol); // might change by LoadUserSettings below
 
    this->mq_ModeSingleNode = true;
 
@@ -346,11 +345,6 @@ void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeI
 
       if (this->mpc_Ui->pc_CbInterface->count() > 0)
       {
-         // Select the first interface
-         this->mpc_Ui->pc_CbInterface->setCurrentIndex(0);
-         this->m_InterfaceChanged();
-
-         // TODO BAY: Adapt US handling
          this->LoadUserSettings();
       }
       else
@@ -1107,9 +1101,19 @@ void C_SdBueComIfDescriptionWidget::SaveUserSettings(void) const
       std::vector<stw_types::sint32> c_SignalValues;
       this->mpc_Ui->pc_MsgSigTableWidget->SaveUserSettings(c_MessageValues, c_SignalValues);
 
-      //Get
-      this->mpc_Ui->pc_MsgSigEditWidget->GetLastSelection(q_MessageSelected, c_SelectedMessageName,
-                                                          q_SignalSelected, c_SelectedSignalName);
+      if (this->mpc_Ui->pc_MessageSelectorWidget->IsSelectionEmpty() == true)
+      {
+         q_MessageSelected = false;
+         q_SignalSelected = false;
+         c_SelectedMessageName = "";
+         c_SelectedSignalName = "";
+      }
+      else
+      {
+         this->mpc_Ui->pc_MsgSigEditWidget->GetLastSelection(q_MessageSelected, c_SelectedMessageName,
+                                                             q_SignalSelected, c_SelectedSignalName);
+      }
+
       if (this->mq_ModeSingleNode == false)
       {
          const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
@@ -1137,6 +1141,8 @@ void C_SdBueComIfDescriptionWidget::SaveUserSettings(void) const
             //Set
             C_UsHandler::h_GetInstance()->SetProjSdNodeSelectedProtocol(pc_Node->c_Properties.c_Name.c_str(),
                                                                         e_SelectedProtocol);
+            C_UsHandler::h_GetInstance()->SetProjSdNodeSelectedInterface(pc_Node->c_Properties.c_Name.c_str(),
+                                                                         this->mu32_InterfaceIndex);
 
             if (this->mc_DatapoolIndexes.size() > 0)
             {
@@ -1184,9 +1190,7 @@ void C_SdBueComIfDescriptionWidget::LoadUserSettings(void)
       const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
       if (pc_Bus != NULL)
       {
-         //Restore
          const C_UsCommunication c_UserSettingsBus = C_UsHandler::h_GetInstance()->GetProjSdBus(pc_Bus->c_Name.c_str());
-         //Get
          c_UserSettingsBus.GetLastSelectedMessage(e_SelectedProtocol, q_MessageSelected, c_SelectedMessageName,
                                                   q_SignalSelected, c_SelectedSignalName);
          //Reinit necessary (in some cases)
@@ -1206,13 +1210,23 @@ void C_SdBueComIfDescriptionWidget::LoadUserSettings(void)
 
       if (pc_Node != NULL)
       {
-         //Restore
          const C_UsNode c_UserSettingsNode = C_UsHandler::h_GetInstance()->GetProjSdNode(
             pc_Node->c_Properties.c_Name.c_str());
-         e_SelectedProtocol = c_UserSettingsNode.GetSelectedProtocol();
+         uint32 u32_SelectedInterface = c_UserSettingsNode.GetSelectedInterface();
 
+         // Protocol
+         e_SelectedProtocol = c_UserSettingsNode.GetSelectedProtocol();
          this->m_SetProtocol(e_SelectedProtocol);
 
+         // Interface
+         if (u32_SelectedInterface >= static_cast<uint32>(this->mpc_Ui->pc_CbInterface->count()))
+         {
+            u32_SelectedInterface = 0;
+         }
+         this->mpc_Ui->pc_CbInterface->setCurrentIndex(u32_SelectedInterface);
+         this->m_InterfaceChanged();
+
+         // Selection
          if (this->mc_DatapoolIndexes.size() > 0)
          {
             const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPool(

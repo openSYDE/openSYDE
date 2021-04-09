@@ -42,21 +42,24 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent        Reference to parent
-   \param[in]     oc_ProductName    Product name
-   \param[in]     oc_LogoUrl        Product logo path
-   \param[in]     ou32_Margin       Contents margin
+   \param[in,out] orc_Parent              Reference to parent
+   \param[in]     oc_ProductName          Product name
+   \param[in]     oc_LogoUrl              Product logo path
+   \param[in]     ou32_Margin             Contents margin
+   \param[in]     oc_OptionalComponents   Optional components for showing in dialog
+                                          When adding more than one component, separate the strings by semicolon
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_NagAboutDialog::C_NagAboutDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                    const QString oc_ProductName, const QString oc_LogoUrl,
-                                   const stw_types::uint32 ou32_Margin) :
+                                   const stw_types::uint32 ou32_Margin, const QString oc_OptionalComponents) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_NagAboutDialog),
    mrc_ParentDialog(orc_Parent),
    mc_ProductName(oc_ProductName),
    mc_LogoUrl(oc_LogoUrl),
-   mu32_Margin(ou32_Margin)
+   mu32_Margin(ou32_Margin),
+   mc_OptionalComponents(oc_OptionalComponents)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -89,9 +92,6 @@ void C_NagAboutDialog::InitStaticNames(void) const
 {
    QString c_Text;
 
-   //mpc_Ui->pc_LabelDescOpenSYDEVersion->setText(C_GtGetText::h_GetText("Version"));
-   //this->mpc_Ui->pc_AboutCopyright->setText(C_GtGetText::h_GetText("Copyright"));
-
    c_Text =  C_GtGetText::h_GetText("Sensor-Technik Wiedemann GmbH. All rights reserved.\n");
    c_Text += C_GtGetText::h_GetText("\n");
    c_Text += this->mc_ProductName;
@@ -105,6 +105,17 @@ void C_NagAboutDialog::InitStaticNames(void) const
    c_Text += C_GtGetText::h_GetText("    - TinyXML-2 by Lee Thomason and others\n");
    c_Text += C_GtGetText::h_GetText("    - The MinGW Runtime\n");
    c_Text += C_GtGetText::h_GetText("    - Miniz\n");
+
+   if (this->mc_OptionalComponents != "")
+   {
+      QStringList c_Components = this->mc_OptionalComponents.split(";");
+      sintn sn_Counter;
+
+      for (sn_Counter = 0; sn_Counter < c_Components.size(); ++sn_Counter)
+      {
+         c_Text += static_cast<QString>("    - %1\n").arg(c_Components[sn_Counter]);
+      }
+   }
 
    this->mpc_Ui->pc_LabelValCopyright->setText(c_Text);
 

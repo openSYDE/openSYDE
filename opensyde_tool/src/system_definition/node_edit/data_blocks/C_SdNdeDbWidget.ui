@@ -173,7 +173,7 @@
          </layout>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="pc_FrameApplicationsViewSperator">
+         <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameApplicationsViewSperator">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -478,9 +478,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFrameSeparator</class>
+   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFrameSeparator.h</header>
+   <header>C_OgeFraSeparator.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -457,10 +457,10 @@ QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orsn_Pos)
 QAbstractSpinBox::StepEnabled C_OgeSpxInt64::stepEnabled(void) const
 {
    QAbstractSpinBox::StepEnabled c_Retval;
-   QVariant c_Tmp = this->GetValue();
+   const QVariant c_Tmp = this->GetValue();
    if (mq_IsUnsigned == true)
    {
-      uint64 u64_Tmp = c_Tmp.toULongLong();
+      const uint64 u64_Tmp = c_Tmp.toULongLong();
       if (u64_Tmp == this->mc_Minimum.toULongLong())
       {
          c_Retval = StepUpEnabled;
@@ -476,7 +476,7 @@ QAbstractSpinBox::StepEnabled C_OgeSpxInt64::stepEnabled(void) const
    }
    else
    {
-      sint64 s64_Tmp = c_Tmp.toLongLong();
+      const sint64 s64_Tmp = c_Tmp.toLongLong();
       if (s64_Tmp == this->mc_Minimum.toLongLong())
       {
          c_Retval = StepUpEnabled;
@@ -657,7 +657,7 @@ QVariant C_OgeSpxInt64::m_PrepareValue(const QVariant & orc_Value) const
 {
    QVariant c_Retval;
 
-   switch (orc_Value.type())
+   switch (orc_Value.type()) //lint !e788 //not all cases handled here explicitly
    {
    case QVariant::ULongLong:
       if (this->mq_IsUnsigned == true)

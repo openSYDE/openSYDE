@@ -21,7 +21,6 @@
 #include "C_SyvDaCopyPasteManager.h"
 #include "C_GiSvDaArrow.h"
 #include "C_GiSvDaBoundary.h"
-#include "C_GiSvDaChartBase.h"
 #include "C_GiSvDaImageGroup.h"
 #include "C_GiSvDaLabelBase.h"
 #include "C_GiSvDaParam.h"
@@ -152,46 +151,31 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
             }
             if (q_Handled == false)
             {
-               
                C_PuiSvDbDataElement * const pc_Data = dynamic_cast<C_PuiSvDbDataElement *>(pc_CurItem);
                if (pc_Data != NULL)
                {
                   //Update core data
                   pc_Data->UpdateData();
                   {
-                     
-                     const C_GiSvDaChartBase * const pc_Chart = dynamic_cast<const C_GiSvDaChartBase *>(pc_CurItem);
-                     
                      const C_GiSvDaLabelBase * const pc_Label = dynamic_cast<const C_GiSvDaLabelBase *>(pc_CurItem);
-                     
+
                      const C_GiSvDaParam * const pc_Param = dynamic_cast<const C_GiSvDaParam *>(pc_CurItem);
-                     
+
                      const C_GiSvDaPieChartBase * const pc_PieChart =
                         dynamic_cast<const C_GiSvDaPieChartBase *>(pc_CurItem);
-                     
+
                      const C_GiSvDaProgressBarBase * const pc_ProgressBar =
                         dynamic_cast<const C_GiSvDaProgressBarBase *>(pc_CurItem);
-                     
+
                      const C_GiSvDaSliderBase * const pc_Slider = dynamic_cast<const C_GiSvDaSliderBase *>(pc_CurItem);
-                     
+
                      const C_GiSvDaSpinBoxBase * const pc_SpinBox =
                         dynamic_cast<const C_GiSvDaSpinBoxBase *>(pc_CurItem);
-                     
+
                      const C_GiSvDaTableBase * const pc_Table = dynamic_cast<const C_GiSvDaTableBase *>(pc_CurItem);
-                     
+
                      const C_GiSvDaToggleBase * const pc_Toggle = dynamic_cast<const C_GiSvDaToggleBase *>(pc_CurItem);
-                     if (pc_Chart != NULL)
-                     {
-                        u32_Index = static_cast<uint32>(pc_Chart->GetIndex());
-                        const C_PuiSvDbChart * const pc_ChartData = pc_Dashboard->GetChart(u32_Index);
-                        if (pc_ChartData != NULL)
-                        {
-                           C_PuiSvDbChart c_Tmp = *pc_ChartData;
-                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
-                           tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::eCHART) == C_NO_ERR);
-                        }
-                     }
-                     else if (pc_Label != NULL)
+                     if (pc_Label != NULL)
                      {
                         u32_Index = static_cast<uint32>(pc_Label->GetIndex());
                         const C_PuiSvDbLabel * const pc_LabelData = pc_Dashboard->GetLabel(u32_Index);
@@ -288,7 +272,7 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         switch (pc_CurItem->type())
                         {
                         case msn_GRAPHICS_ITEM_TEXTELEMENT:
-                           
+
                            pc_TextElement = dynamic_cast<const C_GiSvDaTextElement *>(pc_CurItem);
                            if (pc_TextElement != NULL)
                            {
@@ -303,7 +287,7 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                            }
                            break;
                         case msn_GRAPHICS_ITEM_BOUNDARY:
-                           
+
                            pc_Boundary = dynamic_cast<const C_GiSvDaBoundary *>(pc_CurItem);
                            if (pc_Boundary != NULL)
                            {
@@ -318,7 +302,7 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                            }
                            break;
                         case msn_GRAPHICS_ITEM_IMAGE:
-                           
+
                            pc_Image = dynamic_cast<const C_GiSvDaImageGroup *>(pc_CurItem);
                            if (pc_Image != NULL)
                            {
@@ -333,7 +317,7 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                            }
                            break;
                         case msn_GRAPHICS_ITEM_LINE_ARROW:
-                           
+
                            pc_LineArrow = dynamic_cast<const C_GiSvDaArrow *>(pc_CurItem);
                            if (pc_LineArrow != NULL)
                            {
@@ -542,7 +526,6 @@ void C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(C_PuiSvDashboard & orc_Cop
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * const opc_Data)
 {
-   
    const C_PuiSvDashboard * const pc_ExpectedData =
       dynamic_cast<const C_PuiSvDashboard * const>(opc_Data);
 
@@ -550,7 +533,6 @@ void C_SyvDaCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * con
    if (pc_ExpectedData != NULL)
    {
       uint32 u32_ItElem;
-      const std::vector<C_PuiSvDbChart> & rc_Charts = pc_ExpectedData->GetCharts();
       const std::vector<C_PuiSvDbLabel> & rc_Labels = pc_ExpectedData->GetLabels();
       const std::vector<C_PuiSvDbPieChart> & rc_PieCharts = pc_ExpectedData->GetPieCharts();
       const std::vector<C_PuiSvDbProgressBar> & rc_ProgressBars = pc_ExpectedData->GetProgressBars();
@@ -558,12 +540,6 @@ void C_SyvDaCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * con
       const std::vector<C_PuiSvDbSlider> & rc_Sliders = pc_ExpectedData->GetSliders();
       const std::vector<C_PuiSvDbTable> & rc_Tabless = pc_ExpectedData->GetTables();
       const std::vector<C_PuiSvDbToggle> & rc_Toggles = pc_ExpectedData->GetToggles();
-
-      for (u32_ItElem = 0; u32_ItElem < rc_Charts.size(); ++u32_ItElem)
-      {
-         const C_PuiSvDbChart & rc_Widget = rc_Charts[u32_ItElem];
-         m_MinToOrgPos(rc_Widget.c_UIPosition);
-      }
 
       for (u32_ItElem = 0; u32_ItElem < rc_Labels.size(); ++u32_ItElem)
       {

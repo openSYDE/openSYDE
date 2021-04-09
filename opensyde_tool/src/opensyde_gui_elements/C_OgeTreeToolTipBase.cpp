@@ -76,7 +76,6 @@ bool C_OgeTreeToolTipBase::m_CallForEvent(QEvent * const opc_Event)
       //show tooltip
       if (this->m_GetToolTip()->isVisible() == false)
       {
-         
          QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
          //Trigger tooltip update
@@ -166,7 +165,6 @@ bool C_OgeTreeToolTipBase::m_CallForEvent(QEvent * const opc_Event)
    //Necessary to detect mouse move events over integrated widgets
    else if (opc_Event->type() == QEvent::HoverMove)
    {
-      
       QHoverEvent * const pc_HoverEvent = dynamic_cast<QHoverEvent * const>(opc_Event);
 
       if (pc_HoverEvent != NULL)
@@ -193,7 +191,6 @@ void C_OgeTreeToolTipBase::m_CallBeforeEventFilter(const QEvent * const opc_Even
 {
    if (opc_Event->type() == QEvent::HoverMove)
    {
-      
       const QHoverEvent * const pc_HoverEvent = dynamic_cast<const QHoverEvent * const>(opc_Event);
 
       if (pc_HoverEvent != NULL)

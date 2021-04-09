@@ -209,7 +209,7 @@ void C_GiText::keyPressEvent(QKeyEvent * const opc_Event)
    if ((C_Uti::h_CheckKeyModifier(opc_Event->modifiers(),
                                   Qt::ControlModifier) == true) && (opc_Event->key() == static_cast<sintn>(Qt::Key_V)))
    {
-      const QClipboard * pc_ClipBoard = QApplication::clipboard();
+      const QClipboard * const pc_ClipBoard = QApplication::clipboard();
       QTextCursor c_Cursor = this->textCursor();
       c_Cursor.insertText(pc_ClipBoard->text());
    }

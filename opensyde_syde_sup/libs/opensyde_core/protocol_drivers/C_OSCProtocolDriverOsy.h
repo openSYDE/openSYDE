@@ -82,6 +82,8 @@ private:
                                             const bool oq_ExactSizeExpected,
                                             std::vector<stw_types::uint8> & orc_ReadData,
                                             stw_types::uint8 & oru8_NrCode);
+   stw_types::sint32 m_ReadStringDataIdentifier(const stw_types::uint16 ou16_DataIdentifier,
+                                                stw_scl::C_SCLString & orc_String, stw_types::uint8 & oru8_NrCode);
    stw_types::sint32 m_WriteDataByIdentifier(const stw_types::uint16 ou16_Identifier,
                                              std::vector<stw_types::uint8> & orc_WriteData,
                                              stw_types::uint8 & oru8_NrCode);
@@ -158,6 +160,7 @@ private:
    static const stw_types::uint16 mhu16_OSY_DI_DEVICE_NAME                 = 0xA81AU;
    static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_NAME            = 0xA81BU;
    static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_VERSION         = 0xA81CU;
+   static const stw_types::uint16 mhu16_OSY_DI_FILE_BASED_TRANSFER_EXIT_RESULT = 0xA81DU;
    //routine identifiers
    static const stw_types::uint16 mhu16_OSY_RC_SID_ROUTE_DIAGNOSIS_COMMUNICATION     = 0x0202U;
    static const stw_types::uint16 mhu16_OSY_RC_SID_SEND_CAN_MESSAGE                  = 0x0203U;
@@ -243,10 +246,13 @@ public:
    class C_ListOfFeatures
    {
    public:
-      bool q_FlashloaderCanWriteToNvm;           ///< set to true in Flashloader to show that "Writing to NVM" is
-                                                 // supported
-      bool q_MaxNumberOfBlockLengthAvailable;    ///< true: MaxNumberOfBlockLength can be read
-      bool q_EthernetToEthernetRoutingSupported; ///< true: E2E routing supported
+      C_ListOfFeatures(void);
+
+      bool q_FlashloaderCanWriteToNvm;             ///< set to true in Flashloader to show that "Writing to NVM" is
+                                                   // supported
+      bool q_MaxNumberOfBlockLengthAvailable;      ///< true: MaxNumberOfBlockLength can be read
+      bool q_EthernetToEthernetRoutingSupported;   ///< true: E2E routing supported
+      bool q_FileBasedTransferExitResultAvailable; ///< true: FileBasedTransferExitResult can be read
    };
 
    C_OSCProtocolDriverOsy(void);
@@ -319,6 +325,8 @@ public:
                                                            stw_types::uint8(&orau8_Time)[3],
                                                            stw_scl::C_SCLString & orc_Username,
                                                            stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadFileBasedTransferExitResult(stw_scl::C_SCLString & orc_TransferExitResult,
+                                                        stw_types::uint8 * const opu8_NrCode = NULL);
 
    //Device configuration
    stw_types::sint32 OsySetNodeIdForChannel(const stw_types::uint8 ou8_ChannelType,

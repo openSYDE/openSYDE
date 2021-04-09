@@ -308,6 +308,16 @@ sint32 C_PuiSvHandlerFiler::h_LoadDashboard(C_PuiSvDashboard & orc_Dashboard, C_
    }
    if (s32_Retval == C_NO_ERR)
    {
+      C_PuiSvDbTabChart c_Widget;
+      s32_Retval = mh_LoadTabChart(c_Widget, orc_XMLParser);
+      orc_Dashboard.SetTabChart(c_Widget);
+      if (oq_IgnoreMostErrorCases == true)
+      {
+         s32_Retval = C_NO_ERR;
+      }
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
       s32_Retval = C_PuiBsElementsFiler::h_LoadBaseElements(orc_Dashboard, orc_XMLParser);
    }
    orc_Dashboard.SetActive(orc_XMLParser.GetAttributeBool("active"));
@@ -318,6 +328,23 @@ sint32 C_PuiSvHandlerFiler::h_LoadDashboard(C_PuiSvDashboard & orc_Dashboard, C_
    else
    {
       orc_Dashboard.SetTabIndex(-1);
+   }
+   if (orc_XMLParser.AttributeExists("tab-type"))
+   {
+      const stw_scl::C_SCLString c_TabTypeString = orc_XMLParser.GetAttributeString("tab-type");
+      C_PuiSvDashboard::E_TabType e_TabType;
+      if (C_PuiSvHandlerFiler::mh_StringToTabType(c_TabTypeString.c_str(), e_TabType) == C_NO_ERR)
+      {
+         orc_Dashboard.SetType(e_TabType);
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
+   }
+   else
+   {
+      orc_Dashboard.SetType(C_PuiSvDashboard::eSCENE);
    }
    return s32_Retval;
 }
@@ -333,6 +360,8 @@ void C_PuiSvHandlerFiler::h_SaveDashboard(const C_PuiSvDashboard & orc_Dashboard
 {
    orc_XMLParser.SetAttributeBool("active", orc_Dashboard.GetActive());
    orc_XMLParser.SetAttributeSint32("tab-index", orc_Dashboard.GetTabIndex());
+   orc_XMLParser.SetAttributeString("tab-type", C_PuiSvHandlerFiler::mh_TabTypeToString(
+                                       orc_Dashboard.GetType()).toStdString().c_str());
    orc_XMLParser.CreateNodeChild("name", orc_Dashboard.GetName().toStdString().c_str());
    orc_XMLParser.CreateNodeChild("comment", orc_Dashboard.GetComment().toStdString().c_str());
    mh_SaveCharts(orc_Dashboard.GetCharts(), orc_XMLParser);
@@ -344,6 +373,10 @@ void C_PuiSvHandlerFiler::h_SaveDashboard(const C_PuiSvDashboard & orc_Dashboard
    mh_SaveProgressBars(orc_Dashboard.GetProgressBars(), orc_XMLParser);
    mh_SaveTables(orc_Dashboard.GetTables(), orc_XMLParser);
    mh_SaveToggles(orc_Dashboard.GetToggles(), orc_XMLParser);
+   if (orc_Dashboard.GetType() == C_PuiSvDashboard::eCHART)
+   {
+      mh_SaveTabChart(orc_Dashboard.GetTabChart(), orc_XMLParser);
+   }
    C_PuiBsElementsFiler::h_SaveBaseElements(orc_Dashboard, orc_XMLParser);
 }
 
@@ -754,7 +787,7 @@ sint32 C_PuiSvHandlerFiler::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate & 
                                                             const C_OSCNode & orc_Node)
 {
    std::vector<QString> c_Paths;
-   sint32 s32_Retval = C_NO_ERR;
+   const sint32 s32_Retval = C_NO_ERR;
 
    if (orc_XMLParser.AttributeExists("position") == true)
    {
@@ -1255,6 +1288,177 @@ sint32 C_PuiSvHandlerFiler::mh_LoadCharts(std::vector<C_PuiSvDbChart> & orc_Widg
    else
    {
       s32_Retval = C_CONFIG;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load tab chart
+
+   \param[in,out]  orc_Widget       Tab chart
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
+
+   \return
+   C_NO_ERR    information loaded
+   C_CONFIG    error loading information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandlerFiler::mh_LoadTabChart(C_PuiSvDbTabChart & orc_Widget, C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_XMLParser.SelectNodeChild("tab-chart") == "tab-chart")
+   {
+      s32_Retval = C_PuiSvHandlerFiler::mh_LoadWidgetBase(orc_Widget, orc_XMLParser);
+      if (orc_XMLParser.SelectNodeChild("active-flags") == "active-flags")
+      {
+         C_SCLString c_CurrentWidgetNode2 = orc_XMLParser.SelectNodeChild("active-flag");
+         if (c_CurrentWidgetNode2 == "active-flag")
+         {
+            do
+            {
+               if (orc_XMLParser.AttributeExists("state") == true)
+               {
+                  orc_Widget.c_DataPoolElementsActive.push_back(orc_XMLParser.GetAttributeBool("state"));
+               }
+               else
+               {
+                  s32_Retval = C_CONFIG;
+               }
+               //Next
+               c_CurrentWidgetNode2 = orc_XMLParser.SelectNodeNext("active-flag");
+            }
+            while ((c_CurrentWidgetNode2 == "active-flag") && (s32_Retval == C_NO_ERR));
+
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "active-flags");
+         }
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "tab-chart");
+      }
+
+      if (orc_Widget.c_DataPoolElementsActive.size() != orc_Widget.c_DataPoolElementsConfig.size())
+      {
+         // Size shall be identical
+         orc_Widget.c_DataPoolElementsActive.resize(orc_Widget.c_DataPoolElementsConfig.size(), true);
+      }
+
+      if (orc_XMLParser.SelectNodeChild("color-indexes") == "color-indexes")
+      {
+         C_SCLString c_CurrentWidgetNode2 = orc_XMLParser.SelectNodeChild("color-index");
+         if (c_CurrentWidgetNode2 == "color-index")
+         {
+            do
+            {
+               if (orc_XMLParser.AttributeExists("index") == true)
+               {
+                  orc_Widget.c_DataPoolElementsColorIndex.push_back(
+                     static_cast<uint8>(orc_XMLParser.GetAttributeUint32("index")));
+               }
+               else
+               {
+                  s32_Retval = C_CONFIG;
+               }
+               //Next
+               c_CurrentWidgetNode2 = orc_XMLParser.SelectNodeNext("color-index");
+            }
+            while ((c_CurrentWidgetNode2 == "color-index") && (s32_Retval == C_NO_ERR));
+
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "color-indexes");
+         }
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "tab-chart");
+      }
+
+      if (orc_Widget.c_DataPoolElementsColorIndex.size() != orc_Widget.c_DataPoolElementsConfig.size())
+      {
+         // Size shall be identical
+         uint32 u32_Counter;
+
+         for (u32_Counter = orc_Widget.c_DataPoolElementsColorIndex.size();
+              u32_Counter < orc_Widget.c_DataPoolElementsConfig.size(); ++u32_Counter)
+         {
+            orc_Widget.c_DataPoolElementsColorIndex.push_back(static_cast<uint8>(u32_Counter));
+         }
+      }
+
+      if (orc_XMLParser.AttributeExists("splitter-left-width"))
+      {
+         orc_Widget.s32_SplitterLeftWidth = orc_XMLParser.GetAttributeSint32("splitter-left-width");
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
+
+      if (orc_XMLParser.SelectNodeChild("zoom-mode") == "zoom-mode")
+      {
+         if (C_PuiSvHandlerFiler::mh_StringToTabChartSettingZoomMode(orc_XMLParser.GetNodeContent().c_str(),
+                                                                     orc_Widget.e_SettingZoomMode) != C_NO_ERR)
+         {
+            s32_Retval = C_CONFIG;
+         }
+
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "tab-chart");
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
+
+      if (orc_XMLParser.SelectNodeChild("yaxis-mode") == "yaxis-mode")
+      {
+         if (C_PuiSvHandlerFiler::mh_StringToTabChartSettingYAxisMode(orc_XMLParser.GetNodeContent().c_str(),
+                                                                      orc_Widget.e_SettingYAxisMode) != C_NO_ERR)
+         {
+            s32_Retval = C_CONFIG;
+         }
+
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "tab-chart");
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
+
+      if (orc_XMLParser.AttributeExists("is-paused"))
+      {
+         orc_Widget.q_IsPaused = orc_XMLParser.GetAttributeBool("is-paused");
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
+
+      if (orc_XMLParser.AttributeExists("is-zoom-mode-active"))
+      {
+         orc_Widget.q_IsZoomModeActive = orc_XMLParser.GetAttributeBool("is-zoom-mode-active");
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
+
+      if (orc_XMLParser.AttributeExists("are-sample-points-shown"))
+      {
+         orc_Widget.q_AreSamplePointsShown = orc_XMLParser.GetAttributeBool("are-sample-points-shown");
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
+
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = mh_LoadTabChartScreenRegion(orc_Widget.c_VisibleScreen, orc_XMLParser);
+      }
+
+      //Return
+      orc_XMLParser.SelectNodeParent();
    }
 
    return s32_Retval;
@@ -2100,6 +2304,64 @@ void C_PuiSvHandlerFiler::mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load tab chart screen region
+
+   \param[in,out]  orc_ScreenRegion    Screen region
+   \param[in,out]  orc_XMLParser       XML parser
+
+   \return
+   C_NO_ERR    information loaded
+   C_CONFIG    error loading information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandlerFiler::mh_LoadTabChartScreenRegion(std::vector<std::array<float64, 4> > & orc_ScreenRegion,
+                                                        C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   orc_ScreenRegion.clear();
+   if (orc_XMLParser.SelectNodeChild("screen-regions") == "screen-regions")
+   {
+      C_SCLString c_CurrentValueNode = orc_XMLParser.SelectNodeChild("screen-region");
+      if (c_CurrentValueNode == "screen-region")
+      {
+         do
+         {
+            if (((orc_XMLParser.AttributeExists("value1") && orc_XMLParser.AttributeExists("value2")) &&
+                 orc_XMLParser.AttributeExists("value3")) && orc_XMLParser.AttributeExists("value4"))
+            {
+               const float64 f64_Value1 = orc_XMLParser.GetAttributeFloat64("value1");
+               const float64 f64_Value2 = orc_XMLParser.GetAttributeFloat64("value2");
+               const float64 f64_Value3 = orc_XMLParser.GetAttributeFloat64("value3");
+               const float64 f64_Value4 = orc_XMLParser.GetAttributeFloat64("value4");
+               const std::array<float64, 4> c_ScreenRegion = {
+                  {f64_Value1, f64_Value2, f64_Value3, f64_Value4}
+               };
+               orc_ScreenRegion.push_back(c_ScreenRegion);
+            }
+            else
+            {
+               s32_Retval = C_CONFIG;
+            }
+            //Next
+            c_CurrentValueNode = orc_XMLParser.SelectNodeNext("screen-region");
+         }
+         while ((c_CurrentValueNode == "screen-region") && (s32_Retval == C_NO_ERR));
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "screen-regions");
+      }
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "tab-chart");
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load values
 
    \param[in,out]  orc_Values       Values
@@ -2375,6 +2637,38 @@ sint32 C_PuiSvHandlerFiler::mh_StringToDisplayStyle(const QString & orc_String,
    {
       //Default
       ore_Style = C_PuiSvDbWidgetBase::eOPENSYDE;
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform string to tab type
+
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_TabType   Tab type
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandlerFiler::mh_StringToTabType(const QString & orc_String, C_PuiSvDashboard::E_TabType & ore_TabType)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_String.compare("scene") == 0)
+   {
+      ore_TabType = C_PuiSvDashboard::eSCENE;
+   }
+   else if (orc_String.compare("chart") == 0)
+   {
+      ore_TabType = C_PuiSvDashboard::eCHART;
+   }
+   else
+   {
+      //Default
+      ore_TabType = C_PuiSvDashboard::eSCENE;
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
@@ -2706,6 +3000,76 @@ sint32 C_PuiSvHandlerFiler::mh_StringToChartSettingZoomMode(const QString & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform string to source type
+
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_ZoomMode  Zoom mode
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandlerFiler::mh_StringToTabChartSettingZoomMode(const QString & orc_String,
+                                                               C_PuiSvDbTabChart::E_SettingZoomMode & ore_ZoomMode)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_String.compare("setting_zm_xy") == 0)
+   {
+      ore_ZoomMode = C_PuiSvDbTabChart::eSETTING_ZM_XY;
+   }
+   else if (orc_String.compare("setting_zm_x") == 0)
+   {
+      ore_ZoomMode = C_PuiSvDbTabChart::eSETTING_ZM_X;
+   }
+   else if (orc_String.compare("setting_zm_y") == 0)
+   {
+      ore_ZoomMode = C_PuiSvDbTabChart::eSETTING_ZM_Y;
+   }
+   else
+   {
+      //Default
+      ore_ZoomMode = C_PuiSvDbTabChart::eSETTING_ZM_XY;
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform string to source type
+
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_YAxisMode Y axis mode
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandlerFiler::mh_StringToTabChartSettingYAxisMode(const QString & orc_String,
+                                                                C_PuiSvDbTabChart::E_SettingYAxisMode & ore_YAxisMode)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_String.compare("setting_ya_one") == 0)
+   {
+      ore_YAxisMode = C_PuiSvDbTabChart::eSETTING_YA_ONE_VISIBLE;
+   }
+   else if (orc_String.compare("setting_ya_all") == 0)
+   {
+      ore_YAxisMode = C_PuiSvDbTabChart::eSETTING_YA_ALL_VISIBLE;
+   }
+   else
+   {
+      //Default
+      ore_YAxisMode = C_PuiSvDbTabChart::eSETTING_YA_ONE_VISIBLE;
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node active flags
 
    \param[in]      orc_NodeActiveFlags    Node active flags
@@ -2947,7 +3311,9 @@ void C_PuiSvHandlerFiler::mh_SavePc(const C_PuiSvPc & orc_Pc, C_OSCXMLParserBase
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save widget elements
+/*! \brief   Save chart dummy
+
+   For loading compatibility we keep an empty "charts" node.
 
    \param[in]      orc_Widgets      Widget elements
    \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
@@ -2956,31 +3322,60 @@ void C_PuiSvHandlerFiler::mh_SavePc(const C_PuiSvPc & orc_Pc, C_OSCXMLParserBase
 void C_PuiSvHandlerFiler::mh_SaveCharts(const std::vector<C_PuiSvDbChart> & orc_Widgets,
                                         C_OSCXMLParserBase & orc_XMLParser)
 {
+   Q_UNUSED(orc_Widgets)
+
    orc_XMLParser.CreateAndSelectNodeChild("charts");
-   for (uint32 u32_ItWidget = 0; u32_ItWidget < orc_Widgets.size(); ++u32_ItWidget)
+   //Return
+   orc_XMLParser.SelectNodeParent();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save tab chart
+
+   \param[in]      orc_Widget       Tab chart
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandlerFiler::mh_SaveTabChart(const C_PuiSvDbTabChart & orc_Widget, C_OSCXMLParserBase & orc_XMLParser)
+{
+   orc_XMLParser.CreateAndSelectNodeChild("tab-chart");
+   C_PuiSvHandlerFiler::mh_SaveWidgetBase(orc_Widget, orc_XMLParser);
+   orc_XMLParser.CreateAndSelectNodeChild("active-flags");
+   for (uint32 u32_ItActive = 0; u32_ItActive < orc_Widget.c_DataPoolElementsActive.size(); ++u32_ItActive)
    {
-      const C_PuiSvDbChart & rc_Chart = orc_Widgets[u32_ItWidget];
-      orc_XMLParser.CreateAndSelectNodeChild("chart");
-      C_PuiSvHandlerFiler::mh_SaveWidgetBase(rc_Chart, orc_XMLParser);
-      orc_XMLParser.CreateAndSelectNodeChild("active-flags");
-      for (uint32 u32_ItActive = 0; u32_ItActive < rc_Chart.c_DataPoolElementsActive.size(); ++u32_ItActive)
-      {
-         orc_XMLParser.CreateAndSelectNodeChild("active-flag");
-         orc_XMLParser.SetAttributeBool("state", rc_Chart.c_DataPoolElementsActive[u32_ItActive]);
-         //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "active-flags");
-      }
-
+      orc_XMLParser.CreateAndSelectNodeChild("active-flag");
+      orc_XMLParser.SetAttributeBool("state", orc_Widget.c_DataPoolElementsActive[u32_ItActive]);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "chart");
-
-      orc_XMLParser.CreateNodeChild("zoom-mode",
-                                    C_PuiSvHandlerFiler::mh_ChartZoomModeToString(
-                                       rc_Chart.e_SettingZoomMode).toStdString().c_str());
-
-      //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "charts");
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "active-flags");
    }
+
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "tab-chart");
+
+   orc_XMLParser.CreateAndSelectNodeChild("color-indexes");
+   for (uint32 u32_ItActive = 0; u32_ItActive < orc_Widget.c_DataPoolElementsColorIndex.size(); ++u32_ItActive)
+   {
+      orc_XMLParser.CreateAndSelectNodeChild("color-index");
+      orc_XMLParser.SetAttributeUint32("index", orc_Widget.c_DataPoolElementsColorIndex[u32_ItActive]);
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "color-indexes");
+   }
+
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "tab-chart");
+
+   orc_XMLParser.CreateNodeChild("zoom-mode",
+                                 C_PuiSvHandlerFiler::mh_TabChartZoomModeToString(
+                                    orc_Widget.e_SettingZoomMode).toStdString().c_str());
+   orc_XMLParser.CreateNodeChild("yaxis-mode",
+                                 C_PuiSvHandlerFiler::mh_TabChartYAxisModeToString(
+                                    orc_Widget.e_SettingYAxisMode).toStdString().c_str());
+   orc_XMLParser.SetAttributeBool("is-paused", orc_Widget.q_IsPaused);
+   orc_XMLParser.SetAttributeSint32("splitter-left-width", orc_Widget.s32_SplitterLeftWidth);
+   orc_XMLParser.SetAttributeBool("is-zoom-mode-active", orc_Widget.q_IsZoomModeActive);
+   orc_XMLParser.SetAttributeBool("are-sample-points-shown", orc_Widget.q_AreSamplePointsShown);
+
+   mh_SaveTabChartScreenRegion(orc_Widget.c_VisibleScreen, orc_XMLParser);
    //Return
    orc_XMLParser.SelectNodeParent();
 }
@@ -3404,6 +3799,33 @@ void C_PuiSvHandlerFiler::mh_SaveDataElement(const C_OSCNodeDataPoolListElementI
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save tab chart screen region
+
+   \param[in]      orc_ScreenRegion    Screen region
+   \param[in,out]  orc_XMLParser       XML parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandlerFiler::mh_SaveTabChartScreenRegion(const std::vector<std::array<float64, 4> > & orc_ScreenRegion,
+                                                      C_OSCXMLParserBase & orc_XMLParser)
+{
+   orc_XMLParser.CreateAndSelectNodeChild("screen-regions");
+   for (std::vector<std::array<float64, 4> >::const_iterator c_It = orc_ScreenRegion.begin();
+        c_It != orc_ScreenRegion.end(); ++c_It)
+   {
+      const std::array<float64, 4> & rc_Vals = *c_It;
+      orc_XMLParser.CreateAndSelectNodeChild("screen-region");
+      orc_XMLParser.SetAttributeFloat64("value1", rc_Vals[0]);
+      orc_XMLParser.SetAttributeFloat64("value2", rc_Vals[1]);
+      orc_XMLParser.SetAttributeFloat64("value3", rc_Vals[2]);
+      orc_XMLParser.SetAttributeFloat64("value4", rc_Vals[3]);
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "screen-regions");
+   }
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "tab-chart");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform device config mode to string
 
    \param[in]  oe_Mode  Device config mode
@@ -3516,6 +3938,34 @@ QString C_PuiSvHandlerFiler::mh_ToggleTypeToString(const C_PuiSvDbToggle::E_Type
       break;
    case C_PuiSvDbToggle::eTYPE3:
       c_Retval = "type3";
+      break;
+   default:
+      break;
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform tab type to string
+
+   \param[in]  oe_Type  Tab type
+
+   \return
+   Stringified tab type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSvHandlerFiler::mh_TabTypeToString(const C_PuiSvDashboard::E_TabType oe_Type)
+{
+   QString c_Retval;
+
+   switch (oe_Type)
+   {
+   case C_PuiSvDashboard::eCHART:
+      c_Retval = "chart";
+      break;
+   case C_PuiSvDashboard::eSCENE:
+      c_Retval = "scene";
       break;
    default:
       break;
@@ -3790,6 +4240,65 @@ QString C_PuiSvHandlerFiler::mh_ChartZoomModeToString(const C_PuiSvDbChart::E_Se
       break;
    case C_PuiSvDbChart::eSETTING_ZM_Y:
       c_Retval = "setting_zm_y";
+      break;
+   default:
+      break;
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform chart zoom mode to string
+
+   \param[in]  oe_ZoomMode    Zoom mode
+
+   \return
+   Stringified zoom mode setting
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSvHandlerFiler::mh_TabChartZoomModeToString(const C_PuiSvDbTabChart::E_SettingZoomMode oe_ZoomMode)
+{
+   QString c_Retval;
+
+   switch (oe_ZoomMode)
+   {
+   case C_PuiSvDbTabChart::eSETTING_ZM_XY:
+      c_Retval = "setting_zm_xy";
+      break;
+   case C_PuiSvDbTabChart::eSETTING_ZM_X:
+      c_Retval = "setting_zm_x";
+      break;
+   case C_PuiSvDbTabChart::eSETTING_ZM_Y:
+      c_Retval = "setting_zm_y";
+      break;
+   default:
+      break;
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform chart zoom mode to string
+
+   \param[in]  oe_YAxisMode    Y axis mode
+
+   \return
+   Stringified zoom mode setting
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSvHandlerFiler::mh_TabChartYAxisModeToString(const C_PuiSvDbTabChart::E_SettingYAxisMode oe_YAxisMode)
+{
+   QString c_Retval;
+
+   switch (oe_YAxisMode)
+   {
+   case C_PuiSvDbTabChart::eSETTING_YA_ONE_VISIBLE:
+      c_Retval = "setting_ya_one";
+      break;
+   case C_PuiSvDbTabChart::eSETTING_YA_ALL_VISIBLE:
+      c_Retval = "setting_ya_all";
       break;
    default:
       break;

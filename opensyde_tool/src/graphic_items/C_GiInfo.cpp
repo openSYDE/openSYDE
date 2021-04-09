@@ -107,11 +107,8 @@ void C_GiInfo::SetGif(const QString & orc_Value)
       this->mpc_Movie = new QMovie(orc_Value);
       connect(this->mpc_Movie, &QMovie::frameChanged, this, &C_GiInfo::m_Update);
       connect(this->mpc_Movie, &QMovie::finished, this, &C_GiInfo::m_RestartGif);
-      if (this->mpc_Movie != NULL)
-      {
-         this->mpc_Movie->setScaledSize(QSize(this->ms32_IconSize, this->ms32_IconSize));
-         this->mpc_Movie->start();
-      }
+      this->mpc_Movie->setScaledSize(QSize(this->ms32_IconSize, this->ms32_IconSize));
+      this->mpc_Movie->start();
    }
    else
    {
@@ -205,11 +202,11 @@ void C_GiInfo::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
    const sint32 s32_TextOffset = static_cast<sint32>(opc_Option->rect.height() - c_Metrics.height()) / 2L;
    sint32 s32_TextX = opc_Option->rect.topLeft().x() + s32_TextOffset;
    const sint32 s32_TextY = opc_Option->rect.topLeft().y() + s32_TextOffset;
-   sint32 s32_TextWidth = opc_Option->rect.width() - (2L * s32_TextOffset);
-   const sint32 s32_TextHeight = opc_Option->rect.height() - (2L * s32_TextOffset);
-   const sint32 s32_IconOffset = (opc_Option->rect.height() - this->ms32_IconSize) / 2;
-   const sint32 s32_IconRectX = opc_Option->rect.topLeft().x() + s32_IconOffset;
-   const sint32 s32_IconRectY = opc_Option->rect.topLeft().y() + s32_IconOffset;
+   sint32 s32_TextWidth = static_cast<sint32>(opc_Option->rect.width()) - (2L * s32_TextOffset);
+   const sint32 s32_TextHeight = static_cast<sint32>(opc_Option->rect.height()) - (2L * s32_TextOffset);
+   const sint32 s32_IconOffset = (static_cast<sint32>(opc_Option->rect.height()) - this->ms32_IconSize) / 2;
+   const sint32 s32_IconRectX = static_cast<sint32>(opc_Option->rect.topLeft().x()) + s32_IconOffset;
+   const sint32 s32_IconRectY = static_cast<sint32>(opc_Option->rect.topLeft().y()) + s32_IconOffset;
    const QRectF c_IconRect(static_cast<float64>(s32_IconRectX),
                            static_cast<float64>(s32_IconRectY),
                            static_cast<float64>(this->ms32_IconSize),
@@ -219,7 +216,7 @@ void C_GiInfo::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
    if (this->mc_BackgroundColor.alpha() > 0)
    {
       opc_Painter->save();
-      opc_Painter->setBrush(QBrush(this->mc_BackgroundColor));
+      opc_Painter->setBrush(static_cast<QBrush>(this->mc_BackgroundColor));
       opc_Painter->setPen(Qt::NoPen);
       opc_Painter->drawRoundedRect(opc_Option->rect,
                                    std::min(static_cast<float64>(opc_Option->rect.width()) / 2.0,
@@ -240,7 +237,7 @@ void C_GiInfo::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
    if (this->mpc_Movie != NULL)
    {
       const QRectF c_TransformedRect = this->mc_Transform.mapRect(c_IconRect);
-      this->mpc_Movie->setScaledSize(QSize(c_TransformedRect.size().toSize()));
+      this->mpc_Movie->setScaledSize(static_cast<QSize>(c_TransformedRect.size().toSize()));
       {
          const QImage c_Image = this->mpc_Movie->currentImage();
          opc_Painter->drawImage(c_IconRect, c_Image);

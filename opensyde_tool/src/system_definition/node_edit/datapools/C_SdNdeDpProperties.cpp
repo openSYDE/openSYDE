@@ -58,7 +58,7 @@ const stw_types::sintn C_SdNdeDpProperties::mhsn_INDEX_PUBLIC = 1;
 
    \param[in,out] opc_Parent                Reference to parent
    \param[in,out] opc_OSCDataPool           Pointer to the actual core Datapool object
-   \param[in,out] pc_UiDataPool             Pointer to the actual UI Datapool object
+   \param[in,out] opc_UiDataPool            Pointer to the actual UI Datapool object
    \param[in]     os32_DataPoolIndex        Flag for new Datapool (-1 is new Datapool, >= 0 is existing Datapool)
    \param[in]     oru32_NodeIndex           Node index
    \param[in]     oq_SelectName             Selects the Datapool name for instant editing
@@ -68,7 +68,7 @@ const stw_types::sintn C_SdNdeDpProperties::mhsn_INDEX_PUBLIC = 1;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNodeDataPool * const opc_OSCDataPool,
-                                         C_PuiSdNodeDataPool * const pc_UiDataPool,
+                                         C_PuiSdNodeDataPool * const opc_UiDataPool,
                                          C_OSCCanProtocol::E_Type * const ope_ComProtocolType,
                                          const sint32 os32_DataPoolIndex, const uint32 & oru32_NodeIndex,
                                          const bool oq_SelectName, const bool oq_ShowApplicationSection,
@@ -77,7 +77,7 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
    mpc_Ui(new Ui::C_SdNdeDpProperties()),
    mpc_ParentDialog(&orc_Parent),
    mpc_OSCDataPool(opc_OSCDataPool),
-   mpc_UiDataPool(pc_UiDataPool),
+   mpc_UiDataPool(opc_UiDataPool),
    mpe_ComProtocolType(ope_ComProtocolType),
    mu32_NodeIndex(oru32_NodeIndex),
    ms32_DataPoolIndex(os32_DataPoolIndex)
@@ -200,8 +200,8 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
    {
       const C_PuiSdSharedDatapools & rc_SharedDatapools = C_PuiSdHandler::h_GetInstance()->GetSharedDatapoolsConst();
       uint32 u32_SharedDatapoolGroup;
-      C_OSCNodeDataPoolId c_DpId(this->mu32_NodeIndex,
-                                 static_cast<uint32>(this->ms32_DataPoolIndex));
+      const C_OSCNodeDataPoolId c_DpId(this->mu32_NodeIndex,
+                                       static_cast<uint32>(this->ms32_DataPoolIndex));
 
       q_IsShared = rc_SharedDatapools.IsSharedDatapool(c_DpId, &u32_SharedDatapoolGroup);
 
@@ -310,10 +310,10 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ParentDialog and the Qt memory management
 C_SdNdeDpProperties::~C_SdNdeDpProperties(void)
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_ParentDialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -459,7 +459,8 @@ void C_SdNdeDpProperties::m_OkClicked(void)
    if (C_OSCUtils::h_CheckValidCName(this->mpc_Ui->pc_LineEditDatapoolName->text().toStdString().c_str()) == false)
    {
       c_Details +=
-         static_cast<QString>(C_GtGetText::h_GetText("Name is empty or contains invalid characters. Choose another name."));
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "Name is empty or contains invalid characters. Choose another name."));
       c_Details += "\n\n";
       // Do not accept
       q_Continue = false;
@@ -471,7 +472,8 @@ void C_SdNdeDpProperties::m_OkClicked(void)
    if (this->m_CheckDatapoolNameNotDuplicate(&c_ExistingDatapoolNames) == false)
    {
       c_Details +=
-         static_cast<QString>(C_GtGetText::h_GetText("A Datapool with the name \"%1\" already exists. Choose another name.\n")).
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "A Datapool with the name \"%1\" already exists. Choose another name.\n")).
          arg(this->mpc_Ui->pc_LineEditDatapoolName->text());
       c_Details += C_GtGetText::h_GetText("Used Datapool names:\n");
       for (uint32 u32_ItExistingName = 0UL; u32_ItExistingName < c_ExistingDatapoolNames.size(); ++u32_ItExistingName)
@@ -962,14 +964,9 @@ void C_SdNdeDpProperties::m_OnSafetyChange(const bool oq_IsSafety) const
       c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
       c_Message.SetCustomMinHeight(200, 200);
       e_Output = c_Message.Execute();
-      switch (e_Output)
+      if (e_Output != C_OgeWiCustomMessage::eYES)
       {
-      case C_OgeWiCustomMessage::eYES:
-         break;
-      default:
-         //Reset
          this->mpc_Ui->pc_CheckBoxSafety->setChecked(false);
-         break;
       }
    }
 }
@@ -1050,7 +1047,7 @@ bool C_SdNdeDpProperties::m_IsRelatedAppValid(const sint32 os32_RelatedDataBlock
    {
       if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eCOM)
       {
-         C_OSCCanProtocol::E_Type e_SelectedProtocolType = this->m_GetSelectedProtocol();
+         const C_OSCCanProtocol::E_Type e_SelectedProtocolType = this->m_GetSelectedProtocol();
 
          const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
          if (pc_Node != NULL)

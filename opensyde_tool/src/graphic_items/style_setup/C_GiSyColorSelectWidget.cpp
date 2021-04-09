@@ -68,6 +68,7 @@ C_GiSyColorSelectWidget::C_GiSyColorSelectWidget(stw_opensyde_gui_elements::C_Og
    msn_NextRecentButton(C_UsHandler::h_GetInstance()->GetNextRecentColorButtonNumber())
 {
    const QVector<QColor> c_RecentColors = C_UsHandler::h_GetInstance()->GetRecentColors();
+
    this->mc_RecentColorNr1 = c_RecentColors.at(0);
    this->mc_RecentColorNr2 = c_RecentColors.at(1);
    this->mc_RecentColorNr3 = c_RecentColors.at(2);
@@ -390,15 +391,13 @@ void C_GiSyColorSelectWidget::m_InitElements(void) const
                                                              "If you have found the right color, click with the cross on it. "
                                                              "This color will be shown on the color shower until "
                                                              "you choose a new one."));
-   this->mpc_Ui->pc_LineEditColor->setStyleSheet(
-      "QLineEdit {\
-                                                       background-color: rgb(250, 250, 250);\
-                                                       border: none;\
-                                                       color: rgb(86, 86, 104);\
-                                                       selection-background-color: rgb(195, 186, 221);\
-                                                       selection-color: rgb(42, 42, 91);\
-                                                 }\
-                                                 ");
+   this->mpc_Ui->pc_LineEditColor->setStyleSheet("QLineEdit {"
+                                                 "background-color: rgb(250, 250, 250);"
+                                                 "border: none;"
+                                                 "color: rgb(86, 86, 104);"
+                                                 "selection-background-color: rgb(195, 186, 221);"
+                                                 " selection-color: rgb(42, 42, 91);"
+                                                 "}");
 
    this->mpc_Ui->pc_LabelNote->SetForegroundColor(6);
 
@@ -1057,33 +1056,25 @@ void C_GiSyColorSelectWidget::m_SetRecentColorToRecentButton(C_OgePubColor * con
    sn_BlueLightDark = (sn_RedDarker > 255) ? 255 : sn_BlueLightDark;
 
    opc_Button->setStyleSheet(
-      "stw_opensyde_gui_elements--C_OgePubColor {\
-                                background-color: " + oc_Color.name() + ";\
-                                border-top-color: rgb(" + QString::number(
-         sn_RedDark) + ", \
-                                                      " + QString::number(
-         sn_GreenDark) + ", \
-                                                      " + QString::number(
-         sn_BlueDark) + ");\
-                                border-right-color: rgb(" + QString::number(
-         sn_RedDarker) + ", \
-                                                        " + QString::number(
-         sn_GreenDarker) + ", \
-                                                        " + QString::number(
-         sn_BlueDarker) + ");\
-                                border-bottom-color: rgb(" + QString::number(
-         sn_RedLightDark) + ", \
-                                                         " + QString::number(
-         sn_GreenLightDark) + ", \
-                                                         " + QString::number(
-         sn_BlueLightDark) + ");\
-                                border-left-color: rgb(" + QString::number(
-         sn_RedDarker) + ", \
-                                                       " + QString::number(
-         sn_GreenDarker) + ", \
-                                                       " + QString::number(
-         sn_BlueDarker) + ");\
-                            }");
+      "stw_opensyde_gui_elements--C_OgePubColor {"
+      "background-color: " + oc_Color.name() + ";"
+      "border-top-color: rgb(" +
+      QString::number(sn_RedDark) + ", " +
+      QString::number(sn_GreenDark) + ", " +
+      QString::number(sn_BlueDark) + ");"
+      "border-right-color: rgb(" +
+      QString::number(sn_RedDarker) + ", " +
+      QString::number(sn_GreenDarker) + ", " +
+      QString::number(sn_BlueDarker) + ");"
+      "border-bottom-color: rgb(" +
+      QString::number(sn_RedLightDark) + ", " +
+      QString::number(sn_GreenLightDark) + ", " +
+      QString::number(sn_BlueLightDark) + ");"
+      "border-left-color: rgb(" +
+      QString::number(sn_RedDarker) + ", " +
+      QString::number(sn_GreenDarker) + ", " +
+      QString::number(sn_BlueDarker) + ");"
+      "}");
    QString c_Style = opc_Button->styleSheet();
    C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(c_Style, oc_Color);
    opc_Button->setStyleSheet(c_Style);
@@ -1254,10 +1245,10 @@ void C_GiSyColorSelectWidget::m_UpdateColorPicking(const QPoint & orc_GlobalPosi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Sets all widgets to display rgb
 
-   \param[in]  oun_Rgb  RGB color
+   \param[in]  oun_Rgb  RGB color of type QRgb that is equivalent to an unsigned int
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorSelectWidget::m_SetCurrentRgbColor(const QRgb oun_Rgb)
+void C_GiSyColorSelectWidget::m_SetCurrentRgbColor(const uintn oun_Rgb)
 {
    const QColor c_RgbColor = this->mpc_Ui->pc_PushButtonColorShower->SetRgb(oun_Rgb);
 
@@ -1302,10 +1293,10 @@ QColor C_GiSyColorSelectWidget::m_GrabScreenColor(const QPoint & orc_Position) c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Sets all widgets except cs to display rgb
 
-   \param[in]  oun_Rgb  RGB color
+   \param[in]  oun_Rgb  RGB color of type QRgb that is equivalent to an unsigned int
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorSelectWidget::m_NewColorTypedIn(const QRgb oun_Rgb)
+void C_GiSyColorSelectWidget::m_NewColorTypedIn(const uintn oun_Rgb)
 {
    sintn sn_Hue;
    sintn sn_Sat;

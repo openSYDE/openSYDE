@@ -94,8 +94,7 @@ C_GiSyBoundaryWidget::C_GiSyBoundaryWidget(C_GiSyBaseWidget & orc_Parent) :
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxWidth, static_cast<void (QSpinBox::*)(sintn)>(&QSpinBox::valueChanged),
            this, &C_GiSyBoundaryWidget::m_WidthChanged);
-
-}  //lint !e429  //no memory leak because of the parent of pc_Label-Background / Border and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Label-Background / Border and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default destructor
@@ -103,11 +102,11 @@ C_GiSyBoundaryWidget::C_GiSyBoundaryWidget(C_GiSyBaseWidget & orc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because the ownership of these objects was never transfered to this class
+// and Qt management takes care of the rest
 C_GiSyBoundaryWidget::~C_GiSyBoundaryWidget()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
-   // and Qt management takes care of the rest
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -227,7 +226,7 @@ void C_GiSyBoundaryWidget::SetBackgroundColor(const QColor & orc_Value)
 void C_GiSyBoundaryWidget::m_UpdatePreview(void)
 {
    const QSize c_ViewSize = C_GiSyBaseWidget::h_GetSceneViewSize();
-   C_GiBiBoundary * pc_Item = new C_GiBiBoundary(0ULL, 200.0, 70.0);
+   C_GiBiBoundary * const pc_Item = new C_GiBiBoundary(0ULL, 200.0, 70.0);
    const QSizeF c_ItemSize = pc_Item->GetSize();
 
    pc_Item->setPos((static_cast<float64>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0,
@@ -243,8 +242,7 @@ void C_GiSyBoundaryWidget::m_UpdatePreview(void)
    // add item
    this->mpc_ParentDialog->GetPreviewScene()->addItem(pc_Item);
    this->mpc_ParentDialog->GetPreviewScene()->clearSelection();
-
-}  //lint !e429  //no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of Color button
@@ -285,7 +283,7 @@ void C_GiSyBoundaryWidget::m_BorderColorClicked(void)
    {
       c_Popup->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of inner color button
@@ -326,7 +324,7 @@ void C_GiSyBoundaryWidget::m_BackgroundColorClicked(void)
    {
       c_Popup->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of spin box changed

@@ -231,8 +231,9 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
       }
       else
       {
-         // Make sure to remove project from recent projects
-         C_UsHandler::h_GetInstance()->RemoveOfRecentProjects(orc_FilePath);
+         // we also want those projects in the "recent projects" list, which fail to load
+         C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
+         C_UsHandler::h_GetInstance()->Save();
 
          // load last available recent project (where "available" here means: *.syde exists)
          const QStringList c_RecentProjects = C_UsHandler::h_GetInstance()->GetRecentProjects();
@@ -255,7 +256,6 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
          s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
 
          // very unlikely, but the previous project could be corrupt -> check it and load empty project else
-         C_PopErrorHandling::h_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
          if (s32_Result == C_NO_ERR)
          {
             C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
@@ -424,7 +424,7 @@ void C_NagMainWidget::m_UpdateCurrProjInfo(void)
       //Current project
       const QString c_TooltipContent =
          static_cast<QString>(C_GtGetText::h_GetText(
-                    "Author: %1 \nCreated: %2 \nLast Modified: %3 (by %4) \nUsed openSYDE version: %5")).
+                                 "Author: %1 \nCreated: %2 \nLast Modified: %3 (by %4) \nUsed openSYDE version: %5")).
          arg(C_PuiProject::h_GetInstance()->c_Author.c_str()).
          arg(C_PuiProject::h_GetTimeFormatted(C_PuiProject::h_GetInstance()->c_CreationTime).c_str()).
          arg(C_PuiProject::h_GetTimeFormatted(C_PuiProject::h_GetInstance()->c_ModificationTime).c_str()).
@@ -487,7 +487,8 @@ void C_NagMainWidget::m_SysViewClicked()
 void C_NagMainWidget::m_AboutClicked()
 {
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
-   new C_NagAboutDialog(*c_New, "openSYDE", ":/images/LogoOpensyde_XXL.png", 27);
+   new C_NagAboutDialog(*c_New, "openSYDE", ":/images/LogoOpensyde_XXL.png", 27,
+                        C_GtGetText::h_GetText("QCustomPlot by Emanuel Eichhammer"));
 
    //Resize
    c_New->SetSize(QSize(650, 350));
@@ -590,7 +591,7 @@ void C_NagMainWidget::m_OnEditFinished(void)
    // display elided new version
    QFont c_Font = mc_STYLE_GUIDE_FONT_SEMIBOLD_24;
    c_Font.setPixelSize(c_Font.pointSize());
-   QFontMetrics c_FontMetrics(c_Font);
+   const QFontMetrics c_FontMetrics(c_Font);
    this->mpc_Ui->pc_LabelVersion->setText(c_FontMetrics.elidedText(C_PuiProject::h_GetInstance()->c_Version.c_str(),
                                                                    Qt::ElideLeft, 120));
 

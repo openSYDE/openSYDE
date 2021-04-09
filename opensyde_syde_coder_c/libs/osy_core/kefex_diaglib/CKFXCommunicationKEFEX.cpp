@@ -257,9 +257,9 @@ sint32 C_KFXCommunicationKEFEX::ReadService(const uint32 ou32_Index, uint32 & or
    }
 
    oru32_Value = static_cast<uint32>(c_Service.au8_Data[0]) +
-               ((static_cast<uint32>(c_Service.au8_Data[1])) << 8) +
-               ((static_cast<uint32>(c_Service.au8_Data[2])) << 16) +
-               ((static_cast<uint32>(c_Service.au8_Data[3])) << 24);
+               ((static_cast<uint32>(c_Service.au8_Data[1])) << 8U) +
+               ((static_cast<uint32>(c_Service.au8_Data[2])) << 16U) +
+               ((static_cast<uint32>(c_Service.au8_Data[3])) << 24U);
    return C_NO_ERR;
 }
 
@@ -383,9 +383,9 @@ sint32 C_KFXCommunicationKEFEX::WriteEEPROM(const uint32 ou32_Address, const uin
    while (u32_BytesLeft > 0U)
    {
       au8_Data[0] = static_cast<uint8>(ou32_Address + u32_Offset);
-      au8_Data[1] = static_cast<uint8>((ou32_Address + u32_Offset) >> 8);
-      au8_Data[2] = static_cast<uint8>((ou32_Address + u32_Offset) >> 16);
-      au8_Data[3] = static_cast<uint8>((ou32_Address + u32_Offset) >> 24);
+      au8_Data[1] = static_cast<uint8>((ou32_Address + u32_Offset) >> 8U);
+      au8_Data[2] = static_cast<uint8>((ou32_Address + u32_Offset) >> 16U);
+      au8_Data[3] = static_cast<uint8>((ou32_Address + u32_Offset) >> 24U);
       C_SCLChecksums::CalcCRC16(&au8_Data[0], 4U, mu16_CRCOverSentServices);
       if (u32_BytesLeft >= 2U)
       {

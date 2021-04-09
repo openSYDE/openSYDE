@@ -72,7 +72,7 @@ bool C_OgeTreeViewToolTipBaseDelegate::editorEvent(QEvent * const opc_Event, QAb
        (opc_Model->flags(orc_Index).testFlag(Qt::ItemIsEnabled) == true))
    {
       // make sure that we have a check state
-      QVariant c_Value = orc_Index.data(static_cast<sintn>(Qt::CheckStateRole));
+      const QVariant c_Value = orc_Index.data(static_cast<sintn>(Qt::CheckStateRole));
       if (c_Value.isValid() == true)
       {
          bool q_AdaptState = true;
@@ -83,8 +83,8 @@ bool C_OgeTreeViewToolTipBaseDelegate::editorEvent(QEvent * const opc_Event, QAb
              (opc_Event->type() == QEvent::MouseButtonPress))
          {
             QStyleOptionViewItem c_ViewOpt(orc_Option);
-            QRect c_CheckRect = orc_Option.widget->rect();
-            
+            const QRect c_CheckRect = orc_Option.widget->rect();
+
             QMouseEvent * const pc_MouseEvent = dynamic_cast<QMouseEvent *>(opc_Event);
 
             tgl_assert(pc_MouseEvent != NULL);
@@ -111,7 +111,6 @@ bool C_OgeTreeViewToolTipBaseDelegate::editorEvent(QEvent * const opc_Event, QAb
          }
          else if (opc_Event->type() == QEvent::KeyPress)
          {
-            
             QKeyEvent * const pc_KeyEvent = dynamic_cast<QKeyEvent *>(opc_Event);
 
             tgl_assert(pc_KeyEvent != NULL);

@@ -125,8 +125,7 @@ sint32 C_OSCImportEdsDcf::h_Import(const C_SCLString & orc_FilePath, const uint8
          {
             s32_Retval = C_RANGE;
             orc_ParsingError = c_Dictionary.GetLastErrorText();
-            osc_write_log_warning("Import ECS/DCF", C_SCLString(
-                                     "Could not parse file: " + c_Dictionary.GetLastErrorText()).c_str());
+            osc_write_log_warning("Import ECS/DCF", "Could not parse file: " + c_Dictionary.GetLastErrorText());
          }
       }
    }
@@ -429,11 +428,11 @@ sint32 C_OSCImportEdsDcf::mh_ParseSignals(const uint32 ou32_COMessageId, const u
    if ((pc_COMessageMappingObject != NULL) && (pc_COMessageMappingObject->u8_NumSubs > 0U))
    {
       //Skip first section because this is just the number of sub segments
-      uint32 u32_MappingCount = static_cast<uint32>(pc_COMessageMappingObject->u8_NumSubs) - 1UL;
-      if (u32_MappingCount <= 0x40)
+      const uint32 u32_MappingCount = static_cast<uint32>(pc_COMessageMappingObject->u8_NumSubs) - 1UL;
+      if (u32_MappingCount <= 0x40U)
       {
-         uint32 u32_StartBitCounter = 0;
-         for (uint32 u32_ItSignal = 0; u32_ItSignal < u32_MappingCount; ++u32_ItSignal)
+         uint32 u32_StartBitCounter = 0U;
+         for (uint32 u32_ItSignal = 0U; u32_ItSignal < u32_MappingCount; ++u32_ItSignal)
          {
             //Signal pointer section
             //----------------------
@@ -659,14 +658,16 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValue(const C_SCLString & orc_COValue, co
 {
    sint32 s32_Retval = C_NO_ERR;
 
+   oru32_Value = 0UL;
+
    if (orc_COValue.Length() > 0)
    {
       C_SCLString c_LowerCaseNoWhiteSpaceNumberM;
       //Remove whitespace and $
       for (uint32 u32_ItChar = 0; u32_ItChar < orc_COValue.Length(); ++u32_ItChar)
       {
-         if ((orc_COValue[static_cast<sintn>(u32_ItChar + 1UL)] == ' ') ||
-             (orc_COValue[static_cast<sintn>(u32_ItChar + 1UL)] == '$'))
+         const charn cn_Character = orc_COValue[static_cast<sintn>(u32_ItChar + 1UL)];
+         if ((cn_Character == ' ') || (cn_Character == '$'))
          {
             //Skip
          }
@@ -683,7 +684,6 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValue(const C_SCLString & orc_COValue, co
          c_LowerCaseNoWhiteSpaceNumberM.Tokenize("+", c_Tokens);
          if (c_Tokens.GetLength() > 0L)
          {
-            oru32_Value = 0UL;
             for (uint32 u32_ItToken = 0;
                  (u32_ItToken < static_cast<uint32>(c_Tokens.GetLength())) && (s32_Retval == C_NO_ERR);
                  ++u32_ItToken)
@@ -742,14 +742,16 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValueSimple(const C_SCLString & orc_COVal
 {
    sint32 s32_Retval;
 
+   oru32_Value = 0U;
+
    if (orc_COValue.Length() > 0)
    {
-      charn * pc_Ptr = NULL;
+      charn * pcn_Ptr = NULL;
 
-      oru32_Value = strtoul(orc_COValue.c_str(), &pc_Ptr, 0);
-      if (pc_Ptr != NULL)
+      oru32_Value = strtoul(orc_COValue.c_str(), &pcn_Ptr, 0);
+      if (pcn_Ptr != NULL)
       {
-         if (*pc_Ptr == '\0')
+         if (*pcn_Ptr == '\0')
          {
             s32_Retval = C_NO_ERR;
          }
@@ -798,7 +800,7 @@ void C_OSCImportEdsDcf::mh_AddUserMessage(const uint32 ou32_COObjectId, const C_
    if (os32_COSubSectionId >= 0L)
    {
       c_Message += "sub";
-      c_Message += C_SCLString(os32_COSubSectionId);
+      c_Message += C_SCLString::IntToStr(os32_COSubSectionId);
    }
    //Optional section name by spec
    if (orc_COSectionName != "")
@@ -917,6 +919,8 @@ sint32 C_OSCImportEdsDcf::mh_CalcMinMax(C_OSCNodeDataPoolListElement & orc_Eleme
       }
       q_IsFloat = true;
       break;
+   default:
+      break;
    }
    if (s32_Retval == C_NO_ERR)
    {
@@ -925,14 +929,14 @@ sint32 C_OSCImportEdsDcf::mh_CalcMinMax(C_OSCNodeDataPoolListElement & orc_Eleme
          //Unsigned
          if (q_IsUnsigned == true)
          {
-            uint64 u64_Max = 0;
+            uint64 u64_Max = 0U;
 
-            for (uint16 u16_ItBit = 0; u16_ItBit < ou16_NumberBits; ++u16_ItBit)
+            for (uint16 u16_ItBit = 0U; u16_ItBit < ou16_NumberBits; ++u16_ItBit)
             {
-               u64_Max += 1ULL << static_cast<uint64>(u16_ItBit);
+               u64_Max += (static_cast<uint64>(1U) << u16_ItBit);
             }
 
-            switch (orc_Element.GetType())
+            switch (orc_Element.GetType()) //lint !e788 not all enum constants used; this is for unsigned only
             {
             case C_OSCNodeDataPoolContent::eUINT8:
                orc_Element.c_MinValue.SetValueU8(0);
@@ -963,10 +967,10 @@ sint32 C_OSCImportEdsDcf::mh_CalcMinMax(C_OSCNodeDataPoolListElement & orc_Eleme
             //We need exactly one more than half of the unsigned maximum
             if (ou16_NumberBits > 0U)
             {
-               u64_Max += 1ULL << (static_cast<uint64>(ou16_NumberBits) - 1ULL);
+               u64_Max += (static_cast<uint64>(1U) << (ou16_NumberBits - 1U));
             }
 
-            switch (orc_Element.GetType())
+            switch (orc_Element.GetType()) //lint !e788 not all enum constants used; this is for signed only
             {
             case C_OSCNodeDataPoolContent::eSINT8:
                orc_Element.c_MinValue.SetValueS8(-static_cast<sint8>(u64_Max));
@@ -992,7 +996,7 @@ sint32 C_OSCImportEdsDcf::mh_CalcMinMax(C_OSCNodeDataPoolListElement & orc_Eleme
          //Float
          if (q_IsFloat == true)
          {
-            switch (orc_Element.GetType())
+            switch (orc_Element.GetType()) //lint !e788 not all enum constants used; this is for float only
             {
             case C_OSCNodeDataPoolContent::eFLOAT32:
                orc_Element.c_MinValue.SetValueF32(-std::numeric_limits<float32>::max());
@@ -1034,12 +1038,12 @@ void C_OSCImportEdsDcf::mh_LoadDummies(const C_SCLString & orc_FilePath, std::ve
       if (c_StringList.GetCount() > 0UL)
       {
          //1B is last supported data type
-         for (uint32 u32_ItPossibleDummy = 1; u32_ItPossibleDummy <= 0x1B; ++u32_ItPossibleDummy)
+         for (uint32 u32_ItPossibleDummy = 1U; u32_ItPossibleDummy <= 0x1B; ++u32_ItPossibleDummy)
          {
             std::stringstream c_Stream;
             C_SCLString c_CurString;
             c_Stream << std::setw(4) << std::setfill('0') << &std::hex << u32_ItPossibleDummy;
-            c_CurString = "Dummy" + C_SCLString(c_Stream.str().c_str());
+            c_CurString = static_cast<C_SCLString>("Dummy") + c_Stream.str().c_str();
             //Check if entry exists
             if (c_StringList.IndexOf(c_CurString) >= 0L)
             {

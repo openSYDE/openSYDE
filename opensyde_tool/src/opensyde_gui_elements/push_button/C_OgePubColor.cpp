@@ -59,15 +59,14 @@ void C_OgePubColor::SetColors(const QColor & orc_BackgroundColor, const QColor &
                               const QColor & orc_RestBorderColor)
 {
    this->setStyleSheet(
-      "stw_opensyde_gui_elements--C_OgePubColor\
-                        {\
-                           background-color: " + orc_BackgroundColor.name() + ";\
-                           border-top-color: " + orc_TopBorderColor.name() + ";\
-                           border-right-color: " + orc_RestBorderColor.name() + ";\
-                           border-bottom-color: " + orc_RestBorderColor.name() + ";\
-                           border-left-color: " + orc_RestBorderColor.name() + ";\
-                        }\
-                       ");
+      "stw_opensyde_gui_elements--C_OgePubColor"
+      "{"
+      "   background-color: " + orc_BackgroundColor.name() + ";"
+      "   border-top-color: " + orc_TopBorderColor.name() + ";"
+      "   border-right-color: " + orc_RestBorderColor.name() + ";"
+      "   border-bottom-color: " + orc_RestBorderColor.name() + ";"
+      "   border-left-color: " + orc_RestBorderColor.name() + ";"
+      "}");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,7 +92,6 @@ bool C_OgePubColor::event(QEvent * const opc_Event)
          //show tooltip
          if (this->m_GetToolTip()->isVisible() == false)
          {
-            
             QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
             if (pc_HelpEvent != NULL)

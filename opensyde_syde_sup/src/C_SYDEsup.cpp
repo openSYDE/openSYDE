@@ -22,8 +22,6 @@
 #include "CSCLString.h"
 #include "C_SYDEsup.h"
 #include "C_OSCSuServiceUpdatePackage.h"
-#include "CCAN.h"
-#include "C_OSCIpDispatcherWinSock.h"
 #include "C_OSCLoggingHandler.h"
 #include "TGLTime.h"
 #include "TGLFile.h"
@@ -54,10 +52,28 @@ using namespace stw_can;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::C_SYDEsup(void)
+C_SYDEsup::C_SYDEsup(void) :
+   mpc_CanDispatcher(NULL),
+   mpc_EthDispatcher(NULL),
+   mq_Quiet(false),
+   mc_SUPFilePath(""),
+   mc_CanDriver(""),
+   mc_LogPath(""),
+   mc_LogFile(""),
+   mc_UnzipPath("")
 {
-   mq_Quiet = false;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SYDEsup::~C_SYDEsup(void)
+{
+   mpc_CanDispatcher = NULL;
+   mpc_EthDispatcher = NULL;
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get options from command line
 
@@ -66,14 +82,16 @@ C_SYDEsup::C_SYDEsup(void)
 
    Parameters are:
    * -h for help
+   * -v for version
+   * -m for manual page
    * -q for quiet
    * -p for package file path
-   * -i for CAN interface (path to CAN DLL) (optional but needed if packages active bus is CAN, not Ethernet)
+   * -i for CAN interface information (optional but needed if active bus in package is of type CAN, not Ethernet)
    * -z for path to unzip directory (optional)
    * -l for path to log file (optional)
 
-   \param[in]   osn_Argc     number of command line arguments
-   \param[in]   oppcn_Argv   command line arguments
+   \param[in]  osn_Argc    number of command line arguments
+   \param[in]  oppcn_Argv  command line arguments
 
    \return
    eOK                        initialization worked
@@ -86,7 +104,9 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    sintn sn_Result;
    bool q_ParseError = false;
    bool q_ShowHelp = false;
-   const C_SCLString c_Version = h_GetApplicationVersion(oppcn_Argv[0]);
+   bool q_ShowManPage = false;
+   bool q_ShowVersionOnly = false;
+   const C_SCLString c_Version = m_GetApplicationVersion(TGL_GetExePath());
    const C_SCLString c_BinaryHash = stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash();
 
    mq_Quiet = false;
@@ -96,6 +116,12 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
       /* name, has_arg, flag, val */
       {
          "help",         no_argument,         NULL,    'h'
+      },
+      {
+         "man",          no_argument,         NULL,    'm'
+      },
+      {
+         "version",      no_argument,         NULL,    'v'
       },
       {
          "quiet",        no_argument,         NULL,    'q'
@@ -117,21 +143,23 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
       }
    };
 
-   mc_SUPFilePath = "";
-   mc_CanDLLPath = "";
-   mc_UnzipPath = "";
-   mc_LogPath = "";
-
    do
    {
       sintn sn_Index;
-      sn_Result = getopt_long(osn_Argc, oppcn_Argv, "hqp:i:z:l:", &ac_Options[0], &sn_Index);
+      sn_Result = getopt_long(osn_Argc, oppcn_Argv, "hmvqp:i:z:l:", &ac_Options[0], &sn_Index);
       if (sn_Result != -1)
       {
          switch (sn_Result)
          {
          case 'h':
             q_ShowHelp = true;
+            break;
+         case 'm':
+            q_ShowHelp = true;
+            q_ShowManPage = true;
+            break;
+         case 'v':
+            q_ShowVersionOnly = true;
             break;
          case 'q':
             mq_Quiet = true;
@@ -140,7 +168,7 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
             mc_SUPFilePath = optarg;
             break;
          case 'i':
-            mc_CanDLLPath = optarg;
+            mc_CanDriver = optarg;
             break;
          case 'z':
             mc_UnzipPath = optarg;
@@ -159,37 +187,59 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    }
    while (sn_Result != -1);
 
-   if (q_ShowHelp == true)
+   if ((q_ShowVersionOnly == true) && (q_ShowHelp == false))
    {
-      //print directly to console; no need for logging this user feedback
-      this->m_PrintInformation(c_Version, c_BinaryHash);
-      std::cout << "SYDEsup is a console application for updating your system with a Service Update Package created "
-         "with openSYDE, the toolset and framework by STW (Sensor-Technik Wiedemann GmbH). "
-         "For further information take a look at openSYDE user manual.\n" << &std::endl;
-      e_Return = eERR_PARSE_COMMAND_LINE;
-   }
-   else if ((mc_SUPFilePath == "") || (q_ParseError == true))
-   {
-      //print directly to console; no need for logging this user feedback
-      this->m_PrintInformation(c_Version, c_BinaryHash);
-      std::cout << "Error: Invalid or missing command line parameters.\n" << &std::endl;
+      this->m_PrintVersion(c_Version, c_BinaryHash, false);
       e_Return = eERR_PARSE_COMMAND_LINE;
    }
    else
    {
-      // Initialize optional parameters
-      e_Return = this->m_InitOptionalParameters();
-      // only error here is not-existing unzip directory
-
-      if (e_Return != eOK)
+      if (mq_Quiet == false)
       {
-         this->m_PrintInformation(c_Version, c_BinaryHash);
-         std::cout << "Error: " << this->mc_UnzipPath.c_str() << " is no existing directory.\n" << &std::endl;
+         // print banner
+         std::cout <<
+            " ________       ___    ___ ________  _______   ________  ___  ___  ________\n"
+            "|\\   ____\\     |\\  \\  /  /|\\   ___ \\|\\  ___ \\ |\\   ____\\|\\  \\|\\  \\|\\   __  \\\n"
+            "\\ \\  \\___|_    \\ \\  \\/  / | \\  \\_|\\ \\ \\   __/|\\ \\  \\___|\\ \\  \\\\\\  \\ \\  \\|\\  \\\n"
+            " \\ \\_____  \\    \\ \\    / / \\ \\  \\ \\\\ \\ \\  \\_|/_\\ \\_____  \\ \\  \\\\\\  \\ \\   ____\\\n"
+            "  \\|____|\\  \\    \\/  /  /   \\ \\  \\_\\\\ \\ \\  \\_|\\ \\|____|\\  \\ \\  \\\\\\  \\ \\  \\___|\n"
+            "    ____\\_\\  \\ __/  / /      \\ \\_______\\ \\_______\\____\\_\\  \\ \\_______\\ \\__\\\n"
+            "   |\\_________\\\\___/ /        \\|_______|\\|_______|\\_________\\|_______|\\|__|\n"
+            "   \\|_________\\|___|/                            \\|_________|\n" << &std::endl;
+      }
+
+      // handle helper command line options and errors
+      if (q_ShowHelp == true)
+      {
+         // logging not yet set up -> print directly to console
+         this->m_PrintVersion(c_Version, c_BinaryHash, !mq_Quiet);
+         this->m_PrintInformation(q_ShowManPage);
+         e_Return = eERR_PARSE_COMMAND_LINE;
+      }
+      else if ((mc_SUPFilePath == "") || (q_ParseError == true))
+      {
+         // logging not yet set up -> print directly to console
+         this->m_PrintVersion(c_Version, c_BinaryHash, !mq_Quiet);
+         std::cout << "Error: Invalid or missing command line parameters, try -h." << &std::endl;
+         e_Return = eERR_PARSE_COMMAND_LINE;
       }
       else
       {
-         // log version
-         h_WriteLog("SYDEsup Version", "Version: " + c_Version + ", MD5-Checksum: " + c_BinaryHash);
+         const stw_scl::C_SCLString c_Date = __DATE__;
+         const stw_scl::C_SCLString c_Time = __TIME__;
+
+         // Initialize optional parameters and setup logging
+         e_Return = this->m_InitOptionalParameters(); // only error here is not-existing unzip directory
+
+         // log extended version information
+         h_WriteLog("SYDEsup Version", "SYDEsup Version: " + c_Version + ", MD5-Checksum: " + c_BinaryHash);
+         h_WriteLog("SYDEsup Version", "   Binary: " + stw_tgl::TGL_GetExePath(), false, mq_Quiet);
+         h_WriteLog("SYDEsup Version", "   Build date: " + c_Date + " " + c_Time, false, mq_Quiet);
+
+         if (e_Return != eOK)
+         {
+            h_WriteLog("Initialize Parameters",  this->mc_UnzipPath + " is no existing directory.", true);
+         }
       }
    }
 
@@ -227,23 +277,17 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    eERR_PACKAGE_NOT_FOUND
    eERR_PACKAGE_WRONG_EXTENSION
 
-   // result from check if DLL file exists
-   eERR_DLL_NOT_FOUND
+   // results from opening CAN interface
+   eERR_CAN_IF_NOT_FOUND
+   eERR_CAN_IF_LOAD_FAILED
 
-   // results from c_CanDispatcher.DLL_Open
-   eERR_DLL_ALREADY_OPENED
-   eERR_DLL_INIT_FAILED
-   eERR_DLL_FORMAT
-
-   // results from c_CanDispatcher.CAN_Init
-   eERR_DLL_C_UNKNOWN
-   eERR_DLL_CHANNEL
-   eERR_DLL_NOT_OPENED
+   // results from opening ETH driver
+   eERR_ETH_IF_LOAD_FAILED
 
    // results from c_Sequence.Init
    eERR_SEQUENCE_ROUTING
    eERR_SEQUENCE_UNKNOWN_CONFIG
-   eERR_SEQUENCE_DLL_NOT_FOUND
+   eERR_SEQUENCE_CAN_IF_NOT_FOUND
    eERR_SEQUENCE_INVALID_PARAM
    eERR_SEQUENCE_CAN_INIT
    eERR_SEQUENCE_C_CONFIG
@@ -271,7 +315,7 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    eERR_UNKNOWN
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsup::Update(void) const
+C_SYDEsup::E_Result C_SYDEsup::Update(void)
 {
    E_Result e_Result = eOK;
    sint32 s32_Return = C_NO_ERR;
@@ -279,10 +323,7 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
    uint32 u32_ActiveBusIndex = 0;
    C_SCLStringList c_WarningMessages;
    C_SCLString c_ErrorMessage;
-   C_OSCIpDispatcherWinSock c_IpDispatcher;
-   C_CAN c_CanDispatcher;
    C_SUPSuSequences c_Sequence;
-   bool q_CanLoaded = false; // flag
    bool q_ResetSystem = false;
 
    std::vector<uint8> c_ActiveNodes;
@@ -336,70 +377,32 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
    // go on if previous step was successful
    if (e_Result == eOK)
    {
+      tgl_assert(u32_ActiveBusIndex < c_SystemDefinition.c_Buses.size());
+
       // do CAN stuff if CAN bus
-      if (c_SystemDefinition.c_Buses[u32_ActiveBusIndex].e_Type == C_OSCSystemBus::eCAN)
+      if (u32_ActiveBusIndex < c_SystemDefinition.c_Buses.size())
       {
-         // check if CAN DLL exists
-         if (TGL_FileExists(mc_CanDLLPath) == false)
+         if (c_SystemDefinition.c_Buses[u32_ActiveBusIndex].e_Type == C_OSCSystemBus::eCAN)
          {
-            e_Result = eERR_DLL_NOT_FOUND;
+            e_Result = m_OpenCan(mc_CanDriver, c_SystemDefinition.c_Buses[u32_ActiveBusIndex].u64_BitRate);
+            if (e_Result == eOK)
+            {
+               h_WriteLog("Open CAN", "CAN driver initialized.");
+               tgl_assert(mpc_CanDispatcher != NULL);
+            }
+         }
+         else if (c_SystemDefinition.c_Buses[u32_ActiveBusIndex].e_Type == C_OSCSystemBus::eETHERNET)
+         {
+            e_Result = m_OpenEthernet();
+            if (e_Result == eOK)
+            {
+               h_WriteLog("Open Ethernet", "Ethernet driver initialized.");
+               tgl_assert(mpc_EthDispatcher != NULL);
+            }
          }
          else
          {
-            h_WriteLog("CAN DLL", "CAN DLL \"" + mc_CanDLLPath + "\" found.");
-            // setup/load CAN dispatcher
-            c_CanDispatcher.SetDLLName(mc_CanDLLPath);
-            s32_Return = c_CanDispatcher.DLL_Open();
-         }
-
-         // initialize CAN DLL if previous step was successful and return errors else
-         if (e_Result == eOK)
-         {
-            switch (s32_Return) // here s32_Return is result of c_CanDispatcher.DLL_Open
-            {
-            case C_NO_ERR:
-               h_WriteLog("Setup CAN", "CAN DLL loaded.");
-               q_CanLoaded = true;
-               // initialize CAN dispatcher
-               s32_Return = c_CanDispatcher.CAN_Init(static_cast<sint32>(c_SystemDefinition.c_Buses[u32_ActiveBusIndex].
-                                                                         u64_BitRate / 1000ULL));
-               break;
-            case CAN_COMP_ERR_DLL_ALREADY_OPENED:
-               e_Result = eERR_DLL_ALREADY_OPENED;
-               break;
-            case CAN_COMP_ERR_DLL_INIT:
-               e_Result = eERR_DLL_INIT_FAILED;
-               break;
-            case CAN_COMP_ERR_DLL_FORMAT:
-               e_Result = eERR_DLL_FORMAT;
-               break;
-            default:
-               e_Result = eERR_UNKNOWN;
-               break;
-            }
-         }
-
-         // report success or translate errors
-         if (e_Result == eOK)
-         {
-            switch (s32_Return) // here s32_Return is result of c_CanDispatcher.CAN_Init
-            {
-            case C_NO_ERR:
-               h_WriteLog("Setup CAN", "CAN interface initialized.");
-               break;
-            case C_UNKNOWN_ERR:
-               e_Result = eERR_DLL_C_UNKNOWN;
-               break;
-            case C_CONFIG:
-               e_Result = eERR_DLL_CHANNEL;
-               break;
-            case CAN_COMP_ERR_DLL_NOT_OPENED:
-               e_Result = eERR_DLL_NOT_OPENED;
-               break;
-            default:
-               e_Result = eERR_UNKNOWN;
-               break;
-            }
+            tgl_assert(false);
          }
       }
    }
@@ -408,8 +411,8 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
    if (e_Result == eOK)
    {
       // initialize sequence
-      s32_Return = c_Sequence.Init(c_SystemDefinition, u32_ActiveBusIndex, c_ActiveNodes, &c_CanDispatcher,
-                                   &c_IpDispatcher);
+      s32_Return = c_Sequence.Init(c_SystemDefinition, u32_ActiveBusIndex, c_ActiveNodes, mpc_CanDispatcher,
+                                   mpc_EthDispatcher);
       // tell report methods to not print to console
       c_Sequence.SetQuiet(mq_Quiet);
    }
@@ -429,9 +432,6 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
          break;
       case C_OVERFLOW:
          e_Result = eERR_SEQUENCE_UNKNOWN_CONFIG;
-         break;
-      case C_RD_WR:
-         e_Result = eERR_SEQUENCE_DLL_NOT_FOUND;
          break;
       case C_NOACT:
          e_Result = eERR_SEQUENCE_INVALID_PARAM;
@@ -524,8 +524,8 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
    // inform user about errors
    this->m_PrintStringFromError(e_Result);
 
-   // conclude (reset system and close CAN DLL)
-   this->m_Conclude(c_CanDispatcher, c_Sequence, q_CanLoaded, q_ResetSystem);
+   // conclude (reset system and close CAN driver)
+   this->m_Conclude(c_Sequence, q_ResetSystem);
 
    return e_Result;
 }
@@ -536,9 +536,10 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
    Write detailed information with logging engine to log file but
    only print concise details to console.
 
-   \param[in]     orc_Activity    Activity
-   \param[in]     orc_Text        Information text
-   \param[in]     orq_IsError     True: log as error; false: log as information
+   \param[in]  orc_Activity   Activity
+   \param[in]  orc_Text       Information text
+   \param[in]  orq_IsError    True: log as error; false: log as information
+   \param[in]  orq_Quiet      Quiet flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SYDEsup::h_WriteLog(const stw_scl::C_SCLString & orc_Activity, const stw_scl::C_SCLString & orc_Text,
@@ -561,72 +562,114 @@ void C_SYDEsup::h_WriteLog(const stw_scl::C_SCLString & orc_Activity, const stw_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get resource version number of a file as an C_SCLString
+/*! \brief   Initialize optional parameters unzip path and logging path
 
-   Extracts the windows version number of the specified file and returns it
-    in the commonly used STW format: "Vx.yyrz".
-   This function is Windows specific and needs to be replaced by another solution
-    when porting to a non-Windows system
-
-   \param[in]   orc_FileName    file name to get version from
+   Check if path exists and replace it with default location if necessary.
+   Set logging file.
 
    \return
-   string with version information ("V?.??r?" on error)
+   eOK                        initialization worked
+   eERR_PARSE_COMMAND_LINE    unzip directory is provided but does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SYDEsup::h_GetApplicationVersion(const C_SCLString & orc_FileName)
+C_SYDEsup::E_Result C_SYDEsup::m_InitOptionalParameters(void)
 {
-   VS_FIXEDFILEINFO * pt_Info;
-   uintn un_ValSize;
-   sint32 s32_InfoSize;
-   uint8 * pu8_Buffer;
-   C_SCLString c_Version;
+   E_Result e_Return = eOK;
 
-   c_Version = "V?.\?\?r?";
-
-   s32_InfoSize = GetFileVersionInfoSizeA(orc_FileName.c_str(), NULL);
-   if (s32_InfoSize != 0)
+   // unzip path:
+   if (mc_UnzipPath == "")
    {
-      pu8_Buffer = new uint8[static_cast<uintn>(s32_InfoSize)];
-      if (GetFileVersionInfoA(orc_FileName.c_str(), 0, s32_InfoSize, pu8_Buffer) != FALSE)
-      {
-         //reinterpret_cast required due to function interface
-         if (VerQueryValueA(pu8_Buffer, "\\",
-                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e9176
-                            &un_ValSize) != FALSE)
-         {
-            c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16U),
-                                     pt_Info->dwFileVersionMS & 0x0000FFFFUL,
-                                     (pt_Info->dwFileVersionLS >> 16U));
-         }
-      }
-      delete[] pu8_Buffer;
+      // default location is Service Update Package file path "converted" to directory
+      mc_UnzipPath = TGL_ChangeFileExtension(mc_SUPFilePath, ""); // note: unzipping checks if this location is valid
    }
-   return c_Version;
+   else if (TGL_DirectoryExists(mc_UnzipPath) == true)
+   {
+      // unzip to sub directory with name of update package
+      mc_UnzipPath = mc_UnzipPath + "\\" + TGL_ChangeFileExtension(TGL_ExtractFileName(mc_SUPFilePath), "");
+   }
+   else
+   {
+      // User provided not-existing directory, which is an invalid command line parameter
+      e_Return = C_SYDEsup::eERR_PARSE_COMMAND_LINE;
+   }
+
+   // log path (gets created, so just check for non empty):
+   if (mc_LogPath == "")
+   {
+      // default location
+      mc_LogPath = this->m_GetDefaultLogLocation();
+   }
+
+   // add trailing path delimiter in case there is none
+   mc_LogPath = TGL_FileIncludeTrailingDelimiter(mc_LogPath);
+
+   // log to file
+   mc_LogFile = this->m_GetLogFileLocation();
+   C_OSCLoggingHandler::h_SetCompleteLogFileLocation(mc_LogFile);
+   std::cout << "The following output also is logged to the file: " << mc_LogFile.c_str() << &std::endl;
+   C_OSCLoggingHandler::h_SetWriteToConsoleActive(false);
+   C_OSCLoggingHandler::h_SetWriteToFileActive(true);
+
+   return e_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Print information about command line parameters, application version and the MD5-Checksum to console.
+/*! \brief  Print version and MD5-Checksum directly to console without logging.
+
+   \param[in]  orc_Version       Version
+   \param[in]  orc_BinaryHash    Binary hash
+   \param[in]  oq_Detailed       Show details
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SYDEsup::m_PrintInformation(const C_SCLString & orc_Version, const C_SCLString &orc_BinaryHash) const
+void C_SYDEsup::m_PrintVersion(const C_SCLString & orc_Version, const C_SCLString & orc_BinaryHash,
+                               const bool oq_Detailed) const
 {
-   // show version and MD5-Checksum
-   std::cout << "Version: " << orc_Version.c_str() << &std::endl;
-   std::cout << "MD5-Checksum: " << orc_BinaryHash.c_str() << "\n" << &std::endl;
+   std::cout << "SYDEsup Version: " << orc_Version.c_str() << ", " <<
+      "MD5-Checksum: " << orc_BinaryHash.c_str() << &std::endl;
+
+   if (oq_Detailed == true)
+   {
+      std::cout << "   Binary: " << stw_tgl::TGL_GetExePath().c_str() <<
+         "\n   Build date: " << __DATE__ << " " << __TIME__ << &std::endl;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Print information about application and command line parameters.
+
+   Print directly to console, as logging is probably not set up yet and not necessary though.
+
+   \param[out]  oq_Detailed   Print detailed application description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SYDEsup::m_PrintInformation(const bool oq_Detailed) const
+{
+   if (oq_Detailed == true)
+   {
+      std::cout <<
+         "\nThis tool \"SYDEsup\" is part of the openSYDE tool chain by STW (Sensor-Technik Wiedemann GmbH).\n"
+         "It allows to update a openSYDE compatible system of multiple nodes in a single step.\n"
+         "The update data must be provided in the openSYDE Service Update Package"
+         "format (*.syde_sup), which can be created with the openSYDE PC tool.\n\n"
+         "For further information take a look at openSYDE user manual." << &std::endl;
+   }
 
    // show parameter help
-   std::cout << "Command line parameters:\n\n"
+   std::cout << "\nCommand line parameters:\n\n"
       "Flag   Alternative      Description                                   Default         Example\n"
       "---------------------------------------------------------------------------------------------------------------\n"
       "-h     --help           Print help                                                    -h\n"
+      "-m     --manpage        Print manual page                                             -m\n"
+      "-v     --version        Print version                                                 -v\n"
       "-q     --quiet          Print less console output                                     -q\n"
-      "-p     --packagefile    Path to Service Update Package file           <none>          -p d:\\MyPackage.syde_sup\n"
-      "-i     --caninterface   CAN interface (Path to CAN DLL)               <none>          -i d:\\MyCan.dll\n"
-      "-z     --unzipdir       Existing directory where files get unzipped   <packagefile>   -z d:\\MyUnzipDir\n"
-      "-l     --logdir         Directory for log files                       .\\Logs          -l d:\\MyLogDir\n\n"
+      "-p     --packagefile    Path to Service Update Package file           <none>          -p .\\MyPackage.syde_sup\n"
+      "-i     --caninterface   CAN interface                                 <none>          " <<
+      this->m_GetCanInterfaceUsageExample().c_str() << "\n"
+      "-z     --unzipdir       Existing directory where files get unzipped   <packagefile>   -z .\\MyUnzipDir\n"
+      "-l     --logdir         Directory for log files                       " <<
+      this->m_GetDefaultLogLocation().c_str() <<      "          -l .\\MyLogDir\n"
       "The package file parameter \"-p\" is mandatory, all others are optional. \n"
-      "If the active bus in the given Service Update Package is of CAN type, a CAN interface must be provided.\n" <<
+      "If the active bus in the given Service Update Package is of CAN type, a CAN interface must be provided." <<
       &std::endl;
 }
 
@@ -666,61 +709,9 @@ C_SCLString C_SYDEsup::m_GetLogFileLocation(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize optional parameters unzip path and logging path
-
-   Check if path exists and replace it with default location if necessary.
-   Set logging file.
-
-   \return
-   eOK                        initialization worked
-   eERR_PARSE_COMMAND_LINE    unzip directory is provided but does not exist
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsup::m_InitOptionalParameters()
-{
-   E_Result e_Return = eOK;
-
-   // unzip path:
-   if (mc_UnzipPath == "")
-   {
-      // default location is Service Update Package file path "converted" to directory
-      mc_UnzipPath = TGL_ChangeFileExtension(mc_SUPFilePath, ""); // note: unzipping checks if this location is valid
-   }
-   else if (TGL_DirectoryExists(mc_UnzipPath) == true)
-   {
-      // unzip to sub directory with name of update package
-      mc_UnzipPath = mc_UnzipPath + "\\" + TGL_ChangeFileExtension(TGL_ExtractFileName(mc_SUPFilePath), "");
-   }
-   else
-   {
-      // User provided not-existing directory, which is an invalid command line parameter
-      e_Return = E_Result::eERR_PARSE_COMMAND_LINE;
-   }
-
-   // log path (gets created, so just check for non empty):
-   if (mc_LogPath == "")
-   {
-      // default location is "here"
-      mc_LogPath = ".\\Logs\\";
-   }
-
-   // add trailing path delimiter in case there is none
-   mc_LogPath = TGL_FileIncludeTrailingDelimiter(mc_LogPath);
-
-   // log to file
-   mc_LogFile = this->m_GetLogFileLocation();
-   C_OSCLoggingHandler::h_SetCompleteLogFileLocation(mc_LogFile);
-   std::cout << "The following output also is logged to the file: " << mc_LogFile.c_str() << "\n" << &std::endl;
-   C_OSCLoggingHandler::h_SetWriteToConsoleActive(false);
-   C_OSCLoggingHandler::h_SetWriteToFileActive(true);
-
-   return e_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Print error description from error result
 
-   \param[in]     ore_Result     error enum
+   \param[in]  ore_Result  error enum
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
@@ -768,38 +759,20 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       c_Error = "Service Update Package has wrong file extension. File extension must be *.syde_sup.";
       break;
 
-   // result from check if DLL file exists
-   case eERR_DLL_NOT_FOUND:
-      c_Activity = "CAN DLL";
-      c_Error = "Could not find CAN DLL file: \"" + mc_CanDLLPath + "\".";
+   // result from check if driver exists
+   case eERR_CAN_IF_NOT_FOUND:
+      c_Activity = "CAN interface";
+      c_Error = "Could not find CAN driver: \"" + mc_CanDriver + "\".";
       break;
-
-   // results from c_CanDispatcher.DLL_Open (comment is corresponding core return value)
-   case eERR_DLL_ALREADY_OPENED: //CAN_COMP_ERR_DLL_ALREADY_OPENED
-      c_Activity = "Open CAN DLL";
-      c_Error = "CAN DLL already opened.";
+   // results from m_OpenCan
+   case eERR_CAN_IF_LOAD_FAILED:
+      c_Activity = "Load CAN driver";
+      c_Error = "CAN driver loading or initialization failed.";
       break;
-   case eERR_DLL_INIT_FAILED: //CAN_COMP_ERR_DLL_INIT
-      c_Activity = "Open CAN DLL";
-      c_Error = "CAN DLL initialization failed.";
-      break;
-   case eERR_DLL_FORMAT: //CAN_COMP_ERR_DLL_FORMAT
-      c_Activity = "Open CAN DLL";
-      c_Error = "CAN DLL not in STW CAN DLL format.";
-      break;
-
-   // results from c_CanDispatcher.CAN_Init (comment is corresponding core return value)
-   case eERR_DLL_C_UNKNOWN: //C_UNKNOWN_ERR
-      c_Activity = "Initialize CAN";
-      c_Error = "DLL function returned initialization error.";
-      break;
-   case eERR_DLL_CHANNEL: //C_CONFIG
-      c_Activity = "Initialize CAN";
-      c_Error = "Channel different from 0 configured but not supported by loaded DLL.";
-      break;
-   case eERR_DLL_NOT_OPENED: //CAN_COMP_ERR_DLL_NOT_OPENED
-      c_Activity = "Initialize CAN";
-      c_Error = "CAN DLL was not yet loaded.";
+   // results from m_OpenEthernet
+   case eERR_ETH_IF_LOAD_FAILED:
+      c_Activity = "Load ethernet driver";
+      c_Error = "Ethernet driver loading or initialization failed.";
       break;
 
    // results from c_Sequence.Init (comment is corresponding core return value)
@@ -811,9 +784,9 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       c_Activity = "Initialize Sequence";
       c_Error = "Unknown transport protocol or unknown diagnostic server for at least one node.";
       break;
-   case eERR_SEQUENCE_DLL_NOT_FOUND: //C_RD_RW
+   case eERR_SEQUENCE_CAN_IF_NOT_FOUND: //C_RD_RW
       c_Activity = "Initialize Sequence";
-      c_Error = "Configured communication DLL not found.";
+      c_Error = "Configured communication driver not found.";
       break;
    case eERR_SEQUENCE_INVALID_PARAM: //C_NOACT
       c_Activity = "Initialize Sequence";
@@ -894,7 +867,18 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       c_Activity = "Update System";
       c_Error = "At least one feature of the openSYDE Flashloader is not available for NVM writing.";
       break;
-   // general results (comment is corresponding core return value)
+
+   // results regarding thread process issues
+   case  eERR_THREAD_UPDATE_IN_PROGRESS:
+      c_Activity = "Thread Process";
+      c_Error = "Update task in thread is in progress.";
+      break;
+   case eERR_THREAD_UPDATE_INIT_FAILED:
+      c_Activity = "Thread Process";
+      c_Error = "Could not initialize thread for update task.";
+      break;
+
+   // general results
    case eOK: //C_NO_ERR
       // no error, everything worked fine (and user already got informed about success)
       break;
@@ -918,21 +902,19 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       std::cout << "\n";
       h_WriteLog("System Update", "Could not update system! Tool result code: " +
                  C_SCLString::IntToStr(static_cast<sintn>(ore_Result)), true);
-      std::cout << "See openSYDE user manual or log file for information: " << mc_LogFile.c_str() << "\n" << &std::endl;
+      std::cout << "See openSYDE user manual or log file for information: " << mc_LogFile.c_str()  << "\n" <<
+         &std::endl;
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Conclude (reset system and close CAN DLL)
 
-   \param[in]     orc_CanDispatcher    CAN dispatcher
-   \param[in]     orc_Sequence         system update sequence
-   \param[in]     orq_CanLoaded        true: orc_CanDispatcher.CAN_Open() successfully called; false: else
-   \param[in]     orq_ResetSystem      true: Flashloader activation failed or system update succeeded; false: else
+   \param[in]  orc_Sequence      system update sequence
+   \param[in]  orq_ResetSystem   true: Flashloader activation failed or system update succeeded; false: else
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SYDEsup::m_Conclude(C_CAN & orc_CanDispatcher, C_SUPSuSequences & orc_Sequence, const bool & orq_CanLoaded,
-                           const bool & orq_ResetSystem) const
+void C_SYDEsup::m_Conclude(C_SUPSuSequences & orc_Sequence, const bool & orq_ResetSystem)
 {
    sint32 s32_Result;
 
@@ -950,17 +932,6 @@ void C_SYDEsup::m_Conclude(C_CAN & orc_CanDispatcher, C_SUPSuSequences & orc_Seq
       }
    }
 
-   // close CAN (if CAN was loaded)
-   if (orq_CanLoaded == true)
-   {
-      s32_Result = orc_CanDispatcher.DLL_Close();
-      if (s32_Result == C_NO_ERR)
-      {
-         h_WriteLog("Close CAN DLL", "CAN DLL successfully closed.", false, mq_Quiet);
-      }
-      else
-      {
-         h_WriteLog("Close CAN DLL", "Could not close CAN DLL.", true, mq_Quiet);
-      }
-   }
+   // close CAN
+   this->m_CloseCan();
 }

@@ -30,12 +30,14 @@ class C_CieExportReportWidget :
    Q_OBJECT
 
 public:
-   explicit C_CieExportReportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, QString & orc_FilePath);
+   explicit C_CieExportReportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                    const QString & orc_FilePath);
    ~C_CieExportReportWidget(void);
 
    void InitStaticNames(void) const;
-   stw_types::sint32 SetMessageData(const std::map<stw_scl::C_SCLString, stw_scl::C_SCLString> & orc_NodeMapping,
-                                    const stw_opensyde_gui_logic::C_CieExportDbc::C_ExportStatistic & orc_ExportStatistic, const stw_scl::C_SCLStringList & orc_Warnings);
+   void SetMessageData(const std::map<stw_scl::C_SCLString, stw_scl::C_SCLString> & orc_NodeMapping,
+                       const stw_opensyde_gui_logic::C_CieExportDbc::C_ExportStatistic & orc_ExportStatistic,
+                       const stw_scl::C_SCLStringList & orc_Warnings);
 
 protected:
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
@@ -52,7 +54,7 @@ private:
    static const QString mhc_HTML_TABLE_DATA_START;
 
    void m_OkClicked(void);
-   stw_types::sint32 m_BuildReport(void);
+   void m_BuildReport(void);
 
    //Avoid call
    C_CieExportReportWidget(const C_CieExportReportWidget &);

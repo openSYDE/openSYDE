@@ -129,13 +129,16 @@ public:
    void GetValueAsLittleEndianBlob(std::vector<stw_types::uint8> & orc_Data) const;
 
    void SetArraySize(const stw_types::uint32 & oru32_Size);
+   //lint -sem(stw_opensyde_core::C_OSCNodeDataPoolContent::GetArraySize,pure)
    stw_types::uint32 GetArraySize(void) const;
 
    void SetType(const E_Type & ore_Value);
+   //lint -sem(stw_opensyde_core::C_OSCNodeDataPoolContent::GetType,pure)
    E_Type GetType(void) const;
 
-   bool GetArray(void) const;
    void SetArray(const bool oq_Value);
+   //lint -sem(stw_opensyde_core::C_OSCNodeDataPoolContent::GetArray,pure)
+   bool GetArray(void) const;
 
    stw_types::uint32 GetSizeByte(void) const;
 
@@ -151,7 +154,8 @@ public:
    bool CompareArrayGreater(const C_OSCNodeDataPoolContent & orc_Cmp, const stw_types::uint32 ou32_Index) const;
 
    void GetValueAsScaledString(const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset,
-                               std::string & orc_Output, const stw_types::uint32 ou32_Index) const;
+                               std::string & orc_Output, const stw_types::uint32 ou32_Index,
+                               const bool oq_AllowRangeAdaptation = true) const;
    void GetAnyValueAsFloat64(stw_types::float64 & orf64_Output, const stw_types::uint32 ou32_Index) const;
 
 private:

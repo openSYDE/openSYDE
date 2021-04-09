@@ -132,7 +132,6 @@ C_SdNdeDpListDataSetWidget::C_SdNdeDpListDataSetWidget(stw_opensyde_gui_elements
 C_SdNdeDpListDataSetWidget::~C_SdNdeDpListDataSetWidget(void)
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent and the Qt memory management or never took ownership
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -307,7 +306,8 @@ bool C_SdNdeDpListDataSetWidget::m_IsThereStillSpaceForDataSets(const uint32 ou3
    {
       C_OgeWiCustomMessage c_MessageBox(this);
 
-      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Only %1 Datasets allowed per Datapool list.")).
+      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Only %1 Datasets allowed per Datapool list.")).
                                   arg(mu32_NODE_DATA_SET_PER_LIST_MAX));
       c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();

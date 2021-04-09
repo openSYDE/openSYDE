@@ -109,15 +109,15 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
    Pointer to frame separator item
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgeFrameSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, QVBoxLayout * const opc_Layout,
-                                                        QWidget * const opc_Parent, const bool oq_AddSpacerBefore)
+C_OgeFraSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, QVBoxLayout * const opc_Layout,
+                                                      QWidget * const opc_Parent, const bool oq_AddSpacerBefore)
 {
-   C_OgeFrameSeparator * pc_FrameSeparator = NULL;
+   C_OgeFraSeparator * pc_FrameSeparator = NULL;
 
    if (opc_Layout != NULL)
    {
       C_OgeLabToolboxHeadingGroupBig * const pc_Heading = new C_OgeLabToolboxHeadingGroupBig(opc_Parent);
-      pc_FrameSeparator = new C_OgeFrameSeparator(opc_Parent);
+      pc_FrameSeparator = new C_OgeFraSeparator(opc_Parent);
       QVBoxLayout * const pc_FrameLayout = new QVBoxLayout();
       sintn sn_Index;
 
@@ -145,7 +145,6 @@ C_OgeFrameSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name
       // add new layout with frame separator to existing layout
       opc_Layout->addLayout(pc_FrameLayout);
       pc_FrameLayout->setContentsMargins(13, 0, 0, 0);
-
    } //lint !e429  //no memory leak because of the parent of the call of addSpacerItem and the Qt
    // memory management
    return pc_FrameSeparator;
@@ -175,7 +174,7 @@ std::vector<C_OgePubIconOnly *> C_SebToolboxUtil::h_AddNewUserHeading(const QStr
       //lint -e429  no memory leak because of the parent of the call of addSpacerItem and the Qt
       // memory management
       C_OgeLabToolboxHeadingGroup * const pc_Heading = new C_OgeLabToolboxHeadingGroup(opc_Parent);
-      C_OgeFrameSeparator * const pc_FrameSeparator = new C_OgeFrameSeparator(opc_Parent);
+      C_OgeFraSeparator * const pc_FrameSeparator = new C_OgeFraSeparator(opc_Parent);
       QVBoxLayout * const pc_FrameLayout = new QVBoxLayout();
       QHBoxLayout * const pc_HorizontalLayout = new QHBoxLayout();
       pc_IconButton = new C_OgePubIconOnly(opc_Parent);

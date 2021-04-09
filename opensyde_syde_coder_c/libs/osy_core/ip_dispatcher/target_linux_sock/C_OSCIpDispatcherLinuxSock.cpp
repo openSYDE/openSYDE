@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       openSYDE protocol IP driver for Windows
+   \brief       openSYDE protocol IP driver for Linux
 
    For details cf. documentation in .h file.
 
@@ -21,7 +21,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-//#include <netdb.h>
 #include <ifaddrs.h>
 
 #include "stwtypes.h"
@@ -39,29 +38,6 @@ using namespace stw_tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 #define INVALID_SOCKET     (-1)
-
-//export a few WinSock constants here
-//Purpose: the definitions in the Windows header violate a lot of coding rules.
-//So we can relocate the required suppressions here at a central spot ...
-//The violations do not cause problems in the application as long as we are on a Windows platform.
-/*
-static sintn m_WsInvalidSocket(void)
-{
-   return -1;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-static sint32 m_WsFionBio(void)
-{
-   return FIONBIO; //lint !e1960 !e970 !e1924 !e569
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-static sint32 m_WsFionRead(void)
-{
-   return FIONREAD; //lint !e1960 !e970 !e1924
-}
-*/
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -525,9 +501,9 @@ C_SCLString C_OSCIpDispatcherLinuxSock::mh_IpToText(const uint8 (&orau8_Ip)[4])
 /*! \brief   Initialize UDP communication
 
    Jobs to perform:
-   * create non-blocking UDP "server" sockets on each local interface
-   ** bind them to the IP of the interface and port 13400
-   * create non-blocking UDS "client" sockets on each local interface
+   * create one non-blocking UDP "server" socket to collect incoming UDP messages (broadcast and unicast)
+   ** bind them to INADDR_ANY and port 13400
+   * create non-blocking UDS "client" sockets on each local interface to send UDP messages (broadcast and unicast)
    ** bind them to the IP of the interface but don't assign a fixed port
    ** set permissions to send broadcasts
 
@@ -550,27 +526,31 @@ sint32 C_OSCIpDispatcherLinuxSock::InitUdp(void)
       mc_LocalInterfaceIps[0] = INADDR_ANY;
    }
    mc_SocketsUdpClient.resize(mc_LocalInterfaceIps.size());
-   mc_SocketsUdpServer.resize(mc_LocalInterfaceIps.size());
 
    for (uint32 u32_Interface = 0U; u32_Interface < mc_LocalInterfaceIps.size(); u32_Interface++)
    {
       mc_SocketsUdpClient[u32_Interface] = INVALID_SOCKET;
-      mc_SocketsUdpServer[u32_Interface] = INVALID_SOCKET;
    }
+   msn_SocketUdpServer = INVALID_SOCKET;
 
    for (uint32 u32_Interface = 0U; u32_Interface < mc_LocalInterfaceIps.size(); u32_Interface++)
    {
       //create UDP socket:
       s32_Return = m_ConfigureUdpSocket(false, mc_LocalInterfaceIps[u32_Interface], mc_SocketsUdpClient[u32_Interface]);
-      if (s32_Return == C_NO_ERR)
-      {
-         s32_Return =
-            m_ConfigureUdpSocket(true, mc_LocalInterfaceIps[u32_Interface], mc_SocketsUdpServer[u32_Interface]);
-      }
       if (s32_Return != C_NO_ERR)
       {
          q_Error = true;
          break;
+      }
+   }
+
+   if (q_Error == false)
+   {
+      // Create one UDP server socket, bind to INADDR_ANY, port 13400
+      s32_Return = m_ConfigureUdpSocket(true, INADDR_ANY, msn_SocketUdpServer);
+      if (s32_Return != C_NO_ERR)
+      {
+         q_Error = true;
       }
    }
 
@@ -748,13 +728,16 @@ sint32 C_OSCIpDispatcherLinuxSock::CloseUdp(void)
       {
          (void)close(mc_SocketsUdpClient[u32_Interface]);
       }
-      if (mc_SocketsUdpServer[u32_Interface] != INVALID_SOCKET)
-      {
-         (void)close(mc_SocketsUdpServer[u32_Interface]);
-      }
    }
+
+   if (msn_SocketUdpServer != INVALID_SOCKET)
+   {
+      (void)close(msn_SocketUdpServer);
+   }
+
    mc_SocketsUdpClient.resize(0);
-   mc_SocketsUdpServer.resize(0);
+   msn_SocketUdpServer = INVALID_SOCKET;
+
    return C_NO_ERR;
 }
 
@@ -1123,7 +1106,7 @@ sint32 C_OSCIpDispatcherLinuxSock::SendUdp(const std::vector<uint8> & orc_Data)
 /*! \brief   Read package from UDP socket
 
    Jobs to perform:
-   Go through all set up UDP "server" sockets and try to read incoming datagram from UDP socket.
+   Try to read incoming datagram from UDP "server" socket.
    Report datagrams sent from:
    * any IP
    * port 13400 (to ignore reception of our own broadcasts and unexpected traffic)
@@ -1142,80 +1125,78 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 
 {
    sint32 s32_Return = C_NOACT;
 
-   if (mc_SocketsUdpServer.size() == 0)
+   if (msn_SocketUdpServer == INVALID_SOCKET)
    {
       osc_write_log_error("openSYDE IP-TP", "ReadUdp called with no socket.");
       s32_Return = C_CONFIG;
    }
    else
    {
-      for (uint32 u32_Interface = 0U; u32_Interface < mc_SocketsUdpServer.size(); u32_Interface++)
+      //do we have a package in RX buffer ?
+      sintn sn_SizeInBuffer;
+      sintn sn_Return = ioctl(msn_SocketUdpServer, FIONREAD, &sn_SizeInBuffer);
+
+      if ((sn_Return == 0) && (sn_SizeInBuffer >= 1))
       {
-         if (mc_SocketsUdpClient[u32_Interface] != INVALID_SOCKET)
+         sockaddr_in t_Sender;
+         socklen_t t_AddressSize = sizeof(t_Sender);
+         //enough bytes: read
+         orc_Data.resize(sn_SizeInBuffer);
+
+         //lint -e{926,929} Side-effect of the "char"-based API. No problems as long as we are on Windows.
+         //lint -e{740}     Side-effect of the POSIX-style API. Match is guaranteed by the API.
+         sn_Return = recvfrom(msn_SocketUdpServer, reinterpret_cast<charn *>(&orc_Data[0]),
+                              orc_Data.size(), 0, reinterpret_cast<sockaddr *>(&t_Sender),
+                              &t_AddressSize);
+
+         //there might be more than one package in the buffer; recvfrom only reads one
+         //so we check whether we have more than zero bytes:
+         if (sn_Return > 0)
          {
-            //do we have a package in RX buffer ?
-            sintn sn_SizeInBuffer;
-            sintn sn_Return = ioctl(mc_SocketsUdpServer[u32_Interface], FIONREAD, &sn_SizeInBuffer);
-            if ((sn_Return == 0) && (sn_SizeInBuffer >= 1))
+            //extract sender address
+            const uint32 u32_IpAddr = ntohl(t_Sender.sin_addr.s_addr);
+            orau8_Ip[0] = (u32_IpAddr >> 24) & 0x0FF;
+            orau8_Ip[1] = (u32_IpAddr >> 16) & 0x0FF;
+            orau8_Ip[2] = (u32_IpAddr >> 8) & 0x0FF;
+            orau8_Ip[3] = u32_IpAddr & 0x0FF;
+
+            if (sn_Return != static_cast<sintn>(orc_Data.size()))
             {
-               sockaddr_in t_Sender;
-               socklen_t t_AddressSize = sizeof(t_Sender);
-               //enough bytes: read
-               orc_Data.resize(sn_SizeInBuffer);
+               orc_Data.resize(sn_Return); //we only need the data we really received
+            }
 
-               //lint -e{926,929} Side-effect of the "char"-based API. No problems as long as we are on Windows.
-               //lint -e{740}     Side-effect of the POSIX-style API. Match is guaranteed by the API.
-               sn_Return = recvfrom(mc_SocketsUdpServer[u32_Interface], reinterpret_cast<charn *>(&orc_Data[0]),
-                                    orc_Data.size(), 0, reinterpret_cast<sockaddr *>(&t_Sender),
-                                    &t_AddressSize);
-
-               //there might be more than one package in the buffer; recvfrom only reads one
-               //so we check whether we have more than zero bytes:
-               if (sn_Return > 0)
-               {
-                  //extract sender address
-                  const uint32 u32_IpAddr = ntohl(t_Sender.sin_addr.s_addr);
-                  orau8_Ip[0] = (u32_IpAddr >> 24) & 0x0FF;
-                  orau8_Ip[1] = (u32_IpAddr >> 16) & 0x0FF;
-                  orau8_Ip[2] = (u32_IpAddr >> 8) & 0x0FF;
-                  orau8_Ip[3] = u32_IpAddr & 0x0FF;
-
-                  if (sn_Return != static_cast<sintn>(orc_Data.size()))
-                  {
-                     orc_Data.resize(sn_Return); //we only need the data we really received
-                  }
-
-                  //filter out local reception of broadcasts we sent ourselves
-                  //strategy to identify those:
-                  //Responses from real nodes are sent from Port 13400
-                  //Our broadcasts are sent with dynamically assigned Port != 13400
-                  //Also: we should not just accept anything that is thrown upon us ...
-                  if (t_Sender.sin_port == htons(13400))
-                  {
-                     s32_Return = C_NO_ERR;
-                  }
-                  else
-                  {
-                     s32_Return = C_NOACT;
-                  }
-                  break; //we have a package ...
-               }
-               else
-               {
-                  //comm error: no data read even though it was reported by ioctl
-                  osc_write_log_error("openSYDE IP-TP",
-                                      "ReadUdp unexpected error: data reported as available but reading failed. Reported size: " +
-                                      C_SCLString::IntToStr(
-                                         orc_Data.size()) + " Read size: " + C_SCLString::IntToStr(sn_Return));
-                  s32_Return = C_RD_WR;
-               }
+            //filter out local reception of broadcasts we sent ourselves
+            //strategy to identify those:
+            //Responses from real nodes are sent from Port 13400
+            //Our broadcasts are sent with dynamically assigned Port != 13400
+            //Also: we should not just accept anything that is thrown upon us ...
+            if (t_Sender.sin_port == htons(13400))
+            {
+               s32_Return = C_NO_ERR;
             }
             else
             {
-               // Write error to log, then ignore the error and continue
-               osc_write_log_error("openSYDE IP-TP", "ReadUdp called with invalid socket(s).");
+               s32_Return = C_NOACT;
             }
          }
+         else
+         {
+            //comm error: no data read even though it was reported by ioctl
+            osc_write_log_error("openSYDE IP-TP",
+                                 "ReadUdp unexpected error: data reported as available but reading failed. Reported size: " +
+                                 C_SCLString::IntToStr(
+                                    orc_Data.size()) + " Read size: " + C_SCLString::IntToStr(sn_Return));
+            s32_Return = C_RD_WR;
+         }
+      }
+      else if (sn_Return < 0)
+      {
+         // Write error to log, then ignore the error and continue
+         osc_write_log_error("openSYDE IP-TP", "ReadUdp called with invalid socket (ioctl(FIONREAD) failed).");
+      }
+      else
+      {
+         // No data available, nothing to do...
       }
    }
 

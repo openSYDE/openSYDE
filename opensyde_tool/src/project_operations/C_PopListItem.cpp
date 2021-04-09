@@ -65,11 +65,11 @@ void C_PopListItem::paint(QPainter * const opc_Painter, const QStyleOptionViewIt
       const QFontMetrics c_FontHeadingInfo(c_FontHeading);
       const sintn sn_Height = orc_Option.rect.height();
       QRect c_Rect = orc_Option.rect;
-      QColor c_ColorPen(42, 42, 91);
-      QPen c_Pen(c_ColorPen, 1.0, Qt::SolidLine);
+      const QColor c_ColorPen(42, 42, 91);
+      const QPen c_Pen(c_ColorPen, 1.0, Qt::SolidLine);
       //advisory
       opc_Painter->save();
-      opc_Painter->setBrush(QBrush(QColor(245, 247, 248)));
+      opc_Painter->setBrush(static_cast<QBrush>(QColor(245, 247, 248)));
       //Deactivate pen to disable border
       opc_Painter->setPen(Qt::NoPen);
       opc_Painter->drawRect(c_Rect);
@@ -79,14 +79,14 @@ void C_PopListItem::paint(QPainter * const opc_Painter, const QStyleOptionViewIt
 
       //Display heading
       {
-         QString c_Heading = orc_Index.data(static_cast<sintn>(Qt::DisplayRole)).toString();
+         const QString c_Heading = orc_Index.data(static_cast<sintn>(Qt::DisplayRole)).toString();
          c_Rect = orc_Option.rect.adjusted(0, 0, 0, c_FontHeadingInfo.height() - sn_Height);
          opc_Painter->setFont(c_FontHeading);
          opc_Painter->drawText(c_Rect, static_cast<sintn>(Qt::AlignLeft), c_Heading);
       }
       //Display description
       {
-         QString c_Description = orc_Index.data(msn_USER_ROLE_ADDITIONAL_INFORMATION).toString();
+         const QString c_Description = orc_Index.data(msn_USER_ROLE_ADDITIONAL_INFORMATION).toString();
          c_Rect = orc_Option.rect.adjusted(0, c_FontHeadingInfo.height(), 0, 0);
          opc_Painter->setFont(QFont("Segoe UI", 10, static_cast<sintn>(QFont::Normal)));
          opc_Painter->drawText(c_Rect, static_cast<sintn>(Qt::AlignLeft), c_Description);

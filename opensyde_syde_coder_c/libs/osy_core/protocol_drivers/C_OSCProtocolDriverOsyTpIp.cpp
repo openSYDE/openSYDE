@@ -97,13 +97,11 @@ sint32 C_OSCProtocolDriverOsyTpIp::C_DoIpHeader::DecodeHeader(const std::vector<
    else
    {
       //this is the one we know how to handle ...
-      //lint -e{864} //false positive due to const/non-const misinterpretation
-      u16_PayloadType = static_cast<uint16>(static_cast<uint16>(orc_Header[2]) << 8) +
+      u16_PayloadType = static_cast<uint16>(static_cast<uint16>(orc_Header[2]) << 8U) +
                         static_cast<uint16>(orc_Header[3]);
-      //lint -e{864} //false positive due to const/non-const misinterpretation
-      u32_PayloadSize = (static_cast<uint32>(orc_Header[4]) << 24) +
-                        (static_cast<uint32>(orc_Header[5]) << 16) +
-                        (static_cast<uint32>(orc_Header[6]) << 8) +
+      u32_PayloadSize = (static_cast<uint32>(orc_Header[4]) << 24U) +
+                        (static_cast<uint32>(orc_Header[5]) << 16U) +
+                        (static_cast<uint32>(orc_Header[6]) << 8U) +
                         orc_Header[7];
       s32_Return = C_NO_ERR;
    }
@@ -124,7 +122,7 @@ void C_OSCProtocolDriverOsyTpIp::C_DoIpHeader::ComposeHeader(std::vector<uint8> 
    orc_Header.resize(static_cast<uintn>(hu8_DOIP_HEADER_SIZE + u32_PayloadSize));
    orc_Header[0] = 0x02U;         //protocol version DoIP ISO 13400-2:2012
    orc_Header[1] = 0x02U ^ 0xFFU; //inverted protocol version
-   orc_Header[2] = static_cast<uint8>(u16_PayloadType >> 8);
+   orc_Header[2] = static_cast<uint8>(u16_PayloadType >> 8U);
    orc_Header[3] = static_cast<uint8>(u16_PayloadType & 0xFFU);
    orc_Header[4] = static_cast<uint8>(u32_PayloadSize >> 24U);
    orc_Header[5] = static_cast<uint8>(u32_PayloadSize >> 16U);
@@ -296,7 +294,7 @@ const
       else
       {
          //check for responses
-         uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+         const uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
          uint8 au8_Ip[4];
          std::vector<uint8> c_Response;
          std::vector<C_BroadcastGetDeviceInfoResults>::iterator c_ItDeviceInfo;
@@ -352,9 +350,7 @@ const
 
          // Remove duplicates. It is possible to get the responses multiple times, if the server and the client
          // are connected to at least two same subnets.
-         //lint -e{864} Call as expected by interface
          std::sort(orc_DeviceInfos.begin(), orc_DeviceInfos.end());
-         //lint -e{864} Call as expected by interface
          c_ItDeviceInfo = std::unique(orc_DeviceInfos.begin(), orc_DeviceInfos.end());
 
          if (c_ItDeviceInfo != orc_DeviceInfos.end())
@@ -363,7 +359,6 @@ const
                                "At least one server sent multiple device information responses");
          }
 
-         //lint -e{64,119,1025,1703} Function not recognized
          orc_DeviceInfos.erase(c_ItDeviceInfo, orc_DeviceInfos.end());
       }
    }
@@ -415,15 +410,11 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_Ser
    {
       sint32 s32_ReturnLocal;
       c_Header.ComposeHeader(c_Request);
-      //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
       (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE], &orau8_SerialNumber[0], 6);
       // Mode flag. Bit 1 is IP address, bit 2 is node identifier
       c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 6] = 0x03;
-      //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
       (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 7], &orau8_NewIpAddress[0], 4);
-      //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
       (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 11], &orau8_NetMask[0], 4);
-      //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
       (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 15], &orau8_DefaultGateway[0], 4);
       c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 19] = orc_NewNodeId.u8_BusIdentifier;
       c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 20] = orc_NewNodeId.u8_NodeIdentifier;
@@ -436,7 +427,7 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_Ser
       }
       else
       {
-         uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+         const uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
          std::vector<uint8> c_Response;
          bool q_Done = false;
 
@@ -459,7 +450,6 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_Ser
                          (c_Header.u16_PayloadType == C_DoIpHeader::hu16_PAYLOAD_TYPE_SET_IP_ADDRESS_MESSAGE_RES))
                      {
                         //looks legit; check payload ...
-                        //lint -e{420} //we checked that c_Response has enough data
                         const sintn sn_SnrOk = std::memcmp(&orau8_SerialNumber[0],
                                                            &c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2], 6U);
                         if (sn_SnrOk != 0)
@@ -558,7 +548,7 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastRequestProgramming(
       else
       {
          //check for responses
-         uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+         const uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
          uint8 au8_Ip[4];
          std::vector<uint8> c_Response;
 
@@ -581,12 +571,11 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastRequestProgramming(
                      {
                         //looks legit; extract payload ...
                         C_BroadcastRequestProgrammingResults c_Info;
-                        //lint -e{864} //false positive due to const/non-const misinterpretation
                         const uint16 u16_SourceAddress =
                            (static_cast<uint16>(static_cast<uint16>(c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE]) <<
-                                                8) + c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 1]) - 1U;
+                                                8U) + c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 1]) - 1U;
                         c_Info.c_NodeId.u8_NodeIdentifier = static_cast<uint8>(u16_SourceAddress & 0x7FU);
-                        c_Info.c_NodeId.u8_BusIdentifier = static_cast<uint8>((u16_SourceAddress >> 7) & 0x0FU);
+                        c_Info.c_NodeId.u8_BusIdentifier = static_cast<uint8>((u16_SourceAddress >> 7U) & 0x0FU);
                         c_Info.q_RequestAccepted =
                            (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2] == 0U) ? true : false;
                         (void)std::memcpy(&c_Info.au8_IpAddress[0], &au8_Ip[0], 4U);
@@ -645,7 +634,7 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastNetReset(const uint8 ou8_ResetType, 
                                                      const uint8 (*const opau8_SerialNumber)[6]) const
 {
    sint32 s32_Return;
-   C_DoIpHeader c_Header(C_DoIpHeader::hu16_PAYLOAD_TYPE_NET_RESET_MESSAGE_REQ, 8U);
+   const C_DoIpHeader c_Header(C_DoIpHeader::hu16_PAYLOAD_TYPE_NET_RESET_MESSAGE_REQ, 8U);
 
    std::vector<uint8> c_Request;
 
@@ -663,12 +652,10 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastNetReset(const uint8 ou8_ResetType, 
       c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 6] = (oq_SpecificSerialNumberOnly == true) ? 1U : 0U;
       if (oq_SpecificSerialNumberOnly == true)
       {
-         //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
          (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE], opau8_SerialNumber, 6U);
       }
       else
       {
-         //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
          (void)std::memset(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE], 0x00U, 6U);
       }
       // set reset type
@@ -1100,16 +1087,14 @@ void C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::ParseFromArray
        orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 1U]) - 1U;
 
    this->c_NodeId.u8_NodeIdentifier = static_cast<uint8>(u16_SourceAddress & 0x7FU);
-   this->c_NodeId.u8_BusIdentifier = static_cast<uint8>((u16_SourceAddress >> 7) & 0x0FU);
+   this->c_NodeId.u8_BusIdentifier = static_cast<uint8>((u16_SourceAddress >> 7U) & 0x0FU);
 
-   //lint -e{420} //caller is responsible to pass enough data ...
    (void)std::memcpy(&this->au8_SerialNumber[0], &orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 2U], 6U);
 
    //defensive approach: spec says it's always zero terminated: make sure
    au8_DeviceName[28] = 0U;
-   //lint -e{420} //caller is responsible to pass enough data ...
    (void)std::memcpy(&au8_DeviceName[0], &orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 8U], 28U);
 
-   //lint -e{926} //no problems as long as charn has the same size as uint8; and then we'd be in deep !"=?& anyway
+   //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?& anyway
    this->c_DeviceName = reinterpret_cast<const charn *>(&au8_DeviceName[0]);
 }

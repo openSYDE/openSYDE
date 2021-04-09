@@ -12,7 +12,6 @@
 
 #include <limits>
 #include <fstream>
-#include <cstdio>
 #include <QFileInfo>
 #include <QDir>
 #include <QGraphicsView>
@@ -766,9 +765,8 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
       c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
 
-      switch (e_ReturnMessageBox)
+      if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
       {
-      case C_OgeWiCustomMessage::eYES:
          // Delete old file
          if (std::remove(c_RtfPath.c_str()) != 0)
          {
@@ -783,15 +781,6 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
          {
             s32_Return = C_NO_ERR;
          }
-         break;
-      case C_OgeWiCustomMessage::eCANCEL:
-         // do not continue and do nothing
-         break;
-      case C_OgeWiCustomMessage::eNO:
-         // do not continue and do nothing
-         break;
-      default:
-         break;
       }
    }
 

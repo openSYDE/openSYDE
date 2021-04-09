@@ -430,7 +430,8 @@ const C_OSCHalcDefStruct * C_PuiSdHandlerHALC::GetHALCDomainFileVariableData(con
    Else:  NULL
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPool * C_PuiSdHandlerHALC::GetHALCDatapool(const uint32 ou32_NodeIndex, const bool oq_SafeDatapool)
+const C_OSCNodeDataPool * C_PuiSdHandlerHALC::GetHALCDatapool(const uint32 ou32_NodeIndex,
+                                                              const bool oq_SafeDatapool) const
 {
    const C_OSCNodeDataPool * pc_Retval = NULL;
 
@@ -441,6 +442,56 @@ const C_OSCNodeDataPool * C_PuiSdHandlerHALC::GetHALCDatapool(const uint32 ou32_
    }
 
    return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get the domain category from datapool list element id
+
+   \param[in]  orc_Id            Id
+   \param[in]  ou32_ArrayIndex   Array index
+
+   \return
+   eCA_INPUT   Use the input domain
+   eCA_OUTPUT  Use the output domain
+   eCA_OTHER   Use the other domain
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCHalcDefDomain::E_Category C_PuiSdHandlerHALC::GetDomainCategoryFromDpId(
+   const C_OSCNodeDataPoolListElementId & orc_Id, const uint32 ou32_ArrayIndex)
+{
+   uint32 u32_DomainIndex = 0;
+   bool q_UseChannelIndex;
+   uint32 u32_ChannelIndex;
+
+   C_OSCHalcDefDomain::E_VariableSelector e_Selector;
+   uint32 u32_ParameterIndex;
+   bool q_UseElementIndex;
+   uint32 u32_ParameterElementIndex;
+   bool q_IsUseCaseIndex;
+   bool q_IsChanNumIndex;
+
+   C_OSCHalcDefDomain::E_Category e_Category = C_OSCHalcDefDomain::eCA_OTHER;
+
+   if (this->TranslateToHALCIndex(orc_Id, ou32_ArrayIndex, u32_DomainIndex, q_UseChannelIndex, u32_ChannelIndex,
+                                  e_Selector,
+                                  u32_ParameterIndex, q_UseElementIndex, u32_ParameterElementIndex, q_IsUseCaseIndex,
+                                  q_IsChanNumIndex) == C_NO_ERR)
+   {
+      const C_OSCHalcDefDomain * const pc_Domain = this->GetHALCDomainFileDataConst(orc_Id.u32_NodeIndex,
+                                                                                    u32_DomainIndex);
+      if (pc_Domain != NULL)
+      {
+         e_Category = pc_Domain->e_Category;
+
+         // we don't need those here
+         Q_UNUSED(q_IsChanNumIndex)
+         Q_UNUSED(q_IsUseCaseIndex)
+         Q_UNUSED(u32_ChannelIndex)
+         Q_UNUSED(q_UseChannelIndex)
+      }
+   }
+
+   return e_Category;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1186,6 +1237,8 @@ sint32 C_PuiSdHandlerHALC::TranslateToHALCIndex(const C_OSCNodeDataPoolListEleme
                            u32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                               pc_CurrentDomainDef->c_DomainValues.c_StatusValues);
                            break;
+                        default:
+                           break;
                         }
                      }
                      else
@@ -1208,6 +1261,8 @@ sint32 C_PuiSdHandlerHALC::TranslateToHALCIndex(const C_OSCNodeDataPoolListEleme
                         case C_OSCHalcDefDomain::eVA_STATUS:
                            u32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                               pc_CurrentDomainDef->c_ChannelValues.c_StatusValues);
+                           break;
+                        default:
                            break;
                         }
                      }
@@ -1256,6 +1311,8 @@ sint32 C_PuiSdHandlerHALC::TranslateToHALCIndex(const C_OSCNodeDataPoolListEleme
                                  orq_UseElementIndex,
                                  oru32_ParameterElementIndex);
                               break;
+                           default:
+                              break;
                            }
                         }
                         else
@@ -1294,6 +1351,8 @@ sint32 C_PuiSdHandlerHALC::TranslateToHALCIndex(const C_OSCNodeDataPoolListEleme
                                  oru32_ParameterIndex,
                                  orq_UseElementIndex,
                                  oru32_ParameterElementIndex);
+                              break;
+                           default:
                               break;
                            }
                         }
@@ -1449,7 +1508,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigOfLinkedChannels(const uint
    // linking is a channel feature only
    if (oq_UseChannelIndex == true)
    {
-      bool q_IsLinkedOld;
+      bool q_IsLinkedOld = false;
       bool q_IsLinkedNew = false;
       std::vector<uint32> c_LinkedChannelIndicesOld;
       std::vector<uint32> c_LinkedChannelIndicesNew;
@@ -1621,6 +1680,7 @@ sint32 C_PuiSdHandlerHALC::GetHALCRelevantIndicesForSelectedUseCase(const uint32
 
    \return
    C_NO_ERR Datapool generated
+   C_NOACT  No datapool generated because nothing changed
    C_CONFIG Configuration invalid
    C_RANGE  Parameter invalid
 */
@@ -1633,120 +1693,135 @@ sint32 C_PuiSdHandlerHALC::HALCGenerateDatapools(const uint32 ou32_NodeIndex)
        (ou32_NodeIndex < this->mc_UINodes.size()))
    {
       C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      uint32 u32_DatapoolCounter;
+      static std::map<uint32, uint32> hc_PreviousHashes; // key: node index, value: previous hash value
+      const std::map<uint32, uint32>::const_iterator c_ItPrevHash = hc_PreviousHashes.find(ou32_NodeIndex);
 
-      stw_types::uint8 au8_SafeVersion[3] = {0};
-      stw_scl::C_SCLString c_SafeComment;
-      bool q_SafeScopeIsPrivate = true;
-      stw_types::sint32 s32_SafeDatablockIndex = -1;
-      bool q_SafeFound = false;
+      uint32 u32_CurrentHash = 0xFFFFFFFFUL;
+      rc_OSCNode.c_HALCConfig.CalcHash(u32_CurrentHash);
 
-      stw_types::uint8 au8_NonsafeVersion[3] = {0};
-      stw_scl::C_SCLString c_NonsafeComment;
-      bool q_NonsafeScopeIsPrivate = true;
-      stw_types::sint32 s32_NonsafeDatablockIndex = -1;
-      bool q_NonsafeFound = false;
-
-      // In case of existing HAL Datapools, safe Datapool specific properties
-      for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < rc_OSCNode.c_DataPools.size(); ++u32_DatapoolCounter)
+      // check if HALC configuration changed since last HALC Datapool generation
+      if ((c_ItPrevHash == hc_PreviousHashes.end()) || (c_ItPrevHash->second != u32_CurrentHash))
       {
-         const C_OSCNodeDataPool & rc_Datapool = rc_OSCNode.c_DataPools[u32_DatapoolCounter];
-         if (rc_Datapool.e_Type == C_OSCNodeDataPool::eHALC)
-         {
-            if (rc_Datapool.q_IsSafety == true)
-            {
-               memcpy(au8_SafeVersion, rc_Datapool.au8_Version, sizeof(au8_SafeVersion));
-               c_SafeComment = rc_Datapool.c_Comment;
-               q_SafeScopeIsPrivate = rc_Datapool.q_ScopeIsPrivate;
-               s32_SafeDatablockIndex = rc_Datapool.s32_RelatedDataBlockIndex;
-               q_SafeFound = true;
-            }
-            else
-            {
-               memcpy(au8_NonsafeVersion, rc_Datapool.au8_Version, sizeof(au8_NonsafeVersion));
-               c_NonsafeComment = rc_Datapool.c_Comment;
-               q_NonsafeScopeIsPrivate = rc_Datapool.q_ScopeIsPrivate;
-               s32_NonsafeDatablockIndex = rc_Datapool.s32_RelatedDataBlockIndex;
-               q_NonsafeFound = true;
-            }
-         }
+         hc_PreviousHashes[ou32_NodeIndex] = u32_CurrentHash;
 
-         if ((q_SafeFound == true) && (q_NonsafeFound == true))
-         {
-            break;
-         }
-      }
+         uint32 u32_DatapoolCounter;
+         stw_types::uint8 au8_SafeVersion[3] = {0};
+         stw_scl::C_SCLString c_SafeComment;
+         bool q_SafeScopeIsPrivate = true;
+         stw_types::sint32 s32_SafeDatablockIndex = -1;
+         bool q_SafeFound = false;
 
-      //Clean up existing datapools
-      s32_Retval = this->HALCRemoveDatapools(ou32_NodeIndex, true);
+         stw_types::uint8 au8_NonsafeVersion[3] = {0};
+         stw_scl::C_SCLString c_NonsafeComment;
+         bool q_NonsafeScopeIsPrivate = true;
+         stw_types::sint32 s32_NonsafeDatablockIndex = -1;
+         bool q_NonsafeFound = false;
 
-      if (s32_Retval == C_NO_ERR)
-      {
-         //Check if new datapools should be generated
-         if (rc_OSCNode.c_HALCConfig.c_FileString.IsEmpty() == false)
+         // In case of existing HAL Datapools, safe Datapool specific properties
+         for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < rc_OSCNode.c_DataPools.size(); ++u32_DatapoolCounter)
          {
-            std::vector<C_OSCNodeDataPool> c_Datapools;
-            C_OSCHALCMagicianGenerator c_Magician(&rc_OSCNode);
-            s32_Retval = c_Magician.GenerateHALCDatapools(c_Datapools);
-            if (s32_Retval == C_NO_ERR)
+            const C_OSCNodeDataPool & rc_Datapool = rc_OSCNode.c_DataPools[u32_DatapoolCounter];
+            if (rc_Datapool.e_Type == C_OSCNodeDataPool::eHALC)
             {
-               C_PuiSdNode & rc_UiNode = this->mc_UINodes[ou32_NodeIndex];
-               tgl_assert(rc_OSCNode.c_DataPools.size() == rc_UiNode.c_UIDataPools.size());
-               if (rc_OSCNode.c_DataPools.size() == rc_UiNode.c_UIDataPools.size())
+               if (rc_Datapool.q_IsSafety == true)
                {
-                  std::vector<C_PuiSdNodeDataPool> c_UiDatapools;
-
-                  //Get ui datapools
-                  for (uint32 u32_It = 0UL; u32_It < c_Datapools.size(); ++u32_It)
-                  {
-                     const C_PuiSdNodeDataPool c_Tmp =
-                        C_PuiSdHandlerHALC::mh_GetUiDatapoolForOSCDataPool(c_Datapools[u32_It]);
-                     c_UiDatapools.push_back(c_Tmp);
-                  }
-                  //Add new datapools
-                  tgl_assert(c_Datapools.size() == c_UiDatapools.size());
-                  for (uint32 u32_It = 0UL; u32_It < c_Datapools.size(); ++u32_It)
-                  {
-                     C_OSCNodeDataPool & rc_Datapool = c_Datapools[u32_It];
-                     if (rc_Datapool.e_Type == C_OSCNodeDataPool::eHALC)
-                     {
-                        // Apply the saved Datapool properties
-                        if ((q_NonsafeFound == true) &&
-                            (rc_Datapool.q_IsSafety == false))
-                        {
-                           memcpy(rc_Datapool.au8_Version, au8_NonsafeVersion, sizeof(au8_NonsafeVersion));
-                           rc_Datapool.c_Comment = c_NonsafeComment;
-                           rc_Datapool.q_ScopeIsPrivate = q_NonsafeScopeIsPrivate;
-                           rc_Datapool.s32_RelatedDataBlockIndex = s32_NonsafeDatablockIndex;
-                        }
-                        else if ((q_SafeFound == true) &&
-                                 (rc_Datapool.q_IsSafety == true))
-                        {
-                           memcpy(rc_Datapool.au8_Version, au8_SafeVersion, sizeof(au8_SafeVersion));
-                           rc_Datapool.c_Comment = c_SafeComment;
-                           rc_Datapool.q_ScopeIsPrivate = q_SafeScopeIsPrivate;
-                           rc_Datapool.s32_RelatedDataBlockIndex = s32_SafeDatablockIndex;
-                        }
-                        else
-                        {
-                           // Nothing to do
-                        }
-                     }
-
-                     rc_OSCNode.c_DataPools.push_back(c_Datapools[u32_It]);
-                     rc_UiNode.c_UIDataPools.push_back(c_UiDatapools[u32_It]);
-                  }
+                  memcpy(au8_SafeVersion, rc_Datapool.au8_Version, sizeof(au8_SafeVersion));
+                  c_SafeComment = rc_Datapool.c_Comment;
+                  q_SafeScopeIsPrivate = rc_Datapool.q_ScopeIsPrivate;
+                  s32_SafeDatablockIndex = rc_Datapool.s32_RelatedDataBlockIndex;
+                  q_SafeFound = true;
                }
                else
                {
-                  s32_Retval = C_RANGE;
+                  memcpy(au8_NonsafeVersion, rc_Datapool.au8_Version, sizeof(au8_NonsafeVersion));
+                  c_NonsafeComment = rc_Datapool.c_Comment;
+                  q_NonsafeScopeIsPrivate = rc_Datapool.q_ScopeIsPrivate;
+                  s32_NonsafeDatablockIndex = rc_Datapool.s32_RelatedDataBlockIndex;
+                  q_NonsafeFound = true;
+               }
+            }
+
+            if ((q_SafeFound == true) && (q_NonsafeFound == true))
+            {
+               break;
+            }
+         }
+
+         //Clean up existing datapools
+         s32_Retval = this->HALCRemoveDatapools(ou32_NodeIndex, true);
+
+         if (s32_Retval == C_NO_ERR)
+         {
+            //Check if new datapools should be generated
+            if (rc_OSCNode.c_HALCConfig.c_FileString.IsEmpty() == false)
+            {
+               std::vector<C_OSCNodeDataPool> c_Datapools;
+               const C_OSCHALCMagicianGenerator c_Magician(&rc_OSCNode);
+               s32_Retval = c_Magician.GenerateHALCDatapools(c_Datapools);
+               if (s32_Retval == C_NO_ERR)
+               {
+                  C_PuiSdNode & rc_UiNode = this->mc_UINodes[ou32_NodeIndex];
+                  tgl_assert(rc_OSCNode.c_DataPools.size() == rc_UiNode.c_UIDataPools.size());
+                  if (rc_OSCNode.c_DataPools.size() == rc_UiNode.c_UIDataPools.size())
+                  {
+                     std::vector<C_PuiSdNodeDataPool> c_UiDatapools;
+
+                     //Get ui datapools
+                     for (uint32 u32_It = 0UL; u32_It < c_Datapools.size(); ++u32_It)
+                     {
+                        const C_PuiSdNodeDataPool c_Tmp =
+                           C_PuiSdHandlerHALC::mh_GetUiDatapoolForOSCDataPool(c_Datapools[u32_It]);
+                        c_UiDatapools.push_back(c_Tmp);
+                     }
+                     //Add new datapools
+                     tgl_assert(c_Datapools.size() == c_UiDatapools.size());
+                     for (uint32 u32_It = 0UL; u32_It < c_Datapools.size(); ++u32_It)
+                     {
+                        C_OSCNodeDataPool & rc_Datapool = c_Datapools[u32_It];
+                        if (rc_Datapool.e_Type == C_OSCNodeDataPool::eHALC)
+                        {
+                           // Apply the saved Datapool properties
+                           if ((q_NonsafeFound == true) &&
+                               (rc_Datapool.q_IsSafety == false))
+                           {
+                              memcpy(rc_Datapool.au8_Version, au8_NonsafeVersion, sizeof(au8_NonsafeVersion));
+                              rc_Datapool.c_Comment = c_NonsafeComment;
+                              rc_Datapool.q_ScopeIsPrivate = q_NonsafeScopeIsPrivate;
+                              rc_Datapool.s32_RelatedDataBlockIndex = s32_NonsafeDatablockIndex;
+                           }
+                           else if ((q_SafeFound == true) &&
+                                    (rc_Datapool.q_IsSafety == true))
+                           {
+                              memcpy(rc_Datapool.au8_Version, au8_SafeVersion, sizeof(au8_SafeVersion));
+                              rc_Datapool.c_Comment = c_SafeComment;
+                              rc_Datapool.q_ScopeIsPrivate = q_SafeScopeIsPrivate;
+                              rc_Datapool.s32_RelatedDataBlockIndex = s32_SafeDatablockIndex;
+                           }
+                           else
+                           {
+                              // Nothing to do
+                           }
+                        }
+
+                        rc_OSCNode.c_DataPools.push_back(c_Datapools[u32_It]);
+                        rc_UiNode.c_UIDataPools.push_back(c_UiDatapools[u32_It]);
+                     }
+                  }
+                  else
+                  {
+                     s32_Retval = C_RANGE;
+                  }
                }
             }
          }
-      }
 
-      //Trigger sync
-      Q_EMIT (this->SigSyncNodeHALC(ou32_NodeIndex));
+         //Trigger sync
+         Q_EMIT (this->SigSyncNodeHALC(ou32_NodeIndex));
+      }
+      else
+      {
+         s32_Retval = C_NOACT;
+      }
    }
    else
    {
@@ -1823,7 +1898,7 @@ bool C_PuiSdHandlerHALC::CheckHALCChannelNameAvailable(const uint32 ou32_NodeInd
 {
    bool q_Retval = true;
 
-   const C_OSCHalcConfigDomain * pc_Domain = this->GetHALCDomainConfigDataConst(ou32_NodeIndex, ou32_DomainIndex);
+   const C_OSCHalcConfigDomain * const pc_Domain = this->GetHALCDomainConfigDataConst(ou32_NodeIndex, ou32_DomainIndex);
 
    if (pc_Domain != NULL)
    {

@@ -193,7 +193,8 @@ void C_CamMetStatusBarWidget::m_UpdateFilterLabel(void) const
        (this->mu32_ActiveFilters > 0U))
    {
       this->mpc_Ui->pc_ActiveFiltersLabel->setText(this->mpc_Ui->pc_ActiveFiltersLabel->text() +
-                                                   static_cast<QString>(C_GtGetText::h_GetText(" (Filtered Messages: %1)")).
+                                                   static_cast<QString>(C_GtGetText::h_GetText(
+                                                                           " (Filtered Messages: %1)")).
                                                    arg(QString::number(this->mu32_FilteredMessages)));
    }
 }

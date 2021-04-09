@@ -1047,8 +1047,7 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
             //Type
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("type") == "type"))
             {
-               s32_Retval = C_OSCNodeApplication::h_StringToApplication(
-                  orc_XMLParser.GetNodeContent(), c_CurApplication.e_Type);
+               C_OSCNodeApplication::h_StringToApplication(orc_XMLParser.GetNodeContent(), c_CurApplication.e_Type);
                //Return
                tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
             }

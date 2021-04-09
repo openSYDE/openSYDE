@@ -116,7 +116,7 @@ sint32 C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & 
       u32_Base = 16;
    }
 
-   switch (this->me_Type)
+   switch (this->me_Type) //lint !e788 //not all cases handled here explicitly
    {
    case QVariant::Int:
       orc_Value = this->text().toInt(&q_Worked, u32_Base);

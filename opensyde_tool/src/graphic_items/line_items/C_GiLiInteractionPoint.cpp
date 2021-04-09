@@ -149,7 +149,7 @@ QVariant C_GiLiInteractionPoint::itemChange(const GraphicsItemChange oe_Change, 
    {
    case ItemPositionChange:
    case ItemPositionHasChanged:
-      Q_EMIT this->PointChanged(ms32_PointIndex);
+      Q_EMIT this->SigPointChanged(ms32_PointIndex);
       break;
    default:
       break;

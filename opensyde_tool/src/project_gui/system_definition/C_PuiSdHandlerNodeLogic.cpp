@@ -18,7 +18,7 @@
 #include "stwerrors.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdUtil.h"
-#include "C_PuiSdHandlerNodeLogic.h"
+#include "C_PuiSdHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
@@ -517,7 +517,7 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
                                                  &q_DataPoolsInvalid, &q_ApplicationsInvalid, &q_DomainsInvalid,
                                                  true, NULL, NULL, NULL, NULL) == C_NO_ERR)
       {
-         bool q_NvmSizeConflict = this->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
+         const bool q_NvmSizeConflict = this->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
          if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
                 (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_NameEmpty == true)) ||
              (q_NvmSizeConflict == true))
@@ -856,7 +856,7 @@ sint32 C_PuiSdHandlerNodeLogic::AddDataPool(const uint32 & oru32_NodeIndex, cons
       const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
       uint32 u32_ItTargetIndex = 0;
       //Handle correct array segment position
-      if (orc_OSCContent.e_Type != C_OSCNodeDataPool::eCOM)
+      if (orc_OSCContent.e_Type != C_OSCNodeDataPool::eHALC)
       {
          const C_OSCNodeDataPool * pc_DataPool;
 
@@ -869,9 +869,10 @@ sint32 C_PuiSdHandlerNodeLogic::AddDataPool(const uint32 & oru32_NodeIndex, cons
                break;
             }
          }
-         if (orc_OSCContent.e_Type == C_OSCNodeDataPool::eNVM)
+         if ((orc_OSCContent.e_Type == C_OSCNodeDataPool::eNVM) ||
+             (orc_OSCContent.e_Type == C_OSCNodeDataPool::eCOM))
          {
-            //Go to end of NVM
+            //Go to end of NVM in case of NVM and COMM Datapools
             for (; u32_ItTargetIndex < rc_OSCNode.c_DataPools.size(); ++u32_ItTargetIndex)
             {
                pc_DataPool = &rc_OSCNode.c_DataPools[u32_ItTargetIndex];
@@ -881,9 +882,22 @@ sint32 C_PuiSdHandlerNodeLogic::AddDataPool(const uint32 & oru32_NodeIndex, cons
                }
             }
          }
+         if (orc_OSCContent.e_Type == C_OSCNodeDataPool::eCOM)
+         {
+            //Go to end of COMM
+            for (; u32_ItTargetIndex < rc_OSCNode.c_DataPools.size(); ++u32_ItTargetIndex)
+            {
+               pc_DataPool = &rc_OSCNode.c_DataPools[u32_ItTargetIndex];
+               if (pc_DataPool->e_Type != C_OSCNodeDataPool::eCOM)
+               {
+                  break;
+               }
+            }
+         }
       }
       else
       {
+         //Go to "total" end
          u32_ItTargetIndex = rc_OSCNode.c_DataPools.size();
       }
 
@@ -914,7 +928,7 @@ sint32 C_PuiSdHandlerNodeLogic::AddAutoGenCommDataPool(const uint32 & oru32_Node
                                                        const C_OSCCanProtocol::E_Type & ore_ComProtocolType)
 {
    C_OSCNodeDataPool c_NewDatapool;
-   C_PuiSdNodeDataPool c_UIDataPool;
+   const C_PuiSdNodeDataPool c_UIDataPool;
    sint32 s32_Return;
    QString c_Comment;
    QString c_ProtocolName = C_PuiSdUtil::h_ConvertProtocolTypeToString(ore_ComProtocolType);
@@ -1392,7 +1406,7 @@ sint32 C_PuiSdHandlerNodeLogic::MoveDataPool(const uint32 ou32_NodeIndex, const 
          if (s32_Retval == C_NO_ERR)
          {
             //Copy
-            C_PuiSdNodeDataPool c_Data = rc_UINode.c_UIDataPools[ou32_SourceIndex];
+            const C_PuiSdNodeDataPool c_Data = rc_UINode.c_UIDataPools[ou32_SourceIndex];
             //Erase
             rc_UINode.c_UIDataPools.erase(rc_UINode.c_UIDataPools.begin() + ou32_SourceIndex);
             //Insert
@@ -1809,7 +1823,7 @@ sint32 C_PuiSdHandlerNodeLogic::MoveApplication(const uint32 ou32_NodeIndex, con
           (ou32_TargetIndex < rc_Node.c_Applications.size()))
       {
          //Copy
-         C_OSCNodeApplication c_Data = rc_Node.c_Applications[ou32_SourceIndex];
+         const C_OSCNodeApplication c_Data = rc_Node.c_Applications[ou32_SourceIndex];
          //Erase
          rc_Node.c_Applications.erase(rc_Node.c_Applications.begin() + ou32_SourceIndex);
          //Insert
@@ -3194,7 +3208,7 @@ sint32 C_PuiSdHandlerNodeLogic::MoveDataPoolListDataSet(const uint32 & oru32_Nod
                 (oru32_TargetIndex < rc_OSCList.c_DataSets.size()))
             {
                //Copy
-               C_OSCNodeDataPoolDataSet c_Data = rc_OSCList.c_DataSets[oru32_SourceIndex];
+               const C_OSCNodeDataPoolDataSet c_Data = rc_OSCList.c_DataSets[oru32_SourceIndex];
                //Erase
                rc_OSCList.c_DataSets.erase(rc_OSCList.c_DataSets.begin() + oru32_SourceIndex);
                //Insert
@@ -3214,7 +3228,7 @@ sint32 C_PuiSdHandlerNodeLogic::MoveDataPoolListDataSet(const uint32 & oru32_Nod
                    (oru32_TargetIndex < rc_DataElement.c_DataSetValues.size()))
                {
                   //Copy
-                  C_OSCNodeDataPoolContent c_Data = rc_DataElement.c_DataSetValues[oru32_SourceIndex];
+                  const C_OSCNodeDataPoolContent c_Data = rc_DataElement.c_DataSetValues[oru32_SourceIndex];
                   //Erase
                   rc_DataElement.c_DataSetValues.erase(rc_DataElement.c_DataSetValues.begin() + oru32_SourceIndex);
                   //Insert
@@ -3369,7 +3383,7 @@ sint32 C_PuiSdHandlerNodeLogic::MoveDataPoolList(const uint32 & oru32_NodeIndex,
              (oru32_TargetIndex < rc_UIDataPool.c_DataPoolLists.size()))
          {
             //Copy
-            C_PuiSdNodeDataPoolList c_Data = rc_UIDataPool.c_DataPoolLists[oru32_SourceIndex];
+            const C_PuiSdNodeDataPoolList c_Data = rc_UIDataPool.c_DataPoolLists[oru32_SourceIndex];
             //Erase
             rc_UIDataPool.c_DataPoolLists.erase(rc_UIDataPool.c_DataPoolLists.begin() + oru32_SourceIndex);
             //Insert
@@ -4016,7 +4030,8 @@ sint32 C_PuiSdHandlerNodeLogic::GetDataPoolListElement(const uint32 & oru32_Node
 void C_PuiSdHandlerNodeLogic::h_InitDataElement(const C_OSCNodeDataPool::E_Type & ore_Type, const bool oq_IsSafety,
                                                 C_OSCNodeDataPoolListElement & orc_OSCElement)
 {
-   const QString c_Type = C_PuiSdHandlerNodeLogic::h_GetElementTypeName(ore_Type);
+   const QString c_Type =
+      C_PuiSdHandler::h_AutomaticCStringAdaptation(C_PuiSdHandlerNodeLogic::h_GetElementTypeName(ore_Type));
 
    //Translation: 1: Data element type
    orc_OSCElement.c_Name = static_cast<QString>(static_cast<QString>("New%1").arg(c_Type)).toStdString().c_str();
@@ -4066,6 +4081,8 @@ QString C_PuiSdHandlerNodeLogic::h_GetElementTypeName(const C_OSCNodeDataPool::E
       c_Retval = "Signal";
       break;
    case C_OSCNodeDataPool::eHALC:
+      c_Retval = "HAL Data Element";
+      break;
    default:
       c_Retval = "Data Element";
       break;
@@ -4767,7 +4784,7 @@ sint32 C_PuiSdHandlerNodeLogic::MoveDataPoolListElement(const uint32 & oru32_Nod
                 (oru32_TargetIndex < rc_UIList.c_DataPoolListElements.size()))
             {
                //Copy
-               C_PuiSdNodeDataPoolListElement c_Data = rc_UIList.c_DataPoolListElements[oru32_SourceIndex];
+               const C_PuiSdNodeDataPoolListElement c_Data = rc_UIList.c_DataPoolListElements[oru32_SourceIndex];
                rc_OSCList.MoveElement(oru32_SourceIndex, oru32_TargetIndex);
                //Erase
                rc_UIList.c_DataPoolListElements.erase(
@@ -5350,7 +5367,7 @@ void C_PuiSdHandlerNodeLogic::m_SetUpComDataPool(const uint32 & oru32_NodeIndex,
             //Set up com protocol
             {
                C_PuiSdNodeCanProtocol c_UiProtocol;
-               C_PuiSdNodeCanMessageContainer c_UiMessageContainer;
+               const C_PuiSdNodeCanMessageContainer c_UiMessageContainer;
                C_OSCCanProtocol c_Protocol;
                C_OSCCanMessageContainer c_New;
                uint32 u32_CanCounter = 0U;

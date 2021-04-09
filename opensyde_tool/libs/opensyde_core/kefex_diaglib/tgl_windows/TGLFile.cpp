@@ -531,7 +531,7 @@ sint32 TGL_PACKAGE stw_tgl::TGL_RemoveDirectory(const C_SCLString & orc_Director
       for (u32_Index = 0U; u32_Index < static_cast<uint32>(c_Files.GetLength()); u32_Index++)
       {
          //delete content of directory
-         if (c_Files[u32_Index].c_FileName[1] != '.') //ignore "." and ".."
+         if ((c_Files[u32_Index].c_FileName != ".") && (c_Files[u32_Index].c_FileName != "..")) //ignore "." and ".."
          {
             c_FilePath = orc_Directory + "/" + c_Files[u32_Index].c_FileName;
 

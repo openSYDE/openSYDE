@@ -131,7 +131,16 @@ sint32 C_GtGetText::h_SetLanguage(const C_SCLString & orc_Language)
    sint32 s32_Return;
 
    s32_Return = stw_tgl::TGL_SetEnvironmentVariable("LANG", orc_Language);
-   return (s32_Return == -1) ? stw_errors::C_NOACT : stw_errors::C_NO_ERR;
+   if (s32_Return == -1)
+   {
+      s32_Return = stw_errors::C_NOACT;
+   }
+   else
+   {
+      s32_Return = stw_errors::C_NO_ERR;
+   }
+
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

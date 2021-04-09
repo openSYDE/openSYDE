@@ -392,23 +392,26 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
 
    switch (oe_Step)
    {
-   case eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_START:
-      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Broadcast request programming start");
+   case eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_START:
+      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Request programming start");
       break;
-   case eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR:
-      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Broadcast request programming error");
+   case eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_WARNING:
+      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Request programming warning");
       break;
-   case eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_START:
-      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Broadcast ECU reset start");
+   case eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR:
+      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Request programming error");
       break;
-   case eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR:
-      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Broadcast ECU reset error ");
+   case eACTIVATE_FLASHLOADER_OSY_ECU_RESET_WARNING:
+      c_Text = C_GtGetText::h_GetText("Activate Flashloader: ECU reset warning");
       break;
-   case eACTIVATE_FLASHLOADER_XFL_ECU_RESET_START:
-      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Sending ECU reset requests start");
+   case eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR:
+      c_Text = C_GtGetText::h_GetText("Activate Flashloader: ECU reset error");
+      break;
+   case eACTIVATE_FLASHLOADER_XFL_ECU_RESET_WARNING:
+      c_Text = C_GtGetText::h_GetText("Activate Flashloader: No ECU reset message configured");
       break;
    case eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
-      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Sending ECU reset requests error");
+      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Sending ECU reset request error");
       break;
    case eACTIVATE_FLASHLOADER_OSY_XFL_BC_ENTER_FLASHLOADER_START:
       c_Text = C_GtGetText::h_GetText("Activate Flashloader: Broadcast enter Flashloader start");
@@ -421,6 +424,9 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START:
       c_Text = C_GtGetText::h_GetText("Activate Flashloader: Ping devices start");
+      break;
+   case eACTIVATE_FLASHLOADER_OSY_RECONNECT_WARNING:
+      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Reconnect warning");
       break;
    case eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
       c_Text = C_GtGetText::h_GetText("Activate Flashloader: Reconnect error");
@@ -506,6 +512,9 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eUPDATE_SYSTEM_OSY_NODE_START:
       c_Text = C_GtGetText::h_GetText("Update System: Node start");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node read of available features error");
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FINISHED:
       c_Text = C_GtGetText::h_GetText("Update System: Node finished");
@@ -598,10 +607,13 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
       c_Text = C_GtGetText::h_GetText("Update System: Node flash area of file system file transfer error");
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_START:
-      c_Text = C_GtGetText::h_GetText("Update System: Node flash area of file system file exit start");
+      c_Text = C_GtGetText::h_GetText("Update System: Node flash of file system file exit start");
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
-      c_Text = C_GtGetText::h_GetText("Update System: Node flash area of file system file exit error");
+      c_Text = C_GtGetText::h_GetText("Update System: Node flash of file system file exit error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_RESULT_STRING:
+      c_Text = C_GtGetText::h_GetText("Update System: Node flash of file system file read exit result");
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED:
       c_Text = C_GtGetText::h_GetText("Update System: Node flash of file system file finished");
@@ -611,9 +623,6 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
       c_Text = C_GtGetText::h_GetText("Update System: Node NVM write reconnect to server error");
-      break;
-   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR:
-      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write read of available features error");
       break;
    case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
       c_Text = C_GtGetText::h_GetText("Update System: Node NVM write available features error");
@@ -669,17 +678,17 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
    case eRESET_SYSTEM_START:
       c_Text = C_GtGetText::h_GetText("Reset System: Start");
       break;
+   case eRESET_SYSTEM_OSY_NODE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Reset System: Node error");
+      break;
    case eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:
       c_Text = C_GtGetText::h_GetText("Reset System: Routed node error");
       break;
-   case eRESET_SYSTEM_OSY_BROADCAST_ERROR:
-      c_Text = C_GtGetText::h_GetText("Reset System: openSYDE nodes error");
-      break;
-   case eRESET_SYSTEM_XFL_BROADCAST_ERROR:
-      c_Text = C_GtGetText::h_GetText("Reset System: STW Flashloader nodes error");
-      break;
    case eRESET_SYSTEM_FINISHED:
       c_Text = C_GtGetText::h_GetText("Reset System: Finished");
+      break;
+   default:
+      tgl_assert(false);
       break;
    }
 
@@ -944,7 +953,7 @@ void C_SyvUpSequences::m_ReportStwFlashloaderInformationRead(const C_XflDeviceIn
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::mh_ThreadFunc(void * const opv_Instance)
 {
-   //lint -e{925,9079}  This class is the only one which registers itself at the caller of this function. It must match.
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
    C_SyvUpSequences * const pc_Sequences = reinterpret_cast<C_SyvUpSequences * const>(opv_Instance);
 
    tgl_assert(pc_Sequences != NULL);
@@ -988,6 +997,9 @@ void C_SyvUpSequences::m_ThreadFunc(void)
          //Wait until every device is restarted
          stw_tgl::TGL_Sleep(2000);
          break;
+      default:
+         tgl_assert(false);
+         break;
       }
    }
    else
@@ -1006,10 +1018,10 @@ void C_SyvUpSequences::mh_WriteLog(const C_OSCSuSequences::E_ProgressStep oe_Ste
                                    const stw_scl::C_SCLString & orc_Text)
 {
    // Decide if error or info
-   switch (oe_Step)
+   switch (oe_Step) //lint !e788  //not all cases handled explicitly here
    {
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR:
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
@@ -1026,6 +1038,7 @@ void C_SyvUpSequences::mh_WriteLog(const C_OSCSuSequences::E_ProgressStep oe_Ste
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
@@ -1044,16 +1057,14 @@ void C_SyvUpSequences::mh_WriteLog(const C_OSCSuSequences::E_ProgressStep oe_Ste
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
+   case C_OSCSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
    case C_OSCSuSequences::eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:
-   case C_OSCSuSequences::eRESET_SYSTEM_OSY_BROADCAST_ERROR:
-   case C_OSCSuSequences::eRESET_SYSTEM_XFL_BROADCAST_ERROR:
       osc_write_log_error("Update Node", orc_Text);
       break;
    default:

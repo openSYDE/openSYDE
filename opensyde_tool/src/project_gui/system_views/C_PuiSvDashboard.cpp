@@ -51,7 +51,8 @@ C_PuiSvDashboard::C_PuiSvDashboard(void) :
    mc_Name("Dashboard"),
    mc_Comment(""),
    mq_Active(true),
-   ms32_TabIndex(-1)
+   ms32_TabIndex(-1),
+   me_Type(eSCENE)
 {
 }
 
@@ -116,6 +117,7 @@ void C_PuiSvDashboard::CalcHash(uint32 & oru32_HashValue) const
       const C_PuiSvDbParam & rc_Widget = this->mc_ParamWidgets[u32_ItWidget];
       rc_Widget.CalcHash(oru32_HashValue);
    }
+   this->mc_TabChart.CalcHash(oru32_HashValue);
    C_PuiBsElements::CalcHash(oru32_HashValue);
 }
 
@@ -163,6 +165,29 @@ const QString & C_PuiSvDashboard::GetComment(void) const
 void C_PuiSvDashboard::SetComment(const QString & orc_Value)
 {
    this->mc_Comment = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get type
+
+   \return
+   Current type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvDashboard::E_TabType C_PuiSvDashboard::GetType(void) const
+{
+   return this->me_Type;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set type
+
+   \param[in]  oe_Type  Type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::SetType(const C_PuiSvDashboard::E_TabType oe_Type)
+{
+   this->me_Type = oe_Type;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -232,6 +257,29 @@ const std::vector<C_PuiSvDbChart> & C_PuiSvDashboard::GetCharts(void) const
 void C_PuiSvDashboard::SetCharts(const std::vector<C_PuiSvDbChart> & orc_Value)
 {
    this->mc_Charts = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get tab chart
+
+   \return
+   Current tab chart
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_PuiSvDbTabChart & C_PuiSvDashboard::GetTabChart() const
+{
+   return this->mc_TabChart;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set tab chart
+
+   \param[in]  orc_Value   New tab chart
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::SetTabChart(const C_PuiSvDbTabChart & orc_Value)
+{
+   this->mc_TabChart = orc_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -625,11 +673,8 @@ const C_PuiSvDbWidgetBase * C_PuiSvDashboard::GetWidgetBase(const C_PuiSvDbDataE
 
    switch (oe_Type)
    {
-   case C_PuiSvDbDataElement::eCHART:
-      if (ou32_Index < this->mc_Charts.size())
-      {
-         pc_Retval = &this->mc_Charts[ou32_Index];
-      }
+   case C_PuiSvDbDataElement::eTAB_CHART:
+      pc_Retval = &this->mc_TabChart;
       break;
    case C_PuiSvDbDataElement::eLABEL:
       if (ou32_Index < this->mc_Labels.size())
@@ -679,6 +724,12 @@ const C_PuiSvDbWidgetBase * C_PuiSvDashboard::GetWidgetBase(const C_PuiSvDbDataE
          pc_Retval = &this->mc_ParamWidgets[ou32_Index];
       }
       break;
+   case C_PuiSvDbDataElement::eCHART: // handle deprecated chart as unacceptable
+   case C_PuiSvDbDataElement::eLINE_ARROW:
+   case C_PuiSvDbDataElement::eBOUNDARY:
+   case C_PuiSvDbDataElement::eTEXT_ELEMENT:
+   case C_PuiSvDbDataElement::eIMAGE:
+   case C_PuiSvDbDataElement::eUNKNOWN:
    default:
       //No handling possible
       break;
@@ -698,7 +749,7 @@ void C_PuiSvDashboard::GetAllWidgetItems(std::vector<const C_PuiSvDbWidgetBase *
 {
    const uintn un_Size = this->mc_Charts.size() + this->mc_Labels.size() + this->mc_PieCharts.size() +
                          this->mc_ProgressBars.size() + this->mc_SpinBoxes.size() + this->mc_Sliders.size() +
-                         this->mc_Tables.size() + this->mc_Toggles.size() + this->mc_ParamWidgets.size();
+                         this->mc_Tables.size() + this->mc_Toggles.size() + this->mc_ParamWidgets.size() + 1U;
 
    //Improve performance
    orc_Output.reserve(un_Size);
@@ -738,6 +789,7 @@ void C_PuiSvDashboard::GetAllWidgetItems(std::vector<const C_PuiSvDbWidgetBase *
    {
       orc_Output.push_back(&this->mc_Toggles[u32_ItItem]);
    }
+   orc_Output.push_back(&this->mc_TabChart);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -781,7 +833,7 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
                                    const C_PuiSvDbDataElement::E_Type oe_Type)
 {
    sint32 s32_Retval = C_NO_ERR;
-   const C_PuiSvDbChart * opc_Chart;
+   const C_PuiSvDbTabChart * opc_TabChart;
    const C_PuiSvDbLabel * opc_Label;
    const C_PuiSvDbParam * opc_ParamWidget;
    const C_PuiSvDbPieChart * opc_PieChart;
@@ -793,18 +845,11 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
 
    switch (oe_Type)
    {
-   case C_PuiSvDbDataElement::eCHART:
-      opc_Chart = dynamic_cast<const C_PuiSvDbChart *>(opc_Value);
-      if (opc_Chart != NULL)
+   case C_PuiSvDbDataElement::eTAB_CHART:
+      opc_TabChart = dynamic_cast<const C_PuiSvDbTabChart *>(opc_Value);
+      if (opc_TabChart != NULL)
       {
-         if (ou32_Index < this->mc_Charts.size())
-         {
-            this->mc_Charts[ou32_Index] = *opc_Chart;
-         }
-         else
-         {
-            s32_Retval = C_RANGE;
-         }
+         this->mc_TabChart = *opc_TabChart;
       }
       else
       {
@@ -955,6 +1000,12 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
          s32_Retval = C_RANGE;
       }
       break;
+   case C_PuiSvDbDataElement::eCHART: // setting new deprecated chart is forbidden
+   case C_PuiSvDbDataElement::eLINE_ARROW:
+   case C_PuiSvDbDataElement::eBOUNDARY:
+   case C_PuiSvDbDataElement::eTEXT_ELEMENT:
+   case C_PuiSvDbDataElement::eIMAGE:
+   case C_PuiSvDbDataElement::eUNKNOWN:
    default:
       s32_Retval = C_RANGE;
       break;
@@ -2309,9 +2360,6 @@ sint32 C_PuiSvDashboard::AddWidget(const C_PuiSvDbWidgetBase * const opc_Box,
 
    switch (oe_Type)
    {
-   case C_PuiSvDbDataElement::eCHART:
-      s32_Retval = this->InsertWidget(this->mc_Charts.size(), opc_Box, oe_Type);
-      break;
    case C_PuiSvDbDataElement::eLABEL:
       s32_Retval = this->InsertWidget(this->mc_Labels.size(), opc_Box, oe_Type);
       break;
@@ -2336,6 +2384,15 @@ sint32 C_PuiSvDashboard::AddWidget(const C_PuiSvDbWidgetBase * const opc_Box,
    case C_PuiSvDbDataElement::eTOGGLE:
       s32_Retval = this->InsertWidget(this->mc_Toggles.size(), opc_Box, oe_Type);
       break;
+   case C_PuiSvDbDataElement::eTAB_CHART:
+      s32_Retval = this->InsertWidget(0UL, opc_Box, oe_Type);
+      break;
+   case C_PuiSvDbDataElement::eCHART: // adding deprecated chart is forbidden
+   case C_PuiSvDbDataElement::eLINE_ARROW:
+   case C_PuiSvDbDataElement::eBOUNDARY:
+   case C_PuiSvDbDataElement::eTEXT_ELEMENT:
+   case C_PuiSvDbDataElement::eIMAGE:
+   case C_PuiSvDbDataElement::eUNKNOWN:
    default:
       s32_Retval = C_RANGE;
       break;
@@ -2359,7 +2416,7 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
                                       const C_PuiSvDbDataElement::E_Type oe_Type)
 {
    sint32 s32_Retval = C_NO_ERR;
-   const C_PuiSvDbChart * opc_Chart;
+   const C_PuiSvDbTabChart * opc_TabChart;
    const C_PuiSvDbLabel * opc_Label;
    const C_PuiSvDbParam * opc_ParamWidget;
    const C_PuiSvDbPieChart * opc_PieChart;
@@ -2371,24 +2428,6 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
 
    switch (oe_Type)
    {
-   case C_PuiSvDbDataElement::eCHART:
-      opc_Chart = dynamic_cast<const C_PuiSvDbChart *>(opc_Box);
-      if (opc_Chart != NULL)
-      {
-         if (ou32_WidgetIndex <= this->mc_Charts.size())
-         {
-            this->mc_Charts.insert(this->mc_Charts.begin() + ou32_WidgetIndex, *opc_Chart);
-         }
-         else
-         {
-            s32_Retval = C_RANGE;
-         }
-      }
-      else
-      {
-         s32_Retval = C_RANGE;
-      }
-      break;
    case C_PuiSvDbDataElement::eLABEL:
       opc_Label = dynamic_cast<const C_PuiSvDbLabel *>(opc_Box);
       if (opc_Label != NULL)
@@ -2533,6 +2572,23 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
          s32_Retval = C_RANGE;
       }
       break;
+   case C_PuiSvDbDataElement::eTAB_CHART:
+      opc_TabChart = dynamic_cast<const C_PuiSvDbTabChart *>(opc_Box);
+      if (opc_TabChart != NULL)
+      {
+         this->mc_TabChart = *opc_TabChart;
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eCHART: // inserting deprecated chart is forbidden
+   case C_PuiSvDbDataElement::eLINE_ARROW:
+   case C_PuiSvDbDataElement::eBOUNDARY:
+   case C_PuiSvDbDataElement::eTEXT_ELEMENT:
+   case C_PuiSvDbDataElement::eIMAGE:
+   case C_PuiSvDbDataElement::eUNKNOWN:
    default:
       s32_Retval = C_RANGE;
       break;
@@ -2703,7 +2759,7 @@ sint32 C_PuiSvDashboard::DeleteWidget(const uint32 ou32_WidgetIndex, const C_Pui
 
    switch (oe_Type)
    {
-   case C_PuiSvDbDataElement::eCHART:
+   case C_PuiSvDbDataElement::eCHART: // keep this for compatibility update in existing projects
       if (ou32_WidgetIndex < this->mc_Charts.size())
       {
          this->mc_Charts.erase(this->mc_Charts.begin() + ou32_WidgetIndex);
@@ -2793,6 +2849,12 @@ sint32 C_PuiSvDashboard::DeleteWidget(const uint32 ou32_WidgetIndex, const C_Pui
          s32_Retval = C_RANGE;
       }
       break;
+   case C_PuiSvDbDataElement::eTAB_CHART: // tab chart delete is handled like dashboard tab delete
+   case C_PuiSvDbDataElement::eLINE_ARROW:
+   case C_PuiSvDbDataElement::eBOUNDARY:
+   case C_PuiSvDbDataElement::eTEXT_ELEMENT:
+   case C_PuiSvDbDataElement::eIMAGE:
+   case C_PuiSvDbDataElement::eUNKNOWN:
    default:
       s32_Retval = C_RANGE;
       break;
@@ -2953,6 +3015,59 @@ bool C_PuiSvDashboard::DiscardInvalidIndices(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle compatibility chart
+
+   \param[in,out]  orc_NewCharts    New charts
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::HandleCompatibilityChart(std::vector<C_PuiSvDashboard> & orc_NewCharts)
+{
+   uint32 u32_Counter = 0;
+
+   for (const C_PuiSvDbChart & rc_Chart : this->GetCharts())
+   {
+      C_PuiSvDashboard c_NewDashboard;
+      const QString c_NewTabName = QString("%1_Chart_%2").arg(this->GetName()).arg(u32_Counter + 1UL);
+      C_PuiSvDbTabChart c_NewChart;
+      C_PuiBsTextElement c_NewTextElement;
+      uint8 u8_ColorCounter;
+      //Text
+      c_NewTextElement.c_UIText =
+         QString(C_GtGetText::h_GetText(
+                    "This version of the chart is no longer supported, and was replaced by tab \"%1\"")).arg(
+            c_NewTabName);
+      //New text element
+      c_NewTextElement.f64_ZOrder = rc_Chart.f64_ZOrder;
+      c_NewTextElement.f64_Height = rc_Chart.f64_Height;
+      c_NewTextElement.f64_Width = rc_Chart.f64_Width;
+      c_NewTextElement.c_UIPosition = rc_Chart.c_UIPosition;
+      this->AddTextElement(c_NewTextElement);
+      //New chart
+      c_NewChart.c_DataPoolElementsActive = rc_Chart.c_DataPoolElementsActive;
+      c_NewChart.c_DataPoolElementsConfig = rc_Chart.c_DataPoolElementsConfig;
+      for (u8_ColorCounter = 0U; u8_ColorCounter < c_NewChart.c_DataPoolElementsActive.size(); ++u8_ColorCounter)
+      {
+         // Color index is necessary now but does not exist for the old chart
+         c_NewChart.c_DataPoolElementsColorIndex.push_back(u8_ColorCounter);
+      }
+      //New dashboard
+      c_NewDashboard.SetTabChart(c_NewChart);
+      c_NewDashboard.SetName(c_NewTabName);
+      c_NewDashboard.SetComment(C_GtGetText::h_GetText("Autogenerated for compatibility reasons"));
+      c_NewDashboard.SetType(C_PuiSvDashboard::eCHART);
+      orc_NewCharts.push_back(c_NewDashboard);
+      //Iterate
+      ++u32_Counter;
+   }
+   for (uint32 u32_It = this->GetCharts().size(); u32_It > 0UL; --u32_It)
+   {
+      Q_UNUSED(u32_It)
+      tgl_assert(this->DeleteWidget(0UL, C_PuiSvDbDataElement::eCHART) == C_NO_ERR);
+   }
+   tgl_assert(this->GetCharts().size() == 0UL);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget type
 
    \param[in]  opc_Box  Basic widget item
@@ -2975,6 +3090,7 @@ C_PuiSvDbDataElement::E_Type C_PuiSvDashboard::h_GetWidgetType(const C_PuiSvDbWi
       const C_PuiSvDbSlider * const pc_Sliders = dynamic_cast<const C_PuiSvDbSlider * const>(opc_Box);
       const C_PuiSvDbTable * const pc_Tables = dynamic_cast<const C_PuiSvDbTable * const>(opc_Box);
       const C_PuiSvDbToggle * const pc_Toggles = dynamic_cast<const C_PuiSvDbToggle * const>(opc_Box);
+      const C_PuiSvDbTabChart * const pc_TabChart = dynamic_cast<const C_PuiSvDbTabChart * const>(opc_Box);
 
       if (pc_Charts != NULL)
       {
@@ -3011,6 +3127,10 @@ C_PuiSvDbDataElement::E_Type C_PuiSvDashboard::h_GetWidgetType(const C_PuiSvDbWi
       if (pc_Toggles != NULL)
       {
          e_Retval = C_PuiSvDbDataElement::eTOGGLE;
+      }
+      if (pc_TabChart != NULL)
+      {
+         e_Retval = C_PuiSvDbDataElement::eTAB_CHART;
       }
       tgl_assert(e_Retval != C_PuiSvDbDataElement::eUNKNOWN);
    }
@@ -3070,7 +3190,7 @@ void C_PuiSvDashboard::m_GetAllWidgetItems(std::vector<C_PuiSvDbWidgetBase *> & 
 {
    const uintn un_Size = this->mc_Charts.size() + this->mc_Labels.size() + this->mc_PieCharts.size() +
                          this->mc_ProgressBars.size() + this->mc_SpinBoxes.size() + this->mc_Sliders.size() +
-                         this->mc_Tables.size() + this->mc_Toggles.size() + this->mc_ParamWidgets.size();
+                         this->mc_Tables.size() + this->mc_Toggles.size() + this->mc_ParamWidgets.size() + 1U;
 
    //Improve performance
    orc_Output.reserve(un_Size);
@@ -3110,6 +3230,7 @@ void C_PuiSvDashboard::m_GetAllWidgetItems(std::vector<C_PuiSvDbWidgetBase *> & 
    {
       orc_Output.push_back(&this->mc_Toggles[u32_ItItem]);
    }
+   orc_Output.push_back(&this->mc_TabChart);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3127,7 +3248,7 @@ void C_PuiSvDashboard::mh_MarkInvalid(C_PuiSvDbNodeDataPoolListElementId & orc_D
 
    if (pc_DataPool != NULL)
    {
-      QString c_Namespace = C_PuiSvHandler::h_GetNamespace(orc_DataElementId);
+      const QString c_Namespace = C_PuiSvHandler::h_GetNamespace(orc_DataElementId);
       orc_DataElementId.MarkInvalid(pc_DataPool->e_Type, c_Namespace);
    }
 }

@@ -593,9 +593,11 @@ void C_SdNdeDpSelectorWidget::m_UpdateErrorToolTip(void)
             bool q_NameConflict;
             bool q_NameInvalid;
             bool q_IsErrorInListOrMessage;
+            bool q_IsErrorInListOrElementLength;
             pc_Node->CheckErrorDataPool(static_cast<uint32>(s32_Index), &q_NameConflict, &q_NameInvalid,
-                                        &q_IsErrorInListOrMessage, NULL);
-            if (((q_NameConflict == true) || (q_NameInvalid == true)) || (q_IsErrorInListOrMessage == true))
+                                        &q_IsErrorInListOrMessage, &q_IsErrorInListOrElementLength, NULL);
+            if (((q_NameConflict == true) || (q_NameInvalid == true)) || (q_IsErrorInListOrMessage == true) ||
+                (q_IsErrorInListOrElementLength == true))
             {
                q_Error = true;
                c_InvalidDataPoolIndices.push_back(static_cast<uint32>(s32_Index));

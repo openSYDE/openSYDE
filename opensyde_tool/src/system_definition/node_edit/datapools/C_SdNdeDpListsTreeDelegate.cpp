@@ -98,12 +98,10 @@ QSize C_SdNdeDpListsTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Opti
 /*!
    \brief   Sets the maximum height for the calculation of the table size in sizeHint
 
-   \param[in]     sn_Height       Maximum height of entire tree widget
-
-   \created     20.02.2019  STW/B.Bayer
+   \param[in]     osn_Height       Maximum height of entire tree widget
 */
 //-----------------------------------------------------------------------------
-void C_SdNdeDpListsTreeDelegate::SetMaximumHeight(const sintn sn_Height)
+void C_SdNdeDpListsTreeDelegate::SetMaximumHeight(const sintn osn_Height)
 {
-   this->msn_MaximumHeight = sn_Height;
+   this->msn_MaximumHeight = osn_Height;
 }

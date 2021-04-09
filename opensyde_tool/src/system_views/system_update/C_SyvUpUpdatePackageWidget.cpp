@@ -129,7 +129,8 @@ C_SyvUpUpdatePackageWidget::~C_SyvUpUpdatePackageWidget()
 void C_SyvUpUpdatePackageWidget::InitText(void) const
 {
    this->mpc_Ui->pc_LabelTitle->setText(
-      static_cast<QString>(C_GtGetText::h_GetText("UPDATE PACKAGE (%1)")).arg(QString::number(this->mpc_Ui->pc_ListWidget->count())));
+      static_cast<QString>(C_GtGetText::h_GetText("UPDATE PACKAGE (%1)")).arg(QString::number(this->mpc_Ui->
+                                                                                              pc_ListWidget->count())));
 
    this->mpc_Ui->pc_PushButtonClearAll->SetToolTipInformation(C_GtGetText::h_GetText("Clear Update Package"),
                                                               C_GtGetText::h_GetText(

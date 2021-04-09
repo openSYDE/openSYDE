@@ -149,7 +149,7 @@ C_SCLString C_CMONProtocolSTWFF::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
             c_Text+=" !!WRONG_DLC!!";
             return c_Text;
          }
-         c_Text += (" SIZE:" + m_GetValueDecHex(orc_Msg.au8_Data[2] + (((uint16)orc_Msg.au8_Data[3]) << 8)));
+         c_Text += (" SIZE:" + m_GetValueDecHex(orc_Msg.au8_Data[2] + (((uint16)orc_Msg.au8_Data[3]) << 8U)));
          s32_Start = 4;
       }
       else
@@ -189,7 +189,7 @@ C_SCLString C_CMONProtocolSTWFF::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
             c_Text += " !!WRONG_DLC!!";
             return c_Text;
          }
-         c_Text+=(" Ver:" + m_GetValueDecHex(orc_Msg.au8_Data[3] + (((uint16)orc_Msg.au8_Data[4]) << 8))+
+         c_Text+=(" Ver:" + m_GetValueDecHex(orc_Msg.au8_Data[3] + (((uint16)orc_Msg.au8_Data[4]) << 8U))+
                      " BSmax:"+m_GetByteAsStringFormat(orc_Msg.au8_Data[5]) +
                      " STmin:"+m_GetByteAsStringFormat(orc_Msg.au8_Data[6]));
          break;
@@ -213,9 +213,9 @@ C_SCLString C_CMONProtocolSTWFF::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
             c_Text+=" !!WRONG_DLC!!";
             return c_Text;
          }
-         c_Text+=(" SIZE:" + m_GetValueDecHex(orc_Msg.au8_Data[2] + (((uint16)orc_Msg.au8_Data[3]) << 8)) +
-                                            (((uint32)orc_Msg.au8_Data[4]) << 16) +
-                                            (((uint32)orc_Msg.au8_Data[5]) << 24));
+         c_Text+=(" SIZE:" + m_GetValueDecHex(orc_Msg.au8_Data[2] + (((uint16)orc_Msg.au8_Data[3]) << 8U)) +
+                                            (((uint32)orc_Msg.au8_Data[4]) << 16U) +
+                                            (((uint32)orc_Msg.au8_Data[5]) << 24U));
          s32_Start = 6;
       }
       else
@@ -251,9 +251,9 @@ C_SCLString C_CMONProtocolSTWFF::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
       else
       {
          c_Text += (" ERROR: " + m_GetValueDecHex(orc_Msg.au8_Data[2] +
-                                               (((uint16)orc_Msg.au8_Data[3]) << 8)) +
-                                               (((uint32)orc_Msg.au8_Data[4]) << 16) +
-                                               (((uint32)orc_Msg.au8_Data[5]) << 24));
+                                               (((uint16)orc_Msg.au8_Data[3]) << 8U)) +
+                                               (((uint32)orc_Msg.au8_Data[4]) << 16U) +
+                                               (((uint32)orc_Msg.au8_Data[5]) << 24U));
       }
       break;
    default:

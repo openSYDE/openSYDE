@@ -18,6 +18,7 @@
 #include <QList>
 
 #include "C_OgePubIconText.h"
+#include "C_PuiSvDashboard.h"
 #include "C_SyvDaDashboardWidget.h"
 #include "C_SyvDaDashboardSelectorTabBar.h"
 #include "C_SyvDaTearOffWidget.h"
@@ -56,9 +57,6 @@ public:
    stw_types::sint32 GetDashboardIndexForTabIndex(const stw_types::sint32 os32_TabIndex,
                                                   stw_types::uint32 & oru32_DashboardIndex) const;
    void HandleManualOperationFinished(const stw_types::sint32 os32_Result, const stw_types::uint8 ou8_NRC);
-   void SetErrorForFailedCyclicElementIdRegistrations(
-      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-      const std::vector<QString> & orc_FailedIdErrorDetails);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -132,6 +130,7 @@ private:
    static const QTabBar::ButtonPosition mhe_TabContentPosition;
    static const QString mhc_AddIconDark;
    static const QString mhc_AddIconLight;
+   stw_opensyde_gui_logic::C_PuiSvDashboard::E_TabType me_DashboardTabType;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

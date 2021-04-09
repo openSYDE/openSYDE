@@ -64,7 +64,7 @@ C_OgePubIconOnly::C_OgePubIconOnly(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgePubIconOnly::event(QEvent * const opc_Event)
 {
-   bool q_Retval = C_OgePubToolTipBase::event(opc_Event);
+   const bool q_Retval = C_OgePubToolTipBase::event(opc_Event);
 
    if (opc_Event->type() == QEvent::HoverLeave)
    {
@@ -101,7 +101,7 @@ void C_OgePubIconOnly::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
    QPixmap c_Pixmap;
-   QSize c_Size = this->size();
+   const QSize c_Size = this->size();
 
    Q_UNUSED(opc_Event)
 
@@ -139,7 +139,7 @@ void C_OgePubIconOnly::paintEvent(QPaintEvent * const opc_Event)
 void C_OgePubIconOnly::SetCustomIcons(const QString & orc_IconPathNormal, const QString & orc_IconPathHovered,
                                       const QString & orc_IconPathClicked, const QString & orc_IconPathDisabled)
 {
-   QSize c_Size = this->size();
+   const QSize c_Size = this->size();
 
    mc_IconNormal = QIcon(orc_IconPathNormal).pixmap(c_Size);
    this->setIcon(mc_IconNormal);

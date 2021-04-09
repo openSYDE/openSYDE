@@ -143,13 +143,13 @@ C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32 & oru32_ViewIndex, con
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ProxyWidget and mpc_ConflictIcon and the Qt memory
+// management
 C_GiSvDaRectBaseGroup::~C_GiSvDaRectBaseGroup(void)
 {
    this->mpc_ProxyWidget->setWidget(NULL);
    delete mpc_Widget;
    this->mpc_Widget = NULL;
-   //lint -e{1740}  no memory leak because of the parent of mpc_ProxyWidget and mpc_ConflictIcon and the Qt memory
-   // management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -336,7 +336,8 @@ void C_GiSvDaRectBaseGroup::RegisterDataPoolElementCyclicError(
             static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_ErrorCode, 16));
          break;
       }
-      c_Info = static_cast<QString>(C_GtGetText::h_GetText("Cyclic service failed with error: %1")).arg(c_AdditionalInfo);
+      c_Info =
+         static_cast<QString>(C_GtGetText::h_GetText("Cyclic service failed with error: %1")).arg(c_AdditionalInfo);
       this->mc_CommmunicationErrors.remove(orc_WidgetDataPoolElementId);
       this->mc_CommmunicationErrors.insert(orc_WidgetDataPoolElementId, c_Info);
       m_UpdateErrorIcon();
@@ -439,6 +440,7 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
    \param[in]     osn_Value                 Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_GiSvDaRectBaseGroup::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    // Nothing to do in the base class implementation
@@ -527,6 +529,7 @@ void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active)
    \param[in]  oq_Active  Flag if edit mode is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_GiSvDaRectBaseGroup::EditModeActiveChanged(const bool oq_Active)
 {
    // Nothing to do in the base class implementation
@@ -655,114 +658,10 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
       {
          QString c_Description;
          QString c_Details;
-         switch (os32_Result)
-         {
-         case C_CONFIG:
-         case C_RANGE:
-         case C_RD_WR:
-         case C_OVERFLOW:
-            c_Description = C_GtGetText::h_GetText("Operation failed with an internal error.");
-            //Update log file
-            C_OSCLoggingHandler::h_Flush();
-            c_Details = static_cast<QString>("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
-                        arg(C_GtGetText::h_GetText("For details see ")).
-                        arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
-                        arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                        arg(C_GtGetText::h_GetText("log file"));
-            break;
-         case C_TIMEOUT:
-            c_Description = C_GtGetText::h_GetText("Operation did not get a response within timeout interval.");
-            break;
-         case C_NOACT:
-            c_Description = C_GtGetText::h_GetText("Operation could not send request (e.g. Tx buffer full).");
-            break;
-         case C_WARN:
-            if (this->mq_ReadItem == true)
-            {
-               switch (ou8_NRC)
-               {
-               case 0x13:
-                  c_Details = C_GtGetText::h_GetText("Incorrect length of request.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               case 0x31:
-                  c_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               case 0x22:
-                  c_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               case 0x33:
-                  c_Details = C_GtGetText::h_GetText("Required security level was not unlocked.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               case 0x14:
-                  c_Details = C_GtGetText::h_GetText(
-                     "The total length of the response message exceeds the available buffer size.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               case 0x7F:
-                  c_Details = C_GtGetText::h_GetText(
-                     "The requested service is not available in the currently active session.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               default:
-                  c_Details =
-                     static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC, 16));
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               }
-            }
-            else
-            {
-               switch (ou8_NRC)
-               {
-               case 0x13:
-                  c_Details = C_GtGetText::h_GetText("Incorrect length of request.\n"
-                                                     "Specifically for this service: Size of payload data does not "
-                                                     "match size of Datapool element.");
-                  c_Message.SetCustomMinHeight(180, 300);
-                  break;
-               case 0x31:
-                  c_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               case 0x22:
-                  c_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               case 0x33:
-                  c_Details = C_GtGetText::h_GetText("Required security level was not unlocked.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               case 0x14:
-                  c_Details = C_GtGetText::h_GetText(
-                     "The total length of the response message exceeds the available buffer size.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               case 0x7F:
-                  c_Details = C_GtGetText::h_GetText(
-                     "The requested service is not available in the currently active session.");
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               default:
-                  c_Details =
-                     static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC, 16));
-                  c_Message.SetCustomMinHeight(180, 250);
-                  break;
-               }
-            }
-            c_Description =
-               static_cast<QString>(C_GtGetText::h_GetText("Operation failed with error response (%1).")).arg(c_Details);
-            c_Details = "";
-            c_Message.SetCustomMinHeight(180, 230);
-            break;
-         default:
-            c_Description = C_GtGetText::h_GetText("Operation failure, cause unknown.");
-            c_Message.SetCustomMinHeight(180, 180);
-            break;
-         }
+         sint32 s32_MaxHeight = 0;
+
+         this->m_GetErrorDescriptionForManualOperation(os32_Result, ou8_NRC, c_Description, c_Details, s32_MaxHeight);
+
          osc_write_log_info("Manual operation",
                             static_cast<QString>("The C_SyvComDataDealer function ended with error code \"%1\"").arg(
                                C_Uti::h_StwError(os32_Result)).toStdString().c_str());
@@ -775,6 +674,11 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
          }
          else
          {
+            if (s32_MaxHeight != 0)
+            {
+               // Change only if a concrete value was set
+               c_Message.SetCustomMinHeight(180, s32_MaxHeight);
+            }
             c_Message.SetHeading(C_GtGetText::h_GetText("Transmission failure"));
             c_Message.SetDescription(c_Description);
             c_Message.SetDetails(c_Details);
@@ -813,48 +717,6 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal all widgets which read rail element ID registrations failed
-
-   \param[in]     orc_FailedIdRegisters    Failed IDs
-   \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaRectBaseGroup::SetErrorForFailedCyclicElementIdRegistrations(
-   const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-   const std::vector<QString> & orc_FailedIdErrorDetails)
-{
-   //Only relevant for read items
-   if ((this->mq_ReadItem == true) && (orc_FailedIdRegisters.size() == orc_FailedIdErrorDetails.size()))
-   {
-      //Clear last error
-      this->mc_RegistrationFailedIdErrorDetails = "";
-      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
-
-      //Check if any elements are in here
-      for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_It = rc_Elements.begin();
-           c_It != rc_Elements.end(); ++c_It)
-      {
-         if (c_It.key().GetIsValid() == true)
-         {
-            for (uint32 u32_ItInput = 0UL; u32_ItInput < orc_FailedIdRegisters.size();
-                 ++u32_ItInput)
-            {
-               if (c_It.key() == orc_FailedIdRegisters[u32_ItInput])
-               {
-                  const QString c_ErrorDescription = static_cast<QString>("Failed registration for %1 with Error message: %2").arg(
-                     C_PuiSvHandler::h_GetNamespace(c_It.key())).arg(orc_FailedIdErrorDetails[u32_ItInput]);
-                  //Add error
-                  this->mc_RegistrationFailedIdErrorDetails += c_ErrorDescription;
-               }
-            }
-         }
-      }
-
-      m_UpdateErrorIcon();
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set DLC error for specified element id
 
    \param[in] orc_ElementId Element ID
@@ -874,6 +736,7 @@ void C_GiSvDaRectBaseGroup::SetErrorForInvalidDlc(const C_OSCNodeDataPoolListEle
    \param[in] oq_Active Flag if widgets should currently be drawn
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_GiSvDaRectBaseGroup::SetDrawingActive(const bool oq_Active)
 {
    Q_UNUSED(oq_Active)
@@ -905,9 +768,10 @@ void C_GiSvDaRectBaseGroup::paint(QPainter * const opc_Painter, const QStyleOpti
       QPolygonF c_Poly;
       QPainterPath c_Path;
       QBrush c_Brush(mc_STYLE_GUIDE_COLOR_21, Qt::BDiagPattern);
+      const QTransform c_Transform = opc_Painter->worldTransform().inverted();
 
       //Apply inverse transformation to get improved pattern
-      c_Brush.setTransform(QTransform(opc_Painter->worldTransform().inverted()));
+      c_Brush.setTransform(c_Transform);
 
       c_Poly.append(c_Inner.bottomRight());
       c_Poly.append(c_Inner.bottomLeft());
@@ -939,6 +803,7 @@ void C_GiSvDaRectBaseGroup::paint(QPainter * const opc_Painter, const QStyleOpti
    \param[in]     oq_Active               Flag if context menu entries have to be shown or not
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_GiSvDaRectBaseGroup::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,
                                                  const bool oq_Active)
 {
@@ -982,6 +847,7 @@ C_PuiSvDbWidgetBase::E_Style C_GiSvDaRectBaseGroup::GetDisplayStyleType(void) co
 /*! \brief   Generate hint for current widget
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_GiSvDaRectBaseGroup::GenerateHint(void)
 {
    //Hint always up to date
@@ -1183,7 +1049,7 @@ void C_GiSvDaRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc
        (this->mpc_ButtonGroup != NULL) &&
        (this->mpc_ButtonGroup->isVisible() == true))
    {
-      QPointF c_Pos = opc_Event->scenePos();
+      const QPointF c_Pos = opc_Event->scenePos();
       const QRectF c_Rect = this->mpc_ButtonGroup->sceneBoundingRect();
 
       // is the cursor in the area of the label
@@ -1455,10 +1321,10 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
          {
             c_Content +=
                static_cast<QString>(C_GtGetText::h_GetText(
-                          "- This widget and this data element (\"%1\") does not match, possible reasons:\n"
-                          "   Data element was deleted\n"
-                          "   Data element has become an array\n"
-                          "   Data element has different value range")).arg(c_Name);
+                                       "- This widget and this data element (\"%1\") does not match, possible reasons:\n"
+                                       "   Data element was deleted\n"
+                                       "   Data element has become an array\n"
+                                       "   Data element has different value range")).arg(c_Name);
          }
          if (m_CheckHasAnyRequiredNodesActive() == false)
          {
@@ -1544,207 +1410,6 @@ void C_GiSvDaRectBaseGroup::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check for any invalid elements
-
-   \param[out]   orc_FirstInvalidElementName    Name of first invalid element
-
-   \return
-   true  Found
-   false Not found
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvDaRectBaseGroup::m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const
-{
-   bool q_ValidElement = false;
-   const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
-
-   for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
-        c_ItElement != rc_Elements.end(); ++c_ItElement)
-   {
-      const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
-
-      // Is the data element valid?
-      if (c_ElementId.GetIsValid())
-      {
-         q_ValidElement = true;
-      }
-      else
-      {
-         orc_FirstInvalidElementName = c_ElementId.GetInvalidNamePlaceholder();
-      }
-   }
-   return q_ValidElement;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check for any manual read items
-
-   \return
-   true  Found
-   false Not found
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvDaRectBaseGroup::m_CheckManualReadRequired(void) const
-{
-   bool q_ManualReadElement = false;
-
-   if (this->mq_ReadItem == true)
-   {
-      // Check for invalid elements
-      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
-
-      for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
-           c_ItElement != rc_Elements.end(); ++c_ItElement)
-      {
-         const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
-
-         // Is the data element valid and a datapool element
-         if ((c_ElementId.GetIsValid() == true) &&
-             (c_ElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT))
-         {
-            const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-            C_PuiSvReadDataConfiguration c_ReadConfig;
-            if (pc_View != NULL)
-            {
-               pc_View->GetReadRailAssignment(c_ElementId, c_ReadConfig);
-               if (c_ReadConfig.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
-               {
-                  q_ManualReadElement = true;
-                  break;
-               }
-            }
-         }
-      }
-   }
-   return q_ManualReadElement;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check for any required nodes inactive
-
-   \return
-   true  Found
-   false Not found
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvDaRectBaseGroup::m_CheckHasAnyRequiredNodesActive(void) const
-{
-   bool q_AtLeastOneValidElement = false;
-
-   const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
-
-   for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
-        c_ItElement != rc_Elements.end(); ++c_ItElement)
-   {
-      const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
-      if (c_ElementId.GetIsValid() == true)
-      {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-         const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
-         //Is corresponding view active
-         if ((c_ElementId.u32_NodeIndex < rc_ActiveNodes.size()) &&
-             (rc_ActiveNodes[c_ElementId.u32_NodeIndex] == 1U))
-         {
-            q_AtLeastOneValidElement = true;
-            break;
-         }
-      }
-   }
-
-   return q_AtLeastOneValidElement;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check for any required buses not connected in view
-
-   \return
-   true  Found
-   false Not found
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvDaRectBaseGroup::m_CheckHasAnyRequiredBusesConnected(void) const
-{
-   bool q_AtLeastOneValidElement = false;
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-   if (pc_View != NULL)
-   {
-      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
-
-      for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
-           c_ItElement != rc_Elements.end(); ++c_ItElement)
-      {
-         const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
-         if ((c_ElementId.GetIsValid() == true) &&
-             (c_ElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL))
-         {
-            C_OSCCanMessageIdentificationIndices c_MessageID;
-            uint32 u32_SignalIndex;
-            if ((pc_View->GetPcData().GetConnected() == true) &&
-                (C_PuiSdUtil::h_ConvertIndex(c_ElementId, c_MessageID, u32_SignalIndex) == C_NO_ERR))
-            {
-               const C_OSCNode * const pc_Node =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_MessageID.u32_NodeIndex);
-               if ((pc_Node != NULL) && (c_MessageID.u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
-               {
-                  const C_OSCNodeComInterfaceSettings & rc_Interface =
-                     pc_Node->c_Properties.c_ComInterfaces[c_MessageID.u32_InterfaceIndex];
-                  if (rc_Interface.q_IsBusConnected == true)
-                  {
-                     if (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())
-                     {
-                        //Active
-                        q_AtLeastOneValidElement = true;
-                     }
-                     else
-                     {
-                        //Inactive
-                        q_AtLeastOneValidElement = false;
-                     }
-                  }
-                  else
-                  {
-                     //Failure
-                     q_AtLeastOneValidElement = false;
-                  }
-               }
-               else
-               {
-                  //Failure
-                  q_AtLeastOneValidElement = false;
-               }
-            }
-            else
-            {
-               //Failure
-               q_AtLeastOneValidElement = false;
-            }
-         }
-         else
-         {
-            //Allow continue as this means at least one element is not a bus element
-            //so this check can at least clarify that one element is valid
-            q_AtLeastOneValidElement = true;
-
-         }
-         if(q_AtLeastOneValidElement == true)
-         {
-            break;
-         }
-      }
-   }
-   else
-   {
-      //Failure
-      q_AtLeastOneValidElement = false;
-   }
-
-   return q_AtLeastOneValidElement;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Event function if the datapool element configuration was changed
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1819,8 +1484,8 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIcon(void)
 {
    if ((this->mpc_ConflictIcon != NULL) && (this->mpc_ButtonGroup != NULL))
    {
-      if (((this->mc_RegistrationFailedIdErrorDetails.compare("") != 0) ||
-           (this->mc_CommmunicationErrors.size() > 0)) || (this->mc_InvalidDlcSignals.size() > 0))
+      if ((this->mc_CommmunicationErrors.size() > 0) ||
+          (this->mc_InvalidDlcSignals.size() > 0))
       {
          this->mpc_ConflictIcon->setVisible(true);
          if (this->mpc_ButtonGroup->isVisible())
@@ -1898,17 +1563,14 @@ void C_GiSvDaRectBaseGroup::m_InitConflictIcon(void)
                               static_cast<float64>(this->ms32_IconSize),
                               static_cast<float64>(this->ms32_IconSize));
 
-   if (this->mpc_WarningIcon != NULL)
-   {
-      this->mpc_WarningIcon->moveBy(f64_PosX - this->mpc_WarningIcon->pos().x(),
-                                    f64_PosY - this->mpc_WarningIcon->pos().y());
+   this->mpc_WarningIcon->moveBy(f64_PosX - this->mpc_WarningIcon->pos().x(),
+                                 f64_PosY - this->mpc_WarningIcon->pos().y());
 
-      // set the position of the icon
-      this->mpc_WarningIcon->setParentItem(this);
+   // set the position of the icon
+   this->mpc_WarningIcon->setParentItem(this);
 
-      // the icon will be shown if a warning is detected
-      this->mpc_WarningIcon->setVisible(false);
-   }
+   // the icon will be shown if a warning is detected
+   this->mpc_WarningIcon->setVisible(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1950,13 +1612,13 @@ void C_GiSvDaRectBaseGroup::m_InitButton(void)
    c_Rect.setWidth(static_cast<float64>(this->ms32_IconSize));
    c_Rect.setHeight(static_cast<float64>(this->ms32_IconSize));
    pc_RectItem = new QGraphicsRectItem(c_Rect);
-   pc_RectItem->setPen(QPen(Qt::NoPen));
-   pc_RectItem->setBrush(QBrush(Qt::NoBrush));
+   pc_RectItem->setPen(static_cast<QPen>(Qt::NoPen));
+   pc_RectItem->setBrush(static_cast<QBrush>(Qt::NoBrush));
    this->mpc_ButtonGroup->addToGroup(pc_RectItem);
 
    this->mpc_ButtonGroup->setParentItem(this);
    this->mpc_ButtonGroup->setVisible(false);
-}  //lint !e429  //no memory leak because of adding pc_RectItem to the group and the Qt memory management
+} //lint !e429  //no memory leak because of adding pc_RectItem to the group and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Trigger next manual read operation
@@ -1978,14 +1640,14 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
       {
          //Always iterate to next element!
          ++this->mu32_NextManualActionIndex;
-         if (this->m_IsOnTrigger(c_ElementId))
+         if (this->m_CheckIsOnTrigger(c_ElementId))
          {
             if ((c_ElementId.GetIsValid() == true) && (m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true))
             {
                //-1 because we already prepared for the next element!
                if (this->m_CheckElementAlreadyRead(this->mu32_NextManualActionIndex - 1UL, c_ElementId) == false)
                {
-                  Q_EMIT this->SigDataPoolRead(c_ElementId);
+                  Q_EMIT (this->SigDataPoolRead(c_ElementId));
                }
                else
                {
@@ -2016,49 +1678,6 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
       //Last element reached or write element
       this->m_ManualOperationFinished();
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check if the specified ID is configured as on trigger
-
-   \param[in] orc_Id ID to check
-
-   \retval   true   Error occurred or on trigger configured
-   \retval   false  Definitely not on trigger configured
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvDaRectBaseGroup::m_IsOnTrigger(const C_PuiSvDbNodeDataPoolListElementId & orc_Id) const
-{
-   bool q_Retval = true;
-
-   if (orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
-   {
-      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-      if (pc_View != NULL)
-      {
-         const QMap<C_OSCNodeDataPoolListElementId,
-                    C_PuiSvReadDataConfiguration> & rc_RailAssignments = pc_View->GetReadRailAssignments();
-         const QMap<C_OSCNodeDataPoolListElementId,
-                    C_PuiSvReadDataConfiguration>::const_iterator c_ItRailAssignment = rc_RailAssignments.find(
-            orc_Id);
-         if (c_ItRailAssignment != rc_RailAssignments.end())
-         {
-            //Only allow manual transmission for "on trigger" elements
-            if (c_ItRailAssignment.value().e_TransmissionMode != C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
-            {
-               q_Retval = false;
-            }
-         }
-      }
-   }
-   else
-   {
-      //Never trigger manual for bus element
-      q_Retval = false;
-   }
-
-   return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2098,11 +1717,6 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIconToolTip(void)
    QString c_Heading = C_GtGetText::h_GetText("Transmission error");
    QString c_Content;
 
-   if (this->mc_RegistrationFailedIdErrorDetails.compare("") != 0)
-   {
-      c_Content += C_GtGetText::h_GetText("Could not register cyclic transmission, following errors occurred:\n");
-      c_Content += this->mc_RegistrationFailedIdErrorDetails + "\n";
-   }
    if (this->mc_CommmunicationErrors.size() > 0L)
    {
       c_Content += C_GtGetText::h_GetText("Following transmissions failed:\n");
@@ -2186,65 +1800,4 @@ void C_GiSvDaRectBaseGroup::m_ManualOperationFinished(void)
       }
    }
    QApplication::restoreOverrideCursor();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if requested node is active
-
-   \param[in] ou32_NodeIndex Node index to check
-
-   \return
-   True  Definitely active
-   False Either not active or something else is wrong
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvDaRectBaseGroup::m_CheckNodeActive(const uint32 ou32_NodeIndex) const
-{
-   bool q_Retval = false;
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-   if (pc_View != NULL)
-   {
-      const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
-      if (ou32_NodeIndex < rc_ActiveNodes.size())
-      {
-         if (rc_ActiveNodes[ou32_NodeIndex] == true)
-         {
-            q_Retval = true;
-         }
-      }
-   }
-
-   return q_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check if the element was already read, assuming the order was in the internally stored data element order
-
-   \param[in] ou32_ItemIndex Internally stored data element order index
-   \param[in] orc_Id         ID of the current index
-
-   \retval   true    Already read
-   \retval   false   New read required
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvDaRectBaseGroup::m_CheckElementAlreadyRead(const uint32 ou32_ItemIndex,
-                                                      const C_PuiSvDbNodeDataPoolListElementId & orc_Id) const
-{
-   bool q_AlreadyRead = false;
-
-   for (uint32 u32_ItItem = 0UL; (u32_ItItem < this->GetWidgetDataPoolElementCount()) && (u32_ItItem < ou32_ItemIndex);
-        ++u32_ItItem)
-   {
-      C_PuiSvDbNodeDataPoolListElementId c_CurId;
-      if (this->GetDataPoolElementIndex(u32_ItItem, c_CurId) == C_NO_ERR)
-      {
-         if (c_CurId.CheckSameDataElement(orc_Id))
-         {
-            q_AlreadyRead = true;
-            break;
-         }
-      }
-   }
-   return q_AlreadyRead;
 }

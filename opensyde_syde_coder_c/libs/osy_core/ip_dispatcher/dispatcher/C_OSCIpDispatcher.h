@@ -54,6 +54,7 @@ protected:
       \param[in]  ou32_Handle   handle obtained by InitTcp()
    */
    //-----------------------------------------------------------------------------
+   //lint -e{9175}  //intentionally no functionality in default implementation
    virtual void m_OnTcpConnectionDropped(const stw_types::uint32 ou32_Handle)
    {
       (void)ou32_Handle;

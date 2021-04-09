@@ -101,6 +101,8 @@ public:
 
    stw_types::sint32 SetDashboardName(const stw_types::uint32 ou32_DashboardIndex, const QString & orc_Name);
    stw_types::sint32 SetDashboardComment(const stw_types::uint32 ou32_DashboardIndex, const QString & orc_Comment);
+   stw_types::sint32 SetDashboardType(const stw_types::uint32 ou32_DashboardIndex,
+                                      const C_PuiSvDashboard::E_TabType oe_Type);
    stw_types::sint32 SetDashboardActive(const stw_types::uint32 ou32_DashboardIndex, const bool oq_Active);
    stw_types::sint32 SetDashboardTabIndex(const stw_types::uint32 ou32_DashboardIndex,
                                           const stw_types::sint32 os32_Value);
@@ -256,6 +258,7 @@ public:
 
    //Other
    void FixInvalidRailConfig(void);
+   void HandleCompatibilityChart(void);
    void InitFromSystemDefintion(void);
    bool CheckDashboardName(const QString & orc_Proposal, const stw_types::uint32 * const opu32_DashboardIndex) const;
    QString GetUniqueDashboardName(const QString & orc_Proposal) const;

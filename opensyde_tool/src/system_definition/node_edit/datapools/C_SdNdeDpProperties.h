@@ -39,7 +39,7 @@ class C_SdNdeDpProperties :
 public:
    explicit C_SdNdeDpProperties(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                 stw_opensyde_core::C_OSCNodeDataPool * const opc_OSCDataPool,
-                                stw_opensyde_gui_logic::C_PuiSdNodeDataPool * const pc_UiDataPool,
+                                stw_opensyde_gui_logic::C_PuiSdNodeDataPool * const opc_UiDataPool,
                                 stw_opensyde_core::C_OSCCanProtocol::E_Type * const ope_ComProtocolType,
                                 const stw_types::sint32 os32_DataPoolIndex, const stw_types::uint32 & oru32_NodeIndex,
                                 const bool oq_SelectName, const bool oq_ShowApplicationSection,

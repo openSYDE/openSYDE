@@ -56,7 +56,7 @@ const QString C_CieExportReportWidget::mhc_HTML_TABLE_DATA_START =
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CieExportReportWidget::C_CieExportReportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                 QString & orc_FilePath) :
+                                                 const QString & orc_FilePath) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CieExportReportWidget),
    mrc_ParentDialog(orc_Parent),
@@ -108,31 +108,20 @@ void C_CieExportReportWidget::InitStaticNames(void) const
    \param[in] orc_NodeMapping              key is openSYDE name, value is DBC symbol name
    \param[in] orc_ExportStatistic          number of messages and signals of network
    \param[in] orc_Warnings                 warnings of DBC file export
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieExportReportWidget::SetMessageData(const std::map<C_SCLString,
-                                                              C_SCLString> & orc_NodeMapping,
-                                               const C_CieExportDbc::C_ExportStatistic & orc_ExportStatistic,
-                                               const C_SCLStringList & orc_Warnings)
+void C_CieExportReportWidget::SetMessageData(const std::map<C_SCLString,
+                                                            C_SCLString> & orc_NodeMapping,
+                                             const C_CieExportDbc::C_ExportStatistic & orc_ExportStatistic,
+                                             const C_SCLStringList & orc_Warnings)
 {
-   sint32 s32_Return;
-
    //Copy to internal data
    this->mc_NodeMapping = orc_NodeMapping;
    this->mc_ExportStatistic = orc_ExportStatistic;
    this->mc_Warnings = orc_Warnings;
 
    // build up report in message dialog field
-   s32_Return = m_BuildReport();
-   if (s32_Return != C_NO_ERR)
-   {
-      s32_Return = C_RANGE;
-   }
-   return s32_Return;
+   this->m_BuildReport();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -179,12 +168,9 @@ void C_CieExportReportWidget::m_OkClicked(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Build up report for DBC export to file.
-
-   \return
-   C_NO_ERR Operation success (default)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieExportReportWidget::m_BuildReport(void)
+void C_CieExportReportWidget::m_BuildReport(void)
 {
    // get nodes
    C_SCLString c_Nodes = "Node(s): ";
@@ -266,6 +252,4 @@ sint32 C_CieExportReportWidget::m_BuildReport(void)
    c_CompleteLog += "</body>";
    c_CompleteLog += "</html>";
    this->mpc_Ui->pc_TextBrowserReport->setHtml(c_CompleteLog);
-
-   return C_NO_ERR;
 }

@@ -121,7 +121,6 @@ C_SdManUnoTopologyAddCommand::~C_SdManUnoTopologyAddCommand(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddCommand::m_AddNew(void)
 {
-   
    C_SdTopologyScene * const pc_Scene = dynamic_cast<C_SdTopologyScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -176,9 +175,9 @@ void C_SdManUnoTopologyAddCommand::m_AddNew(void)
             pc_Scene->AddImage(this->mc_AdditionalInformation, this->mc_NewPos, &(c_IDs[0]));
             break;
          case E_ElementType::eBUS_CONNECTOR:
-            
+
             pc_Node = dynamic_cast<C_GiNode *>(m_GetSceneItem(this->mu64_BusConnectorNodeID));
-            
+
             pc_Bus = dynamic_cast<C_GiLiBus *>(m_GetSceneItem(this->mu64_BusConnectorBusID));
             if ((pc_Node != NULL) && (pc_Bus != NULL))
             {

@@ -49,13 +49,18 @@ stw_types::sint32 C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex = 
    \param[in]     oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
    \param[in]     oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
    \param[in]     oq_ShowNVMLists           Optional flag to only show NVM LISTs
+   \param[in]     opc_AlreasyUsedElements   Optional pointer to vector with already used elements. All added elements
+                                            will be marked as used an will be disabled. Usable for non NVM list mode
+
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Parent, const uint32 ou32_ViewIndex,
                                                        const bool oq_MultiSelect, const bool oq_ShowOnlyWriteElements,
                                                        const bool oq_ShowArrayElements,
                                                        const bool oq_ShowArrayIndexElements,
-                                                       const bool oq_Show64BitValues, const bool oq_ShowNVMLists) :
+                                                       const bool oq_Show64BitValues, const bool oq_ShowNVMLists,
+                                                       const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
+   :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeDataElementBrowse),
    mpc_ContextMenu(NULL),
@@ -92,6 +97,7 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
    this->mq_ShowArrayElements = oq_ShowArrayElements;
    this->mq_ShowArrayIndexElements = oq_ShowArrayIndexElements;
    this->mq_Show64BitValues = oq_Show64BitValues;
+   this->mpc_AlreasyUsedElements = opc_AlreasyUsedElements;
 
    // set title
    if (oq_ShowNVMLists == true)
@@ -125,7 +131,8 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
       this->mpc_Ui->pc_TreeView->InitSV(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                                         oq_ShowArrayIndexElements,
                                         oq_Show64BitValues,
-                                        oq_ShowNVMLists);
+                                        oq_ShowNVMLists,
+                                        opc_AlreasyUsedElements);
    }
    //After tree was filled
    m_UpdateSelection(0);
@@ -161,10 +168,10 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ContextMenu and the Qt memory management
 C_SyvDaPeDataElementBrowse::~C_SyvDaPeDataElementBrowse(void)
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_ContextMenu and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -340,10 +347,11 @@ void C_SyvDaPeDataElementBrowse::m_SwitchType(const sintn osn_Index) const
    case C_SyvDaPeDataElementBrowse::mhsn_INDEX_DATAPOOL_ELEMENT:
       this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eDATAPOOL_ELEMENT, this->mq_ShowOnlyWriteElements,
                                             this->mq_ShowArrayElements, this->mq_ShowArrayIndexElements,
-                                            this->mq_Show64BitValues);
+                                            this->mq_Show64BitValues, this->mpc_AlreasyUsedElements);
       break;
    case C_SyvDaPeDataElementBrowse::mhsn_INDEX_BUS_SIGNAL:
-      this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eBUS_SIGNAL, false, false, false, true);
+      this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eBUS_SIGNAL, false, false, false, true,
+                                            this->mpc_AlreasyUsedElements);
       break;
    default:
       //Unknown
@@ -369,12 +377,14 @@ void C_SyvDaPeDataElementBrowse::m_UpdateSelection(const sintn osn_SelectionCoun
       this->mpc_Ui->pc_LabelSelection->setVisible(true);
       if (osn_SelectionCount > 0)
       {
-         this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText("%1 selected data element(s)")).
+         this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                          "%1 selected data element(s)")).
                                                   arg(osn_SelectionCount));
       }
       else
       {
-         this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText("No selected data element")));
+         this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                          "No selected data element")));
       }
    }
 }
@@ -417,7 +427,7 @@ void C_SyvDaPeDataElementBrowse::m_SetupContextMenu(const bool & orq_MultiSelect
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
-   QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
+   const QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
 
    // check if position is on tree view
    if (this->mpc_Ui->pc_TreeView->geometry().contains(orc_Pos))

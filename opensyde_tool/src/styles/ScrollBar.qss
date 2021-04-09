@@ -56,7 +56,7 @@ min-height: 0px;
 /* Scroll areas */
 stw_opensyde_gui_elements--C_OgeSmoothScrollArea QScrollBar:vertical,
 stw_opensyde_gui--C_SebGraphicsView QScrollBar:vertical,
-stw_opensyde_gui_elements--C_OgeFrame QScrollBar:vertical
+stw_opensyde_gui_elements--C_OgeFraFrame QScrollBar:vertical
 {
 width: 11px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
 padding-right: 6px;
@@ -67,7 +67,7 @@ padding-bottom: 15px;
 stw_opensyde_gui_elements--C_OgeDarkScrollArea QScrollBar:horizontal,
 stw_opensyde_gui_elements--C_OgeSmoothScrollArea QScrollBar:horizontal,
 stw_opensyde_gui--C_SebGraphicsView QScrollBar:horizontal,
-stw_opensyde_gui_elements--C_OgeFrame QScrollBar:horizontal
+stw_opensyde_gui_elements--C_OgeFraFrame QScrollBar:horizontal
 {
 height: 11px; /*real height of scroll bar is 5px; Real height = height - padding-bottom/top */
 padding-bottom: 6px;
@@ -343,7 +343,7 @@ padding-bottom: 3px;
 }
 
 stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar:vertical,
-stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar:vertical
+stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar:vertical
 {
 width: 7px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
 padding-right: 2px;
@@ -391,7 +391,7 @@ stw_opensyde_gui--C_SdCodeGenerationView QScrollBar:horizontal,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget QScrollBar:horizontal,
 stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar:horizontal,
 stw_opensyde_gui--C_SyvUpUpdatePackageListNodeWidget QScrollBar:horizontal,
-stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar:horizontal,
+stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar:horizontal,
 stw_opensyde_gui--C_SdNdeHalcChannelTreeView QScrollBar:horizontal,
 stw_opensyde_gui--C_SdNdeHalcConfigTreeView QScrollBar:horizontal
 {

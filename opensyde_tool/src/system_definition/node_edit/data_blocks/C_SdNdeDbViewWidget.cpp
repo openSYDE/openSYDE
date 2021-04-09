@@ -231,7 +231,7 @@ void C_SdNdeDbViewWidget::AddApp(void)
             {
                c_New->HideOverlay();
             }
-         }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+         } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
          else
          {
             //no fbl support
@@ -461,7 +461,7 @@ void C_SdNdeDbViewWidget::m_AddFromTSP(void)
       C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownTSPPath(pc_Dialog->GetTSPPath());
       c_New->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update data block count
@@ -474,7 +474,8 @@ void C_SdNdeDbViewWidget::m_UpdateCount(void) const
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
    {
-      this->mpc_Ui->pc_LabelApplicationName->setText(static_cast<QString>("Data Blocks (%1)").arg(pc_Node->c_Applications.size()));
+      this->mpc_Ui->pc_LabelApplicationName->setText(static_cast<QString>("Data Blocks (%1)").arg(pc_Node->
+                                                                                                  c_Applications.size()));
    }
 }
 
@@ -511,7 +512,7 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
       {
          c_New->HideOverlay();
       }
-   }  //lint !e429  //no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
    else
    {
       C_OgeWiCustomMessage c_Message(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
@@ -573,7 +574,7 @@ void C_SdNdeDbViewWidget::m_AddManualApplication(const C_OSCNodeApplication::E_T
    {
       c_New->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle visibility of button "Code generation settings"

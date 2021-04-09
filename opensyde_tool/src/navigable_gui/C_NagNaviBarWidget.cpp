@@ -341,6 +341,7 @@ void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMo
    \param[in]  ou32_Index     Optional Index number (for example for node or bus)
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in deactivated implementation
 void C_NagNaviBarWidget::MarkModeForDataChanged(const bool oq_Changed, const bool oq_All, const sint32 os32_Mode,
                                                 const sint32 os32_SubMode, const uint32 ou32_Index) const
 {
@@ -615,11 +616,11 @@ void C_NagNaviBarWidget::m_AddViewClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_OpenCanMonitor(void)
 {
-   QString c_ExecutablePath = C_Uti::h_GetExePath() + "/CAN_Monitor/openSYDE_CAN_Monitor.exe";
+   const QString c_ExecutablePath = C_Uti::h_GetExePath() + "/CAN_Monitor/openSYDE_CAN_Monitor.exe";
    // Adapted working directory is necessary for the stwpeak2.ini
-   bool q_Temp = QProcess::startDetached(c_ExecutablePath, QStringList(),
-                                         C_Uti::h_GetExePath() + "/CAN_Monitor");
-   QString c_ErrorMsg = static_cast<QString>(
+   const bool q_Temp = QProcess::startDetached(c_ExecutablePath, QStringList(),
+                                               C_Uti::h_GetExePath() + "/CAN_Monitor");
+   const QString c_ErrorMsg = static_cast<QString>(
       "Could not start openSYDE CAN Monitor. Reason: Most likely due to insufficient permissions or the executable"
       " \"%1\" is missing.").arg(c_ExecutablePath);
 
@@ -678,7 +679,7 @@ void C_NagNaviBarWidget::m_SysViewSizeChanged(void) const
       //Check if there is any available space to work with
       if (this->height() > (s32_OtherItemSizes + s32_MinSize))
       {
-         const sint32 s32_AvailableSpace = this->height() - s32_OtherItemSizes;
+         const sint32 s32_AvailableSpace = static_cast<sint32>(this->height()) - s32_OtherItemSizes;
          //Get desired size taking into account that the minimum is still there
          const sint32 s32_DesiredSize =
             std::max(this->mpc_Ui->pc_ListViewViews->GetMaximumRequiredHeight(), s32_MinSize);
@@ -706,8 +707,8 @@ void C_NagNaviBarWidget::m_SysViewSizeChanged(void) const
    {
       //Restore defaults
       this->mpc_Ui->pc_ScrollArea->setMinimumHeight(0);
-      //lint -e1960 we cannot change Qt constant but it is still better than using the hard coded magic number 16777215
-      this->mpc_Ui->pc_ScrollArea->setMaximumHeight(QWIDGETSIZE_MAX);
+      // we cannot change Qt constant but it is still better than using the hard coded magic number 16777215
+      this->mpc_Ui->pc_ScrollArea->setMaximumHeight(QWIDGETSIZE_MAX); //lint !e893 !e9130 !e9136
    }
 }
 

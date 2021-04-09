@@ -56,8 +56,8 @@ void C_OgeLabDashboardProgressBarMaximum::AdjustFontToSize(void)
    if (sn_NewPointSize > 0)
    {
       this->setStyleSheet(static_cast<QString>("QLabel{\n"
-                                  "font-size:%1pt;\n"
-                                  "margin-bottom:-%2px;\n"
-                                  "}").arg(sn_NewPointSize).arg((sn_NewPointSize * 30) / 100));
+                                               "font-size:%1pt;\n"
+                                               "margin-bottom:-%2px;\n"
+                                               "}").arg(sn_NewPointSize).arg((sn_NewPointSize * 30) / 100));
    }
 }

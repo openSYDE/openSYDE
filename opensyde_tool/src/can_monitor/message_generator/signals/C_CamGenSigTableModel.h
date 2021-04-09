@@ -86,7 +86,12 @@ private:
                            const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Max) const;
    QVariant m_HandleColRawInterpreted(const stw_types::uint32 ou32_Index, const stw_types::sintn osn_Role) const;
    QVariant m_HandleColPhysicalInterpreted(const stw_types::uint32 ou32_Index, const stw_types::sintn osn_Role) const;
+   static stw_opensyde_core::C_OSCNodeDataPoolContent mh_GetInitialValue(
+      const stw_opensyde_core::C_OSCNodeDataPoolListElement * const opc_OsySignalCommon,
+      const C_CieConverter::C_CIECanSignal * const opc_DbcSignal);
    static void mh_SetBoolInContent(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Value, const bool oq_Value);
+   stw_types::sint32 m_SetSignalFromOsyValue(const stw_opensyde_core::C_OSCCanSignal & orc_OsySignal,
+                                             const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Value);
    static stw_opensyde_core::C_OSCNodeDataPoolContent mh_GetBorderValue(
       const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_InitValue, const stw_types::uint16 ou16_BitLength,
       const bool oq_IsMin);
@@ -102,6 +107,11 @@ private:
    static std::vector<stw_types::uint16> mh_GetStartBits(
       const stw_opensyde_core::C_OSCCanMessage * const opc_OsyMessage,
       const C_CieConverter::C_CIECanMessage * const opc_DbcMessage, const stw_types::uint16 ou16_MuxValue);
+   void m_ResetUnusedMultiplexedSignals(void);
+   void m_UpdateMultiplexedSignal(const stw_opensyde_core::C_OSCCanMessage * const opc_OsyMessage,
+                                  const C_CieConverter::C_CIECanMessage * const opc_DbcMessage,
+                                  const stw_types::uint16 ou16_MuxValue, const stw_types::uint32 ou32_SignalIndex,
+                                  const bool oq_SetToZero);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -1239,6 +1239,29 @@ void C_UsHandler::SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system definition node selected protocol
+
+   \param[in]  orc_NodeName            Project system definition node name (identifier)
+   \param[in]  ou32_SelectedInterface  Selected CAN interface
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeSelectedInterface(const QString & orc_NodeName,
+                                                 const stw_types::uint32 ou32_SelectedInterface)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedInterface(ou32_SelectedInterface);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetSelectedInterface(ou32_SelectedInterface);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set project system definition node datapool expanded list names
 
    \param[in]  orc_NodeName      Project system definition node name (identifier)

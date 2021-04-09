@@ -750,11 +750,10 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
       }
       else if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
       {
-         const C_OSCHalcConfigChannel * pc_Data;
-         switch (e_Col)
+         if (e_Col == eSAFETY_RELEVANT)
          {
-         case eSAFETY_RELEVANT:
-            pc_Data = this->MapRowToChannel(orc_Index.row());
+            const C_OSCHalcConfigChannel * const pc_Data =
+               this->MapRowToChannel(orc_Index.row());
             if (pc_Data != NULL)
             {
                if (pc_Data->q_SafetyRelevant == true)
@@ -766,9 +765,6 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
                   c_Retval = static_cast<sintn>(Qt::Unchecked);
                }
             }
-            break;
-         default:
-            break;
          }
       }
       else if (osn_Role == msn_USER_ROLE_ICON)
@@ -813,7 +809,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
                      case C_OSCHalcDefDomain::eCA_INPUT:
                         if (q_IsLinked)
                         {
-                           if (q_Error)
+                           if (q_Error == true)
                            {
                               c_Path += "InputLargeLinkedError.svg";
                            }
@@ -824,7 +820,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
                         }
                         else
                         {
-                           if (q_Error)
+                           if (q_Error == true)
                            {
                               c_Path += "InputLargeError.svg";
                            }
@@ -835,9 +831,9 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
                         }
                         break;
                      case C_OSCHalcDefDomain::eCA_OUTPUT:
-                        if (q_IsLinked)
+                        if (q_IsLinked == true)
                         {
-                           if (q_Error)
+                           if (q_Error == true)
                            {
                               c_Path += "OutputLargeLinkedError.svg";
                            }
@@ -848,7 +844,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
                         }
                         else
                         {
-                           if (q_Error)
+                           if (q_Error == true)
                            {
                               c_Path += "OutputLargeError.svg";
                            }
@@ -859,9 +855,9 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
                         }
                         break;
                      case C_OSCHalcDefDomain::eCA_OTHER:
-                        if (q_IsLinked)
+                        if (q_IsLinked == true)
                         {
-                           if (q_Error)
+                           if (q_Error == true)
                            {
                               c_Path += "OtherLargeLinkedError.svg";
                            }
@@ -872,7 +868,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
                         }
                         else
                         {
-                           if (q_Error)
+                           if (q_Error == true)
                            {
                               c_Path += "OtherLargeError.svg";
                            }
@@ -964,15 +960,14 @@ Qt::ItemFlags C_SdNdeHalcOvTableModel::flags(const QModelIndex & orc_Index) cons
       //Each item
       c_Retval = QAbstractTableModel::flags(orc_Index);
       //Add edit
-      switch (e_Col)
+      if (e_Col == eSAFETY_RELEVANT)
       {
-      case eSAFETY_RELEVANT:
          //Check box
          c_Retval = c_Retval | Qt::ItemIsUserCheckable;
-         break;
-      default:
+      }
+      else
+      {
          //Nothing to add
-         break;
       }
    }
    else

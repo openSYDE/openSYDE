@@ -63,6 +63,7 @@ C_GiBiTextElement::C_GiBiTextElement(const stw_types::uint64 & oru64_ID, const b
    //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiBiRectBaseGroup(oru64_ID, mhf64_MinWidthTextElement, mhf64_MinHeightTextElement, mf64_ActionPointOffsetBoundary,
                        false, opc_Parent),
+   mpc_TextItem(NULL),
    mq_Editable(oq_Editable)
 {
    this->m_Init();
@@ -82,6 +83,7 @@ C_GiBiTextElement::C_GiBiTextElement(const uint64 & oru64_ID, QGraphicsItem * co
    //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiBiRectBaseGroup(oru64_ID, mhf64_MinWidthTextElement, mhf64_MinHeightTextElement, mf64_ActionPointOffsetBoundary,
                        false, opc_Parent),
+   mpc_TextItem(NULL),
    mq_Editable(true)
 {
    this->m_Init();
@@ -198,7 +200,6 @@ bool C_GiBiTextElement::OpenStyleDialog(const bool oq_DarkMode)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiTextElement::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 {
-
    const C_GiBiTextElement * const pc_Item = dynamic_cast<const C_GiBiTextElement * const>(opc_GuidelineItem);
 
    if (pc_Item != NULL)
@@ -372,7 +373,7 @@ void C_GiBiTextElement::m_UpdateTextElementData(C_PuiBsTextElement * const opc_D
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_GiBiTextElement::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
 {
    Q_UNUSED(of64_DiffWidth)
@@ -477,7 +478,6 @@ bool C_GiBiTextElement::sceneEventFilter(QGraphicsItem * const opc_Watched, QEve
    if ((opc_Watched == this->mpc_TextItem) &&
        (this->mpc_TextItem->IsEditModeActive() == false))
    {
-
       QGraphicsSceneMouseEvent * const pc_MouseEvent = dynamic_cast<QGraphicsSceneMouseEvent *>(opc_Event);
 
       switch (opc_Event->type()) //lint !e788  not all enum constants are necessary here

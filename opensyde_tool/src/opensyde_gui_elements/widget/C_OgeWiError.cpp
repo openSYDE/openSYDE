@@ -59,10 +59,10 @@ C_OgeWiError::C_OgeWiError(QWidget * const opc_Parent) :
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} Never took ownership of parent dialog
 C_OgeWiError::~C_OgeWiError()
 {
    delete mpc_Ui;
-   //lint -e{1740} Never took ownership of parent dialog
 }
 
 //----------------------------------------------------------------------------------------------------------------------

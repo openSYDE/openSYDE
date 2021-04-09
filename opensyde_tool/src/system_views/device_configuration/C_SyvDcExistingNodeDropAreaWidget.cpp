@@ -99,7 +99,8 @@ void C_SyvDcExistingNodeDropAreaWidget::SetContent(const bool oq_ValidSerialNumb
                                                    const QString & orc_PureSerialNumber)
 {
    this->mc_PureSerialNumber = orc_PureSerialNumber;
-   this->mpc_Ui->pc_LabelSerialNumber->setText(static_cast<QString>(C_GtGetText::h_GetText("SN.: %1")).arg(this->mc_PureSerialNumber));
+   this->mpc_Ui->pc_LabelSerialNumber->setText(static_cast<QString>(C_GtGetText::h_GetText("SN.: %1")).arg(this->
+                                                                                                           mc_PureSerialNumber));
    if (oq_ValidSerialNumber == true)
    {
       this->mpc_Ui->pc_GroupBoxEmpty->setVisible(false);

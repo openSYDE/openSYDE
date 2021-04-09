@@ -497,9 +497,8 @@ QWidget * C_SdNdeDpUtil::h_CreateGenericEditor(QWidget * const opc_Parent, const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpUtil::h_SetGenericEditorDataVariable(QWidget * const opc_Editor, const QModelIndex & orc_Index)
 {
-   
    C_OgeWiSpinBoxGroup * const pc_SpinBox = dynamic_cast<C_OgeWiSpinBoxGroup * const>(opc_Editor);
-   
+
    QLineEdit * const pc_LineEdit = dynamic_cast<QLineEdit * const>(opc_Editor);
 
    if (pc_SpinBox != NULL)
@@ -524,9 +523,8 @@ void C_SdNdeDpUtil::h_SetGenericEditorDataVariable(QWidget * const opc_Editor, c
 void C_SdNdeDpUtil::h_SetModelGenericDataVariable(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                                   const QModelIndex & orc_Index)
 {
-   
    C_OgeWiSpinBoxGroup * const pc_SpinBox = dynamic_cast<C_OgeWiSpinBoxGroup * const>(opc_Editor);
-   
+
    QLineEdit * const pc_LineEdit = dynamic_cast<QLineEdit * const>(opc_Editor);
 
    if (pc_SpinBox != NULL)
@@ -964,8 +962,10 @@ sint32 C_SdNdeDpUtil::h_GetNextDiagOrNvmDpIndex(const uint32 ou32_NodeIndex, con
                                                 const bool oq_Forwards)
 {
    sint32 s32_Return = -1;
-   sint32 s32_NumberNVM = C_PuiSdHandler::h_GetInstance()->GetDataPoolCount(ou32_NodeIndex, C_OSCNodeDataPool::eNVM);
-   sint32 s32_NumberDIAG = C_PuiSdHandler::h_GetInstance()->GetDataPoolCount(ou32_NodeIndex, C_OSCNodeDataPool::eDIAG);
+   const sint32 s32_NumberNVM = C_PuiSdHandler::h_GetInstance()->GetDataPoolCount(ou32_NodeIndex,
+                                                                                  C_OSCNodeDataPool::eNVM);
+   const sint32 s32_NumberDIAG = C_PuiSdHandler::h_GetInstance()->GetDataPoolCount(ou32_NodeIndex,
+                                                                                   C_OSCNodeDataPool::eDIAG);
 
    if ((s32_NumberNVM >= 0) && (s32_NumberDIAG >= 0))
    {

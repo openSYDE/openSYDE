@@ -351,7 +351,8 @@ sint32 C_OSCComMessageLogger::SetOsySysDefBus(const C_SCLString & orc_PathSystem
 {
    sint32 s32_Return = C_NOACT;
 
-   std::map<stw_scl::C_SCLString, C_OSCComMessageLoggerOsySysDefConfig>::iterator c_ItSysDef = this->mc_OsySysDefs.find(
+   const std::map<stw_scl::C_SCLString,
+                  C_OSCComMessageLoggerOsySysDefConfig>::iterator c_ItSysDef = this->mc_OsySysDefs.find(
       orc_PathSystemDefinition);
 
    if (c_ItSysDef != this->mc_OsySysDefs.end())
@@ -415,7 +416,8 @@ sint32 C_OSCComMessageLogger::RemoveDatabase(const C_SCLString & orc_Path)
 {
    sint32 s32_Return = C_NOACT;
 
-   std::map<stw_scl::C_SCLString, C_OSCComMessageLoggerOsySysDefConfig>::iterator c_ItSysDef = this->mc_OsySysDefs.find(
+   const std::map<stw_scl::C_SCLString,
+                  C_OSCComMessageLoggerOsySysDefConfig>::iterator c_ItSysDef = this->mc_OsySysDefs.find(
       orc_Path);
 
    if (c_ItSysDef != this->mc_OsySysDefs.end())
@@ -447,11 +449,11 @@ sint32 C_OSCComMessageLogger::ActivateDatabase(const C_SCLString & orc_Path, con
 {
    sint32 s32_Return = C_NOACT;
 
-   std::map<stw_scl::C_SCLString, bool>::iterator c_ItFlag = this->mc_DatabaseActiveFlags.find(orc_Path);
+   const std::map<stw_scl::C_SCLString, bool>::iterator c_ItFlag = this->mc_DatabaseActiveFlags.find(orc_Path);
 
    if (c_ItFlag != this->mc_DatabaseActiveFlags.end())
    {
-      std::map<stw_scl::C_SCLString, C_OSCComMessageLoggerOsySysDefConfig>::iterator c_ItSysDef =
+      const std::map<stw_scl::C_SCLString, C_OSCComMessageLoggerOsySysDefConfig>::iterator c_ItSysDef =
          this->mc_OsySysDefs.find(orc_Path);
 
       c_ItFlag->second = oq_Active;
@@ -502,8 +504,7 @@ sint32 C_OSCComMessageLogger::AddLogFileAsc(const C_SCLString & orc_FilePath, co
    this->mc_LoggingFiles.insert(std::pair<C_SCLString,
                                           C_OSCComMessageLoggerFileBase * const>(orc_FilePath, pc_File));
 
-   //lint -e{429}  no memory leak of pc_File because of handling of instance in map mc_LoggingFiles
-   return s32_Return;
+   return s32_Return; //lint !e429  //no memory leak of pc_File because of handling of instance in map mc_LoggingFiles
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -698,6 +699,7 @@ void C_OSCComMessageLogger::ResetCounter(void)
    \param[in] ou8_BusLoad Current CAN bus load in percentage
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_OSCComMessageLogger::UpdateBusLoad(const uint8 ou8_BusLoad)
 {
    (void)ou8_BusLoad;
@@ -712,6 +714,7 @@ void C_OSCComMessageLogger::UpdateBusLoad(const uint8 ou8_BusLoad)
    \param[in] ou32_TxErrors Current detected CAN Tx errors
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_OSCComMessageLogger::UpdateTxErrors(const uint32 ou32_TxErrors)
 {
    (void)ou32_TxErrors;
@@ -726,6 +729,7 @@ void C_OSCComMessageLogger::UpdateTxErrors(const uint32 ou32_TxErrors)
    \param[in] ou32_TxCount Current counted CAN Tx messages
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_OSCComMessageLogger::UpdateTxCounter(const uint32 ou32_TxCount)
 {
    (void)ou32_TxCount;
@@ -1396,7 +1400,7 @@ void C_OSCComMessageLogger::m_ConvertCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
    }
    else
    {
-      std::map<stw_types::uint32, stw_types::uint32>::iterator c_ItCounter =
+      const std::map<stw_types::uint32, stw_types::uint32>::iterator c_ItCounter =
          this->mc_MsgCounterExtendedId.find(orc_Msg.u32_ID);
 
       if (c_ItCounter == this->mc_MsgCounterExtendedId.end())

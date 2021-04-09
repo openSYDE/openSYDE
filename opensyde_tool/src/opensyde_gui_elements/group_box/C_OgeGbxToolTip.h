@@ -8,8 +8,8 @@
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OGEGBXToolTip_H
-#define C_OGEGBXToolTip_H
+#ifndef C_OGEGBXTOOLTIP_H
+#define C_OGEGBXTOOLTIP_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 

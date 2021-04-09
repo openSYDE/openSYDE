@@ -62,7 +62,7 @@ C_GiTextElementBus::C_GiTextElementBus(const sint32 & ors32_Index, const uint64 
    mpc_SvgRenderer(NULL)
 {
    QFont c_Font;
-   QString c_SvgString("://images/Error_iconV2.svg");
+   const QString c_SvgString("://images/Error_iconV2.svg");
 
    this->mpc_SvgRenderer = new QSvgRenderer(c_SvgString);
 

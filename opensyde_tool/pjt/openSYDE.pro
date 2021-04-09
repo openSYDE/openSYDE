@@ -8,7 +8,7 @@ QT       += core gui
 CONFIG   += precompile_header
 CONFIG   += no_keywords
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets charts svg winextras
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets svg winextras printsupport
 
 TARGET = openSYDE
 TEMPLATE = app
@@ -82,7 +82,7 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubIconOnly.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidget.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingGroupBold.cpp \
-    ../src/opensyde_gui_elements/C_OgeFrame.cpp \
+    ../src/opensyde_gui_elements/frame/C_OgeFraFrame.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetSubTitle.cpp \
     ../src/graphic_items/line_items/C_GiLiLineGroup.cpp \
     ../src/project_operations/C_PopErrorHandling.cpp \
@@ -153,7 +153,7 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemWidget.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorListDelegate.cpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesWidget.cpp \
-    ../src/opensyde_gui_elements/C_OgeFrameSeparator.cpp \
+    ../src/opensyde_gui_elements/frame/C_OgeFraSeparator.cpp \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddCommand.cpp \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand.cpp \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementBaseCommand.cpp \
@@ -329,8 +329,6 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/bus_edit/C_SdBueSignalTableModel.cpp \
     ../src/system_definition/bus_edit/C_SdBueSignalTableView.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingProperties.cpp \
-    ../src/opensyde_gui_elements/chart/C_OgeChaViewBase.cpp \
-    ../src/opensyde_gui_elements/chart/C_OgeChaChartBase.cpp \
     ../src/system_definition/bus_edit/C_SdBueMessageSignalTableDelegate.cpp \
     ../src/system_definition/C_SdTopologyDataSnapshot.cpp \
     ../src/scene_base/C_SebBaseCopyPasteManager.cpp \
@@ -439,7 +437,7 @@ SOURCES += ../src/main.cpp \
     ../src/scene_base/C_SebToolboxUtil.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetDark.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxHover.cpp \
-    ../src/opensyde_gui_elements/C_OgeFrameBorder.cpp \
+    ../src/opensyde_gui_elements/frame/C_OgeFraBorder.cpp \
     ../src/graphic_items/system_view_items/dashboard/C_GiSvDaLabelBase.cpp \
     ../src/system_views/dashboards/items/C_SyvDaItDashboardBaseWidget.cpp \
     ../src/system_views/dashboards/items/C_SyvDaItDashboardLabelWidget.cpp \
@@ -471,11 +469,7 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxTransparentDashboard.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbChart.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbToggle.cpp \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartWidget.cpp \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartDataSelectorWidget.cpp \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartDataItemWidget.cpp \
     ../src/graphic_items/system_view_items/dashboard/C_GiSvDaToggleBase.cpp \
-    ../src/graphic_items/system_view_items/dashboard/C_GiSvDaChartBase.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabColorOnly.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbPieChart.cpp \
     ../src/graphic_items/system_view_items/dashboard/C_GiSvDaPieChartBase.cpp \
@@ -765,7 +759,6 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabNavigationSubHeading.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationHeadingBackground.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationSectionSelected.cpp \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartSettingsWidget.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.cpp \
     ../src/system_definition/bus_edit/C_SdBueMessageRxDatapoolEntry.cpp \
@@ -824,7 +817,21 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.cpp \
     ../src/system_definition/C_SdCodeGenerationDialog.cpp \
     ../src/system_definition/C_SdCodeGenerationView.cpp \
-    ../src/system_definition/C_SdCodeGenerationModel.cpp
+    ../src/system_definition/C_SdCodeGenerationModel.cpp \
+    ../src/system_views/dashboards/C_SyvDaDashboardSceneWidget.cpp \
+    ../src/system_views/dashboards/C_SyvDaDashboardContentBaseWidget.cpp \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaWidget.cpp \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaDataItemWidget.cpp \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaDataSelectorWidget.cpp \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaPlotHandlerWidget.cpp \
+    ../src/project_gui/system_views/dashboard/C_PuiSvDbTabChart.cpp \
+    ../src/opensyde_gui_elements/tool_button/C_OgeTobToolTipBase.cpp \
+    ../src/opensyde_gui_elements/menu/C_OgeMuTabChartFit.cpp \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaPlot.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubAddChartDataElement.cpp \
+    ../src/opensyde_gui_elements/frame/C_OgeFraGeneric.cpp \
+    ../src/opensyde_gui_elements/check_box/C_OgeChxTiny.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubIconChart.cpp
 
 #using our standard compiler warning switches we will get some (non-critical) warnings in miniz.c
 #we do not want to modify that library (as it is not maintained by us)
@@ -910,7 +917,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/push_button/C_OgePubIconOnly.h \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidget.h \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingGroupBold.h \
-    ../src/opensyde_gui_elements/C_OgeFrame.h \
+    ../src/opensyde_gui_elements/frame/C_OgeFraFrame.h \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetSubTitle.h \
     ../src/graphic_items/line_items/C_GiLiLineGroup.h \
     ../src/project_operations/C_PopErrorHandling.h \
@@ -981,7 +988,7 @@ HEADERS  += \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemWidget.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorListDelegate.h \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesWidget.h \
-    ../src/opensyde_gui_elements/C_OgeFrameSeparator.h \
+    ../src/opensyde_gui_elements/frame/C_OgeFraSeparator.h \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddCommand.h \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand.h \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementBaseCommand.h \
@@ -1157,8 +1164,6 @@ HEADERS  += \
     ../src/system_definition/bus_edit/C_SdBueSignalTableModel.h \
     ../src/system_definition/bus_edit/C_SdBueSignalTableView.h \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingProperties.h \
-    ../src/opensyde_gui_elements/chart/C_OgeChaViewBase.h \
-    ../src/opensyde_gui_elements/chart/C_OgeChaChartBase.h \
     ../src/system_definition/bus_edit/C_SdBueMessageSignalTableDelegate.h \
     ../src/system_definition/C_SdTopologyDataSnapshot.h \
     ../src/scene_base/C_SebBaseCopyPasteManager.h \
@@ -1267,7 +1272,7 @@ HEADERS  += \
     ../src/scene_base/C_SebToolboxUtil.h \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetDark.h \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxHover.h \
-    ../src/opensyde_gui_elements/C_OgeFrameBorder.h \
+    ../src/opensyde_gui_elements/frame/C_OgeFraBorder.h \
     ../src/graphic_items/system_view_items/dashboard/C_GiSvDaLabelBase.h \
     ../src/system_views/dashboards/items/C_SyvDaItDashboardBaseWidget.h \
     ../src/system_views/dashboards/items/C_SyvDaItDashboardLabelWidget.h \
@@ -1299,11 +1304,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxTransparentDashboard.h \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbChart.h \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbToggle.h \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartWidget.h \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartDataSelectorWidget.h \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartDataItemWidget.h \
     ../src/graphic_items/system_view_items/dashboard/C_GiSvDaToggleBase.h \
-    ../src/graphic_items/system_view_items/dashboard/C_GiSvDaChartBase.h \
     ../src/opensyde_gui_elements/label/C_OgeLabColorOnly.h \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbPieChart.h \
     ../src/graphic_items/system_view_items/dashboard/C_GiSvDaPieChartBase.h \
@@ -1603,7 +1604,6 @@ HEADERS  += \
     ../src/opensyde_gui_elements/label/C_OgeLabNavigationSubHeading.h \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationHeadingBackground.h \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationSectionSelected.h \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartSettingsWidget.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.h \
     ../src/system_definition/bus_edit/C_SdBueMessageRxDatapoolEntry.h \
@@ -1662,7 +1662,21 @@ HEADERS  += \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.h \
     ../src/system_definition/C_SdCodeGenerationDialog.h \
     ../src/system_definition/C_SdCodeGenerationView.h \
-    ../src/system_definition/C_SdCodeGenerationModel.h
+    ../src/system_definition/C_SdCodeGenerationModel.h \
+    ../src/system_views/dashboards/C_SyvDaDashboardSceneWidget.h \
+    ../src/system_views/dashboards/C_SyvDaDashboardContentBaseWidget.h \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaWidget.h \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaDataItemWidget.h \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaDataSelectorWidget.h \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaPlotHandlerWidget.h \
+    ../src/project_gui/system_views/dashboard/C_PuiSvDbTabChart.h \
+    ../src/opensyde_gui_elements/tool_button/C_OgeTobToolTipBase.h \
+    ../src/opensyde_gui_elements/menu/C_OgeMuTabChartFit.h \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaPlot.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubAddChartDataElement.h \
+    ../src/opensyde_gui_elements/frame/C_OgeFraGeneric.h \
+    ../src/opensyde_gui_elements/check_box/C_OgeChxTiny.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubIconChart.h
 
 FORMS    += \
     ../src/system_definition/C_SdTopologyWidget.ui \
@@ -1728,9 +1742,6 @@ FORMS    += \
     ../src/system_views/dashboards/items/C_SyvDaItDashboardSliderWidget.ui \
     ../src/opensyde_gui_elements/widget/C_OgeWiSpinBoxGroup.ui \
     ../src/system_views/dashboards/items/C_SyvDaItDashboardProgressBarWidget.ui \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartWidget.ui \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartDataSelectorWidget.ui \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartDataItemWidget.ui \
     ../src/system_views/dashboards/properties/C_SyvDaPeBase.ui \
     ../src/system_views/dashboards/properties/C_SyvDaPeLabel.ui \
     ../src/system_views/dashboards/properties/C_SyvDaPeDataElementBrowse.ui \
@@ -1789,7 +1800,6 @@ FORMS    += \
     ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.ui \
     ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.ui \
     ../src/system_views/dashboards/C_SyvDaDashboardInteraction.ui \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartSettingsWidget.ui \
     ../src/system_definition/bus_edit/C_SdBueMessageRxDatapoolEntry.ui \
     ../src/system_definition/bus_edit/C_SdBueMessageRxTimeoutConfig.ui \
     ../src/com_import_export/C_CieImportDatapoolSelectWidget.ui \
@@ -1805,7 +1815,12 @@ FORMS    += \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpListEditWidget.ui \
     ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelDpPreviewPopUp.ui \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpListCommentDialog.ui \
-    ../src/system_definition/C_SdCodeGenerationDialog.ui
+    ../src/system_definition/C_SdCodeGenerationDialog.ui \
+    ../src/system_views/dashboards/C_SyvDaDashboardSceneWidget.ui \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaWidget.ui \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaDataItemWidget.ui \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaDataSelectorWidget.ui \
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaPlotHandlerWidget.ui
 
 INCLUDEPATH += ../src \
                ../src/com_import_export \
@@ -1813,6 +1828,7 @@ INCLUDEPATH += ../src \
                ../src/opensyde_gui_elements \
                ../src/opensyde_gui_elements/check_box \
                ../src/opensyde_gui_elements/combo_box \
+               ../src/opensyde_gui_elements/frame \
                ../src/opensyde_gui_elements/group_box \
                ../src/opensyde_gui_elements/spin_box \
                ../src/opensyde_gui_elements/splitter \
@@ -1826,8 +1842,8 @@ INCLUDEPATH += ../src \
                ../src/opensyde_gui_elements/tab_widget \
                ../src/opensyde_gui_elements/text_edit \
                ../src/opensyde_gui_elements/text_browser \
+               ../src/opensyde_gui_elements/tool_button \
                ../src/opensyde_gui_elements/widget \
-               ../src/opensyde_gui_elements/chart \
                ../src/scene_base \
                ../src/scene_base/undo \
                ../src/scene_base/undo/topology \
@@ -1852,11 +1868,11 @@ INCLUDEPATH += ../src \
                ../src/system_views/communication \
                ../src/system_views/dashboards \
                ../src/system_views/dashboards/items \
-               ../src/system_views/dashboards/items/chart \
                ../src/system_views/dashboards/items/param \
                ../src/system_views/dashboards/items/param/array_editor \
                ../src/system_views/dashboards/items/table \
                ../src/system_views/dashboards/properties \
+               ../src/system_views/dashboards/tab_chart \
                ../src/system_views/system_setup \
                ../src/system_views/system_update \
                ../src/system_views/dashboards/undo \
@@ -1890,12 +1906,14 @@ INCLUDEPATH += ../src \
                ../libs/gettext \
                ../libs/dbc_driver_library/src/ \
                ../libs/dbc_driver_library/src/Vector \
-               ../libs/dbc_driver_library/src/Vector/DBC
+               ../libs/dbc_driver_library/src/Vector/DBC \
+               ../libs/qcustomplot
 
 RESOURCES += \
     ../src/application.qrc
 
 LIBS += -L../libs/gettext -lintl \
+        -L../libs/qcustomplot -lqcustomplot \
         -lz
 
 LIBS += -lws2_32   #WinSock

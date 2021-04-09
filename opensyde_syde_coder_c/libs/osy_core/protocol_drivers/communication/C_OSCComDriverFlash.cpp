@@ -36,7 +36,7 @@ using namespace stw_diag_lib;
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
-extern void XFLSetInternalKey(const uint16 ou16_Key);
+extern void XFLSetInternalKey(const uint16 ou16_Key); //lint !e2701 //very special case here
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
@@ -52,8 +52,8 @@ C_OSCComDriverFlash::C_OSCComDriverFlash(const bool oq_RoutingActive,
                                          const C_OSCFlashProtocolStwFlashloader::PR_ReportProgress opr_XflReportProgress,
                                          void * const opv_XflReportProgressInstance) :
    C_OSCComDriverProtocol(),
-   mpr_XflReportProgress(opr_XflReportProgress),
-   mpv_XflReportProgressInstance(opv_XflReportProgressInstance),
+   pr_XflReportProgress(opr_XflReportProgress),
+   pv_XflReportProgressInstance(opv_XflReportProgressInstance),
    mq_RoutingActive(oq_RoutingActive)
 {
    mc_CompanyId.u8_NumBytes = 2U;
@@ -81,8 +81,8 @@ C_OSCComDriverFlash::~C_OSCComDriverFlash(void)
    }
    this->mc_StwFlashProtocols.clear();
 
-   mpr_XflReportProgress = NULL;
-   mpv_XflReportProgressInstance = NULL;
+   pr_XflReportProgress = NULL;
+   pv_XflReportProgressInstance = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -177,6 +177,7 @@ sint32 C_OSCComDriverFlash::OsySetPollingTimeout(const C_OSCProtocolDriverOsyNod
    if (pc_ExistingProtocol != NULL)
    {
       pc_ExistingProtocol->SetTimeoutPolling(ou32_TimeoutMs);
+      s32_Return = C_NO_ERR;
    }
 
    return s32_Return;
@@ -200,6 +201,7 @@ sint32 C_OSCComDriverFlash::OsyResetPollingTimeout(const C_OSCProtocolDriverOsyN
    if (pc_ExistingProtocol != NULL)
    {
       pc_ExistingProtocol->ResetTimeoutPolling();
+      s32_Return = C_NO_ERR;
    }
 
    return s32_Return;
@@ -224,7 +226,7 @@ const
 
    for (u32_Counter = 0U; u32_Counter < this->mc_ActiveNodesIndexes.size(); ++u32_Counter)
    {
-      uint32 u32_NodeWaitTime;
+      uint32 u32_NodeWaitTime = 0;
       tgl_assert(m_GetMinimumFlashloaderResetWaitTime(oe_Type, this->mc_ActiveNodesIndexes[u32_Counter],
                                                       u32_NodeWaitTime) == C_NO_ERR);
       if (u32_NodeWaitTime > u32_WaitTime)
@@ -1119,16 +1121,47 @@ sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitFileBased(const C_OSCProto
    if (pc_ExistingProtocol != NULL)
    {
       uint8 au8_Signature[8];
-      //place the CRC into the first four bytes; rest is unused
-      au8_Signature[0] = static_cast<uint8>(ou32_CrcOverData >> 24);
-      au8_Signature[1] = static_cast<uint8>(ou32_CrcOverData >> 16);
-      au8_Signature[2] = static_cast<uint8>(ou32_CrcOverData >> 8);
+      //place the CRC into the first four bytes; rest is reserved
+      au8_Signature[0] = static_cast<uint8>(ou32_CrcOverData >> 24U);
+      au8_Signature[1] = static_cast<uint8>(ou32_CrcOverData >> 16U);
+      au8_Signature[2] = static_cast<uint8>(ou32_CrcOverData >> 8U);
       au8_Signature[3] = static_cast<uint8>(ou32_CrcOverData);
-      au8_Signature[4] = 0U;
-      au8_Signature[5] = 0U;
-      au8_Signature[6] = 0U;
-      au8_Signature[7] = 0U;
+      au8_Signature[4] = 0U; //reserved: set to zero
+      au8_Signature[5] = 0U; //reserved: set to zero
+      au8_Signature[6] = 0U; //reserved: set to zero
+      au8_Signature[7] = 0U; //reserved: set to zero
       s32_Return = pc_ExistingProtocol->OsyRequestTransferExitFileBased(au8_Signature, opu8_NrCode);
+   }
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Execute ReadFileBasedTransferExitResult service
+
+   \param[in]   orc_ServerId      Server id for communication
+   \param[out]  orc_Result        read information
+   \param[out]  opu8_NrCode       if != NULL and error response: negative response code
+
+   \return
+   C_NO_ERR    service finished without problems
+   C_RANGE     openSYDE protocol not found
+   C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
+   C_NOACT     Could not put request in Tx queue
+   C_WARN      Error response received
+   C_TIMEOUT   Expected response not received within timeout
+   C_COM       communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverFlash::SendOsyRequestFileBasedTransferExitResult(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                                      C_SCLString & orc_Result,
+                                                                      uint8 * const opu8_NrCode) const
+{
+   sint32 s32_Return = C_RANGE;
+   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+
+   if (pc_ExistingProtocol != NULL)
+   {
+      s32_Return = pc_ExistingProtocol->OsyReadFileBasedTransferExitResult(orc_Result, opu8_NrCode);
    }
    return s32_Return;
 }
@@ -1507,28 +1540,30 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(const C_OSCProtocolDriverOsy
    sint32 s32_Return = C_CONFIG;
    uint32 u32_NodeIndex;
 
-   if ((this->mq_Initialized == true) &&
-       (this->GetNodeIndex(orc_ServerId, u32_NodeIndex) == true))
+   if (this->mq_Initialized == true)
    {
-      T_STWCAN_Msg_TX t_ResetMsg;
-      C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
-      C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
-
-      if (pc_ExistingProtocol == NULL)
+      if (this->GetNodeIndex(orc_ServerId, u32_NodeIndex) == true)
       {
-         // No device with this server id with STW protocol exists. We need a temporary protocol.
-         this->m_InitFlashProtocolStw(&c_StwProtocol, orc_ServerId.u8_NodeIdentifier);
-         pc_ExistingProtocol = &c_StwProtocol;
-      }
+         T_STWCAN_Msg_TX t_ResetMsg;
+         C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+         C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
-      s32_Return = this->m_GetStwResetMessage(u32_NodeIndex, t_ResetMsg);
-      if (s32_Return == C_NO_ERR)
-      {
-         s32_Return = pc_ExistingProtocol->RequestNodeReset(&t_ResetMsg);
-
-         if (s32_Return != C_NO_ERR)
+         if (pc_ExistingProtocol == NULL)
          {
-            s32_Return = C_COM;
+            // No device with this server id with STW protocol exists. We need a temporary protocol.
+            this->m_InitFlashProtocolStw(&c_StwProtocol, orc_ServerId.u8_NodeIdentifier);
+            pc_ExistingProtocol = &c_StwProtocol;
+         }
+
+         s32_Return = this->m_GetStwResetMessage(u32_NodeIndex, t_ResetMsg);
+         if (s32_Return == C_NO_ERR)
+         {
+            s32_Return = pc_ExistingProtocol->RequestNodeReset(&t_ResetMsg);
+
+            if (s32_Return != C_NO_ERR)
+            {
+               s32_Return = C_COM;
+            }
          }
       }
    }
@@ -1552,7 +1587,7 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(const C_OSCProtocolDriverOsy
 sint32 C_OSCComDriverFlash::SendStwSendFlash(const C_OSCProtocolDriverOsyNode & orc_ServerId)
 {
    sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
+   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
    C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol == NULL)
@@ -1588,7 +1623,7 @@ sint32 C_OSCComDriverFlash::SendStwSendFlash(const C_OSCProtocolDriverOsyNode & 
 sint32 C_OSCComDriverFlash::SendStwSearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFFERENT_LOCAL_IDS],
                                             uint8 & oru8_NodeFounds)
 {
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
+   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
    // No concrete device. We need a temporary protocol.
    this->m_InitFlashProtocolStw(&c_StwProtocol, 0);
@@ -1628,7 +1663,7 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalId(const C_OSCProtocolDriverOsyNod
    }
    else
    {
-      C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
+      C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
       // No device with this server id with STW protocol exist. We need a temporary protocol.
       this->m_InitFlashProtocolStw(&c_StwProtocol, orc_ServerId.u8_NodeIdentifier);
@@ -1642,7 +1677,7 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalId(const C_OSCProtocolDriverOsyNod
 
       C_OSCFlashProtocolStwFlashloader::CompIDStructToString(c_ReceivedCompanyId, c_CompanyId);
 
-      osc_write_log_info("SendStwWakeupLocalId", C_SCLString("Other company id found: ") + c_CompanyId);
+      osc_write_log_info("SendStwWakeupLocalId", "Other company id found: " + c_CompanyId);
 
       // An other company id is no error
       s32_Return = C_NO_ERR;
@@ -1667,7 +1702,7 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const uint8 (&orau8_S
    sint32 s32_Return;
    C_XFLCompanyID c_ReceivedCompanyId;
 
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
+   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
    // No concrete device. We need a temporary protocol.
    this->m_InitFlashProtocolStw(&c_StwProtocol, 0);
@@ -1682,7 +1717,7 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const uint8 (&orau8_S
 
       C_OSCFlashProtocolStwFlashloader::CompIDStructToString(c_ReceivedCompanyId, c_CompanyId);
 
-      osc_write_log_info("SendStwWakeupLocalId", C_SCLString("Other company id found: ") + c_CompanyId.c_str());
+      osc_write_log_info("SendStwWakeupLocalId", "Other company id found: " + c_CompanyId);
 
       // An other company id is no error
       s32_Return = C_NO_ERR;
@@ -1711,7 +1746,7 @@ sint32 C_OSCComDriverFlash::SendStwGetSerialNumbers(const C_OSCProtocolDriverOsy
                                                     uint8 & oru8_NumFound)
 {
    sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
+   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
    C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol == NULL)
@@ -1741,7 +1776,7 @@ sint32 C_OSCComDriverFlash::SendStwGetDeviceId(const C_OSCProtocolDriverOsyNode 
                                                C_SCLString & orc_DeviceName)
 {
    sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
+   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
    C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
    uint16 u16_ProtocolVersion;
    bool q_LongId;
@@ -1783,7 +1818,7 @@ sint32 C_OSCComDriverFlash::SendStwSetLocalId(const C_OSCProtocolDriverOsyNode &
 {
    sint32 s32_Return;
 
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
+   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
    // We change the server Id and do not want to change the server Id of existing protocols.
    // We need a temporary protocol.
@@ -1810,7 +1845,7 @@ sint32 C_OSCComDriverFlash::SendStwSetBitrateCan(const C_OSCProtocolDriverOsyNod
                                                  const uint32 ou32_Bitrate)
 {
    sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
+   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
    C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol == NULL)
@@ -1838,7 +1873,7 @@ sint32 C_OSCComDriverFlash::SendStwSetBitrateCan(const C_OSCProtocolDriverOsyNod
 sint32 C_OSCComDriverFlash::SendStwNetReset(const C_OSCProtocolDriverOsyNode & orc_ServerId)
 {
    sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
+   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
    C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol == NULL)
@@ -1870,7 +1905,7 @@ sint32 C_OSCComDriverFlash::SendStwNetReset(void)
 {
    sint32 s32_Return;
 
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
+   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
    // No concrete device. We need a temporary protocol.
    this->m_InitFlashProtocolStw(&c_StwProtocol, 0);
@@ -2081,7 +2116,6 @@ sint32 C_OSCComDriverFlash::m_StartRoutingSpecific(const uint32 ou32_ActiveNode,
 
    if (opc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_OSCFlashProtocolStwFlashloader * const pc_StwFlashloader =
          dynamic_cast<C_OSCFlashProtocolStwFlashloader * const>(this->mc_StwFlashProtocols[ou32_ActiveNode]);
 
@@ -2121,7 +2155,6 @@ void C_OSCComDriverFlash::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
 
    if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
    {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_OSCFlashProtocolStwFlashloader * const pc_StwFlashloader =
          dynamic_cast<C_OSCFlashProtocolStwFlashloader * const>(this->mc_StwFlashProtocols[ou32_ActiveNode]);
 
@@ -2268,12 +2301,13 @@ sint32 C_OSCComDriverFlash::m_InitFlashProtocol(void)
                this->mc_OsyProtocols[u32_ActiveNodeCounter] = pc_ProtocolOsy;
                break;
             case C_OSCNodeProperties::eFL_STW:
-               pc_ProtocolStw = new C_OSCFlashProtocolStwFlashloader(mpr_XflReportProgress,
-                                                                     mpv_XflReportProgressInstance);
+               pc_ProtocolStw = new C_OSCFlashProtocolStwFlashloader(pr_XflReportProgress,
+                                                                     pv_XflReportProgressInstance);
                this->m_InitFlashProtocolStw(pc_ProtocolStw,
                                             this->mc_ServerIDs[u32_ActiveNodeCounter].u8_NodeIdentifier);
                this->mc_StwFlashProtocols[u32_ActiveNodeCounter] = pc_ProtocolStw;
                break;
+            case C_OSCNodeProperties::eFL_NONE:
             default:
                s32_Return = C_OVERFLOW;
                break;
@@ -2421,6 +2455,9 @@ sint32 C_OSCComDriverFlash::m_GetMinimumFlashloaderResetWaitTime(
          case C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_ETHERNET:
             oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeFundamentalChangesEthernet;
             break;
+         default:
+            tgl_assert(false);
+            break;
          }
       }
    }
@@ -2438,7 +2475,7 @@ sint32 C_OSCComDriverFlash::m_GetMinimumFlashloaderResetWaitTime(
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComDriverFlash::mh_HandleWaitTime(void * const opv_Instance)
 {
-   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
    C_OSCComDriverFlash * const pc_ComDriver = reinterpret_cast<C_OSCComDriverFlash * const>(opv_Instance);
 
    tgl_assert(pc_ComDriver != NULL);

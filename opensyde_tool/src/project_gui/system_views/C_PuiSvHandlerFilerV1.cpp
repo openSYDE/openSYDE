@@ -263,6 +263,8 @@ sint32 C_PuiSvHandlerFilerV1::h_LoadDashboard(C_PuiSvDashboard & orc_Dashboard, 
       s32_Retval = C_PuiBsElementsFiler::h_LoadBaseElements(orc_Dashboard, orc_XMLParser);
    }
    orc_Dashboard.SetActive(orc_XMLParser.GetAttributeBool("active"));
+   //Default
+   orc_Dashboard.SetType(C_PuiSvDashboard::eSCENE);
    return s32_Retval;
 }
 

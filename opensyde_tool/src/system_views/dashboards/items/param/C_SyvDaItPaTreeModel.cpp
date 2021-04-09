@@ -174,7 +174,6 @@ void C_SyvDaItPaTreeModel::SetActionActive(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::DeleteSpecified(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
-
    C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -244,7 +243,6 @@ void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolLis
                                           std::vector<QString> & orc_InvalidValues,
                                           std::vector<QString> & orc_NewValues)
 {
-
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -435,7 +433,6 @@ bool C_SyvDaItPaTreeModel::CheckAllListsRead(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
 {
-
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if ((pc_ParamWidget != NULL) && (orc_ListIds.size() > 0UL))
@@ -506,7 +503,6 @@ void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OSCNodeDataP
 void C_SyvDaItPaTreeModel::RemoveValuesChangedFlag(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 const
 {
-
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if ((pc_ParamWidget != NULL) && (orc_ListIds.size() > 0UL))
@@ -960,7 +956,6 @@ std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeModel::GetInvalidListIds(voi
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::UpdateECUValues(void)
 {
-
    C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -1058,7 +1053,6 @@ void C_SyvDaItPaTreeModel::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_List
 void C_SyvDaItPaTreeModel::GetListSetValues(const C_OSCNodeDataPoolListElementId & orc_ListId,
                                             std::vector<C_OSCNodeDataPoolContent> & orc_ListValues) const
 {
-
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -1097,7 +1091,6 @@ void C_SyvDaItPaTreeModel::GetListSetValues(const C_OSCNodeDataPoolListElementId
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidget)
 {
-
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(opc_DataWidget);
 
    this->beginResetModel();
@@ -1461,7 +1454,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
             break;
          case 3:
             //List
-            switch (e_Col)
+            switch (e_Col) //lint !e788 not all cases handled here explicitly
             {
             case C_SyvDaItPaTreeModel::eCOMMENT:
                if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
@@ -1579,7 +1572,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
             break;
          case 4:
             //Element
-            switch (e_Col)
+            switch (e_Col) //lint !e788 not all cases handled here explicitly
             {
             case C_SyvDaItPaTreeModel::eCOMMENT:
                if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
@@ -1736,7 +1729,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
          QStringList c_Icons;
-         switch (e_Col)
+         switch (e_Col) //lint !e788 not all cases handled here explicitly
          {
          case eACTION_READ:
             if (u32_ValidLayers < 4)
@@ -1821,7 +1814,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
             const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
             C_OSCNodeDataPoolListElementId c_Id;
             uint32 u32_ValidLayers;
-            switch (e_Col)
+            switch (e_Col) //lint !e788 not all cases handled here explicitly
             {
             case C_SyvDaItPaTreeModel::eSET:
                C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
@@ -1896,7 +1889,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          //Handle action columns
          if (u32_ValidLayers < 4UL)
          {
-            switch (e_Col)
+            switch (e_Col) //lint !e788 not all cases handled here explicitly
             {
             case C_SyvDaItPaTreeModel::eACTION_APPLY:
                c_Retval = C_GtGetText::h_GetText("Copy command");
@@ -1934,7 +1927,6 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          if (((e_Col == C_SyvDaItPaTreeModel::eDEVICE_VALUE) || (e_Col == C_SyvDaItPaTreeModel::eSET)) &&
              (u32_ValidLayers == 4UL))
          {
-
             const C_GiSvDaParam * const pc_ParamWidget =
                dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
             if (pc_ParamWidget != NULL)
@@ -1972,7 +1964,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
             if (u32_ValidLayers < 4UL)
             {
                const QString c_Template = C_SyvDaItPaTreeModel::h_GetSelectedItemTypeTemplate(orc_Index);
-               switch (e_Col)
+               switch (e_Col) //lint !e788 not all cases handled here explicitly
                {
                case C_SyvDaItPaTreeModel::eACTION_APPLY:
                case C_SyvDaItPaTreeModel::eACTION_READ:
@@ -2105,7 +2097,7 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
       const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
 
       const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
-      switch (e_Col)
+      switch (e_Col) //lint !e788 not all cases handled here explicitly
       {
       case C_SyvDaItPaTreeModel::eSET:
          switch (u32_ValidLayers)
@@ -2576,31 +2568,26 @@ void C_SyvDaItPaTreeModel::h_DecodeIndex(const QModelIndex & orc_Index, C_OSCNod
    oru32_ValidLayers = 0UL;
    if (orc_Index.isValid() == true)
    {
-      //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreItem * const pc_TreeItem =
          static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
       {
-
          const C_TblTreItem * const pc_FirstParent = dynamic_cast<const C_TblTreItem * const>(pc_TreeItem->pc_Parent);
          if ((pc_FirstParent != NULL) && (pc_FirstParent->pc_Parent != NULL))
          {
-
             const C_TblTreItem * const pc_SecondParent =
                dynamic_cast<const C_TblTreItem * const>(pc_FirstParent->pc_Parent);
             if ((pc_SecondParent != NULL) && (pc_SecondParent->pc_Parent != NULL))
             {
-
                const C_TblTreItem * const pc_ThirdParent =
                   dynamic_cast<const C_TblTreItem * const>(pc_SecondParent->pc_Parent);
                if ((pc_ThirdParent != NULL) && (pc_ThirdParent->pc_Parent != NULL))
                {
-
                   const C_TblTreItem * const pc_FourthParent =
                      dynamic_cast<const C_TblTreItem * const>(pc_ThirdParent->pc_Parent);
                   if ((pc_FourthParent != NULL) && (pc_FourthParent->pc_Parent != NULL))
                   {
-
                      const C_TblTreItem * const pc_FifthParent =
                         dynamic_cast<const C_TblTreItem * const>(pc_FourthParent->pc_Parent);
                      if ((pc_FifthParent != NULL) && (pc_FifthParent->pc_Parent != NULL))
@@ -3511,7 +3498,6 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
            (c_ItAll != this->mpc_InvisibleRootItem->c_Children.end()) && (q_Found == false);
            ++c_ItAll)
       {
-
          const C_TblTreItem * const pc_AllNode = dynamic_cast<const C_TblTreItem * const>(*c_ItAll);
          if (pc_AllNode != NULL)
          {
@@ -3519,7 +3505,6 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
             for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
                  (c_ItNode != pc_AllNode->c_Children.end()) && (q_Found == false); ++c_ItNode)
             {
-
                const C_TblTreItem * const pc_Node = dynamic_cast<const C_TblTreItem * const>(*c_ItNode);
                if (pc_Node != NULL)
                {
@@ -3527,7 +3512,6 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
                   for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
                        (c_ItDp != pc_Node->c_Children.end()) && (q_Found == false); ++c_ItDp)
                   {
-
                      const C_TblTreItem * const pc_Dp = dynamic_cast<const C_TblTreItem * const>(*c_ItDp);
                      if (pc_Dp != NULL)
                      {
@@ -3536,7 +3520,6 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
                              (c_ItList != pc_Dp->c_Children.end()) && (q_Found == false);
                              ++c_ItList)
                         {
-
                            const C_TblTreItem * const pc_List = dynamic_cast<const C_TblTreItem * const>(*c_ItList);
                            if (pc_List != NULL)
                            {

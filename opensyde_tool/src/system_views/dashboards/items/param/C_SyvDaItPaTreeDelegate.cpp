@@ -100,7 +100,7 @@ QWidget * C_SyvDaItPaTreeDelegate::createEditor(QWidget * const opc_Parent, cons
       if (u32_ValidLayers > 2UL)
       {
          QComboBox * pc_ComboBox;
-         switch (e_Col)
+         switch (e_Col) //lint !e788 //not all columns handled here explicitly
          {
          case C_SyvDaItPaTreeModel::eSET:
             if (u32_ValidLayers == 4UL)
@@ -160,7 +160,7 @@ QWidget * C_SyvDaItPaTreeDelegate::createEditor(QWidget * const opc_Parent, cons
       }
       else
       {
-         switch (e_Col)
+         switch (e_Col) //lint !e788 //not all columns handled here explicitly
          {
          case C_SyvDaItPaTreeModel::eACTION_READ:
             Q_EMIT this->SigActionRead(c_Id, u32_ValidLayers);
@@ -212,16 +212,14 @@ void C_SyvDaItPaTreeDelegate::setEditorData(QWidget * const opc_Editor, const QM
       if (u32_ValidLayers > 2UL)
       {
          const C_SyvDaItPaTreeModel::E_Columns e_Col = C_SyvDaItPaTreeModel::h_ColumnToEnum(orc_Index.column());
-         switch (e_Col)
+         if (e_Col == C_SyvDaItPaTreeModel::eSET)
          {
-         case C_SyvDaItPaTreeModel::eSET:
             if (u32_ValidLayers == 4UL)
             {
                C_SdNdeDpUtil::h_SetGenericEditorDataVariable(opc_Editor, orc_Index);
             }
             else if (u32_ValidLayers == 3UL)
             {
-               
                QComboBox * const pc_ComboBox = dynamic_cast<QComboBox * const>(opc_Editor);
                if (pc_ComboBox != NULL)
                {
@@ -234,9 +232,6 @@ void C_SyvDaItPaTreeDelegate::setEditorData(QWidget * const opc_Editor, const QM
             {
                //Undefined
             }
-            break;
-         default:
-            break;
          }
       }
    }
@@ -264,16 +259,14 @@ void C_SyvDaItPaTreeDelegate::setModelData(QWidget * const opc_Editor, QAbstract
       if (u32_ValidLayers > 2UL)
       {
          const C_SyvDaItPaTreeModel::E_Columns e_Col = C_SyvDaItPaTreeModel::h_ColumnToEnum(orc_Index.column());
-         switch (e_Col)
+         if (e_Col == C_SyvDaItPaTreeModel::eSET)
          {
-         case C_SyvDaItPaTreeModel::eSET:
             if (u32_ValidLayers == 4UL)
             {
                C_SdNdeDpUtil::h_SetModelGenericDataVariable(opc_Editor, opc_Model, orc_Index);
             }
             else if (u32_ValidLayers == 3UL)
             {
-               
                QComboBox * const pc_ComboBox = dynamic_cast<QComboBox * const>(opc_Editor);
                if (pc_ComboBox != NULL)
                {
@@ -284,9 +277,6 @@ void C_SyvDaItPaTreeDelegate::setModelData(QWidget * const opc_Editor, QAbstract
             {
                //Undefined
             }
-            break;
-         default:
-            break;
          }
       }
    }
@@ -362,8 +352,7 @@ void C_SyvDaItPaTreeDelegate::destroyEditor(QWidget * const opc_Editor, const QM
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeDelegate::eventFilter(QObject * const opc_Object, QEvent * const opc_Event)
 {
-   
-   C_OgeCbxParam * pc_ComboBox = dynamic_cast<C_OgeCbxParam *>(opc_Object);
+   C_OgeCbxParam * const pc_ComboBox = dynamic_cast<C_OgeCbxParam *>(opc_Object);
    bool q_Return = false;
 
    if (pc_ComboBox != NULL)

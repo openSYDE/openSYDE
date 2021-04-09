@@ -412,6 +412,7 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
       const C_OSCNode & rc_CheckedNode = this->c_Nodes[ou32_NodeIndex];
       if (opq_NameConflict != NULL)
       {
+         //check for node name used more than once (independent of character case)
          *opq_NameConflict = false;
          for (uint32 u32_ItNode = 0; u32_ItNode < this->c_Nodes.size(); ++u32_ItNode)
          {
@@ -421,22 +422,25 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                if (rc_CheckedNode.c_Properties.c_Name.LowerCase() == rc_CurrentNode.c_Properties.c_Name.LowerCase())
                {
                   *opq_NameConflict = true;
+                  break;
                }
             }
          }
       }
       if (opq_NameInvalid != NULL)
       {
+         //check for valid node name
          *opq_NameInvalid = !C_OSCUtils::h_CheckValidCName(rc_CheckedNode.c_Properties.c_Name);
       }
       if (opq_NodeIdInvalid != NULL)
       {
+         //chaeck for valid node ID
          *opq_NodeIdInvalid = false;
 
          for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_CheckedNode.c_Properties.c_ComInterfaces.size();
               ++u32_ItComInterface)
          {
-            //check
+            //check for same node ID used twice on same bus
             const bool q_ComIdValid = this->CheckInterfaceIsAvailable(ou32_NodeIndex, u32_ItComInterface,
                                                                       rc_CheckedNode.c_Properties.c_ComInterfaces[
                                                                          u32_ItComInterface].u8_NodeID);
@@ -447,6 +451,7 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                *opq_NodeIdInvalid = true;
                if (opc_InvalidInterfaceIndices == NULL)
                {
+                  //not interested in details, we are finished here as we know there was at least one conflics
                   break;
                }
                else
@@ -458,15 +463,16 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
       }
       if (opq_DataPoolsInvalid != NULL)
       {
+         // check all datapools for errors
          uint32 u32_Counter;
          bool q_DataPoolNameConflict;
          bool q_DataPoolNameInvalid;
          bool q_DataPoolListError;
+         bool q_DataPoolListOrElementLengthError;
          bool q_ResultError = false;
          static std::map<std::vector<uint32>, bool> hc_PreviousCommChecks;
          static std::map<uint32, bool> hc_PreviousCommonChecks;
 
-         // check all datapools for errors
          for (u32_Counter = 0U;
               (u32_Counter < rc_CheckedNode.c_DataPools.size()) &&
               ((q_ResultError == false) || (opc_InvalidDataPoolIndices != NULL));
@@ -490,6 +496,18 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                   std::vector<uint32> c_Hashes;
                   c_Hashes.push_back(u32_Hash);
                   c_Hashes.push_back(u32_ProtocolHash);
+
+                  //check basic: list and element count:
+                  rc_CheckedNode.CheckErrorDataPoolNumListsAndElements(u32_Counter, q_DataPoolListOrElementLengthError);
+                  if (q_DataPoolListOrElementLengthError == true)
+                  {
+                     q_ResultError = true;
+                     q_AlreadyAdded = true;
+                     if (opc_InvalidDataPoolIndices != NULL)
+                     {
+                        opc_InvalidDataPoolIndices->push_back(u32_Counter);
+                     }
+                  }
 
                   //Check if check was already performed in the past
                   c_It = hc_PreviousCommChecks.find(c_Hashes);
@@ -559,10 +577,10 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                if (c_It == hc_PreviousCommonChecks.end())
                {
                   rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, &q_DataPoolNameInvalid,
-                                                    &q_DataPoolListError, NULL);
+                                                    &q_DataPoolListError, &q_DataPoolListOrElementLengthError, NULL);
 
                   if (((q_DataPoolNameConflict == true) || (q_DataPoolNameInvalid == true)) ||
-                      (q_DataPoolListError == true))
+                      (q_DataPoolListError == true) || (q_DataPoolListOrElementLengthError == true))
                   {
                      q_ResultError = true;
                      if (opc_InvalidDataPoolIndices != NULL)
@@ -583,7 +601,7 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                else
                {
                   //ALWAYS do datapool name conflict check
-                  rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, NULL, NULL, NULL);
+                  rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, NULL, NULL, NULL, NULL);
 
                   if (q_DataPoolNameConflict == true)
                   {

@@ -78,9 +78,11 @@ using namespace stw_opensyde_gui_elements;
 /*! \brief   Default constructor
 
    Set up GUI with all elements.
+
+   \param[in]  ou16_Timer  Timer
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_NagMainWindow::C_NagMainWindow(void) :
+C_NagMainWindow::C_NagMainWindow(const uint16 ou16_Timer) :
    QMainWindow(NULL),
    mpc_Ui(new Ui::C_NagMainWindow),
    mpc_ActiveWidget(NULL),
@@ -95,7 +97,8 @@ C_NagMainWindow::C_NagMainWindow(void) :
    mu32_SdFlag(0U),
    ms32_SvSubMode(ms32_SUBMODE_SYSVIEW_SETUP),
    mu32_SvIndex(0U),
-   mu32_SvFlag(0U)
+   mu32_SvFlag(0U),
+   mu16_Timer(ou16_Timer)
 {
    // Performance measurement
    // Switch on and off because using flag from user settings would load them, hence this loading time would not count
@@ -197,6 +200,7 @@ C_NagMainWindow::C_NagMainWindow(void) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1579}  no memory leak because of the parent all elements and the Qt memory management
 C_NagMainWindow::~C_NagMainWindow()
 {
    // save position
@@ -217,8 +221,6 @@ C_NagMainWindow::~C_NagMainWindow()
    stw_opensyde_gui_logic::C_PuiProject::h_Destroy();
    C_UsHandler::h_Destroy();
    C_TblTreDataElementModel::h_CleanUp();
-
-   //lint -e{1579}  no memory leak because of the parent all elements and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -266,17 +268,17 @@ void C_NagMainWindow::m_ShowStartView()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_ChangeUseCase(const sint32 os32_Mode, const sint32 os32_SubIndex, const bool oq_ChangeUseCase)
+void C_NagMainWindow::m_ChangeUseCase(const sint32 os32_Mode, const sint32 os32_SubMode, const bool oq_ChangeUseCase)
 {
    bool q_Worked;
    QString c_Name;
    QString c_SubItemName;
 
    //Get appropriate default heading
-   C_NagMainWindow::mh_GetHeadingNames(os32_Mode, os32_SubIndex, 0UL, c_Name, c_SubItemName);
+   C_NagMainWindow::mh_GetHeadingNames(os32_Mode, os32_SubMode, 0UL, c_Name, c_SubItemName);
 
    //Change use-case
-   q_Worked = m_ChangeMode(os32_Mode, os32_SubIndex, 0U, c_Name, c_SubItemName, 0U, oq_ChangeUseCase);
+   q_Worked = m_ChangeMode(os32_Mode, os32_SubMode, 0U, c_Name, c_SubItemName, 0U, oq_ChangeUseCase);
 
    if (q_Worked == false)
    {
@@ -355,8 +357,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    {
       if (this->mq_StartView == false)
       {
-         
-         C_SdHandlerWidget * pc_Handler = dynamic_cast<C_SdHandlerWidget *>(this->mpc_ActiveWidget);
+         C_SdHandlerWidget * const pc_Handler = dynamic_cast<C_SdHandlerWidget *>(this->mpc_ActiveWidget);
 
          //SD is active
          if (pc_Handler != NULL)
@@ -364,8 +365,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
             pc_Handler->CallHelp();
          }
 
-         
-         C_SyvHandlerWidget * pc_HandlerSv = dynamic_cast<C_SyvHandlerWidget *>(this->mpc_ActiveWidget);
+         C_SyvHandlerWidget * const pc_HandlerSv = dynamic_cast<C_SyvHandlerWidget *>(this->mpc_ActiveWidget);
 
          //SV is active
          if (pc_HandlerSv != NULL)
@@ -421,12 +421,12 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
       }
    }
    //Trigger tool tip hide if necessary
-   if (opc_KeyEvent->key() == Qt::Key_Escape)
+   if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Escape))
    {
       q_ToolTipHidden2 = C_NagToolTip::h_HideAll();
    }
    QMainWindow::keyPressEvent(opc_KeyEvent);
-   if ((((opc_KeyEvent->key() == Qt::Key_Escape) && (opc_KeyEvent->isAccepted() == false)) &&
+   if ((((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Escape)) && (opc_KeyEvent->isAccepted() == false)) &&
         (q_ToolTipHidden1 == false)) && (q_ToolTipHidden2 == false))
    {
       switch (this->ms32_Mode)
@@ -643,6 +643,7 @@ void C_NagMainWindow::m_LoadInitialProject(void)
 
    // Initialize dynamic text of main widget and window title
    this->mpc_MainWidget->UpdateRecentProjects();
+   osc_write_log_performance_stop(mu16_Timer, "Project Load Initial");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -688,13 +689,13 @@ void C_NagMainWindow::m_PrepareForSpecificWidget(const bool oq_DeleteActualWidge
 
    \param[in]  os32_Mode            Mode
    \param[in]  os32_SubMode         Sub mode
-   \param[in]  oc_ItemName          Item name
+   \param[in]  orc_ItemName         Item name
    \param[in]  orc_SubSubModeName   Sub sub mode name
    \param[in]  ou32_Index           Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_SetNewSpecificWidget(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
-                                             QString oc_ItemName, const QString & orc_SubSubModeName,
+                                             const QString & orc_ItemName, const QString & orc_SubSubModeName,
                                              const uint32 ou32_Index)
 {
    connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigChangeMode,
@@ -720,7 +721,7 @@ void C_NagMainWindow::m_SetNewSpecificWidget(const stw_types::sint32 os32_Mode, 
    this->mpc_Ui->pc_NaviBar->SetMode(os32_Mode, os32_SubMode, ou32_Index);
 
    // show the new widget
-   this->mpc_UseCaseWidget->SetUseCaseWidget(this->mpc_ActiveWidget, os32_Mode, os32_SubMode, oc_ItemName,
+   this->mpc_UseCaseWidget->SetUseCaseWidget(this->mpc_ActiveWidget, os32_Mode, os32_SubMode, orc_ItemName,
                                              orc_SubSubModeName, os32_Mode == ms32_MODE_SYSVIEW);
 
    // configure the buttons of the upper toolbar
@@ -875,7 +876,6 @@ void C_NagMainWindow::mh_GetHeadingNames(const sint32 os32_Mode, const sint32 & 
 void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
                                        const QString & orc_SubName, const uint32 ou32_Flag)
 {
-   
    C_SdHandlerWidget * pc_Handler = dynamic_cast<C_SdHandlerWidget *>(this->mpc_ActiveWidget);
 
    // Special case: Restore last screen when coming from main
@@ -929,7 +929,6 @@ void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 o
 void C_NagMainWindow::m_ShowSysViewItem(sint32 & ors32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
                                         const QString & orc_SubSubModeName, const uint32 ou32_Flag)
 {
-   
    C_SyvHandlerWidget * pc_Handler = dynamic_cast<C_SyvHandlerWidget *>(this->mpc_ActiveWidget);
 
    // Special case: Handle system view PC reconnect
@@ -1004,12 +1003,12 @@ bool C_NagMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
       if (opc_Mime->hasUrls() == true)
       {
          QStringList c_PathList;
-         QList<QUrl> c_UrlList = opc_Mime->urls();
+         const QList<QUrl> & rc_UrlList = opc_Mime->urls();
 
          // extract the local paths of the files
-         for (sintn sn_It = 0; sn_It < c_UrlList.size(); ++sn_It)
+         for (sintn sn_It = 0; sn_It < rc_UrlList.size(); ++sn_It)
          {
-            c_PathList.append(c_UrlList.at(sn_It).toLocalFile());
+            c_PathList.append(rc_UrlList.at(sn_It).toLocalFile());
          }
          if (c_PathList.size() == 1)
          {
@@ -1094,31 +1093,10 @@ void C_NagMainWindow::m_ProjectLoaded(const bool & orq_SwitchToLastKnownMode)
    C_UsHandler::h_GetInstance()->GetProjLastScreenMode(this->ms32_SdSubMode, this->mu32_SdIndex, this->mu32_SdFlag,
                                                        this->ms32_SvSubMode, this->mu32_SvIndex, this->mu32_SvFlag);
 
-   // reset SD submode always to network topology on project load TODO: remove from user settings save (and remove
-   // following index checker)
+   // reset SD submode always to network topology on project load TODO: remove from user settings save
    this->ms32_SdSubMode = ms32_SUBMODE_SYSDEF_TOPOLOGY;
    this->mu32_SdIndex = 0U;
    this->mu32_SdFlag = 0U;
-
-   // Check the indexes for existence
-   if ((this->ms32_SdSubMode == ms32_SUBMODE_SYSDEF_NODEEDIT) &&
-       (C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_SdIndex) == NULL))
-   {
-      this->ms32_SdSubMode = ms32_SUBMODE_SYSDEF_TOPOLOGY;
-      this->mu32_SdIndex = 0U;
-      this->mu32_SdFlag = 0U;
-   }
-   else if ((this->ms32_SdSubMode == ms32_SUBMODE_SYSDEF_BUSEDIT) &&
-            (C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_SdIndex) == NULL))
-   {
-      this->ms32_SdSubMode = ms32_SUBMODE_SYSDEF_TOPOLOGY;
-      this->mu32_SdIndex = 0U;
-      this->mu32_SdFlag = 0U;
-   }
-   else
-   {
-      // Nothing to do
-   }
 
    //Update system views (after project was loaded
    this->mpc_Ui->pc_NaviBar->InitSysView();
@@ -1155,6 +1133,7 @@ void C_NagMainWindow::m_ProjectLoaded(const bool & orq_SwitchToLastKnownMode)
          break;
       case ms32_MODE_SYSVIEW:
          this->m_ChangeUseCase(this->ms32_Mode, this->ms32_SvSubMode);
+         break;
       default:
          break;
       }

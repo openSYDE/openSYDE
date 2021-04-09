@@ -156,11 +156,10 @@ C_GiSyLineWidget::C_GiSyLineWidget(const E_Type oe_Mode, C_GiSyBaseWidget & orc_
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because the ownership of these objects was never transferred to this class
 C_GiSyLineWidget::~C_GiSyLineWidget(void)
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
-   // and Qt management takes care of the rest
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -376,7 +375,7 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
 
       // Main line
       c_Points.push_back(QPointF(f64_PlacementOffset, 70.0));
-      c_Points.push_back(QPointF(c_ViewSize.width() - f64_PlacementOffset, 70.0));
+      c_Points.push_back(QPointF(static_cast<float64>(c_ViewSize.width()) - f64_PlacementOffset, 70.0));
 
       if (me_Mode == eETHERNET_BUS)
       {
@@ -412,7 +411,7 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
       pc_Item->SetMiddleLineColor(this->mc_InnerLineColor);
       pc_Item->setFlag(QGraphicsItem::ItemStacksBehindParent);
       this->mpc_ParentDialog->GetPreviewScene()->addItem(pc_Item);
-   }  //lint !e429  //no memory leak because of adding the item to the scene and the Qt memory management
+   } //lint !e429  //no memory leak because of adding the item to the scene and the Qt memory management
    else
    {
       C_GiBiArrow * pc_Arrow;
@@ -420,17 +419,17 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
       float64 f64_XOffset = 0.0;
       if (C_GiBiArrow::h_HasOffsetInteractionPoint(e_ArrowHeadType) == true)
       {
-         f64_XOffset = this->mpc_Ui->pc_SpinBoxWidth->value() * 2.0;
+         f64_XOffset = static_cast<float64>(this->mpc_Ui->pc_SpinBoxWidth->value()) * 2.0;
       }
 
-      c_Points.push_back(QPointF(f64_PlacementOffset + f64_XOffset, c_ViewSize.height() / 2.0));
+      c_Points.push_back(QPointF(f64_PlacementOffset + f64_XOffset, static_cast<float64>(c_ViewSize.height()) / 2.0));
       e_ArrowHeadType = this->GetEndArrow();
       if (C_GiBiArrow::h_HasOffsetInteractionPoint(e_ArrowHeadType) == true)
       {
-         f64_XOffset = this->mpc_Ui->pc_SpinBoxWidth->value() * 2.0;
+         f64_XOffset = static_cast<float64>(this->mpc_Ui->pc_SpinBoxWidth->value()) * 2.0;
       }
       c_Points.push_back(QPointF((static_cast<float64>(c_ViewSize.width()) - f64_PlacementOffset) - f64_XOffset,
-                                 c_ViewSize.height() / 2.0));
+                                 static_cast<float64>(c_ViewSize.height()) / 2.0));
 
       pc_Arrow = new C_GiBiArrow(0ULL, &c_Points);
 
@@ -442,12 +441,11 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
       pc_Arrow->SetEndArrowHeadType(this->GetEndArrow());
 
       this->mpc_ParentDialog->GetPreviewScene()->addItem(pc_Arrow);
-   }  //lint !e429  //no memory leak because of adding the item to the scene and the Qt memory management
+   } //lint !e429  //no memory leak because of adding the item to the scene and the Qt memory management
 
    //refresh the graphicsview
    if (this->mpc_ParentDialog->GetPreviewScene()->views().size() > 0)
    {
-      //lint -e{1793} Access necessary for view update
       this->mpc_ParentDialog->GetPreviewScene()->views()[0] -> update();
    }
 
@@ -493,7 +491,7 @@ void C_GiSyLineWidget::m_ColorClicked(void)
    {
       c_Popup->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of inner color button
@@ -534,7 +532,7 @@ void C_GiSyLineWidget::m_ColorInnerClicked(void)
    {
       c_Popup->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of spin box changed
@@ -561,7 +559,7 @@ void C_GiSyLineWidget::mh_InitArrow(C_OgeCbxIconOnly * const opc_ComboBox, const
       QPixmap c_Img5(":/images/graphic_items/LineArrowHeadType3.png");
       QPixmap c_Img7(":/images/graphic_items/LineArrowHeadType4.png");
       QPixmap c_Img9(":/images/graphic_items/LineArrowHeadType5.png");
-      QPixmap c_Img11(":/images/graphic_items/LineStyleSolid.png");
+      const QPixmap c_Img11(":/images/graphic_items/LineStyleSolid.png");
 
       QIcon c_Icon0;
       QIcon c_Icon1;

@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiCustomMouseItem::C_GiBiCustomMouseItem(void)
 {
-   this->mc_DefaultCursor = QCursor(Qt::ArrowCursor);
+   this->mc_DefaultCursor = static_cast<QCursor>(Qt::ArrowCursor);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

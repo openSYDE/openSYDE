@@ -192,6 +192,9 @@ std::vector<C_CieDbcOsyNodeAssignment> C_CieDbcImportNodeAssignmentWidget::GetNo
    {
       C_CieDbcOsyNodeAssignment c_UnmappedMessages;
 
+      // subtract one of current index because of ignore item in combobox
+      const uint32 u32_DataIndex = static_cast<uint32>(s32_UnmappedIndex - 1);
+
       // messages
       c_UnmappedMessages.c_CieNode.c_Properties.c_Name = C_GtGetText::h_GetText("Unmapped");
       if (this->mpc_Ui->pc_CbxDirection->currentIndex() == mhu8_INDEX_RECEIVE)
@@ -205,11 +208,10 @@ std::vector<C_CieDbcOsyNodeAssignment> C_CieDbcImportNodeAssignmentWidget::GetNo
 
       // assigned indexes
       tgl_assert(this->mc_InterfaceIndexes.size() == this->mc_NodeIndexes.size());
-      if (s32_UnmappedIndex - 1 < static_cast<sint32>(this->mc_NodeIndexes.size()))
+      if (u32_DataIndex < this->mc_NodeIndexes.size())
       {
-         // subtract one of current index because of ignore item in combobox
-         c_UnmappedMessages.s32_AssignedOsyNodeIndex = this->mc_NodeIndexes[s32_UnmappedIndex - 1];
-         c_UnmappedMessages.s32_AssignedOsyInterfaceIndex = this->mc_InterfaceIndexes[s32_UnmappedIndex - 1];
+         c_UnmappedMessages.s32_AssignedOsyNodeIndex = this->mc_NodeIndexes[u32_DataIndex];
+         c_UnmappedMessages.s32_AssignedOsyInterfaceIndex = this->mc_InterfaceIndexes[u32_DataIndex];
       }
 
       c_Return.push_back(c_UnmappedMessages);
@@ -322,10 +324,9 @@ void C_CieDbcImportNodeAssignmentWidget::m_InitNodes(const uint32 ou32_BusIndex,
    for (std::vector<C_CieConverter::C_CIENode>::const_iterator c_It = orc_CIECommDef.c_Nodes.begin();
         c_It != orc_CIECommDef.c_Nodes.end(); ++c_It)
    {
-      C_CieDbcImportNodeAssignmentItemWidget * pc_NewItem =
+      C_CieDbcImportNodeAssignmentItemWidget * const pc_NewItem =
          new C_CieDbcImportNodeAssignmentItemWidget(*c_It, c_NodeNames, this->mc_NodeIndexes,
-                                                    this->mc_InterfaceIndexes,
-                                                    this);
+                                                    this->mc_InterfaceIndexes, this);
 
       // insert new item before spacer -> "-1"
       this->mpc_Ui->pc_LayoutContents->insertWidget(this->mpc_Ui->pc_LayoutContents->count() - 1, pc_NewItem);
@@ -336,12 +337,12 @@ void C_CieDbcImportNodeAssignmentWidget::m_InitNodes(const uint32 ou32_BusIndex,
 
       // remember
       this->mc_Entries.push_back(pc_NewItem);
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_NewItem and the Qt memory management
 
    // handle no mapped messages case
    this->mpc_Ui->pc_ScrollAreaMapped->setVisible(orc_CIECommDef.c_Nodes.size() > 0);
    this->mpc_Ui->pc_WiMappedTitles->setVisible(orc_CIECommDef.c_Nodes.size() > 0);
-   this->mpc_Ui->pc_WiNoMapped->setVisible(orc_CIECommDef.c_Nodes.size() <= 0);
+   this->mpc_Ui->pc_WiNoMapped->setVisible(orc_CIECommDef.c_Nodes.size() == 0);
 
    // unmapped messages section:
    this->mpc_Ui->pc_WiNoUnmapped->setVisible(!q_UnmappedMessagesFound);
@@ -390,7 +391,7 @@ void C_CieDbcImportNodeAssignmentWidget::m_OnUnmappedCbxIndexChanged(const sint3
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieDbcImportNodeAssignmentWidget::m_UpdateComboboxEntries(const uint32 ou32_Index, const bool oq_Enable,
-                                                                 C_CieDbcImportNodeAssignmentItemWidget * const opc_Sender)
+                                                                 const C_CieDbcImportNodeAssignmentItemWidget * const opc_Sender)
 {
    std::vector<C_CieDbcImportNodeAssignmentItemWidget *>::const_iterator c_It;
 

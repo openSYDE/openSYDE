@@ -99,7 +99,7 @@ void C_OgeTreeWidgetToolBarSearchItemDelegate::paint(QPainter * const opc_Painte
       {
          // adapt the position of the icon
          // it will be drawn into the free space of the widget. The layout left margin of the widget must be big enough.
-         QRect c_Rect = orc_Option.rect.adjusted(0, 8, 0, 8);
+         const QRect c_Rect = orc_Option.rect.adjusted(0, 8, 0, 8);
          c_Icon.paint(opc_Painter, c_Rect, Qt::AlignLeft);
       }
 

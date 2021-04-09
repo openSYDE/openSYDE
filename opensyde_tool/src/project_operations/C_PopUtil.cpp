@@ -76,7 +76,8 @@ bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_Al
          c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Save and Continue"));
          c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
       }
-      c_Description += static_cast<QString>(C_GtGetText::h_GetText("Do you want to save the changes of the current project"));
+      c_Description +=
+         static_cast<QString>(C_GtGetText::h_GetText("Do you want to save the changes of the current project"));
 
       //Don't set details. User expects in details something like a list of what was changed in project
       if (C_PuiProject::h_GetInstance()->IsEmptyProject() == false)
@@ -108,7 +109,7 @@ bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_Al
                pc_Dialog->SaveUserSettings();
                c_New->HideOverlay();
             }
-         }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+         } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
          else
          {
             QApplication::setOverrideCursor(Qt::WaitCursor);

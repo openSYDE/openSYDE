@@ -1849,6 +1849,349 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize maximum depending on bit length (utility for CAN signals)
+
+   \param[in,out]  orc_Content      Content
+   \param[in]      ou16_BitLength   Signal bit length
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpContentUtil::h_InitMaxForSignal(C_OSCNodeDataPoolContent & orc_Content, const uint16 ou16_BitLength)
+{
+   bool q_IsUnsigned = false;
+   bool q_IsSigned = false;
+   bool q_IsFloat = false;
+   bool q_BitLengthInvalid = false;
+
+   //Check if type is realistic for number of bits
+   switch (orc_Content.GetType())
+   {
+   case C_OSCNodeDataPoolContent::eUINT8:
+      if (ou16_BitLength > 8)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsUnsigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eUINT16:
+      if (ou16_BitLength > 16)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsUnsigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eUINT32:
+      if (ou16_BitLength > 32)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsUnsigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eUINT64:
+      if (ou16_BitLength > 64)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsUnsigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT8:
+      if (ou16_BitLength > 8)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsSigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT16:
+      if (ou16_BitLength > 16)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsSigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT32:
+      if (ou16_BitLength > 32)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsSigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT64:
+      if (ou16_BitLength > 64)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsSigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eFLOAT32:
+      if (ou16_BitLength > 32)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsFloat = true;
+      break;
+   case C_OSCNodeDataPoolContent::eFLOAT64:
+      if (ou16_BitLength > 64)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsFloat = true;
+      break;
+   default:
+      q_BitLengthInvalid = true;
+      break;
+   }
+   if (q_BitLengthInvalid == false)
+   {
+      //Unsigned
+      if (q_IsUnsigned == true)
+      {
+         uint64 u64_Max = 0;
+
+         for (uint16 u16_ItBit = 0; u16_ItBit < ou16_BitLength; ++u16_ItBit)
+         {
+            u64_Max += static_cast<uint64>(1ULL) << static_cast<uint64>(u16_ItBit);
+         }
+
+         switch (orc_Content.GetType()) //lint !e788 //only unsigned types handled explicitly
+         {
+         case C_OSCNodeDataPoolContent::eUINT8:
+            orc_Content.SetValueU8(static_cast<uint8>(u64_Max));
+            break;
+         case C_OSCNodeDataPoolContent::eUINT16:
+            orc_Content.SetValueU16(static_cast<uint16>(u64_Max));
+            break;
+         case C_OSCNodeDataPoolContent::eUINT32:
+            orc_Content.SetValueU32(static_cast<uint32>(u64_Max));
+            break;
+         case C_OSCNodeDataPoolContent::eUINT64:
+            orc_Content.SetValueU64(u64_Max);
+            break;
+         default:
+            tgl_assert(false);
+            break;
+         }
+      }
+      //Signed
+      if (q_IsSigned == true)
+      {
+         uint64 u64_Max = 0;
+
+         //We need exactly one more than half of the unsigned maximum
+         if (ou16_BitLength > 0U)
+         {
+            u64_Max += static_cast<uint64>(1ULL) << (static_cast<uint64>(ou16_BitLength) - 1ULL);
+         }
+
+         switch (orc_Content.GetType()) //lint !e788 //only signed types handled explicitly
+         {
+         case C_OSCNodeDataPoolContent::eSINT8:
+            orc_Content.SetValueS8(static_cast<sint8>(u64_Max - 1U));
+            break;
+         case C_OSCNodeDataPoolContent::eSINT16:
+            orc_Content.SetValueS16(static_cast<sint16>(u64_Max - 1U));
+            break;
+         case C_OSCNodeDataPoolContent::eSINT32:
+            orc_Content.SetValueS32(static_cast<sint32>(u64_Max - 1UL));
+            break;
+         case C_OSCNodeDataPoolContent::eSINT64:
+            orc_Content.SetValueS64(static_cast<sint64>(u64_Max - 1ULL));
+            break;
+         default:
+            tgl_assert(false);
+            break;
+         }
+      }
+      //Float
+      if (q_IsFloat == true)
+      {
+         switch (orc_Content.GetType()) //lint !e788 //only float types handled explicitly
+         {
+         case C_OSCNodeDataPoolContent::eFLOAT32:
+            orc_Content.SetValueF32(std::numeric_limits<float32>::max());
+            break;
+         case C_OSCNodeDataPoolContent::eFLOAT64:
+            orc_Content.SetValueF64(std::numeric_limits<float64>::max());
+            break;
+         default:
+            tgl_assert(false);
+            break;
+         }
+      }
+   }
+   else
+   {
+      h_InitMax(orc_Content);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize minimum depending on bit length (utility for CAN signals)
+
+   \param[in,out]  orc_Content      Content
+   \param[in]      ou16_BitLength   Signal bit length
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpContentUtil::h_InitMinForSignal(C_OSCNodeDataPoolContent & orc_Content, const uint16 ou16_BitLength)
+{
+   bool q_IsUnsigned = false;
+   bool q_IsSigned = false;
+   bool q_IsFloat = false;
+   bool q_BitLengthInvalid = false;
+
+   //Check if type is realistic for number of bits
+   switch (orc_Content.GetType())
+   {
+   case C_OSCNodeDataPoolContent::eUINT8:
+      if (ou16_BitLength > 8)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsUnsigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eUINT16:
+      if (ou16_BitLength > 16)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsUnsigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eUINT32:
+      if (ou16_BitLength > 32)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsUnsigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eUINT64:
+      if (ou16_BitLength > 64)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsUnsigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT8:
+      if (ou16_BitLength > 8)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsSigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT16:
+      if (ou16_BitLength > 16)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsSigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT32:
+      if (ou16_BitLength > 32)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsSigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT64:
+      if (ou16_BitLength > 64)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsSigned = true;
+      break;
+   case C_OSCNodeDataPoolContent::eFLOAT32:
+      if (ou16_BitLength > 32)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsFloat = true;
+      break;
+   case C_OSCNodeDataPoolContent::eFLOAT64:
+      if (ou16_BitLength > 64)
+      {
+         q_BitLengthInvalid = true;
+      }
+      q_IsFloat = true;
+      break;
+   default:
+      q_BitLengthInvalid = true;
+      break;
+   }
+   if (q_BitLengthInvalid == false)
+   {
+      //Unsigned
+      if (q_IsUnsigned == true)
+      {
+         switch (orc_Content.GetType()) //lint !e788 //only unsigned types handled explicitly
+         {
+         case C_OSCNodeDataPoolContent::eUINT8:
+            orc_Content.SetValueU8(0);
+            break;
+         case C_OSCNodeDataPoolContent::eUINT16:
+            orc_Content.SetValueU16(0);
+            break;
+         case C_OSCNodeDataPoolContent::eUINT32:
+            orc_Content.SetValueU32(0);
+            break;
+         case C_OSCNodeDataPoolContent::eUINT64:
+            orc_Content.SetValueU64(0ULL);
+            break;
+         default:
+            tgl_assert(false);
+            break;
+         }
+      }
+      //Signed
+      if (q_IsSigned == true)
+      {
+         uint64 u64_Max = 0;
+
+         //We need exactly one more than half of the unsigned maximum
+         if (ou16_BitLength > 0U)
+         {
+            u64_Max += static_cast<uint64>(1ULL) << (static_cast<uint64>(ou16_BitLength) - 1ULL);
+         }
+
+         switch (orc_Content.GetType()) //lint !e788 //only signed types handled explicitly
+         {
+         case C_OSCNodeDataPoolContent::eSINT8:
+            orc_Content.SetValueS8(-static_cast<sint8>(u64_Max));
+            break;
+         case C_OSCNodeDataPoolContent::eSINT16:
+            orc_Content.SetValueS16(-static_cast<sint16>(u64_Max));
+            break;
+         case C_OSCNodeDataPoolContent::eSINT32:
+            orc_Content.SetValueS32(-static_cast<sint32>(u64_Max));
+            break;
+         case C_OSCNodeDataPoolContent::eSINT64:
+            orc_Content.SetValueS64(-static_cast<sint64>(u64_Max));
+            break;
+         default:
+            tgl_assert(false);
+            break;
+         }
+      }
+      //Float
+      if (q_IsFloat == true)
+      {
+         switch (orc_Content.GetType()) //lint !e788 //only float types handled explicitly
+         {
+         case C_OSCNodeDataPoolContent::eFLOAT32:
+            orc_Content.SetValueF32(-std::numeric_limits<float32>::max());
+            break;
+         case C_OSCNodeDataPoolContent::eFLOAT64:
+            orc_Content.SetValueF64(-std::numeric_limits<float64>::max());
+            break;
+         default:
+            tgl_assert(false);
+            break;
+         }
+      }
+   }
+   else
+   {
+      h_InitMin(orc_Content);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert node data pool content type to QVariant
 
    \param[in]  orc_Input      Node data pool content type

@@ -1,5 +1,5 @@
-#ifndef CKFXProtocolH
-#define CKFXProtocolH
+#ifndef CKFXPROTOCOLH
+#define CKFXPROTOCOLH
 
 #include <cstdio>
 

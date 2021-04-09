@@ -56,7 +56,7 @@ private:
    void m_OkClicked(void) const;
    void m_CancelClicked(void) const;
 
-   void m_FillUpComboBox(stw_types::uint32 ou32_BusIndex);
+   void m_FillUpComboBox(const stw_types::uint32 ou32_BusIndex);
 
    Ui::C_CieDcfEdsImportNodeSelectWidget * mpc_Ui;
    //lint -e{1725} Only problematic if copy or assignment is allowed

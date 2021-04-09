@@ -55,6 +55,9 @@ public:
                                       const stw_types::uint32 ou32_DashboardIndex, const QString & orc_Name);
    stw_types::sint32 SetDashboardComment(const stw_types::uint32 ou32_ViewIndex,
                                          const stw_types::uint32 ou32_DashboardIndex, const QString & orc_Comment);
+   stw_types::sint32 SetDashboardType(const stw_types::uint32 ou32_ViewIndex,
+                                      const stw_types::uint32 ou32_DashboardIndex,
+                                      const C_PuiSvDashboard::E_TabType oe_Type);
    stw_types::sint32 SetDashboardActive(const stw_types::uint32 ou32_ViewIndex,
                                         const stw_types::uint32 ou32_DashboardIndex, const bool oq_Active);
    stw_types::sint32 SetDashboardTabIndex(const stw_types::uint32 ou32_ViewIndex,
@@ -250,7 +253,7 @@ protected:
 
    //Avoid call (protected access for test)
    explicit C_PuiSvHandler(QObject * const opc_Parent = NULL);
-   ~C_PuiSvHandler(void);
+   ~C_PuiSvHandler(void); //lint !e1768 see comment above
 
 private:
    //Avoid call
@@ -329,6 +332,7 @@ private:
    //Other
    stw_types::uint32 m_CalcHashSystemViews(void) const;
    void m_FixInvalidRailConfig(void);
+   void m_HandleCompatibilityChart(void);
    std::map<stw_scl::C_SCLString, bool> m_GetExistingViewNames(void) const;
 
    static C_PuiSvHandler * mhpc_Singleton;

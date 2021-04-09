@@ -227,7 +227,6 @@ const
       QLayoutItem * const pc_Layout = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(s32_ItItem);
       if (pc_Layout != NULL)
       {
-
          C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
             dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget * const>(pc_Layout->widget());
          if (pc_SelectorItem != NULL)
@@ -249,7 +248,6 @@ void C_SdBueNodeSelectorCheckBoxListWidget::Refresh(void) const
       QLayoutItem * const pc_Layout = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(s32_ItItem);
       if (pc_Layout != NULL)
       {
-
          C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
             dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget * const>(pc_Layout->widget());
          if (pc_SelectorItem != NULL)
@@ -269,7 +267,7 @@ void C_SdBueNodeSelectorCheckBoxListWidget::Refresh(void) const
 void C_SdBueNodeSelectorCheckBoxListWidget::m_AddNode(const QString & orc_Name, const uint32 ou32_Index,
                                                       const uint32 ou32_SubIndex)
 {
-   C_SdBueNodeSelectorCheckBoxItemWidget * pc_SelectorItem =
+   C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
       new C_SdBueNodeSelectorCheckBoxItemWidget(ou32_Index,
                                                 ou32_SubIndex,
                                                 orc_Name,
@@ -279,7 +277,6 @@ void C_SdBueNodeSelectorCheckBoxListWidget::m_AddNode(const QString & orc_Name, 
            this, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled);
 
    this->mpc_Ui->pc_CbxVerticalLayout->addWidget(pc_SelectorItem);
-
 } //lint !e429  //no memory leak because of the parent of pc_SelectorItem by addWidget and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------

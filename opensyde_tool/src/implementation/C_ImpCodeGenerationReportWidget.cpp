@@ -104,7 +104,7 @@ const
         c_ItDatablocks != orc_ExportInfo.end(); ++c_ItDatablocks)
    {
       const C_ReportData & rc_ReportData = *c_ItDatablocks;
-      QFileInfo c_DirFileInfo(rc_ReportData.c_CodeGeneratorPath);
+      const QFileInfo c_DirFileInfo(rc_ReportData.c_CodeGeneratorPath);
 
       // section title
       c_MessageResultText += "<h4>";
@@ -159,7 +159,7 @@ const
       for (QStringList::ConstIterator c_ItFiles = rc_ReportData.c_GeneratedFiles.begin();
            c_ItFiles != rc_ReportData.c_GeneratedFiles.end(); ++c_ItFiles)
       {
-         QFileInfo c_FileInfo(*c_ItFiles);
+         const QFileInfo c_FileInfo(*c_ItFiles);
          // show only file names; link will point to actual file
          c_MessageResultText += C_Uti::h_GetLink(c_FileInfo.fileName(), mc_STYLE_GUIDE_COLOR_LINK,
                                                  c_FileInfo.filePath());

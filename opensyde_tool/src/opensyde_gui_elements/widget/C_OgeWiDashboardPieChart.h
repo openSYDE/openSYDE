@@ -64,21 +64,22 @@ private:
    bool mq_TransparentBackground;
    stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style me_Style;
    bool mq_DarkMode;
-   void m_SetPie(QPainter & orc_Painter, QBrush oc_PieBrush, const Qt::PenCapStyle oe_CapStyle,
+   void m_SetPie(QPainter & orc_Painter, const QBrush oc_PieBrush, const Qt::PenCapStyle oe_CapStyle,
                  const QRect & orc_PieCircleRect, const stw_types::float32 of32_PieWidth,
-                 const stw_types::float32 of32_GesamtPixel, const stw_types::float32 of32_Progress) const;
+                 const stw_types::float32 of32_TotalPixels, const stw_types::float32 of32_Progress) const;
    void m_SetPieDot(QPainter & orc_Painter, const QColor & orc_PieDotColor, const QRect & orc_PieRect,
-                    const stw_types::float32 of32_DotSize, const stw_types::float32 of32_GesamtPixel,
+                    const stw_types::float32 of32_DotSize, const stw_types::float32 of32_TotalPixels,
                     const stw_types::float32 of32_Progress) const;
-   void m_SetPieRim(QPainter & orc_Painter, QBrush oc_RimBrush, const QRect & orc_RimCircleRect,
-                    const stw_types::float32 of32_RimSize, const stw_types::float32 of32_GesamtPixel,
+   void m_SetPieRim(QPainter & orc_Painter, const QBrush oc_RimBrush, const QRect & orc_RimCircleRect,
+                    const stw_types::float32 of32_RimSize, const stw_types::float32 of32_TotalPixels,
                     const stw_types::float32 of32_ReductionFactor =  static_cast<stw_types::float32>(0.0)) const;
-   void m_SetInnerCircle(QPainter & orc_Painter, QBrush oc_InnerCircleBrush, const QRect & orc_InnerCircleRect) const;
+   void m_SetInnerCircle(QPainter & orc_Painter, const QBrush oc_InnerCircleBrush,
+                         const QRect & orc_InnerCircleRect) const;
    void m_SetPieText(QPainter & orc_Painter, const QColor & orc_TextColor, const QRect & orc_InnerCircleRect,
-                     QString oc_DisplayString) const;
+                     const QString & orc_DisplayString) const;
    void m_SetAllPieRects(QRect & orc_InnerCircleRect, QRect & orc_RimCircleRect, QRect & orc_PieCircleRect,
                          const stw_types::float32 of32_PieGap, const stw_types::float32 of32_PieSize,
-                         const stw_types::float32 of32_RimSize, const stw_types::float32 of32_GesamtPixel,
+                         const stw_types::float32 of32_RimSize, const stw_types::float32 of32_TotalPixels,
                          const stw_types::float32 of32_AdditionalFactor = static_cast<stw_types::float32>(0.0)) const;
 };
 

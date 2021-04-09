@@ -64,9 +64,10 @@ void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)
 
    const QString c_PageName = orc_ClassName;
 
-   //Debug helper: Which class call this function?
-   std::cout << c_PageName.toStdString().c_str() << &std::endl;
+   //Debug helper: Which class calls this function?
+   // std::cout << c_PageName.toStdString().c_str() << &std::endl;
    const QMap<QString, QString>::const_iterator c_Page = this->mc_LookUpHelpPageName.find(c_PageName);
+
    if (c_Page != this->mc_LookUpHelpPageName.end())
    {
       //Html help

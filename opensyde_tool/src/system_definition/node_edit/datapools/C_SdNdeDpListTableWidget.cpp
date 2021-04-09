@@ -87,11 +87,11 @@ C_SdNdeDpListTableWidget::C_SdNdeDpListTableWidget(QWidget * const opc_Parent, Q
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because never took ownership
 C_SdNdeDpListTableWidget::~C_SdNdeDpListTableWidget(void)
 
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because never took ownership
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -363,7 +363,6 @@ void C_SdNdeDpListTableWidget::m_OnCRCOptionChange(const bool & orq_Value)
 {
    if (this->mpc_UndoStack != NULL)
    {
-      
       this->mpc_UndoStack->DoChangeListData(this->mu32_NodeIndex,
                                             this->mu32_DataPoolIndex,
                                             dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
@@ -387,7 +386,7 @@ void C_SdNdeDpListTableWidget::m_InitCRCOption(void)
    {
       if (pc_DataPool->e_Type == C_OSCNodeDataPool::eNVM)
       {
-         const C_OSCNodeDataPoolList * pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+         const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
             this->mu32_NodeIndex,
             this->mu32_DataPoolIndex,
             this->mu32_ListIndex);

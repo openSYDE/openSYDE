@@ -29,7 +29,7 @@ public:
                               const stw_types::float32 of32_Factor = 1.0F);
    static void h_SyncFontSize(QLabel * const opc_Label1, QLabel * const opc_Label2, QLabel * const opc_Label3 = NULL,
                               QLabel * const opc_Label4 = NULL);
-   static QString mh_GetHtmlIndentStyle(const stw_types::uint32 ou32_NumberOfTimes);
+   static QString h_GetHtmlIndentStyle(const stw_types::uint32 ou32_NumberOfTimes);
 
 private:
    C_SyvDaItUtil(void);

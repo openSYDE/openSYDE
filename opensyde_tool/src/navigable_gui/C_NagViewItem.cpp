@@ -398,7 +398,7 @@ QSize C_NagViewItem::sizeHint(void) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_NagViewItem::event(QEvent * const opc_Event)
 {
-   bool q_Retval = QWidget::event(opc_Event);
+   const bool q_Retval = QWidget::event(opc_Event);
 
    if ((opc_Event->type() == QEvent::Leave) &&
        (this->mq_ButtonPressed == false))

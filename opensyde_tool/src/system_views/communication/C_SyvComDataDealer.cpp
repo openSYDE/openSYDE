@@ -258,8 +258,8 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolI
    {
       QMap<C_OSCNodeDataPoolListElementId,
            QList<C_PuiSvDbDataElementHandler *> >::const_iterator c_ItElement;
-      C_OSCNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
-                                                 ou16_ElementIndex);
+      const C_OSCNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
+                                                       ou16_ElementIndex);
 
       // Get the correct list with all pointers to the widgets which are showing this datapool element
       c_ItElement = this->mc_AllWidgets.find(c_ElementId);
@@ -271,7 +271,7 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolI
          const C_OSCNodeDataPoolContent * const pc_ElementContent =
             &this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex)->c_Value;
          // Create the necessary instance with a copy of the content. The timestamp will be filled in the constructor
-         C_PuiSvDbDataElementContent c_DbContent(*pc_ElementContent);
+         const C_PuiSvDbDataElementContent c_DbContent(*pc_ElementContent);
 
          for (c_ItWidget = rc_ListWidgets.begin(); c_ItWidget != rc_ListWidgets.end(); ++c_ItWidget)
          {
@@ -311,8 +311,8 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_Data
    {
       QMap<C_OSCNodeDataPoolListElementId,
            QList<C_PuiSvDbDataElementHandler *> >::const_iterator c_ItElement;
-      C_OSCNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
-                                                 ou16_ElementIndex);
+      const C_OSCNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
+                                                       ou16_ElementIndex);
 
       // Get the correct list with all pointers to the widgets which are showing this datapool element
       c_ItElement = this->mc_AllWidgets.find(c_ElementId);
@@ -349,8 +349,8 @@ void C_SyvComDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPo
    {
       QMap<C_OSCNodeDataPoolListElementId,
            QList<C_PuiSvDbDataElementHandler *> >::const_iterator c_ItElement;
-      C_OSCNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
-                                                 ou16_ElementIndex);
+      const C_OSCNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
+                                                       ou16_ElementIndex);
 
       // Get the correct list with all pointers to the widgets which are showing this datapool element
       c_ItElement = this->mc_AllWidgets.find(c_ElementId);
@@ -362,7 +362,7 @@ void C_SyvComDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPo
          const C_OSCNodeDataPoolContent * const pc_ElementContent =
             &this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex)->c_NvmValue;
          // Create the necessary instance with a copy of the content. The timestamp will be filled in the constructor
-         C_PuiSvDbDataElementContent c_DbContent(*pc_ElementContent);
+         const C_PuiSvDbDataElementContent c_DbContent(*pc_ElementContent);
 
          for (c_ItWidget = rc_ListWidgets.begin(); c_ItWidget != rc_ListWidgets.end(); ++c_ItWidget)
          {

@@ -45,7 +45,7 @@ public:
 private:
    //Avoid call
    C_SdBueMlvEmptyItem(const C_SdBueMlvEmptyItem &);
-   C_SdBueMlvEmptyItem & operator =(const C_SdBueMlvEmptyItem &);
+   C_SdBueMlvEmptyItem & operator =(const C_SdBueMlvEmptyItem &); //lint !e1511 //we want to hide the base function
 
    QColor mc_BackgroundColorError;
    QPixmap mc_ErrorIcon;

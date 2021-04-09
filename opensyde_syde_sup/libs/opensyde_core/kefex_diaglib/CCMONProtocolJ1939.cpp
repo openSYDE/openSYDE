@@ -12,8 +12,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
@@ -38,44 +38,44 @@ using namespace stw_can;
 #define J1939_MAX_PGN     (259U)
 
 /* Request */
-#define J1939_PGN_REQUEST                    (static_cast<uint16>(0xEA00U))   // Request
+#define J1939_PGN_REQUEST                    (static_cast<uint16>(0xEA00U)) // Request
 
 /* Acknowledgement */
-#define J1939_PGN_ACK                        (static_cast<uint16>(0xE800U))   // ACK/NACK PGN
-#define J1939_ACK_POS                        (static_cast<uint8>(0U))         // Positive Acknowledgement
-#define J1939_ACK_NEG                        (static_cast<uint8>(1U))         // Negative Acknowledgement
-#define J1939_ACK_ACCESS_DENIED              (static_cast<uint8>(2U))         // Access denied
-#define J1939_ACK_CANNOT_RESPOND             (static_cast<uint8>(3U))         // Cannot respond
+#define J1939_PGN_ACK                        (static_cast<uint16>(0xE800U)) // ACK/NACK PGN
+#define J1939_ACK_POS                        (static_cast<uint8>(0U))       // Positive Acknowledgement
+#define J1939_ACK_NEG                        (static_cast<uint8>(1U))       // Negative Acknowledgement
+#define J1939_ACK_ACCESS_DENIED              (static_cast<uint8>(2U))       // Access denied
+#define J1939_ACK_CANNOT_RESPOND             (static_cast<uint8>(3U))       // Cannot respond
 
 /* Address Claim */
-#define J1939_PGN_ADDRESS_CLAIMED            (static_cast<uint16>(0xEE00U))   // Address Claim Response
+#define J1939_PGN_ADDRESS_CLAIMED            (static_cast<uint16>(0xEE00U)) // Address Claim Response
 
 /* Multi-Packet Broadcast/Peer-to-Peer */
-#define J1939_PGN_TP_CM                      (static_cast<uint16>(0xEC00U))   // TP.CM Connection Management
-#define J1939_PGN_TP_DT                      (static_cast<uint16>(0xEB00U))   // TP.DT Data Transfer
-#define J1939_TP_CM_RTS                      (static_cast<uint8>(16U))        // TP.CM Ready to Send
-#define J1939_TP_CM_CTS                      (static_cast<uint8>(17U))        // TP.CM Clear to Send
-#define J1939_TP_CM_EOM_ACK                  (static_cast<uint8>(19U))        // TP.CM End of message acknowledgement
-#define J1939_TP_CM_CONN_ABORT               (static_cast<uint8>(0xFFU))      // TP.CM Connection Abort
-#define J1939_TP_CM_BAM                      (static_cast<uint8>(32U))        // TP.CM Broadcast Announce Message
-#define J1939_TP_CM_ABORT_AS_BUSY            (static_cast<uint8>(1U))         // TP.CM Connection Abort Reason 1
-#define J1939_TP_CM_ABORT_AS_RESOURCE_LACK   (static_cast<uint8>(2U))         // TP.CM Connection Abort Reason 2
-#define J1939_TP_CM_ABORT_AS_TIMEOUT         (static_cast<uint8>(3U))         // TP.CM Connection Abort Reason 3
+#define J1939_PGN_TP_CM                      (static_cast<uint16>(0xEC00U)) // TP.CM Connection Management
+#define J1939_PGN_TP_DT                      (static_cast<uint16>(0xEB00U)) // TP.DT Data Transfer
+#define J1939_TP_CM_RTS                      (static_cast<uint8>(16U))      // TP.CM Ready to Send
+#define J1939_TP_CM_CTS                      (static_cast<uint8>(17U))      // TP.CM Clear to Send
+#define J1939_TP_CM_EOM_ACK                  (static_cast<uint8>(19U))      // TP.CM End of message acknowledgement
+#define J1939_TP_CM_CONN_ABORT               (static_cast<uint8>(0xFFU))    // TP.CM Connection Abort
+#define J1939_TP_CM_BAM                      (static_cast<uint8>(32U))      // TP.CM Broadcast Announce Message
+#define J1939_TP_CM_ABORT_AS_BUSY            (static_cast<uint8>(1U))       // TP.CM Connection Abort Reason 1
+#define J1939_TP_CM_ABORT_AS_RESOURCE_LACK   (static_cast<uint8>(2U))       // TP.CM Connection Abort Reason 2
+#define J1939_TP_CM_ABORT_AS_TIMEOUT         (static_cast<uint8>(3U))       // TP.CM Connection Abort Reason 3
 
 /* Destination Addresses */
-#define J1939_DA_BROADCAST                   (static_cast<uint8>(0xFFU))      // Destination address for Broadcasts
-#define J1939_DA_MASK                        (static_cast<uint16>(0xFF00U))   // Mask destination address
+#define J1939_DA_BROADCAST                   (static_cast<uint8>(0xFFU))    // Destination address for Broadcasts
+#define J1939_DA_MASK                        (static_cast<uint16>(0xFF00U)) // Mask destination address
 
 /* Source Addresses */
-#define J1939_SA_NULL                        (static_cast<uint8>(0xFEU))     // NULL address (used by addressless nodes)
+#define J1939_SA_NULL                        (static_cast<uint8>(0xFEU)) // NULL address (used by addressless nodes)
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 typedef struct
 {
-   uint16 u16_Value;        // PGN value, e.g. 0x0000)
-   C_SCLString c_Brief;     // PGN brief text, e.g. TSC1
-   C_SCLString c_Verbose;   // PGN verbose text, e.g. Torque/Speed Control 1
+   uint16 u16_Value;      // PGN value, e.g. 0x0000)
+   C_SCLString c_Brief;   // PGN brief text, e.g. TSC1
+   C_SCLString c_Verbose; // PGN verbose text, e.g. Torque/Speed Control 1
 }T_J1939_PGN;
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
@@ -347,7 +347,8 @@ const T_J1939_PGN mat_Pgn[J1939_MAX_PGN] =
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
-C_CMONProtocolJ1939::C_CMONProtocolJ1939(void) : C_CMONProtocolBase()
+C_CMONProtocolJ1939::C_CMONProtocolJ1939(void) :
+   C_CMONProtocolBase()
 {
 }
 
@@ -383,11 +384,11 @@ C_SCLString C_CMONProtocolJ1939::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
    {
       //just evaluate CAN messages with extended ID
       //get PGN
-      u16_Pgn = static_cast<uint16>(orc_Msg.u32_ID >> 8);
+      u16_Pgn = static_cast<uint16>(orc_Msg.u32_ID >> 8U);
       //get PDU format
-      u8_PduFormat = static_cast<uint8>(orc_Msg.u32_ID >> 16);
+      u8_PduFormat = static_cast<uint8>(orc_Msg.u32_ID >> 16U);
       //get PDU specific
-      u8_PduSpecific = static_cast<uint8>(orc_Msg.u32_ID >> 8);
+      u8_PduSpecific = static_cast<uint8>(orc_Msg.u32_ID >> 8U);
 
       //evaluate PDU format
       if (u8_PduFormat <= J1939_PDU1_MAX)
@@ -625,7 +626,7 @@ C_SCLString C_CMONProtocolJ1939::m_PgnToString(const uint32 ou32_Pgn) const
    C_SCLString c_Pgn = "";
    uint16 u16_Pos;
    uint16 u16_First = 0U;
-   uint16 u16_Last = static_cast<uint16>((sizeof(mat_Pgn)/sizeof(T_J1939_PGN)) - 1);
+   uint16 u16_Last = static_cast<uint16>((sizeof(mat_Pgn) / sizeof(T_J1939_PGN)) - 1);
 
    //do a binary search for desired PGN
    while (u16_First <= u16_Last)
@@ -650,7 +651,7 @@ C_SCLString C_CMONProtocolJ1939::m_PgnToString(const uint32 ou32_Pgn) const
    if (c_Pgn == "")
    {
       //specific PGN not found -> evaluate PDU format
-      if (static_cast<uint8>(ou32_Pgn >> 8) <= J1939_PDU1_MAX)
+      if (static_cast<uint8>(ou32_Pgn >> 8U) <= J1939_PDU1_MAX)
       {
          c_Pgn = "PDU1";
       }
@@ -667,7 +668,7 @@ C_SCLString C_CMONProtocolJ1939::m_PgnToString(const uint32 ou32_Pgn) const
 
 uint32 C_CMONProtocolJ1939::m_GetPgn(const uint8 * const opu8_Data) const
 {
-   return (static_cast<uint32>(opu8_Data[2]) << 16) + (static_cast<uint32>(opu8_Data[1]) << 8) + opu8_Data[0];
+   return (static_cast<uint32>(opu8_Data[2]) << 16U) + (static_cast<uint32>(opu8_Data[1]) << 8U) + opu8_Data[0];
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -676,7 +677,8 @@ C_SCLString C_CMONProtocolJ1939::m_GetMessageSize(const T_STWCAN_Msg_RX & orc_Ms
 {
    C_SCLString c_Size = "SIZE ";
 
-   c_Size += m_GetWordAsStringFormat((static_cast<uint16>(static_cast<uint16>(orc_Msg.au8_Data[2]) << 8)) + orc_Msg.au8_Data[1]);
+   c_Size += m_GetWordAsStringFormat(
+      (static_cast<uint16>(static_cast<uint16>(orc_Msg.au8_Data[2]) << 8U)) + orc_Msg.au8_Data[1]);
 
    return c_Size;
 }
@@ -720,52 +722,52 @@ C_SCLString C_CMONProtocolJ1939::m_GetName(const T_STWCAN_Msg_RX & orc_Msg) cons
    //copy the eight data bytes to the 64bit NAME
    for (u8_Index = 0U; u8_Index < orc_Msg.u8_DLC; u8_Index++)
    {
-      u64_Name += static_cast<uint64>(orc_Msg.au8_Data[u8_Index]) << (8*u8_Index);
+      u64_Name += static_cast<uint64>(orc_Msg.au8_Data[u8_Index]) << (8 * u8_Index);
    }
 
    //Arbitrary Address Capable
    c_Data += "AAC:";
-   c_Data += m_GetValueDecHex(static_cast<uint32>(u64_Name >> 63));
+   c_Data += m_GetValueDecHex(static_cast<uint32>(u64_Name >> 63U));
    c_Data += " ";
 
    //Industry Group
    c_Data += "IG:";
-   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 60) & 0x07U));
+   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 60U) & 0x07U));
    c_Data += " ";
 
    //Vehicle System Instance
    c_Data += "VSI:";
-   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 56) & 0x0FU));
+   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 56U) & 0x0FU));
    c_Data += " ";
 
    //Vehicle System
    c_Data += "VS:";
-   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 49) & 0x7FU));
+   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 49U) & 0x7FU));
    c_Data += " ";
 
    //Reserved
    c_Data += "R:";
-   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 48) & 0x01U));
+   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 48U) & 0x01U));
    c_Data += " ";
 
    //Function
    c_Data += "F:";
-   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 40) & 0xFFU));
+   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 40U) & 0xFFU));
    c_Data += " ";
 
    //Function Instance
    c_Data += "FI:";
-   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 35) & 0x1FU));
+   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 35U) & 0x1FU));
    c_Data += " ";
 
    //ECU Instance
    c_Data += "EI:";
-   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 32) & 0x07U));
+   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 32U) & 0x07U));
    c_Data += " ";
 
    //Manufacturer Code
    c_Data += "MC:";
-   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 21) & 0x07FFU));
+   c_Data += m_GetValueDecHex(static_cast<uint32>((u64_Name >> 21U) & 0x07FFU));
    c_Data += " ";
 
    //Identity Number
@@ -774,4 +776,3 @@ C_SCLString C_CMONProtocolJ1939::m_GetName(const T_STWCAN_Msg_RX & orc_Msg) cons
 
    return c_Data;
 }
-

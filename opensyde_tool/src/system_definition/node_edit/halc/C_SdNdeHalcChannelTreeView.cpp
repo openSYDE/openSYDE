@@ -294,7 +294,7 @@ void C_SdNdeHalcChannelTreeView::m_OnCustomContextMenuRequested(const QPoint & o
 {
    if (this->indexAt(orc_Pos).isValid() == true)
    {
-      QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
+      const QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
 
       // disable copy action if multiple indices are selected
       if (this->mpc_CopyAction != NULL)

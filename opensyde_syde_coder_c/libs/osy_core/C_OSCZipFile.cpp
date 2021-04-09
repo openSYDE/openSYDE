@@ -231,7 +231,7 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
             if (opc_ErrorText != NULL)
             {
                (*opc_ErrorText) = "Could not get information of zip archive \"" + orc_SourcePath +
-                                  "\" for position \"" + C_SCLString(un_Pos) + "\".";
+                                  "\" for position \"" + C_SCLString::IntToStr(un_Pos) + "\".";
             }
             s32_Return = C_RD_WR;
          }
@@ -245,8 +245,10 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
       vector<mz_zip_archive_file_stat>::const_iterator c_Iter;
       for (c_Iter = c_Files.begin(); (c_Iter != c_Files.end()) && (s32_Return == C_NO_ERR); ++c_Iter)
       {
+         //lint -e{8080} //using type expected by the library for compatibility
          size_t un_UncompFileSize;
-         void * pv_Data = mz_zip_reader_extract_file_to_heap(&c_ZipArchive, c_Iter->m_filename, &un_UncompFileSize, 0);
+         void * const pv_Data = mz_zip_reader_extract_file_to_heap(&c_ZipArchive, c_Iter->m_filename,
+                                                                   &un_UncompFileSize, 0);
          if (pv_Data != NULL)
          {
             // get complete file path of current file
@@ -271,12 +273,15 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
                // create new empty file
                if (s32_Return == C_NO_ERR)
                {
-                  FILE * pc_File = fopen(c_CompleteFilePath.c_str(), "wb");
+                  std::FILE * const pc_File = std::fopen(c_CompleteFilePath.c_str(), "wb");
                   // write data
                   if (pc_File != NULL)
                   {
-                     size_t un_SizeOfElement = sizeof(charn);
-                     size_t un_NumOfBytesWritten = fwrite(pv_Data, un_SizeOfElement, un_UncompFileSize, pc_File);
+                     //lint -e{8080} //using type expected by the library for compatibility
+                     const size_t un_SizeOfElement = sizeof(charn);
+                     //lint -e{8080} //using type expected by the library for compatibility
+                     const size_t un_NumOfBytesWritten = std::fwrite(pv_Data, un_SizeOfElement, un_UncompFileSize,
+                                                                     pc_File);
                      if (un_NumOfBytesWritten != un_UncompFileSize)
                      {
                         // data not written completely
@@ -287,7 +292,7 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
                         }
                         s32_Return = C_RD_WR;
                      }
-                     fclose(pc_File);
+                     std::fclose(pc_File);
                   }
                   else
                   {

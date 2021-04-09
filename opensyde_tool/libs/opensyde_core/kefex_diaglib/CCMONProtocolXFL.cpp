@@ -275,7 +275,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
          if (orc_Msg.au8_Data[2] == mu8_XFL_CMD_EE_READ_CMD) //sub-command ee-read
          {
             c_Help = "ee_read NUM: " + m_GetValueDecHex(orc_Msg.au8_Data[3]) + " ADD: " +
-                     m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+                     m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
          }
          else
          {
@@ -288,7 +288,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             c_Help = "";
             break;
          }
-         c_Help = "ee_write ADD: " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) + " DATA: [";
+         c_Help = "ee_write ADD: " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) + " DATA: [";
          for (s32_Index = 4; s32_Index < orc_Msg.u8_DLC; s32_Index++)
          {
             c_Help += m_GetValueDecHex(orc_Msg.au8_Data[s32_Index]);
@@ -308,7 +308,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
          if (orc_Msg.au8_Data[2] == 0x00U) //sub-command ee-read
          {
             c_Help = "ee_read_word NUM: " + m_GetValueDecHex(orc_Msg.au8_Data[3]) + " ADD: " +
-                     m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+                     m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
          }
          else
          {
@@ -324,16 +324,16 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
          if (mq_Decimal == true)
          {
             (void)c_Help.PrintFormatted("ee_write_word ADD: %d DATA: [%d,%d]",
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]),
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]),
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]),
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]),
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
          }
          else
          {
             (void)c_Help.PrintFormatted("ee_write_word ADD: %04X DATA: [%04X,%04X]",
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]),
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]),
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]),
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]),
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
          }
          break;
       case mu8_XFL_CMD_GRP_GET_COMMAND:
@@ -402,7 +402,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "get_sec_crc SEC:" + m_GetValueDecHex(orc_Msg.au8_Data[3]);
                break;
             case 5U:
-               c_Help = "get_sec_crc SEC:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+               c_Help = "get_sec_crc SEC:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                break;
             default:
                c_Help = "";
@@ -416,7 +416,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "get_sec_mode_compare SEC:" + m_GetValueDecHex(orc_Msg.au8_Data[3]);
                break;
             case 5U:
-               c_Help = "get_sec_mode_compare SEC:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+               c_Help = "get_sec_mode_compare SEC:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                break;
             default:
                c_Help = "";
@@ -661,10 +661,10 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             switch (orc_Msg.u8_DLC)
             {
             case 5U:
-               c_Help = "set_bitrate_can BITRATE:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+               c_Help = "set_bitrate_can BITRATE:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                break;
             case 7U:
-               c_Help = "set_bitrate_can BITRATE:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
+               c_Help = "set_bitrate_can BITRATE:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
                break;
             default:
                c_Help = "";
@@ -677,7 +677,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "";
                break;
             }
-            c_Help = "set_can_id ID:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
+            c_Help = "set_can_id ID:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
             break;
          case mu8_XFL_CMD_SET_CAN_TYPE:
             if (orc_Msg.u8_DLC != 4U)
@@ -693,7 +693,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "";
                break;
             }
-            c_Help = "set_control_id CONID:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
+            c_Help = "set_control_id CONID:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
             break;
          case mu8_XFL_CMD_SET_SEC_CRC:
             switch (orc_Msg.u8_DLC)
@@ -702,7 +702,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "set_sec_crc SEC:" + m_GetValueDecHex(orc_Msg.au8_Data[3]);
                break;
             case 5U:
-               c_Help = "set_sec_crc SEC:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+               c_Help = "set_sec_crc SEC:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                break;
             default:
                c_Help = "";
@@ -717,7 +717,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                         " MODE:" + C_SCLString::IntToStr(orc_Msg.au8_Data[4]);
                break;
             case 6U:
-               c_Help = "set_sec_mode_compare SEC:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3])) +
+               c_Help = "set_sec_mode_compare SEC:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3])) +
                         " MODE:" + C_SCLString::IntToStr(orc_Msg.au8_Data[5]);
                break;
             default:
@@ -743,7 +743,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             c_Help = "set_gateway_parameter DEV:" + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
                      " POS:" + m_GetValueDecHex(orc_Msg.au8_Data[4]) +
                      " IDX:" + m_GetValueDecHex(orc_Msg.au8_Data[5]) +
-                     " PAR:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                     " PAR:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
             break;
          case mu8_XFL_CMD_SET_XFL_EXCHANGE:
             if (orc_Msg.u8_DLC != 3U)
@@ -771,7 +771,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "";
                break;
             }
-            c_Help = "set_temp_bitrate BITRATE:" + C_SCLString::IntToStr(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
+            c_Help = "set_temp_bitrate BITRATE:" + C_SCLString::IntToStr(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
             break;
          case mu8_XFL_CMD_SET_BLOCK_START_ADDRESS:
             if (orc_Msg.u8_DLC != 8U)
@@ -780,7 +780,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "set_block_start_address BLK:" + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                     " ADD:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                     " ADD:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             break;
          case mu8_XFL_CMD_SET_BLOCK_END_ADDRESS:
             if (orc_Msg.u8_DLC != 8U)
@@ -789,7 +789,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "set_block_end_address BLK:" + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                     " ADD:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                     " ADD:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             break;
          case mu8_XFL_CMD_SET_BLOCK_CHECKSUM:
             if (orc_Msg.u8_DLC != 4U)
@@ -823,7 +823,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "erase_sector SEC:" + m_GetValueDecHex(orc_Msg.au8_Data[3]);
                break;
             case 5U:
-               c_Help = "erase_sector SEC:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+               c_Help = "erase_sector SEC:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                break;
             default:
                c_Help = "";
@@ -869,7 +869,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "read_flash NUM: " + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                     " ADD: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                     " ADD: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             break;
          case mu8_XFL_CMD_NODE_COMPID:
             switch (orc_Msg.u8_DLC)
@@ -915,12 +915,12 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             if (mq_Decimal == true)
             {
                (void)c_Help.PrintFormatted("wakeup_divert_client POS:%d UID:%d", orc_Msg.au8_Data[3],
-                                           m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+                                           mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
             }
             else
             {
                (void)c_Help.PrintFormatted("wakeup_divert_client POS:%02X UID:%04X", orc_Msg.au8_Data[3],
-                                           m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+                                           mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
             }
             break;
          case 0x09U:
@@ -930,7 +930,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "read_flash_word NUM: " + m_GetValueDecHex(orc_Msg.au8_Data[2]) +
-                     " ADD: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
+                     " ADD: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
             break;
          default:
             c_Help = "";
@@ -1004,7 +1004,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             break;
          }
          c_Help = "ee_read NUM: " + m_GetValueDecHex(orc_Msg.au8_Data[3]) + " ADD: " +
-                  m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+                  m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
          break;
       case mu8_XFL_CMD_GRP_EE_WRITE_CMD: //ee_write
          if (orc_Msg.u8_DLC < 5U)
@@ -1012,7 +1012,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             c_Help = "";
             break;
          }
-         c_Help = "ee_write ADD: " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) + " DATA: [";
+         c_Help = "ee_write ADD: " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) + " DATA: [";
          for (s32_Index = 4; s32_Index < orc_Msg.u8_DLC; s32_Index++)
          {
             c_Help += m_GetValueDecHex(orc_Msg.au8_Data[s32_Index]);
@@ -1030,7 +1030,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             break;
          }
          c_Help = "ee_read_word NUM: " + m_GetValueDecHex(orc_Msg.au8_Data[2]) + " ADD: " +
-                  m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+                  m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
          break;
       case 0x13U: //ee_write_word
          if (orc_Msg.u8_DLC != 8U)
@@ -1041,16 +1041,16 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
          if (mq_Decimal == true)
          {
             (void)c_Help.PrintFormatted("ee_write_word ADD: %d DATA: [%d,%d]",
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]),
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]),
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]),
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]),
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
          }
          else
          {
             (void)c_Help.PrintFormatted("ee_write_word ADD: %04X DATA: [%04X,%04X]",
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[2]),
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]),
-                                        m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]),
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]),
+                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
          }
          break;
       case mu8_XFL_CMD_GRP_GET_COMMAND: //get command
@@ -1071,7 +1071,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "get_sector_count NUM:" + m_GetValueDecHex(orc_Msg.au8_Data[3]);
                break;
             case 5U:
-               c_Help = "get_sector_count NUM:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+               c_Help = "get_sector_count NUM:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                break;
             default:
                c_Help = "";
@@ -1092,7 +1092,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                }
                (void)c_Help.PrintFormatted("get_version_number VER: %c.%c%c/%d",
                                            orc_Msg.au8_Data[3], orc_Msg.au8_Data[4], orc_Msg.au8_Data[5],
-                                           (static_cast<uint16>((static_cast<uint16>(orc_Msg.au8_Data[6])) << 8)) +
+                                           (static_cast<uint16>((static_cast<uint16>(orc_Msg.au8_Data[6])) << 8U)) +
                                            orc_Msg.au8_Data[7]);
             }
             break;
@@ -1102,21 +1102,16 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "";
                break;
             }
-            c_Help = "get_download_count COUNT:" + m_GetValueDecHex(static_cast<uint32>(orc_Msg.au8_Data[3] +
-                                                                                        ((static_cast<uint32>(orc_Msg.
-                                                                                                              au8_Data[4
-                                                                                                              ])) <<
-                                                                                         8) +
-                                                                                        ((static_cast<uint32>(orc_Msg.
-                                                                                                              au8_Data[5
-                                                                                                              ])) <<
-                                                                                         16)));
+            c_Help = "get_download_count COUNT:" +
+                     m_GetValueDecHex(static_cast<uint32>(orc_Msg.au8_Data[3] +
+                                                          ((static_cast<uint32>(orc_Msg.au8_Data[4])) << 8U) +
+                                                          ((static_cast<uint32>(orc_Msg.au8_Data[5])) << 16U)));
             break;
          case mu8_XFL_CMD_GET_DEVICE_ID: //get_device_id
             //Some ECUs have a shorter DLC if (orc_Msg.bDLC != 8) { c_Help = ""; break; }
             //There is no way we can know whether this is an indexed or traditional response
             //-> check for each character whether it can be displayed
-            if (orc_Msg.u8_DLC < 4)
+            if (orc_Msg.u8_DLC < 4U)
             {
                c_Help = "";
                break;
@@ -1141,7 +1136,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "";
                break;
             }
-            c_Help = "get_control_id CONID:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
+            c_Help = "get_control_id CONID:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
             break;
          case mu8_XFL_CMD_GET_SEC_CRC: //get_sec_crc
             if (orc_Msg.u8_DLC != 7U)
@@ -1149,8 +1144,8 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "";
                break;
             }
-            c_Help = "get_sec_crc CRCCALC:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3])) +
-                     " CRCEE:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[5]));
+            c_Help = "get_sec_crc CRCCALC:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3])) +
+                     " CRCEE:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[5]));
             break;
          case mu8_XFL_CMD_GET_SEC_MODE_COMPARE: //get_sec_mode_compare
             switch (orc_Msg.u8_DLC)
@@ -1160,7 +1155,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                         " MODE:" + C_SCLString::IntToStr(orc_Msg.au8_Data[4]);
                break;
             case 6U:
-               c_Help = "get_sec_mode_compare SEC:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3])) +
+               c_Help = "get_sec_mode_compare SEC:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3])) +
                         " MODE:" + C_SCLString::IntToStr(orc_Msg.au8_Data[5]);
                break;
             default:
@@ -1185,11 +1180,11 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             }
             if (mq_Decimal == true)
             {
-               (void)c_Help.PrintFormatted("get_last_user UID:%d", m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+               (void)c_Help.PrintFormatted("get_last_user UID:%d", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
             }
             else
             {
-               (void)c_Help.PrintFormatted("get_last_user UID:%04X", m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+               (void)c_Help.PrintFormatted("get_last_user UID:%04X", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
             }
             break;
          case mu8_XFL_CMD_GET_FLASH_INFORMATION:
@@ -1208,17 +1203,17 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_TOTAL_SIZE:
                c_Help = c_Help + "total_size";
-               c_Help2 = " SIZE: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "bytes";
+               c_Help2 = " SIZE: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "bytes";
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_PROTECTED_SECTORS:
                c_Help = c_Help + "protected_sectors";
-               c_Help2 = " SEC: " + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
+               c_Help2 = " SEC: " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
                          " IC: " + m_GetValueDecHex(orc_Msg.au8_Data[6]) +
                          " STAT: " + m_GetValueDecHex(orc_Msg.au8_Data[7]);
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_OFFSET_ADDRESS:
                c_Help = c_Help + "sector_0_offset";
-               c_Help2 = " OFFS: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "bytes";
+               c_Help2 = " OFFS: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "bytes";
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_REGIONS:
                c_Help = c_Help + "number_of_regions";
@@ -1226,7 +1221,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_REGION_INFO:
                c_Help = c_Help + "region_information";
-               u16_Help = m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]);
+               u16_Help = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]);
                if (u16_Help == 0U)
                {
                   c_Help2 = " SIZE: 0bytes";
@@ -1235,16 +1230,16 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                {
                   c_Help2 = " SIZE: " + m_GetValueDecHex((static_cast<uint32>(u16_Help)) * 256U) + "bytes";
                }
-               u16_Help = m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]);
+               u16_Help = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]);
                c_Help2 = c_Help2 + " NUMSECS: " + m_GetValueDecHex(u16_Help);
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ERASE_TIME:
                c_Help = c_Help + "max_erase_time";
-               c_Help2 = " TIME: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "ms";
+               c_Help2 = " TIME: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "ms";
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_PROGRAM_TIME:
                c_Help = c_Help + "max_program_time";
-               c_Help2 = " TIME: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "ms";
+               c_Help2 = " TIME: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "ms";
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_ALIASES:
                c_Help = c_Help + "num_aliases";
@@ -1252,15 +1247,15 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_PHYSICAL:
                c_Help = c_Help + "aliases_physical_address";
-               c_Help2 = " ADD: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+               c_Help2 = " ADD: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_SIZE:
                c_Help = c_Help + "aliases_size";
-               c_Help2 = " SIZE: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "bytes";
+               c_Help2 = " SIZE: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4])) + "bytes";
                break;
             case mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_ADDRESS:
                c_Help = c_Help + "aliases_alias_address";
-               c_Help2 = " ADD: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+               c_Help2 = " ADD: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
                break;
             default:
                c_Help = c_Help + "undefined_index:" + C_SCLString::IntToStr(orc_Msg.au8_Data[3]);
@@ -1287,11 +1282,11 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             {
             case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_PROTOCOL_VERSION:
                c_Help = c_Help + "protocol_version";
-               u16_Help = m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]);
+               u16_Help = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]);
                (void)c_Help2.PrintFormatted(" V%x.%x%xr%x",
-                                            static_cast<uint8>((u16_Help >> 12) & 0x0FU),
-                                            static_cast<uint8>((u16_Help >> 8) & 0x0FU),
-                                            static_cast<uint8>((u16_Help >> 4) & 0x0FU),
+                                            static_cast<uint8>((u16_Help >> 12U) & 0x0FU),
+                                            static_cast<uint8>((u16_Help >> 8U) & 0x0FU),
+                                            static_cast<uint8>((u16_Help >> 4U) & 0x0FU),
                                             static_cast<uint8>((u16_Help) & 0x0FU));
                break;
             case mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_SPECIAL_SERVICES:
@@ -1388,7 +1383,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "get_block_start_address BLK:" + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                     " ADD: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                     " ADD: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             break;
          case mu8_XFL_CMD_GET_BLOCK_END_ADDRESS:
             if (orc_Msg.u8_DLC != 8U)
@@ -1397,7 +1392,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "get_block_end_address BLK:" + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                     " ADD: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                     " ADD: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             break;
          case mu8_XFL_CMD_GET_BLOCK_CHECKSUM:
             if (orc_Msg.u8_DLC != 8U)
@@ -1406,7 +1401,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "get_block_checksum IDX:" + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                     " CHK: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                     " CHK: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             break;
          case mu8_XFL_CMD_GET_BLOCK_COMPARE_MODE:
             if (orc_Msg.u8_DLC != 5U)
@@ -1445,10 +1440,10 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             switch (orc_Msg.u8_DLC)
             {
             case 5U:
-               c_Help = "set_bitrate_can BITRATE:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+               c_Help = "set_bitrate_can BITRATE:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                break;
             case 7U:
-               c_Help = "set_bitrate_can BITRATE:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
+               c_Help = "set_bitrate_can BITRATE:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
                break;
             default:
                c_Help = "";
@@ -1461,7 +1456,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "";
                break;
             }
-            c_Help = "set_can_id ID:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
+            c_Help = "set_can_id ID:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
             break;
          case mu8_XFL_CMD_SET_CAN_TYPE: //set_can_type
             if (orc_Msg.u8_DLC != 4U)
@@ -1477,7 +1472,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "";
                break;
             }
-            c_Help = "set_control_id CONID:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
+            c_Help = "set_control_id CONID:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
             break;
          case mu8_XFL_CMD_SET_SEC_CRC: //set_sec_crc
             if (orc_Msg.u8_DLC != 5U)
@@ -1485,7 +1480,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "";
                break;
             }
-            c_Help = "set_sec_crc CRC:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+            c_Help = "set_sec_crc CRC:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
             break;
          case mu8_XFL_CMD_SET_SEC_MODE_COMPARE: //set_sec_mode_compare
             switch (orc_Msg.u8_DLC)
@@ -1495,7 +1490,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                         " MODE:" + C_SCLString::IntToStr(orc_Msg.au8_Data[4]);
                break;
             case 6U:
-               c_Help = "set_sec_mode_compare SEC:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3])) +
+               c_Help = "set_sec_mode_compare SEC:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3])) +
                         " MODE:" + C_SCLString::IntToStr(orc_Msg.au8_Data[5]);
                break;
             default:
@@ -1521,7 +1516,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             c_Help = "set_gateway_parameter DEV:" + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
                      " POS:" + m_GetValueDecHex(orc_Msg.au8_Data[4]) +
                      " IDX:" + m_GetValueDecHex(orc_Msg.au8_Data[5]) +
-                     " PAR:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                     " PAR:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
             break;
          case mu8_XFL_CMD_SET_FINGER_PRINT:
             if (orc_Msg.u8_DLC != 8U)
@@ -1542,7 +1537,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "set_block_start_address BLK:" + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                     " ADD:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                     " ADD:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             break;
          case mu8_XFL_CMD_SET_BLOCK_END_ADDRESS:
             if (orc_Msg.u8_DLC != 8U)
@@ -1551,7 +1546,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "set_block_end_address BLK:" + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                     " ADD:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                     " ADD:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             break;
          case mu8_XFL_CMD_SET_BLOCK_CHECKSUM:
             if (orc_Msg.u8_DLC != 8U)
@@ -1560,7 +1555,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "set_block_checksum BLK:" + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                     " CHK:" + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                     " CHK:" + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
             break;
          case mu8_XFL_CMD_SET_BLOCK_COMPARE_MODE:
             if (orc_Msg.u8_DLC != 5U)
@@ -1586,7 +1581,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                c_Help = "erase_sector SEC:" + m_GetValueDecHex(orc_Msg.au8_Data[3]);
                break;
             case 5U:
-               c_Help = "erase_sector SEC:" + m_GetValueDecHex(m_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+               c_Help = "erase_sector SEC:" + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                break;
             default:
                c_Help = "";
@@ -1632,7 +1627,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "read_flash NUM: " + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                     " ADD: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                     " ADD: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
 
             break;
          case mu8_XFL_CMD_NODE_COMPID: //node_compid
@@ -1679,12 +1674,12 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
             if (mq_Decimal == true)
             {
                (void)c_Help.PrintFormatted("wakeup_divert_client POS:%d UID:%d", orc_Msg.au8_Data[3],
-                                           m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+                                           mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
             }
             else
             {
                (void)c_Help.PrintFormatted("wakeup_divert_client POS:%02X UID:%04X", orc_Msg.au8_Data[3],
-                                           m_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
+                                           mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
             }
             break;
          case 0x09U: //read_flash_word
@@ -1694,7 +1689,7 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
                break;
             }
             c_Help = "read_flash_word NUM: " + m_GetValueDecHex(orc_Msg.au8_Data[2]) +
-                     " ADD: " + m_GetValueDecHex(m_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
+                     " ADD: " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
             break;
          default:
             c_Help = "";

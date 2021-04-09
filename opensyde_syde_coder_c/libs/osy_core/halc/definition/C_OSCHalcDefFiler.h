@@ -34,7 +34,7 @@ public:
    static stw_types::sint32 h_CheckDomainDisplayNames(const C_OSCHalcDefDomain & orc_IODataDomain);
 
 private:
-   static const stw_types::uint16 hu16_FILE_VERSION_1 = 1U;
+   static const stw_types::uint16 mhu16_FILE_VERSION_1 = 1U;
 
    C_OSCHalcDefFiler(void);
 

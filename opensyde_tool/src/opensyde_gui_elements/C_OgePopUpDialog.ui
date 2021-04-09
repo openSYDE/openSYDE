@@ -153,7 +153,7 @@
                </layout>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeFrameBorder" name="pc_FramSperator1">
+               <widget class="stw_opensyde_gui_elements::C_OgeFraBorder" name="pc_FramSperator1">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -213,9 +213,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFrameBorder</class>
+   <class>stw_opensyde_gui_elements::C_OgeFraBorder</class>
    <extends>QFrame</extends>
-   <header>C_OgeFrameBorder.h</header>
+   <header>C_OgeFraBorder.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

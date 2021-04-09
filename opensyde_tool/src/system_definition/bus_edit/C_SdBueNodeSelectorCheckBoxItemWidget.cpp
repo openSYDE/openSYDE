@@ -76,10 +76,10 @@ C_SdBueNodeSelectorCheckBoxItemWidget::C_SdBueNodeSelectorCheckBoxItemWidget(con
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_CheckBox and the Qt memory management
 C_SdBueNodeSelectorCheckBoxItemWidget::~C_SdBueNodeSelectorCheckBoxItemWidget()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_CheckBox and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

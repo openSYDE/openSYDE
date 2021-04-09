@@ -114,7 +114,7 @@ void C_OSCNodeDataPoolList::MoveElement(const stw_types::uint32 & oru32_Start, c
    if ((oru32_Start < this->c_Elements.size()) && (oru32_Target < this->c_Elements.size()))
    {
       //Copy
-      C_OSCNodeDataPoolListElement c_ListElementData = this->c_Elements[oru32_Start];
+      const C_OSCNodeDataPoolListElement c_ListElementData = this->c_Elements[oru32_Start];
       //Erase
       this->c_Elements.erase(this->c_Elements.begin() + oru32_Start);
       //Insert

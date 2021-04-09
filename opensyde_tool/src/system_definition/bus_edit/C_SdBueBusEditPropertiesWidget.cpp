@@ -199,7 +199,7 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
          std::vector<uint32> c_ConnectedInterfaces;
          std::vector<uint32> c_SupportedBitrates;
          uint32 u32_BitrateCounter;
-         uint32 u32_CurrentSetBitrate = static_cast<uint32>(pc_Bus->u64_BitRate / 1000ULL);
+         const uint32 u32_CurrentSetBitrate = static_cast<uint32>(pc_Bus->u64_BitRate / 1000ULL);
          const QString c_CurrentSetBitrate = this->m_GetComboBoxString(u32_CurrentSetBitrate);
          bool q_CurrentSetBitrateFound = false;
 
@@ -247,7 +247,8 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
             }
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidNodesForBitRate.size())
             {
-               c_Content += static_cast<QString>("+%1\n").arg(c_InvalidNodesForBitRate.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+               c_Content += static_cast<QString>("+%1\n").arg(
+                  static_cast<uint32>(c_InvalidNodesForBitRate.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
          }
@@ -489,7 +490,8 @@ void C_SdBueBusEditPropertiesWidget::m_RegisterNameChange(void)
                                                                  &c_ExistingNames) == false)
       {
          const QString c_Description = static_cast<QString>(C_GtGetText::h_GetText(
-                                                  "A bus with the name \"%1\" already exists. Choose another name.")).
+                                                               "A bus with the name \"%1\" already exists. Choose another name."))
+                                       .
                                        arg(this->mpc_Ui->pc_LineEditBusName->text());
          QString c_Details;
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
@@ -520,7 +522,7 @@ void C_SdBueBusEditPropertiesWidget::m_RegisterNameChange(void)
          Q_EMIT (this->SigNameChanged(C_GtGetText::h_GetText(
                                          "NETWORK TOPOLOGY"), this->mpc_Ui->pc_LineEditBusName->text(), false));
       }
-      hq_InProgress = false;
+      hq_InProgress = false; //lint !e838 its static and could be used on strange second call
    }
 }
 

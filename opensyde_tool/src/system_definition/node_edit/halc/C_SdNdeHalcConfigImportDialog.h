@@ -12,6 +12,7 @@
 #include <QWidget>
 
 #include "stwtypes.h"
+#include "C_OSCHalcConfig.h"
 #include "C_OgePopUpDialog.h"
 
 #include "C_OSCHalcConfigStandalone.h"
@@ -59,6 +60,14 @@ private:
 
    void m_OkClicked(void);
    void m_OnCancel(void);
+
+   static bool mh_CheckConsistency(const stw_opensyde_core::C_OSCHalcConfig * const opc_Config,
+                                   const stw_opensyde_core::C_OSCHalcConfigStandalone & orc_ConfigStandalone,
+                                   QString & orc_ErrorDetails);
+   static bool mh_CheckConsistencyEl(const stw_opensyde_core::C_OSCHalcConfigParameter & orc_Ref,
+                                     const stw_opensyde_core::C_OSCHalcConfigParameter & orc_New,
+                                     QString & orc_ErrorDetails, const QString & orc_Domain,
+                                     const QString & orc_Channel, const QString & orc_CheckAddendum);
 
    //Avoid call
    C_SdNdeHalcConfigImportDialog(const C_SdNdeHalcConfigImportDialog &);

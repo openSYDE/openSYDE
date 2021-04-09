@@ -32,6 +32,7 @@
 #include "C_CamGenKeySelect.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_CamMosDatabaseSelectionPopup.h"
+#include "C_OSCNodeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -105,6 +106,7 @@ C_CamGenTableView::C_CamGenTableView(QWidget * const opc_Parent) :
            &C_CamGenTableView::m_ModelRegisterCyclicMessage);
    connect(this, &C_CamGenTableView::SigLinkClicked, this, &C_CamGenTableView::m_HandleLinkClicked);
    connect(&this->mc_Model, &C_CamGenTableModel::SigItemCheck, this, &C_CamGenTableView::m_HandleCheckChange);
+   connect(&this->mc_Model, &C_CamGenTableModel::SigReport, this, &C_CamGenTableView::m_Report);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -953,11 +955,24 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
                for (uint32 u32_ItSignal = 0UL; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
                {
                   const C_CieConverter::C_CIECanSignal & rc_Signal = pc_Message->c_Signals[u32_ItSignal];
-                  if (rc_Signal.c_Element.c_DataSetValues.size() > 0UL)
+                  const C_OSCCanSignal c_OSCSignal = C_CamGenSigUtil::h_ConvertDBCToOSY(rc_Signal);
+
+                  // set unused multiplexed signals to zero
+                  // (i.e. those with mux value != 0, the initial multiplexer value)
+                  if ((rc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
+                      (rc_Signal.u16_MultiplexValue != 0U))
                   {
-                     const C_OSCCanSignal c_OSCSignal = C_CamGenSigUtil::h_ConvertDBCToOSY(rc_Signal);
-                     C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, c_OSCSignal,
-                                                               rc_Signal.c_Element.c_DataSetValues[0UL]);
+                     C_OSCNodeDataPoolContent c_ZeroContent = rc_Signal.c_Element.c_MinValue; // init appropriately
+                     C_OSCNodeDataPoolContentUtil::h_ZeroContent(c_ZeroContent);
+                     C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, c_OSCSignal, c_ZeroContent);
+                  }
+                  else
+                  {
+                     if (rc_Signal.c_Element.c_DataSetValues.size() > 0UL)
+                     {
+                        C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, c_OSCSignal,
+                                                                  rc_Signal.c_Element.c_DataSetValues[0UL]);
+                     }
                   }
                }
 
@@ -1009,15 +1024,28 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
                for (uint32 u32_ItSignal = 0UL; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
                {
                   const C_OSCCanSignal & rc_Signal = pc_Message->c_Signals[u32_ItSignal];
+
                   if (rc_Signal.u32_ComDataElementIndex < pc_List->c_Elements.size())
                   {
                      const C_OSCNodeDataPoolListElement & rc_Element =
                         pc_List->c_Elements[rc_Signal.u32_ComDataElementIndex];
                      c_DatapoolPart.push_back(rc_Element);
-                     if (rc_Element.c_DataSetValues.size() > 0UL)
+                     // set unused multiplexed signals to zero
+                     // (i.e. those with mux value != 0, the initial multiplexer value)
+                     if ((rc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
+                         (rc_Signal.u16_MultiplexValue != 0U))
                      {
-                        C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, rc_Signal,
-                                                                  rc_Element.c_DataSetValues[0UL]);
+                        C_OSCNodeDataPoolContent c_ZeroContent = rc_Element.c_MinValue; // init appropriately
+                        C_OSCNodeDataPoolContentUtil::h_ZeroContent(c_ZeroContent);
+                        C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, rc_Signal, c_ZeroContent);
+                     }
+                     else
+                     {
+                        if (rc_Element.c_DataSetValues.size() > 0UL)
+                        {
+                           C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, rc_Signal,
+                                                                     rc_Element.c_DataSetValues[0UL]);
+                        }
                      }
                   }
                }
@@ -1185,4 +1213,22 @@ void C_CamGenTableView::m_RegisterAllCyclicMessages(void)
    }
 
    // remove of all current cyclic messages is handled by main window (start/stop) resp. by messages widget (toggle)
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Report
+
+   \param[in]  oe_Type           Type
+   \param[in]  orc_Heading       Heading
+   \param[in]  orc_Description   Description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenTableView::m_Report(const C_OgeWiCustomMessage::E_Type oe_Type, const QString & orc_Heading,
+                                 const QString & orc_Description)
+{
+   C_OgeWiCustomMessage c_Message(this, oe_Type);
+
+   c_Message.SetHeading(orc_Heading);
+   c_Message.SetDescription(orc_Description);
+   c_Message.Execute();
 }

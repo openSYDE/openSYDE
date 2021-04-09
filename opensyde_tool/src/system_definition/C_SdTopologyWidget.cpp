@@ -58,7 +58,9 @@ const sintn C_SdTopologyWidget::mhsn_ToolboxInitPosY = 150;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyWidget::C_SdTopologyWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
-   mpc_Ui(new Ui::C_SdTopologyWidget)
+   mpc_Ui(new Ui::C_SdTopologyWidget),
+   mpc_Toolbox(NULL),
+   mpc_FixMinimizedToolbox(NULL)
 {
    sintn sn_ViewZoomValue;
 
@@ -109,15 +111,15 @@ C_SdTopologyWidget::C_SdTopologyWidget(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} Toolbox cleaned up via Qt parent mechanism
 C_SdTopologyWidget::~C_SdTopologyWidget()
 {
    // store configuration of the view
-   C_UsHandler::h_GetInstance()->SetProjSdTopologyViewZoom(this->mpc_Ui->pc_GraphicsView->GetZoomValue());
    C_UsHandler::h_GetInstance()->SetProjSdTopologyViewPos(this->mpc_Ui->pc_GraphicsView->GetViewPos());
+   C_UsHandler::h_GetInstance()->SetProjSdTopologyViewZoom(this->mpc_Ui->pc_GraphicsView->GetZoomValue());
 
    delete mpc_Ui;
    delete mpc_Scene;
-   //lint -e{1740} Toolbox cleaned up via Qt parent mechanism
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -148,10 +150,10 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
       if (C_UsHandler::h_GetInstance()->GetSdTopologyToolboxPos().x() < 0)
       {
          // default value
-         sintn sn_ToolboxWidth = 355;
-         sintn sn_ToolboxHeight = 328;
+         const sintn sn_ToolboxWidth = 355;
+         const sintn sn_ToolboxHeight = 328;
          // needed to make the toolbox stay inside graphics view (maybe depends on size of navibar)
-         sintn sn_ToolboxOffset = 308;
+         const sintn sn_ToolboxOffset = 308;
          // use available desktop space to have real information about screen (widget sizes are not reliable here)
          const QDesktopWidget * const pc_Desktop = QApplication::desktop();
          this->mpc_Toolbox->setGeometry(((pc_Desktop->availableGeometry().width() - sn_ToolboxWidth) -
@@ -182,7 +184,7 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
               this, &C_SdTopologyWidget::m_WiHoverMinBtnClicked);
       connect(this->mpc_FixMinimizedToolbox, &C_OgeWiFixPosition::SigWiFixPosMaxBtnClicked,
               this, &C_SdTopologyWidget::m_WiFixPosMaxBtnClicked);
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Drag and the Qt memory management
    else
    {
       QSize c_Size;

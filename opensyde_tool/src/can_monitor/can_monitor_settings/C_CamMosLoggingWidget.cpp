@@ -505,7 +505,7 @@ void C_CamMosLoggingWidget::m_CheckAndStartLogging()
             C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eWARNING);
             c_Message.SetHeading(C_GtGetText::h_GetText("Log file overwrite"));
             c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("The log file %1 already exists. "
-                                                                    "Do you want to overwrite the file?")).
+                                                                                 "Do you want to overwrite the file?")).
                                      arg(c_FileInfo.absoluteFilePath()));
             c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
             c_Message.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));

@@ -96,7 +96,8 @@ sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
       if ((oq_NameWithInterfaceAlways == false) &&
           (orc_NodeIndices.size() > 1))
       {
-         for (uint32 u32_NodeCounter = 0U; u32_NodeCounter < (orc_NodeIndices.size() - 1UL); ++u32_NodeCounter)
+         for (uint32 u32_NodeCounter = 0U; u32_NodeCounter < static_cast<uint32>(orc_NodeIndices.size() - 1UL);
+              ++u32_NodeCounter)
          {
             for (uint32 u32_NextNodeCounter = u32_NodeCounter + 1U;
                  u32_NextNodeCounter < (orc_NodeIndices.size());
@@ -131,7 +132,7 @@ sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
          }
          orc_Names.push_back(c_TmpName);
 
-         if ((opc_DatapoolIndices != NULL) && (opc_DatapoolNames != NULL) &&
+         if (((opc_DatapoolIndices != NULL) && (opc_DatapoolNames != NULL)) &&
              (orc_NodeIndices.size() == opc_DatapoolIndices->size()))
          {
             // Get the matching Datapool name
@@ -359,7 +360,8 @@ void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std
    }
    if (mu32_TOOL_TIP_MAXIMUM_ITEMS < orc_Indices.size())
    {
-      orc_Content += static_cast<QString>("+%1\n").arg(orc_Indices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+      orc_Content +=
+         static_cast<QString>("+%1\n").arg(orc_Indices.size() - static_cast<uintn>(mu32_TOOL_TIP_MAXIMUM_ITEMS));
    }
 }
 
@@ -521,7 +523,7 @@ uint32 C_SdUtil::h_GetActiveNodeInterface(const QComboBox & orc_ComboBox, const 
    if (pc_Node != NULL)
    {
       uint32 u32_InterfaceCounter;
-      QString c_SelectedName = orc_ComboBox.currentText();
+      const QString c_SelectedName = orc_ComboBox.currentText();
 
       for (u32_InterfaceCounter = 0; u32_InterfaceCounter <  pc_Node->c_Properties.c_ComInterfaces.size();
            ++u32_InterfaceCounter)
@@ -628,6 +630,8 @@ bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OSCNode & orc_Node, const C_O
          break;
       case C_OSCCanProtocol::eECES:
          orq_ComProtocolECeS = true;
+         break;
+      default:
          break;
       }
    }
@@ -777,10 +781,11 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message, C_Pui
       //Tx method always cyclic
       if (orc_Message.e_TxMethod != C_OSCCanMessage::eTX_METHOD_CYCLIC)
       {
-         c_Info.push_back(static_cast<QString>(C_GtGetText::h_GetText("Message transmission type changed from \"%1\" to \"%2\" due "
-                                                         "to ECeS/ECoS protocol restrictions.")).
-                          arg(C_SdUtil::h_ConvertTxMethodToName(orc_Message.e_TxMethod)).
-                          arg(C_SdUtil::h_ConvertTxMethodToName(C_OSCCanMessage::eTX_METHOD_CYCLIC)));
+         c_Info.push_back(
+            static_cast<QString>(C_GtGetText::h_GetText("Message transmission type changed from \"%1\" to \"%2\" due "
+                                                        "to ECeS/ECoS protocol restrictions.")).
+            arg(C_SdUtil::h_ConvertTxMethodToName(orc_Message.e_TxMethod)).
+            arg(C_SdUtil::h_ConvertTxMethodToName(C_OSCCanMessage::eTX_METHOD_CYCLIC)));
          orc_Message.e_TxMethod = C_OSCCanMessage::eTX_METHOD_CYCLIC;
 
          // Adapt the necessary cyclic information
@@ -804,8 +809,9 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message, C_Pui
          //DLC fix 8
          if (orc_Message.u16_Dlc != 8U)
          {
-            c_Info.push_back(static_cast<QString>(C_GtGetText::h_GetText("Message DLC changed from %1 to 8 due to ECeS/ECoS "
-                                                            "protocol restrictions.")).arg(orc_Message.u16_Dlc));
+            c_Info.push_back(
+               static_cast<QString>(C_GtGetText::h_GetText("Message DLC changed from %1 to 8 due to ECeS/ECoS "
+                                                           "protocol restrictions.")).arg(orc_Message.u16_Dlc));
             orc_Message.u16_Dlc = 8U;
          }
          break;
@@ -821,15 +827,17 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message, C_Pui
          if ((orc_Message.u32_CanId < mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN) ||
              (orc_Message.u32_CanId > mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX))
          {
-            c_Info.push_back(static_cast<QString>(C_GtGetText::h_GetText("Message ID changed from 0x%1 to 0x%2 due to ECoS protocol "
-                                                            "restrictions. Allowed IDs: 0x%3-0x%2.")).
-                             arg(orc_Message.u32_CanId, 0, 16).
-                             arg(mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX, 0, 16).
-                             arg(mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN, 0, 16));
+            c_Info.push_back(
+               static_cast<QString>(C_GtGetText::h_GetText("Message ID changed from 0x%1 to 0x%2 due to ECoS protocol "
+                                                           "restrictions. Allowed IDs: 0x%3-0x%2.")).
+               arg(orc_Message.u32_CanId, 0, 16).
+               arg(mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX, 0, 16).
+               arg(mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN, 0, 16));
             orc_Message.u32_CanId = mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX;
          }
          break;
       case C_OSCCanProtocol::eLAYER2:
+      default:
          //No restrictions
          break;
       }
@@ -879,7 +887,7 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OSCCanSignal & orc_Signal, const C_
          if (orc_Signal.u16_ComBitStart >= mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX)
          {
             c_Info.append(static_cast<QString>(C_GtGetText::h_GetText("Start bit of signal set from %1 to 0 because "
-                                                         "of reserved bytes in ECeS protocol.")).
+                                                                      "of reserved bytes in ECeS protocol.")).
                           arg(orc_Signal.u16_ComBitStart));
             orc_Signal.u16_ComBitStart = 0;
          }
@@ -940,7 +948,7 @@ QString C_SdUtil::h_InitUsedIdsString(const std::vector<uint32> & orc_UsedIds, c
    {
       QString c_BusIds;
 
-      for (uint32 u32_ItBusId = 0; u32_ItBusId < (orc_UsedIds.size() - 1UL); ++u32_ItBusId)
+      for (uint32 u32_ItBusId = 0; u32_ItBusId < static_cast<uint32>(orc_UsedIds.size() - 1UL); ++u32_ItBusId)
       {
          c_BusIds += static_cast<QString>("%1,").arg(orc_UsedIds[u32_ItBusId]);
       }
@@ -1093,7 +1101,7 @@ bool C_SdUtil::h_CheckNodeInterfaceConnected(const std::vector<C_OSCNodeComInter
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check the total number of datapool
 
-   The total number of datapools is bounded above by mu32_NODE_DATA_POOL_MAX.
+   The total number of datapools is bounded above by C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE.
 
    \param[in]  oru32_NodeIndex      node index
    \param[in]  orq_AlreadyChecked   for pre-checking cases (true: we know that the number exceeds the maximum)
@@ -1119,7 +1127,7 @@ bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const bool 
       if (pc_Node != NULL)
       {
          // is enough space available
-         if (pc_Node->c_DataPools.size() < mu32_NODE_DATA_POOL_MAX)
+         if (pc_Node->c_DataPools.size() < C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE)
          {
             // all OK
             q_Return = true;
@@ -1132,8 +1140,9 @@ bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const bool 
       C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
 
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Datapool add"));
-      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("The allowed maximum number of Datapools is %1.")).
-                                  arg(mu32_NODE_DATA_POOL_MAX));
+      c_MessageBox.SetDescription(
+         static_cast<QString>(C_GtGetText::h_GetText("The allowed maximum number of Datapools is %1.")).
+         arg(C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE));
       c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
    }
@@ -1159,7 +1168,7 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
    bool q_NameEmpty;
    bool q_NodeIdInvalid;
 
-   bool q_DataPoolsSizeConflict =
+   const bool q_DataPoolsSizeConflict =
       C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
    bool q_DataPoolsInvalid;
    bool q_ApplicationsInvalid;
@@ -1169,7 +1178,7 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
    std::vector<uint32> c_InvalidDataPoolIndices;
    std::vector<uint32> c_InvalidApplicationIndices;
    std::vector<uint32> c_InvalidDomainIndices;
-   sint32 s32_Retval = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckErrorNode(
+   const sint32 s32_Retval = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckErrorNode(
       oru32_NodeIndex, &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid, &q_DataPoolsInvalid, &q_ApplicationsInvalid,
       &q_DomainsInvalid, true, &c_InvalidInterfaceIndices, &c_InvalidDataPoolIndices, &c_InvalidApplicationIndices,
       &c_InvalidDomainIndices);
@@ -1223,7 +1232,7 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidApplicationIndices.size())
             {
                orc_Text += static_cast<QString>("+%1\n").arg(
-                  c_InvalidApplicationIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                  c_InvalidApplicationIndices.size() - static_cast<sintn>(mu32_TOOL_TIP_MAXIMUM_ITEMS));
             }
             orc_Text += "\n";
          }
@@ -1254,7 +1263,9 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
             }
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDomainIndices.size())
             {
-               orc_Text += static_cast<QString>("+%1\n").arg(c_InvalidDomainIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+               orc_Text +=
+                  static_cast<QString>("+%1\n").arg(c_InvalidDomainIndices.size() -
+                                                    static_cast<sintn>(mu32_TOOL_TIP_MAXIMUM_ITEMS));
             }
             orc_Text += "\n";
          }
@@ -1318,7 +1329,9 @@ void C_SdUtil::h_GetErrorToolTipBus(const uint32 & oru32_BusIndex, QString & orc
          }
          if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidNodesForBitRate.size())
          {
-            orc_Text += static_cast<QString>("+%1\n").arg(c_InvalidNodesForBitRate.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+            orc_Text +=
+               static_cast<QString>("+%1\n").
+               arg(c_InvalidNodesForBitRate.size() - static_cast<sintn>(mu32_TOOL_TIP_MAXIMUM_ITEMS));
          }
       }
       orc_Text += "\n";
@@ -1328,7 +1341,8 @@ void C_SdUtil::h_GetErrorToolTipBus(const uint32 & oru32_BusIndex, QString & orc
       orc_Text += C_GtGetText::h_GetText("COMM protocols with invalid content:\n");
       for (uint32 u32_ItP = 0; u32_ItP < c_InvalidProtocols.size(); ++u32_ItP)
       {
-         orc_Text += static_cast<QString>("%1\n").arg(C_PuiSdUtil::h_ConvertProtocolTypeToString(c_InvalidProtocols[u32_ItP]));
+         orc_Text +=
+            static_cast<QString>("%1\n").arg(C_PuiSdUtil::h_ConvertProtocolTypeToString(c_InvalidProtocols[u32_ItP]));
       }
       orc_Text += "\n";
    }
@@ -1364,7 +1378,7 @@ QString C_SdUtil::h_GetToolTipContentDpList(const uint32 & oru32_NodeIndex, cons
    }
 
    // datasets
-   uint32 u32_DatasetNumber = pc_DpList->c_DataSets.size();
+   const uint32 u32_DatasetNumber = pc_DpList->c_DataSets.size();
 
    if (u32_DatasetNumber == 0)
    {
@@ -1458,14 +1472,8 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
          }
 
          //Properties:
-         if (pc_Datapool->e_Type == C_OSCNodeDataPool::eDIAG)
-         {
-            c_ToolTipContent.append(C_GtGetText::h_GetText("Variable Properties: "));
-         }
-         else //eNVM
-         {
-            c_ToolTipContent.append(C_GtGetText::h_GetText("Parameter Properties: "));
-         }
+         c_ToolTipContent.append(C_PuiSdHandlerNodeLogic::h_GetElementTypeName(pc_Datapool->e_Type) +
+                                 C_GtGetText::h_GetText(" Properties: "));
          c_ToolTipContent.append("\n");
 
          //value type
@@ -1622,7 +1630,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
             c_ToolTipContent.append(QString::number(pc_DpListElement->u32_NvMStartAddress));
             c_ToolTipContent.append(")");
          }
-         // case DIAG (case COMM is handled at the beginning)
+         // case DIAG or HALC (case COMM is handled at the beginning)
          else
          {
             // event call
@@ -1743,9 +1751,10 @@ void C_SdUtil::h_SortIndicesDescendingAndSync(std::vector<stw_types::uint32> & o
       c_UIContentTmp.reserve(orc_UIContentTmp.size());
       for (stw_types::uint32 u32_ItIndex = c_IndexMap.size(); u32_ItIndex > 0; --u32_ItIndex)
       {
-         if (c_IndexMap[u32_ItIndex - 1] >= 0)
+         if (c_IndexMap[static_cast<uintn>(u32_ItIndex - 1U)] >= 0)
          {
-            const stw_types::uint32 u32_CurIndex = static_cast<stw_types::uint32>(c_IndexMap[u32_ItIndex - 1]);
+            const stw_types::uint32 u32_CurIndex =
+               static_cast<stw_types::uint32>(c_IndexMap[static_cast<uintn>(u32_ItIndex - 1U)]);
             if (((u32_CurIndex < orc_IndicesTmp.size()) &&
                  (u32_CurIndex < orc_OSCContentTmp.size())) &&
                 (u32_CurIndex < orc_UIContentTmp.size()))

@@ -6,8 +6,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SyvDaDashboardTabProperties_H
-#define C_SyvDaDashboardTabProperties_H
+#ifndef C_SYVDADASHBOARDTABPROPERTIES_H
+#define C_SYVDADASHBOARDTABPROPERTIES_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
@@ -42,6 +42,7 @@ public:
    void InitStaticNames(void);
    QString GetDashboardTabName() const;
    QString GetDashboardTabComment() const;
+   stw_opensyde_gui_logic::C_PuiSvDashboard::E_TabType GetDashboardTabType() const;
 
 protected:
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
@@ -61,6 +62,8 @@ private:
    void m_OkClicked(void);
    void m_CancelClicked(void);
    bool m_CheckDashboardTabName(void) const;
+   void m_SetCommonDashboardType(const bool oq_IsChecked) const;
+   void m_SetChartDashboardType(const bool oq_IsChecked) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

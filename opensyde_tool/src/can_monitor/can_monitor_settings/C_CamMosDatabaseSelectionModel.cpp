@@ -220,7 +220,8 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
    const QMap<QString, C_CamDbOsy> & rc_OSYFiles = C_CamDbHandler::h_GetInstance()->GetOSYFiles();
 
    //Reserve
-   this->mpc_InvisibleRootItem->ReserveChildrenSpace(rc_DBCFiles.size() + rc_OSYFiles.size());
+   this->mpc_InvisibleRootItem->ReserveChildrenSpace(static_cast<uint32>(rc_DBCFiles.size()) +
+                                                     static_cast<uint32>(rc_OSYFiles.size()));
 
    //DBC
    for (QMap<QString, C_CamDbDbc>::const_iterator c_ItDbc = rc_DBCFiles.begin(); c_ItDbc != rc_DBCFiles.end();
@@ -269,7 +270,7 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
          //Database
          C_TblTreItem * const pc_DatabaseItem = this->m_CreateAndFillDatabaseNode(
             c_ItOsy.key(), this->mpc_InvisibleRootItem);
-         if (rc_Messages.size() == 0UL)
+         if (static_cast<uint32>(rc_Messages.size()) == 0UL)
          {
             //Special handling for no messages
             pc_DatabaseItem->c_Name = static_cast<QString>(C_GtGetText::h_GetText("%1 (No mapped messages)")).arg(

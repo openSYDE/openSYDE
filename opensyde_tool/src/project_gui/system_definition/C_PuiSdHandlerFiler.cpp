@@ -2420,7 +2420,7 @@ stw_types::sint32 C_PuiSdHandlerFiler::mh_LoadTextElement(C_PuiBsTextElement * c
                                                           stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Return;
-   
+
    C_PuiSdTextElementBus * const opc_BusTextElement =
       dynamic_cast<C_PuiSdTextElementBus * const>(opc_TextElement);
 
@@ -2443,7 +2443,6 @@ stw_types::sint32 C_PuiSdHandlerFiler::mh_LoadTextElement(C_PuiBsTextElement * c
 void C_PuiSdHandlerFiler::mh_SaveTextElement(const C_PuiBsTextElement * const opc_TextElement,
                                              stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
-   
    const C_PuiSdTextElementBus * const opc_BusTextElement =
       dynamic_cast<const C_PuiSdTextElementBus * const>(opc_TextElement);
 

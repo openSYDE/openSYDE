@@ -221,8 +221,8 @@ void C_TblModelAction::MoveSelectedItems(const std::vector<uint32> & orc_Selecte
       //Specify target indices: one step "up"
       for (uint32 u32_It = 0UL; u32_It < c_TargetIndices.size(); ++u32_It)
       {
-         uint32 & rc_CurItem = c_TargetIndices[u32_It];
-         --rc_CurItem;
+         uint32 & ru32_CurItem = c_TargetIndices[u32_It];
+         --ru32_CurItem;
       }
    }
    else
@@ -230,8 +230,8 @@ void C_TblModelAction::MoveSelectedItems(const std::vector<uint32> & orc_Selecte
       //Specify target indices: one step "down"
       for (uint32 u32_It = 0UL; u32_It < c_TargetIndices.size(); ++u32_It)
       {
-         uint32 & rc_CurItem = c_TargetIndices[u32_It];
-         ++rc_CurItem;
+         uint32 & ru32_CurItem = c_TargetIndices[u32_It];
+         ++ru32_CurItem;
       }
    }
    //Check if move can be normally performed

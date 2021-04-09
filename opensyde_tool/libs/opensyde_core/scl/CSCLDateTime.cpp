@@ -17,9 +17,9 @@
 #pragma package(smart_init)
 #endif
 
-#include <ctime> //lint !e829 //this module is specifically for Windows targets; no trouble with unspecified
+//lint -estring(829,*ctime*)   //this module is specifically for Windows targets; no trouble with unspecified
 // behavior expected
-
+#include <ctime>
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "CSCLDateTime.h"

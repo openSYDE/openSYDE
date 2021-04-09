@@ -118,6 +118,7 @@ void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingCha
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{8001}  //name of function dictated by base class
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(void)
 {
    return this->mrc_OsyProtocol.OsySetTunnelCanMessages(this->mu8_RoutingChannel, this->mu32_FilterId,
@@ -136,6 +137,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(void)
    C_NOACT
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{8001}  //name of function dictated by base class
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
 {
    (void)os32_BitrateKBitS;
@@ -155,6 +157,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{8001}  //name of function dictated by base class
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Exit(void)
 {
    return this->mrc_OsyProtocol.OsyStopTunnelCanMessages();
@@ -173,6 +176,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Exit(void)
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{8001}  //name of function dictated by base class
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
 {
    sint32 s32_Return;
@@ -203,6 +207,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{8001}  //name of function dictated by base class
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Send_Msg(const stw_can::T_STWCAN_Msg_TX & orc_Message)
 {
    return this->mrc_OsyProtocol.OsySendCanMessage(this->mu8_RoutingChannel, orc_Message);
@@ -221,6 +226,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Send_Msg(const stw_can::T_STWCAN_Msg_TX 
    C_NO_ERR   information read
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{8001}  //name of function dictated by base class
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Get_System_Time(uint64 & oru64_SystemTimeUs) const
 {
    oru64_SystemTimeUs = stw_tgl::TGL_GetTickCountUS();
@@ -240,6 +246,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Get_System_Time(uint64 & oru64_SystemTim
    C_WARN     no message read
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{8001}  //name of function dictated by base class
 sint32 C_OSCCanDispatcherOsyRouter::m_CAN_Read_Msg(stw_can::T_STWCAN_Msg_RX & orc_Message)
 {
    sint32 s32_Return = C_WARN;
@@ -273,9 +280,9 @@ sint32 C_OSCCanDispatcherOsyRouter::m_CAN_Read_Msg(stw_can::T_STWCAN_Msg_RX & or
 void C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived(void * const opv_Instance, const uint8 ou8_Channel,
                                                                  const stw_can::T_STWCAN_Msg_RX & orc_CanMessage)
 {
-   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
    C_OSCCanDispatcherOsyRouter * const pc_Dispatcher =
-      reinterpret_cast<C_OSCCanDispatcherOsyRouter *>(opv_Instance);
+      reinterpret_cast<C_OSCCanDispatcherOsyRouter * const>(opv_Instance);
 
    tgl_assert(pc_Dispatcher != NULL);
    if (pc_Dispatcher != NULL)

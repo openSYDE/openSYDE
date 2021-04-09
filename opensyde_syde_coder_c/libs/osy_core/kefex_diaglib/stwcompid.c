@@ -132,12 +132,12 @@ sintn CID_string_to_bytes(const charn * const opcn_String, uint8 * const opu8_By
 
          //now put the 16 bit value together
          u16_CID = (uint16)(0x8000U + //set flag to signal "binary" format
-                      (((uint16)(au8_Help[0])) << 10) +
-                      (((uint16)(au8_Help[1])) << 5) +
+                      (((uint16)(au8_Help[0])) << 10U) +
+                      (((uint16)(au8_Help[1])) << 5U) +
                        ((uint16)(au8_Help[2])));
          //spec: little endian
          opu8_Bytes[0] = (uint8)u16_CID;
-         opu8_Bytes[1] = (uint8)(u16_CID >> 8);
+         opu8_Bytes[1] = (uint8)(u16_CID >> 8U);
          if (opu8_NumBytes != NULL)
          {
             *opu8_NumBytes = 2;
@@ -179,13 +179,13 @@ sintn CID_bytes_to_string(const uint8 * const opu8_Bytes, const uint8 ou8_NumByt
    case 2:
       //either a real 2 character ID, or an encoded 3 character one
       //spec: little endian
-      u16_CID = (uint16)(((uint16)opu8_Bytes[1] << 8) + opu8_Bytes[0]);
+      u16_CID = (uint16)(((uint16)opu8_Bytes[1] << 8U) + opu8_Bytes[0]);
       if ((u16_CID & 0x8000U) == 0x8000U)
       {
          //encoded 3 character ID -> decode
-         au8_Bytes[0] = (uint8)((u16_CID >> 10) & 0x1F);
-         au8_Bytes[1] = (uint8)((u16_CID >> 5)  & 0x1F);
-         au8_Bytes[2] = (uint8)( u16_CID        & 0x1F);
+         au8_Bytes[0] = (uint8)((u16_CID >> 10U) & 0x1F);
+         au8_Bytes[1] = (uint8)((u16_CID >> 5U)  & 0x1F);
+         au8_Bytes[2] = (uint8)( u16_CID         & 0x1F);
 
          for (u8_Index = 0; u8_Index < 3; u8_Index++)
          {

@@ -28,6 +28,7 @@
 #include "C_CieUtil.h"
 #include "C_OSCNodeDataPoolContentUtil.h"
 #include "C_OSCUtils.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -373,7 +374,6 @@ sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMes
 
    if (s32_Return == C_NO_ERR)
    {
-      bool q_MultiplexedMessage = false;
       bool q_MessageAdapted = false;
 
       osc_write_log_info("DBC file import",
@@ -383,17 +383,14 @@ sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMes
       for (const auto c_DbcSignal : orc_DbcMessage.signals)
       {
          // If a multiplexer signal exists the message is a multiplexed message
-         if (mh_GetSignal(c_DbcSignal.second, q_MultiplexedMessage, q_MessageAdapted, orc_Message) != C_NO_ERR)
+         if (mh_GetSignal(c_DbcSignal.second, q_MessageAdapted, orc_Message) != C_NO_ERR)
          {
             s32_Return = C_WARN;
          }
       }
 
       // get transmission definitions
-      if (mh_GetTransmission(orc_DbcMessage, orc_Message) != C_NO_ERR)
-      {
-         s32_Return = C_WARN;
-      }
+      mh_GetTransmission(orc_DbcMessage, orc_Message);
 
       if (q_MessageAdapted == true)
       {
@@ -453,7 +450,6 @@ sint32 C_CieImportDbc::mh_ConvertAndAddMessage(const Vector::DBC::Message & orc_
 /*! \brief    Get signal definition
 
    \param[in]      orc_DbcSignal                signal definition from DBC file
-   \param[in,out]  orq_MultiplexerSignalExists  flag if signal is multiplexer signal, will not be reset to false
    \param[in,out]  orq_SignalAdapted            flag if signal was adapted, will not be reset to false
    \param[out]     orc_Message                  target message definitions
 
@@ -462,8 +458,8 @@ sint32 C_CieImportDbc::mh_ConvertAndAddMessage(const Vector::DBC::Message & orc_
    C_WARN      unknown parameter found -> default value set and warning reported
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, bool & orq_MultiplexerSignalExists,
-                                    bool & orq_SignalAdapted, C_CieConverter::C_CIENodeMessage & orc_Message)
+sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, bool & orq_SignalAdapted,
+                                    C_CieConverter::C_CIENodeMessage & orc_Message)
 {
    sint32 s32_Return = C_NO_ERR;
 
@@ -481,7 +477,7 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, b
    else if (orc_DbcSignal.multiplexedSignal == true)
    {
       c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL;
-      c_Signal.u16_MultiplexValue = orc_DbcSignal.multiplexerSwitchValue;
+      c_Signal.u16_MultiplexValue = static_cast<uint16>(orc_DbcSignal.multiplexerSwitchValue);
    }
    else
    {
@@ -577,11 +573,6 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, b
    C_CieImportDbc::mh_VerifySignalValueTable(c_Signal);
 
    orc_Message.c_CanMessage.c_Signals.push_back(c_Signal);
-
-   if (q_MultiplexerSignal == true)
-   {
-      orq_MultiplexerSignalExists = true;
-   }
 
    return s32_Return;
 }
@@ -683,6 +674,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
          orq_SignalAdapted = true;
       }
 
+      // avoid bit length >16
       if (c_DbcSignal.bitSize > 16U)
       {
          c_DbcSignal.bitSize = 16U;
@@ -701,14 +693,14 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
          orq_SignalAdapted = true;
       }
 
-      // 0.0 equals auto
+      // 0.0 equals auto/default (correct value is set below)
       if (C_OSCUtils::h_IsFloat64NearlyEqual(c_DbcSignal.maximumPhysicalValue, 0.0) == false)
       {
          c_DbcSignal.maximumPhysicalValue = 0.0;
          orq_SignalAdapted = true;
       }
 
-      // 0.0 equals auto
+      // 0.0 equals auto/default (correct value is set below)
       if (C_OSCUtils::h_IsFloat64NearlyEqual(c_DbcSignal.minimumPhysicalValue, 0.0) == false)
       {
          c_DbcSignal.minimumPhysicalValue = 0.0;
@@ -845,8 +837,15 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
       s32_Return = C_WARN;
    }
    // set values via comfort data pool util interface
+
    C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_MinValue, orc_Element.c_MinValue);
    C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_MaxValue, orc_Element.c_MaxValue);
+
+   if (oq_MultiplexerSignal == true)
+   {
+      C_SdNdeDpContentUtil::h_InitMinForSignal(orc_Element.c_MinValue, static_cast<uint16>(c_DbcSignal.bitSize));
+      C_SdNdeDpContentUtil::h_InitMaxForSignal(orc_Element.c_MaxValue, static_cast<uint16>(c_DbcSignal.bitSize));
+   }
 
    // get optional initial value if available
    C_OSCNodeDataPoolContent c_InitialValue;
@@ -1211,16 +1210,11 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
 
    \param[in]  orc_DbcMessage        message definition from DBC file
    \param[out] orc_Message           target message definitions
-
-   \return
-   C_NO_ERR    all data successfully retrieved
-   C_WARN      unknown parameter found -> default value set and error reported
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMessage,
-                                          C_CieConverter::C_CIENodeMessage & orc_Message)
+void C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMessage,
+                                        C_CieConverter::C_CIENodeMessage & orc_Message)
 {
-   const sint32 s32_Return = C_NO_ERR;
    C_SCLString c_MessageType;
    bool q_CycleTimeFound = false;
 
@@ -1315,8 +1309,6 @@ sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMe
    {
       // Nothing to do
    }
-
-   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -1007,7 +1007,6 @@ void C_PuiBsElementsFiler::mh_SaveFontStyle(const QFont & orc_FontStyle,
 void C_PuiBsElementsFiler::mh_PixmapToString(const QPixmap & orc_Pixmap, QString & orc_String)
 {
    QByteArray c_PixmapAsByteArray;
-   //lint -e{10,40,522}  Qt feature
    QBuffer c_PixmapBuffer(&c_PixmapAsByteArray);
 
    c_PixmapBuffer.open(QIODevice::WriteOnly);

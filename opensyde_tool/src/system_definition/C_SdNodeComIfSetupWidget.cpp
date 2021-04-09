@@ -292,6 +292,7 @@ void C_SdNodeComIfSetupWidget::m_OnNodeIdChange(const sint32 & ors32_Value)
       if (static_cast<uint32>(ors32_Value) == this->mc_UsedNodeIds[u32_ItBusId])
       {
          q_Valid = false;
+         break;
       }
    }
 
@@ -301,7 +302,7 @@ void C_SdNodeComIfSetupWidget::m_OnNodeIdChange(const sint32 & ors32_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check the total number of datapools
 
-   The total number of datapools is bounded above by mu32_NODE_DATA_POOL_MAX.
+   The total number of datapools is bounded above by C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE.
 
    \return
       true:  total number is ok
@@ -374,7 +375,7 @@ bool C_SdNodeComIfSetupWidget::m_CheckDatapoolNumber(void) const
       }
 
       // check if the resulting total number of datapools is too high
-      if ((pc_OscNode->c_DataPools.size() + u32_DatapoolsToAdd) <= mu32_NODE_DATA_POOL_MAX)
+      if ((pc_OscNode->c_DataPools.size() + u32_DatapoolsToAdd) <= C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE)
       {
          // all OK
          q_Return = true;

@@ -70,9 +70,6 @@ public:
    virtual void SendCurrentValue(void);
    virtual bool CallProperties(void);
    virtual void HandleManualOperationFinished(const stw_types::sint32 os32_Result, const stw_types::uint8 ou8_NRC);
-   virtual void SetErrorForFailedCyclicElementIdRegistrations(
-      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-      const std::vector<QString> & orc_FailedIdErrorDetails);
    virtual void SetErrorForInvalidDlc(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ElementId,
                                       const stw_types::uint8 ou8_DLC);
    virtual void SetDrawingActive(const bool oq_Active);
@@ -126,10 +123,6 @@ protected:
    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
 
-   virtual bool m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const;
-   bool m_CheckManualReadRequired(void) const;
-   bool m_CheckHasAnyRequiredNodesActive(void) const;
-   bool m_CheckHasAnyRequiredBusesConnected(void) const;
    virtual void m_DataPoolElementsChanged(void) override;
    virtual bool m_AllowRefreshButton(void) const;
    virtual void m_UpdateErrorIcon(void);
@@ -160,7 +153,6 @@ private:
    bool mq_ConnectionActive;
    bool mq_ShowButton;
    bool mq_AbortTriggered;
-   QString mc_RegistrationFailedIdErrorDetails;
    stw_types::uint32 mu32_NextManualActionIndex; ///< 0: Inactive
                                                  // Else: If current is finished this is the next index to try,
                                                  // else reset
@@ -179,14 +171,10 @@ private:
    void m_InitConflictIcon(void);
    void m_InitButton(void);
    void m_ManualRead(void);
-   bool m_IsOnTrigger(const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id) const;
    void m_HandleGenericButtonClick(void);
    void m_UpdateErrorIconToolTip(void);
    void m_ManualOperationStarted(void);
    void m_ManualOperationFinished(void);
-   bool m_CheckNodeActive(const stw_types::uint32 ou32_NodeIndex) const;
-   bool m_CheckElementAlreadyRead(const stw_types::uint32 ou32_ItemIndex,
-                                  const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -75,7 +75,7 @@ private:
    static stw_types::float64 mh_GetArc(const QPointF & orc_V1, const QPointF & orc_V2);
 
    void m_SetLabelColor(QPainter & orc_Painter, QFont & orc_TextFont, QPen & orc_ArrowPen, QPen & orc_MinMaxPen,
-                      QPen & orc_ValuePen) const;
+                        QPen & orc_ValuePen) const;
    void m_SetBarMargins();
    QString mc_Value;
    QString mc_MinValue;

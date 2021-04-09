@@ -95,7 +95,9 @@ C_CieImportReportWidget::C_CieImportReportWidget(C_OgePopUpDialog & orc_Parent, 
    //Trigger report
    m_AdaptMessagesToProtocolType();
    m_AdaptMessageNames();
-   tgl_assert(m_ShowReport() == C_NO_ERR);
+   tgl_assert(m_ShowReport(c_FileInfo.
+                           completeSuffix().
+                           toUpper()) == C_NO_ERR);
 
    // connects
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_CieImportReportWidget::m_OkClicked);
@@ -410,12 +412,14 @@ void C_CieImportReportWidget::mh_AdaptName(stw_scl::C_SCLString & orc_Name, stw_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show/update report
 
+   \param[in]  orc_Suffix  Suffix of the message file
+
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieImportReportWidget::m_ShowReport(void)
+sint32 C_CieImportReportWidget::m_ShowReport(const QString & orc_Suffix)
 {
    sint32 s32_Retval;
    QString c_Table = "";
@@ -425,7 +429,7 @@ sint32 C_CieImportReportWidget::m_ShowReport(void)
    s32_Retval = m_CheckMessages();
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = m_CheckMessageMatches();
+      s32_Retval = m_CheckMessageMatches(orc_Suffix);
    }
 
    // Get table with message entries
@@ -446,7 +450,8 @@ sint32 C_CieImportReportWidget::m_ShowReport(void)
                                            rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData,
                                            rc_CurData.c_ImportData.c_Core.c_OSCTxSignalData,
                                            rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerTxMessage,
-                                           rc_CurData.c_TxMessageOverrideIndices);
+                                           rc_CurData.c_TxMessageOverrideIndices, rc_CurData.u32_OsyNodeIndex, "TPDO",
+                                           orc_Suffix);
          if (s32_Retval == C_NO_ERR)
          {
             //Rx
@@ -454,7 +459,8 @@ sint32 C_CieImportReportWidget::m_ShowReport(void)
                                               rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData,
                                               rc_CurData.c_ImportData.c_Core.c_OSCRxSignalData,
                                               rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerRxMessage,
-                                              rc_CurData.c_RxMessageOverrideIndices);
+                                              rc_CurData.c_RxMessageOverrideIndices, rc_CurData.u32_OsyNodeIndex,
+                                              "RPDO", orc_Suffix);
          }
       }
    }
@@ -662,12 +668,14 @@ sint32 C_CieImportReportWidget::m_CheckMessages(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for matching messages
 
+   \param[in]  orc_Suffix  Suffix of the message file
+
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieImportReportWidget::m_CheckMessageMatches(void)
+sint32 C_CieImportReportWidget::m_CheckMessageMatches(const QString & orc_Suffix)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -681,27 +689,33 @@ sint32 C_CieImportReportWidget::m_CheckMessageMatches(void)
       rc_CurData.c_RxMessageOverrideIndices.clear();
       rc_CurData.c_TxMessageOverrideIndices.clear();
 
-      std::vector<stw_opensyde_core::C_OSCCanMessage>::const_iterator c_DBCMessageIt;
+      std::vector<stw_opensyde_core::C_OSCCanMessage>::iterator c_ImportMessageIt;
       std::pair<sint32, sint32> c_OverrideInfo;
 
-      // Check every Tx message of DBC
-      for (c_DBCMessageIt = rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.begin();
-           (c_DBCMessageIt != rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.end()) && (s32_Retval == C_NO_ERR);
-           ++c_DBCMessageIt)
+      // Check every Tx message of import file
+      uint32 u32_TxMessageCount = 0;
+      for (c_ImportMessageIt = rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.begin();
+           (c_ImportMessageIt != rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.end()) && (s32_Retval == C_NO_ERR);
+           ++c_ImportMessageIt)
       {
-         s32_Retval = m_GetMessageOverrideInfo(*c_DBCMessageIt, true, rc_CurData.u32_OsyNodeIndex,
-                                               rc_CurData.u32_OsyInterfaceIndex, c_OverrideInfo);
+         s32_Retval = m_GetMessageOverrideInfo(*c_ImportMessageIt, true, rc_CurData.u32_OsyNodeIndex,
+                                               rc_CurData.u32_OsyInterfaceIndex, c_OverrideInfo, u32_TxMessageCount,
+                                               orc_Suffix);
          rc_CurData.c_TxMessageOverrideIndices.push_back(c_OverrideInfo);
+         u32_TxMessageCount++;
       }
 
-      // Check every Rx message of DBC
-      for (c_DBCMessageIt = rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.begin();
-           (c_DBCMessageIt != rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.end()) && (s32_Retval == C_NO_ERR);
-           ++c_DBCMessageIt)
+      // Check every Rx message of import file
+      uint32 u32_RxMessageCount = 0;
+      for (c_ImportMessageIt = rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.begin();
+           (c_ImportMessageIt != rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.end()) && (s32_Retval == C_NO_ERR);
+           ++c_ImportMessageIt)
       {
-         s32_Retval = m_GetMessageOverrideInfo(*c_DBCMessageIt, false, rc_CurData.u32_OsyNodeIndex,
-                                               rc_CurData.u32_OsyInterfaceIndex, c_OverrideInfo);
+         s32_Retval = m_GetMessageOverrideInfo(*c_ImportMessageIt, false, rc_CurData.u32_OsyNodeIndex,
+                                               rc_CurData.u32_OsyInterfaceIndex, c_OverrideInfo, u32_RxMessageCount,
+                                               orc_Suffix);
          rc_CurData.c_RxMessageOverrideIndices.push_back(c_OverrideInfo);
+         u32_RxMessageCount++;
       }
    }
 
@@ -709,35 +723,54 @@ sint32 C_CieImportReportWidget::m_CheckMessageMatches(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Compare a DBC message with existing messages to find out if the message is new or just an update.
+/*! \brief  Compare a import message with existing messages to find out if the message is new or just an update.
 
-   \param[in]   orc_DBCMessageToFind      message from DBC file that should be checked for existing message
+   \param[in]   orc_ImportMessageToFind   message from import file that should be checked for existing message
    \param[in]   oq_Tx                     flag if message is Tx
    \param[in]   ou32_OsyNodeIndex         Osy node index
    \param[in]   ou32_OsyInterfaceIndex    Osy interface index
    \param[out]  orc_MessageOverrideInfo   pair of datapool index and index of message in corresponding protocol
+   \param[in]   ou32_MessageIndex         Message count index
+   \param[in]   orc_Suffix                Suffix of the message file
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieImportReportWidget::m_GetMessageOverrideInfo(const C_OSCCanMessage & orc_DBCMessageToFind, const bool oq_Tx,
+sint32 C_CieImportReportWidget::m_GetMessageOverrideInfo(C_OSCCanMessage & orc_ImportMessageToFind, const bool oq_Tx,
                                                          const uint32 ou32_OsyNodeIndex,
                                                          const uint32 ou32_OsyInterfaceIndex,
                                                          std::pair<stw_types::sint32,
-                                                                   stw_types::sint32> & orc_MessageOverrideInfo)
-const
+                                                                   stw_types::sint32> & orc_MessageOverrideInfo,
+                                                         const uint32 ou32_MessageIndex,
+                                                         const QString & orc_Suffix) const
 {
    sint32 s32_Retval = C_NO_ERR;
 
    // reset
    orc_MessageOverrideInfo = std::make_pair(-1, -1);
 
-   const C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_OsyNodeIndex);
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_OsyNodeIndex);
 
    if (pc_Node != NULL)
    {
+      if ((orc_Suffix == "EDS") || (orc_Suffix == "DCF"))
+      {
+         stw_scl::C_SCLString c_Nodename = pc_Node->c_Properties.c_Name;
+         stw_scl::C_SCLString c_TpdoRpdo = "RPDO";
+         if (c_Nodename.Length() > 24)
+         {
+            c_Nodename = c_Nodename.SubString(1, 24);
+         }
+         if (oq_Tx == true)
+         {
+            c_TpdoRpdo = "TPDO";
+         }
+         orc_ImportMessageToFind.c_Name = static_cast<QString>((c_Nodename + "_" + c_TpdoRpdo + "%1").c_str()).
+                                          arg(QString::number(ou32_MessageIndex + 1)).toStdString().c_str();
+      }
+
       std::vector<const C_OSCCanProtocol *> c_Protocols = pc_Node->GetCANProtocolsConst(this->me_ProtocolType);
       std::vector<const C_OSCCanProtocol *>::const_iterator c_ProtocolIt;
 
@@ -757,8 +790,8 @@ const
                for (uint32 u32_MessageIt = 0; u32_MessageIt < rc_Messages.size(); u32_MessageIt++)
                {
                   const C_OSCCanMessage & rc_ExistingMessage = rc_Messages[u32_MessageIt];
-                  if ((rc_ExistingMessage.u32_CanId == orc_DBCMessageToFind.u32_CanId) &&
-                      (rc_ExistingMessage.c_Name == orc_DBCMessageToFind.c_Name))
+                  if ((rc_ExistingMessage.u32_CanId == orc_ImportMessageToFind.u32_CanId) &&
+                      (rc_ExistingMessage.c_Name == orc_ImportMessageToFind.c_Name))
                   {
                      orc_MessageOverrideInfo =
                         std::make_pair(static_cast<sint32>(pc_Protocol->u32_DataPoolIndex),
@@ -840,6 +873,9 @@ void C_CieImportReportWidget::m_InsertMessages(void) const
    \param[in]      orc_OSCAllSignalData         All signal data for this message type (Tx or Rx)
    \param[in]      orc_InfoMessagesPerMessage   Info messages for imported CAN messages for this message type (Tx or Rx)
    \param[in]      orc_MessageOverrideIndices   Indices indicating if message will get replaced or will be added
+   \param[in]      ou32_NodeIndex               Node index of this message
+   \param[in]      orc_TpdpRpdo                 String of TPDO and RPDO
+   \param[in]      orc_Suffix                   Suffix of the message file
 
    \return
    C_NO_ERR Operation success
@@ -849,9 +885,12 @@ void C_CieImportReportWidget::m_InsertMessages(void) const
 sint32 C_CieImportReportWidget::mh_GetMessageEntries(uint32 & oru32_EntryCount, uint32 & oru32_NewEntryCount,
                                                      QString & orc_TableEntries,
                                                      std::vector<C_OSCCanMessage> & orc_MessageList,
-                                                     const std::vector<C_OSCCanMessage> & orc_OSCMessageData,
-                                                     const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const std::vector<QString> & orc_InfoMessagesPerMessage, const std::vector< std::pair<stw_types::sint32,
-                                                                                                                                                                                                                   stw_types::sint32> > & orc_MessageOverrideIndices)
+                                                     std::vector<C_OSCCanMessage> & orc_OSCMessageData,
+                                                     const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const
+                                                     std::vector<QString> & orc_InfoMessagesPerMessage, const
+                                                     std::vector< std::pair<stw_types::sint32, stw_types::sint32> > & orc_MessageOverrideIndices, const
+                                                     uint32 ou32_NodeIndex, const stw_scl::C_SCLString & orc_TpdpRpdo,
+                                                     const QString & orc_Suffix)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -881,7 +920,8 @@ sint32 C_CieImportReportWidget::mh_GetMessageEntries(uint32 & oru32_EntryCount, 
             orc_TableEntries += "<tr>";
             orc_TableEntries += mh_GetMessageEntry(oru32_EntryCount, orc_OSCMessageData[u32_ItMessage],
                                                    orc_OSCAllSignalData,
-                                                   orc_InfoMessagesPerMessage[u32_ItMessage]);
+                                                   orc_InfoMessagesPerMessage[u32_ItMessage], ou32_NodeIndex,
+                                                   orc_TpdpRpdo, u32_ItMessage, orc_Suffix);
             orc_TableEntries += "</tr>";
             ++oru32_EntryCount;
             orc_MessageList.push_back(orc_OSCMessageData[u32_ItMessage]);
@@ -908,14 +948,20 @@ sint32 C_CieImportReportWidget::mh_GetMessageEntries(uint32 & oru32_EntryCount, 
    \param[in]  orc_CurMessage          Current message
    \param[in]  orc_OSCAllSignalData    All signal data for this message type (Tx or Rx)
    \param[in]  orc_InfoMessages        All info messages for this message
+   \param[in]  ou32_NodeIndex          Node index of this message
+   \param[in]  orc_TpdoRpdo            String of TPDO and RPDO
+   \param[in]  ou32_MessageIndex       Message index of this message
+   \param[in]  orc_Suffix              Suffix of the message file
 
    \return
    One message entry in import report
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32 ou32_Index, const C_OSCCanMessage & orc_CurMessage,
-                                                    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData,
-                                                    const QString & orc_InfoMessages)
+QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32 ou32_Index, C_OSCCanMessage & orc_CurMessage,
+                                                    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const
+                                                    QString & orc_InfoMessages, const uint32 ou32_NodeIndex, const
+                                                    stw_scl::C_SCLString & orc_TpdoRpdo, const uint32 ou32_MessageIndex,
+                                                    const QString & orc_Suffix)
 {
    const QString c_TableEntryEnd = "</td>";
    const QString c_LineBreak = "<br/>";
@@ -927,8 +973,29 @@ QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32 ou32_Index, con
                c_TableEntryEnd;
    //Message name
    //Translation: 1=CAN Message name, 2=CAN Message ID
-   c_Retval += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START + static_cast<QString>("%1 (0x%2)").arg(
-      orc_CurMessage.c_Name.c_str()).arg(orc_CurMessage.u32_CanId, 0, 16) + c_TableEntryEnd;
+   if ((orc_Suffix == "EDS") || (orc_Suffix == "DCF"))
+   {
+      stw_scl::C_SCLString c_Nodename = "NodeName";
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+      if (pc_Node != NULL)
+      {
+         c_Nodename = pc_Node->c_Properties.c_Name;
+      }
+      if (c_Nodename.Length() > 24)
+      {
+         c_Nodename = c_Nodename.SubString(1, 24);
+      }
+
+      c_Retval += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START +
+                  static_cast<QString>((c_Nodename + "_" + orc_TpdoRpdo + "%1").c_str()).
+                  arg(QString::number(ou32_MessageIndex + 1)) + c_TableEntryEnd;
+   }
+   else
+   {
+      c_Retval += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START + static_cast<QString>("%1 (0x%2)").arg(
+         orc_CurMessage.c_Name.c_str()).arg(orc_CurMessage.u32_CanId, 0, 16) + c_TableEntryEnd;
+   }
+
    //Signals
    if (orc_CurMessage.c_Signals.size() == 0UL)
    {
@@ -1067,9 +1134,9 @@ sint32 C_CieImportReportWidget::mh_InsertMessages(const uint32 ou32_NodeIndex, c
             if (pc_Node != NULL)
             {
                // Message already exists, adapt message in its datapool
-               uint32 u32_PresentDatapoolIndex = orc_MessageOverrideIndices[u32_ItMessage].first;
+               const uint32 u32_PresentDatapoolIndex = orc_MessageOverrideIndices[u32_ItMessage].first;
 
-               const stw_opensyde_core::C_OSCCanMessageContainer * pc_Container =
+               const stw_opensyde_core::C_OSCCanMessageContainer * const pc_Container =
                   C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(ou32_NodeIndex, oe_Type,
                                                                                   ou32_InterfaceIndex,
                                                                                   u32_PresentDatapoolIndex);

@@ -17,6 +17,7 @@
 #include "CSCLString.h"
 #include "C_GtGetText.h"
 #include "C_Uti.h"
+#include "C_SdNdeDpUtil.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_SdNdeHalcConfigImportDialog.h"
 #include "ui_C_SdNdeHalcConfigImportDialog.h"
@@ -51,9 +52,9 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent          Reference to parent
-   \param[in]     ou32_NodeIndex      Node index of node for updating the HALC definition and its configuration,
-   \param[in]     orc_ImportFileName  File path of HALC configuration import file
+   \param[in,out]  orc_Parent          Reference to parent
+   \param[in]      ou32_NodeIndex      Node index of node for updating the HALC definition and its configuration,
+   \param[in]      orc_ImportFileName  File path of HALC configuration import file
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeHalcConfigImportDialog::C_SdNdeHalcConfigImportDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
@@ -103,7 +104,7 @@ void C_SdNdeHalcConfigImportDialog::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Checks the preconditions for the import
 
-   \param[out] orc_ErrorDetails   String with details of error. Empty string in case of no error
+   \param[out]  orc_ErrorDetails    String with details of error. Empty string in case of no error
 
    \retval   C_NO_ERR    All ok, dialog can be opened
    \retval   C_RANGE     specified file does not exist
@@ -116,7 +117,7 @@ void C_SdNdeHalcConfigImportDialog::InitStaticNames(void) const
 sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
 {
    sint32 s32_Return = C_NO_ERR;
-   const C_OSCHalcConfig * pc_Config = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+   const C_OSCHalcConfig * const pc_Config = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
 
    orc_ErrorDetails = "";
 
@@ -169,6 +170,21 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
                   break;
                }
             }
+
+            //Consistency
+            {
+               QString c_ErrDetails;
+               const bool q_Consistent = C_SdNdeHalcConfigImportDialog::mh_CheckConsistency(pc_Config,
+                                                                                            this->mc_ImportConfig,
+                                                                                            c_ErrDetails);
+               if (q_Consistent == false)
+               {
+                  s32_Return = C_CONFIG;
+                  orc_ErrorDetails = C_GtGetText::h_GetText(
+                     "Current Hardware configuration of node is invalid. File does not match the definition. Error:\n");
+                  orc_ErrorDetails += c_ErrDetails;
+               }
+            }
          }
       }
       else
@@ -185,7 +201,8 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
             orc_ErrorDetails = C_GtGetText::h_GetText("The Hardware configuration content of the file is invalid.");
             break;
          default:
-            orc_ErrorDetails = static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Return));
+            orc_ErrorDetails =
+               static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Return));
             break;
          }
       }
@@ -203,7 +220,7 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Gets the result of the saving of the imported configuration in case of a click on the Ok button
 
-   \param[out] orc_ErrorDetails   String with details of error. Empty string in case of no error
+   \param[out]  orc_ErrorDetails    String with details of error. Empty string in case of no error
 
    \retval   C_NO_ERR   All ok, changes saved
    \retval   C_NOACT    Nothing done, dialog was not open or accepted yet
@@ -224,7 +241,8 @@ sint32 C_SdNdeHalcConfigImportDialog::GetResult(QString & orc_ErrorDetails) cons
       orc_ErrorDetails = C_GtGetText::h_GetText("The import dialog was not accepted or opened.");
       break;
    default:
-      orc_ErrorDetails = static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(this->ms32_Result));
+      orc_ErrorDetails =
+         static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(this->ms32_Result));
       break;
    }
 
@@ -236,7 +254,7 @@ sint32 C_SdNdeHalcConfigImportDialog::GetResult(QString & orc_ErrorDetails) cons
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcConfigImportDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -307,4 +325,236 @@ void C_SdNdeHalcConfigImportDialog::m_OkClicked(void)
 void C_SdNdeHalcConfigImportDialog::m_OnCancel(void)
 {
    this->mrc_ParentDialog.reject();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check consistency
+
+   \param[in]      opc_Config             Config
+   \param[in]      orc_ConfigStandalone   Config standalone
+   \param[in,out]  orc_ErrorDetails       Error details
+
+   \return
+   Consistency state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeHalcConfigImportDialog::mh_CheckConsistency(const C_OSCHalcConfig * const opc_Config,
+                                                        const C_OSCHalcConfigStandalone & orc_ConfigStandalone,
+                                                        QString & orc_ErrorDetails)
+{
+   bool q_Consistent = true;
+
+   if (opc_Config != NULL)
+   {
+      if (opc_Config->GetDomainSize() == orc_ConfigStandalone.c_Domains.size())
+      {
+         for (uint32 u32_ItDomain = 0UL; u32_ItDomain < opc_Config->GetDomainSize(); ++u32_ItDomain)
+         {
+            const C_OSCHalcConfigDomain * const pc_RefConfig = opc_Config->GetDomainConfigDataConst(
+               u32_ItDomain);
+            if (pc_RefConfig != NULL)
+            {
+               const C_OSCHalcConfigStandaloneDomain & rc_NewConfig =
+                  orc_ConfigStandalone.c_Domains[u32_ItDomain];
+               if (pc_RefConfig->c_ChannelConfigs.size() == rc_NewConfig.c_ChannelConfigs.size())
+               {
+                  for (uint32 u32_ItChan = 0UL; u32_ItChan < pc_RefConfig->c_ChannelConfigs.size();
+                       ++u32_ItChan)
+                  {
+                     const C_OSCHalcConfigChannel & rc_RefChan = pc_RefConfig->c_ChannelConfigs[u32_ItChan];
+                     const C_OSCHalcConfigChannel & rc_NewChan = rc_NewConfig.c_ChannelConfigs[u32_ItChan];
+                     if (rc_RefChan.c_Parameters.size() == rc_NewChan.c_Parameters.size())
+                     {
+                        for (uint32 u32_ItPar = 0UL; (u32_ItPar < rc_RefChan.c_Parameters.size()) && q_Consistent;
+                             ++u32_ItPar)
+                        {
+                           const C_OSCHalcConfigParameterStruct & rc_RefPar =
+                              rc_RefChan.c_Parameters[u32_ItPar];
+                           const C_OSCHalcConfigParameterStruct & rc_NewPar =
+                              rc_NewChan.c_Parameters[u32_ItPar];
+                           if (rc_RefPar.c_ParameterElements.size() == rc_NewPar.c_ParameterElements.size())
+                           {
+                              if (rc_RefPar.c_ParameterElements.size() == 0UL)
+                              {
+                                 q_Consistent = C_SdNdeHalcConfigImportDialog::mh_CheckConsistencyEl(rc_RefPar,
+                                                                                                     rc_NewPar,
+                                                                                                     orc_ErrorDetails,
+                                                                                                     pc_RefConfig->c_Name.c_str(),
+                                                                                                     rc_RefChan.c_Name.c_str(),
+                                                                                                     "");
+                              }
+                              for (uint32 u32_ItParEl = 0UL;
+                                   (u32_ItParEl < rc_RefPar.c_ParameterElements.size()) && q_Consistent;
+                                   ++u32_ItParEl)
+                              {
+                                 const C_OSCHalcConfigParameter & rc_RefParEl =
+                                    rc_RefPar.c_ParameterElements[u32_ItParEl];
+                                 const C_OSCHalcConfigParameter & rc_NewParEl =
+                                    rc_NewPar.c_ParameterElements[u32_ItParEl];
+                                 q_Consistent = C_SdNdeHalcConfigImportDialog::mh_CheckConsistencyEl(rc_RefParEl,
+                                                                                                     rc_NewParEl,
+                                                                                                     orc_ErrorDetails,
+                                                                                                     pc_RefConfig->c_Name.c_str(),
+                                                                                                     rc_RefChan.c_Name.c_str(),
+                                                                                                     " elements");
+                              }
+                           }
+                           else
+                           {
+                              q_Consistent = false;
+                              //lint -e{1946} Qt interface
+                              orc_ErrorDetails +=
+                                 QString(
+                                    "Num parameter elements differ for domain %1, channel %2 (def: %3 <-> new: %4)\n")
+                                 .arg(
+                                    pc_RefConfig->c_Name.c_str()).arg(rc_RefChan.c_Name.c_str()).arg(
+                                    rc_RefChan.c_Parameters.size()).arg(
+                                    rc_NewChan.c_Parameters.size());
+                           }
+                        }
+                     }
+                     else
+                     {
+                        q_Consistent = false;
+                        //lint -e{1946} Qt interface
+                        orc_ErrorDetails +=
+                           QString("Num parameters differ for domain %1, channel %2 (def: %3 <-> new: %4)\n").arg(
+                              pc_RefConfig->c_Name.c_str()).arg(rc_RefChan.c_Name.c_str()).arg(
+                              rc_RefChan.c_Parameters.size()).arg(
+                              rc_NewChan.c_Parameters.size());
+                     }
+                  }
+               }
+               else
+               {
+                  q_Consistent = false;
+                  //lint -e{1946} Qt interface
+                  orc_ErrorDetails +=
+                     QString("Num channel configurations differ for domain %1 (def: %2 <-> new: %3)\n").arg(
+                        pc_RefConfig->c_Name.c_str()).arg(pc_RefConfig->c_ChannelConfigs.size()).arg(
+                        rc_NewConfig.c_ChannelConfigs.size());
+               }
+               if (pc_RefConfig->c_Channels.size() != rc_NewConfig.c_Channels.size())
+               {
+                  q_Consistent = false;
+                  //lint -e{1946} Qt interface
+                  orc_ErrorDetails += QString("Num channels differ for domain %1 (def: %2 <-> new: %3)\n").arg(
+                     pc_RefConfig->c_Name.c_str()).arg(pc_RefConfig->c_Channels.size()).arg(
+                     rc_NewConfig.c_Channels.size());
+               }
+               //Should exist but does not, probably not stored in standalone config
+               //if (pc_RefConfig->c_ChannelUseCases.size() != rc_NewConfig.c_ChannelUseCases.size())
+               //{
+               //   q_Consistent = false;
+               //   orc_ErrorDetails += QString("Num channel use-cases differ for domain %1 (def: %2 <-> new:
+               // %3)\n").arg(
+               //      pc_RefConfig->c_Name.c_str()).arg(pc_RefConfig->c_ChannelUseCases.size()).arg(
+               //      rc_NewConfig.c_ChannelUseCases.size());
+               //}
+               //if (pc_RefConfig->c_ChannelValues.c_InputValues.size() !=
+               //    rc_NewConfig.c_ChannelValues.c_InputValues.size())
+               //{
+               //   q_Consistent = false;
+               //   orc_ErrorDetails += QString("Num channel input-values differ for domain %1 (def: %2 <-> new:
+               // %3)\n").arg(
+               //      pc_RefConfig->c_Name.c_str()).arg(pc_RefConfig->c_ChannelValues.c_InputValues.size()).arg(
+               //      rc_NewConfig.c_ChannelValues.c_InputValues.size());
+               //}
+               //if (pc_RefConfig->c_ChannelValues.c_Parameters.size() !=
+               //    rc_NewConfig.c_ChannelValues.c_Parameters.size())
+               //{
+               //   q_Consistent = false;
+               //   orc_ErrorDetails += QString("Num channel param-values differ for domain %1 (def: %2 <-> new:
+               // %3)\n").arg(
+               //      pc_RefConfig->c_Name.c_str()).arg(pc_RefConfig->c_ChannelValues.c_Parameters.size()).arg(
+               //      rc_NewConfig.c_ChannelValues.c_Parameters.size());
+               //}
+               //if (pc_RefConfig->c_ChannelValues.c_OutputValues.size() !=
+               //    rc_NewConfig.c_ChannelValues.c_OutputValues.size())
+               //{
+               //   q_Consistent = false;
+               //   orc_ErrorDetails +=
+               //      QString("Num channel output-values differ for domain %1 (def: %2 <-> new: %3)\n").arg(
+               //         pc_RefConfig->c_Name.c_str()).arg(pc_RefConfig->c_ChannelValues.c_OutputValues.size()).arg(
+               //         rc_NewConfig.c_ChannelValues.c_OutputValues.size());
+               //}
+               //if (pc_RefConfig->c_ChannelValues.c_StatusValues.size() !=
+               //    rc_NewConfig.c_ChannelValues.c_StatusValues.size())
+               //{
+               //   q_Consistent = false;
+               //   orc_ErrorDetails +=
+               //      QString("Num channel status-values differ for domain %1 (def: %2 <-> new: %3)\n").arg(
+               //         pc_RefConfig->c_Name.c_str()).arg(pc_RefConfig->c_ChannelValues.c_StatusValues.size()).arg(
+               //         rc_NewConfig.c_ChannelValues.c_StatusValues.size());
+               //}
+            }
+         }
+      }
+      else
+      {
+         q_Consistent = false;
+         //lint -e{1946} Qt interface
+         orc_ErrorDetails += QString("Num comains differ (def: %1 <-> new: %2)\n").arg(
+            opc_Config->GetDomainSize()).arg(orc_ConfigStandalone.c_Domains.size());
+      }
+   }
+   return q_Consistent;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check consistency element
+
+   \param[in]      orc_Ref             Ref
+   \param[in]      orc_New             New
+   \param[in,out]  orc_ErrorDetails    Error details
+   \param[in]      orc_Domain          Domain
+   \param[in]      orc_Channel         Channel
+   \param[in]      orc_CheckAddendum   Check addendum
+
+   \return
+   Consistency state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeHalcConfigImportDialog::mh_CheckConsistencyEl(const C_OSCHalcConfigParameter & orc_Ref,
+                                                          const C_OSCHalcConfigParameter & orc_New,
+                                                          QString & orc_ErrorDetails, const QString & orc_Domain,
+                                                          const QString & orc_Channel,
+                                                          const QString & orc_CheckAddendum)
+{
+   bool q_Consistent = true;
+   QString c_Type;
+   QString c_Ref;
+   QString c_New;
+
+   if (orc_Ref.c_Value.GetArray() != orc_New.c_Value.GetArray())
+   {
+      c_Type = "array state";
+      //lint -e{730,1785} Qt interface
+      c_Ref = QString::number(orc_Ref.c_Value.GetArray());
+      //lint -e{730,1785} Qt interface
+      c_New = QString::number(orc_New.c_Value.GetArray());
+      q_Consistent = false;
+   }
+   if (orc_Ref.c_Value.GetArraySize() != orc_New.c_Value.GetArraySize())
+   {
+      c_Type = "array size";
+      c_Ref = QString::number(orc_Ref.c_Value.GetArraySize());
+      c_New = QString::number(orc_New.c_Value.GetArraySize());
+      q_Consistent = false;
+   }
+   if (orc_Ref.c_Value.GetType() != orc_New.c_Value.GetType())
+   {
+      c_Type = "type";
+      c_Ref = C_SdNdeDpUtil::h_ConvertContentTypeToString(orc_Ref.c_Value.GetType());
+      c_New = C_SdNdeDpUtil::h_ConvertContentTypeToString(orc_New.c_Value.GetType());
+      q_Consistent = false;
+   }
+   if (not q_Consistent == false)
+   {
+      //lint -e{1946} Qt interface
+      orc_ErrorDetails +=
+         QString("Parameter%1 %2 differ for domain %3, channel %4 (def: %5 <-> new: %6)\n")
+         .arg(orc_CheckAddendum).arg(c_Type).arg(orc_Domain).arg(orc_Channel).arg(c_Ref).arg(c_New);
+   }
+   return q_Consistent;
 }

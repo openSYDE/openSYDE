@@ -511,6 +511,9 @@ sint32 C_OSCHalcDefStructFiler::h_SaveSimpleValueAsAttribute(const C_SCLString &
       case C_OSCNodeDataPoolContent::eFLOAT64:
          orc_XMLParser.SetAttributeFloat64(orc_Node, orc_Content.GetValueF64());
          break;
+      default:
+         tgl_assert(false);
+         break;
       }
    }
    else

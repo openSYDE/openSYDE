@@ -39,7 +39,7 @@ public:
    stw_types::uint32 GetNumBytesUsed(void) const;
    stw_types::sint32 GetFreeBytes(void) const;
    stw_types::uint32 GetListsSize(void) const;
-   void CheckErrorList(const stw_types::uint32 & oru_ListIndex, bool * const opq_NameConflict,
+   void CheckErrorList(const stw_types::uint32 & oru32_ListIndex, bool * const opq_NameConflict,
                        bool * const opq_NameInvalid, bool * const opq_UsageInvalid, bool * const opq_OutOfDataPool,
                        bool * const opq_DataSetsInvalid, bool * const opq_ElementsInvalid,
                        std::vector<stw_types::uint32> * const opc_InvalidDataSetIndices,

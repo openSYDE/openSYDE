@@ -62,7 +62,7 @@ namespace stw_scl
 #elif defined(_MSC_VER)
 #define SCL_DEPRECATED_PRE __declspec(deprecated)
 #define SCL_DEPRECATED_POST
-#elif __BORLANDC__ >= 0x630 //>= XE ?
+#elif __BORLANDC__ >= 0x630 && (!defined(__clang__)) //>= XE but not Clang-based ?
 #define SCL_DEPRECATED_PRE
 #define SCL_DEPRECATED_POST [[deprecated]]
 #else

@@ -6,8 +6,8 @@
    \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CCMONProtocolBASEH
-#define CCMONProtocolBASEH
+#ifndef CCMONPROTOCOLBASEH
+#define CCMONPROTOCOLBASEH
 
 #include "stwtypes.h"
 #include "CCMONProtocolTarget.h"
@@ -40,10 +40,10 @@ protected:
    stw_scl::C_SCLString m_GetValueDecHex(const stw_types::uint32 ou32_Value) const;
    stw_scl::C_SCLString m_GetByteAsStringFormat(const stw_types::uint8 ou8_Value) const;
    stw_scl::C_SCLString m_GetWordAsStringFormat(const stw_types::uint16 ou16_Value) const;
-   static stw_types::uint32 m_BytesToDwordLowHigh(const stw_types::uint8 oau8_Bytes[4]);
-   static stw_types::uint16 m_BytesToWordLowHigh(const stw_types::uint8 oau8_Bytes[2]);
-   static stw_types::uint16 m_BytesToWordHighLow(const stw_types::uint8 oau8_Bytes[2]);
-   static stw_types::uint32 m_BytesToDwordHighLow(const stw_types::uint8 oau8_Bytes[4]);
+   static stw_types::uint32 mh_BytesToDwordLowHigh(const stw_types::uint8 oau8_Bytes[4]);
+   static stw_types::uint16 mh_BytesToWordLowHigh(const stw_types::uint8 oau8_Bytes[2]);
+   static stw_types::uint16 mh_BytesToWordHighLow(const stw_types::uint8 oau8_Bytes[2]);
+   static stw_types::uint32 mh_BytesToDwordHighLow(const stw_types::uint8 oau8_Bytes[4]);
    static stw_scl::C_SCLString mh_SerialNumberToString(const stw_types::uint8 * const opu8_SerialNumber);
 
 public:

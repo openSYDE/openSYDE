@@ -75,14 +75,14 @@ protected:
 private:
    //Avoid call
    C_SyvSeScene(const C_SyvSeScene &);
-   C_SyvSeScene & operator =(const C_SyvSeScene &);
+   C_SyvSeScene & operator =(const C_SyvSeScene &); //lint !e1511 //we want to hide the base func.
 
    void m_Edit(QGraphicsItem * const opc_GraphicsItem) const;
    void m_SelectionChanged(void);
    void m_OnPcBusConnectionStartConnect(const C_GiSvPcBusConnector::E_ConnectState & ore_ConnectState,
-                                        QGraphicsItem * const opc_Item,
+                                        const QGraphicsItem * const opc_Item,
                                         const stw_opensyde_core::C_OSCSystemBus::E_Type * const opc_Type,
-                                        C_GiLiBusConnectorBase * const opc_Connector) const;
+                                        const C_GiLiBusConnectorBase * const opc_Connector) const;
    void m_OnPcBusConnectionStopConnect(void) const;
    void m_OnConnectionChanged(void);
 

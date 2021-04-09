@@ -94,11 +94,11 @@ C_GiSyBaseWidget::C_GiSyBaseWidget(C_OgePopUpDialog & orc_Parent, const QString 
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because the ownership of these objects was never transferred to this class
 C_GiSyBaseWidget::~C_GiSyBaseWidget(void)
 {
    delete mpc_Ui;
    delete mpc_Scene;
-   //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ void C_GiSyBaseWidget::SetWidget(QWidget * const opc_Widget)
    if (opc_Widget != NULL)
    {
       stw_types::sintn sn_Index;
-      QVBoxLayout * pc_Layout = new QVBoxLayout(this->mpc_Ui->pc_SettingsShowWidget);
+      QVBoxLayout * const pc_Layout = new QVBoxLayout(this->mpc_Ui->pc_SettingsShowWidget);
 
       opc_Widget->setParent(this);
       this->mpc_Ui->pc_SettingsShowWidget->setLayout(pc_Layout);
@@ -133,7 +133,7 @@ void C_GiSyBaseWidget::SetWidget(QWidget * const opc_Widget)
       sn_Index = pc_Layout->indexOf(opc_Widget);
       pc_Layout->setStretch(sn_Index, 1);
       pc_Layout->setMargin(0);
-   }  //lint !e429  //no memory leak because of the parent of pc_Layout and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Layout and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

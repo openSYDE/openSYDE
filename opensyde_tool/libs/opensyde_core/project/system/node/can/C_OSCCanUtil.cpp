@@ -13,6 +13,7 @@
 #include "stwtypes.h"
 #include "C_OSCCanUtil.h"
 #include "C_OSCNodeDataPoolContentUtil.h"
+#include "TGLUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -129,7 +130,7 @@ void C_OSCCanUtil::h_GetSignalValue(const uint8 (&orau8_CanDb)[8], const C_OSCCa
          // Byte aligned data, copy the data in other direction
          for (u16_CurByte = 0U; u16_CurByte < u16_LengthByte; ++u16_CurByte)
          {
-            const uint16 u16_DataIndex = static_cast<uint16>((u16_LengthByte - u16_CurByte) - 1U);
+            const uint16 u16_DataIndex = (static_cast<uint16>(u16_LengthByte - u16_CurByte)) - 1U;
             orc_DataPoolData[u16_DataIndex] = orau8_CanDb[u16_StartByte + u16_CurByte];
          }
       }
@@ -156,11 +157,13 @@ void C_OSCCanUtil::h_GetSignalValue(const uint8 (&orau8_CanDb)[8], const C_OSCCa
             {
                // Iterate through the message bytes in opposite direction
                const uint16 u16_MessageIndex =
-                  static_cast<uint16>(((u16_LengthInMessage + u16_StartByte) - u16_CurByte) - 1U);
+                  static_cast<uint16>(static_cast<uint16>(u16_LengthInMessage + u16_StartByte) - u16_CurByte) - 1U;
+               tgl_assert(u16_MessageIndex < sizeof(orau8_CanDb));
 
                // This is the MSB part of the byte, right shifting to get it byte aligned
                orc_DataPoolData[u16_CurByte] = orau8_CanDb[u16_MessageIndex] >> u16_LsbBitOffset;
-               if (u16_MessageIndex > 0U)
+
+               if ((u16_MessageIndex > 0U) && (u16_MessageIndex < sizeof(orau8_CanDb)))
                {
                   // If the byte is spread over two bytes of the message bytes
                   // This is the MSB 'part' of the byte, left shifting over the LSB 'part'
@@ -329,7 +332,6 @@ void C_OSCCanUtil::h_SetSignalValue(uint8 (&orau8_CanDb)[8], const C_OSCCanSigna
          {
             const uint8 u8_MessageIndex = u8_StartByte + u8_CurByte;
             // This is the MSB part of the byte, left shifting to get it to the correct position
-            //lint -e{701} no signed value here
             orau8_CanDb[u8_MessageIndex] |= static_cast<uint8>(c_ValueData[u8_CurByte] << u8_LsbBitOffset);
             if ((u8_MessageIndex + 1U) < 8U)
             {
@@ -363,7 +365,6 @@ void C_OSCCanUtil::h_SetSignalValue(uint8 (&orau8_CanDb)[8], const C_OSCCanSigna
          if ((static_cast<uint16>(u8_LsbBitOffset) + orc_Signal.u16_ComBitLength) <= 8U)
          {
             // The signal is in only one message byte
-            //lint -e{701} no signed value here
             orau8_CanDb[u8_StartByte] |= static_cast<uint8>(c_ValueData[0] << u8_LsbBitOffset);
          }
          else
@@ -384,11 +385,11 @@ void C_OSCCanUtil::h_SetSignalValue(uint8 (&orau8_CanDb)[8], const C_OSCCanSigna
                // Iterate through the message bytes in opposite direction
                const uint8 u8_MessageIndex = ((u8_LengthInMessage + u8_StartByte) - u8_CurByte) -
                                              static_cast<uint8>(1U);
+               tgl_assert(u8_MessageIndex < sizeof(orau8_CanDb));
 
                // This is the MSB part of the byte, right shifting to get it byte aligned
-               //lint -e{701} no signed value here
                orau8_CanDb[u8_MessageIndex] |= static_cast<uint8>(c_ValueData[u8_CurByte] << u8_LsbBitOffset);
-               if (u8_MessageIndex > 0U)
+               if ((u8_MessageIndex > 0U) && (u8_MessageIndex < sizeof(orau8_CanDb)))
                {
                   // If the byte is spread over two bytes of the message bytes
                   // This is the MSB 'part' of the byte, left shifting over the LSB 'part'

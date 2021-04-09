@@ -122,10 +122,11 @@ C_SdTopologyToolbox::C_SdTopologyToolbox(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent all elements and the Qt memory management
+
 C_SdTopologyToolbox::~C_SdTopologyToolbox()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent all elements and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -316,8 +317,8 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
 
       if (c_DeviceGroups[u32_ItDeviceGroup].GetGroupName() != "User Nodes")
       {
-         this->mc_Icon.addPixmap(QPixmap("://images/system_definition/PreviewNode.svg"), QIcon::Normal);
-         this->mc_Icon.addPixmap(QPixmap("://images/system_definition/PreviewNode.svg"), QIcon::Selected);
+         this->mc_Icon.addPixmap(static_cast<QPixmap>("://images/system_definition/PreviewNode.svg"), QIcon::Normal);
+         this->mc_Icon.addPixmap(static_cast<QPixmap>("://images/system_definition/PreviewNode.svg"), QIcon::Selected);
 
          this->mpc_List = C_SebToolboxUtil::h_AddNewList(
             c_DeviceGroups[u32_ItDeviceGroup].GetGroupName().c_str(),
@@ -331,7 +332,7 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
             }
          }
       }
-      if (u32_ItDeviceGroup == (c_DeviceGroups.size() - 1UL))
+      if (u32_ItDeviceGroup == static_cast<uint32>(c_DeviceGroups.size() - 1))
       {
          // Add final spacer
          C_SebToolboxUtil::h_AddFinalSpacer(this->mpc_Ui->pc_VerticalLayout1, this->mpc_List);
@@ -340,14 +341,14 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
          c_Icons = C_SebToolboxUtil::h_AddNewUserHeading("User Nodes",
                                                          this->mpc_Ui->pc_VerticalLayout1,
                                                          this);
-         C_OgePubIconOnly * pc_IconButton = c_Icons[0];
+         C_OgePubIconOnly * const pc_IconButton = c_Icons[0];
          pc_IconButton->SetToolTipInformation(C_GtGetText::h_GetText("Add User Nodes"),
                                               C_GtGetText::h_GetText(
                                                  "Add user nodes to toolbox from file device desription file (.syde_defdev)"
                                                  " or user nodes ini file (.ini)."));
          connect(pc_IconButton, &C_OgePubIconOnly::clicked, this, &C_SdTopologyToolbox::m_FileBrowseDialog);
 
-         C_OgePubIconOnly * pc_ClearAllUserNodesButton = c_Icons[1];
+         C_OgePubIconOnly * const pc_ClearAllUserNodesButton = c_Icons[1];
          pc_ClearAllUserNodesButton->SetToolTipInformation(C_GtGetText::h_GetText("Clear User Nodes"),
                                                            C_GtGetText::h_GetText(
                                                               "Delete all user nodes from toolbox."));
@@ -355,8 +356,8 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
          connect(pc_ClearAllUserNodesButton, &C_OgePubIconOnly::clicked, this,
                  &C_SdTopologyToolbox::m_IconClearAllClicked);
 
-         this->mc_Icon.addPixmap(QPixmap("://images/Icon_toolbox_user_node.svg"), QIcon::Normal);
-         this->mc_Icon.addPixmap(QPixmap("://images/Icon_toolbox_user_node.svg"), QIcon::Selected);
+         this->mc_Icon.addPixmap(static_cast<QPixmap>("://images/Icon_toolbox_user_node.svg"), QIcon::Normal);
+         this->mc_Icon.addPixmap(static_cast<QPixmap>("://images/Icon_toolbox_user_node.svg"), QIcon::Selected);
 
          this->mpc_List = C_SebToolboxUtil::h_AddNewList("", this->mpc_Ui->pc_VerticalLayout1, this->mc_ListWidgets,
                                                          this);
@@ -419,22 +420,22 @@ void C_SdTopologyToolbox::m_FillToolboxStatic(void)
 /*! \brief   Add a device to toolbox
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyToolbox::m_FillToolboxWithDynamicNodes(const C_OSCDeviceDefinition & rc_Device)
+void C_SdTopologyToolbox::m_FillToolboxWithDynamicNodes(const C_OSCDeviceDefinition & orc_Device)
 {
-   const QString c_DeviceName = rc_Device.c_DeviceName.c_str();
+   const QString c_DeviceName = orc_Device.c_DeviceName.c_str();
    // Tooltip
-   const QString c_DeviceDescription = static_cast<QString>(rc_Device.c_DeviceDescription.c_str());
+   const QString c_DeviceDescription = static_cast<QString>(orc_Device.c_DeviceDescription.c_str());
 
    if (this->mpc_List != NULL)
    {
       QListWidgetItem * pc_Item;
-      this->mpc_List->addItem(rc_Device.GetDisplayName().c_str());
+      this->mpc_List->addItem(orc_Device.GetDisplayName().c_str());
       pc_Item = this->mpc_List->item(this->mpc_List->count() - 1);
       pc_Item->setData(msn_USER_ROLE_ADDITIONAL_INFORMATION, c_DeviceName);
       // Toolbox icon
       pc_Item->setIcon(this->mc_Icon);
       // Tooltip
-      pc_Item->setData(msn_USER_ROLE_TOOL_TIP_HEADING, rc_Device.GetDisplayName().c_str());
+      pc_Item->setData(msn_USER_ROLE_TOOL_TIP_HEADING, orc_Device.GetDisplayName().c_str());
       pc_Item->setData(msn_USER_ROLE_TOOL_TIP_CONTENT, c_DeviceDescription);
    }
 }
@@ -475,13 +476,13 @@ void C_SdTopologyToolbox::m_ErrorHandlingUserFeedback(const QStringList & orc_Er
    C_OgeWiCustomMessage c_Message(this);
    QString c_Description;
    QString c_Details = "";
-   QString c_Success = QString::number(orc_PathGood.size()) + C_GtGetText::h_GetText(
+   const QString c_Success = QString::number(orc_PathGood.size()) + C_GtGetText::h_GetText(
       " node(s) successfully added to toolbox.<br/>");
-   QString c_Fail = QString::number(orc_PathFail.size()) + C_GtGetText::h_GetText(
+   const QString c_Fail = QString::number(orc_PathFail.size()) + C_GtGetText::h_GetText(
       " node(s) could not be added to toolbox.<br/>");
-   QString c_LogLink = C_GtGetText::h_GetText("For details see ") +
-                       C_Uti::h_GetLink(C_GtGetText::h_GetText("log file."), mc_STYLE_GUIDE_COLOR_LINK,
-                                        C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+   const QString c_LogLink = C_GtGetText::h_GetText("For details see ") +
+                             C_Uti::h_GetLink(C_GtGetText::h_GetText("log file."), mc_STYLE_GUIDE_COLOR_LINK,
+                                              C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
 
    // no errors
    if ((orc_Errors.size() == 0) && (orc_PathFail.size() == 0))
@@ -547,7 +548,8 @@ void C_SdTopologyToolbox::m_FileBrowseDialog(void)
 
    {
       QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select Device Definition or Ini File"),
-                           c_Folder, static_cast<QString>(C_GtGetText::h_GetText("Device Definition")) + " (*.syde_devdef *.ini)");
+                           c_Folder, static_cast<QString>(C_GtGetText::h_GetText(
+                                                             "Device Definition")) + " (*.syde_devdef *.ini)");
 
       c_Dialog.setDefaultSuffix("*.syde_devdef");
       c_Dialog.setFileMode(QFileDialog::ExistingFiles);
@@ -599,8 +601,8 @@ void C_SdTopologyToolbox::m_LoadUserDeviceDefinitionPaths(const QString & orc_Pa
       // handle errors from c_UserDeviceManager.LoadFromFile
       if (s32_Result == C_NO_ERR)
       {
-         C_SCLString c_CheckString = "User Nodes";
-         // get DeviceGroups from .ini to check if it is a valid file with user nodes // TODO Paul: comment passt nicht
+         const C_SCLString c_CheckString = "User Nodes";
+         // get DeviceGroups from device manager
          std::vector<C_OSCDeviceGroup> c_DeviceGroups = c_UserDeviceManager.GetDeviceGroups();
          std::vector<C_OSCDeviceDefinition> c_UserDevices;
          bool q_IsValidUserIni = false;
@@ -787,7 +789,7 @@ sint32 C_SdTopologyToolbox::m_DeleteUserNode(const QPoint & orc_Pos)
 
    if (this->mpc_List != NULL)
    {
-      QListWidgetItem * pc_Item = this->mpc_List->itemAt(orc_Pos);
+      QListWidgetItem * const pc_Item = this->mpc_List->itemAt(orc_Pos);
 
       std::vector<C_OSCDeviceDefinition> c_Devices;
       std::vector<C_OSCDeviceDefinition>::iterator c_ItDevice;
@@ -807,7 +809,7 @@ sint32 C_SdTopologyToolbox::m_DeleteUserNode(const QPoint & orc_Pos)
       // get all nodes, which are currently used in Network Topology
       for (uint32 u32_ItNode = 0U; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
       {
-         C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_ItNode);
+         C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_ItNode);
 
          if (pc_Node != NULL)
          {
@@ -879,7 +881,7 @@ sint32 C_SdTopologyToolbox::m_ClearAllUserNodes()
       // get all nodes, which are currently used in Network Topology
       for (uint32 u32_ItNode = 0U; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
       {
-         C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_ItNode);
+         C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_ItNode);
 
          if (pc_Node != NULL)
          {

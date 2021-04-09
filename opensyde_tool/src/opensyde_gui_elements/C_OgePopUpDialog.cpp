@@ -79,14 +79,14 @@ C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const o
    if (oq_AddShadow)
    {
       QColor c_Color;
-      QGraphicsDropShadowEffect * pc_Shadow = new QGraphicsDropShadowEffect(this->mpc_Ui->pc_GroupBoxPopUp);
+      QGraphicsDropShadowEffect * const pc_Shadow = new QGraphicsDropShadowEffect(this->mpc_Ui->pc_GroupBoxPopUp);
       pc_Shadow->setBlurRadius(15.0);
       pc_Shadow->setOffset(0.0);
       c_Color = mc_STYLE_GUIDE_COLOR_33;
       c_Color.setAlpha(128);
       pc_Shadow->setColor(c_Color);
       this->mpc_Ui->pc_GroupBoxPopUp->setGraphicsEffect(pc_Shadow);
-   }  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
    //Deactivate debug info
    this->mpc_Ui->pc_GroupBoxTitle->setTitle("");
    //Overlay
@@ -212,7 +212,7 @@ void C_OgePopUpDialog::HandleMousePressEvent(const QMouseEvent * const opc_Event
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_OgePopUpDialog::HandleMouseReleaseEvent(QMouseEvent * const opc_Event)
+void C_OgePopUpDialog::HandleMouseReleaseEvent(const QMouseEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
    mq_Pressed = false;
@@ -348,8 +348,8 @@ void C_OgePopUpDialog::showEvent(QShowEvent * const opc_Event)
    //Center dialog
    if (pc_TopWidget != NULL)
    {
-      QPoint c_DialogCenter = mapToGlobal(this->rect().center());
-      QPoint c_ParentWindowCenter = pc_TopWidget->window()->mapToGlobal(pc_TopWidget->window()->rect().center());
+      const QPoint c_DialogCenter = mapToGlobal(this->rect().center());
+      const QPoint c_ParentWindowCenter = pc_TopWidget->window()->mapToGlobal(pc_TopWidget->window()->rect().center());
       move(c_ParentWindowCenter - c_DialogCenter);
    }
    QDialog::showEvent(opc_Event);

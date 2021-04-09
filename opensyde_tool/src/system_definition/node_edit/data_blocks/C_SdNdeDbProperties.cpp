@@ -258,8 +258,10 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
 
    this->mpc_Ui->pc_LabelProcessID->SetToolTipInformation(
       C_GtGetText::h_GetText("Process ID"),
-      C_GtGetText::h_GetText("Process ID of an application: Used to identify each application when more than one are "
-                             "running on the same server.\nThis is required by remote Datapool configurations."));
+      C_GtGetText::h_GetText(
+         "This is required by remote Datapool configurations. "
+         "For devices that only can run one process at a time this setting is not relevant. "
+         "For information how the IDs are used see the device's user manual."));
 
    this->mpc_Ui->pc_LabelProject->SetToolTipInformation(
       C_GtGetText::h_GetText("Project Path"),
@@ -278,15 +280,16 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
                              "Absolute or relative to openSYDE.exe."));
    this->mpc_Ui->pc_LabelCodeStructure->SetToolTipInformation(
       C_GtGetText::h_GetText("Code Structure Version"),
-      static_cast<QString>(C_GtGetText::h_GetText("Version of structure for generated code. Which version to select depends on what "
-                                     "your physical target supports. See target documentation for further information about "
-                                     "supported versions.\n"
-                                     " - %1: Compatibility mode for previous versions of provided tools \n"
-                                     "   (might not take all supported project properties into account)\n"
-                                     " - %2: Support of COMM messages with multiplexing\n"
-                                     " - %3: Support for flexible placement of embedded RAM variables\n"
-                                     " - %4: Support for public scope of Datapool content\n"
-                                     " - %5: Optimization of sequences where the openSYDE server keeps a thread/process lock on "))
+      static_cast<QString>(C_GtGetText::h_GetText(
+                              "Version of structure for generated code. Which version to select depends on what "
+                              "your physical target supports. See target documentation for further information about "
+                              "supported versions.\n"
+                              " - %1: Compatibility mode for previous versions of provided tools \n"
+                              "   (might not take all supported project properties into account)\n"
+                              " - %2: Support of COMM messages with multiplexing\n"
+                              " - %3: Support for flexible placement of embedded RAM variables\n"
+                              " - %4: Support for public scope of Datapool content\n"
+                              " - %5: Optimization of sequences where the openSYDE server keeps a thread/process lock on "))
       .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V1))
       .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V2))
       .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V3))
@@ -483,7 +486,8 @@ void C_SdNdeDbProperties::m_OkClicked(void)
       if (q_NameIsValid == false)
       {
          c_Details +=
-            static_cast<QString>(C_GtGetText::h_GetText("Name \"%1\" is invalid: ")).arg(this->mpc_Ui->pc_LineEditName->text());
+            static_cast<QString>(C_GtGetText::h_GetText("Name \"%1\" is invalid: ")).arg(
+               this->mpc_Ui->pc_LineEditName->text());
          c_Details += "\n";
          c_Details += c_ErrorName;
          c_Details += "\n\n";
@@ -535,7 +539,7 @@ QString C_SdNdeDbProperties::m_CheckName() const
    {
       //Check Name
       bool q_DuplicateNameError = false;
-      bool q_InvalidNameError =
+      const bool q_InvalidNameError =
          !C_OSCUtils::h_CheckValidCName(this->mpc_Ui->pc_LineEditName->text().toStdString().c_str());
 
       for (uint32 u32_ItApplication = 0UL; u32_ItApplication < pc_Node->c_Applications.size(); ++u32_ItApplication)
@@ -1088,7 +1092,8 @@ void C_SdNdeDbProperties::m_OnClickIDE(void)
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
    const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("Executable (*.exe);;Others (*.*)"));
    QString c_IDECall =
-      static_cast<QString>(C_PuiUtil::h_ResolvePlaceholderVariables(this->mpc_Ui->pc_LineEditIDE->text(), c_ProjectPath));
+      static_cast<QString>(C_PuiUtil::h_ResolvePlaceholderVariables(this->mpc_Ui->pc_LineEditIDE->text(),
+                                                                    c_ProjectPath));
    QString c_Path;
    QString c_FolderName;
    QStringList c_SplittedString;
@@ -1214,7 +1219,8 @@ void C_SdNdeDbProperties::m_CleanUpDataPoolWidgets(void)
 void C_SdNdeDbProperties::m_UpdateOwnedDpsCount(void) const
 {
    //update owned dp count
-   this->mpc_Ui->pc_LabelHeadingDatapools->setText(static_cast<QString>(C_GtGetText::h_GetText("Owned Datapools (%1)")).arg(
+   this->mpc_Ui->pc_LabelHeadingDatapools->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                           "Owned Datapools (%1)")).arg(
                                                       this->mc_SelectedDataPools.size()));
 }
 
@@ -1313,7 +1319,7 @@ void C_SdNdeDbProperties::m_HandleAddDataPools(void)
    {
       c_New->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle revert to default code generator action

@@ -48,16 +48,16 @@ private:
                                               C_CieConverter::C_CIENodeMessage & orc_Message);
    static stw_types::sint32 mh_ConvertAndAddMessage(const Vector::DBC::Message & orc_DbcMessage,
                                                     std::vector<C_CieConverter::C_CIENodeMessage> & orc_Messages);
-   static stw_types::sint32 mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, bool & orq_MultiplexerSignalExists,
-                                         bool & orq_SignalAdapted, C_CieConverter::C_CIENodeMessage & orc_Message);
+   static stw_types::sint32 mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, bool & orq_SignalAdapted,
+                                         C_CieConverter::C_CIENodeMessage & orc_Message);
    static void mh_VerifySignalValueTable(C_CieConverter::C_CIECanSignal & orc_DbcSignal);
    static stw_types::sint32 mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSignal,
                                                const bool oq_MultiplexerSignal, bool & orq_SignalAdapted,
                                                C_CieConverter::C_CIEDataPoolElement & orc_Element,
                                                stw_scl::C_SCLStringList & orc_WarningMessages);
    static stw_types::sint32 mh_GetAttributeDefinitions(const Vector::DBC::Network & orc_DbcNetwork);
-   static stw_types::sint32 mh_GetTransmission(const Vector::DBC::Message & orc_DbcMessage,
-                                               C_CieConverter::C_CIENodeMessage & orc_Message);
+   static void mh_GetTransmission(const Vector::DBC::Message & orc_DbcMessage,
+                                  C_CieConverter::C_CIENodeMessage & orc_Message);
    static stw_types::sint32 mh_CheckRange(const stw_types::float64 of64_Value,
                                           const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type oe_Datatype);
    static stw_scl::C_SCLString mh_ReEscapeCriticalSymbols(const stw_scl::C_SCLString & orc_String);

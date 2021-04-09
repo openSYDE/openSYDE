@@ -19,7 +19,8 @@ Non-Features:
 Platform:
 =========
 MS Windows (Win10 verified)
+Ubuntu Linux (Ubuntu 20.04.1 LTS verified)
 
 Requires:
 =========
-- STW "CANDLL" to access CAN bus
+- Windows: STW "CANDLL" to access CAN bus

@@ -454,7 +454,7 @@ void C_OSCExportHalc::mh_AddGlobalVariables(C_SCLStringList & orc_Data, const C_
       {
          for (uint32 u32_DomainIt = 0U; u32_DomainIt < u32_DomainNumber; u32_DomainIt++)
          {
-            const C_OSCHalcConfigDomain * pc_Domain = orc_HalcConfig.GetDomainConfigDataConst(u32_DomainIt);
+            const C_OSCHalcConfigDomain * const pc_Domain = orc_HalcConfig.GetDomainConfigDataConst(u32_DomainIt);
             C_SCLString c_Tmp;
 
             if (pc_Domain != NULL)

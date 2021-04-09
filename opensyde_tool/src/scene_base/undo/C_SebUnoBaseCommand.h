@@ -34,8 +34,8 @@ public:
                        const QString & orc_Text, QUndoCommand * const opc_Parent = NULL);
    C_SebUnoBaseCommand(const C_SebUnoBaseCommand * const opc_Prev, QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SebUnoBaseCommand(void);
-   virtual void undo(void) override = 0;
-   virtual void redo(void) override = 0;
+   virtual void undo(void) override = 0; //lint !e9170 //we do want to force children to implement this functions
+   virtual void redo(void) override = 0; //lint !e9170 //we do want to force children to implement this functions
 
 protected:
    std::vector<QGraphicsItem *> m_GetSceneItems(void) const;

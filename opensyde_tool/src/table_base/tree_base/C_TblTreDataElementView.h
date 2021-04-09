@@ -38,12 +38,14 @@ public:
                const std::vector<stw_types::uint32> & orc_UsedDataPoolIndicesIndex);
    void InitSV(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
-               const bool oq_ShowNVMLists);
+               const bool oq_ShowNVMLists,
+               const std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements);
    void Search(const QString & orc_Text);
    void SetViewIndex(const stw_types::uint32 ou32_ViewIndex);
    void SwitchMode(const stw_opensyde_gui_logic::C_TblTreDataElementModel::E_Mode & ore_Mode,
                    const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
-                   const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues);
+                   const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
+                   const std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements);
 
    std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> GetSelectedDataElements(void) const;
    bool IsEmpty(void) const;

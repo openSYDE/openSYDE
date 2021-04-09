@@ -20,7 +20,6 @@
 #include "C_GiBiConnectableItem.h"
 #include "C_SyvDaItDashboardProgressBarWidget.h"
 #include "ui_C_SyvDaItDashboardProgressBarWidget.h"
-#include <QTime>
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -55,7 +54,13 @@ C_SyvDaItDashboardProgressBarWidget::C_SyvDaItDashboardProgressBarWidget(QWidget
    me_Alignment(C_PuiSvDbProgressBar::eTOP),
    mc_MinValue("0"),
    mc_MaxValue("100"),
+   me_Style(C_PuiSvDbWidgetBase::eOPENSYDE),
    mq_ShowMinMax(true),
+   mq_DarkMode(false),
+   mf32_BarMarginTop(0.0F),
+   mf32_BarMarginBottom(0.0F),
+   mf32_BarMarginLeft(0.0F),
+   mf32_BarMarginRight(0.0F),
    msn_Transparence(255)
 {
    mpc_Ui->setupUi(this);
@@ -137,8 +142,8 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
    QPen c_MinMaxPen;
    QPen c_ValuePen;
 
-   float32 f32_ArrowSizeH = 3.0F; // Factor for sizing the arrow horizontal
-   float32 f32_ArrowSizeV = 5.0F; // Factor for sizing the arrow vertical
+   const float32 f32_ArrowSizeH = 3.0F; // Factor for sizing the arrow horizontal
+   const float32 f32_ArrowSizeV = 5.0F; // Factor for sizing the arrow vertical
    float32 f32_Value;
    sintn sn_ActualPixelSize;
    float32 f32_TemporaryHelpingVariable1;
@@ -148,7 +153,7 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
 
    Q_UNUSED(opc_Event)
    m_SetLabelColor(c_Painter, c_TextFont, c_ArrowPen, c_MinMaxPen, c_ValuePen); // Setting all Colors
-   c_ArrowPen.setJoinStyle(Qt::RoundJoin);                                    // To draw the arrow with round edges
+   c_ArrowPen.setJoinStyle(Qt::RoundJoin);                                      // To draw the arrow with round edges
    // Value for setting the value text to the right position
    f32_Value = static_cast<float32>(this->mpc_Ui->pc_ProgressBar->value()) -
                static_cast<float32>(this->mpc_Ui->pc_ProgressBar->minimum());
@@ -364,6 +369,8 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
             QPointF(static_cast<float64>(f32_TemporaryHelpingVariable1),
                     static_cast<float64>(f32_TemporaryHelpingVariable2));
          break;
+      case stw_opensyde_gui_logic::C_PuiSvDbProgressBar::eRIGHT:
+      case stw_opensyde_gui_logic::C_PuiSvDbProgressBar::eLEFT:
       default:
          break;
       }
@@ -638,6 +645,8 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
             QPointF(static_cast<float64>(f32_TemporaryHelpingVariable1),
                     static_cast<float64>(f32_TemporaryHelpingVariable2));
          break;
+      case stw_opensyde_gui_logic::C_PuiSvDbProgressBar::eTOP:
+      case stw_opensyde_gui_logic::C_PuiSvDbProgressBar::eBOTTOM:
       default:
          break;
       }
@@ -790,6 +799,8 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
          c_Painter.setFont(c_TextFont);
          c_Painter.drawText(c_ValueRect, Qt::AlignBottom | Qt::AlignLeft, this->mc_Unit);
          break;
+      case stw_opensyde_gui_logic::C_PuiSvDbProgressBar::eTOP:
+      case stw_opensyde_gui_logic::C_PuiSvDbProgressBar::eBOTTOM:
       default:
          break;
       }
@@ -1168,8 +1179,8 @@ float64 C_SyvDaItDashboardProgressBarWidget::mh_GetArc(const QPointF & orc_V1, c
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::m_SetLabelColor(QPainter & orc_Painter, QFont & orc_TextFont,
-                                                        QPen & orc_ArrowPen, QPen & orc_MinMaxPen,
-                                                        QPen & orc_ValuePen) const
+                                                          QPen & orc_ArrowPen, QPen & orc_MinMaxPen,
+                                                          QPen & orc_ValuePen) const
 {
    QColor c_HelpingColorVariable;
 
@@ -1180,29 +1191,28 @@ void C_SyvDaItDashboardProgressBarWidget::m_SetLabelColor(QPainter & orc_Painter
       c_HelpingColorVariable.setAlpha(msn_Transparence); // Color for Value hast to get more transparent some times
       orc_MinMaxPen.setColor(mc_STYLE_GUIDE_COLOR_0);
       orc_ValuePen.setColor(c_HelpingColorVariable);
-      orc_Painter.setBrush(QBrush(c_HelpingColorVariable)); // Arrow inside
-      orc_ArrowPen.setColor(c_HelpingColorVariable);        // Arrow Rim
+      orc_Painter.setBrush(static_cast<QBrush>(c_HelpingColorVariable)); // Arrow inside
+      orc_ArrowPen.setColor(c_HelpingColorVariable);                     // Arrow Rim
    }
    else
    {
-      switch (me_Style)
+      if (me_Style == stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::eOPENSYDE_2)
       {
-      case stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::eOPENSYDE_2:
          c_HelpingColorVariable = mc_STYLE_GUIDE_COLOR_6;
          c_HelpingColorVariable.setAlpha(msn_Transparence);
          orc_MinMaxPen.setColor(mc_STYLE_GUIDE_COLOR_6);
          orc_ValuePen.setColor(c_HelpingColorVariable);
-         orc_Painter.setBrush(QBrush(c_HelpingColorVariable));
+         orc_Painter.setBrush(static_cast<QBrush>(c_HelpingColorVariable));
          orc_ArrowPen.setColor(c_HelpingColorVariable);
-         break;
-      default:
+      }
+      else
+      {
          c_HelpingColorVariable = mc_STYLE_GUIDE_COLOR_34;
          c_HelpingColorVariable.setAlpha(msn_Transparence);
          orc_MinMaxPen.setColor(mc_STYLE_GUIDE_COLOR_34);
          orc_ValuePen.setColor(c_HelpingColorVariable);
-         orc_Painter.setBrush(QBrush(c_HelpingColorVariable));
+         orc_Painter.setBrush(static_cast<QBrush>(c_HelpingColorVariable));
          orc_ArrowPen.setColor(c_HelpingColorVariable);
-         break;
       }
    }
 }
@@ -1494,4 +1504,3 @@ stw_opensyde_gui_logic::C_PuiSvDbProgressBar::E_Type C_SyvDaItDashboardProgressB
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-

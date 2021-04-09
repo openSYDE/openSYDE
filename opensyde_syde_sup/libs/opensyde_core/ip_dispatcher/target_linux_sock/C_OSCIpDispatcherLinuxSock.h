@@ -65,7 +65,7 @@ private:
    std::vector<C_TcpConnection> mc_SocketsTcp; ///< one per connection
 
    std::vector<stw_types::sintn> mc_SocketsUdpClient; ///< one socket per local interface (for sending broadcasts)
-   std::vector<stw_types::sintn> mc_SocketsUdpServer; ///< one socket per local interface (for receiving responses)
+   stw_types::sintn msn_SocketUdpServer; ///< one socket for all interfaces (for receiving responses)
 
    std::vector<stw_types::uint32> mc_LocalInterfaceIps; ///< IPs of local interfaces
 

@@ -90,7 +90,6 @@ C_SyvDaUnoAddSnapshotCommand::~C_SyvDaUnoAddSnapshotCommand(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddSnapshotCommand::m_AddNew(void)
 {
-   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -129,13 +128,6 @@ void C_SyvDaUnoAddSnapshotCommand::m_AddNew(void)
          for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.GetSpinBoxes().size(); ++u32_ItItem)
          {
             c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::eSPIN_BOX),
-                                                  u32_ItItem), c_AllIDs[u32_ItID]);
-            ++u32_ItID;
-         }
-         //Charts
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.GetCharts().size(); ++u32_ItItem)
-         {
-            c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::eCHART),
                                                   u32_ItItem), c_AllIDs[u32_ItID]);
             ++u32_ItID;
          }
@@ -219,7 +211,6 @@ void C_SyvDaUnoAddSnapshotCommand::m_AddNew(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddSnapshotCommand::m_InitialReadRailHandling(void)
 {
-   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)

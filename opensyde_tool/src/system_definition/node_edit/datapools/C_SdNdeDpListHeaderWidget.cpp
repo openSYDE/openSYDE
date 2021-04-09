@@ -368,7 +368,8 @@ void C_SdNdeDpListHeaderWidget::UpdateDataSetCount(void)
       }
       else
       {
-         c_Svg = static_cast<QString>("://images/system_definition/NodeEdit/datasets/IconDatasetsMore%1.svg").arg(c_Error);
+         c_Svg = static_cast<QString>("://images/system_definition/NodeEdit/datasets/IconDatasetsMore%1.svg").arg(
+            c_Error);
       }
 
       this->mpc_Ui->pc_PushButtonDataset->SetSvg(c_Svg);
@@ -505,7 +506,8 @@ void C_SdNdeDpListHeaderWidget::m_OnPushButtonExpandClicked(const bool oq_Checke
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::m_UpdateListNamePrefix(void) const
 {
-   const QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("List #%1 - ")).arg(QString::number(this->mu32_ListIndex + 1));
+   const QString c_Text =
+      static_cast<QString>(C_GtGetText::h_GetText("List #%1 - ")).arg(QString::number(this->mu32_ListIndex + 1));
 
    this->mpc_Ui->pc_LabelListNamePrefix->setText(c_Text);
 }
@@ -606,7 +608,6 @@ void C_SdNdeDpListHeaderWidget::m_EditNameFinished(void)
 
       if (this->mpc_UndoManager != NULL)
       {
-
          this->mpc_UndoManager->DoChangeListData(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                  dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
                                                                                                 mpc_TreeWidget),
@@ -652,8 +653,7 @@ void C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked(void)
       {
          c_Dialog->HideOverlay();
       }
-
-   }  //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -669,7 +669,6 @@ void C_SdNdeDpListHeaderWidget::m_EditSizeFinished(void)
 
       if (this->mpc_UndoManager != NULL)
       {
-
          this->mpc_UndoManager->DoChangeListData(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                  dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
                                                                                                 mpc_TreeWidget),
@@ -718,11 +717,10 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
             //Revert changes
             C_PuiSdHandler::h_GetInstance()->SetDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                              this->mu32_ListIndex, c_OSCList, c_UIList);
-            this->UpdateDataSetCount();
-            Q_EMIT (this->SigErrorChange());
+            this->CheckError();
          }
       }
-   }  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    if (c_Dialog != NULL)
    {
       c_Dialog->HideOverlay();

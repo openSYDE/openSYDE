@@ -79,8 +79,6 @@ public:
       const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCInsertedElements,
       const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeDataPoolListElement> & orc_UIInsertedElements,
       const std::vector<stw_types::uint32> & orc_Rows);
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
-   // and default parameters are identical.
    virtual bool insertColumns(const stw_types::sintn osn_Col, const stw_types::sintn osn_Count,
                               const QModelIndex & orc_Parent = QModelIndex()) override;
    // Remove data:

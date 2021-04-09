@@ -49,7 +49,7 @@ public:
       const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId, const stw_types::uint8 ou8_ErrorCode);
    void RemoveDataPoolElement(const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId);
    void ClearDataPoolElements(void);
-   void UpdateTransmissionConfiguration(void);
+   void UpdateElementTransmissionConfiguration(void);
    stw_types::uint32 GetWidgetDataPoolElementCount(void) const;
    stw_types::sint32 GetDataPoolElementIndex(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
                                              C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolId) const;
@@ -89,9 +89,23 @@ protected:
                                    stw_types::float64 & orf64_Min, stw_types::float64 & orf64_Max) const;
    void m_UpdateDataPoolElementTimeoutAndValidFlag(void);
 
+   virtual bool m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const;
+   bool m_CheckManualReadRequired(void) const;
+   bool m_CheckHasAnyRequiredNodesActive(void) const;
+   bool m_CheckHasAnyRequiredBusesConnected(void) const;
+   bool m_CheckNodeActive(const stw_types::uint32 ou32_NodeIndex) const;
+   bool m_CheckIsOnTrigger(const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id) const;
+   bool m_CheckElementAlreadyRead(const stw_types::uint32 ou32_ItemIndex,
+                                  const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id) const;
+
    virtual void m_DataPoolElementsChanged(void);
 
+   void m_GetErrorDescriptionForManualOperation(const stw_types::sint32 os32_Result, const stw_types::uint8 ou8_NRC,
+                                                QString & orc_Description, QString & orc_Details,
+                                                stw_types::sint32 & ors32_TextHeight) const;
+
    const QMap<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32> & m_GetMappingDpElementToDataSerie(void) const;
+   void m_GetAllRegisteredElements(std::vector<C_PuiSvDbNodeDataPoolListElementId> & orc_RegisteredElements) const;
 
    const bool mq_ReadItem;
 

@@ -261,7 +261,7 @@ void C_CAN_RXQueue::Clear(void)
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_RXQueue::GetStatus(void)
 {
-   sint32 s32_Return = ms32_Status;
+   const sint32 s32_Return = ms32_Status;
 
    ms32_Status = C_NO_ERR;
    return s32_Return;

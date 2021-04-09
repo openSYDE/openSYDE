@@ -92,11 +92,11 @@ C_GiSyTextElementWidget::C_GiSyTextElementWidget(C_GiSyBaseWidget & orc_Parent) 
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because the ownership of these objects was never transfered to this class
+// and Qt management takes care of the rest
 C_GiSyTextElementWidget::~C_GiSyTextElementWidget()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
-   // and Qt management takes care of the rest
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -185,7 +185,7 @@ void C_GiSyTextElementWidget::SetFontColor(const QColor & orc_Value)
 void C_GiSyTextElementWidget::m_UpdatePreview(void)
 {
    const QSize c_ViewSize = C_GiSyBaseWidget::h_GetSceneViewSize();
-   C_GiBiTextElement * pc_Item = new C_GiBiTextElement(0ULL);
+   C_GiBiTextElement * const pc_Item = new C_GiBiTextElement(0ULL);
    QSizeF c_ItemSize;
    bool q_SizeInvalid = true;
    QFont c_Tmp = this->mc_FontStyle;
@@ -215,7 +215,8 @@ void C_GiSyTextElementWidget::m_UpdatePreview(void)
       pc_Item->setPos((static_cast<float64>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0,
                       (static_cast<float64>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0);
       //Check item size valid
-      if ((pc_Item->boundingRect().width() + (2.0 * C_GiCustomFunctions::hf64_SceneMinBorderSize)) > c_ViewSize.width())
+      if ((static_cast<float64>(pc_Item->boundingRect().width()) +
+           (2.0 * C_GiCustomFunctions::hf64_SceneMinBorderSize)) > static_cast<float64>(c_ViewSize.width()))
       {
          q_SizeInvalid = true;
       }

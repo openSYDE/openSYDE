@@ -201,7 +201,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
 {
    sint32 s32_Return;
 
-   uint32 u32_ExpectedSize = orc_ReadData.size();
+   const uint32 u32_ExpectedSize = orc_ReadData.size();
 
    s32_Return = this->OsyReadDataPoolData(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, orc_ReadData,
                                           opu8_NrCode);

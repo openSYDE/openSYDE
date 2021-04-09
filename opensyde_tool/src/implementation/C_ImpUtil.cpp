@@ -104,8 +104,6 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
    bool q_Continue = true;
    C_OgeWiCustomMessage c_Message(opc_Parent);
 
-   //TODO SFI
-
    // number of nodes must equal number of nodes for that applications were given
    tgl_assert(orc_NodeIndices.size() == orc_AppIndicesPerNode.size());
    if (orc_NodeIndices.size() != orc_AppIndicesPerNode.size())
@@ -227,8 +225,9 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
                {
                   // message for generating
                   //Translation: 1 = Node name, 2 = Application name
-                  c_DataBlockInfoMessage += static_cast<QString>(C_GtGetText::h_GetText("- %1, Data Block \"%2\"<br>")).arg(
-                     pc_Node->c_Properties.c_Name.c_str()).arg(pc_Application->c_Name.c_str());
+                  c_DataBlockInfoMessage +=
+                     static_cast<QString>(C_GtGetText::h_GetText("- %1, Data Block \"%2\"<br>")).arg(
+                        pc_Node->c_Properties.c_Name.c_str()).arg(pc_Application->c_Name.c_str());
 
                   // message for erase information
                   const QDir c_GenerationDir(h_GetAbsoluteGeneratedDir(pc_Application, pc_Node->c_Properties.c_Name));
@@ -263,7 +262,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
                                                               "will get deleted permanently:<br>"));
             c_EraseInfoMessage.append("<br>");
             c_Description = static_cast<QString>(C_GtGetText::h_GetText("All target directories will be erased and its "
-                                                           "content will be deleted permanently! "));
+                                                                        "content will be deleted permanently! "));
             c_Message.SetType(C_OgeWiCustomMessage::E_Type::eQUESTION);
             c_Message.SetHeading(C_GtGetText::h_GetText("Erase target directories"));
             c_Message.SetDescription(c_Description);
@@ -286,7 +285,8 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          c_Message.SetDescription(C_GtGetText::h_GetText("Cannot generate code. "
                                                          "Set a code generator for every Data Block."));
          c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("<a/>The following Data Blocks "
-                                                             "have no code generator:<br>%1")).arg(c_ErrorMessage));
+                                                                          "have no code generator:<br>%1")).arg(
+                                 c_ErrorMessage));
          c_Message.SetCustomMinHeight(180, 300);
          c_Message.Execute();
          q_Continue = false;
@@ -324,8 +324,9 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          {
             c_PopUpDialogReportDialog->HideOverlay();
          }
-      }    //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
-      else // inform about fail with error message box
+      } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+      else
+      // inform about fail with error message box
       {
          C_OgeWiCustomMessage c_MessageResult(opc_Parent);
          c_MessageResult.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
@@ -896,33 +897,28 @@ void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName
 {
    PROCESSENTRY32 c_Entry;
    bool q_Exists = false;
-   HANDLE pc_Snapshot;
+   HANDLE pv_Snapshot;
    uint32 u32_ProcessID = 0;
 
    //Get process ID
-   //lint -e{40,63,1013} Windows library interface
    c_Entry.dwSize = sizeof(PROCESSENTRY32);
 
-   //lint -e{10,64,530} Windows library interface
-   pc_Snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+   pv_Snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
-   //lint -e{10,909,530} Windows library interface
-   if (Process32First(pc_Snapshot, &c_Entry))
+   //lint -e{909} Windows library interface
+   if (Process32First(pv_Snapshot, &c_Entry) != 0)
    {
-      //lint -e{10,530} Windows library interface
-      while (Process32Next(pc_Snapshot, &c_Entry) != 0)
+      while (Process32Next(pv_Snapshot, &c_Entry) != 0)
       {
-         //lint -e{40,64,918,1013} Windows library interface
-         if (std::wcscmp(c_Entry.szExeFile, orc_ExeName.c_str()) == 0)
+         if (std::wcscmp(c_Entry.szExeFile, orc_ExeName.c_str()) == 0) //lint !e64 //Windows library interface
          {
-            //lint -e{64,530,644,1013} Windows library interface
             u32_ProcessID = c_Entry.th32ProcessID;
             q_Exists = true;
          }
       }
    }
 
-   CloseHandle(pc_Snapshot);
+   CloseHandle(pv_Snapshot);
 
    if (q_Exists == true)
    {
@@ -931,7 +927,7 @@ void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName
       C_ImpUtil::T_HandleData c_Data;
       c_Data.u32_ProcessId = u32_ProcessID;
       c_Data.pc_WindowHandle = NULL;
-      //lint -e923 required by EnumWindows
+      //lint -e{9091} required by EnumWindows
       EnumWindows(&C_ImpUtil::mh_EnumWindowsCallback, reinterpret_cast<LPARAM>(&c_Data));
       orc_Windows.push_back(c_Data.pc_WindowHandle);
    }
@@ -1048,7 +1044,9 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
       q_Tmp = pc_Process->waitForFinished(); // 30 seconds (default)
       if (q_Tmp == true)
       {
-         switch (pc_Process->exitCode())
+         const sintn sn_ProcessExitCode = pc_Process->exitCode();
+
+         switch (sn_ProcessExitCode)
          {
          case 0: // eRESULT_OK
             // everything ok
@@ -1067,7 +1065,8 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
             else
             {
                osc_write_log_warning("Generate Code", static_cast<QString>("Could not open file list file: \"" +
-                                                              c_FileListFile.fileName() + "\"").toStdString().c_str());
+                                                                           c_FileListFile.fileName() +
+                                                                           "\"").toStdString().c_str());
                // no error code because generation worked, only result file was not found
             }
             break;
@@ -1084,12 +1083,13 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
          case 13: // eRESULT_ERASE_TARGET_FOLDER_ERROR
             c_ErrorText =
                static_cast<QString>("Could not erase pre-existing target directory \"" + orc_ExportFolder +
-                       "\".").toStdString().c_str();
+                                    "\".").toStdString().c_str();
             s32_Return = C_RD_WR;
             break;
          case 14: // eRESULT_CREATE_TARGET_FOLDER_ERROR
             c_ErrorText =
-               static_cast<QString>("Could not create target directory \"" + orc_ExportFolder + "\".").toStdString().c_str();
+               static_cast<QString>("Could not create target directory \"" + orc_ExportFolder +
+                                    "\".").toStdString().c_str();
             s32_Return = C_RD_WR;
             break;
          case 20: // eRESULT_INVALID_CLI_PARAMETERS
@@ -1132,9 +1132,14 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
             break;
          case 10: // eRESULT_HELPING --> we do not call help option, so why should this error occur? --> unknown
          default:
-            c_ErrorText = "Unknown error occurred.";
+            c_ErrorText = "Unknown error occurred. Exit code: " + C_SCLString::IntToStr(sn_ProcessExitCode);
             s32_Return = C_UNKNOWN_ERR;
             break;
+         }
+         if (s32_Return != C_NO_ERR)
+         {
+            //clarify that this is a problem that was reported by the invoked code generator
+            c_ErrorText = "Code generator call reported problems: " + c_ErrorText;
          }
       }
    }
@@ -1146,9 +1151,10 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
       switch (e_ProcessError)
       {
       case QProcess::FailedToStart:
-         c_ErrorText = static_cast<QString>("Could not start code generator most likely due to insufficient permissions to "
-                               "invoke this program or the executable is missing: " +
-                               c_CodeGenFileInfo.absoluteFilePath()).toStdString().c_str();
+         c_ErrorText =
+            static_cast<QString>("Could not start code generator most likely due to insufficient permissions to "
+                                 "invoke this program or the executable is missing: " +
+                                 c_CodeGenFileInfo.absoluteFilePath()).toStdString().c_str();
          s32_Return = C_UNKNOWN_ERR;
          break;
       case QProcess::Crashed:
@@ -1167,6 +1173,7 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
          c_ErrorText = "Error when attempting to write to the code generator process.";
          s32_Return = C_RD_WR;
          break;
+      case QProcess::UnknownError:
       default:
          c_ErrorText = "Execution of code generator process not successful. Can't get any more information.";
          s32_Return = C_UNKNOWN_ERR;

@@ -77,7 +77,7 @@ C_NagToolBarSearchResults::C_NagToolBarSearchResults(QWidget * const opc_Parent)
            &C_NagToolBarSearchResults::SigHide);
    connect(this->mpc_Ui->pc_SearchTreeWidget, &C_SdSearchTreeWidget::SigFocusOut, this,
            &C_NagToolBarSearchResults::SigFocusOut);
-}  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor

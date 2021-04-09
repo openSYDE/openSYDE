@@ -94,8 +94,7 @@ C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
            this, &C_SyvUpInformationWidget::m_HideBigUpdateSummary);
    connect(this->mpc_Ui->pc_WidgetUpdateSummarySmall, &C_SyvUpSummaryWidgetSmall::SigHideSmallSummaryWidget,
            this, &C_SyvUpInformationWidget::m_HideSmallUpdateSummary);
-
-}  //lint !e429  //no memory leak because of the parent of pc_Button and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Button and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
@@ -716,7 +715,8 @@ void C_SyvUpInformationWidget::m_UpdateLabel(void) const
    }
    else
    {
-      this->mpc_Ui->pc_WidgetUpdateSummary->SetDataTransfer(static_cast<QString>("%1\n%2").arg(this->mc_EstimatedTime).arg(
+      this->mpc_Ui->pc_WidgetUpdateSummary->SetDataTransfer(static_cast<QString>("%1\n%2").arg(
+                                                               this->mc_EstimatedTime).arg(
                                                                c_DataRateCombined));
    }
 
@@ -734,21 +734,21 @@ void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesC
 {
    const QString c_Default = C_GtGetText::h_GetText("Estimated waiting time --.");
 
-   if (oq_IncludesCurrentNodeStatus)
+   if (oq_IncludesCurrentNodeStatus == true)
    {
       if (this->mc_FileSizeInformation.GetOverallFilesSize() > 0ULL)
       {
          bool q_Worked;
-         uint64 u64_WaitingTimeS = this->mc_FileSizeInformation.GetEstimatedTimeS(&q_Worked);
+         const uint64 u64_WaitingTimeS = this->mc_FileSizeInformation.GetEstimatedTimeS(&q_Worked);
          //After all estimations were attempted check if any succeeded
-         if (q_Worked)
+         if (q_Worked == true)
          {
             const uint64 u64_WaitingTimeMin = u64_WaitingTimeS / 60ULL;
 
             if (u64_WaitingTimeMin == 0ULL)
             {
                this->mc_EstimatedTime = static_cast<QString>(C_GtGetText::h_GetText(
-                                                   "Estimated waiting time less than one minute."));
+                                                                "Estimated waiting time less than one minute."));
             }
             else
             {
@@ -757,8 +757,9 @@ void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesC
                const uint64 u64_WaitingTimeH = (u64_WaitingTimeMin + 1ULL) / 60ULL;
                if (u64_WaitingTimeH == 0ULL)
                {
-                  this->mc_EstimatedTime = static_cast<QString>(C_GtGetText::h_GetText("Estimated waiting time %1 min.")).arg(
-                     u64_WaitingTimeMin + 1ULL);
+                  this->mc_EstimatedTime =
+                     static_cast<QString>(C_GtGetText::h_GetText("Estimated waiting time %1 min.")).arg(
+                        u64_WaitingTimeMin + 1ULL);
                }
                else
                {

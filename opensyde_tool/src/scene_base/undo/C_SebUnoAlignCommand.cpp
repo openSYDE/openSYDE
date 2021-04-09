@@ -94,7 +94,7 @@ void C_SebUnoAlignCommand::undo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoAlignCommand::m_Align(const uint64 & oru64_GuidelineItemID, const E_Alignment & ore_Alignment)
 {
-   QGraphicsItem * pc_GuidelineItem = this->m_GetSceneItem(oru64_GuidelineItemID);
+   QGraphicsItem * const pc_GuidelineItem = this->m_GetSceneItem(oru64_GuidelineItemID);
 
    //Is there a guideline object
    if (pc_GuidelineItem != NULL)
@@ -106,7 +106,7 @@ void C_SebUnoAlignCommand::m_Align(const uint64 & oru64_GuidelineItemID, const E
          //Align objects
          QGraphicsItem * pc_CurItem;
          C_GiUnique * pc_UniqueItem;
-         
+
          C_SebScene * const pc_Scene = dynamic_cast<C_SebScene * const>(this->mpc_Scene);
          QRectF c_CurRect;
          QPointF c_Difference;
@@ -155,11 +155,11 @@ void C_SebUnoAlignCommand::m_Align(const uint64 & oru64_GuidelineItemID, const E
                      //UNKNOWN
                      break;
                   }
-                  
+
                   pc_UniqueItem = dynamic_cast<C_GiUnique *>(pc_CurItem);
                   if (pc_UniqueItem != NULL)
                   {
-                     std::vector<uint64> c_Vec(1, pc_UniqueItem->GetID());
+                     const std::vector<uint64> c_Vec(1, pc_UniqueItem->GetID());
                      new C_SebUnoMoveCommand(this->mpc_Scene, c_Vec, c_Difference, this);
                   }
                }

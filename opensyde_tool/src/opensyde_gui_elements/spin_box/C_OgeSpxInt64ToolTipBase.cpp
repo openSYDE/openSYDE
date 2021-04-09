@@ -226,7 +226,7 @@ void C_OgeSpxInt64ToolTipBase::m_SetupContextMenu(void)
 void C_OgeSpxInt64ToolTipBase::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    m_SetupContextMenu(); // setup the custom menu here to have real "is-read-only" information
-   QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
+   const QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
    this->mpc_ContextMenu->popup(c_PosGlobal);
 }
 

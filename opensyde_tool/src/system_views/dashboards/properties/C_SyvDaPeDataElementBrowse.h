@@ -39,7 +39,9 @@ public:
                                        const stw_types::uint32 ou32_ViewIndex, const bool oq_MultiSelect,
                                        const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                        const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
-                                       const bool oq_ShowNVMLists);
+                                       const bool oq_ShowNVMLists,
+                                       const std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements =
+                                          NULL);
    ~C_SyvDaPeDataElementBrowse(void);
 
    void InitStaticNames(void) const;
@@ -65,6 +67,7 @@ private:
    bool mq_ShowArrayElements;
    bool mq_ShowArrayIndexElements;
    bool mq_Show64BitValues;
+   const std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> * mpc_AlreasyUsedElements;
 
    void m_OkClicked(void);
    void m_HandleHiding(void) const;

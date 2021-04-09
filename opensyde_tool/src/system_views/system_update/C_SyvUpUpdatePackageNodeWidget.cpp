@@ -1223,7 +1223,7 @@ void C_SyvUpUpdatePackageNodeWidget::m_Init(void)
 void C_SyvUpUpdatePackageNodeWidget::m_UpdateTitle(void) const
 {
    this->mpc_Ui->pc_Title->setText(static_cast<QString>("#%1 - %2").arg(QString::number(this->mu32_PositionNumber + 1U),
-                                                           this->mc_NodeName));
+                                                                        this->mc_NodeName));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1339,7 +1339,6 @@ C_SyvUpUpdatePackageListNodeWidget * C_SyvUpUpdatePackageNodeWidget::m_GetAppPar
 
    if (opc_App != NULL)
    {
-      
       pc_Parent = dynamic_cast<C_SyvUpUpdatePackageListNodeWidget *>(opc_App->GetListParent());
 
       tgl_assert(pc_Parent != NULL);
@@ -1403,8 +1402,9 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckFileAlreadyContained(const QString &
       // inform user that file already exists
       C_OgeWiCustomMessage c_Message(this);
       c_Message.SetHeading(C_GtGetText::h_GetText("Add file"));
-      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("The file %1 is already contained in the Update Package "
-                                                              "for this node and therefore not added again.")).
+      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                       "The file %1 is already contained in the Update Package "
+                                                       "for this node and therefore not added again.")).
                                arg(C_PuiUtil::h_GetResolvedAbsPathFromProject(orc_File)));
       c_Message.SetCustomMinHeight(180, 180);
       c_Message.Execute();
@@ -1441,7 +1441,7 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckMime(const QMimeData * const opc_Mim
        (opc_Mime->hasUrls() == true))
    {
       QStringList c_PathList;
-      QList<QUrl> c_UrlList = opc_Mime->urls();
+      const QList<QUrl> c_UrlList = opc_Mime->urls();
       QFileInfo c_File;
       sintn sn_FileCounter;
       bool q_FilesValid = true;

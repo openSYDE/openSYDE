@@ -295,4 +295,4 @@ void C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(const std::vector<QGraph
          }
       }
    }
-}  //lint !e429  //Never took ownership of input parameter
+} //lint !e429  //Never took ownership of input parameter

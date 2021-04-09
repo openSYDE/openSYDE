@@ -72,7 +72,6 @@ C_SdManUnoTopologyAddSnapshotCommand::~C_SdManUnoTopologyAddSnapshotCommand(void
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddSnapshotCommand::m_AddNew(void)
 {
-   
    C_SdTopologyScene * const pc_Scene = dynamic_cast<C_SdTopologyScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)

@@ -8,8 +8,8 @@
    \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CXFLHexfileH
-#define CXFLHexfileH
+#ifndef CXFLHEXFILEH
+#define CXFLHEXFILEH
 
 #include "stwtypes.h"
 #include "CHexFile.h"

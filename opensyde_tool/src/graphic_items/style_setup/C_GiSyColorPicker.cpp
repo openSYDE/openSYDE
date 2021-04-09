@@ -185,13 +185,12 @@ void C_GiSyColorPicker::resizeEvent(QResizeEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
 
-   //TODO
    QImage c_Image((width() - (frameWidth() * 2)), (height() - (frameWidth() * 2)), QImage::Format_RGB32);
-   //lint -e{826,927}  Cast is necessary due to Qt interface. See Qt documentation for scanLine
+   //lint -e{826,927,9176}  Cast is necessary due to Qt interface. See Qt documentation for scanLine
    sintn * psn_Pixel = reinterpret_cast<sintn *>(c_Image.scanLine(0));
    for (sintn sn_YValue = 0; sn_YValue < (height() - (frameWidth() * 2)); sn_YValue++)
    {
-      const sintn * psn_End = psn_Pixel + (width() - (frameWidth() * 2));
+      const sintn * const psn_End = psn_Pixel + (width() - (frameWidth() * 2));
       sintn sn_XValue = 0;
       //lint -e{946}  operator is necessary for painting the brightness
       while (psn_Pixel < psn_End)

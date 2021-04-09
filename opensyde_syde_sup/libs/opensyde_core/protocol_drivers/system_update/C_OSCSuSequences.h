@@ -77,19 +77,21 @@ public:
    };
 
    //constants for steps reported by "m_ReportProgress"
-   //we use enums so the application can use static checkers to verify all all evaluated
+   //we use enums so the application can use static checkers to verify all are evaluated
    enum E_ProgressStep
    {
-      eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_START = 0,
-      eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR,
-      eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_START,
-      eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR,
-      eACTIVATE_FLASHLOADER_XFL_ECU_RESET_START,
+      eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_START = 0,
+      eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR,
+      eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_WARNING,
+      eACTIVATE_FLASHLOADER_OSY_ECU_RESET_WARNING,
+      eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR,
+      eACTIVATE_FLASHLOADER_XFL_ECU_RESET_WARNING,
       eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR,
       eACTIVATE_FLASHLOADER_OSY_XFL_BC_ENTER_FLASHLOADER_START,
       eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR,
       eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR,
       eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START,
+      eACTIVATE_FLASHLOADER_OSY_RECONNECT_WARNING,
       eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR,
       eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR,
       eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR,
@@ -120,6 +122,7 @@ public:
 
       eUPDATE_SYSTEM_START,
       eUPDATE_SYSTEM_OSY_NODE_START,
+      eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR, // problem getting the available features
       eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_START,
       eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR,
@@ -153,11 +156,11 @@ public:
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_START,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_RESULT_STRING,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED,
 
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START, //reported once for each node (if there are > 0 NVM files)
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR,
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR,      // problem getting the available features
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of flashloader
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR,   //problem getting maximum block size from device
@@ -180,9 +183,8 @@ public:
       eUPDATE_SYSTEM_XFL_NODE_FINISHED,
 
       eRESET_SYSTEM_START,
+      eRESET_SYSTEM_OSY_NODE_ERROR,
       eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR,
-      eRESET_SYSTEM_OSY_BROADCAST_ERROR,
-      eRESET_SYSTEM_XFL_BROADCAST_ERROR,
       eRESET_SYSTEM_FINISHED
    };
 
@@ -230,8 +232,10 @@ protected:
    stw_types::uint32 mu32_CurrentFile;
 
 private:
-   C_OSCSuSequences(const C_OSCSuSequences & orc_Source);               //not implemented -> prevent copying
-   C_OSCSuSequences & operator = (const C_OSCSuSequences & orc_Source); //not implemented -> prevent assignment
+   //not implemented -> prevent copying
+   C_OSCSuSequences(const C_OSCSuSequences & orc_Source);
+   //not implemented -> prevent assignment
+   C_OSCSuSequences & operator = (const C_OSCSuSequences & orc_Source); //lint !e1511 //we want to hide the base func.
 
    C_OSCProtocolDriverOsyNode mc_CurrentNode; //node we currently deal with
 
@@ -245,11 +249,14 @@ private:
                                                const stw_types::uint32 ou32_TransferDataTimeout);
    stw_types::sint32 m_FlashNodeOpenSydeFile(const std::vector<stw_scl::C_SCLString> & orc_FilesToFlash,
                                              const stw_types::uint32 ou32_RequestDownloadTimeout,
-                                             const stw_types::uint32 ou32_TransferDataTimeout);
+                                             const stw_types::uint32 ou32_TransferDataTimeout,
+                                             const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures);
    stw_types::sint32 m_FlashOneFileOpenSydeFile(const stw_scl::C_SCLString & orc_FileToFlash,
                                                 const stw_types::uint32 ou32_RequestDownloadTimeout,
-                                                const stw_types::uint32 ou32_TransferDataTimeout);
-   stw_types::sint32 m_WriteNvmOpenSyde(const std::vector<stw_scl::C_SCLString> & orc_FilesToWrite);
+                                                const stw_types::uint32 ou32_TransferDataTimeout,
+                                                const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures);
+   stw_types::sint32 m_WriteNvmOpenSyde(const std::vector<stw_scl::C_SCLString> & orc_FilesToWrite,
+                                        const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures);
 
    stw_types::sint32 m_WriteFingerPrintOsy(void);
 
@@ -270,7 +277,7 @@ private:
 
    stw_types::uint32 m_GetAdaptedTransferDataTimeout(const stw_types::uint32 ou32_DeviceTransferDataTimeout,
                                                      const stw_types::uint32 ou32_MaxBlockLength,
-                                                     const stw_types::uint8 ou8_BusIdentifier);
+                                                     const stw_types::uint8 ou8_BusIdentifier) const;
 
    static stw_types::sint32 mh_CopyFile(const stw_scl::C_SCLString & orc_SourceFile,
                                         const stw_scl::C_SCLString & orc_TargetFile,

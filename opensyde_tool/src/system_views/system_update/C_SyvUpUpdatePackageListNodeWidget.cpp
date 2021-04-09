@@ -337,7 +337,6 @@ void C_SyvUpUpdatePackageListNodeWidget::RemoveAllFiles(void)
 
       if (pc_Item != NULL)
       {
-
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -373,7 +372,6 @@ const
 
       if (pc_Item != NULL)
       {
-
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -411,7 +409,6 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::CheckAllFiles(stw_types::uint32 & oru
 
       if (pc_Item != NULL)
       {
-
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -440,14 +437,16 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::CheckAllFiles(stw_types::uint32 & oru
                   if (pc_App->IsAppInfoAmbiguous() == false)
                   {
                      c_New =
-                        static_cast<QString>(C_GtGetText::h_GetText("#%1 - %2 - %3: Device type %4 does not match node type %5")).
+                        static_cast<QString>(C_GtGetText::h_GetText(
+                                                "#%1 - %2 - %3: Device type %4 does not match node type %5")).
                         arg(this->mu32_PositionNumber + 1U).arg(this->mc_NodeName).arg(pc_App->GetAppName()).
                         arg(pc_App->GetAppDeviceType()).arg(this->mc_DeviceType);
                   }
                   else
                   {
                      c_New =
-                        static_cast<QString>(C_GtGetText::h_GetText("#%1 - %2 - %3: HEX file has multiple application blocks.")).
+                        static_cast<QString>(C_GtGetText::h_GetText(
+                                                "#%1 - %2 - %3: HEX file has multiple application blocks.")).
                         arg(this->mu32_PositionNumber + 1U).arg(this->mc_NodeName).arg(pc_App->GetAppName());
                   }
                   opc_FlashwareWarningsApps->push_back(c_New);
@@ -529,7 +528,6 @@ const
 
             if (pc_Item != NULL)
             {
-
                pc_App = dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
                if (pc_App != NULL)
@@ -567,7 +565,6 @@ void C_SyvUpUpdatePackageListNodeWidget::SetApplicationSelect(const uint32 ou32_
    // Return the path of the application
    if (pc_Item != NULL)
    {
-
       C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
          dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -639,7 +636,6 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_
 
       if (pc_Item != NULL)
       {
-
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -800,7 +796,6 @@ QString C_SyvUpUpdatePackageListNodeWidget::m_GetApplicationPath(const uint32 ou
    // Return the path of the application
    if (pc_Item != NULL)
    {
-
       C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
          dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -834,7 +829,6 @@ void C_SyvUpUpdatePackageListNodeWidget::m_SetApplicationState(const uint32 ou32
    // Adapt the icon of the finished application
    if (pc_Item != NULL)
    {
-
       C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
          dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -935,7 +929,6 @@ uint32 C_SyvUpUpdatePackageListNodeWidget::m_GetApplicationState(const uint32 ou
    // Adapt the icon of the finished application
    if (pc_Item != NULL)
    {
-
       C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
          dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -957,7 +950,6 @@ void C_SyvUpUpdatePackageListNodeWidget::m_SetApplicationConnected(const uint32 
    // Return the path of the application
    if (pc_Item != NULL)
    {
-
       C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
          dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 
@@ -999,7 +991,6 @@ void C_SyvUpUpdatePackageListNodeWidget::m_UpdateNumbers(void) const
 
       if (pc_Item != NULL)
       {
-
          C_SyvUpUpdatePackageListNodeItemWidget * const pc_App =
             dynamic_cast<C_SyvUpUpdatePackageListNodeItemWidget *>(pc_Item->widget());
 

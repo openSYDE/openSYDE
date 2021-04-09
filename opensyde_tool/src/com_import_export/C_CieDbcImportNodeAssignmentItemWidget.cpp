@@ -108,11 +108,13 @@ C_CieDbcOsyNodeAssignment C_CieDbcImportNodeAssignmentItemWidget::GetNodeAssignm
    {
       tgl_assert(this->mc_InterfaceIndexes.size() == this->mc_NodeIndexes.size());
 
-      if ((s32_CurrentIndex - 1) < static_cast<sint32>(this->mc_NodeIndexes.size()))
+      // subtract one of current index because of ignore item in combobox
+      const uint32 u32_DataIndex = static_cast<uint32>(s32_CurrentIndex - 1);
+
+      if (u32_DataIndex < this->mc_NodeIndexes.size())
       {
-         // subtract one of current index because of ignore item in combobox
-         c_Return.s32_AssignedOsyNodeIndex = this->mc_NodeIndexes[s32_CurrentIndex - 1];
-         c_Return.s32_AssignedOsyInterfaceIndex = this->mc_InterfaceIndexes[s32_CurrentIndex - 1];
+         c_Return.s32_AssignedOsyNodeIndex = static_cast<sint32>(this->mc_NodeIndexes[u32_DataIndex]);
+         c_Return.s32_AssignedOsyInterfaceIndex = static_cast<sint32>(this->mc_InterfaceIndexes[u32_DataIndex]);
       }
    }
 

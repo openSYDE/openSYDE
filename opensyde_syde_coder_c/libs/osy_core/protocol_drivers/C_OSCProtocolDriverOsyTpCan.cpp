@@ -226,7 +226,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFirstFrame(const T_STWCAN_Ms
       const uint16 u16_ServiceSize = static_cast<uint16>(static_cast<uint16>(u8_Size) << 8U) +
                                      orc_CanMessage.au8_Data[1];
       mc_RxService.c_ServiceData.c_Data.resize(u16_ServiceSize);
-      //lint -e{419} //std::vector reference returned by [] is guaranteed to have linear data in memory
       (void)std::memcpy(&mc_RxService.c_ServiceData.c_Data[0], &orc_CanMessage.au8_Data[2], 6U);
       mc_RxService.u16_TransmissionIndex = 6U;
       mc_RxService.u8_SequenceNumber = 1U;
@@ -447,7 +446,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_STW
          }
          else if (orc_CanMessage.u8_DLC == 8U)
          {
-            //lint -e{419} //std::vector reference returned by [] is guaranteed to have linear data in memory
             (void)std::memcpy(&mc_RxService.c_ServiceData.c_Data[mc_RxService.u16_TransmissionIndex],
                               &orc_CanMessage.au8_Data[1], 7U);
             mc_RxService.u16_TransmissionIndex += 7U;
@@ -527,7 +525,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const 
          //get total size:
          const uint16 u16_ServiceSize = orc_CanMessage.au8_Data[1];
          mc_RxService.c_ServiceData.c_Data.resize(u16_ServiceSize);
-         //lint -e{419} //std::vector reference returned by [] is guaranteed to have linear data in memory
          (void)memcpy(&mc_RxService.c_ServiceData.c_Data[0], &orc_CanMessage.au8_Data[2], 6U);
          mc_RxService.u16_TransmissionIndex = 6U;
          mc_RxService.u8_SequenceNumber = 1U;
@@ -564,7 +561,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const 
          }
          else if (orc_CanMessage.u8_DLC == 8U)
          {
-            //lint -e{419} //std::vector reference returned by [] is guaranteed to have linear data in memory
             (void)memcpy(&mc_RxService.c_ServiceData.c_Data[mc_RxService.u16_TransmissionIndex],
                          &orc_CanMessage.au8_Data[1], 7U);
             mc_RxService.u16_TransmissionIndex += 7U;
@@ -740,7 +736,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
 
                   t_TxMsg.au8_Data[0] = mhu8_ISO15765_N_PCI_OMF;
                   t_TxMsg.au8_Data[1] = static_cast<uint8>(un_CountBytes & 0xFFU);
-                  //lint -e{420} //std::vector reference returned by [] is guaranteed to have linear data in memory
                   (void)std::memcpy(&t_TxMsg.au8_Data[2], &mc_TxService.c_ServiceData.c_Data[0], 6U);
                   s32_Return = mpc_CanDispatcher->CAN_Send_Msg(t_TxMsg);
 
@@ -799,9 +794,8 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
                   t_TxMsg.u8_DLC = 8U;
 
                   t_TxMsg.au8_Data[0] = static_cast<uint8>(mhu8_ISO15765_N_PCI_FF +
-                                                           ((mc_TxService.c_ServiceData.c_Data.size() >> 8) & 0x0FU));
+                                                           ((mc_TxService.c_ServiceData.c_Data.size() >> 8U) & 0x0FU));
                   t_TxMsg.au8_Data[1] = static_cast<uint8>(mc_TxService.c_ServiceData.c_Data.size() & 0xFFU);
-                  //lint -e{420} //std::vector reference returned by [] is guaranteed to have linear data in memory
                   (void)std::memcpy(&t_TxMsg.au8_Data[2], &mc_TxService.c_ServiceData.c_Data[0], 6U);
                   mc_TxService.u16_TransmissionIndex = 6U;
                   mc_TxService.u8_SequenceNumber = 1U;
@@ -1006,14 +1000,14 @@ uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxIdentifier(void) const
    if (mc_ServerId.u8_BusIdentifier == mc_ClientId.u8_BusIdentifier)
    {
       //same bus; no routing -> we use normal fixed addressing
-      u32_Identifier = 0x18DA0000U +
+      u32_Identifier = static_cast<uint32>(0x18DA0000U) +
                        (static_cast<uint32>(mc_ServerId.u8_NodeIdentifier) << 8U) +
                        mc_ClientId.u8_NodeIdentifier;
    }
    else
    {
       //different bus; routing -> we use 15765-3 section 8.3 IDs
-      u32_Identifier =  0x1BC00000U +
+      u32_Identifier = static_cast<uint32>(0x1BC00000U) +
                        (static_cast<uint32>(mc_ClientId.u8_BusIdentifier) << 18U) +
                        (static_cast<uint32>(mc_ClientId.u8_NodeIdentifier) << 11U) +
                        (static_cast<uint32>(mc_ServerId.u8_BusIdentifier) << 7U) +
@@ -1035,7 +1029,8 @@ uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxIdentifier(void) const
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxBroadcastIdentifier(void) const
 {
-   return (0x18DB0000U + ((static_cast<uint32>(C_OSCProtocolDriverOsyNode::mhu8_NODE_ID_BROADCASTS)) << 8U) +
+   return (static_cast<uint32>(0x18DB0000U) +
+           ((static_cast<uint32>(C_OSCProtocolDriverOsyNode::mhu8_NODE_ID_BROADCASTS)) << 8U) +
            mc_ClientId.u8_NodeIdentifier);
 }
 
@@ -1074,7 +1069,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
       if (mc_ServerId.u8_BusIdentifier == mc_ClientId.u8_BusIdentifier)
       {
          //same bus; no routing -> we use normal fixed addressing (physical)
-         c_Filter.u32_Code = 0x18DA0000U +
+         c_Filter.u32_Code = static_cast<uint32>(0x18DA0000U) +
                              (static_cast<uint32>(mc_ClientId.u8_NodeIdentifier) << 8U) +
                              mc_ServerId.u8_NodeIdentifier;
          c_Filter.u32_Mask = 0x1FFFFFFFU; //must be exactly for us and from specific sender
@@ -1082,7 +1077,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
       else
       {
          //different bus; routing -> we use 15765-3 section 8.3 IDs
-         c_Filter.u32_Code =  0x1BC00000U +
+         c_Filter.u32_Code = static_cast<uint32>(0x1BC00000U) +
                              (static_cast<uint32>(mc_ServerId.u8_BusIdentifier) << 18U) +
                              (static_cast<uint32>(mc_ServerId.u8_NodeIdentifier) << 11U) +
                              (static_cast<uint32>(mc_ClientId.u8_BusIdentifier) << 7U) +
@@ -1093,7 +1088,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
    else
    {
       //normal fixed addressing physical (responses will not be addresses as broadcasts)
-      c_Filter.u32_Code = 0x18DA0000U +
+      c_Filter.u32_Code = static_cast<uint32>(0x18DA0000U) +
                           (static_cast<uint32>(mc_ClientId.u8_NodeIdentifier) << 8U);
       c_Filter.u32_Mask = 0x1FFFFF80U; //must be exactly for us; but sender may be anyone
    }
@@ -1198,7 +1193,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
       else
       {
          //check for responses
-         uint32 u32_StartTime = TGL_GetTickCount();
+         const uint32 u32_StartTime = TGL_GetTickCount();
          T_STWCAN_Msg_RX c_Response;
          sint32 s32_ReturnLocal;
 
@@ -1286,7 +1281,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
       else
       {
          //check for responses
-         uint32 u32_StartTime = TGL_GetTickCount();
+         const uint32 u32_StartTime = TGL_GetTickCount();
          T_STWCAN_Msg_RX c_Response;
          sint32 s32_ReturnLocal;
 
@@ -1445,7 +1440,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const uint8
       if (s32_Return == C_NO_ERR)
       {
          //check for responses
-         uint32 u32_StartTime = TGL_GetTickCount();
+         const uint32 u32_StartTime = TGL_GetTickCount();
          T_STWCAN_Msg_RX c_Response;
          sint32 s32_ReturnLocal;
          bool q_PositiveResponseReceived = false;

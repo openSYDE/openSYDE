@@ -24,21 +24,19 @@ namespace stw_opensyde_core
 {
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 //PC-Lint suppressions: function-like macro is the only way to get file,func,line information into the text
-//lint -save -e1960
-#define osc_write_log_info(activity, \
-                           message) (stw_opensyde_core::C_OSCLoggingHandler::h_WriteLogInfo(activity, message, __FILE__, \
-                                                                                            TGL_UTIL_FUNC_ID))
-#define osc_write_log_warning(activity, \
-                              message) (stw_opensyde_core::C_OSCLoggingHandler::h_WriteLogWarning(activity, message, \
-                                                                                                  __FILE__, \
-                                                                                                  TGL_UTIL_FUNC_ID))
-#define osc_write_log_error(activity, \
-                            message) (stw_opensyde_core::C_OSCLoggingHandler::h_WriteLogError(activity, message, \
-                                                                                              __FILE__, \
-                                                                                              TGL_UTIL_FUNC_ID))
+//lint -save -e9026
+#define osc_write_log_info(activity, message) \
+   (stw_opensyde_core::C_OSCLoggingHandler::h_WriteLogInfo((activity), (message), \
+                                                           __FILE__, TGL_UTIL_FUNC_ID))
+#define osc_write_log_warning(activity, message) \
+   (stw_opensyde_core::C_OSCLoggingHandler::h_WriteLogWarning((activity), (message), \
+                                                              __FILE__, TGL_UTIL_FUNC_ID))
+#define osc_write_log_error(activity, message) \
+   (stw_opensyde_core::C_OSCLoggingHandler::h_WriteLogError((activity), (message), \
+                                                            __FILE__, TGL_UTIL_FUNC_ID))
 #define osc_write_log_performance_start() (stw_opensyde_core::C_OSCLoggingHandler::h_StartPerformanceTimer())
 #define osc_write_log_performance_stop(timerid, message) \
-   (stw_opensyde_core::C_OSCLoggingHandler::h_WriteLogPerformance(timerid, message, __FILE__, TGL_UTIL_FUNC_ID))
+   (stw_opensyde_core::C_OSCLoggingHandler::h_WriteLogPerformance((timerid), (message), __FILE__, TGL_UTIL_FUNC_ID))
 //lint -restore
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -56,17 +54,17 @@ public:
 
    //Logging call
    static void h_WriteLogInfo(const stw_scl::C_SCLString & orc_Activity, const stw_scl::C_SCLString & orc_Message,
-                              const stw_types::charn * const opc_Class = NULL,
-                              const stw_types::charn * const opc_Function = NULL);
+                              const stw_types::charn * const opcn_Class = NULL,
+                              const stw_types::charn * const opcn_Function = NULL);
    static void h_WriteLogWarning(const stw_scl::C_SCLString & orc_Activity, const stw_scl::C_SCLString & orc_Message,
-                                 const stw_types::charn * const opc_Class = NULL,
-                                 const stw_types::charn * const opc_Function = NULL);
+                                 const stw_types::charn * const opcn_Class = NULL,
+                                 const stw_types::charn * const opcn_Function = NULL);
    static void h_WriteLogError(const stw_scl::C_SCLString & orc_Activity, const stw_scl::C_SCLString & orc_Message,
-                               const stw_types::charn * const opc_Class = NULL,
-                               const stw_types::charn * const opc_Function = NULL);
+                               const stw_types::charn * const opcn_Class = NULL,
+                               const stw_types::charn * const opcn_Function = NULL);
    static void h_WriteLogPerformance(const stw_types::uint16 ou16_TimerId, const stw_scl::C_SCLString & orc_Message,
-                                     const stw_types::charn * const opc_Class = NULL,
-                                     const stw_types::charn * const opc_Function = NULL);
+                                     const stw_types::charn * const opcn_Class = NULL,
+                                     const stw_types::charn * const opcn_Function = NULL);
 
    static stw_types::uint16 h_StartPerformanceTimer(void);
    static stw_scl::C_SCLString h_StwError(const stw_types::sint32 os32_Error);
@@ -86,8 +84,8 @@ private:
    static std::ofstream mhc_File;
 
    static void mh_WriteLog(const stw_scl::C_SCLString & orc_Type, const stw_scl::C_SCLString & orc_Activity,
-                           const stw_scl::C_SCLString & orc_Message, const stw_types::charn * const opc_Class = NULL,
-                           const stw_types::charn * const opc_Function = NULL);
+                           const stw_scl::C_SCLString & orc_Message, const stw_types::charn * const opcn_Class = NULL,
+                           const stw_types::charn * const opcn_Function = NULL);
    static void mh_OpenFile(void);
    //Avoid calling
    C_OSCLoggingHandler(void);

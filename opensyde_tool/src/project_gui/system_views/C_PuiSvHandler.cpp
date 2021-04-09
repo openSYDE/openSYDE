@@ -455,6 +455,35 @@ sint32 C_PuiSvHandler::SetDashboardComment(const uint32 ou32_ViewIndex, const ui
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dashboard type
+
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oe_Type              Type
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::SetDashboardType(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
+                                        const C_PuiSvDashboard::E_TabType oe_Type)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_ViewIndex < this->mc_Views.size())
+   {
+      C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+      s32_Retval = rc_View.SetDashboardType(ou32_DashboardIndex, oe_Type);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard active flag
 
    \param[in]  ou32_ViewIndex       View index
@@ -2934,6 +2963,7 @@ sint32 C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
                      }
                   }
                   m_FixInvalidRailConfig();
+                  m_HandleCompatibilityChart();
                }
                else
                {
@@ -3671,6 +3701,18 @@ void C_PuiSvHandler::m_FixInvalidRailConfig(void)
    for (uint32 u32_Counter = 0U; u32_Counter < this->mc_Views.size(); ++u32_Counter)
    {
       this->mc_Views[u32_Counter].FixInvalidRailConfig();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle compatibility chart
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandler::m_HandleCompatibilityChart(void)
+{
+   for (uint32 u32_Counter = 0U; u32_Counter < this->mc_Views.size(); ++u32_Counter)
+   {
+      this->mc_Views[u32_Counter].HandleCompatibilityChart();
    }
 }
 

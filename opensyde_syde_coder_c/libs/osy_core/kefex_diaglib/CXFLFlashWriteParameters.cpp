@@ -8,14 +8,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
 
 #include <string.h>
-#include "DiagLib_config.h"  //diaglib configuration
+#include "DiagLib_config.h" //diaglib configuration
 
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -116,7 +116,6 @@ C_XFLFlashWriteParameters::~C_XFLFlashWriteParameters(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
 {
-   sint32 i;
    sint32 s32_Return;
    C_SCLString c_Temp2;
    sint32 s32_Value;
@@ -124,38 +123,40 @@ void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_
    c_WakeupConfig.u8_FLASHIntervalMs   = orc_IniFile.ReadUint8(orc_Section, "FLASHINTERVAL", 10U);
    u8_HexRecordLength                  = orc_IniFile.ReadUint8(orc_Section, "HEXRECORDLENGTH", 0U);
    s32_Value                           = orc_IniFile.ReadInteger(orc_Section, "DEV_ID_CHECK",
-                                                                static_cast<sint32>(eXFL_DEV_TYPE_CHECK_SCAN_HEX_FILE));
+                                                                 static_cast<sint32>(eXFL_DEV_TYPE_CHECK_SCAN_HEX_FILE));
    e_DevTypeCheck                      = static_cast<E_XFLDevTypeCheck>(s32_Value);
    s32_Value                           = orc_IniFile.ReadInteger(orc_Section, "DEV_ID_CHECK_GET_ID_FAIL",
-                                                      static_cast<sint32>(eXFL_DEV_TYPE_CHECK_GETID_FAIL_REACTION_ASK));
+                                                                 static_cast<sint32>(
+                                                                    eXFL_DEV_TYPE_CHECK_GETID_FAIL_REACTION_ASK));
    e_DevTypeCheckGetIDFailedReaction   = static_cast<E_XFLDevTypeCheckGetIDFailReaction>(s32_Value);
    s32_Value                           = orc_IniFile.ReadInteger(orc_Section, "DEV_ID_CHECK_MATCH_ID_FAIL",
-                                                    static_cast<sint32>(eXFL_DEV_TYPE_CHECK_MATCHID_FAIL_REACTION_ASK));
+                                                                 static_cast<sint32>(
+                                                                    eXFL_DEV_TYPE_CHECK_MATCHID_FAIL_REACTION_ASK));
    e_DevTypeCheckMatchIDFailedReaction = static_cast<E_XFLDevTypeCheckMatchIDFailReaction>(s32_Value);
    c_WakeupConfig.u32_StartTimeMs      = static_cast<uint32>(orc_IniFile.ReadInteger(orc_Section, "STARTTIME", 3)) *
-                                          1000U;
+                                         1000U;
    u32_SendID                          = orc_IniFile.ReadInteger(orc_Section, "SendID",    XFL_DEFAULT_SEND_ID);
    u32_ReceiveID                       = u32_SendID + 1U;
-   q_XtdID                             = orc_IniFile.ReadBool   (orc_Section, "XTDID",     false);
-   c_WakeupConfig.c_CompanyID          = orc_IniFile.ReadString (orc_Section, "CompanyID", "XX");
-   c_WakeupConfig.u8_LocalID           = orc_IniFile.ReadUint8  (orc_Section, "LocalID",   0U);
-   c_Temp2                             = orc_IniFile.ReadString (orc_Section, "SNR", "000000000000");
+   q_XtdID                             = orc_IniFile.ReadBool(orc_Section, "XTDID",     false);
+   c_WakeupConfig.c_CompanyID          = orc_IniFile.ReadString(orc_Section, "CompanyID", "XX");
+   c_WakeupConfig.u8_LocalID           = orc_IniFile.ReadUint8(orc_Section, "LocalID",   0U);
+   c_Temp2                             = orc_IniFile.ReadString(orc_Section, "SNR", "000000000000");
    s32_Return = C_XFLActions::SNRStringToBytes(c_Temp2, c_WakeupConfig.au8_SNR);
    if ((s32_Return != C_NO_ERR) && (s32_Return != C_WARN)) //accept weird hex SNRs as well
    {
       (void)memset(&c_WakeupConfig.au8_SNR[0], 0, sizeof(c_WakeupConfig.au8_SNR));
    }
    e_EraseMode           = static_cast<E_XFLEraseMode>(orc_IniFile.ReadInteger(orc_Section, "ProgType",  0));
-   c_UserDefinedSectors  = orc_IniFile.ReadString (orc_Section, "Sectors",   "1,2,3,4,5,6");
-   c_WakeupConfig.q_SendResetRQ         = orc_IniFile.ReadBool   (orc_Section, "SENDRESETRQ", false);
-   c_WakeupConfig.t_ResetMsg.u8_XTD     = orc_IniFile.ReadUint8  (orc_Section, "RESETMSGXTD", 0U);
+   c_UserDefinedSectors  = orc_IniFile.ReadString(orc_Section, "Sectors",   "1,2,3,4,5,6");
+   c_WakeupConfig.q_SendResetRQ         = orc_IniFile.ReadBool(orc_Section, "SENDRESETRQ", false);
+   c_WakeupConfig.t_ResetMsg.u8_XTD     = orc_IniFile.ReadUint8(orc_Section, "RESETMSGXTD", 0U);
    c_WakeupConfig.t_ResetMsg.u32_ID     = orc_IniFile.ReadInteger(orc_Section, "RESETMSGID",  0);
-   c_WakeupConfig.t_ResetMsg.u8_DLC     = orc_IniFile.ReadUint8  (orc_Section, "RESETMSGDLC", 0U);
+   c_WakeupConfig.t_ResetMsg.u8_DLC     = orc_IniFile.ReadUint8(orc_Section, "RESETMSGDLC", 0U);
    c_WakeupConfig.t_ResetMsg.u8_RTR     = 0U; //make sure to have a clearly defined value
-   for (i = 0; i < 8; i++)
+   for (uint8 u8_Byte = 0; u8_Byte < 8; u8_Byte++)
    {
-      c_WakeupConfig.t_ResetMsg.au8_Data[i] = orc_IniFile.ReadUint8(orc_Section, "RESETMSGDB" +
-                                                                    C_SCLString::IntToStr(i), 0U);
+      c_WakeupConfig.t_ResetMsg.au8_Data[u8_Byte] = orc_IniFile.ReadUint8(orc_Section, "RESETMSGDB" +
+                                                                          C_SCLString::IntToStr(u8_Byte), 0U);
    }
    c_HexFile = orc_IniFile.ReadString(orc_Section, "Filename", "");
 }
@@ -199,29 +200,27 @@ void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWriteParameters::SaveToIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section) const
 {
-   sint32 i;
-
    try
    {
       orc_IniFile.WriteInteger(orc_Section, "STARTTIME", static_cast<sintn>(c_WakeupConfig.u32_StartTimeMs / 1000U));
       orc_IniFile.WriteInteger(orc_Section, "SENDID",    u32_SendID);
-      orc_IniFile.WriteBool   (orc_Section, "XTDID",     q_XtdID);
+      orc_IniFile.WriteBool(orc_Section, "XTDID",     q_XtdID);
 
-      orc_IniFile.WriteString (orc_Section, "COMPANYID", c_WakeupConfig.c_CompanyID);
+      orc_IniFile.WriteString(orc_Section, "COMPANYID", c_WakeupConfig.c_CompanyID);
       orc_IniFile.WriteInteger(orc_Section, "LOCALID",   c_WakeupConfig.u8_LocalID);
-      orc_IniFile.WriteString (orc_Section, "FILENAME",  c_HexFile);
+      orc_IniFile.WriteString(orc_Section, "FILENAME",  c_HexFile);
       orc_IniFile.WriteInteger(orc_Section, "PROGTYPE",  static_cast<sint32>(e_EraseMode));
-      orc_IniFile.WriteString (orc_Section, "SECTORS",   c_UserDefinedSectors);
-      orc_IniFile.WriteString (orc_Section, "SNR",       C_XFLActions::SNRBytesToString(c_WakeupConfig.au8_SNR, false));
+      orc_IniFile.WriteString(orc_Section, "SECTORS",   c_UserDefinedSectors);
+      orc_IniFile.WriteString(orc_Section, "SNR",       C_XFLActions::SNRBytesToString(c_WakeupConfig.au8_SNR, false));
 
-      orc_IniFile.WriteBool   (orc_Section, "SENDRESETRQ", c_WakeupConfig.q_SendResetRQ);
+      orc_IniFile.WriteBool(orc_Section, "SENDRESETRQ", c_WakeupConfig.q_SendResetRQ);
       orc_IniFile.WriteInteger(orc_Section, "RESETMSGXTD", c_WakeupConfig.t_ResetMsg.u8_XTD);
       orc_IniFile.WriteInteger(orc_Section, "RESETMSGID",  static_cast<sint32>(c_WakeupConfig.t_ResetMsg.u32_ID));
       orc_IniFile.WriteInteger(orc_Section, "RESETMSGDLC", c_WakeupConfig.t_ResetMsg.u8_DLC);
-      for (i = 0; i < 8; i++)
+      for (uint8 u8_Byte = 0; u8_Byte < 8; u8_Byte++)
       {
-         orc_IniFile.WriteInteger(orc_Section, "RESETMSGDB" + C_SCLString::IntToStr(i),
-                                  c_WakeupConfig.t_ResetMsg.au8_Data[i]);
+         orc_IniFile.WriteInteger(orc_Section, "RESETMSGDB" + C_SCLString::IntToStr(u8_Byte),
+                                  c_WakeupConfig.t_ResetMsg.au8_Data[u8_Byte]);
       }
 
       orc_IniFile.WriteInteger(orc_Section, "DEV_ID_CHECK", static_cast<sint32>(e_DevTypeCheck));
@@ -238,4 +237,3 @@ sint32 C_XFLFlashWriteParameters::SaveToIni(C_SCLIniFile & orc_IniFile, const C_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-

@@ -377,7 +377,7 @@ void C_SCLIniFile::WriteInteger(const C_SCLString & orc_Section, const C_SCLStri
                                 const bool oq_ForceAppend)
 {
    bool q_Return;
-   C_SCLString c_Value(osn_Value);
+   const C_SCLString c_Value(osn_Value);
 
    q_Return = m_SetValue(orc_Section, orc_Key, c_Value, oq_ForceAppend);
    if (q_Return == false)
@@ -408,7 +408,7 @@ void C_SCLIniFile::WriteBool(const C_SCLString & orc_Section, const C_SCLString 
                              const bool oq_ForceAppend)
 {
    bool q_Return;
-   C_SCLString c_Value(static_cast<sintn>(oq_Value));
+   const C_SCLString c_Value(static_cast<sintn>(oq_Value));
 
    q_Return = m_SetValue(orc_Section, orc_Key, c_Value, oq_ForceAppend);
    if (q_Return == false)
@@ -439,7 +439,7 @@ void C_SCLIniFile::WriteFloat(const C_SCLString & orc_Section, const C_SCLString
                               const bool oq_ForceAppend)
 {
    bool q_Return;
-   C_SCLString c_Value(of64_Value);
+   const C_SCLString c_Value(of64_Value);
 
    q_Return = m_SetValue(orc_Section, orc_Key, c_Value, oq_ForceAppend);
    if (q_Return == false)
@@ -466,7 +466,7 @@ const C_SCLString & C_SCLIniFile::m_GetValue(const C_SCLString & orc_Key, const 
 {
    static const C_SCLString hc_Empty = "";
 
-   const C_SCLIniKey * pc_Key = m_GetKey(orc_Key, orc_Section);
+   const C_SCLIniKey * const pc_Key = m_GetKey(orc_Key, orc_Section);
 
    return (pc_Key == NULL) ? hc_Empty : pc_Key->c_Value;
 }

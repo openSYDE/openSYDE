@@ -56,7 +56,7 @@ static const stw_scl::C_SCLString mhc_MessageLineBreak = "\n"; // must be '\n' f
    Assumptions:
    * consistent data (guaranteed by DBC import mechanism, this is no customer API function)
 
-   \param[in] orc_CIENode         data of DBC node
+   \param[in]  orc_CIENode    data of DBC node
 
    \return  project internal openSYDE data structure
 */
@@ -90,11 +90,11 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDBCFileIm
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add all necessary elements to the imported core elements
 
-   \param[in] orc_OSCRxMessageData           Imported core Rx message data
-   \param[in] orc_OSCRxSignalData            Imported core Rx signal data
-   \param[in] orc_OSCTxMessageData           Imported core Tx message data
-   \param[in] orc_OSCTxSignalData            Imported core Tx signal data
-   \param[in] orc_InfoMessagesPerMessage     Information messages per message
+   \param[in]  orc_OSCRxMessageData          Imported core Rx message data
+   \param[in]  orc_OSCRxSignalData           Imported core Rx signal data
+   \param[in]  orc_OSCTxMessageData          Imported core Tx message data
+   \param[in]  orc_OSCTxSignalData           Imported core Tx signal data
+   \param[in]  orc_InfoMessagesPerMessage    Information messages per message
 
    \return
    Complete structure as required by our interface
@@ -155,12 +155,10 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDS
    Assumptions:
    * consistent data (guaranteed by DBC import mechanism, this is no customer API function)
 
-   \param[in]     orc_CIENodeMessages    DBC CAN message data of node
-   \param[out]    orc_CanMessages        project internal core CAN message data
-   \param[out]    orc_CanSignalData      project internal core CAN signal data
-   \param[out]    orc_WarningMessages    warning message of each CAN message
-
-   \return  project internal openSYDE data structure
+   \param[in]   orc_CIENodeMessages    DBC CAN message data of node
+   \param[out]  orc_CanMessages        project internal core CAN message data
+   \param[out]  orc_CanSignalData      project internal core CAN signal data
+   \param[out]  orc_WarningMessages    warning message of each CAN message
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDBCValues(
@@ -263,16 +261,27 @@ void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDBCValues(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Internal adapter function to fill up data for Ui functionality.
 
-   Currently this function is only resizing the Ui containers.
+   This function handles TX methods for messages and calls mh_FillUpUiStructureForSignal for signals.
 
-   \param[in,out] orc_DataPoolListStructure       openSYDE data structure for data pool lists
-   \param[in,out] oq_ActivateAutoMinMaxForSignals Flag to automatically set the auto min max flag if necessary
+   \param[in,out]  orc_DataPoolListStructure          openSYDE data structure for data pool lists
+   \param[in,out]  oq_ActivateAutoMinMaxForSignals    Flag to automatically set the auto min max flag if necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure & orc_DataPoolListStructure,
                                                     const bool oq_ActivateAutoMinMaxForSignals)
 {
    C_PuiSdNodeDataPoolListElement c_DefaultUiSignal;
+
+   //Set import default values (different from default values)
+   if (oq_ActivateAutoMinMaxForSignals == true)
+   {
+      c_DefaultUiSignal.q_AutoMinMaxActive = true;
+   }
+   else
+   {
+      c_DefaultUiSignal.q_AutoMinMaxActive = false;
+   }
+   c_DefaultUiSignal.q_InterpretAsString = false;
 
    // resize Ui vectors
    // Rx messages
@@ -312,7 +321,7 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
             c_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
          }
       }
-
+      mh_FillUpUiStructureForSignals(*c_MessageIter, false, c_DefaultUiSignal, orc_DataPoolListStructure);
       orc_DataPoolListStructure.c_Ui.c_UiRxMessageData.push_back(c_UiMessage);
    }
    // Tx messages
@@ -323,34 +332,62 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
    {
       C_PuiSdNodeCanMessage c_UiMessage;
       c_UiMessage.c_Signals.resize(c_MessageIter->c_Signals.size());
+      mh_FillUpUiStructureForSignals(*c_MessageIter, true, c_DefaultUiSignal, orc_DataPoolListStructure);
       orc_DataPoolListStructure.c_Ui.c_UiTxMessageData.push_back(c_UiMessage);
    }
-   //Set import default values (different from default values)
-   if (oq_ActivateAutoMinMaxForSignals == true)
+
+   tgl_assert(orc_DataPoolListStructure.c_Ui.c_UiRxSignalData.size() ==
+              orc_DataPoolListStructure.c_Core.c_OSCRxSignalData.size());
+   tgl_assert(orc_DataPoolListStructure.c_Ui.c_UiTxSignalData.size() ==
+              orc_DataPoolListStructure.c_Core.c_OSCTxSignalData.size());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Internal adapter function to fill up data for Ui functionality for signals.
+
+   Handles adaption of Ui specific auto min/max setting (multiplexed signal only)
+
+   \param[in]      orc_Message                  Message that holds the signals
+   \param[in]      orc_DefaultUiSig             Default Ui signal
+   \param[in,out]  orc_DataPoolListStructure    Data pool list structure
+   \param[in]      oq_TxMessage                 Tx message
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CieDataPoolListAdapter::mh_FillUpUiStructureForSignals(const C_OSCCanMessage & orc_Message,
+                                                              const bool oq_TxMessage,
+                                                              const C_PuiSdNodeDataPoolListElement & orc_DefaultUiSig,
+                                                              C_CieDataPoolListStructure & orc_DataPoolListStructure)
+{
+   std::vector<C_OSCCanSignal>::const_iterator c_SignalIter;
+   C_PuiSdNodeDataPoolListElement c_AdaptedUiSignal;
+
+   for (c_SignalIter = orc_Message.c_Signals.begin(); c_SignalIter != orc_Message.c_Signals.end(); ++c_SignalIter)
    {
-      c_DefaultUiSignal.q_AutoMinMaxActive = true;
+      c_AdaptedUiSignal = orc_DefaultUiSig;
+      if (c_SignalIter->e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         c_AdaptedUiSignal.q_AutoMinMaxActive = true;
+      }
+
+      if (oq_TxMessage == true)
+      {
+         orc_DataPoolListStructure.c_Ui.c_UiTxSignalData.push_back(c_AdaptedUiSignal);
+      }
+      else
+      {
+         orc_DataPoolListStructure.c_Ui.c_UiRxSignalData.push_back(c_AdaptedUiSignal);
+      }
    }
-   else
-   {
-      c_DefaultUiSignal.q_AutoMinMaxActive = false;
-   }
-   c_DefaultUiSignal.q_InterpretAsString = false;
-   // Rx signals
-   (orc_DataPoolListStructure.c_Ui.c_UiRxSignalData).resize(
-      orc_DataPoolListStructure.c_Core.c_OSCRxSignalData.size(), c_DefaultUiSignal);
-   // Tx signals
-   (orc_DataPoolListStructure.c_Ui.c_UiTxSignalData).resize(
-      orc_DataPoolListStructure.c_Core.c_OSCTxSignalData.size(), c_DefaultUiSignal);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert openSYDE CAN message data structure to DBC data structure for a single message
 
-   \param[in]     ou32_BusIndex         bus index
-   \param[in]     oe_Type               CAN protocol type (e.g. Layer 2, ECeS, ECoS)
-   \param[in]     orc_OSCCanMessage     openSYDE CAN message structure
-   \param[out]    orc_CIENodeMessage    CAN message structure of DBC import/export
-   \param[out]    orc_Warnings          message container to give user feedback
+   \param[in]   ou32_BusIndex       bus index
+   \param[in]   oe_Type             CAN protocol type (e.g. Layer 2, ECeS, ECoS)
+   \param[in]   orc_OSCCanMessage   openSYDE CAN message structure
+   \param[out]  orc_CIENodeMessage  CAN message structure of DBC import/export
+   \param[out]  orc_Warnings        message container to give user feedback
 
    \return
    C_NO_ERR    successful

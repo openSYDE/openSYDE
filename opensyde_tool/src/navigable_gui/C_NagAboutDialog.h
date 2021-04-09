@@ -35,7 +35,8 @@ class C_NagAboutDialog :
 
 public:
    explicit C_NagAboutDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const QString oc_ProductName,
-                             const QString oc_LogoUrl, const stw_types::uint32 ou32_Margin);
+                             const QString oc_LogoUrl, const stw_types::uint32 ou32_Margin,
+                             const QString oc_OptionalComponents = "");
    ~C_NagAboutDialog(void);
 
    void InitStaticNames(void) const;
@@ -60,6 +61,7 @@ private:
    QString mc_ProductName;
    QString mc_LogoUrl;
    stw_types::uint32 mu32_Margin;
+   QString mc_OptionalComponents;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

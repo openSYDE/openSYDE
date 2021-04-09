@@ -55,12 +55,11 @@ C_OgeMuSections::C_OgeMuSections(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeMuSections::AddCustomSection(const QString & orc_SectionTitle)
 {
-   QWidgetAction * pc_Action = new QWidgetAction(this);
-   C_OgeLabGenericNoPaddingNoMargins * pc_Label = new C_OgeLabGenericNoPaddingNoMargins(this);
+   QWidgetAction * const pc_Action = new QWidgetAction(this);
+   C_OgeLabGenericNoPaddingNoMargins * const pc_Label = new C_OgeLabGenericNoPaddingNoMargins(this);
 
    // label style is handled in style sheets: stw_opensyde_gui_elements--C_OgeMuSections QLabel
    pc_Label->setText(orc_SectionTitle);
    pc_Action->setDefaultWidget(pc_Label);
    this->addAction(pc_Action);
-
-}  //lint !e429  //no memory leak because of the parent of pc_Label and pc_Action and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Label and pc_Action and the Qt memory management

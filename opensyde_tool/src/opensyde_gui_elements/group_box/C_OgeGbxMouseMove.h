@@ -8,8 +8,8 @@
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_OgeGbxMouseMove_H
-#define C_OgeGbxMouseMove_H
+#ifndef C_OGEGBXMOUSEMOVE_H
+#define C_OGEGBXMOUSEMOVE_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMouseEvent>

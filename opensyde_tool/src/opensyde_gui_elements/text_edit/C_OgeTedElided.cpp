@@ -60,7 +60,7 @@ C_OgeTedElided::C_OgeTedElided(QWidget * const opc_Parent) :
 void C_OgeTedElided::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this->viewport());
-   QFontMetrics c_FontMetrics = c_Painter.fontMetrics();
+   const QFontMetrics c_FontMetrics = c_Painter.fontMetrics();
    QString c_Content = this->toPlainText();
    const sintn sn_LineSpacing = c_FontMetrics.lineSpacing();
    // Offset of the border
@@ -74,7 +74,7 @@ void C_OgeTedElided::paintEvent(QPaintEvent * const opc_Event)
       sintn sn_Counter = 0;
       QString c_Line = "";
       sintn sn_ActLineWidth = 0;
-      sintn sn_NextLinePosY = sn_PosY + sn_LineSpacing;
+      const sintn sn_NextLinePosY = sn_PosY + sn_LineSpacing;
 
       // search end line char or the last fitting letter
       while (c_Content != "")
@@ -134,7 +134,7 @@ void C_OgeTedElided::paintEvent(QPaintEvent * const opc_Event)
       else
       {
          // this is the last fitting line
-         QString c_ElidedLastLine = c_FontMetrics.elidedText(c_Line, Qt::ElideRight, this->width() - 16);
+         const QString c_ElidedLastLine = c_FontMetrics.elidedText(c_Line, Qt::ElideRight, this->width() - 16);
 
          c_Painter.drawText(QPoint(4, sn_PosY + c_FontMetrics.ascent()), c_ElidedLastLine);
          c_Content = "";

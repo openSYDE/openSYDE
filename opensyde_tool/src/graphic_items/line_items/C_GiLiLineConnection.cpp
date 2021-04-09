@@ -51,7 +51,7 @@ C_GiLiLineConnection::C_GiLiLineConnection(const sint32 & ors32_LineIndex, QGrap
    this->setFlag(ItemIsMovable);
    this->setFlag(ItemSendsGeometryChanges);
 
-   this->mc_DefaultCursor = QCursor(Qt::SizeAllCursor);
+   this->mc_DefaultCursor = static_cast<QCursor>(Qt::SizeAllCursor);
    this->setCursor(this->mc_DefaultCursor);
 
    this->setLine(QLineF(0.0, 0.0, 0.0, 0.0));
@@ -145,6 +145,7 @@ void C_GiLiLineConnection::SetDefaultCursor(const QCursor & orc_Value)
    \param[in,out] opc_Widget  Widget
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_GiLiLineConnection::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                                  QWidget * const opc_Widget)
 {

@@ -66,8 +66,7 @@ const QString C_SdNdeHalcWidget::mhc_CONFIG_FILE_TYPE = ".syde_halc_conf";
 C_SdNdeHalcWidget::C_SdNdeHalcWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeHalcWidget),
-   mu32_NodeIndex(0),
-   mq_HalcDescriptionSelected(false)
+   mu32_NodeIndex(0)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -129,7 +128,6 @@ C_SdNdeHalcWidget::C_SdNdeHalcWidget(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeHalcWidget::~C_SdNdeHalcWidget()
 {
-   this->m_RunDatapoolMagician();
    delete this->mpc_Ui;
 }
 
@@ -241,15 +239,6 @@ void C_SdNdeHalcWidget::SetNode(const uint32 ou32_NodeIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save signal received. Generate the HAL Datapool in this case
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::Save(void)
-{
-   this->m_RunDatapoolMagician();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Jumps to the selected HALC channel
 
    \param[in]  ou32_DomainIndex     Index of HALC domain
@@ -263,20 +252,6 @@ void C_SdNdeHalcWidget::ShowChannel(const stw_types::uint32 ou32_DomainIndex,
 
    this->mpc_Ui->pc_TreeChannels->SelectChannel(ou32_DomainIndex, static_cast<uint32>(os32_ChannelIndex),
                                                 q_UseChannelIndex);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten hide event slot
-
-   Here: Generate/Update HAL Datapool
-
-   \param[in,out]  opc_Event  Event identification and information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::hideEvent(QHideEvent * const opc_Event)
-{
-   this->m_RunDatapoolMagician();
-   QWidget::hideEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -315,7 +290,8 @@ void C_SdNdeHalcWidget::m_OnImportConfigClicked(void)
 {
    const QString c_Folder =
       C_SdNdeHalcWidget::mh_GetDialogPath(C_UsHandler::h_GetInstance()->GetLastKnownHalcImportPath());
-   const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("openSYDE Hardware Configuration File")) + "(*" +
+   const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("openSYDE Hardware Configuration File")) +
+                            "(*" +
                             mhc_CONFIG_FILE_TYPE + ")";
 
    const QString c_FileName =
@@ -371,8 +347,7 @@ void C_SdNdeHalcWidget::m_OnImportConfigClicked(void)
       {
          c_PopUpDialog->HideOverlay();
       }
-
-   }  //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -395,7 +370,8 @@ void C_SdNdeHalcWidget::m_OnExportConfigClicked(void)
 
    c_FileName =
       C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("openSYDE Hardware Configuration Export"), c_Folder,
-                                     static_cast<QString>(C_GtGetText::h_GetText("openSYDE Hardware Configuration File")) +
+                                     static_cast<QString>(C_GtGetText::h_GetText(
+                                                             "openSYDE Hardware Configuration File")) +
                                      " (*" + mhc_CONFIG_FILE_TYPE + ")", c_DefaultName);
 
    if (c_FileName != "")
@@ -416,7 +392,7 @@ void C_SdNdeHalcWidget::m_OnExportConfigClicked(void)
 
       if (q_Continue == true)
       {
-         const stw_opensyde_core::C_OSCHalcConfig * pc_Config =
+         const stw_opensyde_core::C_OSCHalcConfig * const pc_Config =
             stw_opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
 
          if (pc_Config != NULL)
@@ -478,8 +454,8 @@ void C_SdNdeHalcWidget::m_OnCleanUpClicked(void) const
       this->mpc_Ui->pc_TreeChannels->Clear();
       this->m_ShowOverview(true);
 
-      // Inform Datapool overview about changed existence of HAL Datapools
-      Q_EMIT (this->SigHalcDataPoolChanged());
+      // Run HALC magician now because Datapool number changed
+      this->m_RunDatapoolMagician();
    }
 }
 
@@ -535,16 +511,16 @@ void C_SdNdeHalcWidget::m_OnSelectClicked(void)
             }
          }
       }
-      if (u32_NotHALCDpCount > (mu32_NODE_DATA_POOL_MAX - 2UL))
+      if (u32_NotHALCDpCount > (C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE - 2UL))
       {
          C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR);
 
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Select Hardware Description"));
          c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                "Cannot select hardware description,\n"
-                                                "because HAL Datapools may not be created,\n"
-                                                "as the max Datapool count (%1) would be exceeded.")).arg(
-                                        mu32_NODE_DATA_POOL_MAX));
+                                                             "Cannot select hardware description,\n"
+                                                             "because HAL Datapools may not be created,\n"
+                                                             "as the max Datapool count (%1) would be exceeded.")).arg(
+                                        C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE));
          c_MessageBox.SetCustomMinHeight(200, 270);
          c_MessageBox.Execute();
       }
@@ -571,9 +547,8 @@ void C_SdNdeHalcWidget::m_OnSelectClicked(void)
             this->m_UpdateNodeData();
             this->m_ShowOverview(true);
 
-            // Inform Datapool overview about changed existence of HAL Datapools
-            // The signal can not be emitted yet, the Datapools will be created by running the Datapool magician
-            this->mq_HalcDescriptionSelected = true;
+            // Run HALC magician now because Datapool number changed
+            this->m_RunDatapoolMagician();
          }
       }
    }
@@ -604,9 +579,10 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
             C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
             c_Message.SetHeading("Update Hardware Description");
             c_Message.SetDescription(
-               static_cast<QString>(C_GtGetText::h_GetText("The content version '%1' of the selected hardware description "
-                                              "equals the current hardware description version.\n"
-                                              "Do you want to update the hardware description anyway?")).
+               static_cast<QString>(C_GtGetText::h_GetText(
+                                       "The content version '%1' of the selected hardware description "
+                                       "equals the current hardware description version.\n"
+                                       "Do you want to update the hardware description anyway?")).
                arg(c_HalcConfig.u32_ContentVersion));
             c_Message.SetOKButtonText(C_GtGetText::h_GetText("Update"));
             c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
@@ -660,8 +636,7 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
             {
                c_PopUpDialog->HideOverlay();
             }
-
-         }  //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
+         } //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
       }
    }
 }
@@ -670,50 +645,14 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
 /*! \brief  Triggering Datapool magician.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::m_RunDatapoolMagician(void)
+void C_SdNdeHalcWidget::m_RunDatapoolMagician(void) const
 {
    const sint32 s32_Result = C_PuiSdHandler::h_GetInstance()->HALCGenerateDatapools(this->mu32_NodeIndex);
 
-   if (s32_Result == C_NO_ERR)
-   {
-      if (this->mq_HalcDescriptionSelected == true)
-      {
-         // Inform Datapool overview about changed existence of HAL Datapools
-         Q_EMIT (this->SigHalcDataPoolChanged());
-         this->mq_HalcDescriptionSelected = false;
-      }
-   }
-   else
-   {
-      C_OgeWiCustomMessage c_Message(this);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Generating DataPools for HALC"));
+   tgl_assert((s32_Result == C_NO_ERR) || (s32_Result == C_NOACT));
 
-      if (s32_Result == C_CONFIG)
-      {
-         c_Message.SetType(C_OgeWiCustomMessage::eERROR);
-         c_Message.SetDescription(C_GtGetText::h_GetText("Configuration Error!"));
-         c_Message.SetDetails(static_cast<QString>("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
-                              arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
-                              arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                              arg(C_GtGetText::h_GetText("log file")));
-         c_Message.SetCustomMinHeight(180, 300);
-
-         // update log file:
-         C_OSCLoggingHandler::h_Flush();
-      }
-      else if (s32_Result == C_RANGE)
-      {
-         c_Message.SetType(C_OgeWiCustomMessage::eERROR);
-         c_Message.SetDescription(C_GtGetText::h_GetText("Node index invalid."));
-         c_Message.SetCustomMinHeight(180, 180);
-      }
-      else
-      {
-         // Should not happen
-         tgl_assert(false);
-      }
-      c_Message.exec();
-   }
+   // Inform Datapool overview about changed existence of HAL Datapools
+   Q_EMIT (this->SigHalcDataPoolChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -831,9 +770,10 @@ bool C_SdNdeHalcWidget::m_LoadHalcDefinitionFile(C_OSCHalcConfig & orc_HalcConfi
                c_Message.SetHeading(C_GtGetText::h_GetText("Load hardware description"));
                c_Message.SetDescription(C_GtGetText::h_GetText("The selected hardware description is intended for a "
                                                                "different device type. Nothing was loaded."));
-               c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("The selected hardware description is for nodes "
-                                                                   "of type: %1\n"
-                                                                   "The current node is of type: %2")).
+               c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText(
+                                                            "The selected hardware description is for nodes "
+                                                            "of type: %1\n"
+                                                            "The current node is of type: %2")).
                                     arg(orc_HalcConfig.c_DeviceName.c_str()).
                                     arg(pc_Node->c_DeviceType.c_str()));
                c_Message.SetCustomMinHeight(200, 250);
@@ -889,7 +829,7 @@ void C_SdNdeHalcWidget::m_UpdatePinCount(void) const
       // Update pin counter
       for (uint32 u32_ItDomain = 0; u32_ItDomain < pc_Config->GetDomainSize(); u32_ItDomain++)
       {
-         const C_OSCHalcDefDomain * pc_Domain = pc_Config->GetDomainDefDataConst(u32_ItDomain);
+         const C_OSCHalcDefDomain * const pc_Domain = pc_Config->GetDomainDefDataConst(u32_ItDomain);
          if (pc_Domain != NULL)
          {
             if (pc_Domain->c_Channels.empty() == true)
@@ -904,7 +844,8 @@ void C_SdNdeHalcWidget::m_UpdatePinCount(void) const
       }
       if (u32_PinCount > 0)
       {
-         this->mpc_Ui->pc_PubOverview->setText(static_cast<QString>(C_GtGetText::h_GetText("Channel Overview (%1)")).arg(
+         this->mpc_Ui->pc_PubOverview->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                       "Channel Overview (%1)")).arg(
                                                   u32_PinCount));
       }
       else

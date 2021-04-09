@@ -59,7 +59,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SebGraphicsView",
    "stw_opensyde_gui--C_SyvUpUpdatePackageListWidget",
    "stw_opensyde_gui--C_SyvUpUpdatePackageListNodeWidget",
-   "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget",
+   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget",
    "stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView",
    "stw_opensyde_gui_elements--C_OgeSmoothScrollArea",
    "stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QAbstractScrollArea",
@@ -99,53 +99,29 @@ const std::vector<C_UtiStyleSheets::C_ElementColorConfig> C_UtiStyleSheets::mhc_
    C_UtiStyleSheets::C_ElementColorConfig(
       "stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"SKEUOMORPH_DARK\"]", mc_STYLE_GUIDE_COLOR_0),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"true\"]",
+      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"true\"][Active=\"true\"]",
       mc_STYLE_GUIDE_COLOR_4),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"true\"]",
+      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"true\"][Active=\"true\"]",
       mc_STYLE_GUIDE_COLOR_0),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"false\"]",
+      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"false\"][Active=\"true\"]",
       mc_STYLE_GUIDE_COLOR_34),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"false\"]",
-      mc_STYLE_GUIDE_COLOR_2),
+      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"false\"][Active=\"true\"]",
+      mc_STYLE_GUIDE_COLOR_10),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_2_BRIGHT\"][Selected=\"true\"]",
-      mc_STYLE_GUIDE_COLOR_3),
+      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"true\"][Active=\"false\"]",
+      mc_STYLE_GUIDE_COLOR_8),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_2_DARK\"][Selected=\"true\"]",
-      mc_STYLE_GUIDE_COLOR_0),
+      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"true\"][Active=\"false\"]",
+      mc_STYLE_GUIDE_COLOR_8),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_2_BRIGHT\"][Selected=\"false\"]",
-      mc_STYLE_GUIDE_COLOR_6),
+      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"false\"][Active=\"false\"]",
+      mc_STYLE_GUIDE_COLOR_8),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_2_DARK\"][Selected=\"false\"]",
-      mc_STYLE_GUIDE_COLOR_0),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"FLAT_BRIGHT\"][Selected=\"true\"]",
-      mc_STYLE_GUIDE_COLOR_1),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"FLAT_DARK\"][Selected=\"true\"]",
-      mc_STYLE_GUIDE_COLOR_0),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"FLAT_BRIGHT\"][Selected=\"false\"]",
-      mc_STYLE_GUIDE_COLOR_34),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"FLAT_DARK\"][Selected=\"false\"]",
-      mc_STYLE_GUIDE_COLOR_36),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"SKEUOMORPH_BRIGHT\"][Selected=\"true\"]",
-      mc_STYLE_GUIDE_COLOR_0),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"SKEUOMORPH_DARK\"][Selected=\"true\"]",
-      mc_STYLE_GUIDE_COLOR_0),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"SKEUOMORPH_BRIGHT\"][Selected=\"false\"]",
-      mc_STYLE_GUIDE_COLOR_34),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"SKEUOMORPH_DARK\"][Selected=\"false\"]",
-      mc_STYLE_GUIDE_COLOR_37)
+      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"false\"][Active=\"false\"]",
+      mc_STYLE_GUIDE_COLOR_8)
 }
    );
 
@@ -184,10 +160,10 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui--C_SebGraphicsView QScrollBar[DarkMode=\"false\"]",
    "stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar",
    "stw_opensyde_gui--C_SyvUpUpdatePackageListNodeWidget QScrollBar",
-   "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"OPENSYDE_BRIGHT\"]",
-   "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"FLAT_BRIGHT\"]",
-   "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_BRIGHT\"]",
-   "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_BRIGHT\"]",
+   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_BRIGHT\"]",
+   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"FLAT_BRIGHT\"]",
+   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_BRIGHT\"]",
+   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_BRIGHT\"]",
    "stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView QScrollBar",
    "stw_opensyde_gui_elements--C_OgeSmoothScrollArea[DarkMode=\"false\"] QScrollBar",
    "stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView QScrollBar",
@@ -223,10 +199,10 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsDark(
    "stw_opensyde_gui--C_SebGraphicsView QScrollBar[DarkMode=\"true\"]",
    "stw_opensyde_gui_elements--C_OgeSmoothScrollArea QScrollBar[DarkMode=\"true\"]",
    "stw_opensyde_gui_elements--C_OgeDarkScrollArea QScrollBar[DarkMode=\"true\"]",
-   "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"OPENSYDE_DARK\"]",
-   "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"FLAT_DARK\"]",
-   "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_DARK\"]",
-   "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_DARK\"]"
+   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_DARK\"]",
+   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"FLAT_DARK\"]",
+   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_DARK\"]",
+   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_DARK\"]"
 }
    );
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_ScrollBarPropertiesDark(
@@ -296,7 +272,6 @@ QString C_UtiStyleSheets::h_GetStylesheet(void)
    mh_AppendScrollBarStyleSheet(C_UtiStyleSheets::mhc_ScrollAreaElements, C_UtiStyleSheets::mhc_ScrollAreaProperties,
                                 c_Stylesheet);
 
-   mh_AppendStylesheet("://styles/Charts.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/CheckBox.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/Color.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/ComboBox.qss", c_Stylesheet);

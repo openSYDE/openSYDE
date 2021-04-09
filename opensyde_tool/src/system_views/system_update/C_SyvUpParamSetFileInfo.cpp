@@ -161,7 +161,8 @@ void C_SyvUpParamSetFileInfo::m_Comparison(const bool oq_OptionlContentMissing)
                rc_NoDp.CalcDefinitionHash(u32_DpHash);
                //Datapool CRC
                this->m_CompareString(static_cast<QString>("0x%1").arg(rc_InDp.c_DataPoolInfo.u32_DataPoolCrc, 0, 16),
-                                     static_cast<QString>("0x%1").arg(u32_DpHash, 0, 16), C_GtGetText::h_GetText("Datapool CRC"),
+                                     static_cast<QString>("0x%1").arg(u32_DpHash, 0, 16),
+                                     C_GtGetText::h_GetText("Datapool CRC"),
                                      1UL);
                //Datapool NVM start address
                if (oq_OptionlContentMissing)
@@ -316,7 +317,8 @@ void C_SyvUpParamSetFileInfo::m_ConvertToHtmlString(const bool oq_OptionlContent
    //Comparison
    this->mc_ComparisonHtml += "<h3>" + static_cast<QString>(C_GtGetText::h_GetText("Comparison result")) + "</h3>";
    this->mc_ComparisonHtml += "<p>" +
-                              static_cast<QString>(C_GtGetText::h_GetText("Compare selected file with current SYSTEM DEFINITION.")) +
+                              static_cast<QString>(C_GtGetText::h_GetText(
+                                                      "Compare selected file with current SYSTEM DEFINITION.")) +
                               "</p>";
    this->mc_ComparisonHtml += "<table>";
 
@@ -481,7 +483,8 @@ QString C_SyvUpParamSetFileInfo::mh_GetVersionString(const uint32 ou32_VersionBy
                                                      const uint32 ou32_VersionByte3)
 {
    const QString c_Retval =
-      static_cast<QString>("v%1.%2r%3").arg(ou32_VersionByte1, 2, 10, QChar('0')).arg(ou32_VersionByte2, 2, 10, QChar('0')).arg(
+      static_cast<QString>("v%1.%2r%3").arg(ou32_VersionByte1, 2, 10, QChar('0')).arg(ou32_VersionByte2, 2, 10,
+                                                                                      QChar('0')).arg(
          ou32_VersionByte3, 2, 10, QChar('0'));
 
    return c_Retval;

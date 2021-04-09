@@ -132,13 +132,13 @@ sint32 C_OSCDeviceManager::AddDevice(const stw_scl::C_SCLString & orc_DeviceDefi
       bool q_NewGroupNecessary = true;
 
       // Check number of devices in group
-      sintn sn_NumDevices = c_Ini.ReadInteger(orc_DeviceGroup, "DeviceCount", 0);
+      const sintn sn_NumDevices = c_Ini.ReadInteger(orc_DeviceGroup, "DeviceCount", 0);
 
       // Write device count in the list in order
       c_Ini.WriteInteger(orc_DeviceGroup, "DeviceCount", sn_NumDevices + 1);
 
       // Write device in the list in order
-      c_Ini.WriteString(orc_DeviceGroup, "Device" + C_SCLString(sn_NumDevices + 1), orc_DeviceDefinitionFile);
+      c_Ini.WriteString(orc_DeviceGroup, "Device" + C_SCLString::IntToStr(sn_NumDevices + 1), orc_DeviceDefinitionFile);
 
       for (uint32 u32_DeviceGroupCounter = 0U; u32_DeviceGroupCounter < this->mc_DeviceGroups.size();
            ++u32_DeviceGroupCounter)
@@ -214,9 +214,9 @@ sint32 C_OSCDeviceManager::ChangeDevices(std::vector<C_OSCDeviceDefinition> & or
    if (s32_Return == C_NO_ERR)
    {
       // Check number of devices in group bevor deleting a device
-      sintn sn_NumDevicesBevorChanges = c_Ini.ReadInteger(orc_DeviceGroup, "DeviceCount", 0);
+      const sintn sn_NumDevicesBeforeChanges = c_Ini.ReadInteger(orc_DeviceGroup, "DeviceCount", 0);
 
-      if (sn_NumDevicesBevorChanges > 0)
+      if (sn_NumDevicesBeforeChanges > 0)
       {
          c_Ini.EraseSection(orc_DeviceGroup);
 
@@ -226,7 +226,7 @@ sint32 C_OSCDeviceManager::ChangeDevices(std::vector<C_OSCDeviceDefinition> & or
          for (uint32 u32_ItDevice = 0; u32_ItDevice < orc_Devices.size(); ++u32_ItDevice)
          {
             // Write device in the list in order
-            c_Ini.WriteString(orc_DeviceGroup, "Device" + C_SCLString(u32_ItDevice + 1),
+            c_Ini.WriteString(orc_DeviceGroup, "Device" + C_SCLString::IntToStr(u32_ItDevice + 1),
                               orc_Devices[u32_ItDevice].c_FilePath.c_str());
          }
 
@@ -307,14 +307,15 @@ sint32 C_OSCDeviceManager::LoadFromFile(const C_SCLString & orc_File, const bool
 
    //Ini with toolbox structure definition
    C_SCLIniFile c_Ini(orc_File);
-   sintn sn_NumTypes = c_Ini.ReadInteger("DeviceTypes", "NumTypes", 0);
+   const sintn sn_NumTypes = c_Ini.ReadInteger("DeviceTypes", "NumTypes", 0);
 
    //Parse groups
    for (sintn sn_ItType = 0; sn_ItType < sn_NumTypes; ++sn_ItType)
    {
       //Get group name
       C_OSCDeviceGroup c_Group;
-      const C_SCLString c_GroupName = c_Ini.ReadString("DeviceTypes", "TypeName" + C_SCLString(sn_ItType + 1), "");
+      const C_SCLString c_GroupName = c_Ini.ReadString("DeviceTypes", "TypeName" + C_SCLString::IntToStr(
+                                                          sn_ItType + 1), "");
       c_Group.SetGroupName(c_GroupName.c_str());
       s32_Return = c_Group.LoadGroup(c_Ini, TGL_ExtractFilePath(orc_File));
 

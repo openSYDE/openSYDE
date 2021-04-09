@@ -69,8 +69,9 @@ private:
    void m_ErrorChange(void);
    void m_GenerateCode(void) const;
    void m_Export(void);
-   void m_Import(void);
+   void m_Import(void) const;
    void m_RtfExport(void);
+   void m_GenerateHalcDatapools(void) const;
 
    Ui::C_SdHandlerWidget * mpc_Ui;
    C_SdTopologyWidget * mpc_Topology;

@@ -30,6 +30,7 @@
 #include "TGLUtils.h"
 #include "C_GiCustomFunctions.h"
 #include "C_Uti.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_SebUnoZOrderSortHelper.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -199,7 +200,7 @@ void C_SebScene::BlockContextMenu(void)
 void C_SebScene::DisplayToolTip(const QPointF & orc_ScenePos)
 {
    //Check if item has tool tip
-   const C_GiBiCustomToolTip * pc_ToolTip =
+   const C_GiBiCustomToolTip * const pc_ToolTip =
       dynamic_cast<C_GiBiCustomToolTip *>(C_SebUtil::h_GetHighestParent(this->itemAt(orc_ScenePos,
                                                                                      QTransform())));
 
@@ -1121,17 +1122,20 @@ void C_SebScene::m_UpdateSelection(QGraphicsItem * const opc_Item, const bool oq
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_SelectAll(void) const
 {
+   const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
+
    QList<QGraphicsItem *> c_ListItems = this->items();
 
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_ListItems.begin(); c_ItItem != c_ListItems.end();
         ++c_ItItem)
    {
-      QGraphicsItem * pc_Graphics = *c_ItItem;
+      QGraphicsItem * const pc_Graphics = *c_ItItem;
       if (pc_Graphics != NULL)
       {
          pc_Graphics->setSelected(true);
       }
    }
+   osc_write_log_performance_stop(u16_Timer, "Scene Select All");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1167,6 +1171,7 @@ void C_SebScene::m_HandleProxyWidgetInteractionChange(const bool & orq_On)
    \param[in] orc_Position Image scene position
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in implementation of pure virtual function of base class
 void C_SebScene::m_AddImage(const QString & orc_Path, const QPointF & orc_Position)
 {
    Q_UNUSED(orc_Path)
@@ -1233,7 +1238,7 @@ void C_SebScene::m_MapFromGlobal(const QPoint & orc_GlobalPos, QPointF & orc_Sce
    // convert coordinates
    tgl_assert(c_Views.size() > 0);
    // adapt the coordinates if zoom was used
-   QPoint c_Tmp = c_Views[0]->mapFromGlobal(orc_GlobalPos);
+   const QPoint c_Tmp = c_Views[0]->mapFromGlobal(orc_GlobalPos);
    // adapt the coordinates to screen coordinates for the context menu
    orc_ScenePos = c_Views[0]->mapToScene(c_Tmp);
 }
@@ -1354,7 +1359,7 @@ void C_SebScene::m_Clear(void)
    \param[in,out] opc_Item Line based item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebScene::m_RemoveLineGroupOfScene(C_GiLiLineGroup * const opc_Item)
+void C_SebScene::m_RemoveLineGroupOfScene(const C_GiLiLineGroup * const opc_Item) const
 {
    //Move
    disconnect(opc_Item, &C_GiLiLineGroup::SigItemWasMoved, this, &C_SebScene::m_HandleRevertableMove);
@@ -1369,7 +1374,7 @@ void C_SebScene::m_RemoveLineGroupOfScene(C_GiLiLineGroup * const opc_Item)
    \param[in,out] opc_Item Rectangle based item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebScene::m_RemoveRectBaseGroupOfScene(C_GiBiRectBaseGroup * const opc_Item)
+void C_SebScene::m_RemoveRectBaseGroupOfScene(const C_GiBiRectBaseGroup * const opc_Item) const
 {
    //Move
    disconnect(opc_Item, &C_GiBiRectBaseGroup::SigItemWasMoved, this, &C_SebScene::m_HandleRevertableMove);
@@ -1449,6 +1454,7 @@ bool C_SebScene::m_HandleDeleteUserConfirmation(const QList<QGraphicsItem *> & o
    \param[in] opc_Pos Optional position to paste at (Otherwise current mouse cursor position is chosen)
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in implementation of pure virtual function of base class
 void C_SebScene::m_PasteOfClipBoard(const QPointF * const opc_Pos)
 {
    //Default no action

@@ -51,9 +51,9 @@ using namespace stw_scl;
 void CMD5Checksum::mh_MD5Compress(C_HashState * const opc_HashState, const uint8 * const opu8_Buffer)
 {
 #define LOAD32L(x, y)                            \
-   (x) = (static_cast<uint32>((y)[3] & 255U) << 24) | \
-         (static_cast<uint32>((y)[2] & 255U) << 16) | \
-         (static_cast<uint32>((y)[1] & 255U) << 8)  | \
+   (x) = (static_cast<uint32>((y)[3] & 255U) << 24U) | \
+         (static_cast<uint32>((y)[2] & 255U) << 16U) | \
+         (static_cast<uint32>((y)[1] & 255U) << 8U)  | \
          (static_cast<uint32>((y)[0] & 255U));
 
 #define F(x, y, z)  ((z) ^ ((x) & ((y) ^ (z))))
@@ -84,7 +84,7 @@ void CMD5Checksum::mh_MD5Compress(C_HashState * const opc_HashState, const uint8
    uint32 u32_D;
 
    /* copy the state into 512-bits into W[0..15] */
-   for (uint32 u32_I = 0; u32_I < 16; u32_I++)
+   for (uint32 u32_I = 0U; u32_I < 16U; u32_I++)
    {
       LOAD32L(au32_W[u32_I], &opu8_Buffer[4 * u32_I]);
    }
@@ -249,14 +249,14 @@ sint32 CMD5Checksum::mh_MD5Process(C_HashState * const opc_HashState, const uint
 sint32 CMD5Checksum::mh_MD5Done(C_HashState * const opc_HashState, uint8 * const opu8_Output)
 {
 #define STORE32L(x, y)                                                                     \
-   (y)[3] = static_cast<uint8>(((x) >> 24) & 255U); (y)[2] = static_cast<uint8>(((x) >> 16) & 255U);   \
-   (y)[1] = static_cast<uint8>(((x) >> 8) & 255U); (y)[0] = static_cast<uint8>((x) & 255U);
+   (y)[3] = static_cast<uint8>(((x) >> 24U) & 255U); (y)[2] = static_cast<uint8>(((x) >> 16U) & 255U);   \
+   (y)[1] = static_cast<uint8>(((x) >> 8U) & 255U); (y)[0] = static_cast<uint8>((x) & 255U);
 
 #define STORE64L(x, y)                                                                     \
-   (y)[7] = static_cast<uint8>(((x) >> 56) & 255U); (y)[6] = static_cast<uint8>(((x) >> 48) & 255U);   \
-   (y)[5] = static_cast<uint8>(((x) >> 40) & 255U); (y)[4] = static_cast<uint8>(((x) >> 32) & 255U);   \
-   (y)[3] = static_cast<uint8>(((x) >> 24) & 255U); (y)[2] = static_cast<uint8>(((x) >> 16) & 255U);   \
-   (y)[1] = static_cast<uint8>(((x) >> 8) & 255U); (y)[0] = static_cast<uint8>((x) & 255U);
+   (y)[7] = static_cast<uint8>(((x) >> 56U) & 255U); (y)[6] = static_cast<uint8>(((x) >> 48U) & 255U);   \
+   (y)[5] = static_cast<uint8>(((x) >> 40U) & 255U); (y)[4] = static_cast<uint8>(((x) >> 32U) & 255U);   \
+   (y)[3] = static_cast<uint8>(((x) >> 24U) & 255U); (y)[2] = static_cast<uint8>(((x) >> 16U) & 255U);   \
+   (y)[1] = static_cast<uint8>(((x) >> 8U) & 255U); (y)[0] = static_cast<uint8>((x) & 255U);
 
    if (opc_HashState->u32_CurLen >= sizeof(opc_HashState->au8_Buffer))
    {

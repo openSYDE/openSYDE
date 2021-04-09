@@ -208,8 +208,9 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OS
       if (orc_Application.u16_GenCodeVersion > mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION)
       {
          orc_Application.u16_GenCodeVersion = mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION;
-         orc_Warnings.append(static_cast<QString>(C_GtGetText::h_GetText("Code structure version of application %1 is unknown and "
-                                                            "therefore set to most recent version %2.\n")).
+         orc_Warnings.append(static_cast<QString>(C_GtGetText::h_GetText(
+                                                     "Code structure version of application %1 is unknown and "
+                                                     "therefore set to most recent version %2.\n")).
                              arg(orc_Application.c_Name.c_str()).arg(mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION));
       }
 
@@ -317,7 +318,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
          break;
       }
       c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                          "Could not load specified openSYDE Target Support Package.")));
+                                                       "Could not load specified openSYDE Target Support Package.")));
       c_Message.SetDetails(c_Details);
       c_Message.SetCustomMinHeight(180, 250);
       c_Message.Execute();
@@ -333,7 +334,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
          c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                             "No openSYDE Target Support Package specified")));
+                                                          "No openSYDE Target Support Package specified")));
          c_Message.SetCustomMinHeight(180, 180);
          c_Message.Execute();
       }
@@ -342,8 +343,9 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
          c_Message.SetDescription(
-            static_cast<QString>(C_GtGetText::h_GetText("The openSYDE Target Support Package device \"%1\" does not match the "
-                                           "device \"%2\" of this node")).
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "The openSYDE Target Support Package device \"%1\" does not match the "
+                                    "device \"%2\" of this node")).
             arg(this->mc_Package.c_DeviceName.c_str()).
             arg(pc_Node->c_DeviceType.c_str()));
          c_Message.SetCustomMinHeight(230, 180);
@@ -353,7 +355,8 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
       {
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
-         c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Define a directory for the project here.")));
+         c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Define a directory for the project here.")));
          c_Message.SetCustomMinHeight(180, 180);
          c_Message.Execute();
       }
@@ -366,8 +369,10 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
          c_Message.SetNOButtonText(C_GtGetText::h_GetText("Continue without Clearing"));
          c_Message.SetOKButtonText(C_GtGetText::h_GetText("Clear and Continue"));
          c_Message.SetDescription(
-            static_cast<QString>(C_GtGetText::h_GetText("Directory \"%1\" is not empty. \n\nShould this directory be cleared? "
-                                           "Attention: Your data will be lost!")).arg(c_CreateInFolder.absolutePath()));
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "Directory \"%1\" is not empty. \n\nShould this directory be cleared? "
+                                    "Attention: Your data will be lost!")).arg(c_CreateInFolder.
+                                                                               absolutePath()));
          c_Message.SetCustomMinHeight(230, 230);
          c_Message.SetCustomMinWidth(800);
 
@@ -424,8 +429,10 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
       {
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
-         c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Could not extract openSYDE Target Support Package "
-                                                                 "from file \"%1\" to directory \"%2\".")).arg(c_Path).
+         c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Could not extract openSYDE Target Support Package "
+                                                          "from file \"%1\" to directory \"%2\".")).arg(
+                                     c_Path).
                                   arg(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->
                                                                               GetPath())));
          c_Message.SetCustomMinWidth(800);
@@ -577,7 +584,8 @@ void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
    for (uint32 u32_ItTemplate = 0UL; u32_ItTemplate < this->mc_Package.c_Applications.size(); ++u32_ItTemplate)
    {
       const C_OSCTSPApplication & rc_Template = this->mc_Package.c_Applications[u32_ItTemplate];
-      orc_Content += "<h4>" + static_cast<QString>(C_GtGetText::h_GetText("Data Block %1")).arg(u32_ItTemplate + 1UL) + "</h4>";
+      orc_Content += "<h4>" + static_cast<QString>(C_GtGetText::h_GetText("Data Block %1")).arg(u32_ItTemplate + 1UL) +
+                     "</h4>";
       orc_Content += "<table>";
       orc_Content += "<tr>";
       orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;

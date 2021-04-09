@@ -104,13 +104,10 @@ C_SdNdeDpListArrayEditView::C_SdNdeDpListArrayEditView(QWidget * const opc_Paren
    //Corner button label
    {
       this->mpc_LabelCorner = new QLabel(this);
-      tgl_assert(this->mpc_LabelCorner != NULL);
-      if (this->mpc_LabelCorner != NULL)
-      {
-         this->mpc_LabelCorner->setAlignment(Qt::AlignCenter);
-         this->mpc_LabelCorner->setAttribute(Qt::WA_TransparentForMouseEvents);
-         this->mpc_LabelCorner->setText(C_GtGetText::h_GetText("Index"));
-      }
+      this->mpc_LabelCorner->setAlignment(Qt::AlignCenter);
+      this->mpc_LabelCorner->setAttribute(Qt::WA_TransparentForMouseEvents);
+      this->mpc_LabelCorner->setText(C_GtGetText::h_GetText("Index"));
+
       connect(
          this->verticalHeader(), &QHeaderView::geometriesChanged, this,
          &C_SdNdeDpListArrayEditView::m_UpdateCornerButton);
@@ -126,6 +123,7 @@ C_SdNdeDpListArrayEditView::C_SdNdeDpListArrayEditView(QWidget * const opc_Paren
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent and the Qt memory management or never took ownership
 C_SdNdeDpListArrayEditView::~C_SdNdeDpListArrayEditView(void)
 {
    if (this->mpc_ModelViewManager != NULL)
@@ -134,7 +132,6 @@ C_SdNdeDpListArrayEditView::~C_SdNdeDpListArrayEditView(void)
                                                           this->mu32_ListIndex, this->mu32_ElementIndex,
                                                           this->me_ArrayEditType, this->mu32_DataSetIndex, this);
    }
-   //lint -e{1540,1740}  no memory leak because of the parent and the Qt memory management or never took ownership
 }
 
 //----------------------------------------------------------------------------------------------------------------------

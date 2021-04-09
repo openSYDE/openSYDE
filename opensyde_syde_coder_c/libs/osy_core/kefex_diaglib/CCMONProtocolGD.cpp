@@ -96,24 +96,24 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
    C_SCLString c_HelpHystHigh;
    C_SCLString c_HelpHystLow;
 
-   if((orc_Msg.u32_ID < 0x600) || (orc_Msg.u32_ID > 0x6FF))
+   if((orc_Msg.u32_ID < 0x600) || (orc_Msg.u32_ID > 0x6FFU))
    {
       return "";
    }
 
    //get sender "network segment" and "node number"
-   u8_SenderSegment = static_cast<uint8>((orc_Msg.u32_ID & 0xF0U) >> 4);
+   u8_SenderSegment = static_cast<uint8>((orc_Msg.u32_ID & 0xF0U) >> 4U);
    u8_SenderNode    = static_cast<uint8>(orc_Msg.u32_ID & 0x0FU);
    c_HelpSender = m_GetByteAsStringFormat(u8_SenderSegment) + "/" + m_GetByteAsStringFormat(u8_SenderNode);
 
    //get receiver "network segment" and "node number"
-   u8_ReceiverSegment = static_cast<uint8>((orc_Msg.au8_Data[0] & 0xF0U) >> 4);
+   u8_ReceiverSegment = static_cast<uint8>((orc_Msg.au8_Data[0] & 0xF0U) >> 4U);
    u8_ReceiverNode    = static_cast<uint8>(orc_Msg.au8_Data[0] & 0x0FU);
    c_HelpReceiver = m_GetByteAsStringFormat(u8_ReceiverSegment) + "/" + m_GetByteAsStringFormat(u8_ReceiverNode);
 
    //get the variables index:
    u16_VariableIndex = static_cast<uint16>(orc_Msg.au8_Data[1] +
-                     ((static_cast<uint16>(orc_Msg.au8_Data[2]) & 0x7FU) << 8));
+                     ((static_cast<uint16>(orc_Msg.au8_Data[2]) & 0x7FU) << 8U));
 
    //response or request
    if((orc_Msg.au8_Data[2] & 0x80U) == 0x80U)
@@ -142,7 +142,7 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
       else
       {
          //response
-         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8));
+         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8U));
          c_Text = c_HelpSender +
                  " -> " +
                  c_HelpReceiver +
@@ -163,7 +163,7 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
       else
       {
          //response
-         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8));
+         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8U));
          c_Text = c_HelpSender + " -> " + c_HelpReceiver + ", SRR RES HS IDX: " +
                  m_GetValueDecHex(u16_VariableIndex) + ", DATA: " + m_GetValueDecHex(u16_Data);
       }
@@ -230,7 +230,7 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
       else
       {
          //response
-         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8));
+         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8U));
          c_Text = c_HelpSender + " -> " +
                  c_HelpReceiver + ", ECRR RES IDX: " +
                  m_GetValueDecHex(u16_VariableIndex) + ", DATA: " +
@@ -296,7 +296,7 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
       else
       {
          //response
-         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8));
+         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8U));
          c_Text = c_HelpSender + " -> " +
                  c_HelpReceiver + ", ECRR RES HS IDX: " +
                  m_GetValueDecHex(u16_VariableIndex) + ", DATA: " +
@@ -332,7 +332,7 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
       else
       {
          //response
-         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8));
+         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8U));
          c_Text = c_HelpSender + " -> " + c_HelpReceiver + ", TCRR RES IDX: " + m_GetValueDecHex(u16_VariableIndex) +
                  ", DATA: " + m_GetValueDecHex(u16_Data);
       }
@@ -361,7 +361,7 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
       break;
    case GD_IMMEDIATE_WRITE_WO_HS:
       //immeditate write without handshake
-      u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8));
+      u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8U));
       c_Text = c_HelpSender + " -> " + c_HelpReceiver + ", IMMEDIATE WRITE IDX: " +
               m_GetValueDecHex(u16_VariableIndex) + ", DATA: " + m_GetValueDecHex(u16_Data);
       break;
@@ -370,7 +370,7 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
       if (q_IsRequest == true)
       {
          //request
-         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8));
+         u16_Data = static_cast<uint16>(orc_Msg.au8_Data[5] + (static_cast<uint16>(orc_Msg.au8_Data[6]) << 8U));
          c_Text = c_HelpSender + " -> " + c_HelpReceiver + ", IMMEDIATE WRITE HS IDX: " +
                  m_GetValueDecHex(u16_VariableIndex) + ", DATA: " + m_GetValueDecHex(u16_Data);
       }
@@ -389,10 +389,10 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
          case 0x0U:
             //block transfer read request
             u16_NumberOfBytes = static_cast<uint16>(orc_Msg.au8_Data[4] +
-                               (static_cast<uint16>(orc_Msg.au8_Data[5]) << 8));
+                               (static_cast<uint16>(orc_Msg.au8_Data[5]) << 8U));
             c_Text = c_HelpSender + " -> " + c_HelpReceiver + ", BLOCK TRANSFER READ REQ IDX: " +
                     m_GetValueDecHex(u16_VariableIndex) + ", NOB: " + m_GetValueDecHex(u16_NumberOfBytes) +
-                    ", REP: " + m_GetValueDecHex(orc_Msg.au8_Data[7] >> 4) + ", ACK: " +
+                    ", REP: " + m_GetValueDecHex(orc_Msg.au8_Data[7] >> 4U) + ", ACK: " +
                     m_GetValueDecHex(orc_Msg.au8_Data[7] & 0x0FU);
             break;
          case 0x2DU:
@@ -421,10 +421,10 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
          case 0x80U:
             //block transfer write request
             u16_NumberOfBytes = static_cast<uint16>(orc_Msg.au8_Data[4] +
-                             (static_cast<uint16>(orc_Msg.au8_Data[5]) << 8));
+                             (static_cast<uint16>(orc_Msg.au8_Data[5]) << 8U));
             c_Text = c_HelpSender + " -> " + c_HelpReceiver + ", BLOCK TRANSFER WRITE REQ IDX: " +
                     m_GetValueDecHex(u16_VariableIndex) + ", NOB: " + m_GetValueDecHex(u16_NumberOfBytes) +
-                    ", REP: " + m_GetValueDecHex(orc_Msg.au8_Data[7] >> 4) +
+                    ", REP: " + m_GetValueDecHex(orc_Msg.au8_Data[7] >> 4U) +
                     ", ACK: " + m_GetValueDecHex(orc_Msg.au8_Data[7] & 0x0FU);
             break;
          case 0xACU:
@@ -550,26 +550,26 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
    case GD_LIFE_MESSAGE:
       //life messages (with mapped system time in [ms])
       u32_SysTime = static_cast<uint32>(orc_Msg.au8_Data[4]) +
-                  (static_cast<uint32>(orc_Msg.au8_Data[5]) << 8 ) +
-                  (static_cast<uint32>(orc_Msg.au8_Data[6]) << 16) +
-                  (static_cast<uint32>(orc_Msg.au8_Data[7]) << 24);
+                  (static_cast<uint32>(orc_Msg.au8_Data[5]) << 8U ) +
+                  (static_cast<uint32>(orc_Msg.au8_Data[6]) << 16U) +
+                  (static_cast<uint32>(orc_Msg.au8_Data[7]) << 24U);
       c_Text = c_HelpSender +
               ", LIFE (SYSTIME: " + m_GetValueDecHex(u32_SysTime) + "ms)";
       break;
    case GD_LOGON:
       //logon messages (with mapped system time in [ms])
       u32_SysTime = static_cast<uint32>(orc_Msg.au8_Data[4]) +
-                   (static_cast<uint32>(orc_Msg.au8_Data[5]) << 8 ) +
-                   (static_cast<uint32>(orc_Msg.au8_Data[6]) << 16) +
-                   (static_cast<uint32>(orc_Msg.au8_Data[7]) << 24);
+                   (static_cast<uint32>(orc_Msg.au8_Data[5]) << 8U ) +
+                   (static_cast<uint32>(orc_Msg.au8_Data[6]) << 16U) +
+                   (static_cast<uint32>(orc_Msg.au8_Data[7]) << 24U);
       c_Text = c_HelpSender + ", LOGON (SYSTIME: " + m_GetValueDecHex(u32_SysTime) + "ms)";
       break;
    case GD_LOGOFF:
       //logon messages (with mapped system time in [ms])
       u32_SysTime = static_cast<uint32>(orc_Msg.au8_Data[4]) +
-                   (static_cast<uint32>(orc_Msg.au8_Data[5]) << 8 ) +
-                   (static_cast<uint32>(orc_Msg.au8_Data[6]) << 16) +
-                   (static_cast<uint32>(orc_Msg.au8_Data[7]) << 24);
+                   (static_cast<uint32>(orc_Msg.au8_Data[5]) << 8U ) +
+                   (static_cast<uint32>(orc_Msg.au8_Data[6]) << 16U) +
+                   (static_cast<uint32>(orc_Msg.au8_Data[7]) << 24U);
       c_Text = c_HelpSender + ", LOGOFF (SYSTIME: " + m_GetValueDecHex(u32_SysTime) + "ms)";
       break;
    default:

@@ -10,8 +10,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
@@ -65,7 +65,7 @@ static const uint8 mu8_XFL_CMD_GET_ERASE_COUNT     = 0x03U;
 static const uint8 mu8_XFL_CMD_GET_DEVICE_ID       = 0x04U;
 static const uint8 mu8_XFL_CMD_GET_CONTROL_ID      = 0x05U;
 static const uint8 mu8_XFL_CMD_GET_SEC_CRC         = 0x06U;
-static const uint8 mu8_XFL_CMD_GET_SEC_MODE_COMPARE= 0x07U;
+static const uint8 mu8_XFL_CMD_GET_SEC_MODE_COMPARE = 0x07U;
 static const uint8 mu8_XFL_CMD_GET_TIMEOUT_FACTOR  = 0x08U;
 static const uint8 mu8_XFL_CMD_GET_LAST_USER       = 0x09U;
 static const uint8 mu8_XFL_CMD_GET_FLASH_INFORMATION   = 0x0AU;
@@ -192,11 +192,12 @@ sint32 C_XFLAliasedRanges::GetRangeOccupiedByAddress(const uint32 ou32_Address, 
 {
    sint32 s32_Return = C_RANGE;
    sint32 s32_Index;
+
    oru8_Range = 0U;
    for (s32_Index = 0; s32_Index < this->GetLength(); s32_Index++)
    {
-      if ((ou32_Address >= this->operator[](s32_Index).u32_AliasedAddress) &&
-          (ou32_Address < (this->operator[](s32_Index).u32_AliasedAddress + this->operator[](s32_Index).u32_Size)))
+      if ((ou32_Address >= this->operator [](s32_Index).u32_AliasedAddress) &&
+          (ou32_Address < (this->operator [](s32_Index).u32_AliasedAddress + this->operator [](s32_Index).u32_Size)))
       {
          oru8_Range = static_cast<uint8>(s32_Index);
          s32_Return = C_NO_ERR;
@@ -320,20 +321,20 @@ uint8 C_XFLProtocol::mh_DEC2BCD(const uint8 ou8_DECValue)
 
 //----------------------------------------------------------------------------------------------------------------------
 //convert array of 4 bytes in little-endian order to uint32 value
-uint32 C_XFLProtocol::mh_AU8_2_U32_LE(const stw_types::uint8 * const opu8_Data)
+uint32 C_XFLProtocol::mh_AU8ToU32LE(const stw_types::uint8 * const opu8_Data)
 {
-   return ( (static_cast<uint32>(opu8_Data[0])) +
-           ((static_cast<uint32>(opu8_Data[1])) <<  8) +
-           ((static_cast<uint32>(opu8_Data[2])) << 16) +
-           ((static_cast<uint32>(opu8_Data[3])) << 24) );
+   return ((static_cast<uint32>(opu8_Data[0])) +
+           ((static_cast<uint32>(opu8_Data[1])) <<  8U) +
+           ((static_cast<uint32>(opu8_Data[2])) << 16U) +
+           ((static_cast<uint32>(opu8_Data[3])) << 24U));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 //convert array of 2 bytes in little-endian order to uint16 value
-uint16 C_XFLProtocol::mh_AU8_2_U16_LE(const stw_types::uint8 * const opu8_Data)
+uint16 C_XFLProtocol::mh_AU8ToU16LE(const stw_types::uint8 * const opu8_Data)
 {
-   return (                      (static_cast<uint16>(opu8_Data[0])) +
-             static_cast<uint16>((static_cast<uint16>(opu8_Data[1])) <<  8));
+   return ((static_cast<uint16>(opu8_Data[0])) +
+           static_cast<uint16>((static_cast<uint16>(opu8_Data[1])) <<  8U));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -341,7 +342,7 @@ uint16 C_XFLProtocol::mh_AU8_2_U16_LE(const stw_types::uint8 * const opu8_Data)
 
    Set comm dispatcher driver to use.
    Will register a client with the installed driver.
-   
+
    \param[in]   opc_CANDispatcher  comm dispatcher to use (NULL: remove installed dispatcher)
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -359,14 +360,14 @@ void C_XFLProtocol::CfgSetCommDispatcher(C_CAN_Dispatcher * const opc_CANDispatc
       //new registration:
       mc_Config.pc_CANDispatcher->RegisterClient(mu16_CANDispatcherHandle, NULL);
       m_UpdateDispatcherRXFilter();
-   }   
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Make used CAN bitrate known to this class
 
    The configured bitrate is used for internal bus load calculations
-   
+
    \param[in]   ou32_Bitrate   bitrate the CAN bus runs at
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -379,7 +380,7 @@ void C_XFLProtocol::CfgSetBitrate(const uint32 ou32_Bitrate)
 /*! \brief   Set CAN TX and RX CAN identifiers
 
    If the ReceiveID is set to 0xFFFFFFFF we accept all responses for compatibility with stwrs232.dll
-   
+
    \param[in]   ou32_SendId      TX CAN ID to send requests on
    \param[in]   ou32_ReceiveId   TX CAN ID to expect responses on
 */
@@ -408,7 +409,7 @@ void C_XFLProtocol::CfgSetXtdId(const bool oq_XtdOn)
 /*! \brief   Set local ID for target to communicate with
 
    Used for all services directed at one specific node.
-   
+
    \param[in]   ou8_LocalID   local ID of server node
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -431,7 +432,7 @@ sint32 C_XFLProtocol::NetReset(void)
 {
    mc_CanWriteMessage.u32_ID = mc_Config.u32_SendID;
    mc_CanWriteMessage.u8_DLC = 3U;
-   mc_CanWriteMessage.au8_Data[0] = 0xFFU;  //all nodes !!
+   mc_CanWriteMessage.au8_Data[0] = 0xFFU; //all nodes !!
    mc_CanWriteMessage.au8_Data[1] = mu8_XFL_CMD_GRP_NET_COMMAND;
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_NET_RESET;
    return m_CANSendMessage();
@@ -451,7 +452,7 @@ sint32 C_XFLProtocol::NetStart(void)
 {
    mc_CanWriteMessage.u32_ID = mc_Config.u32_SendID;
    mc_CanWriteMessage.u8_DLC = 3U;
-   mc_CanWriteMessage.au8_Data[0] = 0xFFU;  //all nodes !!
+   mc_CanWriteMessage.au8_Data[0] = 0xFFU; //all nodes !!
    mc_CanWriteMessage.au8_Data[1] = mu8_XFL_CMD_GRP_NET_COMMAND;
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_NET_START;
    return m_CANSendMessage();
@@ -497,8 +498,8 @@ sint32 C_XFLProtocol::SendFLASH(const uint32 ou32_StartTimeMs, const uint8 ou8_F
    TRG_ReportProgress(0U, TGL_LoadStr(STR_FDL_TXT_WR_FLASH_RQ));
    do
    {
-      (void)m_SendFlashMessage();  //do not check for return = OK here:
-                                   //network might still be down resulting in send errors
+      (void)m_SendFlashMessage(); //do not check for return = OK here:
+                                  //network might still be down resulting in send errors
       TRG_WaitMicroSeconds(static_cast<uint32>(ou8_FLASHIntervalMs) * 1000U);
       TRG_HandleSystemMessages(); //prevent system from freezing
       u32_Elapsed = TGL_GetTickCount() - u32_StartTime;
@@ -542,13 +543,14 @@ sint32 C_XFLProtocol::SendFLASH(const uint32 ou32_StartTimeMs, const uint8 ou8_F
 sint32 C_XFLProtocol::EraseSector(const uint16 ou16_SectorNumber, const uint32 ou32_TimeOut)
 {
    uint32 u32_TimeOut;
+
    mc_CanWriteMessage.u8_DLC = 4U;
    mc_CanWriteMessage.au8_Data[1] = mu8_XFL_CMD_GRP_FLASH_COMMAND;
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_ERASE_SECTOR;
    mc_CanWriteMessage.au8_Data[3] = static_cast<uint8>(ou16_SectorNumber);
    if (ou16_SectorNumber > 255U)
    {
-      mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_SectorNumber >> 8);
+      mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_SectorNumber >> 8U);
       mc_CanWriteMessage.u8_DLC = 5U;
    }
    m_SendMessageWithIDs(); // send erase request
@@ -563,7 +565,7 @@ sint32 C_XFLProtocol::EraseSector(const uint16 ou16_SectorNumber, const uint32 o
    }
 
    return m_WaitForResponse(mc_Config.u8_LocalID, u32_TimeOut, mc_CanWriteMessage.au8_Data,
-                              static_cast<uint8>(mc_CanWriteMessage.u8_DLC - 1U), NULL, mc_CanWriteMessage.u8_DLC);
+                            static_cast<uint8>(mc_CanWriteMessage.u8_DLC - 1U), NULL, mc_CanWriteMessage.u8_DLC);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -622,7 +624,8 @@ sint32 C_XFLProtocol::m_WaitForResponse(const uint8 ou8_ExpectedLocalID, const u
             }
          }
       }
-   } while ((TGL_GetTickCount() - u32_StartTime) < ou32_TimeOutMS);
+   }
+   while ((TGL_GetTickCount() - u32_StartTime) < ou32_TimeOutMS);
    return C_COM;
 }
 
@@ -663,7 +666,7 @@ sint32 C_XFLProtocol::m_SendHexLine(const uint8 * const opu8_HexLine, const uint
 {
    uint8 u8_LineCheckSum;
    uint32 u32_TimeOut;
-   uint32 u8_Tries;
+   uint32 u32_Tries;
    sint32 s32_RemainingLength;
    sint32 s32_Return;
    uint32 u32_StartTime;
@@ -671,7 +674,7 @@ sint32 C_XFLProtocol::m_SendHexLine(const uint8 * const opu8_HexLine, const uint
    static const uint16 hu16_MAX_TRIES = 5U;
 
    u8_LineCheckSum = opu8_HexLine[ou16_LineSize - 1U];
-   u8_Tries = 0U;
+   u32_Tries = 0U;
 
    if (ou32_TimeOut > TIMEOUT_FLASH_MS)
    {
@@ -686,7 +689,7 @@ sint32 C_XFLProtocol::m_SendHexLine(const uint8 * const opu8_HexLine, const uint
    {
       uint8 u8_SendNow;
       sint32 s32_Counter;
-      u8_Tries++;
+      u32_Tries++;
       s32_Counter = 1;
       s32_RemainingLength = ou16_LineSize;
 
@@ -730,14 +733,14 @@ sint32 C_XFLProtocol::m_SendHexLine(const uint8 * const opu8_HexLine, const uint
                   {
                      return C_CHECKSUM;
                   }
-                  u8_Tries = hu16_MAX_TRIES + 1U;// checksum OK -> finished with this line
+                  u32_Tries = hu16_MAX_TRIES + 1U; // checksum OK -> finished with this line
                   break;
                case mu8_COMMAND_ERR:
                   switch (t_RXMsg.au8_Data[2])
                   {
                   case XFL_ERR_CHECKSUM_ERR:
                   case 0xF5U: //incorrect checksum return value in ESX2 flashloader up to V2.01
-                     if (u8_Tries == (hu16_MAX_TRIES - 1U))
+                     if (u32_Tries == (hu16_MAX_TRIES - 1U))
                      {
                         mu8_LastError = t_RXMsg.au8_Data[2];
                         return C_NOACT;
@@ -753,12 +756,14 @@ sint32 C_XFLProtocol::m_SendHexLine(const uint8 * const opu8_HexLine, const uint
                }
             }
          }
-      } while((u8_Tries < hu16_MAX_TRIES) && ((TGL_GetTickCount() - u32_StartTime) < u32_TimeOut));
+      }
+      while ((u32_Tries < hu16_MAX_TRIES) && ((TGL_GetTickCount() - u32_StartTime) < u32_TimeOut));
       TRG_HandleSystemMessages();
-   } while(u8_Tries < hu16_MAX_TRIES);
-   if (u8_Tries != (hu16_MAX_TRIES + 1U))
+   }
+   while (u32_Tries < hu16_MAX_TRIES);
+   if (u32_Tries != (hu16_MAX_TRIES + 1U))
    {
-      return C_COM;      // Maximale Fehlversuche erreicht
+      return C_COM; // Maximale Fehlversuche erreicht
    }
    return C_NO_ERR;
 }
@@ -787,8 +792,7 @@ sint32 C_XFLProtocol::m_SendHexLine(const uint8 * const opu8_HexLine, const uint
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SendMultiHexLine(uint16 & oru16_NumLines, const uint32 ou32_InterFrameDelayUs,
-                                       uint32 & oru32_NumBytesSent, C_HexFile & orc_HexFile,
-                                       const uint32 ou32_TimeOut)
+                                       uint32 & oru32_NumBytesSent, C_HexFile & orc_HexFile, const uint32 ou32_TimeOut)
 {
    uint16 u16_LineLength;
    const uint8 * pu8_NextLine;
@@ -822,7 +826,8 @@ sint32 C_XFLProtocol::SendMultiHexLine(uint16 & oru16_NumLines, const uint32 ou3
       }
       TRG_HandleSystemMessages();
       oru16_NumLines++;
-   } while (oru16_NumLines < u16_NumLinesToSend);
+   }
+   while (oru16_NumLines < u16_NumLinesToSend);
    return C_NO_ERR;
 }
 
@@ -879,7 +884,8 @@ sint32 C_XFLProtocol::WakeupSerialNumber(const uint8 (&orau8_SerialNumber)[6], c
             return m_SendCompanyIDExt(oru8_LocalID, orc_CompanyID, u8_Dummy, opc_CompanyIDOut);
          }
       }
-   } while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_CHANGE_STATE_MS);
+   }
+   while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_CHANGE_STATE_MS);
    return C_COM;
 }
 
@@ -938,7 +944,7 @@ sint32 C_XFLProtocol::GetSectorCount(uint16 & oru16_NumSectors)
          oru16_NumSectors = t_RXMsg.au8_Data[3];
          break;
       case 5:
-         oru16_NumSectors = mh_AU8_2_U16_LE(&t_RXMsg.au8_Data[3]);
+         oru16_NumSectors = mh_AU8ToU16LE(&t_RXMsg.au8_Data[3]);
          break;
       default:
          s32_Return = C_RANGE;
@@ -957,8 +963,8 @@ sint32 C_XFLProtocol::GetLocalID(uint8 & oru8_LocalID)
 
    mc_CanWriteMessage.u32_ID = mc_Config.u32_SendID;
    mc_CanWriteMessage.u8_DLC = 3U;
-   mc_CanWriteMessage.au8_Data[0] = 0x00U;  // don't care, only one device may be
-                                            //  in wakeup state at a time
+   mc_CanWriteMessage.au8_Data[0] = 0x00U; // don't care, only one device may be
+                                           //  in wakeup state at a time
    mc_CanWriteMessage.au8_Data[1] = mu8_XFL_CMD_GRP_GET_COMMAND;
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_GET_LOKAL_ID;
 
@@ -982,7 +988,8 @@ sint32 C_XFLProtocol::GetLocalID(uint8 & oru8_LocalID)
             return C_NOACT;
          }
       }
-   } while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
+   }
+   while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
    return C_COM;
 }
 
@@ -1012,7 +1019,7 @@ sint32 C_XFLProtocol::GetLocalIDExt(uint8 * const opu8_LocalId, const uint8 ou8_
    T_STWCAN_Msg_RX t_RXMsg;
    uint8 u8_Found = 0U;
 
-    // Found Ecu reset
+   // Found Ecu reset
    oru8_NumFoundECUs = 0U;
 
    mc_CanWriteMessage.u32_ID = mc_Config.u32_SendID;
@@ -1033,7 +1040,7 @@ sint32 C_XFLProtocol::GetLocalIDExt(uint8 * const opu8_LocalId, const uint8 ou8_
          if ((t_RXMsg.au8_Data[1] == mu8_XFL_CMD_GRP_GET_COMMAND) &&
              (t_RXMsg.au8_Data[2] == mu8_XFL_CMD_GET_LOKAL_ID))
          {
-            if ( u8_Found < ou8_NumMaxLocalId )
+            if (u8_Found < ou8_NumMaxLocalId)
             {
                // Eintrag Local_Id
                opu8_LocalId[u8_Found] = t_RXMsg.au8_Data[0];
@@ -1050,7 +1057,8 @@ sint32 C_XFLProtocol::GetLocalIDExt(uint8 * const opu8_LocalId, const uint8 ou8_
             return C_NOACT;
          }
       }
-   } while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
+   }
+   while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
    if (u8_Found > 0U)
    {
       oru8_NumFoundECUs = u8_Found;
@@ -1158,7 +1166,8 @@ sint32 C_XFLProtocol::SetLocalID(const uint8 ou8_LocalIDNew)
             }
          }
       }
-   } while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_WRITE_CONFIG_MS);
+   }
+   while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_WRITE_CONFIG_MS);
    return C_COM;
 }
 
@@ -1182,7 +1191,7 @@ sint32 C_XFLProtocol::SetBitrateCAN(const uint32 ou32_Bitrate, const bool oq_32B
    mc_CanWriteMessage.au8_Data[1] = mu8_XFL_CMD_GRP_SET_COMMAND;
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_SET_BITRATE_CAN;
    mc_CanWriteMessage.au8_Data[3] = static_cast<uint8>(ou32_Bitrate);
-   mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou32_Bitrate >> 8);
+   mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou32_Bitrate >> 8U);
 
    if (oq_32BitBitrate == false)
    {
@@ -1191,8 +1200,8 @@ sint32 C_XFLProtocol::SetBitrateCAN(const uint32 ou32_Bitrate, const bool oq_32B
    else
    {
       mc_CanWriteMessage.u8_DLC = 7U;
-      mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_Bitrate >> 16);
-      mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_Bitrate >> 24);
+      mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_Bitrate >> 16U);
+      mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_Bitrate >> 24U);
    }
    m_SendMessageWithIDs();
 
@@ -1220,9 +1229,9 @@ sint32 C_XFLProtocol::SetCANID(const uint32 ou32_CANID)
    mc_CanWriteMessage.au8_Data[1] = mu8_XFL_CMD_GRP_SET_COMMAND;
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_SET_CAN_ID;
    mc_CanWriteMessage.au8_Data[3] = static_cast<uint8>(ou32_CANID);
-   mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou32_CANID >> 8);
-   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_CANID >> 16);
-   mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_CANID >> 24);
+   mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou32_CANID >> 8U);
+   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_CANID >> 16U);
+   mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_CANID >> 24U);
    m_SendMessageWithIDs();
 
    return m_WaitForResponse(mc_Config.u8_LocalID, mu16_TIMEOUT_WRITE_CONFIG_MS, mc_CanWriteMessage.au8_Data, 6U, NULL,
@@ -1287,9 +1296,9 @@ sint32 C_XFLProtocol::ReadFlash(const uint8 ou8_NumBytes, const uint32 ou32_Star
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_READ_FLASH;
    mc_CanWriteMessage.au8_Data[3] = ou8_NumBytes;
    mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou32_StartAddress);
-   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_StartAddress >> 8);
-   mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_StartAddress >> 16);
-   mc_CanWriteMessage.au8_Data[7] = static_cast<uint8>(ou32_StartAddress >> 24);
+   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_StartAddress >> 8U);
+   mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_StartAddress >> 16U);
+   mc_CanWriteMessage.au8_Data[7] = static_cast<uint8>(ou32_StartAddress >> 24U);
    m_SendMessageWithIDs(); // send ReadFlash request
 
    //wait for 1st response
@@ -1319,8 +1328,9 @@ sint32 C_XFLProtocol::ReadFlash(const uint8 ou8_NumBytes, const uint32 ou32_Star
             break;
          }
       }
-   } while ((TGL_GetTickCount() - u32_StartTime) < TIMEOUT_FLASH_MS); //"TIMEOUT_FLASH" used for compatibility reasons
-                                                                      // with previous client implementations
+   }
+   while ((TGL_GetTickCount() - u32_StartTime) < TIMEOUT_FLASH_MS); //"TIMEOUT_FLASH" used for compatibility reasons
+                                                                    // with previous client implementations
    if (s32_Return != C_NO_ERR)
    {
       return s32_Return;
@@ -1358,8 +1368,9 @@ sint32 C_XFLProtocol::ReadFlash(const uint8 ou8_NumBytes, const uint32 ou32_Star
                break;
             }
          }
-      } while ((TGL_GetTickCount() - u32_StartTime) < TIMEOUT_FLASH_MS); //"TIMEOUT_FLASH" used for compatibility reasons
-                                                                         // with previous client implementations
+      }
+      while ((TGL_GetTickCount() - u32_StartTime) < TIMEOUT_FLASH_MS); //"TIMEOUT_FLASH" used for compatibility reasons
+                                                                       // with previous client implementations
       if (s32_Return != C_NO_ERR)
       {
          return s32_Return;
@@ -1525,7 +1536,8 @@ sint32 C_XFLProtocol::m_SendCompanyIDExt(const uint8 ou8_LocalID, const C_XFLCom
             }
          }
       }
-   } while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_CHANGE_STATE_MS);
+   }
+   while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_CHANGE_STATE_MS);
 
    oru8_NumFound = u8_Found;
    if ((u8_Found > 0U) && (s32_Return == C_NO_ERR))
@@ -1569,7 +1581,7 @@ sint32 C_XFLProtocol::WakeupLocalId(const C_XFLCompanyID & orc_CompanyID, uint8 
    m_SendMessageWithIDs(); // send wakeup - request
 
    u32_OldTime = TGL_GetTickCount();
-   for(;;)
+   for (;;)
    {
       TRG_HandleSystemMessages();
       if (m_CANGetResponse(t_RXMsg) == C_NO_ERR)
@@ -1625,6 +1637,7 @@ sint32 C_XFLProtocol::SearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFFERENT_LOCAL_I
    uint8 u8_NumIDs = 0U;
    uint32 u32_OldTime;
    T_STWCAN_Msg_RX t_RXMsg;
+
    (void)memset(&orau8_LocalIDs[0], 0, sizeof(orau8_LocalIDs));
 
    s32_Return = SendFLASH(ou32_StartTime, ou8_FLASHInterval);
@@ -1639,14 +1652,14 @@ sint32 C_XFLProtocol::SearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFFERENT_LOCAL_I
    for (u8_LID = 0U; u8_LID < (XFL_NUM_DIFFERENT_LOCAL_IDS - 1U); u8_LID++) //-1: ID 255 is reserved !
    {
       mc_CanWriteMessage.au8_Data[0] = u8_LID;
-      s32_Return = m_CANSendMessage();// send wakeup request
+      s32_Return = m_CANSendMessage(); // send wakeup request
       if (s32_Return != C_NO_ERR)
       {
          return s32_Return;
       }
       if (mc_Config.u32_Bitrate != 0U)
       {
-         TRG_WaitMicroSeconds(250000U / mc_Config.u32_Bitrate); //use ca 50% busload ...
+         TRG_WaitMicroSeconds(static_cast<uint32>(250000U) / mc_Config.u32_Bitrate); //use ca 50% busload ...
       }
       else
       {
@@ -1656,7 +1669,7 @@ sint32 C_XFLProtocol::SearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFFERENT_LOCAL_I
    }
 
    u32_OldTime = TGL_GetTickCount();
-   for(;;)
+   for (;;)
    {
       TRG_HandleSystemMessages();
       if (m_CANGetResponse(t_RXMsg) == C_NO_ERR)
@@ -1736,7 +1749,8 @@ sint32 C_XFLProtocol::GetSNRExt(uint8 * const opu8_SNR, const uint8 ou8_NumMax, 
             return C_NOACT;
          }
       }
-   } while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
+   }
+   while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
 
    oru8_NumFound = u8_Found;
    if (u8_Found > 0U)
@@ -1772,7 +1786,7 @@ sint32 C_XFLProtocol::GetSecCRC(const uint16 ou16_Sector, uint16 & oru16_CRC, ui
    mc_CanWriteMessage.au8_Data[3] = static_cast<uint8>(ou16_Sector);
    if (ou16_Sector > 255U)
    {
-      mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_Sector >> 8);
+      mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_Sector >> 8U);
       mc_CanWriteMessage.u8_DLC = 5U;
    }
    m_SendMessageWithIDs();
@@ -1782,8 +1796,8 @@ sint32 C_XFLProtocol::GetSecCRC(const uint16 ou16_Sector, uint16 & oru16_CRC, ui
                                   &t_RXMsg, 7);
    if (s32_Return == C_NO_ERR)
    {
-      oru16_CRC   = mh_AU8_2_U16_LE(&t_RXMsg.au8_Data[3]);
-      oru16_EECRC = mh_AU8_2_U16_LE(&t_RXMsg.au8_Data[5]);
+      oru16_CRC   = mh_AU8ToU16LE(&t_RXMsg.au8_Data[3]);
+      oru16_EECRC = mh_AU8ToU16LE(&t_RXMsg.au8_Data[5]);
    }
    return s32_Return;
 }
@@ -1813,7 +1827,7 @@ sint32 C_XFLProtocol::SetSecCRC(const uint16 ou16_Sector, uint16 & oru16_CRC)
    mc_CanWriteMessage.au8_Data[3] = static_cast<uint8>(ou16_Sector);
    if (ou16_Sector > 255U)
    {
-      mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_Sector >> 8);
+      mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_Sector >> 8U);
       mc_CanWriteMessage.u8_DLC = 5U;
    }
 
@@ -1824,7 +1838,7 @@ sint32 C_XFLProtocol::SetSecCRC(const uint16 ou16_Sector, uint16 & oru16_CRC)
                                   &t_RXMsg, 5);
    if (s32_Return == C_NO_ERR)
    {
-      oru16_CRC = mh_AU8_2_U16_LE(&t_RXMsg.au8_Data[3]);
+      oru16_CRC = mh_AU8ToU16LE(&t_RXMsg.au8_Data[3]);
    }
    return s32_Return;
 }
@@ -1846,7 +1860,7 @@ sint32 C_XFLProtocol::GetModeCompare(const uint16 ou16_Sector, uint8 & oru8_Mode
    mc_CanWriteMessage.au8_Data[3] = static_cast<uint8>(ou16_Sector);
    if (ou16_Sector > 255U)
    {
-      mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_Sector >> 8);
+      mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_Sector >> 8U);
       mc_CanWriteMessage.u8_DLC = 5U;
    }
    m_SendMessageWithIDs();
@@ -1889,7 +1903,7 @@ sint32 C_XFLProtocol::SetModeCompare(const uint16 ou16_Sector, const uint8 ou8_M
    }
    else
    {
-      mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_Sector >> 8);
+      mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_Sector >> 8U);
       mc_CanWriteMessage.au8_Data[5] = ou8_ModeCompare;
       mc_CanWriteMessage.u8_DLC = 6U;
    }
@@ -1918,8 +1932,8 @@ sint32 C_XFLProtocol::GetEraseCount(uint32 & oru32_EraseCount)
    if (s32_Return == C_NO_ERR)
    {
       oru32_EraseCount = t_RXMsg.au8_Data[3] +
-               ((static_cast<uint32>(t_RXMsg.au8_Data[4])) << 8) +
-               ((static_cast<uint32>(t_RXMsg.au8_Data[5])) << 16);
+                         ((static_cast<uint32>(t_RXMsg.au8_Data[4])) << 8U) +
+                         ((static_cast<uint32>(t_RXMsg.au8_Data[5])) << 16U);
    }
    return s32_Return;
 }
@@ -2050,7 +2064,7 @@ sint32 C_XFLProtocol::BBWakeup(const uint8 ou8_Position, const uint8 (&orau8_Las
    mc_CanWriteMessage.au8_Data[3] = ou8_Position;
    mc_CanWriteMessage.au8_Data[4] = orau8_LastUserSignature[0];
    mc_CanWriteMessage.au8_Data[5] = orau8_LastUserSignature[1];
-   m_SendMessageWithIDs();  // send bb_wakeup - request
+   m_SendMessageWithIDs(); // send bb_wakeup - request
 
    return m_WaitForResponse(mc_Config.u8_LocalID, mu16_TIMEOUT_CHANGE_STATE_MS, mc_CanWriteMessage.au8_Data, 5U, NULL,
                             6);
@@ -2196,7 +2210,8 @@ sint32 C_XFLProtocol::m_GetDeviceIDBlock(const uint8 ou8_BlockIndex, charn (&ora
             }
          }
       }
-   } while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
+   }
+   while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
    return C_COM;
 }
 
@@ -2279,7 +2294,8 @@ sint32 C_XFLProtocol::GetDeviceID(const bool oq_LongID, C_SCLString & orc_Device
                break;
             }
          }
-      } while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
+      }
+      while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
    }
 
    if (s32_Return == C_NO_ERR)
@@ -2355,6 +2371,7 @@ sint32 C_XFLProtocol::m_CANSendMessage(void)
 sint32 C_XFLProtocol::m_CANGetResponse(T_STWCAN_Msg_RX & orc_MSG)
 {
    sint32 s32_Return = C_NO_ERR;
+
    tgl_assert(mc_Config.pc_CANDispatcher != NULL);
    if (mc_Config.pc_CANDispatcher == NULL)
    {
@@ -2367,7 +2384,7 @@ sint32 C_XFLProtocol::m_CANGetResponse(T_STWCAN_Msg_RX & orc_MSG)
       s32_Return = mc_Config.pc_CANDispatcher->CAN_Read_Msg(mu16_CANDispatcherHandle, orc_MSG);
       if ((s32_Return == C_NO_ERR) &&
           ((mc_Config.u32_ReceiveID == 0xFFFFFFFFU) ||
-             ((orc_MSG.u32_ID == mc_Config.u32_ReceiveID) && (static_cast<bool>(orc_MSG.u8_XTD) == mc_Config.q_XtdID))))
+           ((orc_MSG.u32_ID == mc_Config.u32_ReceiveID) && (orc_MSG.u8_XTD == static_cast<uint8>(mc_Config.q_XtdID)))))
       {
          return C_NO_ERR;
       }
@@ -2381,8 +2398,6 @@ sint32 C_XFLProtocol::EEPROMRead(const uint8 ou8_NumBytes, const uint16 ou16_Sta
 {
    uint32 u32_StartTime;
    sint32 s32_Return;
-   uint8 i;
-   uint8 j;
    uint8 u8_NumMessages;
    uint8 u8_BytesReceived;
    uint16 u16_BytesLeft;
@@ -2395,7 +2410,7 @@ sint32 C_XFLProtocol::EEPROMRead(const uint8 ou8_NumBytes, const uint16 ou16_Sta
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_EE_READ_CMD;
    mc_CanWriteMessage.au8_Data[3] = ou8_NumBytes;
    mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou16_StartAddress);
-   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou16_StartAddress >> 8);
+   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou16_StartAddress >> 8U);
    m_SendMessageWithIDs();
 
    //wait for first message...
@@ -2412,7 +2427,7 @@ sint32 C_XFLProtocol::EEPROMRead(const uint8 ou8_NumBytes, const uint16 ou16_Sta
    u8_NumMessages = static_cast<uint8>((ou8_NumBytes + 1U + 6U) / 7U); //7 bytes per message (+1 for checksum)
    u8_BytesReceived = 0U;
    u16_BytesLeft = static_cast<uint16>(static_cast<uint16>(ou8_NumBytes) + 1U); //+1 for checksum
-   for (i = 0U; i < u8_NumMessages; i++)
+   for (uint8 u8_Message = 0U; u8_Message < u8_NumMessages; u8_Message++)
    {
       u32_StartTime = TGL_GetTickCount();
       do
@@ -2422,21 +2437,21 @@ sint32 C_XFLProtocol::EEPROMRead(const uint8 ou8_NumBytes, const uint16 ou16_Sta
          {
             if (t_RXMsg.au8_Data[0] == mc_Config.u8_LocalID)
             {
-               uint8 u8_Temp = static_cast<uint8>((u16_BytesLeft > 7U) ? 7U : u16_BytesLeft);
+               const uint8 u8_Temp = static_cast<uint8>((u16_BytesLeft > 7U) ? 7U : u16_BytesLeft);
                if (t_RXMsg.u8_DLC == static_cast<uint8>(u8_Temp + 1U))
                {
                   //make sure to extract checksum directly to the correct uint8 as the
                   // buffer supplied to us might not be large enough !
-                  for (j = 0U; j < u8_Temp; j++)
+                  for (uint8 u8_Index = 0U; u8_Index < u8_Temp; u8_Index++)
                   {
                      if (u16_BytesLeft > 1U)
                      {
-                        opu8_Data[u8_BytesReceived] = t_RXMsg.au8_Data[1 + j];
+                        opu8_Data[u8_BytesReceived] = t_RXMsg.au8_Data[1 + u8_Index];
                      }
                      else
                      {
                         //it's the checksum !
-                        u8_ChecksumReceived = t_RXMsg.au8_Data[1 + j];
+                        u8_ChecksumReceived = t_RXMsg.au8_Data[1 + u8_Index];
                      }
                      u8_BytesReceived++;
                      u16_BytesLeft--;
@@ -2453,7 +2468,8 @@ sint32 C_XFLProtocol::EEPROMRead(const uint8 ou8_NumBytes, const uint16 ou16_Sta
                }
             }
          }
-      } while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
+      }
+      while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_READ_INFO_MS);
    }
    if (u16_BytesLeft > 0U)
    {
@@ -2462,9 +2478,9 @@ sint32 C_XFLProtocol::EEPROMRead(const uint8 ou8_NumBytes, const uint16 ou16_Sta
 
    //finally check checksum
    u8_ChecksumCalc = 0U;
-   for (i = 0; i < ou8_NumBytes; i++)
+   for (uint8 u8_Byte = 0; u8_Byte < ou8_NumBytes; u8_Byte++)
    {
-      u8_ChecksumCalc += opu8_Data[i];
+      u8_ChecksumCalc += opu8_Data[u8_Byte];
    }
    if (static_cast<uint8>(u8_ChecksumCalc + u8_ChecksumReceived) != 0U)
    {
@@ -2495,7 +2511,7 @@ sint32 C_XFLProtocol::EEPROMWrite(const uint8 ou8_NumBytes, const uint16 ou16_St
    {
       u16_Address = (ou16_StartAddress + (static_cast<uint16>(u8_Message) * 4U));
       mc_CanWriteMessage.au8_Data[2] = static_cast<uint8>(u16_Address);
-      mc_CanWriteMessage.au8_Data[3] = static_cast<uint8>(u16_Address >> 8);
+      mc_CanWriteMessage.au8_Data[3] = static_cast<uint8>(u16_Address >> 8U);
 
       mc_CanWriteMessage.u8_DLC = 4U + ((u8_BytesLeft > 4U) ? 4U : u8_BytesLeft);
       for (u8_Byte = 0U; u8_Byte < static_cast<uint8>((u8_BytesLeft > 4U) ? 4U : u8_BytesLeft); u8_Byte++)
@@ -2531,7 +2547,8 @@ sint32 C_XFLProtocol::EEPROMWrite(const uint8 ou8_NumBytes, const uint16 ou16_St
                }
             }
          }
-      } while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_WRITE_CONFIG_MS);
+      }
+      while ((TGL_GetTickCount() - u32_StartTime) < mu16_TIMEOUT_WRITE_CONFIG_MS);
       if (q_OK == false)
       {
          return C_COM;
@@ -2570,7 +2587,7 @@ C_XFLProtocol::C_XFLProtocol(const C_XFLProtocolConfig & orc_Config) :
 {
    mc_Config = orc_Config;
 
-   mc_CanWriteMessage.u8_XTD = mc_Config.q_XtdID;
+   mc_CanWriteMessage.u8_XTD = (mc_Config.q_XtdID == true) ? 1U : 0U;
    mc_CanWriteMessage.u8_RTR = 0U;
 
    if (mc_Config.pc_CANDispatcher != NULL)
@@ -2664,6 +2681,7 @@ sint32 C_XFLProtocol::GetFlashInformationNumberOfICs(uint8 & oru8_ICCount)
 {
    sint32 s32_Return;
    uint8 au8_Result[4];
+
    s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_IC_COUNT, 0U, 0U, 0U, au8_Result);
    if (s32_Return == C_NO_ERR)
    {
@@ -2690,10 +2708,11 @@ sint32 C_XFLProtocol::GetFlashInformationTotalMemorySize(const uint8 ou8_ICIndex
 {
    sint32 s32_Return;
    uint8 au8_Result[4];
+
    s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_TOTAL_SIZE, 1U, ou8_ICIndex, 0U, au8_Result);
    if (s32_Return == C_NO_ERR)
    {
-      oru32_Size = mh_AU8_2_U32_LE(&au8_Result[0]);
+      oru32_Size = mh_AU8ToU32LE(&au8_Result[0]);
    }
    return s32_Return;
 }
@@ -2713,11 +2732,12 @@ sint32 C_XFLProtocol::GetFlashInformationTotalMemorySize(const uint8 ou8_ICIndex
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformationProtectedSectors(
-                                                      SCLDynamicArray <C_XFLProtectedSectorInfo> &orc_ProtectedSectors)
+   SCLDynamicArray<C_XFLProtectedSectorInfo> & orc_ProtectedSectors)
 {
    sint32 s32_Return;
    uint8 au8_Result[4];
    uint8 u8_BlockIndex = 0U;
+
    orc_ProtectedSectors.SetLength(0);
    bool q_Finished = false;
 
@@ -2742,7 +2762,7 @@ sint32 C_XFLProtocol::GetFlashInformationProtectedSectors(
          {
             orc_ProtectedSectors.IncLength();
             orc_ProtectedSectors[orc_ProtectedSectors.GetHigh()].u8_ICIndex = au8_Result[2];
-            orc_ProtectedSectors[orc_ProtectedSectors.GetHigh()].u16_SectorNumber = mh_AU8_2_U16_LE(&au8_Result[0]);
+            orc_ProtectedSectors[orc_ProtectedSectors.GetHigh()].u16_SectorNumber = mh_AU8ToU16LE(&au8_Result[0]);
             switch (au8_Result[3])
             {
             case 0x00U: //last sector !
@@ -2785,10 +2805,12 @@ sint32 C_XFLProtocol::GetFlashInformationOffsetSector0(const uint8 ou8_ICIndex, 
 {
    sint32 s32_Return;
    uint8 au8_Result[4];
-   s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_OFFSET_ADDRESS, 1U, ou8_ICIndex, 0U, au8_Result);
+
+   s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_OFFSET_ADDRESS, 1U, ou8_ICIndex, 0U,
+                                    au8_Result);
    if (s32_Return == C_NO_ERR)
    {
-      oru32_Offset = mh_AU8_2_U32_LE(&au8_Result[0]);
+      oru32_Offset = mh_AU8ToU32LE(&au8_Result[0]);
    }
    return s32_Return;
 }
@@ -2811,6 +2833,7 @@ sint32 C_XFLProtocol::GetFlashInformationNumberRegions(const uint8 ou8_ICIndex, 
 {
    sint32 s32_Return;
    uint8 au8_Result[4];
+
    s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_REGIONS, 1U, ou8_ICIndex, 0U, au8_Result);
    if (s32_Return == C_NO_ERR)
    {
@@ -2841,11 +2864,12 @@ sint32 C_XFLProtocol::GetFlashInformationRegionInformation(const uint8 ou8_ICInd
    sint32 s32_Return;
    uint8 au8_Result[4];
    uint16 u16_Help;
+
    s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_REGION_INFO, 2U, ou8_ICIndex, ou8_RegionIndex,
                                     au8_Result);
    if (s32_Return == C_NO_ERR)
    {
-      u16_Help = mh_AU8_2_U16_LE(&au8_Result[0]);
+      u16_Help = mh_AU8ToU16LE(&au8_Result[0]);
       if (u16_Help == 0U)
       {
          oru32_BlockSize = 0U;
@@ -2854,7 +2878,7 @@ sint32 C_XFLProtocol::GetFlashInformationRegionInformation(const uint8 ou8_ICInd
       {
          oru32_BlockSize = (static_cast<uint32>(u16_Help)) * 256U;
       }
-      oru16_BlockCount = mh_AU8_2_U16_LE(&au8_Result[2]) + 1U;
+      oru16_BlockCount = mh_AU8ToU16LE(&au8_Result[2]) + 1U;
    }
    return s32_Return;
 }
@@ -2877,10 +2901,11 @@ sint32 C_XFLProtocol::GetFlashInformationEraseTime(const uint8 ou8_ICIndex, uint
 {
    sint32 s32_Return;
    uint8 au8_Result[4];
+
    s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ERASE_TIME, 1U, ou8_ICIndex, 0U, au8_Result);
    if (s32_Return == C_NO_ERR)
    {
-      oru32_EraseTime = mh_AU8_2_U32_LE(&au8_Result[0]);
+      oru32_EraseTime = mh_AU8ToU32LE(&au8_Result[0]);
    }
    return s32_Return;
 }
@@ -2903,11 +2928,12 @@ sint32 C_XFLProtocol::GetFlashInformationWriteTime(const uint8 ou8_ICIndex, uint
 {
    sint32 s32_Return;
    uint8 au8_Result[4];
+
    s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_PROGRAM_TIME, 1U, ou8_ICIndex, 0U,
                                     au8_Result);
    if (s32_Return == C_NO_ERR)
    {
-      oru32_WriteTime = mh_AU8_2_U32_LE(&au8_Result[0]);
+      oru32_WriteTime = mh_AU8ToU32LE(&au8_Result[0]);
    }
    return s32_Return;
 }
@@ -2930,6 +2956,7 @@ sint32 C_XFLProtocol::GetFlashInformationAliases(C_XFLAliasedRanges & orc_Aliase
    sint32 s32_Return;
    uint8 u8_Region;
    uint8 au8_Result[4];
+
    s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_NUM_ALIASES, 0U, 0U, 0U, au8_Result);
    if (s32_Return == C_NO_ERR)
    {
@@ -2941,21 +2968,21 @@ sint32 C_XFLProtocol::GetFlashInformationAliases(C_XFLAliasedRanges & orc_Aliase
                                           au8_Result);
          if (s32_Return == C_NO_ERR)
          {
-            orc_Aliases[u8_Region].u32_PhysicalAddress = mh_AU8_2_U32_LE(&au8_Result[0]);
+            orc_Aliases[u8_Region].u32_PhysicalAddress = mh_AU8ToU32LE(&au8_Result[0]);
 
             s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_SIZE, 1U, u8_Region, 0U,
                                              au8_Result);
          }
          if (s32_Return == C_NO_ERR)
          {
-            orc_Aliases[u8_Region].u32_Size = mh_AU8_2_U32_LE(&au8_Result[0]);
+            orc_Aliases[u8_Region].u32_Size = mh_AU8ToU32LE(&au8_Result[0]);
 
             s32_Return = GetFlashInformation(mu8_XFL_CMD_GET_FLASH_INFORMATION_IDX_ALIAS_ADDRESS, 1U, u8_Region, 0U,
                                              au8_Result);
          }
          if (s32_Return == C_NO_ERR)
          {
-            orc_Aliases[u8_Region].u32_AliasedAddress = mh_AU8_2_U32_LE(&au8_Result[0]);
+            orc_Aliases[u8_Region].u32_AliasedAddress = mh_AU8ToU32LE(&au8_Result[0]);
          }
          else
          {
@@ -3022,10 +3049,11 @@ sint32 C_XFLProtocol::GetImplementationInformationProtocolVersion(uint16 & oru16
 {
    sint32 s32_Return;
    uint8 au8_Result[4];
+
    s32_Return = GetImplementationInformation(mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_PROTOCOL_VERSION, au8_Result);
    if (s32_Return == C_NO_ERR)
    {
-      oru16_Version = mh_AU8_2_U16_LE(&au8_Result[0]);
+      oru16_Version = mh_AU8ToU16LE(&au8_Result[0]);
    }
    return s32_Return;
 }
@@ -3273,6 +3301,7 @@ sint32 C_XFLProtocol::GetImplementationInformationHexRecords(uint8 & oru8_MaxRec
 {
    sint32 s32_Return;
    uint8 au8_Result[4];
+
    s32_Return = GetImplementationInformation(mu8_XFL_CMD_GET_IMPLEMENTATION_INFORMATION_HEX_RECORDS, au8_Result);
    if (s32_Return == C_NO_ERR)
    {
@@ -3337,6 +3366,7 @@ sint32 C_XFLProtocol::GetFingerPrintSupportedIndexes(C_XFLFingerPrintSupportedIn
 {
    sint32 s32_Return;
    uint8 au8_Result[4];
+
    s32_Return = GetFingerPrint(mu8_XFL_CMD_FINGER_PRINT_SUPPORTED_INDEXES, au8_Result);
    if (s32_Return == C_NO_ERR)
    {
@@ -3460,7 +3490,7 @@ sint32 C_XFLProtocol::GetFingerPrintChecksum(uint32 & oru32_CheckSum)
    s32_Return = GetFingerPrint(mu8_XFL_CMD_FINGER_PRINT_CHECKSUM, au8_Result);
    if (s32_Return == C_NO_ERR)
    {
-      oru32_CheckSum = mh_AU8_2_U32_LE(&au8_Result[0]);
+      oru32_CheckSum = mh_AU8ToU32LE(&au8_Result[0]);
    }
    return s32_Return;
 }
@@ -3582,7 +3612,7 @@ sint32 C_XFLProtocol::GetDeviceInfoAddresses(SCLDynamicArray<uint32> & orc_Addre
       if (s32_Return == C_NO_ERR)
       {
          orc_Addresses.SetLength(1);
-         orc_Addresses[0] = mh_AU8_2_U32_LE(&au8_Data[0]);
+         orc_Addresses[0] = mh_AU8ToU32LE(&au8_Data[0]);
       }
    }
    else
@@ -3605,7 +3635,7 @@ sint32 C_XFLProtocol::GetDeviceInfoAddresses(SCLDynamicArray<uint32> & orc_Addre
                {
                   break;
                }
-               orc_Addresses[u8_Index] = mh_AU8_2_U32_LE(&au8_Data[0]);
+               orc_Addresses[u8_Index] = mh_AU8ToU32LE(&au8_Data[0]);
             }
          }
       }
@@ -3644,7 +3674,7 @@ sint32 C_XFLProtocol::GetDeviceInfoBlock(const uint32 ou32_Address, C_XFLECUInfo
 
    //first read the first couple of bytes to detect "MAGIC":
    s32_Return = this->ReadFlash(XFL_DEVICE_INFO_MAGIC_LENGTH_V1, ou32_Address,
-                                reinterpret_cast<uint8 *>(orc_Data.acn_Magic));  //lint !e926 //cf. assertion above
+                                reinterpret_cast<uint8 *>(orc_Data.acn_Magic)); //lint !e926 //cf. assertion above
    if (s32_Return != C_NO_ERR)
    {
       return s32_Return;
@@ -3669,7 +3699,7 @@ sint32 C_XFLProtocol::GetDeviceInfoBlock(const uint32 ou32_Address, C_XFLECUInfo
    }
 
    u16_Offset = static_cast<uint16>(u16_Offset + XFL_DEVICE_INFO_MAGIC_LENGTH_V1);
-   u16_Offset += (q_IsV2 == true) ? 1 : 0;
+   u16_Offset += static_cast<uint16>((q_IsV2 == true) ? 1U : 0U);
 
    //read header information
    s32_Return = this->ReadFlash(2U, ou32_Address + u16_Offset, &orc_Data.u8_StructVersion);
@@ -3722,7 +3752,8 @@ sint32 C_XFLProtocol::GetDeviceInfoBlock(const uint32 ou32_Address, C_XFLECUInfo
    {
       u8_Size = C_XFLECUInformation::hau8_LENGTHS_PROJECT_NAME[u8_VersionIndex];
       s32_Return = this->ReadFlash(u8_Size, ou32_Address + u16_Offset,
-                                reinterpret_cast<uint8 *>(orc_Data.acn_ProjectName)); //lint !e926 //cf. assertion above
+                                   reinterpret_cast<uint8 *>(orc_Data.acn_ProjectName)); //lint !e926 //cf. assertion
+                                                                                         // above
       if (s32_Return != C_NO_ERR)
       {
          return s32_Return;
@@ -3734,7 +3765,8 @@ sint32 C_XFLProtocol::GetDeviceInfoBlock(const uint32 ou32_Address, C_XFLECUInfo
    {
       u8_Size = C_XFLECUInformation::hau8_LENGTHS_PROJECT_VERSION[u8_VersionIndex];
       s32_Return = this->ReadFlash(u8_Size, ou32_Address + u16_Offset,
-                             reinterpret_cast<uint8 *>(orc_Data.acn_ProjectVersion)); //lint !e926 //cf. assertion above
+                                   reinterpret_cast<uint8 *>(orc_Data.acn_ProjectVersion)); //lint !e926 //cf. assertion
+                                                                                            // above
       if (s32_Return != C_NO_ERR)
       {
          return s32_Return;
@@ -3752,7 +3784,8 @@ sint32 C_XFLProtocol::GetDeviceInfoBlock(const uint32 ou32_Address, C_XFLECUInfo
 
       u16_Offset = static_cast<uint16>(u16_Offset + 1U);
       s32_Return = this->ReadFlash(orc_Data.u8_LenAdditionalInfo, ou32_Address + u16_Offset,
-                         reinterpret_cast<uint8 *>(&orc_Data.acn_AdditionalInfo[0])); //lint !e926 //cf. assertion above
+                                   reinterpret_cast<uint8 *>(&orc_Data.acn_AdditionalInfo[0])); //lint !e926 //cf.
+                                                                                                // assertion above
       if (s32_Return != C_NO_ERR)
       {
          return s32_Return;
@@ -3782,6 +3815,7 @@ sint32 C_XFLProtocol::GetBlockAddressesAll(SCLDynamicArray<C_XFLChecksumBlock> &
    sint32 s32_Return;
    uint8 u8_BlockIndex = 0U;
    C_XFLChecksumBlock c_Block;
+
    orc_ChecksumBlocks.SetLength(0);
    s32_Return = C_NO_ERR;
    while (s32_Return == C_NO_ERR)
@@ -3852,7 +3886,7 @@ sint32 C_XFLProtocol::GetBlockAddresses(const uint8 ou8_BlockNumber, C_XFLChecks
                                   &t_RXMsg, 8);
    if (s32_Return == C_NO_ERR)
    {
-      orc_ChecksumBlock.u32_StartAddress = mh_AU8_2_U32_LE(&t_RXMsg.au8_Data[4]);
+      orc_ChecksumBlock.u32_StartAddress = mh_AU8ToU32LE(&t_RXMsg.au8_Data[4]);
 
       //read end address
       mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_GET_BLOCK_END_ADDRESS;
@@ -3861,7 +3895,7 @@ sint32 C_XFLProtocol::GetBlockAddresses(const uint8 ou8_BlockNumber, C_XFLChecks
                                      &t_RXMsg, 8);
       if (s32_Return == C_NO_ERR)
       {
-         orc_ChecksumBlock.u32_EndAddress = mh_AU8_2_U32_LE(&t_RXMsg.au8_Data[4]);
+         orc_ChecksumBlock.u32_EndAddress = mh_AU8ToU32LE(&t_RXMsg.au8_Data[4]);
       }
    }
 
@@ -3918,7 +3952,7 @@ sint32 C_XFLProtocol::GetBlockChecksum(const uint8 ou8_BlockNumber, const uint8 
                                   &t_RXMsg, 8);
    if (s32_Return == C_NO_ERR)
    {
-      oru32_Checksum = mh_AU8_2_U32_LE(&t_RXMsg.au8_Data[4]);
+      oru32_Checksum = mh_AU8ToU32LE(&t_RXMsg.au8_Data[4]);
    }
    return s32_Return;
 }
@@ -4037,9 +4071,9 @@ sint32 C_XFLProtocol::SetFingerPrintChecksum(const uint32 ou32_CheckSum)
    uint8 au8_Data[4];
 
    au8_Data[0] = static_cast<uint8>(ou32_CheckSum);
-   au8_Data[1] = static_cast<uint8>(ou32_CheckSum >> 8);
-   au8_Data[2] = static_cast<uint8>(ou32_CheckSum >> 16);
-   au8_Data[3] = static_cast<uint8>(ou32_CheckSum >> 24);
+   au8_Data[1] = static_cast<uint8>(ou32_CheckSum >> 8U);
+   au8_Data[2] = static_cast<uint8>(ou32_CheckSum >> 16U);
+   au8_Data[3] = static_cast<uint8>(ou32_CheckSum >> 24U);
    return SetFingerPrint(mu8_XFL_CMD_FINGER_PRINT_CHECKSUM, au8_Data);
 }
 
@@ -4062,11 +4096,11 @@ sint32 C_XFLProtocol::SetFingerPrintUserName(const C_SCLString & orc_UserName)
    sint32 s32_Return;
    uint8 au8_Data[17];
    uint8 au8_Buffer[4];
-   sint32 s32_Length;
+   uint32 u32_Length;
 
-   s32_Length = orc_UserName.Length();
+   u32_Length = orc_UserName.Length();
 
-   if (s32_Length >= 16)
+   if (u32_Length >= 16U)
    {
       au8_Data[16] = 0U; //terminate string
       (void)memcpy(&au8_Data[0], orc_UserName.c_str(), 16U);
@@ -4074,7 +4108,7 @@ sint32 C_XFLProtocol::SetFingerPrintUserName(const C_SCLString & orc_UserName)
    else
    {
       (void)memset(&au8_Data[0], 0, 17U);
-      (void)memcpy(&au8_Data[0], orc_UserName.c_str(), s32_Length);
+      (void)memcpy(&au8_Data[0], orc_UserName.c_str(), u32_Length);
    }
 
    //we can be sure to have enough data -> provide data through casting to avoid needing a local 4 byte buffer ...
@@ -4117,9 +4151,9 @@ sint32 C_XFLProtocol::SetTempBitrate(const uint32 ou32_TempBitrate)
    mc_CanWriteMessage.au8_Data[1] = mu8_XFL_CMD_GRP_SET_COMMAND;
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_SET_TEMP_BITRATE;
    mc_CanWriteMessage.au8_Data[3] = static_cast<uint8>(ou32_TempBitrate);
-   mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou32_TempBitrate >> 8);
-   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_TempBitrate >> 16);
-   mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_TempBitrate >> 24);
+   mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou32_TempBitrate >> 8U);
+   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_TempBitrate >> 16U);
+   mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_TempBitrate >> 24U);
 
    m_SendMessageWithIDs();
 
@@ -4154,9 +4188,9 @@ sint32 C_XFLProtocol::SetBlockAddresses(const uint8 ou8_BlockNumber, const uint3
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_SET_BLOCK_START_ADDRESS;
    mc_CanWriteMessage.au8_Data[3] = ou8_BlockNumber;
    mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou32_StartAddress);
-   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_StartAddress >> 8);
-   mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_StartAddress >> 16);
-   mc_CanWriteMessage.au8_Data[7] = static_cast<uint8>(ou32_StartAddress >> 24);
+   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_StartAddress >> 8U);
+   mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_StartAddress >> 16U);
+   mc_CanWriteMessage.au8_Data[7] = static_cast<uint8>(ou32_StartAddress >> 24U);
 
    m_SendMessageWithIDs();
 
@@ -4175,9 +4209,9 @@ sint32 C_XFLProtocol::SetBlockAddresses(const uint8 ou8_BlockNumber, const uint3
    //write end address
    mc_CanWriteMessage.au8_Data[2] = mu8_XFL_CMD_SET_BLOCK_END_ADDRESS;
    mc_CanWriteMessage.au8_Data[4] = static_cast<uint8>(ou32_EndAddress);
-   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_EndAddress >> 8);
-   mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_EndAddress >> 16);
-   mc_CanWriteMessage.au8_Data[7] = static_cast<uint8>(ou32_EndAddress >> 24);
+   mc_CanWriteMessage.au8_Data[5] = static_cast<uint8>(ou32_EndAddress >> 8U);
+   mc_CanWriteMessage.au8_Data[6] = static_cast<uint8>(ou32_EndAddress >> 16U);
+   mc_CanWriteMessage.au8_Data[7] = static_cast<uint8>(ou32_EndAddress >> 24U);
    m_SendMessageWithIDs();
 
    return m_WaitForResponse(mc_Config.u8_LocalID, mu16_TIMEOUT_WRITE_CONFIG_MS, mc_CanWriteMessage.au8_Data, 7U, NULL,
@@ -4214,7 +4248,7 @@ sint32 C_XFLProtocol::SetBlockChecksum(const uint8 ou8_BlockNumber, uint32 & oru
                                   &t_RXMsg, 8);
    if (s32_Return == C_NO_ERR)
    {
-      oru32_CalculatedChecksum = mh_AU8_2_U32_LE(&t_RXMsg.au8_Data[4]);
+      oru32_CalculatedChecksum = mh_AU8ToU32LE(&t_RXMsg.au8_Data[4]);
    }
    return s32_Return;
 }
@@ -4269,7 +4303,7 @@ sint32 C_XFLProtocol::GetControlID(uint32 & oru32_ControlID)
                                   &t_RXMsg, 7);
    if (s32_Return == C_NO_ERR)
    {
-      oru32_ControlID = mh_AU8_2_U32_LE(&t_RXMsg.au8_Data[3]);
+      oru32_ControlID = mh_AU8ToU32LE(&t_RXMsg.au8_Data[3]);
    }
    return s32_Return;
 }
@@ -4351,7 +4385,7 @@ sint32 C_XFLProtocol::SetBlockCompareMode(const uint8 ou8_BlockNumber, const boo
 
    \param[in]     ou16_Progress1_1000       progress to report 0..1000
    \param[in]     orc_AdditionalText        text to report
-   
+
    \return
    C_NO_ERR   continue operations
    else       abort operation (not necessarily honored by all calls)
@@ -4406,4 +4440,3 @@ void C_XFLProtocol::TRG_HandleSystemMessages(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-

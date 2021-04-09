@@ -32,7 +32,7 @@ public:
    stw_types::sintn GetLineEditWidth(void) const;
 
    virtual void fixup(QString & orc_Input) const override;
-   virtual QValidator::State validate(QString & orc_Input, stw_types::sintn & orc_Pos) const override;
+   virtual QValidator::State validate(QString & orc_Input, stw_types::sintn & orsn_Pos) const override;
 
 protected:
    virtual void m_Init(void) override;

@@ -10,13 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
 
-#include "DiagLib_config.h"  //diaglib configuration
+#include "DiagLib_config.h" //diaglib configuration
 
 #include <string.h>
 #include "stwtypes.h"
@@ -78,8 +78,10 @@ C_XFLWakeupParameters::C_XFLWakeupParameters(void) :
    e_WakeupMode(eXFL_WAKEUP_MODE_LID),
    q_SendResetRQ(false),
    q_SendFLASHRequired(true),
-   u32_StartTimeMs(3000U),  //defines how long the "FLASH" command should be sent
-   u8_FLASHIntervalMs(10U), //interval between individual "FLASH" commands in ms
+   //defines how long the "FLASH" command should be sent
+   u32_StartTimeMs(3000U),
+   //interval between individual "FLASH" commands in ms
+   u8_FLASHIntervalMs(10U),
    u8_LocalID(0U),
    c_CompanyID("")
 {
@@ -103,7 +105,8 @@ C_XFLFoundNode::C_XFLFoundNode(void) :
 //----------------------------------------------------------------------------------------------------------------------
 
 C_XFLDivertParameters::C_XFLDivertParameters(void) :
-   u8_DeviceIndex(0U),     //0 = CAN (cf. flashloader protocol specification)
+   //0 = CAN (cf. flashloader protocol specification)
+   u8_DeviceIndex(0U),
    u8_SelectedPosition(0U)
 {
 }
@@ -146,24 +149,27 @@ C_XFLDivertParameters & C_XFLDivertParameters::operator =(const C_XFLDivertParam
 //----------------------------------------------------------------------------------------------------------------------
 void C_XFLDivertParameters::LoadFromINI(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
 {
-   sint32 i;
    u8_DeviceIndex      = orc_IniFile.ReadUint8(orc_Section, "DIVERT_DEVICE_INDEX", 0U);
    u8_SelectedPosition = orc_IniFile.ReadUint8(orc_Section, "DIVERT_SELECTED_POSITION", 0U);
 
    c_PositionNames.SetLength(orc_IniFile.ReadInteger(orc_Section, "DIVERT_NUM_POSITIONS", 0));
-   for (i = 0; i < c_PositionNames.GetLength(); i++)
+   for (sint32 s32_NameIndex = 0; s32_NameIndex < c_PositionNames.GetLength(); s32_NameIndex++)
    {
-      c_PositionNames[i] = orc_IniFile.ReadString(orc_Section, "DIVERT_POSITION_" + C_SCLString::IntToStr(i), "");
+      c_PositionNames[s32_NameIndex] =
+         orc_IniFile.ReadString(orc_Section, "DIVERT_POSITION_" + C_SCLString::IntToStr(s32_NameIndex), "");
    }
    c_Parameters.SetLength(orc_IniFile.ReadInteger(orc_Section, "DIVERT_NUM_PARAMETERS", 0));
-   for (i = 0; i < c_Parameters.GetLength(); i++)
+   for (sint32 s32_ParameterIndex = 0; s32_ParameterIndex < c_Parameters.GetLength(); s32_ParameterIndex++)
    {
-      c_Parameters[i].u8_ParameterIndex  = orc_IniFile.ReadUint8(orc_Section,
-                                "DIVERT_PARAMETER_" + C_SCLString::IntToStr(i) + "_INDEX", 0U);
-      c_Parameters[i].c_ParameterName    = orc_IniFile.ReadString(orc_Section,
-                                "DIVERT_PARAMETER_" + C_SCLString::IntToStr(i) + "_NAME", "");
-      c_Parameters[i].u16_ParameterValue = orc_IniFile.ReadUint16(orc_Section,
-                                "DIVERT_PARAMETER_" + C_SCLString::IntToStr(i) + "_VALUE", 0U);
+      c_Parameters[s32_ParameterIndex].u8_ParameterIndex  =
+         orc_IniFile.ReadUint8(orc_Section, "DIVERT_PARAMETER_" + C_SCLString::IntToStr(s32_ParameterIndex) + "_INDEX",
+                               0U);
+      c_Parameters[s32_ParameterIndex].c_ParameterName    =
+         orc_IniFile.ReadString(orc_Section, "DIVERT_PARAMETER_" + C_SCLString::IntToStr(s32_ParameterIndex) + "_NAME",
+                                "");
+      c_Parameters[s32_ParameterIndex].u16_ParameterValue =
+         orc_IniFile.ReadUint16(orc_Section, "DIVERT_PARAMETER_" + C_SCLString::IntToStr(s32_ParameterIndex) + "_VALUE",
+                                0U);
    }
 }
 
@@ -195,27 +201,27 @@ void C_XFLDivertParameters::LoadFromINI(C_SCLIniFile & orc_IniFile, const C_SCLS
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLDivertParameters::SaveToINI(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
 {
-   sint32 i;
    try
    {
       orc_IniFile.WriteInteger(orc_Section, "DIVERT_DEVICE_INDEX", u8_DeviceIndex);
       orc_IniFile.WriteInteger(orc_Section, "DIVERT_SELECTED_POSITION", u8_SelectedPosition);
 
       orc_IniFile.WriteInteger(orc_Section, "DIVERT_NUM_POSITIONS", c_PositionNames.GetLength());
-      for (i = 0; i < c_PositionNames.GetLength(); i++)
+      for (sint32 s32_NameIndex = 0; s32_NameIndex < c_PositionNames.GetLength(); s32_NameIndex++)
       {
-         orc_IniFile.WriteString(orc_Section, "DIVERT_POSITION_" + C_SCLString::IntToStr(i), c_PositionNames[i]);
+         orc_IniFile.WriteString(orc_Section, "DIVERT_POSITION_" + C_SCLString::IntToStr(
+                                    s32_NameIndex), c_PositionNames[s32_NameIndex]);
       }
 
       orc_IniFile.WriteInteger(orc_Section, "DIVERT_NUM_PARAMETERS", c_Parameters.GetLength());
-      for (i = 0; i < c_Parameters.GetLength(); i++)
+      for (sint32 s32_ParameterIndex = 0; s32_ParameterIndex < c_Parameters.GetLength(); s32_ParameterIndex++)
       {
-         orc_IniFile.WriteInteger(orc_Section, "DIVERT_PARAMETER_" + C_SCLString::IntToStr(i) +
-                                                                          "_INDEX", c_Parameters[i].u8_ParameterIndex);
-         orc_IniFile.WriteString(orc_Section, "DIVERT_PARAMETER_" + C_SCLString::IntToStr(i) +
-                                                                           "_NAME", c_Parameters[i].c_ParameterName);
-         orc_IniFile.WriteInteger(orc_Section, "DIVERT_PARAMETER_" + C_SCLString::IntToStr(i) +
-                                                                          "_VALUE", c_Parameters[i].u16_ParameterValue);
+         orc_IniFile.WriteInteger(orc_Section, "DIVERT_PARAMETER_" + C_SCLString::IntToStr(s32_ParameterIndex) +
+                                  "_INDEX", c_Parameters[s32_ParameterIndex].u8_ParameterIndex);
+         orc_IniFile.WriteString(orc_Section, "DIVERT_PARAMETER_" + C_SCLString::IntToStr(s32_ParameterIndex) +
+                                 "_NAME", c_Parameters[s32_ParameterIndex].c_ParameterName);
+         orc_IniFile.WriteInteger(orc_Section, "DIVERT_PARAMETER_" + C_SCLString::IntToStr(s32_ParameterIndex) +
+                                  "_VALUE", c_Parameters[s32_ParameterIndex].u16_ParameterValue);
       }
    }
    catch (...)
@@ -289,15 +295,14 @@ C_XFLDivertParametersCAN::C_XFLDivertParametersCAN(const uint8 ou8_NumPositions)
          c_Parameters[(s32_Loop * 8) + 5].u16_ParameterValue++;
       }
    }
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueClientIDType(const bool oq_StdIDs, const bool oq_ExtIDs)
 {
-   c_Parameters[mu8_PARAM_INDEX_CLIENT_ID_TYPE].u16_ParameterValue =  (oq_StdIDs ? 1U : 0U);
-   c_Parameters[mu8_PARAM_INDEX_CLIENT_ID_TYPE].u16_ParameterValue += (oq_ExtIDs ? 2U : 0U);
+   c_Parameters[mu8_PARAM_INDEX_CLIENT_ID_TYPE].u16_ParameterValue =  static_cast<uint16>(oq_StdIDs ? 1U : 0U);
+   c_Parameters[mu8_PARAM_INDEX_CLIENT_ID_TYPE].u16_ParameterValue += static_cast<uint16>(oq_ExtIDs ? 2U : 0U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -319,7 +324,7 @@ void C_XFLDivertParametersCAN::SetValueClientMaskStandard(const uint16 ou16_Mask
 void C_XFLDivertParametersCAN::SetValueClientMaskExtended(const uint32 ou32_Mask)
 {
    c_Parameters[mu8_PARAM_INDEX_CLIENT_LW_MASK_EXT].u16_ParameterValue = static_cast<uint16>(ou32_Mask);
-   c_Parameters[mu8_PARAM_INDEX_CLIENT_HW_MASK_EXT].u16_ParameterValue = static_cast<uint16>(ou32_Mask >> 16);
+   c_Parameters[mu8_PARAM_INDEX_CLIENT_HW_MASK_EXT].u16_ParameterValue = static_cast<uint16>(ou32_Mask >> 16U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -334,7 +339,7 @@ void C_XFLDivertParametersCAN::SetValueClientIDStandard(const uint16 ou16_ID)
 void C_XFLDivertParametersCAN::SetValueClientIDExtended(const uint32 ou32_ID)
 {
    c_Parameters[mu8_PARAM_INDEX_CLIENT_LW_ID_EXT].u16_ParameterValue = static_cast<uint16>(ou32_ID);
-   c_Parameters[mu8_PARAM_INDEX_CLIENT_HW_ID_EXT].u16_ParameterValue = static_cast<uint16>(ou32_ID >> 16);
+   c_Parameters[mu8_PARAM_INDEX_CLIENT_HW_ID_EXT].u16_ParameterValue = static_cast<uint16>(ou32_ID >> 16U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -364,7 +369,7 @@ void C_XFLDivertParametersCAN::SetValueTargetMaskStandard(const uint16 ou16_Mask
 void C_XFLDivertParametersCAN::SetValueTargetMaskExtended(const uint32 ou32_Mask)
 {
    c_Parameters[mu8_PARAM_INDEX_TARGET_LW_MASK_EXT].u16_ParameterValue = static_cast<uint16>(ou32_Mask);
-   c_Parameters[mu8_PARAM_INDEX_TARGET_HW_MASK_EXT].u16_ParameterValue = static_cast<uint16>(ou32_Mask >> 16);
+   c_Parameters[mu8_PARAM_INDEX_TARGET_HW_MASK_EXT].u16_ParameterValue = static_cast<uint16>(ou32_Mask >> 16U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -379,12 +384,13 @@ void C_XFLDivertParametersCAN::SetValueTargetIDStandard(const uint16 ou16_ID)
 void C_XFLDivertParametersCAN::SetValueTargetIDExtended(const uint32 ou32_ID)
 {
    c_Parameters[mu8_PARAM_INDEX_TARGET_LW_ID_EXT].u16_ParameterValue = static_cast<uint16>(ou32_ID);
-   c_Parameters[mu8_PARAM_INDEX_TARGET_HW_ID_EXT].u16_ParameterValue = static_cast<uint16>(ou32_ID >> 16);
+   c_Parameters[mu8_PARAM_INDEX_TARGET_HW_ID_EXT].u16_ParameterValue = static_cast<uint16>(ou32_ID >> 16U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-C_XFLActions::C_XFLActions(void) : C_XFLProtocol()
+C_XFLActions::C_XFLActions(void) :
+   C_XFLProtocol()
 {
    //nothing to do here
 }
@@ -415,6 +421,7 @@ bool C_XFLActions::m_AllowSTWCID(const C_XFLCompanyID & orc_ConfiguredCompanyID,
 sint32 C_XFLActions::RequestNodeReset(const T_STWCAN_Msg_TX * const opt_ResetMessage, const bool oq_SingleNode)
 {
    sint32 s32_Return = C_NO_ERR;
+
    if (opt_ResetMessage != NULL)
    {
       if (oq_SingleNode == true)
@@ -554,7 +561,7 @@ sint32 C_XFLActions::m_WakeupSNR(const C_XFLCompanyID & orc_CompanyID, const uin
    C_NOACT            error response from server
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_XFLActions::m_WakeupLocalIDAndSNR(const C_XFLCompanyID & orc_CompanyID, const uint8 (& orau8_SNR)[6])
+sint32 C_XFLActions::m_WakeupLocalIDAndSNR(const C_XFLCompanyID & orc_CompanyID, const uint8 (&orau8_SNR)[6])
 {
    const uint8 u8_MAX_NUM_ECUS_PER_LOCAL_ID = 100U;
 
@@ -622,7 +629,6 @@ sint32 C_XFLActions::DivertStreamOnOff(const bool oq_On, const C_XFLDivertParame
                                        const bool oq_UseHopHandle, const uint8 ou8_HopHandle)
 {
    sint32 s32_Return;
-   sint32 i;
    uint8 au8_Params[2];
 
    if (oq_On == false)
@@ -637,7 +643,7 @@ sint32 C_XFLActions::DivertStreamOnOff(const bool oq_On, const C_XFLDivertParame
       {
          s32_Return = this->DivertStream(orc_DivertParams.u8_DeviceIndex, orc_DivertParams.u8_SelectedPosition, 0U);
       }
-      if(s32_Return != C_NO_ERR)
+      if (s32_Return != C_NO_ERR)
       {
          TRG_ReportStatus(TGL_LoadStr(STR_FM_ERR_DIVERT_STREAM), gu8_DL_REPORT_STATUS_TYPE_ERROR);
          return s32_Return;
@@ -648,16 +654,18 @@ sint32 C_XFLActions::DivertStreamOnOff(const bool oq_On, const C_XFLDivertParame
    {
       //turn divert stream on
       //first send all parameters:
-      for (i = 0; i < orc_DivertParams.c_Parameters.GetLength(); i++)
+      for (sint32 s32_Parameter = 0; s32_Parameter < orc_DivertParams.c_Parameters.GetLength(); s32_Parameter++)
       {
-         TRG_ReportStatus(TGL_LoadStr(STR_FM_TXT_SET_PARA_PT1) + orc_DivertParams.c_Parameters[i].c_ParameterName + TGL_LoadStr(STR_FM_TXT_SET_PARA_PT2) +
-                          C_SCLString::IntToStr(orc_DivertParams.c_Parameters[i].u16_ParameterValue),
+         TRG_ReportStatus(TGL_LoadStr(
+                             STR_FM_TXT_SET_PARA_PT1) + orc_DivertParams.c_Parameters[s32_Parameter].c_ParameterName +
+                          TGL_LoadStr(STR_FM_TXT_SET_PARA_PT2) +
+                          C_SCLString::IntToStr(orc_DivertParams.c_Parameters[s32_Parameter].u16_ParameterValue),
                           gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
-         au8_Params[0] = static_cast<uint8>(orc_DivertParams.c_Parameters[i].u16_ParameterValue);
-         au8_Params[1] = static_cast<uint8>(orc_DivertParams.c_Parameters[i].u16_ParameterValue >> 8);
+         au8_Params[0] = static_cast<uint8>(orc_DivertParams.c_Parameters[s32_Parameter].u16_ParameterValue);
+         au8_Params[1] = static_cast<uint8>(orc_DivertParams.c_Parameters[s32_Parameter].u16_ParameterValue >> 8U);
 
          s32_Return = SetDivertParameter(orc_DivertParams.u8_DeviceIndex, orc_DivertParams.u8_SelectedPosition,
-                                         orc_DivertParams.c_Parameters[i].u8_ParameterIndex, au8_Params);
+                                         orc_DivertParams.c_Parameters[s32_Parameter].u8_ParameterIndex, au8_Params);
          if (s32_Return != C_NO_ERR)
          {
             TRG_ReportStatus(TGL_LoadStr(STR_FM_ERR_SET_DIVERT_STREAM_PARA), gu8_DL_REPORT_STATUS_TYPE_ERROR);
@@ -674,7 +682,7 @@ sint32 C_XFLActions::DivertStreamOnOff(const bool oq_On, const C_XFLDivertParame
       {
          s32_Return = this->DivertStream(orc_DivertParams.u8_DeviceIndex, orc_DivertParams.u8_SelectedPosition, 1U);
       }
-      if(s32_Return != C_NO_ERR)
+      if (s32_Return != C_NO_ERR)
       {
          TRG_ReportStatus(TGL_LoadStr(STR_FM_ERR_DIVERT_STREAM), gu8_DL_REPORT_STATUS_TYPE_ERROR);
          return s32_Return;
@@ -687,9 +695,10 @@ sint32 C_XFLActions::DivertStreamOnOff(const bool oq_On, const C_XFLDivertParame
 //----------------------------------------------------------------------------------------------------------------------
 //function for ESX2 BBB specific divert stream mechanism
 sint32 C_XFLActions::DivertStreamOnOffBBB(const bool oq_OnOff, const uint8 ou8_TargetPosition,
-                                          const uint8 (& orau8_UserID)[2])
+                                          const uint8 (&orau8_UserID)[2])
 {
    sint32 s32_Return;
+
    if (oq_OnOff == false)
    {
       //Divert Stream abschalten
@@ -714,7 +723,7 @@ sint32 C_XFLActions::DivertStreamOnOffBBB(const bool oq_OnOff, const uint8 ou8_T
       TRG_ReportStatus(TGL_LoadStr(STR_FM_WAKEUP_BBB_OK), gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
       TRG_ReportStatus(TGL_LoadStr(STR_FM_DIVERT_STREAM_BBB), gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
       s32_Return = DivertStream(XFL_DIVERT_TARGET_BABY_B, ou8_TargetPosition, 1U);
-      if(s32_Return != C_NO_ERR)
+      if (s32_Return != C_NO_ERR)
       {
          TRG_ReportStatus(TGL_LoadStr(STR_FM_ERR_DIVERT_STREAM), gu8_DL_REPORT_STATUS_TYPE_ERROR);
          return s32_Return;
@@ -839,6 +848,7 @@ uint16 C_XFLFlashICInformation::GetNumberOfSectors(void) const
 {
    sint32 s32_RangeIndex;
    uint16 u16_NumSectors = 0U;
+
    for (s32_RangeIndex = 0; s32_RangeIndex < this->c_Regions.GetLength(); s32_RangeIndex++)
    {
       u16_NumSectors += this->c_Regions[s32_RangeIndex].u16_NumBlocks;
@@ -868,6 +878,7 @@ void C_XFLFlashInformation::ConvertToFlashSectorTable(C_XFLFlashSectors & orc_Se
    const C_XFLFlashICInformation * pt_IC;
 
    uint16 u16_NumBlocks;
+
    orc_Sectors.SetLength(0);
 
    //first go through list to set at_Sectors.Length (faster than dynamically incrementing it all the time)
@@ -889,7 +900,7 @@ void C_XFLFlashInformation::ConvertToFlashSectorTable(C_XFLFlashSectors & orc_Se
          {
             orc_Sectors[u32_TotalIndex].u32_LowestAddress  = u32_CurrentOffset;
             orc_Sectors[u32_TotalIndex].u32_HighestAddress = u32_CurrentOffset +
-                                                            (pt_IC->c_Regions[s32_RangeIndex].u32_BlockSize - 1);
+                                                             (pt_IC->c_Regions[s32_RangeIndex].u32_BlockSize - 1);
             orc_Sectors[u32_TotalIndex].u8_ICIndex = static_cast<uint8>(s32_ICIndex);
 
             orc_Sectors[u32_TotalIndex].q_IsProtected = false;
@@ -897,7 +908,7 @@ void C_XFLFlashInformation::ConvertToFlashSectorTable(C_XFLFlashSectors & orc_Se
                  s32_ProtectedIndex++)
             {
                if ((this->c_ProtectedSectors[s32_ProtectedIndex].u16_SectorNumber ==
-                                                                                 static_cast<uint16>(u32_TotalIndex)) &&
+                    static_cast<uint16>(u32_TotalIndex)) &&
                    (this->c_ProtectedSectors[s32_ProtectedIndex].u8_ICIndex == static_cast<uint8>(s32_ICIndex)))
                {
                   orc_Sectors[u32_TotalIndex].q_IsProtected = true;
@@ -940,9 +951,10 @@ sint32 C_XFLFlashSectors::GetSectorOccupiedByAddress(const uint32 ou32_Address, 
 {
    sint32 s32_Return = C_RANGE;
    sint32 s32_Index;
+
    for (s32_Index = 0; s32_Index < this->GetLength(); s32_Index++)
    {
-      if (this->operator[](s32_Index).IsAddressWithinSector(ou32_Address) == true)
+      if (this->operator [](s32_Index).IsAddressWithinSector(ou32_Address) == true)
       {
          oru16_Sector = static_cast<uint16>(s32_Index);
          s32_Return = C_NO_ERR;
@@ -1048,6 +1060,7 @@ sint32 C_XFLActions::CompIDStructToString(const C_XFLCompanyID & orc_Data, C_SCL
 {
    sint32 s32_Return;
    charn acn_Help[6];
+
    s32_Return = stw_company_id::CID_bytes_to_string(&orc_Data.au8_Data[0], orc_Data.u8_NumBytes, &acn_Help[0]);
    if (s32_Return == C_NO_ERR)
    {
@@ -1073,18 +1086,19 @@ sint32 C_XFLActions::CompIDStructToString(const C_XFLCompanyID & orc_Data, C_SCL
 C_SCLString C_XFLActions::XFLProtocolErrorToText(const sint32 os32_ReturnValue, const uint8 ou8_ErrorCode)
 {
    C_SCLString c_Help;
+
    switch (os32_ReturnValue)
    {
    case C_NO_ERR: //no problems
       c_Help = "";
       break;
-   case C_COM:    //no response
+   case C_COM: //no response
       c_Help = TGL_LoadStr(STR_XFL_ERR_NO_RESPONSE);
       break;
-   case C_RANGE:  //invalid parameter
+   case C_RANGE: //invalid parameter
       c_Help = TGL_LoadStr(STR_XFL_ERR_INVALID_PARAMETER);
       break;
-   case C_NOACT:  //error response
+   case C_NOACT: //error response
       if ((ou8_ErrorCode >= XFL_ERR_APP_DEF_ERR_MIN) && (ou8_ErrorCode <= XFL_ERR_APP_DEF_ERR_MAX))
       {
          c_Help.PrintFormatted("%s %02x", TGL_LoadStr(STR_FDL_ERR_ERASE_NO_CODE).c_str(), ou8_ErrorCode);
@@ -1139,9 +1153,10 @@ C_SCLString C_XFLActions::XFLProtocolErrorToText(const sint32 os32_ReturnValue, 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-C_SCLString C_XFLActions::SNRBytesToString(const uint8 (& orau8_Data)[6], const bool oq_IncludeDots)
+C_SCLString C_XFLActions::SNRBytesToString(const uint8 (&orau8_Data)[6], const bool oq_IncludeDots)
 {
    C_SCLString c_Text;
+
    if (oq_IncludeDots == false)
    {
       c_Text.PrintFormatted("%02X%02X%02X%02X%02X%02X", orau8_Data[0], orau8_Data[1], orau8_Data[2], orau8_Data[3],
@@ -1157,7 +1172,7 @@ C_SCLString C_XFLActions::SNRBytesToString(const uint8 (& orau8_Data)[6], const 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-sint32 C_XFLActions::SNRStringToBytes(const C_SCLString & orc_Text, uint8 (& orau8_Data)[6])
+sint32 C_XFLActions::SNRStringToBytes(const C_SCLString & orc_Text, uint8 (&orau8_Data)[6])
 {
    uint8 u8_Index;
    C_SCLString c_SNR;
@@ -1191,12 +1206,12 @@ sint32 C_XFLActions::SNRStringToBytes(const C_SCLString & orc_Text, uint8 (& ora
       for (u8_Index = 0U; u8_Index < 6U; u8_Index++)
       {
          c_Help = static_cast<C_SCLString>("0x") + c_SNR[(static_cast<sintn>(u8_Index) * 2U) + 1U];
-         orau8_Data[u8_Index] = static_cast<uint8>(static_cast<uint8>(c_Help.ToInt()) << 4);
+         orau8_Data[u8_Index] = static_cast<uint8>(static_cast<uint8>(c_Help.ToInt()) << 4U);
          c_Help = static_cast<C_SCLString>("0x") + c_SNR[(static_cast<sintn>(u8_Index) * 2U) + 2U];
          orau8_Data[u8_Index] += static_cast<uint8>(c_Help.ToInt());
       }
    }
-   catch(...)
+   catch (...)
    {
       return C_CONFIG; //definitely a total mess ...
    }
@@ -1231,7 +1246,6 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
    uint8 u8_NumFound;
    uint8 u8_NumSNRsFound;
    uint16 u16_ProtocolVersion;
-   sint32 s32_i;
    sint32 s32_j;
    uint8 aau8_SNRs[u8_MAX_NUM_ECUS_PER_LOCAL_ID][6];
    uint8 u8_Dummy;
@@ -1259,29 +1273,29 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
 
    if (u8_NumFound > 0U)
    {
-      for (s32_i = 0; s32_i < orc_FoundNodes.GetLength(); s32_i++)
+      for (sint32 s32_Node = 0; s32_Node < orc_FoundNodes.GetLength(); s32_Node++)
       {
-         orc_FoundNodes[s32_i].c_SNR = "?\?\?";
-         orc_FoundNodes[s32_i].c_DeviceID = "?\?\?";
+         orc_FoundNodes[s32_Node].c_SNR = "?\?\?";
+         orc_FoundNodes[s32_Node].c_DeviceID = "?\?\?";
       }
 
       s32_IndexInTable = 0;
-      for (s32_i = 0; s32_i < XFL_NUM_DIFFERENT_LOCAL_IDS; s32_i++)
+      for (sint32 s32_IdIndex = 0; s32_IdIndex < XFL_NUM_DIFFERENT_LOCAL_IDS; s32_IdIndex++)
       {
-         if ((static_cast<uint16>(au8_Found[s32_i])) > u8_MAX_NUM_ECUS_PER_LOCAL_ID)
+         if ((static_cast<uint16>(au8_Found[s32_IdIndex])) > u8_MAX_NUM_ECUS_PER_LOCAL_ID)
          {
             return C_OVERFLOW;
          }
 
-         if (au8_Found[s32_i] > 0U)
+         if (au8_Found[s32_IdIndex] > 0U)
          {
-            for (s32_j = s32_IndexInTable; s32_j < (s32_IndexInTable + au8_Found[s32_i]); s32_j++)
+            for (s32_j = s32_IndexInTable; s32_j < (s32_IndexInTable + au8_Found[s32_IdIndex]); s32_j++)
             {
-               orc_FoundNodes[s32_j].u8_NodeID = static_cast<uint8>(s32_i);
+               orc_FoundNodes[s32_j].u8_NodeID = static_cast<uint8>(s32_IdIndex);
             }
 
             //read out SNR(s)
-            CfgSetLocalId(static_cast<uint8>(s32_i));
+            CfgSetLocalId(static_cast<uint8>(s32_IdIndex));
             s32_Return = WakeupLocalId(c_CompIDIn, &u8_NumFound, NULL);
             if (s32_Return == C_WARN)
             {
@@ -1290,9 +1304,9 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
             }
 
             // < : if we have more responses now only use a max. of abFound[i]
-            if ((s32_Return != C_NO_ERR) || (u8_NumFound < au8_Found[s32_i]))
+            if ((s32_Return != C_NO_ERR) || (u8_NumFound < au8_Found[s32_IdIndex]))
             {
-               TRG_ReportStatus(TGL_LoadStr(STR_FM_TXT_NODE_WAKE_PT1) + C_SCLString::IntToStr(s32_i) +
+               TRG_ReportStatus(TGL_LoadStr(STR_FM_TXT_NODE_WAKE_PT1) + C_SCLString::IntToStr(s32_IdIndex) +
                                 TGL_LoadStr(STR_FM_TXT_NODE_WAKE_PT2),
                                 gu8_DL_REPORT_STATUS_TYPE_WARNING);
             }
@@ -1302,7 +1316,7 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
                s32_Return = GetSNRExt(&aau8_SNRs[0][0], u8_MAX_NUM_ECUS_PER_LOCAL_ID, u8_NumSNRsFound);
                if (s32_Return != C_NO_ERR)
                {
-                  TRG_ReportStatus(TGL_LoadStr(STR_FM_TXT_NODE_SNR_PT1) + C_SCLString::IntToStr(s32_i) +
+                  TRG_ReportStatus(TGL_LoadStr(STR_FM_TXT_NODE_SNR_PT1) + C_SCLString::IntToStr(s32_IdIndex) +
                                    TGL_LoadStr(STR_FM_TXT_NODE_SNR_PT2),
                                    gu8_DL_REPORT_STATUS_TYPE_WARNING);
                }
@@ -1316,22 +1330,22 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
                   //  multiple responses as well, due to the different SNR in the data byte area
                   //  (wakeup and send-comp-id can result in identical responses from different nodes, possibly
                   //   resulting in a number of the responses not actually making it to the CAN bus)
-                  if (u8_NumSNRsFound > au8_Found[s32_i])
+                  if (u8_NumSNRsFound > au8_Found[s32_IdIndex])
                   {
                      //more responses here than we had before:
                      //-> expand list
                      C_XFLFoundNode c_Node;
-                     c_Node.u8_NodeID = static_cast<uint8>(s32_i);
+                     c_Node.u8_NodeID = static_cast<uint8>(s32_IdIndex);
                      c_Node.c_SNR = "?\?\?";
                      c_Node.c_DeviceID = "?\?\?";
 
-                     for (s32_j = au8_Found[s32_i]; s32_j < u8_NumSNRsFound; s32_j++)
+                     for (s32_j = au8_Found[s32_IdIndex]; s32_j < u8_NumSNRsFound; s32_j++)
                      {
                         orc_FoundNodes.Insert(static_cast<uint16>(s32_IndexInTable), c_Node);
-                        TRG_ReportStatus(TGL_LoadStr(STR_FM_TXT_SURP_NODE_AMBIG_ID) + C_SCLString::IntToStr(s32_i),
+                        TRG_ReportStatus(TGL_LoadStr(STR_FM_TXT_SURP_NODE_AMBIG_ID) + C_SCLString::IntToStr(s32_IdIndex),
                                          gu8_DL_REPORT_STATUS_TYPE_WARNING);
                      }
-                     au8_Found[s32_i] = u8_NumSNRsFound; //to be added to s32_IndexInTable later !
+                     au8_Found[s32_IdIndex] = u8_NumSNRsFound; //to be added to s32_IndexInTable later !
                   }
 
                   for (s32_j = s32_IndexInTable; s32_j < (s32_IndexInTable + u8_NumSNRsFound); s32_j++)
@@ -1350,7 +1364,7 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
                   //   service
                   for (s32_j = 0; s32_j < u8_NumSNRsFound; s32_j++)
                   {
-                     if (au8_Found[s32_i] > 1)
+                     if (au8_Found[s32_IdIndex] > 1)
                      {
                         //Some versions of the C167 flashloader (e.g. ESX2) do not respond to "wakeup-snr"
                         // if the nodes are already in the ACTIVE state.
@@ -1400,14 +1414,14 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
                      }
                      else
                      {
-                        TRG_ReportStatus(TGL_LoadStr(STR_FM_ERR_WAKE_SNR_PT1) + C_SCLString::IntToStr(s32_i) +
+                        TRG_ReportStatus(TGL_LoadStr(STR_FM_ERR_WAKE_SNR_PT1) + C_SCLString::IntToStr(s32_IdIndex) +
                                          TGL_LoadStr(STR_FM_ERR_WAKE_SNR_PT2) +
                                          TGL_LoadStr(STR_FM_ERR_WAKE_SNR_PT3), gu8_DL_REPORT_STATUS_TYPE_WARNING);
                      }
                   }
                }
             }
-            s32_IndexInTable += au8_Found[s32_i]; //skip all the ones originally found ...
+            s32_IndexInTable += au8_Found[s32_IdIndex]; //skip all the ones originally found ...
          }
       }
    }
@@ -1513,6 +1527,7 @@ void C_XFLActions::m_ReadDeviceInfo(C_XFLInformationFromServer & orc_Information
 {
    sint32 s32_Return;
    uint8 u8_Block;
+
    if (orc_Information.c_AvailableFeatures.q_DeviceInfo == true)
    {
       s32_Return = GetDeviceInfoAddresses(orc_Information.c_DeviceInfoAddresses, orc_Information.u16_ProtocolVersion);
@@ -1579,25 +1594,25 @@ void C_XFLFeaturesAvailable::DetermineFeatures(const C_XFLImplementedServices & 
    this->q_SMMHandling     = orc_Services.q_GetTimeOutFactor && orc_Services.q_SetTimeoutFactor;
    this->q_EraseCount      = orc_Services.q_GetDownloadCount;
    this->q_SectorBasedCRCs = orc_Services.q_GetSectorChecksum &&
-                                    orc_Services.q_GetSectorModeCompare &&
-                                    orc_Services.q_SetSectorChecksum &&
-                                    orc_Services.q_SetSectorModeCompare;
+                             orc_Services.q_GetSectorModeCompare &&
+                             orc_Services.q_SetSectorChecksum &&
+                             orc_Services.q_SetSectorModeCompare;
    this->q_BlockBasedCRCsEEPROM = orc_Services.q_GetBlockStartAddress &&
-                                     orc_Services.q_GetBlockEndAddress &&
-                                     orc_Services.q_GetBlockChecksum &&
-                                     orc_Services.q_SetBlockStartAddress &&
-                                     orc_Services.q_SetBlockEndAddress &&
-                                     orc_Services.q_SetBlockChecksum &&
-                                     orc_Services.q_GetBlockCompareMode &&
-                                     orc_Services.q_SetBlockCompareMode;
+                                  orc_Services.q_GetBlockEndAddress &&
+                                  orc_Services.q_GetBlockChecksum &&
+                                  orc_Services.q_SetBlockStartAddress &&
+                                  orc_Services.q_SetBlockEndAddress &&
+                                  orc_Services.q_SetBlockChecksum &&
+                                  orc_Services.q_GetBlockCompareMode &&
+                                  orc_Services.q_SetBlockCompareMode;
    this->q_BlockBasedCRCsFlash = orc_Services.q_GetBlockStartAddress &&
-                                        orc_Services.q_GetBlockEndAddress &&
-                                        orc_Services.q_GetBlockChecksum &&
-                                        (!orc_Services.q_SetBlockStartAddress) &&
-                                        (!orc_Services.q_SetBlockEndAddress) &&
-                                        (!orc_Services.q_SetBlockChecksum) &&
-                                        orc_Services.q_GetBlockCompareMode &&
-                                        (!orc_Services.q_SetBlockCompareMode);  //must not be available
+                                 orc_Services.q_GetBlockEndAddress &&
+                                 orc_Services.q_GetBlockChecksum &&
+                                 (!orc_Services.q_SetBlockStartAddress) &&
+                                 (!orc_Services.q_SetBlockEndAddress) &&
+                                 (!orc_Services.q_SetBlockChecksum) &&
+                                 orc_Services.q_GetBlockCompareMode &&
+                                 (!orc_Services.q_SetBlockCompareMode); //must not be available
    this->q_ListAvailableServices = orc_Services.q_GetImplementationInformation;
    this->q_FlashInformation = orc_Services.q_GetFlashInformation;
    this->q_FingerPrint      = orc_Services.q_SetFingerPrint && orc_Services.q_GetFingerPrint;
@@ -1731,22 +1746,22 @@ sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info
    s32_Return = GetVersionNumber(au8_Version, u8_Size);
    if (s32_Return == C_NO_ERR)
    {
-      switch(u8_Size)
+      switch (u8_Size)
       {
       case 1U: //"old" implementation
          //BCD coded
-         orc_Info.c_FlashloaderVersion = C_SCLString::IntToStr(static_cast<uint8>(au8_Version[0] >> 4)) + "." +
+         orc_Info.c_FlashloaderVersion = C_SCLString::IntToStr(static_cast<uint8>(au8_Version[0] >> 4U)) + "." +
                                          C_SCLString::IntToStr(au8_Version[0] & 0x0FU);
 
          orc_Info.q_FlashloaderVersionValid = true;
          break;
       case 5U:
-         u16_Ident = static_cast<uint16>(((static_cast<uint16>(au8_Version[3])) << 8) + au8_Version[4]);
+         u16_Ident = static_cast<uint16>(((static_cast<uint16>(au8_Version[3])) << 8U) + au8_Version[4]);
          orc_Info.c_FlashloaderVersion.PrintFormatted("%c.%c%cr%d", au8_Version[0], au8_Version[1], au8_Version[2],
                                                       u16_Ident);
          u32_FlashloaderVersion = ((au8_Version[0] - 48U) * 100U) +
                                   ((au8_Version[1] - 48U) * 10U) +
-                                   (au8_Version[2] - 48U);
+                                  (au8_Version[2] - 48U);
 
          if (orc_Info.u16_ProtocolVersion >= 0x3000U) //read_implementation_info should be available !
          {
@@ -1771,7 +1786,7 @@ sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info
                pt_Features->q_SectorBasedCRCs = true;
             }
             if (((s16_Device == KNOWN_DEVICE_ESX) && (u32_FlashloaderVersion >= 203U)) ||
-                 (s16_Device == KNOWN_DEVICE_EHC))
+                (s16_Device == KNOWN_DEVICE_EHC))
             {
                pt_Features->q_SMMHandling = true;
             }
@@ -1893,7 +1908,7 @@ sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info
       }
       else
       {
-        orc_Info.q_FlashMappingInformationValid = true;
+         orc_Info.q_FlashMappingInformationValid = true;
       }
    }
 
@@ -1905,7 +1920,8 @@ sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info
    }
    else
    {
-      TRG_ReportStatus(TGL_LoadStr(STR_WARNING) + ": " + TGL_LoadStr(STR_FW_ERR_READ_LID), gu8_DL_REPORT_STATUS_TYPE_WARNING);
+      TRG_ReportStatus(TGL_LoadStr(STR_WARNING) + ": " + TGL_LoadStr(
+                          STR_FW_ERR_READ_LID), gu8_DL_REPORT_STATUS_TYPE_WARNING);
    }
 
    //read SNR (mandatory function for all implementations)
@@ -1917,7 +1933,8 @@ sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info
    }
    else
    {
-      TRG_ReportStatus(TGL_LoadStr(STR_WARNING) + ": " + TGL_LoadStr(STR_FW_ERR_READ_SNR), gu8_DL_REPORT_STATUS_TYPE_WARNING);
+      TRG_ReportStatus(TGL_LoadStr(STR_WARNING) + ": " + TGL_LoadStr(
+                          STR_FW_ERR_READ_SNR), gu8_DL_REPORT_STATUS_TYPE_WARNING);
    }
    return C_NO_ERR;
 }
@@ -2030,7 +2047,6 @@ sint32 C_XFLActions::ReadServerSectorChecksumInformation(const uint16 ou16_Secto
                                                          C_XFLChecksumAreas & orc_ChecksumInformation)
 {
    sint32 s32_Return;
-   sint32 i;
    uint16 u16_CRC;
    uint16 u16_CRCEE;
 
@@ -2048,9 +2064,9 @@ sint32 C_XFLActions::ReadServerSectorChecksumInformation(const uint16 ou16_Secto
 
    orc_ChecksumInformation.c_Areas.SetLength(ou16_SectorCount);
 
-   for (i = 0; i < ou16_SectorCount; i++)
+   for (uint16 u16_Sector = 0; u16_Sector < ou16_SectorCount; u16_Sector++)
    {
-      s32_Return = GetSecCRC(static_cast<uint16>(i), u16_CRC, u16_CRCEE);
+      s32_Return = GetSecCRC(static_cast<uint16>(u16_Sector), u16_CRC, u16_CRCEE);
       if (s32_Return != C_NO_ERR)
       {
          TRG_ReportStatus(TGL_LoadStr(STR_ERROR) + ": " + TGL_LoadStr(STR_FW_ERR_READ_CRC),
@@ -2058,7 +2074,7 @@ sint32 C_XFLActions::ReadServerSectorChecksumInformation(const uint16 ou16_Secto
          return s32_Return;
       }
 
-      s32_Return = GetModeCompare(static_cast<uint16>(i), u8_ModeCompare);
+      s32_Return = GetModeCompare(u16_Sector, u8_ModeCompare);
       if (s32_Return != C_NO_ERR)
       {
          TRG_ReportStatus(TGL_LoadStr(STR_ERROR) + ": " +
@@ -2068,13 +2084,13 @@ sint32 C_XFLActions::ReadServerSectorChecksumInformation(const uint16 ou16_Secto
       }
 
       orc_ChecksumInformation.c_BlockConfig.SetLength(orc_ChecksumInformation.c_Areas.GetLength());
-      orc_ChecksumInformation.c_BlockConfig[i].u32_StartAddress = 0U; //can not be determined for sector based ...
-      orc_ChecksumInformation.c_BlockConfig[i].u32_EndAddress = 0U;   // ... checksums :-(
-      orc_ChecksumInformation.c_BlockConfig[i].q_BlockDefinitionValid = true;
-      orc_ChecksumInformation.c_Areas[i].u32_ChecksumEEP  = u16_CRCEE;
-      orc_ChecksumInformation.c_Areas[i].u32_ChecksumCalc = u16_CRC;
-      orc_ChecksumInformation.c_Areas[i].q_CheckAtStartup = (u8_ModeCompare == 1U);
-      orc_ChecksumInformation.c_Areas[i].q_CheckAfterFlashing = false; //not supported for sector based CRCs
+      orc_ChecksumInformation.c_BlockConfig[u16_Sector].u32_StartAddress = 0U; //can not be determined for sector based ...
+      orc_ChecksumInformation.c_BlockConfig[u16_Sector].u32_EndAddress = 0U;   // ... checksums :-(
+      orc_ChecksumInformation.c_BlockConfig[u16_Sector].q_BlockDefinitionValid = true;
+      orc_ChecksumInformation.c_Areas[u16_Sector].u32_ChecksumEEP  = u16_CRCEE;
+      orc_ChecksumInformation.c_Areas[u16_Sector].u32_ChecksumCalc = u16_CRC;
+      orc_ChecksumInformation.c_Areas[u16_Sector].q_CheckAtStartup = (u8_ModeCompare == 1U);
+      orc_ChecksumInformation.c_Areas[u16_Sector].q_CheckAfterFlashing = false; //not supported for sector based CRCs
    }
    return C_NO_ERR;
 }
@@ -2132,7 +2148,7 @@ sint32 C_XFLActions::PerformWakeup(const C_XFLWakeupParameters & orc_Parameters,
       }
    }
 
-   switch(orc_Parameters.e_WakeupMode)
+   switch (orc_Parameters.e_WakeupMode)
    {
    case eXFL_WAKEUP_MODE_LID:
       s32_Return = m_WakeupLocalID(c_CompID);

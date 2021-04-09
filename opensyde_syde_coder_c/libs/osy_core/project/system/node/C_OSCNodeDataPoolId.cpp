@@ -41,6 +41,14 @@ C_OSCNodeDataPoolId::C_OSCNodeDataPoolId(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Destructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCNodeDataPoolId::~C_OSCNodeDataPoolId()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
    \param[in] ou32_NodeIndex     Node index
@@ -126,7 +134,7 @@ bool C_OSCNodeDataPoolId::operator ==(const C_OSCNodeDataPoolId & orc_Cmp) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCNodeDataPoolId::operator !=(const C_OSCNodeDataPoolId & orc_Cmp) const
 {
-   bool q_Return = !C_OSCNodeDataPoolId::operator ==(orc_Cmp);
+   const bool q_Return = !C_OSCNodeDataPoolId::operator ==(orc_Cmp);
 
    return q_Return;
 }

@@ -55,9 +55,6 @@ public:
    void SetEnabled(const bool oq_Enabled) const;
    void Save(void) const;
    void HandleManualOperationFinished(const stw_types::sint32 os32_Result, const stw_types::uint8 ou8_NRC) const;
-   void SetErrorForFailedCyclicElementIdRegistrations(
-      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-      const std::vector<QString> & orc_FailedIdErrorDetails) const;
    void RegisterWidgets(stw_opensyde_gui_logic::C_SyvComDriverDiag & orc_ComDriver) const;
    void ConnectionActiveChanged(const bool oq_Active, const bool oq_WidgetTabOnly = false) const;
    void UpdateShowValues(void) const;
@@ -86,8 +83,8 @@ protected:
    virtual void closeEvent(QCloseEvent * const opc_Event) override;
 
 private:
-   void m_OnActiveChange(stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source, const bool oq_Active);
-   void m_OnCopy(stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source) const;
+   void m_OnActiveChange(const stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source, const bool oq_Active);
+   void m_OnCopy(const stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source) const;
    void m_OnEditProperties(stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source);
    void m_CheckError(void) const;
    void m_AdaptSpaceHolderWidgetColor(void) const;

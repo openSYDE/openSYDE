@@ -267,22 +267,6 @@ void C_SyvDaDashboardToolbox::m_AddWidgetItems(void)
                                         "://images/system_views/dashboards/DataListSkeuDark.png",
                                         c_Theme4 + c_ToolTipPrefix);
 
-   pc_List = C_SebToolboxUtil::h_AddNewList(C_GtGetText::h_GetText(
-                                               "2D Chart"), this->mpc_Ui->pc_VerticalLayout1, this->mc_ListWidgets,
-                                            this);
-   C_SebToolboxUtil::h_AddElementToList(pc_List, c_Theme1, "://images/system_views/dashboards/TDChartStw.png",
-                                        "://images/system_views/dashboards/TDChartStwDark.png",
-                                        c_Theme1 + c_ToolTipPrefix);
-   C_SebToolboxUtil::h_AddElementToList(pc_List, c_Theme2, "://images/system_views/dashboards/TDChartStw2.png",
-                                        "://images/system_views/dashboards/TDChartStw2Dark.png",
-                                        c_Theme2 + c_ToolTipPrefix);
-   C_SebToolboxUtil::h_AddElementToList(pc_List, c_Theme3, "://images/system_views/dashboards/TDChartFlat.png",
-                                        "://images/system_views/dashboards/TDChartFlatDark.png",
-                                        c_Theme3 + c_ToolTipPrefix);
-   C_SebToolboxUtil::h_AddElementToList(pc_List, c_Theme4, "://images/system_views/dashboards/TDChartSkeu.png",
-                                        "://images/system_views/dashboards/TDChartSkeuDark.png",
-                                        c_Theme4 + c_ToolTipPrefix);
-
    //add free space
    this->mpc_FrameSeparatorWritingWidgets =
       C_SebToolboxUtil::h_AddNewHeading(C_GtGetText::h_GetText("Writing Widgets"),

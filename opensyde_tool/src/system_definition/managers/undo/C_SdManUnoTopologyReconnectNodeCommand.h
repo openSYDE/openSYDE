@@ -31,7 +31,7 @@ public:
                                           const stw_types::uint64 & oru64_StartingNodeID,
                                           const stw_types::uint64 & oru64_LastNodeID, const QPointF & orc_ConnectionPos,
                                           const stw_types::sint32 & ors32_Interface,
-                                          const stw_types::sint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
+                                          const stw_types::sint8 & ors8_NodeId, const bool oq_ActivateDatapoolL2,
                                           const bool oq_ActivateDatapoolECeS, const bool oq_ActivateDatapoolECoS,
                                           QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SdManUnoTopologyReconnectNodeCommand(void);

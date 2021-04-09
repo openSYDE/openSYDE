@@ -132,8 +132,8 @@ C_SebGraphicsView::~C_SebGraphicsView()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::SetZoomValue(const sintn osn_Percent, const bool & orq_Silent)
 {
-   float64 f64_TargetScale = static_cast<float64>(osn_Percent) / 100.0;
-   float64 f64_ScaleFactor = f64_TargetScale / transform().m11();
+   const float64 f64_TargetScale = static_cast<float64>(osn_Percent) / 100.0;
+   const float64 f64_ScaleFactor = f64_TargetScale / transform().m11();
 
    m_ScaleBy(f64_ScaleFactor, orq_Silent);
 }
@@ -155,7 +155,7 @@ sintn C_SebGraphicsView::GetZoomValue(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::UpdateTransform(void) const
 {
-   C_SebScene * pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
+   C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
 
    if (pc_Scene != NULL)
    {
@@ -235,7 +235,7 @@ void C_SebGraphicsView::SetSubtleSurroundGradient(const bool & orq_SubtleSurroun
 void C_SebGraphicsView::ShowToolTip(const QPointF & orc_ScenePos, const QString & orc_Heading,
                                     const QString & orc_Content, const C_NagToolTip::E_Type oe_Type)
 {
-   QPointF c_AdaptedScenePos(orc_ScenePos.x(), orc_ScenePos.y());
+   const QPointF c_AdaptedScenePos(orc_ScenePos.x(), orc_ScenePos.y());
 
    mc_ToolTip.SetHeading(orc_Heading);
    mc_ToolTip.SetContent(orc_Content);
@@ -462,7 +462,7 @@ void C_SebGraphicsView::mouseMoveEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::mousePressEvent(QMouseEvent * const opc_Event)
 {
-   C_SebScene * pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
+   C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
    bool q_BlockPressHandling = false;
 
    if (pc_Scene != NULL)
@@ -673,10 +673,10 @@ bool C_SebGraphicsView::event(QEvent * const opc_Event)
 
    if (opc_Event->type() == QEvent::ToolTip)
    {
-      QHelpEvent * pc_Help = dynamic_cast<QHelpEvent *>(opc_Event);
+      QHelpEvent * const pc_Help = dynamic_cast<QHelpEvent *>(opc_Event);
       if (pc_Help != NULL)
       {
-         Q_EMIT this->SigShowToolTip(this->mapToScene(pc_Help->pos()));
+         Q_EMIT (this->SigShowToolTip(this->mapToScene(pc_Help->pos())));
          //Accept event because of Qt dynamic tooltip time based on the fact if there was a tooltip in this widget
          // already
          opc_Event->accept();
@@ -711,7 +711,7 @@ void C_SebGraphicsView::m_ScaleBy(const float64 of64_ScaleFactor, const bool & o
    QTransform c_Tranform = this->transform();
 
    //get absolute factor
-   float64 f64_Factor =
+   const float64 f64_Factor =
       c_Tranform.scale(of64_ScaleFactor, of64_ScaleFactor).mapRect(QRectF(0.0, 0.0, 1.0, 1.0)).width();
    const float64 f64_Value = f64_Factor * 100.0;
 
@@ -742,7 +742,7 @@ void C_SebGraphicsView::m_ScaleBy(const float64 of64_ScaleFactor, const bool & o
 
    {
       // adapt the scene rectangle
-      C_SebScene * pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
+      C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
       if (pc_Scene != NULL)
       {
          QPointF c_Point;
@@ -752,7 +752,7 @@ void C_SebGraphicsView::m_ScaleBy(const float64 of64_ScaleFactor, const bool & o
          pc_Scene->UpdateTransform(this->transform());
 
          // add this to the rectangle to avoid the view move to left border first
-         c_Point = QPointF(this->mapToScene(this->rect().bottomRight()));
+         c_Point = this->mapToScene(this->rect().bottomRight());
          c_Rect.setBottomRight(c_Point);
 
          // check if new rectangle is bigger than minimum required scene rectangle
@@ -816,9 +816,9 @@ void C_SebGraphicsView::m_UpdateZoomValue(const bool & orq_Silent)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_DragMove(const QMouseEvent * const opc_Event)
 {
-   QScrollBar * pc_HorBar = this->horizontalScrollBar();
-   QScrollBar * pc_VerBar = this->verticalScrollBar();
-   QPointF c_Delta = opc_Event->pos() - this->mc_LastMouseEvent.pos();
+   QScrollBar * const pc_HorBar = this->horizontalScrollBar();
+   QScrollBar * const pc_VerBar = this->verticalScrollBar();
+   const QPointF c_Delta = opc_Event->pos() - this->mc_LastMouseEvent.pos();
 
    // calculate the complete difference of this move
    this->mc_DragMoveDistance += c_Delta;
@@ -826,7 +826,7 @@ void C_SebGraphicsView::m_DragMove(const QMouseEvent * const opc_Event)
    if ((std::fabs(this->mc_DragMoveDistance.x()) > 2.0) ||
        (std::fabs(this->mc_DragMoveDistance.y()) > 2.0))
    {
-      C_SebScene * pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
+      C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
 
       if (pc_Scene != NULL)
       {
@@ -835,7 +835,7 @@ void C_SebGraphicsView::m_DragMove(const QMouseEvent * const opc_Event)
       }
    }
 
-   bool q_RightToLeft = this->isRightToLeft();
+   const bool q_RightToLeft = this->isRightToLeft();
 
    if (q_RightToLeft == true)
    {

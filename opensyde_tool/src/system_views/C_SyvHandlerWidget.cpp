@@ -23,6 +23,7 @@
 #include "C_HeHandler.h"
 #include "C_PuiProject.h"
 #include "C_PopErrorHandling.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_TblTreDataElementModel.h"
 
 #include "constants.h"
@@ -98,7 +99,8 @@ C_SyvHandlerWidget::C_SyvHandlerWidget(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvHandlerWidget::~C_SyvHandlerWidget()
+//lint -e{1540}  no memory leak because of the parent of mpc_DashboardsWidget and the Qt memory management
+C_SyvHandlerWidget::~C_SyvHandlerWidget(void)
 {
    //Necessary for use-case switch
    if (this->mc_Interaction.isNull() == false)
@@ -107,7 +109,6 @@ C_SyvHandlerWidget::~C_SyvHandlerWidget()
    }
 
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_DashboardsWidget and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -171,10 +172,10 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
    // set the icons. this can not be done in constructor
    QIcon c_IconApply("://images/IconSave.svg");
    c_IconApply.addPixmap(QPixmap("://images/IconSaveDisabled.svg"), QIcon::Disabled);
-   Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, c_IconApply); //QIcon(":images/IconSave.svg"));
+   Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, c_IconApply)); //QIcon(":images/IconSave.svg"));
    QIcon c_IconSettings("://images/SettingsIcon.svg");
    c_IconSettings.addPixmap(QPixmap("://images/SettingsIconDisabled.svg"), QIcon::Disabled);
-   Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, c_IconSettings);
+   Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, c_IconSettings));
 
    // if the submode is setup it can be the initial call or a kind of refresh because
    // of the start screen
@@ -185,8 +186,8 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
       sintn sn_Index;
 
       // Deactivate all buttons in the first step
-      Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, false);
-      Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, false);
+      Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, false));
+      Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, false));
 
       // delete or remove from the layout the other widgets if necessary
       if (this->mpc_SetupWidget != NULL)
@@ -243,12 +244,12 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
       if (os32_SubMode == ms32_SUBMODE_SYSVIEW_SETUP)
       {
          //Handle buttons
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true);
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, true);
+         Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true));
+         Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, true));
 
          QIcon c_IconDevice("://images/system_views/Device.svg");
          c_IconDevice.addPixmap(QPixmap("://images/system_views/DeviceDisabled.svg"), QIcon::Disabled);
-         Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, c_IconDevice);
+         Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, c_IconDevice));
 
          this->mpc_SetupWidget = new C_SyvSeSetupWidget(ou32_Index, this);
          if (this->mpc_SetupWidget != NULL)
@@ -270,7 +271,7 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
       if (os32_SubMode == ms32_SUBMODE_SYSVIEW_UPDATE)
       {
          //Handle buttons
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true);
+         Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true));
 
          this->mpc_UpdateWidget = new C_SyvUpUpdateWidget(ou32_Index, this->parentWidget(), this);
          if (this->mpc_UpdateWidget != NULL)
@@ -295,12 +296,12 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
                  &C_SyvHandlerWidget::OnPushButtonIconPress);
          connect(this->mc_Interaction, &C_SyvDaDashboardInteraction::SigPushButtonConnectPressed, this,
                  &C_SyvHandlerWidget::m_OnPushButtonConnectPress);
-         Q_EMIT this->SigSetInteractionWidget(this->mc_Interaction);
+         Q_EMIT (this->SigSetInteractionWidget(this->mc_Interaction));
          //Handle buttons
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true);
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true);
+         Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true));
+         Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true));
 
-         Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true);
+         Q_EMIT (this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true));
 
          this->mpc_DashboardsWidget = new C_SyvDaDashboardsWidget(ou32_Index, this->parentWidget(), this);
          if (this->mpc_DashboardsWidget != NULL)
@@ -343,6 +344,8 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::Save(void)
 {
+   const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
+
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
    // save all changes of the active edit widgets to the core
@@ -371,6 +374,7 @@ void C_SyvHandlerWidget::Save(void)
       }
    }
    QApplication::restoreOverrideCursor();
+   osc_write_log_performance_stop(u16_Timer, "System Commisioning Save");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -586,5 +590,9 @@ void C_SyvHandlerWidget::CallHelp(void)
    {
       stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
          "stw_opensyde_gui::C_SyvDaDashboardsWidget");
+   }
+   else
+   {
+      // Nothing to do
    }
 }

@@ -1081,6 +1081,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orc_NodeDataPoolContent.SetValueF64(orc_XMLParser.GetAttributeFloat64("value"));
             break;
+         default:
+            break;
          }
       }
    }
@@ -1144,6 +1146,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
             case C_OSCNodeDataPoolContent::eFLOAT64:
                orc_NodeDataPoolContent.SetValueAF64Element(orc_XMLParser.GetAttributeFloat64("value"),
                                                            u32_CurIndex);
+               break;
+            default:
                break;
             }
             u32_CurIndex++; //next element
@@ -1217,6 +1221,8 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLStri
       case C_OSCNodeDataPoolContent::eFLOAT64:
          orc_XMLParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueF64());
          break;
+      default:
+         break;
       }
    }
    else
@@ -1264,6 +1270,8 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLStri
             break;
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orc_XMLParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueAF64Element(u32_ItElem));
+            break;
+         default:
             break;
          }
          //Return to parent
@@ -1327,6 +1335,8 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCont
       case C_OSCNodeDataPoolContent::eFLOAT64:
          orc_XMLParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueF64());
          break;
+      default:
+         break;
       }
    }
    else
@@ -1377,6 +1387,8 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCont
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orc_XMLParser.SetAttributeFloat64("content", orc_NodeDataPoolContent.GetValueAF64Element(u32_ItElem));
             break;
+         default:
+            break;
          }
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "array");
@@ -1426,40 +1438,31 @@ sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDa
    switch (orc_ContentType)
    {
    case C_OSCNodeDataPoolContent::eUINT8:
-      if ((((u64_Val >= std::numeric_limits<stw_types::uint8>::min()) &&
-            (u64_Val <= std::numeric_limits<stw_types::uint8>::max())) &&
+      if ((((u64_Val <= std::numeric_limits<stw_types::uint8>::max())) &&
            ((s64_Val >= std::numeric_limits<stw_types::uint8>::min()) &&
-            (s64_Val <=
-             std::numeric_limits<stw_types::uint8>::max()))) &&
+            (s64_Val <= std::numeric_limits<stw_types::uint8>::max()))) &&
           (((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint8>::min())) &&
-            (f64_Val <=
-             static_cast<float64>(std::numeric_limits<stw_types::uint8>::max())))))
+            (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::uint8>::max())))))
       {
          s32_Retval = C_NO_ERR;
       }
       break;
    case C_OSCNodeDataPoolContent::eUINT16:
-      if ((((u64_Val >= std::numeric_limits<stw_types::uint16>::min()) &&
-            (u64_Val <= std::numeric_limits<stw_types::uint16>::max())) &&
+      if ((((u64_Val <= std::numeric_limits<stw_types::uint16>::max())) &&
            ((s64_Val >= std::numeric_limits<stw_types::uint16>::min()) &&
-            (s64_Val <=
-             std::numeric_limits<stw_types::uint16>::max()))) &&
+            (s64_Val <= std::numeric_limits<stw_types::uint16>::max()))) &&
           ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint16>::min())) &&
-           (f64_Val <=
-            static_cast<float64>(std::numeric_limits<stw_types::uint16>::max()))))
+           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::uint16>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
       break;
    case C_OSCNodeDataPoolContent::eUINT32:
-      if ((((u64_Val >= std::numeric_limits<stw_types::uint32>::min()) &&
-            (u64_Val <= std::numeric_limits<stw_types::uint32>::max())) &&
+      if ((((u64_Val <= std::numeric_limits<stw_types::uint32>::max())) &&
            ((s64_Val >= std::numeric_limits<stw_types::uint32>::min()) &&
-            (s64_Val <=
-             std::numeric_limits<stw_types::uint32>::max()))) &&
+            (s64_Val <= std::numeric_limits<stw_types::uint32>::max()))) &&
           ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint32>::min())) &&
-           (f64_Val <=
-            static_cast<float64>(std::numeric_limits<stw_types::uint32>::max()))))
+           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::uint32>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
@@ -1467,11 +1470,8 @@ sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDa
    case C_OSCNodeDataPoolContent::eUINT64:
       //Sint64 check not reliable as the range of uint64 and sint64 don't completely overlap
       // and overflows might mess up the check
-      if (((u64_Val >= std::numeric_limits<stw_types::uint64>::min()) &&
-           (u64_Val <= std::numeric_limits<stw_types::uint64>::max())) &&
-          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint64>::min())) &&
-           (f64_Val <=
-            static_cast<float64>(std::numeric_limits<stw_types::uint64>::max()))))
+      if (((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint64>::min())) &&
+           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::uint64>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
@@ -1480,11 +1480,9 @@ sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDa
       //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
       // and overflows might mess up the check
       if ((((s64_Val >= std::numeric_limits<stw_types::sint8>::min()) &&
-            (s64_Val <=
-             std::numeric_limits<stw_types::sint8>::max()))) &&
+            (s64_Val <= std::numeric_limits<stw_types::sint8>::max()))) &&
           ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint8>::min())) &&
-           (f64_Val <=
-            static_cast<float64>(std::numeric_limits<stw_types::sint8>::max()))))
+           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::sint8>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
@@ -1493,11 +1491,9 @@ sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDa
       //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
       // and overflows might mess up the check
       if ((((s64_Val >= std::numeric_limits<stw_types::sint16>::min()) &&
-            (s64_Val <=
-             std::numeric_limits<stw_types::sint16>::max()))) &&
+            (s64_Val <= std::numeric_limits<stw_types::sint16>::max()))) &&
           ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint16>::min())) &&
-           (f64_Val <=
-            static_cast<float64>(std::numeric_limits<stw_types::sint16>::max()))))
+           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::sint16>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
@@ -1506,11 +1502,9 @@ sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDa
       //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
       // and overflows might mess up the check
       if ((((s64_Val >= std::numeric_limits<stw_types::sint32>::min()) &&
-            (s64_Val <=
-             std::numeric_limits<stw_types::sint32>::max()))) &&
+            (s64_Val <= std::numeric_limits<stw_types::sint32>::max()))) &&
           ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint32>::min())) &&
-           (f64_Val <=
-            static_cast<float64>(std::numeric_limits<stw_types::sint32>::max()))))
+           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::sint32>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
@@ -1518,11 +1512,8 @@ sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDa
    case C_OSCNodeDataPoolContent::eSINT64:
       //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
       // and overflows might mess up the check
-      if ((((s64_Val >= std::numeric_limits<stw_types::sint64>::min()) &&
-            (s64_Val <= std::numeric_limits<stw_types::sint64>::max()))) &&
-          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint64>::min())) &&
-           (f64_Val <=
-            static_cast<float64>(std::numeric_limits<stw_types::sint64>::max()))))
+      if ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint64>::min())) &&
+          (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::sint64>::max())))
       {
          s32_Retval = C_NO_ERR;
       }
@@ -1531,6 +1522,8 @@ sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDa
    case C_OSCNodeDataPoolContent::eFLOAT64:
       //No range error or wrong type error possible for uint64 or sint64
       s32_Retval = C_NO_ERR;
+      break;
+   default:
       break;
    }
    if (s32_Retval != C_NO_ERR)
@@ -1643,6 +1636,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent 
                case C_OSCNodeDataPoolContent::eFLOAT64:
                   orc_NodeDataPoolContent.SetValueAF64Element(orc_XMLParser.GetAttributeFloat64("content"),
                                                               u32_CurIndex);
+                  break;
+               default:
                   break;
                }
                c_CurNode = orc_XMLParser.SelectNodeNext("element");
@@ -1900,7 +1895,7 @@ void C_OSCNodeDataPoolFiler::mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XMLP
    std::stringstream c_Stream;
    c_Stream << ou64_Input;
 
-   orc_XMLParser.SetAttributeString(orc_String, std::string(c_Stream.str()).c_str());
+   orc_XMLParser.SetAttributeString(orc_String, static_cast<std::string>(c_Stream.str()).c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

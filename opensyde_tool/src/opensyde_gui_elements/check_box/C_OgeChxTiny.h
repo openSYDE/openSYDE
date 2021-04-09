@@ -1,0 +1,33 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Tiny checkbox initially created for dashboard chart data element selection
+   \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+#ifndef C_OGECHXTINY_H
+#define C_OGECHXTINY_H
+
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include "C_OgeChxToolTipBase.h"
+
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
+namespace stw_opensyde_gui_elements
+{
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
+
+/* -- Types --------------------------------------------------------------------------------------------------------- */
+
+class C_OgeChxTiny :
+   public C_OgeChxToolTipBase
+{
+   Q_OBJECT
+
+public:
+   explicit C_OgeChxTiny(QWidget * const opc_Parent = NULL);
+};
+
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
+} //end of namespace
+
+#endif

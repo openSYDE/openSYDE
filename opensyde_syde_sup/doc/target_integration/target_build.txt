@@ -1,0 +1,48 @@
+---------------------------------------------------------------------
+File:      target_build.txt
+Content:   How to build this project for any target
+---------------------------------------------------------------------
+
+Linux based target with socket CAN
+==================================
+Prerequisites:
+- Linux-based target with socket CAN
+- 32-bit compiler (64-bit compiling is not supported by opensyde core)
+- toolchain file that specifies the compiler
+
+Rebuild the project in analogy to Ubuntu build (see build.txt).
+Check your build as described in target_verify.txt.
+
+
+Other targets
+=============
+For other targets the following target specific implementations 
+are required:
+- target glue layer implementations:
+      TGLFile.cpp/.h
+      TGLTasks.cpp/.h
+      TGLTime.cpp/.h
+      TGLUtils.cpp/.h
+   Refer to tgl_linux or tgl_windows to see which functions 
+   are necessary.
+- CAN dispatcher implementation:
+   class that inherits from C_CAN_Dispatcher
+   and implements its target specific functions
+   Examples: taget_linux_socket_can/CCAN.cpp, target_windows_stw_dlls/CCAN.cpp
+- IP dispatcher implementation:
+   class that inherits from C_OSCIpDispatcher
+   and implements its target specific functions
+   Examples: C_OSCIpDispatcherLinuxSock.cpp, C_OSCIpDispatcherWinSock.cpp
+- SYDEsup base class and main:
+   - class that inherits from C_SYDEsup 
+     and implements its target specific functions
+   - class that implements the main() and instantiates 
+     this new SYDEsup class
+   Examples: LinuxMain.cpp, WindowsMain.cpp,
+             C_SYDEsupLinux.cpp, C_SYDEsupWindows.cpp
+
+How these components interact can be seen on the graphic 
+next to this .txt file.
+
+Build your project with a 32-bit compiler.
+Check your build as described in target_verify.txt.

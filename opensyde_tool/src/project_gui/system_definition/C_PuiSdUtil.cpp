@@ -472,6 +472,7 @@ QString C_PuiSdUtil::h_GetNamespace(const C_OSCNodeDataPoolListElementId & orc_I
                     arg(pc_DataPool->c_Name.c_str()).
                     arg(pc_List->c_Name.c_str()).
                     arg(pc_Element->c_Name.c_str());
+         // HALC extra handling not possible if only C_OSCNodeDataPoolListElementId is provided
       }
    }
 

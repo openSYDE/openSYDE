@@ -97,7 +97,7 @@ sint32 C_XFLHexFile::GetECUInformationBlocks(SCLDynamicArray<C_XFLECUInformation
    uint32 u32_Address = ou32_SearchStartAddress;
    C_XFLECUInformation c_Block;
    uint16 u16_Size = static_cast<uint16>(c_Block.GetMaxSizeOnECU());
-   uint8 * pu8_Buffer = new uint8[u16_Size];
+   uint8 * const pu8_Buffer = new uint8[u16_Size];
    uint16 u16_Help;
 
    s32_Return = C_NO_ERR;
@@ -241,9 +241,9 @@ sint32 C_XFLHexFile::CalcFileChecksum(uint32 & oru32_Checksum)
       const uint8 au8_AddressOffset[4] =
       {
          static_cast<uint8>(u32_AddressOffset),
-         static_cast<uint8>(u32_AddressOffset >> 8),
-         static_cast<uint8>(u32_AddressOffset >> 16),
-         static_cast<uint8>(u32_AddressOffset >> 24),
+         static_cast<uint8>(u32_AddressOffset >> 8U),
+         static_cast<uint8>(u32_AddressOffset >> 16U),
+         static_cast<uint8>(u32_AddressOffset >> 24U),
       };
 
       //address:

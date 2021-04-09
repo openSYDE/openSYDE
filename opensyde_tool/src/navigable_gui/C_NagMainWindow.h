@@ -43,7 +43,7 @@ class C_NagMainWindow :
    Q_OBJECT
 
 public:
-   explicit C_NagMainWindow(void);
+   explicit C_NagMainWindow(const stw_types::uint16 ou16_Timer);
    virtual ~C_NagMainWindow();
 
 private Q_SLOTS:
@@ -75,14 +75,14 @@ private:
    void m_LoadInitialProject(void);
    void m_PrepareForSpecificWidget(const bool oq_DeleteActualWidget = true);
    void m_SetNewSpecificWidget(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode = 0,
-                               QString oc_ItemName = "", const QString & orc_SubSubModeName = "",
+                               const QString & orc_ItemName = "", const QString & orc_SubSubModeName = "",
                                const stw_types::uint32 ou32_Index = 0);
    void m_RemoveUseCaseWidget(void);
    void m_AdaptParameter(const stw_types::sint32 os32_Mode, stw_types::sint32 & ors32_SubMode,
                          stw_types::uint32 & oru32_Index, QString & orc_Name, QString & orc_SubItemName,
                          stw_types::uint32 & oru32_Flag, const bool oq_ChangeUseCase);
    static void mh_GetHeadingNames(const stw_types::sint32 os32_Mode, const stw_types::sint32 & ors32_SubMode,
-                                 const stw_types::uint32 ou32_Index, QString & orc_SubMode, QString & orc_SubSubMode);
+                                  const stw_types::uint32 ou32_Index, QString & orc_SubMode, QString & orc_SubSubMode);
    void m_ShowSysDefItem(const stw_types::sint32 os32_SubMode, const stw_types::uint32 ou32_Index = 0U,
                          const QString & orc_Name = "", const QString & orc_SubName = "",
                          const stw_types::uint32 ou32_Flag = 0U);
@@ -132,6 +132,8 @@ private:
    stw_types::sint32 ms32_SvSubMode;
    stw_types::uint32 mu32_SvIndex;
    stw_types::uint32 mu32_SvFlag;
+
+   const stw_types::uint16 mu16_Timer;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

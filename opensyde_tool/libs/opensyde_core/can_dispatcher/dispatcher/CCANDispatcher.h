@@ -136,8 +136,8 @@ public:
    stw_types::sint32 ReadFromQueue(const stw_types::uint16 ou16_Handle, T_STWCAN_Msg_RX & orc_Message);
    stw_types::sint32 ClearQueue(const stw_types::uint16 ou16_Handle);
 
-   //lint -e{1411}  we hide the base class function on purpose here
-   stw_types::sint32 CAN_Read_Msg(const stw_types::uint16 ou16_Handle, T_STWCAN_Msg_RX & orc_Message);
+   //we hide the base class function on purpose here
+   stw_types::sint32 CAN_Read_Msg(const stw_types::uint16 ou16_Handle, T_STWCAN_Msg_RX & orc_Message); //lint !e1411
    //try to read from CAN driver and add message to all installed RX queues:
    virtual stw_types::sint32 CAN_Read_Msg(T_STWCAN_Msg_RX & orc_Message);
 };

@@ -50,6 +50,8 @@ C_OSCDiagProtocolBase::C_OSCDiagProtocolBase(void) :
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCDiagProtocolBase::~C_OSCDiagProtocolBase(void)
 {
+   mpr_OnDataPoolReadEventReceived = NULL;
+   mpr_OnDataPoolReadEventErrorReceived = NULL;
    mpv_OnAsyncInstance = NULL;
 }
 

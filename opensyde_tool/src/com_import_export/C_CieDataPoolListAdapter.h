@@ -55,6 +55,10 @@ private:
    // internal function called by adapters to fill Ui data structures
    static void mh_FillUpUiStructure(C_CieDataPoolListStructure & orc_DataPoolListStructure,
                                     const bool oq_ActivateAutoMinMaxForSignals);
+   static void mh_FillUpUiStructureForSignals(const stw_opensyde_core::C_OSCCanMessage & orc_Message,
+                                              const bool oq_TxMessage,
+                                              const C_PuiSdNodeDataPoolListElement & orc_DefaultUiSig,
+                                              C_CieDataPoolListStructure & orc_DataPoolListStructure);
 
    static void mh_FillUpCoreStructureByDBCValues(
       const std::vector<stw_opensyde_gui_logic::C_CieConverter::C_CIENodeMessage> & orc_CIENodeMessages,

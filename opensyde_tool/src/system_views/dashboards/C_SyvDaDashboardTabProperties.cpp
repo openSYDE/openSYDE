@@ -17,7 +17,6 @@
 #include "C_PuiSvHandler.h"
 #include "stwerrors.h"
 #include "C_OgeWiUtil.h"
-#include "C_SyvDaDashboardWidget.h"
 #include "C_OgeWiCustomMessage.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -74,17 +73,31 @@ C_SyvDaDashboardTabProperties::C_SyvDaDashboardTabProperties(C_OgePopUpDialog & 
    //BEFORE load
    InitStaticNames();
 
+   this->mpc_Ui->pc_RbCommonDashboard->setEnabled(oq_NewDashboard);
+   this->mpc_Ui->pc_RbChartDashboard->setEnabled(oq_NewDashboard);
+
    // init name and comment
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
    if (pc_View != NULL)
    {
       if (this->mq_NewDashboard == false)
       {
-         const C_PuiSvDashboard * pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
+         const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
          if (pc_Dashboard != NULL)
          {
             this->mpc_Ui->pc_LineEditName->setText(pc_Dashboard->GetName());
             this->mpc_Ui->pc_TedComment->setText(pc_Dashboard->GetComment());
+
+            if (pc_Dashboard->GetType() == C_PuiSvDashboard::eSCENE)
+            {
+               this->mpc_Ui->pc_RbCommonDashboard->setChecked(true);
+               this->mpc_Ui->pc_RbChartDashboard->setChecked(false);
+            }
+            else
+            {
+               this->mpc_Ui->pc_RbCommonDashboard->setChecked(false);
+               this->mpc_Ui->pc_RbChartDashboard->setChecked(true);
+            }
          }
       }
       else
@@ -92,6 +105,8 @@ C_SyvDaDashboardTabProperties::C_SyvDaDashboardTabProperties(C_OgePopUpDialog & 
          // New dashboard, get a unique name
          this->mpc_Ui->pc_LineEditName->setText(pc_View->GetUniqueDashboardName("Dashboard"));
          this->mpc_Ui->pc_TedComment->setText("");
+
+         this->mpc_Ui->pc_RbCommonDashboard->setChecked(oq_NewDashboard);
       }
    }
 
@@ -101,6 +116,10 @@ C_SyvDaDashboardTabProperties::C_SyvDaDashboardTabProperties(C_OgePopUpDialog & 
            this, &C_SyvDaDashboardTabProperties::m_CancelClicked);
    connect(this->mpc_Ui->pc_LineEditName, &QLineEdit::textChanged, this,
            &C_SyvDaDashboardTabProperties::m_CheckDashboardTabName);
+   connect(this->mpc_Ui->pc_RbCommonDashboard, &QRadioButton::clicked,
+           this, &C_SyvDaDashboardTabProperties::m_SetCommonDashboardType);
+   connect(this->mpc_Ui->pc_RbChartDashboard, &QRadioButton::clicked,
+           this, &C_SyvDaDashboardTabProperties::m_SetChartDashboardType);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,10 +128,10 @@ C_SyvDaDashboardTabProperties::C_SyvDaDashboardTabProperties(C_OgePopUpDialog & 
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_ParentDialog and the Qt memory management
 C_SyvDaDashboardTabProperties::~C_SyvDaDashboardTabProperties(void)
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_ParentDialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -129,6 +148,9 @@ void C_SyvDaDashboardTabProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
    this->mpc_Ui->pc_LabelHintComment->setText(
       C_GtGetText::h_GetText("Note: Comment is shown in tooltip on tab hover."));
+   this->mpc_Ui->pc_LabelType->setText(C_GtGetText::h_GetText("Type"));
+   this->mpc_Ui->pc_RbCommonDashboard->setText(C_GtGetText::h_GetText("Common Dashboard"));
+   this->mpc_Ui->pc_RbChartDashboard->setText(C_GtGetText::h_GetText("Chart Dashboard"));
 
    //Tool tips
    this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
@@ -138,6 +160,10 @@ void C_SyvDaDashboardTabProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this Dashboard tab, that "
                                                                                "is shown in tooltip on tab hover."));
+   this->mpc_Ui->pc_RbCommonDashboard->SetToolTipInformation(C_GtGetText::h_GetText("Common Dashboard"),
+                                                             C_GtGetText::h_GetText("Empty Dashboard"));
+   this->mpc_Ui->pc_RbChartDashboard->SetToolTipInformation(C_GtGetText::h_GetText("Chart Dashboard"),
+                                                            C_GtGetText::h_GetText("Dashboard with a chart"));
 }
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get name of dashboard tab.
@@ -162,6 +188,26 @@ QString C_SyvDaDashboardTabProperties::GetDashboardTabComment(void) const
 {
    return this->mpc_Ui->pc_TedComment->toPlainText();
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get tab type of dashboard tab.
+
+   \return
+   type of dashboard tab
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvDashboard::E_TabType C_SyvDaDashboardTabProperties::GetDashboardTabType() const
+{
+   C_PuiSvDashboard::E_TabType e_TabType = C_PuiSvDashboard::eSCENE;
+
+   if (this->mpc_Ui->pc_RbChartDashboard->isChecked() == true)
+   {
+      e_TabType = C_PuiSvDashboard::eCHART;
+   }
+
+   return e_TabType;
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten key press event slot
 
@@ -276,4 +322,22 @@ bool C_SyvDaDashboardTabProperties::m_CheckDashboardTabName(void) const
    }
 
    return q_ValidName;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot of common dashboard radio button
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardTabProperties::m_SetCommonDashboardType(const bool oq_IsChecked) const
+{
+   this->mpc_Ui->pc_RbCommonDashboard->setChecked(oq_IsChecked);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot of chart dashboard radio button
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardTabProperties::m_SetChartDashboardType(const bool oq_IsChecked) const
+{
+   this->mpc_Ui->pc_RbChartDashboard->setChecked(oq_IsChecked);
 }

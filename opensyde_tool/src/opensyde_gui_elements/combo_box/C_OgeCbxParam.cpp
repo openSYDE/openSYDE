@@ -52,7 +52,7 @@ C_OgeCbxParam::C_OgeCbxParam(QWidget * const opc_Parent) :
    pc_ItemDelegate->SetPaddingLeft(0);
 
    this->setItemDelegate(pc_ItemDelegate);
-}  //lint !e429  //no memory leak because of the parent all elements and the Qt memory management
+} //lint !e429  //no memory leak because of the parent all elements and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor

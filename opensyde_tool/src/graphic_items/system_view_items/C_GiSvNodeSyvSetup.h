@@ -56,7 +56,7 @@ protected:
 private:
    //Avoid call
    C_GiSvNodeSyvSetup(const C_GiSvNodeSyvSetup &);
-   C_GiSvNodeSyvSetup & operator =(const C_GiSvNodeSyvSetup &);
+   C_GiSvNodeSyvSetup & operator =(const C_GiSvNodeSyvSetup &); //lint !e1511 //we want to hide the base
 
    void m_InitCheckBox(void);
 

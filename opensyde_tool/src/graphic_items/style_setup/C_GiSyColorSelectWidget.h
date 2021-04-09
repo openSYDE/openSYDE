@@ -34,7 +34,6 @@ namespace stw_opensyde_gui
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
-//lint -e{1960}  Forward declarations necessary for automatic registration
 class C_GiSyColorSelectWidget :
    public QWidget
 {
@@ -136,9 +135,9 @@ private:
    void m_PickScreenColor(void);
    void m_UpdatePositionWhileScreenColorPicking(void);
    void m_UpdateColorPicking(const QPoint & orc_GlobalPosition);
-   void m_SetCurrentRgbColor(const QRgb oun_Rgb);
+   void m_SetCurrentRgbColor(const stw_types::uintn oun_Rgb); // see QRgb
    QColor m_GrabScreenColor(const QPoint & orc_Position) const;
-   void m_NewColorTypedIn(const QRgb oun_Rgb);
+   void m_NewColorTypedIn(const stw_types::uintn oun_Rgb); // see QRgb
    void m_LeaveColorPicking(void);
 };
 

@@ -278,8 +278,6 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpToList(std::vector<uint8> & orc_Values, C_O
 
          c_CrcData.resize(2);
          // TODO: KEFEX position of CRC can be different
-         //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
-         //lint -e{420} //sub-function reported we have enough bytes; no problem
          (void)std::memcpy(&c_CrcData[0], &orc_Values[0], 2);
 
          if (this->mpc_DiagProtocol->GetEndianness() == C_OSCDiagProtocolBase::mhu8_ENDIANNESS_BIG)
@@ -334,13 +332,12 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8> & orc
       const uint32 u32_SizeElement = pc_Element->GetSizeByte();
       const uint32 u32_Index = pc_Element->u32_NvMStartAddress - orc_List.u32_NvMStartAddress;
 
-      if (orc_Values.size() >= (u32_Index + u32_SizeElement))
+      if (orc_Values.size() >= static_cast<size_t>(u32_Index + u32_SizeElement))
       {
          std::vector<uint8> c_ElementData;
 
          // Get the relevant data for this element
          c_ElementData.resize(u32_SizeElement);
-         //lint -e{419} //std::vector reference returned by [] is linear; we allocated enough memory
          (void)std::memcpy(&c_ElementData[0], &orc_Values[u32_Index], u32_SizeElement);
 
          //we have data

@@ -351,7 +351,8 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
                         "<td valign=\"middle\" style=\"padding: 0 9px 0 9px;\">");
                      const QString c_FileProjectName = rc_FileInfo.acn_ProjectName;
                      const QString c_FileVersion = rc_FileInfo.acn_ProjectVersion;
-                     const QString c_FileBuild = static_cast<QString>(rc_FileInfo.acn_Date) + " " + rc_FileInfo.acn_Time;
+                     const QString c_FileBuild = static_cast<QString>(rc_FileInfo.acn_Date) + " " +
+                                                 rc_FileInfo.acn_Time;
                      QString c_DeviceProjectName = C_GtGetText::h_GetText("<b>Missing</b>");
                      QString c_DeviceVersion = C_GtGetText::h_GetText("<b>Missing</b>");
                      QString c_DeviceBuild = C_GtGetText::h_GetText("<b>Missing</b>");
@@ -430,7 +431,8 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
                                  //Apply
                                  c_DeviceProjectName = rc_STWDeviceInfo.acn_ProjectName;
                                  c_DeviceVersion = rc_STWDeviceInfo.acn_ProjectVersion;
-                                 c_DeviceBuild = static_cast<QString>(rc_STWDeviceInfo.acn_Date) + " " + rc_STWDeviceInfo.acn_Time;
+                                 c_DeviceBuild = static_cast<QString>(rc_STWDeviceInfo.acn_Date) + " " +
+                                                 rc_STWDeviceInfo.acn_Time;
                                  //Highlighting
                                  if (c_FileProjectName.compare(c_DeviceProjectName) != 0)
                                  {
@@ -513,7 +515,8 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
                      c_Content += "<table>";
                      c_Content += "<tr>";
                      c_Content += "<td valign=\"middle\">";
-                     c_Content += static_cast<QString>("#%1 - %2 ").arg(u32_ItFile + 1).arg(rc_Application.c_Name.c_str());
+                     c_Content += static_cast<QString>("#%1 - %2 ").arg(u32_ItFile + 1).arg(
+                        rc_Application.c_Name.c_str());
                      c_Content += "</td>";
                      c_Content += "<td valign=\"middle\">";
                      //Image

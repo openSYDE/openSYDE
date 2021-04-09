@@ -84,7 +84,7 @@ void C_SyvUpScene::SetConnected(const bool oq_Active, const bool oq_SignalNodes)
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         
+
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if ((pc_Node != NULL) && (oq_SignalNodes == true))
          {
@@ -92,7 +92,6 @@ void C_SyvUpScene::SetConnected(const bool oq_Active, const bool oq_SignalNodes)
          }
          else
          {
-            
             C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc *>(pc_CurItemParent);
             if (pc_Pc != NULL)
             {
@@ -120,7 +119,7 @@ void C_SyvUpScene::SetUpdating(const bool oq_Active) const
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         
+
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if (pc_Node != NULL)
          {
@@ -152,7 +151,7 @@ void C_SyvUpScene::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeI
          if (pc_CurItemParent != NULL)
          {
             //Nodes
-            
+
             C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
             if (pc_Node != NULL)
             {
@@ -186,7 +185,7 @@ void C_SyvUpScene::StartConnectionAnimation(void) const
       if (pc_CurItemParent != NULL)
       {
          //PC connection
-         
+
          C_GiSvPcBusConnector * const pc_CurPcConnector = dynamic_cast<C_GiSvPcBusConnector *>(pc_CurItemParent);
          if (pc_CurPcConnector != NULL)
          {
@@ -226,7 +225,7 @@ void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
          if (pc_CurItemParent != NULL)
          {
             //Connectors
-            
+
             C_GiLiBusConnector * const pc_CurBusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_CurItemParent);
             if (pc_CurBusConnector != NULL)
             {
@@ -332,7 +331,7 @@ void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
             else
             {
                //PC connection
-               
+
                C_GiSvPcBusConnector * const pc_CurPcConnector =
                   dynamic_cast<C_GiSvPcBusConnector *>(pc_CurItemParent);
                if (pc_CurPcConnector != NULL)
@@ -349,7 +348,7 @@ void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
                else
                {
                   //Nodes
-                  
+
                   C_GiSvNodeSyvUpdate * const pc_Node =
                      dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
                   if (pc_Node != NULL)
@@ -399,7 +398,7 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
       if (pc_CurItemParent != NULL)
       {
          //Busses
-         
+
          C_GiLiBus * const pc_CurBus = dynamic_cast<C_GiLiBus *>(pc_CurItemParent);
          if (pc_CurBus != NULL)
          {
@@ -409,7 +408,7 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
          else
          {
             //Connectors
-            
+
             C_GiLiBusConnector * const pc_CurBusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_CurItemParent);
             if (pc_CurBusConnector != NULL)
             {
@@ -419,7 +418,7 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
             else
             {
                //PC connection
-               
+
                C_GiSvPcBusConnector * const pc_CurPcConnector =
                   dynamic_cast<C_GiSvPcBusConnector *>(pc_CurItemParent);
                if (pc_CurPcConnector != NULL)
@@ -430,7 +429,7 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
                else
                {
                   //Nodes
-                  
+
                   C_GiSvNodeSyvUpdate * const pc_Node =
                      dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
                   if (pc_Node != NULL)
@@ -461,7 +460,7 @@ void C_SyvUpScene::SetNoResponse(const uint32 ou32_NodeIndex) const
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         
+
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if ((pc_Node != NULL) && (static_cast<uint32>(pc_Node->GetIndex()) == ou32_NodeIndex))
          {
@@ -490,7 +489,7 @@ std::vector<uint32> C_SyvUpScene::GetActiveNoResponseNodeIndices(void) const
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         
+
          const C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<const C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->HasNoResponseAndIsActive() == true))
          {
@@ -522,7 +521,7 @@ std::vector<uint32> C_SyvUpScene::GetActiveNoneThirdPartyNodeIndices(void) const
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         
+
          const C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<const C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if ((((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true)) &&
              (pc_Node->IsStwDevice() == true))
@@ -550,7 +549,7 @@ void C_SyvUpScene::CheckUpdateDisabledState(void) const
       if (pc_CurItemParent != NULL)
       {
          //Nodes
-         
+
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true))
          {
@@ -644,7 +643,7 @@ void C_SyvUpScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Ev
       if (pc_Parent != NULL)
       {
          //Nodes
-         
+
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_Parent);
          if (pc_Node != NULL)
          {
@@ -652,7 +651,6 @@ void C_SyvUpScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Ev
          }
          else
          {
-            
             C_GiSvPc * const pc_Pc = dynamic_cast<C_GiSvPc * const>(pc_Parent);
 
             if (pc_Pc != NULL)
@@ -672,7 +670,6 @@ void C_SyvUpScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Ev
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
 {
-   
    C_GiSvNodeSyvUpdate * const pc_UpdateNode = dynamic_cast<C_GiSvNodeSyvUpdate * const>(opc_NodeGraphicsItem);
 
    if (pc_UpdateNode != NULL)
@@ -818,7 +815,7 @@ sint32 C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculatio
                         if (pc_CurItemParent != NULL)
                         {
                            //Busses
-                           
+
                            C_GiLiBus * const pc_CurBus = dynamic_cast<C_GiLiBus *>(pc_CurItemParent);
                            if ((pc_CurBus != NULL) &&
                                (static_cast<uint32>(pc_CurBus->GetIndex()) == c_Busses[u32_ItBus]))

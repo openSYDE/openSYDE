@@ -291,8 +291,8 @@ protected:
 
    static stw_types::uint8 mh_BCD2DEC(const stw_types::uint8 ou8_BCDValue);
    static stw_types::uint8 mh_DEC2BCD(const stw_types::uint8 ou8_DECValue);
-   static stw_types::uint32 mh_AU8_2_U32_LE(const stw_types::uint8 * const opu8_Data);
-   static stw_types::uint16 mh_AU8_2_U16_LE(const stw_types::uint8 * const opu8_Data);
+   static stw_types::uint32 mh_AU8ToU32LE(const stw_types::uint8 * const opu8_Data);
+   static stw_types::uint16 mh_AU8ToU16LE(const stw_types::uint8 * const opu8_Data);
 
 public:
    C_XFLProtocol(const C_XFLProtocolConfig & orc_Config);

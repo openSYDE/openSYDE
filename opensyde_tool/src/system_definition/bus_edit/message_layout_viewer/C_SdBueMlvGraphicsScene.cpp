@@ -710,8 +710,7 @@ void C_SdBueMlvGraphicsScene::m_InitBorderItems(void)
    }
 
    this->m_UpdateBorderItems();
-
-}  //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
@@ -725,8 +724,7 @@ void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
       this->mc_VecEmptyItems.push_back(pc_Item);
       pc_Item->setZValue(C_SdBueMlvGraphicsScene::mhf64_ZOrderEmptyItem);
       this->addItem(pc_Item);
-
-   }  //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
 
    this->m_UpdateEmptyItems();
 }
@@ -753,8 +751,7 @@ void C_SdBueMlvGraphicsScene::m_InitProtocolItems(void)
    this->addItem(this->mapc_ECeSHints[1]);
 
    this->m_UpdateProtocolItems();
-
-}  //lint !e429  //no memory leak because of the parent of mapc_ECeSHints by addItem and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of mapc_ECeSHints by addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a signal
@@ -1007,8 +1004,7 @@ void C_SdBueMlvGraphicsScene::m_AddSignalToGridMapping(C_SdBueMlvSignalManager *
          // TODO Set error
       }
    }
-
-}  //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateSignalInGridMapping(C_SdBueMlvSignalManager * const opc_Item)

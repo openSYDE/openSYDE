@@ -110,7 +110,6 @@ C_SyvUpUpdatePackageListWidget::~C_SyvUpUpdatePackageListWidget()
       C_UsHandler::h_GetInstance()->SetProjSvUpdateEmptyOptionalSectionsVisible(pc_View->GetName(),
                                                                                 this->mq_EmptyOptionalSectionsVisible);
    }
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -219,7 +218,6 @@ void C_SyvUpUpdatePackageListWidget::SetConnected(void)
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -242,7 +240,6 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateStarted(void) const
    {
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-
 
       const C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
@@ -268,7 +265,6 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationStarted(const uint32 ou
    {
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-
 
       const C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
@@ -300,7 +296,6 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationFinished(const uint32 o
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -329,7 +324,6 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationError(const uint32 ou32
    {
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-
 
       const C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
@@ -360,7 +354,6 @@ void C_SyvUpUpdatePackageListWidget::DiscardApplicationStatus(const uint32 ou32_
       // Search for match
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -388,7 +381,6 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateFinished(void) const
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -411,7 +403,6 @@ void C_SyvUpUpdatePackageListWidget::SetDisconnected(void)
    {
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-
 
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
@@ -446,7 +437,6 @@ const
       {
          // activate the first item and deactivate all other items
          QListWidgetItem * const pc_Item = this->item(sn_NodeWidgetCounter);
-
 
          C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
             dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
@@ -508,7 +498,6 @@ void C_SyvUpUpdatePackageListWidget::RemoveAllFiles(void) const
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -560,7 +549,6 @@ void C_SyvUpUpdatePackageListWidget::ExportConfig(void)
          {
             // Check all paths from all nodes
             QListWidgetItem * const pc_Item = this->item(sn_Counter);
-
 
             C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
                dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
@@ -645,7 +633,6 @@ void C_SyvUpUpdatePackageListWidget::ImportConfig(void)
             {
                // Check all paths from all nodes
                QListWidgetItem * const pc_Item = this->item(sn_Counter);
-
 
                C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
                   dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
@@ -842,7 +829,6 @@ sint32 C_SyvUpUpdatePackageListWidget::CheckAllPaths(uint32 & oru32_CountFiles,
       // Check all paths from all nodes
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
@@ -903,7 +889,6 @@ sint32 C_SyvUpUpdatePackageListWidget::GetUpdatePackage(
    for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
    {
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-
 
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
@@ -1008,7 +993,6 @@ void C_SyvUpUpdatePackageListWidget::resizeEvent(QResizeEvent * const opc_Event)
    {
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-
 
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
@@ -1120,7 +1104,6 @@ void C_SyvUpUpdatePackageListWidget::m_MoveItem(const sintn osn_SourceIndex, con
          // activate the first item and deactivate all other items
          QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-
          C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
             dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
          if (pc_WidgetItem != NULL)
@@ -1164,7 +1147,6 @@ void C_SyvUpUpdatePackageListWidget::m_UpdateNumbers(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::m_DelegateStartPaint(void)
 {
-
    C_SyvUpUpdatePackageNodeWidget * const pc_ItemWidget =
       dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(this->item(this->currentIndex().row())));
 
@@ -1605,7 +1587,6 @@ void C_SyvUpUpdatePackageListWidget::m_HideShowOptionalSections(void)
    {
       // activate the first item and deactivate all other items
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
-
 
       C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));

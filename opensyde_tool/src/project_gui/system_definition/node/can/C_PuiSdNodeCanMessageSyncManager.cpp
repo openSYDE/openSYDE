@@ -193,8 +193,8 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the number of the unique messages of a protocol
 
-   \param[in]  oe_ComProtocol      Protocol type
-   \param[out] opu32_SignalCount   Number of unique signals of all unique messages (optional)
+   \param[in]   oe_ComProtocol      Protocol type
+   \param[out]  opu32_SignalCount   Number of unique signals of all unique messages (optional)
 
    \return
    Number of messages of the protocol

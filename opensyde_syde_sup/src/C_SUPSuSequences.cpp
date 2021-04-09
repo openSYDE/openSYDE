@@ -248,8 +248,8 @@ bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep o
    // Decide if error or info
    switch (oe_Step)
    {
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR:
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
@@ -257,6 +257,7 @@ bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep o
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:
    case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:
@@ -265,6 +266,7 @@ bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep o
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
@@ -283,18 +285,69 @@ bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep o
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
+   case C_OSCSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
    case C_OSCSuSequences::eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:
-   case C_OSCSuSequences::eRESET_SYSTEM_OSY_BROADCAST_ERROR:
-   case C_OSCSuSequences::eRESET_SYSTEM_XFL_BROADCAST_ERROR:
       q_Return = true;
       break;
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_START:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_WARNING:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_WARNING:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_WARNING:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_WARNING:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_ENTER_FLASHLOADER_START:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_START:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_FINISHED:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_START:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_START:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_START:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_START:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_START:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_START:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FINISHED:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_START:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_START:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_FINISHED:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_FINISHED:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_FINAL_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_FINISHED:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_RESULT_STRING:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINISHED:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_ABORTED:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_FINISHED:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_START:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_START:
+   case C_OSCSuSequences::eXFL_PROGRESS:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_FINISHED:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FINISHED:
+   case C_OSCSuSequences::eRESET_SYSTEM_START:
+   case C_OSCSuSequences::eRESET_SYSTEM_FINISHED:
    default:
       break;
    }
@@ -317,20 +370,23 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
 
    switch (oe_Step)
    {
-   case eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_START:
-      c_Text = "Activate Flashloader - Broadcast request programming start";
+   case eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_START:
+      c_Text = "Activate Flashloader - Request programming start";
       break;
-   case eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR:
-      c_Text = "Activate Flashloader - Broadcast request programming error";
+   case eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_WARNING:
+      c_Text = "Activate Flashloader - Request programming warning";
       break;
-   case eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_START:
-      c_Text = "Activate Flashloader - Broadcast ECU reset start";
+   case eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR:
+      c_Text = "Activate Flashloader - Request programming error";
       break;
-   case eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR:
-      c_Text = "Activate Flashloader - Broadcast ECU reset error ";
+   case eACTIVATE_FLASHLOADER_OSY_ECU_RESET_WARNING:
+      c_Text = "Activate Flashloader - ECU reset warning";
       break;
-   case eACTIVATE_FLASHLOADER_XFL_ECU_RESET_START:
-      c_Text = "Activate Flashloader - Sending ECU reset requests start";
+   case eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR:
+      c_Text = "Activate Flashloader - ECU reset error";
+      break;
+   case eACTIVATE_FLASHLOADER_XFL_ECU_RESET_WARNING:
+      c_Text = "Activate Flashloader - No ECU reset message configured";
       break;
    case eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
       c_Text = "Activate Flashloader - Sending ECU reset requests error";
@@ -346,6 +402,9 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START:
       c_Text = "Activate Flashloader - Ping devices start";
+      break;
+   case eACTIVATE_FLASHLOADER_OSY_RECONNECT_WARNING:
+      c_Text = "Activate Flashloader - Reconnect warning";
       break;
    case eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
       c_Text = "Activate Flashloader - Reconnect error";
@@ -363,7 +422,7 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
       c_Text = "Activate Flashloader - Error on starting routing";
       break;
    case eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
-      c_Text = "Activate Flashloader - Error on start routing due to available features";
+      c_Text = "Activate Flashloader - Problem with available features of flashloader";
       break;
    case eACTIVATE_FLASHLOADER_FINISHED:
       c_Text = "Activate Flashloader - Finished";
@@ -430,6 +489,9 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eUPDATE_SYSTEM_OSY_NODE_START:
       c_Text = "Update System - Node start";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
+      c_Text = "Update System - Problem with getting nodes available features";
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FINISHED:
       c_Text = "Update System - Node finished";
@@ -527,6 +589,9 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
       c_Text = "Update System - Node flash area of file system file exit error";
       break;
+   case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_RESULT_STRING:
+      c_Text = "Update System - Node flash area of file result text";
+      break;
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED:
       c_Text = "Update System - Node flash of file system file finished";
       break;
@@ -535,9 +600,6 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
       c_Text = "Update System - Node NVM write reconnect to server error";
-      break;
-   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR:
-      c_Text = "Update System - Node NVM write read of available features error";
       break;
    case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
       c_Text = "Update System - Node NVM write available feature error";
@@ -593,17 +655,17 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    case eRESET_SYSTEM_START:
       c_Text = "Reset System - Start";
       break;
+   case eRESET_SYSTEM_OSY_NODE_ERROR:
+      c_Text = "Reset System - Node error";
+      break;
    case eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:
       c_Text = "Reset System - Routed node error";
       break;
-   case eRESET_SYSTEM_OSY_BROADCAST_ERROR:
-      c_Text = "Reset System - openSYDE nodes error";
-      break;
-   case eRESET_SYSTEM_XFL_BROADCAST_ERROR:
-      c_Text = "Reset System - STW Flashloader nodes error";
-      break;
    case eRESET_SYSTEM_FINISHED:
       c_Text = "Reset System - Finished";
+      break;
+   default:
+      c_Text = "Unknown Step - How did you get here?";
       break;
    }
 

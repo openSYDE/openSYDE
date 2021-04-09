@@ -71,7 +71,7 @@ protected:
 private:
    //Avoid call
    C_SdBueMlvSignalItem(const C_SdBueMlvSignalItem &);
-   C_SdBueMlvSignalItem & operator =(const C_SdBueMlvSignalItem &);
+   C_SdBueMlvSignalItem & operator =(const C_SdBueMlvSignalItem &); //lint !e1511 //we want to hide the base function
 
    stw_types::uint16 mu16_ByteRow;
    stw_types::uint16 mu16_StartBit;

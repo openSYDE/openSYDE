@@ -226,7 +226,7 @@ void C_OgeLeIpAddress::keyPressEvent(QKeyEvent * const opc_KeyEvent)
          tgl_assert(this->cursorPosition() >= 0);
 
          // moving backwards is a bit more defensive with jumps, to allow moving to every position by arrow keys
-         sint32 s32_MaximumJumpWidth = static_cast<sint32>(this->cursorPosition() % 4);
+         const sint32 s32_MaximumJumpWidth = static_cast<sint32>(this->cursorPosition() % 4);
          sint32 s32_RealJumpWidth = s32_MaximumJumpWidth;
 
          // part-position 2 or 3:
@@ -236,7 +236,7 @@ void C_OgeLeIpAddress::keyPressEvent(QKeyEvent * const opc_KeyEvent)
             // check all characters in this part for ciphers
             for (sint32 s32_Step = 0; s32_Step <= s32_MaximumJumpWidth; s32_Step++)
             {
-               const sint32 s32_Help = this->cursorPosition() - s32_Step;
+               const sint32 s32_Help = static_cast<sint32>(this->cursorPosition()) - s32_Step;
                if (this->displayText().at(s32_Help).isNumber() == true)
                {
                   s32_RealJumpWidth = 1;
@@ -252,7 +252,7 @@ void C_OgeLeIpAddress::keyPressEvent(QKeyEvent * const opc_KeyEvent)
             // check all characters in the previous part for ciphers
             for (sint32 s32_Step = 2; s32_Step < 5; s32_Step++)
             {
-               const sint32 s32_Help = this->cursorPosition() - s32_Step;
+               const sint32 s32_Help = static_cast<sint32>(this->cursorPosition()) - s32_Step;
                if (this->displayText().at(s32_Help).isNumber() == true)
                {
                   s32_RealJumpWidth = 1;

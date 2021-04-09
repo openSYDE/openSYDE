@@ -81,8 +81,8 @@ C_SdCodeGenerationModel::~C_SdCodeGenerationModel(void)
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_NodeIndices)
 {
-   uint32 u32_CheckedAppsCounter = 0;
-   C_SdCodeGenerationItem * pc_VisibleRootItem = new C_SdCodeGenerationItem();
+   uint32 u32_CheckedAppsCounter;
+   C_SdCodeGenerationItem * const pc_VisibleRootItem = new C_SdCodeGenerationItem();
 
    const std::vector<C_OSCNode> & rc_Nodes = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_Nodes;
 
@@ -113,10 +113,9 @@ uint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_NodeIndices
          {
             const C_OSCNodeApplication & rc_Application = c_Applications.at(u32_ApplicationCounter);
 
-            if (rc_Application.e_Type == rc_Application.ePROGRAMMABLE_APPLICATION)
+            if (rc_Application.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
             {
                C_SdCodeGenerationItem * const pc_ApplicationItem = new C_SdCodeGenerationItem();
-               //lint -e{734}  C++ 11 feature
                pc_ApplicationItem->c_Name = (rc_Application.c_Name + " (Code structure version: " +
                                              rc_Application.u16_GenCodeVersion + ")").c_str();
                pc_ApplicationItem->c_ToolTipHeading = rc_Application.c_Name.c_str();
@@ -148,14 +147,12 @@ uint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_NodeIndices
       {
          pc_VisibleRootItem->AddChild(pc_NodeItem);
       }
-      //lint -e{593}  no memory leak because of the parent of pc_NodeItem and the Qt memory management
-   }
+   } //lint !e593  //no memory leak because of the parent of pc_NodeItem and the Qt memory management
 
    pc_VisibleRootItem->q_Enabled = true;
    pc_VisibleRootItem->q_Checkable = true;
    pc_VisibleRootItem->q_Selectable = false;
 
-   //lint -e{838}  C++ 11 feature
    u32_CheckedAppsCounter = this->m_CheckInitItems(*pc_VisibleRootItem, orc_NodeIndices);
 
    this->mpc_InvisibleRootItem->AddChild(pc_VisibleRootItem);
@@ -178,24 +175,24 @@ uint32 C_SdCodeGenerationModel::GetCheckedItemCount(void) const
    for (uint32 u32_ItInvisibleRootChild = 0;
         u32_ItInvisibleRootChild < c_InvisibleRootChildren.size(); u32_ItInvisibleRootChild++)
    {
-      C_SdCodeGenerationItem * pc_VisibleRootItem = dynamic_cast<C_SdCodeGenerationItem *>(c_InvisibleRootChildren
-                                                                                           .at(u32_ItInvisibleRootChild));
+      C_SdCodeGenerationItem * const pc_VisibleRootItem =
+         dynamic_cast<C_SdCodeGenerationItem *>(c_InvisibleRootChildren.at(u32_ItInvisibleRootChild));
       if (pc_VisibleRootItem != NULL)
       {
          std::vector<C_TblTreSimpleItem *> c_VisibleRootChildren = pc_VisibleRootItem->c_Children;
          for (uint32 u32_ItVisibleRootChild = 0;
               u32_ItVisibleRootChild < c_VisibleRootChildren.size(); u32_ItVisibleRootChild++)
          {
-            C_SdCodeGenerationItem * pc_NodeItem = dynamic_cast<C_SdCodeGenerationItem *>(c_VisibleRootChildren
-                                                                                          .at(u32_ItVisibleRootChild));
+            C_SdCodeGenerationItem * const pc_NodeItem =
+               dynamic_cast<C_SdCodeGenerationItem *>(c_VisibleRootChildren.at(u32_ItVisibleRootChild));
             if (pc_NodeItem != NULL)
             {
                std::vector<C_TblTreSimpleItem *> c_NodeChildren = pc_NodeItem->c_Children;
                std::vector<uint32> c_AppIndices;
                for (uint32 u32_ItNodeChild = 0; u32_ItNodeChild < c_NodeChildren.size(); u32_ItNodeChild++)
                {
-                  C_SdCodeGenerationItem * pc_AppItem = dynamic_cast<C_SdCodeGenerationItem *>(c_NodeChildren
-                                                                                               .at(u32_ItNodeChild));
+                  C_SdCodeGenerationItem * const pc_AppItem =
+                     dynamic_cast<C_SdCodeGenerationItem *>(c_NodeChildren.at(u32_ItNodeChild));
                   if ((pc_AppItem != NULL) && (pc_AppItem->e_CheckState == Qt::Checked))
                   {
                      c_AppIndices.push_back(pc_AppItem->u32_Index);
@@ -228,24 +225,24 @@ void C_SdCodeGenerationModel::GetCheckedItems(std::vector<uint32> & orc_NodeIndi
    for (uint32 u32_ItInvisibleRootChild = 0;
         u32_ItInvisibleRootChild < c_InvisibleRootChildren.size(); u32_ItInvisibleRootChild++)
    {
-      C_SdCodeGenerationItem * pc_VisibleRootItem = dynamic_cast<C_SdCodeGenerationItem *>(c_InvisibleRootChildren
-                                                                                           .at(u32_ItInvisibleRootChild));
+      C_SdCodeGenerationItem * const pc_VisibleRootItem =
+         dynamic_cast<C_SdCodeGenerationItem *>(c_InvisibleRootChildren.at(u32_ItInvisibleRootChild));
       if (pc_VisibleRootItem != NULL)
       {
          std::vector<C_TblTreSimpleItem *> c_VisibleRootChildren = pc_VisibleRootItem->c_Children;
          for (uint32 u32_ItVisibleRootChild = 0;
               u32_ItVisibleRootChild < c_VisibleRootChildren.size(); u32_ItVisibleRootChild++)
          {
-            C_SdCodeGenerationItem * pc_NodeItem = dynamic_cast<C_SdCodeGenerationItem *>(c_VisibleRootChildren
-                                                                                          .at(u32_ItVisibleRootChild));
+            C_SdCodeGenerationItem * const pc_NodeItem =
+               dynamic_cast<C_SdCodeGenerationItem *>(c_VisibleRootChildren.at(u32_ItVisibleRootChild));
             if (pc_NodeItem != NULL)
             {
                std::vector<C_TblTreSimpleItem *> c_NodeChildren = pc_NodeItem->c_Children;
                std::vector<uint32> c_AppIndices;
                for (uint32 u32_ItNodeChild = 0; u32_ItNodeChild < c_NodeChildren.size(); u32_ItNodeChild++)
                {
-                  C_SdCodeGenerationItem * pc_AppItem = dynamic_cast<C_SdCodeGenerationItem *>(c_NodeChildren
-                                                                                               .at(u32_ItNodeChild));
+                  C_SdCodeGenerationItem * const pc_AppItem =
+                     dynamic_cast<C_SdCodeGenerationItem *>(c_NodeChildren.at(u32_ItNodeChild));
                   if ((pc_AppItem != NULL) && (pc_AppItem->e_CheckState == Qt::Checked))
                   {
                      c_AppIndices.push_back(pc_AppItem->u32_Index);
@@ -295,7 +292,7 @@ QVariant C_SdCodeGenerationModel::data(const QModelIndex & orc_Index, const sint
    if ((osn_Role == static_cast<sintn>(Qt::CheckStateRole)) &&
        (orc_Index.isValid() == true))
    {
-      //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
       C_SdCodeGenerationItem * const pc_TreeItem =
          static_cast<C_SdCodeGenerationItem * const>(orc_Index.internalPointer());
 
@@ -332,7 +329,7 @@ bool C_SdCodeGenerationModel::setData(const QModelIndex & orc_Index, const QVari
    {
       if (orc_Index.isValid() == true)
       {
-         //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
+         //lint -e{9079}  Result of Qt interface restrictions, set by index function
          C_SdCodeGenerationItem * const pc_TreeItem =
             static_cast<C_SdCodeGenerationItem * const>(orc_Index.internalPointer());
 
@@ -350,7 +347,6 @@ bool C_SdCodeGenerationModel::setData(const QModelIndex & orc_Index, const QVari
             // or has a parent
             this->m_CheckParent(pc_TreeItem, orc_Index, c_StartIndex);
 
-            //lint -e{1793} Qt example
             Q_EMIT (this->dataChanged(c_StartIndex, c_EndIndex, QVector<stw_types::sintn>() << osn_Role));
             q_Return = true;
          }
@@ -379,7 +375,7 @@ Qt::ItemFlags C_SdCodeGenerationModel::flags(const QModelIndex & orc_Index) cons
 
    if (orc_Index.isValid() == true)
    {
-      //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_SdCodeGenerationItem * const pc_TreeItem =
          static_cast<const C_SdCodeGenerationItem * const>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
@@ -408,7 +404,7 @@ void C_SdCodeGenerationModel::m_CheckChildren(C_SdCodeGenerationItem * const opc
    if (opc_TreeItem->c_Children.size() > 0)
    {
       uint32 u32_ChildCounter;
-      const uint32 u32_IndexLastChild = opc_TreeItem->c_Children.size() - 1UL;
+      const uint32 u32_IndexLastChild = static_cast<uint32>(opc_TreeItem->c_Children.size() - 1UL);
 
       orc_EndIndex = this->index(u32_IndexLastChild, 0, orc_ItemIndex);
 
@@ -527,8 +523,8 @@ uint32 C_SdCodeGenerationModel::m_CheckInitItems(C_SdCodeGenerationItem & orc_Vi
    for (uint32 u32_ItRootChildren = 0; u32_ItRootChildren < orc_VisibleRootItem.c_Children.size();
         u32_ItRootChildren++)
    {
-      C_SdCodeGenerationItem * pc_NodeItem = dynamic_cast<C_SdCodeGenerationItem *>(orc_VisibleRootItem.c_Children
-                                                                                    .at(u32_ItRootChildren));
+      C_SdCodeGenerationItem * const pc_NodeItem =
+         dynamic_cast<C_SdCodeGenerationItem *>(orc_VisibleRootItem.c_Children.at(u32_ItRootChildren));
       if (pc_NodeItem != NULL)
       {
          for (uint32 u32_ItNodeIndices = 0; u32_ItNodeIndices < orc_NodeIndices.size(); u32_ItNodeIndices++)
@@ -538,9 +534,8 @@ uint32 C_SdCodeGenerationModel::m_CheckInitItems(C_SdCodeGenerationItem & orc_Vi
                for (uint32 u32_ItNodeChildren = 0; u32_ItNodeChildren < pc_NodeItem->c_Children.size();
                     u32_ItNodeChildren++)
                {
-                  C_SdCodeGenerationItem * pc_AppItem =
-                     dynamic_cast<C_SdCodeGenerationItem *>(pc_NodeItem->c_Children
-                                                            .at(u32_ItNodeChildren));
+                  C_SdCodeGenerationItem * const pc_AppItem =
+                     dynamic_cast<C_SdCodeGenerationItem *>(pc_NodeItem->c_Children.at(u32_ItNodeChildren));
                   if (pc_AppItem != NULL)
                   {
                      u32_CheckedAppsCounter++;
@@ -561,12 +556,13 @@ uint32 C_SdCodeGenerationModel::m_CheckInitItems(C_SdCodeGenerationItem & orc_Vi
       }
    }
 
-   if (u32_CheckedNodeCounter == (orc_VisibleRootItem.c_Children.size() - u32_NotEnabledNodeCounter))
+   if (u32_CheckedNodeCounter == static_cast<uint32>(orc_VisibleRootItem.c_Children.size() - u32_NotEnabledNodeCounter))
    {
       orc_VisibleRootItem.e_CheckState = Qt::Checked;
    }
    else if ((u32_CheckedNodeCounter > 0) &&
-            (u32_CheckedNodeCounter < (orc_VisibleRootItem.c_Children.size() - u32_NotEnabledNodeCounter)))
+            (u32_CheckedNodeCounter <
+             static_cast<uint32>(orc_VisibleRootItem.c_Children.size() - u32_NotEnabledNodeCounter)))
    {
       orc_VisibleRootItem.e_CheckState = Qt::PartiallyChecked;
    }

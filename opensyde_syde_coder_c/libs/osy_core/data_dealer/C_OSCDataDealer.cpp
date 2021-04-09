@@ -541,8 +541,8 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance
                                                        const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex,
                                                        const std::vector<uint8> & orc_Value)
 {
-   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_OSCDataDealer * const pc_Dealer = reinterpret_cast<C_OSCDataDealer *>(opv_Instance);
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
+   C_OSCDataDealer * const pc_Dealer = reinterpret_cast<C_OSCDataDealer * const>(opv_Instance);
 
    tgl_assert(pc_Dealer != NULL);
    if (pc_Dealer != NULL)
@@ -594,8 +594,10 @@ void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIn
       else
       {
          //we have data: is the size as expected ?
-         //not all protocols are able to report the exact size of incoming data
-         //so we do not check for an exact match but for "do we have enough ?"
+         //Not all protocols are able to report the exact size of incoming data.
+         //Early openSYDE CAN server protocol implementations always would send 4 bytes even if not all of them were
+         // used.
+         //So we do not check for an exact match but for "do we have enough ?"
          if (orc_Value.size() < pc_Element->GetSizeByte())
          {
             stw_scl::C_SCLString c_Error;
@@ -648,8 +650,8 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Ins
                                                             const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex,
                                                             const uint8 ou8_NrCode)
 {
-   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_OSCDataDealer * const pc_Dealer = reinterpret_cast<C_OSCDataDealer *>(opv_Instance);
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
+   C_OSCDataDealer * const pc_Dealer = reinterpret_cast<C_OSCDataDealer * const>(opv_Instance);
 
    tgl_assert(pc_Dealer != NULL);
    if (pc_Dealer != NULL)

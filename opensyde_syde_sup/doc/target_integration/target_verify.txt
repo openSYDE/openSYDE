@@ -1,0 +1,22 @@
+---------------------------------------------------------------------
+File:      target_verify.txt
+Content:   How to verify a custom build
+---------------------------------------------------------------------
+Prerequisites
+=============
+- system of custom target and other target(s) that you want to 
+   update with SYDEsup
+- openSYDE project defining this system 
+- custom build of SYDEsup
+
+How to verify custom build
+==========================
+1. Check if the binary can be called without parameters.
+2. Try the non-functional parameters -h, -v, -m.
+3. Create at least two service update packages (*.syde_sup) 
+   with the openSYDE GUI tool - one for updating via CAN and
+   one for updating via Ethernet.
+4. Connect the custom target to the other target(s) as described
+   in your system definition.
+5. Run SYDEsup with both packages and check if updating the other target(s) 
+   works. Refer to flash fingerprint, SYDEsup log file and console output.

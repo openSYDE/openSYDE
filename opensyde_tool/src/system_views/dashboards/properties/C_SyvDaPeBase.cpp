@@ -193,11 +193,11 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because the ownership of these objects was never transferred to this class
 C_SyvDaPeBase::~C_SyvDaPeBase(void)
 {
    delete mpc_Ui;
    delete mpc_Scene;
-   //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -340,6 +340,8 @@ void C_SyvDaPeBase::SetTheme(const C_PuiSvDbWidgetBase::E_Style oe_Style) const
    case C_PuiSvDbWidgetBase::eFLAT:
       this->mpc_Ui->pc_ComboBoxTheme->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_THEME_FLAT);
       break;
+   default:
+      break;
    }
 }
 
@@ -389,7 +391,6 @@ float64 C_SyvDaPeBase::h_GetFixIconOffset(void)
 void C_SyvDaPeBase::h_GetIdealItemRect(QPointF & orc_ItemPos, QSizeF & orc_ItemSize,
                                        const QGraphicsItem * const opc_Item)
 {
-
    const C_GiSvDaRectBaseGroup * const pc_GiItem = dynamic_cast<const C_GiSvDaRectBaseGroup * const>(opc_Item);
 
    if (pc_GiItem != NULL)
@@ -774,7 +775,7 @@ void C_SyvDaPeBase::m_Configuration(void) const
             if (pc_Dashboard != NULL)
             {
                tgl_assert(pc_Dashboard->GetLabels().size() > 0UL);
-               u32_LabelIndex = pc_Dashboard->GetLabels().size() - 1UL;
+               u32_LabelIndex = static_cast<uint32>(pc_Dashboard->GetLabels().size()) - 1UL;
             }
          }
       }
@@ -816,7 +817,6 @@ void C_SyvDaPeBase::m_Configuration(void) const
    {
       c_New->HideOverlay();
    }
-
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -839,7 +839,7 @@ QString C_SyvDaPeBase::m_GetDefaultDisplayName(const C_PuiSvDbNodeDataPoolListEl
                                                                     this->mc_DataElement.u32_DataPoolIndex,
                                                                     this->mc_DataElement.u32_ListIndex,
                                                                     this->mc_DataElement.u32_ElementIndex);
-      const C_OSCNodeDataPool * pc_Datapool =
+      const C_OSCNodeDataPool * const pc_Datapool =
          C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_Id.u32_NodeIndex,
                                                          orc_Id.u32_DataPoolIndex);
       if (pc_Element != NULL)
@@ -852,7 +852,7 @@ QString C_SyvDaPeBase::m_GetDefaultDisplayName(const C_PuiSvDbNodeDataPoolListEl
             }
             else
             {
-               QString c_ElementName = pc_Element->c_Name.c_str();
+               const QString c_ElementName = pc_Element->c_Name.c_str();
                if (orc_Id.GetUseArrayElementIndex())
                {
                   c_Retval = static_cast<QString>("%1[%2]").arg(c_ElementName).arg(orc_Id.GetArrayElementIndex());

@@ -285,22 +285,6 @@ void C_GiSvDaParam::HandleManualOperationFinished(const sint32 os32_Result, cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal all widgets which read rail element ID registrations failed
-
-   \param[in]      orc_FailedIdRegisters     Failed IDs
-   \param[in,out]  orc_FailedIdErrorDetails  Error details for element IDs which failed registration (if any)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaParam::SetErrorForFailedCyclicElementIdRegistrations(
-   const std::vector<C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-   const std::vector<QString> & orc_FailedIdErrorDetails)
-{
-   //Explicitly do not call base implementation to disable this error for param widgets
-   Q_UNUSED(orc_FailedIdRegisters)
-   Q_UNUSED(orc_FailedIdErrorDetails)
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the com driver for parametrization functions
 
    \param[in]  orc_ComDriver  Reference to the com driver

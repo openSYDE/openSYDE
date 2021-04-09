@@ -107,7 +107,7 @@ void C_GiSvNodeSyvBase::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvNodeSyvBase::m_UpdateError(void)
 {
-   bool q_Retval = C_PuiSvHandler::h_GetInstance()->GetErrorNode(static_cast<uint32>(this->ms32_Index));
+   const bool q_Retval = C_PuiSvHandler::h_GetInstance()->GetErrorNode(static_cast<uint32>(this->ms32_Index));
 
    if (q_Retval == true)
    {

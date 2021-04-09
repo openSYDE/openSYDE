@@ -177,14 +177,14 @@ private:
                           const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
                           const bool oq_ActivateDatapoolECoS, C_GiLiBusConnector * const opc_Connector);
    void m_RestoreToolTips(void) const;
-   void m_RemoveNodeOfScene(C_GiNode * const opc_NodeGraphicsItem);
-   void m_RemoveBusOfScene(C_GiLiBus * const opc_BusGraphicsItem);
+   void m_RemoveNodeOfScene(const C_GiNode * const opc_NodeGraphicsItem);
+   void m_RemoveBusOfScene(const C_GiLiBus * const opc_BusGraphicsItem);
    void m_RemoveBusConnectorOfScene(C_GiLiBusConnector * const opc_BusConnectorGraphicsItem);
-   void m_RemoveLineArrowOfScene(stw_opensyde_gui::C_GiSdArrow * const opc_Item);
-   void m_RemoveBoundaryOfScene(stw_opensyde_gui::C_GiSdBoundary * const opc_Item);
-   void m_RemoveImageGroupOfScene(stw_opensyde_gui::C_GiSdImageGroup * const opc_Item);
-   void m_RemoveTextElementOfScene(C_GiSdTextElement * const opc_Item);
-   void m_RemoveTextElementBusOfScene(C_GiTextElementBus * const opc_Item);
+   void m_RemoveLineArrowOfScene(const C_GiSdArrow * const opc_Item);
+   void m_RemoveBoundaryOfScene(const C_GiSdBoundary * const opc_Item);
+   void m_RemoveImageGroupOfScene(const C_GiSdImageGroup * const opc_Item);
+   void m_RemoveTextElementOfScene(const C_GiSdTextElement * const opc_Item);
+   void m_RemoveTextElementBusOfScene(const C_GiTextElementBus * const opc_Item);
    void m_EnterConnectState(const C_GiLiBusConnector::E_ConnectState & ore_ConnectState,
                             const C_GiNode * const opc_Node = NULL,
                             const stw_opensyde_core::C_OSCSystemBus::E_Type * const ope_Type = NULL);
@@ -215,7 +215,7 @@ private:
                                                   C_GiLiBusConnector * const opc_BusConnector);
    void m_CleanUpPorts(void) const;
    void m_RevertBusConnectorNode(stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
-                                 C_GiNode * const opc_StartingNode, C_GiNode * const opc_LastNode,
+                                 C_GiNode * const opc_StartingNode, const C_GiNode * const opc_LastNode,
                                  const QPointF & orc_ScenePos) const;
    void m_ReconnectBusConnectorNode(const C_GiLiBusConnector * const opc_BusConnector,
                                     const C_GiNode * const opc_StartingNode, const C_GiNode * const opc_LastNode,

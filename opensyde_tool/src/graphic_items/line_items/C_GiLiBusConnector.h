@@ -31,7 +31,6 @@ namespace stw_opensyde_gui
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-//lint -e{1960} Forward-declaration was necessary
 class C_GiLiBusConnector :
    public C_GiLiBusConnectorBase
 {
@@ -55,7 +54,7 @@ public:
    virtual void GenerateHint(void);
    const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId * GetConnectionData(void) const;
    void ChangeInterface(const stw_types::uint8 & oru8_NewInterface, const stw_types::uint8 & oru8_NodeId);
-   void Revert(C_GiNode * const opc_StartingNode, C_GiNode * const opc_LastNode, const QPointF & orc_ScenePos);
+   void Revert(C_GiNode * const opc_StartingNode, const C_GiNode * const opc_LastNode, const QPointF & orc_ScenePos);
    void Reconnect(C_GiNode * const opc_StartingNode, stw_opensyde_gui::C_GiNode * const opc_LastNode,
                   const QPointF & orc_ConnectionPos, const stw_types::sint32 & ors32_Interface,
                   const stw_types::uint8 & oru8_NodeId);

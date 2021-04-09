@@ -135,20 +135,15 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    this->SetEditMode(false);
 
    // create toolbox
-   if (this->mpc_Toolbox == NULL)
-   {
-      mpc_ToolboxContent = new C_SyvDaDashboardToolbox();
-      mpc_Toolbox = new C_OgeWiHover(*mpc_ToolboxContent, C_GtGetText::h_GetText("TOOLBOX"), ":images/IconToolbox.svg",
-                                     false, this->mpc_ToolboxParent, this->mpc_ToolboxParent);
-   }
+   this->mpc_ToolboxContent = new C_SyvDaDashboardToolbox();
+   this->mpc_Toolbox = new C_OgeWiHover(*mpc_ToolboxContent,
+                                        C_GtGetText::h_GetText("TOOLBOX"), ":images/IconToolbox.svg",
+                                        false, this->mpc_ToolboxParent, this->mpc_ToolboxParent);
 
    // create fix minimized toolbox
-   if (this->mpc_FixMinimizedToolbox == NULL)
-   {
-      this->mpc_FixMinimizedToolbox = new C_OgeWiFixPosition(C_GtGetText::h_GetText("TOOLBOX"),
-                                                             ":images/IconToolbox.svg",
-                                                             QRect(1277, 14, 190, 36), this->mpc_ToolboxParent);
-   }
+   this->mpc_FixMinimizedToolbox = new C_OgeWiFixPosition(C_GtGetText::h_GetText("TOOLBOX"),
+                                                          ":images/IconToolbox.svg",
+                                                          QRect(1277, 14, 190, 36), this->mpc_ToolboxParent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -157,6 +152,8 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak of mpc_ComDriver because of calling m_CloseOsyDriver here and for mpc_Toolbox the Qt
+// memory management
 C_SyvDaDashboardsWidget::~C_SyvDaDashboardsWidget(void)
 {
    this->m_CloseOsyDriver();
@@ -172,9 +169,6 @@ C_SyvDaDashboardsWidget::~C_SyvDaDashboardsWidget(void)
    }
 
    delete mpc_Ui;
-
-   //lint -e{1579}  no memory leak of mpc_ComDriver because of calling m_CloseOsyDriver here and for mpc_Toolbox the Qt
-   // memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -192,18 +186,18 @@ void C_SyvDaDashboardsWidget::InitText(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::LoadDarkMode(void)
 {
-   const C_PuiSvData * pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    if (pc_View != NULL)
    {
       if (pc_View->GetDarkModeActive() == true)
       {
-         Q_EMIT this->SigSetDarkModePushButtonIcon(C_SyvDaDashboardsWidget::mhc_DarkModeEnabledIconPath);
+         Q_EMIT (this->SigSetDarkModePushButtonIcon(C_SyvDaDashboardsWidget::mhc_DarkModeEnabledIconPath));
          m_ApplyDarkMode(true);
       }
       else
       {
-         Q_EMIT this->SigSetDarkModePushButtonIcon(C_SyvDaDashboardsWidget::mhc_DarkModeDisabledIconPath);
+         Q_EMIT (this->SigSetDarkModePushButtonIcon(C_SyvDaDashboardsWidget::mhc_DarkModeDisabledIconPath));
          m_ApplyDarkMode(false);
       }
    }
@@ -225,8 +219,9 @@ void C_SyvDaDashboardsWidget::Save(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::OpenSettings(void)
 {
-   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_SyvDaPeUpdateModeConfiguration * pc_Dialog = new C_SyvDaPeUpdateModeConfiguration(*c_New, this->mu32_ViewIndex);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   C_SyvDaPeUpdateModeConfiguration * const pc_Dialog = new C_SyvDaPeUpdateModeConfiguration(*c_New,
+                                                                                             this->mu32_ViewIndex);
 
    Q_UNUSED(pc_Dialog)
 
@@ -245,7 +240,7 @@ void C_SyvDaDashboardsWidget::OpenSettings(void)
    {
       c_New->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle dark mode toggle
@@ -253,7 +248,7 @@ void C_SyvDaDashboardsWidget::OpenSettings(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::ToggleDarkMode(void)
 {
-   const C_PuiSvData * pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    if (pc_View != NULL)
    {
@@ -407,7 +402,7 @@ void C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardsWidget::PrepareToClose(void) const
 {
-   bool q_Return = this->me_ConnectState != eCS_CONNECTING;
+   const bool q_Return = (this->me_ConnectState != eCS_CONNECTING);
 
    return q_Return;
 }
@@ -449,7 +444,7 @@ void C_SyvDaDashboardsWidget::OnPushButtonConnectPress(void)
    case eCS_DISCONNECTED:
       //Connecting
       this->me_ConnectState = eCS_CONNECTING;
-      Q_EMIT this->SigSetConnectPushButtonIcon("://images/system_views/IconConnecting.svg", true);
+      Q_EMIT (this->SigSetConnectPushButtonIcon("://images/system_views/IconConnecting.svg", true));
       //Leave edit mode
       if (this->GetEditMode() == true)
       {
@@ -458,7 +453,7 @@ void C_SyvDaDashboardsWidget::OnPushButtonConnectPress(void)
       //Deactivate edit & config
       this->mpc_Ui->pc_TabWidget->SetEnabled(false);
       this->mpc_Ui->pc_PbConfirm->setEnabled(false);
-      Q_EMIT this->SigSetConfigurationAvailable(false);
+      Q_EMIT (this->SigSetConfigurationAvailable(false));
       //While connecting display updated tool bar
       QApplication::processEvents();
       this->SetConnectActive(true);
@@ -466,18 +461,21 @@ void C_SyvDaDashboardsWidget::OnPushButtonConnectPress(void)
    case eCS_CONNECTED:
       //Disconnecting
       this->me_ConnectState = eCS_DISCONNECTING;
-      Q_EMIT this->SigSetConnectPushButtonIcon("://images/system_views/IconDisconnecting.svg", true);
+      Q_EMIT (this->SigSetConnectPushButtonIcon("://images/system_views/IconDisconnecting.svg", true));
       this->SetConnectActive(false);
       this->me_ConnectState = eCS_DISCONNECTED;
-      Q_EMIT this->SigSetConnectPushButtonIcon("://images/system_views/IconDisconnected.svg", false);
+      Q_EMIT (this->SigSetConnectPushButtonIcon("://images/system_views/IconDisconnected.svg", false));
       //Reactivate edit & config
       this->mpc_Ui->pc_TabWidget->SetEnabled(true);
       this->mpc_Ui->pc_PbConfirm->setEnabled(true);
-      Q_EMIT this->SigSetConfigurationAvailable(true);
+      Q_EMIT (this->SigSetConfigurationAvailable(true));
       break;
    case eCS_CONNECTING:
    case eCS_DISCONNECTING:
       //No action can be started
+      break;
+   default:
+      // Nothing to do
       break;
    }
 }
@@ -563,7 +561,7 @@ void C_SyvDaDashboardsWidget::resizeEvent(QResizeEvent * const opc_Event)
 
       // adapt position of fix minimized toolbox
       // The operator '-' have to follow by the same operator, otherwise the geometry is wrong
-      //lint -save -e834 -e1963
+      //lint -save -e834
       c_PointFixMiniToolbox.setX((pc_Widget->width() - this->mpc_FixMinimizedToolbox->width()) -
                                  170 - mhsn_WidgetBorder);
       //lint -restore
@@ -781,17 +779,20 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
       break;
    case C_CONFIG:
       orc_Message =
-         static_cast<QString>(C_GtGetText::h_GetText("System connect failed. Configuration error.")); //Many possibilities for this
-                                                                                         // error
+         static_cast<QString>(C_GtGetText::h_GetText("System connect failed. Configuration error.")); //Many
+                                                                                                      // possibilities
+                                                                                                      // for this
+      // error
       break;
    case C_RD_WR:
       orc_Message =
-         static_cast<QString>(C_GtGetText::h_GetText("Configured communication DLL does not exist or DLL could not be opened."));
+         static_cast<QString>(C_GtGetText::h_GetText(
+                                 "Configured communication DLL does not exist or DLL could not be opened."));
       break;
    case C_OVERFLOW:
       orc_Message =
          static_cast<QString>(C_GtGetText::h_GetText(
-                    "Unknown transport protocol or unknown diagnostic server for at least one node."));
+                                 "Unknown transport protocol or unknown diagnostic server for at least one node."));
       break;
    case C_BUSY:
       if (C_PuiSvHandler::h_GetInstance()->CheckViewError(this->mu32_ViewIndex, &q_NameInvalid,
@@ -802,14 +803,15 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
          if ((((((q_NameInvalid == false) && (q_PCNotConnected == false)) && (q_RoutingInvalid == false)) &&
                (q_SysDefInvalid == false)) && (q_NoNodesActive == false)) && (q_UpdateDisabledButDataBlocks == false))
          {
-            orc_Message = static_cast<QString>(C_GtGetText::h_GetText("System View Dashboard configuration error detected. "
-                                                         "Check your Dashboard configuration settings and retry."));
+            orc_Message =
+               static_cast<QString>(C_GtGetText::h_GetText("System View Dashboard configuration error detected. "
+                                                           "Check your Dashboard configuration settings and retry."));
          }
          else
          {
             orc_Message =
                static_cast<QString>(C_GtGetText::h_GetText(
-                          "System View is invalid. Action cannot be performed. Fix the issues and retry."));
+                                       "System View is invalid. Action cannot be performed. Fix the issues and retry."));
          }
       }
       else
@@ -820,8 +822,8 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
    case C_COM:
       orc_Message =
          static_cast<QString>(C_GtGetText::h_GetText(
-                    "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
-                    "double-click on PC)."));
+                                 "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
+                                 "double-click on PC)."));
       break;
    case C_CHECKSUM:
       orc_Message = static_cast<QString>(C_GtGetText::h_GetText("Internal buffer overflow detected."));
@@ -833,7 +835,8 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
       orc_Message = static_cast<QString>(C_GtGetText::h_GetText("Wrapped error of internal function call."));
       break;
    default:
-      orc_Message = static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
+      orc_Message =
+         static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
       break;
    }
 
@@ -1053,11 +1056,14 @@ void C_SyvDaDashboardsWidget::m_ConnectStepFinished(void)
             break;
          case C_CONFIG:
             c_Message =
-               static_cast<QString>(C_GtGetText::h_GetText("System connect failed. Configuration error.")); //Many possibilities for
-                                                                                               // this error
+               static_cast<QString>(C_GtGetText::h_GetText("System connect failed. Configuration error.")); //Many
+                                                                                                            // possibilities
+                                                                                                            // for
+            // this error
             break;
          default:
-            c_Message = static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
+            c_Message =
+               static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
             break;
          }
       }

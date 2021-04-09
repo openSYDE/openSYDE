@@ -177,7 +177,7 @@ void C_SyvDaItTaDelegate::paint(QPainter * const opc_Painter, const QStyleOption
                             QSize(static_cast<sintn>(f32_RectBarWidth), c_RectBarBase.height()));
       opc_Painter->save();
       opc_Painter->setPen(Qt::NoPen);
-      opc_Painter->setBrush(QBrush(this->mc_BarColor));
+      opc_Painter->setBrush(static_cast<QBrush>(this->mc_BarColor));
       opc_Painter->drawRect(c_RectBar);
       opc_Painter->restore();
    }

@@ -114,9 +114,8 @@ void C_SdNdeDpListDataSetDelegate::setEditorData(QWidget * const opc_Editor, con
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
    {
-      
       QLineEdit * const pc_LineEdit = dynamic_cast<QLineEdit * const>(opc_Editor);
-      
+
       QTextEdit * const pc_TextEdit = dynamic_cast<QTextEdit * const>(opc_Editor);
       const C_SdNdeDpListDataSetModel::E_Rows e_Row =
          C_SdNdeDpListDataSetModel::h_RowToEnum(orc_Index.row());
@@ -155,9 +154,8 @@ void C_SdNdeDpListDataSetDelegate::setModelData(QWidget * const opc_Editor, QAbs
 {
    if (((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true))
    {
-      
       const QLineEdit * const pc_LineEdit = dynamic_cast<const QLineEdit * const>(opc_Editor);
-      
+
       const QTextEdit * const pc_TextEdit = dynamic_cast<const QTextEdit * const>(opc_Editor);
       const C_SdNdeDpListDataSetModel::E_Rows e_Row =
          C_SdNdeDpListDataSetModel::h_RowToEnum(orc_Index.row());
@@ -237,7 +235,6 @@ void C_SdNdeDpListDataSetDelegate::m_Store(const QModelIndex & orc_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetDelegate::m_OnNameChange(const QString & orc_Text) const
 {
-   
    QWidget * const pc_Widget = dynamic_cast<QWidget * const>(this->sender());
 
    if ((pc_Widget != NULL) && (this->mpc_Model != NULL))

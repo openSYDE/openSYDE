@@ -12,6 +12,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "TGLUtils.h"
 #include "constants.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
@@ -159,9 +160,9 @@ QVariant C_SdNdeSfoResetMessageTableModel::headerData(const sintn osn_Section, c
 //----------------------------------------------------------------------------------------------------------------------
 sintn C_SdNdeSfoResetMessageTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   const sintn sn_Retval = 0;
 
-   if (!orc_Parent.isValid())
+   if (orc_Parent.isValid() == false)
    {
       return 1;
    }
@@ -486,6 +487,9 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   }
                }
                break;
+            default:
+               tgl_assert(false);
+               break;
             }
          }
       }
@@ -590,6 +594,9 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                      c_Retval = c_Disabled;
                   }
                   break;
+               default:
+                  tgl_assert(false);
+                  break;
                }
             }
          }
@@ -600,11 +607,9 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
       }
       else if (osn_Role == msn_USER_ROLE_CONDITIONAL_VALUE)
       {
-         const C_OSCNode * pc_OSCNode;
-         switch (e_Col)
+         if (e_Col == eID)
          {
-         case eID:
-            pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+            const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
             if (pc_OSCNode != NULL)
             {
                if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.q_ResetMessageExtendedId == true)
@@ -616,10 +621,10 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   c_Retval = 0;
                }
             }
-            break;
-         default:
+         }
+         else
+         {
             //not required
-            break;
          }
       }
       else
@@ -645,7 +650,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
 bool C_SdNdeSfoResetMessageTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                                                const sintn osn_Role)
 {
-   bool q_Retval = false;
+   const bool q_Retval = false;
 
    if (data(orc_Index, osn_Role) != orc_Value)
    {
@@ -737,7 +742,6 @@ bool C_SdNdeSfoResetMessageTableModel::setData(const QModelIndex & orc_Index, co
 
             C_PuiSdHandler::h_GetInstance()->SetStwFlashloaderSettings(this->mu32_NodeIndex, c_Settings);
 
-            //lint -e{1793} Qt example
             Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
          }
       }

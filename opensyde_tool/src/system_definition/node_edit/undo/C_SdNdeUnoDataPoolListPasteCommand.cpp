@@ -92,7 +92,7 @@ bool C_SdNdeUnoDataPoolListPasteCommand::InitialSetup(const uint32 & oru32_First
             {
                q_Retval =
                   (static_cast<uint32>(pc_DataPool->c_Lists.size() + c_OSCContent.size()) <=
-                   mu32_NODE_DATA_POOL_LIST_MAX);
+                   C_OSCNode::hu32_MAX_NUMBER_OF_LISTS_PER_DATA_POOL);
                if (q_Retval == true)
                {
                   std::vector<stw_types::uint32> c_Indices;
@@ -106,8 +106,9 @@ bool C_SdNdeUnoDataPoolListPasteCommand::InitialSetup(const uint32 & oru32_First
                else
                {
                   C_OgeWiCustomMessage c_MessageBox(this->mpc_DataPoolListsTreeWidget);
-                  c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Only %1 lists allowed per Datapool.")).
-                                              arg(mu32_NODE_DATA_POOL_LIST_MAX));
+                  c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                      "Only %1 lists allowed per Datapool.")).
+                                              arg(C_OSCNode::hu32_MAX_NUMBER_OF_LISTS_PER_DATA_POOL));
                   c_MessageBox.SetCustomMinHeight(180, 180);
                   c_MessageBox.Execute();
                }

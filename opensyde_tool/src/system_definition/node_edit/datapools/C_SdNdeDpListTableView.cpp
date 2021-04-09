@@ -144,7 +144,6 @@ C_SdNdeDpListTableView::C_SdNdeDpListTableView(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-//lint -e{1540}  no memory leak because of the parent and the Qt memory management or never took ownership
 C_SdNdeDpListTableView::~C_SdNdeDpListTableView(void)
 {
    m_HandleColumnStateSave();
@@ -153,6 +152,17 @@ C_SdNdeDpListTableView::~C_SdNdeDpListTableView(void)
       this->mpc_ModelViewManager->UnRegisterElementView(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                         this->mu32_ListIndex, this);
    }
+
+   //cleanup handled by Qt engine; just NULLing here
+   mpc_ContextMenu      = NULL;
+   mpc_ModelViewManager = NULL;
+   mpc_ActionMoveUp     = NULL;
+   mpc_ActionMoveDown   = NULL;
+   mpc_ActionAdd        = NULL;
+   mpc_ActionCut        = NULL;
+   mpc_ActionCopy       = NULL;
+   mpc_ActionPaste      = NULL;
+   mpc_ActionDelete     = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -267,7 +277,8 @@ void C_SdNdeDpListTableView::Paste(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::Delete(void)
 {
-   std::vector<uint32> c_Indices = m_GetSelectedIndices();
+   const std::vector<uint32> c_Indices = m_GetSelectedIndices();
+
    this->mc_UndoManager.DoDeleteElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                          this->mpc_ModelViewManager,
                                          c_Indices);
@@ -310,21 +321,14 @@ void C_SdNdeDpListTableView::Insert(const bool & orq_SetFocus)
          this->mu32_NodeIndex, this->mu32_DataPoolIndex);
       if (pc_DataPool != NULL)
       {
-         if (pc_DataPool->e_Type == C_OSCNodeDataPool::eDIAG)
-         {
-            c_Text = C_GtGetText::h_GetText("Variables");
-         }
-         else
-         {
-            c_Text = C_GtGetText::h_GetText("Parameters");
-         }
+         c_Text = C_PuiSdHandlerNodeLogic::h_GetElementTypeName(pc_DataPool->e_Type) + "s";
       }
       else
       {
          c_Text = C_GtGetText::h_GetText("Data elements");
       }
       c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Only %1 %2 allowed per list.")).arg(
-                                     mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX).arg(c_Text));
+                                     C_OSCNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST).arg(c_Text));
       c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
    }
@@ -575,7 +579,6 @@ void C_SdNdeDpListTableView::keyPressEvent(QKeyEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::dropEvent(QDropEvent * const opc_Event)
 {
-
    C_SdNdeDpListTableView * const pc_SourceTable =
       dynamic_cast<C_SdNdeDpListTableView * const>(opc_Event->source());
 
@@ -606,7 +609,7 @@ void C_SdNdeDpListTableView::dropEvent(QDropEvent * const opc_Event)
                         uint32 u32_TargetRow;
                         const QString c_IndicesString = pc_MimeData->data(pc_Model->mimeTypes().at(2));
                         std::vector<uint32> c_NewIndices;
-                        QModelIndex c_Index = this->indexAt(opc_Event->pos());
+                        const QModelIndex c_Index = this->indexAt(opc_Event->pos());
                         //Target row
                         if (c_Index.isValid())
                         {
@@ -1009,15 +1012,15 @@ void C_SdNdeDpListTableView::m_HandleColumnChange(void)
          //Handle data pool type
          C_PuiSdHandler::h_GetInstance()->GetDataPoolType(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                           e_DataPoolType);
-         if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eDIAG)
+         if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eNVM)
+         {
+            this->hideColumn(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eEVENT_CALL));
+         }
+         else // DIAG Datapool
          {
             this->hideColumn(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eADDRESS));
             this->hideColumn(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eDATA_SIZE));
-         }
-         else
-         {
-            //NVM
-            this->hideColumn(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eEVENT_CALL));
+            //no extra handling for COMM & HAL Datapools because they do not use this list visualization
          }
          m_HandleColumnStateRestore();
       }
@@ -1039,7 +1042,7 @@ void C_SdNdeDpListTableView::m_CheckActions(const std::vector<uint32> & orc_Sele
       bool q_AllowMoveDown;
 
       //Add
-      if (static_cast<uint32>(this->model()->rowCount()) < mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX)
+      if (static_cast<uint32>(this->model()->rowCount()) < C_OSCNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST)
       {
          q_AllowAdd = true;
       }
@@ -1202,7 +1205,7 @@ void C_SdNdeDpListTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
                const uint32 u32_DataSetIndex = static_cast<uint32>(s32_DataSetIndex);
                C_OSCNodeDataPoolListElement c_OSCElement;
                C_PuiSdNodeDataPoolListElement c_UIElement;
-               QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
+               const QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
 
                if (C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(this->mu32_NodeIndex,
                                                                            this->mu32_DataPoolIndex,
@@ -1267,20 +1270,14 @@ void C_SdNdeDpListTableView::m_CheckContextMenuText(void)
 
       if (pc_DataPool != NULL)
       {
-         if (pc_DataPool->e_Type == C_OSCNodeDataPool::eDIAG)
-         {
-            c_Text = C_GtGetText::h_GetText("Add new Variable");
-         }
-         else
-         {
-            c_Text = C_GtGetText::h_GetText("Add new Parameter");
-         }
+         c_Text = C_PuiSdHandlerNodeLogic::h_GetElementTypeName(pc_DataPool->e_Type);
       }
       else
       {
-         c_Text = C_GtGetText::h_GetText("Add new Data Element");
+         c_Text = C_GtGetText::h_GetText("Data Element");
       }
-      this->mpc_ActionAdd->setText(c_Text);
+
+      this->mpc_ActionAdd->setText(C_GtGetText::h_GetText("Add new ") + c_Text);
    }
 }
 

@@ -101,7 +101,7 @@ void C_OgeLabContextMenuBase::m_OnCustomContextMenuRequested(const QPoint & orc_
    {
       m_SetupContextMenu(); // setup the custom menu here to have real is-selectable information
 
-      QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
+      const QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
       this->mpc_ContextMenu->popup(c_PosGlobal);
    }
 }

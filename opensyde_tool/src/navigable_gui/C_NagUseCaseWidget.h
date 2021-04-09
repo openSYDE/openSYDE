@@ -39,7 +39,7 @@ class C_NagUseCaseWidget :
 
 public:
    explicit C_NagUseCaseWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_NagUseCaseWidget() = 0;
+   virtual ~C_NagUseCaseWidget(void);
 
    virtual void SetParentHook(QWidget * const opc_Parent);
 

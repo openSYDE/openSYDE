@@ -39,7 +39,7 @@ class C_SyvHandlerWidget :
 
 public:
    explicit C_SyvHandlerWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvHandlerWidget();
+   virtual ~C_SyvHandlerWidget(void);
 
    virtual void UserInputFunc(const stw_types::uint32 ou32_FuncNumber) override;
    virtual void SetSubMode(const stw_types::sint32 os32_SubMode, const stw_types::uint32 ou32_Index,
@@ -54,7 +54,7 @@ public:
 private:
    //Avoid call
    C_SyvHandlerWidget(const C_SyvHandlerWidget &);
-   C_SyvHandlerWidget & operator =(const C_SyvHandlerWidget &);
+   C_SyvHandlerWidget & operator =(const C_SyvHandlerWidget &); //lint !e1511 //we want to hide the base func.
 
    void m_DataChanged(void);
    void m_DashboardCountChanged(void);

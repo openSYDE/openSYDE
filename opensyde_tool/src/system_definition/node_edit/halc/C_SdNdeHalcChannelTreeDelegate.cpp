@@ -90,9 +90,7 @@ void C_SdNdeHalcChannelTreeDelegate::paint(QPainter * const opc_Painter, const Q
 
       if (orc_Index.row() == this->msn_CurrentIndexParentRow)
       {
-         //lint -e{730,746,1013,1055} Qt feature
          c_Option.state.setFlag(QStyle::State_Selected, true);
-         //lint -e{730,1013} Qt feature
          c_Option.state.setFlag(QStyle::State_Enabled, true);
       }
 

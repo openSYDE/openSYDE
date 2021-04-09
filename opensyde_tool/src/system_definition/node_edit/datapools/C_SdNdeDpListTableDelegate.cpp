@@ -244,7 +244,6 @@ void C_SdNdeDpListTableDelegate::setEditorData(QWidget * const opc_Editor, const
 {
    if (((opc_Editor != NULL) && (orc_Index.isValid() == true)) && (this->mpc_Model != NULL))
    {
-
       QLineEdit * const pc_LineEdit = dynamic_cast<QLineEdit * const>(opc_Editor);
 
       QTextEdit * const pc_TextEdit = dynamic_cast<QTextEdit * const>(opc_Editor);
@@ -364,7 +363,6 @@ void C_SdNdeDpListTableDelegate::setModelData(QWidget * const opc_Editor, QAbstr
 {
    if ((((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true)) && (this->mpc_Model != NULL))
    {
-
       const QLineEdit * const pc_LineEdit = dynamic_cast<const QLineEdit * const>(opc_Editor);
 
       const QTextEdit * const pc_TextEdit = dynamic_cast<const QTextEdit * const>(opc_Editor);
@@ -722,7 +720,6 @@ void C_SdNdeDpListTableDelegate::m_OnCreateEditor(const QModelIndex & orc_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableDelegate::m_OnNameChange(const QString & orc_Text) const
 {
-
    QWidget * const pc_Widget = dynamic_cast<QWidget * const>(this->sender());
 
    if ((pc_Widget != NULL) && (this->mpc_Model != NULL))

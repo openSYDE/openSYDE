@@ -66,7 +66,8 @@ C_CieDcfEdsImportNodeSelectWidget::C_CieDcfEdsImportNodeSelectWidget(
    this->mpc_Ui->pc_LabPath->setText(
       C_Uti::h_MinimizePath(orc_FilePath, C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13), 500, 0));
    this->mpc_Ui->pc_LabPath->SetToolTipInformation("", orc_FilePath);
-   mrc_ParentDialog.SetSubTitle(QFileInfo(orc_FilePath).completeSuffix().toUpper() + C_GtGetText::h_GetText(" File"));
+   mrc_ParentDialog.SetSubTitle(static_cast<QFileInfo>(orc_FilePath).completeSuffix().toUpper() +
+                                C_GtGetText::h_GetText(" File"));
 
    this->m_FillUpComboBox(ou32_BusIndex);
 
@@ -196,7 +197,7 @@ void C_CieDcfEdsImportNodeSelectWidget::m_CancelClicked(void) const
 /*! \brief   Initialize ComboBox for node selection.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieDcfEdsImportNodeSelectWidget::m_FillUpComboBox(uint32 ou32_BusIndex)
+void C_CieDcfEdsImportNodeSelectWidget::m_FillUpComboBox(const uint32 ou32_BusIndex)
 {
    std::vector<QString> c_Names;
 

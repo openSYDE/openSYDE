@@ -226,7 +226,7 @@ void C_GiLiBusConnector::GenerateHint(void)
 
    if ((pc_Node != NULL) && (this->GetBusItem() != NULL))
    {
-      const C_PuiSdNodeConnectionId * pc_NodeConnection = this->GetConnectionData();
+      const C_PuiSdNodeConnectionId * const pc_NodeConnection = this->GetConnectionData();
       const C_OSCNode * pc_NodeData;
       pc_Node->GetOSCNodeConst(pc_NodeData);
       if ((pc_NodeConnection != NULL) && (pc_NodeData != NULL))
@@ -311,7 +311,7 @@ void C_GiLiBusConnector::ChangeInterface(const uint8 & oru8_NewInterface, const 
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::Revert(stw_opensyde_gui::C_GiNode * const opc_StartingNode,
-                                stw_opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ScenePos)
+                                const stw_opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ScenePos)
 {
    Q_UNUSED(opc_LastNode)
    this->mpc_GenericSignalItem = opc_StartingNode;

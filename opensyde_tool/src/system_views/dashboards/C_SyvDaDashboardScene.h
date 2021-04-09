@@ -12,7 +12,6 @@
 #define C_SYVDADASHBOARDSCENE_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <C_OgeChaChartBase.h>
 #include <QTimer>
 
 #include "C_GiSvDaParam.h"
@@ -83,9 +82,6 @@ public:
    void UpdateShowValues(void) const;
    void UpdateTransmissionConfiguration(void) const;
    void HandleManualOperationFinished(const stw_types::sint32 os32_Result, const stw_types::uint8 ou8_NRC) const;
-   void SetErrorForFailedCyclicElementIdRegistrations(
-      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-      const std::vector<QString> & orc_FailedIdErrorDetails) const;
    void TriggerErrorCheck(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -132,11 +128,11 @@ private:
    void m_AddParamWidgetToScene(C_GiSvDaParam * const opc_Item);
    void m_AddWidgetToScene(C_GiSvDaRectBaseGroup * const opc_Item);
 
-   void m_RemoveWidgetOfScene(C_GiSvDaRectBaseGroup * const opc_Item);
-   void m_RemoveBoundaryOfScene(C_GiSvDaBoundary * const opc_Item);
-   void m_RemoveTextElementOfScene(C_GiSvDaTextElement * const opc_Item);
-   void m_RemoveImageGroupOfScene(C_GiSvDaImageGroup * const opc_Item);
-   void m_RemoveLineArrowOfScene(C_GiSvDaArrow * const opc_Item);
+   void m_RemoveWidgetOfScene(const C_GiSvDaRectBaseGroup * const opc_Item);
+   void m_RemoveBoundaryOfScene(const C_GiSvDaBoundary * const opc_Item);
+   void m_RemoveTextElementOfScene(const C_GiSvDaTextElement * const opc_Item);
+   void m_RemoveImageGroupOfScene(const C_GiSvDaImageGroup * const opc_Item);
+   void m_RemoveLineArrowOfScene(const C_GiSvDaArrow * const opc_Item);
 
    //Sync
    void m_SyncIndex(const stw_opensyde_gui_logic::C_PuiSvDbDataElement::E_Type & ore_Type,

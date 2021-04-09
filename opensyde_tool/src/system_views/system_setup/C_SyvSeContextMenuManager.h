@@ -44,7 +44,8 @@ Q_SIGNALS:
 private:
    //Avoid call
    C_SyvSeContextMenuManager(const C_SyvSeContextMenuManager &);
-   C_SyvSeContextMenuManager & operator =(const C_SyvSeContextMenuManager &);
+   C_SyvSeContextMenuManager & operator =(const C_SyvSeContextMenuManager &); //lint !e1511 //we want to hide the base
+                                                                              // func.
 
    void m_ShowNodeInformation(void);
    void m_ShowCanConfiguration(void);

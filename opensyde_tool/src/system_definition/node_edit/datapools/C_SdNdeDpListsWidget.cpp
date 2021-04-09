@@ -304,7 +304,8 @@ void C_SdNdeDpListsWidget::m_HandleSelection(const uint32 & oru32_Count, const b
          }
          else
          {
-            c_Text = static_cast<QString>(C_GtGetText::h_GetText("%1 Lists selected")).arg(this->mu32_LastKnownListSelectionCount);
+            c_Text = static_cast<QString>(C_GtGetText::h_GetText("%1 Lists selected")).arg(
+               this->mu32_LastKnownListSelectionCount);
          }
       }
       else
@@ -319,7 +320,8 @@ void C_SdNdeDpListsWidget::m_HandleSelection(const uint32 & oru32_Count, const b
          {
             //Translation: 1: Number of selected items 2: Data element type
             c_Text =
-               static_cast<QString>(C_GtGetText::h_GetText("%1 %2s selected")).arg(this->mu32_LastKnownTableSelectionCount).arg(
+               static_cast<QString>(C_GtGetText::h_GetText("%1 %2s selected")).arg(
+                  this->mu32_LastKnownTableSelectionCount).arg(
                   c_Type);
          }
       }

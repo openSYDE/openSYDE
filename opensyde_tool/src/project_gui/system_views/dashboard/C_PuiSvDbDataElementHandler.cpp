@@ -14,12 +14,15 @@
 
 #include "stwerrors.h"
 #include "constants.h"
+#include "C_OSCLoggingHandler.h"
+#include "C_GtGetText.h"
 #include "C_PuiSvDbDataElementHandler.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSvData.h"
 #include "C_OSCUtils.h"
 #include "TGLUtils.h"
 #include "TGLTime.h"
+#include "C_PuiSdUtil.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeDpContentUtil.h"
 #include "C_OSCNodeDataPoolContentUtil.h"
@@ -134,6 +137,7 @@ sint32 C_PuiSvDbDataElementHandler::RegisterDataPoolElement(
    \param[in]  ou8_ErrorCode                 Registered error code
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_PuiSvDbDataElementHandler::RegisterDataPoolElementCyclicError(
    const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId, const uint8 ou8_ErrorCode)
 {
@@ -210,6 +214,7 @@ void C_PuiSvDbDataElementHandler::ClearDataPoolElements(void)
 {
    this->mc_CriticalSection.Acquire();
    this->mc_MappingDpElementToDataSerie.clear();
+   this->mc_MappingDpElementToScaling.clear();
    this->m_SetWidgetDataPoolElementCount(this->mc_MappingDpElementToDataSerie.size());
    this->mc_CriticalSection.Release();
 
@@ -220,7 +225,7 @@ void C_PuiSvDbDataElementHandler::ClearDataPoolElements(void)
 /*! \brief   Handle changes of transmission mode for any data element
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbDataElementHandler::UpdateTransmissionConfiguration(void)
+void C_PuiSvDbDataElementHandler::UpdateElementTransmissionConfiguration(void)
 {
    const uint32 u32_Count = this->GetWidgetDataPoolElementCount();
 
@@ -990,7 +995,6 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(voi
                   C_PuiSvReadDataConfiguration c_ReadConfig;
                   s32_Return = pc_View->GetReadRailAssignment(rc_ElementId, c_ReadConfig);
 
-                  tgl_assert(s32_Return == C_NO_ERR);
                   if (s32_Return == C_NO_ERR)
                   {
                      s32_Return = pc_View->GetUpdateRate(c_ReadConfig.u8_RailIndex, u16_UpdateRate);
@@ -1002,7 +1006,18 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(voi
                   s32_Return = C_NO_ERR;
                }
 
-               tgl_assert(s32_Return == C_NO_ERR);
+               if (s32_Return != C_NO_ERR)
+               {
+                  const QString c_ElementDetail = static_cast<QString>(
+                     "Problem with Element %1. Indexes: Node %2; Datapool %3; List %4; Element %5")
+                                                  .arg(C_PuiSdUtil::h_GetNamespace(rc_ElementId).toStdString().c_str())
+                                                  .arg(rc_ElementId.u32_NodeIndex)
+                                                  .arg(rc_ElementId.u32_DataPoolIndex)
+                                                  .arg(rc_ElementId.u32_ListIndex)
+                                                  .arg(rc_ElementId.u32_ElementIndex);
+                  tgl_assertdetail(s32_Return == C_NO_ERR, c_ElementDetail.toStdString().c_str());
+               }
+
                if ((s32_Return == C_NO_ERR) &&
                    (c_ItItem.value() < this->mc_DataPoolElementTimeoutsMs.size()))
                {
@@ -1086,15 +1101,447 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(voi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for any invalid elements
+
+   \param[out]   orc_FirstInvalidElementName    Name of first invalid element
+
+   \return
+   true  Found
+   false Not found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbDataElementHandler::m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const
+{
+   bool q_ValidElement = false;
+   const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
+
+   for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
+        c_ItElement != rc_Elements.end(); ++c_ItElement)
+   {
+      const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
+
+      // Is the data element valid?
+      if (c_ElementId.GetIsValid())
+      {
+         q_ValidElement = true;
+      }
+      else
+      {
+         orc_FirstInvalidElementName = c_ElementId.GetInvalidNamePlaceholder();
+      }
+   }
+   return q_ValidElement;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for any manual read items
+
+   \return
+   true  Found
+   false Not found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbDataElementHandler::m_CheckManualReadRequired(void) const
+{
+   bool q_ManualReadElement = false;
+
+   if (this->mq_ReadItem == true)
+   {
+      // Check for invalid elements
+      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
+
+      for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
+           c_ItElement != rc_Elements.end(); ++c_ItElement)
+      {
+         const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
+
+         // Is the data element valid and a datapool element
+         if ((c_ElementId.GetIsValid() == true) &&
+             (c_ElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT))
+         {
+            const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+            C_PuiSvReadDataConfiguration c_ReadConfig;
+            if (pc_View != NULL)
+            {
+               pc_View->GetReadRailAssignment(c_ElementId, c_ReadConfig);
+               if (c_ReadConfig.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
+               {
+                  q_ManualReadElement = true;
+                  break;
+               }
+            }
+         }
+      }
+   }
+   return q_ManualReadElement;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for any required nodes inactive
+
+   \return
+   true  Found
+   false Not found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredNodesActive(void) const
+{
+   bool q_AtLeastOneValidElement = false;
+
+   const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
+
+   for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
+        c_ItElement != rc_Elements.end(); ++c_ItElement)
+   {
+      const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
+      if (c_ElementId.GetIsValid() == true)
+      {
+         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+         const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
+         //Is corresponding view active
+         if ((c_ElementId.u32_NodeIndex < rc_ActiveNodes.size()) &&
+             (rc_ActiveNodes[c_ElementId.u32_NodeIndex] == 1U))
+         {
+            q_AtLeastOneValidElement = true;
+            break;
+         }
+      }
+   }
+
+   return q_AtLeastOneValidElement;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for any required buses not connected in view
+
+   \return
+   true  Found
+   false Not found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredBusesConnected(void) const
+{
+   bool q_AtLeastOneValidElement = false;
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   if (pc_View != NULL)
+   {
+      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
+
+      for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
+           c_ItElement != rc_Elements.end(); ++c_ItElement)
+      {
+         const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
+         if ((c_ElementId.GetIsValid() == true) &&
+             (c_ElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL))
+         {
+            C_OSCCanMessageIdentificationIndices c_MessageID;
+            uint32 u32_SignalIndex;
+            if ((pc_View->GetPcData().GetConnected() == true) &&
+                (C_PuiSdUtil::h_ConvertIndex(c_ElementId, c_MessageID, u32_SignalIndex) == C_NO_ERR))
+            {
+               const C_OSCNode * const pc_Node =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_MessageID.u32_NodeIndex);
+               if ((pc_Node != NULL) && (c_MessageID.u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
+               {
+                  const C_OSCNodeComInterfaceSettings & rc_Interface =
+                     pc_Node->c_Properties.c_ComInterfaces[c_MessageID.u32_InterfaceIndex];
+                  if (rc_Interface.q_IsBusConnected == true)
+                  {
+                     if (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())
+                     {
+                        //Active
+                        q_AtLeastOneValidElement = true;
+                     }
+                     else
+                     {
+                        //Inactive
+                        q_AtLeastOneValidElement = false;
+                     }
+                  }
+                  else
+                  {
+                     //Failure
+                     q_AtLeastOneValidElement = false;
+                  }
+               }
+               else
+               {
+                  //Failure
+                  q_AtLeastOneValidElement = false;
+               }
+            }
+            else
+            {
+               //Failure
+               q_AtLeastOneValidElement = false;
+            }
+         }
+         else
+         {
+            //Allow continue as this means at least one element is not a bus element
+            //so this check can at least clarify that one element is valid
+            q_AtLeastOneValidElement = true;
+         }
+         if (q_AtLeastOneValidElement == true)
+         {
+            break;
+         }
+      }
+   }
+   else
+   {
+      //Failure
+      q_AtLeastOneValidElement = false;
+   }
+
+   return q_AtLeastOneValidElement;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if requested node is active
+
+   \param[in] ou32_NodeIndex Node index to check
+
+   \return
+   True  Definitely active
+   False Either not active or something else is wrong
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbDataElementHandler::m_CheckNodeActive(const uint32 ou32_NodeIndex) const
+{
+   bool q_Retval = false;
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   if (pc_View != NULL)
+   {
+      const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
+      if (ou32_NodeIndex < rc_ActiveNodes.size())
+      {
+         if (rc_ActiveNodes[ou32_NodeIndex] == true)
+         {
+            q_Retval = true;
+         }
+      }
+   }
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if the specified ID is configured as on trigger
+
+   \param[in] orc_Id ID to check
+
+   \retval   true   Error occurred or on trigger configured
+   \retval   false  Definitely not on trigger configured
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbDataElementHandler::m_CheckIsOnTrigger(const C_PuiSvDbNodeDataPoolListElementId & orc_Id) const
+{
+   bool q_Retval = true;
+
+   if (orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
+   {
+      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+      if (pc_View != NULL)
+      {
+         const QMap<C_OSCNodeDataPoolListElementId,
+                    C_PuiSvReadDataConfiguration> & rc_RailAssignments = pc_View->GetReadRailAssignments();
+         const QMap<C_OSCNodeDataPoolListElementId,
+                    C_PuiSvReadDataConfiguration>::const_iterator c_ItRailAssignment = rc_RailAssignments.find(
+            orc_Id);
+         if (c_ItRailAssignment != rc_RailAssignments.end())
+         {
+            //Only allow manual transmission for "on trigger" elements
+            if (c_ItRailAssignment.value().e_TransmissionMode != C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
+            {
+               q_Retval = false;
+            }
+         }
+      }
+   }
+   else
+   {
+      //Never trigger manual for bus element
+      q_Retval = false;
+   }
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if the element was already read, assuming the order was in the internally stored data element order
+
+   \param[in] ou32_ItemIndex Internally stored data element order index
+   \param[in] orc_Id         ID of the current index
+
+   \retval   true    Already read
+   \retval   false   New read required
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbDataElementHandler::m_CheckElementAlreadyRead(const uint32 ou32_ItemIndex,
+                                                            const C_PuiSvDbNodeDataPoolListElementId & orc_Id) const
+{
+   bool q_AlreadyRead = false;
+
+   for (uint32 u32_ItItem = 0UL; (u32_ItItem < this->GetWidgetDataPoolElementCount()) && (u32_ItItem < ou32_ItemIndex);
+        ++u32_ItItem)
+   {
+      C_PuiSvDbNodeDataPoolListElementId c_CurId;
+      if (this->GetDataPoolElementIndex(u32_ItItem, c_CurId) == C_NO_ERR)
+      {
+         if (c_CurId.CheckSameDataElement(orc_Id))
+         {
+            q_AlreadyRead = true;
+            break;
+         }
+      }
+   }
+   return q_AlreadyRead;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Event function if the datapool element configuration was changed
 
    Base class implementation does nothing. If there are configurable properties for the dashboard element
    the derived class must reimplement this function.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_PuiSvDbDataElementHandler::m_DataPoolElementsChanged(void)
 {
    // Nothing to do in the base class implementation
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Short function description
+
+   \param[in]   os32_Result       Operation result
+   \param[in]   ou8_NRC           Negative response code, if any
+   \param[out]  orc_Description   Error description
+   \param[out]  orc_Details       Details for error
+   \param[out]  ors32_TextHeight  Necessary height of text
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDbDataElementHandler::m_GetErrorDescriptionForManualOperation(const sint32 os32_Result, const uint8 ou8_NRC,
+                                                                          QString & orc_Description,
+                                                                          QString & orc_Details,
+                                                                          sint32 & ors32_TextHeight) const
+{
+   switch (os32_Result)
+   {
+   case C_CONFIG:
+   case C_RANGE:
+   case C_RD_WR:
+   case C_OVERFLOW:
+      orc_Description = C_GtGetText::h_GetText("Operation failed with an internal error.");
+      //Update log file
+      C_OSCLoggingHandler::h_Flush();
+      orc_Details = static_cast<QString>("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
+                    arg(C_GtGetText::h_GetText("For details see ")).
+                    arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                    arg(stw_opensyde_gui::mc_STYLESHEET_GUIDE_COLOR_LINK).
+                    arg(C_GtGetText::h_GetText("log file"));
+      break;
+   case C_TIMEOUT:
+      orc_Description = C_GtGetText::h_GetText("Operation did not get a response within timeout interval.");
+      break;
+   case C_NOACT:
+      orc_Description = C_GtGetText::h_GetText("Operation could not send request (e.g. Tx buffer full).");
+      break;
+   case C_WARN:
+      if (this->mq_ReadItem == true)
+      {
+         switch (ou8_NRC)
+         {
+         case 0x13:
+            orc_Details = C_GtGetText::h_GetText("Incorrect length of request.");
+            ors32_TextHeight = 250;
+            break;
+         case 0x31:
+            orc_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available.");
+            ors32_TextHeight = 250;
+            break;
+         case 0x22:
+            orc_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application.");
+            ors32_TextHeight = 250;
+            break;
+         case 0x33:
+            orc_Details = C_GtGetText::h_GetText("Required security level was not unlocked.");
+            ors32_TextHeight = 250;
+            break;
+         case 0x14:
+            orc_Details = C_GtGetText::h_GetText(
+               "The total length of the response message exceeds the available buffer size.");
+            ors32_TextHeight = 250;
+            break;
+         case 0x7F:
+            orc_Details = C_GtGetText::h_GetText(
+               "The requested service is not available in the currently active session.");
+            ors32_TextHeight = 250;
+            break;
+         default:
+            orc_Details =
+               static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC,
+                                                                                                     16));
+            ors32_TextHeight = 250;
+            break;
+         }
+      }
+      else
+      {
+         switch (ou8_NRC)
+         {
+         case 0x13:
+            orc_Details = C_GtGetText::h_GetText("Incorrect length of request.\n"
+                                                 "Specifically for this service: Size of payload data does not "
+                                                 "match size of Datapool element.");
+            ors32_TextHeight = 300;
+            break;
+         case 0x31:
+            orc_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available.");
+            ors32_TextHeight = 250;
+            break;
+         case 0x22:
+            orc_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application.");
+            ors32_TextHeight = 250;
+            break;
+         case 0x33:
+            orc_Details = C_GtGetText::h_GetText("Required security level was not unlocked.");
+            ors32_TextHeight = 250;
+            break;
+         case 0x14:
+            orc_Details = C_GtGetText::h_GetText(
+               "The total length of the response message exceeds the available buffer size.");
+            ors32_TextHeight = 250;
+            break;
+         case 0x7F:
+            orc_Details = C_GtGetText::h_GetText(
+               "The requested service is not available in the currently active session.");
+            ors32_TextHeight = 250;
+            break;
+         default:
+            orc_Details =
+               static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC,
+                                                                                                     16));
+            ors32_TextHeight = 250;
+            break;
+         }
+      }
+      orc_Description =
+         static_cast<QString>(C_GtGetText::h_GetText("Operation failed with error response (%1).")).arg(orc_Details);
+      orc_Details = "";
+      ors32_TextHeight = 230;
+      break;
+   default:
+      orc_Description = C_GtGetText::h_GetText("Operation failure, cause unknown.");
+      ors32_TextHeight = 180;
+      break;
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1108,6 +1555,26 @@ const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & C_PuiSvDbDataElementHan
    void) const
 {
    return this->mc_MappingDpElementToDataSerie;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns all registered elements
+
+   \param[out]      orc_RegisteredElements   Vector with all elements
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDbDataElementHandler::m_GetAllRegisteredElements(
+   std::vector<C_PuiSvDbNodeDataPoolListElementId> & orc_RegisteredElements) const
+{
+   QMap<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvDbDataElementScaling>::const_iterator c_ItItem;
+
+   orc_RegisteredElements.clear();
+   orc_RegisteredElements.reserve(this->mc_MappingDpElementToScaling.size());
+   for (c_ItItem = this->mc_MappingDpElementToScaling.begin(); c_ItItem != this->mc_MappingDpElementToScaling.end();
+        ++c_ItItem)
+   {
+      orc_RegisteredElements.push_back(c_ItItem.key());
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

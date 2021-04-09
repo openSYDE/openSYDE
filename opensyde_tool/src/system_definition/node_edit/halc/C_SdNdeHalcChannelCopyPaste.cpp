@@ -176,7 +176,7 @@ bool C_SdNdeHalcChannelCopyPaste::mh_CheckDataFromClipboard(const uint32 ou32_No
    const QString c_SupportedPasteExplanation =
       C_GtGetText::h_GetText("Pasting is only supported for one channel to n channels in the same domain.");
 
-   const stw_opensyde_core::C_OSCHalcConfig * pc_Config =
+   const stw_opensyde_core::C_OSCHalcConfig * const pc_Config =
       stw_opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetHALCConfig(ou32_NodeIndex);
 
    // device type match?
@@ -186,16 +186,18 @@ bool C_SdNdeHalcChannelCopyPaste::mh_CheckDataFromClipboard(const uint32 ou32_No
       if (orc_HalcConfig.c_DeviceType != pc_Config->c_DeviceName)
       {
          q_Return = false;
-         orc_ErrorDescription += static_cast<QString>(C_GtGetText::h_GetText("Cannot apply HALC channel configuration for device "
-                                                                "type %1 to device type %2.")).
-                                 arg(orc_HalcConfig.c_DeviceType.c_str(), pc_Config->c_DeviceName.c_str());
+         orc_ErrorDescription +=
+            static_cast<QString>(C_GtGetText::h_GetText("Cannot apply HALC channel configuration for device "
+                                                        "type %1 to device type %2.")).
+            arg(orc_HalcConfig.c_DeviceType.c_str(), pc_Config->c_DeviceName.c_str());
       }
       else if (orc_HalcConfig.u32_DefinitionContentVersion != pc_Config->u32_ContentVersion)
       {
          q_Return = false;
-         orc_ErrorDescription += static_cast<QString>(C_GtGetText::h_GetText("Cannot apply HALC channel configuration with content "
-                                                                "version %1 to configuration with content version %2."))
-                                 .arg(orc_HalcConfig.u32_DefinitionContentVersion).arg(pc_Config->u32_ContentVersion);
+         orc_ErrorDescription +=
+            static_cast<QString>(C_GtGetText::h_GetText("Cannot apply HALC channel configuration with content "
+                                                        "version %1 to configuration with content version %2."))
+            .arg(orc_HalcConfig.u32_DefinitionContentVersion).arg(pc_Config->u32_ContentVersion);
       }
       else
       {
@@ -358,10 +360,10 @@ bool C_SdNdeHalcChannelCopyPaste::mh_CheckSelectedChannel(const uint32 ou32_Node
    C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(orc_TargetIndex, u32_DomainIndex, u32_ChannelIndex,
                                                            q_ChannelCase);
 
-   const C_OSCHalcConfigChannel * pc_Channel =
+   const C_OSCHalcConfigChannel * const pc_Channel =
       C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(ou32_NodeIndex, u32_DomainIndex,
                                                                       u32_ChannelIndex, q_ChannelCase);
-   const C_OSCHalcConfigDomain * pc_Domain =
+   const C_OSCHalcConfigDomain * const pc_Domain =
       C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(ou32_NodeIndex, u32_DomainIndex);
 
    tgl_assert((pc_Channel != NULL) && (pc_Domain != NULL));
@@ -492,7 +494,7 @@ bool C_SdNdeHalcChannelCopyPaste::mh_CheckSelectedDomain(const stw_types::uint32
 
    C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(orc_TargetIndex, u32_DomainIndex, u32_ChannelIndex,
                                                            q_ChannelCase);
-   const C_OSCHalcConfigDomain * pc_Domain =
+   const C_OSCHalcConfigDomain * const pc_Domain =
       C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(ou32_NodeIndex, u32_DomainIndex);
 
    tgl_assert(pc_Domain != NULL);
@@ -587,7 +589,7 @@ void C_SdNdeHalcChannelCopyPaste::mh_PasteToSelectedChannels(const uint32 ou32_N
          // get indexe
          C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(*c_ItIndex, u32_DomainIndex, u32_ChannelIndex,
                                                                  q_ChannelCase);
-         const C_OSCHalcConfigChannel * pc_CurrentChannel =
+         const C_OSCHalcConfigChannel * const pc_CurrentChannel =
             C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(ou32_NodeIndex, u32_DomainIndex,
                                                                             u32_ChannelIndex, q_ChannelCase);
 
@@ -655,7 +657,7 @@ void C_SdNdeHalcChannelCopyPaste::mh_PasteToSelectedDomain(const uint32 ou32_Nod
       tgl_assert(q_ChannelCase == false);
       if (q_ChannelCase == false)
       {
-         const C_OSCHalcConfigDomain * pc_CurrentDomain =
+         const C_OSCHalcConfigDomain * const pc_CurrentDomain =
             C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(ou32_NodeIndex, u32_DomainIndex);
 
          tgl_assert(pc_CurrentDomain != NULL);

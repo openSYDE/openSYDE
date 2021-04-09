@@ -239,7 +239,8 @@ void C_SyvDaItPaImportReport::m_HandleSourceFileInformation(QString & orc_Text) 
       }
    }
    c_ReadContent +=
-      static_cast<QString>(C_GtGetText::h_GetText("Nodes: %1, Datapools: %2, Lists: %3, Parameters: %4")).arg(u32_NodeCount).arg(
+      static_cast<QString>(C_GtGetText::h_GetText("Nodes: %1, Datapools: %2, Lists: %3, Parameters: %4")).arg(
+         u32_NodeCount).arg(
          u32_DatapoolCount).arg(u32_ListCount).arg(u32_ParameterCount);
    orc_Text += C_ImpUtil::h_FormatSourceFileInfoForReport(this->mrc_Path, c_ReadContent);
 }
@@ -342,7 +343,8 @@ void C_SyvDaItPaImportReport::m_HandleParsing(QString & orc_Text)
    }
    orc_Text += "<p><b>";
    //Translation: 1=Number of entries
-   orc_Text += static_cast<QString>(C_GtGetText::h_GetText("Remaining untouched parameters (%1)")).arg(u32_TableRemainContent);
+   orc_Text += static_cast<QString>(C_GtGetText::h_GetText("Remaining untouched parameters (%1)")).arg(
+      u32_TableRemainContent);
    orc_Text += "</b></p>";
    if (u32_TableRemainContent == 0UL)
    {
@@ -493,7 +495,8 @@ void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyCont
                                        false);
                                     const QString c_Description =
                                        static_cast<QString>(C_GtGetText::h_GetText(
-                                                  "Specified value not in allowed range. Min: %1, Max: %2")).arg(c_Min).
+                                                               "Specified value not in allowed range. Min: %1, Max: %2"))
+                                       .arg(c_Min).
                                        arg(c_Max);
                                     m_AppendTableEntry(orc_TableMismatchContent, oru32_TableMismatchCount, rc_ParamId,
                                                        c_Value, c_Description);
@@ -623,7 +626,8 @@ QString C_SyvDaItPaImportReport::m_GetFilter(const uint32 ou32_Value) const
             this->mrc_Id.u32_ElementIndex);
          if (pc_Element != NULL)
          {
-            c_Retval = static_cast<QString>(C_GtGetText::h_GetText(" - Parameter \"%1\"")).arg(pc_Element->c_Name.c_str());
+            c_Retval = static_cast<QString>(C_GtGetText::h_GetText(" - Parameter \"%1\"")).arg(
+               pc_Element->c_Name.c_str());
          }
          break;
       case 3UL:
@@ -639,14 +643,16 @@ QString C_SyvDaItPaImportReport::m_GetFilter(const uint32 ou32_Value) const
                                                                        this->mrc_Id.u32_DataPoolIndex);
          if (pc_DataPool != NULL)
          {
-            c_Retval = static_cast<QString>(C_GtGetText::h_GetText(" - Datapool \"%1\"")).arg(pc_DataPool->c_Name.c_str());
+            c_Retval = static_cast<QString>(C_GtGetText::h_GetText(" - Datapool \"%1\"")).arg(
+               pc_DataPool->c_Name.c_str());
          }
          break;
       case 1UL:
          pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mrc_Id.u32_NodeIndex);
          if (pc_Node != NULL)
          {
-            c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Node \"%1\"")).arg(pc_Node->c_Properties.c_Name.c_str());
+            c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Node \"%1\"")).arg(
+               pc_Node->c_Properties.c_Name.c_str());
          }
          break;
       default:

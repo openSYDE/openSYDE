@@ -91,13 +91,13 @@ void C_SdNdeDbListDelegate::paint(QPainter * const opc_Painter, const QStyleOpti
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update index to paint widget in drag
 
-   \param[in] s32_Index          Update index for
+   \param[in] os32_Index          Update index for
    \param[in] opc_MovingWidget   Actual widget which will be moved
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbListDelegate::StartPaint(const sint32 s32_Index, C_SdNdeDbWidget * const opc_MovingWidget)
+void C_SdNdeDbListDelegate::StartPaint(const sint32 os32_Index, C_SdNdeDbWidget * const opc_MovingWidget)
 {
-   this->ms32_IndexPaint = s32_Index;
+   this->ms32_IndexPaint = os32_Index;
    this->mpc_ApplicationWidget = opc_MovingWidget;
 }
 

@@ -79,7 +79,9 @@ void C_OSCNodeDataPoolListElement::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
    this->c_MinValue.CalcHash(oru32_HashValue);
    this->c_MaxValue.CalcHash(oru32_HashValue);
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);
@@ -110,7 +112,9 @@ void C_OSCNodeDataPoolListElement::CalcHashElement(uint32 & oru32_HashValue, con
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
    this->c_MinValue.CalcHashElement(oru32_HashValue, ou32_Index);
    this->c_MaxValue.CalcHashElement(oru32_HashValue, ou32_Index);
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);

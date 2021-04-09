@@ -82,7 +82,7 @@ void C_OSCHalcConfigUtil::h_GetConfigStandalone(const stw_opensyde_core::C_OSCHa
 
          {
             // Add the standalone domain
-            C_OSCHalcConfigStandaloneDomain c_StandaloneDomain(*pc_Domain, c_ChannelIds);
+            const C_OSCHalcConfigStandaloneDomain c_StandaloneDomain(*pc_Domain, c_ChannelIds);
             orc_ConfigStandalone.c_Domains.push_back(c_StandaloneDomain);
          }
       }

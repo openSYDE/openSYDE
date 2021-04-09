@@ -101,18 +101,18 @@ void C_GiSyColorBrightnessPicker::paintEvent(QPaintEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
 
-   QRect c_Rect(0, 0, width(), height());
+   const QRect c_Rect(0, 0, width(), height());
    if ((this->mp_Pixmap == NULL) ||
        (this->mp_Pixmap->height() != c_Rect.height()) ||
        (this->mp_Pixmap->width() != c_Rect.width()))
    {
       delete this->mp_Pixmap;
       QImage c_Image(c_Rect.width(), c_Rect.height(), QImage::Format_RGB32);
-      //lint -e{826,927}  Cast is necessary due to Qt interface. See Qt documentation for scanLine
+      //lint -e{826,927,9176}  Cast is necessary due to Qt interface. See Qt documentation for scanLine
       sintn * psn_Pixel = reinterpret_cast<sintn *>(c_Image.scanLine(0));
       for (sintn sn_YValue = 0; sn_YValue < c_Rect.height(); sn_YValue++)
       {
-         sintn * psn_End = psn_Pixel + c_Rect.width();
+         sintn * const psn_End = psn_Pixel + c_Rect.width();
          std::fill(psn_Pixel, psn_End, QColor::fromHsv(this->msn_Hue,
                                                        this->msn_Sat,
                                                        (255 - ((sn_YValue * 255) / (height() - 1)))).rgb());
@@ -128,7 +128,7 @@ void C_GiSyColorBrightnessPicker::paintEvent(QPaintEvent * const opc_Event)
       c_Painter.setPen(palette().foreground().color());
       c_Painter.setBrush(palette().foreground());
       QPolygon c_Polygon;
-      sintn sn_YValue = ((255 - this->msn_Value) * (height() - 1)) / 255;
+      const sintn sn_YValue = ((255 - this->msn_Value) * (height() - 1)) / 255;
       c_Polygon.setPoints(4, width(), sn_YValue, width() - 36, sn_YValue, width(), sn_YValue + 1,
                           width() - 36, sn_YValue + 1);
       c_Painter.eraseRect(width(), 0, 5, height());

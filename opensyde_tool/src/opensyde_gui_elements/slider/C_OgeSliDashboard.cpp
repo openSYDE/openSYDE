@@ -139,17 +139,18 @@ void C_OgeSliDashboard::HandleResize(void)
    }
    sn_HandleVMargin = (sn_AvailableHeight + sn_Offset) / 2;
    c_Style = static_cast<QString>("stw_opensyde_gui_elements--C_OgeSliDashboard::groove {\n"
-                     " height:%1px;\n"
-                     "}\n"
-                     "stw_opensyde_gui_elements--C_OgeSliDashboard::handle {\n"
-                     " height:%2px;\n"
-                     " width:%2px;\n"
-                     " margin-top: -%3px;"
-                     " margin-bottom: -%3px;\n"
-                     "}\n").arg(QString::number(sn_GrooveHeight),            //Bar height
-                                QString::number(this->height() - sn_Offset), //Handle size
-                                QString::number(sn_HandleVMargin));          //Handle offset, negative to be outside
-                                                                             // of groove/bar
+                                  " height:%1px;\n"
+                                  "}\n"
+                                  "stw_opensyde_gui_elements--C_OgeSliDashboard::handle {\n"
+                                  " height:%2px;\n"
+                                  " width:%2px;\n"
+                                  " margin-top: -%3px;"
+                                  " margin-bottom: -%3px;\n"
+                                  "}\n").arg(QString::number(sn_GrooveHeight),            //Bar height
+                                             QString::number(this->height() - sn_Offset), //Handle size
+                                             QString::number(sn_HandleVMargin));          //Handle offset, negative to
+                                                                                          // be outside
+                                                                                          // of groove/bar
    this->setStyleSheet(c_Style);
 }
 

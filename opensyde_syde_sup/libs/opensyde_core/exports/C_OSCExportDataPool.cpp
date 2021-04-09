@@ -491,10 +491,30 @@ sint32 C_OSCExportDataPool::mh_AddDefinesHeader(C_SCLStringList & orc_Data, cons
             for (uint16 u16_ElementIndex = 0U; u16_ElementIndex < rc_List.c_Elements.size(); u16_ElementIndex++)
             {
                const C_SCLString c_ElementName = rc_List.c_Elements[u16_ElementIndex].c_Name.UpperCase();
-               const C_SCLString c_Factor =
-                  C_OSCExportUti::h_FloatToStrCutZeroes(rc_List.c_Elements[u16_ElementIndex].f64_Factor);
+               bool q_InfOrNanFactor;
+               bool q_InfOrNanOffset;
 
-               if ((rc_List.c_Elements[u16_ElementIndex].f64_Factor <= 0.0) || (c_Factor == "0.0"))
+               C_SCLString c_Factor;
+               C_SCLString c_Offset;
+               if (oe_ScalingSupport == C_OSCNodeCodeExportSettings::eFLOAT64)
+               {
+                  c_Factor = C_OSCExportUti::h_FloatToStrG(rc_List.c_Elements[u16_ElementIndex].f64_Factor,
+                                                           &q_InfOrNanFactor);
+                  c_Offset = C_OSCExportUti::h_FloatToStrG(rc_List.c_Elements[u16_ElementIndex].f64_Offset,
+                                                           &q_InfOrNanOffset);
+               }
+               else
+               {
+                  // use f32 variant if f32 scaling values are requested!
+                  c_Factor = C_OSCExportUti::h_FloatToStrG(
+                     static_cast<float32>(rc_List.c_Elements[u16_ElementIndex].f64_Factor), &q_InfOrNanFactor);
+                  c_Offset = C_OSCExportUti::h_FloatToStrG(
+                     static_cast<float32>(rc_List.c_Elements[u16_ElementIndex].f64_Offset), &q_InfOrNanOffset);
+               }
+
+               if (((rc_List.c_Elements[u16_ElementIndex].f64_Factor <= 0.0) || (c_Factor == "0.0")) ||
+                   ((oe_ScalingSupport == C_OSCNodeCodeExportSettings::eFLOAT32) &&
+                    (static_cast<float32>(rc_List.c_Elements[u16_ElementIndex].f64_Factor) <= 0.0)))
                {
                   osc_write_log_error("Creating source code",
                                       "Did not generate code because factor of element \"" + orc_DataPool.c_Name +
@@ -503,14 +523,31 @@ sint32 C_OSCExportDataPool::mh_AddDefinesHeader(C_SCLStringList & orc_Data, cons
                   s32_Retval = C_CONFIG;
                }
 
+               if (q_InfOrNanFactor == true)
+               {
+                  osc_write_log_error("Creating source code",
+                                      "Did not generate code because factor of element \"" + orc_DataPool.c_Name +
+                                      "::" + rc_List.c_Name + "::" + rc_List.c_Elements[u16_ElementIndex].c_Name +
+                                      "\" would be generated as 'inf' or 'nan'.");
+                  s32_Retval = C_CONFIG;
+               }
+
+               if (q_InfOrNanOffset == true)
+               {
+                  osc_write_log_error("Creating source code",
+                                      "Did not generate code because factor of element \"" + orc_DataPool.c_Name +
+                                      "::" + rc_List.c_Name + "::" + rc_List.c_Elements[u16_ElementIndex].c_Name +
+                                      "\" would be generated as 'inf' or 'nan'.");
+                  s32_Retval = C_CONFIG;
+               }
+
                orc_Data.Append("#define " +
                                mh_GetElementScaleDefine(c_DataPoolName, c_ListName, c_ElementName, true) +
                                " (" + c_Factor + c_FloatType + ")");
 
                orc_Data.Append("#define " +
-                               mh_GetElementScaleDefine(c_DataPoolName, c_ListName, c_ElementName, false) + " (" +
-                               C_OSCExportUti::h_FloatToStrCutZeroes(rc_List.c_Elements[u16_ElementIndex].f64_Offset) +
-                               c_FloatType + ")");
+                               mh_GetElementScaleDefine(c_DataPoolName, c_ListName, c_ElementName, false) +
+                               " (" + c_Offset + c_FloatType + ")");
             }
             if (rc_List.c_Elements.size() > 0)
             {
@@ -1384,12 +1421,12 @@ C_SCLString C_OSCExportDataPool::mh_GetElementValueString(const C_OSCNodeDataPoo
          }
          break;
       case C_OSCNodeDataPoolContent::eFLOAT32: ///< Data type 32 bit floating point
-         c_String += C_OSCExportUti::h_FloatToStrCutZeroes(orc_Value.GetValueF32()) + "F";
+         c_String += C_OSCExportUti::h_FloatToStrG(orc_Value.GetValueF32()) + "F";
          break;
       case C_OSCNodeDataPoolContent::eFLOAT64: ///< Data type 64 bit floating point
          //depending on the value this could result in a very long string
          //but with other approaches (e.g. "printf formatter %g" we might lose precision)
-         c_String += C_OSCExportUti::h_FloatToStrCutZeroes(orc_Value.GetValueF64());
+         c_String += C_OSCExportUti::h_FloatToStrG(orc_Value.GetValueF64());
          break;
       default:
          break;
@@ -1446,10 +1483,10 @@ C_SCLString C_OSCExportDataPool::mh_GetElementValueString(const C_OSCNodeDataPoo
             }
             break;
          case C_OSCNodeDataPoolContent::eFLOAT32: ///< Data type 32 bit floating point
-            c_String += C_OSCExportUti::h_FloatToStrCutZeroes(orc_Value.GetValueAF32Element(u32_ArrayIndex)) + "F";
+            c_String += C_OSCExportUti::h_FloatToStrG(orc_Value.GetValueAF32Element(u32_ArrayIndex)) + "F";
             break;
          case C_OSCNodeDataPoolContent::eFLOAT64: ///< Data type 64 bit floating point
-            c_String += C_OSCExportUti::h_FloatToStrCutZeroes(orc_Value.GetValueAF64Element(u32_ArrayIndex));
+            c_String += C_OSCExportUti::h_FloatToStrG(orc_Value.GetValueAF64Element(u32_ArrayIndex));
             break;
          default:
             break;

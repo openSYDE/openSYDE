@@ -201,7 +201,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
 {
    sint32 s32_Return;
 
-   uint32 u32_ExpectedSize = orc_ReadData.size();
+   const uint32 u32_ExpectedSize = orc_ReadData.size();
 
    s32_Return = this->OsyReadDataPoolData(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, orc_ReadData,
                                           opu8_NrCode);
@@ -535,11 +535,12 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, 
 
    \return
    C_NO_ERR   request sent, positive response received; or: no action required
-   C_RANGE    data pool index is zero
    C_TIMEOUT  expected response not received within timeout
    C_NOACT    could not send protocol request
    C_CONFIG   CAN dispatcher not installed
    C_WARN     error response
+   C_RD_WR    unexpected content in response (here: wrong data pool index)
+   C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolReadMetaData(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3],

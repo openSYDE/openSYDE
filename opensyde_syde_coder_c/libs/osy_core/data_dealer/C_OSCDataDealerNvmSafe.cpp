@@ -1532,12 +1532,12 @@ sint32 C_OSCDataDealerNvmSafe::m_CreateRawEntryAndPrepareInterpretedData(C_OSCNo
          case C_CHECKSUM:
             s32_Retval = C_CHECKSUM;
             break;
-         case C_NO_ERR: //Unexpected
          default:
             //Not documented error was returned by function
             s32_Retval = C_UNKNOWN_ERR;
             osc_write_log_info("parametrization",
                                "Not documented error was returned by m_InterpretDumbToList");
+            break;
          }
       }
    }
@@ -1554,12 +1554,12 @@ sint32 C_OSCDataDealerNvmSafe::m_CreateRawEntryAndPrepareInterpretedData(C_OSCNo
       case C_OVERFLOW:
          s32_Retval = C_RANGE;
          break;
-      case C_NO_ERR: //Unexpected
       default:
          //Not documented error was returned by function
          s32_Retval = C_UNKNOWN_ERR;
          osc_write_log_info("parametrization",
                             "Not documented error was returned by m_NvmReadListRaw");
+         break;
       }
    }
    return s32_Retval;

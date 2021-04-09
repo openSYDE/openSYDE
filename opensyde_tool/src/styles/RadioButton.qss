@@ -26,4 +26,9 @@ stw_opensyde_gui_elements--C_OgeRabCheckBox::indicator:enabled:checked
 {
 image: url(://images/RadioButtonActive.svg);
 }
+
+stw_opensyde_gui_elements--C_OgeRabProperties::indicator:checked
+{
+image: url(://images/RadioButtonDisabled.svg);
+}
 /* --------------------------------------------------------------------- */

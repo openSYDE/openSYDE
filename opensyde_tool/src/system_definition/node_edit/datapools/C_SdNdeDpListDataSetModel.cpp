@@ -307,24 +307,22 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
       {
          c_Retval = "";
-         switch (e_Col)
+         if (e_Col == eNAME)
          {
-         case eNAME:
             if (this->data(orc_Index, msn_USER_ROLE_ERROR).toBool() == true)
             {
                c_Retval = C_GtGetText::h_GetText("Dataset Name");
             }
-            break;
-         default:
+         }
+         else
+         {
             // default already set to ""
-            break;
          }
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_TYPE)
       {
-         switch (e_Col)
+         if (e_Col == eNAME)
          {
-         case eNAME:
             if (this->data(orc_Index, msn_USER_ROLE_ERROR).toBool() == true)
             {
                c_Retval = static_cast<sintn>(C_NagToolTip::eERROR);
@@ -333,18 +331,17 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
             {
                c_Retval = static_cast<sintn>(C_NagToolTip::eDEFAULT);
             }
-            break;
-         default:
+         }
+         else
+         {
             c_Retval = static_cast<sintn>(C_NagToolTip::eDEFAULT);
-            break;
          }
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
       {
          c_Retval = "";
-         switch (e_Col)
+         if (e_Col == eNAME)
          {
-         case eNAME:
             //Check error
             if (orc_Index.row() >= 0)
             {
@@ -370,17 +367,16 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
                }
                c_Retval = c_Output;
             }
-            break;
-         default:
+         }
+         else
+         {
             // default already set to ""
-            break;
          }
       }
       else if (osn_Role == msn_USER_ROLE_ERROR)
       {
-         switch (e_Col)
+         if (e_Col == eNAME)
          {
-         case eNAME:
             //Default
             c_Retval = false;
             //Check error
@@ -406,10 +402,10 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
                   c_Retval = true;
                }
             }
-            break;
-         default:
+         }
+         else
+         {
             c_Retval = false;
-            break;
          }
       }
       else
@@ -465,7 +461,6 @@ bool C_SdNdeDpListDataSetModel::setData(const QModelIndex & orc_Index, const QVa
                break;
             }
 
-            //lint -e{1793} Qt example
             Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
          }
       }

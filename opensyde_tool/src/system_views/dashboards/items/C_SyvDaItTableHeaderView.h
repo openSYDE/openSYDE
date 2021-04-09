@@ -31,7 +31,7 @@ protected:
 private:
    //Avoid call
    C_SyvDaItTableHeaderView(const C_SyvDaItTableHeaderView &);
-   C_SyvDaItTableHeaderView & operator =(const C_SyvDaItTableHeaderView &);
+   C_SyvDaItTableHeaderView & operator =(const C_SyvDaItTableHeaderView &); //lint !e1511 //we want to hide the base
 
    bool mq_CursorChanged;
 };

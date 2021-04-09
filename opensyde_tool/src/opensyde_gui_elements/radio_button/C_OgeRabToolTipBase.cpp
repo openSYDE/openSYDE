@@ -67,7 +67,6 @@ bool C_OgeRabToolTipBase::event(QEvent * const opc_Event)
          //show tooltip
          if (this->m_GetToolTip()->isVisible() == false)
          {
-            
             QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
             if (pc_HelpEvent != NULL)

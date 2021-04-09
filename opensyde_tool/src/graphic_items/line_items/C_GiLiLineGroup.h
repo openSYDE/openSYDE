@@ -91,7 +91,6 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void ClickActive(const stw_types::sint32 & ors32_PointIndex, const bool & orq_Active, const QPointF & orc_Pos);
    void SigItemWasMoved(const QPointF & orc_PositionDifference);
    void SigItemWasResized(const stw_types::sint32 & ors32_InteractionPointIndex,
                           const QPointF & orc_PositionDifference);

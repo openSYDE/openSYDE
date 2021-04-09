@@ -551,7 +551,7 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComMessage(C_OSCCanMessage & orc_NodeComMes
    if ((orc_XMLParser.SelectNodeChild("tx-method") == "tx-method") &&
        (s32_Retval == C_NO_ERR))
    {
-      s32_Retval = mh_StringToNodeComMessageTxMethod(orc_XMLParser.GetNodeContent(), orc_NodeComMessage.e_TxMethod);
+      mh_StringToNodeComMessageTxMethod(orc_XMLParser.GetNodeContent(), orc_NodeComMessage.e_TxMethod);
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
    }
@@ -886,6 +886,8 @@ C_SCLString C_OSCNodeCommFiler::mh_CommunicationByteOrderToString(
    case C_OSCCanSignal::eBYTE_ORDER_MOTOROLA:
       c_Retval = "motorola";
       break;
+   default:
+      break;
    }
    return c_Retval;
 }
@@ -948,6 +950,8 @@ C_SCLString C_OSCNodeCommFiler::mh_CommunicationMuxTypeToString(
       break;
    case C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL:
       c_Retval = "multiplexed";
+      break;
+   default:
       break;
    }
    return c_Retval;
@@ -1028,16 +1032,11 @@ C_SCLString C_OSCNodeCommFiler::mh_NodeComMessageTxMethodToString(
 
    \param[in]  orc_String String to interpret
    \param[out] ore_Type   Node data pool communication message transmission method type
-
-   \return
-   C_NO_ERR   no error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeCommFiler::mh_StringToNodeComMessageTxMethod(const C_SCLString & orc_String,
-                                                             C_OSCCanMessage::E_TxMethodType & ore_Type)
+void C_OSCNodeCommFiler::mh_StringToNodeComMessageTxMethod(const C_SCLString & orc_String,
+                                                           C_OSCCanMessage::E_TxMethodType & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
-
    if (orc_String == "cyclic")
    {
       ore_Type = C_OSCCanMessage::eTX_METHOD_CYCLIC;
@@ -1057,6 +1056,4 @@ sint32 C_OSCNodeCommFiler::mh_StringToNodeComMessageTxMethod(const C_SCLString &
       osc_write_log_warning("Loading project file", "Invalid transmission type \"" + orc_String + "\" in file. " \
                             "Assuming \"on_change\".");
    }
-
-   return s32_Retval;
 }

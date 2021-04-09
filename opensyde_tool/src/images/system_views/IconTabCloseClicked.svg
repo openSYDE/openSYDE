@@ -1,19 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 22.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+<!-- Generator: Adobe Illustrator 25.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:none;}
-	.st1{fill:#16162C;}
+	.st0{display:none;}
+	.st1{display:inline;opacity:0.2;fill:#FF0000;}
+	.st2{fill:#16162C;}
+	.st3{fill:#CECED9;}
+	.st4{fill:#9B9BAA;}
+	.st5{fill:#5EA343;}
+	.st6{fill:#7F7FBB;}
+	.st7{opacity:0.2;fill:none;}
+	.st8{fill:#E63A3F;}
+	.st9{fill:#FFFFFF;}
+	.st10{fill:#FAFAFA;}
+	.st11{fill:none;stroke:#7F7FBB;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
+	.st12{fill:none;stroke:#16162C;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
+	.st13{fill:#CBEBC1;}
+	.st14{fill:#38396D;}
+	.st15{fill:#EDEDF2;}
+	.st16{fill:url(#SVGID_1_);}
+	.st17{fill:url(#SVGID_2_);}
+	.st18{fill:url(#SVGID_3_);}
+	.st19{fill:url(#SVGID_4_);}
+	.st20{fill:none;stroke:#16162C;stroke-width:1.8947;stroke-miterlimit:10;}
+	.st21{fill:#CCCCCC;stroke:#CECED9;stroke-miterlimit:10;}
+	.st22{fill:none;stroke:#CECED9;stroke-width:1.6733;stroke-linecap:round;stroke-miterlimit:10;}
+	.st23{fill:#E1E1E5;}
+	.st24{fill:#82828F;}
+	.st25{fill:#39396D;}
+	.st26{fill:url(#SVGID_5_);}
+	.st27{fill:#2B2B5B;}
+	.st28{fill:url(#SVGID_6_);}
+	.st29{fill:url(#SVGID_7_);}
+	.st30{fill:#201F43;}
+	.st31{opacity:0.3;fill:#16162C;}
+	.st32{opacity:0.7;fill:#16162C;}
+	.st33{opacity:0.5;fill:#16162C;}
+	.st34{opacity:0.9;fill:#16162C;}
+	.st35{opacity:0.6;fill:#16162C;}
+	.st36{opacity:0.4;fill:#16162C;}
+	.st37{opacity:0.8;fill:#16162C;}
+	.st38{opacity:0.3;fill:#FFFFFF;}
+	.st39{opacity:0.7;fill:#FFFFFF;}
+	.st40{opacity:0.5;fill:#FFFFFF;}
+	.st41{opacity:0.9;fill:#FFFFFF;}
+	.st42{opacity:0.6;fill:#FFFFFF;}
+	.st43{opacity:0.4;fill:#FFFFFF;}
+	.st44{opacity:0.8;fill:#FFFFFF;}
+	.st45{fill:#7EB569;}
+	.st46{fill:url(#SVGID_8_);}
+	.st47{fill:url(#SVGID_9_);}
+	.st48{fill:url(#SVGID_10_);}
+	.st49{fill:url(#SVGID_11_);}
+	.st50{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}
+	.st51{fill:none;stroke:#16162C;stroke-width:2;stroke-miterlimit:10;}
+	.st52{fill:none;stroke:#FFFFFF;stroke-width:3;stroke-miterlimit:10;}
+	.st53{fill:none;stroke:#16162C;stroke-miterlimit:10;}
+	.st54{fill:#FFB300;}
+	.st55{fill:#4F4FBD;}
+	.st56{fill:#16162C;}
+	.st57{fill:#5C5C5C;}
+	.st58{fill:#575769;}
+	.st59{fill:#029B88;}
+	.st60{fill:#5D5D5D;}
+	.st61{fill:#616196;}
+	.st62{fill:#1E1E21;}
+	.st63{fill:#5858BF;}
+	.st64{fill:url(#SVGID_12_);}
+	.st65{fill:#2F3036;}
+	.st66{fill:#060708;}
+	.st67{fill:#DECA45;}
+	.st68{fill:#AA3636;}
+	.st69{opacity:0.5;}
+	.st70{fill:#616193;}
+	.st71{fill:none;stroke:#5EA343;stroke-width:6.0526;stroke-miterlimit:10;}
+	.st72{opacity:0.1;fill:#E63A3F;}
+	.st73{fill:#B2B2BD;}
+	.st74{fill:#DFEDD9;}
+	.st75{fill:url(#SVGID_13_);}
+	.st76{fill:none;stroke:#16162C;stroke-width:2;stroke-linecap:square;stroke-miterlimit:10;}
+	.st77{fill:url(#SVGID_14_);}
+	.st78{fill:url(#SVGID_15_);}
+	.st79{fill:url(#SVGID_16_);}
+	.st80{fill:url(#SVGID_17_);}
+	.st81{fill:#ABABD4;}
+	.st82{fill:#474763;}
+	.st83{fill:none;stroke:#39396D;stroke-width:2;stroke-miterlimit:10;}
+	.st84{fill:#BFBFDE;}
+	.st85{fill:none;stroke:#39396D;stroke-width:1.5;stroke-miterlimit:10;}
+	.st86{fill:#939393;}
+	.st87{fill:#7F7FBB;stroke:#39396D;stroke-width:2;stroke-miterlimit:10;}
+	.st88{display:inline;fill:none;stroke:#FF00FF;stroke-miterlimit:10;}
 </style>
-<title>Element 242</title>
-<g id="Ebene_2_1_">
-	<g id="Platzhalter">
-		<rect y="0" class="st0" width="16" height="16"/>
-	</g>
-	<g id="Ebene_1-2">
-		<polygon class="st1" points="15.7,1.7 14.3,0.3 8,6.6 1.7,0.3 0.3,1.7 6.6,8 0.3,14.3 1.7,15.7 8,9.4 14.3,15.7 15.7,14.3 9.4,8 
-					"/>
-	</g>
+<g id="background" class="st0">
+</g>
+<g id="Icons">
+	<polygon class="st2" points="2.9,1.8 1.8,2.9 6.9,8 1.8,13.1 2.9,14.2 8,9.1 13.1,14.2 14.2,13.1 9.1,8 14.2,2.9 13.1,1.8 8,6.9 	
+		"/>
+</g>
+<g id="Export" class="st0">
+	<rect x="-9.5" y="-45.5" class="st88" width="35" height="72"/>
 </g>
 </svg>

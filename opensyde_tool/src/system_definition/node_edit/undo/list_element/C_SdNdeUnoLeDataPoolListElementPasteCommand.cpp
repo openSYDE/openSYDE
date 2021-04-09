@@ -85,13 +85,13 @@ bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const stw_types::
       q_Retval = (c_OSCContent.size() == c_UIContent.size());
       if (q_Retval == true)
       {
-         const C_OSCNodeDataPoolList * pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+         const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
             this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
          if (pc_List != NULL)
          {
             q_Retval =
                (static_cast<uint32>(pc_List->c_Elements.size() + c_OSCContent.size()) <=
-                mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX);
+                C_OSCNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST);
             if (q_Retval == true)
             {
                std::vector<stw_types::uint32> c_Indices;
@@ -117,21 +117,15 @@ bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const stw_types::
                   this->mu32_DataPoolIndex);
                if (pc_DataPool != NULL)
                {
-                  if (pc_DataPool->e_Type == C_OSCNodeDataPool::eDIAG)
-                  {
-                     c_Text = C_GtGetText::h_GetText("Variables");
-                  }
-                  else
-                  {
-                     c_Text = C_GtGetText::h_GetText("Parameters");
-                  }
+                  c_Text = C_PuiSdHandlerNodeLogic::h_GetElementTypeName(pc_DataPool->e_Type);
                }
                else
                {
-                  c_Text = C_GtGetText::h_GetText("Data elements");
+                  c_Text = C_GtGetText::h_GetText("Data element");
                }
-               c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Only %1 %2 allowed per list.")).arg(
-                                              mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX).arg(c_Text));
+               c_MessageBox.SetDescription(
+                  static_cast<QString>(C_GtGetText::h_GetText("Only %1 %2s allowed per list.")).
+                  arg(C_OSCNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST).arg(c_Text));
                c_MessageBox.SetCustomMinHeight(180, 180);
                c_MessageBox.Execute();
             }

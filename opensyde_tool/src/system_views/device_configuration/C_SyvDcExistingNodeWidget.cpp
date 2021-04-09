@@ -70,7 +70,7 @@ C_SyvDcExistingNodeWidget::C_SyvDcExistingNodeWidget(QWidget * const opc_Parent)
 
    //Clear debug text
    this->mpc_Ui->pc_LabelIcon->setText("");
-   this->mpc_Ui->pc_LabelIcon->setPixmap(QPixmap("://images/system_definition/IconNode.svg"));
+   this->mpc_Ui->pc_LabelIcon->setPixmap(static_cast<QPixmap>("://images/system_definition/IconNode.svg"));
 
    //Deactivate debug string
    this->mpc_Ui->pc_GroupBoxSerialNumber->setTitle("");
@@ -89,10 +89,10 @@ C_SyvDcExistingNodeWidget::C_SyvDcExistingNodeWidget(QWidget * const opc_Parent)
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} Never took ownership of mpc_ListWidgetItem
 C_SyvDcExistingNodeWidget::~C_SyvDcExistingNodeWidget(void)
 {
    delete mpc_Ui;
-   //lint -e{1740} Never took ownership of mpc_ListWidgetItem
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -365,8 +365,9 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
          C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_Box.SetHeading(C_GtGetText::h_GetText("Device Assignment"));
          c_Box.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                         "Device type does not match. Expected \"%1\", dropped: \"%2\"")).arg(this->
-                                                                                                              mc_DeviceName).arg(
+                                                      "Device type does not match. Expected \"%1\", dropped: \"%2\"")).arg(
+                                 this->
+                                 mc_DeviceName).arg(
                                  c_DroppedDevice));
          c_Box.SetCustomMinHeight(180, 180);
          c_Box.Execute();
@@ -433,8 +434,10 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
       //Translation: 1: Node ID
       this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>(C_GtGetText::h_GetText("Node-ID: %1")).arg(c_Ids));
       //Translation: 1: Node type
-      this->mpc_Ui->pc_LabelDeviceType->setText(static_cast<QString>(C_GtGetText::h_GetText("Type: %1")).arg(pc_Node->c_DeviceType.
-                                                                                                c_str()));
+      this->mpc_Ui->pc_LabelDeviceType->setText(static_cast<QString>(C_GtGetText::h_GetText("Type: %1")).arg(pc_Node->
+                                                                                                             c_DeviceType
+                                                                                                             .
+                                                                                                             c_str()));
    }
    //Resize
    this->resize(this->width(), sn_Height);

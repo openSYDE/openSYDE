@@ -101,7 +101,6 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
             else
             {
                const uint64 u64_RangeValue = u64_Value - u64_Min;
-               //lint -e{18,762,830,1055}  C++ 11 feature
                const float64 f64_Steps =
                   std::round(static_cast<float64>(u64_RangeValue) / static_cast<float64>(this->GetStepWidth()));
                u64_Value = u64_Min + (static_cast<uint64>(f64_Steps) * this->GetStepWidth());
@@ -131,7 +130,6 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
             else
             {
                const uint64 u64_RangeValue = static_cast<uint64>(s64_Value - s64_Min);
-               //lint -e{18,762,830,1055}  C++ 11 feature
                const float64 f64_Steps =
                   std::round(static_cast<float64>(u64_RangeValue) / static_cast<float64>(this->GetStepWidth()));
                const float64 f64_RangeOffset = f64_Steps * static_cast<float64>(this->GetStepWidth());
@@ -155,7 +153,7 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
 /*! \brief   Validate current input string
 
    \param[in,out]  orc_Input  Input string
-   \param[in,out]  orc_Pos    Position
+   \param[in,out]  orsn_Pos   Position
 
    \return
    Invalid      Unusable
@@ -163,9 +161,9 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
    Acceptable   Completely valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-QValidator::State C_OgeSpxInt64AutoFix::validate(QString & orc_Input, sintn & orc_Pos) const
+QValidator::State C_OgeSpxInt64AutoFix::validate(QString & orc_Input, sintn & orsn_Pos) const
 {
-   QValidator::State e_Retval = C_OgeSpxInt64::validate(orc_Input, orc_Pos);
+   QValidator::State e_Retval = C_OgeSpxInt64::validate(orc_Input, orsn_Pos);
    if (e_Retval == QValidator::Acceptable)
    {
       const QString c_ValueOnly = this->m_ExtractSpinBoxValue(orc_Input);
@@ -242,24 +240,24 @@ void C_OgeSpxInt64AutoFix::m_Init(void)
          if (this->GetIsUnsigned() == true)
          {
             u64_ScaledMin = static_cast<uint64>(f64_Tmp);
-            c_ScaledMin = QVariant(u64_ScaledMin);
+            c_ScaledMin = static_cast<QVariant>(u64_ScaledMin);
          }
          else
          {
             s64_ScaledMin = static_cast<sint64>(f64_Tmp);
-            c_ScaledMin = QVariant(s64_ScaledMin);
+            c_ScaledMin = static_cast<QVariant>(s64_ScaledMin);
          }
          this->mc_UnscaledMax.GetAnyValueAsFloat64(f64_Tmp, this->mu32_Index);
          f64_Tmp = C_OSCUtils::h_GetValueScaled(f64_Tmp, this->mf64_Factor, this->mf64_Offset);
          if (this->GetIsUnsigned() == true)
          {
             u64_ScaledMax = static_cast<uint64>(f64_Tmp);
-            c_ScaledMax = QVariant(u64_ScaledMax);
+            c_ScaledMax = static_cast<QVariant>(u64_ScaledMax);
          }
          else
          {
             s64_ScaledMax = static_cast<sint64>(f64_Tmp);
-            c_ScaledMax = QVariant(s64_ScaledMax);
+            c_ScaledMax = static_cast<QVariant>(s64_ScaledMax);
          }
       }
       else
@@ -268,15 +266,15 @@ void C_OgeSpxInt64AutoFix::m_Init(void)
          {
             C_SdNdeDpContentUtil::h_GetAnyValueAsUint64(this->mc_UnscaledMin, u64_ScaledMin, this->mu32_Index);
             C_SdNdeDpContentUtil::h_GetAnyValueAsUint64(this->mc_UnscaledMax, u64_ScaledMax, this->mu32_Index);
-            c_ScaledMin = QVariant(u64_ScaledMin);
-            c_ScaledMax = QVariant(u64_ScaledMax);
+            c_ScaledMin = static_cast<QVariant>(u64_ScaledMin);
+            c_ScaledMax = static_cast<QVariant>(u64_ScaledMax);
          }
          else
          {
             C_SdNdeDpContentUtil::h_GetAnyValueAsSint64(this->mc_UnscaledMin, s64_ScaledMin, this->mu32_Index);
             C_SdNdeDpContentUtil::h_GetAnyValueAsSint64(this->mc_UnscaledMax, s64_ScaledMax, this->mu32_Index);
-            c_ScaledMin = QVariant(s64_ScaledMin);
-            c_ScaledMax = QVariant(s64_ScaledMax);
+            c_ScaledMin = static_cast<QVariant>(s64_ScaledMin);
+            c_ScaledMax = static_cast<QVariant>(s64_ScaledMax);
          }
       }
       this->SetMinimum(c_ScaledMin);

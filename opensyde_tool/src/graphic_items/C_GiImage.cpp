@@ -85,10 +85,10 @@ C_GiImage::~C_GiImage()
 void C_GiImage::Redraw(void)
 {
    // calculate the scaling on the original picture to get best quality
-   QPixmap c_Pixmap = this->mc_OriginalPixmap.scaled(QSize(static_cast<sintn>(this->f64_Width),
-                                                           static_cast<sintn>(this->f64_Height)),
-                                                     Qt::KeepAspectRatio,
-                                                     Qt::SmoothTransformation);
+   const QPixmap c_Pixmap = this->mc_OriginalPixmap.scaled(QSize(static_cast<sintn>(this->f64_Width),
+                                                                 static_cast<sintn>(this->f64_Height)),
+                                                           Qt::KeepAspectRatio,
+                                                           Qt::SmoothTransformation);
 
    this->setPixmap(c_Pixmap);
 }

@@ -28,6 +28,7 @@
 #include "C_OSCNodeDataPoolContent.h"
 #include "CSCLChecksums.h"
 #include "C_OSCUtils.h"
+#include "TGLUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -131,7 +132,7 @@ void C_OSCNodeDataPoolContent::CalcHashElement(uint32 & oru32_HashValue, const u
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->me_Type, sizeof(this->me_Type), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_Array, sizeof(this->mq_Array), oru32_HashValue);
-   if ((this->mq_Array) && (ou32_Index < this->GetArraySize()))
+   if ((this->mq_Array == true) && (ou32_Index < this->GetArraySize()))
    {
       uint64 u64_Val = 0ULL;
       sint64 s64_Val = 0LL;
@@ -172,11 +173,15 @@ void C_OSCNodeDataPoolContent::CalcHashElement(uint32 & oru32_HashValue, const u
          break;
       case C_OSCNodeDataPoolContent::eFLOAT32:
          f64_Val = static_cast<float64>(this->GetValueAF32Element(ou32_Index));
+         //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
          stw_scl::C_SCLChecksums::CalcCRC32(&f64_Val, sizeof(f64_Val), oru32_HashValue);
          break;
       case C_OSCNodeDataPoolContent::eFLOAT64:
          f64_Val = this->GetValueAF64Element(ou32_Index);
+         //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
          stw_scl::C_SCLChecksums::CalcCRC32(&f64_Val, sizeof(f64_Val), oru32_HashValue);
+         break;
+      default:
          break;
       }
    }
@@ -205,6 +210,7 @@ template <typename T> void C_OSCNodeDataPoolContent::m_SetValue(const T & orc_Va
       if (this->me_Type == oe_Type)
       {
          this->mc_CriticalSection.Acquire();
+         //lint -e{9110} //we do not really use the bit representation; mc_Data is just our "BLOB" storage
          (void)std::memcpy(&this->mc_Data[0], &orc_Value, sizeof(orc_Value));
          this->mc_CriticalSection.Release();
       }
@@ -236,6 +242,7 @@ template <typename T> void C_OSCNodeDataPoolContent::m_GetValue(const E_Type oe_
       if (this->me_Type == oe_Type)
       {
          this->mc_CriticalSection.Acquire();
+         //lint -e{9110} //we do not really use the bit representation; mc_Data is just our "BLOB" storage
          (void)std::memcpy(&orc_Value, &this->mc_Data[0], sizeof(orc_Value));
          this->mc_CriticalSection.Release();
       }
@@ -650,6 +657,7 @@ template <typename T> void C_OSCNodeDataPoolContent::m_SetValueArray(const T & o
       {
          this->mc_CriticalSection.Acquire();
          mc_Data.resize(orc_Value.size() * sizeof(orc_Value[0]));
+         //lint -e{9110} //we do not really use the bit representation; mc_Data is just our "BLOB" storage
          (void)std::memcpy(&this->mc_Data[0], &orc_Value[0], this->mc_Data.size());
          this->mc_CriticalSection.Release();
       }
@@ -688,6 +696,8 @@ template <typename T> void C_OSCNodeDataPoolContent::m_SetValueArrayElement(cons
          if (this->GetArraySize() > ou32_Index)
          {
             this->mc_CriticalSection.Acquire();
+            //lint -e{9110} //we do not really use the bit representation; mc_Data is just our "BLOB" storage
+            //lint -e{9114} //range of parameter is safe for sizeof result to fit in
             (void)std::memcpy(&this->mc_Data[ou32_Index * (sizeof(orc_Value))], &orc_Value, sizeof(orc_Value));
             this->mc_CriticalSection.Release();
          }
@@ -725,6 +735,7 @@ template <typename T> void C_OSCNodeDataPoolContent::m_GetValueArray(const E_Typ
       {
          this->mc_CriticalSection.Acquire();
          orc_Result.resize(this->mc_Data.size() / sizeof(orc_Result[0]));
+         //lint -e{9110} //we do not really use the bit representation; mc_Data is just our "BLOB" storage
          (void)std::memcpy(&orc_Result[0], &this->mc_Data[0], this->mc_Data.size());
          this->mc_CriticalSection.Release();
       }
@@ -763,6 +774,8 @@ template <typename T> void C_OSCNodeDataPoolContent::m_GetValueArrayElement(cons
          if (this->GetArraySize() > ou32_Index)
          {
             this->mc_CriticalSection.Acquire();
+            //lint -e{9110} //we do not really use the bit representation; mc_Data is just our "BLOB" storage
+            //lint -e{9114} //range of parameter is safe for sizeof result to fit in
             (void)std::memcpy(&orc_Result, &this->mc_Data[ou32_Index * sizeof(orc_Result)], sizeof(orc_Result));
             this->mc_CriticalSection.Release();
          }
@@ -1480,7 +1493,7 @@ void C_OSCNodeDataPoolContent::SetType(const E_Type & ore_Value)
       const uint32 u32_Size = this->GetArraySize();
 
       //get copy of existing data:
-      C_OSCNodeDataPoolContent c_OldData = (*this);
+      const C_OSCNodeDataPoolContent c_OldData = (*this);
 
       //Apply new type
       this->me_Type = ore_Value;
@@ -1753,8 +1766,7 @@ bool C_OSCNodeDataPoolContent::CheckInsideRange(const C_OSCNodeDataPoolContent::
       case C_OSCNodeDataPoolContent::eUINT8:
          if (q_ThisBaseIsUnsigned == true)
          {
-            if ((static_cast<uint64>(std::numeric_limits<uint8>::min()) <= u64_Value) &&
-                (u64_Value <= static_cast<uint64>(std::numeric_limits<uint8>::max())))
+            if (u64_Value <= static_cast<uint64>(std::numeric_limits<uint8>::max()))
             {
                q_Retval = true;
             }
@@ -1795,8 +1807,7 @@ bool C_OSCNodeDataPoolContent::CheckInsideRange(const C_OSCNodeDataPoolContent::
       case C_OSCNodeDataPoolContent::eUINT16:
          if (q_ThisBaseIsUnsigned == true)
          {
-            if ((static_cast<uint64>(std::numeric_limits<uint16>::min()) <= u64_Value) &&
-                (u64_Value <= static_cast<uint64>(std::numeric_limits<uint16>::max())))
+            if (u64_Value <= static_cast<uint64>(std::numeric_limits<uint16>::max()))
             {
                q_Retval = true;
             }
@@ -1837,8 +1848,7 @@ bool C_OSCNodeDataPoolContent::CheckInsideRange(const C_OSCNodeDataPoolContent::
       case C_OSCNodeDataPoolContent::eUINT32:
          if (q_ThisBaseIsUnsigned == true)
          {
-            if ((static_cast<uint64>(std::numeric_limits<uint32>::min()) <= u64_Value) &&
-                (u64_Value <= static_cast<uint64>(std::numeric_limits<uint32>::max())))
+            if (u64_Value <= static_cast<uint64>(std::numeric_limits<uint32>::max()))
             {
                q_Retval = true;
             }
@@ -2730,21 +2740,23 @@ bool C_OSCNodeDataPoolContent::CompareArrayGreater(const C_OSCNodeDataPoolConten
          - The postfix e+001 will be skipped (if the number has less than 6 digits)
          - The last digit will get rounded if necessary
 
-   \param[in]   of64_Factor   Scaling factor
-   \param[in]   of64_Offset   Scaling offset
-   \param[out]  orc_Output    Scaled string
-   \param[in]   ou32_Index    Index to use in case of array
+   \param[in]   of64_Factor               Scaling factor
+   \param[in]   of64_Offset               Scaling offset
+   \param[out]  orc_Output                Scaled string
+   \param[in]   ou32_Index                Index to use in case of array
+   \param[in]   oq_AllowRangeAdaptation   Allow range adaptation
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::GetValueAsScaledString(const float64 of64_Factor, const float64 of64_Offset,
-                                                      std::string & orc_Output, const uint32 ou32_Index) const
+                                                      std::string & orc_Output, const uint32 ou32_Index,
+                                                      const bool oq_AllowRangeAdaptation) const
 {
    std::stringstream c_Stream;
    if (C_OSCUtils::h_IsScalingActive(of64_Factor, of64_Offset) == true)
    {
       float64 f64_Tmp;
       this->GetAnyValueAsFloat64(f64_Tmp, ou32_Index);
-      f64_Tmp = C_OSCUtils::h_GetValueScaled(f64_Tmp, of64_Factor, of64_Offset);
+      f64_Tmp = C_OSCUtils::h_GetValueScaled(f64_Tmp, of64_Factor, of64_Offset, oq_AllowRangeAdaptation);
       c_Stream << f64_Tmp;
    }
    else
@@ -2783,6 +2795,8 @@ void C_OSCNodeDataPoolContent::GetValueAsScaledString(const float64 of64_Factor,
          case C_OSCNodeDataPoolContent::eFLOAT64:
             c_Stream << this->GetValueF64();
             break;
+         default:
+            break;
          }
       }
       else
@@ -2818,6 +2832,8 @@ void C_OSCNodeDataPoolContent::GetValueAsScaledString(const float64 of64_Factor,
             break;
          case C_OSCNodeDataPoolContent::eFLOAT64:
             c_Stream << this->GetValueAF64Element(ou32_Index);
+            break;
+         default:
             break;
          }
       }
@@ -2872,6 +2888,8 @@ void C_OSCNodeDataPoolContent::GetAnyValueAsFloat64(float64 & orf64_Output, cons
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orf64_Output = static_cast<float64>(this->GetValueAF64Element(ou32_Index));
             break;
+         default:
+            break;
          }
       }
    }
@@ -2908,6 +2926,8 @@ void C_OSCNodeDataPoolContent::GetAnyValueAsFloat64(float64 & orf64_Output, cons
          break;
       case C_OSCNodeDataPoolContent::eFLOAT64:
          orf64_Output = static_cast<float64>(this->GetValueF64());
+         break;
+      default:
          break;
       }
    }
@@ -3159,14 +3179,14 @@ sint32 C_OSCNodeDataPoolContent::SetValueFromBigEndianBlob(const std::vector<uin
 {
    sint32 s32_Return = C_NO_ERR;
    //using unions is not nice but more portable than reinterpret_casting
-   //lint -e{1960}  //cf. comment above
+   //lint -e{9018}  //cf. comment above
    union U_Union32
    {
       uint32 u32_Value;
       float32 f32_Value;
    };
 
-   //lint -e{1960}  //cf. comment above
+   //lint -e{9018}  //cf. comment above
    union U_Union64
    {
       uint64 u64_Value;
@@ -3219,6 +3239,8 @@ sint32 C_OSCNodeDataPoolContent::SetValueFromBigEndianBlob(const std::vector<uin
             U_Union64 u_Value64;
             u_Value64.u64_Value = mh_BinaryToUInt64Big(&orc_Data[0]);
             this->SetValueF64(u_Value64.f64_Value);
+            break;
+         default:
             break;
          }
       }
@@ -3322,6 +3344,8 @@ sint32 C_OSCNodeDataPoolContent::SetValueFromBigEndianBlob(const std::vector<uin
             }
             this->SetValueAF64(c_DataF64);
             break;
+         default:
+            break;
          }
       }
    }
@@ -3346,14 +3370,14 @@ sint32 C_OSCNodeDataPoolContent::SetValueFromLittleEndianBlob(const std::vector<
    sint32 s32_Return = C_NO_ERR;
 
    //using unions is not nice but more portable than reinterpret_casting
-   //lint -e{1960}  //cf. comment above
+   //lint -e{9018}  //cf. comment above
    union U_Union32
    {
       uint32 u32_Value;
       float32 f32_Value;
    };
 
-   //lint -e{1960}  //cf. comment above
+   //lint -e{9018}  //cf. comment above
    union U_Union64
    {
       uint64 u64_Value;
@@ -3406,6 +3430,8 @@ sint32 C_OSCNodeDataPoolContent::SetValueFromLittleEndianBlob(const std::vector<
             U_Union64 u_Value64;
             u_Value64.u64_Value = mh_BinaryToUInt64Little(&orc_Data[0]);
             this->SetValueF64(u_Value64.f64_Value);
+            break;
+         default:
             break;
          }
       }
@@ -3510,6 +3536,8 @@ sint32 C_OSCNodeDataPoolContent::SetValueFromLittleEndianBlob(const std::vector<
             }
             this->SetValueAF64(c_DataF64);
             break;
+         default:
+            break;
          }
       }
    }
@@ -3528,14 +3556,14 @@ sint32 C_OSCNodeDataPoolContent::SetValueFromLittleEndianBlob(const std::vector<
 void C_OSCNodeDataPoolContent::GetValueAsBigEndianBlob(std::vector<uint8> & orc_Data) const
 {
    //using unions is not nice but more portable than reinterpret_casting
-   //lint -e{1960}  //cf. comment above
+   //lint -e{9018}  //cf. comment above
    union U_Union32
    {
       uint32 u32_Value;
       float32 f32_Value;
    };
 
-   //lint -e{1960}  //cf. comment above
+   //lint -e{9018}  //cf. comment above
    union U_Union64
    {
       uint64 u64_Value;
@@ -3588,6 +3616,8 @@ void C_OSCNodeDataPoolContent::GetValueAsBigEndianBlob(std::vector<uint8> & orc_
       case eFLOAT64: ///< Data type 64 bit floating point
          u_Value64.f64_Value = this->GetValueF64();
          mh_UInt64ToBinaryBig(u_Value64.u64_Value, &orc_Data[0]);
+         break;
+      default:
          break;
       }
    }
@@ -3679,6 +3709,8 @@ void C_OSCNodeDataPoolContent::GetValueAsBigEndianBlob(std::vector<uint8> & orc_
             u_Value64.f64_Value = c_DataF64[u32_ArrayIndex];
             mh_UInt64ToBinaryBig(u_Value64.u64_Value, &orc_Data[static_cast<size_t>(u32_ArrayIndex * 8U)]);
          }
+         break;
+      default:
          break;
       }
    }
@@ -3852,14 +3884,14 @@ void C_OSCNodeDataPoolContent::mh_UInt32ToBinaryLittle(const uint32 ou32_Data, u
 void C_OSCNodeDataPoolContent::GetValueAsLittleEndianBlob(std::vector<uint8> & orc_Data) const
 {
    //using unions is not nice but more portable than reinterpret_casting
-   //lint -e{1960}  //cf. comment above
+   //lint -e{9018}  //cf. comment above
    union U_Union32
    {
       uint32 u32_Value;
       float32 f32_Value;
    };
 
-   //lint -e{1960}  //cf. comment above
+   //lint -e{9018}  //cf. comment above
    union U_Union64
    {
       uint64 u64_Value;
@@ -3912,6 +3944,8 @@ void C_OSCNodeDataPoolContent::GetValueAsLittleEndianBlob(std::vector<uint8> & o
       case eFLOAT64: ///< Data type 64 bit floating point
          u_Value64.f64_Value = this->GetValueF64();
          mh_UInt64ToBinaryLittle(u_Value64.u64_Value, &orc_Data[0]);
+         break;
+      default:
          break;
       }
    }
@@ -4003,6 +4037,8 @@ void C_OSCNodeDataPoolContent::GetValueAsLittleEndianBlob(std::vector<uint8> & o
             u_Value64.f64_Value = c_DataF64[u32_ArrayIndex];
             mh_UInt64ToBinaryLittle(u_Value64.u64_Value, &orc_Data[static_cast<size_t>(u32_ArrayIndex * 8U)]);
          }
+         break;
+      default:
          break;
       }
    }

@@ -34,7 +34,8 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_UsNode::C_UsNode(void) :
-   me_SelectedProtocol(stw_opensyde_core::C_OSCCanProtocol::eLAYER2)
+   me_SelectedProtocol(stw_opensyde_core::C_OSCCanProtocol::eLAYER2),
+   mu32_SelectedInterface(0)
 {
 }
 
@@ -86,6 +87,18 @@ QString C_UsNode::GetSelectedDatapoolName(void) const
 stw_opensyde_core::C_OSCCanProtocol::E_Type C_UsNode::GetSelectedProtocol(void) const
 {
    return this->me_SelectedProtocol;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected CAN interface index
+
+   \return
+   Selected CAN interface index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::uint32 C_UsNode::GetSelectedInterface(void) const
+{
+   return this->mu32_SelectedInterface;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -156,6 +169,17 @@ void C_UsNode::SetSelectedDatapoolName(const QString & orc_DatapoolName)
 void C_UsNode::SetSelectedProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol)
 {
    this->me_SelectedProtocol = oe_Protocol;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected CAN interface index
+
+   \param[in]  ou32_InterfaceIndex    Selected CAN interface index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetSelectedInterface(const stw_types::uint32 ou32_InterfaceIndex)
+{
+   this->mu32_SelectedInterface = ou32_InterfaceIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

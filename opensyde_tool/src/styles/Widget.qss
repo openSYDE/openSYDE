@@ -12,8 +12,6 @@ border-style: none;
 stw_opensyde_gui--C_SyvDaItDashboardLabelWidget[Style="OPENSYDE_DARK"],
 stw_opensyde_gui--C_SyvDaItDashboardLabelWidget[Style="OPENSYDE_BRIGHT"],
 stw_opensyde_gui--C_SyvDaItPaWidget,
-stw_opensyde_gui--C_SyvDaItChartWidget[Style="OPENSYDE_DARK"],
-stw_opensyde_gui--C_SyvDaItChartWidget[Style="OPENSYDE_BRIGHT"],
 stw_opensyde_gui_elements--C_OgeWiBorder,
 stw_opensyde_gui--C_SdNdeDpListPopUp
 {

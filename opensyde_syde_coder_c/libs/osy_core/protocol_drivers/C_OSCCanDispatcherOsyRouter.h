@@ -38,14 +38,21 @@ public:
    void SetFilterParameters(const stw_types::uint8 ou8_RoutingChannel, const stw_types::uint32 ou32_FilterId,
                             const stw_types::uint32 ou32_FilterMask);
 
+   //lint -e{8001}  //name of function dictated by base class
    virtual stw_types::sint32 CAN_Init(void);
+   //lint -e{8001}  //name of function dictated by base class
    virtual stw_types::sint32 CAN_Init(const stw_types::sint32 os32_BitrateKBitS);
+   //lint -e{8001}  //name of function dictated by base class
    virtual stw_types::sint32 CAN_Exit(void);
+   //lint -e{8001}  //name of function dictated by base class
    virtual stw_types::sint32 CAN_Reset(void);
+   //lint -e{8001}  //name of function dictated by base class
    virtual stw_types::sint32 CAN_Send_Msg(const stw_can::T_STWCAN_Msg_TX & orc_Message);
+   //lint -e{8001}  //name of function dictated by base class
    virtual stw_types::sint32 CAN_Get_System_Time(stw_types::uint64 & oru64_SystemTimeUs) const;
 
 protected:
+   //lint -e{8001}  //name of function dictated by base class
    virtual stw_types::sint32 m_CAN_Read_Msg(stw_can::T_STWCAN_Msg_RX & orc_Message);
 
 private:

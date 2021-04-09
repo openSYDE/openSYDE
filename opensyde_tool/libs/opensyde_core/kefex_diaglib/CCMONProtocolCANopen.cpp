@@ -287,7 +287,7 @@ C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_M
          switch (orc_Msg.au8_Data[0] & 0xE0U)
          {
             case SCS_INIT_UPLOAD     :
-               u16_Index = m_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
+               u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
                u16_SubIndex = orc_Msg.au8_Data[3];
                if ((orc_Msg.au8_Data[0] & 0x02U) == 0x02U)
                {
@@ -316,7 +316,7 @@ C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   //segmented
                   c_Help = c_Help + "INIT UPLOAD SEG RES ";
                   (void)c_Help2.PrintFormatted("%X,%02X  ", u16_Index, u16_SubIndex);
-                  u32_Size =  m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]);
+                  u32_Size =  mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]);
                   c_Help2 += ("Size: " + m_GetValueDecHex(u32_Size));
                   c_Text = c_Help + c_Help2;
                }
@@ -342,7 +342,7 @@ C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_M
                break;
             case SCS_INIT_DOWNLOAD   :
                c_Help = c_Help + "INIT DOWNLOAD RES ";
-               u16_Index = m_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
+               u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
                u16_SubIndex = orc_Msg.au8_Data[3];
                (void)c_Help2.PrintFormatted("%X,%02X", u16_Index, u16_SubIndex);
                c_Text = c_Help + c_Help2;
@@ -353,7 +353,7 @@ C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_M
                break;
             case ABORT_DOMAIN        :
                c_Help = c_Help + "ABORT ";
-               u16_Index = m_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
+               u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
                u16_SubIndex = orc_Msg.au8_Data[3];
                (void)c_Help2.PrintFormatted("%X,%02X  Reason:", u16_Index, u16_SubIndex);
                for (j = 0; j < 4; j++)
@@ -364,7 +364,7 @@ C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_M
 
                //add real error codes:
                c_Help2 = "";
-               switch (m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]))
+               switch (mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]))
                {
                case SDO_ERROR_TOGGLE_BIT_NOT_ALTERNATED:
                   c_Help2 = "(toggle bit not alternated)";
@@ -472,7 +472,7 @@ C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_M
          {
          case CCS_INIT_UPLOAD     :
             c_Help = c_Help + "INIT UPLOAD REQ ";
-            u16_Index = m_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
+            u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
             u16_SubIndex = orc_Msg.au8_Data[3];
             (void)c_Help2.PrintFormatted("%X,%02X  ", u16_Index, u16_SubIndex);
             c_Text = c_Help + c_Help2;
@@ -481,7 +481,7 @@ C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_M
             c_Text = c_Help + "UPLOAD SEG REQ ";
             break;
          case CCS_INIT_DOWNLOAD   :
-            u16_Index = m_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
+            u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
             u16_SubIndex = orc_Msg.au8_Data[3];
             (void)c_Help2.PrintFormatted("%X,%02X  ", u16_Index, u16_SubIndex);
             if ((orc_Msg.au8_Data[0] & 0x02U) == 0x02U)
@@ -508,7 +508,7 @@ C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_M
             {
                //segmented
                c_Help = c_Help + "INIT DOWNLOAD SEG REQ ";
-               u32_Size = m_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]);
+               u32_Size = mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]);
                c_Help2 += ("Size: " + m_GetValueDecHex(u32_Size));
                c_Text = c_Help + c_Help2;
             }
@@ -534,7 +534,7 @@ C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_M
             break;
          case ABORT_DOMAIN        :
             c_Help = c_Help + "ABORT ";
-            u16_Index = m_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
+            u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
             u16_SubIndex = orc_Msg.au8_Data[3];
             (void)c_Help2.PrintFormatted("%X,%02X  Reason:", u16_Index, u16_SubIndex);
             for (j = 0; j < 4; j++)

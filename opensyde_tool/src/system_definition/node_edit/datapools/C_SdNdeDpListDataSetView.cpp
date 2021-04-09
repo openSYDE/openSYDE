@@ -107,13 +107,10 @@ C_SdNdeDpListDataSetView::C_SdNdeDpListDataSetView(QWidget * const opc_Parent) :
    //Corner button label
    {
       this->mpc_LabelCorner = new QLabel(this);
-      tgl_assert(this->mpc_LabelCorner != NULL);
-      if (this->mpc_LabelCorner != NULL)
-      {
-         this->mpc_LabelCorner->setAlignment(Qt::AlignCenter);
-         this->mpc_LabelCorner->setAttribute(Qt::WA_TransparentForMouseEvents);
-         this->mpc_LabelCorner->setText(C_GtGetText::h_GetText("Dataset #"));
-      }
+      this->mpc_LabelCorner->setAlignment(Qt::AlignCenter);
+      this->mpc_LabelCorner->setAttribute(Qt::WA_TransparentForMouseEvents);
+      this->mpc_LabelCorner->setText(C_GtGetText::h_GetText("Dataset #"));
+
       connect(
          this->verticalHeader(), &QHeaderView::geometriesChanged, this,
          &C_SdNdeDpListDataSetView::m_UpdateCornerButton);
@@ -129,6 +126,7 @@ C_SdNdeDpListDataSetView::C_SdNdeDpListDataSetView(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent and the Qt memory management or never took ownership
 C_SdNdeDpListDataSetView::~C_SdNdeDpListDataSetView(void)
 {
    if (this->mpc_ModelViewManager != NULL)
@@ -136,7 +134,6 @@ C_SdNdeDpListDataSetView::~C_SdNdeDpListDataSetView(void)
       this->mpc_ModelViewManager->UnRegisterDataSetView(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                         this->mu32_ListIndex, this);
    }
-   //lint -e{1540,1740}  no memory leak because of the parent and the Qt memory management or never took ownership
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -431,7 +428,6 @@ void C_SdNdeDpListDataSetView::OnColumnCountChange(const sint32 & ors32_NewColum
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::dropEvent(QDropEvent * const opc_Event)
 {
-
    C_SdNdeDpListDataSetView * const pc_SourceTable =
       dynamic_cast<C_SdNdeDpListDataSetView * const>(opc_Event->source());
 
@@ -462,7 +458,7 @@ void C_SdNdeDpListDataSetView::dropEvent(QDropEvent * const opc_Event)
                         uint32 u32_TargetCol;
                         const QString c_IndicesString = pc_MimeData->data(pc_Model->mimeTypes().at(2));
                         std::vector<uint32> c_NewIndices;
-                        QModelIndex c_Index = this->indexAt(opc_Event->pos());
+                        const QModelIndex c_Index = this->indexAt(opc_Event->pos());
                         //Target row
                         if (c_Index.isValid())
                         {
@@ -597,7 +593,7 @@ void C_SdNdeDpListDataSetView::startDrag(const Qt::DropActions oc_SupportedActio
 
       pc_Drag->setMimeData(this->model()->mimeData(c_SelectedItems));
       pc_Drag->exec(oc_SupportedActions, this->defaultDropAction());
-   }  //lint !e429  //no memory leak because of the parent of pc_Drag and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Drag and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

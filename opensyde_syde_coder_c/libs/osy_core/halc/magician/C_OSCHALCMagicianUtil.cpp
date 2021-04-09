@@ -167,6 +167,7 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_CombineVariableName(const stw_scl:
 /*! \brief  Get channel number variable
 
    \param[in]  orc_DomainSingularName  Domain singular name
+   \param[in]  oq_IsSafe               Is safe
    \param[in]  ou32_NumChannels        Num channels
    \param[in]  oq_AddDataset           Add dataset
 
@@ -175,14 +176,19 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_CombineVariableName(const stw_scl:
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetChanNumVariable(
-   const stw_scl::C_SCLString & orc_DomainSingularName, const uint32 ou32_NumChannels, const bool oq_AddDataset)
+   const stw_scl::C_SCLString & orc_DomainSingularName, const bool oq_IsSafe, const uint32 ou32_NumChannels,
+   const bool oq_AddDataset)
 {
    C_OSCNodeDataPoolListElement c_Element;
 
    c_Element.c_Name = C_OSCHALCMagicianUtil::h_GetChanNumVariableName(orc_DomainSingularName);
    c_Element.c_Comment = "Zero based channel numbers";
+
    //Defined defaults
    h_SetCommonDpElementDefaults(c_Element);
+
+   // Access
+   c_Element.e_Access = oq_IsSafe ? C_OSCNodeDataPoolListElement::eACCESS_RO : C_OSCNodeDataPoolListElement::eACCESS_RW;
 
    //Type
    C_OSCHALCMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, true);
@@ -208,6 +214,7 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetChanNumVariableName(const stw_s
 /*! \brief  Get use case variable
 
    \param[in]  orc_DomainSingularName  Domain singular name
+   \param[in]  oq_IsSafe               Is safe
    \param[in]  ou32_NumChannels        Num channels
    \param[in]  oq_AddDataset           Add dataset
 
@@ -216,14 +223,19 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetChanNumVariableName(const stw_s
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetUseCaseVariable(
-   const stw_scl::C_SCLString & orc_DomainSingularName, const uint32 ou32_NumChannels, const bool oq_AddDataset)
+   const stw_scl::C_SCLString & orc_DomainSingularName, const bool oq_IsSafe, const uint32 ou32_NumChannels,
+   const bool oq_AddDataset)
 {
    C_OSCNodeDataPoolListElement c_Element;
 
    c_Element.c_Name = C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(orc_DomainSingularName);
    c_Element.c_Comment = "Selected use-case";
+
    //Defined defaults
    h_SetCommonDpElementDefaults(c_Element);
+
+   // Access
+   c_Element.e_Access = oq_IsSafe ? C_OSCNodeDataPoolListElement::eACCESS_RO : C_OSCNodeDataPoolListElement::eACCESS_RW;
 
    //Type
    C_OSCHALCMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, false);
@@ -254,7 +266,6 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(const stw_s
 void C_OSCHALCMagicianUtil::h_SetCommonDpElementDefaults(C_OSCNodeDataPoolListElement & orc_Element)
 {
    orc_Element.c_Unit = "";
-   orc_Element.e_Access = C_OSCNodeDataPoolListElement::eACCESS_RW;
    orc_Element.f64_Factor = 1.0;
    orc_Element.f64_Offset = 0.0;
    orc_Element.q_DiagEventCall = false;

@@ -396,7 +396,7 @@ void C_SdNdeHalcChannelWidget::m_SetLinkedSymbolAndChannel(const bool oq_IsLinke
       if ((pc_LinkedChannel != NULL) && (pc_Domain != NULL) && (u32_LinkedChannelIndex < pc_Domain->c_Channels.size()))
       {
          c_LinkText = static_cast<QString>("%1 (%2)").arg(pc_LinkedChannel->c_Name.c_str(),
-                                             pc_Domain->c_Channels[u32_LinkedChannelIndex].c_Name.c_str());
+                                                          pc_Domain->c_Channels[u32_LinkedChannelIndex].c_Name.c_str());
       }
    }
 
@@ -417,7 +417,7 @@ void C_SdNdeHalcChannelWidget::m_SetLinkedSymbolAndChannel(const bool oq_IsLinke
 void C_SdNdeHalcChannelWidget::m_OnLinkedChannelClicked(const QString & orc_LinkedChannelName)
 {
    // get domain
-   const C_OSCHalcConfigDomain * pc_Domain =
+   const C_OSCHalcConfigDomain * const pc_Domain =
       C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(this->mu32_NodeIndex, this->mu32_DomainIndex);
 
    for (uint32 u32_Counter = 0; u32_Counter < pc_Domain->c_Channels.size(); u32_Counter++)
@@ -435,6 +435,11 @@ void C_SdNdeHalcChannelWidget::m_OnLinkedChannelClicked(const QString & orc_Link
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelWidget::m_OnViewDatapoolDetailsClicked(void)
 {
+   // Make sure HALC magician did its work
+   const sint32 s32_Result = C_PuiSdHandler::h_GetInstance()->HALCGenerateDatapools(this->mu32_NodeIndex);
+
+   tgl_assert((s32_Result == C_NO_ERR) || (s32_Result == C_NOACT));
+
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
    new C_SdNdeHalcChannelDpPreviewPopUp(*c_New,
                                         this->mu32_NodeIndex,
@@ -451,7 +456,7 @@ void C_SdNdeHalcChannelWidget::m_OnViewDatapoolDetailsClicked(void)
    {
       c_New->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the Qt memory management
+} //lint !e429  //no memory leak because of the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot of channel selected click.
@@ -462,7 +467,7 @@ void C_SdNdeHalcChannelWidget::m_OnViewDatapoolDetailsClicked(void)
 void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
 {
    // get domain
-   const C_OSCHalcConfigDomain * pc_Domain =
+   const C_OSCHalcConfigDomain * const pc_Domain =
       C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(this->mu32_NodeIndex, this->mu32_DomainIndex);
 
    if (pc_Domain != NULL)
@@ -700,7 +705,7 @@ bool C_SdNdeHalcChannelWidget::m_AskUserToContinueLinkingIfNecessary(const bool 
    if ((oq_IsLinkedOld == true) || (oq_IsLinkedNew == true))
    {
       // if linking/unlinking: ask user to continue
-      const C_OSCHalcDefChannelUseCase * pc_UseCase =
+      const C_OSCHalcDefChannelUseCase * const pc_UseCase =
          C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileUseCaseData(this->mu32_NodeIndex,
                                                                        this->mu32_DomainIndex,
                                                                        ou32_NewUseCaseIndex);
@@ -726,9 +731,9 @@ bool C_SdNdeHalcChannelWidget::m_AskUserToContinueLinkingIfNecessary(const bool 
          {
             c_Description =
                static_cast<QString>(C_GtGetText::h_GetText("Are you sure to select the use case '%1'?\n"
-                                              "Linked channel %2 will lose its configuration "
-                                              "and also be set to this use case. After linking, the configuration is "
-                                              "always applied to both channels.")).
+                                                           "Linked channel %2 will lose its configuration "
+                                                           "and also be set to this use case. After linking, the configuration is "
+                                                           "always applied to both channels.")).
                arg(pc_UseCase->c_Display.c_str(), c_LinkedChannels);
             c_MessageBox.SetCustomMinHeight(230, 230);
          }
@@ -736,7 +741,7 @@ bool C_SdNdeHalcChannelWidget::m_AskUserToContinueLinkingIfNecessary(const bool 
          {
             c_Description =
                static_cast<QString>(C_GtGetText::h_GetText("Are you sure to select the use case '%1'?\n"
-                                              "Use case of linked channel %2 will be reset to default.")).
+                                                           "Use case of linked channel %2 will be reset to default.")).
                arg(pc_UseCase->c_Display.c_str(), c_LinkedChannels);
             c_MessageBox.SetCustomMinHeight(200, 200);
          }

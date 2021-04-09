@@ -100,7 +100,6 @@ void C_SyvDcConnectedNodeList::EnableSerialNumber(const QString & orc_SerialNumb
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
-
       C_SyvDcConnectedNodeWidget * const pc_Widget =
          dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(this->item(sn_It)));
       if ((pc_Widget != NULL) && (pc_Widget->CompareSerialNumber(orc_SerialNumber) == true))
@@ -120,7 +119,6 @@ void C_SyvDcConnectedNodeList::DisableSerialNumber(const QString & orc_SerialNum
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
-
       C_SyvDcConnectedNodeWidget * const pc_Widget =
          dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(this->item(sn_It)));
       if ((pc_Widget != NULL) && (pc_Widget->CompareSerialNumber(orc_SerialNumber) == true))
@@ -168,8 +166,7 @@ void C_SyvDcConnectedNodeList::startDrag(const Qt::DropActions oc_Actions)
       // No Qt event or signal will detect this on drop exit on one common position
       // That is the only solution to handle a drag exit always.
       Q_EMIT (this->SigStopDrag());
-
-   }  //lint !e429  //no memory leak because of the parent of pc_Drag and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Drag and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -191,7 +188,6 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
    {
       if (oc_Items.size() > 0)
       {
-
          C_SyvDcConnectedNodeWidget * const pc_Widget =
             dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(oc_Items[0]));
          if (pc_Widget != NULL)

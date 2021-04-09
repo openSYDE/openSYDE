@@ -81,9 +81,9 @@ sint32 C_CMONProtocolBase::LoadParamsFromIni(C_SCLIniFile & orc_IniFile, const C
    extracted value
 */
 //-----------------------------------------------------------------------------
-uint16 C_CMONProtocolBase::m_BytesToWordLowHigh(const uint8 oau8_Bytes[2])
+uint16 C_CMONProtocolBase::mh_BytesToWordLowHigh(const uint8 oau8_Bytes[2])
 {
-   return (oau8_Bytes[0] + (static_cast<uint16>((static_cast<uint16>(oau8_Bytes[1])) << 8)));
+   return (oau8_Bytes[0] + (static_cast<uint16>((static_cast<uint16>(oau8_Bytes[1])) << 8U)));
 }
 
 //-----------------------------------------------------------------------------
@@ -96,9 +96,9 @@ uint16 C_CMONProtocolBase::m_BytesToWordLowHigh(const uint8 oau8_Bytes[2])
    extracted value
 */
 //-----------------------------------------------------------------------------
-uint16 C_CMONProtocolBase::m_BytesToWordHighLow(const uint8 oau8_Bytes[2])
+uint16 C_CMONProtocolBase::mh_BytesToWordHighLow(const uint8 oau8_Bytes[2])
 {
-   return (oau8_Bytes[1] + (static_cast<uint16>(static_cast<uint16>(oau8_Bytes[0]) << 8)));
+   return (oau8_Bytes[1] + (static_cast<uint16>(static_cast<uint16>(oau8_Bytes[0]) << 8U)));
 }
 
 //-----------------------------------------------------------------------------
@@ -111,12 +111,12 @@ uint16 C_CMONProtocolBase::m_BytesToWordHighLow(const uint8 oau8_Bytes[2])
    extracted value
 */
 //-----------------------------------------------------------------------------
-uint32 C_CMONProtocolBase::m_BytesToDwordLowHigh(const uint8 oau8_Bytes[4])
+uint32 C_CMONProtocolBase::mh_BytesToDwordLowHigh(const uint8 oau8_Bytes[4])
 {
    return static_cast<uint32>(oau8_Bytes[0] +
-                              ((static_cast<uint32>(oau8_Bytes[1])) << 8) +
-                              ((static_cast<uint32>(oau8_Bytes[2])) << 16) +
-                              ((static_cast<uint32>(oau8_Bytes[3])) << 24));
+                              ((static_cast<uint32>(oau8_Bytes[1])) << 8U) +
+                              ((static_cast<uint32>(oau8_Bytes[2])) << 16U) +
+                              ((static_cast<uint32>(oau8_Bytes[3])) << 24U));
 }
 
 //-----------------------------------------------------------------------------
@@ -129,12 +129,12 @@ uint32 C_CMONProtocolBase::m_BytesToDwordLowHigh(const uint8 oau8_Bytes[4])
    extracted value
 */
 //-----------------------------------------------------------------------------
-uint32 C_CMONProtocolBase::m_BytesToDwordHighLow(const uint8 oau8_Bytes[4])
+uint32 C_CMONProtocolBase::mh_BytesToDwordHighLow(const uint8 oau8_Bytes[4])
 {
    return static_cast<uint32>(oau8_Bytes[3] +
-                              ((static_cast<uint32>(oau8_Bytes[2])) << 8) +
-                              ((static_cast<uint32>(oau8_Bytes[1])) << 16) +
-                              ((static_cast<uint32>(oau8_Bytes[0])) << 24));
+                              ((static_cast<uint32>(oau8_Bytes[2])) << 8U) +
+                              ((static_cast<uint32>(oau8_Bytes[1])) << 16U) +
+                              ((static_cast<uint32>(oau8_Bytes[0])) << 24U));
 }
 
 //-----------------------------------------------------------------------------

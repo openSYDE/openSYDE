@@ -31,7 +31,7 @@ public:
 protected:
    //Avoid call (protected for test cases)
    explicit C_PuiSdHandler(QObject * const opc_Parent = NULL);
-   virtual ~C_PuiSdHandler(void);
+   virtual ~C_PuiSdHandler(void); //lint !e1768 see comment above
 
 private:
    //Avoid call

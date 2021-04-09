@@ -1,14 +1,12 @@
-# Status of this file is experimental; at the time of writing using the qmake .pro file is the verified approach
-#
 # This file lists all openSYDE Core files and include paths.
-# It can be included from the cmakelists.txt file of an application.
-# Some optional parts of the Core can be skipped by setting options in the application cmakelists.txt file before
+# It can be included from the CMakeLists.txt file of an application.
+# Some optional parts of the core can be skipped by setting options in the application CMakeLists.txt file before
 #  including this file in order to keep build times low.
 # See the "OPENSYDE_CORE_SKIP_*" checks below for parts that can be skipped
 #
-# This cmakelists.txt defined the library "opensyde_core" to be linked from the application.
+# This CMakeLists.txt defined the library "opensyde_core" to be linked from the application.
 # As the openSYDE core needs the "precomp_headers.h" that is placed with the application the path
-#  to that file needs to be set before this cmakelists.txt is dragged in.
+#  to that file needs to be set before this CMakeLists.txt is dragged in.
 #
 # Simplified example usage:
 #

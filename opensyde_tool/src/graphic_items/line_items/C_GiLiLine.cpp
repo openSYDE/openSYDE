@@ -316,7 +316,7 @@ uint8 C_GiLiLine::m_GetAnimationStepCount(void) const
 
    if (this->mq_SpeedUpAnimation == true)
    {
-      u8_Retval = C_GiLiLine::mhu8_AnimationStepCount * 4;
+      u8_Retval = C_GiLiLine::mhu8_AnimationStepCount * 4U;
    }
    else
    {
@@ -381,7 +381,7 @@ void C_GiLiLine::UpdatePoint(const sint32 & ors32_Index, const QPointF & orc_Pos
       //Update bounding rect
       {
          QPainterPath c_LinePath;
-         QPolygonF c_Polygon(this->mc_Points);
+         const QPolygonF c_Polygon(this->mc_Points);
          c_LinePath.addPolygon(c_Polygon);
          this->setPath(c_LinePath);
       }
@@ -727,7 +727,7 @@ void C_GiLiLine::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsI
          c_Pattern.push_back(24.0 / f64_PenWidth);
          //Animated package color
          c_Pen =
-            QPen(QBrush(c_AnimatedColor),
+            QPen(static_cast<QBrush>(c_AnimatedColor),
                  static_cast<qreal>(this->GetWidth()), Qt::CustomDashLine, Qt::FlatCap, Qt::RoundJoin);
          //Offset representing the current animation state, 48 / f64_PenWidth = sum of pattern
          if (this->mq_InverseAnimation == false)

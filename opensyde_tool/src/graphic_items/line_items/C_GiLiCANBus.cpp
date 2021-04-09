@@ -93,8 +93,8 @@ bool C_GiLiCANBus::OpenStyleDialog(void)
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
-   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, "CAN Bus", false);
-   C_GiSyLineWidget * pc_SettingsWidget = new C_GiSyLineWidget(C_GiSyLineWidget::E_Type::eCAN_BUS, *pc_Dialog);
+   C_GiSyBaseWidget * const pc_Dialog = new C_GiSyBaseWidget(*c_New, "CAN Bus", false);
+   C_GiSyLineWidget * const pc_SettingsWidget = new C_GiSyLineWidget(C_GiSyLineWidget::E_Type::eCAN_BUS, *pc_Dialog);
 
    pc_SettingsWidget->SetLineColor(this->GetColor());
    pc_SettingsWidget->SetLineWidth(this->GetWidth());
@@ -112,9 +112,8 @@ bool C_GiLiCANBus::OpenStyleDialog(void)
    {
       c_New->HideOverlay();
    }
-   return q_Retval; //lint !e429  //no memory leak because of the parent of pc_Dialog and pc_SettingsWidget and the
-                    //Qt memory management
-}
+   return q_Retval;
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and pc_SettingsWidget and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Return bus type

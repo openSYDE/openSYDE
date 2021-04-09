@@ -113,7 +113,7 @@ void C_GiPort::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
    c_Font.setPixelSize(c_Font.pointSize());
 
    //rounded rect
-   QRectF c_Rect = this->boundingRect();
+   const QRectF c_Rect = this->boundingRect();
 
    c_Gradient.setColorAt(0.0, QColor(97, 97, 147));
    c_Gradient.setColorAt(1.0, QColor(127, 127, 168));
@@ -129,12 +129,12 @@ void C_GiPort::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
       //Polygon underneath Port, locking like a sorrounding
       if (this->mq_DrawWhiteFilter == false)
       {
-         opc_Painter->setBrush(QBrush(mc_STYLE_GUIDE_COLOR_3));
+         opc_Painter->setBrush(static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_3));
          c_PointsSurrounding.append(QPointF(this->mc_Points[0].x() + 0.6, this->mc_Points[0].y() - 1.0));
          c_PointsSurrounding.append(QPointF(this->mc_Points[1].x() - 0.6, this->mc_Points[1].y() - 1.0));
          c_PointsSurrounding.append(QPointF(this->mc_Points[2].x(), this->mc_Points[2].y()));
          c_PointsSurrounding.append(QPointF(this->mc_Points[3].x(), this->mc_Points[3].y()));
-         opc_Painter->drawPolygon(QPolygonF(c_PointsSurrounding));
+         opc_Painter->drawPolygon(static_cast<QPolygonF>(c_PointsSurrounding));
 
          c_PointsInside.append(QPointF(this->mc_Points[0].x() + 2.0, this->mc_Points[0].y()));
          c_PointsInside.append(QPointF(this->mc_Points[1].x() - 2.0, this->mc_Points[1].y()));
@@ -159,7 +159,7 @@ void C_GiPort::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
       c_PointsInside.append(QPointF(this->mc_Points[3].x(), this->mc_Points[3].y()));
    }
    opc_Painter->setBrush(c_Gradient);
-   opc_Painter->drawPolygon(QPolygonF(c_PointsInside));
+   opc_Painter->drawPolygon(static_cast<QPolygonF>(c_PointsInside));
 
    if (this->mq_DrawWhiteFilter == true)
    {
@@ -175,7 +175,7 @@ void C_GiPort::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
       opc_Painter->setBrush(c_Brush);
       opc_Painter->setPen(Qt::NoPen);
 
-      opc_Painter->drawPolygon(QPolygonF(mc_Points));
+      opc_Painter->drawPolygon(static_cast<QPolygonF>(mc_Points));
    }
 }
 
@@ -186,7 +186,6 @@ void C_GiPort::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
    \param[out] orc_Closest    Closest point in shape
 */
 //----------------------------------------------------------------------------------------------------------------------
-
 void C_GiPort::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
 {
    const QPointF c_Offset(0.0, (-1.0 * (this->boundingRect().topLeft().y() - this->boundingRect().center().y())) - 1.0);

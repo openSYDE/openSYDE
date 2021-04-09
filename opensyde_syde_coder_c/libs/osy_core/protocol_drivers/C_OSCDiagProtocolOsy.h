@@ -41,8 +41,11 @@ class C_OSCDiagProtocolOsy :
    public C_OSCProtocolDriverOsy
 {
 private:
-   C_OSCDiagProtocolOsy(const C_OSCDiagProtocolOsy & orc_Souce);               //not implemented -> prevent copying
-   C_OSCDiagProtocolOsy & operator = (const C_OSCDiagProtocolOsy & orc_Souce); //not implemented -> prevent assignment
+   //not implemented -> prevent copying
+   C_OSCDiagProtocolOsy(const C_OSCDiagProtocolOsy & orc_Souce);
+   //not implemented -> prevent assignment
+   C_OSCDiagProtocolOsy & operator = (const C_OSCDiagProtocolOsy & orc_Souce); //lint !e1511 //we want to hide the base
+                                                                               // function
 
 protected:
    //implemented function from C_OSCProtocolDriverOsy:

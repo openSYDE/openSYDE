@@ -223,8 +223,7 @@ sint32 C_OSCExportNode::mh_CreateDatapoolCode(const C_OSCNode & orc_Node, const 
    uint8 u8_DataPoolIndexWithinApplication = 0U;
 
    //Export Datapools
-   for (uint32 u32_ItDataPool = 0U;
-        (u32_ItDataPool < orc_Node.c_DataPools.size()) && (s32_Retval == C_NO_ERR); ++u32_ItDataPool)
+   for (uint32 u32_ItDataPool = 0U; u32_ItDataPool < orc_Node.c_DataPools.size(); ++u32_ItDataPool)
    {
       bool q_Create = false;
       const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
@@ -336,6 +335,10 @@ sint32 C_OSCExportNode::mh_CreateDatapoolCode(const C_OSCNode & orc_Node, const 
          {
             C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path, C_OSCExportDataPool::h_GetFileName(rc_DataPool));
          }
+         else
+         {
+            break;
+         }
          u8_DataPoolIndexWithinApplication++;
       }
    }
@@ -366,12 +369,11 @@ sint32 C_OSCExportNode::mh_CreateCOMMStackCode(const C_OSCNode & orc_Node, const
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   for (uint32 u32_ItProtocol = 0U; (u32_ItProtocol < orc_Node.c_ComProtocols.size()) && (s32_Retval == C_NO_ERR);
-        ++u32_ItProtocol)
+   for (uint32 u32_ItProtocol = 0U; u32_ItProtocol < orc_Node.c_ComProtocols.size(); ++u32_ItProtocol)
    {
       const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
 
-      //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the application than create it
+      //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the application than create code
       if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
       {
          for (uint32 u32_ItInterface = 0U; u32_ItInterface < rc_Protocol.c_ComMessages.size();
@@ -393,7 +395,15 @@ sint32 C_OSCExportNode::mh_CreateCOMMStackCode(const C_OSCNode & orc_Node, const
                                                      C_OSCExportCommunicationStack::h_GetFileName(
                                                         static_cast<uint8>(u32_ItInterface), rc_Protocol.e_Type));
                }
+               else
+               {
+                  break;
+               }
             }
+         }
+         if (s32_Retval != C_NO_ERR)
+         {
+            break;
          }
       }
    }
@@ -422,8 +432,7 @@ sint32 C_OSCExportNode::mh_CreateHALConfigCode(const C_OSCNode & orc_Node, const
    sint32 s32_Retval = C_NO_ERR;
 
    // Okay here we iterate over the Datapools again, but at least it is encapsulated
-   for (uint32 u32_ItDataPool = 0U;
-        (u32_ItDataPool < orc_Node.c_DataPools.size()) && (s32_Retval == C_NO_ERR); ++u32_ItDataPool)
+   for (uint32 u32_ItDataPool = 0U; u32_ItDataPool < orc_Node.c_DataPools.size(); ++u32_ItDataPool)
    {
       const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
 
@@ -441,6 +450,10 @@ sint32 C_OSCExportNode::mh_CreateHALConfigCode(const C_OSCNode & orc_Node, const
          {
             C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path,
                                                C_OSCExportHalc::h_GetFileName(rc_DataPool.q_IsSafety));
+         }
+         else
+         {
+            break;
          }
       }
    }
@@ -482,8 +495,8 @@ sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
               static_cast<sint32>(orc_Node.c_Applications.size())))
          {
             osc_write_log_error("Creating source code",
-                                "Invalid definition of owner application for Datapool " +
-                                orc_Node.c_DataPools[u8_DataPool].c_Name + ".");
+                                "Invalid definition of owner application for Datapool \"" +
+                                orc_Node.c_DataPools[u8_DataPool].c_Name + "\".");
             s32_Retval = C_RANGE;
             break;
          }

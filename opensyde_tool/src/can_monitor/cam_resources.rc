@@ -1,7 +1,7 @@
 #include <windows.h>
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     1,20,0,0
+FILEVERSION     1,23,0,0
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN

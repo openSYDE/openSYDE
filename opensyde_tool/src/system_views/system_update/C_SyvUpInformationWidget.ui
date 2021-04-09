@@ -117,7 +117,7 @@
       <number>20</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="frame">
+      <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -147,9 +147,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFrameSeparator</class>
+   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFrameSeparator.h</header>
+   <header>C_OgeFraSeparator.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

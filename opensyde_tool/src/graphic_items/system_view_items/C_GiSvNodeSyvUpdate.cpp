@@ -263,6 +263,10 @@ void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bo
             this->m_RefreshDialog();
          }
          break;
+      case eU_WAITING:
+      case eU_UP_TO_DATE:
+      case eU_UPDATE_SUCCESS:
+      case eU_UPDATE_DISABLED:
       default:
          //No change
          break;
@@ -597,7 +601,8 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                               s32_ItDeviceInfoBlock];
                         //Search for match
                         if (((static_cast<QString>(rc_STWDeviceInfo.acn_ProjectName).compare(rc_FileInfo.acn_ProjectName)
-                              == 0) &&
+                              ==
+                              0) &&
                              (static_cast<QString>(rc_STWDeviceInfo.acn_ProjectVersion).compare(rc_FileInfo.
                                                                                                 acn_ProjectVersion) ==
                               0)) &&
@@ -805,6 +810,7 @@ void C_GiSvNodeSyvUpdate::UpdateIcons(void)
                case eU_WAITING:
                   this->mpc_IconTopLeft->SetSvg("://images/system_views/IconUpdateWaiting.svg");
                   break;
+               case eU_UNKNOWN:
                default:
                   this->mpc_IconTopLeft->SetSvg("");
                   break;
@@ -905,6 +911,8 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
                   case C_SyvUtil::eI_NO_RESPONSE:
                      c_Text = C_GtGetText::h_GetText("Node not found. Check connection!");
                      break;
+                  case C_SyvUtil::eI_UPDATE_DISABLED:
+                  case C_SyvUtil::eI_UNKNOWN:
                   default:
                      break;
                   }
@@ -922,6 +930,8 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
                   case C_SyvUtil::eI_NO_RESPONSE:
                      c_Text = C_GtGetText::h_GetText("Node not found. Check connection!");
                      break;
+                  case C_SyvUtil::eI_UPDATE_DISABLED:
+                  case C_SyvUtil::eI_UNKNOWN:
                   default:
                      break;
                   }
@@ -934,11 +944,9 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
                      c_Text += C_GtGetText::h_GetText("\nWaiting for update...");
                      break;
                   case eU_UP_TO_DATE:
-                     break;
                   case eU_UPDATE_SUCCESS:
-                     break;
                   case eU_UPDATE_DISABLED:
-                     break;
+                  case eU_UNKNOWN:
                   default:
                      break;
                   }
@@ -1038,24 +1046,15 @@ void C_GiSvNodeSyvUpdate::m_InitIcons(void)
    }
 
    //Icons
-   if (this->mpc_IconTopLeft != NULL)
-   {
-      this->mpc_IconTopLeft->SetIconSize(s32_IconSize);
-   }
+   this->mpc_IconTopLeft->SetIconSize(s32_IconSize);
    this->mpc_IconBottom->SetIconSize(s32_IconSize);
 
    //Defaults
-   if (this->mpc_IconTopLeft != NULL)
-   {
-      this->mpc_IconTopLeft->setZValue(mf64_ZORDER_INIT_NODE + 1.0);
-   }
+   this->mpc_IconTopLeft->setZValue(mf64_ZORDER_INIT_NODE + 1.0);
    this->mpc_IconBottom->setZValue(mf64_ZORDER_INIT_NODE + 1.0);
 
    //Initial disable
-   if (this->mpc_IconTopLeft != NULL)
-   {
-      this->mpc_IconTopLeft->setVisible(false);
-   }
+   this->mpc_IconTopLeft->setVisible(false);
    this->mpc_IconBottom->setVisible(false);
 
    //Add

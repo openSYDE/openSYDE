@@ -115,7 +115,6 @@ bool C_OgeTawToolTipBase::event(QEvent * const opc_Event)
 
       if (this->mpc_ToolTip->isVisible() == false)
       {
-         
          QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
          if (pc_HelpEvent != NULL)

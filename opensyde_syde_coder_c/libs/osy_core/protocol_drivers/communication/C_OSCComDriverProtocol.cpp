@@ -98,8 +98,7 @@ C_OSCComDriverProtocol::~C_OSCComDriverProtocol(void)
    this->mpc_CanTransportProtocolBroadcast = NULL;
    this->mpc_IpTransportProtocolBroadcast = NULL;
    this->mpc_IpDispatcher = NULL; //do not delete ! not owned by us
-
-   //lint -e{1740}  no memory leak because the ownership of mpc_SysDef was never transferred to this class
+   this->mpc_SysDef = NULL;       //do not delete ! not owned by us
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -725,8 +724,7 @@ void C_OSCComDriverProtocol::ClearDispatcherQueue(void)
 
       for (u32_Counter = 0U; u32_Counter < this->mc_TransportProtocols.size(); ++u32_Counter)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         C_OSCProtocolDriverOsyTpCan * pc_CanTp =
+         C_OSCProtocolDriverOsyTpCan * const pc_CanTp =
             dynamic_cast<C_OSCProtocolDriverOsyTpCan *>(this->mc_TransportProtocols[u32_Counter]);
 
          if (pc_CanTp != NULL)
@@ -844,7 +842,6 @@ void C_OSCComDriverProtocol::PrepareForDestruction(void)
    //go through TP instances and let them know there will be no more dispatcher ...
    for (uint32 u32_ItTp = 0; u32_ItTp < this->mc_TransportProtocols.size(); ++u32_ItTp)
    {
-      //lint -e{929}  result of cast is verified; no problem expected
       C_OSCProtocolDriverOsyTpCan * const pc_Tp =
          dynamic_cast<C_OSCProtocolDriverOsyTpCan *>(this->mc_TransportProtocols[u32_ItTp]);
       //do we have a CAN TP ?
@@ -854,7 +851,6 @@ void C_OSCComDriverProtocol::PrepareForDestruction(void)
       }
       else
       {
-         //lint -e{929}  result of cast is verified; no problem expected
          C_OSCProtocolDriverOsyTpIp * const pc_TpIp =
             dynamic_cast<C_OSCProtocolDriverOsyTpIp *>(this->mc_TransportProtocols[u32_ItTp]);
          if (pc_TpIp != NULL)
@@ -1448,8 +1444,6 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
          if (q_Found == true)
          {
             // Using the same connection for configuring the router and the final openSYDE target
-            //lint -e{740}  no problem because of common base class
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             pc_ProtocolOsy =
                dynamic_cast<C_OSCProtocolDriverOsy * const>(this->mc_OsyProtocols[u32_OsyRoutingTarget]);
          }
@@ -1457,7 +1451,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
          if (pc_ProtocolOsy != NULL)
          {
             // In case of Ethernet save the number of protocols which use the same TCP connection
-            std::map<uint32, uint32>::const_iterator c_Iter =
+            const std::map<uint32, uint32>::const_iterator c_Iter =
                this->mc_ActiveNodeIp2IpDispatcher.find(ou32_ActiveNode);
 
             if ((c_Iter != this->mc_ActiveNodeIp2IpDispatcher.end()) &&
@@ -1736,8 +1730,6 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
             const C_OSCRoutingRoutePoint c_LastNodeOfRouting =
                c_ActRoute.c_VecRoutePoints[c_ActRoute.c_VecRoutePoints.size() - 1];
             const uint32 u32_ActiveLastNode = this->m_GetActiveIndex(c_LastNodeOfRouting.u32_NodeIndex);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            //lint -e{740}  no problem because of common base class
             C_OSCProtocolDriverOsy * pc_ProtocolOsyOfLastNodeOfRouting =
                dynamic_cast<C_OSCProtocolDriverOsy * const>(this->mc_OsyProtocols[u32_ActiveLastNode]);
             bool q_EthernetRouter = false;
@@ -1792,8 +1784,6 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                   {
                      const uint32 u32_ActiveRouterNode = this->m_GetActiveIndex(rc_Point.u32_NodeIndex);
 
-                     //lint -e{740}  no problem because of common base class
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                      C_OSCProtocolDriverOsy * const pc_ProtocolOsyTarget =
                         dynamic_cast<C_OSCProtocolDriverOsy * const>(this->mc_OsyProtocols[u32_ActiveOsyTargetNode]);
 
@@ -1905,8 +1895,6 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                if ((q_OsyRouting == false) &&
                    (c_ActRoute.c_VecRoutePoints.size() == 1))
                {
-                  //lint -e{740}  no problem because of common base class
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                   C_OSCProtocolDriverOsy * const pc_ProtocolOsyRouter =
                      dynamic_cast<C_OSCProtocolDriverOsy * const>(this->mc_OsyProtocols[u32_ActiveLastNode]);
 
@@ -1945,7 +1933,7 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
 
             if (s32_Return == C_NO_ERR)
             {
-               std::map<uint32, uint32>::const_iterator c_ItRouterNode = this->mc_ActiveNodeIp2CanDispatcher.find(
+               const std::map<uint32, uint32>::const_iterator c_ItRouterNode = this->mc_ActiveNodeIp2CanDispatcher.find(
                   ou32_ActiveNode);
 
                if (c_ItRouterNode != this->mc_ActiveNodeIp2CanDispatcher.end())
@@ -1965,9 +1953,7 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                // Routing started. Save the active node index of the last router node on the route
                this->mc_ActiveNodesLastCanRouters.push_back(u32_ActiveLastNode);
             }
-
-            //lint -e{429}  pc_RoutingDispatcher will be saved in mc_LegacyRouterDispatchers and deleted by destructor
-         }
+         } //lint !e429  //pc_RoutingDispatcher will be saved in mc_LegacyRouterDispatchers and deleted by destructor
       }
    }
 
@@ -2182,8 +2168,6 @@ sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_Act
    sint32 s32_Return = C_NO_ERR;
 
    // Using the same connection for configuring the router and the final openSYDE target
-   //lint -e{740}  no problem because of common base class
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_OSCProtocolDriverOsy * const pc_ProtocolOsyTarget =
       dynamic_cast<C_OSCProtocolDriverOsy * const>(this->mc_OsyProtocols[ou32_ActiveOsyTargetNode]);
 
@@ -2231,7 +2215,7 @@ sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_Act
          {
             // In case of Ethernet to CAN routing check the number of protocols which use the same TCP connection
             // Disconnect only if no one is left
-            std::map<uint32, uint32>::const_iterator c_ItRouterNode = this->mc_ActiveNodeIp2CanDispatcher.find(
+            const std::map<uint32, uint32>::const_iterator c_ItRouterNode = this->mc_ActiveNodeIp2CanDispatcher.find(
                ou32_ActiveNode);
 
             if ((c_ItRouterNode != this->mc_ActiveNodeIp2CanDispatcher.end()) &&
@@ -2275,7 +2259,7 @@ sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_Act
 
          // In case of Ethernet check the number of protocols which use the same TCP connection
          // Disconnect only if no one is left
-         std::map<uint32, uint32>::const_iterator c_Iter =
+         const std::map<uint32, uint32>::const_iterator c_Iter =
             this->mc_ActiveNodeIp2IpDispatcher.find(ou32_ActiveNode);
 
          if ((c_Iter != this->mc_ActiveNodeIp2IpDispatcher.end()) &&
@@ -2492,7 +2476,7 @@ sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
 
             if (u32_ItActiveNode < this->mpc_SysDef->c_Nodes.size())
             {
-               const C_OSCNode * pc_Node =
+               const C_OSCNode * const pc_Node =
                   &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[u32_ItActiveNode]];
 
                const std::vector<C_OSCNodeComInterfaceSettings> & rc_ComInterfaces =
@@ -2734,7 +2718,8 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
                   if (s32_Retval == C_NO_ERR)
                   {
                      // Exist a dispatcher handle for this router server
-                     std::map<uint32, uint32>::const_iterator c_IterUniqueIp2IpRouters = c_ActiveNodeIp2IpRouters.find(
+                     const std::map<uint32,
+                                    uint32>::const_iterator c_IterUniqueIp2IpRouters = c_ActiveNodeIp2IpRouters.find(
                         u32_Ip2IpRouterActiveNodeTargetSide);
 
                      if (c_IterUniqueIp2IpRouters == c_ActiveNodeIp2IpRouters.end())
@@ -2919,6 +2904,9 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32 ou32_A
 {
    sint32 s32_Return = C_RANGE;
 
+   oru32_ActiveIndexRouterClient = 0U;
+   oru32_ActiveIndexRouterTarget = 0U;
+
    if (ou32_ActiveIndexTarget < this->mc_Routes.size())
    {
       const C_OSCRoutingRoute & rc_Route = this->mc_Routes[ou32_ActiveIndexTarget];
@@ -3015,6 +3003,8 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2CanRouter(const uint32 ou32_
                                                               uint32 & oru32_ActiveIndexRouter)
 {
    sint32 s32_Return = C_RANGE;
+
+   oru32_ActiveIndexRouter = 0U;
 
    if (ou32_ActiveIndexTarget < this->mc_Routes.size())
    {

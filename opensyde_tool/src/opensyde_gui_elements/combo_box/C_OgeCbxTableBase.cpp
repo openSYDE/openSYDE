@@ -130,7 +130,6 @@ sint32 C_OgeCbxTableBase::GetValue(sint64 & ors64_Value, QString & orc_ErrorDesc
 
    if (q_Ok == true)
    {
-      //lint -e{18,762,830,1055}  C++ 11 feature
       ors64_Value =
          static_cast<sint64>(std::round(C_OSCUtils::h_GetValueUnscaled(f64_Tmp, this->mf64_Factor, this->mf64_Offset)));
       s32_Retval = C_NO_ERR;
@@ -138,7 +137,7 @@ sint32 C_OgeCbxTableBase::GetValue(sint64 & ors64_Value, QString & orc_ErrorDesc
    else
    {
       // try to find current text in combobox selection
-      sint64 s64_StringIndex = this->mc_Strings.indexOf(c_CurText);
+      const sint64 s64_StringIndex = this->mc_Strings.indexOf(c_CurText);
       if ((s64_StringIndex >= 0) && (s64_StringIndex < this->mc_Values.size()))
       {
          const QString & rc_CurVal = this->mc_Values.at(static_cast<sint32>(s64_StringIndex));

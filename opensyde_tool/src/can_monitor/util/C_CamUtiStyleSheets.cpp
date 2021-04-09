@@ -227,10 +227,10 @@ void C_CamUtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString
          c_Value = "{\n";
          //Add config
          c_Value += static_cast<QString>("%1:rgba(%2,%3,%4,%5);").arg(rc_Property.c_ValueName,
-                                                         QString::number(rc_Property.c_Color.red()),
-                                                         QString::number(rc_Property.c_Color.green()),
-                                                         QString::number(rc_Property.c_Color.blue()),
-                                                         QString::number(rc_Property.c_Color.alpha()));
+                                                                      QString::number(rc_Property.c_Color.red()),
+                                                                      QString::number(rc_Property.c_Color.green()),
+                                                                      QString::number(rc_Property.c_Color.blue()),
+                                                                      QString::number(rc_Property.c_Color.alpha()));
          c_Value += "\n}\n";
          orc_Stylesheet += c_Value;
       }

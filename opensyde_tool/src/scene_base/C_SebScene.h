@@ -14,7 +14,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsScene>
 #include <QRectF>
-#include <QImage>
 #include <QGraphicsItem>
 #include <QTimer>
 
@@ -147,8 +146,8 @@ protected:
    void m_Delete(const bool oq_NoUserConfirm = false);
    void m_CopyItemsToCopyPasteManager(const QList<QGraphicsItem *> & orc_SelectedItems);
    void m_Clear(void);
-   void m_RemoveLineGroupOfScene(C_GiLiLineGroup * const opc_Item);
-   void m_RemoveRectBaseGroupOfScene(C_GiBiRectBaseGroup * const opc_Item);
+   void m_RemoveLineGroupOfScene(const C_GiLiLineGroup * const opc_Item) const;
+   void m_RemoveRectBaseGroupOfScene(const C_GiBiRectBaseGroup * const opc_Item) const;
 
    // copy paste functions
    virtual void m_Copy(void) = 0;

@@ -142,6 +142,7 @@ public:
    void SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName, const QString & orc_DatapoolName);
    void SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
                                       const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol);
+   void SetProjSdNodeSelectedInterface(const QString & orc_NodeName, const stw_types::uint32 ou32_SelectedInterface);
    void SetProjSdNodeDatapoolOpenListNames(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                            const std::vector<QString> & orc_New);
    void SetProjSdNodeDatapoolSelectedListNames(const QString & orc_NodeName, const QString & orc_DatapoolName,

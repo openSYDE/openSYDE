@@ -12,9 +12,13 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "stwtypes.h"
+#include "C_GtGetText.h"
+
 #include "C_TblTreDataElementItem.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
@@ -71,10 +75,13 @@ C_TblTreDataElementItem::C_TblTreDataElementItem(const bool oq_IsArrayItem, cons
    \param[in]  oq_ShowArrayElements       Optional flag to hide all array elements (if false)
    \param[in]  oq_ShowArrayIndexElements  Optional flag to hide all array index elements (if false)
    \param[in]  oq_Show64BitValues         Optional flag to hide all 64 bit elements (if false)
+   \param[in]  opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
+                                          will be marked as used an will be disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementItem::ConfigureDynamicName(const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
-                                                   const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues)
+                                                   const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
+                                                   const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
 {
    // Set the name always here, in case of an earlier update, the name was adapted with the explanation
    this->c_Name = this->mc_OriginalName;
@@ -145,6 +152,24 @@ void C_TblTreDataElementItem::ConfigureDynamicName(const bool oq_ShowOnlyWriteEl
                //Explanation
                this->c_Name += C_TblTreDataElementItem::mhc_AdditionalArrayInfo;
             }
+         }
+      }
+   }
+
+   if (opc_AlreasyUsedElements != NULL)
+   {
+      // Check for already used elements is active
+      // Check if element is already used
+      uintn un_Counter;
+      for (un_Counter = 0; un_Counter < opc_AlreasyUsedElements->size(); ++un_Counter)
+      {
+         const C_PuiSvDbNodeDataPoolListElementId & rc_ExistingId = (*opc_AlreasyUsedElements)[un_Counter];
+
+         if (rc_ExistingId == this->mc_Id)
+         {
+            this->c_Name += C_GtGetText::h_GetText(" (Already used)");
+            this->q_Selectable = false;
+            this->q_Enabled = false;
          }
       }
    }

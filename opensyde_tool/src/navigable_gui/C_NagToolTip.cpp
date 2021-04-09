@@ -73,7 +73,7 @@ C_NagToolTip::C_NagToolTip(const QString & orc_Heading, const QString & orc_Cont
       c_Color.setAlpha(110);
       pc_Shadow->setColor(c_Color);
       this->mpc_Ui->mpc_GroupBox->setGraphicsEffect(pc_Shadow);
-   }  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
+   } //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ void C_NagToolTip::DoMove(const QPoint & orc_GlobalPos)
 
    stw_types::sintn sn_NewY = orc_GlobalPos.y();
    stw_types::sintn sn_NewX = orc_GlobalPos.x();
-   sintn sn_DistanceToBoarder = 20; //space between tooltip and boarder
+   const sintn sn_DistanceToBorder = 20; //space between tooltip and boarder
 
    this->updateGeometry();
 
@@ -173,9 +173,9 @@ void C_NagToolTip::DoMove(const QPoint & orc_GlobalPos)
        (c_RectMonitor.x() + c_RectMonitor.width()))
    {
       // max of left border of monitor and right border of monitor minus tool-tip-width
-      sn_NewX = std::max(c_RectMonitor.x() + sn_DistanceToBoarder,
+      sn_NewX = std::max(c_RectMonitor.x() + sn_DistanceToBorder,
                          (c_RectMonitor.x() + c_RectMonitor.width()) -
-                         (this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width() + sn_DistanceToBoarder));
+                         (this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width() + sn_DistanceToBorder));
    }
 
    // y coordinate out of monitor
@@ -185,7 +185,7 @@ void C_NagToolTip::DoMove(const QPoint & orc_GlobalPos)
       //display tooltip above global pos (otheriwse the global pos is inside the tooltip
       // which usally means the mouse is inside the tooltip which then will trigger the tooltip to instantly hide
       // Also include the distance to the border so the mouse does not even touch the tooltip
-      sn_NewY = (orc_GlobalPos.y() - this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) - sn_DistanceToBoarder;
+      sn_NewY = (orc_GlobalPos.y() - this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) - sn_DistanceToBorder;
    }
 
    this->move(QPoint(sn_NewX, sn_NewY));

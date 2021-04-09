@@ -93,7 +93,8 @@ void C_GiSdTextElement::UpdateData(void)
 {
    if (C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.size() > static_cast<uint32>(this->ms32_Index))
    {
-      C_PuiBsTextElement * pc_Item = &C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements[this->ms32_Index];
+      C_PuiBsTextElement * const pc_Item =
+         &C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements[this->ms32_Index];
 
       this->m_UpdateTextElementData(pc_Item, false);
    }

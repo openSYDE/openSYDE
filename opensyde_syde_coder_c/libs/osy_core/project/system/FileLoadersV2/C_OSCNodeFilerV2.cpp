@@ -632,7 +632,7 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessage(C_OSCCanMessage & orc_NodeComMessa
    if ((orc_XMLParser.SelectNodeChild("tx-method") == "tx-method") &&
        (s32_Retval == C_NO_ERR))
    {
-      s32_Retval = mh_StringToNodeComMessageTxMethod(orc_XMLParser.GetNodeContent(), orc_NodeComMessage.e_TxMethod);
+      mh_StringToNodeComMessageTxMethod(orc_XMLParser.GetNodeContent(), orc_NodeComMessage.e_TxMethod);
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
    }
@@ -1457,8 +1457,7 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
             //Type
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("type") == "type"))
             {
-               s32_Retval = C_OSCNodeApplication::h_StringToApplication(
-                  orc_XMLParser.GetNodeContent(), c_CurApplication.e_Type);
+               C_OSCNodeApplication::h_StringToApplication(orc_XMLParser.GetNodeContent(), c_CurApplication.e_Type);
                //Return
                tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
             }
@@ -1968,16 +1967,11 @@ C_SCLString C_OSCNodeFilerV2::mh_NodeComMessageTxMethodToString(
 
    \param[in]  orc_String String to interpret
    \param[out] ore_Type   Node data pool communication message transmission method type
-
-   \return
-   C_NO_ERR   no error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::mh_StringToNodeComMessageTxMethod(const C_SCLString & orc_String,
-                                                           C_OSCCanMessage::E_TxMethodType & ore_Type)
+void C_OSCNodeFilerV2::mh_StringToNodeComMessageTxMethod(const C_SCLString & orc_String,
+                                                         C_OSCCanMessage::E_TxMethodType & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
-
    if (orc_String == "cyclic")
    {
       ore_Type = C_OSCCanMessage::eTX_METHOD_CYCLIC;
@@ -1997,6 +1991,4 @@ sint32 C_OSCNodeFilerV2::mh_StringToNodeComMessageTxMethod(const C_SCLString & o
       osc_write_log_warning("Loading project file", "Invalid transmission type \"" + orc_String + "\" in file. " \
                             "Assuming \"on_change\".");
    }
-
-   return s32_Retval;
 }

@@ -17,6 +17,7 @@
 
 #include "stwerrors.h"
 #include "C_OSCNodeDataPoolContentUtil.h"
+#include "TGLUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -78,6 +79,8 @@ void C_OSCNodeDataPoolContentUtil::h_ZeroContent(C_OSCNodeDataPoolContent & orc_
       case C_OSCNodeDataPoolContent::eFLOAT64:
          orc_Content.SetValueF64(0.0);
          break;
+      default:
+         break;
       }
    }
    else
@@ -116,6 +119,8 @@ void C_OSCNodeDataPoolContentUtil::h_ZeroContent(C_OSCNodeDataPoolContent & orc_
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orc_Content.SetValueAF64Element(0.0, u32_ItElem);
             break;
+         default:
+            break;
          }
       }
    }
@@ -146,17 +151,14 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
    switch (orc_Content.GetType())
    {
    case C_OSCNodeDataPoolContent::eUINT8:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (of64_Value <= static_cast<float64>(std::numeric_limits<uint8>::min()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAU8Element(std::numeric_limits<uint8>::min(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueU8(std::numeric_limits<uint8>::min());
          }
          q_ValueAssigned = true;
@@ -165,29 +167,24 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAU8Element(std::numeric_limits<uint8>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueU8(std::numeric_limits<uint8>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eUINT16:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (of64_Value <= static_cast<float64>(std::numeric_limits<uint16>::min()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAU16Element(std::numeric_limits<uint16>::min(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueU16(std::numeric_limits<uint16>::min());
          }
          q_ValueAssigned = true;
@@ -196,29 +193,24 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAU16Element(std::numeric_limits<uint16>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueU16(std::numeric_limits<uint16>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eUINT32:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (of64_Value <= static_cast<float64>(std::numeric_limits<uint32>::min()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAU32Element(std::numeric_limits<uint32>::min(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueU32(std::numeric_limits<uint32>::min());
          }
          q_ValueAssigned = true;
@@ -227,29 +219,24 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAU32Element(std::numeric_limits<uint32>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueU32(std::numeric_limits<uint32>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eUINT64:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (of64_Value <= static_cast<float64>(std::numeric_limits<uint64>::min()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,747,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAU64Element(std::numeric_limits<uint64>::min(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,747,1015,1013,1960}  c++11 feature
             orc_Content.SetValueU64(std::numeric_limits<uint64>::min());
          }
          q_ValueAssigned = true;
@@ -258,29 +245,24 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAU64Element(std::numeric_limits<uint64>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueU64(std::numeric_limits<uint64>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eSINT8:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (of64_Value <= static_cast<float64>(std::numeric_limits<sint8>::min()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAS8Element(std::numeric_limits<sint8>::min(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueS8(std::numeric_limits<sint8>::min());
          }
          q_ValueAssigned = true;
@@ -289,29 +271,24 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAS8Element(std::numeric_limits<sint8>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueS8(std::numeric_limits<sint8>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eSINT16:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (of64_Value <= static_cast<float64>(std::numeric_limits<sint16>::min()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAS16Element(std::numeric_limits<sint16>::min(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,1015,1013,1960}  c++11 feature
             orc_Content.SetValueS16(std::numeric_limits<sint16>::min());
          }
          q_ValueAssigned = true;
@@ -320,29 +297,24 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAS16Element(std::numeric_limits<sint16>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueS16(std::numeric_limits<sint16>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eSINT32:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (of64_Value <= static_cast<float64>(std::numeric_limits<sint32>::min()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAS32Element(std::numeric_limits<sint32>::min(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueS32(std::numeric_limits<sint32>::min());
          }
          q_ValueAssigned = true;
@@ -351,29 +323,24 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAS32Element(std::numeric_limits<sint32>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueS32(std::numeric_limits<sint32>::max());
          }
          q_ValueAssigned = true;
       }
       break;
    case C_OSCNodeDataPoolContent::eSINT64:
-      //lint -e{530,10,1015,1013}  c++11 feature
       if (of64_Value <= static_cast<float64>(std::numeric_limits<sint64>::min()))
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,734,747,1015,1013,1960}  c++11 feature
             orc_Content.SetValueAS64Element(std::numeric_limits<sint64>::min(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,734,747,1015,1013,1960}  c++11 feature
             orc_Content.SetValueS64(std::numeric_limits<sint64>::min());
          }
          q_ValueAssigned = true;
@@ -382,19 +349,19 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
       {
          if (orc_Content.GetArray() == true)
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueAS64Element(std::numeric_limits<sint64>::max(), ou32_ArrayIndex);
          }
          else
          {
-            //lint -e{530,10,1015,1013}  c++11 feature
             orc_Content.SetValueS64(std::numeric_limits<sint64>::max());
          }
          q_ValueAssigned = true;
       }
       break;
+   case C_OSCNodeDataPoolContent::eFLOAT32:
+   case C_OSCNodeDataPoolContent::eFLOAT64:
    default:
-      //Not an integer type
+      //Not an integer type; nothing todo
       break;
    }
 
@@ -434,6 +401,8 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orc_Content.SetValueAF64Element(of64_Value, ou32_ArrayIndex);
             break;
+         default:
+            break;
          }
       }
       else
@@ -469,6 +438,8 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
             break;
          case C_OSCNodeDataPoolContent::eFLOAT64:
             orc_Content.SetValueF64(of64_Value);
+            break;
+         default:
             break;
          }
       }
@@ -689,6 +660,8 @@ uint32 C_OSCNodeDataPoolContentUtil::h_GetDataTypeSizeInByte(const C_OSCNodeData
    case C_OSCNodeDataPoolContent::eUINT64:
    case C_OSCNodeDataPoolContent::eFLOAT64:
       u32_Retval = 8UL;
+      break;
+   default:
       break;
    }
    return u32_Retval;

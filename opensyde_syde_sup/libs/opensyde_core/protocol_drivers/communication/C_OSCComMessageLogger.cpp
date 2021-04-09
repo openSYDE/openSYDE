@@ -113,8 +113,6 @@ C_OSCComMessageLogger::C_OSCComMessageLogger(void) :
 C_OSCComMessageLogger::~C_OSCComMessageLogger(void)
 {
    this->RemoveAllLogFiles();
-
-   //lint -e{1579} Never took ownership of mpc_OsySysDefMessage and mpc_OsySysDefDataPoolList
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -504,8 +502,7 @@ sint32 C_OSCComMessageLogger::AddLogFileAsc(const C_SCLString & orc_FilePath, co
    this->mc_LoggingFiles.insert(std::pair<C_SCLString,
                                           C_OSCComMessageLoggerFileBase * const>(orc_FilePath, pc_File));
 
-   //lint -e{429}  no memory leak of pc_File because of handling of instance in map mc_LoggingFiles
-   return s32_Return;
+   return s32_Return; //lint !e429  //no memory leak of pc_File because of handling of instance in map mc_LoggingFiles
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -700,6 +697,7 @@ void C_OSCComMessageLogger::ResetCounter(void)
    \param[in] ou8_BusLoad Current CAN bus load in percentage
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_OSCComMessageLogger::UpdateBusLoad(const uint8 ou8_BusLoad)
 {
    (void)ou8_BusLoad;
@@ -714,6 +712,7 @@ void C_OSCComMessageLogger::UpdateBusLoad(const uint8 ou8_BusLoad)
    \param[in] ou32_TxErrors Current detected CAN Tx errors
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_OSCComMessageLogger::UpdateTxErrors(const uint32 ou32_TxErrors)
 {
    (void)ou32_TxErrors;
@@ -728,6 +727,7 @@ void C_OSCComMessageLogger::UpdateTxErrors(const uint32 ou32_TxErrors)
    \param[in] ou32_TxCount Current counted CAN Tx messages
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_OSCComMessageLogger::UpdateTxCounter(const uint32 ou32_TxCount)
 {
    (void)ou32_TxCount;
@@ -1409,7 +1409,7 @@ void C_OSCComMessageLogger::m_ConvertCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
       }
       else
       {
-         ++c_ItCounter->second;
+         c_ItCounter->second = c_ItCounter->second + 1;
          this->mc_HandledCanMessage.c_Counter = C_SCLString::IntToStr(c_ItCounter->second);
       }
    }

@@ -23,6 +23,7 @@ class C_OSCHalcDefContentBitmaskItem
 {
 public:
    C_OSCHalcDefContentBitmaskItem(void);
+   virtual ~C_OSCHalcDefContentBitmaskItem();
 
    stw_types::sint32 SetValueByString(const stw_scl::C_SCLString & orc_Item);
 

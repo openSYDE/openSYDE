@@ -47,7 +47,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenTableModel::C_CamGenTableModel(QObject * const opc_Parent) :
@@ -60,7 +60,7 @@ C_CamGenTableModel::C_CamGenTableModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update message key column
 
-   \param[in] ou32_MessageIndex Message index
+   \param[in]  ou32_MessageIndex    Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::UpdateMessageKey(const uint32 ou32_MessageIndex)
@@ -77,7 +77,7 @@ void C_CamGenTableModel::UpdateMessageKey(const uint32 ou32_MessageIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update message data column
 
-   \param[in] ou32_MessageIndex Message index
+   \param[in]  ou32_MessageIndex    Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::UpdateMessageData(const uint32 ou32_MessageIndex)
@@ -96,8 +96,8 @@ void C_CamGenTableModel::UpdateMessageData(const uint32 ou32_MessageIndex)
 
    Reason: have one central point for each check which has to be done when changing an existing message
 
-   \param[in] ou32_MessageIndex Message index
-   \param[in] oq_Active         Change of cyclic message state
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  oq_Active            Change of cyclic message state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::TriggerModelUpdateCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
@@ -108,9 +108,9 @@ void C_CamGenTableModel::TriggerModelUpdateCyclicMessage(const uint32 ou32_Messa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get header data
 
-   \param[in] osn_Section    Section
-   \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in]  osn_Section       Section
+   \param[in]  oe_Orientation    Orientation
+   \param[in]  osn_Role          Role
 
    \return
    Header string
@@ -262,7 +262,7 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get table column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -282,8 +282,8 @@ sintn C_CamGenTableModel::columnCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -614,9 +614,9 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set data at index
 
-   \param[in] orc_Index Index
-   \param[in] orc_Value New data
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  orc_Value   New data
+   \param[in]  osn_Role    Data role
 
    \return
    true  success
@@ -756,6 +756,11 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
                   //lint -e644 that's what the q_Continue is for
                   tgl_assert(C_CamProHandler::h_GetInstance()->SetMessageBoolValue(u32_Index, e_Selector,
                                                                                    q_Val) == C_NO_ERR);
+                  //Special handling for XTD
+                  if ((e_Col == eXTD) && (q_Val == false))
+                  {
+                     m_SpecialXtdFlagSetHandling(orc_Index.row(), u32_Index, osn_Role);
+                  }
                   //Trigger sending of updated message
                   if (q_UpdateCyclicMessage == true)
                   {
@@ -793,7 +798,7 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get flags for item
 
-   \param[in] orc_Index Item
+   \param[in]  orc_Index   Item
 
    \return
    Flags for item
@@ -858,7 +863,7 @@ Qt::ItemFlags C_CamGenTableModel::flags(const QModelIndex & orc_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle copy items action
 
-   \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
+   \param[in]  orc_SelectedIndices  Selected row indices (Expected: unique)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::CopySelectedItems(const std::vector<uint32> & orc_SelectedIndices) const
@@ -879,7 +884,7 @@ void C_CamGenTableModel::CopySelectedItems(const std::vector<uint32> & orc_Selec
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Column to enum conversion
 
-   \param[in] os32_Column Column
+   \param[in]  os32_Column    Column
 
    \return
    Enum value
@@ -930,7 +935,7 @@ C_CamGenTableModel::E_Columns C_CamGenTableModel::h_ColumnToEnum(const sint32 os
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Enum to column conversion
 
-   \param[in] oe_Value Enum value
+   \param[in]  oe_Value    Enum value
 
    \return
    Column
@@ -983,8 +988,8 @@ sint32 C_CamGenTableModel::h_EnumToColumn(const C_CamGenTableModel::E_Columns oe
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle add specific new items action
 
-   \param[in] orc_SelectedIndex Selected indices
-   \param[in] orc_Messages      Messages to add
+   \param[in]  orc_SelectedIndex    Selected indices
+   \param[in]  orc_Messages         Messages to add
 
    \return
    Index of new item
@@ -1002,7 +1007,7 @@ std::vector<uint32> C_CamGenTableModel::AddSpecificNewItems(const std::vector<ui
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle add new item action
 
-   \param[in] ou32_SelectedIndex Index to insert item at
+   \param[in]  ou32_SelectedIndex   Index to insert item at
 
    \return
    Index of new item
@@ -1036,7 +1041,7 @@ uint32 C_CamGenTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle paste items action
 
-   \param[in] ou32_SelectedIndex Index to insert item at
+   \param[in]  ou32_SelectedIndex   Index to insert item at
 
    \return
    Indices of new items
@@ -1070,7 +1075,7 @@ uint32 C_CamGenTableModel::m_GetSizeItems(void) const
 
    Warning: not expected to fail
 
-   \param[in] ou32_Index Index to delete
+   \param[in]  ou32_Index  Index to delete
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::m_DeleteItem(const uint32 ou32_Index)
@@ -1084,8 +1089,8 @@ void C_CamGenTableModel::m_DeleteItem(const uint32 ou32_Index)
    For implementation: First delete ou32_SourceIndex then insert ou32_TargetIndex
    Warning: not expected to fail
 
-   \param[in] ou32_SourceIndex Source index
-   \param[in] ou32_TargetIndex Target index
+   \param[in]  ou32_SourceIndex  Source index
+   \param[in]  ou32_TargetIndex  Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex)
@@ -1096,8 +1101,8 @@ void C_CamGenTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add specified new messages
 
-   \param[in] ou32_SelectedIndex Selected row index
-   \param[in] orc_Data           New messages
+   \param[in]  ou32_SelectedIndex   Selected row index
+   \param[in]  orc_Data             New messages
 
    \return
    Indices of new items
@@ -1138,8 +1143,8 @@ std::vector<uint32> C_CamGenTableModel::m_AddNewMessages(const uint32 ou32_Selec
 
    Add check if necessary
 
-   \param[in] ou32_MessageIndex Message index
-   \param[in] oq_Active         Flag if cyclic message is active
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  oq_Active            Flag if cyclic message is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::m_CheckAndHandleRegisterCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
@@ -1151,5 +1156,39 @@ void C_CamGenTableModel::m_CheckAndHandleRegisterCyclicMessage(const uint32 ou32
        ((C_CamProHandler::h_GetInstance()->GetCyclicMessageTransmitActive() == true)))
    {
       Q_EMIT (this->SigRegisterCyclicMessage(ou32_MessageIndex, oq_Active));
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Special xtd flag set handling
+
+   \param[in]  osn_Row     Row
+   \param[in]  ou32_Index  Index
+   \param[in]  osn_Role    Role
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenTableModel::m_SpecialXtdFlagSetHandling(const sintn osn_Row, const uint32 ou32_Index, const sintn osn_Role)
+{
+   const sint32 s32_Col = C_CamGenTableModel::h_EnumToColumn(eID);
+   const uint64 u64_MessageId =
+      this->data(this->index(osn_Row, s32_Col), msn_USER_ROLE_SORT).toULongLong();
+
+   if (u64_MessageId > 0x7FFULL)
+   {
+      constexpr C_CamProMessageData::E_GenericUint32DataSelector e_SelectorID =
+         C_CamProMessageData::eGUIDS_ID;
+      constexpr uint32 u32_NewVal = 0x0UL;
+      tgl_assert(C_CamProHandler::h_GetInstance()->SetMessageUint32Value(ou32_Index, e_SelectorID,
+                                                                         u32_NewVal) == C_NO_ERR);
+      //Message
+      Q_EMIT (this->SigReport(stw_opensyde_gui_elements::C_OgeWiCustomMessage::eWARNING,
+                              C_GtGetText::h_GetText("Check Message ID"),
+                              C_GtGetText::h_GetText(
+                                 "XTD flag is disabled, message ID is invalid and is reset to \"0\"")));
+
+      //lint -e{1793} Qt example
+      Q_EMIT (this->dataChanged(this->index(osn_Row, s32_Col),
+                                this->index(osn_Row, s32_Col),
+                                QVector<stw_types::sintn>() << osn_Role));
    }
 }

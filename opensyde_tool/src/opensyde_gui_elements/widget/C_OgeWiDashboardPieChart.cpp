@@ -186,7 +186,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
    stw_types::float32 f32_PieGap = (f32_PieWidth / 2.0F) +
                                    2.0F; // Addition factor for the spacing to
    // this->rect()
-   stw_types::float32 f32_GesamtPixel = 158.0F; // Size of the Pie, defined in the
+   stw_types::float32 f32_TotalPixels = 158.0F; // Size of the Pie, defined in the
    // template
    stw_types::float32 f32_DotSize = 8.0F; // Size of the Dot on the pieCircle
    QConicalGradient c_Gradient;           // For pieCircle with Gradation (STW_2)
@@ -226,27 +226,27 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          f32_PieWidth = 8.0F;
          f32_RimWidth = 8.0F;
          f32_PieGap = (f32_PieWidth / 2.0F) + 2.0F;
-         f32_GesamtPixel = 158.0F;
+         f32_TotalPixels = 158.0F;
 
          // Sizing the three rectangles dependent on the set variables above------------------------
          m_SetAllPieRects(c_InnerCircleRect, c_RimRect, c_PieRect, f32_PieGap, f32_PieWidth, f32_RimWidth,
-                          f32_GesamtPixel, 2.0F);
+                          f32_TotalPixels, 2.0F);
 
          // Pie--------------------------------------------------------------------------------
-         m_SetPie(c_Painter, QBrush(
-                     mc_STYLE_GUIDE_COLOR_13), Qt::RoundCap, c_PieRect, f32_PieWidth, f32_GesamtPixel, f32_Progress);
+         m_SetPie(c_Painter, static_cast<QBrush>(
+                     mc_STYLE_GUIDE_COLOR_13), Qt::RoundCap, c_PieRect, f32_PieWidth, f32_TotalPixels, f32_Progress);
 
          // Rim--------------------------------------------------------------------------
-         m_SetPieRim(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_2), c_RimRect, f32_RimWidth, f32_GesamtPixel);
+         m_SetPieRim(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_2), c_RimRect, f32_RimWidth, f32_TotalPixels);
 
          // Inner circuit-------------------------------------------------------------------------
          if (mq_TransparentBackground == false) // Nicht transparent
          {
-            m_SetInnerCircle(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_52), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_52), c_InnerCircleRect);
          }
          else // Transparent
          {
-            m_SetInnerCircle(c_Painter, QBrush(QColor(Qt::transparent)), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(QColor(Qt::transparent)), c_InnerCircleRect);
          }
 
          // Text-------------------------------------------------------------------------------
@@ -261,25 +261,25 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          f32_PieWidth = 7.0F;
          f32_RimWidth = 6.0F;
          f32_PieGap = (f32_PieWidth / 2.0F) + 2.0F;
-         f32_GesamtPixel = 148.0F;
+         f32_TotalPixels = 148.0F;
 
          m_SetAllPieRects(c_InnerCircleRect, c_RimRect, c_PieRect, f32_PieGap, f32_PieWidth, f32_RimWidth,
-                          f32_GesamtPixel);
+                          f32_TotalPixels);
          // Pie--------------------------------------------------------------------------------
-         m_SetPie(c_Painter, QBrush(
-                     mc_STYLE_GUIDE_COLOR_13), Qt::RoundCap, c_PieRect, f32_PieWidth, f32_GesamtPixel, f32_Progress);
+         m_SetPie(c_Painter, static_cast<QBrush>(
+                     mc_STYLE_GUIDE_COLOR_13), Qt::RoundCap, c_PieRect, f32_PieWidth, f32_TotalPixels, f32_Progress);
 
          // Rim--------------------------------------------------------------------------
-         m_SetPieRim(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_38), c_RimRect, f32_RimWidth, f32_GesamtPixel);
+         m_SetPieRim(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_38), c_RimRect, f32_RimWidth, f32_TotalPixels);
 
          // Inner circuit-------------------------------------------------------------------------
          if (mq_TransparentBackground == false)
          {
-            m_SetInnerCircle(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_0), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_0), c_InnerCircleRect);
          }
          else
          {
-            m_SetInnerCircle(c_Painter, QBrush(QColor(Qt::transparent)), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(QColor(Qt::transparent)), c_InnerCircleRect);
          }
 
          // Text-------------------------------------------------------------------------------
@@ -296,9 +296,9 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
       f32_PieWidth = 7.0F;
       f32_RimWidth = 5.0F;
       f32_PieGap = (f32_PieWidth / 2.0F) + 2.0F;
-      f32_GesamtPixel = 148.0F;
+      f32_TotalPixels = 148.0F;
 
-      m_SetAllPieRects(c_InnerCircleRect, c_RimRect, c_PieRect, f32_PieGap, f32_PieWidth, f32_RimWidth, f32_GesamtPixel,
+      m_SetAllPieRects(c_InnerCircleRect, c_RimRect, c_PieRect, f32_PieGap, f32_PieWidth, f32_RimWidth, f32_TotalPixels,
                        2.0F);
       // For smooth edges
       c_Painter.setRenderHint(QPainter::Antialiasing);
@@ -306,14 +306,14 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
       if (this->mq_DarkMode != 0) // Flat DARK
       {
          // Pie--------------------------------------------------------------------------------
-         m_SetPie(c_Painter, QBrush(
-                     mc_STYLE_GUIDE_COLOR_26), Qt::FlatCap, c_PieRect, f32_PieWidth, f32_GesamtPixel, f32_Progress);
+         m_SetPie(c_Painter, static_cast<QBrush>(
+                     mc_STYLE_GUIDE_COLOR_26), Qt::FlatCap, c_PieRect, f32_PieWidth, f32_TotalPixels, f32_Progress);
 
          // Rim--------------------------------------------------------------------------
-         m_SetPieRim(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_32), c_RimRect, f32_RimWidth, f32_GesamtPixel);
+         m_SetPieRim(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_32), c_RimRect, f32_RimWidth, f32_TotalPixels);
 
          // Inner circuit-------------------------------------------------------------------------
-         m_SetInnerCircle(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_32), c_InnerCircleRect);
+         m_SetInnerCircle(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_32), c_InnerCircleRect);
 
          // Text-------------------------------------------------------------------------------
          c_HelpingColor = mc_STYLE_GUIDE_COLOR_0;
@@ -326,14 +326,14 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
       else // Flat BRIGHT
       {
          // Pie--------------------------------------------------------------------------------
-         m_SetPie(c_Painter, QBrush(
-                     mc_STYLE_GUIDE_COLOR_26), Qt::FlatCap, c_PieRect, f32_PieWidth, f32_GesamtPixel, f32_Progress);
+         m_SetPie(c_Painter, static_cast<QBrush>(
+                     mc_STYLE_GUIDE_COLOR_26), Qt::FlatCap, c_PieRect, f32_PieWidth, f32_TotalPixels, f32_Progress);
 
          // Rim--------------------------------------------------------------------------
-         m_SetPieRim(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_10), c_RimRect, f32_RimWidth, f32_GesamtPixel);
+         m_SetPieRim(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_10), c_RimRect, f32_RimWidth, f32_TotalPixels);
 
          // Inner circuit-------------------------------------------------------------------------
-         m_SetInnerCircle(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_10), c_InnerCircleRect);
+         m_SetInnerCircle(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_10), c_InnerCircleRect);
 
          // Text-------------------------------------------------------------------------------
          c_HelpingColor = mc_STYLE_GUIDE_COLOR_0;
@@ -349,10 +349,10 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
       f32_PieWidth = 4.0F;
       f32_RimWidth = 7.0F;
       f32_PieGap = (f32_PieWidth / 2.0F) + 2.0F;
-      f32_GesamtPixel = 142.0F;
+      f32_TotalPixels = 142.0F;
       f32_DotSize = 8.0F;
 
-      m_SetAllPieRects(c_InnerCircleRect, c_RimRect, c_PieRect, f32_PieGap, f32_PieWidth, f32_RimWidth, f32_GesamtPixel,
+      m_SetAllPieRects(c_InnerCircleRect, c_RimRect, c_PieRect, f32_PieGap, f32_PieWidth, f32_RimWidth, f32_TotalPixels,
                        2.0F);
       // For smooth edges
       c_Painter.setRenderHint(QPainter::Antialiasing);
@@ -372,14 +372,14 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          c_LinearGradient2.setFinalStop(c_RimRect.bottomLeft());
 
          // Pie--------------------------------------------------------------------------------
-         m_SetPie(c_Painter, QBrush(
-                     mc_STYLE_GUIDE_COLOR_24), Qt::FlatCap, c_PieRect, f32_PieWidth, f32_GesamtPixel, f32_Progress);
+         m_SetPie(c_Painter, static_cast<QBrush>(
+                     mc_STYLE_GUIDE_COLOR_24), Qt::FlatCap, c_PieRect, f32_PieWidth, f32_TotalPixels, f32_Progress);
 
          // Optional Punkt auf Pie-------------------------------------------------------------
-         m_SetPieDot(c_Painter, mc_STYLE_GUIDE_COLOR_24, c_PieRect, f32_DotSize, f32_GesamtPixel, f32_Progress);
+         m_SetPieDot(c_Painter, mc_STYLE_GUIDE_COLOR_24, c_PieRect, f32_DotSize, f32_TotalPixels, f32_Progress);
 
          // Rim--------------------------------------------------------------------------
-         m_SetPieRim(c_Painter, c_LinearGradient2, c_RimRect, f32_RimWidth, f32_GesamtPixel);
+         m_SetPieRim(c_Painter, c_LinearGradient2, c_RimRect, f32_RimWidth, f32_TotalPixels);
 
          // Inner circuit-------------------------------------------------------------------------
          m_SetInnerCircle(c_Painter, c_LinearGradient, c_InnerCircleRect);
@@ -407,14 +407,14 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          c_LinearGradient2.setFinalStop(c_RimRect.bottomLeft());
 
          // Pie--------------------------------------------------------------------------------
-         m_SetPie(c_Painter, QBrush(
-                     mc_STYLE_GUIDE_COLOR_24), Qt::FlatCap, c_PieRect, f32_PieWidth, f32_GesamtPixel, f32_Progress);
+         m_SetPie(c_Painter, static_cast<QBrush>(
+                     mc_STYLE_GUIDE_COLOR_24), Qt::FlatCap, c_PieRect, f32_PieWidth, f32_TotalPixels, f32_Progress);
 
          // Optional Punkt auf Pie-------------------------------------------------------------
-         m_SetPieDot(c_Painter, mc_STYLE_GUIDE_COLOR_24, c_PieRect, f32_DotSize, f32_GesamtPixel, f32_Progress);
+         m_SetPieDot(c_Painter, mc_STYLE_GUIDE_COLOR_24, c_PieRect, f32_DotSize, f32_TotalPixels, f32_Progress);
 
          // Rim--------------------------------------------------------------------------
-         m_SetPieRim(c_Painter, c_LinearGradient2, c_RimRect, f32_RimWidth, f32_GesamtPixel);
+         m_SetPieRim(c_Painter, c_LinearGradient2, c_RimRect, f32_RimWidth, f32_TotalPixels);
 
          // Inner circuit-------------------------------------------------------------------------
          m_SetInnerCircle(c_Painter, c_LinearGradient, c_InnerCircleRect);
@@ -435,10 +435,10 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          f32_PieWidth = 7.0F;
          f32_RimWidth = 7.0F;
          f32_PieGap = (f32_PieWidth / 2.0F) + 2.0F;
-         f32_GesamtPixel = 150.0F;
+         f32_TotalPixels = 150.0F;
 
          m_SetAllPieRects(c_InnerCircleRect, c_RimRect, c_PieRect, f32_PieGap, f32_PieWidth, f32_RimWidth,
-                          f32_GesamtPixel, 3.0F);
+                          f32_TotalPixels, 3.0F);
 
          // For smooth edges
          c_Painter.setRenderHint(QPainter::Antialiasing);
@@ -448,20 +448,20 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          c_Gradient.setAngle(static_cast<qreal>(90));
          c_Gradient.setColorAt(1.0, mc_STYLE_GUIDE_COLOR_33);                                        // Farbe: 33
          c_Gradient.setColorAt((1.0 - static_cast<float64>(f32_Progress)), mc_STYLE_GUIDE_COLOR_13); // Farbe: 13
-         m_SetPie(c_Painter, c_Gradient, Qt::FlatCap, c_PieRect, f32_PieWidth, f32_GesamtPixel, f32_Progress);
+         m_SetPie(c_Painter, c_Gradient, Qt::FlatCap, c_PieRect, f32_PieWidth, f32_TotalPixels, f32_Progress);
 
          // Rim--------------------------------------------------------------------------
-         m_SetPieRim(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_32), c_RimRect, f32_RimWidth, f32_GesamtPixel,
+         m_SetPieRim(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_32), c_RimRect, f32_RimWidth, f32_TotalPixels,
                      2.0F);
 
          // Inner circuit-------------------------------------------------------------------------
          if (mq_TransparentBackground == false)
          {
-            m_SetInnerCircle(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_52), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_52), c_InnerCircleRect);
          }
          else
          {
-            m_SetInnerCircle(c_Painter, QBrush(QColor(Qt::transparent)), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(QColor(Qt::transparent)), c_InnerCircleRect);
          }
 
          // Text-------------------------------------------------------------------------------
@@ -477,10 +477,10 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          f32_PieWidth = 6.0F;
          f32_RimWidth = 6.0F;
          f32_PieGap = (f32_PieWidth / 2.0F) + 2.0F;
-         f32_GesamtPixel = 146.0F;
+         f32_TotalPixels = 146.0F;
 
          m_SetAllPieRects(c_InnerCircleRect, c_RimRect, c_PieRect, f32_PieGap, f32_PieWidth, f32_RimWidth,
-                          f32_GesamtPixel, 2.0F);
+                          f32_TotalPixels, 2.0F);
 
          // For smooth edges
          c_Painter.setRenderHint(QPainter::Antialiasing);
@@ -490,19 +490,19 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          c_Gradient.setAngle(static_cast<qreal>(90));
          c_Gradient.setColorAt(1.0, mc_STYLE_GUIDE_COLOR_38);                                        // Farbe: 38
          c_Gradient.setColorAt((1.0 - static_cast<float64>(f32_Progress)), mc_STYLE_GUIDE_COLOR_13); // Farbe: 13
-         m_SetPie(c_Painter, c_Gradient, Qt::FlatCap, c_PieRect, f32_PieWidth, f32_GesamtPixel, f32_Progress);
+         m_SetPie(c_Painter, c_Gradient, Qt::FlatCap, c_PieRect, f32_PieWidth, f32_TotalPixels, f32_Progress);
 
          // Rim--------------------------------------------------------------------------
-         m_SetPieRim(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_38), c_RimRect, f32_RimWidth, f32_GesamtPixel);
+         m_SetPieRim(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_38), c_RimRect, f32_RimWidth, f32_TotalPixels);
 
          // Inner circuit-------------------------------------------------------------------------
          if (mq_TransparentBackground == false)
          {
-            m_SetInnerCircle(c_Painter, QBrush(mc_STYLE_GUIDE_COLOR_0), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_0), c_InnerCircleRect);
          }
          else
          {
-            m_SetInnerCircle(c_Painter, QBrush(QColor(Qt::transparent)), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(QColor(Qt::transparent)), c_InnerCircleRect);
          }
 
          // Text-------------------------------------------------------------------------------
@@ -522,91 +522,91 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_OgeWiDashboardPieChart::m_SetPie(QPainter & orc_Painter, QBrush oc_PieBrush, const Qt::PenCapStyle oe_CapStyle,
-                                        const QRect & orc_PieCircleRect, const stw_types::float32 of32_PieWidth,
-                                        const stw_types::float32 of32_GesamtPixel,
-                                        const stw_types::float32 of32_Progress) const
+void C_OgeWiDashboardPieChart::m_SetPie(QPainter & orc_Painter, const QBrush oc_PieBrush,
+                                        const Qt::PenCapStyle oe_CapStyle, const QRect & orc_PieCircleRect,
+                                        const float32 of32_PieWidth, const float32 of32_TotalPixels,
+                                        const float32 of32_Progress) const
 {
    QPen c_PieArc;
 
    c_PieArc.setBrush(oc_PieBrush); // Color
    // Setting the with a little bigger to avoid gaps
-   c_PieArc.setWidth(static_cast<stw_types::sintn>(std::ceil((static_cast<stw_types::float32>(orc_PieCircleRect.height())
-                                                              *
-                                                              (of32_PieWidth + 1.0F)) / of32_GesamtPixel)));
+   c_PieArc.setWidth(static_cast<sintn>(std::ceil((static_cast<float32>(orc_PieCircleRect.height())
+                                                   *
+                                                   (of32_PieWidth + 1.0F)) / of32_TotalPixels)));
 
    c_PieArc.setCapStyle(oe_CapStyle); //Qt::RoundCap causes  overlap & default not possible with Gradient
    orc_Painter.setPen(c_PieArc);
-   stw_types::sintn sn_PieStartAngle = 90 * 16;                                    // To start on top in the middle
-   stw_types::float32 f32_PieSpanAngle = (-1.0F * 360.0F * of32_Progress * 16.0F); // -1: clockwise, 360*16: full turn
+   const sintn sn_PieStartAngle = 90 * 16; // To start on top in the
+   // middle
+   const float32 f32_PieSpanAngle = (-1.0F * 360.0F * of32_Progress * 16.0F); // -1: clockwise, 360*16: full
+   // turn
 
    // Paints the Arc in the rect form start with the length span
-   orc_Painter.drawArc(orc_PieCircleRect, sn_PieStartAngle, static_cast<stw_types::sintn>(f32_PieSpanAngle));
+   orc_Painter.drawArc(orc_PieCircleRect, sn_PieStartAngle, static_cast<sintn>(f32_PieSpanAngle));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::m_SetPieDot(QPainter & orc_Painter, const QColor & orc_PieDotColor,
-                                           const QRect & orc_PieRect, const stw_types::float32 of32_DotSize,
-                                           const stw_types::float32 of32_GesamtPixel,
-                                           const stw_types::float32 of32_Progress) const
+                                           const QRect & orc_PieRect, const float32 of32_DotSize,
+                                           const float32 of32_TotalPixels, const float32 of32_Progress) const
 {
-   stw_types::float32 f32_DotPositionX; // Variable for X-Postition
-   stw_types::float32 f32_DotPositionY; // Variable for Y-Position
-   stw_types::float32 f32_DotSize;      // Size of the Dot (diameter)
+   float32 f32_DotPositionX; // Variable for X-Postition
+   float32 f32_DotPositionY; // Variable for Y-Position
+   float32 f32_DotSize;      // Size of the Dot (diameter)
 
-   float32 f32_DotPositionXCosInput = (of32_Progress * 2.0F * static_cast<stw_types::float32>(M_PI)) -
-                                      (static_cast<stw_types::float32>(M_PI) / 2.0F);
-   float32 f32_DotPositionYSinInput = (of32_Progress * 2.0F * static_cast<stw_types::float32>(M_PI)) +
-                                      (static_cast<stw_types::float32>(M_PI) / 2.0F);
+   const float32 f32_DotPositionXCosInput = (of32_Progress * 2.0F * static_cast<float32>(M_PI)) -
+                                            (static_cast<float32>(M_PI) / 2.0F);
+   const float32 f32_DotPositionYSinInput = (of32_Progress * 2.0F * static_cast<float32>(M_PI)) +
+                                            (static_cast<float32>(M_PI) / 2.0F);
 
    orc_Painter.setPen(Qt::NoPen);
-   orc_Painter.setBrush(QBrush(QColor(orc_PieDotColor))); // Color of the Dot
+   orc_Painter.setBrush(static_cast<QBrush>(orc_PieDotColor)); // Color of the Dot
    //f32_DotPositionX = static_cast<stw_types::sint16>(oc_PieRect.left()); // Initial value
    //f32_DotPositionY = static_cast<stw_types::sint16>(oc_PieRect.top());  // Initial value
-   f32_DotSize = (static_cast<stw_types::float32>(orc_PieRect.width()) * of32_DotSize) /
-                 of32_GesamtPixel; // Size dependent on the this->rect size
+   f32_DotSize = (static_cast<float32>(orc_PieRect.width()) * of32_DotSize) /
+                 of32_TotalPixels; // Size dependent on the this->rect size
 
    // Kugel sitzt auf Außenrand des Keises
    f32_DotPositionX =
-      (((static_cast<stw_types::float32>(orc_PieRect.right()) + static_cast<stw_types::float32>(orc_PieRect.left())) /
-        2.0F) - (static_cast<stw_types::float32>(f32_DotSize) / 2.0F)) +
-      ((static_cast<stw_types::float32>(cos(static_cast<stw_types::float64>(f32_DotPositionXCosInput))) *
-        static_cast<stw_types::float32>(orc_PieRect.width())) /
+      (((static_cast<float32>(orc_PieRect.right()) + static_cast<float32>(orc_PieRect.left())) /
+        2.0F) - (static_cast<float32>(f32_DotSize) / 2.0F)) +
+      ((static_cast<float32>(cos(static_cast<float64>(f32_DotPositionXCosInput))) *
+        static_cast<float32>(orc_PieRect.width())) /
        2.0F);
    f32_DotPositionY =
-      (((static_cast<stw_types::float32>(orc_PieRect.bottom()) + static_cast<stw_types::float32>(orc_PieRect.top())) /
-        2.0F) - (static_cast<stw_types::float32>(f32_DotSize) / 2.0F)) -
-      (static_cast<stw_types::float32>(sin(static_cast<stw_types::float64>(f32_DotPositionYSinInput))) *
-       (static_cast<stw_types::float32>(orc_PieRect.height()) / static_cast<stw_types::float32>(2.0)));
+      (((static_cast<float32>(orc_PieRect.bottom()) + static_cast<float32>(orc_PieRect.top())) /
+        2.0F) - (static_cast<float32>(f32_DotSize) / 2.0F)) -
+      (static_cast<float32>(sin(static_cast<float64>(f32_DotPositionYSinInput))) *
+       (static_cast<float32>(orc_PieRect.height()) / static_cast<float32>(2.0)));
 
    orc_Painter.drawEllipse(static_cast<sintn>(f32_DotPositionX), static_cast<sintn>(f32_DotPositionY),
                            static_cast<sintn>(f32_DotSize), static_cast<sintn>(f32_DotSize));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiDashboardPieChart::m_SetPieRim(QPainter & orc_Painter, QBrush oc_RimBrush, const QRect & orc_RimCircleRect,
-                                           const stw_types::float32 of32_RimSize,
-                                           const stw_types::float32 of32_GesamtPixel,
-                                           const stw_types::float32 of32_ReductionFactor) const
+void C_OgeWiDashboardPieChart::m_SetPieRim(QPainter & orc_Painter, const QBrush oc_RimBrush,
+                                           const QRect & orc_RimCircleRect, const float32 of32_RimSize,
+                                           const float32 of32_TotalPixels, const float32 of32_ReductionFactor) const
 {
    const float32 f32_WidthHeightMin =
-      static_cast<stw_types::float32>(std::min(this->rect().width(), this->rect().height()));
+      static_cast<float32>(std::min(this->rect().width(), this->rect().height()));
    QPen c_RandArc;
 
    c_RandArc.setBrush(oc_RimBrush); // Color
    // ReductionFactor to close or open gaps between the circles
-   c_RandArc.setWidth(static_cast<stw_types::sintn>(std::ceil((f32_WidthHeightMin *
-                                                               (of32_RimSize - of32_ReductionFactor)) /
-                                                              of32_GesamtPixel)));
+   c_RandArc.setWidth(static_cast<sintn>(std::ceil((f32_WidthHeightMin *
+                                                    (of32_RimSize - of32_ReductionFactor)) /
+                                                   of32_TotalPixels)));
    c_RandArc.setCapStyle(Qt::FlatCap);
    orc_Painter.setPen(c_RandArc);
    // Arc with complete turn
-   orc_Painter.drawArc(orc_RimCircleRect, static_cast<stw_types::sint16>(90 * 16),
-                       static_cast<stw_types::sint16>(-360.0  * 16.0));
+   orc_Painter.drawArc(orc_RimCircleRect, static_cast<sint16>(90 * 16),
+                       static_cast<sintn>(-360)  * 16);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiDashboardPieChart::m_SetInnerCircle(QPainter & orc_Painter, QBrush oc_InnerCircleBrush,
+void C_OgeWiDashboardPieChart::m_SetInnerCircle(QPainter & orc_Painter, const QBrush oc_InnerCircleBrush,
                                                 const QRect & orc_InnerCircleRect) const
 {
    // Painting the inner Circle
@@ -617,13 +617,13 @@ void C_OgeWiDashboardPieChart::m_SetInnerCircle(QPainter & orc_Painter, QBrush o
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::m_SetPieText(QPainter & orc_Painter, const QColor & orc_TextColor,
-                                            const QRect & orc_InnerCircleRect, QString oc_DisplayString) const
+                                            const QRect & orc_InnerCircleRect, const QString & orc_DisplayString) const
 {
-   stw_types::uint16 u16_FontPixelSize = static_cast<stw_types::uint16>(orc_InnerCircleRect.height());
+   const uint16 u16_FontPixelSize = static_cast<uint16>(orc_InnerCircleRect.height());
    QPen c_TextPen;
    QFont c_TextFont;
    //   QLabel c_TextLabel;
-   float32 f32_TextPixelSize = static_cast<stw_types::float32>(u16_FontPixelSize) / 3.0F;
+   const float32 f32_TextPixelSize = static_cast<float32>(u16_FontPixelSize) / 3.0F;
 
    c_TextPen.setColor(orc_TextColor);
    c_TextFont.setFamily("Segoe UI");
@@ -634,78 +634,79 @@ void C_OgeWiDashboardPieChart::m_SetPieText(QPainter & orc_Painter, const QColor
 
    orc_Painter.setPen(c_TextPen);
    orc_Painter.setFont(c_TextFont);
-   orc_Painter.drawText(orc_InnerCircleRect, static_cast<sintn>(Qt::AlignCenter), oc_DisplayString);
+   orc_Painter.drawText(orc_InnerCircleRect, static_cast<sintn>(Qt::AlignCenter), orc_DisplayString);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::m_SetAllPieRects(QRect & orc_InnerCircleRect, QRect & orc_RimCircleRect,
-                                                QRect & orc_PieCircleRect, const stw_types::float32 of32_PieGap,
-                                                const stw_types::float32 of32_PieSize,
-                                                const stw_types::float32 of32_RimSize,
-                                                const stw_types::float32 of32_GesamtPixel,
-                                                const stw_types::float32 of32_AdditionalFactor) const
+                                                QRect & orc_PieCircleRect, const float32 of32_PieGap,
+                                                const float32 of32_PieSize, const float32 of32_RimSize,
+                                                const float32 of32_TotalPixels,
+                                                const float32 of32_AdditionalFactor) const
 {
    const float32 f32_WidthHeightMin =
-      static_cast<stw_types::float32>(std::min(this->rect().width(), this->rect().height()));
+      static_cast<float32>(std::min(this->rect().width(), this->rect().height()));
    // Defining Inner Circle Rect --------------------------------------------------------
-   float32 f32_InnerCircleRectX =
-      (static_cast<stw_types::float32>(this->rect().left()) +
+   const float32 f32_InnerCircleRectX =
+      (static_cast<float32>(this->rect().left()) +
        ((f32_WidthHeightMin * (of32_PieGap + (of32_PieSize / 2.0F) + of32_RimSize)) /
-        of32_GesamtPixel)) - of32_AdditionalFactor;
-   float32 f32_InnerCircleRectY = (static_cast<stw_types::float32>(this->rect().top()) +
-                                   ((f32_WidthHeightMin *
-                                     (of32_PieGap + (of32_PieSize / 2.0F) + of32_RimSize)) /
-                                    of32_GesamtPixel)) - of32_AdditionalFactor;
-   float32 f32_InnerCircleRectW =
+        of32_TotalPixels)) - of32_AdditionalFactor;
+   const float32 f32_InnerCircleRectY = (static_cast<float32>(this->rect().top()) +
+                                         ((f32_WidthHeightMin *
+                                           (of32_PieGap + (of32_PieSize / 2.0F) + of32_RimSize)) /
+                                          of32_TotalPixels)) - of32_AdditionalFactor;
+   const float32 f32_InnerCircleRectW =
       ((f32_WidthHeightMin *
-        (of32_GesamtPixel - (2.0F * (of32_PieGap + (of32_PieSize / 2.0F) + of32_RimSize)))) / of32_GesamtPixel) +
+        (of32_TotalPixels - (2.0F * (of32_PieGap + (of32_PieSize / 2.0F) + of32_RimSize)))) / of32_TotalPixels) +
       (2.0F * of32_AdditionalFactor);
-   float32 f32_InnerCircleRectH =
+   const float32 f32_InnerCircleRectH =
       ((f32_WidthHeightMin *
-        (of32_GesamtPixel - (2.0F * (of32_PieGap + (of32_PieSize / 2.0F) + of32_RimSize)))) / of32_GesamtPixel) +
+        (of32_TotalPixels - (2.0F * (of32_PieGap + (of32_PieSize / 2.0F) + of32_RimSize)))) / of32_TotalPixels) +
       (2.0F * of32_AdditionalFactor);
    // ------------------------------------------------------------------------------------
 
    // Defining Inner Rim Rect ------------------------------------------------------------
-   float32 f32_RimCircleRectX = static_cast<stw_types::float32>(this->rect().left()) +
-                                ((f32_WidthHeightMin *
-                                  (of32_PieGap + (of32_PieSize / 2.0F) + (of32_RimSize / 2.0F))) / of32_GesamtPixel);
-   float32 f32_RimCircleRectY = static_cast<stw_types::float32>(this->rect().top()) +
-                                ((f32_WidthHeightMin *
-                                  (of32_PieGap + (of32_PieSize / 2.0F) + (of32_RimSize / 2.0F))) / of32_GesamtPixel);
-   float32 f32_RimCircleRectW =
+   const float32 f32_RimCircleRectX = static_cast<float32>(this->rect().left()) +
+                                      ((f32_WidthHeightMin *
+                                        (of32_PieGap + (of32_PieSize / 2.0F) + (of32_RimSize / 2.0F))) /
+                                       of32_TotalPixels);
+   const float32 f32_RimCircleRectY = static_cast<float32>(this->rect().top()) +
+                                      ((f32_WidthHeightMin *
+                                        (of32_PieGap + (of32_PieSize / 2.0F) + (of32_RimSize / 2.0F))) /
+                                       of32_TotalPixels);
+   const float32 f32_RimCircleRectW =
       (f32_WidthHeightMin *
-       (of32_GesamtPixel - (2.0F * (of32_PieGap + (of32_PieSize / 2.0F) + (of32_RimSize / 2.0F))))) / of32_GesamtPixel;
-   float32 f32_RimCircleRectH =
+       (of32_TotalPixels - (2.0F * (of32_PieGap + (of32_PieSize / 2.0F) + (of32_RimSize / 2.0F))))) / of32_TotalPixels;
+   const float32 f32_RimCircleRectH =
       (f32_WidthHeightMin *
-       (of32_GesamtPixel - (2.0F * (of32_PieGap + (of32_PieSize / 2.0F) + (of32_RimSize / 2.0F))))) / of32_GesamtPixel;
+       (of32_TotalPixels - (2.0F * (of32_PieGap + (of32_PieSize / 2.0F) + (of32_RimSize / 2.0F))))) / of32_TotalPixels;
    // ------------------------------------------------------------------------------------
 
    // Defining Pie Circle Rect -----------------------------------------------------------
-   float32 f32_PieCircleRectX = (static_cast<stw_types::float32>(this->rect().left()) +
-                                 ((f32_WidthHeightMin * of32_PieGap) /
-                                  of32_GesamtPixel));
-   float32 f32_PieCircleRectY = static_cast<stw_types::float32>(this->rect().top()) +
-                                (((f32_WidthHeightMin) * of32_PieGap) /
-                                 of32_GesamtPixel);
-   float32 f32_PieCircleRectW = (f32_WidthHeightMin *
-                                 (of32_GesamtPixel - (2.0F * of32_PieGap))) / of32_GesamtPixel;
-   float32 f32_PieCircleRectH = (f32_WidthHeightMin *
-                                 (of32_GesamtPixel - (2.0F * of32_PieGap))) / of32_GesamtPixel;
+   const float32 f32_PieCircleRectX = (static_cast<float32>(this->rect().left()) +
+                                       ((f32_WidthHeightMin * of32_PieGap) /
+                                        of32_TotalPixels));
+   const float32 f32_PieCircleRectY = static_cast<float32>(this->rect().top()) +
+                                      (((f32_WidthHeightMin) * of32_PieGap) /
+                                       of32_TotalPixels);
+   const float32 f32_PieCircleRectW = (f32_WidthHeightMin *
+                                       (of32_TotalPixels - (2.0F * of32_PieGap))) / of32_TotalPixels;
+   const float32 f32_PieCircleRectH = (f32_WidthHeightMin *
+                                       (of32_TotalPixels - (2.0F * of32_PieGap))) / of32_TotalPixels;
 
    // ------------------------------------------------------------------------------------
 
-   orc_InnerCircleRect.setRect(static_cast<stw_types::sintn>(f32_InnerCircleRectX),
-                               static_cast<stw_types::sintn>(f32_InnerCircleRectY),
-                               static_cast<stw_types::sintn>(f32_InnerCircleRectW),
-                               static_cast<stw_types::sintn>(f32_InnerCircleRectH));
+   orc_InnerCircleRect.setRect(static_cast<sintn>(f32_InnerCircleRectX),
+                               static_cast<sintn>(f32_InnerCircleRectY),
+                               static_cast<sintn>(f32_InnerCircleRectW),
+                               static_cast<sintn>(f32_InnerCircleRectH));
 
-   orc_RimCircleRect.setRect(static_cast<stw_types::sintn>(f32_RimCircleRectX),
-                             static_cast<stw_types::sintn>(f32_RimCircleRectY),
-                             static_cast<stw_types::sintn>(f32_RimCircleRectW),
-                             static_cast<stw_types::sintn>(f32_RimCircleRectH));
-   orc_PieCircleRect.setRect(static_cast<stw_types::sintn>(f32_PieCircleRectX),
-                             static_cast<stw_types::sintn>(f32_PieCircleRectY),
-                             static_cast<stw_types::sintn>(f32_PieCircleRectW),
-                             static_cast<stw_types::sintn>(f32_PieCircleRectH));
+   orc_RimCircleRect.setRect(static_cast<sintn>(f32_RimCircleRectX),
+                             static_cast<sintn>(f32_RimCircleRectY),
+                             static_cast<sintn>(f32_RimCircleRectW),
+                             static_cast<sintn>(f32_RimCircleRectH));
+   orc_PieCircleRect.setRect(static_cast<sintn>(f32_PieCircleRectX),
+                             static_cast<sintn>(f32_PieCircleRectY),
+                             static_cast<sintn>(f32_PieCircleRectW),
+                             static_cast<sintn>(f32_PieCircleRectH));
 }

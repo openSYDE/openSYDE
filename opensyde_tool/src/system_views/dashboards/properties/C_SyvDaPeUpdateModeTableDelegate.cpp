@@ -168,15 +168,14 @@ void C_SyvDaPeUpdateModeTableDelegate::setEditorData(QWidget * const opc_Editor,
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
    {
-      
       QDoubleSpinBox * const pc_DoubleSpinBox = dynamic_cast<QDoubleSpinBox * const>(opc_Editor);
-      
+
       C_OgeSpxInt64 * const pc_Int64SpinBox = dynamic_cast<C_OgeSpxInt64 * const>(opc_Editor);
-      
+
       QComboBox * const pc_ComboBox = dynamic_cast<QComboBox * const>(opc_Editor);
       const C_SyvDaPeUpdateModeTableModel::E_Columns e_Col = C_SyvDaPeUpdateModeTableModel::h_ColumnToEnum(
          orc_Index.column());
-      switch (e_Col)  //lint !e788 //not all columns handled on purpose
+      switch (e_Col) //lint !e788 //not all columns handled on purpose
       {
       case C_SyvDaPeUpdateModeTableModel::eTRANSMISSION_MODE:
       case C_SyvDaPeUpdateModeTableModel::eCYCLIC_INTERVAL:
@@ -237,11 +236,10 @@ void C_SyvDaPeUpdateModeTableDelegate::setModelData(QWidget * const opc_Editor, 
 {
    if (((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true))
    {
-      
       QDoubleSpinBox * const pc_DoubleSpinBox = dynamic_cast<QDoubleSpinBox * const>(opc_Editor);
-      
+
       C_OgeSpxInt64Factor * const pc_Int64SpinBox = dynamic_cast<C_OgeSpxInt64Factor * const>(opc_Editor);
-      
+
       QComboBox * const pc_ComboBox = dynamic_cast<QComboBox * const>(opc_Editor);
       const C_SyvDaPeUpdateModeTableModel::E_Columns e_Col = C_SyvDaPeUpdateModeTableModel::h_ColumnToEnum(
          orc_Index.column());

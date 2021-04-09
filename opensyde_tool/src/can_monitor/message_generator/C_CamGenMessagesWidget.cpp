@@ -277,9 +277,12 @@ void C_CamGenMessagesWidget::m_InitButtons(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::m_UpdateHeading(void) const
 {
-   this->mpc_Ui->pc_LabelHeading->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(C_CamProHandler::
-                                                                                               h_GetInstance()->
-                                                                                               GetMessages().size()));
+   this->mpc_Ui->pc_LabelHeading->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(
+                                             C_CamProHandler::
+                                             h_GetInstance()
+                                             ->
+                                             GetMessages()
+                                             .size()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

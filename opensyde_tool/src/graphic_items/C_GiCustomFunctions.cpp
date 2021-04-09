@@ -206,6 +206,9 @@ QPointF C_GiCustomFunctions::h_AdaptDeltaForAspectRatio(const float64 of64_Aspec
          c_Delta.setX(c_Delta.y() * of64_AspectRatio);
       }
       break;
+   default:
+      break;
    }
+
    return c_Delta;
 }

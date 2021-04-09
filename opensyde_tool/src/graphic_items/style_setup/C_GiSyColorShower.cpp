@@ -83,7 +83,7 @@ void C_GiSyColorShower::SetHsv(const sintn osn_Hue, const sintn osn_Sat, const s
    The current color
 */
 //----------------------------------------------------------------------------------------------------------------------
-QColor C_GiSyColorShower::SetRgb(const QRgb oun_Rgb)
+QColor C_GiSyColorShower::SetRgb(const uintn oun_Rgb)
 {
    this->mc_CurrentRGBAColor.setRgba(qRgba(qRed(oun_Rgb),
                                            qGreen(oun_Rgb),
@@ -108,12 +108,12 @@ QColor C_GiSyColorShower::CurrentColor(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set new current color
 
-   \param[in]   rc_Color   Reference of new current color
+   \param[in]   orc_Color   Reference of new current color
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorShower::SetCurrentColor(QColor const & rc_Color)
+void C_GiSyColorShower::SetCurrentColor(QColor const & orc_Color)
 {
-   this->mc_CurrentRGBAColor = rc_Color;
+   this->mc_CurrentRGBAColor = orc_Color;
    Q_EMIT (this->SigChangeColor(CurrentColor()));
 }
 

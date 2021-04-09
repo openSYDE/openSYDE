@@ -44,13 +44,13 @@ static const sintn msn_SHADOW_WIDTH = 8;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent  Optional pointer to parent
-   \param[in,out] oc_Title    Title of fix position widget
-   \param[in,out] oc_IconPath Icon of fix position widget
-   \param[in,out] rc_Geometry Position of fix position widget
+   \param[in,out] opc_Parent   Optional pointer to parent
+   \param[in,out] oc_Title     Title of fix position widget
+   \param[in,out] oc_IconPath  Icon of fix position widget
+   \param[in,out] orc_Geometry Position of fix position widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgeWiFixPosition::C_OgeWiFixPosition(QString oc_Title, QString oc_IconPath, QRect const & rc_Geometry,
+C_OgeWiFixPosition::C_OgeWiFixPosition(QString oc_Title, QString oc_IconPath, QRect const & orc_Geometry,
                                        QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiFixPosition)
@@ -65,9 +65,9 @@ C_OgeWiFixPosition::C_OgeWiFixPosition(QString oc_Title, QString oc_IconPath, QR
    this->mpc_Ui->pc_PushButtonMax->setIcon(QIcon(":images/IconDoubleArrowLeft.svg"));
    c_Icon.load(oc_IconPath);
    this->mpc_Ui->pc_LabelIcon->setPixmap(QPixmap::fromImage(c_Icon));
-   this->setGeometry(rc_Geometry);
-   this->mpc_Ui->pc_GroupBox->setMaximumSize(rc_Geometry.width() - msn_SHADOW_WIDTH,
-                                             rc_Geometry.height() - msn_SHADOW_WIDTH);
+   this->setGeometry(orc_Geometry);
+   this->mpc_Ui->pc_GroupBox->setMaximumSize(orc_Geometry.width() - msn_SHADOW_WIDTH,
+                                             orc_Geometry.height() - msn_SHADOW_WIDTH);
 
    // Activate shadow
    this->m_ApplyShadow();
@@ -108,4 +108,4 @@ void C_OgeWiFixPosition::m_ApplyShadow()
    c_Color.setAlpha(128);
    pc_Shadow->setColor(c_Color);
    this->mpc_Ui->pc_GroupBox->setGraphicsEffect(pc_Shadow);
-}  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management

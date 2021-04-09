@@ -265,7 +265,7 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
 {
-   bool q_Retval = false;
+   const bool q_Retval = false;
 
    if (data(orc_Index, osn_Role) != orc_Value)
    {
@@ -273,7 +273,6 @@ bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant &
       {
          if (orc_Index.column() >= 0)
          {
-            
             const C_GiSvDaParam * const pc_ParamWidget =
                dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -297,7 +296,6 @@ bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant &
                }
             }
 
-            //lint -e{1793} Qt example
             Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
          }
       }
@@ -405,7 +403,7 @@ const C_OSCNodeDataPoolListElement * C_SyvDaItPaArModel::GetOSCElement(void) con
 const C_OSCNodeDataPoolContent * C_SyvDaItPaArModel::GetElementData(void) const
 {
    const C_OSCNodeDataPoolContent * pc_Retval = NULL;
-   
+
    const C_GiSvDaParam * const pc_ParamWidget =
       dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -444,7 +442,7 @@ void C_SyvDaItPaArModel::Reset(void)
 const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItPaArModel::m_GetElementId(void) const
 {
    const C_PuiSvDbNodeDataPoolListElementId * pc_Retval = NULL;
-   
+
    const C_GiSvDaParam * const pc_ParamWidget =
       dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -475,7 +473,7 @@ const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItPaArModel::m_GetElementId(vo
 sint32 C_SyvDaItPaArModel::m_GetDataSetIndex(void) const
 {
    sint32 s32_Retval = -1;
-   
+
    const C_GiSvDaParam * const pc_ParamWidget =
       dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 

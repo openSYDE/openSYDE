@@ -180,7 +180,8 @@ void C_SdCodeGenerationDialog::m_UpdateSelection(const sintn osn_SelectionCount)
 {
    if (osn_SelectionCount > 0)
    {
-      this->mpc_Ui->pc_SelectionLabel->setText(static_cast<QString>(C_GtGetText::h_GetText("%1 Data Block(s) selected")).
+      this->mpc_Ui->pc_SelectionLabel->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                       "%1 Data Block(s) selected")).
                                                arg(osn_SelectionCount));
       this->mpc_Ui->pc_PushButtonOk->setDisabled(false);
    }

@@ -543,7 +543,7 @@ void C_OSCUtils::h_FileToString(const C_SCLString & orc_FilePath, C_SCLString & 
       }
    }
    //Copy to output
-   orc_OutputString = C_SCLString(c_Input.c_str());
+   orc_OutputString = c_Input.c_str();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -211,7 +211,6 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
 
    if (q_Return == true)
    {
-
       const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
       if (pc_ParamWidget != NULL)
       {
@@ -434,7 +433,6 @@ void C_SyvDaItPaWidgetNew::SetDark(const bool oq_Value) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::ButtonAddClicked(void)
 {
-
    C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -885,7 +883,6 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
 
    if (pc_View != NULL)
    {
-
       const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
       if (pc_ParamWidget != NULL)
       {
@@ -1303,7 +1300,6 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_RecordElements(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
-
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -1633,7 +1629,6 @@ void C_SyvDaItPaWidgetNew::m_InformUserFloatRangeCheck(
    {
       if (orc_InvalidValueIds.size() > 0UL)
       {
-
          const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
          if (pc_ParamWidget != NULL)
          {

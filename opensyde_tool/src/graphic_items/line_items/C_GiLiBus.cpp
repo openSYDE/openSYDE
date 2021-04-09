@@ -115,18 +115,17 @@ C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiBus::~C_GiLiBus() //lint -e{1540}  no memory leak because of the parent of mpc_TextElementName and the Qt memory
+C_GiLiBus::~C_GiLiBus() //lint !e1540  no memory leak because of the parent of mpc_TextElementName and the Qt memory
                         // management
 {
    if (this->mpc_TextElementName != NULL)
    {
       disconnect(this->mpc_TextElementName, &C_GiTextElementBus::destroyed, this, &C_GiLiBus::m_UnregisterTextElement);
    }
-   //lint -e{1740}  no memory leak because of the parent of mpc_TextElementName and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Returns the type of this itme
+/*! \brief  Returns the type of this item
 
    \return  ID
 */
@@ -317,7 +316,6 @@ void C_GiLiBus::GenerateHint(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 {
-   
    const C_GiLiBus * const pc_Item = dynamic_cast<const C_GiLiBus * const>(opc_GuidelineItem);
 
    if (pc_Item != NULL)

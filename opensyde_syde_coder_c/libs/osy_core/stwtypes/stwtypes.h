@@ -4,12 +4,13 @@
    \brief      STW specific standard defines and types
 
    Standard typedefs in compliance with STW C++ Coding Rules.
-   here: for 32bit compilation under Windows.
 
-   Suitable for applications compiled with:
+   Suitable for 32bit Windows applications compiled with:
    - Embarcadero C++ Builder
    - MinGW
    - MS Visual C++
+
+   The definitions should also be fine for many other 32bit compilers and platforms.
 
    \copyright   Copyright 2007 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -18,6 +19,13 @@
 #define STWTYPESH
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+//This header file is intended for 32bit compilation. If it is used with 64bit compilers the sized of the types will
+// not be correct. This can result in undefined behavior in the application which might be hard to debug.
+//So for convenience create a compilation fail on some commonly used 64bit compilers:
+#if defined _WIN64 || defined __x86_64__ || defined __ppc64__
+//If compilation fails here make sure a 32bit compiler is used
+extern T_use_a_32bit_compiler gt_YesIWill; //portable compiler fail
+#endif
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 #ifdef __cplusplus
@@ -38,7 +46,6 @@ typedef unsigned long long uint64; ///< data type 64bit unsigned
 typedef signed long long sint64;   ///< data type 64bit signed
 typedef float float32;             ///< data type IEEE 32bit float
 typedef double float64;            ///< data type IEEE 64bit float
-typedef long double float80;       ///< data type IEEE 80bit float
 
 // native data types
 typedef unsigned int uintn; ///< data type native unsigned int

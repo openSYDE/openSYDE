@@ -35,7 +35,6 @@ public:
    void DetachNode(void);
    void AttachToNode(const C_GiNode * const opc_Node);
    virtual stw_types::sintn type() const override;
-   void UpdateTransform(const QTransform & orc_Transform) const;
    virtual void GenerateHint(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -43,7 +42,7 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void StartConnector(const QPointF & orc_LineStart, const QPointF & orc_SceneTriggerPos);
+   void SigStartConnector(const QPointF & orc_LineStart, const QPointF & orc_SceneTriggerPos);
 
 protected:
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;

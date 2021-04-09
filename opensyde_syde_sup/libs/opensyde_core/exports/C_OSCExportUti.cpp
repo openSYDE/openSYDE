@@ -220,9 +220,9 @@ sint32 C_OSCExportUti::h_SaveToFile(stw_scl::C_SCLStringList & orc_Data, const s
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add .c and .h file paths to file paths list.
 
-   \param[in,out]    orc_FilePaths     List of file paths
-   \param[in]        orc_Path          Base path of files to add
-   \param[in]        orc_FileName      File base name of files to add
+   \param[in,out]  orc_FilePaths    List of file paths
+   \param[in]      orc_Path         Base path of files to add
+   \param[in]      orc_FileName     File base name of files to add
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportUti::h_CollectFilePaths(std::vector<C_SCLString> & orc_FilePaths, const C_SCLString & orc_Path,
@@ -324,58 +324,124 @@ C_SCLString C_OSCExportUti::h_GetElementCName(const C_SCLString & orc_Name, cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Utility wrapper for C_SCLString::FloatToStr that cuts trailing zeroes.
+/*! \brief  Convert 32-bit float to string with %g formatter and maximum representable precision.
 
-   Call C_SCLString::FloatToStr and cut all trailing zeroes.
+   Always adds a decimal point.
 
-   If oq_MakePrecise is false (default), the standard version is used that returns 6 digits after the decimal point.
-   If oq_MakePrecise is true, the conversion uses a variant of C_SCLString::FloatToStr where the number of
-   decimals can be specified. Using a large number it returns more precise representations of the float values.
-
-   \param[in]  of64_Value        Value to convert
-   \param[in]  oq_MakePrecise    Flag if to use more than 6 digits after decimal point
+   \param[in]  of32_Value     Float value
+   \param[in]  opq_InfOrNan   Flag if conversion returned "inf" or "nan"
 
    \return
    Value converted to string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCExportUti::h_FloatToStrCutZeroes(const float64 of64_Value, const bool oq_MakePrecise)
+C_SCLString C_OSCExportUti::h_FloatToStrG(const float32 of32_Value, bool * const opq_InfOrNan)
 {
    C_SCLString c_Return;
+   bool q_InfOrNan;
 
-   if (oq_MakePrecise == true)
+   c_Return.StringPrintFormatted("%.*g", 9, of32_Value);
+   // do not use '#' option of print formatted, as it also adds trailing zeroes
+
+   q_InfOrNan = h_CheckInfOrNan(c_Return);
+
+   if (opq_InfOrNan != NULL)
    {
-      c_Return = C_SCLString::FloatToStr(of64_Value, 100);
-   }
-   else
-   {
-      c_Return = C_SCLString::FloatToStr(of64_Value);
+      *opq_InfOrNan = q_InfOrNan;
    }
 
-   // defensive check
-   if (c_Return.Pos('.') > 0)
+   if (q_InfOrNan == false)
    {
-      // cut trailing zeros
-      while ((c_Return.IsEmpty() == false) && (c_Return[c_Return.Length()] == '0') &&
-             (c_Return.Pos(".") != (c_Return.Length() - 1)))
-      {
-         c_Return.Delete(c_Return.Length(), 1);
-      }
+      h_AddDecimalPointIfNone(c_Return);
    }
+
    return c_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Float32 version of C_OSCExportDataPool::h_FloatToStringCutZeroes
+/*! \brief  Convert 64-bit float to string with %g formatter and maximum representable precision
 
-   \param[in]  of32_Value        Value to convert
-   \param[in]  oq_MakePrecise    Flag if to use more than 6 digits after decimal point
+   Always adds a decimal point.
+
+   \param[in]  of64_Value     Float value
+   \param[in]  opq_InfOrNan   Flag if conversion returned "inf" or "nan"
 
    \return
    Value converted to string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCExportUti::h_FloatToStrCutZeroes(const float32 of32_Value, const bool oq_MakePrecise)
+C_SCLString C_OSCExportUti::h_FloatToStrG(const float64 of64_Value, bool * const opq_InfOrNan)
 {
-   return h_FloatToStrCutZeroes(static_cast<float64>(of32_Value), oq_MakePrecise);
+   C_SCLString c_Return;
+   bool q_InfOrNan;
+
+   c_Return.StringPrintFormatted("%.*g", 17, of64_Value);
+   // do not use '#' option of print formatted, as it also adds trailing zeroes
+
+   q_InfOrNan = h_CheckInfOrNan(c_Return);
+
+   if (opq_InfOrNan != NULL)
+   {
+      *opq_InfOrNan = q_InfOrNan;
+   }
+
+   if (q_InfOrNan == false)
+   {
+      h_AddDecimalPointIfNone(c_Return);
+   }
+
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if a string contains inf or nan (case independent)
+
+   \param[in]  orc_String  String
+
+   \retval   true   string contains "inf" or "nan"
+   \retval   false  string does not contain "inf" or "nan"
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCExportUti::h_CheckInfOrNan(const C_SCLString & orc_String)
+{
+   bool q_Return;
+
+   if ((orc_String.LowerCase().Pos("inf") > 0) || (orc_String.LowerCase().Pos("nan") > 0))
+   {
+      q_Return = true;
+   }
+   else
+   {
+      q_Return = false;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add decimal point to a float string if there is none.
+
+   Use this if float was converted with %g, but without '#' option as trailing zeroes shall be omitted.
+
+   Examples:
+      5        -> 5.0
+      5e+20    -> 5.0e+20
+      123.45   -> 123.45
+
+   \param[in,out]  orc_FloatString  Float string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCExportUti::h_AddDecimalPointIfNone(C_SCLString & orc_FloatString)
+{
+   if (orc_FloatString.Pos('.') == 0)
+   {
+      if (orc_FloatString.Pos('e') > 0)
+      {
+         orc_FloatString = orc_FloatString.Insert(".0", orc_FloatString.Pos('e'));
+      }
+      else
+      {
+         orc_FloatString += ".0";
+      }
+   }
 }

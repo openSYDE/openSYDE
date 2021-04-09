@@ -107,7 +107,7 @@ private:
    void m_ToggleIcon(const bool oq_Checked) const;
    void m_OnTimeoutConfigLinkClicked(void);
    void m_HandleInactiveStates(void) const;
-   void m_UpdateAutoReceiveTimeoutValue(void);
+   void m_UpdateAndAdaptRxTimeoutValue(void);
    void m_UpdateTimeoutLink(void) const;
 
    //Avoid call

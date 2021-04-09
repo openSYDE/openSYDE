@@ -454,6 +454,9 @@ sint32 C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CIECanS
          c_DBCSignal.multiplexorSwitch = false;
          c_DBCSignal.multiplexerSwitchValue = c_CIESignal.u16_MultiplexValue;
          break;
+      default:
+         tgl_assert(false);
+         break;
       }
 
       // set signal values
@@ -1142,7 +1145,7 @@ C_SCLString C_CieExportDbc::mh_EscapeCriticalSymbols(const C_SCLString & orc_Str
 
    for (sint32 s32_Char = 0; s32_Char < static_cast<sint32>(orc_String.Length()); ++s32_Char)
    {
-      const charn cn_Char = orc_String[s32_Char + 1];
+      const charn cn_Char = orc_String[static_cast<uint32>(s32_Char + 1)];
       if (cn_Char == '\"')
       {
          c_Retval += "\\\"";

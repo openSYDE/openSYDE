@@ -38,86 +38,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfig::C_OSCHalcConfig(void) :
-   mq_SafeDatablockAssigned(false),
-   mu32_SafeDatablockIndex(0UL),
-   mq_UnsafeDatablockAssigned(false),
-   mu32_UnsafeDatablockIndex(0UL)
+C_OSCHalcConfig::C_OSCHalcConfig(void)
 {
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get safe datablock assigned
-
-   \return
-   Safe datablock assigned
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHalcConfig::GetSafeDatablockAssigned() const
-{
-   return mq_SafeDatablockAssigned;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get safe datablock index
-
-   \return
-   Safe datablock index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_OSCHalcConfig::GetSafeDatablockIndex() const
-{
-   return mu32_SafeDatablockIndex;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get unsafe datablock assigned
-
-   \return
-   Unsafe datablock assigned
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHalcConfig::GetUnsafeDatablockAssigned() const
-{
-   return mq_UnsafeDatablockAssigned;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get unsafe datablock index
-
-   \return
-   Unsafe datablock index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_OSCHalcConfig::GetUnsafeDatablockIndex() const
-{
-   return mu32_UnsafeDatablockIndex;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set safe datablock assigned
-
-   \param[in]  oq_IsSet       Is set
-   \param[in]  ou32_NewValue  New value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfig::SetSafeDatablockAssigned(const bool oq_IsSet, const uint32 ou32_NewValue)
-{
-   this->mq_SafeDatablockAssigned = oq_IsSet;
-   this->mu32_SafeDatablockIndex = ou32_NewValue;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set unsafe datablock assigned
-
-   \param[in]  oq_IsSet       Is set
-   \param[in]  ou32_NewValue  New value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfig::SetUnsafeDatablockAssigned(const bool oq_IsSet, const uint32 ou32_NewValue)
-{
-   this->mq_UnsafeDatablockAssigned = oq_IsSet;
-   this->mu32_UnsafeDatablockIndex = ou32_NewValue;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1152,15 +1074,6 @@ void C_OSCHalcConfig::CheckDomainConfigValid(const uint32 ou32_DomainIndex, bool
 void C_OSCHalcConfig::CalcHash(uint32 & oru32_HashValue) const
 {
    C_OSCHalcDefBase::CalcHash(oru32_HashValue);
-
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_SafeDatablockAssigned, sizeof(this->mq_SafeDatablockAssigned),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mu32_SafeDatablockIndex, sizeof(this->mu32_SafeDatablockIndex),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_UnsafeDatablockAssigned, sizeof(this->mq_UnsafeDatablockAssigned),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mu32_UnsafeDatablockIndex, sizeof(this->mu32_UnsafeDatablockIndex),
-                                      oru32_HashValue);
 
    for (uint32 u32_It = 0UL; u32_It < this->mc_Domains.size(); ++u32_It)
    {

@@ -175,7 +175,7 @@ void C_OgeWiProgressBar::paintEvent(QPaintEvent * const opc_Event)
    }
    else
    {
-      uint32 u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / (10000U / this->mu32_Percentage);
+      const uint32 u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / (10000U / this->mu32_Percentage);
 
       // draw the used area
       this->mc_Brush.setColor(this->mc_ColorReserved);

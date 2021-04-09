@@ -60,8 +60,7 @@ C_SebTopologyBaseContextMenuManager::~C_SebTopologyBaseContextMenuManager(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SebTopologyBaseContextMenuManager::m_ActivateSpecificActions(void)
 {
-   
-   const C_GiLiLineGroup * pc_LineGroup = dynamic_cast<C_GiLiLineGroup *>(this->mpc_ActiveItem);
+   const C_GiLiLineGroup * const pc_LineGroup = dynamic_cast<C_GiLiLineGroup *>(this->mpc_ActiveItem);
    bool q_Return = false;
 
    if (pc_LineGroup != NULL)

@@ -89,6 +89,8 @@ QVariant C_CamMosFilterTableModel::headerData(const sintn osn_Section, const Qt:
          case eREMOVE:
             c_Retval = C_GtGetText::h_GetText("Remove");
             break;
+         default:
+            break;
          }
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
@@ -113,6 +115,8 @@ QVariant C_CamMosFilterTableModel::headerData(const sintn osn_Section, const Qt:
             break;
          case eREMOVE:
             c_Retval = C_GtGetText::h_GetText("Remove selected filter item.");
+            break;
+         default:
             break;
          }
       }
@@ -182,6 +186,8 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
             case C_CamProFilterItemData::eID_RANGE:
                c_Retval = C_GtGetText::h_GetText("CAN ID Range");
                break;
+            default:
+               break;
             }
             break;
          case eMODE:
@@ -219,6 +225,8 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
          case eREMOVE:
             // no text
             break;
+         default:
+            break;
          }
       }
       else if (osn_Role == msn_USER_ROLE_INTERACTION_IS_LINK)
@@ -228,6 +236,10 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
          case eREMOVE:
             c_Retval = true;
             break;
+         case eENABLED:
+         case eTYPE:
+         case eMODE:
+         case eDETAILS:
          default:
             c_Retval = false;
             break;
@@ -245,6 +257,8 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
             break;
          case eENABLED:
             c_Retval = mh_GetBoolAsCheckStateVariant(c_FilterItem.q_Enabled);
+            break;
+         default:
             break;
          }
       }
@@ -265,6 +279,8 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
             c_Icons.append("://images/IconClearGrayHovered.svg");
             c_Retval = c_Icons;
             break;
+         default:
+            break;
          }
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
@@ -279,6 +295,8 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
             break;
          case eDETAILS:
             c_Retval = data(orc_Index, static_cast<sintn>(Qt::DisplayRole));
+            break;
+         default:
             break;
          }
       }
@@ -297,6 +315,7 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
    \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  nothing needs to be done here
 void C_CamMosFilterTableModel::CopySelectedItems(const std::vector<uint32> & orc_SelectedIndices) const
 {
    // nothing needs to be done here
@@ -346,6 +365,8 @@ bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVar
                      rc_FilterItemData.q_Enabled = mh_GetCheckStateVariantAsBool(orc_Value);
                      q_Retval = true;
                      break;
+                  default:
+                     break;
                   }
                }
             }
@@ -377,6 +398,8 @@ bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVar
                // Different handling for button
                case eENABLED:
                   // Different handling for Boolean
+                  break;
+               default:
                   break;
                }
             }
@@ -424,6 +447,8 @@ Qt::ItemFlags C_CamMosFilterTableModel::flags(const QModelIndex & orc_Index) con
          break;
       case eENABLED:
          c_Retval = c_Retval | Qt::ItemIsUserCheckable;
+         break;
+      default:
          break;
       }
    }
@@ -497,6 +522,8 @@ sint32 C_CamMosFilterTableModel::h_EnumToColumn(const C_CamMosFilterTableModel::
    case eREMOVE:
       s32_Retval = 4;
       break;
+   default:
+      break;
    }
    return s32_Retval;
 }
@@ -520,7 +547,7 @@ QString C_CamMosFilterTableModel::h_SearchMessageInDatabases(const uint32 ou32_C
 
    if ((c_Database != "") && (c_Message != ""))
    {
-      QFileInfo c_FileInfo(c_Database);
+      const QFileInfo c_FileInfo(c_Database);
 
       c_Return = c_FileInfo.completeBaseName() + "::" + c_Message;
    }
@@ -699,6 +726,7 @@ void C_CamMosFilterTableModel::m_DeleteItem(const uint32 ou32_Index)
    \param[in] ou32_TargetIndex Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  nothing needs to be done here
 void C_CamMosFilterTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex)
 {
    // nothing needs to be done here

@@ -68,7 +68,7 @@ C_SdBueMlvGraphicsView::~C_SdBueMlvGraphicsView()
 void C_SdBueMlvGraphicsView::ShowToolTip(const QPointF & orc_ScenePos, const QString & orc_Heading,
                                          const QString & orc_Content, const bool oq_Error)
 {
-   QPointF c_AdaptedScenePos(orc_ScenePos.x(), orc_ScenePos.y());
+   const QPointF c_AdaptedScenePos(orc_ScenePos.x(), orc_ScenePos.y());
 
    this->mc_ToolTip.SetHeading(orc_Heading);
    this->mc_ToolTip.SetContent(orc_Content);
@@ -133,8 +133,7 @@ bool C_SdBueMlvGraphicsView::event(QEvent * const opc_Event)
 {
    if (opc_Event->type() == QEvent::ToolTip)
    {
-      
-      QHelpEvent * pc_Help = dynamic_cast<QHelpEvent *>(opc_Event);
+      QHelpEvent * const pc_Help = dynamic_cast<QHelpEvent *>(opc_Event);
       if (pc_Help != NULL)
       {
          Q_EMIT this->SigShowToolTip(this->mapToScene(pc_Help->pos()));

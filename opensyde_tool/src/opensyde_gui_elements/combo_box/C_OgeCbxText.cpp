@@ -113,7 +113,7 @@ void C_OgeCbxText::showPopup(void)
 {
    if (this->mc_TemporaryText != "")
    {
-      C_OgeCbxTextLineEdit * pc_Edit = new C_OgeCbxTextLineEdit();
+      C_OgeCbxTextLineEdit * const pc_Edit = new C_OgeCbxTextLineEdit();
       this->SuppressHide(); // suppress next hidePopup
 
       // In case of showing an error, we need the stylesheet properties of the concrete line edit

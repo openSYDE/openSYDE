@@ -77,10 +77,10 @@ C_NagUseCaseViewWidget::C_NagUseCaseViewWidget(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_Widget and the Qt memory management
 C_NagUseCaseViewWidget::~C_NagUseCaseViewWidget()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_Widget and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -225,11 +225,9 @@ void C_NagUseCaseViewWidget::SetUseCaseWidget(C_NagUseCaseWidget * const opc_Wid
       this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
 
       // Use specific set parent function. The widgets can react on the parent change if necessary.
-      if (this->mpc_Widget != NULL)
-      {
-         this->mpc_Widget->SetParentHook(this);
-         connect(this->mpc_Widget, &C_NagUseCaseWidget::SigNameChanged, this, &C_NagUseCaseViewWidget::UpdateItemName);
-      }
+
+      this->mpc_Widget->SetParentHook(this);
+      connect(this->mpc_Widget, &C_NagUseCaseWidget::SigNameChanged, this, &C_NagUseCaseViewWidget::UpdateItemName);
 
       // set the text of labels
       this->ms32_Mode = os32_Mode;

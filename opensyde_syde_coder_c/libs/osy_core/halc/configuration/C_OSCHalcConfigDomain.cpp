@@ -131,6 +131,114 @@ void C_OSCHalcConfigDomain::CheckChannelNameUnique(const uint32 ou32_ChannelInde
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check channel linked
+
+   \param[in]      ou32_ChannelIndex         Channel index
+   \param[in]      oq_UseChannelIndex        Use channel index
+   \param[out]     orq_IsLinked              Is linked
+   \param[in,out]  opc_LinkedChannelNames    Linked channel names
+   \param[in,out]  opc_LinkedChannelIndices  Linked channel indices
+   \param[in]      opu32_UseCaseIndex        Use case index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfigDomain::CheckChannelLinked(const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
+                                                 bool & orq_IsLinked,
+                                                 std::vector<stw_scl::C_SCLString> * const opc_LinkedChannelNames,
+                                                 std::vector<uint32> * const opc_LinkedChannelIndices,
+                                                 const uint32 * const opu32_UseCaseIndex) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (oq_UseChannelIndex == true)
+   {
+      if (ou32_ChannelIndex < this->c_ChannelConfigs.size())
+      {
+         const C_OSCHalcConfigChannel & rc_Config = this->c_ChannelConfigs[ou32_ChannelIndex];
+
+         if (this->c_ChannelUseCases.size() > 0UL)
+         {
+            const uint32 u32_UseCaseIndex =
+               (opu32_UseCaseIndex == NULL) ? rc_Config.u32_UseCaseIndex : *opu32_UseCaseIndex;
+            if (u32_UseCaseIndex < this->c_ChannelUseCases.size())
+            {
+               bool q_Found = false;
+               const C_OSCHalcDefChannelUseCase & rc_UseCase = this->c_ChannelUseCases[u32_UseCaseIndex];
+               for (uint32 u32_ItAv = 0UL; u32_ItAv < rc_UseCase.c_Availability.size(); ++u32_ItAv)
+               {
+                  const C_OSCHalcDefChannelAvailability & rc_Avail = rc_UseCase.c_Availability[u32_ItAv];
+                  if (rc_Avail.u32_ValueIndex == ou32_ChannelIndex)
+                  {
+                     q_Found = true;
+                     if (rc_Avail.c_DependentValues.size() > 0UL)
+                     {
+                        orq_IsLinked = true;
+                        if (opc_LinkedChannelNames != NULL)
+                        {
+                           opc_LinkedChannelNames->clear();
+                           for (uint32 u32_ItDe = 0UL; u32_ItDe < rc_Avail.c_DependentValues.size(); ++u32_ItDe)
+                           {
+                              if (rc_Avail.c_DependentValues[u32_ItDe] < this->c_ChannelConfigs.size())
+                              {
+                                 const C_OSCHalcConfigChannel & rc_LinkedChannelConfig =
+                                    this->c_ChannelConfigs[rc_Avail.c_DependentValues[u32_ItDe]];
+                                 opc_LinkedChannelNames->push_back(rc_LinkedChannelConfig.c_Name.c_str());
+                              }
+                              else
+                              {
+                                 s32_Retval = C_RANGE;
+                              }
+                           }
+                        }
+                        if (opc_LinkedChannelIndices != NULL)
+                        {
+                           *opc_LinkedChannelIndices = rc_Avail.c_DependentValues;
+                        }
+                     }
+                     else
+                     {
+                        orq_IsLinked = false;
+                     }
+                     //Stop
+                     break;
+                  }
+               }
+               if (q_Found == false)
+               {
+                  s32_Retval = C_RANGE;
+               }
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            //Domain without use case -> irrelevant
+            orq_IsLinked = false;
+            if (opc_LinkedChannelNames != NULL)
+            {
+               opc_LinkedChannelNames->clear();
+            }
+            if (opc_LinkedChannelIndices != NULL)
+            {
+               opc_LinkedChannelIndices->clear();
+            }
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Reset channel configuration to default
 
    \param[in]  ou32_ChannelIndex    Channel index
@@ -379,7 +487,7 @@ C_OSCHalcConfigChannel C_OSCHalcConfigDomain::mh_InitConfigFromName(const stw_sc
    Initialized channel configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigChannel C_OSCHalcConfigDomain::m_InitChannelConfig(const uint32 ou32_ChannelIndex)
+C_OSCHalcConfigChannel C_OSCHalcConfigDomain::m_InitChannelConfig(const uint32 ou32_ChannelIndex) const
 {
    C_OSCHalcConfigChannel c_NewChannel;
 
@@ -409,7 +517,7 @@ C_OSCHalcConfigChannel C_OSCHalcConfigDomain::m_InitChannelConfig(const uint32 o
    Use case index (0 if no default was found)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCHalcConfigDomain::m_InitChannelUseCase(const uint32 ou32_ChannelIndex)
+uint32 C_OSCHalcConfigDomain::m_InitChannelUseCase(const uint32 ou32_ChannelIndex) const
 {
    uint32 u32_UseCaseIndex = 0;
 

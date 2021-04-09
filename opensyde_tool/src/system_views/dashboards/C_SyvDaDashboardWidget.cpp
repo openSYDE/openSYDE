@@ -11,13 +11,15 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
+#include "TGLUtils.h"
 
 #include "C_SyvDaDashboardWidget.h"
 #include "ui_C_SyvDaDashboardWidget.h"
 
-#include "C_UsHandler.h"
 #include "C_PuiSvHandler.h"
 #include "C_OgeWiUtil.h"
+#include "C_SyvDaDashboardSceneWidget.h"
+#include "C_SyvDaChaWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -41,88 +43,71 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]      ou32_ViewIndex   Index of view
-   \param[in]      ou32_DataIndex   Index of dashboard
-   \param[in]      orc_Name         Name of dashboard
-   \param[in]      oq_Window        Flag if widget will be showed in a seperate window
-   \param[in,out]  opc_Parent       Optional pointer to parent
+   \param[in]      ou32_ViewIndex        Index of view
+   \param[in]      ou32_DashboardIndex   Index of dashboard
+   \param[in]      orc_Name              Name of dashboard
+   \param[in]      oq_Window             Flag if widget will be showed in a separate window
+   \param[in,out]  opc_Parent            Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DataIndex,
+C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
                                                const QString & orc_Name, const bool oq_Window,
                                                QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaDashboardWidget),
    mu32_ViewIndex(ou32_ViewIndex),
-   mu32_DataIndex(ou32_DataIndex),
+   mu32_DashboardIndex(ou32_DashboardIndex),
    mc_Name(orc_Name)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-   QString c_ViewName = "";
-   QString c_DashboardName = "";
+   bool q_InitSceneWidget = true;
 
-   mpc_Ui->setupUi(this);
+   this->mpc_Ui->setupUi(this);
+
+   tgl_assert(pc_View != NULL);
+   if (pc_View != NULL)
+   {
+      const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
+      tgl_assert(pc_Dashboard != NULL);
+      if (pc_Dashboard != NULL)
+      {
+         if (pc_Dashboard->GetType() == C_PuiSvDashboard::eCHART)
+         {
+            q_InitSceneWidget = false;
+         }
+      }
+   }
+
+   if (q_InitSceneWidget == true)
+   {
+      this->m_InitSceneWidget();
+   }
+   else
+   {
+      this->m_InitChartWidget();
+   }
 
    this->setWindowTitle(orc_Name);
-
-   // create scene for graphics view
-   this->mpc_Scene = new C_SyvDaDashboardScene(this->mu32_ViewIndex, this->mu32_DataIndex, true);
-
-   // configure scene
-   this->mpc_Scene->setSceneRect(0.0, 0.0,
-                                 static_cast<float64>(this->mpc_Ui->pc_GraphicsView->width()),
-                                 static_cast<float64>(this->mpc_Ui->pc_GraphicsView->height()));
-   this->mpc_Ui->pc_GraphicsView->SetSceneAndConnect(this->mpc_Scene);
 
    if (oq_Window == true)
    {
       this->layout()->setMargin(0);
    }
 
-   // make all generic connects
-   //Connect for tool tip
-   connect(this->mpc_Scene, &C_SebScene::SigShowToolTip, this->mpc_Ui->pc_GraphicsView,
-           &C_SebGraphicsView::ShowToolTip);
-   connect(this->mpc_Scene, &C_SebScene::SigHideToolTip, this->mpc_Ui->pc_GraphicsView,
-           &C_SebGraphicsView::HideToolTip);
-   connect(this->mpc_Ui->pc_GraphicsView, &C_SebGraphicsView::SigShowToolTip, this->mpc_Scene,
-           &C_SebScene::DisplayToolTip);
-   //Interaction point scaling
-   connect(this->mpc_Scene, &C_SebScene::SigTriggerUpdateTransform, this->mpc_Ui->pc_GraphicsView,
-           &C_SebGraphicsView::UpdateTransform);
    //Error handling
-   connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigErrorChange, this, &C_SyvDaDashboardWidget::SigErrorChange);
+   connect(this->mpc_Content, &C_SyvDaDashboardContentBaseWidget::SigErrorChange, this,
+           &C_SyvDaDashboardWidget::SigErrorChange);
 
-   connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigTriggerUpdateTransmissionConfiguration, this,
+   connect(this->mpc_Content, &C_SyvDaDashboardContentBaseWidget::SigTriggerUpdateTransmissionConfiguration, this,
            &C_SyvDaDashboardWidget::SigTriggerUpdateTransmissionConfiguration);
 
-   // Delayed update
-   // Necessary because of issue #49525
-   this->mc_UpdateTimer.setSingleShot(true);
-   this->mc_UpdateTimer.setInterval(300);
-   connect(&this->mc_UpdateTimer, &QTimer::timeout, this->mpc_Scene, &C_SyvDaDashboardScene::UpdateBoundaries);
-
    // Manual datapool element handling
-   connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigDataPoolWrite, this, &C_SyvDaDashboardWidget::SigDataPoolWrite);
-   connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigDataPoolRead, this, &C_SyvDaDashboardWidget::SigDataPoolRead);
-   connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigNvmReadList, this, &C_SyvDaDashboardWidget::SigNvmReadList);
-
-   //Update all items with initial zoom & pos value
-   if (pc_View != NULL)
-   {
-      const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DataIndex);
-      c_ViewName = pc_View->GetName();
-      if (pc_Dashboard != NULL)
-      {
-         c_DashboardName = pc_Dashboard->GetName();
-      }
-   }
-   this->mpc_Ui->pc_GraphicsView->SetZoomValue(C_UsHandler::h_GetInstance()->GetProjSvSetupView(
-                                                  c_ViewName).GetDashboardSettings(
-                                                  c_DashboardName).sn_SceneZoom, true);
-   this->mpc_Ui->pc_GraphicsView->SetViewPos(C_UsHandler::h_GetInstance()->GetProjSvSetupView(
-                                                c_ViewName).GetDashboardSettings(
-                                                c_DashboardName).c_ScenePos);
+   connect(this->mpc_Content, &C_SyvDaDashboardContentBaseWidget::SigDataPoolWrite, this,
+           &C_SyvDaDashboardWidget::SigDataPoolWrite);
+   connect(this->mpc_Content, &C_SyvDaDashboardContentBaseWidget::SigDataPoolRead, this,
+           &C_SyvDaDashboardWidget::SigDataPoolRead);
+   connect(this->mpc_Content, &C_SyvDaDashboardContentBaseWidget::SigNvmReadList, this,
+           &C_SyvDaDashboardWidget::SigNvmReadList);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -131,10 +116,10 @@ C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32 ou32_ViewIndex, cons
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_Content and the Qt memory management
 C_SyvDaDashboardWidget::~C_SyvDaDashboardWidget(void)
 {
    delete this->mpc_Ui;
-   delete this->mpc_Scene;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -156,9 +141,9 @@ uint32 C_SyvDaDashboardWidget::GetViewIndex(void) const
    Index of the dashboard
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvDaDashboardWidget::GetDataIndex(void) const
+uint32 C_SyvDaDashboardWidget::GetDashboardIndex(void) const
 {
-   return this->mu32_DataIndex;
+   return this->mu32_DashboardIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -167,10 +152,10 @@ uint32 C_SyvDaDashboardWidget::GetDataIndex(void) const
    \param[in]  ou32_Value  New data index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardWidget::SetDataIndex(const uint32 ou32_Value)
+void C_SyvDaDashboardWidget::SetDashboardIndex(const uint32 ou32_Value)
 {
-   this->mu32_DataIndex = ou32_Value;
-   this->mpc_Scene->SetDashboardIndex(this->mu32_DataIndex);
+   this->mu32_DashboardIndex = ou32_Value;
+   this->mpc_Content->SetDashboardIndex(this->mu32_DashboardIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -193,12 +178,7 @@ QString C_SyvDaDashboardWidget::GetName(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetEditMode(const bool oq_Active)
 {
-   if (this->mpc_Scene != NULL)
-   {
-      this->mpc_Scene->SetDrawingBackground(oq_Active);
-      this->mpc_Scene->SetEditMode(oq_Active);
-   }
-   this->mpc_Ui->pc_GraphicsView->SetDrawingBackground(oq_Active);
+   this->mpc_Content->SetEditMode(oq_Active);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_DrawFrame, "NoBorder", true);
 }
 
@@ -210,12 +190,7 @@ void C_SyvDaDashboardWidget::SetEditMode(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetDarkMode(const bool oq_Active)
 {
-   if (this->mpc_Scene != NULL)
-   {
-      this->mpc_Scene->SetDarkModeActive(oq_Active);
-      this->mpc_Scene->SetDarkModeInitialized();
-   }
-   this->mpc_Ui->pc_GraphicsView->SetDarkMode(oq_Active);
+   this->mpc_Content->SetDarkMode(oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -226,10 +201,7 @@ void C_SyvDaDashboardWidget::SetDarkMode(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetDrawingActive(const bool oq_Active) const
 {
-   if (this->mpc_Scene != NULL)
-   {
-      this->mpc_Scene->SetDrawingActive(oq_Active);
-   }
+   this->mpc_Content->SetDrawingActive(oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -238,24 +210,7 @@ void C_SyvDaDashboardWidget::SetDrawingActive(const bool oq_Active) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::Save(void) const
 {
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-   // store configuration of the view
-   if (pc_View != NULL)
-   {
-      const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DataIndex);
-      if (pc_Dashboard != NULL)
-      {
-         C_UsHandler::h_GetInstance()->SetProjSvDashboardScenePositionAndZoom(pc_View->GetName(),
-                                                                              pc_Dashboard->GetName(),
-                                                                              this->mpc_Ui->pc_GraphicsView->GetViewPos(),
-                                                                              this->mpc_Ui->pc_GraphicsView->GetZoomValue());
-      }
-   }
-   if (this->mpc_Scene != NULL)
-   {
-      this->mpc_Scene->Save();
-   }
+   this->mpc_Content->Save();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -268,15 +223,13 @@ void C_SyvDaDashboardWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
-   if ((this->mpc_Scene != NULL) &&
-       (pc_View != NULL))
+   if (pc_View != NULL)
    {
-      const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DataIndex);
+      const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
 
-      if ((pc_Dashboard != NULL) &&
-          (pc_Dashboard->GetActive() == true))
+      if ((pc_Dashboard != NULL) && (pc_Dashboard->GetActive() == true))
       {
-         this->mpc_Scene->RegisterWidgets(orc_ComDriver);
+         this->mpc_Content->RegisterWidgets(orc_ComDriver);
       }
    }
 }
@@ -289,10 +242,7 @@ void C_SyvDaDashboardWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::ConnectionActiveChanged(const bool oq_Active) const
 {
-   if (this->mpc_Scene != NULL)
-   {
-      this->mpc_Scene->ConnectionActiveChanged(oq_Active);
-   }
+   this->mpc_Content->ConnectionActiveChanged(oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -301,11 +251,7 @@ void C_SyvDaDashboardWidget::ConnectionActiveChanged(const bool oq_Active) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::UpdateShowValues(void) const
 {
-   if (this->mpc_Scene != NULL)
-   {
-      this->mpc_Scene->UpdateShowValues();
-      this->mpc_Ui->pc_GraphicsView->repaint();
-   }
+   this->mpc_Content->UpdateShowValues();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -314,10 +260,7 @@ void C_SyvDaDashboardWidget::UpdateShowValues(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::UpdateTransmissionConfiguration(void) const
 {
-   if (this->mpc_Scene != NULL)
-   {
-      this->mpc_Scene->UpdateTransmissionConfiguration();
-   }
+   this->mpc_Content->UpdateTransmissionConfiguration();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -329,48 +272,34 @@ void C_SyvDaDashboardWidget::UpdateTransmissionConfiguration(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC) const
 {
-   if (this->mpc_Scene != NULL)
-   {
-      this->mpc_Scene->HandleManualOperationFinished(os32_Result, ou8_NRC);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal all widgets which read rail element ID registrations failed
-
-   \param[in]      orc_FailedIdRegisters     Failed IDs
-   \param[in,out]  orc_FailedIdErrorDetails  Error details for element IDs which failed registration (if any)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardWidget::SetErrorForFailedCyclicElementIdRegistrations(
-   const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-   const std::vector<QString> & orc_FailedIdErrorDetails) const
-{
-   if (this->mpc_Scene != NULL)
-   {
-      this->mpc_Scene->SetErrorForFailedCyclicElementIdRegistrations(orc_FailedIdRegisters, orc_FailedIdErrorDetails);
-   }
+   this->mpc_Content->HandleManualOperationFinished(os32_Result, ou8_NRC);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set focus to scene
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardWidget::SetSceneFocus(void) const
+void C_SyvDaDashboardWidget::SetFocus(void) const
 {
-   this->mpc_Ui->pc_GraphicsView->setFocus();
+   this->mpc_Content->setFocus();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Event
-
-   \param[in,out]  opc_Event  Event
+/*! \brief  Short function description
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardWidget::showEvent(QShowEvent * const opc_Event)
+void C_SyvDaDashboardWidget::m_InitSceneWidget(void)
 {
-   QWidget::showEvent(opc_Event);
-   // Trigger delayed update
-   // Necessary because of issue #49525
-   this->mc_UpdateTimer.start();
+   this->mpc_Content = new C_SyvDaDashboardSceneWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex, this);
+   this->mpc_Ui->pc_DrawFrameLayout->addWidget(this->mpc_Content);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Short function description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardWidget::m_InitChartWidget(void)
+{
+   this->mpc_Content = new C_SyvDaChaWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex, this);
+   this->mpc_Ui->pc_DrawFrameLayout->addWidget(this->mpc_Content);
 }

@@ -67,7 +67,7 @@ SOURCES += \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxTransparent.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabContextMenuBase.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabPopUpSubTitle.cpp \
-    ../src/opensyde_gui_elements/C_OgeFrameBorder.cpp \
+    ../src/opensyde_gui_elements/frame/C_OgeFraBorder.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubStandard.cpp \
     ../src/opensyde_gui_elements/text_browser/C_OgeTebContextMenuBase.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxToolTip.cpp \
@@ -117,7 +117,7 @@ SOURCES += \
     ../src/can_monitor/can_monitor_gui_elements/widget/C_CamOgeWiSettingSubSection.cpp \
     ../src/opensyde_gui_elements/radio_button/C_OgeRabProperties.cpp \
     ../src/opensyde_gui_elements/radio_button/C_OgeRabToolTipBase.cpp \
-    ../src/opensyde_gui_elements/C_OgeFrameSeparator.cpp \
+    ../src/opensyde_gui_elements/frame/C_OgeFraSeparator.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubProjAction.cpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxToolTipBase.cpp \
     ../src/can_monitor/can_monitor_gui_elements/combo_box/C_CamOgeCbxWhite.cpp \
@@ -287,7 +287,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxTransparent.h \
     ../src/opensyde_gui_elements/label/C_OgeLabContextMenuBase.h \
     ../src/opensyde_gui_elements/label/C_OgeLabPopUpSubTitle.h \
-    ../src/opensyde_gui_elements/C_OgeFrameBorder.h \
+    ../src/opensyde_gui_elements/frame/C_OgeFraBorder.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubStandard.h \
     ../src/opensyde_gui_elements/text_browser/C_OgeTebContextMenuBase.h \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxToolTip.h \
@@ -339,7 +339,7 @@ HEADERS  += \
     ../src/can_monitor/can_monitor_gui_elements/widget/C_CamOgeWiSettingSubSection.h \
     ../src/opensyde_gui_elements/radio_button/C_OgeRabProperties.h \
     ../src/opensyde_gui_elements/radio_button/C_OgeRabToolTipBase.h \
-    ../src/opensyde_gui_elements/C_OgeFrameSeparator.h \
+    ../src/opensyde_gui_elements/frame/C_OgeFraSeparator.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubProjAction.h \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxToolTipBase.h \
     ../src/can_monitor/can_monitor_gui_elements/combo_box/C_CamOgeCbxWhite.h \
@@ -625,6 +625,7 @@ INCLUDEPATH += ../src \
                ../src/opensyde_gui_elements \
                ../src/opensyde_gui_elements/check_box \
                ../src/opensyde_gui_elements/combo_box \
+               ../src/opensyde_gui_elements/frame \
                ../src/opensyde_gui_elements/group_box \
                ../src/opensyde_gui_elements/label \
                ../src/opensyde_gui_elements/line_edit \

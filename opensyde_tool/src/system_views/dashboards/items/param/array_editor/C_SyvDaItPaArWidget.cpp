@@ -86,7 +86,7 @@ void C_SyvDaItPaArWidget::InitStaticNames(void)
 {
    sint32 s32_DataSetIndex = -1;
    const C_PuiSvDbNodeDataPoolListElementId * pc_Id = NULL;
-   
+
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)

@@ -66,7 +66,7 @@ C_SdNdeHalcChannelDpPreviewPopUp::C_SdNdeHalcChannelDpPreviewPopUp(
 
    //Dynamic title
    {
-      const C_OSCHalcConfigChannel * pc_Channel =
+      const C_OSCHalcConfigChannel * const pc_Channel =
          C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(ou32_NodeIndex, ou32_DomainIndex,
                                                                          ou32_ChannelIndex, oq_UseChannelIndex);
       if (pc_Channel != NULL)
@@ -188,7 +188,7 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDpSection(const uint32 ou32_NodeInd
                                                        QString & orc_Text)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
-   const C_OSCHalcConfigChannel * pc_Channel =
+   const C_OSCHalcConfigChannel * const pc_Channel =
       C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(ou32_NodeIndex, ou32_DomainIndex,
                                                                       ou32_ChannelIndex, oq_UseChannelIndex);
 
@@ -204,7 +204,8 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDpSection(const uint32 ou32_NodeInd
       orc_Text += "<table style=\"width:100%;\">";
       orc_Text += "<tr>";
       orc_Text += "<td>" + static_cast<QString>(C_GtGetText::h_GetText("Datapool:")) + "</td>";
-      orc_Text += "<td>" + static_cast<QString>(C_OSCHALCMagicianUtil::h_GetDatapoolName(pc_Channel->q_SafetyRelevant).c_str()) +
+      orc_Text += "<td>" +
+                  static_cast<QString>(C_OSCHALCMagicianUtil::h_GetDatapoolName(pc_Channel->q_SafetyRelevant).c_str()) +
                   "</td>";
       orc_Text += "</tr>";
       orc_Text += "<tr>";
@@ -246,10 +247,12 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
                                                        const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
                                                        QString & orc_Text)
 {
-   const QString c_Column1HeadingTagStart = static_cast<QString>("<td style=\"padding: 30px %1 6px 0px;font-weight: bold;\">").
-                                            arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
-   const QString c_ColumnContentHeadingTagStart = static_cast<QString>("<td style=\"padding: 30px %1 6px %1;font-weight: bold;\">").
-                                                  arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
+   const QString c_Column1HeadingTagStart =
+      static_cast<QString>("<td style=\"padding: 30px %1 6px 0px;font-weight: bold;\">").
+      arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
+   const QString c_ColumnContentHeadingTagStart =
+      static_cast<QString>("<td style=\"padding: 30px %1 6px %1;font-weight: bold;\">").
+      arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
 
    orc_Text += "<h3>";
    orc_Text += C_GtGetText::h_GetText("Used Datapool Elements");
@@ -287,7 +290,7 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
                                                                                     &c_OutputIndices,
                                                                                     &c_StatusIndices) == C_NO_ERR)
       {
-         const C_OSCHalcConfig * pc_HALCConfig = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(ou32_NodeIndex);
+         const C_OSCHalcConfig * const pc_HALCConfig = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(ou32_NodeIndex);
 
          if (pc_HALCConfig != NULL)
          {
@@ -361,14 +364,14 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddUseCase(const uint32 ou32_NodeIndex
                                                      const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
                                                      QString & orc_Text)
 {
-   QString c_UseCase = "";
+   const QString c_UseCase = "";
 
    if (oq_UseChannelIndex == true)
    {
-      const C_OSCHalcConfigChannel * pc_Channel =
+      const C_OSCHalcConfigChannel * const pc_Channel =
          C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(ou32_NodeIndex, ou32_DomainIndex,
                                                                          ou32_ChannelIndex, oq_UseChannelIndex);
-      const C_OSCHalcConfigDomain * pc_Domain =
+      const C_OSCHalcConfigDomain * const pc_Domain =
          C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(ou32_NodeIndex, ou32_DomainIndex);
       if ((pc_Domain != NULL) && (pc_Channel != NULL) &&
           (pc_Channel->u32_UseCaseIndex < pc_Domain->c_ChannelUseCases.size()))

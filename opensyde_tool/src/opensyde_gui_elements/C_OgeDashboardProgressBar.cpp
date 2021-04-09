@@ -64,7 +64,6 @@ void C_OgeDashboardProgressBar::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Sty
    {
       switch (oe_Style)
       {
-      //TBD by Karsten: done
       case C_PuiSvDbWidgetBase::eOPENSYDE:
          this->mc_BackgroundColor = mc_STYLE_GUIDE_COLOR_10;
          this->mc_ProgressColor = mc_STYLE_GUIDE_COLOR_7;
@@ -75,16 +74,8 @@ void C_OgeDashboardProgressBar::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Sty
          this->mc_ProgressColor = mc_STYLE_GUIDE_COLOR_26;
          this->msn_Offset = 1;
          break;
-      /*case C_PuiSvDbWidgetBase::eSKEUOMORPH:
-         this->mc_BackgroundColor = mc_STYLE_GUIDE_COLOR_46;
-         this->mc_ProgressColor = mc_STYLE_GUIDE_COLOR_23;
-         this->msn_Offset = 0;
-         break;
+      case C_PuiSvDbWidgetBase::eSKEUOMORPH:
       case C_PuiSvDbWidgetBase::eOPENSYDE_2:
-         this->mc_BackgroundColor = mc_STYLE_GUIDE_COLOR_0;
-         this->mc_ProgressColor = mc_STYLE_GUIDE_COLOR_48;
-         this->msn_Offset = 0;
-         break;*/
       default:
          break;
       }
@@ -93,7 +84,6 @@ void C_OgeDashboardProgressBar::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Sty
    {
       switch (oe_Style)
       {
-      //TBD by Karsten: done
       case C_PuiSvDbWidgetBase::eOPENSYDE:
          this->mc_BackgroundColor = mc_STYLE_GUIDE_COLOR_36;
          this->mc_ProgressColor = mc_STYLE_GUIDE_COLOR_2;
@@ -104,16 +94,8 @@ void C_OgeDashboardProgressBar::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Sty
          this->mc_ProgressColor = mc_STYLE_GUIDE_COLOR_26;
          this->msn_Offset = 1;
          break;
-      /*case C_PuiSvDbWidgetBase::eSKEUOMORPH:
-         this->mc_BackgroundColor = mc_STYLE_GUIDE_COLOR_42;
-         this->mc_ProgressColor = mc_STYLE_GUIDE_COLOR_23;
-         this->msn_Offset = 0;
-         break;
+      case C_PuiSvDbWidgetBase::eSKEUOMORPH:
       case C_PuiSvDbWidgetBase::eOPENSYDE_2:
-         this->mc_BackgroundColor = mc_STYLE_GUIDE_COLOR_35;
-         this->mc_ProgressColor = mc_STYLE_GUIDE_COLOR_48;
-         this->msn_Offset = 0;
-         break;*/
       default:
          break;
       }
@@ -291,9 +273,10 @@ void C_OgeDashboardProgressBar::paintEvent(QPaintEvent * const opc_Event)
                      //Progress
                      c_Painter.setPen(Qt::NoPen);
                      c_Painter.setBrush(this->mc_ProgressColor);
-                     c_Painter.drawRect(QRect(QPoint(c_Rect.topLeft() +
-                                                     QPoint(0, c_Rect.height() - sn_SegmentProgressHeight)),
-                                              QSize(c_Rect.width(), sn_SegmentProgressHeight)));
+                     c_Painter.drawRect(QRect(
+                                           static_cast<QPoint>(c_Rect.topLeft() +
+                                                               QPoint(0, c_Rect.height() - sn_SegmentProgressHeight)),
+                                           QSize(c_Rect.width(), sn_SegmentProgressHeight)));
                   }
                   else
                   {
@@ -351,7 +334,7 @@ void C_OgeDashboardProgressBar::resizeEvent(QResizeEvent * const opc_Event)
    QProgressBar::resizeEvent(opc_Event);
    if (this->orientation() == Qt::Horizontal)
    {
-      QString c_Border =
+      const QString c_Border =
          static_cast<QString>("stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"],"
                               "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"]::chunk,"
                               "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_BRIGHT\"],"
@@ -361,7 +344,7 @@ void C_OgeDashboardProgressBar::resizeEvent(QResizeEvent * const opc_Event)
    }
    else
    {
-      QString c_Border =
+      const QString c_Border =
          static_cast<QString>("stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"],"
                               "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_DARK\"]::chunk,"
                               "stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style=\"SKEUOMORPH_BRIGHT\"],"

@@ -203,7 +203,7 @@ void C_SyvManager::DeleteSysView(const uint32 ou32_Index, const sint32 os32_Sele
          C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eQUESTION);
          c_Message.SetHeading(C_GtGetText::h_GetText("View delete"));
          c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                             "Do you really want to delete this view (%1)?")).arg(
+                                                          "Do you really want to delete this view (%1)?")).arg(
                                      pc_View->GetName()));
          c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
          c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));

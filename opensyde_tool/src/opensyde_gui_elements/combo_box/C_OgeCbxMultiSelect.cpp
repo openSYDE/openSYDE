@@ -196,7 +196,7 @@ void C_OgeCbxMultiSelect::mousePressEvent(QMouseEvent * const opc_Event)
 void C_OgeCbxMultiSelect::showPopup()
 {
    QRect c_Rect;
-   sintn sn_ListHeight = (this->mpc_ListWidget->count() * this->mpc_ListWidget->sizeHintForRow(0)) + 2;
+   const sintn sn_ListHeight = (this->mpc_ListWidget->count() * this->mpc_ListWidget->sizeHintForRow(0)) + 2;
    const QRect c_ScreenRect = QApplication::desktop()->screenGeometry(this);
    const QPoint c_Above = this->mapToGlobal(QPoint(0, 0));
    const QPoint c_Below = this->mapToGlobal(QPoint(0, this->geometry().height()));
@@ -265,7 +265,7 @@ void C_OgeCbxMultiSelect::AddItem(const QString & orc_Text, const QVariant & orc
    }
 
    this->mpc_ListWidget->addItem(pc_ListWidgetItem);
-}  //lint !e429  //no memory leak because of the parent of pc_ListWidgetItem (use addItem) and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_ListWidgetItem (use addItem) and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set the check state to item
@@ -403,7 +403,7 @@ void C_OgeCbxMultiSelect::m_UpdateDisplayName(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeCbxMultiSelect::m_ListWidgetItemClicked(const QModelIndex & orc_ModelIndex)
 {
-   QListWidgetItem * pc_Item = this->mpc_ListWidget->item(orc_ModelIndex.row());
+   QListWidgetItem * const pc_Item = this->mpc_ListWidget->item(orc_ModelIndex.row());
 
    if (pc_Item != NULL)
    {

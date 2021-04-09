@@ -165,7 +165,6 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DeleteDataPool(void) c
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_UpdateUi(void)
 {
-   
    C_SdBueComIfDescriptionWidget * const pc_Widget =
       dynamic_cast<C_SdBueComIfDescriptionWidget * const>(this->mpc_Widget);
 

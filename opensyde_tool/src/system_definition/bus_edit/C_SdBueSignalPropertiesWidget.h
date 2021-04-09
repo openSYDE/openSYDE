@@ -125,10 +125,6 @@ private:
                                    const stw_types::uint16 ou16_BitLength,
                                    const stw_opensyde_core::C_OSCNodeDataPoolContent * const opc_Min,
                                    const stw_opensyde_core::C_OSCNodeDataPoolContent * const opc_Max) const;
-   static stw_types::sint32 mh_InitMin(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
-                                       const stw_types::uint16 ou16_BitLength);
-   static stw_types::sint32 mh_InitMax(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
-                                       const stw_types::uint16 ou16_BitLength);
    stw_types::sint32 m_SaveGeneric(const stw_opensyde_gui_elements::C_OgeWiSpinBoxGroup * const opc_Widget,
                                    stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
                                    const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset) const;
@@ -153,8 +149,8 @@ private:
    void m_UpdateUIForChange(const E_Change oe_Change);
    void m_UpdateErrorForChange(const E_Change oe_Change);
    void m_SendSignalForChange(const E_Change oe_Change);
-   void m_ConnectAll(void);
-   void m_DisconnectAll(void);
+   void m_ConnectAll(void) const;
+   void m_DisconnectAll(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

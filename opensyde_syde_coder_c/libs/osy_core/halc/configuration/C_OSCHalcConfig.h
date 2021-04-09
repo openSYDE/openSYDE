@@ -25,14 +25,6 @@ class C_OSCHalcConfig :
 public:
    C_OSCHalcConfig(void);
 
-   //General
-   bool GetSafeDatablockAssigned() const;
-   stw_types::uint32 GetSafeDatablockIndex() const;
-   bool GetUnsafeDatablockAssigned() const;
-   stw_types::uint32 GetUnsafeDatablockIndex() const;
-   void SetSafeDatablockAssigned(const bool oq_IsSet, const stw_types::uint32 ou32_NewValue);
-   void SetUnsafeDatablockAssigned(const bool oq_IsSet, const stw_types::uint32 ou32_NewValue);
-
    //Domains
    virtual stw_types::uint32 GetDomainSize(void) const;
    const C_OSCHalcConfigDomain * GetDomainConfigDataConst(const stw_types::uint32 ou32_Index) const;
@@ -112,10 +104,6 @@ public:
 
 private:
    std::vector<C_OSCHalcConfigDomain> mc_Domains; ///< Domains of HALC configuration (synced with C_OSCHalcDefBase)
-   bool mq_SafeDatablockAssigned;                 ///< Flag if safe datablock is assigned
-   stw_types::uint32 mu32_SafeDatablockIndex;     ///< Safe datablock index
-   bool mq_UnsafeDatablockAssigned;               ///< Flag if unsafe datablock is assigned
-   stw_types::uint32 mu32_UnsafeDatablockIndex;   ///< Unsafe datablock index
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -1,15 +1,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       short description (header)
-
-   To use this precompiled-header in a QtCreator project add the following to your .pro file:
-
-   CONFIG   += precompile_header
-   PRECOMPILED_HEADER = ../src/precomp_headers.h
+   \brief       Precompiled headers (header)
 
    Contains a list of header files to be pre-compiled.
-   see http://doc.qt.io/qt-5/qmake-precompiledheaders.html for details
 */
 //----------------------------------------------------------------------------------------------------------------------
 #ifndef PRECOMP_HEADERS_H
@@ -25,10 +19,18 @@
 #if defined __cplusplus
 /* Add C++ includes here */
 
+#ifdef _WIN32
 #include <winsock2.h>
 #include <windows.h>
+#endif
+
 #include <cstdio>
 #include <cstring>
+#include <vector>
+#include <map>
+#include <list>
+
+#include "CSCLString.h"
 
 #endif
 

@@ -14,8 +14,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLString.h"
-#include "CCAN.h"
 #include "C_SUPSuSequences.h"
+#include "CCAN.h"
+#include "C_OSCIpDispatcher.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -27,6 +28,8 @@ class C_SYDEsup
 {
 public:
    C_SYDEsup(void);
+   virtual ~C_SYDEsup(void);
+
    enum E_Result
    {
       // for detailed description see C_SYDEsup::m_PrintStringFromError
@@ -40,19 +43,13 @@ public:
       eERR_PACKAGE_NOT_FOUND           = 25,
       eERR_PACKAGE_WRONG_EXTENSION     = 26,
 
-      eERR_DLL_NOT_FOUND               = 30,
-
-      eERR_DLL_ALREADY_OPENED          = 31,
-      eERR_DLL_INIT_FAILED             = 32,
-      eERR_DLL_FORMAT                  = 33,
-
-      eERR_DLL_C_UNKNOWN               = 34,
-      eERR_DLL_CHANNEL                 = 35,
-      eERR_DLL_NOT_OPENED              = 36,
+      eERR_CAN_IF_NOT_FOUND            = 30,
+      eERR_CAN_IF_LOAD_FAILED          = 31,
+      eERR_ETH_IF_LOAD_FAILED          = 32,
 
       eERR_SEQUENCE_ROUTING            = 40,
       eERR_SEQUENCE_UNKNOWN_CONFIG     = 41,
-      eERR_SEQUENCE_DLL_NOT_FOUND      = 42,
+      eERR_SEQUENCE_CAN_IF_NOT_FOUND   = 42,
       eERR_SEQUENCE_INVALID_PARAM      = 43,
       eERR_SEQUENCE_CAN_INIT           = 44,
       eERR_SEQUENCE_C_CONFIG           = 45,
@@ -71,30 +68,44 @@ public:
       eERR_UPDATE_CHECKSUM             = 66,
       eERR_UPDATE_NO_NVM               = 67,
 
+      eERR_THREAD_UPDATE_IN_PROGRESS   = 70,
+      eERR_THREAD_UPDATE_INIT_FAILED   = 71,
+
       eOK                              = 0,
       eERR_UNKNOWN                     = 100
    };
 
    E_Result ParseCommandLine(const stw_types::sintn osn_Argc, stw_types::charn * const * const oppcn_Argv);
-   E_Result Update(void) const;
+   E_Result Update(void);
    static void h_WriteLog(const stw_scl::C_SCLString & orc_Activity, const stw_scl::C_SCLString & orc_Text,
                           const bool & orq_IsError = false, const bool & orq_Quiet = false);
-   static stw_scl::C_SCLString h_GetApplicationVersion(const stw_scl::C_SCLString & orc_FileName);
 
-private:
+protected:
+   stw_can::C_CAN * mpc_CanDispatcher;
+   stw_opensyde_core::C_OSCIpDispatcher * mpc_EthDispatcher;
+   bool mq_Quiet;
    stw_scl::C_SCLString mc_SUPFilePath;
-   stw_scl::C_SCLString mc_CanDLLPath;
+   stw_scl::C_SCLString mc_CanDriver;
    stw_scl::C_SCLString mc_LogPath;
    stw_scl::C_SCLString mc_LogFile;
    stw_scl::C_SCLString mc_UnzipPath;
-   bool mq_Quiet;
 
-   void m_PrintInformation(const stw_scl::C_SCLString & orc_Version, const stw_scl::C_SCLString & orc_BinaryHash) const;
-   stw_scl::C_SCLString m_GetLogFileLocation(void) const;
    C_SYDEsup::E_Result m_InitOptionalParameters(void);
+
+private:
+   virtual void m_CloseCan(void) = 0;
+   virtual E_Result m_OpenCan(const stw_scl::C_SCLString & orc_CanDriver, const stw_types::uint64 ou64_BitrateBps) = 0;
+   virtual E_Result m_OpenEthernet(void) = 0;
+   virtual stw_scl::C_SCLString m_GetApplicationVersion(const stw_scl::C_SCLString & orc_ApplicationFileName) const = 0;
+   virtual stw_scl::C_SCLString m_GetDefaultLogLocation(void) const = 0;
+   virtual stw_scl::C_SCLString m_GetCanInterfaceUsageExample(void) const = 0;
+
+   void m_PrintVersion(const stw_scl::C_SCLString & orc_Version, const stw_scl::C_SCLString & orc_BinaryHash,
+                       const bool oq_Detailed) const;
+   void m_PrintInformation(const bool oq_Detailed) const;
+   stw_scl::C_SCLString m_GetLogFileLocation(void) const;
    void m_PrintStringFromError(const C_SYDEsup::E_Result & ore_Result) const;
-   void m_Conclude(stw_can::C_CAN & orc_CanDispatcher, C_SUPSuSequences & orc_Sequence, const bool & orq_CanLoaded,
-                   const bool & orq_ResetSystem) const;
+   void m_Conclude(C_SUPSuSequences & orc_Sequence, const bool & orq_ResetSystem);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

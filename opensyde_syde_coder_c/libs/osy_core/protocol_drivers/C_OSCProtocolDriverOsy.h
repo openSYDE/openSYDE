@@ -22,6 +22,8 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
+#include <map>
+
 #include "stwtypes.h"
 #include "C_OSCProtocolDriverOsyTpBase.h"
 #include "stw_can.h" //for CAN message type
@@ -58,6 +60,9 @@ private:
    //maximum service size including header (used in WriteMemoryByAddress):
    stw_types::uint16 mu16_MaxServiceSize;
 
+   std::map<stw_types::uint8, stw_types::uint8> mc_DataPoolMappingClientToServer;
+   std::map<stw_types::uint8, stw_types::uint8> mc_DataPoolMappingServerToClient;
+
    void m_LogServiceError(const stw_scl::C_SCLString & orc_Service, const stw_types::sint32 os32_ReturnCode,
                           const stw_types::uint8 ou8_NrCode) const;
 
@@ -77,6 +82,8 @@ private:
                                             const bool oq_ExactSizeExpected,
                                             std::vector<stw_types::uint8> & orc_ReadData,
                                             stw_types::uint8 & oru8_NrCode);
+   stw_types::sint32 m_ReadStringDataIdentifier(const stw_types::uint16 ou16_DataIdentifier,
+                                                stw_scl::C_SCLString & orc_String, stw_types::uint8 & oru8_NrCode);
    stw_types::sint32 m_WriteDataByIdentifier(const stw_types::uint16 ou16_Identifier,
                                              std::vector<stw_types::uint8> & orc_WriteData,
                                              stw_types::uint8 & oru8_NrCode);
@@ -84,9 +91,8 @@ private:
                                               const stw_types::uint16 ou16_ListIndex,
                                               const stw_types::uint16 ou16_ElementIndex,
                                               stw_types::uint8(&orau8_PackedId)[3]) const;
-   static void mh_UnpackDataPoolIdentifier(const stw_types::uint8(&orau8_PackedId)[3],
-                                           stw_types::uint8 & oru8_DataPoolIndex, stw_types::uint16 & oru16_ListIndex,
-                                           stw_types::uint16 & oru16_ElementIndex);
+   void m_UnpackDataPoolIdentifier(const stw_types::uint8(&orau8_PackedId)[3], stw_types::uint8 & oru8_DataPoolIndex,
+                                   stw_types::uint16 & oru16_ListIndex, stw_types::uint16 & oru16_ElementIndex) const;
    stw_types::sint32 m_RoutineControl(const stw_types::uint16 ou16_RoutineIdentifier,
                                       const stw_types::uint8 ou8_SubFunction,
                                       const std::vector<stw_types::uint8> & orc_SendData,
@@ -104,6 +110,9 @@ private:
    stw_types::sint32 m_HandleAsyncOsyReadDataPoolDataErrorEvent(
       const C_OSCProtocolDriverOsyService & orc_ReceivedService);
    stw_types::sint32 m_HandleAsyncOsyTunnelCanMessagesEvent(const C_OSCProtocolDriverOsyService & orc_ReceivedService);
+
+   stw_types::uint8 m_GetDataPoolIndexClientToServer(const stw_types::uint8 ou8_ClientDataPoolIndex) const;
+   stw_types::uint8 m_GetDataPoolIndexServerToClient(const stw_types::uint8 ou8_ServerDataPoolIndex) const;
 
    static void mh_ConvertVariableToNecessaryBytes(const stw_types::uint32 ou32_Variable,
                                                   std::vector<stw_types::uint8> & orc_Bytes);
@@ -151,6 +160,7 @@ private:
    static const stw_types::uint16 mhu16_OSY_DI_DEVICE_NAME                 = 0xA81AU;
    static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_NAME            = 0xA81BU;
    static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_VERSION         = 0xA81CU;
+   static const stw_types::uint16 mhu16_OSY_DI_FILE_BASED_TRANSFER_EXIT_RESULT = 0xA81DU;
    //routine identifiers
    static const stw_types::uint16 mhu16_OSY_RC_SID_ROUTE_DIAGNOSIS_COMMUNICATION     = 0x0202U;
    static const stw_types::uint16 mhu16_OSY_RC_SID_SEND_CAN_MESSAGE                  = 0x0203U;
@@ -236,10 +246,13 @@ public:
    class C_ListOfFeatures
    {
    public:
-      bool q_FlashloaderCanWriteToNvm;           ///< set to true in Flashloader to show that "Writing to NVM" is
-                                                 // supported
-      bool q_MaxNumberOfBlockLengthAvailable;    ///< true: MaxNumberOfBlockLength can be read
-      bool q_EthernetToEthernetRoutingSupported; ///< true: E2E routing supported
+      C_ListOfFeatures(void);
+
+      bool q_FlashloaderCanWriteToNvm;             ///< set to true in Flashloader to show that "Writing to NVM" is
+                                                   // supported
+      bool q_MaxNumberOfBlockLengthAvailable;      ///< true: MaxNumberOfBlockLength can be read
+      bool q_EthernetToEthernetRoutingSupported;   ///< true: E2E routing supported
+      bool q_FileBasedTransferExitResultAvailable; ///< true: FileBasedTransferExitResult can be read
    };
 
    C_OSCProtocolDriverOsy(void);
@@ -264,6 +277,9 @@ public:
 
    C_OSCProtocolDriverOsyTpBase * GetTransportProtocol(void);
    void GetNodeIdentifiers(C_OSCProtocolDriverOsyNode & orc_ClientId, C_OSCProtocolDriverOsyNode & orc_ServerId) const;
+
+   void RegisterDataPoolMapping(const std::map<stw_types::uint8, stw_types::uint8> & orc_Mapping);
+   void ClearDataPoolMapping(void);
 
    static stw_scl::C_SCLString h_GetOpenSydeServiceErrorDetails(const stw_types::sint32 os32_FunctionResult,
                                                                 const stw_types::uint8 ou8_NrCode,
@@ -309,6 +325,8 @@ public:
                                                            stw_types::uint8(&orau8_Time)[3],
                                                            stw_scl::C_SCLString & orc_Username,
                                                            stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadFileBasedTransferExitResult(stw_scl::C_SCLString & orc_TransferExitResult,
+                                                        stw_types::uint8 * const opu8_NrCode = NULL);
 
    //Device configuration
    stw_types::sint32 OsySetNodeIdForChannel(const stw_types::uint8 ou8_ChannelType,

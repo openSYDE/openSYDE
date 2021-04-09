@@ -50,9 +50,6 @@ public:
    virtual void EditModeActiveChanged(const bool oq_Active) override;
    virtual void HandleManualOperationFinished(const stw_types::sint32 os32_Result,
                                               const stw_types::uint8 ou8_NRC) override;
-   virtual void SetErrorForFailedCyclicElementIdRegistrations(
-      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-      const std::vector<QString> & orc_FailedIdErrorDetails) override;
 
    void SetSyvComDriver(stw_opensyde_gui_logic::C_SyvComDriverDiag & orc_ComDriver);
 

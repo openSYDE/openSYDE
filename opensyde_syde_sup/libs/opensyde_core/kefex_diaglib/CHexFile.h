@@ -161,44 +161,45 @@ protected:
                           // last built
    stw_types::uint32 mu32_LastOverlayErrorAddress;
 
-   void InitHexFile(void);
-   stw_types::uint32 GetFileType(std::FILE * const opt_File, stw_types::sint32 & ors32_FileType) const;
-   stw_types::uint32 LoadIntelHex(std::FILE * const opt_File);
-   stw_types::uint32 LoadSRecord(std::FILE * const opt_File);
-   stw_types::uint32 CopyHex2Mem(stw_types::uint16 * opu16_BinImage, const stw_types::uint32 ou32_Offset);
-   stw_types::uint32 CloseRecord(stw_types::charn * const opcn_Record, bool & orq_RecordOpen);
-   static const stw_types::charn * HexLineString(const stw_types::uint8 * const opu8_HexLine);
-   stw_types::uint32 GetIHexCommand(const stw_types::charn * const opcn_String, stw_types::uint8 & oru8_Command) const;
-   stw_types::uint32 GetSRecordType(const stw_types::charn * const opcn_String, stw_types::uint8 & oru8_RecordType)
+   void m_InitHexFile(void);
+   stw_types::uint32 m_GetFileType(std::FILE * const opt_File, stw_types::sint32 & ors32_FileType) const;
+   stw_types::uint32 m_LoadIntelHex(std::FILE * const opt_File);
+   stw_types::uint32 m_LoadSRecord(std::FILE * const opt_File);
+   stw_types::uint32 m_CopyHex2Mem(stw_types::uint16 * opu16_BinImage, const stw_types::uint32 ou32_Offset);
+   stw_types::uint32 m_CloseRecord(stw_types::charn * const opcn_Record, bool & orq_RecordOpen);
+   static const stw_types::charn * mh_HexLineString(const stw_types::uint8 * const opu8_HexLine);
+   stw_types::uint32 m_GetIHexCommand(const stw_types::charn * const opcn_String,
+                                      stw_types::uint8 & oru8_Command) const;
+   stw_types::uint32 m_GetSRecordType(const stw_types::charn * const opcn_String, stw_types::uint8 & oru8_RecordType)
    const;
-   stw_types::uint32 GetIntelAddress(const stw_types::charn * const opcn_String, const stw_types::uint8 ou8_Command,
-                                     stw_types::uint32 & oru32_Adr) const;
-   stw_types::uint32 GetSRecordAddress(const stw_types::charn * const opcn_String,
-                                       const stw_types::uint8 ou8_RecordType, stw_types::uint32 & oru32_Adr) const;
-   void             SetEOFPtr(void);
-   void             SetDataPtr(const stw_types::uint32 ou32_Adr);
-   stw_types::uint32 SetXAdrPtr(const stw_types::uint32 ou32_Adr);
-   stw_types::uint32 AddHexLine(const stw_types::charn * const opcn_String);
-   void             RemoveFirst(void);
-   stw_types::uint32 ConvOffs16To32(stw_types::charn * const opcn_String) const;
-   stw_types::uint32 ConvRec16ToRec32(stw_types::charn * const opcn_String);
-   stw_types::uint32 SetOffset(const stw_types::uint32 ou32_Adr);
-   static stw_types::uint32 CalcCheck(stw_types::charn * const opcn_String);
-   stw_types::uint32 CopyData(const stw_types::charn * opcn_String, T_HexLine * const opt_HexLine,
-                              const stw_types::uint32 ou32_Length);
-   static stw_types::uint32 GetByte(const stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
-                                    stw_types::uint8 & oru8_Data);
-   static void SetByte(stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
-                       const stw_types::uint8 ou8_Byte);
-   static stw_types::uint32 GetWord(const stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
-                                    stw_types::uint32 & oru32_Word);
-   static void SetWord(stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
-                       const stw_types::uint32 ou32_Data);
+   stw_types::uint32 m_GetIntelAddress(const stw_types::charn * const opcn_String, const stw_types::uint8 ou8_Command,
+                                       stw_types::uint32 & oru32_Adr) const;
+   stw_types::uint32 m_GetSRecordAddress(const stw_types::charn * const opcn_String,
+                                         const stw_types::uint8 ou8_RecordType, stw_types::uint32 & oru32_Adr) const;
+   void             m_SetEOFPtr(void);
+   void             m_SetDataPtr(const stw_types::uint32 ou32_Adr);
+   stw_types::uint32 m_SetXAdrPtr(const stw_types::uint32 ou32_Adr);
+   stw_types::uint32 m_AddHexLine(const stw_types::charn * const opcn_String);
+   void             m_RemoveFirst(void);
+   stw_types::uint32 m_ConvOffs16To32(stw_types::charn * const opcn_String) const;
+   stw_types::uint32 m_ConvRec16ToRec32(stw_types::charn * const opcn_String);
+   stw_types::uint32 m_SetOffset(const stw_types::uint32 ou32_Adr);
+   static stw_types::uint32 mh_CalcCheck(stw_types::charn * const opcn_String);
+   stw_types::uint32 m_CopyData(const stw_types::charn * opcn_String, T_HexLine * const opt_HexLine,
+                                const stw_types::uint32 ou32_Length);
+   static stw_types::uint32 mh_GetByte(const stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
+                                       stw_types::uint8 & oru8_Data);
+   static void mh_SetByte(stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
+                          const stw_types::uint8 ou8_Byte);
+   static stw_types::uint32 mh_GetWord(const stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
+                                       stw_types::uint32 & oru32_Word);
+   static void mh_SetWord(stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
+                          const stw_types::uint32 ou32_Data);
 
-   static stw_types::sint32 prv_FindPattern(const stw_types::uint8 * const opu8_Buffer,
-                                            const stw_types::uint8 * const opu8_Pattern,
-                                            const stw_types::uint32 ou32_BufSize,
-                                            const stw_types::uint16 ou16_PatternLength);
+   static stw_types::sint32 mh_FindPattern(const stw_types::uint8 * const opu8_Buffer,
+                                           const stw_types::uint8 * const opu8_Pattern,
+                                           const stw_types::uint32 ou32_BufSize,
+                                           const stw_types::uint16 ou16_PatternLength);
 };
 }
 

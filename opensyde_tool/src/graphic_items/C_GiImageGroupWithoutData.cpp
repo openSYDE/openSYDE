@@ -105,11 +105,11 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, co
    Clean up.
 */
 //--------------------------------------------- ------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_Image and the Qt memory management
 C_GiImageGroupWithoutData::~C_GiImageGroupWithoutData()
 {
    //Deleted via Qt parent mechanism
    this->mpc_Image = NULL;
-   //lint -e{1740}  no memory leak because of the parent of mpc_Image and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

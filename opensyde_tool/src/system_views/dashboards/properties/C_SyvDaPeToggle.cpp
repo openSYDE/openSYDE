@@ -158,7 +158,7 @@ void C_SyvDaPeToggle::m_UpdatePreview(void)
    //Also include the fix offset to the right
    const float64 f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
    const QSize c_ViewSize = C_SyvDaPeBase::h_GetSceneViewSize();
-   C_GiSvDaToggleBase * pc_Item = new C_GiSvDaToggleBase(0UL, 0UL, -1L, 0ULL, NULL);
+   C_GiSvDaToggleBase * const pc_Item = new C_GiSvDaToggleBase(0UL, 0UL, -1L, 0ULL, NULL);
    const QSizeF c_ItemSize(150.0, 100.0);
    // 20 =  Vertical center adjustment
    const QPointF c_ItemPos(
@@ -176,5 +176,4 @@ void C_SyvDaPeToggle::m_UpdatePreview(void)
    // add item
    this->mrc_ParentDialog.GetPreviewScene()->addItem(pc_Item);
    this->mrc_ParentDialog.GetPreviewScene()->clearSelection();
-
 } //lint !e429  //no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management

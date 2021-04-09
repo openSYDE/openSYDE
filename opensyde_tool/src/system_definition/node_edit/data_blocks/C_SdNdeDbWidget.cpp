@@ -140,8 +140,10 @@ void C_SdNdeDbWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelDataPoolDescription->setText(C_GtGetText::h_GetText("Owned Datapools"));
 
    //Update application index
-   this->mpc_Ui->pc_LabelNamePrefix->setText(static_cast<QString>(C_GtGetText::h_GetText("#%1 -")).arg(this->mu32_ApplicationIndex +
-                                                                                          1));
+   this->mpc_Ui->pc_LabelNamePrefix->setText(static_cast<QString>(C_GtGetText::h_GetText("#%1 -")).arg(this->
+                                                                                                       mu32_ApplicationIndex
+                                                                                                       +
+                                                                                                       1));
 
    //Tool tips
    this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
@@ -220,7 +222,9 @@ void C_SdNdeDbWidget::UpdateDataPools(void)
                                                                              this->mu32_NodeIndex, u32_ItDataPool));
                   }
                   c_Temp += ")";
-                  c_Text += static_cast<QString>(C_Uti::h_GetLink(c_Temp, mc_STYLE_GUIDE_COLOR_6, QString::number(u32_ItDataPool)));
+                  c_Text +=
+                     static_cast<QString>(C_Uti::h_GetLink(c_Temp, mc_STYLE_GUIDE_COLOR_6,
+                                                           QString::number(u32_ItDataPool)));
                }
             }
          }
@@ -244,7 +248,8 @@ void C_SdNdeDbWidget::UpdateDataPools(void)
       }
 
       //update owned dp count
-      this->mpc_Ui->pc_LabelDataPoolDescription->setText(static_cast<QString>(C_GtGetText::h_GetText("Owned Datapools (%1)")).arg(
+      this->mpc_Ui->pc_LabelDataPoolDescription->setText(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                                 "Owned Datapools (%1)")).arg(
                                                             u8_OwnedDpCounter));
    }
    //Conditional visibility for empty data pool label

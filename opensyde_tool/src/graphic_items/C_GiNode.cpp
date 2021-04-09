@@ -208,7 +208,6 @@ void C_GiNode::m_InitPorts()
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::m_InitConflictIcon(void)
 {
-   //   QPixmap c_Pixmap;
    const float64 f64_PosX = (this->mpc_Boundary->boundingRect().width() - 33.0) - // static offset for correct position
                             (static_cast<float64>(this->ms32_IconSize) - 24.0);   // offset of scaled icon
 
@@ -566,7 +565,7 @@ sint32 C_GiNode::GetIndexOfConnector(const C_GiLiBusConnector * const opc_Connec
    \param[out]   orpc_Node   Node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiNode::GetOSCNodeConst(const C_OSCNode * & orpc_Node) const
+void C_GiNode::GetOSCNodeConst(const C_OSCNode * (&orpc_Node)) const
 {
    orpc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
 }
@@ -605,7 +604,7 @@ void C_GiNode::GenerateHint(void)
    }
    else
    {
-      const C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->ms32_Index);
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->ms32_Index);
 
       this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
 

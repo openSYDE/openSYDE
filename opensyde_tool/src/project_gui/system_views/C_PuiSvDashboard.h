@@ -26,6 +26,7 @@
 #include "C_PuiBsElements.h"
 #include "C_PuiSvDbDataElement.h"
 #include "C_PuiSvDbParam.h"
+#include "C_PuiSvDbTabChart.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -38,6 +39,12 @@ class C_PuiSvDashboard :
    public C_PuiBsElements
 {
 public:
+   enum E_TabType
+   {
+      eSCENE,
+      eCHART
+   };
+
    C_PuiSvDashboard(void);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
@@ -46,12 +53,16 @@ public:
    void SetName(const QString & orc_Value);
    const QString & GetComment() const;
    void SetComment(const QString & orc_Value);
+   E_TabType GetType(void) const;
+   void SetType(const E_TabType oe_Type);
    bool GetActive(void) const;
    void SetActive(const bool oq_Value);
    stw_types::sint32 GetTabIndex(void) const;
    void SetTabIndex(const stw_types::sint32 os32_Value);
    const std::vector<C_PuiSvDbChart> & GetCharts(void) const;
    void SetCharts(const std::vector<C_PuiSvDbChart> & orc_Value);
+   const C_PuiSvDbTabChart & GetTabChart(void) const;
+   void SetTabChart(const C_PuiSvDbTabChart & orc_Value);
    const C_PuiSvDbChart * GetChart(const stw_types::uint32 ou32_Index) const;
    const std::vector<C_PuiSvDbLabel> & GetLabels(void) const;
    void SetLabels(const std::vector<C_PuiSvDbLabel> & orc_Value);
@@ -211,6 +222,7 @@ public:
 
    //Util
    bool DiscardInvalidIndices(void);
+   void HandleCompatibilityChart(std::vector<C_PuiSvDashboard> & orc_NewCharts);
    static C_PuiSvDbDataElement::E_Type h_GetWidgetType(const C_PuiSvDbWidgetBase * const opc_Box);
 
    //Clear
@@ -218,7 +230,7 @@ public:
    virtual stw_types::uint32 Count(void) const;
 
 protected:
-   std::vector<C_PuiSvDbChart> mc_Charts;
+   std::vector<C_PuiSvDbChart> mc_Charts; // deprecated but needed for loading old projects
    std::vector<C_PuiSvDbLabel> mc_Labels;
    std::vector<C_PuiSvDbPieChart> mc_PieCharts;
    std::vector<C_PuiSvDbProgressBar> mc_ProgressBars;
@@ -227,12 +239,14 @@ protected:
    std::vector<C_PuiSvDbTable> mc_Tables;
    std::vector<C_PuiSvDbToggle> mc_Toggles;
    std::vector<C_PuiSvDbParam> mc_ParamWidgets;
+   C_PuiSvDbTabChart mc_TabChart;
 
 private:
    QString mc_Name;
    QString mc_Comment;
    bool mq_Active;
    stw_types::sint32 ms32_TabIndex;
+   E_TabType me_Type;
 
    void m_GetAllWidgetItems(std::vector<C_PuiSvDbWidgetBase *> & orc_Output);
    static void mh_MarkInvalid(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId);

@@ -43,6 +43,7 @@ public:
    void DeactivateAdditionalActions(void);
    void SetDarkMode(const bool oq_Active);
    void SetInteractive(const bool oq_Active);
+   void SetTabIconVisibility(const bool oq_Visibility) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

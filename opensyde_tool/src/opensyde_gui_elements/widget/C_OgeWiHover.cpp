@@ -71,16 +71,16 @@ static const uint32 mu32_RESIZE_VER_TOP = 8U;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Widget          Reference to embedded widget
-   \param[in]     oc_Title            String with title for showing in the heading
-   \param[in]     oc_Icon             Icon of which one
-   \param[in]     oq_Search           Flag if search function shall be active or not
-   \param[in,out] opc_ContainerWidget Optional widget for resize restriction
-   \param[in,out] opc_Parent          Optional pointer to parent
+   \param[in,out]  orc_Widget             Reference to embedded widget
+   \param[in]      orc_Title              String with title for showing in the heading
+   \param[in]      orc_Icon               Icon of which one
+   \param[in]      oq_Search              Flag if search function shall be active or not
+   \param[in,out]  opc_ContainerWidget    Optional widget for resize restriction
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, QString oc_Icon, const bool oq_Search,
-                           QWidget * const opc_ContainerWidget, QWidget * const opc_Parent) :
+C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, const QString & orc_Title, const QString & orc_Icon,
+                           const bool oq_Search, QWidget * const opc_ContainerWidget, QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiHover),
    mpc_Widget(&orc_Widget),
@@ -88,7 +88,7 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, QString oc_Ic
    mq_Maximized(true),
    mu32_MouseMode(mu32_MOUSE_MODE_NO_FUNC),
    mu32_ResizeMode(mu32_RESIZE_NONE),
-   mc_IconPath(oc_Icon),
+   mc_IconPath(orc_Icon),
    mq_SearchActive(oq_Search),
    msn_OffsetX(0),
    msn_OffsetY(0),
@@ -112,7 +112,7 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, QString oc_Ic
    this->mpc_Ui->pc_GroupBoxSearch->setVisible(this->mq_SearchActive);
 
    // set icons to elements
-   c_Icon.load(oc_Icon);
+   c_Icon.load(orc_Icon);
    this->mpc_Ui->pc_LabelIcon->setPixmap(QPixmap::fromImage(c_Icon));
    this->mpc_Ui->pc_LabelSearchImg->SetSvg("://images/IconSearch.svg");
    this->mpc_Ui->pc_BtnCancelSearch->SetCustomIcons(":images/DeleteSearchInput.svg",  // enabled
@@ -124,7 +124,7 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, QString oc_Ic
    InitStaticNames();
 
    // set title
-   this->mpc_Ui->pc_LabelTitle->setText(oc_Title);
+   this->mpc_Ui->pc_LabelTitle->setText(orc_Title);
    this->mpc_Ui->pc_LabelTitle->SetForegroundColor(3);
    this->mpc_Ui->pc_LabelTitle->SetFontPixel(13, false, true);
 
@@ -151,7 +151,7 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, QString oc_Ic
            this, &C_OgeWiHover::SigWiHoverMinBtnClicked);
    connect(this->mpc_Ui->pc_LabelIcon, &C_OgeLabDoubleClick::SigDoubleClicked,
            this, &C_OgeWiHover::SigWiHoverMinBtnClicked);
-}  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default destructor
@@ -159,10 +159,10 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, QString oc_Ic
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} Cleaned up via Qt parent mechanism
 C_OgeWiHover::~C_OgeWiHover()
 {
    delete mpc_Ui;
-   //lint -e{1740} Cleaned up via Qt parent mechanism
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -265,7 +265,7 @@ void C_OgeWiHover::ApplyDarkMode(const bool oq_Active)
    c_Color.setAlpha(128);
    pc_Shadow->setColor(c_Color);
    this->mpc_Ui->pc_GroupBox->setGraphicsEffect(pc_Shadow);
-}  //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Shadow and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot function for animation timer

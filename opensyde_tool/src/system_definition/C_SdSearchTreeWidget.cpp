@@ -142,7 +142,7 @@ bool C_SdSearchTreeWidget::Search(const QString & orc_SearchString)
 
    if (orc_SearchString != "")
    {
-      QString c_CounterResult = " (%1)";
+      const QString c_CounterResult = " (%1)";
 
       this->mc_SearchString = orc_SearchString;
 
@@ -533,13 +533,13 @@ void C_SdSearchTreeWidget::m_SearchHalcConfigurationContent(const stw_opensyde_c
 
                for (u32_ChannelCounter = 0U; u32_ChannelCounter < pc_HalcDef->c_Channels.size(); ++u32_ChannelCounter)
                {
-                  QString c_UserName = pc_HalcConf->c_ChannelConfigs[u32_ChannelCounter].c_Name.c_str();
-                  QString c_DefName = pc_HalcDef->c_Channels[u32_ChannelCounter].c_Name.c_str();
+                  const QString c_UserName = pc_HalcConf->c_ChannelConfigs[u32_ChannelCounter].c_Name.c_str();
+                  const QString c_DefName = pc_HalcDef->c_Channels[u32_ChannelCounter].c_Name.c_str();
 
                   if ((c_UserName.contains(this->mc_SearchString, Qt::CaseInsensitive) == true) ||
                       (c_DefName.contains(this->mc_SearchString, Qt::CaseInsensitive) == true))
                   {
-                     QString c_ShownName = c_UserName + " (" + c_DefName + ")";
+                     const QString c_ShownName = c_UserName + " (" + c_DefName + ")";
                      this->m_AddHalcChannelResult(c_DomainName, u32_DomainCounter, c_ShownName, u32_ChannelCounter,
                                                   true, orc_NodeName, ou32_NodeIndex, pc_HalcDef->e_Category);
                   }
@@ -625,7 +625,7 @@ bool C_SdSearchTreeWidget::m_CheckWhereToJumpCan(const QTreeWidgetItem * const o
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_ItemClicked(void)
 {
-   QTreeWidgetItem * pc_Item = this->currentItem();
+   QTreeWidgetItem * const pc_Item = this->currentItem();
 
    if (pc_Item != NULL)
    {
@@ -710,7 +710,7 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
                 (pc_Item->parent() == this->mpc_TreeItemRootMessages))
             {
                // Datapool or application index
-               sint32 s32_MainIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_2).toInt();
+               const sint32 s32_MainIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_2).toInt();
                // to make a difference between only datapool, list or dataelement
                sint32 s32_ListIndex = -1;
                sint32 s32_DataElementIndex = -1;
@@ -819,7 +819,7 @@ void C_SdSearchTreeWidget::m_AddNodeResult(const QString & orc_NodeName, const u
 
    mpc_TreeItemRootNodes->addChild(pc_Item);
    mpc_TreeItemRootNodes->setHidden(false);
-}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uint32 ou32_BusIndex,
@@ -851,7 +851,7 @@ void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uin
 
    mpc_TreeItemRootBusses->addChild(pc_Item);
    mpc_TreeItemRootBusses->setHidden(false);
-}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName, const uint32 ou32_DataPoolIndex,
@@ -875,7 +875,7 @@ void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName,
 
    mpc_TreeItemRootDataPools->addChild(pc_Item);
    mpc_TreeItemRootDataPools->setHidden(false);
-}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const uint32 ou32_ListIndex,
@@ -901,7 +901,7 @@ void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const u
 
    mpc_TreeItemRootLists->addChild(pc_Item);
    mpc_TreeItemRootLists->setHidden(false);
-}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, const uint32 ou32_MessageIndex,
@@ -939,7 +939,7 @@ void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, c
 
    mpc_TreeItemRootMessages->addChild(pc_Item);
    mpc_TreeItemRootMessages->setHidden(false);
-}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataElementName,
@@ -985,7 +985,7 @@ void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataEleme
 
    mpc_TreeItemRootDataElements->addChild(pc_Item);
    mpc_TreeItemRootDataElements->setHidden(false);
-}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_ApplicationName,
@@ -1010,7 +1010,7 @@ void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_Applicatio
 
    mpc_TreeItemRootApplications->addChild(pc_Item);
    mpc_TreeItemRootApplications->setHidden(false);
-}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Adding an entry for a found HALC element (domain or channel)
@@ -1073,7 +1073,7 @@ void C_SdSearchTreeWidget::m_AddHalcChannelResult(const QString & orc_HalcDomain
 
    mpc_TreeItemRootHalcChannels->addChild(pc_Item);
    mpc_TreeItemRootHalcChannels->setHidden(false);
-}  //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Setup/restore starting state

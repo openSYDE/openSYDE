@@ -407,7 +407,7 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
          // Adapt enable states if necessary
          if (q_NewBusPossible == true)
          {
-            C_OSCSystemBus c_OSCBus;
+            const C_OSCSystemBus c_OSCBus;
 
             if (q_ExistingBusExists == false)
             {
@@ -890,7 +890,7 @@ void C_SdNodeToNodeConnectionSetupWidget::m_CheckTypeRestrictions(bool & orq_New
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check the total number of datapools for both nodes
 
-   The total number of datapools is bounded above by mu32_NODE_DATA_POOL_MAX.
+   The total number of datapools is bounded above by C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE.
 
    \return
       true:  total number is ok
@@ -909,7 +909,7 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNodes(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check the total number of datapools for node 1
 
-   The total number of datapools is bounded above by mu32_NODE_DATA_POOL_MAX.
+   The total number of datapools is bounded above by C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE.
 
    \return
       true:  total number is ok
@@ -982,7 +982,7 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode1(void) const
       }
 
       // check if the resulting total number of datapools is too high
-      if ((pc_OscNode->c_DataPools.size() + u32_DatapoolsToAdd) > mu32_NODE_DATA_POOL_MAX)
+      if ((pc_OscNode->c_DataPools.size() + u32_DatapoolsToAdd) > C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE)
       {
          C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eERROR);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Datapool add"));
@@ -991,7 +991,7 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode1(void) const
                                                              "without exceeding the limit of %3 Datapools.")).
                                      arg(pc_OscNode->c_Properties.c_Name.c_str()).
                                      arg(u32_DatapoolsToAdd).
-                                     arg(mu32_NODE_DATA_POOL_MAX));
+                                     arg(C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE));
          c_MessageBox.SetCustomMinHeight(180, 180);
          c_MessageBox.Execute();
       }
@@ -1008,7 +1008,7 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode1(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check the total number of datapools for node 2
 
-   The total number of datapools is bounded above by mu32_NODE_DATA_POOL_MAX.
+   The total number of datapools is bounded above by C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE.
 
    \return
       true:  total number is ok
@@ -1081,7 +1081,7 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode2(void) const
       }
 
       // check if the resulting total number of datapools is too high
-      if ((pc_OscNode->c_DataPools.size() + u32_DatapoolsToAdd) > mu32_NODE_DATA_POOL_MAX)
+      if ((pc_OscNode->c_DataPools.size() + u32_DatapoolsToAdd) > C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE)
       {
          C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eERROR);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Datapool add"));
@@ -1090,7 +1090,7 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode2(void) const
                                                              "without exceeding the limit of %3 Datapools.")).
                                      arg(pc_OscNode->c_Properties.c_Name.c_str()).
                                      arg(u32_DatapoolsToAdd).
-                                     arg(mu32_NODE_DATA_POOL_MAX));
+                                     arg(C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE));
          c_MessageBox.SetCustomMinHeight(180, 180);
          c_MessageBox.Execute();
       }

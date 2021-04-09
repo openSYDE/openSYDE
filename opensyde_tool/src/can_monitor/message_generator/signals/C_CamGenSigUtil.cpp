@@ -115,7 +115,7 @@ void C_CamGenSigUtil::h_DecodeSignalValueToRaw(std::vector<uint8> & orc_Raw, con
       C_CamGenSigUtil::h_SetBit(orc_Signal.GetDataBytesBitPosOfSignalBit(u16_ItBit), orc_Raw, false);
    }
 
-   //Step 2: covert all bytes to array
+   //Step 2: convert all bytes to array
    for (uint8 u8_ItByte = 0U; u8_ItByte < 8U; ++u8_ItByte)
    {
       if (static_cast<uint32>(u8_ItByte) < orc_Raw.size())

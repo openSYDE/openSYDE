@@ -23,6 +23,7 @@
 #include "C_OSCNode.h"
 #include "C_SyvDcWidget.h"
 #include "C_OgePopUpDialog.h"
+#include "C_OSCLoggingHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -294,7 +295,7 @@ void C_SyvSeSetupWidget::StartDeviceConfiguration(void)
       pc_Dialog->CleanUp();
       c_New->HideOverlay();
    }
-}  //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function to prepare closing the scene
@@ -405,13 +406,16 @@ void C_SyvSeSetupWidget::m_SelectAllStateChanged(void)
    //Flag to ignore automated changes triggering this function
    if ((this->mq_IgnoreSelectAllCheckboxChanges == false) && (this->mpc_Scene != NULL))
    {
+      const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
       if (this->mpc_Ui->pc_CheckBoxSelectAll->isChecked())
       {
          this->mpc_Scene->SetAllNodesConnected(true);
+         osc_write_log_performance_stop(u16_Timer, "System Commisioning Setup Check All");
       }
       else
       {
          this->mpc_Scene->SetAllNodesConnected(false);
+         osc_write_log_performance_stop(u16_Timer, "System Commisioning Setup Uncheck All");
       }
    }
 }

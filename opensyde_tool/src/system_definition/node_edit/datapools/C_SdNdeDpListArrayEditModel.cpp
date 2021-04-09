@@ -367,7 +367,7 @@ QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const 
 bool C_SdNdeDpListArrayEditModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                                           const sintn osn_Role)
 {
-   bool q_Retval = false;
+   const bool q_Retval = false;
 
    if (data(orc_Index, osn_Role) != orc_Value)
    {
@@ -381,7 +381,6 @@ bool C_SdNdeDpListArrayEditModel::setData(const QModelIndex & orc_Index, const Q
                                        this->mu32_DataSetIndex,
                                        u32_Index, orc_Value);
 
-            //lint -e{1793} Qt example
             Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
             Q_EMIT this->SigErrorChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                                 this->mu32_ElementIndex, this->me_ArrayEditType,

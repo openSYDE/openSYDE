@@ -77,7 +77,7 @@ public:
 
    stw_types::sint32 InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bitrate);
 
-   // openSYDE protocol configuration (TBD: where and how do we set the timeout ?)
+   // openSYDE protocol configuration
    stw_types::sint32 OsySetPollingTimeout(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                           const stw_types::uint32 ou32_TimeoutMs) const;
    stw_types::sint32 OsyResetPollingTimeout(const C_OSCProtocolDriverOsyNode & orc_ServerId) const;
@@ -153,6 +153,9 @@ public:
    stw_types::sint32 SendOsyRequestTransferExitFileBased(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                          const stw_types::uint32 ou32_CrcOverData,
                                                          stw_types::uint8 * const opu8_NrCode = NULL) const;
+   stw_types::sint32 SendOsyRequestFileBasedTransferExitResult(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                               stw_scl::C_SCLString & orc_Result,
+                                                               stw_types::uint8 * const opu8_NrCode = NULL) const;
 
    stw_types::sint32 SendOsyRequestProgramming(const C_OSCProtocolDriverOsyNode & orc_ServerId) const;
    stw_types::sint32 SendOsyEcuReset(const C_OSCProtocolDriverOsyNode & orc_ServerId,
@@ -238,7 +241,7 @@ private:
 
    //Avoid call
    C_OSCComDriverFlash(const C_OSCComDriverFlash &);
-   C_OSCComDriverFlash & operator =(const C_OSCComDriverFlash &);
+   C_OSCComDriverFlash & operator =(const C_OSCComDriverFlash &); //lint !e1511 //we want to hide the base function
 
    void m_InitFlashProtocolStw(C_OSCFlashProtocolStwFlashloader * const opc_FlashProtocolStw,
                                const stw_types::uint8 ou8_LocalId);

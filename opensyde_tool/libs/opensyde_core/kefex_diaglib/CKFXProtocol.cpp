@@ -12,8 +12,8 @@
 //   .SPEC
 //   SWKE KEFEX
 //**************************************************************.DE*
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
@@ -56,8 +56,8 @@ uint16 C_KFXProcotolResponse::GetU16FromDataIntel(const uint8 ou8_StartIndex) co
    {
       return 0U;
    }
-   return static_cast<uint16>( static_cast<uint16>(au8_Data[ou8_StartIndex]) +
-                              (static_cast<uint16>((static_cast<uint16>(au8_Data[ou8_StartIndex + 1U])) << 8)));
+   return static_cast<uint16>(static_cast<uint16>(au8_Data[ou8_StartIndex]) +
+                              (static_cast<uint16>((static_cast<uint16>(au8_Data[ou8_StartIndex + 1U])) << 8U)));
 }
 
 //---------------------------------------------------------------------------
@@ -71,10 +71,10 @@ uint32 C_KFXProcotolResponse::GetU32FromDataIntel(const uint8 ou8_StartIndex) co
    {
       return 0U;
    }
-   return ( static_cast<uint32>(au8_Data[ou8_StartIndex]) +
-           ((static_cast<uint32>(au8_Data[ou8_StartIndex + 1U])) << 8) +
-           ((static_cast<uint32>(au8_Data[ou8_StartIndex + 2U])) << 16) +
-           ((static_cast<uint32>(au8_Data[ou8_StartIndex + 3U])) << 24));
+   return (static_cast<uint32>(au8_Data[ou8_StartIndex]) +
+           ((static_cast<uint32>(au8_Data[ou8_StartIndex + 1U])) << 8U) +
+           ((static_cast<uint32>(au8_Data[ou8_StartIndex + 2U])) << 16U) +
+           ((static_cast<uint32>(au8_Data[ou8_StartIndex + 3U])) << 24U));
 }
 
 //---------------------------------------------------------------------------
@@ -200,9 +200,11 @@ void C_KFXProtocol::ResetCommProtocol(void)
 C_KFXProtocol::~C_KFXProtocol()
 {
    this->ResetCommProtocol();
+   mpr_ResetCallBack = NULL;
    mpv_ResetCallBackInstance = NULL;
    mpc_Dispatcher = NULL;
    mpt_Config = NULL;
+   mpr_OnNewCyclicTransmissionReceived = NULL;
    mpv_CyclicCallbackInstance = NULL;
 }
 
@@ -216,9 +218,9 @@ C_KFXProtocol::~C_KFXProtocol()
 //**************************************************************.FE*
 sint32 C_KFXProtocol::ConfigChanged(void)
 {
-   uint8 u8_BaseID        = mpt_Config->GetBaseID();
-   uint8 u8_ClientAddress = mpt_Config->GetClientAddress();
-   uint8 u8_ServerAddress = mpt_Config->GetServerAddress();
+   const uint8 u8_BaseID        = mpt_Config->GetBaseID();
+   const uint8 u8_ClientAddress = mpt_Config->GetClientAddress();
+   const uint8 u8_ServerAddress = mpt_Config->GetServerAddress();
 
    //base-ID must be 0,2,4,6
    if ((u8_BaseID > 6U) || ((u8_BaseID & 0x01U) == 0x01U))
@@ -226,8 +228,9 @@ sint32 C_KFXProtocol::ConfigChanged(void)
       return C_RANGE;
    }
 
-   mu32_SendIDRQ     = (((static_cast<uint32>(u8_BaseID)) << 8) | ((static_cast<uint32>(u8_ClientAddress)) << 1));
-   mu32_ReceiveIDRSP = (((static_cast<uint32>(u8_BaseID)) << 8) | ((static_cast<uint32>(u8_ServerAddress)) << 1)) | 1U;
+   mu32_SendIDRQ     = (((static_cast<uint32>(u8_BaseID)) << 8U) | ((static_cast<uint32>(u8_ClientAddress)) << 1U));
+   mu32_ReceiveIDRSP = (((static_cast<uint32>(u8_BaseID)) << 8U) | ((static_cast<uint32>(u8_ServerAddress)) << 1U)) |
+                       1U;
 
    if (mpc_Dispatcher != NULL)
    {
@@ -250,7 +253,7 @@ sint32 C_KFXProtocol::m_SendMessage(T_STWCAN_Msg_TX & orc_Msg, const bool oq_Set
    }
    orc_Msg.u8_RTR = 0U;
 
-   sint32 s32_Return = mpc_Dispatcher->CAN_Send_Msg(orc_Msg);
+   const sint32 s32_Return = mpc_Dispatcher->CAN_Send_Msg(orc_Msg);
    if (u8_CreateCommProtocol > 0U)
    {
 #ifndef DIAGLIB_KEFEX_PROTOCOL_NO_LOGGING
@@ -268,6 +271,7 @@ sint32 C_KFXProtocol::SendLogonRequest(const uint16 ou16_TypeAddressCRC, const u
                                        const uint16 ou16_DataVersion, const uint16 ou16_NumOfVariables)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -282,11 +286,11 @@ sint32 C_KFXProtocol::SendLogonRequest(const uint16 ou16_TypeAddressCRC, const u
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = static_cast<uint8>(KFX_PROTOCOL_LOGON_HS);
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_TypeAddressCRC);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_TypeAddressCRC >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_TypeAddressCRC >> 8U);
    c_MSG.au8_Data[4] = static_cast<uint8>(ou16_DataVersion);
-   c_MSG.au8_Data[5] = static_cast<uint8>((ou16_DataVersion >> 8) | (static_cast<uint8>(ou8_ProjectIndex << 4)));
+   c_MSG.au8_Data[5] = static_cast<uint8>((ou16_DataVersion >> 8U) | (static_cast<uint8>(ou8_ProjectIndex << 4U)));
    c_MSG.au8_Data[6] = static_cast<uint8>(ou16_NumOfVariables);
-   c_MSG.au8_Data[7] = static_cast<uint8>(ou16_NumOfVariables >> 8);
+   c_MSG.au8_Data[7] = static_cast<uint8>(ou16_NumOfVariables >> 8U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
@@ -296,6 +300,7 @@ sint32 C_KFXProtocol::SendLogonRequest(const uint16 ou16_TypeAddressCRC, const u
 sint32 C_KFXProtocol::SendLogoffRequest(void)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -314,6 +319,7 @@ sint32 C_KFXProtocol::SendLogoffRequest(void)
 sint32 C_KFXProtocol::SendSRRRequest(const uint16 ou16_VariableIndex)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -323,7 +329,7 @@ sint32 C_KFXProtocol::SendSRRRequest(const uint16 ou16_VariableIndex)
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = KFX_PROTOCOL_SRR;
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_VariableIndex);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
@@ -333,6 +339,7 @@ sint32 C_KFXProtocol::SendSRRRequest(const uint16 ou16_VariableIndex)
 sint32 C_KFXProtocol::m_SendSRRRequest(const uint16 ou16_VariableIndex)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -342,7 +349,7 @@ sint32 C_KFXProtocol::m_SendSRRRequest(const uint16 ou16_VariableIndex)
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = KFX_PROTOCOL_SRR;
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_VariableIndex);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8U);
    c_MSG.au8_Data[4] = 0U;
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
@@ -351,10 +358,11 @@ sint32 C_KFXProtocol::m_SendSRRRequest(const uint16 ou16_VariableIndex)
 //---------------------------------------------------------------------------
 
 sint32 C_KFXProtocol::SendECRRRequest(const uint16 ou16_VariableIndex, const uint16 ou16_MaxWaitTime,
-                                      const uint8 ou8_UpperHysteresis,
-                                      const uint8 ou8_LowerHysteresis, const uint8 ou8_HysteresisBase)
+                                      const uint8 ou8_UpperHysteresis, const uint8 ou8_LowerHysteresis,
+                                      const uint8 ou8_HysteresisBase)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -368,11 +376,11 @@ sint32 C_KFXProtocol::SendECRRRequest(const uint16 ou16_VariableIndex, const uin
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = KFX_PROTOCOL_ECRR;
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_VariableIndex);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8U);
    c_MSG.au8_Data[4] = static_cast<uint8>(ou16_MaxWaitTime);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou16_MaxWaitTime >> 8);
-   c_MSG.au8_Data[6] = static_cast<uint8>((static_cast<uint8>(ou8_UpperHysteresis << 7)) | ou8_LowerHysteresis);
-   c_MSG.au8_Data[7] = static_cast<uint8>((static_cast<uint8>(ou8_HysteresisBase << 6)) | (ou8_UpperHysteresis >> 1));
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou16_MaxWaitTime >> 8U);
+   c_MSG.au8_Data[6] = static_cast<uint8>((static_cast<uint8>(ou8_UpperHysteresis << 7U)) | ou8_LowerHysteresis);
+   c_MSG.au8_Data[7] = static_cast<uint8>((static_cast<uint8>(ou8_HysteresisBase << 6U)) | (ou8_UpperHysteresis >> 1U));
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
@@ -383,6 +391,7 @@ sint32 C_KFXProtocol::SendTCRRRequest(const uint16 ou16_VariableIndex, const boo
                                       const uint16 ou16_Interval)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -399,18 +408,19 @@ sint32 C_KFXProtocol::SendTCRRRequest(const uint16 ou16_VariableIndex, const boo
       c_MSG.au8_Data[1] = KFX_PROTOCOL_TCRR;
    }
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_VariableIndex);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8U);
    c_MSG.au8_Data[4] = static_cast<uint8>(ou16_Interval);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou16_Interval >> 8);
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou16_Interval >> 8U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
 
 //---------------------------------------------------------------------------
 
-sint32 C_KFXProtocol::SendAbortIndividualResponseRequest (const uint16 ou16_VariableIndex, const bool oq_Handshake)
+sint32 C_KFXProtocol::SendAbortIndividualResponseRequest(const uint16 ou16_VariableIndex, const bool oq_Handshake)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -419,18 +429,19 @@ sint32 C_KFXProtocol::SendAbortIndividualResponseRequest (const uint16 ou16_Vari
    c_MSG.u8_DLC = 4U;
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = static_cast<uint8>((oq_Handshake == false) ? KFX_PROTOCOL_ABORT_INDIVIDUAL_RESPONSE :
-                                                                     KFX_PROTOCOL_ABORT_INDIVIDUAL_RESPONSE_HS);
+                                          KFX_PROTOCOL_ABORT_INDIVIDUAL_RESPONSE_HS);
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_VariableIndex);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
 
 //---------------------------------------------------------------------------
 
-sint32 C_KFXProtocol::SendAbortAllResponsesRequest (const bool oq_Handshake)
+sint32 C_KFXProtocol::SendAbortAllResponsesRequest(const bool oq_Handshake)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -439,16 +450,17 @@ sint32 C_KFXProtocol::SendAbortAllResponsesRequest (const bool oq_Handshake)
    c_MSG.u8_DLC = 2U;
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = static_cast<uint8>((oq_Handshake == false) ? KFX_PROTOCOL_ABORT_ALL_RESPONSES :
-                                                                     KFX_PROTOCOL_ABORT_ALL_RESPONSES_HS);
+                                          KFX_PROTOCOL_ABORT_ALL_RESPONSES_HS);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
 
 //---------------------------------------------------------------------------
 
-sint32 C_KFXProtocol::SendImmediateWriteRequest (const uint16 ou16_VariableIndex, const uint32 ou32_Value)
+sint32 C_KFXProtocol::SendImmediateWriteRequest(const uint16 ou16_VariableIndex, const uint32 ou32_Value)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -458,27 +470,28 @@ sint32 C_KFXProtocol::SendImmediateWriteRequest (const uint16 ou16_VariableIndex
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = static_cast<uint8>(KFX_PROTOCOL_IMMEDIATE_WRITE_HS);
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_VariableIndex);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8U);
    c_MSG.au8_Data[4] = static_cast<uint8>(ou32_Value);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Value >> 8);
-   c_MSG.au8_Data[6] = static_cast<uint8>(ou32_Value >> 16);
-   c_MSG.au8_Data[7] = static_cast<uint8>(ou32_Value >> 24);
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Value >> 8U);
+   c_MSG.au8_Data[6] = static_cast<uint8>(ou32_Value >> 16U);
+   c_MSG.au8_Data[7] = static_cast<uint8>(ou32_Value >> 24U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
 
 //---------------------------------------------------------------------------
 
-sint32 C_KFXProtocol::SendReadDataWordRequest (const uint8 ou8_Type, const uint32 ou32_Address)
+sint32 C_KFXProtocol::SendReadDataWordRequest(const uint8 ou8_Type, const uint32 ou32_Address)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
    }
    if (((ou8_Type != KFX_PROTOCOL_READ_EEPROM) && (ou8_Type != KFX_PROTOCOL_READ_FLASH_EEPROM) &&
-        (ou8_Type != KFX_PROTOCOL_READ_SRAM  ) && (ou8_Type != KFX_PROTOCOL_READ_EPROM)) ||
-        (ou32_Address > 0xFFFFFFU))
+        (ou8_Type != KFX_PROTOCOL_READ_SRAM) && (ou8_Type != KFX_PROTOCOL_READ_EPROM)) ||
+       (ou32_Address > 0xFFFFFFU))
    {
       return C_RANGE;
    }
@@ -488,24 +501,25 @@ sint32 C_KFXProtocol::SendReadDataWordRequest (const uint8 ou8_Type, const uint3
    c_MSG.au8_Data[1] = ou8_Type;
    c_MSG.au8_Data[2] = 0x00U;
    c_MSG.au8_Data[3] = static_cast<uint8>(ou32_Address);
-   c_MSG.au8_Data[4] = static_cast<uint8>(ou32_Address >> 8);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Address >> 16);
+   c_MSG.au8_Data[4] = static_cast<uint8>(ou32_Address >> 8U);
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Address >> 16U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
 
 //---------------------------------------------------------------------------
 
-sint32 C_KFXProtocol::SendReadDataByteRequest (const uint8 ou8_Type, const uint32 ou32_Address)
+sint32 C_KFXProtocol::SendReadDataByteRequest(const uint8 ou8_Type, const uint32 ou32_Address)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
    }
    if (((ou8_Type != KFX_PROTOCOL_READ_EEPROM) && (ou8_Type != KFX_PROTOCOL_READ_FLASH_EEPROM) &&
-        (ou8_Type != KFX_PROTOCOL_READ_SRAM  ) && (ou8_Type != KFX_PROTOCOL_READ_EPROM)) ||
-        (ou32_Address > 0xFFFFFFU))
+        (ou8_Type != KFX_PROTOCOL_READ_SRAM) && (ou8_Type != KFX_PROTOCOL_READ_EPROM)) ||
+       (ou32_Address > 0xFFFFFFU))
    {
       return C_RANGE;
    }
@@ -515,8 +529,8 @@ sint32 C_KFXProtocol::SendReadDataByteRequest (const uint8 ou8_Type, const uint3
    c_MSG.au8_Data[1] = ou8_Type;
    c_MSG.au8_Data[2] = 0x01U;
    c_MSG.au8_Data[3] = static_cast<uint8>(ou32_Address);
-   c_MSG.au8_Data[4] = static_cast<uint8>(ou32_Address >> 8);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Address >> 16);
+   c_MSG.au8_Data[4] = static_cast<uint8>(ou32_Address >> 8U);
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Address >> 16U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
@@ -527,13 +541,14 @@ sint32 C_KFXProtocol::SendWriteDataWordRequest(const uint8 ou8_Type, const uint3
                                                const uint8 oau8_Values[2])
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
    }
    if (((ou8_Type != KFX_PROTOCOL_WRITE_EEPROM_HS) && (ou8_Type != KFX_PROTOCOL_WRITE_FLASH_EEPROM_HS) &&
         (ou8_Type != KFX_PROTOCOL_WRITE_SRAM_HS)) ||
-        (ou32_Address > 0xFFFFFFU))
+       (ou32_Address > 0xFFFFFFU))
    {
       return C_RANGE;
    }
@@ -543,8 +558,8 @@ sint32 C_KFXProtocol::SendWriteDataWordRequest(const uint8 ou8_Type, const uint3
    c_MSG.au8_Data[1] = ou8_Type;
    c_MSG.au8_Data[2] = 0x00U;
    c_MSG.au8_Data[3] = static_cast<uint8>(ou32_Address);
-   c_MSG.au8_Data[4] = static_cast<uint8>(ou32_Address >> 8);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Address >> 16);
+   c_MSG.au8_Data[4] = static_cast<uint8>(ou32_Address >> 8U);
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Address >> 16U);
    c_MSG.au8_Data[6] = oau8_Values[0];
    c_MSG.au8_Data[7] = oau8_Values[1];
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
@@ -556,13 +571,14 @@ sint32 C_KFXProtocol::SendWriteDataWordRequest(const uint8 ou8_Type, const uint3
 sint32 C_KFXProtocol::SendWriteDataByteRequest(const uint8 ou8_Type, const uint32 ou32_Address, const uint8 ou8_Value)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
    }
    if (((ou8_Type != KFX_PROTOCOL_WRITE_EEPROM_HS) && (ou8_Type != KFX_PROTOCOL_WRITE_FLASH_EEPROM_HS) &&
         (ou8_Type != KFX_PROTOCOL_WRITE_SRAM_HS)) ||
-        (ou32_Address > 0xFFFFFFU))
+       (ou32_Address > 0xFFFFFFU))
    {
       return C_RANGE;
    }
@@ -572,8 +588,8 @@ sint32 C_KFXProtocol::SendWriteDataByteRequest(const uint8 ou8_Type, const uint3
    c_MSG.au8_Data[1] = ou8_Type;
    c_MSG.au8_Data[2] = 0x01U;
    c_MSG.au8_Data[3] = static_cast<uint8>(ou32_Address);
-   c_MSG.au8_Data[4] = static_cast<uint8>(ou32_Address >> 8);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Address >> 16);
+   c_MSG.au8_Data[4] = static_cast<uint8>(ou32_Address >> 8U);
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Address >> 16U);
    c_MSG.au8_Data[6] = ou8_Value;
    c_MSG.au8_Data[7] = 0x00U;
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
@@ -582,9 +598,10 @@ sint32 C_KFXProtocol::SendWriteDataByteRequest(const uint8 ou8_Type, const uint3
 
 //---------------------------------------------------------------------------
 
-sint32 C_KFXProtocol::SendUpdateTaskRequest (const uint16 ou16_TaskIndex, const bool oq_Handshake)
+sint32 C_KFXProtocol::SendUpdateTaskRequest(const uint16 ou16_TaskIndex, const bool oq_Handshake)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -596,9 +613,10 @@ sint32 C_KFXProtocol::SendUpdateTaskRequest (const uint16 ou16_TaskIndex, const 
    c_MSG.u32_ID = mu32_SendIDRQ;
    c_MSG.u8_DLC = 4U;
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
-   c_MSG.au8_Data[1] = static_cast<uint8>((oq_Handshake == false) ? KFX_PROTOCOL_UPDATE_TASK : KFX_PROTOCOL_UPDATE_TASK_HS);
+   c_MSG.au8_Data[1] =
+      static_cast<uint8>((oq_Handshake == false) ? KFX_PROTOCOL_UPDATE_TASK : KFX_PROTOCOL_UPDATE_TASK_HS);
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_TaskIndex);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_TaskIndex >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_TaskIndex >> 8U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
@@ -621,6 +639,7 @@ sint32 C_KFXProtocol::SendWriteEepromSslStartRequest(const uint16 ou16_NumFollow
 {
    T_STWCAN_Msg_TX c_MSG;
    uint16 u16_CRC;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -632,11 +651,11 @@ sint32 C_KFXProtocol::SendWriteEepromSslStartRequest(const uint16 ou16_NumFollow
    c_MSG.au8_Data[2] = 0x01U; //"START"
    c_MSG.au8_Data[3] = 0x00U; //reserved
    c_MSG.au8_Data[4] = static_cast<uint8>(ou16_NumFollowingWriteServices);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou16_NumFollowingWriteServices >> 8);
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou16_NumFollowingWriteServices >> 8U);
    u16_CRC = 0x1D0FU; //set CCITT25 start value
    C_SCLChecksums::CalcCRC16(&c_MSG.au8_Data[2], 4, u16_CRC);
    c_MSG.au8_Data[6] = static_cast<uint8>(u16_CRC);
-   c_MSG.au8_Data[7] = static_cast<uint8>(u16_CRC >> 8);
+   c_MSG.au8_Data[7] = static_cast<uint8>(u16_CRC >> 8U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
@@ -661,6 +680,7 @@ sint32 C_KFXProtocol::SendWriteEepromSslEndRequest(const uint16 ou16_NumRequeste
                                                    const uint16 ou16_CRCOverSentPayload)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -673,9 +693,9 @@ sint32 C_KFXProtocol::SendWriteEepromSslEndRequest(const uint16 ou16_NumRequeste
    c_MSG.au8_Data[2] = 0x02U; //"END"
    c_MSG.au8_Data[3] = 0x00U; //reserved
    c_MSG.au8_Data[4] = static_cast<uint8>(ou16_NumRequestedWriteServices);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou16_NumRequestedWriteServices >> 8);
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou16_NumRequestedWriteServices >> 8U);
    c_MSG.au8_Data[6] = static_cast<uint8>(ou16_CRCOverSentPayload);
-   c_MSG.au8_Data[7] = static_cast<uint8>(ou16_CRCOverSentPayload >> 8);
+   c_MSG.au8_Data[7] = static_cast<uint8>(ou16_CRCOverSentPayload >> 8U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
@@ -705,6 +725,7 @@ sint32 C_KFXProtocol::m_CalcHysteresis(const uint32 ou32_AbsoluteValue, uint8 * 
 {
    sint64 s64_Value;
    float64 f64_Factor;
+
    s64_Value = ou32_AbsoluteValue;
    if (oq_ForceBase == false)
    {
@@ -771,6 +792,7 @@ sint32 C_KFXProtocol::SendECRRRequestAbsolute(const uint16 ou16_VariableIndex, c
    uint8 u8_ValHigh;
    sint32 s32_Return;
    sint32 s32_Return2;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -790,20 +812,14 @@ sint32 C_KFXProtocol::SendECRRRequestAbsolute(const uint16 ou16_VariableIndex, c
       if (ou32_LowerHysteresis > ou32_UpperHysteresis)
       {
          u8_BaseHigh = u8_BaseLow;
-         s32_Return = m_CalcHysteresis(ou32_UpperHysteresis, &u8_BaseHigh, &u8_ValHigh, true);
-         if (s32_Return != C_NO_ERR)
-         {
-            return s32_Return;
-         }
+         //parameter has not changed and was already checked for range in preceeding call
+         (void)m_CalcHysteresis(ou32_UpperHysteresis, &u8_BaseHigh, &u8_ValHigh, true);
       }
       else
       {
          u8_BaseLow = u8_BaseHigh;
-         s32_Return = m_CalcHysteresis(ou32_LowerHysteresis, &u8_BaseLow, &u8_ValLow, true);
-         if (s32_Return != C_NO_ERR)
-         {
-            return s32_Return;
-         }
+         //parameter has not changed and was already checked for range in preceeding call
+         (void)m_CalcHysteresis(ou32_LowerHysteresis, &u8_BaseLow, &u8_ValLow, true);
       }
       s32_Return = C_WARN;
    }
@@ -816,11 +832,11 @@ sint32 C_KFXProtocol::SendECRRRequestAbsolute(const uint16 ou16_VariableIndex, c
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = KFX_PROTOCOL_ECRR;
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_VariableIndex);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8U);
    c_MSG.au8_Data[4] = static_cast<uint8>(ou16_MaxWaitTime);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou16_MaxWaitTime >> 8);
-   c_MSG.au8_Data[6] = static_cast<uint8>((static_cast<uint8>(u8_ValHigh << 7)) | u8_ValLow);
-   c_MSG.au8_Data[7] = static_cast<uint8>((static_cast<uint8>(u8_BaseLow << 6)) | (u8_ValHigh >> 1));
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou16_MaxWaitTime >> 8U);
+   c_MSG.au8_Data[6] = static_cast<uint8>((static_cast<uint8>(u8_ValHigh << 7U)) | u8_ValLow);
+   c_MSG.au8_Data[7] = static_cast<uint8>((static_cast<uint8>(u8_BaseLow << 6U)) | (u8_ValHigh >> 1U));
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    if (s32_Return == C_NO_ERR)
    {
@@ -884,12 +900,13 @@ sint32 C_KFXProtocol::m_EvalResponses(const uint16 ou16_TimeOut, const uint8 ou8
    uint32 u32_OldTime;
    sint32 s32_Return;
    bool q_SomeResponse = false;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
    }
    u32_OldTime = TGL_GetTickCount();
-   while(true)
+   while (true)
    {
       (void)mpc_Dispatcher->DispatchIncoming();
       s32_Return = C_NO_ERR;
@@ -911,8 +928,8 @@ sint32 C_KFXProtocol::m_EvalResponses(const uint16 ou16_TimeOut, const uint8 ou8
                   }
                   else
                   {
-                      //not what we want !
-                      q_SomeResponse = false;
+                     //not what we want !
+                     q_SomeResponse = false;
                   }
                }
 
@@ -943,6 +960,7 @@ sint32 C_KFXProtocol::m_EvalResponses(const uint16 ou16_TimeOut, const uint8 ou8
 void C_KFXProtocol::EvaluateAllResponses(void)
 {
    C_KFXProcotolResponse c_Dummy;
+
    (void)m_EvalResponses(0U, 0U, false, c_Dummy);
 }
 
@@ -983,31 +1001,33 @@ bool C_KFXProtocol::m_MessageReceived(const T_STWCAN_Msg_RX & orc_MSG)
       case KFX_PROTOCOL_SRR:          //no break (same format)
       case KFX_PROTOCOL_SERVICE_READ: //no break (same format)
          m_SetLastResponse(u8_Service,
-                           orc_MSG.au8_Data[1] + ((static_cast<uint32>(orc_MSG.au8_Data[2])) << 8), //index
-                           &orc_MSG.au8_Data[3], //value
+                           orc_MSG.au8_Data[1] + ((static_cast<uint32>(orc_MSG.au8_Data[2])) << 8U), //index
+                           &orc_MSG.au8_Data[3],                                                     //value
                            4U, q_Error);
          break;
       case KFX_PROTOCOL_SRR_FF:
          m_SetLastResponse(u8_Service,
-                           orc_MSG.au8_Data[1] + ((static_cast<uint32>(orc_MSG.au8_Data[2])) << 8), //index
-                           &orc_MSG.au8_Data[3], //numbytes + parameter + first two bytes
+                           orc_MSG.au8_Data[1] + ((static_cast<uint32>(orc_MSG.au8_Data[2])) << 8U), //index
+                           &orc_MSG.au8_Data[3],                                                     //numbytes +
+                                                                                                     // parameter +
+                                                                                                     // first two bytes
                            5U, q_Error);
          break;
       case KFX_PROTOCOL_SRR_CF:
          m_SetLastResponse(u8_Service,
-                           0U, //index N/A
+                           0U,                   //index N/A
                            &orc_MSG.au8_Data[1], //block number + six bytes
                            7U, q_Error);
          break;
       case KFX_PROTOCOL_IWR_FC:
          m_SetLastResponse(u8_Service,
-                           orc_MSG.au8_Data[1] + ((static_cast<uint32>(orc_MSG.au8_Data[2])) << 8), //index
-                           &orc_MSG.au8_Data[3], //blocksize + stmin
+                           orc_MSG.au8_Data[1] + ((static_cast<uint32>(orc_MSG.au8_Data[2])) << 8U), //index
+                           &orc_MSG.au8_Data[3],                                                     //blocksize + stmin
                            2U, q_Error);
          break;
       case KFX_PROTOCOL_ABORT_INDIVIDUAL_RESPONSE_HS:
          m_SetLastResponse(u8_Service,
-                           orc_MSG.au8_Data[1] + ((static_cast<uint32>(orc_MSG.au8_Data[2])) << 8), //index
+                           orc_MSG.au8_Data[1] + ((static_cast<uint32>(orc_MSG.au8_Data[2])) << 8U), //index
                            NULL,
                            0U, false);
          break;
@@ -1017,18 +1037,19 @@ bool C_KFXProtocol::m_MessageReceived(const T_STWCAN_Msg_RX & orc_MSG)
       case KFX_PROTOCOL_IMMEDIATE_WRITE_HS: //no break (same format)
       case KFX_PROTOCOL_SERVICE_WRITE:
          m_SetLastResponse(u8_Service,
-                           orc_MSG.au8_Data[1] + ((static_cast<uint32>(orc_MSG.au8_Data[2])) << 8), //index
-                           &orc_MSG.au8_Data[3], //possible error code
+                           orc_MSG.au8_Data[1] + ((static_cast<uint32>(orc_MSG.au8_Data[2])) << 8U), //index
+                           &orc_MSG.au8_Data[3],                                                     //possible error
+                                                                                                     // code
                            2U, q_Error);
          break;
       //response looks exactly the same for read and write(w/hs)
-      case KFX_PROTOCOL_READ_EEPROM:       //no break
-      case KFX_PROTOCOL_READ_FLASH_EEPROM: //no break
-      case KFX_PROTOCOL_READ_SRAM:         //no break
-      case KFX_PROTOCOL_READ_EPROM:        //no break
-      case KFX_PROTOCOL_WRITE_EEPROM_HS:   //no break
+      case KFX_PROTOCOL_READ_EEPROM:           //no break
+      case KFX_PROTOCOL_READ_FLASH_EEPROM:     //no break
+      case KFX_PROTOCOL_READ_SRAM:             //no break
+      case KFX_PROTOCOL_READ_EPROM:            //no break
+      case KFX_PROTOCOL_WRITE_EEPROM_HS:       //no break
       case KFX_PROTOCOL_WRITE_FLASH_EEPROM_HS: //no break
-      case KFX_PROTOCOL_WRITE_SRAM_HS:     //no break
+      case KFX_PROTOCOL_WRITE_SRAM_HS:         //no break
          if (orc_MSG.au8_Data[1] == 0U)
          {
             u8_Size = 2U;
@@ -1049,11 +1070,11 @@ bool C_KFXProtocol::m_MessageReceived(const T_STWCAN_Msg_RX & orc_MSG)
          }
          else
          {
-            u32_Address = orc_MSG.au8_Data[2] + (((static_cast<uint32>(orc_MSG.au8_Data[3])) << 8) +
-                                                 ((static_cast<uint32>(orc_MSG.au8_Data[4])) << 16));
+            u32_Address = orc_MSG.au8_Data[2] + (((static_cast<uint32>(orc_MSG.au8_Data[3])) << 8U) +
+                                                 ((static_cast<uint32>(orc_MSG.au8_Data[4])) << 16U));
          }
          m_SetLastResponse(u8_Service,
-                           u32_Address, //address
+                           u32_Address,  //address
                            &au8_Data[0], //value(s) or error
                            u8_Size, q_Error);
          break;
@@ -1065,14 +1086,16 @@ bool C_KFXProtocol::m_MessageReceived(const T_STWCAN_Msg_RX & orc_MSG)
          break;
       case KFX_PROTOCOL_LOGOFF_HS:
          m_SetLastResponse(u8_Service,
-                           0U,                  //no Index
-                           &orc_MSG.au8_Data[3],    //possible error code
+                           0U,                   //no Index
+                           &orc_MSG.au8_Data[3], //possible error code
                            2U, q_Error);
          break;
       case KFX_PROTOCOL_LOGON_HS:
          m_SetLastResponse(u8_Service,
-                           orc_MSG.au8_Data[5] + ((static_cast<uint32>(orc_MSG.au8_Data[6])) << 8), //num of variables
-                           &orc_MSG.au8_Data[1], //CRC and Versionnumber or Errorcode
+                           orc_MSG.au8_Data[5] + ((static_cast<uint32>(orc_MSG.au8_Data[6])) << 8U), //num of variables
+                           &orc_MSG.au8_Data[1],                                                     //CRC and
+                                                                                                     // Versionnumber or
+                                                                                                     // Errorcode
                            6U, q_Error);
          break;
       case KFX_PROTOCOL_STARTUP_INDICATION:
@@ -1089,20 +1112,20 @@ bool C_KFXProtocol::m_MessageReceived(const T_STWCAN_Msg_RX & orc_MSG)
          sint64 s64_Value;
          uint16 u16_Index;
          u16_Index = static_cast<uint16>(orc_MSG.au8_Data[1] +
-                   (static_cast<uint16>(static_cast<uint16>(orc_MSG.au8_Data[2]) << 8)));
+                                         (static_cast<uint16>(static_cast<uint16>(orc_MSG.au8_Data[2]) << 8U)));
          if (u8_Service == KFX_PROTOCOL_TCRR_TIMESTAMPED)
          {
-            s64_Value = orc_MSG.au8_Data[3] + (static_cast<uint16>(static_cast<uint16>(orc_MSG.au8_Data[4]) << 8));
-            u32_TimeStamp = orc_MSG.au8_Data[5] + (static_cast<uint32>(orc_MSG.au8_Data[6]) << 8) +
-                                                  (static_cast<uint32>(orc_MSG.au8_Data[7])<< 16);
+            s64_Value = orc_MSG.au8_Data[3] + (static_cast<uint16>(static_cast<uint16>(orc_MSG.au8_Data[4]) << 8U));
+            u32_TimeStamp = orc_MSG.au8_Data[5] + (static_cast<uint32>(orc_MSG.au8_Data[6]) << 8U) +
+                            (static_cast<uint32>(orc_MSG.au8_Data[7]) << 16U);
             q_IsTimeStamped = true;
          }
          else
          {
             s64_Value = static_cast<uint32>(orc_MSG.au8_Data[3])         +
-                      ((static_cast<uint32>(orc_MSG.au8_Data[4])) << 8)  +
-                      ((static_cast<uint32>(orc_MSG.au8_Data[5])) << 16) +
-                      ((static_cast<uint32>(orc_MSG.au8_Data[6])) << 24);
+                        ((static_cast<uint32>(orc_MSG.au8_Data[4])) << 8U)  +
+                        ((static_cast<uint32>(orc_MSG.au8_Data[5])) << 16U) +
+                        ((static_cast<uint32>(orc_MSG.au8_Data[6])) << 24U);
             u32_TimeStamp = 0U;
             q_IsTimeStamped = false;
          }
@@ -1114,8 +1137,9 @@ bool C_KFXProtocol::m_MessageReceived(const T_STWCAN_Msg_RX & orc_MSG)
          break;
       case KFX_PROTOCOL_WRITE_EEPROM_SSL:
          m_SetLastResponse(u8_Service,
-                           orc_MSG.au8_Data[4] + ((static_cast<uint32>(orc_MSG.au8_Data[5])) << 8), //num of services
-                           &orc_MSG.au8_Data[1], //subservice + payload
+                           orc_MSG.au8_Data[4] + ((static_cast<uint32>(orc_MSG.au8_Data[5])) << 8U), //num of services
+                           &orc_MSG.au8_Data[1],                                                     //subservice +
+                                                                                                     // payload
                            7U, q_Error);
          break;
       default:
@@ -1158,7 +1182,7 @@ sint32 C_KFXProtocol::SegmentedSRRTransfer(const uint16 ou16_Index, const uint32
 {
    sint32 s32_Return;
    T_STWCAN_Msg_TX t_MSG;
-   sint32 i;
+   sint32 s32_Message;
    uint32 u32_NumMessagesExpected;
    uint32 u32_NumMessagesReceived;
    uint32 u32_NumBytesReported;
@@ -1172,7 +1196,7 @@ sint32 C_KFXProtocol::SegmentedSRRTransfer(const uint16 ou16_Index, const uint32
       return C_RANGE;
    }
 
-   if (mpt_Config->GetBSMax() == 0)
+   if (mpt_Config->GetBSMax() == 0U)
    {
       return C_CONFIG;
    }
@@ -1195,13 +1219,14 @@ sint32 C_KFXProtocol::SegmentedSRRTransfer(const uint16 ou16_Index, const uint32
    {
       if (opu16_Error != NULL)
       {
-         *opu16_Error = c_Service.au8_Data[0] + (static_cast<uint16>((static_cast<uint16>(c_Service.au8_Data[1])) << 8));
+         *opu16_Error = c_Service.au8_Data[0] +
+                        (static_cast<uint16>((static_cast<uint16>(c_Service.au8_Data[1])) << 8U));
       }
       return C_WARN;
    }
 
-   u32_NumBytesReported = c_Service.au8_Data[0] + ((static_cast<uint32>(c_Service.au8_Data[1])) << 8) +
-                                                  ((static_cast<uint32>(c_Service.au8_Data[2])) << 16);
+   u32_NumBytesReported = c_Service.au8_Data[0] + ((static_cast<uint32>(c_Service.au8_Data[1])) << 8U) +
+                          ((static_cast<uint32>(c_Service.au8_Data[2])) << 16U);
    if (u32_NumBytesReported != ou32_NumBytesExpected)
    {
       return C_RD_WR;
@@ -1226,10 +1251,10 @@ sint32 C_KFXProtocol::SegmentedSRRTransfer(const uint16 ou16_Index, const uint32
    t_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    t_MSG.au8_Data[1] = KFX_PROTOCOL_SRR_FC;
    t_MSG.au8_Data[2] = static_cast<uint8>(ou16_Index);
-   t_MSG.au8_Data[3] = static_cast<uint8>(ou16_Index >> 8);
+   t_MSG.au8_Data[3] = static_cast<uint8>(ou16_Index >> 8U);
    t_MSG.au8_Data[4] = mpt_Config->GetBSMax();
    t_MSG.au8_Data[5] = mpt_Config->GetSTMin();
-   t_MSG.au8_Data[6] = 0U; //parameter (unused)
+   t_MSG.au8_Data[6] = 0U;             //parameter (unused)
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    s32_Return = m_SendMessage(t_MSG);
    if (s32_Return != C_NO_ERR)
@@ -1240,7 +1265,7 @@ sint32 C_KFXProtocol::SegmentedSRRTransfer(const uint16 ou16_Index, const uint32
 
    //now expect all the data frames and send another FC whenever we have received bBSMax messages
    u32_NumMessagesReceived = 0U;
-   for (i = 0; i < static_cast<sint32>(u32_NumMessagesExpected); i++)
+   for (s32_Message = 0; s32_Message < static_cast<sint32>(u32_NumMessagesExpected); s32_Message++)
    {
       //ProcessMessages is handled within EvaluateResponses ...
       s32_Return = this->EvaluateResponses(KFX_PROTOCOL_SRR_CF, c_Service);
@@ -1268,7 +1293,7 @@ sint32 C_KFXProtocol::SegmentedSRRTransfer(const uint16 ou16_Index, const uint32
          pu8_Act += 6;
       }
       u8_NextFCRequired--;
-      if ((u8_NextFCRequired == 0U) && (i != static_cast<sint32>(u32_NumMessagesExpected - 1U)))
+      if ((u8_NextFCRequired == 0U) && (s32_Message != static_cast<sint32>(u32_NumMessagesExpected - 1U)))
       {
          //now we must send another FC ...
          mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
@@ -1290,8 +1315,7 @@ sint32 C_KFXProtocol::SegmentedSRRTransfer(const uint16 ou16_Index, const uint32
 //C_COM          -> no response                                   \n
 //C_RD_WR        -> TX communication error or unexpected response \n
 //27.08.03 added retry on send failure
-sint32 C_KFXProtocol::SegmentedIWRTransfer(const uint16 ou16_Index, const uint32 ou32_NumBytes,
-                                           const uint8 * opu8_Data)
+sint32 C_KFXProtocol::SegmentedIWRTransfer(const uint16 ou16_Index, const uint32 ou32_NumBytes, const uint8 * opu8_Data)
 {
    //Sequence:
    //1. FF,
@@ -1307,8 +1331,8 @@ sint32 C_KFXProtocol::SegmentedIWRTransfer(const uint16 ou16_Index, const uint32
    uint32 u32_NumBytesLeft;
    uint8 u8_NextFCRequired;
    sint32 s32_Return;
-   sint32 i;
-   sint32 j;
+   sint32 s32_Message;
+   sint32 s32_MsCounter;
 
    if (opu8_Data == NULL)
    {
@@ -1326,11 +1350,11 @@ sint32 C_KFXProtocol::SegmentedIWRTransfer(const uint16 ou16_Index, const uint32
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = KFX_PROTOCOL_IWR_FF;
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_Index);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_Index >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_Index >> 8U);
    c_MSG.au8_Data[4] = static_cast<uint8>(ou32_NumBytes);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_NumBytes >> 8);
-   c_MSG.au8_Data[6] = static_cast<uint8>(ou32_NumBytes >> 16);
-   c_MSG.au8_Data[7] = 0U; //parameter (unused)
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_NumBytes >> 8U);
+   c_MSG.au8_Data[6] = static_cast<uint8>(ou32_NumBytes >> 16U);
+   c_MSG.au8_Data[7] = 0U;             //parameter (unused)
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    s32_Return = m_SendMessage(c_MSG);
    if (s32_Return != C_NO_ERR)
@@ -1356,7 +1380,7 @@ sint32 C_KFXProtocol::SegmentedIWRTransfer(const uint16 ou16_Index, const uint32
    u32_NumMessagesTotal = (ou32_NumBytes + 4U) / 5U;
    u32_NumMessagesSent  = 0U;
    u32_NumBytesLeft = ou32_NumBytes;
-   for (i = 0; i < static_cast<sint32>(u32_NumMessagesTotal); i++)
+   for (s32_Message = 0; s32_Message < static_cast<sint32>(u32_NumMessagesTotal); s32_Message++)
    {
       //send CF
       c_MSG.u32_ID = mu32_SendIDRQ;
@@ -1368,7 +1392,7 @@ sint32 C_KFXProtocol::SegmentedIWRTransfer(const uint16 ou16_Index, const uint32
       u32_NumBytesLeft -= 5U;
 
       //stop Codeguard from complaining
-      if (i < static_cast<sint32>(u32_NumMessagesTotal - 1U))
+      if (s32_Message < static_cast<sint32>(u32_NumMessagesTotal - 1U))
       {
          opu8_Data += 5;
       }
@@ -1382,7 +1406,7 @@ sint32 C_KFXProtocol::SegmentedIWRTransfer(const uint16 ou16_Index, const uint32
 
       u8_NextFCRequired--;
       u32_NumMessagesSent++;
-      if ((u8_NextFCRequired == 0U) && (i != static_cast<sint32>(u32_NumMessagesTotal - 1U)))
+      if ((u8_NextFCRequired == 0U) && (s32_Message != static_cast<sint32>(u32_NumMessagesTotal - 1U)))
       {
          //get next FC
          s32_Return = this->EvaluateResponses(KFX_PROTOCOL_IWR_FC, c_Service);
@@ -1403,7 +1427,7 @@ sint32 C_KFXProtocol::SegmentedIWRTransfer(const uint16 ou16_Index, const uint32
       {
          TGL_HandleSystemMessages();
       }
-      for (j = 0; j < u8_STMin; j++)
+      for (s32_MsCounter = 0; s32_MsCounter < u8_STMin; s32_MsCounter++)
       {
          TGL_HandleSystemMessages();
          TGL_DelayUs(1000);
@@ -1417,6 +1441,7 @@ sint32 C_KFXProtocol::SegmentedIWRTransfer(const uint16 ou16_Index, const uint32
 sint32 C_KFXProtocol::SendServiceReadRequest(const uint16 ou16_VariableIndex)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -1426,7 +1451,7 @@ sint32 C_KFXProtocol::SendServiceReadRequest(const uint16 ou16_VariableIndex)
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = KFX_PROTOCOL_SERVICE_READ;
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_VariableIndex);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
@@ -1436,6 +1461,7 @@ sint32 C_KFXProtocol::SendServiceReadRequest(const uint16 ou16_VariableIndex)
 sint32 C_KFXProtocol::SendServiceWriteRequest(const uint16 ou16_VariableIndex, const uint32 ou32_Value)
 {
    T_STWCAN_Msg_TX c_MSG;
+
    if (mpc_Dispatcher == NULL)
    {
       return C_NOACT;
@@ -1445,11 +1471,11 @@ sint32 C_KFXProtocol::SendServiceWriteRequest(const uint16 ou16_VariableIndex, c
    c_MSG.au8_Data[0] = mpt_Config->GetServerAddress();
    c_MSG.au8_Data[1] = KFX_PROTOCOL_SERVICE_WRITE;
    c_MSG.au8_Data[2] = static_cast<uint8>(ou16_VariableIndex);
-   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8);
+   c_MSG.au8_Data[3] = static_cast<uint8>(ou16_VariableIndex >> 8U);
    c_MSG.au8_Data[4] = static_cast<uint8>(ou32_Value);
-   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Value >> 8);
-   c_MSG.au8_Data[6] = static_cast<uint8>(ou32_Value >> 16);
-   c_MSG.au8_Data[7] = static_cast<uint8>(ou32_Value >> 24);
+   c_MSG.au8_Data[5] = static_cast<uint8>(ou32_Value >> 8U);
+   c_MSG.au8_Data[6] = static_cast<uint8>(ou32_Value >> 16U);
+   c_MSG.au8_Data[7] = static_cast<uint8>(ou32_Value >> 24U);
    mc_LastResponse.q_NewValue = false; //we don't have a response yet ...
    return m_SendMessage(c_MSG);
 }
@@ -1489,4 +1515,3 @@ void C_KFXProtocol::SetCommDispatcher(stw_can::C_CAN_Dispatcher * const opc_Disp
 }
 
 //--------------------------------------------------------------
-

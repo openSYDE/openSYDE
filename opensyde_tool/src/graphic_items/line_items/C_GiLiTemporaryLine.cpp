@@ -50,7 +50,7 @@ C_GiLiTemporaryLine::C_GiLiTemporaryLine(QGraphicsItem * const opc_Parent) :
    c_Pen.setStyle(Qt::DashLine);
    this->setPen(c_Pen);
    this->setLine(QLineF(0., 0., 0., 0.));
-   this->setCursor(QCursor(Qt::UpArrowCursor));
+   this->setCursor(static_cast<QCursor>(Qt::UpArrowCursor));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

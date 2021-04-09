@@ -115,7 +115,7 @@ sint32 C_OsyHexFile::ScanDeviceIdFromHexFile(C_SCLString & orc_DeviceID)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   extract device ID from hex-file
+/*! \brief   extract application information block from hex-file
 
    Scan through the hex-file and try to find the "application_info" structure.
    Then extract the information from it and return it.
@@ -125,7 +125,7 @@ sint32 C_OsyHexFile::ScanDeviceIdFromHexFile(C_SCLString & orc_DeviceID)
    \param[out]    orc_InfoBlock        application info block found in hex file
 
    \return
-   C_NO_ERR     everything OK (device ID in orc_DeviceID)
+   C_NO_ERR     everything OK
    C_WARN       multiple application blocks detected in hex file but device names match
                   output in this case is the first found application block
    C_NOACT      no application information block detected in hex file

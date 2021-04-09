@@ -68,7 +68,7 @@ C_SdManUnoTopologyReconnectBusCommand::C_SdManUnoTopologyReconnectBusCommand(QGr
                                           oq_ActivateDatapoolECoS, "Reconnect bus connetor(s) to new bus",
                                           opc_Parent)
 {
-   C_GiLiBusConnector * pc_BusConnector = m_GetBusConnector();
+   C_GiLiBusConnector * const pc_BusConnector = m_GetBusConnector();
 
    if (pc_BusConnector != NULL)
    {
@@ -83,7 +83,7 @@ C_SdManUnoTopologyReconnectBusCommand::C_SdManUnoTopologyReconnectBusCommand(QGr
                C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(s32_NodeIndex));
             if (pc_NodeData != NULL)
             {
-               const C_PuiSdNodeConnectionId * pc_ConnectionId = pc_BusConnector->GetConnectionData();
+               const C_PuiSdNodeConnectionId * const pc_ConnectionId = pc_BusConnector->GetConnectionData();
                if (pc_ConnectionId != NULL)
                {
                   const C_OSCNodeComInterfaceSettings * const pc_ComInterface =
@@ -127,11 +127,9 @@ void C_SdManUnoTopologyReconnectBusCommand::m_Reconnect(const uint64 & oru64_Sta
                                                         const bool oq_ActivateDatapoolECeS,
                                                         const bool oq_ActivateDatapoolECoS)
 {
-   
-   C_GiLiBus * pc_StartingBus = dynamic_cast<C_GiLiBus *>(m_GetSceneItem(oru64_StartingID));
-   
-   C_GiLiBus * pc_LastBus = dynamic_cast<C_GiLiBus *>(m_GetSceneItem(oru64_LastID));
-   C_GiLiBusConnector * pc_BusConnector = m_GetBusConnector();
+   C_GiLiBus * const pc_StartingBus = dynamic_cast<C_GiLiBus *>(m_GetSceneItem(oru64_StartingID));
+   C_GiLiBus * const pc_LastBus = dynamic_cast<C_GiLiBus *>(m_GetSceneItem(oru64_LastID));
+   C_GiLiBusConnector * const pc_BusConnector = m_GetBusConnector();
 
    if (pc_BusConnector != NULL)
    {

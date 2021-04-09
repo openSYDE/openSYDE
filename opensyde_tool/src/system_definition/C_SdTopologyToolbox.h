@@ -66,7 +66,7 @@ private:
 
    void m_FillToolboxDynamic(void);
    void m_FillToolboxStatic(void);
-   void m_FillToolboxWithDynamicNodes(const stw_opensyde_core::C_OSCDeviceDefinition & rc_Device);
+   void m_FillToolboxWithDynamicNodes(const stw_opensyde_core::C_OSCDeviceDefinition & orc_Device);
    void m_IconClearAllClicked(void);
    void m_ErrorHandlingUserFeedback(const QStringList & orc_Errors, const QStringList & orc_PathGood,
                                     const QStringList & orc_PathFail);

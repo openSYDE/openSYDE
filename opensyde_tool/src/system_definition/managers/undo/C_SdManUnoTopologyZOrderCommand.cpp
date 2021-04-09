@@ -80,7 +80,6 @@ void C_SdManUnoTopologyZOrderCommand::h_CheckZOrderPriority(const QList<QGraphic
          // search all bus connectors of the node or bus
          for (c_ItItem = orc_Items.begin(); c_ItItem != orc_Items.end(); ++c_ItItem)
          {
-            
             pc_BusConnectorItem = dynamic_cast<C_GiLiBusConnector *>(*c_ItItem);
 
             if (pc_BusConnectorItem != NULL)
@@ -105,7 +104,6 @@ void C_SdManUnoTopologyZOrderCommand::h_CheckZOrderPriority(const QList<QGraphic
       }
       else if ((*c_ItSelectedItem)->type() == msn_GRAPHICS_ITEM_BUS_CONNECT)
       {
-         
          pc_BusConnectorItem = dynamic_cast<C_GiLiBusConnector *>(*c_ItSelectedItem);
          mh_CheckZOrderOfBusConnectors(pc_BusConnectorItem, orc_NewZValues);
       }
@@ -152,7 +150,7 @@ void C_SdManUnoTopologyZOrderCommand::mh_InsertOrReplaceByMinimum(QMap<QGraphics
    QMap<QGraphicsItem *, float64>::iterator c_Found = orc_Map.find(opc_Key);
    if (c_Found != orc_Map.end())
    {
-      float64 f64_Improved = std::min(*c_Found, orf64_Value);
+      const float64 f64_Improved = std::min(*c_Found, orf64_Value);
       orc_Map.erase(c_Found);
       orc_Map.insert(opc_Key, f64_Improved);
    }

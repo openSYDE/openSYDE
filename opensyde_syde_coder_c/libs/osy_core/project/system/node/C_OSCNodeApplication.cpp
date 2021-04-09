@@ -114,16 +114,11 @@ C_SCLString C_OSCNodeApplication::h_ApplicationToString(const C_OSCNodeApplicati
 
    \param[in]  orc_String String to interpret
    \param[out] ore_Type   Application type
-
-   \return
-   C_NO_ERR   no error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeApplication::h_StringToApplication(const C_SCLString & orc_String,
-                                                   C_OSCNodeApplication::E_Type & ore_Type)
+void C_OSCNodeApplication::h_StringToApplication(const C_SCLString & orc_String,
+                                                 C_OSCNodeApplication::E_Type & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
-
    if (orc_String == "binary")
    {
       ore_Type = C_OSCNodeApplication::eBINARY;
@@ -140,6 +135,4 @@ sint32 C_OSCNodeApplication::h_StringToApplication(const C_SCLString & orc_Strin
                             "Invalid value for application type. Unknown type: " + orc_String + ". "
                             "Type is replaced with: " + h_ApplicationToString(C_OSCNodeApplication::eBINARY));
    }
-
-   return s32_Retval;
 }

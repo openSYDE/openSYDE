@@ -98,8 +98,7 @@ C_OSCComDriverProtocol::~C_OSCComDriverProtocol(void)
    this->mpc_CanTransportProtocolBroadcast = NULL;
    this->mpc_IpTransportProtocolBroadcast = NULL;
    this->mpc_IpDispatcher = NULL; //do not delete ! not owned by us
-
-   //lint -e{1740}  no memory leak because the ownership of mpc_SysDef was never transferred to this class
+   this->mpc_SysDef = NULL;       //do not delete ! not owned by us
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -767,6 +766,7 @@ bool C_OSCComDriverProtocol::IsInitialized(void) const
    C_NO_ERR   re-connected
    C_BUSY     could not re-connect to node
    C_RANGE    node not found or no openSYDE protocol installed
+   C_CONFIG   no transport protocol installed
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::ReConnectNode(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId) const
@@ -1954,9 +1954,7 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                // Routing started. Save the active node index of the last router node on the route
                this->mc_ActiveNodesLastCanRouters.push_back(u32_ActiveLastNode);
             }
-
-            //lint -e{429}  pc_RoutingDispatcher will be saved in mc_LegacyRouterDispatchers and deleted by destructor
-         }
+         } //lint !e429  //pc_RoutingDispatcher will be saved in mc_LegacyRouterDispatchers and deleted by destructor
       }
    }
 
@@ -2907,6 +2905,9 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32 ou32_A
 {
    sint32 s32_Return = C_RANGE;
 
+   oru32_ActiveIndexRouterClient = 0U;
+   oru32_ActiveIndexRouterTarget = 0U;
+
    if (ou32_ActiveIndexTarget < this->mc_Routes.size())
    {
       const C_OSCRoutingRoute & rc_Route = this->mc_Routes[ou32_ActiveIndexTarget];
@@ -3003,6 +3004,8 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2CanRouter(const uint32 ou32_
                                                               uint32 & oru32_ActiveIndexRouter)
 {
    sint32 s32_Return = C_RANGE;
+
+   oru32_ActiveIndexRouter = 0U;
 
    if (ou32_ActiveIndexTarget < this->mc_Routes.size())
    {

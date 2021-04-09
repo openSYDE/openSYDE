@@ -62,7 +62,7 @@ private:
                     const stw_opensyde_gui_logic::C_CieConverter::C_CIECommDefinition & orc_CIECommDef);
    void m_OnUnmappedCbxIndexChanged(const stw_types::sint32 os32_Index);
    void m_UpdateComboboxEntries(const stw_types::uint32 ou32_Index, const bool oq_Enable,
-                                C_CieDbcImportNodeAssignmentItemWidget * const opc_Sender);
+                                const C_CieDbcImportNodeAssignmentItemWidget * const opc_Sender);
 
    //Avoid call
    C_CieDbcImportNodeAssignmentWidget(const C_CieDbcImportNodeAssignmentWidget &);

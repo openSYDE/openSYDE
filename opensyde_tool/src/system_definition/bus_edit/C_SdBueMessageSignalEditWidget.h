@@ -54,8 +54,8 @@ public:
    void GetLastSelection(bool & orq_MessageSelected, QString & orc_MessageName, bool & orq_SignalSelected,
                          QString & orc_SignalName) const;
    void RefreshColors(void) const;
-   void ConnectAllChanges(void);
-   void DisconnectAllChanges(void);
+   void ConnectAllChanges(void) const;
+   void DisconnectAllChanges(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

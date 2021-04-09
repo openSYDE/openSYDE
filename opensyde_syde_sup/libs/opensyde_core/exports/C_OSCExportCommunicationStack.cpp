@@ -182,14 +182,25 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
 
    if (s32_Retval == C_NO_ERR)
    {
-      // make sure version is known and application is programmable
-      if ((c_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION) ||
-          (c_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION))
+      // make sure application is programmable
+      if (c_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
       {
          osc_write_log_error("Creating source code",
                              "Did not generate code for application \"" + c_Application.c_Name +
-                             "\" because code format version is unknown or application is not programmable.");
+                             "\" because application is not programmable.");
          s32_Retval = C_NOACT;
+      }
+      else
+      {
+         // make sure version is known
+         if (c_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
+         {
+            osc_write_log_error("Creating source code",
+                                "Did not generate code for application \"" + c_Application.c_Name +
+                                "\" because code format version \"" +
+                                C_SCLString::IntToStr(c_Application.u16_GenCodeVersion) + "\" is unknown.");
+            s32_Retval = C_NOACT;
+         }
       }
    }
 
@@ -1360,7 +1371,6 @@ void C_OSCExportCommunicationStack::mh_GroupSignalsByMuxValue(const C_OSCCanMess
             orc_SignalsPerValue[rc_Signal.u16_MultiplexValue].push_back(rc_Signal);
             break;
          default:
-            tgl_assert(false);
             break;
          }
       }

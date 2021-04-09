@@ -5,22 +5,58 @@ Content:   How to build this project
 
 Used Compiler:
 ==============
-MinGW: 5.3.0
+Windows: 
+   MinGW 5.3.0
+   CMake 3.18.1
+Ubuntu 20.04: 
+   GCC 9.3.0 (32-bit)
+   CMake 3.16.3
 
 Editor:
 =======
-Qt Creator 4.0.2
+Windows: Qt Creator 4.0.2
+Ubuntu: Qt Creator 4.11.0 
 
-build
-=====
-Open project file in Qt Creator and rebuild.
+How to build:
+=============
+Windows:
+   cd ../bat 
+   build.bat
+Ubuntu: 
+   cd ../bat
+   chmod +x ./build.sh
+   ./build.sh
+Other targets:
+   check infos in directory "target_integration" 
 
-Alternative build using CMake
-=============================
-PATH=C:\CMake\bin;C:\MinGW\bin   # adopt paths
-cd <project_root>/pjt
-mkdir build
-cd build
-cmake -G"MinGW Makefiles" ..
-mingw32-make all
-mingw32-make install
+
+How to use in Qt Creator:
+=========================
+Open project file CMakeLists.txt in Qt Creator and add CMAKE_TOOLCHAIN_FILE 
+variable to build settings (value = path to e.g. toolchain_windows.cmake).
+Make sure to use a 32 bit compiler.
+To get the resulting binary directly in result directory, 
+add build step "install" in project configuration.
+
+For building on a 64-bit Ubuntu machine but with a 32-bit compiler:
+- install gcc-multilib and g++-multilib
+- open Qt creator
+   - add new kit (Projects > Manage Kits > Add)
+   - adapt CMake configuration (Projects > Manage Kits > <YourNewKit> > CMake Configuration > Change)
+   - remove those two lines, because they else overwrite our configuration in the provided toolchain file:
+      CMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}
+      CMAKE_C_COMPILER:STRING=%{Compiler:Executable:C}
+   - adapt resp. add CMake flags (Projects > CMake):
+      CMAKE_CXX_FLAGS                  -m32
+      CMAKE_CXX_FLAGS_DEBUG            -m32
+      CMAKE_C_FLAGS                    -m32
+      CMAKE_C_FLAGS_DEBUG              -m32
+      CMAKE_SHARED_LINKER_FLAGS        "-m32"
+      CMAKE_SHARED_LINKER_FLAGS_DEBUG  "-m32"
+      CMAKE_CXX_COMPILER               /bin/g++ (should not be necessary, just to make sure)
+      CMAKE_TOOLCHAIN_FILE             ../pjt/toolchain_ubuntu.cmake (maybe using absolute path is safer)
+   - add build step "install"
+   - build project
+   - to verify the executable is 32-bit, execute "file SYDEsup" on command line
+
+

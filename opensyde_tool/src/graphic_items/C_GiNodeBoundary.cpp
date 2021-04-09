@@ -212,34 +212,34 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
          {
             //Draw Surrounding Rect
             opc_Painter->setPen(Qt::NoPen);
-            opc_Painter->setBrush(QBrush(mc_STYLE_GUIDE_COLOR_3));
+            opc_Painter->setBrush(static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_3));
             opc_Painter->drawRoundedRect(c_SurroundingRect, 12.0, 12.0);
 
             // Draw shadow as bigger rect than base -> smaller when surrounding rect is drawn
             c_ShadowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
-                                  static_cast<float64>(c_Rect.top()) + 2.0,
-                                  static_cast<float64>(c_Rect.width()) - 4.0,
-                                  static_cast<float64>(c_Rect.height()) - 4.0);
+                                 static_cast<float64>(c_Rect.top()) + 2.0,
+                                 static_cast<float64>(c_Rect.width()) - 4.0,
+                                 static_cast<float64>(c_Rect.height()) - 4.0);
          }
          else
          {
             // Draw shadow as bigger rect than base -> bigger when no surrounding rect
             c_ShadowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
-                                  static_cast<float64>(c_Rect.top()) + 2.0,
-                                  static_cast<float64>(c_Rect.width()) - 4.0,
-                                  static_cast<float64>(c_Rect.height()) - 3.0);
+                                 static_cast<float64>(c_Rect.top()) + 2.0,
+                                 static_cast<float64>(c_Rect.width()) - 4.0,
+                                 static_cast<float64>(c_Rect.height()) - 3.0);
          }
       }
       else
       {
          // Draw shadow as bigger rect than base -> bigger when no surrounding rect
          c_ShadowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
-                               static_cast<float64>(c_Rect.top()) + 2.0,
-                               static_cast<float64>(c_Rect.width()) - 4.0,
-                               static_cast<float64>(c_Rect.height()) - 3.0);
+                              static_cast<float64>(c_Rect.top()) + 2.0,
+                              static_cast<float64>(c_Rect.width()) - 4.0,
+                              static_cast<float64>(c_Rect.height()) - 3.0);
       }
       opc_Painter->setPen(Qt::NoPen);
-      opc_Painter->setBrush(QBrush(QColor(206, 206, 217)));
+      opc_Painter->setBrush(static_cast<QBrush>(QColor(206, 206, 217)));
       opc_Painter->drawRoundedRect(c_ShadowRect, 10.0, 10.0);
 
       // Scalings depending on assumed c_Rect with  w:210, h:137.5

@@ -142,14 +142,15 @@ bool C_SdNdeDpListHeaderUsageWidget::event(QEvent * const opc_Event)
 
       if (this->mpc_ToolTip->isVisible() == false)
       {
-         
          QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
          if (pc_HelpEvent != NULL)
          {
             const QString c_Text = static_cast<QString>("%1% %2 (%3 / %4)").arg(QString::number(this->GetProgress()),
-                                                                   C_GtGetText::h_GetText("used"),
-                                                                   C_Uti::h_GetByteCountAsString(this->mu32_Used),
-                                                                   C_Uti::h_GetByteCountAsString(this->mu32_Size));
+                                                                                C_GtGetText::h_GetText("used"),
+                                                                                C_Uti::h_GetByteCountAsString(this->
+                                                                                                              mu32_Used),
+                                                                                C_Uti::h_GetByteCountAsString(this->
+                                                                                                              mu32_Size));
             if (this->mq_ErrorToolTip == true)
             {
                this->mpc_ToolTip->SetHeading(this->mc_ToolTipErrorHeading);

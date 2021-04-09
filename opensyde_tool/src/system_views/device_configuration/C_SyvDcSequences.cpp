@@ -1137,7 +1137,7 @@ void C_SyvDcSequences::m_RunConfOpenSydeDevicesState(const uint32 ou32_Step, con
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::mh_ThreadFunc(void * const opv_Instance)
 {
-   //lint -e{925,9079}  This class is the only one which registers itself at the caller of this function. It must match.
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
    C_SyvDcSequences * const pc_Sequences = reinterpret_cast<C_SyvDcSequences * const>(opv_Instance);
 
    tgl_assert(pc_Sequences != NULL);
@@ -1183,6 +1183,9 @@ void C_SyvDcSequences::m_ThreadFunc(void)
          break;
       case eREADBACKETH:
          this->ms32_Result = this->m_ReadBackEth();
+         break;
+      default:
+         tgl_assert(false);
          break;
       }
    }
@@ -2765,8 +2768,8 @@ sint32 C_SyvDcSequences::m_SetCanOpenSydeBitrate(const C_OSCProtocolDriverOsyNod
 
                         if (q_SetBitrate == true)
                         {
-                           C_OSCProtocolDriverOsyNode c_StateConfiguredInterface(pc_Bus->u8_BusID,
-                                                                                 rc_InterfaceSettings.u8_NodeID);
+                           const C_OSCProtocolDriverOsyNode c_StateConfiguredInterface(pc_Bus->u8_BusID,
+                                                                                       rc_InterfaceSettings.u8_NodeID);
 
                            s32_Return = this->mpc_ComDriver->SendOsySetBitrate(
                               orc_ServerId, rc_InterfaceSettings.u8_InterfaceNumber,
@@ -2865,8 +2868,8 @@ sint32 C_SyvDcSequences::m_SetEthOpenSydeIpAddress(const C_OSCProtocolDriverOsyN
                       (rc_InterfaceSettings.q_IsBusConnected == true) &&
                       (rc_InterfaceSettings.e_InterfaceType == C_OSCSystemBus::eETHERNET))
                   {
-                     C_OSCProtocolDriverOsyNode c_StateConfiguredInterface(pc_Bus->u8_BusID,
-                                                                           rc_InterfaceSettings.u8_NodeID);
+                     const C_OSCProtocolDriverOsyNode c_StateConfiguredInterface(pc_Bus->u8_BusID,
+                                                                                 rc_InterfaceSettings.u8_NodeID);
 
                      s32_Return = this->mpc_ComDriver->SendOsySetIpAddressForChannel(
                         orc_ServerId, rc_InterfaceSettings.u8_InterfaceNumber,

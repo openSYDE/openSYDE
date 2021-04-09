@@ -36,3 +36,27 @@ padding-left: 10px;
 }
 
 /* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeMuTabChartFit
+{
+border-style: solid;
+border-width: 1px;
+padding: 0px;
+}
+
+stw_opensyde_gui_elements--C_OgeMuTabChartFit::item
+{
+height: 28px;
+border-style: solid;
+border-width: 0px;
+border-bottom-width: 1px;
+padding-left: 38px;
+padding-right: 11px;
+}
+
+stw_opensyde_gui_elements--C_OgeMuTabChartFit::icon
+{
+border-style: solid;
+border-width: 1px;
+padding: 5px;
+}
+/* --------------------------------------------------------------------- */

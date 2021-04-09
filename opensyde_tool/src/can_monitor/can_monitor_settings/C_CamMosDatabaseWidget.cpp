@@ -236,8 +236,8 @@ void C_CamMosDatabaseWidget::OnSigOsySysDefBusResult(const QString & orc_PathSys
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eWARNING);
       c_Message.SetHeading(C_GtGetText::h_GetText("Bus Selection"));
       c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                          "An error occurred on bus that was selected for database %1. "
-                                          "Returned to previous bus.")).arg(
+                                                       "An error occurred on bus that was selected for database %1. "
+                                                       "Returned to previous bus.")).arg(
                                   orc_PathSystemDefinition));
       c_Message.Execute();
    }

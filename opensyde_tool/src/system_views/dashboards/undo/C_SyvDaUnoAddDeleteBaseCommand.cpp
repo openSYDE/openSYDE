@@ -24,7 +24,6 @@
 #include "C_GiSvDaSliderBase.h"
 #include "C_GiSvDaTableBase.h"
 #include "C_GiSvDaProgressBarBase.h"
-#include "C_GiSvDaChartBase.h"
 #include "C_GiSvDaToggleBase.h"
 #include "C_PuiSvDbDataElement.h"
 #include "C_SyvDaDashboardScene.h"
@@ -87,7 +86,6 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_DeleteSave(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_Restore(void)
 {
-   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -109,7 +107,6 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_RestoreReadRailsOnly(void)
 {
    if (this->mc_SavedRailAssignments.size() > 0)
    {
-      
       C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
       if (pc_Scene != NULL)
@@ -268,7 +265,6 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::m_AddReadRailToInternalBackup(const C_OSC
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
 {
-   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -310,35 +306,31 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
 
                         //Backup scene data internally
                         //Widgets
-                        
+
                         pc_RectBase = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItRelatedItem);
                         if (pc_RectBase != NULL)
                         {
-                           
                            const C_GiSvDaLabelBase * const pc_Label  =
                               dynamic_cast<const C_GiSvDaLabelBase * const>(*c_ItRelatedItem);
-                           
+
                            const C_GiSvDaParam * const pc_ParamWidget  =
                               dynamic_cast<const C_GiSvDaParam * const>(*c_ItRelatedItem);
-                           
+
                            const C_GiSvDaSpinBoxBase * const pc_SpinBox  =
                               dynamic_cast<const C_GiSvDaSpinBoxBase * const>(*c_ItRelatedItem);
-                           
+
                            const C_GiSvDaSliderBase * const pc_Slider  =
                               dynamic_cast<const C_GiSvDaSliderBase * const>(*c_ItRelatedItem);
-                           
+
                            const C_GiSvDaProgressBarBase * const pc_ProgressBar  =
                               dynamic_cast<const C_GiSvDaProgressBarBase * const>(*c_ItRelatedItem);
-                           
+
                            const C_GiSvDaToggleBase * const pc_Toggle  =
                               dynamic_cast<const C_GiSvDaToggleBase * const>(*c_ItRelatedItem);
-                           
-                           const C_GiSvDaChartBase * const pc_Chart  =
-                              dynamic_cast<const C_GiSvDaChartBase * const>(*c_ItRelatedItem);
-                           
+
                            const C_GiSvDaPieChartBase * const pc_PieChart  =
                               dynamic_cast<const C_GiSvDaPieChartBase * const>(*c_ItRelatedItem);
-                           
+
                            const C_GiSvDaTableBase * const pc_Table  =
                               dynamic_cast<const C_GiSvDaTableBase * const>(*c_ItRelatedItem);
                            if (pc_Label != NULL)
@@ -427,21 +419,6 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                                     u64_CurUniqueID);
                               }
                            }
-                           if (pc_Chart != NULL)
-                           {
-                              const C_PuiSvDbChart * const pc_ChartData = pc_Dashboard->GetChart(
-                                 u32_Index);
-                              if (pc_ChartData != NULL)
-                              {
-                                 tgl_assert(this->mc_DataBackup.AddWidget(pc_ChartData, C_PuiSvDbDataElement::
-                                                                          eCHART) == C_NO_ERR);
-                                 this->mc_MapTypeAndIndexToID.insert(
-                                    C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::eCHART),
-                                                           this->mc_DataBackup.GetCharts().size() -
-                                                           1UL),
-                                    u64_CurUniqueID);
-                              }
-                           }
                            if (pc_PieChart != NULL)
                            {
                               const C_PuiSvDbPieChart * const pc_PieChartData =
@@ -521,7 +498,6 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Clear(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_Delete(void)
 {
-   
    C_SyvDaDashboardScene * const pc_Scene = dynamic_cast<C_SyvDaDashboardScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
@@ -622,8 +598,6 @@ const C_PuiSvDbWidgetBase * C_SyvDaUnoAddDeleteBaseCommand::mh_GetGenericWidget(
                dynamic_cast<const C_GiSvDaProgressBarBase * const>(opc_DataElement);
             const C_GiSvDaToggleBase * const pc_Toggle  =
                dynamic_cast<const C_GiSvDaToggleBase * const>(opc_DataElement);
-            const C_GiSvDaChartBase * const pc_Chart  =
-               dynamic_cast<const C_GiSvDaChartBase * const>(opc_DataElement);
             const C_GiSvDaPieChartBase * const pc_PieChart  =
                dynamic_cast<const C_GiSvDaPieChartBase * const>(opc_DataElement);
             const C_GiSvDaTableBase * const pc_Table  =
@@ -651,10 +625,6 @@ const C_PuiSvDbWidgetBase * C_SyvDaUnoAddDeleteBaseCommand::mh_GetGenericWidget(
             if (pc_Toggle != NULL)
             {
                pc_Retval = pc_Dashboard->GetToggle(u32_Index);
-            }
-            if (pc_Chart != NULL)
-            {
-               pc_Retval = pc_Dashboard->GetChart(u32_Index);
             }
             if (pc_PieChart != NULL)
             {

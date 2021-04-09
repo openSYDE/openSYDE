@@ -83,13 +83,11 @@ void C_NagTopListDelegate::paint(QPainter * const opc_Painter, const QStyleOptio
    c_Option.rect.adjust(s32_PaddingLeft, 0, 0, 0);
 
    //Never draw focus rectangle
-   //lint -e{730, 746, 1013, 1055} Use clean Qt interface
    c_Option.state.setFlag(QStyle::State_HasFocus, false);
 
    if (orc_Index.row() == this->ms32_Selected)
    {
       //Don't allow drawing of hovered state for selected item
-      //lint -e{730, 746, 1013, 1055} Use clean Qt interface
       c_Option.state.setFlag(QStyle::State_MouseOver, false);
       //Fill up padding for selection
       opc_Painter->save();

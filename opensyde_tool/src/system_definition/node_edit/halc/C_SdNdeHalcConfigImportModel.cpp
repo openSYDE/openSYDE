@@ -77,8 +77,9 @@ C_SdNdeHalcConfigImportModel::~C_SdNdeHalcConfigImportModel(void)
    \param[in]       orc_Config         HALC configuration of the current node
    \param[in]       orc_ImportConfig   Imported HALC configuration for updating
 
-   \retval   C_NO_ERR  No errors, model is initialized
-   \retval   C_NOACT   No domains does match (Id does not match), nothing to import
+   \retval   C_NO_ERR   No errors, model is initialized
+   \retval   C_NOACT    No domains does match (Id does not match), nothing to import
+   \retval   C_CHECKSUM Configuration is not compatible
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
@@ -155,7 +156,8 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
                      const C_OSCHalcDefChannelDef & rc_ImpChannelDef = rc_ImpDomain.c_Channels[u32_ImpChannelCounter];
 
                      pc_ChannelItem->c_Name =
-                        static_cast<QString>("%1 (%2)").arg(rc_ImpChannelConfig.c_Name.c_str(), rc_ImpChannelDef.c_Name.c_str());
+                        static_cast<QString>("%1 (%2)").arg(
+                           rc_ImpChannelConfig.c_Name.c_str(), rc_ImpChannelDef.c_Name.c_str());
                      pc_ChannelItem->c_ToolTipHeading = pc_ChannelItem->c_Name;
                      pc_ChannelItem->c_ToolTipContent =
                         this->m_CreateTooltipContent(u32_CurDomainCounter, u32_ImpChannelCounter);
@@ -173,6 +175,8 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
                            pc_ChannelItem->u32_Index = u32_CurChannelCounter;
                            pc_ChannelItem->q_Enabled = true;
                            pc_ChannelItem->q_Checkable = true;
+
+                           // Check if channel is still matching
 
                            break;
                         }
@@ -219,12 +223,11 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
 void C_SdNdeHalcConfigImportModel::GetAdaptedConfiguration(C_OSCHalcConfig & orc_AdaptedConfig)
 {
    uint32 u32_DomainCounter;
-   
+
    const C_SdNdeHalcConfigImportItem * pc_VisibleRootItem = NULL;
 
    if (this->mpc_InvisibleRootItem->c_Children.size() > 0)
    {
-      
       pc_VisibleRootItem =
          dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(this->mpc_InvisibleRootItem->c_Children[0]);
    }
@@ -236,7 +239,6 @@ void C_SdNdeHalcConfigImportModel::GetAdaptedConfiguration(C_OSCHalcConfig & orc
       for (u32_DomainCounter = 0UL; u32_DomainCounter < pc_VisibleRootItem->c_Children.size();
            ++u32_DomainCounter)
       {
-         
          const C_SdNdeHalcConfigImportItem * const pc_DomainItem =
             dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(pc_VisibleRootItem->c_Children[u32_DomainCounter]);
 
@@ -275,7 +277,6 @@ void C_SdNdeHalcConfigImportModel::GetAdaptedConfiguration(C_OSCHalcConfig & orc
                   for (u32_ChannelCounter = 0UL; u32_ChannelCounter < pc_DomainItem->c_Children.size();
                        ++u32_ChannelCounter)
                   {
-                     
                      const C_SdNdeHalcConfigImportItem * const pc_ChildItem =
                         dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(
                            pc_DomainItem->c_Children[u32_ChannelCounter]);
@@ -319,12 +320,11 @@ bool C_SdNdeHalcConfigImportModel::IsSelectionOfLinkedChannelsValid(std::vector<
 {
    bool q_LinkedValid = true;
    uint32 u32_DomainCounter;
-   
+
    const C_SdNdeHalcConfigImportItem * pc_VisibleRootItem = NULL;
 
    if (this->mpc_InvisibleRootItem->c_Children.size() > 0)
    {
-      
       pc_VisibleRootItem =
          dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(this->mpc_InvisibleRootItem->c_Children[0]);
    }
@@ -334,7 +334,6 @@ bool C_SdNdeHalcConfigImportModel::IsSelectionOfLinkedChannelsValid(std::vector<
       for (u32_DomainCounter = 0UL; u32_DomainCounter < pc_VisibleRootItem->c_Children.size();
            ++u32_DomainCounter)
       {
-         
          const C_SdNdeHalcConfigImportItem * const pc_DomainItem =
             dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(pc_VisibleRootItem->c_Children[u32_DomainCounter]);
          std::map<uint32, bool> c_LinkBuddyCheckStates;
@@ -348,7 +347,7 @@ bool C_SdNdeHalcConfigImportModel::IsSelectionOfLinkedChannelsValid(std::vector<
 
             const C_OSCHalcConfigDomain & rc_ImpDomainConfig =
                this->mc_ImportConfigCopy.c_Domains[pc_DomainItem->u32_ImportIndex];
-            const C_OSCHalcConfigDomain * pc_CopyDomainConfig =
+            const C_OSCHalcConfigDomain * const pc_CopyDomainConfig =
                this->mc_ConfigCopy.GetDomainConfigDataConst(pc_DomainItem->u32_Index);
 
             if (pc_CopyDomainConfig != NULL)
@@ -356,7 +355,6 @@ bool C_SdNdeHalcConfigImportModel::IsSelectionOfLinkedChannelsValid(std::vector<
                for (u32_ChannelCounter = 0UL; u32_ChannelCounter < pc_DomainItem->c_Children.size();
                     ++u32_ChannelCounter)
                {
-                  
                   const C_SdNdeHalcConfigImportItem * const pc_ChildItem =
                      dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(pc_DomainItem->c_Children[
                                                                                 u32_ChannelCounter]);
@@ -523,7 +521,7 @@ QVariant C_SdNdeHalcConfigImportModel::data(const QModelIndex & orc_Index, const
    if ((osn_Role == static_cast<sintn>(Qt::CheckStateRole)) &&
        (orc_Index.isValid() == true))
    {
-      //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
       C_SdNdeHalcConfigImportItem * const pc_TreeItem =
          static_cast<C_SdNdeHalcConfigImportItem * const>(orc_Index.internalPointer());
 
@@ -561,7 +559,7 @@ bool C_SdNdeHalcConfigImportModel::setData(const QModelIndex & orc_Index, const 
    {
       if (orc_Index.isValid() == true)
       {
-         //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
+         //lint -e{9079}  Result of Qt interface restrictions, set by index function
          C_SdNdeHalcConfigImportItem * const pc_TreeItem =
             static_cast<C_SdNdeHalcConfigImportItem * const>(orc_Index.internalPointer());
 
@@ -579,7 +577,6 @@ bool C_SdNdeHalcConfigImportModel::setData(const QModelIndex & orc_Index, const 
             // or has a parent
             this->m_CheckParent(pc_TreeItem, orc_Index, c_StartIndex);
 
-            //lint -e{1793} Qt example
             Q_EMIT (this->dataChanged(c_StartIndex, c_EndIndex, QVector<stw_types::sintn>() << osn_Role));
             q_Return = true;
          }
@@ -608,7 +605,7 @@ Qt::ItemFlags C_SdNdeHalcConfigImportModel::flags(const QModelIndex & orc_Index)
 
    if (orc_Index.isValid() == true)
    {
-      //lint -e{925,9079}  Result of Qt interface restrictions, set by index function
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_SdNdeHalcConfigImportItem * const pc_TreeItem =
          static_cast<const C_SdNdeHalcConfigImportItem * const>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
@@ -643,7 +640,6 @@ void C_SdNdeHalcConfigImportModel::m_CheckChildren(C_SdNdeHalcConfigImportItem *
 
       for (u32_ChildCounter = 0U; u32_ChildCounter < opc_TreeItem->c_Children.size(); ++u32_ChildCounter)
       {
-         
          C_SdNdeHalcConfigImportItem * const pc_ChildItem =
             dynamic_cast<C_SdNdeHalcConfigImportItem * const>(opc_TreeItem->c_Children[u32_ChildCounter]);
          const QModelIndex c_ChildIndex = this->index(u32_ChildCounter, 0, orc_ItemIndex);
@@ -673,7 +669,6 @@ void C_SdNdeHalcConfigImportModel::m_CheckParent(const C_SdNdeHalcConfigImportIt
 {
    if (opc_TreeItem->pc_Parent != NULL)
    {
-      
       C_SdNdeHalcConfigImportItem * const pc_ParentItem =
          dynamic_cast<C_SdNdeHalcConfigImportItem * const>(opc_TreeItem->pc_Parent);
 
@@ -688,7 +683,6 @@ void C_SdNdeHalcConfigImportModel::m_CheckParent(const C_SdNdeHalcConfigImportIt
          // Check the other children to get the necessary state of the parent
          for (u32_ChildCounter = 0U; u32_ChildCounter < pc_ParentItem->c_Children.size(); ++u32_ChildCounter)
          {
-            
             C_SdNdeHalcConfigImportItem * const pc_ChildItem =
                dynamic_cast<C_SdNdeHalcConfigImportItem * const>(pc_ParentItem->c_Children[u32_ChildCounter]);
 
@@ -757,7 +751,7 @@ QString C_SdNdeHalcConfigImportModel::m_CreateTooltipContent(const uint32 ou32_D
    if ((ou32_DomainIndex < this->mc_ImportConfigCopy.c_Domains.size()) &&
        (ou32_DomainIndex < this->mc_ConfigCopy.GetDomainSize()))
    {
-      const C_OSCHalcConfigDomain * pc_CurDomain =  this->mc_ConfigCopy.GetDomainConfigDataConst(ou32_DomainIndex);
+      const C_OSCHalcConfigDomain * const pc_CurDomain = this->mc_ConfigCopy.GetDomainConfigDataConst(ou32_DomainIndex);
       const C_OSCHalcConfigStandaloneDomain & rc_ImpDomain =  this->mc_ImportConfigCopy.c_Domains[ou32_DomainIndex];
 
       if ((pc_CurDomain != NULL) && (ou32_ChannelIndex < rc_ImpDomain.c_ChannelConfigs.size()))

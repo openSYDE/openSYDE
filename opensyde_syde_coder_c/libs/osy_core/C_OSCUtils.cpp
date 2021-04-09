@@ -14,7 +14,9 @@
 
 #include <cmath>
 #include <cctype>
+#include <limits>
 #include <fstream>
+#include <algorithm>
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_OSCUtils.h"
@@ -136,10 +138,12 @@ bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const floa
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
 {
+   //lint -e{8080} //using type expected by the library for compatibility
    size_t un_CharIndex = 0U;
    sint32 s32_Return = C_NO_ERR;
 
-   std::string c_Path = orc_Folder.c_str();
+   const std::string c_Path = orc_Folder.c_str();
+
    do
    {
       std::string c_PartialPath;
@@ -288,13 +292,13 @@ C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_Strin
       {
          c_Result[u32_Index] = '_';
       }
-      else if ((cn_Character == '*') && (u32_Index < orc_String.Length()) &&
+      else if ((u32_Index < orc_String.Length()) && (cn_Character == '*') &&
                (c_Result[u32_NextIndex] == '/'))
       {
          //prevent adding end of C comment
          c_Result[u32_Index] = '_';
       }
-      else if ((cn_Character == '\\') && (u32_Index == orc_String.Length()))
+      else if ((u32_Index == orc_String.Length()) && (cn_Character == '\\'))
       {
          //prevent continuing C++ comment
          c_Result[u32_Index] = '_';
@@ -380,11 +384,12 @@ bool C_OSCUtils::h_CheckValidFilePath(const C_SCLString & orc_String)
             if (rc_Substring != "..")
             {
                // skip if complete string starts with drive name or "."
-               if ((s32_Index > 0) ||
-                   ((rc_Substring != ".") /* . at beginning is allowed */ &&
-                    ((rc_Substring.Length() != 2U) || (rc_Substring.SubString(2, 1) != ':')) /* drive names e.g. C: */))
+               if ((s32_Index > 0) || (rc_Substring != ".")) /* . at beginning is allowed */
                {
-                  q_Return = h_CheckValidFileName(rc_Substring);
+                  if ((rc_Substring.Length() != 2U) || (rc_Substring.SubString(2, 1) != ':')) /* drive names e.g. C: */
+                  {
+                     q_Return = h_CheckValidFileName(rc_Substring);
+                  }
                }
             }
          }
@@ -413,8 +418,11 @@ bool C_OSCUtils::h_CheckValidFilePath(const C_SCLString & orc_String)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCUtils::h_IsScalingActive(const float64 of64_Factor, const float64 of64_Offset)
 {
-   return ((C_OSCUtils::h_IsFloat64NearlyEqual(of64_Factor, 1.0) == false) ||
-           (C_OSCUtils::h_IsFloat64NearlyEqual(of64_Offset, 0.0) == false));
+   bool q_Return = (C_OSCUtils::h_IsFloat64NearlyEqual(of64_Factor, 1.0) == false);
+
+   q_Return = (q_Return || (C_OSCUtils::h_IsFloat64NearlyEqual(of64_Offset, 0.0) == false));
+
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -422,20 +430,27 @@ bool C_OSCUtils::h_IsScalingActive(const float64 of64_Factor, const float64 of64
 
    returns ((value * factor) + offset)
 
-   \param[in]  of64_Value     Original unscaled value
-   \param[in]  of64_Factor    Scaling factor
-   \param[in]  of64_Offset    Scaling offset
+   \param[in]  of64_Value                 Original unscaled value
+   \param[in]  of64_Factor                Scaling factor
+   \param[in]  of64_Offset                Scaling offset
+   \param[in]  oq_AllowRangeAdaptation    Allow range adaptation
 
    \return
    Scaled value
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of64_Factor, const float64 of64_Offset)
+float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of64_Factor, const float64 of64_Offset,
+                                     const bool oq_AllowRangeAdaptation)
 {
    float64 f64_Result;
 
    f64_Result = of64_Value * of64_Factor;
    f64_Result += of64_Offset;
+
+   if (oq_AllowRangeAdaptation == true)
+   {
+      h_RangeCheckFloat(f64_Result);
+   }
 
    return f64_Result;
 }
@@ -443,7 +458,7 @@ float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of6
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Calculates a scaled value back to the unscaled value
 
-   returns ((value - of64_Offset) - offset)
+   returns ((value - offset) / factor)
 
    \param[in]  of64_Value     Scaled value
    \param[in]  of64_Factor    Scaling factor
@@ -528,5 +543,17 @@ void C_OSCUtils::h_FileToString(const C_SCLString & orc_FilePath, C_SCLString & 
       }
    }
    //Copy to output
-   orc_OutputString = C_SCLString(c_Input.c_str());
+   orc_OutputString = c_Input.c_str();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Range check float
+
+   \param[out]  orf64_Value   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCUtils::h_RangeCheckFloat(float64 & orf64_Value)
+{
+   orf64_Value = std::min(orf64_Value, std::numeric_limits<float64>::max());
+   orf64_Value = std::max(orf64_Value, -std::numeric_limits<float64>::max());
 }

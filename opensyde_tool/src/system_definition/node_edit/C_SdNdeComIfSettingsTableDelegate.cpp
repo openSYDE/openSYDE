@@ -116,7 +116,6 @@ void C_SdNdeComIfSettingsTableDelegate::setEditorData(QWidget * const opc_Editor
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
    {
-      
       QSpinBox * const pc_SpinBoxInt = dynamic_cast<QSpinBox * const>(opc_Editor);
 
       switch (orc_Index.column())
@@ -150,7 +149,6 @@ void C_SdNdeComIfSettingsTableDelegate::setModelData(QWidget * const opc_Editor,
 {
    if (((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true))
    {
-      
       QSpinBox * const pc_SpinBoxInt = dynamic_cast<QSpinBox * const>(opc_Editor);
 
       switch (orc_Index.column())
@@ -176,7 +174,6 @@ void C_SdNdeComIfSettingsTableDelegate::setModelData(QWidget * const opc_Editor,
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeComIfSettingsTableDelegate::m_CheckValue(const sintn & orsn_Value) const
 {
-   
    C_OgeSpxToolTipBase * const pc_Widget = dynamic_cast<C_OgeSpxToolTipBase * const>(this->sender());
 
    if (pc_Widget != NULL)

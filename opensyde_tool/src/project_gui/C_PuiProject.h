@@ -27,6 +27,8 @@ class C_PuiProject :
    public stw_opensyde_core::C_OSCProject
 {
 public:
+   virtual ~C_PuiProject(void);
+
    stw_types::sint32 Save(const bool oq_ForceSaveAll = false, const bool oq_UseDeprecatedFileFormatV2 = false);
    stw_types::sint32 Load(stw_types::uint16 * const opu16_FileVersion);
    bool HasHashChanged(void) const;
@@ -52,7 +54,6 @@ private:
 
    //Avoid calling
    C_PuiProject(void);
-   virtual ~C_PuiProject(void);
 
    stw_types::uint32 m_CalcHashProject(void) const;
    static void mh_AdaptProjectPathToSystemViews(const QString & orc_ProjectPath, QString & orc_SystemViewsPath);

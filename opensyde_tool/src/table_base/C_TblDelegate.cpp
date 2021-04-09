@@ -424,7 +424,6 @@ QWidget * C_TblDelegate::m_CreateGenericEditor(QWidget * const opc_Parent, const
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblDelegate::m_SetGenericEditorDataVariable(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
-
    C_OgeWiSpinBoxGroup * const pc_SpinBox = dynamic_cast<C_OgeWiSpinBoxGroup * const>(opc_Editor);
 
    if (pc_SpinBox != NULL)
@@ -465,7 +464,6 @@ void C_TblDelegate::m_CommitData(void)
 void C_TblDelegate::mh_SetModelGenericDataVariable(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                                    const QModelIndex & orc_Index)
 {
-
    C_OgeWiSpinBoxGroup * const pc_SpinBox = dynamic_cast<C_OgeWiSpinBoxGroup * const>(opc_Editor);
 
    if (pc_SpinBox != NULL)

@@ -92,7 +92,6 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
          //Get the value in the data type range
          const float64 f64_RangeValue = f64_Value - this->mf64_ScaledMin;
          //Check if the value fits in the step width and round if necessary
-         //lint -e{18,762,830,1055}  C++ 11 feature
          const float64 f64_Steps = std::round(f64_RangeValue / this->mf64_StepWidth);
          //Apply improved value
          orc_String =
@@ -113,7 +112,7 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
 /*! \brief   Validate current input string
 
    \param[in,out]  orc_Input  Input string
-   \param[in,out]  orc_Pos    Position
+   \param[in,out]  orsn_Pos   Position
 
    \return
    Invalid      Unusable
@@ -121,9 +120,9 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
    Acceptable   Completely valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-QValidator::State C_OgeSpxDoubleAutoFix::validate(QString & orc_Input, sintn & orc_Pos) const
+QValidator::State C_OgeSpxDoubleAutoFix::validate(QString & orc_Input, sintn & orsn_Pos) const
 {
-   QValidator::State e_Retval = C_OgeSpxDoubleToolTipBase::validate(orc_Input, orc_Pos);
+   QValidator::State e_Retval = C_OgeSpxDoubleToolTipBase::validate(orc_Input, orsn_Pos);
    if ((e_Retval == QValidator::Acceptable) && (this->mu64_NumberOfStepsAvailable > 0))
    {
       float64 f64_Value;

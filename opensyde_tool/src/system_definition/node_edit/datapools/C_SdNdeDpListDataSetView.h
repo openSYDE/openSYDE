@@ -31,7 +31,6 @@ namespace stw_opensyde_gui
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-//lint -e{1960} Forward declarations necessary for automatic registration
 class C_SdNdeDpListDataSetView :
    public C_TblViewScroll
 {

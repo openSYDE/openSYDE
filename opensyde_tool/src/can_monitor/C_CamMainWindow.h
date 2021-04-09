@@ -91,18 +91,18 @@ private:
    void m_ThreadFunc(void);
 
    void m_OnExpandSettings(const bool oq_Expand);
-   void m_OnSettingsSplitterHandleDoubleClick(void);
+   void m_OnSettingsSplitterHandleDoubleClick(void) const;
    void m_OnSettingsSplitterMoved(const stw_types::sint32 & ors32_Pos, const stw_types::sint32 & ors32_Index);
 
    void m_OnExpandMessageGen(const bool oq_Expand);
-   void m_OnMessageGenSplitterHandleDoubleClick(void);
+   void m_OnMessageGenSplitterHandleDoubleClick(void) const;
    void m_OnMessageGenSplitterMoved(const stw_types::sint32 & ors32_Pos, const stw_types::sint32 & ors32_Index);
 
    void m_RegisterCyclicMessage(const stw_types::uint32 ou32_MessageIndex, const bool oq_Active);
    void m_SendMessage(const stw_types::uint32 ou32_MessageIndex, const stw_types::uint32 ou32_TimeToSend);
    void m_RemoveAllCyclicMessages(void);
 
-   void m_OnClearOldConfiguration(void);
+   void m_OnClearOldConfiguration(void) const;
    void m_OnNewConfiguration(void);
    void m_OnDatabaseLoadStarted(const QString & orc_File, const QString & orc_OrgPath);
    void m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Result);

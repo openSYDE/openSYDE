@@ -85,7 +85,7 @@ uint16 C_OSCChecksummedIniFile::m_CalcCheckSum(const bool oq_Fast)
             {
                uint8 u8_Value;
                u8_Value = static_cast<uint8>(rc_String.c_str()[u32_Byte]);
-               u8_Value = static_cast<uint8>((static_cast<uint8>(u8_Value << 3)) + (u8_Value >> 5));
+               u8_Value = static_cast<uint8>((static_cast<uint8>(u8_Value << 3U)) + (u8_Value >> 5U));
                C_SCLChecksums::CalcCRC16STW(&u8_Value, 1U, u16_CheckSumCalc);
             }
          }

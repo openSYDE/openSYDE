@@ -119,7 +119,7 @@ void C_SyvDaItUtil::h_SyncFontSize(QLabel * const opc_Label1, QLabel * const opc
    Style with indentations
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaItUtil::mh_GetHtmlIndentStyle(const uint32 ou32_NumberOfTimes)
+QString C_SyvDaItUtil::h_GetHtmlIndentStyle(const uint32 ou32_NumberOfTimes)
 {
    return static_cast<QString>("style=\"margin-left:%1px\"").arg(ou32_NumberOfTimes * 10);
 }

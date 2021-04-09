@@ -66,6 +66,8 @@ C_OgeWiDashboardTab::C_OgeWiDashboardTab(QWidget * const opc_Parent, const bool 
    //Before mode
    m_InitContextMenu();
    m_HandleMode();
+   this->mpc_Ui->pc_LabelChartIcon->SetSvg("://images/system_views/dashboards/tab_chart/IconChartTab.svg");
+
    this->mpc_Ui->pc_PushButtonClose->setIconSize(QSize(16, 16));
    this->mpc_Ui->pc_PushButtonClose->SetToolTipInformation(C_GtGetText::h_GetText(""),
                                                            C_GtGetText::h_GetText("Delete Dashboard tab."));
@@ -73,6 +75,11 @@ C_OgeWiDashboardTab::C_OgeWiDashboardTab(QWidget * const opc_Parent, const bool 
    //Temporary remove of close action until reactivation feature is available
    //connect(this->mpc_Ui->pc_PushButtonClose, &QPushButton::clicked, this, &C_OgeWiDashboardTab::m_CloseAction);
    connect(this->mpc_Ui->pc_PushButtonClose, &QPushButton::clicked, this, &C_OgeWiDashboardTab::m_DeleteAction);
+
+   //retain X-button size when hidden
+   QSizePolicy c_SizePolicy = this->mpc_Ui->pc_PushButtonClose->sizePolicy();
+   c_SizePolicy.setRetainSizeWhenHidden(true);
+   this->mpc_Ui->pc_PushButtonClose->setSizePolicy(c_SizePolicy);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -81,10 +88,10 @@ C_OgeWiDashboardTab::C_OgeWiDashboardTab(QWidget * const opc_Parent, const bool 
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} Action pointers do not take ownership of qt items
 C_OgeWiDashboardTab::~C_OgeWiDashboardTab(void)
 {
    delete mpc_Ui;
-   //lint -e{1740} Action pointers do not take ownership of qt items
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,11 +102,8 @@ C_OgeWiDashboardTab::~C_OgeWiDashboardTab(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetText(const QString & orc_Text)
 {
-   const sintn sn_Offset = 24 + 30 + 6;
-   //this->mpc_Ui->pc_PushButtonClose->width() +
-   //this->mpc_Ui->pc_HorizontalSpacer1->sizeHint().width() +
-   //this->mpc_Ui->pc_HorizontalSpacer2->sizeHint().width()
-
+   // 30 = Icon, 10 = Icon <-> Text, 13 = X, 30 = space so everything fits
+   const sintn sn_Offset = 30 + 10 + 13 + 30;
    const QFontMetrics c_FontMetrics(this->mpc_Ui->pc_LabelName->font());
 
    this->mpc_Ui->pc_LabelName->setText(orc_Text);
@@ -215,6 +219,15 @@ void C_OgeWiDashboardTab::SetDarkMode(const bool oq_Active)
 {
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "DarkMode", oq_Active);
    this->mpc_Ui->pc_PushButtonClose->SetDarkMode(oq_Active);
+
+   if (oq_Active == true)
+   {
+      this->mpc_Ui->pc_LabelChartIcon->SetSvg("://images/system_views/dashboards/tab_chart/IconChartTabDark.svg");
+   }
+   else
+   {
+      this->mpc_Ui->pc_LabelChartIcon->SetSvg("://images/system_views/dashboards/tab_chart/IconChartTab.svg");
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -235,6 +248,19 @@ void C_OgeWiDashboardTab::SetInteractive(const bool oq_Active)
    {
       this->setContextMenuPolicy(Qt::NoContextMenu);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set tab icon visibility
+
+   If dashboard tab type is a chart set the tab icon visible, else not
+
+   \param[in]    oq_Visibility    tab icon visibility
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiDashboardTab::SetTabIconVisibility(const bool oq_Visibility) const
+{
+   this->mpc_Ui->pc_LabelChartIcon->setVisible(oq_Visibility);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

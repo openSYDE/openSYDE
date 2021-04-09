@@ -40,6 +40,7 @@
 #include "C_SdUtil.h"
 #include "TGLUtils.h"
 #include "C_OgePopUpDialog.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_SdNodeComIfSetupWidget.h"
 #include "C_SdNodeToNodeConnectionSetupWidget.h"
 #include "C_SdManTopologyBusConnectorReconnectManager.h"
@@ -103,7 +104,8 @@ C_SdTopologyScene::C_SdTopologyScene(const bool & orq_LoadSystemDefintion, QObje
    //Arrow
    mpc_ArrowCursorButton->setVisible(false);
    this->addItem(mpc_ArrowCursorButton);
-   connect(mpc_ArrowCursorButton, &C_GiArrowCursorButton::StartConnector, this, &C_SdTopologyScene::m_StartConnector);
+   connect(mpc_ArrowCursorButton, &C_GiArrowCursorButton::SigStartConnector,
+           this, &C_SdTopologyScene::m_StartConnector);
 
    // configure context menu
    connect(&this->mc_ContextMenuManager, &C_SdManTopologyContextMenuManager::SigEdit,
@@ -641,6 +643,7 @@ void C_SdTopologyScene::AddImage(const QString & orc_FilePath, const QPointF & o
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
 {
+   const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
    QGraphicsView * const pc_View = this->views().at(0);
    const C_PuiBsElements * const pc_Data = this->mc_CopyPasteManager.GetSnapshot(pc_View);
 
@@ -673,6 +676,7 @@ void C_SdTopologyScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
       this->mc_UndoManager.DoAddSnapshot(c_UniqueIDs, *pc_SnapShot, c_TotalOffset,
                                          this->GetHighestUsedZValueList(this->items()));
    }
+   osc_write_log_performance_stop(u16_Timer, "System Defintion Scene Paste");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1229,7 +1233,8 @@ void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
              (opc_Event->buttons().testFlag(Qt::LeftButton) == true) &&
              (this->m_IsRubberBandActive() == false))
          {
-            const C_GiTextElementBus * const pc_BusName = dynamic_cast<const C_GiTextElementBus * const>(rc_SelectedItems[0]);
+            const C_GiTextElementBus * const pc_BusName =
+               dynamic_cast<const C_GiTextElementBus * const>(rc_SelectedItems[0]);
 
             if (pc_BusName != NULL)
             {
@@ -1612,6 +1617,8 @@ bool C_SdTopologyScene::m_AddOfMime(const QMimeData * const opc_MimeData, const 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_Copy(void)
 {
+   const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
+
    QList<QGraphicsItem *> c_SelectedItems;
    QList<QGraphicsItem *> c_ToAdd;
    QList<QGraphicsItem *> c_ToRemove;
@@ -1624,7 +1631,8 @@ void C_SdTopologyScene::m_Copy(void)
    {
       //Bus
       C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
-      C_GiTextElementBus * const pc_TextBus = dynamic_cast<C_GiTextElementBus *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
+      C_GiTextElementBus * const pc_TextBus =
+         dynamic_cast<C_GiTextElementBus *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
       if (pc_Bus != NULL)
       {
          c_ToAdd.push_back(pc_Bus->GetTextElementBus());
@@ -1645,6 +1653,7 @@ void C_SdTopologyScene::m_Copy(void)
       c_SelectedItems.push_back(*c_ItItem);
    }
    this->m_CopyItemsToCopyPasteManager(c_SelectedItems);
+   osc_write_log_performance_stop(u16_Timer, "System Defintion Scene Copy");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1916,7 +1925,6 @@ void C_SdTopologyScene::m_SelectionChanged(void)
       {
          for (c_ItItem = c_SelectedItems.begin(); c_ItItem != c_SelectedItems.end(); ++c_ItItem)
          {
-
             C_GiLiBusConnector * const pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(*c_ItItem);
             if (pc_BusConnector != NULL)
             {
@@ -1930,13 +1938,11 @@ void C_SdTopologyScene::m_SelectionChanged(void)
       // triggered by signal selectionChanged
       if (c_SelectedItems.size() == 1)
       {
-
          C_GiBiRectBaseGroup * const pc_Item = dynamic_cast<C_GiBiRectBaseGroup *>(c_SelectedItems[0]);
 
          // check if the only one selected item is a resizable rectangle based item
          if (pc_Item != NULL)
          {
-
             C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(pc_Item);
             if (pc_Node != NULL)
             {
@@ -1950,14 +1956,12 @@ void C_SdTopologyScene::m_SelectionChanged(void)
          }
          else
          {
-
             C_GiLiLineGroup * const pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(c_SelectedItems[0]);
             if (pc_LineItem != NULL)
             {
                //Custom rubberband flag
                if (this->m_IsRubberBandActive() == true)
                {
-
                   C_GiLiBusConnector * const pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_LineItem);
                   if (pc_BusConnector == NULL)
                   {
@@ -1997,7 +2001,6 @@ void C_SdTopologyScene::m_SelectionChanged(void)
             }
             else
             {
-
                C_GiLiLineGroup * const pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(*c_ItItem);
                if (pc_LineItem != NULL)
                {
@@ -2086,7 +2089,6 @@ void C_SdTopologyScene::m_Edit(const QGraphicsItem * const opc_Item, const bool 
 
    if (opc_Item->type() == msn_GRAPHICS_ITEM_NODE)
    {
-
       const C_GiNode * const pc_Node = dynamic_cast<const C_GiNode *>(opc_Item);
 
       if (pc_Node != NULL)
@@ -2102,7 +2104,6 @@ void C_SdTopologyScene::m_Edit(const QGraphicsItem * const opc_Item, const bool 
             (opc_Item->type() == msn_GRAPHICS_ITEM_CANBUS) ||
             (opc_Item->type() == msn_GRAPHICS_ITEM_ETHERNETBUS))
    {
-
       const C_GiLiBus * const pc_Bus = dynamic_cast<const C_GiLiBus *>(opc_Item);
 
       if (pc_Bus != NULL)
@@ -2116,7 +2117,6 @@ void C_SdTopologyScene::m_Edit(const QGraphicsItem * const opc_Item, const bool 
    }
    else if (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS)
    {
-
       const C_GiTextElementBus * const pc_Text = dynamic_cast<const C_GiTextElementBus *>(opc_Item);
 
       if (pc_Text != NULL)
@@ -2313,7 +2313,7 @@ void C_SdTopologyScene::m_RestoreToolTips(void) const
    \param[in,out]  opc_NodeGraphicsItem   Pointer to existing node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_RemoveNodeOfScene(C_GiNode * const opc_NodeGraphicsItem)
+void C_SdTopologyScene::m_RemoveNodeOfScene(const C_GiNode * const opc_NodeGraphicsItem)
 {
    if (opc_NodeGraphicsItem != NULL)
    {
@@ -2337,7 +2337,7 @@ void C_SdTopologyScene::m_RemoveNodeOfScene(C_GiNode * const opc_NodeGraphicsIte
    \param[in,out]  opc_BusGraphicsItem    Pointer to existing bus
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_RemoveBusOfScene(C_GiLiBus * const opc_BusGraphicsItem)
+void C_SdTopologyScene::m_RemoveBusOfScene(const C_GiLiBus * const opc_BusGraphicsItem)
 {
    QList<QGraphicsItem *> c_Items = this->items();
    disconnect(opc_BusGraphicsItem, &C_GiLiBus::SigHideToolTip, this,
@@ -2399,7 +2399,7 @@ void C_SdTopologyScene::m_RemoveBusConnectorOfScene(C_GiLiBusConnector * const o
    \param[in,out]  opc_Item   Line arrow item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_RemoveLineArrowOfScene(C_GiSdArrow * const opc_Item)
+void C_SdTopologyScene::m_RemoveLineArrowOfScene(const C_GiSdArrow * const opc_Item)
 {
    if (opc_Item != NULL)
    {
@@ -2416,7 +2416,7 @@ void C_SdTopologyScene::m_RemoveLineArrowOfScene(C_GiSdArrow * const opc_Item)
    \param[in,out]  opc_Item   Boundary item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_RemoveBoundaryOfScene(C_GiSdBoundary * const opc_Item)
+void C_SdTopologyScene::m_RemoveBoundaryOfScene(const C_GiSdBoundary * const opc_Item)
 {
    if (opc_Item != NULL)
    {
@@ -2433,7 +2433,7 @@ void C_SdTopologyScene::m_RemoveBoundaryOfScene(C_GiSdBoundary * const opc_Item)
    \param[in,out]  opc_Item   Image group item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_RemoveImageGroupOfScene(C_GiSdImageGroup * const opc_Item)
+void C_SdTopologyScene::m_RemoveImageGroupOfScene(const C_GiSdImageGroup * const opc_Item)
 {
    if (opc_Item != NULL)
    {
@@ -2450,7 +2450,7 @@ void C_SdTopologyScene::m_RemoveImageGroupOfScene(C_GiSdImageGroup * const opc_I
    \param[in,out]  opc_Item   Text element
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_RemoveTextElementOfScene(C_GiSdTextElement * const opc_Item)
+void C_SdTopologyScene::m_RemoveTextElementOfScene(const C_GiSdTextElement * const opc_Item)
 {
    if (opc_Item != NULL)
    {
@@ -2469,7 +2469,7 @@ void C_SdTopologyScene::m_RemoveTextElementOfScene(C_GiSdTextElement * const opc
    \param[in,out]  opc_Item   Text element
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_RemoveTextElementBusOfScene(C_GiTextElementBus * const opc_Item)
+void C_SdTopologyScene::m_RemoveTextElementBusOfScene(const C_GiTextElementBus * const opc_Item)
 {
    if (opc_Item != NULL)
    {
@@ -2687,7 +2687,6 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
                }
                else
                {
-
                   pc_Other = dynamic_cast<C_GiBiCustomMouseItem *>(pc_Parent);
                   if ((pc_Other != NULL) && (pc_Node == NULL))
                   {
@@ -2728,7 +2727,6 @@ void C_SdTopologyScene::m_LeaveConnectState(void)
       //Reenable all nodes and busses
       for (QList<QGraphicsItem *>::const_iterator c_It = c_Items.begin(); c_It != c_Items.end(); ++c_It)
       {
-
          C_GiNode * const pc_Node = dynamic_cast<C_GiNode * const>(*c_It);
 
          C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus * const>(*c_It);
@@ -2779,7 +2777,6 @@ void C_SdTopologyScene::m_DisableEverythingForConnectState(const C_GiNode * cons
       //Disable all nodes and busses
       for (QList<QGraphicsItem *>::const_iterator c_It = c_Items.begin(); c_It != c_Items.end(); ++c_It)
       {
-
          C_GiNode * const pc_Node = dynamic_cast<C_GiNode * const>(*c_It);
 
          C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus * const>(*c_It);
@@ -2973,7 +2970,6 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
                //Map data index to unique index
                for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
                {
-
                   C_GiLiBus * const pc_Item = dynamic_cast<C_GiLiBus * const>(C_SebUtil::h_GetHighestParent(*c_ItItem));
 
                   if (pc_Item != NULL)
@@ -3019,7 +3015,6 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ShowInterfaceChangePopUp(QGraphicsItem * const opc_Item)
 {
-
    C_GiLiBusConnector * const pc_BusConn = dynamic_cast<C_GiLiBusConnector * const>(opc_Item);
 
    if (pc_BusConn != NULL)
@@ -3126,7 +3121,6 @@ void C_SdTopologyScene::m_BusConnectorReconnectionStart(const C_GiLiBusConnector
                                                         const C_OSCSystemBus::E_Type * const ope_Type,
                                                         C_GiLiBusConnectorBase * const opc_BusConnector)
 {
-
    m_EnterConnectState(ore_ConnectState, dynamic_cast<const C_GiNode * const>(opc_Item), ope_Type);
 
    this->mc_BusConnectorReconnectManager.StartReconnectMode(dynamic_cast<C_GiLiBusConnector * const>(opc_BusConnector),
@@ -3170,7 +3164,6 @@ void C_SdTopologyScene::m_CleanUpPorts(void) const
       //Node
       try
       {
-
          pc_Node = dynamic_cast<C_GiNode *>(C_SebUtil::h_GetHighestParent(*c_ItItem));
          if (pc_Node != NULL)
          {
@@ -3195,7 +3188,7 @@ void C_SdTopologyScene::m_CleanUpPorts(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RevertBusConnectorNode(stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                                                  stw_opensyde_gui::C_GiNode * const opc_StartingNode,
-                                                 stw_opensyde_gui::C_GiNode * const opc_LastNode,
+                                                 const stw_opensyde_gui::C_GiNode * const opc_LastNode,
                                                  const QPointF & orc_ScenePos) const
 {
    if (opc_BusConnector != NULL)

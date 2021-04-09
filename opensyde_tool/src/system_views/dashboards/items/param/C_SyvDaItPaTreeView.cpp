@@ -294,7 +294,6 @@ uint32 C_SyvDaItPaTreeView::GetSelectedItemCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::Init(stw_opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DataWidget)
 {
-   
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    this->mpc_DataWidget = opc_DataWidget;
@@ -317,7 +316,7 @@ void C_SyvDaItPaTreeView::Init(stw_opensyde_gui_logic::C_PuiSvDbDataElementHandl
       else
       {
          //Initialize with default values
-         std::vector<stw_types::sint32> c_Empty;
+         const std::vector<stw_types::sint32> c_Empty;
          this->SetColumnWidth(c_Empty);
       }
    }
@@ -643,7 +642,7 @@ bool C_SyvDaItPaTreeView::event(QEvent * const opc_Event)
    if (opc_Event->type() == QEvent::HoverMove)
    {
       // check if an ip address was hovered
-      
+
       QHoverEvent * const pc_HoverEvent = dynamic_cast<QHoverEvent * const>(opc_Event);
       bool q_IpAddressHovered = false;
       if (pc_HoverEvent != NULL)
@@ -652,7 +651,7 @@ bool C_SyvDaItPaTreeView::event(QEvent * const opc_Event)
          c_Index = this->indexAt(this->viewport()->mapFromGlobal(this->mapToGlobal(pc_HoverEvent->pos())));
          if (c_Index.isValid() == true)
          {
-            QVariant c_Data = this->mc_Model.data(c_Index, static_cast<sintn>(Qt::EditRole));
+            const QVariant c_Data = this->mc_Model.data(c_Index, static_cast<sintn>(Qt::EditRole));
             if (c_Data.type() == QVariant::Point)
             {
                q_IpAddressHovered = true;
@@ -721,7 +720,6 @@ bool C_SyvDaItPaTreeView::m_ColumnsSortedAsExpected(const std::vector<sint32> & 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
 {
-   
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
@@ -733,7 +731,7 @@ void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
       C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
       if ((u32_ValidLayers == 4UL) && (pc_ParamItem != NULL))
       {
-         C_PuiSvDbParam c_Copy = *pc_ParamItem;
+         const C_PuiSvDbParam c_Copy = *pc_ParamItem;
          bool q_ECU;
          QPointer<C_OgePopUpDialog> const c_Dialog = new C_OgePopUpDialog(
             pc_ParamWidget->GetPopUpParent(), pc_ParamWidget->GetPopUpParent());

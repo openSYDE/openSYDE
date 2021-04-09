@@ -107,24 +107,29 @@ void C_TblTreDataElementView::InitSD(const uint32 ou32_NodeIndex, const sint32 o
    \param[in] oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
    \param[in] oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
    \param[in] oq_ShowNVMLists           Optional flag to only show NVM LISTs
+   \param[in] opc_AlreasyUsedElements   Optional pointer to vector with already used elements. All added elements
+                                        will be marked as used an will be disabled. Usable for Datapool element mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::InitSV(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                                      const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements,
-                                     const bool oq_Show64BitValues, const bool oq_ShowNVMLists)
+                                     const bool oq_Show64BitValues, const bool oq_ShowNVMLists,
+                                     const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
    if (oq_ShowNVMLists == true)
    {
       this->me_Mode = C_TblTreDataElementModel::eNVM_LIST;
       this->mc_Model.InitSV(this->mu32_ViewIndex, C_TblTreDataElementModel::eNVM_LIST, oq_ShowOnlyWriteElements,
-                            oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues);
+                            oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues,
+                            opc_AlreasyUsedElements);
    }
    else
    {
       this->me_Mode = C_TblTreDataElementModel::eDATAPOOL_ELEMENT;
       this->mc_Model.InitSV(this->mu32_ViewIndex, C_TblTreDataElementModel::eDATAPOOL_ELEMENT, oq_ShowOnlyWriteElements,
-                            oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues);
+                            oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues,
+                            opc_AlreasyUsedElements);
    }
    m_RestoreExpandedIndices();
 }
@@ -179,16 +184,19 @@ void C_TblTreDataElementView::SetViewIndex(const uint32 ou32_ViewIndex)
    \param[in] oq_ShowArrayElements      Optional flag to hide all array elements (if false)
    \param[in] oq_ShowArrayIndexElements Show array index elements
    \param[in] oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
+   \param[in] opc_AlreasyUsedElements   Optional pointer to vector with already used elements. All added elements
+                                        will be marked as used an will be disabled.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::SwitchMode(const C_TblTreDataElementModel::E_Mode & ore_Mode,
                                          const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
-                                         const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues)
+                                         const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
+                                         const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
 {
    this->me_Mode = ore_Mode;
    this->mc_Model.InitSV(this->mu32_ViewIndex, ore_Mode, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                          oq_ShowArrayIndexElements,
-                         oq_Show64BitValues);
+                         oq_Show64BitValues, opc_AlreasyUsedElements);
    m_RestoreExpandedIndices();
 }
 
