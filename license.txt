@@ -33,7 +33,7 @@ Miniz                 MIT                       <no sources provided>           
 
 (*) Copies of the (unmodified) Qt library sources have not been placed in the openSYDE GitHub repository.
 These can be 
-- found e.g. under http://download.qt.io/archive/qt/5.7/5.7.0/single/
+- found e.g. under http://download.qt.io/new_archive/qt/5.7/5.7.0/single/
 - obtained by contacting STW
 
 The Qt libraries drag in a few other libraries with different licensing terms.

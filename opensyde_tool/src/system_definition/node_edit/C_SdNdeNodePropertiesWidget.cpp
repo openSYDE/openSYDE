@@ -751,10 +751,10 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             if (q_IsUpdateAvailable == true)
             {
                //defensive move
-               if ((pc_DevDef->u8_NumCanBusses - 1) > 0)
+               if ((pc_DevDef->u8_NumCanBusses) > 0)
                {
                   // if Protocol Cbx is KEFEX and we got ETH interfaces update shall be disabled
-                  if ((q_StwFlashloaderActive == true) && (u8_ComIfCnt > (pc_DevDef->u8_NumCanBusses - 1)))
+                  if ((q_StwFlashloaderActive == true) && (u8_ComIfCnt >= (pc_DevDef->u8_NumCanBusses)))
                   {
                      this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
                                                                            sn_ColUpdate)->setEnabled(false);
