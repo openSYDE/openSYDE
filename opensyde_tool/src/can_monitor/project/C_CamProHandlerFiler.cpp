@@ -140,7 +140,7 @@ void C_CamProHandlerFiler::h_SaveMessages(const std::vector<C_CamProMessageData>
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveMessage(const C_CamProMessageData & orc_Message, C_OSCXMLParserBase & orc_XMLParser)
 {
-   orc_XMLParser.SetAttributeUint32("has-valid-hash", orc_Message.q_ContainsValidHash);
+   orc_XMLParser.SetAttributeBool("has-valid-hash", orc_Message.q_ContainsValidHash);
    orc_XMLParser.SetAttributeUint32("hash", orc_Message.u32_Hash);
    orc_XMLParser.SetAttributeUint32("ID", orc_Message.u32_Id);
    orc_XMLParser.SetAttributeUint32("DLC", orc_Message.u16_Dlc);

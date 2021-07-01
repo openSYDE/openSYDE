@@ -55,12 +55,12 @@ C_GiNodeBoundary::C_GiNodeBoundary(const QString & orc_Text, const stw_types::fl
    mq_DrawWhiteFilter(false)
 {
    this->setFlag(ItemIsMovable);
-   this->Redraw();
 
    // Init z order
    this->setZValue(mf64_ZORDER_INIT_NODE);
 
    // set default font
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    this->SetFont(mc_STYLE_GUIDE_FONT_REGULAR_18);
 }
 
@@ -71,7 +71,6 @@ C_GiNodeBoundary::C_GiNodeBoundary(const QString & orc_Text, const stw_types::fl
 C_GiNodeBoundary::~C_GiNodeBoundary()
 {
    this->mpc_Shadow = NULL;
-   //lint -e{1740}  no memory leak because of the parent of mpc_Shadow and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -134,6 +133,7 @@ void C_GiNodeBoundary::paint(QPainter * const opc_Painter, const QStyleOptionGra
    It will be drawn into a pixmap which is used by the paint method
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in this implementation
 void C_GiNodeBoundary::Redraw(void)
 {
 }

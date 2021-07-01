@@ -9,9 +9,9 @@ del /s /f /q ..\temp\*.*
 
 cd ..\temp
 rem set path to C,C++,resource compilers
-SET PATH=%PATH%;C:\Qt\Qt5.7.0\Tools\mingw530_32\bin\
+SET PATH=C:\Qt\Qt5.15.2\Tools\mingw810_32\bin\;%PATH%
 rem set path to cmake
-SET PATH=%PATH%;%CWD%\cmake\bin\
+SET PATH=C:\Qt\Qt5.15.2\Tools\CMake_64\bin;%PATH%
 rem set path to ninja
 SET PATH=%PATH%;%CWD%\
 

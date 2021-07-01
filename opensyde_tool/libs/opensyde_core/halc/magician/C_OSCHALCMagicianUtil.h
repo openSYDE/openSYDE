@@ -24,7 +24,8 @@ class C_OSCHALCMagicianUtil
 public:
    C_OSCHALCMagicianUtil(void);
 
-   static stw_scl::C_SCLString h_GetDatapoolName(const bool oq_IsSafe);
+   static stw_scl::C_SCLString h_GetDatapoolName(const bool oq_IsSafe, const stw_types::uint32 ou32_CopyIndex = 0UL);
+   static stw_scl::C_SCLString h_GetDatapoolComment(const bool oq_IsSafe, const stw_types::uint32 ou32_CopyIndex = 0UL);
    static stw_scl::C_SCLString h_GetListName(const C_OSCHalcDefDomain::E_VariableSelector oe_Type);
    static stw_types::sint32 h_GetVariableName(const std::vector<C_OSCHalcDefStruct> & orc_DefinitionArray,
                                               const stw_types::uint32 ou32_ParameterIndexStruct,
@@ -43,9 +44,12 @@ public:
                                                             const stw_types::uint32 ou32_NumChannels,
                                                             const bool oq_AddDataset);
    static stw_scl::C_SCLString h_GetUseCaseVariableName(const stw_scl::C_SCLString & orc_DomainSingularName);
+   static C_OSCNodeDataPoolListElement h_GetSafetyFlagVariable(const stw_scl::C_SCLString & orc_DomainSingularName,
+                                                               const bool oq_IsSafe,
+                                                               const stw_types::uint32 ou32_NumChannels,
+                                                               const bool oq_AddDataset);
+   static stw_scl::C_SCLString h_GetSafetyFlagVariableName(const stw_scl::C_SCLString & orc_DomainSingularName);
    static void h_SetCommonDpElementDefaults(C_OSCNodeDataPoolListElement & orc_Element);
-   static bool h_CheckChanNumVariableNecessary(const C_OSCHalcConfigDomain & orc_Domain);
-   static bool h_CheckUseCaseVariableNecessary(const C_OSCHalcConfigDomain & orc_Domain);
 
 private:
    static stw_scl::C_SCLString mh_GetElementName(const C_OSCHalcDefElement & orc_Param,

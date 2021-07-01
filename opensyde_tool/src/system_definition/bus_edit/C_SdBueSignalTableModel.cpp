@@ -21,6 +21,7 @@
 #include "C_SdUtil.h"
 #include "C_SdTooltipUtil.h"
 #include "C_SdNdeDpContentUtil.h"
+#include "TGLUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -165,6 +166,9 @@ QVariant C_SdBueSignalTableModel::headerData(const sintn osn_Section, const Qt::
          case eUNIT:
             c_Retval = C_GtGetText::h_GetText("Unit");
             break;
+         default:
+            tgl_assert(false);
+            break;
          }
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
@@ -298,6 +302,9 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                            pc_OSCSignal->u16_MultiplexValue);
                      }
                      break;
+                  default:
+                     tgl_assert(false);
+                     break;
                   }
                }
                break;
@@ -409,6 +416,9 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   c_Retval = static_cast<QString>(pc_OSCSignalCommon->c_Unit.c_str());
                }
                break;
+            default:
+               tgl_assert(false);
+               break;
             }
          }
       }
@@ -494,6 +504,9 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
          case eSTART_BIT:
             //No decoration
             break;
+         default:
+            tgl_assert(false);
+            break;
          }
       }
       else if (osn_Role == static_cast<sintn>(Qt::FontRole))
@@ -522,6 +535,9 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
          case eMAXIMUM_VALUE:
          case eUNIT:
             c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
+            break;
+         default:
+            tgl_assert(false);
             break;
          }
          //Convert point to pixel

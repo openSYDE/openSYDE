@@ -71,13 +71,9 @@ C_TblDelegate::C_TblDelegate(QObject * const opc_Parent) :
 QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
                                       const QModelIndex & orc_Index) const
 {
-   QWidget * pc_Retval;
+   QWidget * pc_Retval = NULL;
 
-   if (orc_Index.data(msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == true)
-   {
-      pc_Retval = NULL;
-   }
-   else
+   if (orc_Index.data(msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == false)
    {
       C_OgeCbxTableBase * pc_ComboBox;
       C_OgeCbxMultiSelect * pc_MultiSelectComboBox;
@@ -150,13 +146,12 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
             tgl_assert(q_Ok == true);
             pc_Retval = m_CreateGenericEditor(opc_Parent, orc_Index, c_Min, c_Max, f64_Factor, f64_Offset, 0UL);
          }
-         else
-         {
-            pc_Retval = NULL;
-         }
+         break;
+      case eURIEL_NONE:
+         pc_Retval = QStyledItemDelegate::createEditor(opc_Parent, orc_Option, orc_Index);
          break;
       default:
-         pc_Retval = QStyledItemDelegate::createEditor(opc_Parent, orc_Option, orc_Index);
+         tgl_assert(false);
          break;
       }
    }
@@ -222,8 +217,11 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
    case eURIEL_GENERIC_SPIN_BOX:
       m_SetGenericEditorDataVariable(opc_Editor, orc_Index);
       break;
-   default:
+   case eURIEL_NONE:
       QStyledItemDelegate::setEditorData(opc_Editor, orc_Index);
+      break;
+   default:
+      tgl_assert(false);
       break;
    }
 }
@@ -304,8 +302,11 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
    case eURIEL_GENERIC_SPIN_BOX:
       mh_SetModelGenericDataVariable(opc_Editor, opc_Model, orc_Index);
       break;
-   default:
+   case eURIEL_NONE:
       QStyledItemDelegate::setModelData(opc_Editor, opc_Model, orc_Index);
+      break;
+   default:
+      tgl_assert(false);
       break;
    }
 }
@@ -374,6 +375,7 @@ E_UserRoleInteractionElementValue C_TblDelegate::mh_GetInteractionElementValue(c
       break;
    default:
       e_Retval = eURIEL_NONE;
+      break;
    }
    return e_Retval;
 }

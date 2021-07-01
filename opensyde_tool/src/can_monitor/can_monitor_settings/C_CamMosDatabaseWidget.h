@@ -13,6 +13,8 @@
 #define C_CAMMOSDATABASEWIDGET_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <QTimer>
+
 #include "C_OgeWiOnlyBackground.h"
 #include "C_CamMosDatabaseItemWidget.h"
 

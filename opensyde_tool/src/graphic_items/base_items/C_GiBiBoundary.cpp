@@ -104,7 +104,6 @@ C_GiBiBoundary::~C_GiBiBoundary()
 {
    //Deleted via Qt parent mechanism
    this->mpc_Rectangle = NULL;
-   //lint -e{1740}  no memory leak because of the parent of mpc_Rectangle and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

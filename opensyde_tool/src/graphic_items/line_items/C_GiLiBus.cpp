@@ -80,7 +80,7 @@ C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64
          }
          m_Init(c_UIBus.c_UIInteractionPoints);
          C_PuiSdHandler::h_GetInstance()->SetUIBus(ms32_Index, c_UIBus);
-         this->LoadData();
+         this->C_GiLiBus::LoadData();
       }
    }
 
@@ -91,7 +91,7 @@ C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64
       if ((C_OSCUtils::h_IsFloat64NearlyEqual(this->mpc_TextElementName->pos().x(), 0.0) == true) &&
           (C_OSCUtils::h_IsFloat64NearlyEqual(this->mpc_TextElementName->pos().y(), 0.0) == true))
       {
-         QPointF c_Pos = this->GetPos();
+         QPointF c_Pos = this->C_GiLiBus::GetPos();
          // Add a little offset to the text element
          c_Pos.setX(c_Pos.x() + 5.0);
          c_Pos.setY(c_Pos.y() + 20.0);

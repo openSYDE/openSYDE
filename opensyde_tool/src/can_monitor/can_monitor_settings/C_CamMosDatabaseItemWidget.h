@@ -87,6 +87,7 @@ private:
    bool mq_AlreadyAskedUserDelete;
    QDateTime mc_FileTimeStamp;
    bool mq_ButtonPressed;
+   bool mq_SuppressChangeSignal;
 
    //Avoid call
    C_CamMosDatabaseItemWidget(const C_CamMosDatabaseItemWidget &);

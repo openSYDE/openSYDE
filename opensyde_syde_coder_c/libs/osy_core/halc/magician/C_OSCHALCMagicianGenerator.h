@@ -34,15 +34,20 @@ private:
    stw_types::sint32 m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolList & orc_List,
                                                const C_OSCHalcConfigDomain & orc_Domain,
                                                const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
-                                               const stw_types::uint32 ou32_ItDomain, const bool oq_IsSafe) const;
+                                               const stw_types::uint32 ou32_ItDomain) const;
    stw_types::sint32 m_FillHALCDatapoolsChanNum(C_OSCNodeDataPoolList & orc_List,
                                                 const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
-                                                const stw_types::uint32 ou32_ItDomain, const bool oq_IsSafe,
+                                                const stw_types::uint32 ou32_ItDomain,
                                                 const stw_types::uint32 ou32_RelevantIndex,
                                                 const stw_types::uint32 ou32_ChanNum) const;
+   stw_types::sint32 m_FillHALCDatapoolsSafetyFlag(C_OSCNodeDataPoolList & orc_List,
+                                                   const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
+                                                   const stw_types::uint32 ou32_ItDomain,
+                                                   const stw_types::uint32 ou32_RelevantIndex,
+                                                   const bool oq_IsSafetyRelevant) const;
    stw_types::sint32 m_FillHALCDatapoolsUseCase(C_OSCNodeDataPoolList & orc_List,
                                                 const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
-                                                const stw_types::uint32 ou32_ItDomain, const bool oq_IsSafe,
+                                                const stw_types::uint32 ou32_ItDomain,
                                                 const stw_types::uint32 ou32_RelevantIndex,
                                                 const stw_types::uint32 ou32_UseCase) const;
    stw_types::sint32 m_FillHALCDatapoolsChannel(C_OSCNodeDataPoolList & orc_List,
@@ -60,7 +65,8 @@ private:
                                                           C_OSCNodeDataPoolList & orc_HALCListInput,
                                                           C_OSCNodeDataPoolList & orc_HALCListOutput,
                                                           C_OSCNodeDataPoolList & orc_HALCListStatus,
-                                                          const bool oq_IsSafe);
+                                                          const bool oq_IsSafe,
+                                                          const C_OSCHALCMagicianDatapoolListHandler & orc_DpHandler);
    static stw_types::sint32 mh_GenerateVariablesForVector(const std::vector<C_OSCHalcDefStruct> & orc_Definition,
                                                           const stw_scl::C_SCLString & orc_DomainSingularName,
                                                           const bool oq_IsSafe,
@@ -91,6 +97,14 @@ private:
    static void mh_InitList(C_OSCNodeDataPoolList & orc_List, const stw_scl::C_SCLString & orc_Name,
                            const bool oq_AddDataset = false);
    static void mh_CleanUpHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools);
+   void m_FillEmptySpaceHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools) const;
+   bool m_CheckTwoDp(void) const;
+   stw_types::sint32 m_HandleCopies(std::vector<C_OSCNodeDataPool> & orc_Datapools) const;
+   stw_types::sint32 m_HandleNVM(std::vector<C_OSCNodeDataPool> & orc_Datapools) const;
+   stw_types::sint32 m_HandleNVMDpOffset(std::vector<C_OSCNodeDataPool> & orc_Datapools,
+                                         const std::vector<stw_types::uint32> & orc_Offsets,
+                                         const bool oq_IsSafe) const;
+   void m_HandleVersion(C_OSCNodeDataPool & orc_Datapool) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

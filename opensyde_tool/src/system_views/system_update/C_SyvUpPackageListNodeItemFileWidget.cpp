@@ -11,6 +11,7 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
+#include "constants.h"
 
 #include "C_SyvUpPackageListNodeItemFileWidget.h"
 
@@ -49,9 +50,21 @@ C_SyvUpPackageListNodeItemFileWidget::C_SyvUpPackageListNodeItemFileWidget(const
                                                                            const bool oq_FileBased,
                                                                            const bool oq_StwFlashloader,
                                                                            QWidget * const opc_Parent) :
-   C_SyvUpUpdatePackageListNodeItemWidget(ou32_ViewIndex, ou32_NodeIndex, orc_DeviceName, oq_FileBased,
-                                          oq_StwFlashloader, opc_Parent)
+   C_SyvUpPackageListNodeItemWidget(ou32_ViewIndex, ou32_NodeIndex, orc_DeviceName, oq_FileBased,
+                                    oq_StwFlashloader, opc_Parent)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of the item
+
+   \return
+   Type of return values, e.g. STW error codes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SyvUpPackageListNodeItemFileWidget::GetType(void) const
+{
+   return mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,18 +77,6 @@ C_SyvUpPackageListNodeItemFileWidget::C_SyvUpPackageListNodeItemFileWidget(const
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpPackageListNodeItemFileWidget::IsViewFileInfoPossible(void) const
-{
-   return false;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Returns the flag if it is possible to show the user hint label
-
-   \retval   true   The user hint label can be shown
-   \retval   false  The user hint label can not be shown
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpPackageListNodeItemFileWidget::IsUserHintPossible(void) const
 {
    return false;
 }

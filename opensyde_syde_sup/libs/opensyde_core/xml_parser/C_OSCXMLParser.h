@@ -43,8 +43,8 @@ public:
 class C_OSCXMLParserBase
 {
 private:
-   C_OSCXMLParserBase(const C_OSCXMLParserBase & orc_Souce);               ///< not implemented: prevent copying
-   C_OSCXMLParserBase & operator = (const C_OSCXMLParserBase & orc_Souce); ///< not implemented: prevent assignment
+   C_OSCXMLParserBase(const C_OSCXMLParserBase & orc_Source);               ///< not implemented: prevent copying
+   C_OSCXMLParserBase & operator = (const C_OSCXMLParserBase & orc_Source); ///< not implemented: prevent assignment
 
    tinyxml2::XMLElement * mpc_CurrentNode;
 
@@ -119,9 +119,9 @@ class C_OSCXMLParser :
 {
 private:
    //not implemented -> prevent copying
-   C_OSCXMLParser(const C_OSCXMLParser & orc_Souce);
+   C_OSCXMLParser(const C_OSCXMLParser & orc_Source);
    //not implemented -> prevent assignment
-   C_OSCXMLParser & operator = (const C_OSCXMLParser & orc_Souce); //lint !e1511 //we want to hide the base function
+   C_OSCXMLParser & operator = (const C_OSCXMLParser & orc_Source); //lint !e1511 //we want to hide the base function
 
 public:
    C_OSCXMLParser(void);
@@ -140,9 +140,9 @@ class C_OSCXMLParserString :
 {
 private:
    // not implemented -> prevent copying
-   C_OSCXMLParserString(const C_OSCXMLParserString & orc_Souce);
+   C_OSCXMLParserString(const C_OSCXMLParserString & orc_Source);
    // not implemented -> prevent assignment
-   C_OSCXMLParserString & operator = (const C_OSCXMLParserString & orc_Souce); //lint !e1511 //we want to hide the base
+   C_OSCXMLParserString & operator = (const C_OSCXMLParserString & orc_Source); //lint !e1511 //we want to hide the base
 
 public:
    C_OSCXMLParserString(void);

@@ -97,6 +97,9 @@ set(SYDESUP_LINK_LIBRARIES_LINUX
 # use same compiler switches that gcc uses when compiling openSYDE core from osc_moduletest.pro file
 add_compile_options(-Wno-deprecated-declarations -Wall -Wextra)
 
+# do not warn about unused parameters in miniz.c; this library is not owned by us
+set_source_files_properties(../libs/opensyde_core/miniz/miniz.c PROPERTIES COMPILE_FLAGS -Wno-unused-parameter)
+
 # --- BUILD LIBRARY (LINUX ONLY) ---------------------------------------------------------------------------------------
 if (NOT WIN32)
    include_directories(${SYDESUP_LINUX_INCLUDE_DIRECTORIES})
@@ -133,7 +136,11 @@ target_precompile_headers(SYDEsup PRIVATE ${PROJECT_ROOT}/src/precomp_headers.h)
 
 # create PC-lint configuration files
 if(COMMAND add_pc_lint)
-   add_pc_lint(SYDEsup ${SYDESUP_COMMON_SOURCES} ${SYDESUP_WINDOWS_SOURCES} ${PROJECT_ROOT}/src/WindowsMain.cpp)
+   if(WIN32)
+		add_pc_lint(SYDEsup ${SYDESUP_COMMON_SOURCES} ${SYDESUP_WINDOWS_SOURCES} ${PROJECT_ROOT}/src/WindowsMain.cpp)
+   else()
+		add_pc_lint(SYDEsup ${SYDESUP_COMMON_SOURCES} ${SYDESUP_LINUX_SOURCES} ${PROJECT_ROOT}/src/LinuxMain.cpp)
+   endif(WIN32)						  
 endif(COMMAND add_pc_lint)
 
 # --- INSTALL RESULTS --------------------------------------------------------------------------------------------------

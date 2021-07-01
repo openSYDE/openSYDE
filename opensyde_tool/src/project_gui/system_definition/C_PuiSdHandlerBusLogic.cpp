@@ -256,7 +256,7 @@ void C_PuiSdHandlerBusLogic::RemoveBus(const uint32 ou32_BusIndex)
    {
       if (this->c_BusTextElements[u32_Counter].u32_BusIndex > ou32_BusIndex)
       {
-         --this->c_BusTextElements[u32_Counter].u32_BusIndex;
+         this->c_BusTextElements[u32_Counter].u32_BusIndex = this->c_BusTextElements[u32_Counter].u32_BusIndex - 1U;
       }
    }
 
@@ -2188,16 +2188,22 @@ void C_PuiSdHandlerBusLogic::ConvertElementIndexToSignalIndex(
          orc_NodeDatapoolListElementId.u32_DataPoolIndex);
       std::vector<C_OSCCanMessage> c_Messages; // either tx messages or rx messages
       bool q_IndexFound = false;
+      tgl_assert(pc_MessageContainer != NULL);
 
-      if (q_MessageIsTx == true)
+      if (pc_MessageContainer != NULL)
       {
-         c_Messages = pc_MessageContainer->c_TxMessages;
+         if (q_MessageIsTx == true)
+         {
+            c_Messages = pc_MessageContainer->c_TxMessages;
+         }
+         else
+         {
+            c_Messages = pc_MessageContainer->c_RxMessages;
+         }
       }
-      else
-      {
-         c_Messages = pc_MessageContainer->c_RxMessages;
-      }
-      for (uint32 u32_PosMessage = 0; (u32_PosMessage < c_Messages.size()) && (q_IndexFound == false); u32_PosMessage++)
+
+      for (uint32 u32_PosMessage = 0; (u32_PosMessage < c_Messages.size()) && (q_IndexFound == false);
+           u32_PosMessage++)
       {
          const C_OSCCanMessage & rc_Message = c_Messages[u32_PosMessage];
          for (uint32 u32_PosSignal = 0; (u32_PosSignal < rc_Message.c_Signals.size()) && (q_IndexFound == false);

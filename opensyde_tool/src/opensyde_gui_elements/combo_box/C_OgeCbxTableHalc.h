@@ -27,6 +27,7 @@ public:
    explicit C_OgeCbxTableHalc(QWidget * const opc_Parent = NULL);
    ~C_OgeCbxTableHalc(void);
 
+private:
    //Avoid call
    C_OgeCbxTableHalc(const C_OgeCbxTableHalc &);
    C_OgeCbxTableHalc & operator =(const C_OgeCbxTableHalc &);

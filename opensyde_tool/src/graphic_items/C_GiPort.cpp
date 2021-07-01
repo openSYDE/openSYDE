@@ -73,7 +73,6 @@ C_GiPort::C_GiPort(QGraphicsItem * const opc_Parent) :
 C_GiPort::~C_GiPort(void)
 {
    this->mpc_Shadow = NULL;
-   //lint -e{1740}  no memory leak because of the parent of mpc_Shadow and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

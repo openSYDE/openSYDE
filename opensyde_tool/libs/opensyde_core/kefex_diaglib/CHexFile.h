@@ -78,8 +78,8 @@ public:
 class STWHEXFILE_PACKAGE C_HexFile
 {
 private:
-   C_HexFile(const C_HexFile & orc_Souce);               ///< not implemented -> prevent copying
-   C_HexFile & operator = (const C_HexFile & orc_Souce); ///< not implemented -> prevent assignment
+   C_HexFile(const C_HexFile & orc_Source);               ///< not implemented -> prevent copying
+   C_HexFile & operator = (const C_HexFile & orc_Source); ///< not implemented -> prevent assignment
 
 public:
    C_HexFile(void);

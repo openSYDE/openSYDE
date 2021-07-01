@@ -81,6 +81,8 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    me_ConnectState(eCS_DISCONNECTED),
    msn_InitToolboxCounter(0)
 {
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
    mpc_Ui->setupUi(this);
 
    this->InitText();
@@ -105,6 +107,9 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    // Configure timer
    this->mc_Timer.setInterval(msn_TIMER_GUI_REFRESH);
    connect(&this->mc_Timer, &QTimer::timeout, this, &C_SyvDaDashboardsWidget::m_UpdateShowValues);
+
+   // Handle the service mode
+   this->mpc_Ui->pc_PbConfirm->setEnabled(!q_ServiceModeActive);
 
    // Connect buttons
    connect(this->mpc_Ui->pc_PbConfirm, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
@@ -467,7 +472,10 @@ void C_SyvDaDashboardsWidget::OnPushButtonConnectPress(void)
       Q_EMIT (this->SigSetConnectPushButtonIcon("://images/system_views/IconDisconnected.svg", false));
       //Reactivate edit & config
       this->mpc_Ui->pc_TabWidget->SetEnabled(true);
-      this->mpc_Ui->pc_PbConfirm->setEnabled(true);
+      if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive() == false)
+      {
+         this->mpc_Ui->pc_PbConfirm->setEnabled(true);
+      }
       Q_EMIT (this->SigSetConfigurationAvailable(true));
       break;
    case eCS_CONNECTING:
@@ -491,15 +499,6 @@ void C_SyvDaDashboardsWidget::OnPushButtonConnectPress(void)
 void C_SyvDaDashboardsWidget::hideEvent(QHideEvent * const opc_Event)
 {
    QWidget::hideEvent(opc_Event);
-   if (this->mpc_Toolbox != NULL)
-   {
-      this->mpc_Toolbox->hide();
-   }
-
-   if (this->mpc_FixMinimizedToolbox != NULL)
-   {
-      this->mpc_FixMinimizedToolbox->hide();
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1110,7 +1109,10 @@ void C_SyvDaDashboardsWidget::m_HandleConnectionResult(const sint32 os32_Result,
       C_SyvDaDashboardsWidget::mhu32_DisconnectTime = TGL_GetTickCount();
 
       //Reactivate edit & config
-      this->mpc_Ui->pc_PbConfirm->setEnabled(true);
+      if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive() == false)
+      {
+         this->mpc_Ui->pc_PbConfirm->setEnabled(true);
+      }
       Q_EMIT this->SigSetConfigurationAvailable(true);
       Q_EMIT this->SigSetConnectPushButtonIcon("://images/system_views/IconDisconnected.svg", false);
 

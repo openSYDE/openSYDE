@@ -886,7 +886,7 @@ sint32 C_SyvUpScene::mh_GetAnimationPath(const QPointF & orc_PointStart, const Q
 
    //Path calculation
    for (uint32 u32_ItBusConnection = 0;
-        (u32_ItBusConnection < (orc_UIInteractionPoints.size() - 1UL)) && (q_Finished == false);
+        (u32_ItBusConnection < (static_cast<uint32>(orc_UIInteractionPoints.size()) - 1UL)) && (q_Finished == false);
         ++u32_ItBusConnection)
    {
       const QPointF & rc_LineStart = orc_UIInteractionPoints[u32_ItBusConnection];

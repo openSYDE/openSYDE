@@ -1838,7 +1838,7 @@ void C_SdTopologyScene::m_AddBusConnectorToScene(C_GiLiBusConnector * const opc_
               &C_SdTopologyScene::m_BusConnectorReconnectionStart);
       connect(opc_BusConnectorGraphicsItem, &C_GiLiBusConnector::SigStopConnect, this,
               &C_SdTopologyScene::m_LeaveConnectState);
-      connect(opc_BusConnectorGraphicsItem, &C_GiLiBusConnector::ShowReconnectContextMenu, this,
+      connect(opc_BusConnectorGraphicsItem, &C_GiLiBusConnector::SigShowReconnectContextMenu, this,
               &C_SdTopologyScene::m_ShowBusConnectorReconnectionContextMenu);
 
       C_SebTopologyBaseScene::m_AddBusConnectorToScene(opc_BusConnectorGraphicsItem);
@@ -2376,7 +2376,7 @@ void C_SdTopologyScene::m_RemoveBusConnectorOfScene(C_GiLiBusConnector * const o
       //Connections
       disconnect(opc_BusConnectorGraphicsItem, &C_GiLiBusConnector::SigStopConnect, this,
                  &C_SdTopologyScene::m_LeaveConnectState);
-      disconnect(opc_BusConnectorGraphicsItem, &C_GiLiBusConnector::ShowReconnectContextMenu, this,
+      disconnect(opc_BusConnectorGraphicsItem, &C_GiLiBusConnector::SigShowReconnectContextMenu, this,
                  &C_SdTopologyScene::m_ShowBusConnectorReconnectionContextMenu);
       disconnect(opc_BusConnectorGraphicsItem, &C_GiLiBusConnector::SigHideToolTip, this,
                  &C_SdTopologyScene::m_HandleHideToolTip);

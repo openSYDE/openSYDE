@@ -350,7 +350,7 @@ bool C_PuiSdSharedDatapools::IsSharedAndGetDatapoolGroup(const C_OSCNodeDataPool
 const
 {
    uint32 u32_SharedGroup;
-   bool q_Found = this->IsSharedDatapool(orc_Datapool, &u32_SharedGroup);
+   const bool q_Found = this->IsSharedDatapool(orc_Datapool, &u32_SharedGroup);
 
    orc_SharedDatapoolGroup.clear();
 
@@ -404,7 +404,7 @@ void C_PuiSdSharedDatapools::OnNodeRemoved(const uint32 ou32_NodeIndex)
          else if (rc_Group[u32_DpIdCounter].u32_NodeIndex > ou32_NodeIndex)
          {
             // Adapt Datapool Ids
-            --rc_Group[u32_DpIdCounter].u32_NodeIndex;
+            rc_Group[u32_DpIdCounter].u32_NodeIndex = rc_Group[u32_DpIdCounter].u32_NodeIndex - 1U;
             ++u32_DpIdCounter;
          }
          else

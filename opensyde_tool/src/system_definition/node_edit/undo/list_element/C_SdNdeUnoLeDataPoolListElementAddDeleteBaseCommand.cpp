@@ -230,7 +230,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_ReSelect(
                                                                                     -
                                                                                     1UL)]);
             //scroll to last
-            if ((oq_ScrollToLast) && (u32_ItSection == (orc_Items.size() - 1UL)))
+            if ((oq_ScrollToLast) && (u32_ItSection == (static_cast<uint32>(orc_Items.size()) - 1UL)))
             {
                C_SdNdeDpListTableModel * const pc_Model =
                   this->mpc_DataPoolListModelViewManager->GetElementModel(

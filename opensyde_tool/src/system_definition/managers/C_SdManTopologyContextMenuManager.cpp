@@ -179,6 +179,7 @@ bool C_SdManTopologyContextMenuManager::m_ItemTypeHasSetupStyle(const sintn osn_
       break;
    default:
       q_Retval = false;
+      break;
    }
    return q_Retval;
 }

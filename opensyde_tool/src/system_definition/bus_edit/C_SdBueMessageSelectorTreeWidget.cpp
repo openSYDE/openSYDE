@@ -2368,7 +2368,7 @@ void C_SdBueMessageSelectorTreeWidget::m_UpdateUniqueMessageIdsSignals(const uin
          //Sort
          c_Begin = orc_CurrentSignals.begin();
          std::sort(c_Begin, orc_CurrentSignals.end(),
-                   C_SdBueSortHelperSignal(this->mc_UniqueMessageIds[oru32_InternalMessageIndex]));
+                   static_cast<C_SdBueSortHelperSignal>(this->mc_UniqueMessageIds[oru32_InternalMessageIndex]));
       }
    }
 }

@@ -847,8 +847,8 @@ void C_CamMosFilterPopup::m_OnExtendedToggled(const bool oq_Checked)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
 {
-   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_CamMosDatabaseSelectionPopup * pc_Dialog = new C_CamMosDatabaseSelectionPopup(*c_New, false);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   C_CamMosDatabaseSelectionPopup * const pc_Dialog = new C_CamMosDatabaseSelectionPopup(*c_New, false);
 
    //Resize
    c_New->SetSize(QSize(700, 800));
@@ -894,6 +894,10 @@ void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
                   this->m_SetMessageDataFromDatabase(pc_Message->u32_CanId, pc_Message->q_IsExtended);
                }
             }
+         }
+         else
+         {
+            // Unknown, nothing to do.
          }
       }
    }

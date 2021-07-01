@@ -36,8 +36,8 @@ public:
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void NewColor(stw_types::sintn osn_Hue, stw_types::sintn osn_Saturation);
-   void ColorSelected(void);
+   void SigNewColor(stw_types::sintn osn_Hue, stw_types::sintn osn_Saturation);
+   void SigColorSelected(void);
 
 protected:
    virtual void paintEvent(QPaintEvent * const opc_Event) override;

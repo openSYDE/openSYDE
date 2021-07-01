@@ -92,10 +92,10 @@ class CMONPROTOCOL_PACKAGE C_CMONProtocolKEFEX_IVA :
    public C_CMONProtocolBase
 {
 private:
-   C_CMONProtocolKEFEX_IVA(const C_CMONProtocolKEFEX_IVA & orc_Souce);               //not implemented -> prevent
-                                                                                     // copying
-   C_CMONProtocolKEFEX_IVA & operator = (const C_CMONProtocolKEFEX_IVA & orc_Souce); //not implemented -> prevent
-                                                                                     // assignment
+   C_CMONProtocolKEFEX_IVA(const C_CMONProtocolKEFEX_IVA & orc_Source);               //not implemented -> prevent
+                                                                                      // copying
+   C_CMONProtocolKEFEX_IVA & operator = (const C_CMONProtocolKEFEX_IVA & orc_Source); //not implemented -> prevent
+                                                                                      // assignment
 
 protected:
    stw_types::uint16 mu16_KFXListOffset;

@@ -103,6 +103,7 @@ sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_T
 {
    sint32 s32_Return = C_NO_ERR;
    C_SCLString c_Text;
+   C_SCLString c_HalcIncluded;
 
    //"empty" target support package to have a clearly defined status:
    orc_TargetSupportPackage.Clear();
@@ -117,8 +118,35 @@ sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_T
    }
    else
    {
-      c_Text = orc_XMLParser.SelectNodeChild("file-version");
-      if (c_Text != "file-version")
+      if (orc_XMLParser.SelectNodeChild("file-version") == "file-version")
+      {
+         uint16 u16_FileVersion = 0U;
+         try
+         {
+            u16_FileVersion = static_cast<uint16>(orc_XMLParser.GetNodeContent().ToInt());
+         }
+         catch (...)
+         {
+            osc_write_log_error("Loading target support package",
+                                "\"file-version\" could not be converted to a number.");
+            s32_Return = C_CONFIG;
+         }
+
+         //is the file version one we know ?
+         if (s32_Return == C_NO_ERR)
+         {
+            osc_write_log_info("Loading target support package", "Value of \"file-version\": " +
+                               C_SCLString::IntToStr(u16_FileVersion));
+            //Check file version
+            if ((u16_FileVersion != 1U) && (u16_FileVersion != 2U))
+            {
+               osc_write_log_error("Loading target support package",
+                                   "Version defined by \"file-version\" is not supported.");
+               s32_Return = C_CONFIG;
+            }
+         }
+      }
+      else
       {
          osc_write_log_error("Loading target support package", "XML node \"file-version\" not found.");
          s32_Return = C_CONFIG;
@@ -126,6 +154,16 @@ sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_T
       //no special handling required yet based on version
       orc_XMLParser.SelectNodeParent(); //back to parent
    }
+
+   // no if statement because of CPPCheck warning. Still safe, because we don't throw error if <halc-included> is not in
+   // XML. We want to be compatible with the old file version. Potential error from above gets caught in next if.
+   c_Text = orc_XMLParser.SelectNodeChild("halc-included");
+   if (c_Text == "halc-included")
+   {
+      c_HalcIncluded = orc_XMLParser.GetNodeContent().LowerCase();
+   }
+   // back to parent
+   orc_XMLParser.SelectNodeParent();
 
    // device name
    if (s32_Return == C_NO_ERR)
@@ -268,6 +306,30 @@ sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_T
       orc_XMLParser.SelectNodeParent();
    }
 
+   // halc definition, only continue if there is a halc config in tsp file
+   if ((s32_Return == C_NO_ERR) && (c_HalcIncluded == "true"))
+   {
+      c_Text = orc_XMLParser.SelectNodeChild("halc-definition");
+      if (c_Text != "halc-definition")
+      {
+         osc_write_log_error("Loading target support package", "XML node \"halc-definition\" not found.");
+         s32_Return = C_CONFIG;
+      }
+      else
+      {
+         s32_Return = mh_ParseHalcSection(orc_TargetSupportPackage, orc_XMLParser);
+      }
+      // back to parent
+      orc_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      // if a TSP with halc was loaded those attributes were set. If one loads a TSP without halc right afterwards the
+      // attributes remain set, so we need to clear them
+      orc_TargetSupportPackage.c_HalcDefPath = "";
+      orc_TargetSupportPackage.c_HalcComment = "";
+   }
+
    if (s32_Return == C_NO_ERR)
    {
       c_Text = orc_XMLParser.SelectNodeChild("application");
@@ -320,6 +382,12 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
    else
    {
       c_Application.q_IsProgrammable = static_cast<bool>(orc_XMLParser.GetAttributeBool("is-programmable"));
+   }
+
+   // generates halc psi files. Required attribute, but no error, due to compatibility with old tsp version
+   if (orc_XMLParser.AttributeExists("generate-halc-psi") == true)
+   {
+      c_Application.q_GeneratesPsiFiles = static_cast<bool>(orc_XMLParser.GetAttributeBool("generate-halc-psi"));
    }
 
    // process id (required if and only if programmable)
@@ -384,8 +452,9 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
       orc_XMLParser.SelectNodeParent(); //back to parent
    }
 
-   // code generation (required if and only if programmable)
-   if ((s32_Return == C_NO_ERR) && (c_Application.q_IsProgrammable == true))
+   // generate (required if and only if file generation is enabled)
+   if ((s32_Return == C_NO_ERR) &&
+       ((c_Application.q_IsProgrammable == true) || (c_Application.q_GeneratesPsiFiles == true)))
    {
       c_Text = orc_XMLParser.SelectNodeChild("code-generation");
       if (c_Text != "code-generation")
@@ -411,7 +480,7 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
             c_Application.u16_GenCodeVersion = 1U;
          }
 
-         // code generation type
+         // file generator type
          c_Text = orc_XMLParser.SelectNodeChild("type");
          if (c_Text != "type")
          {
@@ -434,7 +503,7 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
          }
          orc_XMLParser.SelectNodeParent(); //back to parent
 
-         // if the code generator is not standard, a path do the code generator is required
+         // if the file generator is not standard, a path do the file generator is required
          if ((s32_Return == C_NO_ERR) && (c_Application.q_IsStandardSydeCoderC == false))
          {
             c_Text = orc_XMLParser.SelectNodeChild("path");
@@ -470,8 +539,9 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
       orc_XMLParser.SelectNodeParent(); //back to parent
    }
 
-   // generate (required if and only if programmable)
-   if ((s32_Return == C_NO_ERR) && (c_Application.q_IsProgrammable == true))
+   // generate (required if and only if file generation is enabled)
+   if ((s32_Return == C_NO_ERR) &&
+       ((c_Application.q_IsProgrammable == true) || (c_Application.q_GeneratesPsiFiles == true)))
    {
       c_Text = orc_XMLParser.SelectNodeChild("generate");
       if (c_Text != "generate")
@@ -487,23 +557,97 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
    }
 
    // result
-   if (s32_Return == C_NO_ERR)
+   // old file version, do not throw error, so we maintain compatibility
+   if ((s32_Return == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("result") == "result"))
    {
-      c_Text = orc_XMLParser.SelectNodeChild("result");
-      if (c_Text != "result")
+      c_Application.c_ResultPaths.resize(1);
+      c_Application.c_ResultPaths[0] = orc_XMLParser.GetNodeContent();
+
+      orc_XMLParser.SelectNodeParent(); // back to application
+   }
+   // new file version
+   else if ((s32_Return == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("result-paths") == "result-paths"))
+   {
+      C_SCLString c_CurrNode = orc_XMLParser.SelectNodeChild("output-file");
+      if (c_CurrNode != "output-file")
       {
-         osc_write_log_error("Loading target support package", "No XML node \"result\" found.");
+         osc_write_log_error("Loading target support package", "No XML node \"output-file\" found. ");
          s32_Return = C_CONFIG;
+         orc_XMLParser.SelectNodeParent(); //back to parent result-paths
+         orc_XMLParser.SelectNodeParent(); //back to parent application
       }
       else
       {
-         c_Application.c_ResultPath = orc_XMLParser.GetNodeContent();
+         c_Application.c_ResultPaths.clear();
+         do
+         {
+            c_Application.c_ResultPaths.push_back(orc_XMLParser.GetNodeContent());
+            c_CurrNode = orc_XMLParser.SelectNodeNext("output-file");
+         }
+         while (c_CurrNode == "output-file");
+
+         // maximum of 2 output files allowed
+         tgl_assert(c_Application.c_ResultPaths.size() <= 2);
+
+         orc_XMLParser.SelectNodeParent(); //back to parent result-paths
+         orc_XMLParser.SelectNodeParent(); //back to parent application
       }
-      orc_XMLParser.SelectNodeParent(); //back to parent
+   }
+   // invalid version
+   else
+   {
+      osc_write_log_error("Loading target support package", "No XML node \"result\" or \"result-paths\" found.");
+      s32_Return = C_CONFIG;
+      orc_XMLParser.SelectNodeParent(); // back to application
    }
 
    // add application
    orc_TargetSupportPackage.c_Applications.push_back(c_Application);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief Load halc data from XML file.
+
+   Requires the XML parser to be on node "halc-definition".
+
+   \param[in]     orc_TargetSupportPackage      target support package information to write to file
+   \param[in]     orc_XMLParser                 XML parser
+
+   \return
+   C_NO_ERR    halc data read and placed into target support package instance
+   C_CONFIG    XML node or attribute missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCTargetSupportPackageFiler::mh_ParseHalcSection(C_OSCTargetSupportPackage & orc_TargetSupportPackage,
+                                                           C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Return = C_NO_ERR;
+   C_SCLString c_Text;
+
+   c_Text = orc_XMLParser.SelectNodeChild("halc-path");
+   if (c_Text != "halc-path")
+   {
+      osc_write_log_error("Loading target support package", "XML node \"halc-path\" not found.");
+      s32_Return = C_CONFIG;
+   }
+   else
+   {
+      orc_TargetSupportPackage.c_HalcDefPath = orc_XMLParser.GetNodeContent();
+      c_Text = orc_XMLParser.SelectNodeNext("halc-comment");
+      if (c_Text != "halc-comment")
+      {
+         osc_write_log_error("Loading target support package", "XML node \"halc-comment\" not found.");
+         s32_Return = C_CONFIG;
+      }
+      else
+      {
+         orc_TargetSupportPackage.c_HalcComment = orc_XMLParser.GetNodeContent();
+      }
+   }
+   // go back to "halc-definition"
+   orc_XMLParser.SelectNodeParent();
 
    return s32_Return;
 }

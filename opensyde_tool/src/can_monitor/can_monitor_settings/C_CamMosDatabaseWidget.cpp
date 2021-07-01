@@ -150,10 +150,10 @@ void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const sint32 os32_Result,
              ((os32_Result == C_NO_ERR) && (this->mc_DatabasesToLoad[0]->GetDatabaseData().s32_BusIndex < 0)))
          {
             // Pop up dialog (use scroll area widget as parent to make sure scroll bars are styled correctly)
-            QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
-                                                                    this->mpc_Ui->pc_ScrollAreaContents);
+            const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
+                                                                          this->mpc_Ui->pc_ScrollAreaContents);
 
-            C_CamMosDatabaseBusSelectionPopup * pc_Dialog =
+            C_CamMosDatabaseBusSelectionPopup * const pc_Dialog =
                new C_CamMosDatabaseBusSelectionPopup(orc_Busses, this->mc_DatabasesToLoad[0]->GetDatabaseData(),
                                                      *c_New);
 
@@ -323,7 +323,7 @@ void C_CamMosDatabaseWidget::OnSigSavedAsNew(void) const
 void C_CamMosDatabaseWidget::AddDroppedDatabase(const QString & orc_Path)
 {
    // if necessary adapt .syde path to .syde_sysdef
-   const QFileInfo c_FileInfo = QFileInfo(orc_Path); // dropped paths are always absolute so no problems
+   const QFileInfo c_FileInfo = static_cast<QFileInfo>(orc_Path); // dropped paths are always absolute so no problems
    const QString c_Path = C_CamMosDatabaseItemWidget::h_AdaptPathToSystemDefinitionIfNecessary(c_FileInfo);
 
    // check if already used
@@ -500,7 +500,7 @@ void C_CamMosDatabaseWidget::m_OnAddClicked()
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_AddDatabaseWidget(const C_CamProDatabaseData & orc_DatabaseData)
 {
-   C_CamMosDatabaseItemWidget * pc_NewItem = new C_CamMosDatabaseItemWidget(orc_DatabaseData, this);
+   C_CamMosDatabaseItemWidget * const pc_NewItem = new C_CamMosDatabaseItemWidget(orc_DatabaseData, this);
 
    // remember item
    this->mc_Entries.push_back(pc_NewItem);
@@ -791,9 +791,9 @@ void C_CamMosDatabaseWidget::m_CheckAndLoadDatabase(void)
       if (mc_DatabasesToLoad[0] != NULL)
       {
          // load first database from loading queue
-         C_CamProDatabaseData c_Database = mc_DatabasesToLoad[0]->GetDatabaseData();
+         const C_CamProDatabaseData c_Database = mc_DatabasesToLoad[0]->GetDatabaseData();
          // check if file exists
-         QFileInfo c_DatabaseFile(C_CamUti::h_GetAbsPathFromProj(c_Database.c_Name));
+         const QFileInfo c_DatabaseFile(C_CamUti::h_GetAbsPathFromProj(c_Database.c_Name));
          if (c_DatabaseFile.exists() == true)
          {
             // check suffix to distinguish dbc, osy system definitions or invalid suffix

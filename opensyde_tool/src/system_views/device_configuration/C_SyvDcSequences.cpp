@@ -1138,7 +1138,7 @@ void C_SyvDcSequences::m_RunConfOpenSydeDevicesState(const uint32 ou32_Step, con
 void C_SyvDcSequences::mh_ThreadFunc(void * const opv_Instance)
 {
    //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_SyvDcSequences * const pc_Sequences = reinterpret_cast<C_SyvDcSequences * const>(opv_Instance);
+   C_SyvDcSequences * const pc_Sequences = reinterpret_cast<C_SyvDcSequences *>(opv_Instance);
 
    tgl_assert(pc_Sequences != NULL);
    if (pc_Sequences != NULL)
@@ -2665,9 +2665,9 @@ sint32 C_SyvDcSequences::m_CheckConfOpenSydeDevices(
                   }
 
                   // Check the count of found connected interfaces
-                  if ((rc_CurConfig.c_BusIds.size() == (u32_CanCount + u32_EthCount)) &&
-                      (rc_CurConfig.c_CanBitrates.size() == u32_CanCount) &&
-                      (rc_CurConfig.c_IpAddresses.size() == u32_EthCount))
+                  if ((static_cast<uint32>(rc_CurConfig.c_BusIds.size()) == (u32_CanCount + u32_EthCount)) &&
+                      (static_cast<uint32>(rc_CurConfig.c_CanBitrates.size()) == u32_CanCount) &&
+                      (static_cast<uint32>(rc_CurConfig.c_IpAddresses.size()) == u32_EthCount))
                   {
                      // Configuration is valid
                      s32_Return = C_NO_ERR;
@@ -2730,15 +2730,18 @@ sint32 C_SyvDcSequences::m_SetCanOpenSydeBitrate(const C_OSCProtocolDriverOsyNod
 
             for (u32_BusCounter = 0U; u32_BusCounter < orc_DeviceConfig.c_BusIds.size(); ++u32_BusCounter)
             {
+               std::pair<std::set<uint32>::iterator, bool> c_InsertResult;
                uint32 u32_InterfaceCounter;
                s32_Return = C_NO_ERR;
 
                // If a node is connected at least two times with the same bus,
                // the configuration will be handled by the interface loop
-               if (c_FinishedBusIds.find(orc_DeviceConfig.c_BusIds[u32_BusCounter]) == c_FinishedBusIds.end())
-               {
-                  c_FinishedBusIds.insert(orc_DeviceConfig.c_BusIds[u32_BusCounter]);
+               c_InsertResult = c_FinishedBusIds.insert(orc_DeviceConfig.c_BusIds[u32_BusCounter]);
 
+               //was the element inserted (or already present) ?
+               if (c_InsertResult.second == true)
+               {
+                  // Newly inserted.
                   // We need the interface settings of the node which is connected to the bus with this id
                   for (u32_InterfaceCounter = 0U;
                        u32_InterfaceCounter < pc_Node->c_Properties.c_ComInterfaces.size();

@@ -46,6 +46,8 @@ public:
    void AddSelectedProject(const stw_types::uint32 ou32_TSPIndex,
                            stw_opensyde_core::C_OSCNodeApplication & orc_Application, QString & orc_Warnings) const;
    void HandleCodeGenerationConfig(void) const;
+   QString GetHalcDefinitionFileName(void);
+   QString GetProcessedHalcDefinitionPath(void);
 
 protected:
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;

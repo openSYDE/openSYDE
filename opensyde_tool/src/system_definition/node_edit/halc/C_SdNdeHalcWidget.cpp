@@ -435,18 +435,15 @@ void C_SdNdeHalcWidget::m_OnCleanUpClicked(void) const
 
    c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to delete the hardware description?\n"
                                                       "Complete hardware configuration settings and corresponding "
-                                                      "HAL Datapools of this node will also be deleted."));
+                                                      "HAL Datapools of this node will also be deleted. Associated"
+                                                      "Data Blocks will be reset."));
    c_MessageBox.SetHeading(C_GtGetText::h_GetText("Delete Hardware Description"));
    c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
    c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
    c_MessageBox.SetCustomMinHeight(210, 210);
    if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eOK)
    {
-      // Clear configuration
-      tgl_assert(C_PuiSdHandler::h_GetInstance()->ClearHALCConfig(this->mu32_NodeIndex) == C_NO_ERR);
-
-      // Remove HAL Datapools
-      tgl_assert(C_PuiSdHandler::h_GetInstance()->HALCRemoveDatapools(this->mu32_NodeIndex) == C_NO_ERR);
+      this->m_CleanUpHalcDefinition();
 
       // reset GUI elements
       this->m_UpdateNodeData();
@@ -533,11 +530,7 @@ void C_SdNdeHalcWidget::m_OnSelectClicked(void)
             // clean up if necessary
             if (q_IsClear == false)
             {
-               // Clear configuration
-               tgl_assert(C_PuiSdHandler::h_GetInstance()->ClearHALCConfig(this->mu32_NodeIndex) == C_NO_ERR);
-
-               // Remove HAL Datapools
-               tgl_assert(C_PuiSdHandler::h_GetInstance()->HALCRemoveDatapools(this->mu32_NodeIndex) == C_NO_ERR);
+               this->m_CleanUpHalcDefinition();
             }
 
             // set the HALC definition
@@ -612,9 +605,16 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
                   tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHALCConfig(this->mu32_NodeIndex,
                                                                             c_UpdatedHalcConfig) == C_NO_ERR);
 
+                  // make sure all HALC NVM Datapools are assigned if possible
+                  tgl_assert(C_PuiSdHandler::h_GetInstance()->
+                             AssignAllHalcNvmDataPools(this->mu32_NodeIndex) == stw_errors::C_NO_ERR);
+
                   // update GUI
                   this->m_UpdateNodeData();
                   this->m_ShowOverview(true);
+
+                  // Run HALC magician now because Datapool number changed
+                  this->m_RunDatapoolMagician();
                }
 
                if ((s32_Return != C_NO_ERR) && (s32_Return != C_NOACT))
@@ -653,6 +653,7 @@ void C_SdNdeHalcWidget::m_RunDatapoolMagician(void) const
 
    // Inform Datapool overview about changed existence of HAL Datapools
    Q_EMIT (this->SigHalcDataPoolChanged());
+   Q_EMIT (this->SigErrorChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -797,6 +798,22 @@ bool C_SdNdeHalcWidget::m_LoadHalcDefinitionFile(C_OSCHalcConfig & orc_HalcConfi
    }
 
    return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Clean up HALC definition
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcWidget::m_CleanUpHalcDefinition(void) const
+{
+   // Clear configuration
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->ClearHALCConfig(this->mu32_NodeIndex) == C_NO_ERR);
+
+   // Remove HAL Datapools
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->HALCRemoveDatapools(this->mu32_NodeIndex) == C_NO_ERR);
+
+   // Reset PSI generation Data Blocks
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->HALCResetDataBlocks(this->mu32_NodeIndex) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

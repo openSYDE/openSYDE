@@ -53,6 +53,7 @@ const stw_types::float64 C_SdBueMlvSignalItem::mhf64_ResizeItemClickOffset = 8.0
 C_SdBueMlvSignalItem::C_SdBueMlvSignalItem(const QColor & orc_BackgroundColor, const QColor & orc_FontColor,
                                            const QColor & orc_ResizeItemColor, const QString & orc_Name,
                                            const float64 of64_Space, QGraphicsItem * const opc_Parent) :
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    C_SdBueMlvBaseItem(orc_BackgroundColor, orc_FontColor, mc_STYLE_GUIDE_FONT_REGULAR_16, orc_Name, true, opc_Parent),
    mu16_ByteRow(0U),
    mu16_StartBit(0U),
@@ -63,6 +64,7 @@ C_SdBueMlvSignalItem::C_SdBueMlvSignalItem(const QColor & orc_BackgroundColor, c
    mq_ShowRightResizeItem(false),
    mq_IsResizeable(true),
    mq_Hovered(false),
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    mc_ByteOrderFont(mc_STYLE_GUIDE_FONT_REGULAR_13),
    mc_LeftResizeItemRectDraw(QRect()),
    mc_RightResizeItemRectDraw(QRect()),
@@ -257,7 +259,7 @@ void C_SdBueMlvSignalItem::SetColors(const QColor & orc_BackgroundColor, const Q
 bool C_SdBueMlvSignalItem::ContainsPoint(const QPointF & orc_Pos) const
 {
    // position and size is relevant
-   QRectF c_Rect(this->pos(), this->boundingRect().size());
+   const QRectF c_Rect(this->pos(), this->boundingRect().size());
 
    return c_Rect.contains(orc_Pos);
 }

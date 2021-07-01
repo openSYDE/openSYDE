@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblTreSimpleModel::C_TblTreSimpleModel(QObject * const opc_Parent) :
@@ -48,9 +48,9 @@ C_TblTreSimpleModel::C_TblTreSimpleModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data index
 
-   \param[in] osn_Row    Row
-   \param[in] osn_Column Column
-   \param[in] orc_Parent Parent
+   \param[in]  osn_Row     Row
+   \param[in]  osn_Column  Column
+   \param[in]  orc_Parent  Parent
 
    \return
    Data index (may be invalid = invalid parameters)
@@ -67,7 +67,7 @@ QModelIndex C_TblTreSimpleModel::index(const sintn osn_Row, const sintn osn_Colu
       {
          //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreSimpleItem * const pc_TreeItem =
-            static_cast<const C_TblTreSimpleItem * const>(orc_Parent.internalPointer());
+            static_cast<const C_TblTreSimpleItem *>(orc_Parent.internalPointer());
          if (pc_TreeItem != NULL)
          {
             c_Retval =
@@ -95,7 +95,7 @@ QModelIndex C_TblTreSimpleModel::index(const sintn osn_Row, const sintn osn_Colu
    Warning: currently this implementation works,
             but if a tree requires more layers this implementation has to be adapted
 
-   \param[in] orc_Index Index
+   \param[in]  orc_Index   Index
 
    \return
    Parent index (may be invalid = root level)
@@ -109,7 +109,7 @@ QModelIndex C_TblTreSimpleModel::parent(const QModelIndex & orc_Index) const
    {
       //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreSimpleItem * const pc_TreeItem =
-         static_cast<const C_TblTreSimpleItem * const>(orc_Index.internalPointer());
+         static_cast<const C_TblTreSimpleItem *>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
       {
          if (pc_TreeItem->pc_Parent != NULL)
@@ -128,7 +128,7 @@ QModelIndex C_TblTreSimpleModel::parent(const QModelIndex & orc_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get tree row count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -142,7 +142,7 @@ sintn C_TblTreSimpleModel::rowCount(const QModelIndex & orc_Parent) const
    {
       //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreSimpleItem * const pc_TreeItem =
-         static_cast<const C_TblTreSimpleItem * const>(orc_Parent.internalPointer());
+         static_cast<const C_TblTreSimpleItem *>(orc_Parent.internalPointer());
       if (pc_TreeItem != NULL)
       {
          sn_Retval = pc_TreeItem->c_Children.size();

@@ -83,7 +83,7 @@ C_SdNdeProgrammingOptions::C_SdNdeProgrammingOptions(stw_opensyde_gui_elements::
    this->mrc_ParentDialog.SetWidget(this);
 
    // set main title
-   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Code Generation"));
+   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Source Code Generation"));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Settings"));
 
    // connects

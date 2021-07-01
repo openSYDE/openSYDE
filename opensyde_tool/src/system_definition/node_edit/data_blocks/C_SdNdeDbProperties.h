@@ -43,7 +43,6 @@ public:
    static QSize h_GetBinaryWindowSize(void);
    static QSize h_GetDefaultWindowSize(void);
    void InitStaticNames(void) const;
-   void LoadFromData(const stw_opensyde_core::C_OSCNodeApplication & orc_Application);
    void ApplyNewData(stw_opensyde_core::C_OSCNodeApplication & orc_Application) const;
    void HandleDataPools(const stw_types::uint32 ou32_ApplicationIndex) const;
 
@@ -56,7 +55,7 @@ private:
    const stw_types::sint32 ms32_ApplicationIndex;
    stw_opensyde_core::C_OSCNodeApplication::E_Type me_Type;
    std::vector<C_SdNdeDbDataPoolEntry *> mc_DataPoolWidgets;
-   std::vector<stw_types::uint32> mc_SelectedDataPools;
+   std::set<stw_types::uint32> mc_SelectedDataPools;
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
    static const stw_types::sintn mhsn_VERSION_INDEX_V1;
@@ -73,16 +72,19 @@ private:
    QString m_CheckPath(const QString & orc_Path) const;
    QString m_GetDialogPath(const QString & orc_CurrentPath) const;
 
-   void m_LoadData(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ApplicationIndex);
-   void m_LoadFromData(const stw_opensyde_core::C_OSCNodeApplication & orc_Application);
-   void m_SetVisibilityOfProgrammableLines(const bool & orq_Visible) const;
+   void m_LoadData(void);
+   void m_LoadDataBlock(void);
+   void m_LoadOutputFilePaths(const stw_opensyde_core::C_OSCNodeApplication & orc_Application,
+                              const QString & orc_ProjectPath);
+   void m_SetVisibilityOfContentWidgets(const stw_opensyde_core::C_OSCNodeApplication::E_Type & ore_Type) const;
 
+   void m_OnFileGenerationChanged(const stw_types::sintn osn_State);
    void m_OnClickProject(void);
    void m_OnClickOutput(void);
    void m_OnClickGenerator(void);
-   void m_OnClickGenerate(void);
+   void m_OnClickCodeGeneration(void);
+   void m_OnClickFileGeneration(void);
    void m_OnClickIDE(void);
-   void m_OnClickClearProject(void) const;
 
    void m_OnNameEdited(void) const;
    void m_OnProcessIDChanged(void) const;
@@ -95,6 +97,7 @@ private:
    void m_UpdateOwnedDpsCount(void) const;
 
    void m_UpdatePathsRelativeToProject(void) const;
+   void m_UpdatePathsRelativeToGeneratedDir(void) const;
 
    //Avoid call
    C_SdNdeDbProperties(const C_SdNdeDbProperties &);

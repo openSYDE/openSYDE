@@ -74,6 +74,7 @@ C_SyvDaPeUpdateModeTableView::C_SyvDaPeUpdateModeTableView(const uint32 ou32_Vie
    this->horizontalHeader()->setResizeContentsPrecision(-1);
    this->horizontalHeader()->setStretchLastSection(true);
    this->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+   this->horizontalHeader()->setFixedHeight(40);
    //Row Height
    this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
    this->verticalHeader()->setMinimumSectionSize(30);

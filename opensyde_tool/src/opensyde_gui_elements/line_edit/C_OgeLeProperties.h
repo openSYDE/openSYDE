@@ -29,6 +29,8 @@ class C_OgeLeProperties :
 
 public:
    C_OgeLeProperties(QWidget * const opc_Parent = NULL);
+
+   void SetBackgroundColor(const stw_types::sintn osn_Value);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Dialog for generate code
+   \brief       Dialog for file generation
 
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -65,7 +65,7 @@ C_SdCodeGenerationDialog::C_SdCodeGenerationDialog(stw_opensyde_gui_elements::C_
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_SdCodeGenerationDialog::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &C_OgePubCancel::clicked, this,
            &C_SdCodeGenerationDialog::m_OnCancel);
-   connect(this->mpc_Ui->pc_TreeView, &C_SdCodeGenerationView::SigSelectionChanged, this,
+   connect(this->mpc_Ui->pc_TreeView, &C_OgeTreeViewCheckable::SigSelectionChanged, this,
            &C_SdCodeGenerationDialog::m_UpdateSelection);
 }
 
@@ -84,9 +84,9 @@ C_SdCodeGenerationDialog::~C_SdCodeGenerationDialog()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdCodeGenerationDialog::InitStaticNames(void) const
 {
-   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Code Generation"));
+   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("File Generation"));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Data Blocks Selection"));
-   this->mpc_Ui->pc_LabelHeading->setText(C_GtGetText::h_GetText("Data Blocks of type \"Programmable Application\""));
+   this->mpc_Ui->pc_LabelHeading->setText(C_GtGetText::h_GetText("Data Blocks"));
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("Continue"));
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
 }
@@ -97,17 +97,17 @@ void C_SdCodeGenerationDialog::InitStaticNames(void) const
    \param[in]  orc_NodesIndices  Nodes indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdCodeGenerationDialog::PrepareDialog(const std::vector<uint32> & orc_NodesIndices) const
+void C_SdCodeGenerationDialog::PrepareDialog(const std::vector<uint32> & orc_NodesIndices)
 {
    if (!orc_NodesIndices.empty())
    {
       // Prepare dialog
-      this->mpc_Ui->pc_TreeView->Init(orc_NodesIndices);
+      this->mpc_Ui->pc_TreeView->Init(&this->mc_Model, orc_NodesIndices);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get the checked items to code generation
+/*! \brief  Get the checked items for file generation
 
    \param[out]  orc_NodeIndices         Node indices (ID)
    \param[out]  orc_AppIndicesPerNode   Vector of vectors of application indices
@@ -116,7 +116,7 @@ void C_SdCodeGenerationDialog::PrepareDialog(const std::vector<uint32> & orc_Nod
 void C_SdCodeGenerationDialog::GetCheckedItems(std::vector<uint32> & orc_NodeIndices,
                                                std::vector<std::vector<uint32> > & orc_AppIndicesPerNode) const
 {
-   this->mpc_Ui->pc_TreeView->GetCheckedItems(orc_NodeIndices, orc_AppIndicesPerNode);
+   this->mpc_Ui->pc_TreeView->GetCheckedItems(&this->mc_Model, orc_NodeIndices, orc_AppIndicesPerNode);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

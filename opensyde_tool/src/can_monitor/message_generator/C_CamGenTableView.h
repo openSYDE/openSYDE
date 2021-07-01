@@ -73,7 +73,7 @@ protected:
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected) override;
-   virtual stw_types::sintn sizeHintForColumn(stw_types::sintn osn_Column) const override;
+   virtual stw_types::sintn sizeHintForColumn(const stw_types::sintn osn_Column) const override;
 
 private:
    bool mq_CommunicationActive; ///< True if message trace is currently running

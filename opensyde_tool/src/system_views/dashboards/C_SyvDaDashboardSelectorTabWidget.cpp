@@ -63,6 +63,8 @@ C_SyvDaDashboardSelectorTabWidget::C_SyvDaDashboardSelectorTabWidget(QWidget * c
    mq_Connected(false),
    me_DashboardTabType(C_PuiSvDashboard::eSCENE)
 {
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
    //Add button
    mpc_PushButton = new C_OgePubIconText(this);
    this->mpc_PushButton->SetIconSize(24);
@@ -71,6 +73,9 @@ C_SyvDaDashboardSelectorTabWidget::C_SyvDaDashboardSelectorTabWidget(QWidget * c
    this->mpc_PushButton->SetToolTipInformation(C_GtGetText::h_GetText(""),
                                                C_GtGetText::h_GetText("Add new Dashboard tab."));
    connect(this->mpc_PushButton, &QPushButton::clicked, this, &C_SyvDaDashboardSelectorTabWidget::m_OnAddClicked);
+
+   // Handle service mode
+   this->mpc_PushButton->setEnabled(!q_ServiceModeActive);
 
    //Tabs
    this->mpc_TabBar = new C_SyvDaDashboardSelectorTabBar(this);
@@ -97,6 +102,7 @@ C_SyvDaDashboardSelectorTabWidget::C_SyvDaDashboardSelectorTabWidget(QWidget * c
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1579}  no memory leak because of the parent of mpc_TabBar and mpc_PushButton and the Qt memory management
 C_SyvDaDashboardSelectorTabWidget::~C_SyvDaDashboardSelectorTabWidget(void)
 {
    m_StoreUserSettings();
@@ -111,8 +117,6 @@ C_SyvDaDashboardSelectorTabWidget::~C_SyvDaDashboardSelectorTabWidget(void)
          pc_Widget->deleteLater();
       }
    }
-   //lint -e{1540,1579}  no memory leak because of the parent of mpc_TabBar and mpc_PushButton and the Qt memory
-   // management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -716,8 +720,6 @@ void C_SyvDaDashboardSelectorTabWidget::m_InitTabStyle(const uint32 ou32_Index, 
    C_OgeWiDashboardTab * const pc_DrawingWidget = new C_OgeWiDashboardTab(NULL, true);
    C_OgeGbxTransparent * const pc_GroupBox = new C_OgeGbxTransparent();
 
-   QTabBar::ButtonPosition e_SpacerPosition;
-
    switch (this->me_DashboardTabType)
    {
    case C_PuiSvDashboard::eSCENE:
@@ -733,16 +735,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_InitTabStyle(const uint32 ou32_Index, 
    pc_GroupBox->resize(40, 1);
 
    //Space
-   //lint -e{948,774}  Kept in case button is moved to the other side
-   if (C_SyvDaDashboardSelectorTabWidget::mhe_TabContentPosition == QTabBar::RightSide)
-   {
-      e_SpacerPosition = QTabBar::LeftSide;
-   }
-   else
-   {
-      e_SpacerPosition = QTabBar::RightSide;
-   }
-   this->tabBar()->setTabButton(static_cast<sintn>(ou32_Index), e_SpacerPosition, pc_GroupBox);
+   //"RightSide": We need to modify this if we decide to change sides:
+   this->tabBar()->setTabButton(static_cast<sintn>(ou32_Index), QTabBar::RightSide, pc_GroupBox);
 
    connect(pc_DrawingWidget, &C_OgeWiDashboardTab::SigActiveChanged, this,
            &C_SyvDaDashboardSelectorTabWidget::m_OnActiveChange);
@@ -1312,7 +1306,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_TearOffWidget(const uint32 ou32_DataIn
          }
          // Add the widget to the container
          this->mc_TearedOffWidgets.push_back(pc_Widget);
-      }
+      } //lint !e429  //no memory leak because of the parent of pc_Widget and the Qt memory
    }
 }
 

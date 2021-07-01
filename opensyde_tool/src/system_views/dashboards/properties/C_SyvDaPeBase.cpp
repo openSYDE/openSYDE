@@ -674,6 +674,7 @@ void C_SyvDaPeBase::m_Browse(void)
    if (c_New != NULL)
    {
       pc_Dialog->SaveUserSettings();
+      pc_Dialog->PrepareCleanUp();
       c_New->HideOverlay();
    }
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
@@ -846,7 +847,8 @@ QString C_SyvDaPeBase::m_GetDefaultDisplayName(const C_PuiSvDbNodeDataPoolListEl
       {
          if (pc_Datapool != NULL)
          {
-            if (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC)
+            if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC) ||
+                (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
             {
                c_Retval = C_PuiSvHandler::h_GetShortNamespace(orc_Id);
             }

@@ -3,7 +3,7 @@
    \file
    \brief       Utilitiy functions for C_OSCNodeDataPoolContent access (implementation)
 
-   Utilitiy functions for C_OSCNodeDataPoolContent access
+   Utility functions for C_OSCNodeDataPoolContent access
 
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */

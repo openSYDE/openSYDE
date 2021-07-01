@@ -51,7 +51,7 @@ C_PopFileTableView::C_PopFileTableView(QWidget * const opc_Parent) :
    C_TblViewToolTipBase(opc_Parent)
 {
    //Model
-   this->setModel(&mc_Model);
+   this->C_PopFileTableView::setModel(&mc_Model);
 
    //Drawing delegate
    this->mc_Delegate.SetModel(&mc_Model);

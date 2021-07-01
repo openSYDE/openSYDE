@@ -41,6 +41,7 @@ public:
    stw_types::sint32 GetMaximumRequiredHeight(void) const;
    void SetActive(const stw_types::uint32 ou32_ViewIndex, const stw_types::sint32 os32_SubMode) const;
    C_NagViewItem * GetItemAt(const stw_types::sintn osn_Index) const;
+   void HandleServiceMode(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

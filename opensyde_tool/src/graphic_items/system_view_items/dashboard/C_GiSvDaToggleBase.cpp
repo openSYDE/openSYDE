@@ -125,6 +125,7 @@ void C_GiSvDaToggleBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_S
 /*! \brief   Adjust font to current size
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
 void C_GiSvDaToggleBase::ReInitializeSize(void)
 {
 }

@@ -44,12 +44,12 @@ public:
    virtual void UserInputFunc(const stw_types::uint32 ou32_FuncNumber) override;
    virtual void SetSubMode(const stw_types::sint32 os32_SubMode, const stw_types::uint32 ou32_Index,
                            const stw_types::uint32 ou32_Flag) override;
-   virtual void Save(void);
-   virtual bool PrepareToClose(void);
+   virtual void Save(void) override;
+   virtual bool PrepareToClose(void) override;
    virtual bool GlobalUserKeyPress(QKeyEvent * const opc_Event) override;
    //Generic push button
-   virtual void OnPushButtonIconPress(void);
-   virtual void CallHelp(void);
+   virtual void OnPushButtonIconPress(void) override;
+   virtual void CallHelp(void) override;
 
 private:
    //Avoid call

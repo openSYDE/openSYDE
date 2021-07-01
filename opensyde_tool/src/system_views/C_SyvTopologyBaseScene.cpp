@@ -151,6 +151,7 @@ void C_SyvTopologyBaseScene::Load(void)
    \param[in]  opc_Pos  Optional position offset
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
 void C_SyvTopologyBaseScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
 {
    // Nothing to do yet
@@ -466,6 +467,7 @@ bool C_SyvTopologyBaseScene::m_AddOfMime(const QMimeData * const opc_MimeData, c
 /*! \brief   Copy items
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
 void C_SyvTopologyBaseScene::m_Copy(void)
 {
    // Nothing to do
@@ -475,6 +477,7 @@ void C_SyvTopologyBaseScene::m_Copy(void)
 /*! \brief   Cut items
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
 void C_SyvTopologyBaseScene::m_Cut(void)
 {
    // Nothing to do

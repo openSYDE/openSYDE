@@ -25,7 +25,9 @@ namespace stw_opensyde_gui_logic
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
+//lint -save -e8080 //using types expected by the library for API compatibility
 typedef HWND (WINAPI * PR_HtmlHelp)(HWND opv_Caller, LPCSTR opcn_File, UINT oun_Command, DWORD ou32_Data);
+//lint -restore
 
 class C_HeHandler
 {

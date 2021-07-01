@@ -95,6 +95,7 @@ public:
    stw_types::sint32 AssignDataPoolApplication(const stw_types::uint32 ou32_NodeIndex,
                                                const stw_types::uint32 ou32_DataPoolIndex,
                                                const stw_types::sint32 os32_ApplicationIndex);
+   stw_types::sint32 AssignAllHalcNvmDataPools(const stw_types::uint32 ou32_NodeIndex);
    stw_types::sint32 GetDataPool(const stw_types::uint32 & oru32_NodeIndex,
                                  const stw_types::uint32 & oru32_DataPoolIndex,
                                  stw_opensyde_core::C_OSCNodeDataPool & orc_OSCContent,
@@ -120,9 +121,27 @@ public:
    bool CheckNodeDataPoolNameAvailable(const stw_types::uint32 & oru32_NodeIndex, const stw_scl::C_SCLString & orc_Name,
                                        const stw_types::uint32 * const opu32_DataPoolIndexToSkip = NULL,
                                        std::vector<stw_scl::C_SCLString> * const opc_ExistingDatapoolNames = NULL) const;
-   bool CheckNodeNvmDataPoolsSizeConflict(const stw_types::uint32 ou32_NodeIndex) const;
    C_PuiSdSharedDatapools & GetSharedDatapools(void);
    const C_PuiSdSharedDatapools & GetSharedDatapoolsConst(void) const;
+
+   //NVM based Datapool
+   class C_PuiSdHandlerNodeLogicNvmArea
+   {
+   public:
+      C_PuiSdHandlerNodeLogicNvmArea(void);
+      bool operator <(const C_PuiSdHandlerNodeLogicNvmArea & orc_Cmp) const;
+      C_PuiSdHandlerNodeLogicNvmArea & operator =(const C_PuiSdHandlerNodeLogicNvmArea & orc_Source);
+
+      stw_types::uint32 u32_StartAddress;
+      stw_types::uint32 u32_Size;
+      bool q_InRange;
+      std::vector<stw_types::uint32> c_DataPoolIndexes;
+   };
+
+   bool CheckNodeNvmDataPoolsSizeConflict(const stw_types::uint32 ou32_NodeIndex, bool * const opq_SizeConflict = NULL,
+                                          bool * const opq_OverlapConflict = NULL) const;
+   stw_types::sint32 GetNodeNvmDataPoolAreas(const stw_types::uint32 ou32_NodeIndex,
+                                             std::vector<C_PuiSdHandlerNodeLogicNvmArea> & orc_Areas) const;
 
    //Data block
    stw_types::sint32 AddApplication(const stw_types::uint32 ou32_NodeIndex,
@@ -151,7 +170,7 @@ public:
                                           const stw_types::uint32 * const opu32_SkipApplication = NULL) const;
    std::vector<const stw_opensyde_core::C_OSCNodeApplication *> GetProgrammableApplications(
       const stw_types::uint32 ou32_NodeIndex) const;
-   std::vector<stw_types::uint32> GetProgrammableAppIndices(const stw_types::uint32 ou32_NodeIndex) const;
+   std::vector<stw_types::uint32> GetFileGenAppIndices(const stw_types::uint32 ou32_NodeIndex) const;
 
    //Datapool list
    stw_types::sint32 InsertDataPoolList(const stw_types::uint32 & oru32_NodeIndex,
@@ -366,6 +385,15 @@ protected:
                            const bool & orq_AllowDataAdaptation = false, const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComProtocolType =
                               stw_opensyde_core::C_OSCCanProtocol::eLAYER2);
    void m_CleanUpComDataPool(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex);
+
+private:
+   // NVM base Datapool helper functions
+   static void mh_GetNodeNvmDataPoolAreas(const stw_opensyde_core::C_OSCNode & orc_Node,
+                                          std::vector<C_PuiSdHandlerNodeLogicNvmArea> & orc_Areas);
+   static void mh_AddAndAdaptNvmDataPoolArea(C_PuiSdHandlerNodeLogicNvmArea & orc_CurrentArea,
+                                             std::vector<C_PuiSdHandlerNodeLogicNvmArea> & orc_Areas);
+   static void mh_MergeNvmDataPoolAreas(const C_PuiSdHandlerNodeLogicNvmArea & orc_AreaToAdd,
+                                        C_PuiSdHandlerNodeLogicNvmArea & orc_AreaToMerge);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

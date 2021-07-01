@@ -19,22 +19,18 @@
 #include "stwtypes.h"
 #include "TGLUtils.h"
 #include "CSCLString.h"
-#include "CSCLResourceStrings.h"
-#define STR_TABLE_INCLUDE  //we really want the symbols from the DLStrings.h header
-#include "DLStrings.h"
-
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_tgl;
 using namespace stw_scl;
 
-/* -- Defines ------------------------------------------------------------------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
-static C_SCLResourceStrings mc_ResourceStrings;
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
@@ -136,34 +132,6 @@ void stw_tgl::TGL_HandleSystemMessages(void)
       DispatchMessage(&t_Msg);
    }
 */
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Load resource string
-
-   Load resource strings from resource table.
-   For Windows this is easy as calling "LoadString".
-   For other target we will have to use the C_SCLResourceStrings class
-    and fill a singleton of it with the application strings (e.g. VisLibString.h).
-   So we probably will need an init function as well.
-
-   \param[in]    ou16_StringIndex     Index of string
-
-   \return
-   string
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString stw_tgl::TGL_LoadStr(const uint16 ou16_StringIndex)
-{
-   static bool hq_Initialized = false;
-
-   if (hq_Initialized == false)
-   {
-      mc_ResourceStrings.SetStringTable(gac_DIAG_LIB_RESOURCE_STRINGS, gu16_DIAGLIB_NR_RES_STRNGS);
-      hq_Initialized = true;
-   }
-
-   return mc_ResourceStrings.LoadStr(ou16_StringIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

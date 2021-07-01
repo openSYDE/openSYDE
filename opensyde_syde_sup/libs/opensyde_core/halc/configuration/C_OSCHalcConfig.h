@@ -32,6 +32,7 @@ public:
    virtual void Clear(void);
    virtual bool IsClear(void) const;
    virtual void AddDomain(const C_OSCHalcDefDomain & orc_Domain);
+   virtual void HandleFileLoadPostProcessing(void);
    stw_types::sint32 SetDomainConfig(const stw_types::uint32 ou32_Index, const C_OSCHalcConfigDomain & orc_Domain);
    stw_types::sint32 SetDomainChannelConfig(const stw_types::uint32 ou32_DomainIndex,
                                             const stw_types::uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,

@@ -57,7 +57,7 @@ const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_HALC = 3U;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in] opc_Parent  Optional parent
+   \param[in]  opc_Parent  Optional parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdSearchTreeWidget::C_SdSearchTreeWidget(QWidget * const opc_Parent) :
@@ -126,7 +126,7 @@ C_SdSearchTreeWidget::~C_SdSearchTreeWidget()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Searching for substring in the names of system definition items
 
-   \param[in]     orc_SearchString   Search substring
+   \param[in]  orc_SearchString  Search substring
 
    \return
    true: results found
@@ -254,8 +254,11 @@ void C_SdSearchTreeWidget::SetSearchResultFocus(void)
    }
 
    this->setFocus();
-   this->setItemSelected(pc_Item, true);
-   this->setCurrentItem(pc_Item);
+   if (pc_Item != NULL)
+   {
+      pc_Item->setSelected(true);
+      this->setCurrentItem(pc_Item);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -263,7 +266,7 @@ void C_SdSearchTreeWidget::SetSearchResultFocus(void)
 
    Here: Open concrete item or hide this tree widget
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -287,7 +290,7 @@ void C_SdSearchTreeWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 
    Here: Remove the selection
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::focusOutEvent(QFocusEvent * const opc_Event)
@@ -420,7 +423,11 @@ void C_SdSearchTreeWidget::m_SearchDataPoolContent(const C_OSCNodeDataPool & orc
                u8_Type = mhu8_DATAELEMENT_TYPE_SIGNAL;
                break;
             case C_OSCNodeDataPool::eHALC:
+            case C_OSCNodeDataPool::eHALC_NVM:
                u8_Type = mhu8_DATAELEMENT_TYPE_HALC;
+               break;
+            default:
+               tgl_assert(false);
                break;
             }
 
@@ -489,9 +496,9 @@ void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Searching in HALC configuration of node
 
-   \param[in]       orc_HalcConfig     HALC configuration for searching
-   \param[in]       orc_NodeName       Name of node
-   \param[in]       ou32_NodeIndex     Index of node
+   \param[in]  orc_HalcConfig    HALC configuration for searching
+   \param[in]  orc_NodeName      Name of node
+   \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_SearchHalcConfigurationContent(const stw_opensyde_core::C_OSCHalcConfig & orc_HalcConfig,
@@ -1015,14 +1022,14 @@ void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_Applicatio
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Adding an entry for a found HALC element (domain or channel)
 
-   \param[in]       orc_HalcDomainName      Name of found HALC domain
-   \param[in]       ou32_HalcDomainIndex    Index of found HALC domain
-   \param[in]       orc_HalcChannelName     Name of found HALC channel
-   \param[in]       ou32_HalcChannelIndex   Index of found HALC channel
-   \param[in]       oq_UseElementIndex      Flag if the element is a domain or a channel
-   \param[in]       orc_NodeName            Name of found node of HALC element
-   \param[in]       ou32_NodeIndex          Index of found node of HALC element
-   \param[in]       oe_Category             Category of domain (output, input, other)
+   \param[in]  orc_HalcDomainName      Name of found HALC domain
+   \param[in]  ou32_HalcDomainIndex    Index of found HALC domain
+   \param[in]  orc_HalcChannelName     Name of found HALC channel
+   \param[in]  ou32_HalcChannelIndex   Index of found HALC channel
+   \param[in]  oq_UseChannelIndex      Use channel index
+   \param[in]  orc_NodeName            Name of found node of HALC element
+   \param[in]  ou32_NodeIndex          Index of found node of HALC element
+   \param[in]  oe_Category             Category of domain (output, input, other)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddHalcChannelResult(const QString & orc_HalcDomainName, const uint32 ou32_HalcDomainIndex,

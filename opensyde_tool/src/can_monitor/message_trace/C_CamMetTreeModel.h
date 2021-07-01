@@ -78,7 +78,7 @@ public:
    const override;
    virtual QModelIndex index(const stw_types::sintn osn_Row, const stw_types::sintn osn_Column,
                              const QModelIndex & orc_Parent = QModelIndex()) const override;
-   virtual QModelIndex parent(const QModelIndex & orc_Index) const override;
+   virtual QModelIndex parent(const QModelIndex & orc_Index) const override; //lint !e1511  we want to hide the base
    virtual stw_types::sintn columnCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
    virtual QVariant data(const QModelIndex & orc_Index, const stw_types::sintn osn_Role =

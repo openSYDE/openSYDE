@@ -62,9 +62,9 @@ const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V5 = 4;
    Set up GUI with all elements.
    Warning: uninitialized if os32_ApplicationIndex invalid
 
-   \param[in]     ou32_NodeIndex        Node index
-   \param[in]     os32_ApplicationIndex Application index
-   \param[in,out] orc_Parent            Reference to parent
+   \param[in]      ou32_NodeIndex         Node index
+   \param[in]      os32_ApplicationIndex  Application index
+   \param[in,out]  orc_Parent             Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex, const sint32 os32_ApplicationIndex,
@@ -79,7 +79,10 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    this->mpc_Ui->setupUi(this);
 
    //Configure
-   this->mpc_Ui->pc_PushButtonClearProject->SetSvg("://images/system_views/IconClearAllEnabled.svg");
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_CheckBoxFileGen, "Font", 16);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_CheckBoxFileGen, "SemiBold", false);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_CheckBoxFileGen, "Bold", false);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_CheckBoxFileGen, "Foreground", 3);
    this->mpc_Ui->pc_PushButtonAddDataPool->SetSvg("://images/IconAddEnabled.svg");
    this->mpc_Ui->pc_SpinBoxProcessID->SetMinimumCustom(0);
    this->mpc_Ui->pc_SpinBoxProcessID->SetMaximumCustom(255);
@@ -87,43 +90,45 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    this->mpc_Ui->pc_ScrollAreaDataPools->DeactivateScrollbarResize();
    this->mpc_Ui->pc_PushButtonRevertToDefault->setIcon(QIcon("://images/IconRevert.svg"));
    this->mpc_Ui->pc_PushButtonRevertToDefault->setMenu(NULL); // remove menu (we only need the style of button class)
-   // Provide data block project as placeholder variable for output, code generate, code generator and IDE call
+   // Provide data block project as placeholder variable for output, source code directory, file generator and IDE call
    this->mpc_Ui->pc_PubMenuOutputFile->AddDatablockSection();
    this->mpc_Ui->pc_PubMenuCodeGenerate->AddDatablockSection();
    this->mpc_Ui->pc_PubMenuCodeGenerator->AddDatablockSection();
    this->mpc_Ui->pc_PubMenuIDE->AddDatablockSection();
+   this->mpc_Ui->pc_LineEditName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT); // name restriction
 
    //Remove debug labels
-   this->mpc_Ui->pc_GroupBoxDataPoolsEmpty->setTitle("");
    this->mpc_Ui->pc_GroupBoxDataPoolsNotEmpty->setTitle("");
    this->mpc_Ui->pc_PushButtonProject->setText("");
    this->mpc_Ui->pc_PushButtonOutputFile->setText("");
    this->mpc_Ui->pc_PushButtonCodeGenerate->setText("");
+   this->mpc_Ui->pc_PushButtonFileGenerate->setText("");
    this->mpc_Ui->pc_PushButtonCodeGenerator->setText("");
    this->mpc_Ui->pc_PushButtonIDE->setText("");
    this->mpc_Ui->pc_PubMenuProject->setText("");
    this->mpc_Ui->pc_PubMenuOutputFile->setText("");
    this->mpc_Ui->pc_PubMenuCodeGenerate->setText("");
+   this->mpc_Ui->pc_PubMenuFileGenerate->setText("");
    this->mpc_Ui->pc_PubMenuCodeGenerator->setText("");
    this->mpc_Ui->pc_PubMenuIDE->setText("");
    this->mpc_Ui->pc_PushButtonRevertToDefault->setText("");
+   this->mpc_Ui->pc_LabelSafeFile->setText("");
+   this->mpc_Ui->pc_LabelSafeFileValue->setText("");
+   this->mpc_Ui->pc_LabelNonSafeFile->setText("");
+   this->mpc_Ui->pc_LabelNonSafeFileValue->setText("");
 
+   // Init non empty names
    InitStaticNames();
-   if (os32_ApplicationIndex >= 0)
-   {
-      m_LoadData(ou32_NodeIndex, static_cast<uint32>(os32_ApplicationIndex));
-   }
+
+   // Load data
+   m_LoadData();
 
    // register the widget for showing
    this->mrc_ParentDialog.SetWidget(this);
 
-   // name restriction
-   this->mpc_Ui->pc_LineEditName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
-
+   // general connects
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_CancelClicked);
-   connect(this->mpc_Ui->pc_PushButtonClearProject, &QPushButton::clicked,
-           this, &C_SdNdeDbProperties::m_OnClickClearProject);
    connect(this->mpc_Ui->pc_LineEditName, &C_OgeLePropertiesName::textChanged,
            this, &C_SdNdeDbProperties::m_OnNameEdited);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
@@ -133,11 +138,15 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
            &C_SdNdeDbProperties::m_HandleAddDataPools);
    connect(this->mpc_Ui->pc_PushButtonRevertToDefault, &QPushButton::clicked, this,
            &C_SdNdeDbProperties::m_HandleRevertCodeGenerator);
+   connect(this->mpc_Ui->pc_CheckBoxFileGen, &QCheckBox::stateChanged,
+           this, &C_SdNdeDbProperties::m_OnFileGenerationChanged);
 
    // browse actions
    connect(this->mpc_Ui->pc_PushButtonProject, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_OnClickProject);
    connect(this->mpc_Ui->pc_PushButtonCodeGenerate, &QPushButton::clicked,
-           this, &C_SdNdeDbProperties::m_OnClickGenerate);
+           this, &C_SdNdeDbProperties::m_OnClickCodeGeneration);
+   connect(this->mpc_Ui->pc_PushButtonFileGenerate, &QPushButton::clicked,
+           this, &C_SdNdeDbProperties::m_OnClickFileGeneration);
    connect(this->mpc_Ui->pc_PushButtonCodeGenerator, &QPushButton::clicked,
            this, &C_SdNdeDbProperties::m_OnClickGenerator);
    connect(this->mpc_Ui->pc_PushButtonOutputFile, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_OnClickOutput);
@@ -152,6 +161,10 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
            this->mpc_Ui->pc_LineEditOutputFile, &C_OgeLeFilePath::InsertVariable);
    connect(this->mpc_Ui->pc_PubMenuCodeGenerate, &C_OgePubPathVariables::SigVariableSelected,
            this->mpc_Ui->pc_LineEditCodeGenerate, &C_OgeLeFilePath::InsertVariable);
+   connect(this->mpc_Ui->pc_PubMenuFileGenerate, &C_OgePubPathVariables::SigVariableSelected,
+           this->mpc_Ui->pc_LineEditFileGenerate, &C_OgeLeFilePath::InsertVariable);
+   connect(this->mpc_Ui->pc_PubMenuFileGenerate, &C_OgePubPathVariables::SigVariableSelected,
+           this, &C_SdNdeDbProperties::m_UpdatePathsRelativeToGeneratedDir);
    connect(this->mpc_Ui->pc_PubMenuCodeGenerator, &C_OgePubPathVariables::SigVariableSelected,
            this->mpc_Ui->pc_LineEditCodeGenerator, &C_OgeLeFilePath::InsertVariable);
    connect(this->mpc_Ui->pc_PubMenuIDE, &C_OgePubPathVariables::SigVariableSelected,
@@ -160,6 +173,8 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    // connect for updating paths that are relative to project path
    connect(this->mpc_Ui->pc_LineEditProject, &C_OgeLeFilePath::editingFinished,
            this, &C_SdNdeDbProperties::m_UpdatePathsRelativeToProject);
+   connect(this->mpc_Ui->pc_LineEditFileGenerate, &C_OgeLeFilePath::editingFinished,
+           this, &C_SdNdeDbProperties::m_UpdatePathsRelativeToGeneratedDir);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -180,7 +195,7 @@ C_SdNdeDbProperties::~C_SdNdeDbProperties(void)
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_SdNdeDbProperties::h_GetBinaryWindowSize(void)
 {
-   return QSize(850, 524);
+   return QSize(800, 500);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -192,7 +207,7 @@ QSize C_SdNdeDbProperties::h_GetBinaryWindowSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_SdNdeDbProperties::h_GetDefaultWindowSize(void)
 {
-   return QSize(1000, 946);
+   return QSize(1200, 900);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -205,16 +220,21 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Properties"));
    this->mpc_Ui->pc_LabelName->setText(C_GtGetText::h_GetText("Name"));
    this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
-   this->mpc_Ui->pc_LabelType->setText(C_GtGetText::h_GetText("Type"));
    this->mpc_Ui->pc_LabelHeadingProject->setText(C_GtGetText::h_GetText("Project"));
-   this->mpc_Ui->pc_LabelHeadingProjectTools->setText(C_GtGetText::h_GetText("Project Tools"));
+   this->mpc_Ui->pc_CheckBoxFileGen->setText(C_GtGetText::h_GetText("File Generation"));
+   this->mpc_Ui->pc_LabelFileGenerationDisabled->setText(C_GtGetText::h_GetText("File Generation disabled."));
+   this->mpc_Ui->pc_LabelSafeFile->setText(C_GtGetText::h_GetText("Safe File"));
+   this->mpc_Ui->pc_LabelNonSafeFile->setText(C_GtGetText::h_GetText("Non Safe File"));
+   this->mpc_Ui->pc_LabelSafeFileNone->setText(C_GtGetText::h_GetText("<safe configuration not available>"));
+   this->mpc_Ui->pc_LabelNonSafeFileNone->setText(C_GtGetText::h_GetText("<non-safe configuration not available>"));
    this->mpc_Ui->pc_LabelProject->setText(C_GtGetText::h_GetText("Project Path"));
    this->mpc_Ui->pc_LabelProcessID->setText(C_GtGetText::h_GetText("Process ID"));
    this->mpc_Ui->pc_LabelOutputFile->setText(C_GtGetText::h_GetText("Output File"));
    this->mpc_Ui->pc_LabelIDE->setText(C_GtGetText::h_GetText("IDE Call"));
-   this->mpc_Ui->pc_LabelCodeGenerator->setText(C_GtGetText::h_GetText("Code Generator"));
-   this->mpc_Ui->pc_LabelCodeGenerate->setText(C_GtGetText::h_GetText("Gen. Code Directory"));
-   this->mpc_Ui->pc_LabelCodeStructure->setText(C_GtGetText::h_GetText("Code Structure Version"));
+   this->mpc_Ui->pc_LabelCodeGenerator->setText(C_GtGetText::h_GetText("Generator"));
+   this->mpc_Ui->pc_LabelCodeGenerate->setText(C_GtGetText::h_GetText("Gen. Directory"));
+   this->mpc_Ui->pc_LabelFileGenerate->setText(C_GtGetText::h_GetText("Gen. Directory"));
+   this->mpc_Ui->pc_LabelCodeStructure->setText(C_GtGetText::h_GetText("Structure"));
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
@@ -241,20 +261,31 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
                              "\n - should not be longer than 31 characters"));
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this Data Block."));
-   this->mpc_Ui->pc_LabelType->SetToolTipInformation(C_GtGetText::h_GetText("Type"),
-                                                     C_GtGetText::h_GetText("Type of Data Block."));
 
    this->mpc_Ui->pc_LabelHeadingDatapools->SetToolTipInformation(
       C_GtGetText::h_GetText("Owned Datapools"),
-      C_GtGetText::h_GetText("List of all Datapools which are mapped to this programmable application"
-                             "\n(Relevant for code generation)."));
+      C_GtGetText::h_GetText("List of all Datapool(s) which are mapped to this Data Block"
+                             "\n(Relevant for file generation)."));
 
    this->mpc_Ui->pc_PushButtonAddDataPool->SetToolTipInformation(C_GtGetText::h_GetText(""),
-                                                                 C_GtGetText::h_GetText(
-                                                                    "Add Datapool(s) to list."));
+                                                                 C_GtGetText::h_GetText("Add Datapool(s) to list."));
 
-   this->mpc_Ui->pc_PushButtonClearProject->SetToolTipInformation(C_GtGetText::h_GetText(""),
-                                                                  C_GtGetText::h_GetText("Clear project definitions."));
+   this->mpc_Ui->pc_CheckBoxFileGen->SetToolTipInformation(
+      C_GtGetText::h_GetText("File Generation"),
+      C_GtGetText::h_GetText("Generate files for this Data Block with an external code or file generator tool."));
+
+   this->mpc_Ui->pc_LabelSafeFile->SetToolTipInformation(
+      C_GtGetText::h_GetText("Safe File"),
+      C_GtGetText::h_GetText("File name of generated parameter set image for safe hardware configuration data."));
+   this->mpc_Ui->pc_LabelNonSafeFile->SetToolTipInformation(
+      C_GtGetText::h_GetText("Non Safe File"),
+      C_GtGetText::h_GetText("File name of generated parameter set image for non-safe hardware configuration data."));
+   this->mpc_Ui->pc_LabelSafeFileNone->SetToolTipInformation(
+      "",
+      C_GtGetText::h_GetText("The hardware definition for this node does not support safe channel configuration."));
+   this->mpc_Ui->pc_LabelNonSafeFileNone->SetToolTipInformation(
+      "",
+      C_GtGetText::h_GetText("The hardware definition for this node does not support non-safe channel configuration."));
 
    this->mpc_Ui->pc_LabelProcessID->SetToolTipInformation(
       C_GtGetText::h_GetText("Process ID"),
@@ -270,18 +301,21 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
       C_GtGetText::h_GetText("Output File"),
       C_GtGetText::h_GetText("Location of output file. Absolute or relative to project path."));
    this->mpc_Ui->pc_LabelCodeGenerate->SetToolTipInformation(
-      C_GtGetText::h_GetText("Generated Code Directory"),
-      C_GtGetText::h_GetText("Location of the directory for openSYDE generated code. "
+      C_GtGetText::h_GetText("Generation Directory"),
+      C_GtGetText::h_GetText("Location of the directory for openSYDE generated source code files. "
                              "Absolute or relative to project path."));
-
+   this->mpc_Ui->pc_LabelFileGenerate->SetToolTipInformation(
+      C_GtGetText::h_GetText("Generation Directory"),
+      C_GtGetText::h_GetText("Location of the directory for openSYDE generated parameter set image files. "
+                             "Absolute or relative to *.syde."));
    this->mpc_Ui->pc_LabelCodeGenerator->SetToolTipInformation(
-      C_GtGetText::h_GetText("Code Generator"),
-      C_GtGetText::h_GetText("Location of code generator executable (*.exe / *.bat). "
+      C_GtGetText::h_GetText("Generator"),
+      C_GtGetText::h_GetText("Location of file generator executable (*.exe / *.bat). "
                              "Absolute or relative to openSYDE.exe."));
    this->mpc_Ui->pc_LabelCodeStructure->SetToolTipInformation(
-      C_GtGetText::h_GetText("Code Structure Version"),
+      C_GtGetText::h_GetText("Structure Version"),
       static_cast<QString>(C_GtGetText::h_GetText(
-                              "Version of structure for generated code. Which version to select depends on what "
+                              "Version of structure for generated output files. Which version to select depends on what "
                               "your physical target supports. See target documentation for further information about "
                               "supported versions.\n"
                               " - %1: Compatibility mode for previous versions of provided tools \n"
@@ -290,11 +324,11 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
                               " - %3: Support for flexible placement of embedded RAM variables\n"
                               " - %4: Support for public scope of Datapool content\n"
                               " - %5: Optimization of sequences where the openSYDE server keeps a thread/process lock on "))
-      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V1))
-      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V2))
-      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V3))
-      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V4))
-      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V5)));
+      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V1),
+           this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V2),
+           this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V3),
+           this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V4),
+           this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V5)));
    this->mpc_Ui->pc_LabelIDE->SetToolTipInformation(
       C_GtGetText::h_GetText("IDE Call"),
       C_GtGetText::h_GetText("Command line IDE call. Absolute or relative to working directory. Make sure to escape "
@@ -302,7 +336,7 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
 
    this->mpc_Ui->pc_PushButtonRevertToDefault->SetToolTipInformation(
       C_GtGetText::h_GetText("Revert to Default"),
-      C_GtGetText::h_GetText("Set path to default openSYDE code generator (syde_coder_c)."));
+      C_GtGetText::h_GetText("Set path to default openSYDE file generator \"SYDE Coder C\"."));
 
    this->mpc_Ui->pc_PushButtonProject->SetToolTipInformation(
       C_GtGetText::h_GetText("Browse"),
@@ -312,43 +346,65 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
       C_GtGetText::h_GetText("Browse for output file of this Data Block."));
    this->mpc_Ui->pc_PushButtonCodeGenerate->SetToolTipInformation(
       C_GtGetText::h_GetText("Browse"),
-      C_GtGetText::h_GetText("Browse for location of openSYDE generated code."));
+      C_GtGetText::h_GetText("Browse for location for openSYDE generated source code files."));
+   this->mpc_Ui->pc_PushButtonFileGenerate->SetToolTipInformation(
+      C_GtGetText::h_GetText("Browse"),
+      C_GtGetText::h_GetText("Browse for location for openSYDE generated parameter set image files."));
    this->mpc_Ui->pc_PushButtonCodeGenerator->SetToolTipInformation(
       C_GtGetText::h_GetText("Browse"),
-      C_GtGetText::h_GetText("Browse for code generator of this Data Block."));
+      C_GtGetText::h_GetText("Browse for file generator of this Data Block."));
    this->mpc_Ui->pc_PushButtonIDE->SetToolTipInformation(
       C_GtGetText::h_GetText("Browse"),
       C_GtGetText::h_GetText("Browse for IDE executable."));
-}
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Init from application
-
-   Warning: should only be used in case of invalid application index
-
-   \param[in] orc_Application Application to use for initialization
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::LoadFromData(const C_OSCNodeApplication & orc_Application)
-{
-   this->mc_SelectedDataPools.clear();
-   m_LoadFromData(orc_Application);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply new data block properties
 
-   \param[in,out] orc_Application Application to apply to
+   \param[in,out]  orc_Application  Application to apply to
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::ApplyNewData(C_OSCNodeApplication & orc_Application) const
 {
-   //Section 1
    orc_Application.c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
    orc_Application.c_Comment = this->mpc_Ui->pc_CommentText->toPlainText().toStdString().c_str();
-   //Section 2
-   orc_Application.c_ProjectPath = this->mpc_Ui->pc_LineEditProject->GetPath().toStdString().c_str();
+   orc_Application.e_Type = this->me_Type;
    orc_Application.u8_ProcessId = static_cast<uint8>(this->mpc_Ui->pc_SpinBoxProcessID->value());
-   orc_Application.c_ResultPath = this->mpc_Ui->pc_LineEditOutputFile->GetPath().toStdString().c_str();
+   switch (this->me_Type)
+   {
+   case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
+   case C_OSCNodeApplication::eBINARY:
+      orc_Application.c_ProjectPath = this->mpc_Ui->pc_LineEditProject->GetPath().toStdString().c_str();
+      orc_Application.c_ResultPaths.resize(1);
+      orc_Application.c_ResultPaths[0] = this->mpc_Ui->pc_LineEditOutputFile->GetPath().toStdString().c_str();
+      break;
+   case C_OSCNodeApplication::ePARAMETER_SET_HALC:
+      orc_Application.c_ProjectPath = this->mpc_Ui->pc_LineEditFileGenerate->GetPath().toStdString().c_str();
+
+      if (this->mpc_Ui->pc_LabelSafeFileValue->text() == "")
+      {
+         // all non-safe
+         orc_Application.c_ResultPaths.resize(1);
+         orc_Application.c_ResultPaths[0] = this->mpc_Ui->pc_LabelNonSafeFileValue->text().toStdString().c_str();
+      }
+      else if (this->mpc_Ui->pc_LabelNonSafeFileValue->text() == "")
+      {
+         // all safe
+         orc_Application.c_ResultPaths.resize(1);
+         orc_Application.c_ResultPaths[0] = this->mpc_Ui->pc_LabelSafeFileValue->text().toStdString().c_str();
+      }
+      else
+      {
+         //safe and non-safe
+         orc_Application.c_ResultPaths.resize(2);
+         orc_Application.c_ResultPaths[0] = this->mpc_Ui->pc_LabelSafeFileValue->text().toStdString().c_str();
+         orc_Application.c_ResultPaths[1] = this->mpc_Ui->pc_LabelNonSafeFileValue->text().toStdString().c_str();
+      }
+      break;
+   default:
+      tgl_assert(false);
+      break;
+   }
    orc_Application.c_IDECall = this->mpc_Ui->pc_LineEditIDE->text().toStdString().c_str();
    orc_Application.c_CodeGeneratorPath =
       this->mpc_Ui->pc_LineEditCodeGenerator->GetPath().toStdString().c_str();
@@ -380,7 +436,7 @@ void C_SdNdeDbProperties::ApplyNewData(C_OSCNodeApplication & orc_Application) c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle data pools of application
 
-   \param[in] ou32_ApplicationIndex Index of application to apply data pools to
+   \param[in]  ou32_ApplicationIndex   Index of application to apply data pools to
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::HandleDataPools(const uint32 ou32_ApplicationIndex) const
@@ -393,9 +449,10 @@ void C_SdNdeDbProperties::HandleDataPools(const uint32 ou32_ApplicationIndex) co
       {
          bool q_Found = false;
          const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
-         for (uint32 u32_ItSelect = 0UL; u32_ItSelect < this->mc_SelectedDataPools.size(); ++u32_ItSelect)
+         for (std::set<uint32>::const_iterator c_ItSelect = this->mc_SelectedDataPools.begin();
+              c_ItSelect != this->mc_SelectedDataPools.end(); ++c_ItSelect)
          {
-            if (this->mc_SelectedDataPools[u32_ItSelect] == u32_ItDataPool)
+            if (*c_ItSelect == u32_ItDataPool)
             {
                q_Found = true;
             }
@@ -404,10 +461,9 @@ void C_SdNdeDbProperties::HandleDataPools(const uint32 ou32_ApplicationIndex) co
          if (q_Found == true)
          {
             //Always assign this one
-            tgl_assert(C_PuiSdHandler::h_GetInstance()->AssignDataPoolApplication(this->mu32_NodeIndex, u32_ItDataPool,
-                                                                                  static_cast<sint32>(
-                                                                                     ou32_ApplicationIndex)) ==
-                       C_NO_ERR);
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->
+                       AssignDataPoolApplication(this->mu32_NodeIndex, u32_ItDataPool,
+                                                 static_cast<sint32>(ou32_ApplicationIndex)) == C_NO_ERR);
          }
          else
          {
@@ -428,7 +484,7 @@ void C_SdNdeDbProperties::HandleDataPools(const uint32 ou32_ApplicationIndex) co
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -474,6 +530,36 @@ void C_SdNdeDbProperties::m_OkClicked(void)
 
    if ((q_NameIsValid == true) && (q_IDIsValid == true) && (q_PathsAreValid == true))
    {
+      // clear unused data
+      switch (this->me_Type)
+      {
+      case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
+         this->mpc_Ui->pc_LabelSafeFileValue->setText("");
+         this->mpc_Ui->pc_LabelNonSafeFileValue->setText("");
+         this->mpc_Ui->pc_LineEditFileGenerate->SetPath("");
+         break;
+      case C_OSCNodeApplication::eBINARY:
+         this->mc_SelectedDataPools.clear();
+         this->mpc_Ui->pc_LineEditCodeGenerator->SetPath("");
+         this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(0);
+         this->mpc_Ui->pc_SpinBoxProcessID->setValue(0);
+         this->mpc_Ui->pc_LineEditCodeGenerate->SetPath("");
+         this->mpc_Ui->pc_LabelSafeFileValue->setText("");
+         this->mpc_Ui->pc_LabelNonSafeFileValue->setText("");
+         break;
+      case C_OSCNodeApplication::ePARAMETER_SET_HALC:
+         this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(0);
+         this->mpc_Ui->pc_SpinBoxProcessID->setValue(0);
+         this->mpc_Ui->pc_LineEditCodeGenerate->SetPath("");
+         this->mpc_Ui->pc_LineEditProject->SetPath("");
+         this->mpc_Ui->pc_LineEditOutputFile->SetPath("");
+         this->mpc_Ui->pc_LineEditIDE->setText("");
+         break;
+      default:
+         tgl_assert(false);
+         break;
+      }
+
       this->mrc_ParentDialog.accept();
    }
    else
@@ -501,7 +587,7 @@ void C_SdNdeDbProperties::m_OkClicked(void)
       }
       if (q_PathsAreValid == false)
       {
-         c_Details += C_GtGetText::h_GetText("Paths that contain invalid characters:\n");
+         c_Details += C_GtGetText::h_GetText("Invalid paths (e.g. containing invalid characters):\n");
          c_Details += c_ErrorPaths;
       }
 
@@ -622,10 +708,10 @@ QString C_SdNdeDbProperties::m_CheckID(void) const
       }
       if (q_ProcessIDError == true)
       {
-         if (c_UsedProcessIds.size() > 0UL)
+         if (c_UsedProcessIds.size() > 0)
          {
             QString c_Ids;
-            for (uint32 u32_ItId = 0; u32_ItId < (c_UsedProcessIds.size() - 1UL); ++u32_ItId)
+            for (uint32 u32_ItId = 0; u32_ItId < (static_cast<uint32>(c_UsedProcessIds.size()) - 1UL); ++u32_ItId)
             {
                c_Ids += static_cast<QString>("%1,").arg(c_UsedProcessIds[u32_ItId]);
             }
@@ -657,10 +743,19 @@ QString C_SdNdeDbProperties::m_CheckPaths(void) const
    // Output File
    c_Return += this->m_CheckPath(this->mpc_Ui->pc_LineEditOutputFile->GetPath());
 
-   // Gen. Code Directory
+   // Source Code Generation Directory
    c_Return += this->m_CheckPath(this->mpc_Ui->pc_LineEditCodeGenerate->GetPath());
 
-   // Code Generator
+   // PSI File Generation Directory
+   c_Return += this->m_CheckPath(this->mpc_Ui->pc_LineEditFileGenerate->GetPath());
+   // empty path not allowed for PSI file generation
+   if ((this->me_Type == C_OSCNodeApplication::ePARAMETER_SET_HALC) &&
+       (this->mpc_Ui->pc_LineEditFileGenerate->GetPath().isEmpty() == true))
+   {
+      c_Return += C_GtGetText::h_GetText("Generation directory path must not be empty.\n");
+   }
+
+   // Generator
    c_Return += this->m_CheckPath(this->mpc_Ui->pc_LineEditCodeGenerator->GetPath());
 
    // no logic for IDE call because this can be anything callable on a command line, so the user is responsible for a
@@ -673,6 +768,8 @@ QString C_SdNdeDbProperties::m_CheckPaths(void) const
 /*! \brief   Check path for invalid characters
 
    See C_OSCUtils for details about valid characters.
+
+   \param[in]  orc_Path    Path
 
    \return
    error path plus newline (empty if no error occured)
@@ -793,20 +890,14 @@ QString C_SdNdeDbProperties::m_GetDialogPath(const QString & orc_CurrentPath) co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load from specified data block
-
-   \param[in] ou32_NodeIndex        Node index
-   \param[in] ou32_ApplicationIndex Application index
+/*! \brief   Load displayed data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_LoadData(const stw_types::uint32 ou32_NodeIndex,
-                                     const stw_types::uint32 ou32_ApplicationIndex)
+void C_SdNdeDbProperties::m_LoadData(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
-   const C_OSCNodeApplication * const pc_Appl = C_PuiSdHandler::h_GetInstance()->GetApplication(ou32_NodeIndex,
-                                                                                                ou32_ApplicationIndex);
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
-   if ((pc_Appl != NULL) && (pc_Node != NULL))
+   if (pc_Node != NULL)
    {
       //Add existing selected datapools
       this->mc_SelectedDataPools.clear();
@@ -814,70 +905,134 @@ void C_SdNdeDbProperties::m_LoadData(const stw_types::uint32 ou32_NodeIndex,
       {
          const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
          if ((rc_DataPool.s32_RelatedDataBlockIndex >= 0) &&
-             (static_cast<uint32>(rc_DataPool.s32_RelatedDataBlockIndex) == ou32_ApplicationIndex))
+             (this->ms32_ApplicationIndex >= 0) &&
+             (rc_DataPool.s32_RelatedDataBlockIndex == this->ms32_ApplicationIndex))
          {
-            this->mc_SelectedDataPools.push_back(u32_ItDataPool);
+            this->mc_SelectedDataPools.insert(u32_ItDataPool);
          }
       }
-      m_LoadFromData(*pc_Appl);
+
+      //Handle file generation checkbox
+      if (pc_Node->pc_DeviceDefinition != NULL)
+      {
+         bool q_FileGenEnabled = true;
+         if (pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == false)
+         {
+            q_FileGenEnabled = false;
+
+            // check for HALC NVM file generation (psi files)
+            if ((pc_Node->c_HALCConfig.q_NvMBasedConfig == true) && (pc_Node->c_HALCConfig.IsClear() == false))
+            {
+               q_FileGenEnabled = true;
+
+               // check if there already exists a Data Block of type PSI generation
+               for (uint32 u32_ItDataBlock = 0UL; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
+               {
+                  const C_OSCNodeApplication & rc_CurDataBlock = pc_Node->c_Applications[u32_ItDataBlock];
+                  if ((rc_CurDataBlock.e_Type == C_OSCNodeApplication::ePARAMETER_SET_HALC) &&
+                      (u32_ItDataBlock != static_cast<uint32>(this->ms32_ApplicationIndex)))
+                  {
+                     q_FileGenEnabled = false;
+                     break;
+                  }
+               }
+
+               // set visibility of output file labels
+               if (pc_Node->c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
+               {
+                  // no safe file
+                  this->mpc_Ui->pc_LabelSafeFileValue->setVisible(false);
+                  this->mpc_Ui->pc_LabelSafeFileNone->setVisible(true);
+               }
+               else
+               {
+                  this->mpc_Ui->pc_LabelSafeFileNone->setVisible(false);
+                  this->mpc_Ui->pc_LabelSafeFileValue->setVisible(true);
+               }
+
+               if (pc_Node->c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE)
+               {
+                  // no non-safe file
+                  this->mpc_Ui->pc_LabelNonSafeFileValue->setVisible(false);
+                  this->mpc_Ui->pc_LabelNonSafeFileNone->setVisible(true);
+               }
+               else
+               {
+                  this->mpc_Ui->pc_LabelNonSafeFileNone->setVisible(false);
+                  this->mpc_Ui->pc_LabelNonSafeFileValue->setVisible(true);
+               }
+            }
+         }
+
+         this->mpc_Ui->pc_CheckBoxFileGen->setEnabled(q_FileGenEnabled);
+
+         if (q_FileGenEnabled == true)
+         {
+            if (pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == true)
+            {
+               this->mpc_Ui->pc_CheckBoxFileGen->setText(C_GtGetText::h_GetText("File Generation (Source Code)"));
+            }
+            else
+            {
+               this->mpc_Ui->pc_CheckBoxFileGen->setText(
+                  C_GtGetText::h_GetText("File Generation (Parameter Set Image)"));
+            }
+         }
+         else
+         {
+            this->mpc_Ui->pc_CheckBoxFileGen->setText(C_GtGetText::h_GetText("File Generation"));
+         }
+      }
+
+      // load Data Block stuff
+      this->m_LoadDataBlock();
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load from specified data block
-
-   \param[in] orc_Application Application
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Application)
+void C_SdNdeDbProperties::m_LoadDataBlock(void)
 {
-   //Section 1
-   this->mpc_Ui->pc_LineEditName->setText(orc_Application.c_Name.c_str());
-   this->mpc_Ui->pc_CommentText->setText(orc_Application.c_Comment.c_str());
-   this->me_Type = orc_Application.e_Type;
-   if (orc_Application.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
-   {
-      this->mpc_Ui->pc_GroupBoxProject->setVisible(true);
-      this->m_SetVisibilityOfProgrammableLines(true);
-      this->mpc_Ui->pc_GroupBoxDatapools->setVisible(true);
-   }
-   else if (orc_Application.e_Type == C_OSCNodeApplication::eBINARY)
-   {
-      // first hide lines, then set group box visible
-      this->m_SetVisibilityOfProgrammableLines(false);
-      this->mpc_Ui->pc_GroupBoxProject->setVisible(true);
-      this->mpc_Ui->pc_GroupBoxDatapools->setVisible(false);
-   }
-   else
-   {
-      this->mpc_Ui->pc_GroupBoxProject->setVisible(false);
-      this->mpc_Ui->pc_GroupBoxDatapools->setVisible(false);
-   }
-   switch (orc_Application.e_Type)
-   {
-   case C_OSCNodeApplication::eBINARY:
-      this->mpc_Ui->pc_LabelTypeValue->setText(C_GtGetText::h_GetText("Binary"));
-      break;
-   case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
-      this->mpc_Ui->pc_LabelTypeValue->setText(C_GtGetText::h_GetText("Programmable application"));
-      break;
-   }
-   //Section 2 (order is relevant: first set project path and then output file and code generate directory)
-   this->mpc_Ui->pc_LineEditProject->SetPath(orc_Application.c_ProjectPath.c_str(),
-                                             C_PuiProject::h_GetInstance()->GetFolderPath());
+   // get application / use default
+   const C_OSCNodeApplication * const pc_Appl =
+      C_PuiSdHandler::h_GetInstance()->GetApplication(this->mu32_NodeIndex, this->ms32_ApplicationIndex);
+   C_OSCNodeApplication c_Default;
 
+   if (this->ms32_ApplicationIndex < 0)
+   {
+      //default
+      c_Default.c_Name = C_PuiSdHandler::h_GetInstance()->GetUniqueApplicationName(this->mu32_NodeIndex, "DataBlock");
+      c_Default.u8_ProcessId = C_PuiSdHandler::h_GetInstance()->GetUniqueApplicationProcessId(this->mu32_NodeIndex, 0);
+      c_Default.q_Active = true;
+   }
+   const C_OSCNodeApplication & rc_Application = (pc_Appl != NULL) ? *pc_Appl : c_Default;
+
+   //Section Name and Comment
+   this->mpc_Ui->pc_LineEditName->setText(rc_Application.c_Name.c_str());
+   this->mpc_Ui->pc_CommentText->setText(rc_Application.c_Comment.c_str());
+   this->me_Type = rc_Application.e_Type;
+   this->mpc_Ui->pc_CheckBoxFileGen->setChecked(rc_Application.e_Type != C_OSCNodeApplication::eBINARY);
+
+   //Section Content (order is relevant: first set project path and then output file and gen. source code directory)
+   this->mpc_Ui->pc_LineEditProject->SetPath(rc_Application.c_ProjectPath.c_str(),
+                                             C_PuiProject::h_GetInstance()->GetFolderPath());
+   this->mpc_Ui->pc_LineEditFileGenerate->SetPath(rc_Application.c_ProjectPath.c_str(),
+                                                  C_PuiProject::h_GetInstance()->GetFolderPath());
    const QString c_ProjectPath =
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
-   this->mpc_Ui->pc_SpinBoxProcessID->setValue(orc_Application.u8_ProcessId);
+   this->mpc_Ui->pc_SpinBoxProcessID->setValue(rc_Application.u8_ProcessId);
    this->mpc_Ui->pc_LineEditOutputFile->SetDbProjectPath(c_ProjectPath);
-   this->mpc_Ui->pc_LineEditOutputFile->SetPath(orc_Application.c_ResultPath.c_str(), c_ProjectPath);
-   this->mpc_Ui->pc_LineEditIDE->setText(orc_Application.c_IDECall.c_str());
+   this->m_LoadOutputFilePaths(rc_Application, c_ProjectPath);
+   this->mpc_Ui->pc_LineEditIDE->setText(rc_Application.c_IDECall.c_str());
    this->mpc_Ui->pc_LineEditCodeGenerator->SetDbProjectPath(c_ProjectPath);
-   this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(orc_Application.c_CodeGeneratorPath.c_str(), C_Uti::h_GetExePath());
+   this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(rc_Application.c_CodeGeneratorPath.c_str(), C_Uti::h_GetExePath());
    this->mpc_Ui->pc_LineEditCodeGenerate->SetDbProjectPath(c_ProjectPath);
-   this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(orc_Application.c_GeneratePath.c_str(), c_ProjectPath);
+   this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(rc_Application.c_GeneratePath.c_str(), c_ProjectPath);
    this->mpc_Ui->pc_LineEditIDE->SetDbProjectPath(c_ProjectPath);
-   switch (orc_Application.u16_GenCodeVersion)
+   this->m_UpdatePathsRelativeToGeneratedDir(); // after setting output labels text and file generation directory!
+   switch (rc_Application.u16_GenCodeVersion)
    {
    case 1U:
       this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V1);
@@ -900,8 +1055,10 @@ void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Applic
       break;
    }
 
-   //Section 3
-   m_InitDataPoolsSection();
+   this->m_SetVisibilityOfContentWidgets(rc_Application.e_Type);
+
+   //Section Datapools
+   this->m_InitDataPoolsSection();
 
    // initial check
    this->m_CheckName();
@@ -909,58 +1066,193 @@ void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Applic
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set visibility of properties that are different for programmable and binary applications
-
-   long description of function within several lines
-
-   \param[in]     orq_Visible    true: show  false: hide
-
-   \return
-   possible return value(s) and description
+/*! \brief  Show output file paths in corresponding label / line edit
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_SetVisibilityOfProgrammableLines(const bool & orq_Visible) const
+void C_SdNdeDbProperties::m_LoadOutputFilePaths(const C_OSCNodeApplication & orc_Application,
+                                                const QString & orc_ProjectPath)
 {
-   // process ID
-   this->mpc_Ui->pc_LabelProcessID->setVisible(orq_Visible);
-   this->mpc_Ui->pc_SpinBoxProcessID->setVisible(orq_Visible);
+   // get HALC information (necessary for PSI file generation)
+   const C_OSCHalcConfig * const pc_Halc = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
 
-   // Generated Code Folder
-   this->mpc_Ui->pc_LabelCodeGenerate->setVisible(orq_Visible);
-   this->mpc_Ui->pc_LineEditCodeGenerate->setVisible(orq_Visible);
-   this->mpc_Ui->pc_PushButtonCodeGenerate->setVisible(orq_Visible);
-   this->mpc_Ui->pc_PubMenuCodeGenerate->setVisible(orq_Visible);
-
-   // Code Generator
-   this->mpc_Ui->pc_LabelCodeGenerator->setVisible(orq_Visible);
-   this->mpc_Ui->pc_LineEditCodeGenerator->setVisible(orq_Visible);
-   this->mpc_Ui->pc_PushButtonCodeGenerator->setVisible(orq_Visible);
-   this->mpc_Ui->pc_PushButtonRevertToDefault->setVisible(orq_Visible);
-   this->mpc_Ui->pc_PubMenuCodeGenerator->setVisible(orq_Visible);
-
-   // Code structure version
-   this->mpc_Ui->pc_LabelCodeStructure->setVisible(orq_Visible);
-   this->mpc_Ui->pc_ComboBoxCode->setVisible(orq_Visible);
-
-   // Remove vertical spacers
-   if ((orq_Visible == false))
+   switch (orc_Application.e_Type)
    {
-      if (this->mpc_Ui->pc_SpacerProject != NULL)
+   case C_OSCNodeApplication::eBINARY:
+   case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
+      if (orc_Application.c_ResultPaths.size() > 0) // defensive check
       {
-         this->mpc_Ui->pc_GridLayout->removeItem(this->mpc_Ui->pc_SpacerProject);
-         delete this->mpc_Ui->pc_SpacerProject;
+         this->mpc_Ui->pc_LineEditOutputFile->SetPath(orc_Application.c_ResultPaths[0].c_str(), orc_ProjectPath);
       }
-      if (this->mpc_Ui->pc_SpacerToolsTop != NULL)
+      break;
+   case C_OSCNodeApplication::ePARAMETER_SET_HALC:
+      if (pc_Halc != NULL)
       {
-         this->mpc_Ui->pc_GridLayout->removeItem(this->mpc_Ui->pc_SpacerToolsTop);
-         delete this->mpc_Ui->pc_SpacerToolsTop;
+         QString c_SafeFile = "";
+         QString c_NonSafeFile = "";
+         switch (pc_Halc->e_SafetyMode)
+         {
+         case C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE:
+            if (orc_Application.c_ResultPaths.size() > 0) // defensive check
+            {
+               c_SafeFile = orc_Application.c_ResultPaths[0].c_str();
+            }
+            break;
+         case C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE:
+            if (orc_Application.c_ResultPaths.size() > 0) // defensive check
+            {
+               c_NonSafeFile = orc_Application.c_ResultPaths[0].c_str();
+            }
+            break;
+         case C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING:
+         case C_OSCHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING:
+            if (orc_Application.c_ResultPaths.size() > 1) // defensive check
+            {
+               c_SafeFile = orc_Application.c_ResultPaths[0].c_str();
+               c_NonSafeFile = orc_Application.c_ResultPaths[1].c_str();
+            }
+            break;
+         default:
+            tgl_assert(false);
+            break;
+         }
+         this->mpc_Ui->pc_LabelSafeFileValue->setText(c_SafeFile);
+         this->mpc_Ui->pc_LabelNonSafeFileValue->setText(c_NonSafeFile);
       }
-      if (this->mpc_Ui->pc_SpacerToolsBottom != NULL)
+      break;
+   default:
+      tgl_assert(false);
+      break;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set visibility of properties that are different for each Data Block type
+
+   \param[in]  ore_Type    Type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_SetVisibilityOfContentWidgets(const C_OSCNodeApplication::E_Type & ore_Type) const
+{
+   // first set all invisible and then all visible items
+   switch (ore_Type)
+   {
+   case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
+      this->mpc_Ui->pc_LabelFileGenerationDisabled->setVisible(false);
+      this->mpc_Ui->pc_WidgetPsiFiles->setVisible(false);
+      this->mpc_Ui->pc_PushButtonAddDataPool->setVisible(true);
+      this->mpc_Ui->pc_GroupBoxProject->setVisible(true);
+      this->mpc_Ui->pc_WidgetFileGenContent->setVisible(true);
+      this->mpc_Ui->pc_WidgetCode->setVisible(true);
+      break;
+   case C_OSCNodeApplication::eBINARY:
+      this->mpc_Ui->pc_WidgetFileGenContent->setVisible(false);
+      this->mpc_Ui->pc_GroupBoxProject->setVisible(true);
+      this->mpc_Ui->pc_LabelFileGenerationDisabled->setVisible(true);
+      break;
+   case C_OSCNodeApplication::ePARAMETER_SET_HALC:
+      this->mpc_Ui->pc_GroupBoxProject->setVisible(false);
+      this->mpc_Ui->pc_WidgetCode->setVisible(false);
+      this->mpc_Ui->pc_LabelFileGenerationDisabled->setVisible(false);
+      this->mpc_Ui->pc_PushButtonAddDataPool->setVisible(false);
+      this->mpc_Ui->pc_WidgetFileGenContent->setVisible(true);
+      this->mpc_Ui->pc_WidgetPsiFiles->setVisible(true);
+      break;
+   default:
+      tgl_assert(false);
+      break;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On file generation checked
+
+   \param[in]  osn_State   State
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_OnFileGenerationChanged(const sintn osn_State)
+{
+   // reset
+   this->me_Type = C_OSCNodeApplication::eBINARY;
+
+   if (static_cast<Qt::CheckState>(osn_State) == Qt::Checked)
+   {
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+
+      if (pc_Node != NULL)
       {
-         this->mpc_Ui->pc_GridLayout->removeItem(this->mpc_Ui->pc_SpacerToolsBottom);
-         delete this->mpc_Ui->pc_SpacerToolsBottom;
+         // file generation depends on programmable flag and loaded hardware configuration
+         if (pc_Node->pc_DeviceDefinition != NULL)
+         {
+            bool q_FileGenerationType = false;
+            if (pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == true)
+            {
+               this->me_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
+               q_FileGenerationType = true;
+            }
+            else
+            {
+               if ((pc_Node->c_HALCConfig.q_NvMBasedConfig == true) && (pc_Node->c_HALCConfig.IsClear() == false))
+               {
+                  // set type
+                  this->me_Type = C_OSCNodeApplication::ePARAMETER_SET_HALC;
+                  q_FileGenerationType = true;
+
+                  // set default file names
+                  if (this->mpc_Ui->pc_LabelSafeFileValue->text() == "")
+                  {
+                     // only if safe data is allowed
+                     if (pc_Node->c_HALCConfig.e_SafetyMode != C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
+                     {
+                        this->mpc_Ui->pc_LabelSafeFileValue->setText("halc_parameters_safe.syde_psi");
+                     }
+                  }
+                  if (this->mpc_Ui->pc_LabelNonSafeFileValue->text() == "")
+                  {
+                     // only if non-safe data is allowed
+                     if (pc_Node->c_HALCConfig.e_SafetyMode != C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE)
+                     {
+                        this->mpc_Ui->pc_LabelNonSafeFileValue->setText("halc_parameters_non_safe.syde_psi");
+                     }
+                  }
+
+                  // set default generation directory if empty
+                  if (this->mpc_Ui->pc_LineEditFileGenerate->GetPath().isEmpty() == true)
+                  {
+                     this->mpc_Ui->pc_LineEditFileGenerate->SetPath(
+                        C_ImpUtil::h_GetDefaultGeneratedDir(this->mpc_Ui->pc_LineEditName->text().toStdString().c_str(),
+                                                            pc_Node->c_Properties.c_Name));
+                  }
+
+                  // update for tooltips
+                  this->m_UpdatePathsRelativeToGeneratedDir(); // after setting label text and generation directory!
+
+                  // add all NVM HALC Datapools for displaying
+                  // those can be kept even if type is changed back again - they will be removed on dialog ok click
+                  for (uint32 u32_ItDataPool = 0UL; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+                  {
+                     const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+                     if (rc_DataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM)
+                     {
+                        this->mc_SelectedDataPools.insert(u32_ItDataPool);
+                     }
+                  }
+                  this->m_InitDataPoolsSection();
+               }
+            }
+
+            if (q_FileGenerationType == true)
+            {
+               // revert file generator if none is set
+               if (this->mpc_Ui->pc_LineEditCodeGenerator->GetPath() == "")
+               {
+                  this->m_HandleRevertCodeGenerator();
+               }
+            }
+         }
       }
    }
+
+   this->m_SetVisibilityOfContentWidgets(this->me_Type);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1024,7 +1316,7 @@ void C_SdNdeDbProperties::m_OnClickOutput(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle click on browse button for "Code Generator" section
+/*! \brief   Handle click on browse button for "Generator" section
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_OnClickGenerator(void)
@@ -1033,12 +1325,12 @@ void C_SdNdeDbProperties::m_OnClickGenerator(void)
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
    const QString c_FolderName =
       C_PuiUtil::h_GetResolvedAbsPathFromExe(this->mpc_Ui->pc_LineEditCodeGenerator->GetPath(), c_ProjectPath);
-   // if code generator line edit is empty this results in executable path - we use this as feature
+   // if generator line edit is empty this results in executable path - we use this as feature
 
    const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("Executable (*.exe *.bat);;Others (*.*)"));
 
    // File path check is done by h_AskUserToSaveRelativePath(), so no need to use C_OgeWiUtil::h_GetOpenFileName()
-   QString c_FilePath = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Select Code Generator"),
+   QString c_FilePath = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Select Generator"),
                                                      c_FolderName, c_FilterName, NULL);
 
    if (c_FilePath != "")
@@ -1054,10 +1346,10 @@ void C_SdNdeDbProperties::m_OnClickGenerator(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle click on browse button for "Code Generator Output File" section
+/*! \brief   Handle click on browse button for "Generation Directory" section
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_OnClickGenerate(void)
+void C_SdNdeDbProperties::m_OnClickCodeGeneration(void)
 {
    const QString c_ProjectPath =
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
@@ -1065,7 +1357,7 @@ void C_SdNdeDbProperties::m_OnClickGenerate(void)
       C_PuiUtil::h_GetResolvedAbsPathFromDbProject(c_ProjectPath, this->mpc_Ui->pc_LineEditCodeGenerate->GetPath()));
 
    QString c_Path =
-      QFileDialog::getExistingDirectory(this, C_GtGetText::h_GetText("Select Directory for Generated Code"),
+      QFileDialog::getExistingDirectory(this, C_GtGetText::h_GetText("Select Directory for Generated Files"),
                                         c_FolderName, QFileDialog::ShowDirsOnly);
 
    if (c_Path != "")
@@ -1076,6 +1368,34 @@ void C_SdNdeDbProperties::m_OnClickGenerate(void)
       if (c_Path != "")
       {
          this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(c_Path, c_ProjectPath);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle click on browse button for file generator output directory section
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_OnClickFileGeneration(void)
+{
+   const QString c_FolderName = this->m_GetDialogPath(
+      C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditFileGenerate->GetPath()));
+
+   QString c_Path =
+      QFileDialog::getExistingDirectory(this, C_GtGetText::h_GetText("Select Directory for Generated Files"),
+                                        c_FolderName, QFileDialog::ShowDirsOnly);
+
+   if (c_Path != "")
+   {
+      // check if relative path is possible and appreciated
+      c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
+
+      if (c_Path != "")
+      {
+         this->mpc_Ui->pc_LineEditFileGenerate->SetPath(c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
+
+         // update tooltips of line edits with paths relative to generation directory
+         this->m_UpdatePathsRelativeToGeneratedDir();
       }
    }
 }
@@ -1101,7 +1421,7 @@ void C_SdNdeDbProperties::m_OnClickIDE(void)
    // get path from command line call for browse location start
    if (c_IDECall.startsWith('\"'))
    {
-      c_SplittedString = c_IDECall.split('\"', QString::SkipEmptyParts);
+      c_SplittedString = c_IDECall.split('\"', Qt::SplitBehaviorFlags::SkipEmptyParts);
       if (c_SplittedString.size() > 0)
       {
          c_IDECall = c_SplittedString[0];
@@ -1133,22 +1453,6 @@ void C_SdNdeDbProperties::m_OnClickIDE(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle click on button "Clear project"
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_OnClickClearProject(void) const
-{
-   this->mpc_Ui->pc_LineEditProject->SetPath("", "");
-   this->mpc_Ui->pc_SpinBoxProcessID->setValue(0);
-   this->mpc_Ui->pc_LineEditOutputFile->SetPath("", "");
-   this->mpc_Ui->pc_LineEditIDE->setText("");
-   this->mpc_Ui->pc_LineEditIDE->SetDbProjectPath("");
-   this->mpc_Ui->pc_LineEditCodeGenerator->SetPath("", "");
-   this->mpc_Ui->pc_LineEditCodeGenerate->SetPath("", "");
-   this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V5); // latest is greatest
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot for text changed signal of line edit name
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1158,7 +1462,7 @@ void C_SdNdeDbProperties::m_OnNameEdited(void) const
    const bool q_Error = (c_ErrorText == "");
 
    //set valid text property flag
-   //   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditName, "Valid", q_Error);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditName, "Valid", q_Error);
 
    if (q_Error)
    {
@@ -1241,18 +1545,37 @@ void C_SdNdeDbProperties::m_UpdatePathsRelativeToProject(void) const
    this->mpc_Ui->pc_LineEditOutputFile->SetDbProjectPath(c_ProjectPath);
    this->mpc_Ui->pc_LineEditOutputFile->SetPath(c_Temp, c_ProjectPath);
 
-   // generated code directory
+   // generated source code directory
    c_Temp = this->mpc_Ui->pc_LineEditCodeGenerate->GetPath();
    this->mpc_Ui->pc_LineEditCodeGenerate->SetDbProjectPath(c_ProjectPath);
    this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(c_Temp, c_ProjectPath);
 
-   // code generator (not relative but might contain Data Block path as placeholder variable)
+   // file generator (not relative but might contain Data Block path as placeholder variable)
    c_Temp = this->mpc_Ui->pc_LineEditCodeGenerator->GetPath();
    this->mpc_Ui->pc_LineEditCodeGenerator->SetDbProjectPath(c_ProjectPath);
    this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(c_Temp, C_Uti::h_GetExePath());
 
    // IDE call path (for resolving only)
    this->mpc_Ui->pc_LineEditIDE->SetDbProjectPath(c_ProjectPath);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update tool tips for paths that are relative to generated files directory
+
+   Slot for generation directory path editing finished signal.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_UpdatePathsRelativeToGeneratedDir(void) const
+{
+   const QString c_ProjectPath =
+      C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditFileGenerate->GetPath());
+
+   this->mpc_Ui->pc_LabelSafeFileValue->
+   SetToolTipInformation("",
+                         C_Uti::h_ConcatPathIfNecessary(c_ProjectPath, this->mpc_Ui->pc_LabelSafeFileValue->text()));
+   this->mpc_Ui->pc_LabelNonSafeFileValue->
+   SetToolTipInformation("",
+                         C_Uti::h_ConcatPathIfNecessary(c_ProjectPath, this->mpc_Ui->pc_LabelNonSafeFileValue->text()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1263,7 +1586,7 @@ void C_SdNdeDbProperties::m_InitDataPoolsSection(void)
 {
    m_CleanUpDataPoolWidgets();
    sint32 s32_Count = 0;
-   for (std::vector<uint32>::const_iterator c_It = this->mc_SelectedDataPools.begin();
+   for (std::set<uint32>::const_iterator c_It = this->mc_SelectedDataPools.begin();
         c_It != this->mc_SelectedDataPools.end(); ++c_It)
    {
       const uint32 u32_Val = *c_It;
@@ -1274,16 +1597,16 @@ void C_SdNdeDbProperties::m_InitDataPoolsSection(void)
       this->mpc_Ui->pc_VerticalLayoutDataPools->insertWidget(s32_Count, pc_Entry);
       ++s32_Count;
       this->mc_DataPoolWidgets.push_back(pc_Entry);
-   }
+   } //lint !e429  //no memory leak because of the parent of pc_Entry and the Qt memory management
    if (this->mc_SelectedDataPools.size() > 0UL)
    {
-      this->mpc_Ui->pc_GroupBoxDataPoolsEmpty->setVisible(false);
+      this->mpc_Ui->pc_LabelDataPoolsEmpty->setVisible(false);
       this->mpc_Ui->pc_GroupBoxDataPoolsNotEmpty->setVisible(true);
    }
    else
    {
-      this->mpc_Ui->pc_GroupBoxDataPoolsEmpty->setVisible(true);
       this->mpc_Ui->pc_GroupBoxDataPoolsNotEmpty->setVisible(false);
+      this->mpc_Ui->pc_LabelDataPoolsEmpty->setVisible(true);
    }
 
    //update owned dp count
@@ -1297,9 +1620,10 @@ void C_SdNdeDbProperties::m_InitDataPoolsSection(void)
 void C_SdNdeDbProperties::m_HandleAddDataPools(void)
 {
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   const std::vector<uint32> c_SelectedDatapools(this->mc_SelectedDataPools.begin(), this->mc_SelectedDataPools.end());
    const C_SdNdeDbSelectDataPools * const pc_Dialog = new C_SdNdeDbSelectDataPools(this->mu32_NodeIndex,
                                                                                    this->ms32_ApplicationIndex,
-                                                                                   this->mc_SelectedDataPools, *c_New);
+                                                                                   c_SelectedDatapools, *c_New);
 
    //Resize
    c_New->SetSize(QSize(800, 800));
@@ -1310,7 +1634,7 @@ void C_SdNdeDbProperties::m_HandleAddDataPools(void)
       for (uint32 u32_It = 0UL; u32_It < c_SelectedDataPools.size(); ++u32_It)
       {
          const C_PuiSvDbNodeDataPoolListElementId & rc_CurItem = c_SelectedDataPools[u32_It];
-         this->mc_SelectedDataPools.push_back(rc_CurItem.u32_DataPoolIndex);
+         this->mc_SelectedDataPools.insert(rc_CurItem.u32_DataPoolIndex);
       }
       m_InitDataPoolsSection();
    }
@@ -1322,7 +1646,7 @@ void C_SdNdeDbProperties::m_HandleAddDataPools(void)
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle revert to default code generator action
+/*! \brief   Handle revert to default file generator action
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_HandleRevertCodeGenerator(void) const
@@ -1333,15 +1657,15 @@ void C_SdNdeDbProperties::m_HandleRevertCodeGenerator(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle delete datapool entry
 
-   \param[in,out] opc_Source Source widget
-   \param[in]     ou32_Index Data pool index
+   \param[in,out]  opc_Source    Source widget
+   \param[in]      ou32_Index    Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_HandleDeleteDataPool(C_SdNdeDbDataPoolEntry * const opc_Source, const uint32 ou32_Index)
 {
    if (opc_Source != NULL)
    {
-      for (std::vector<uint32>::iterator c_It = this->mc_SelectedDataPools.begin();
+      for (std::set<uint32>::iterator c_It = this->mc_SelectedDataPools.begin();
            c_It != this->mc_SelectedDataPools.end(); ++c_It)
       {
          if (*c_It == ou32_Index)
@@ -1363,8 +1687,8 @@ void C_SdNdeDbProperties::m_HandleDeleteDataPool(C_SdNdeDbDataPoolEntry * const 
       opc_Source->hide();
       if (this->mc_SelectedDataPools.size() == 0UL)
       {
-         this->mpc_Ui->pc_GroupBoxDataPoolsEmpty->setVisible(true);
          this->mpc_Ui->pc_GroupBoxDataPoolsNotEmpty->setVisible(false);
+         this->mpc_Ui->pc_LabelDataPoolsEmpty->setVisible(true);
       }
    }
 

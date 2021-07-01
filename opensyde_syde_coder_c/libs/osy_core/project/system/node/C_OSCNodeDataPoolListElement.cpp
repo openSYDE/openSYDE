@@ -129,6 +129,38 @@ void C_OSCNodeDataPoolListElement::CalcHashElement(uint32 & oru32_HashValue, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calculates the hash value over structure only
+
+   The hash value is a 32 bit CRC value.
+
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeDataPoolListElement::CalcHashStructure(uint32 & oru32_HashValue) const
+{
+   uint32 u32_Counter;
+
+   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   this->c_MinValue.CalcHashStructure(oru32_HashValue);
+   this->c_MaxValue.CalcHashStructure(oru32_HashValue);
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_DiagEventCall, sizeof(this->q_DiagEventCall), oru32_HashValue);
+
+   for (u32_Counter = 0U; u32_Counter < this->c_DataSetValues.size(); ++u32_Counter)
+   {
+      this->c_DataSetValues[u32_Counter].CalcHashStructure(oru32_HashValue);
+   }
+   // Do not calculate the value to the CRC
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMStartAddress, sizeof(this->u32_NvMStartAddress), oru32_HashValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get size in bytes
 
    \return

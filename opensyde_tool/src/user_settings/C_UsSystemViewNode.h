@@ -12,6 +12,7 @@
 #define C_USSYSTEMVIEWNODE_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <QVector>
 #include <QMap>
 #include "stwtypes.h"
 
@@ -27,14 +28,14 @@ class C_UsSystemViewNode
 public:
    C_UsSystemViewNode(void);
 
-   const QMap<stw_types::uint32, bool> & GetSectionsExpanded(void) const;
-   void SetSectionsExpanded(const QMap<stw_types::uint32, bool> & orc_SectionsExpanded);
+   const QVector<bool> & GetSectionsExpanded(void) const;
+   void SetSectionsExpanded(const QVector<bool> & orc_SectionsExpanded);
 
    const QMap<stw_types::uint32, stw_types::float64> & GetUpdateDataRateHistory() const;
    void AddUpdateDataRate(const stw_types::uint32 ou32_Checksum, const stw_types::float64 of64_Value);
 
 private:
-   QMap<stw_types::uint32, bool> mc_SectionsExpanded;
+   QVector<bool> mc_SectionsExpanded;
    QMap<stw_types::uint32, stw_types::float64 > mc_UpdateDataRateHistory;
 };
 

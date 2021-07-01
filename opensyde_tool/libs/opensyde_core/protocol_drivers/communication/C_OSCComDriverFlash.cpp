@@ -2116,7 +2116,7 @@ sint32 C_OSCComDriverFlash::m_StartRoutingSpecific(const uint32 ou32_ActiveNode,
    if (opc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
    {
       C_OSCFlashProtocolStwFlashloader * const pc_StwFlashloader =
-         dynamic_cast<C_OSCFlashProtocolStwFlashloader * const>(this->mc_StwFlashProtocols[ou32_ActiveNode]);
+         dynamic_cast<C_OSCFlashProtocolStwFlashloader *>(this->mc_StwFlashProtocols[ou32_ActiveNode]);
 
       if ((pc_StwFlashloader != NULL) &&
           (opc_ProtocolOsyOfLastNodeOfRouting != NULL))
@@ -2155,7 +2155,7 @@ void C_OSCComDriverFlash::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
    if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
    {
       C_OSCFlashProtocolStwFlashloader * const pc_StwFlashloader =
-         dynamic_cast<C_OSCFlashProtocolStwFlashloader * const>(this->mc_StwFlashProtocols[ou32_ActiveNode]);
+         dynamic_cast<C_OSCFlashProtocolStwFlashloader *>(this->mc_StwFlashProtocols[ou32_ActiveNode]);
 
       if (pc_StwFlashloader != NULL)
       {
@@ -2475,7 +2475,7 @@ sint32 C_OSCComDriverFlash::m_GetMinimumFlashloaderResetWaitTime(
 void C_OSCComDriverFlash::mh_HandleWaitTime(void * const opv_Instance)
 {
    //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_OSCComDriverFlash * const pc_ComDriver = reinterpret_cast<C_OSCComDriverFlash * const>(opv_Instance);
+   C_OSCComDriverFlash * const pc_ComDriver = reinterpret_cast<C_OSCComDriverFlash *>(opv_Instance);
 
    tgl_assert(pc_ComDriver != NULL);
    if (pc_ComDriver != NULL)

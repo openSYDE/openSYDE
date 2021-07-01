@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeLabFrameError::C_OgeLabFrameError(QWidget * const opc_Parent) :
@@ -47,8 +47,8 @@ C_OgeLabFrameError::C_OgeLabFrameError(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new text content
 
-   \param[in] orc_Text    New text
-   \param[in] orc_Tooltip New tooltip
+   \param[in]  orc_Text       New text
+   \param[in]  orc_Tooltip    New tooltip
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabFrameError::SetCompleteText(const QString & orc_Text, const QString & orc_Tooltip)
@@ -68,7 +68,7 @@ void C_OgeLabFrameError::SetCompleteText(const QString & orc_Text, const QString
 QSize C_OgeLabFrameError::sizeHint(void) const
 {
    const QFontMetrics c_Metrics = mh_GetFontMetrics();
-   const QSize c_Retval(c_Metrics.width(this->mc_Text), c_Metrics.height());
+   const QSize c_Retval(c_Metrics.horizontalAdvance(this->mc_Text), c_Metrics.height());
 
    return c_Retval;
 }
@@ -83,7 +83,7 @@ QSize C_OgeLabFrameError::sizeHint(void) const
 QSize C_OgeLabFrameError::minimumSizeHint(void) const
 {
    const QFontMetrics c_Metrics = mh_GetFontMetrics();
-   const QSize c_Retval(c_Metrics.width("..."), c_Metrics.height());
+   const QSize c_Retval(c_Metrics.horizontalAdvance("..."), c_Metrics.height());
 
    return c_Retval;
 }
@@ -93,7 +93,7 @@ QSize C_OgeLabFrameError::minimumSizeHint(void) const
 
    Here: Handle label adaptations
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabFrameError::resizeEvent(QResizeEvent * const opc_Event)
@@ -107,7 +107,7 @@ void C_OgeLabFrameError::resizeEvent(QResizeEvent * const opc_Event)
 
    Here: Handle label adaptations
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabFrameError::showEvent(QShowEvent * const opc_Event)
@@ -118,6 +118,8 @@ void C_OgeLabFrameError::showEvent(QShowEvent * const opc_Event)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle size change
+
+   \param[in]  opc_SizeToUse  Size to use
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabFrameError::m_OnSizeChange(const QSize * const opc_SizeToUse)

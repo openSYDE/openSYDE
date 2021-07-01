@@ -850,7 +850,8 @@ sint32 C_SdNdeDpUtil::h_GetTableSize(const uint32 ou32_NodeIndex, const uint32 o
          sintn sn_RemainingSpace;
 
          // sum up sizes of lists above (in their expanded state)
-         for (u32_ListCounter = 0U; u32_ListCounter < (pc_Datapool->c_Lists.size() - 1UL); ++u32_ListCounter)
+         for (u32_ListCounter = 0U; u32_ListCounter < (static_cast<uint32>(pc_Datapool->c_Lists.size()) - 1UL);
+              ++u32_ListCounter)
          {
             sn_HeightOtherLists +=
                static_cast<sintn>(C_SdNdeDpUtil::h_GetTableSize(ou32_NodeIndex, ou32_DataPoolIndex, u32_ListCounter)) +

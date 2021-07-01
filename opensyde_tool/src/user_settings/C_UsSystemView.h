@@ -53,7 +53,7 @@ public:
    bool GetUpdatePackEmptyOptionalSectionsVisible(void) const;
    void SetUpdateEmptyOptionalSectionsVisible(const bool oq_Visible);
    C_UsSystemViewNode GetSvNode(const QString & orc_NodeName) const;
-   void SetNodeSectionsExpanded(const QString & orc_NodeName, const QMap<stw_types::uint32, bool> & orc_ExpandedFlags);
+   void SetNodeSectionsExpanded(const QString & orc_NodeName, const QVector<bool> & orc_ExpandedFlags);
    const QList<QString> GetViewNodesKeysInternal(void) const;
 
    // Navigation
@@ -77,6 +77,12 @@ public:
    void SetDashboardToolboxMaximized(const bool oq_Value);
    stw_types::sint32 GetDashboardSelectedTabIndex(void) const;
    void SetDashboardSelectedTabIndex(const stw_types::sint32 os32_Value);
+   bool GetSetupPermission(void) const;
+   void SetSetupPermission(const bool oq_Value);
+   bool GetUpdatePermission(void) const;
+   void SetUpdatePermission(const bool oq_Value);
+   bool GetDashboardPermission(void) const;
+   void SetDashboardPermission(const bool oq_Value);
 
    stw_types::sintn sn_SetupViewZoom;
    QPoint c_SetupViewPos;
@@ -104,6 +110,9 @@ private:
    QSize mc_DashboardToolboxSize;                    ///< History of last known dashboard toolbox size
    bool mq_DashboardToolboxMaximized;                ///< History of dashboard toolbox state
    stw_types::sint32 ms32_DashboardSelectedTabIndex; ///< History of dashboard selected tab index
+   bool mq_SetupPermission;                          ///< History of last known setup permission
+   bool mq_UpdatePermission;                         ///< History of last known update permission
+   bool mq_DashboardPermission;                      ///< History of last known dashboard permission
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

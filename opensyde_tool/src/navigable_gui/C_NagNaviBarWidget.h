@@ -62,6 +62,7 @@ public:
    void InitText(void) const;
    void LoadUserSettings(void);
    void SaveUserSettings(void);
+   void HandleServiceMode(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

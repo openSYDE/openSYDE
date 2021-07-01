@@ -54,7 +54,7 @@ using namespace std;
    * create the target folder
    * erase a pre-existing zip file
 
-   If the zip file already exists with behavior is undefined
+   If the zip file already exists behavior is undefined
    (technically the function will probably add to the existing file but this has not been tested).
 
    Assumptions:
@@ -322,6 +322,84 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
    }
    // Close the archive, freeing any resources it was using
    mz_zip_reader_end(&c_ZipArchive);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Append files to set as relative paths
+
+   Result can be used for parameter orc_SupFiles of h_CreateZipFile
+
+   \param[in,out] orc_Set      Set to appen paths to
+   \param[in]     orc_Files    Vector of files to append
+   \param[in]     orc_BasePath Path the files will be raltive to
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCZipFile::h_AppendFilesRelative(std::set<C_SCLString> & orc_Set, const std::vector<C_SCLString> & orc_Files,
+                                         const C_SCLString & orc_BasePath)
+{
+   for (uint32 u32_PosFilesToFlash = 0;
+        u32_PosFilesToFlash < orc_Files.size();
+        u32_PosFilesToFlash++)
+   {
+      C_SCLString c_RelativeFilePath = orc_Files[u32_PosFilesToFlash];
+      c_RelativeFilePath = c_RelativeFilePath.SubString(
+         orc_BasePath.Length() + 1,
+         c_RelativeFilePath.Length() - orc_BasePath.Length());
+      orc_Set.insert(c_RelativeFilePath);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks the file for a zip file
+
+   \param[in]  orc_FilePath                path of file to check
+
+   \return
+   C_NO_ERR    File is a zip file
+   C_RANGE     File is not a zip file
+   C_CONFIG    The input file does not exist
+   C_RD_WR     could not open input file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCZipFile::h_IsZipFile(const C_SCLString & orc_FilePath)
+{
+   sint32 s32_Return;
+
+   if (TGL_FileExists(orc_FilePath) == false)
+   {
+      s32_Return = C_CONFIG;
+   }
+   else
+   {
+      ifstream c_FileStream(orc_FilePath.c_str(), ifstream::binary | ifstream::ate); // open file and set pos
+      if (c_FileStream.is_open() == true)
+      {
+         const sint32 s32_FileLength = static_cast<sint32>(c_FileStream.tellg());
+
+         s32_Return = C_RANGE;
+
+         if (s32_FileLength > 4)
+         {
+            const stw_types::charn acn_ZIP_HEADER[4] = {0x50, 0x4B, 0x03, 0x04};
+            stw_types::charn acn_Header[4];
+            c_FileStream.seekg(0LL, std::ios::beg);
+            c_FileStream.read(acn_Header, 4);
+
+            if (memcmp(acn_ZIP_HEADER, acn_Header, 4) == 0)
+            {
+               s32_Return = C_NO_ERR;
+            }
+         }
+
+         c_FileStream.close();
+      }
+      else
+      {
+         s32_Return = C_RD_WR;
+      }
+   }
 
    return s32_Return;
 }

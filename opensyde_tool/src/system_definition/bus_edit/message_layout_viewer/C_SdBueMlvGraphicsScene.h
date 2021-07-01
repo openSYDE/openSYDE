@@ -181,15 +181,16 @@ private:
    stw_types::sint32 ms32_LastGridIndex;
    bool mq_SignalChanged;
 
-   // Array for grid states. It saves the pointer to the signals on each bit
-   std::set<C_SdBueMlvSignalManager *> mac_SetGridState[64];
-
    static const stw_types::float64 mhf64_Space;
    static const stw_types::float64 mhf64_ZOrderBelowAllItems;
    static const stw_types::float64 mhf64_ZOrderDefault;
    static const stw_types::float64 mhf64_ZOrderInteraction;
    static const stw_types::float64 mhf64_ZOrderEmptyItem;
    static const stw_types::float64 mhf64_ZOrderHintItem;
+   static const stw_types::uint8 mhu8_NUM_COLORS;
+
+   // Array for grid states. It saves the pointer to the signals on each bit
+   std::set<C_SdBueMlvSignalManager *> mac_SetGridState[64];
 
    // Color configuration for the signals
    static const C_SdBueMlvSignalManager::C_SignalItemColors mhac_SignalsColors[64];

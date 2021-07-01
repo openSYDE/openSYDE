@@ -47,7 +47,7 @@ const stw_types::sintn C_NagViewItem::mhsn_FixSizeBottom = 18;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_NagViewItem::C_NagViewItem(QWidget * const opc_Parent) :
@@ -56,7 +56,11 @@ C_NagViewItem::C_NagViewItem(QWidget * const opc_Parent) :
    mq_Active(false),
    mq_IgnoreActiveOnExpand(false),
    mu32_ViewIndex(0UL),
-   mq_ButtonPressed(false)
+   mq_ButtonPressed(false),
+   mc_IconBulletList(C_NagViewItem::mh_PrepareIcon(
+                        "://images/main_page_and_navi_bar/IconBulletList.svg")),
+   mc_IconBulletListActive(C_NagViewItem::mh_PrepareIcon(
+                              "://images/main_page_and_navi_bar/IconBulletListActive.svg"))
 {
    this->mpc_Ui->setupUi(this);
 
@@ -84,7 +88,6 @@ C_NagViewItem::C_NagViewItem(QWidget * const opc_Parent) :
 
    //Style top label
    this->mpc_Ui->pc_LabelHeading->SetFontPixel(14);
-   this->mpc_Ui->pc_LabelHeading->SetForegroundColor(12);
 
    //Initial icons
    this->mpc_Ui->pc_LabelError->SetSvg("");
@@ -93,9 +96,9 @@ C_NagViewItem::C_NagViewItem(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_WidgetSetup->setIconSize(QSize(16, 16));
    this->mpc_Ui->pc_WidgetUpdate->setIconSize(QSize(16, 16));
    this->mpc_Ui->pc_WidgetDashboard->setIconSize(QSize(16, 16));
-   this->mpc_Ui->pc_WidgetSetup->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
-   this->mpc_Ui->pc_WidgetUpdate->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
-   this->mpc_Ui->pc_WidgetDashboard->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
+   this->mpc_Ui->pc_WidgetSetup->setIcon(this->mc_IconBulletList);
+   this->mpc_Ui->pc_WidgetUpdate->setIcon(this->mc_IconBulletList);
+   this->mpc_Ui->pc_WidgetDashboard->setIcon(this->mc_IconBulletList);
 
    //Configure
    this->mpc_Ui->pc_WidgetTopButton->setCheckable(true);
@@ -111,8 +114,9 @@ C_NagViewItem::C_NagViewItem(QWidget * const opc_Parent) :
            &C_NagViewItem::m_OnNameEditFinished);
    connect(this->mpc_Ui->pc_LineEditHeading, &stw_opensyde_gui_elements::C_OgeLeNavigation::SigEscape, this,
            &C_NagViewItem::m_OnNameEditCancelled);
-   connect(this->mpc_Ui->pc_WidgetTopButton, &stw_opensyde_gui_elements::C_OgePubNavigationHover::toggled, this,
-           &C_NagViewItem::m_SetExpanded);
+   mc_Conn = connect(this->mpc_Ui->pc_WidgetTopButton, &stw_opensyde_gui_elements::C_OgePubNavigationHover::toggled,
+                     this,
+                     &C_NagViewItem::m_SetExpanded);
    connect(this->mpc_Ui->pc_PushButtonCopy, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::clicked, this,
            &C_NagViewItem::m_OnDuplicate);
    connect(this->mpc_Ui->pc_PushButtonDelete, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::clicked, this,
@@ -167,8 +171,16 @@ void C_NagViewItem::LoadUserSettings(void)
 
       if (pc_View != NULL)
       {
-         const C_UsSystemView c_ViewUserSettings = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
-         q_NewVal = c_ViewUserSettings.GetNavigationExpandedStatus();
+         if ((!C_PuiSvHandler::h_GetInstance()->GetServiceModeActive()) || (pc_View->GetServiceModeActive()))
+         {
+            const C_UsSystemView c_ViewUserSettings = C_UsHandler::h_GetInstance()->GetProjSvSetupView(
+               pc_View->GetName());
+            q_NewVal = c_ViewUserSettings.GetNavigationExpandedStatus();
+         }
+         else
+         {
+            q_NewVal = false;
+         }
       }
       else
       {
@@ -204,9 +216,12 @@ void C_NagViewItem::UpdateName(void) const
 
    if (pc_View != NULL)
    {
-      const QString c_Name = static_cast<QString>(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(
+      const QString c_ServiceModeInfo =
+         ((!C_PuiSvHandler::h_GetInstance()->GetServiceModeActive()) ||
+          (pc_View->GetServiceModeActive())) ? "" : C_GtGetText::h_GetText(" (no access)");
+      const QString c_Name = static_cast<QString>(C_GtGetText::h_GetText("VIEW #%1 - %2%3")).arg(
          this->mu32_ViewIndex + 1UL).arg(
-         pc_View->GetName());
+         pc_View->GetName()).arg(c_ServiceModeInfo);
       this->mpc_Ui->pc_LabelHeading->setText(c_Name);
    }
 }
@@ -240,13 +255,6 @@ void C_NagViewItem::UpdateDeco(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewItem::InitStaticNames(void) const
 {
-   const QString c_Padding = " ";
-
-   //Add one space as padding
-   this->mpc_Ui->pc_WidgetSetup->setText(c_Padding + C_GtGetText::h_GetText("Setup"));
-   this->mpc_Ui->pc_WidgetUpdate->setText(c_Padding + C_GtGetText::h_GetText("Update"));
-   this->mpc_Ui->pc_WidgetDashboard->setText(c_Padding + C_GtGetText::h_GetText("Dashboards"));
-
    //Tool tips
    this->mpc_Ui->pc_PushButtonCopy->SetToolTipInformation(C_GtGetText::h_GetText("Duplicate"),
                                                           C_GtGetText::h_GetText("Add a copy of this view"));
@@ -268,7 +276,7 @@ void C_NagViewItem::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dragged state
 
-   \param[in] oq_Active Flag if drag is active
+   \param[in]  oq_Active   Flag if drag is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewItem::SetDragged(const bool oq_Active)
@@ -281,20 +289,22 @@ void C_NagViewItem::SetDragged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set index
 
-   \param[in] ou32_ViewIndex New view index
+   \param[in]  ou32_ViewIndex    New view index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewItem::Init(const uint32 ou32_ViewIndex)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
    this->UpdateName();
+   this->m_HandleSubItemNames();
+   this->HandleServiceMode();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set active state
 
-   \param[in] oq_Active    New active state
-   \param[in] os32_SubMode New active sub mode
+   \param[in]  oq_Active      New active state
+   \param[in]  os32_SubMode   New active sub mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewItem::SetActive(const bool oq_Active, const sint32 os32_SubMode)
@@ -309,33 +319,33 @@ void C_NagViewItem::SetActive(const bool oq_Active, const sint32 os32_SubMode)
          this->mpc_Ui->pc_WidgetSetup->SetActive(true);
          this->mpc_Ui->pc_WidgetUpdate->SetActive(false);
          this->mpc_Ui->pc_WidgetDashboard->SetActive(false);
-         this->mpc_Ui->pc_WidgetSetup->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletListActive.svg"));
-         this->mpc_Ui->pc_WidgetUpdate->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
-         this->mpc_Ui->pc_WidgetDashboard->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
+         this->mpc_Ui->pc_WidgetSetup->setIcon(this->mc_IconBulletListActive);
+         this->mpc_Ui->pc_WidgetUpdate->setIcon(this->mc_IconBulletList);
+         this->mpc_Ui->pc_WidgetDashboard->setIcon(this->mc_IconBulletList);
          break;
       case 1:
          this->mpc_Ui->pc_WidgetSetup->SetActive(false);
          this->mpc_Ui->pc_WidgetUpdate->SetActive(true);
          this->mpc_Ui->pc_WidgetDashboard->SetActive(false);
-         this->mpc_Ui->pc_WidgetSetup->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
-         this->mpc_Ui->pc_WidgetUpdate->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletListActive.svg"));
-         this->mpc_Ui->pc_WidgetDashboard->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
+         this->mpc_Ui->pc_WidgetSetup->setIcon(this->mc_IconBulletList);
+         this->mpc_Ui->pc_WidgetUpdate->setIcon(this->mc_IconBulletListActive);
+         this->mpc_Ui->pc_WidgetDashboard->setIcon(this->mc_IconBulletList);
          break;
       case 2:
          this->mpc_Ui->pc_WidgetSetup->SetActive(false);
          this->mpc_Ui->pc_WidgetUpdate->SetActive(false);
          this->mpc_Ui->pc_WidgetDashboard->SetActive(true);
-         this->mpc_Ui->pc_WidgetSetup->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
-         this->mpc_Ui->pc_WidgetUpdate->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
-         this->mpc_Ui->pc_WidgetDashboard->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletListActive.svg"));
+         this->mpc_Ui->pc_WidgetSetup->setIcon(this->mc_IconBulletList);
+         this->mpc_Ui->pc_WidgetUpdate->setIcon(this->mc_IconBulletList);
+         this->mpc_Ui->pc_WidgetDashboard->setIcon(this->mc_IconBulletListActive);
          break;
       default:
          this->mpc_Ui->pc_WidgetSetup->SetActive(false);
          this->mpc_Ui->pc_WidgetUpdate->SetActive(false);
          this->mpc_Ui->pc_WidgetDashboard->SetActive(false);
-         this->mpc_Ui->pc_WidgetSetup->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
-         this->mpc_Ui->pc_WidgetUpdate->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
-         this->mpc_Ui->pc_WidgetDashboard->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
+         this->mpc_Ui->pc_WidgetSetup->setIcon(this->mc_IconBulletList);
+         this->mpc_Ui->pc_WidgetUpdate->setIcon(this->mc_IconBulletList);
+         this->mpc_Ui->pc_WidgetDashboard->setIcon(this->mc_IconBulletList);
          break;
       }
    }
@@ -344,22 +354,82 @@ void C_NagViewItem::SetActive(const bool oq_Active, const sint32 os32_SubMode)
       this->mpc_Ui->pc_WidgetSetup->SetActive(false);
       this->mpc_Ui->pc_WidgetUpdate->SetActive(false);
       this->mpc_Ui->pc_WidgetDashboard->SetActive(false);
-      this->mpc_Ui->pc_WidgetSetup->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
-      this->mpc_Ui->pc_WidgetUpdate->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
-      this->mpc_Ui->pc_WidgetDashboard->setIcon(QIcon("://images/main_page_and_navi_bar/IconBulletList.svg"));
+      this->mpc_Ui->pc_WidgetSetup->setIcon(this->mc_IconBulletList);
+      this->mpc_Ui->pc_WidgetUpdate->setIcon(this->mc_IconBulletList);
+      this->mpc_Ui->pc_WidgetDashboard->setIcon(this->mc_IconBulletList);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set hovered state
 
-   \param[in] oq_Hovered Current hovered state
+   \param[in]  oq_Hovered  Current hovered state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewItem::SetHovered(const bool oq_Hovered) const
 {
-   //Order is important due to hover event handling
-   this->mpc_Ui->pc_GroupBoxHoverButtons->setVisible(oq_Hovered);
+   if (!C_PuiSvHandler::h_GetInstance()->GetServiceModeActive())
+   {
+      //Order is important due to hover event handling
+      this->mpc_Ui->pc_GroupBoxHoverButtons->setVisible(oq_Hovered);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle service mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagViewItem::HandleServiceMode(void)
+{
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
+   if (!q_ServiceModeActive)
+   {
+      this->mpc_Ui->pc_WidgetTopButton->setEnabled(true);
+      this->mpc_Ui->pc_WidgetSetup->setEnabled(true);
+      this->mpc_Ui->pc_WidgetUpdate->setEnabled(true);
+      this->mpc_Ui->pc_WidgetDashboard->setEnabled(true);
+      //lint -e{909,9133} Only possible this way
+      if (!this->mc_Conn)
+      {
+         this->mc_Conn = connect(this->mpc_Ui->pc_WidgetTopButton,
+                                 &stw_opensyde_gui_elements::C_OgePubNavigationHover::toggled,
+                                 this,
+                                 &C_NagViewItem::m_SetExpanded);
+      }
+   }
+   else
+   {
+      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+      if ((pc_View != NULL) && (pc_View->GetServiceModeActive()))
+      {
+         this->mpc_Ui->pc_WidgetTopButton->setEnabled(true);
+         this->mpc_Ui->pc_WidgetSetup->setEnabled(pc_View->GetServiceModeSetupActive());
+         this->mpc_Ui->pc_WidgetUpdate->setEnabled(pc_View->GetServiceModeUpdateActive());
+         this->mpc_Ui->pc_WidgetDashboard->setEnabled(pc_View->GetServiceModeDashboardActive());
+      }
+      else
+      {
+         //Default
+         this->mpc_Ui->pc_WidgetTopButton->setEnabled(false);
+         this->mpc_Ui->pc_WidgetSetup->setVisible(false);
+         this->mpc_Ui->pc_WidgetUpdate->setVisible(false);
+         this->mpc_Ui->pc_WidgetDashboard->setVisible(false);
+         //lint -e{909} Only possible this way
+         if (this->mc_Conn)
+         {
+            disconnect(this->mpc_Ui->pc_WidgetTopButton, &stw_opensyde_gui_elements::C_OgePubNavigationHover::toggled,
+                       this,
+                       &C_NagViewItem::m_SetExpanded);
+         }
+      }
+   }
+   //lint -e{909,9133} Only possible this way
+   this->mpc_Ui->pc_WidgetTopButton->setChecked(!this->mc_Conn);
+   //lint -e{909,9133} Only possible this way
+   this->m_HandleExpandIcon(!this->mc_Conn);
+   this->m_HandleServiceModeColors();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -389,7 +459,7 @@ QSize C_NagViewItem::sizeHint(void) const
 
    Here: Handle hover
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -424,7 +494,7 @@ bool C_NagViewItem::event(QEvent * const opc_Event)
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewItem::paintEvent(QPaintEvent * const opc_Event)
@@ -518,7 +588,7 @@ void C_NagViewItem::m_OnNameEditCancelled(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new expanded state
 
-   \param[in] oq_Expanded New expanded state
+   \param[in]  oq_Expanded    New expanded state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewItem::m_SetExpanded(const bool oq_Expanded)
@@ -528,15 +598,74 @@ void C_NagViewItem::m_SetExpanded(const bool oq_Expanded)
    this->mpc_Ui->pc_WidgetSetup->setVisible(oq_Expanded);
    this->mpc_Ui->pc_WidgetUpdate->setVisible(oq_Expanded);
    this->mpc_Ui->pc_WidgetDashboard->setVisible(oq_Expanded);
+   this->m_HandleExpandIcon(oq_Expanded);
+   m_OnExpand();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle expand icon
+
+   \param[in]  oq_Expanded    Expanded
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagViewItem::m_HandleExpandIcon(const bool oq_Expanded)
+{
    if (oq_Expanded == true)
    {
       this->mpc_Ui->pc_LabelExpand->SetSvg("://images/main_page_and_navi_bar/Icon_close_list.svg");
    }
    else
    {
-      this->mpc_Ui->pc_LabelExpand->SetSvg("://images/main_page_and_navi_bar/Icon_open_list.svg");
+      if (this->mpc_Ui->pc_WidgetTopButton->isEnabled())
+      {
+         this->mpc_Ui->pc_LabelExpand->SetSvg("://images/main_page_and_navi_bar/Icon_open_list.svg");
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelExpand->SetSvg("://images/main_page_and_navi_bar/Icon_open_list_disabled.svg");
+      }
    }
-   m_OnExpand();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle sub item names
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagViewItem::m_HandleSubItemNames()
+{
+   const QString c_Padding = " ";
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+   QString c_SetupAdd = "";
+   QString c_UpdateAdd = "";
+   QString c_DashboardAdd = "";
+
+   if (((pc_View != NULL) && (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive())) &&
+       (pc_View->GetServiceModeActive()))
+   {
+      const QString c_AccessWarning = C_GtGetText::h_GetText(" (no access)");
+      if (!pc_View->GetServiceModeSetupActive())
+      {
+         c_SetupAdd = c_AccessWarning;
+      }
+      if (!pc_View->GetServiceModeUpdateActive())
+      {
+         c_UpdateAdd = c_AccessWarning;
+      }
+      if (!pc_View->GetServiceModeDashboardActive())
+      {
+         c_DashboardAdd = c_AccessWarning;
+      }
+   }
+   {
+      const QString c_Setup = c_Padding + C_GtGetText::h_GetText("Setup") + c_SetupAdd;
+      const QString c_Update = c_Padding + C_GtGetText::h_GetText("Update") + c_UpdateAdd;
+      const QString c_Dashboard = c_Padding + C_GtGetText::h_GetText("Dashboards") + c_DashboardAdd;
+
+      //Add one space as padding
+      this->mpc_Ui->pc_WidgetSetup->setText(c_Setup);
+      this->mpc_Ui->pc_WidgetUpdate->setText(c_Update);
+      this->mpc_Ui->pc_WidgetDashboard->setText(c_Dashboard);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -549,11 +678,39 @@ void C_NagViewItem::m_OnExpand(void)
    //Check if is expanded NOW (after action was executed)
    if (((this->mq_Active == false) && (this->mq_IgnoreActiveOnExpand == false)) && (this->m_IsExpanded() == true))
    {
-      QString c_SubMode;
-      QString c_SubSubMode;
-      C_SyvUtil::h_GetViewDisplayName(this->mu32_ViewIndex, ms32_SUBMODE_SYSVIEW_SETUP, c_SubMode, c_SubSubMode);
-      //Also select this one
-      Q_EMIT this->SigSelect(this, ms32_SUBMODE_SYSVIEW_SETUP, c_SubMode, c_SubSubMode);
+      sint32 s32_Mode = ms32_SUBMODE_SYSVIEW_SETUP;
+      bool q_Continue = true;
+      if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive())
+      {
+         const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+         if (pc_ViewData != NULL)
+         {
+            if (pc_ViewData->GetServiceModeSetupActive())
+            {
+               s32_Mode = ms32_SUBMODE_SYSVIEW_SETUP;
+            }
+            else if (pc_ViewData->GetServiceModeUpdateActive())
+            {
+               s32_Mode = ms32_SUBMODE_SYSVIEW_UPDATE;
+            }
+            else if (pc_ViewData->GetServiceModeDashboardActive())
+            {
+               s32_Mode = ms32_SUBMODE_SYSVIEW_DASHBOARD;
+            }
+            else
+            {
+               q_Continue = false;
+            }
+         }
+      }
+      if (q_Continue)
+      {
+         QString c_SubMode;
+         QString c_SubSubMode;
+         C_SyvUtil::h_GetViewDisplayName(this->mu32_ViewIndex, s32_Mode, c_SubMode, c_SubSubMode);
+         //Also select this one
+         Q_EMIT this->SigSelect(this, s32_Mode, c_SubMode, c_SubSubMode);
+      }
    }
 }
 
@@ -643,6 +800,30 @@ void C_NagViewItem::m_OnDashboardClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle service mode colors
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagViewItem::m_HandleServiceModeColors()
+{
+   if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive())
+   {
+      const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+      if ((pc_ViewData != NULL) && (!pc_ViewData->GetServiceModeActive()))
+      {
+         this->mpc_Ui->pc_LabelHeading->SetForegroundColor(8);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelHeading->SetForegroundColor(12);
+      }
+   }
+   else
+   {
+      this->mpc_Ui->pc_LabelHeading->SetForegroundColor(12);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot for pressed signal of any button
 
    We need to know when a button of the item was pressed, but is not released already. The signal clicked will be
@@ -664,4 +845,22 @@ void C_NagViewItem::m_ButtonPressed(void)
 void C_NagViewItem::m_ButtonReleased(void)
 {
    this->mq_ButtonPressed = false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Prepare icon
+
+   \param[in]  orc_Path    Path
+
+   \return
+   Prepared icon
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QIcon C_NagViewItem::mh_PrepareIcon(const QString & orc_Path)
+{
+   QIcon c_Retval(orc_Path);
+
+   c_Retval.addFile(orc_Path, QSize(16, 16), QIcon::Disabled, QIcon::On);
+   c_Retval.addFile(orc_Path, QSize(16, 16), QIcon::Disabled, QIcon::Off);
+   return c_Retval;
 }

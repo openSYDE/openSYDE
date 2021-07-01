@@ -60,6 +60,7 @@ C_GiSyLineWidget::C_GiSyLineWidget(const E_Type oe_Mode, C_GiSyBaseWidget & orc_
 {
    QPixmap c_Pic;
 
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    c_Pic.load(mc_PATH_BACKGROUND_IMG);
 
    mpc_Ui->setupUi(this);

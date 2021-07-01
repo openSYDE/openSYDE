@@ -12,8 +12,10 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <cmath>
 #include <cctype>
+#include <fstream>
+#include <iterator>
+#include <cmath>
 #include <limits>
 #include <fstream>
 #include <algorithm>
@@ -21,6 +23,10 @@
 #include "stwerrors.h"
 #include "C_OSCUtils.h"
 #include "TGLFile.h"
+#include "CSCLResourceStrings.h"
+#define STR_TABLE_INCLUDE //we really want the symbols from the DLStrings.h header
+#include "DLStrings.h"
+#include "C_OSCLoggingHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
@@ -31,6 +37,7 @@ using namespace stw_tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::float64 C_OSCUtils::mhf64_Epsilon = 1e-5;
+stw_scl::C_SCLResourceStrings C_OSCUtils::mhc_ResourceStrings;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -73,7 +80,7 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
    for (u32_Index = 0; u32_Index < orc_Name.Length(); u32_Index++)
    {
       cn_Char = orc_Name.c_str()[u32_Index];
-      if ((isalnum(cn_Char) == 0) && (cn_Char != '_')) //ANSI compliant check
+      if ((std::isalnum(cn_Char) == 0) && (cn_Char != '_')) //ANSI compliant check
       {
          return false;
       }
@@ -537,7 +544,7 @@ void C_OSCUtils::h_FileToString(const C_SCLString & orc_FilePath, C_SCLString & 
          c_Input.reserve(static_cast<stw_types::uint32>(c_File.tellg()));
          c_File.seekg(0LL, std::ios::beg);
 
-         c_Input.assign((std::istreambuf_iterator<stw_types::charn>(c_File)),
+         c_Input.assign(static_cast<std::istreambuf_iterator<stw_types::charn> >(c_File),
                         std::istreambuf_iterator<stw_types::charn>());
          c_File.close();
       }
@@ -556,4 +563,116 @@ void C_OSCUtils::h_RangeCheckFloat(float64 & orf64_Value)
 {
    orf64_Value = std::min(orf64_Value, std::numeric_limits<float64>::max());
    orf64_Value = std::max(orf64_Value, -std::numeric_limits<float64>::max());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   load resource string
+
+   Load resource strings from resource table.
+   We use a string table using the C_SCLResourceStrings class
+    and fill a singleton of it with the application strings.
+
+   Note: this is only useful for application using an numeric-index-based localization approach.
+   This is for example not compatible with string-index-based approaches like gettext.
+
+   \param[in]    ou16_StringIndex     Index of string
+
+   \return
+   string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCUtils::h_LoadString(const uint16 ou16_StringIndex)
+{
+   static bool hq_Initialized = false;
+
+   if (hq_Initialized == false)
+   {
+      mhc_ResourceStrings.SetStringTable(gac_DIAG_LIB_RESOURCE_STRINGS, gu16_DIAGLIB_NR_RES_STRNGS);
+      hq_Initialized = true;
+   }
+
+   return mhc_ResourceStrings.LoadStr(ou16_StringIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copies a file from source to target folder (internal function).
+
+   Assumptions:
+   * read permission of source folder
+   * write permission of target folder
+
+   \param[in]  orc_SourceFile            source file (full path required)
+   \param[in]  orc_TargetFile            target file (        -"-       )
+   \param[out] opc_ErrorPath             if != NULL and the function fails:
+                                          file path (source or target) that caused the problem
+   \param[out] opc_ErrorMessage          if != NULL and the function fails:
+                                          error message that caused the problem
+
+   \return
+   C_NO_ERR    success
+   C_RD_WR     read/write error (see log file for details)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCUtils::h_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLString & orc_TargetFile,
+                              C_SCLString * const opc_ErrorPath, C_SCLString * const opc_ErrorMessage)
+{
+   sint32 s32_Return = C_NO_ERR;
+   C_SCLString c_ErrorMessage = "";
+
+   std::fstream c_Input(orc_SourceFile.c_str(), std::fstream::in | std::fstream::binary);
+   if (c_Input.fail() == true)
+   {
+      c_ErrorMessage = "Could not read \"" + orc_SourceFile + "\".";
+      osc_write_log_error("Copying file", c_ErrorMessage);
+      s32_Return = C_RD_WR;
+      if (opc_ErrorPath != NULL)
+      {
+         *opc_ErrorPath = orc_SourceFile;
+      }
+   }
+   else
+   {
+      c_Input << &std::noskipws;
+
+      const std::istream_iterator<uint8> c_Begin(c_Input);
+      const std::istream_iterator<uint8> c_End;
+
+      std::fstream c_Output(orc_TargetFile.c_str(), std::fstream::out | std::fstream::trunc | std::fstream::binary);
+      if (c_Output.fail() == true)
+      {
+         c_ErrorMessage = "Could not write \"" + orc_TargetFile + "\".";
+         osc_write_log_error("Copying file", c_ErrorMessage);
+         s32_Return = C_RD_WR;
+         if (opc_ErrorPath != NULL)
+         {
+            *opc_ErrorPath = orc_TargetFile;
+         }
+      }
+      else
+      {
+         const std::ostream_iterator<uint8> c_Begin2(c_Output);
+         try
+         {
+            std::copy(c_Begin, c_End, c_Begin2);
+         }
+         catch (...)
+         {
+            c_ErrorMessage = "Could not write stream of \"" + orc_TargetFile + "\".";
+            osc_write_log_error("Copying file", c_ErrorMessage);
+            s32_Return = C_RD_WR;
+            if (opc_ErrorPath != NULL)
+            {
+               *opc_ErrorPath = orc_TargetFile;
+            }
+         }
+      }
+   }
+
+   if ((s32_Return != C_NO_ERR) &&
+       (opc_ErrorMessage != NULL))
+   {
+      *opc_ErrorMessage = c_ErrorMessage;
+   }
+
+   return s32_Return;
 }

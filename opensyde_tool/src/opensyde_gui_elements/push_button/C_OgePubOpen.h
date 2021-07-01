@@ -13,6 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgePubToolTipBase.h"
+#include "stwtypes.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
@@ -28,6 +29,8 @@ class C_OgePubOpen :
 
 public:
    C_OgePubOpen(QWidget * const opc_Parent = NULL);
+
+   void SetBackgroundColor(const stw_types::sintn osn_Value);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

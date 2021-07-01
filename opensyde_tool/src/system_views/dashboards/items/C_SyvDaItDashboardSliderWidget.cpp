@@ -10,6 +10,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <QtGlobal>
+
 #include "stwtypes.h"
 #include "C_SyvDaItUtil.h"
 #include "C_SyvDaItDashboardSliderWidget.h"
@@ -133,31 +135,38 @@ void C_SyvDaItDashboardSliderWidget::AdjustFontToSize(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set minimum
+/*! \brief  Set minimum and maximum
 
-   \param[in]  osn_Value   New minimum
-   \param[in]  orc_String  New displayed minimum
+   \param[in]  osn_MinValue   New minimum
+   \param[in]  orc_MinString  New displayed minimum
+   \param[in]  osn_MaxValue   New maximum
+   \param[in]  orc_MaxString  New displayed maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardSliderWidget::SetMin(const sintn osn_Value, const QString & orc_String)
+void C_SyvDaItDashboardSliderWidget::SetMinMax(const sintn osn_MinValue, const QString & orc_MinString,
+                                               const sintn osn_MaxValue, const QString & orc_MaxString)
 {
-   this->mpc_Ui->pc_HorizontalSlider->setMinimum(osn_Value);
-   this->mc_Min = orc_String;
+#if QT_VERSION > QT_VERSION_CHECK(5, 15, 2)
+#warning Check if this bug fix is still necessary in new Qt version
+#endif
+   // Bug fix for qt issue in QStyle::sliderPositionFromValue
+   // Can be reproduced in any call of:
+   // QStyle::sliderPositionFromValue(std::numeric_limits<int>::min(), 0, 0, 100,false);
+   // leads to crashes in C_OgeSliDashboard::paintEvent and
+   // in C_OgeSliToolTipBase::m_MoveToolTip (Systemtest Project View "Bus0" Tab "Single" and Tab "WIN-PC2")
+   const sint64 s64_Range = static_cast<sint64>(osn_MaxValue) - static_cast<sint64>(osn_MinValue);
 
-   this->m_UpdateLabels();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set maximum
-
-   \param[in]  osn_Value   New maximum
-   \param[in]  orc_String  New displayed maximum
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardSliderWidget::SetMax(const sintn osn_Value, const QString & orc_String)
-{
-   this->mpc_Ui->pc_HorizontalSlider->setMaximum(osn_Value);
-   this->mc_Max = orc_String;
+   if (s64_Range == std::abs(static_cast<sint64>(std::numeric_limits<sintn>::min())))
+   {
+      this->mpc_Ui->pc_HorizontalSlider->setMinimum(osn_MinValue + 1);
+   }
+   else
+   {
+      this->mpc_Ui->pc_HorizontalSlider->setMinimum(osn_MinValue);
+   }
+   this->mc_Min = orc_MinString;
+   this->mpc_Ui->pc_HorizontalSlider->setMaximum(osn_MaxValue);
+   this->mc_Max = orc_MaxString;
 
    this->m_UpdateLabels();
 }

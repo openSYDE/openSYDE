@@ -291,7 +291,10 @@ void C_SyvDaTearOffWidget::SetDarkMode(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetEnabled(const bool oq_Enabled) const
 {
-   this->mpc_Ui->pc_PbConfirm->setEnabled(oq_Enabled);
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
+   // Handle the service mode
+   this->mpc_Ui->pc_PbConfirm->setEnabled(oq_Enabled && (!q_ServiceModeActive));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -106,17 +106,15 @@ void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint
    QListWidgetItem * const pc_Item = new QListWidgetItem(NULL, static_cast<sintn>(QListWidgetItem::ItemType::UserType));
    C_SdNdeDbWidget * const pc_ItemWidget = new C_SdNdeDbWidget(ou32_NodeIndex, ou32_ApplicationIndex, this);
 
-   //signal to handle "there are no data blocks declared..." label
+   //signal to handle "there are no data blocks declared..." label, data block count and button visibility
    Q_EMIT this->SigAppDisplay();
 
    pc_Item->setSizeHint(pc_ItemWidget->size());
 
    if (this->count() == 0)
    {
-      // configure the list for the first usage
-      // the offset of 20 pixel: 14(+/-1) pixel + 6 pixel margin of C_SdNdeDbWidget
-      this->setGridSize(QSize(pc_ItemWidget->size().width() + 14, pc_ItemWidget->size().height() + 13));
-      this->setMinimumWidth(pc_ItemWidget->size().width() + 60);
+      // configure the list width for the first usage
+      this->setMinimumWidth(pc_ItemWidget->size().width() - 14);
    }
 
    this->addItem(pc_Item);
@@ -126,8 +124,6 @@ void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint
    connect(pc_ItemWidget, &C_SdNdeDbWidget::SigDelete, this, &C_SdNdeDbListWidget::SigDelete);
    connect(pc_ItemWidget, &C_SdNdeDbWidget::SigCheckNodeId, this,
            &C_SdNdeDbListWidget::m_CheckNodeId);
-   connect(pc_ItemWidget, &C_SdNdeDbWidget::SigOpenDataPool, this,
-           &C_SdNdeDbListWidget::SigOpenDataPool);
    connect(pc_ItemWidget, &C_SdNdeDbWidget::SigOwnedDataPoolsChanged, this,
            &C_SdNdeDbListWidget::SigOwnedDataPoolsChanged);
 } //lint !e429  //no memory leak because of the parent of pc_Item by calling addItem and the Qt memory management
@@ -147,7 +143,7 @@ void C_SdNdeDbListWidget::UpdateApplications(void) const
          dynamic_cast<C_SdNdeDbWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
       {
-         pc_WidgetItem->UpdateDataPools();
+         pc_WidgetItem->UpdateApplication();
       }
    }
 }

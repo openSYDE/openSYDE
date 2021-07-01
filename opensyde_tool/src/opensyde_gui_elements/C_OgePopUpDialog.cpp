@@ -82,6 +82,7 @@ C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const o
       QGraphicsDropShadowEffect * const pc_Shadow = new QGraphicsDropShadowEffect(this->mpc_Ui->pc_GroupBoxPopUp);
       pc_Shadow->setBlurRadius(15.0);
       pc_Shadow->setOffset(0.0);
+      //lint -e{1938}  static const is guaranteed preinitialized before main
       c_Color = mc_STYLE_GUIDE_COLOR_33;
       c_Color.setAlpha(128);
       pc_Shadow->setColor(c_Color);
@@ -322,37 +323,6 @@ void C_OgePopUpDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
       stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->mc_WidgetClassName);
    }
    QDialog::keyPressEvent(opc_KeyEvent);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten show event slot
-
-   Here: Reposition to main window center
-
-   \param[in,out]  opc_Event  Event identification and information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgePopUpDialog::showEvent(QShowEvent * const opc_Event)
-{
-   const QWidget * pc_TopWidget;
-
-   if (this->mpc_EffectTargetChild != NULL)
-   {
-      pc_TopWidget = C_OgeWiUtil::h_GetWidgetUnderNextPopUp(this->mpc_EffectTargetChild);
-   }
-   else
-   {
-      pc_TopWidget = C_OgeOverlay::h_GetTopWidget();
-   }
-
-   //Center dialog
-   if (pc_TopWidget != NULL)
-   {
-      const QPoint c_DialogCenter = mapToGlobal(this->rect().center());
-      const QPoint c_ParentWindowCenter = pc_TopWidget->window()->mapToGlobal(pc_TopWidget->window()->rect().center());
-      move(c_ParentWindowCenter - c_DialogCenter);
-   }
-   QDialog::showEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

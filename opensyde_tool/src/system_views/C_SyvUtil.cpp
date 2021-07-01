@@ -318,6 +318,9 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
                      c_CyclicText).arg(
                      c_ThresholdText);
                   break;
+               default:
+                  tgl_assert(false);
+                  break;
                }
                c_Retval = c_Text;
             }
@@ -347,10 +350,12 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
                   //Translation1: Timeout, 2: Minimum delay, 3: "greater than or equal" - sign, 4: "less than or equal"
                   // - sign
                   c_Retval =
-                     static_cast<QString>(C_GtGetText::h_GetText("On Change (%3 %2 ms; %4 %1 ms)")).arg(
-                        pc_Message->u32_CycleTimeMs).
-                     arg(
-                        pc_Message->u16_DelayTimeMs).arg(QChar(0x2265)).arg(QChar(0x2264));
+                     static_cast<QString>(C_GtGetText::h_GetText("On Change (%3 %2 ms; %4 %1 ms)")).
+                     arg(pc_Message->u32_CycleTimeMs).arg(pc_Message->u16_DelayTimeMs).
+                     arg(static_cast<QChar>(0x2265)).arg(static_cast<QChar>(0x2264));
+                  break;
+               default:
+                  tgl_assert(false);
                   break;
                }
             }

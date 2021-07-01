@@ -87,6 +87,7 @@ public:
    QString GetLastKnownHalcDefPath(void) const;
    QString GetLastKnownHalcImportPath(void) const;
    QString GetLastKnownHalcExportPath(void) const;
+   QString GetLastKnownServiceProjectPath(void) const;
    C_UsNode GetProjSdNode(const QString & orc_NodeName) const;
    C_UsCommunication GetProjSdBus(const QString & orc_BusName) const;
    C_UsSystemView GetProjSvSetupView(const QString & orc_ViewName) const;
@@ -98,6 +99,7 @@ public:
                               stw_types::uint32 & oru32_SysViewIndex, stw_types::uint32 & oru32_SysViewFlag) const;
    stw_types::sintn GetProjLastSysDefNodeTabIndex(void) const;
    stw_types::sintn GetProjLastSysDefBusTabIndex(void) const;
+   std::array<bool, 3> GetViewPermissions(const QString & orc_ViewName);
 
    //Set
    stw_types::sint32 SetLanguage(const QString & orc_Lang);
@@ -139,6 +141,7 @@ public:
    void SetLastKnownHalcDefPath(const QString & orc_NewPath);
    void SetLastKnownHalcImportPath(const QString & orc_NewPath);
    void SetLastKnownHalcExportPath(const QString & orc_NewPath);
+   void SetLastKnownServiceProjectPath(const QString & orc_NewPath);
    void SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName, const QString & orc_DatapoolName);
    void SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
                                       const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol);
@@ -197,7 +200,7 @@ public:
    void SetProjSvUpdateSummaryBig(const QString & orc_ViewName, const bool oq_BigVisible);
    void SetProjSvUpdateEmptyOptionalSectionsVisible(const QString & orc_ViewName, const bool oq_Visible);
    void SetProjSvUpdateSectionsExpandedFlags(const QString & orc_ViewName, const QString & orc_NodeName,
-                                             const QMap<stw_types::uint32, bool> & orc_SectionsExpanded);
+                                             const QVector<bool> & orc_SectionsExpanded);
    void SetProjSvDashboardToolbox(const QString & orc_ViewName, const QPoint & orc_Position, const QSize & orc_Size,
                                   const bool & orq_Maximized);
    void SetProjSvDashboardSelectedTabIndex(const QString & orc_ViewName, const stw_types::sint32 os32_Index);
@@ -213,6 +216,7 @@ public:
    void SetProjLastSysDefNodeTabIndex(const stw_types::sintn osn_SysDefNodeEditTabIndex);
    void SetProjLastSysDefBusTabIndex(const stw_types::sintn osn_SysDefBusEditTabIndex);
    void CopyProjSvSettings(const QString & orc_SourceViewName, const QString & orc_TargetViewName);
+   void SetViewPermission(const QString & orc_ViewName, std::array<bool, 3 > & orc_Permissions);
 
    void ClearMaps(void);
 
@@ -275,6 +279,7 @@ private:
    QString mc_LastKnownHalcDefPath;                      ///< History of last known HALC definition file path
    QString mc_LastKnownHalcImportPath;                   ///< History of last known HALC import file path
    QString mc_LastKnownHalcExportPath;                   ///< History of last known HALC export file path
+   QString mc_LastKnownServiceProjectPath;               ///< History of last known service project path
    QMap<QString, C_UsSystemView> mc_ProjSvSetupView;     ///< History of last known view user settings
    QMap<QString, C_UsNode> mc_ProjSdNode;                ///< History of last known node user settings
    QMap<QString, C_UsCommunication> mc_ProjSdBus;        ///< History of last known bus user settings

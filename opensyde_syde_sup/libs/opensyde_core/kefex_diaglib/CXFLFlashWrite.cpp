@@ -1388,7 +1388,7 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
                f32_Rate = ((((static_cast<float32>(u32_NumSentProgress)) / 1024.0F) /
                             (static_cast<float32>(u32_Diff))) * 1000.0F);
                c_Text.PrintFormatted("%s %d / %d at %2.2fkB/s", TGL_LoadStr(STR_FDL_BYTE).c_str(), u32_NumBytesFlashed,
-                                     u32_NumBytesTotal, f32_Rate);
+                                     u32_NumBytesTotal, static_cast<float64>(f32_Rate));
             }
             else
             {
@@ -1424,7 +1424,7 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
       }
       f32_Rate = (((static_cast<float32>(u32_NumBytesTotal) / 1024.0F) /
                    (static_cast<float32>(u32_FlashTime))) * 1000.0F);
-      c_Text.PrintFormatted("%s %2.2fkB/s", TGL_LoadStr(STR_FDL_AVERAGE_RATE).c_str(), f32_Rate);
+      c_Text.PrintFormatted("%s %2.2fkB/s", TGL_LoadStr(STR_FDL_AVERAGE_RATE).c_str(), static_cast<float64>(f32_Rate));
       m_ReportVerboseStatus(c_Text);
 
       TRG_ReportProgress(1000U, TGL_LoadStr(STR_FDL_TXT_WR_FLASH_DO));

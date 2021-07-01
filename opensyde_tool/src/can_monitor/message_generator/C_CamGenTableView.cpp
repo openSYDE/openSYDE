@@ -73,7 +73,7 @@ C_CamGenTableView::C_CamGenTableView(QWidget * const opc_Parent) :
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
    this->mc_SortProxyModel.setSortRole(msn_USER_ROLE_SORT);
-   this->setModel(&mc_SortProxyModel);
+   this->C_CamGenTableView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
 
@@ -83,6 +83,7 @@ C_CamGenTableView::C_CamGenTableView(QWidget * const opc_Parent) :
    this->setShowGrid(false);
    this->setSortingEnabled(true);
    this->verticalHeader()->setDefaultSectionSize(20);
+   this->horizontalHeader()->setFixedHeight(27);
 
    //Deactivate
    this->verticalHeader()->setVisible(false);
@@ -126,8 +127,8 @@ C_CamGenTableView::~C_CamGenTableView(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::AddMessageFromDatabase(void)
 {
-   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_CamMosDatabaseSelectionPopup * pc_Dialog = new C_CamMosDatabaseSelectionPopup(*c_New, true);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   C_CamMosDatabaseSelectionPopup * const pc_Dialog = new C_CamMosDatabaseSelectionPopup(*c_New, true);
 
    //Resize
    c_New->SetSize(QSize(700, 800));
@@ -265,14 +266,14 @@ void C_CamGenTableView::SetCurrentColumnWidths(const std::vector<sint32> & orc_C
       //Default
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eNAME), 230);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eID), 60);
-      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eXTD), 48);
-      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eRTR), 47);
-      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eDLC), 47);
+      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eXTD), 52);
+      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eRTR), 51);
+      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eDLC), 51);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eDATA), mhsn_COL_WIDTH_DATA);
-      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eCYCLIC_TRIGGER), 59);
+      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eCYCLIC_TRIGGER), 63);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eCYCLIC_TIME), 94);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eKEY), 60);
-      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eMANUAL_TRIGGER), 116);
+      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eMANUAL_TRIGGER), 120);
    }
 }
 
@@ -518,6 +519,7 @@ void C_CamGenTableView::keyPressEvent(QKeyEvent * const opc_Event)
             case C_CamGenTableModel::eCYCLIC_TRIGGER:
             case C_CamGenTableModel::eKEY:
             case C_CamGenTableModel::eMANUAL_TRIGGER:
+            default:
                q_Ignore = true;
                break;
             }
@@ -616,7 +618,7 @@ void C_CamGenTableView::selectionChanged(const QItemSelection & orc_Selected, co
    Width of column in pixel
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamGenTableView::sizeHintForColumn(sintn osn_Column) const
+sintn C_CamGenTableView::sizeHintForColumn(const sintn osn_Column) const
 {
    sintn sn_Size;
 
@@ -822,8 +824,8 @@ void C_CamGenTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
       else if (C_CamGenTableModel::h_ColumnToEnum(this->mc_SortProxyModel.mapToSource(orc_Index).column()) ==
                C_CamGenTableModel::eKEY)
       {
-         QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-         C_CamGenKeySelect * pc_Dialog =
+         const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+         C_CamGenKeySelect * const pc_Dialog =
             new C_CamGenKeySelect(*c_New, static_cast<uint32>(s32_Row));
 
          //Resize

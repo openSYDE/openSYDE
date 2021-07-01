@@ -16,7 +16,7 @@
 
 #include "C_SdNdeDpSelectorWidget.h"
 #include "C_OSCNodeDataPool.h"
-#include "C_SdNdeDpSelectorUsageWidget.h"
+#include "C_SdNdeDpViewUsageWidget.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -38,8 +38,11 @@ public:
    explicit C_SdNdeDpViewWidget(QWidget * const opc_Parent = NULL);
    virtual ~C_SdNdeDpViewWidget();
 
+   void InitStaticNames(void) const;
+
    void SetNode(const stw_types::uint32 ou32_NodeIndex);
    void SetActualDataPoolConflict(const bool oq_Active) const;
+   void UpdateDataPools(void);
    void UpdateActualDataPool(void) const;
    void SetActualDataPool(const stw_types::uint32 ou32_DataPoolIndex);
    void NavigateToNextDataPool(const bool oq_Forwards);
@@ -73,21 +76,24 @@ private:
    void m_DpChangedUpdateUsageView(void);
    void m_DpUpdateUsageView(void);
    void m_UpdateUsageBarSize(void);
+   void m_AutoStartAddressClicked(const bool oq_Enabled);
+   void m_UpdateAutoStartAddressSvg(void) const;
 
    Ui::C_SdNdeDpViewWidget * mpc_Ui;
    // array for more easy use of sub widgets
    C_SdNdeDpSelectorWidget * mapc_Selectors[static_cast<stw_types::sintn>(stw_opensyde_core::C_OSCNodeDataPool::
-                                                                          eHALC) + 1];
-   C_SdNdeDpSelectorUsageWidget * mpc_UsageBar;
+                                                                          eHALC_NVM) + 1];
+   C_SdNdeDpViewUsageWidget * mpc_UsageBar;
    stw_types::uint32 mu32_NodeIndex;
    stw_types::uint32 mu32_LastKnownDataPoolIndex;
    stw_opensyde_core::C_OSCNodeDataPool::E_Type me_ActiveDataPoolType;
    stw_types::sintn msn_ActiveDataPoolWidget;
+   bool mq_HalcNvmBased;
 
    static const bool mhaq_StorageIndicatorActive[static_cast<stw_types::sintn>(stw_opensyde_core::C_OSCNodeDataPool::
-                                                                               eHALC) + 1];
+                                                                               eHALC_NVM) + 1];
    static const bool mhaq_AddButtonVisible[static_cast<stw_types::sintn>(stw_opensyde_core::C_OSCNodeDataPool::
-                                                                         eHALC) + 1];
+                                                                         eHALC_NVM) + 1];
 };
 }
 

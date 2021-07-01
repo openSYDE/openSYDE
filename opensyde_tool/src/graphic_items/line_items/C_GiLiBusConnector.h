@@ -68,9 +68,9 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void ShowReconnectContextMenu(const QPointF & orc_ScenePos, C_GiNode * const opc_Node, const C_GiLiBus * opc_Bus,
-                                 const stw_types::sint32 & ors32_FreeInterface,
-                                 C_GiLiBusConnector * const opc_BusConnector);
+   void SigShowReconnectContextMenu(const QPointF & orc_ScenePos, C_GiNode * const opc_Node, const C_GiLiBus * opc_Bus,
+                                    const stw_types::sint32 & ors32_FreeInterface,
+                                    C_GiLiBusConnector * const opc_BusConnector);
    void SigHintUpdate(void);
 
 protected:

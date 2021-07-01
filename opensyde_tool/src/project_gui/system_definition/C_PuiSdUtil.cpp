@@ -193,7 +193,8 @@ QString C_PuiSdUtil::h_ConvertDataPoolTypeToString(const C_OSCNodeDataPool::E_Ty
    case C_OSCNodeDataPool::eNVM:
       c_Name = "NVM";
       break;
-   case C_OSCNodeDataPool::eHALC:
+   case C_OSCNodeDataPool::eHALC:     // For user is no difference between HALC and HALC_NVM Datapools
+   case C_OSCNodeDataPool::eHALC_NVM: // For user is no difference between HALC and HALC_NVM Datapools
       c_Name = "HAL";
       break;
    case C_OSCNodeDataPool::eDIAG: // default case
@@ -228,7 +229,11 @@ QString C_PuiSdUtil::h_GetInterfaceName(const C_OSCSystemBus::E_Type oe_Type, co
    case C_OSCSystemBus::eETHERNET:
       c_Type = C_GtGetText::h_GetText("ETHERNET");
       break;
+   default:
+      tgl_assert(false);
+      break;
    }
+
    c_Retval = static_cast<QString>("%1%2").arg(c_Type).arg(static_cast<sintn>(ou8_InterfaceNumber) + 1);
    return c_Retval;
 }
@@ -464,7 +469,8 @@ QString C_PuiSdUtil::h_GetNamespace(const C_OSCNodeDataPoolListElementId & orc_I
                     arg(pc_Node->c_Properties.c_Name.c_str()).
                     arg(pc_DataPool->c_Name.c_str()).
                     arg(c_ElementName);
-      }
+      } //lint !e438 //value of u32_SignalIndex not used; we just called the convert function to check whether the
+        // parameters are valid
       else
       {
          c_Retval = static_cast<QString>("%1::%2::%3::%4").
@@ -520,7 +526,8 @@ QString C_PuiSdUtil::h_GetSignalNamespace(const C_OSCNodeDataPoolListElementId &
          }
       }
    }
-   return c_Retval;
+   return c_Retval; //lint !e438 //value of u32_SignalIndex not used; we just called the convert function to check
+                    // whether the parameters are valid
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -545,13 +552,14 @@ QString C_PuiSdUtil::h_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId
    uint32 u32_ParameterElementIndex;
    bool q_IsUseCaseIndex;
    bool q_IsChanNumIndex;
+   bool q_IsSafetyFlagIndex;
 
    if (C_PuiSdHandler::h_GetInstance()->TranslateToHALCIndex(orc_Id, orc_Id.GetArrayElementIndexOrZero(),
                                                              u32_DomainIndex, q_UseChannelIndex,
                                                              u32_ChannelIndex, e_Selector, u32_ParameterIndex,
                                                              q_UseElementIndex,
                                                              u32_ParameterElementIndex, q_IsUseCaseIndex,
-                                                             q_IsChanNumIndex) == C_NO_ERR)
+                                                             q_IsChanNumIndex, q_IsSafetyFlagIndex) == C_NO_ERR)
    {
       {
          const C_OSCNode * const pc_Node =
@@ -584,6 +592,10 @@ QString C_PuiSdUtil::h_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId
             else if (q_IsChanNumIndex)
             {
                c_ElementName = C_OSCHALCMagicianUtil::h_GetChanNumVariableName(pc_Domain->c_SingularName).c_str();
+            }
+            else if (q_IsSafetyFlagIndex)
+            {
+               c_ElementName = C_OSCHALCMagicianUtil::h_GetSafetyFlagVariableName(pc_Domain->c_SingularName).c_str();
             }
             else
             {

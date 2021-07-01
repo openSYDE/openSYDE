@@ -52,6 +52,7 @@ public:
                        const bool oq_AddBtnVisible);
    void SetSelectedDataPool(const stw_types::uint32 ou32_Index) const;
    void SetCurrentDataPoolConflict(const stw_types::sintn osn_DataPoolWidgetIndex, const bool oq_Active);
+   void UpdateDataPools(void);
    void UpdateActualDataPool(void) const;
    void ErrorCheck(void);
 
@@ -67,6 +68,7 @@ Q_SIGNALS:
    void SigErrorCheck(void);
    void SigUpdateLists(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex);
    void SigNoDataPoolSelected(void);
+   void SigDataPoolHoverStateChanged(const stw_types::uint32 ou32_DataPoolIndex, const bool oq_Hovered);
 
 protected:
    virtual void focusInEvent(QFocusEvent * const opc_Event) override;

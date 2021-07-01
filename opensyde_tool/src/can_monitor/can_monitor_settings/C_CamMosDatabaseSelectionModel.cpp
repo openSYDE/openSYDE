@@ -102,7 +102,7 @@ std::vector<std::array<QString,
       //Invisible root
       for (sint32 s32_ItChild = 0L; s32_ItChild < this->rowCount(orc_Index); ++s32_ItChild)
       {
-         mh_CombineIndices(c_Retval, this->GetDataElements(orc_Index.child(s32_ItChild, 0)));
+         mh_CombineIndices(c_Retval, this->GetDataElements(this->index(s32_ItChild, 0, orc_Index)));
       }
    }
    else
@@ -112,7 +112,7 @@ std::vector<std::array<QString,
          //Database
          for (sint32 s32_ItChild = 0L; s32_ItChild < this->rowCount(orc_Index); ++s32_ItChild)
          {
-            mh_CombineIndices(c_Retval, this->GetDataElements(orc_Index.child(s32_ItChild, 0)));
+            mh_CombineIndices(c_Retval, this->GetDataElements(this->index(s32_ItChild, 0, orc_Index)));
          }
       }
       else
@@ -194,7 +194,7 @@ const
    while (c_CurItem.isValid() == true)
    {
       //lint -e{9079}  Result of Qt interface restrictions, set by index function
-      const C_TblTreItem * const pc_TreeItem = static_cast<const C_TblTreItem * const>(c_CurItem.internalPointer());
+      const C_TblTreItem * const pc_TreeItem = static_cast<const C_TblTreItem *>(c_CurItem.internalPointer());
       if (pc_TreeItem != NULL)
       {
          c_Retval.insert(c_Retval.begin(), pc_TreeItem->u32_Index);

@@ -57,7 +57,13 @@ using namespace stw_opensyde_gui_elements;
 void C_PopErrorHandling::h_ProjectLoadErr(const sint32 & ors32_Err, const QString & orc_Path,
                                           QWidget * const opc_Parent, const uint16 ou16_SystemDefinitionVersion)
 {
-   if (ors32_Err != C_NO_ERR)
+   if (ors32_Err == C_WARN)
+   {
+      // Do nothing here. Special case when a user cancels the password dialog for opening a service project.
+      // Project file version is not known (because encrypted zip file), hence we don't want to hit the else
+      // statement below.
+   }
+   else if ((ors32_Err != C_NO_ERR) && (ors32_Err != C_WARN))
    {
       QString c_Details;
       C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
@@ -82,10 +88,13 @@ void C_PopErrorHandling::h_ProjectLoadErr(const sint32 & ors32_Err, const QStrin
          c_Details = C_GtGetText::h_GetText("The content of a project file is invalid or incomplete.");
          break;
       case C_CHECKSUM:
-         c_Details = C_GtGetText::h_GetText("The verification of the project failed.");
+         c_Details = C_GtGetText::h_GetText("The entered password is incorrect.");
          break;
       case C_COM:
          c_Details = C_GtGetText::h_GetText("The device definition for the project was not found.");
+         break;
+      case C_BUSY:
+         c_Details = C_GtGetText::h_GetText("Problems with cleaning up temporary folders.");
          break;
       default:
          c_Details = C_GtGetText::h_GetText("Unknown cause.");
@@ -157,6 +166,51 @@ void C_PopErrorHandling::h_ProjectSaveErr(const sint32 & ors32_Err, QWidget * co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  \brief   Create service project error handling
+
+   \param[in]   ors32_Err     Save error
+   \param[in]   opc_Parent    parent widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PopErrorHandling::h_ServiceProjectSaveErr(const sint32 & ors32_Err, QWidget * const opc_Parent)
+{
+   if (ors32_Err != C_NO_ERR)
+   {
+      C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
+      c_Message.SetHeading(C_GtGetText::h_GetText("Create Service Project"));
+      switch (ors32_Err)
+      {
+      case C_RANGE:
+         c_Message.SetDescription(C_GtGetText::h_GetText("Invalid view configuration."));
+         break;
+      case C_RD_WR:
+         c_Message.SetDescription(C_GtGetText::h_GetText("Problems accessing file system."));
+         break;
+      case C_NOACT:
+         c_Message.SetDescription(C_GtGetText::h_GetText("Could not create temporary project directory."));
+         break;
+      case C_BUSY:
+         c_Message.SetDescription(C_GtGetText::h_GetText("Could not delete temporary folder."));
+         break;
+      case C_COM:
+         c_Message.SetDescription(C_GtGetText::h_GetText("Bus sorting failed."));
+         break;
+      case C_WARN:
+         c_Message.SetDescription(C_GtGetText::h_GetText("No view or part of it is active."));
+         break;
+      case C_CONFIG:
+         c_Message.SetDescription(C_GtGetText::h_GetText("Expected file for project generation missing."));
+         break;
+      default:
+         c_Message.SetDescription(C_GtGetText::h_GetText("Unknown cause."));
+         break;
+      }
+      c_Message.SetCustomMinHeight(180, 180);
+      c_Message.Execute();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle gettext initialize error
 
    \param[in]   ors32_Err   Error
@@ -166,7 +220,7 @@ void C_PopErrorHandling::h_GetTextInitializeErr(const sint32 & ors32_Err)
 {
    if (ors32_Err != C_NO_ERR)
    {
-      C_OgeWiError * pc_Widget = new C_OgeWiError();
+      C_OgeWiError * const pc_Widget = new C_OgeWiError();
       C_OgePopUpDialog c_Dialog;
       c_Dialog.SetTitle("Error occurred!");
       c_Dialog.SetWidget(pc_Widget);

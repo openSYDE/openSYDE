@@ -38,9 +38,7 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 C_UsSystemViewNode::C_UsSystemViewNode(void)
 {
-   mc_SectionsExpanded[mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK] = true;
-   mc_SectionsExpanded[mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE] = true;
-   mc_SectionsExpanded[mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET] = true;
+   this->mc_SectionsExpanded.push_back(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -50,7 +48,7 @@ C_UsSystemViewNode::C_UsSystemViewNode(void)
    vector of expanded flags (true: expanded, false: collapsed)
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QMap<uint32, bool> & C_UsSystemViewNode::GetSectionsExpanded(void) const
+const QVector<bool> & C_UsSystemViewNode::GetSectionsExpanded(void) const
 {
    return this->mc_SectionsExpanded;
 }
@@ -61,7 +59,7 @@ const QMap<uint32, bool> & C_UsSystemViewNode::GetSectionsExpanded(void) const
    \param[in]  orc_SectionsExpanded    Last known expanded flags of sections
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemViewNode::SetSectionsExpanded(const QMap<uint32, bool> & orc_SectionsExpanded)
+void C_UsSystemViewNode::SetSectionsExpanded(const QVector<bool> & orc_SectionsExpanded)
 {
    this->mc_SectionsExpanded = orc_SectionsExpanded;
 }

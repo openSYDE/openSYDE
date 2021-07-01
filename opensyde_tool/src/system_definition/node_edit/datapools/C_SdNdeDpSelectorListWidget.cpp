@@ -129,6 +129,9 @@ bool C_SdNdeDpSelectorListWidget::SetTypeAndNode(const stw_opensyde_core::C_OSCN
    this->me_DataPoolType = oe_Type;
    this->mu32_NodeIndex = ou32_NodeIndex;
 
+   // Reset the selected index to avoid problems when the selection will be restored with the same index
+   this->msn_SelectedItemIndex = -1;
+
    this->m_InitFromData();
 
    if (this->mc_DpItems.size() > 0)
@@ -276,6 +279,23 @@ bool C_SdNdeDpSelectorListWidget::SetActualDataPoolConflict(const stw_types::sin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the widget for the all Datapools
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::UpdateDataPools(void)
+{
+   sintn sn_ItDp;
+
+   for (sn_ItDp = 0; sn_ItDp < this->mc_DpItems.size(); ++sn_ItDp)
+   {
+      C_SdNdeDpSelectorItemWidget * const pc_WidgetItem = this->mc_DpItems.at(sn_ItDp);
+
+      // Update the widget
+      pc_WidgetItem->UpdateData();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the widget for the actual Datapool
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -363,6 +383,8 @@ void C_SdNdeDpSelectorListWidget::m_AddDataPoolWidget(const uint32 ou32_DataPool
            this, &C_SdNdeDpSelectorListWidget::m_ItemDoubleClicked);
    connect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigContextMenuRequested,
            this, &C_SdNdeDpSelectorListWidget::m_OnItemCustomContextMenuRequested);
+   connect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigHoverStateChanged,
+           this, &C_SdNdeDpSelectorListWidget::SigDataPoolHoverStateChanged);
 
    this->m_AdaptSize(pc_ItemWidget->size());
    pc_ItemWidget->setVisible(false);
@@ -483,6 +505,7 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
 
          if ((this->me_DataPoolType == C_OSCNodeDataPool::eCOM) ||
              (this->me_DataPoolType == C_OSCNodeDataPool::eHALC) ||
+             (this->me_DataPoolType == C_OSCNodeDataPool::eHALC_NVM) ||
              (q_ShareNewDatapool == true))
          {
             const C_OSCNodeDataPoolId * opc_SharedDatapoolId = NULL;
@@ -514,6 +537,28 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
                opc_SharedDatapoolId = &c_SharedDatapoolId;
             }
 
+            if ((this->me_DataPoolType == C_OSCNodeDataPool::eNVM) ||
+                (this->me_DataPoolType == C_OSCNodeDataPool::eHALC_NVM))
+            {
+               // Get a potential start address
+               uint32 u32_AreaCounter;
+               std::vector<C_PuiSdHandler::C_PuiSdHandlerNodeLogicNvmArea> c_NvmAreas;
+               tgl_assert(C_PuiSdHandler::h_GetInstance()->GetNodeNvmDataPoolAreas(this->mu32_NodeIndex,
+                                                                                   c_NvmAreas) == C_NO_ERR);
+
+               // Search the first free gap
+               for (u32_AreaCounter = 0; u32_AreaCounter < c_NvmAreas.size(); ++u32_AreaCounter)
+               {
+                  const C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & rc_Area = c_NvmAreas[u32_AreaCounter];
+                  if (rc_Area.c_DataPoolIndexes.size() == 0)
+                  {
+                     // Gap found
+                     c_NewDatapool.u32_NvMStartAddress = rc_Area.u32_StartAddress;
+                     break;
+                  }
+               }
+            }
+
             // Open the Datapool properties dialog for the new Datapool
             if (this->m_OpenDataPoolDialog(c_NewDatapool, c_UIDataPool, opc_SharedDatapoolId,
                                            pc_Node->pc_DeviceDefinition->q_ProgrammingSupport,
@@ -531,6 +576,8 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
                         C_PuiSdHandler::h_InitDataElement(c_NewDatapool.e_Type, c_NewDatapool.q_IsSafety,
                                                           rc_List.c_Elements[u32_ItElement]);
                      }
+
+                     // Safety property of eHALC_NVM is not changeable, no handling necessary
                      if ((c_NewDatapool.e_Type == C_OSCNodeDataPool::eNVM) && (c_NewDatapool.q_IsSafety == true))
                      {
                         rc_List.q_NvMCRCActive = true;
@@ -889,7 +936,8 @@ void C_SdNdeDpSelectorListWidget::paintEvent(QPaintEvent * const opc_Event)
       QFont c_Font;
       QString c_Text;
 
-      if (this->me_DataPoolType != C_OSCNodeDataPool::eHALC)
+      if ((this->me_DataPoolType != C_OSCNodeDataPool::eHALC) &&
+          (this->me_DataPoolType != C_OSCNodeDataPool::eHALC_NVM))
       {
          c_Text = static_cast<QString>(C_GtGetText::h_GetText("No")) + static_cast<QString>(" ") +
                   C_PuiSdUtil::h_ConvertDataPoolTypeToString(this->me_DataPoolType) +
@@ -951,7 +999,8 @@ void C_SdNdeDpSelectorListWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
    bool q_CallOrig = true;
 
-   if (this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC)
+   if ((this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC) &&
+       (this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM))
    {
       const sintn sn_CurrentItemIndex = this->GetCurrentItemIndex();
       if (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == true)
@@ -1223,7 +1272,7 @@ bool C_SdNdeDpSelectorListWidget::m_OpenShareDataPoolDialog(C_OSCNodeDataPool & 
    \param[in,out] orc_UiDataPool              Reference to the actual ui datapool object
    \param[in]     opc_SharedDatapoolId        In case of a new shared Datapool, the Id is the shared Datapool of the new
                                               Datapool. In case of an edited or stand alone Datapool the pointer is NULL
-   \param[in]     oq_ShowApplicationSection   Flag to show or hide application section
+   \param[in]     oq_NodeProgrammingSupport   Flag if node has programming support
    \param[in]     os32_DataPoolIndex          Flag for new Datapool (-1 is new Datapool, >= 0 is existing Datapool)
    \param[in]     oq_SelectName               Selects the Datapool name for instant editing
 
@@ -1235,7 +1284,7 @@ bool C_SdNdeDpSelectorListWidget::m_OpenShareDataPoolDialog(C_OSCNodeDataPool & 
 bool C_SdNdeDpSelectorListWidget::m_OpenDataPoolDialog(C_OSCNodeDataPool & orc_OSCDataPool,
                                                        C_PuiSdNodeDataPool & orc_UiDataPool,
                                                        const C_OSCNodeDataPoolId * const opc_SharedDatapoolId,
-                                                       const bool oq_ShowApplicationSection,
+                                                       const bool oq_NodeProgrammingSupport,
                                                        const sint32 os32_DataPoolIndex, const bool oq_SelectName)
 {
    bool q_Return = false;
@@ -1243,7 +1292,7 @@ bool C_SdNdeDpSelectorListWidget::m_OpenDataPoolDialog(C_OSCNodeDataPool & orc_O
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_SdNdeDpProperties * const pc_Dialog =
       new C_SdNdeDpProperties(*c_New, &orc_OSCDataPool, &orc_UiDataPool, &this->me_ProtocolType,
-                              os32_DataPoolIndex, this->mu32_NodeIndex, oq_SelectName, oq_ShowApplicationSection,
+                              os32_DataPoolIndex, this->mu32_NodeIndex, oq_SelectName, oq_NodeProgrammingSupport,
                               opc_SharedDatapoolId);
 
    Q_UNUSED(pc_Dialog)
@@ -1406,7 +1455,8 @@ void C_SdNdeDpSelectorListWidget::m_OpenCustomContextMenu(const QPoint & orc_Pos
 
       // actions depends on count of Datapools
       if ((this->mc_DpItems.size() > 1) &&
-          (this->me_DataPoolType != C_OSCNodeDataPool::eHALC))
+          (this->me_DataPoolType != C_OSCNodeDataPool::eHALC) &&
+          (this->me_DataPoolType != C_OSCNodeDataPool::eHALC_NVM))
       {
          this->mpc_MoveLeftAction->setEnabled(this->GetCurrentItemIndex() > 0);
          this->mpc_MoveRightAction->setEnabled(this->GetCurrentItemIndex() < (this->mc_DpItems.size() - 1));
@@ -1426,7 +1476,8 @@ void C_SdNdeDpSelectorListWidget::m_OpenCustomContextMenu(const QPoint & orc_Pos
 
       // actions depend on Datapool type
       if ((this->me_DataPoolType == C_OSCNodeDataPool::eCOM) ||
-          (this->me_DataPoolType == C_OSCNodeDataPool::eHALC))
+          (this->me_DataPoolType == C_OSCNodeDataPool::eHALC) ||
+          (this->me_DataPoolType == C_OSCNodeDataPool::eHALC_NVM))
       {
          this->mpc_CopyAction->setEnabled(false);
          this->mpc_CutAction->setEnabled(false);
@@ -1439,7 +1490,8 @@ void C_SdNdeDpSelectorListWidget::m_OpenCustomContextMenu(const QPoint & orc_Pos
          this->mpc_PasteAction->setEnabled(true);
       }
 
-      if (this->me_DataPoolType == C_OSCNodeDataPool::eHALC)
+      if ((this->me_DataPoolType == C_OSCNodeDataPool::eHALC) ||
+          (this->me_DataPoolType == C_OSCNodeDataPool::eHALC_NVM))
       {
          this->mpc_DeleteAction->setEnabled(false);
       }
@@ -1450,7 +1502,8 @@ void C_SdNdeDpSelectorListWidget::m_OpenCustomContextMenu(const QPoint & orc_Pos
    }
    else
    {
-      if (this->me_DataPoolType == C_OSCNodeDataPool::eHALC)
+      if ((this->me_DataPoolType == C_OSCNodeDataPool::eHALC) ||
+          (this->me_DataPoolType == C_OSCNodeDataPool::eHALC_NVM))
       {
          // For HAL Datapools no context menu available when no concrete Datapool was selected
          q_ShowContextMenu = false;
@@ -1584,7 +1637,8 @@ void C_SdNdeDpSelectorListWidget::m_Edit(const bool oq_SelectName)
                                            pc_Node->pc_DeviceDefinition->q_ProgrammingSupport, s32_DpIndex,
                                            oq_SelectName) == true)
             {
-               //Update crc active if safety
+               // Update crc active if safety
+               // Safety property of eHALC_NVM is not changeable, no handling necessary
                if ((c_OSCDatapool.e_Type == C_OSCNodeDataPool::eNVM) && (c_OSCDatapool.q_IsSafety == true))
                {
                   for (uint32 u32_ItList = 0; u32_ItList < c_OSCDatapool.c_Lists.size(); ++u32_ItList)
@@ -1601,6 +1655,7 @@ void C_SdNdeDpSelectorListWidget::m_Edit(const bool oq_SelectName)
                   this->m_UpdateDataPoolWidget(s32_DpIndex, this->GetCurrentItemIndex());
                   Q_EMIT (this->SigDataPoolChanged());
                   //Update may be necessary for CRC option
+                  // eHALC_NVM has no editable lists
                   if (c_OSCDatapool.e_Type == C_OSCNodeDataPool::eNVM)
                   {
                      Q_EMIT (this->SigUpdateLists(this->mu32_NodeIndex, s32_DpIndex));
@@ -1856,6 +1911,7 @@ void C_SdNdeDpSelectorListWidget::m_ItemClicked(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_ItemDoubleClicked(const uint32 ou32_Index)
 {
+   std::cout << __PRETTY_FUNCTION__ << " " << ou32_Index << std::endl;
    if (static_cast<sintn>(ou32_Index) < this->mc_DpItems.size())
    {
       Q_EMIT (this->SigOpenDataPoolContent(ou32_Index));
@@ -1972,6 +2028,8 @@ void C_SdNdeDpSelectorListWidget::m_Clear(void)
                  this, &C_SdNdeDpSelectorListWidget::m_ItemDoubleClicked);
       disconnect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigContextMenuRequested,
                  this, &C_SdNdeDpSelectorListWidget::m_OnItemCustomContextMenuRequested);
+      disconnect(pc_ItemWidget, &C_SdNdeDpSelectorItemWidget::SigHoverStateChanged,
+                 this, &C_SdNdeDpSelectorListWidget::SigDataPoolHoverStateChanged);
 
       pc_ItemWidget->setParent(NULL);
 

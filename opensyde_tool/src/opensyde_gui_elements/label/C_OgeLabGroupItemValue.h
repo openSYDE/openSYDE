@@ -12,8 +12,7 @@
 #define C_OGELABGROUPITEMVALUE_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-
-#include <QLabel>
+#include "C_OgeLabToolTipBase.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
@@ -23,7 +22,7 @@ namespace stw_opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgeLabGroupItemValue :
-   public QLabel
+   public C_OgeLabToolTipBase
 {
    Q_OBJECT
 

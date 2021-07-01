@@ -70,6 +70,7 @@ private:
    void m_OnNameEdited(void);
    void m_OnCommentEdited(void);
    void m_OnSafetyToggled(const bool oq_Checked) const;
+   void m_HandleHalcNvmFlag(void);
    void m_OnUseCaseChanged(const stw_types::sint32 os32_NewIndex);
    void m_OnLinkedChannelClicked(const QString & orc_LinkedChannelName);
    void m_OnViewDatapoolDetailsClicked(void);
@@ -77,7 +78,7 @@ private:
                                     const std::vector<stw_types::uint32> & orc_LinkedChannelIndices) const;
    void m_LoadChannelData(void);
    void m_EmitUpdateSignal(void);
-   void m_ConnectWidgets(const bool oq_Connect);
+   void m_ConnectWidgets(const bool oq_Connect) const;
    void m_CheckName(const QString & orc_NewName) const;
    bool m_AskUserToContinueLinkingIfNecessary(const bool oq_IsLinkedOld, const bool oq_IsLinkedNew,
                                               const std::vector<QString> & orc_LinkedChannelNamesOld, const

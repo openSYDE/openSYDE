@@ -42,11 +42,6 @@ const sint32 ms32_IndexRight = 1;
 const sint32 ms32_IndexLeft = 2;
 const sint32 ms32_IndexBottom = 3;
 
-const float64 mf64_PointDiameter = 4.5;
-const float64 mf64_PointDistance = 10.0;
-const float64 mf64_PointStartX = 113.5;
-const float64 mf64_PointStartY = 9.0;
-
 const float64 mf64_ActionPointOffsetNode = 15.0;
 
 const float64 C_GiNode::mhf64_MinWidthNode = 107.0;
@@ -230,42 +225,36 @@ void C_GiNode::m_DetectIconSize(void)
 {
    const uint32 u32_ScaleCategory = this->m_GetScaleCategory();
 
-   if (u32_ScaleCategory == mhu32_ScaleCategory0)
+   switch (u32_ScaleCategory)
    {
+   case mhu32_ScaleCategory0:
       this->ms32_IconSize = 16;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory1)
-   {
+      break;
+   case mhu32_ScaleCategory1:
       this->ms32_IconSize = 24;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory2)
-   {
+      break;
+   case mhu32_ScaleCategory2:
       this->ms32_IconSize = 32;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory3)
-   {
+      break;
+   case mhu32_ScaleCategory3:
       this->ms32_IconSize = 40;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory4)
-   {
+      break;
+   case mhu32_ScaleCategory4:
       this->ms32_IconSize = 48;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory5)
-   {
+      break;
+   case mhu32_ScaleCategory5:
       this->ms32_IconSize = 56;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory6)
-   {
+      break;
+   case mhu32_ScaleCategory6:
       this->ms32_IconSize = 64;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory7)
-   {
+      break;
+   case mhu32_ScaleCategory7:
       this->ms32_IconSize = 72;
-   }
-   else
-   {
+      break;
+   default:
       // fallback
       this->ms32_IconSize = 16;
+      break;
    }
 }
 
@@ -327,43 +316,38 @@ void C_GiNode::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
    this->mc_Ports[ms32_IndexLeft]->update();
    this->mc_Ports[ms32_IndexRight]->update();
 
-   if (u32_ScaleCategory == mhu32_ScaleCategory0)
+   switch (u32_ScaleCategory)
    {
+   case mhu32_ScaleCategory0:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_13;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory1)
-   {
+      break;
+   case mhu32_ScaleCategory1:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_18;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory2)
-   {
+      break;
+   case mhu32_ScaleCategory2:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_23;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory3)
-   {
+      break;
+   case mhu32_ScaleCategory3:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_28;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory4)
-   {
+      break;
+   case mhu32_ScaleCategory4:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_33;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory5)
-   {
+      break;
+   case mhu32_ScaleCategory5:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_38;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory6)
-   {
+      break;
+   case mhu32_ScaleCategory6:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_43;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory7)
-   {
+      break;
+   case mhu32_ScaleCategory7:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_48;
-   }
-   else
-   {
+      break;
+   default:
       // fallback
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_13;
+      break;
    }
+
    this->mpc_Boundary->SetFont(c_BoundaryFont);
 }
 
@@ -389,8 +373,6 @@ C_GiNode::~C_GiNode()
    //Deleted via Qt parent mechanism
    this->mpc_Boundary = NULL;
    this->mpc_ConflictIcon = NULL;
-
-   //lint -e{1740}  no memory leak because of the parent of mpc_Boundary, mpc_ConflictIcon and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

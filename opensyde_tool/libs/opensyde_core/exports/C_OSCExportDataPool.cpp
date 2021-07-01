@@ -42,24 +42,6 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Constructor
-
-   Initialize all elements with default values
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_OSCExportDataPool::C_OSCExportDataPool(void)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_OSCExportDataPool::~C_OSCExportDataPool(void)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Return filename (without extension)
 
    The caller must provide a valid Datapool.
@@ -514,7 +496,7 @@ sint32 C_OSCExportDataPool::mh_AddDefinesHeader(C_SCLStringList & orc_Data, cons
 
                if (((rc_List.c_Elements[u16_ElementIndex].f64_Factor <= 0.0) || (c_Factor == "0.0")) ||
                    ((oe_ScalingSupport == C_OSCNodeCodeExportSettings::eFLOAT32) &&
-                    (static_cast<float32>(rc_List.c_Elements[u16_ElementIndex].f64_Factor) <= 0.0)))
+                    (static_cast<float32>(rc_List.c_Elements[u16_ElementIndex].f64_Factor) <= 0.0F)))
                {
                   osc_write_log_error("Creating source code",
                                       "Did not generate code because factor of element \"" + orc_DataPool.c_Name +
@@ -535,7 +517,7 @@ sint32 C_OSCExportDataPool::mh_AddDefinesHeader(C_SCLStringList & orc_Data, cons
                if (q_InfOrNanOffset == true)
                {
                   osc_write_log_error("Creating source code",
-                                      "Did not generate code because factor of element \"" + orc_DataPool.c_Name +
+                                      "Did not generate code because offset of element \"" + orc_DataPool.c_Name +
                                       "::" + rc_List.c_Name + "::" + rc_List.c_Elements[u16_ElementIndex].c_Name +
                                       "\" would be generated as 'inf' or 'nan'.");
                   s32_Retval = C_CONFIG;
@@ -1042,7 +1024,8 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
          }
          else
          {
-            if (orc_DataPool.e_Type == C_OSCNodeDataPool::eNVM)
+            if ((orc_DataPool.e_Type == C_OSCNodeDataPool::eNVM) ||
+                (orc_DataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM))
             {
                c_String += C_SCLString::IntToStr(rc_List.q_NvMCRCActive) + "U, ";
                c_String += "0x" + C_SCLString::IntToHex(static_cast<sint64>(rc_List.u32_NvMStartAddress), 8U) + "U, ";
@@ -1080,7 +1063,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
       orc_Data.Append("static const T_osy_dpa_data_pool_definition mt_DataPoolDefinition =");
       orc_Data.Append("{");
       orc_Data.Append("   OSY_DPA_DATA_POOL_DEFINITION_VERSION,");
-      if (orc_DataPool.e_Type == C_OSCNodeDataPool::eNVM)
+      if ((orc_DataPool.e_Type == C_OSCNodeDataPool::eNVM) || (orc_DataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM))
       {
          orc_Data.Append("   OSY_DPA_DATA_POOL_TYPE_NVM,");
       }
@@ -1104,7 +1087,8 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
       orc_Data.Append("   " + c_DataPoolName.UpperCase() + "_NUMBER_OF_LISTS,");
       orc_Data.Append("   0x" + C_SCLString::IntToHex(static_cast<sint64>(u32_HashValue), 4U) +
                       "U, ///< CRC of Datapool definition");
-      if (orc_DataPool.e_Type == C_OSCNodeDataPool::eNVM)
+      if ((orc_DataPool.e_Type == C_OSCNodeDataPool::eNVM) ||
+          (orc_DataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM))
       {
          orc_Data.Append("   0x" + C_SCLString::IntToHex(static_cast<sint64>(orc_DataPool.u32_NvMStartAddress), 8U) +
                          "U,  ///< NVM start address");
@@ -1188,7 +1172,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
 
    //KFXTCSWRSCC_449: special macro from V5 on if local and NVM:
    if ((ou16_GenCodeVersion >= 5U) && (oe_Linkage == eLOCAL) &&
-       (orc_DataPool.e_Type == C_OSCNodeDataPool::eNVM))
+       ((orc_DataPool.e_Type == C_OSCNodeDataPool::eNVM) || (orc_DataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM)))
    {
       uint16 u16_ListIndex;
       uint32 u32_BufferSize;
@@ -1424,8 +1408,6 @@ C_SCLString C_OSCExportDataPool::mh_GetElementValueString(const C_OSCNodeDataPoo
          c_String += C_OSCExportUti::h_FloatToStrG(orc_Value.GetValueF32()) + "F";
          break;
       case C_OSCNodeDataPoolContent::eFLOAT64: ///< Data type 64 bit floating point
-         //depending on the value this could result in a very long string
-         //but with other approaches (e.g. "printf formatter %g" we might lose precision)
          c_String += C_OSCExportUti::h_FloatToStrG(orc_Value.GetValueF64());
          break;
       default:

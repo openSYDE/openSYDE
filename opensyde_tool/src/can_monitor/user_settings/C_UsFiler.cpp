@@ -74,9 +74,9 @@ sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & o
       s32_Retval = C_NO_ERR;
       {
          //Helper to seperate path and file name
-         QFileInfo c_File(orc_Path);
+         const QFileInfo c_File(orc_Path);
          //Check if directory exists
-         QDir c_Dir(c_File.path());
+         const QDir c_Dir(c_File.path());
          if (c_Dir.exists() == false)
          {
             c_Dir.mkpath(".");
@@ -160,7 +160,7 @@ sint32 C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Pat
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
-   QStringList c_List = orc_UserSettings.GetRecentProjects();
+   const QStringList c_List = orc_UserSettings.GetRecentProjects();
 
    // clear recent projects section (the ini file can only add keys and does not delete keys that do not exist anymore)
    if (orc_Ini.SectionExists("RecentProjects") == true)

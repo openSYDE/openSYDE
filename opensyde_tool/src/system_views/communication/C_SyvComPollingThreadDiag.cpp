@@ -160,6 +160,9 @@ void C_SyvComPollingThreadDiag::run(void)
    case eNVMSAFEREADPARAMETERVALUES:
       ms32_Result = mpc_Dealer->NvmSafeReadParameterValues(this->mc_ListIds, &mu8_NRC);
       break;
+   default:
+      tgl_assert(false);
+      break;
    }
 }
 

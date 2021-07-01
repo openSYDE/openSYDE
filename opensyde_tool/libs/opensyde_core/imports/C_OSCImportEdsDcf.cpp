@@ -15,7 +15,7 @@
 #include <limits>
 #include <sstream>
 #include <iomanip>
-#include <stdlib.h>
+#include <cstdlib>
 #include "TGLFile.h"
 #include "stwerrors.h"
 #include "CSCLIniFile.h"

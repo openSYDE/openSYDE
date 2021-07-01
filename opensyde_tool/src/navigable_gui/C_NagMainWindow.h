@@ -108,6 +108,7 @@ private:
    void m_HandleDeleteSysViewRequest(const stw_types::uint32 ou32_Index, const stw_types::sint32 os32_SelectedSubMode,
                                      const stw_types::uint32 ou32_SelectedIndex);
    void m_HandleDuplicateSysViewRequest(const stw_types::uint32 ou32_Index);
+   void m_HandleServiceMode(void) const;
 
    Ui::C_NagMainWindow * mpc_Ui;
 

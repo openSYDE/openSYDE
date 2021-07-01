@@ -66,6 +66,42 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDa
    sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser, orc_FilePath,
                                                                         "opensyde-dp-core-definition");
 
+   //File version
+   if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading Datapool", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading Datapool", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != 1U)
+         {
+            osc_write_log_error("Loading Datapool",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      c_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading Datapool", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
    if (s32_Retval == C_NO_ERR)
    {
       if (c_XMLParser.SelectNodeChild("data-pool") == "data-pool")
@@ -897,6 +933,9 @@ C_SCLString C_OSCNodeDataPoolFiler::h_DataPoolToString(const C_OSCNodeDataPool::
    case C_OSCNodeDataPool::eHALC:
       c_Retval = "halc";
       break;
+   case C_OSCNodeDataPool::eHALC_NVM:
+      c_Retval = "halc-nvm";
+      break;
    default:
       c_Retval = "invalid";
       break;
@@ -934,6 +973,10 @@ sint32 C_OSCNodeDataPoolFiler::h_StringToDataPool(const C_SCLString & orc_String
    else if (orc_String == "halc")
    {
       ore_Type = C_OSCNodeDataPool::eHALC;
+   }
+   else if (orc_String == "halc-nvm")
+   {
+      ore_Type = C_OSCNodeDataPool::eHALC_NVM;
    }
    else
    {

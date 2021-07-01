@@ -43,6 +43,7 @@ using namespace stw_opensyde_gui;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvEmptyItem::C_SdBueMlvEmptyItem(const uint8 ou8_Index, QGraphicsItem * const opc_Parent) :
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    C_SdBueMlvBaseItem(mc_STYLE_GUIDE_COLOR_11, mc_STYLE_GUIDE_COLOR_8, mc_STYLE_GUIDE_FONT_REGULAR_13,
                       QString::number(ou8_Index), false, opc_Parent),
    mc_BackgroundColorError(QColor(247, 196, 197)),
@@ -201,7 +202,7 @@ void C_SdBueMlvEmptyItem::paint(QPainter * const opc_Painter, const QStyleOption
    QPen c_Pen;
    QBrush c_Brush;
    QRectF c_Rect;
-   uint32 u32_Alignment = static_cast<uint32>(Qt::AlignRight) | static_cast<uint32>(Qt::AlignTop);
+   const uint32 u32_Alignment = static_cast<uint32>(Qt::AlignRight) | static_cast<uint32>(Qt::AlignTop);
 
    C_SdBueMlvBaseItem::paint(opc_Painter, opc_Option, opc_Widget);
 

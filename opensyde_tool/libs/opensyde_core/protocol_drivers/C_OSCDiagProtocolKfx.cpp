@@ -69,7 +69,7 @@ void C_OSCDiagProtocolKfx::mh_CyclicResponseReceived(void * const opv_Instance, 
                                                      const bool oq_IsTimeStamped, const bool oq_Error)
 {
    //lint -e{9079}  We know that we registered; this cannot fail
-   C_OSCDiagProtocolKfx * const pc_MeMyselfAndI = reinterpret_cast<C_OSCDiagProtocolKfx * const>(opv_Instance);
+   C_OSCDiagProtocolKfx * const pc_MeMyselfAndI = reinterpret_cast<C_OSCDiagProtocolKfx *>(opv_Instance);
 
    tgl_assert(pc_MeMyselfAndI != NULL);
    if (pc_MeMyselfAndI != NULL)

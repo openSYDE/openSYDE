@@ -152,7 +152,7 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
             c_NodeDatapoolNames.clear();
             c_ReceiveTimeoutModes.clear();
             c_ReceiveTimeoutValues.clear();
-         }
+         } //lint !e429  //no memory leak because of the Qt memory management
       }
 
       //Visibility

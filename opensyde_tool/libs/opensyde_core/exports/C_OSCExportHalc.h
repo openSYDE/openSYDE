@@ -25,8 +25,6 @@ namespace stw_opensyde_core
 class C_OSCExportHalc
 {
 public:
-   C_OSCExportHalc(void);
-
    static stw_scl::C_SCLString h_GetFileName(const bool oq_IsSafe);
    static stw_types::uint16 h_ConvertOverallCodeVersion(const stw_types::uint16 ou16_GenCodeVersion);
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path,
@@ -67,7 +65,7 @@ private:
                                              const std::vector<C_OSCHalcConfigChannel> & orc_ConfigArray,
                                              const C_OSCHalcDefDomain::E_VariableSelector & ore_Type,
                                              const stw_scl::C_SCLString & orc_DomainSingularName, const bool oq_IsArray,
-                                             const bool oq_IsSafe);
+                                             const C_OSCHalcDefBase::E_SafetyMode oe_SafetyMode, const bool oq_IsSafe);
    static stw_scl::C_SCLString mh_GetDpListElementReference(const std::vector<C_OSCHalcDefStruct> & orc_DefinitionArray,
                                                             const C_OSCHalcDefDomain::E_VariableSelector & ore_Type,
                                                             const C_OSCHalcDefElement & orc_Element,
@@ -75,6 +73,8 @@ private:
                                                             const stw_types::uint32 ou32_ElementIndex,
                                                             const stw_scl::C_SCLString & orc_DomainSingularName,
                                                             const bool oq_IsArray, const bool oq_IsSafe);
+   static bool mh_DropChannel(const bool oq_IsChannelSafe, const C_OSCHalcDefBase::E_SafetyMode oe_SafetyMode,
+                              const bool oq_IsSafeCase);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

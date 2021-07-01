@@ -42,7 +42,7 @@ public:
 
    void SetBusId(const stw_types::uint32 ou32_BusIndex);
    void SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol);
-   void Refresh(void);
+   void Refresh(void) const;
 
    void InitStaticNames(void) const;
 

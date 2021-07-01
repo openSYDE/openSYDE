@@ -766,6 +766,7 @@ bool C_OSCComDriverProtocol::IsInitialized(void) const
    C_NO_ERR   re-connected
    C_BUSY     could not re-connect to node
    C_RANGE    node not found or no openSYDE protocol installed
+   C_CONFIG   no transport protocol installed
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::ReConnectNode(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId) const
@@ -1445,7 +1446,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
          {
             // Using the same connection for configuring the router and the final openSYDE target
             pc_ProtocolOsy =
-               dynamic_cast<C_OSCProtocolDriverOsy * const>(this->mc_OsyProtocols[u32_OsyRoutingTarget]);
+               dynamic_cast<C_OSCProtocolDriverOsy *>(this->mc_OsyProtocols[u32_OsyRoutingTarget]);
          }
 
          if (pc_ProtocolOsy != NULL)
@@ -1731,7 +1732,7 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                c_ActRoute.c_VecRoutePoints[c_ActRoute.c_VecRoutePoints.size() - 1];
             const uint32 u32_ActiveLastNode = this->m_GetActiveIndex(c_LastNodeOfRouting.u32_NodeIndex);
             C_OSCProtocolDriverOsy * pc_ProtocolOsyOfLastNodeOfRouting =
-               dynamic_cast<C_OSCProtocolDriverOsy * const>(this->mc_OsyProtocols[u32_ActiveLastNode]);
+               dynamic_cast<C_OSCProtocolDriverOsy *>(this->mc_OsyProtocols[u32_ActiveLastNode]);
             bool q_EthernetRouter = false;
             uint32 u32_ActiveOsyTargetNode = ou32_ActiveNode;
 
@@ -1785,7 +1786,7 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                      const uint32 u32_ActiveRouterNode = this->m_GetActiveIndex(rc_Point.u32_NodeIndex);
 
                      C_OSCProtocolDriverOsy * const pc_ProtocolOsyTarget =
-                        dynamic_cast<C_OSCProtocolDriverOsy * const>(this->mc_OsyProtocols[u32_ActiveOsyTargetNode]);
+                        dynamic_cast<C_OSCProtocolDriverOsy *>(this->mc_OsyProtocols[u32_ActiveOsyTargetNode]);
 
                      if (pc_ProtocolOsyTarget != NULL)
                      {
@@ -1896,7 +1897,7 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                    (c_ActRoute.c_VecRoutePoints.size() == 1))
                {
                   C_OSCProtocolDriverOsy * const pc_ProtocolOsyRouter =
-                     dynamic_cast<C_OSCProtocolDriverOsy * const>(this->mc_OsyProtocols[u32_ActiveLastNode]);
+                     dynamic_cast<C_OSCProtocolDriverOsy *>(this->mc_OsyProtocols[u32_ActiveLastNode]);
 
                   if ((pc_ProtocolOsyRouter != NULL) &&
                       (q_EthernetRouter == false))
@@ -2169,7 +2170,7 @@ sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_Act
 
    // Using the same connection for configuring the router and the final openSYDE target
    C_OSCProtocolDriverOsy * const pc_ProtocolOsyTarget =
-      dynamic_cast<C_OSCProtocolDriverOsy * const>(this->mc_OsyProtocols[ou32_ActiveOsyTargetNode]);
+      dynamic_cast<C_OSCProtocolDriverOsy *>(this->mc_OsyProtocols[ou32_ActiveOsyTargetNode]);
 
    if (pc_ProtocolOsyTarget != NULL)
    {

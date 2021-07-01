@@ -16,8 +16,11 @@
 #include "precomp_headers.h"
 
 #include "C_OgeLeProperties.h"
+#include "C_OgeWiUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_types;
+using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -43,4 +46,15 @@ using namespace stw_opensyde_gui_elements;
 C_OgeLeProperties::C_OgeLeProperties(QWidget * const opc_Parent) :
    C_OgeLeToolTipBase(opc_Parent)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  \brief   Set background color (stylesheet color index)
+
+   \param[in] osn_Value New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeLeProperties::SetBackgroundColor(const sintn osn_Value)
+{
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Background", osn_Value);
 }

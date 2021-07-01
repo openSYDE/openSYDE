@@ -24,7 +24,7 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QColor C_OgeWiDashboardPieChart::mhc_Transparent = QColor(Qt::transparent);
+const QColor C_OgeWiDashboardPieChart::mhc_Transparent = static_cast<QColor>(Qt::transparent);
 const float32 C_OgeWiDashboardPieChart::mhf32_Pi = static_cast<float32>(std::acos(-1));
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -246,7 +246,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          }
          else // Transparent
          {
-            m_SetInnerCircle(c_Painter, static_cast<QBrush>(QColor(Qt::transparent)), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(static_cast<QColor>(Qt::transparent)), c_InnerCircleRect);
          }
 
          // Text-------------------------------------------------------------------------------
@@ -279,7 +279,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          }
          else
          {
-            m_SetInnerCircle(c_Painter, static_cast<QBrush>(QColor(Qt::transparent)), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(static_cast<QColor>(Qt::transparent)), c_InnerCircleRect);
          }
 
          // Text-------------------------------------------------------------------------------
@@ -461,7 +461,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          }
          else
          {
-            m_SetInnerCircle(c_Painter, static_cast<QBrush>(QColor(Qt::transparent)), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(static_cast<QColor>(Qt::transparent)), c_InnerCircleRect);
          }
 
          // Text-------------------------------------------------------------------------------
@@ -502,7 +502,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
          }
          else
          {
-            m_SetInnerCircle(c_Painter, static_cast<QBrush>(QColor(Qt::transparent)), c_InnerCircleRect);
+            m_SetInnerCircle(c_Painter, static_cast<QBrush>(static_cast<QColor>(Qt::transparent)), c_InnerCircleRect);
          }
 
          // Text-------------------------------------------------------------------------------

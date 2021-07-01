@@ -15,6 +15,7 @@
 #include "precomp_headers.h"
 
 #include <QString>
+#include <QRegExpValidator>
 
 #include "C_GiSyColorSelectWidget.h"
 #include "ui_C_GiSyColorSelectWidget.h"
@@ -519,11 +520,11 @@ void C_GiSyColorSelectWidget::m_InitConnects(void) const
    // The screen color picker button
    connect(this->mpc_Ui->pc_PushButtonIcon, &QPushButton::clicked, this, &C_GiSyColorSelectWidget::m_PickScreenColor);
 
-   connect(this->mpc_ColorPicker, &C_GiSyColorPicker::NewColor,
+   connect(this->mpc_ColorPicker, &C_GiSyColorPicker::SigNewColor,
            mpc_ColorBrightnessPicker, &C_GiSyColorBrightnessPicker::SetColorWithHS);
-   connect(this->mpc_ColorBrightnessPicker, &C_GiSyColorBrightnessPicker::NewHsv,
+   connect(this->mpc_ColorBrightnessPicker, &C_GiSyColorBrightnessPicker::SigNewHsv,
            this, &C_GiSyColorSelectWidget::m_NewHsv);
-   connect(this->mpc_ColorBrightnessPicker, &C_GiSyColorBrightnessPicker::NewHsv,
+   connect(this->mpc_ColorBrightnessPicker, &C_GiSyColorBrightnessPicker::SigNewHsv,
            this, &C_GiSyColorSelectWidget::m_UpdateLineEditColor);
    connect(this->mpc_Ui->pc_PushButtonColorShower, &C_GiSyColorShower::SigChangeColor,
            this, &C_GiSyColorSelectWidget::m_RepaintColorShowerButton);

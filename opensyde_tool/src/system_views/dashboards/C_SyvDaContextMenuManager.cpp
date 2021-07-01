@@ -245,6 +245,7 @@ bool C_SyvDaContextMenuManager::m_ItemTypeHasSetupStyle(const stw_types::sintn o
       break;
    default:
       q_Retval = false;
+      break;
    }
    return q_Retval;
 }

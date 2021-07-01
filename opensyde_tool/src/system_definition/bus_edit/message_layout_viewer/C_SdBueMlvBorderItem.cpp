@@ -43,6 +43,7 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvBorderItem::C_SdBueMlvBorderItem(const QString & orc_Title, const stw_types::uint8 ou8_Index,
                                            QGraphicsItem * const opc_Parent) :
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    C_SdBueMlvBaseItem(mc_STYLE_GUIDE_COLOR_10, mc_STYLE_GUIDE_COLOR_6, mc_STYLE_GUIDE_FONT_SEMIBOLD_16, "", true,
                       opc_Parent),
    mc_Title(orc_Title),

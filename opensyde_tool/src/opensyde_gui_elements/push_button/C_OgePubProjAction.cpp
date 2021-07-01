@@ -95,8 +95,8 @@ void C_OgePubProjAction::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubProjAction::SetCustomIcon(const QString & orc_IconPathEnabled, const QString & orc_IconPathDisabled)
 {
-   mc_IconEnabled.addPixmap(QPixmap(orc_IconPathEnabled));
-   mc_IconDisabled.addPixmap(QPixmap(orc_IconPathDisabled));
+   mc_IconEnabled.addPixmap(static_cast<QPixmap>(orc_IconPathEnabled));
+   mc_IconDisabled.addPixmap(static_cast<QPixmap>(orc_IconPathDisabled));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

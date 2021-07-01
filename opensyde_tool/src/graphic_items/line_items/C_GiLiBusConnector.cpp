@@ -568,7 +568,7 @@ bool C_GiLiBusConnector::m_OnGenericInteractionPointMouseRelease(const QPointF &
       {
          if (pc_Node->contains(pc_Node->mapFromScene(orc_ScenePos)) == true)
          {
-            Q_EMIT this->ShowReconnectContextMenu(orc_ScenePos, pc_Node, this->GetBusItem(), -1, this);
+            Q_EMIT this->SigShowReconnectContextMenu(orc_ScenePos, pc_Node, this->GetBusItem(), -1, this);
             q_Retval = false;
          }
       }
@@ -595,8 +595,8 @@ void C_GiLiBusConnector::m_OnBusChange(const QPointF & orc_ScenePos)
    {
       s32_Interface = static_cast<sint32>(pc_Id->u8_InterfaceNumber);
    }
-   Q_EMIT this->ShowReconnectContextMenu(orc_ScenePos, dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem),
-                                         this->GetBusItem(), s32_Interface, this);
+   Q_EMIT this->SigShowReconnectContextMenu(orc_ScenePos, dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem),
+                                            this->GetBusItem(), s32_Interface, this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -118,10 +118,6 @@ private:
       eADD_DBC_FILE
    };
 
-   //Avoid call
-   C_SyvComMessageMonitor(const C_SyvComMessageMonitor &);
-   C_SyvComMessageMonitor & operator =(const C_SyvComMessageMonitor &);
-
    stw_types::sint32 m_AddDbcFile(const stw_scl::C_SCLString & orc_PathDbc);
    const C_CieConverter::C_CIECanMessage * m_CheckDbcFile(const stw_can::T_STWCAN_Msg_RX & orc_Msg);
    bool m_InterpretDbcFile(const C_CieConverter::C_CIECanMessage * const opc_DbcMessage,
@@ -155,7 +151,6 @@ private:
    stw_types::uint8 mu8_BusLoad;
    stw_types::uint32 mu32_TxMessages;
    stw_types::uint32 mu32_TxErrors;
-   stw_types::uint32 mu32_FilteredMessages;
 
    // DBC files
    std::map<stw_scl::C_SCLString, C_CieConverter::C_CIECommDefinition> mc_DbcFiles;

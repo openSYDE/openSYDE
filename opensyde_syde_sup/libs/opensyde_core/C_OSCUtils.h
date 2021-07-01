@@ -15,6 +15,7 @@
 
 #include "stwtypes.h"
 #include "CSCLString.h"
+#include "CSCLResourceStrings.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -45,9 +46,16 @@ public:
    static stw_scl::C_SCLString h_SerialNumberToString(const stw_types::uint8 * const opu8_SerialNumber);
    static void h_FileToString(const stw_scl::C_SCLString & orc_FilePath, stw_scl::C_SCLString & orc_OutputString);
    static void h_RangeCheckFloat(stw_types::float64 & orf64_Value);
+   static stw_scl::C_SCLString h_LoadString(const stw_types::uint16 ou16_StringIndex);
+
+   static stw_types::sint32 h_CopyFile(const stw_scl::C_SCLString & orc_SourceFile,
+                                       const stw_scl::C_SCLString & orc_TargetFile,
+                                       stw_scl::C_SCLString * const opc_ErrorPath = NULL,
+                                       stw_scl::C_SCLString * const opc_ErrorMessage = NULL);
 
 private:
    static const stw_types::float64 mhf64_Epsilon;
+   static stw_scl::C_SCLResourceStrings mhc_ResourceStrings;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -30,7 +30,8 @@ public:
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                       const QModelIndex & orc_Index) const override;
 
-   void StartPaint(const stw_types::sint32 s32_Index, stw_opensyde_gui::C_SdNdeDpSelectorItemWidget * const opc_Widget);
+   void StartPaint(const stw_types::sint32 os32_Index,
+                   stw_opensyde_gui::C_SdNdeDpSelectorItemWidget * const opc_Widget);
    void StopPaint(void);
 
 private:

@@ -119,7 +119,8 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckCrcs(const C_OSCNode & orc_Node) cons
 
       for (u32_DataPoolCounter = 0U; u32_DataPoolCounter < orc_Node.c_DataPools.size(); ++u32_DataPoolCounter)
       {
-         if (orc_Node.c_DataPools[u32_DataPoolCounter].e_Type == C_OSCNodeDataPool::eNVM)
+         if ((orc_Node.c_DataPools[u32_DataPoolCounter].e_Type == C_OSCNodeDataPool::eNVM) ||
+             (orc_Node.c_DataPools[u32_DataPoolCounter].e_Type == C_OSCNodeDataPool::eHALC_NVM))
          {
             uint32 u32_ListCounter;
 
@@ -259,7 +260,8 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
             c_ElementId.u32_DataPoolIndex = u32_DataPoolCounter;
 
             C_OSCNodeDataPool * const pc_DataPool = &this->mpc_Node->c_DataPools[u32_DataPoolCounter];
-            if (pc_DataPool->e_Type == C_OSCNodeDataPool::eNVM)
+            if ((pc_DataPool->e_Type == C_OSCNodeDataPool::eNVM) ||
+                (pc_DataPool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
             {
                // Count the changed elements
                for (u32_ListCounter = 0U; u32_ListCounter < pc_DataPool->c_Lists.size(); ++u32_ListCounter)
@@ -1081,7 +1083,8 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckParameterFileContents(const C_SCLStri
                      {
                         const C_OSCNodeDataPool & rc_DataPool = this->mpc_Node->c_DataPools[u32_ItDataPool];
                         //Check data pool address range and for NVM datapool
-                        if ((rc_DataPool.e_Type == C_OSCNodeDataPool::eNVM) &&
+                        if (((rc_DataPool.e_Type == C_OSCNodeDataPool::eNVM) ||
+                             (rc_DataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM)) &&
                             (rc_DataPool.u32_NvMStartAddress <= rc_CurRawEntry.u32_StartAddress) &&
                             ((rc_DataPool.u32_NvMStartAddress + rc_DataPool.u32_NvMSize) >
                              rc_CurRawEntry.u32_StartAddress))
@@ -1427,7 +1430,7 @@ void C_OSCDataDealerNvmSafe::mh_CreateInterpretedList(const C_OSCNodeDataPoolLis
    C_RD_WR    Data pool version mismatch
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRawNode & orc_Node)
+sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRawNode & orc_Node) const
 {
    sint32 s32_Retval = C_NO_ERR;
 

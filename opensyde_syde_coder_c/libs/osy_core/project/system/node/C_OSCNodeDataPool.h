@@ -47,10 +47,11 @@ public:
 
    enum E_Type ///< Type of data pool
    {
-      eDIAG, ///< Data pool type: diagnostic (contains/handles variables)
-      eNVM,  ///< Data pool type: non-volatile memory (contains/handles parameters)
-      eCOM,  ///< Data pool type: communication (contains/handles signals)
-      eHALC  ///< Data pool type: HALC (contains/handles HALC related variables)
+      eDIAG,    ///< Data pool type: diagnostic (contains/handles variables)
+      eNVM,     ///< Data pool type: non-volatile memory (contains/handles parameters)
+      eCOM,     ///< Data pool type: communication (contains/handles signals)
+      eHALC,    ///< Data pool type: HALC (contains/handles HALC related variables)
+      eHALC_NVM ///< Data pool type: non-volatile memory for HALC (contains/handles HALC related parameters)
    };
 
    E_Type e_Type;                               ///< Data pool type

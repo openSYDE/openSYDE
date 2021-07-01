@@ -36,8 +36,8 @@ public:
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void NewHsv(const stw_types::sintn osn_Hue, const stw_types::sintn osn_Sat, const stw_types::sintn osn_Value);
-   void ColorSelected(void);
+   void SigNewHsv(const stw_types::sintn osn_Hue, const stw_types::sintn osn_Sat, const stw_types::sintn osn_Value);
+   void SigColorSelected(void);
 
 protected:
    virtual void paintEvent(QPaintEvent * const opc_Event) override;

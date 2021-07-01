@@ -147,7 +147,8 @@ void C_SdManUnoTopologyZOrderCommand::mh_InsertOrReplaceByMinimum(QMap<QGraphics
                                                                   QGraphicsItem * const opc_Key,
                                                                   const float64 & orf64_Value)
 {
-   QMap<QGraphicsItem *, float64>::iterator c_Found = orc_Map.find(opc_Key);
+   const QMap<QGraphicsItem *, float64>::iterator c_Found = orc_Map.find(opc_Key);
+
    if (c_Found != orc_Map.end())
    {
       const float64 f64_Improved = std::min(*c_Found, orf64_Value);

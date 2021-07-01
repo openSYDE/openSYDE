@@ -42,7 +42,7 @@ public:
                                 stw_opensyde_gui_logic::C_PuiSdNodeDataPool * const opc_UiDataPool,
                                 stw_opensyde_core::C_OSCCanProtocol::E_Type * const ope_ComProtocolType,
                                 const stw_types::sint32 os32_DataPoolIndex, const stw_types::uint32 & oru32_NodeIndex,
-                                const bool oq_SelectName, const bool oq_ShowApplicationSection,
+                                const bool oq_SelectName, const bool oq_NodeProgrammingSupport,
                                 const stw_opensyde_core::C_OSCNodeDataPoolId * const opc_SharedDatapoolId);
    virtual ~C_SdNdeDpProperties(void);
 
@@ -66,12 +66,13 @@ private:
    stw_opensyde_core::C_OSCCanProtocol::E_Type * const mpe_ComProtocolType;
    const stw_types::uint32 mu32_NodeIndex;
    const stw_types::sint32 ms32_DataPoolIndex;
+   bool mq_DatapoolAutoNvMStartAddress;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);
    void m_ApplyType(const bool oq_SharedDatapool);
    void m_LoadCodeGenerationAndApplication(void) const;
-   void m_SpinBoxChanged(const stw_types::sintn osn_Value) const;
+   void m_SpinBoxSizeChanged(const stw_types::sintn osn_Value) const;
    void m_UpdateSizePrediction(void) const;
    void m_CheckDatapoolName(void) const;
    bool m_CheckDatapoolNameNotDuplicate(std::vector<stw_scl::C_SCLString> * const opc_ExistingDatapoolNames) const;

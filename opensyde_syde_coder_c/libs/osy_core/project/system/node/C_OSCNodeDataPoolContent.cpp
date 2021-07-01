@@ -194,6 +194,20 @@ void C_OSCNodeDataPoolContent::CalcHashElement(uint32 & oru32_HashValue, const u
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calculates the hash value over structure only
+
+   The hash value is a 32 bit CRC value.
+
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeDataPoolContent::CalcHashStructure(uint32 & oru32_HashValue) const
+{
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_Type, sizeof(this->me_Type), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_Array, sizeof(this->mq_Array), oru32_HashValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: set current value for simply type of any type
 
    \param[in]  orc_Value   New value
@@ -1922,7 +1936,6 @@ bool C_OSCNodeDataPoolContent::CheckInsideRange(const C_OSCNodeDataPoolContent::
       case C_OSCNodeDataPoolContent::eSINT8:
          if (q_ThisBaseIsUnsigned == true)
          {
-            //lint -e{571} //we can be sure the max of sint8 is positive
             if (u64_Value <= static_cast<uint64>(std::numeric_limits<sint8>::max()))
             {
                q_Retval = true;
@@ -1964,7 +1977,6 @@ bool C_OSCNodeDataPoolContent::CheckInsideRange(const C_OSCNodeDataPoolContent::
       case C_OSCNodeDataPoolContent::eSINT16:
          if (q_ThisBaseIsUnsigned == true)
          {
-            //lint -e{571} //we can be sure the max of sint16 is positive
             if (u64_Value <= static_cast<uint64>(std::numeric_limits<sint16>::max()))
             {
                q_Retval = true;
@@ -2006,7 +2018,6 @@ bool C_OSCNodeDataPoolContent::CheckInsideRange(const C_OSCNodeDataPoolContent::
       case C_OSCNodeDataPoolContent::eSINT32:
          if (q_ThisBaseIsUnsigned == true)
          {
-            //lint -e{571} //we can be sure the max of sint32 is positive
             if (u64_Value <= static_cast<uint64>(std::numeric_limits<sint32>::max()))
             {
                q_Retval = true;
@@ -2736,8 +2747,8 @@ bool C_OSCNodeDataPoolContent::CompareArrayGreater(const C_OSCNodeDataPoolConten
 /*! \brief   Get all value as scaled string
 
    Info: - floats doubles and any scaled value will be displayed in exponential format with 6 digits precision,
-           e.g. 2.45823e+006
-         - The postfix e+001 will be skipped (if the number has less than 6 digits)
+           e.g. 2.45823e+06
+         - The postfix e+01 will be skipped (if the number has less than 6 digits)
          - The last digit will get rounded if necessary
 
    \param[in]   of64_Factor               Scaling factor
@@ -3726,7 +3737,6 @@ void C_OSCNodeDataPoolContent::GetValueAsBigEndianBlob(std::vector<uint8> & orc_
 //----------------------------------------------------------------------------------------------------------------------
 uint64 C_OSCNodeDataPoolContent::mh_BinaryToUInt64Big(const uint8 * const opu8_Data)
 {
-   //lint --e{415,416} //providing enough buffer is the job of the caller
    return (static_cast<uint64>(opu8_Data[0]) << 56U) +
           (static_cast<uint64>(opu8_Data[1]) << 48U) +
           (static_cast<uint64>(opu8_Data[2]) << 40U) +
@@ -3747,7 +3757,6 @@ uint64 C_OSCNodeDataPoolContent::mh_BinaryToUInt64Big(const uint8 * const opu8_D
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCNodeDataPoolContent::mh_BinaryToUInt32Big(const uint8 * const opu8_Data)
 {
-   //lint --e{415,416} //providing enough buffer is the job of the caller
    return (static_cast<uint32>(opu8_Data[0]) << 24U) +
           (static_cast<uint32>(opu8_Data[1]) << 16U) +
           (static_cast<uint32>(opu8_Data[2]) << 8U) +
@@ -3764,7 +3773,6 @@ uint32 C_OSCNodeDataPoolContent::mh_BinaryToUInt32Big(const uint8 * const opu8_D
 //----------------------------------------------------------------------------------------------------------------------
 uint64 C_OSCNodeDataPoolContent::mh_BinaryToUInt64Little(const uint8 * const opu8_Data)
 {
-   //lint --e{415,416} //providing enough buffer is the job of the caller
    return (static_cast<uint64>(opu8_Data[7]) << 56U) +
           (static_cast<uint64>(opu8_Data[6]) << 48U) +
           (static_cast<uint64>(opu8_Data[5]) << 40U) +
@@ -3785,7 +3793,6 @@ uint64 C_OSCNodeDataPoolContent::mh_BinaryToUInt64Little(const uint8 * const opu
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCNodeDataPoolContent::mh_BinaryToUInt32Little(const uint8 * const opu8_Data)
 {
-   //lint --e{415,416} //providing enough buffer is the job of the caller
    return (static_cast<uint32>(opu8_Data[3]) << 24U) +
           (static_cast<uint32>(opu8_Data[2]) << 16U) +
           (static_cast<uint32>(opu8_Data[1]) << 8U) +
@@ -3803,7 +3810,6 @@ uint32 C_OSCNodeDataPoolContent::mh_BinaryToUInt32Little(const uint8 * const opu
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::mh_UInt64ToBinaryBig(const uint64 ou64_Data, uint8 * const opu8_Data)
 {
-   //lint --e{415,416} //providing enough buffer is the job of the caller
    opu8_Data[0] = static_cast<uint8>(ou64_Data >> 56U);
    opu8_Data[1] = static_cast<uint8>(ou64_Data >> 48U);
    opu8_Data[2] = static_cast<uint8>(ou64_Data >> 40U);
@@ -3825,7 +3831,6 @@ void C_OSCNodeDataPoolContent::mh_UInt64ToBinaryBig(const uint64 ou64_Data, uint
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::mh_UInt32ToBinaryBig(const uint32 ou32_Data, uint8 * const opu8_Data)
 {
-   //lint --e{415,416} //providing enough buffer is the job of the caller
    opu8_Data[0] = static_cast<uint8>(ou32_Data >> 24U);
    opu8_Data[1] = static_cast<uint8>(ou32_Data >> 16U);
    opu8_Data[2] = static_cast<uint8>(ou32_Data >> 8U);
@@ -3843,7 +3848,6 @@ void C_OSCNodeDataPoolContent::mh_UInt32ToBinaryBig(const uint32 ou32_Data, uint
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::mh_UInt64ToBinaryLittle(const uint64 ou64_Data, uint8 * const opu8_Data)
 {
-   //lint --e{415,416} //providing enough buffer is the job of the caller
    opu8_Data[7] = static_cast<uint8>(ou64_Data >> 56U);
    opu8_Data[6] = static_cast<uint8>(ou64_Data >> 48U);
    opu8_Data[5] = static_cast<uint8>(ou64_Data >> 40U);
@@ -3865,7 +3869,6 @@ void C_OSCNodeDataPoolContent::mh_UInt64ToBinaryLittle(const uint64 ou64_Data, u
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::mh_UInt32ToBinaryLittle(const uint32 ou32_Data, uint8 * const opu8_Data)
 {
-   //lint --e{415,416} //providing enough buffer is the job of the caller
    opu8_Data[3] = static_cast<uint8>(ou32_Data >> 24U);
    opu8_Data[2] = static_cast<uint8>(ou32_Data >> 16U);
    opu8_Data[1] = static_cast<uint8>(ou32_Data >> 8U);

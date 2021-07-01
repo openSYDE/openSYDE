@@ -29,7 +29,7 @@ class C_OgeWiFixPosition :
    Q_OBJECT
 
 public:
-   explicit C_OgeWiFixPosition(QString oc_Title, QString oc_IconPath, const QRect & orc_Geometry,
+   explicit C_OgeWiFixPosition(const QString oc_Title, const QString oc_IconPath, const QRect & orc_Geometry,
                                QWidget * const opc_Parent = NULL);
    ~C_OgeWiFixPosition(void);
 

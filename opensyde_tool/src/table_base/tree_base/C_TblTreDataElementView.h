@@ -50,6 +50,7 @@ public:
    std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> GetSelectedDataElements(void) const;
    bool IsEmpty(void) const;
    void SaveExpandedIndices(void);
+   void CleanUpLastView(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

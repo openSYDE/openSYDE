@@ -53,8 +53,8 @@ C_OgePubOptions::C_OgePubOptions(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubOptions::SetCustomIcon(const QString & orc_IconPathEnabled, const QString & orc_IconPathDisabled)
 {
-   mc_IconEnabled.addPixmap(QPixmap(orc_IconPathEnabled));
-   mc_IconDisabled.addPixmap(QPixmap(orc_IconPathDisabled));
+   mc_IconEnabled.addPixmap(static_cast<QPixmap>(orc_IconPathEnabled));
+   mc_IconDisabled.addPixmap(static_cast<QPixmap>(orc_IconPathDisabled));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

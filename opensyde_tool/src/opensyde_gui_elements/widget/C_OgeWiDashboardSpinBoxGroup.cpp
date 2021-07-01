@@ -14,6 +14,7 @@
 
 #include "C_OgeWiUtil.h"
 #include "C_OgeWiDashboardSpinBoxGroup.h"
+#include "TGLUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -42,7 +43,8 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeWiDashboardSpinBoxGroup::C_OgeWiDashboardSpinBoxGroup(QWidget * const opc_Parent) :
    C_OgeWiSpinBoxGroup(opc_Parent),
-   mc_Unit("")
+   mc_Unit(""),
+   mq_ShowUnit(false)
 {
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "Type", 2);
 }
@@ -119,6 +121,9 @@ void C_OgeWiDashboardSpinBoxGroup::SetDesignType(const C_PuiSvDbSpinBox::E_Type 
       break;
    case C_PuiSvDbSpinBox::eTYPE2:
       C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "Type", 2);
+      break;
+   default:
+      tgl_assert(false);
       break;
    }
 }

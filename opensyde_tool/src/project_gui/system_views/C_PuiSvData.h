@@ -43,6 +43,15 @@ public:
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
    stw_types::uint32 CalcUpdateHash(void) const;
 
+   bool GetServiceModeActive(void) const;
+   bool GetServiceModeSetupActive(void) const;
+   bool GetServiceModeUpdateActive(void) const;
+   bool GetServiceModeDashboardActive(void) const;
+   void SetServiceModeActive(const bool oq_NewValue);
+   void SetServiceModeSetupActive(const bool oq_NewValue);
+   void SetServiceModeUpdateActive(const bool oq_NewValue);
+   void SetServiceModeDashboardActive(const bool oq_NewValue);
+
    const C_PuiSvPc & GetPcData(void) const;
    void SetPcData(const C_PuiSvPc & orc_Value);
    const std::vector<stw_types::uint8> & GetNodeActiveFlags(void) const;
@@ -58,6 +67,13 @@ public:
    stw_types::sint32 SetNodeUpdateInformationParamInfo(const stw_types::uint32 ou32_NodeIndex,
                                                        const stw_types::uint32 ou32_Index,
                                                        const C_PuiSvNodeUpdateParamInfo & orc_Value);
+   stw_types::sint32 SetNodeUpdateInformationSkipUpdateOfPath(const stw_types::uint32 ou32_NodeIndex,
+                                                              const stw_types::uint32 ou32_Index,
+                                                              const bool oq_SkipFile,
+                                                              const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+   stw_types::sint32 SetNodeUpdateInformationSkipUpdateOfParamInfo(const stw_types::uint32 ou32_NodeIndex,
+                                                                   const stw_types::uint32 ou32_Index,
+                                                                   const bool oq_SkipFile);
    stw_types::sint32 SetNodeUpdateInformationParamInfoContent(const stw_types::uint32 ou32_NodeIndex,
                                                               const stw_types::uint32 ou32_Index,
                                                               const QString & orc_FilePath,
@@ -140,6 +156,14 @@ public:
                                    const stw_types::uint32 ou32_ApplicationTargetIndex);
    void OnSyncNodeApplicationAboutToBeDeleted(const stw_types::uint32 ou32_NodeIndex,
                                               const stw_types::uint32 ou32_ApplicationIndex);
+   void OnSyncNodeApplicationAboutToBeChangedFromParamSetHALC(const stw_types::uint32 ou32_NodeIndex,
+                                                              const stw_types::uint32 ou32_ApplicationIndex);
+   void OnSyncNodeApplicationChangedToParamSetHALC(const stw_types::uint32 ou32_NodeIndex,
+                                                   const stw_types::uint32 ou32_ApplicationIndex);
+   void OnSyncNodeApplicationResultPathSizeChanged(const stw_types::uint32 ou32_NodeIndex,
+                                                   const stw_types::uint32 ou32_ApplicationIndex,
+                                                   const stw_types::uint32 ou32_OldSize,
+                                                   const stw_types::uint32 ou32_NewSize);
    void OnSyncNodeDataPoolListAdded(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
                                     const stw_types::uint32 ou32_ListIndex);
    void OnSyncNodeDataPoolListMoved(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
@@ -257,7 +281,7 @@ public:
    stw_types::sint32 SyncDashboardScalingInformation(const stw_types::uint32 ou32_DashboardIndex);
 
    //Other
-   void FixInvalidRailConfig(void);
+   void FixInvalidRailConfig(const bool oq_PrintLog = true);
    void HandleCompatibilityChart(void);
    void InitFromSystemDefintion(void);
    bool CheckDashboardName(const QString & orc_Proposal, const stw_types::uint32 * const opu32_DashboardIndex) const;
@@ -289,6 +313,11 @@ private:
 
    QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> mc_ReadRailAssignments;
    bool mq_DarkModeActive;
+
+   bool mq_IsServiceModeActive;
+   bool mq_IsServiceModeSetupActive;
+   bool mq_IsServiceModeUpdateActive;
+   bool mq_IsServiceModeDashboardActive;
 
    std::vector<const QString *> m_GetExistingDashboardNames(void) const;
    std::map<stw_scl::C_SCLString, bool> m_GetExistingDashboardNamesMap(void) const;

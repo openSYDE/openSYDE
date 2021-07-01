@@ -111,16 +111,12 @@ void C_SebUnoBaseManager::DoMove(const QList<QGraphicsItem *> & orc_Items, const
    {
       this->mpc_LastMoveCommand = new C_SebUnoMoveCommand(this->mpc_Scene, c_IDs, orc_PositionDifference,
                                                           this->mpc_MoveCommandGroup);
-      tgl_assert(this->mpc_LastMoveCommand != NULL);
-      if (this->mpc_LastMoveCommand != NULL)
-      {
-         this->mpc_LastMoveCommand->redo();
-      }
+      this->mpc_LastMoveCommand->redo();
    }
    else
    {
-      C_SebUnoMoveCommand * pc_MoveCommand;
-      pc_MoveCommand = new C_SebUnoMoveCommand(this->mpc_Scene, c_IDs, orc_PositionDifference);
+      C_SebUnoMoveCommand * const pc_MoveCommand = new C_SebUnoMoveCommand(this->mpc_Scene, c_IDs,
+                                                                           orc_PositionDifference);
       pc_MoveCommand->redo();
       tgl_assert(this->mpc_LastMoveCommand->mergeWith(pc_MoveCommand) == true);
       delete (pc_MoveCommand);

@@ -212,8 +212,8 @@ void C_CamMosFilterItemWidget::m_CreateTooltipInformation(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterItemWidget::m_OnEdit()
 {
-   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_CamMosFilterPopup * pc_Dialog = new C_CamMosFilterPopup(this->mc_Filter, *c_New);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   C_CamMosFilterPopup * const pc_Dialog = new C_CamMosFilterPopup(this->mc_Filter, *c_New);
 
    //Resize
    c_New->SetSize(QSize(700, 820));

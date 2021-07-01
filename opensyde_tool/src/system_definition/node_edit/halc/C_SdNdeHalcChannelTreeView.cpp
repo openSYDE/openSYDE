@@ -50,7 +50,7 @@ C_SdNdeHalcChannelTreeView::C_SdNdeHalcChannelTreeView(QWidget * const opc_Paren
    mpc_ContextMenu(new C_OgeContextMenu),
    mpc_CopyAction(NULL)
 {
-   this->setModel(&this->mc_Model);
+   this->C_SdNdeHalcChannelTreeView::setModel(&this->mc_Model);
    this->setItemDelegate(&this->mc_Delegate);
 
    this->setHeaderHidden(true);
@@ -112,8 +112,8 @@ void C_SdNdeHalcChannelTreeView::UpdateChannelText(const uint32 ou32_DomainIndex
 void C_SdNdeHalcChannelTreeView::SelectChannel(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
                                                const bool oq_UseChannelIndex)
 {
-   QModelIndex c_Index = this->mc_Model.GetModelIndexFromIndexes(ou32_DomainIndex, ou32_ChannelIndex,
-                                                                 oq_UseChannelIndex);
+   const QModelIndex c_Index = this->mc_Model.GetModelIndexFromIndexes(ou32_DomainIndex, ou32_ChannelIndex,
+                                                                       oq_UseChannelIndex);
 
    this->setCurrentIndex(c_Index);
    this->expand(c_Index.parent());
@@ -240,7 +240,7 @@ void C_SdNdeHalcChannelTreeView::paintEvent(QPaintEvent * const opc_Event)
             // determine last index for bottom line
             if (this->isExpanded(c_Parent) == true)
             {
-               c_LastIndex = c_Parent.child(this->mc_Model.rowCount(c_Parent) - 1, 0);
+               c_LastIndex = this->mc_Model.index(this->mc_Model.rowCount(c_Parent) - 1, 0, c_Parent);
             }
             else
             {

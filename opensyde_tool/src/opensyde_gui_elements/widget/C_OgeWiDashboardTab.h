@@ -64,6 +64,9 @@ protected:
 
 private:
    Ui::C_OgeWiDashboardTab * mpc_Ui;
+   QAction * mpc_ActionEditProperties;
+   QAction * mpc_ActionCopy;
+
    QAction * mpc_ActionActivate;
    QAction * mpc_ActionCut;
    QAction * mpc_ActionPaste;

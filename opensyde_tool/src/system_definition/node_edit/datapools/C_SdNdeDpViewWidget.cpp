@@ -27,11 +27,13 @@
 #include "C_SdNdeDpUtil.h"
 #include "C_OSCNode.h"
 #include "C_GtGetText.h"
+#include "C_OgeWiCustomMessage.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
+using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
@@ -39,22 +41,24 @@ using namespace stw_opensyde_core;
 // configuration for the showing of storage usage indicators
 const bool C_SdNdeDpViewWidget::mhaq_StorageIndicatorActive[static_cast<stw_types::sintn>(stw_opensyde_core::
                                                                                           C_OSCNodeDataPool::
-                                                                                          eHALC) + 1] =
+                                                                                          eHALC_NVM) + 1] =
 {
    false, // DIAG
    true,  // NVM
    false, // COM
-   false  // HALC
+   false, // HALC
+   true   // HALC_NVM
 };
 
 const bool C_SdNdeDpViewWidget::mhaq_AddButtonVisible[static_cast<stw_types::sintn>(stw_opensyde_core::
                                                                                     C_OSCNodeDataPool::
-                                                                                    eHALC) + 1] =
+                                                                                    eHALC_NVM) + 1] =
 {
-   true, // DIAG
-   true, // NVM
-   true, // COM
-   false // HALC
+   true,  // DIAG
+   true,  // NVM
+   true,  // COM
+   false, // HALC
+   false  // HALC_NVM
 };
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -80,11 +84,20 @@ C_SdNdeDpViewWidget::C_SdNdeDpViewWidget(QWidget * const opc_Parent) :
    mu32_NodeIndex(0),
    mu32_LastKnownDataPoolIndex(0),
    me_ActiveDataPoolType(stw_opensyde_core::C_OSCNodeDataPool::eDIAG),
-   msn_ActiveDataPoolWidget(-1)
+   msn_ActiveDataPoolWidget(-1),
+   mq_HalcNvmBased(false)
 {
    sint32 s32_Counter;
 
    mpc_Ui->setupUi(this);
+
+   // Prepare UI
+   this->InitStaticNames();
+   this->mpc_Ui->pc_LabelUsagePercentage->SetForegroundColor(7);
+   this->mpc_Ui->pc_LabelUsagePercentage->SetFontPixel(16, false, false);
+   this->mpc_Ui->pc_PushButtonAutoStartAddress->setCheckable(true);
+   this->mpc_Ui->pc_PushButtonAutoStartAddress->setChecked(true);
+   this->m_UpdateAutoStartAddressSvg();
 
    this->mpc_Ui->pc_WidgetDpDiag->InitWidget(C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OSCNodeDataPool::eDIAG),
                                              C_GtGetText::h_GetText("DIAG - Diagnostic Datapools"),
@@ -111,14 +124,26 @@ C_SdNdeDpViewWidget::C_SdNdeDpViewWidget(QWidget * const opc_Parent) :
                                                 "- The use case of HAL Datapools is to configure, monitor, and control hardware parts of the node \n"
                                                 "- The lifetime of the variables is during operation only"),
                                              "pc_WidgetDpHalc");
+   this->mpc_Ui->pc_WidgetDpHalcNvm->InitWidget(
+      C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OSCNodeDataPool::eHALC_NVM),
+      C_GtGetText::h_GetText("HAL - Hardware Configuration Datapools"),
+      C_GtGetText::h_GetText(
+         "- The use case of HAL Datapools is to configure, monitor, and control hardware parts of the node \n"
+         "- The lifetime of the variables is during operation only"),
+      "pc_WidgetDpHalcNvm");
 
    // save pointer in an array for easy usage
    this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eDIAG] = this->mpc_Ui->pc_WidgetDpDiag;
    this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eNVM] = this->mpc_Ui->pc_WidgetDpNvm;
    this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eCOM] = this->mpc_Ui->pc_WidgetDpCom;
    this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC] = this->mpc_Ui->pc_WidgetDpHalc;
+   this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM] = this->mpc_Ui->pc_WidgetDpHalcNvm;
 
-   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC); ++s32_Counter)
+   // Special case: The HALC NVM Datapool will be visible if a HALC NVM based HALC Description will be loaded
+   this->mpc_Ui->pc_WidgetDpHalcNvm->setVisible(false);
+
+   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
+        ++s32_Counter)
    {
       this->mapc_Selectors[s32_Counter]->SetSelected(false);
 
@@ -139,6 +164,49 @@ C_SdNdeDpViewWidget::C_SdNdeDpViewWidget(QWidget * const opc_Parent) :
            &C_SdNdeDpViewWidget::m_ErrorCheck);
    connect(this->mpc_Ui->pc_WidgetDpNvm, &C_SdNdeDpSelectorWidget::SigErrorCheck, this,
            &C_SdNdeDpViewWidget::m_ErrorCheck);
+   connect(this->mpc_Ui->pc_WidgetDpHalc, &C_SdNdeDpSelectorWidget::SigErrorCheck, this,
+           &C_SdNdeDpViewWidget::m_ErrorCheck);
+   connect(this->mpc_Ui->pc_WidgetDpHalcNvm, &C_SdNdeDpSelectorWidget::SigErrorCheck, this,
+           &C_SdNdeDpViewWidget::m_ErrorCheck);
+
+   connect(this->mpc_Ui->pc_PushButtonAutoStartAddress, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::clicked,
+           this, &C_SdNdeDpViewWidget::m_AutoStartAddressClicked);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
+
+   Clean up.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_UsageBar and the Qt memory management
+C_SdNdeDpViewWidget::~C_SdNdeDpViewWidget()
+{
+   m_StoreToUserSettings();
+   delete mpc_Ui;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpViewWidget::InitStaticNames(void) const
+{
+   const QString c_AutoStartAddressHeading = C_GtGetText::h_GetText("Auto Start Address");
+   const QString c_AutoStartAddressDescription =
+      C_GtGetText::h_GetText("On: All start addresses of NVM Datapools will be calculated "
+                             "automatically without any gaps between the Datapools.\n\n"
+                             "Off: The start addresses of NVM Datapools will not be calculated "
+                             "automatically. The start addresses must be set by the user. Gaps and overlaps "
+                             "between the Datapools are not corrected automatically.");
+
+   this->mpc_Ui->pc_LabelAutoStartAddress->setText(C_GtGetText::h_GetText("Auto Start Address"));
+
+   this->mpc_Ui->pc_LabelAutoStartAddress->SetToolTipInformation(c_AutoStartAddressHeading,
+                                                                 c_AutoStartAddressDescription);
+
+   this->mpc_Ui->pc_PushButtonAutoStartAddress->SetToolTipInformation(c_AutoStartAddressHeading,
+                                                                      c_AutoStartAddressDescription);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -159,12 +227,30 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
 
    //User settings store
    m_StoreToUserSettings();
-   //User settings restores
    if (pc_Node != NULL)
    {
+      //User settings restores
       const C_UsNode c_UserSettingsNode = C_UsHandler::h_GetInstance()->GetProjSdNode(
          pc_Node->c_Properties.c_Name.c_str());
       const QString c_SelectedDataPoolName = c_UserSettingsNode.GetSelectedDatapoolName();
+
+      if (pc_Node->c_HALCConfig.IsClear() == false)
+      {
+         // Node has a HALC Configuration loaded
+         this->mq_HalcNvmBased = pc_Node->c_HALCConfig.q_NvMBasedConfig;
+
+         if (pc_Node->c_HALCConfig.q_NvMBasedConfig == false)
+         {
+            this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC]->setVisible(true);
+            this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM]->setVisible(false);
+         }
+         else
+         {
+            this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC]->setVisible(false);
+            this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM]->setVisible(true);
+         }
+      }
+
       if (c_SelectedDataPoolName.compare("") != 0)
       {
          for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
@@ -189,18 +275,23 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
             }
          }
       }
+
+      // Restore setting for auto start address mode
+      this->mpc_Ui->pc_PushButtonAutoStartAddress->setChecked(pc_Node->q_DatapoolAutoNvMStartAddress);
+      this->m_UpdateAutoStartAddressSvg();
    }
 
    this->mu32_NodeIndex = ou32_NodeIndex;
 
    if (this->mpc_UsageBar == NULL)
    {
-      this->mpc_UsageBar = new C_SdNdeDpSelectorUsageWidget(this);
+      this->mpc_UsageBar = new C_SdNdeDpViewUsageWidget(this);
    }
 
    this->m_UpdateUsageBarSize();
 
-   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC); ++s32_Counter)
+   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
+        ++s32_Counter)
    {
       const bool q_Return = this->mapc_Selectors[s32_Counter]->SetTypeAndNode(
          static_cast<stw_opensyde_core::C_OSCNodeDataPool::E_Type>(s32_Counter), ou32_NodeIndex,
@@ -223,6 +314,8 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
 
       connect(this->mapc_Selectors[s32_Counter], &C_SdNdeDpSelectorWidget::SigDataPoolChanged,
               this, &C_SdNdeDpViewWidget::m_DpChangedUpdateUsageView);
+      connect(this->mapc_Selectors[s32_Counter], &C_SdNdeDpSelectorWidget::SigDataPoolHoverStateChanged,
+              this->mpc_UsageBar, &C_SdNdeDpViewUsageWidget::DataPoolHoverStateChanged);
    }
 
    this->m_DpUpdateUsageView();
@@ -247,6 +340,21 @@ void C_SdNdeDpViewWidget::SetActualDataPoolConflict(const bool oq_Active) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the widget for the all Datapools
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpViewWidget::UpdateDataPools(void)
+{
+   sint32 s32_Counter;
+
+   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
+        ++s32_Counter)
+   {
+      this->mapc_Selectors[s32_Counter]->UpdateDataPools();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the widgets for the actual datapool
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -268,7 +376,7 @@ void C_SdNdeDpViewWidget::SetActualDataPool(const uint32 ou32_DataPoolIndex)
    sint32 s32_DpIndex;
    bool q_Found = false;
 
-   for (u32_DpType = 0U; u32_DpType <= static_cast<uint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC);
+   for (u32_DpType = 0U; u32_DpType <= static_cast<uint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
         ++u32_DpType)
    {
       // search the index
@@ -337,20 +445,6 @@ void C_SdNdeDpViewWidget::SetNoActualDataPool(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   default destructor
-
-   Clean up.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-//lint -e{1540}  no memory leak because of the parent of mpc_UsageBar and the Qt memory management
-C_SdNdeDpViewWidget::~C_SdNdeDpViewWidget()
-{
-   m_StoreToUserSettings();
-   delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_UsageBar and the Qt memory management
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten resize event slot
 
    Here: Resize usage widget size
@@ -371,7 +465,7 @@ void C_SdNdeDpViewWidget::m_SubWidgetFocused(const C_OSCNodeDataPool::E_Type oe_
    sint32 s32_Counter;
 
    // deactivate the other widgets
-   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC);
+   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
         ++s32_Counter)
    {
       if (s32_Counter != static_cast<sint32>(oe_DataPoolType))
@@ -423,6 +517,8 @@ void C_SdNdeDpViewWidget::m_ErrorCheck(void) const
    this->mpc_Ui->pc_WidgetDpCom->ErrorCheck();
    this->mpc_Ui->pc_WidgetDpDiag->ErrorCheck();
    this->mpc_Ui->pc_WidgetDpNvm->ErrorCheck();
+   this->mpc_Ui->pc_WidgetDpHalc->ErrorCheck();
+   this->mpc_Ui->pc_WidgetDpHalcNvm->ErrorCheck();
    Q_EMIT (this->SigErrorChange());
 }
 
@@ -471,37 +567,29 @@ void C_SdNdeDpViewWidget::m_DpUpdateUsageView(void)
    if (this->mpc_UsageBar != NULL)
    {
       // update the usage view
-      std::vector<uint32> c_VecUsedSize;
-      std::vector<QString> c_VecDatapoolNames;
-      uint32 u32_Percentage;
-      uint32 u32_SumNvmSize = 0;
-      uint32 u32_DpCounter;
       const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
          this->mu32_NodeIndex);
 
+      tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
       {
          const stw_opensyde_core::C_OSCDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
          tgl_assert(pc_DevDef != NULL);
          if (pc_DevDef != NULL)
          {
+            uint32 u32_Percentage;
+            uint32 u32_SumNvmSize = 0;
+            std::vector<C_PuiSdHandler::C_PuiSdHandlerNodeLogicNvmArea> c_Areas;
             QString c_LabelTooltip = static_cast<QString>("%1% ") + C_GtGetText::h_GetText("reserved by Datapools") +
                                      static_cast<QString>(
                " (%2 / %3)");
-            // check all datapools of the lists
-            for (u32_DpCounter = 0; u32_DpCounter < pc_Node->c_DataPools.size(); ++u32_DpCounter)
-            {
-               if (pc_Node->c_DataPools[u32_DpCounter].e_Type == stw_opensyde_core::C_OSCNodeDataPool::eNVM)
-               {
-                  // save the name of the datapool
-                  c_VecDatapoolNames.push_back(static_cast<QString>(pc_Node->c_DataPools[u32_DpCounter].c_Name.c_str()));
-                  c_VecUsedSize.push_back(pc_Node->c_DataPools[u32_DpCounter].u32_NvMSize);
-                  u32_SumNvmSize += pc_Node->c_DataPools[u32_DpCounter].u32_NvMSize;
-               }
-            }
 
-            u32_Percentage = this->mpc_UsageBar->SetUsage(pc_DevDef->u32_UserEepromSizeBytes, c_VecUsedSize,
-                                                          c_VecDatapoolNames);
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->GetNodeNvmDataPoolAreas(this->mu32_NodeIndex,
+                                                                                c_Areas) == C_NO_ERR);
+
+            this->mpc_UsageBar->SetUsage(this->mu32_NodeIndex, pc_DevDef->u32_UserEepromSizeBytes, c_Areas,
+                                         u32_Percentage, u32_SumNvmSize);
+
             // show the percentage
             this->mpc_Ui->pc_LabelUsagePercentage->setText(
                C_GtGetText::h_GetText("Memory Usage: ") +
@@ -510,16 +598,18 @@ void C_SdNdeDpViewWidget::m_DpUpdateUsageView(void)
                                                 C_Uti::h_GetByteCountAsString(u32_SumNvmSize),
                                                 C_Uti::h_GetByteCountAsString(pc_DevDef->u32_UserEepromSizeBytes));
 
-            this->mpc_Ui->pc_LabelUsagePercentage->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                                            "Memory Statistics"), c_LabelTooltip);
-
             if (u32_SumNvmSize > pc_DevDef->u32_UserEepromSizeBytes)
             {
-               C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelUsagePercentage, "Conflict", true);
+               this->mpc_Ui->pc_LabelUsagePercentage->SetForegroundColor(24);
+               this->mpc_Ui->pc_LabelUsagePercentage->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                               "Memory Statistics"), c_LabelTooltip,
+                                                                            C_NagToolTip::eERROR);
             }
             else
             {
-               C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelUsagePercentage, "Conflict", false);
+               this->mpc_Ui->pc_LabelUsagePercentage->SetForegroundColor(7);
+               this->mpc_Ui->pc_LabelUsagePercentage->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                               "Memory Statistics"), c_LabelTooltip);
             }
          }
       }
@@ -534,6 +624,101 @@ void C_SdNdeDpViewWidget::m_UpdateUsageBarSize(void)
 {
    if (this->mpc_UsageBar != NULL)
    {
-      this->mpc_UsageBar->setGeometry(0, this->height() - 17, this->width() - 9, 17);
+      this->mpc_UsageBar->setGeometry(0, this->height() - 16, this->width() - 14, 16);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for button auto start address
+
+   \param[in]       oq_Enabled     Flag if auto start address is active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpViewWidget::m_AutoStartAddressClicked(const bool oq_Enabled)
+{
+   if ((oq_Enabled == true) &&
+       (this->mq_HalcNvmBased == true))
+   {
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eWARNING);
+
+      // In case of a NVM HALC based HALC description the automatic start address mode is not activatable
+      this->mpc_Ui->pc_PushButtonAutoStartAddress->setChecked(false);
+
+      c_Message.SetHeading(C_GtGetText::h_GetText("Auto Start Address mode"));
+
+      c_Message.SetDescription(C_GtGetText::h_GetText(
+                                  "Hardware description file with enabled \"nvm-config\" property is loaded. \n"
+                                  "In this case the automatic start address mode cannot be used."));
+      c_Message.SetCustomMinHeight(200, 250);
+      c_Message.Execute();
+   }
+   else
+   {
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
+
+      c_Message.SetHeading(C_GtGetText::h_GetText("Auto Start Address mode"));
+      c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+      c_Message.SetCustomMinHeight(250, 250);
+
+      if (oq_Enabled == true)
+      {
+         c_Message.SetDescription(C_GtGetText::h_GetText(
+                                     "Do you really want to activate the automatic start address mode?\n"
+                                     "This is not revertible.\n\n"
+                                     "After activating, the start addresses of Datapools located in NVM"
+                                     " will be recalculated."));
+
+         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Activate"));
+      }
+      else
+      {
+         c_Message.SetDescription(C_GtGetText::h_GetText(
+                                     "Do you really want to deactivate the automatic start address mode?\n\n"
+                                     "After deactivating, the start addresses of Datapools located in NVM must "
+                                     "be managed manually."));
+
+         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Deactivate"));
+      }
+
+      if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
+      {
+         C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_NodeIndex);
+
+         if (pc_Node != NULL)
+         {
+            pc_Node->q_DatapoolAutoNvMStartAddress = oq_Enabled;
+            this->m_UpdateAutoStartAddressSvg();
+
+            if (pc_Node->q_DatapoolAutoNvMStartAddress == true)
+            {
+               // Recalculate the addresses
+               pc_Node->RecalculateAddress();
+               this->UpdateDataPools();
+               this->m_DpUpdateUsageView();
+               this->m_ErrorCheck();
+            }
+         }
+      }
+      else
+      {
+         this->mpc_Ui->pc_PushButtonAutoStartAddress->setChecked(!oq_Enabled);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the icon of the button for auto start address
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpViewWidget::m_UpdateAutoStartAddressSvg(void) const
+{
+   if (this->mpc_Ui->pc_PushButtonAutoStartAddress->isChecked() == true)
+   {
+      this->mpc_Ui->pc_PushButtonAutoStartAddress->SetSvg("://images/system_views/IconConnected.svg");
+   }
+   else
+   {
+      this->mpc_Ui->pc_PushButtonAutoStartAddress->SetSvg("://images/system_views/IconDisconnected.svg");
+   }
+   this->mpc_Ui->pc_PushButtonAutoStartAddress->update();
 }

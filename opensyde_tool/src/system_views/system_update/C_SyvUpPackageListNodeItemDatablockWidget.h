@@ -11,7 +11,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 
-#include "C_SyvUpUpdatePackageListNodeItemWidget.h"
+#include "C_SyvUpPackageListNodeItemWidget.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -21,7 +21,7 @@ namespace stw_opensyde_gui
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvUpPackageListNodeItemDatablockWidget :
-   public C_SyvUpUpdatePackageListNodeItemWidget
+   public C_SyvUpPackageListNodeItemWidget
 {
 public:
    C_SyvUpPackageListNodeItemDatablockWidget(const stw_types::uint32 ou32_ViewIndex,
@@ -29,11 +29,11 @@ public:
                                              const bool oq_FileBased, const bool oq_StwFlashloader,
                                              QWidget * const opc_Parent = NULL);
 
+   virtual stw_types::uint32 GetType(void) const override;
    virtual bool IsFileIdentical(const QString & orc_AppName, const QString & orc_AppVersion,
                                 const QString & orc_AppBuildTime, const QString & orc_AppBuildDate) const override;
    virtual void ViewFileInfo(void) override;
    virtual bool IsViewFileInfoPossible(void) const override;
-   virtual bool IsUserHintPossible(void) const override;
 
 protected:
    virtual void m_LoadFileInformation(bool & orq_FileExists, bool & orq_FlashwareWarning,

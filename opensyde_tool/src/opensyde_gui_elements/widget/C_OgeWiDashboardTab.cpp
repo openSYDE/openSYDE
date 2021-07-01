@@ -14,6 +14,7 @@
 
 #include <QFontMetrics>
 #include "constants.h"
+#include "C_PuiSvHandler.h"
 #include "C_OgeWiDashboardTab.h"
 #include "ui_C_OgeWiDashboardTab.h"
 #include "C_OgeWiUtil.h"
@@ -42,13 +43,15 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent    Optional pointer to parent
-   \param[in]     oq_ShowUndock Optional flag to show/hide undock option
+   \param[in,out]  opc_Parent       Optional pointer to parent
+   \param[in]      oq_ShowUndock    Optional flag to show/hide undock option
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeWiDashboardTab::C_OgeWiDashboardTab(QWidget * const opc_Parent, const bool oq_ShowUndock) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiDashboardTab),
+   mpc_ActionEditProperties(NULL),
+   mpc_ActionCopy(NULL),
    mpc_ActionActivate(NULL),
    mpc_ActionCut(NULL),
    mpc_ActionPaste(NULL),
@@ -62,7 +65,13 @@ C_OgeWiDashboardTab::C_OgeWiDashboardTab(QWidget * const opc_Parent, const bool 
    mq_CloseButtonVisible(true),
    mq_ShowUndock(oq_ShowUndock)
 {
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
    this->mpc_Ui->setupUi(this);
+
+   // Handle the service mode
+   this->mpc_Ui->pc_PushButtonClose->setEnabled(!q_ServiceModeActive);
+
    //Before mode
    m_InitContextMenu();
    m_HandleMode();
@@ -97,7 +106,7 @@ C_OgeWiDashboardTab::~C_OgeWiDashboardTab(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set text
 
-   \param[in] orc_Text Tab text
+   \param[in]  orc_Text    Tab text
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetText(const QString & orc_Text)
@@ -107,7 +116,7 @@ void C_OgeWiDashboardTab::SetText(const QString & orc_Text)
    const QFontMetrics c_FontMetrics(this->mpc_Ui->pc_LabelName->font());
 
    this->mpc_Ui->pc_LabelName->setText(orc_Text);
-   this->resize(c_FontMetrics.width(orc_Text) + sn_Offset, this->height());
+   this->resize(c_FontMetrics.horizontalAdvance(orc_Text) + sn_Offset, this->height());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -115,8 +124,8 @@ void C_OgeWiDashboardTab::SetText(const QString & orc_Text)
 
    long description of function within several lines
 
-   \param[in]     orc_Heading    tooltip heading
-   \param[in]     orc_Content    tooltip content
+   \param[in]  orc_Heading    tooltip heading
+   \param[in]  orc_Content    tooltip content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetToolTip(const QString & orc_Heading, const QString & orc_Content) const
@@ -134,7 +143,7 @@ void C_OgeWiDashboardTab::SetToolTip(const QString & orc_Heading, const QString 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::paintEvent(QPaintEvent * const opc_Event)
@@ -149,7 +158,7 @@ void C_OgeWiDashboardTab::paintEvent(QPaintEvent * const opc_Event)
 
    Here: Enter edit mode
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
@@ -164,7 +173,7 @@ void C_OgeWiDashboardTab::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set active flag
 
-   \param[in] oq_Value New flag value
+   \param[in]  oq_Value    New flag value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetActive(const bool oq_Value)
@@ -176,7 +185,7 @@ void C_OgeWiDashboardTab::SetActive(const bool oq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set close button visibility
 
-   \param[in] oq_Visibility Close button visibility
+   \param[in]  oq_Visibility  Close button visibility
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetCloseButtonVisibility(const bool oq_Visibility)
@@ -212,7 +221,7 @@ void C_OgeWiDashboardTab::DeactivateAdditionalActions(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dark mode active
 
-   \param[in] oq_Active Dark mode active
+   \param[in]  oq_Active   Dark mode active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetDarkMode(const bool oq_Active)
@@ -233,7 +242,7 @@ void C_OgeWiDashboardTab::SetDarkMode(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function activate or deactivate interaction
 
-   \param[in] oq_Active Flag if interaction available
+   \param[in]  oq_Active   Flag if interaction available
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetInteractive(const bool oq_Active)
@@ -255,7 +264,7 @@ void C_OgeWiDashboardTab::SetInteractive(const bool oq_Active)
 
    If dashboard tab type is a chart set the tab icon visible, else not
 
-   \param[in]    oq_Visibility    tab icon visibility
+   \param[in]  oq_Visibility  tab icon visibility
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetTabIconVisibility(const bool oq_Visibility) const
@@ -266,7 +275,7 @@ void C_OgeWiDashboardTab::SetTabIconVisibility(const bool oq_Visibility) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current flag
 
-   \param[in] oq_Value New flag value
+   \param[in]  oq_Value    New flag value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetCurrent(const bool oq_Value)
@@ -314,8 +323,8 @@ void C_OgeWiDashboardTab::m_HandleMode(void)
 void C_OgeWiDashboardTab::m_InitContextMenu(void)
 {
    // add all actions
-   this->mc_ContextMenu.addAction(C_GtGetText::h_GetText("Edit Properties"), this,
-                                  &C_OgeWiDashboardTab::m_EditProperties);
+   this->mpc_ActionEditProperties = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText("Edit Properties"), this,
+                                                                   &C_OgeWiDashboardTab::m_EditProperties);
 
    this->mc_ContextMenu.addSeparator();
 
@@ -334,7 +343,8 @@ void C_OgeWiDashboardTab::m_InitContextMenu(void)
 
    this->mpc_ActionCut = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
                                                            "Cut"), this, &C_OgeWiDashboardTab::m_CutAction);
-   this->mc_ContextMenu.addAction(C_GtGetText::h_GetText("Copy"), this, &C_OgeWiDashboardTab::m_CopyAction);
+   this->mpc_ActionCopy = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
+                                                            "Copy"), this, &C_OgeWiDashboardTab::m_CopyAction);
    this->mpc_ActionPaste = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
                                                              "Paste"), this, &C_OgeWiDashboardTab::m_PasteAction);
 
@@ -354,11 +364,20 @@ void C_OgeWiDashboardTab::m_InitContextMenu(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show custom context menu
 
-   \param[in] orc_Pos Local context menu position
+   \param[in]  orc_Pos  Local context menu position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
+   this->mpc_ActionEditProperties->setEnabled(!q_ServiceModeActive);
+   this->mpc_ActionCopy->setEnabled(!q_ServiceModeActive);
+
+   this->mpc_ActionCut->setEnabled(!q_ServiceModeActive);
+   this->mpc_ActionPaste->setEnabled(!q_ServiceModeActive);
+   this->mpc_ActionDelete->setEnabled(!q_ServiceModeActive);
+
    this->mc_ContextMenu.popup(this->mapToGlobal(orc_Pos));
 }
 

@@ -74,6 +74,27 @@ C_OgeWiNavigationTab::~C_OgeWiNavigationTab(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set enabled
+
+   \param[in]  oq_Enabled  Enabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiNavigationTab::SetEnabled(const bool oq_Enabled)
+{
+   if (oq_Enabled)
+   {
+      this->mpc_Ui->pc_LabelText->SetForegroundColor(0);
+      this->mpc_Ui->pc_LabelIcon->SetSvg(this->mc_IconEnabled);
+   }
+   else
+   {
+      this->mpc_Ui->pc_LabelText->SetForegroundColor(8);
+      this->mpc_Ui->pc_LabelIcon->SetSvg(this->mc_IconDisabled);
+   }
+   this->setEnabled(oq_Enabled);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set include left border flag
 
    \param[in]  oq_Include  Include left border flag
@@ -108,12 +129,15 @@ void C_OgeWiNavigationTab::SetActive(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new SVG icon
 
-   \param[in]  orc_IconSvg    New icon
+   \param[in]  orc_IconSvg          New icon
+   \param[in]  orc_IconSvgDisabled  Icon svg disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiNavigationTab::SetIconSvg(const QString & orc_IconSvg) const
+void C_OgeWiNavigationTab::SetIconSvg(const QString & orc_IconSvg, const QString & orc_IconSvgDisabled)
 {
    this->mpc_Ui->pc_LabelIcon->SetSvg(orc_IconSvg);
+   this->mc_IconEnabled = orc_IconSvg;
+   this->mc_IconDisabled = orc_IconSvgDisabled;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -156,13 +180,20 @@ void C_OgeWiNavigationTab::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgeWiNavigationTab::event(QEvent * const opc_Event)
 {
-   if ((opc_Event->type() == QEvent::HoverMove) && (this->mq_Active == false))
+   if (((opc_Event->type() == QEvent::HoverMove) && (this->mq_Active == false)) && (this->isEnabled()))
    {
       this->mpc_Ui->pc_LabelText->SetForegroundColor(13);
    }
    else if (opc_Event->type() == QEvent::Leave)
    {
-      this->mpc_Ui->pc_LabelText->SetForegroundColor(0);
+      if (this->isEnabled())
+      {
+         this->mpc_Ui->pc_LabelText->SetForegroundColor(0);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelText->SetForegroundColor(8);
+      }
    }
    else
    {

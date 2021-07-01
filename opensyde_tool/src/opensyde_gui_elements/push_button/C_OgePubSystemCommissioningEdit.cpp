@@ -60,6 +60,7 @@ C_OgePubSystemCommissioningEdit::C_OgePubSystemCommissioningEdit(QWidget * const
    this->mc_BorderColorDisabledTop = mc_STYLE_GUIDE_COLOR_10;
    this->mc_TextColorEnabled = mc_STYLE_GUIDE_COLOR_0;
    this->mc_TextColorDisabled = mc_STYLE_GUIDE_COLOR_10;
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    this->mc_FontPixel = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_SEMIBOLD_14);
    this->mc_BackgroundColorDisabled = mc_STYLE_GUIDE_COLOR_11;
    this->mc_BackgroundColorEnabledDefault = mc_STYLE_GUIDE_COLOR_3001;

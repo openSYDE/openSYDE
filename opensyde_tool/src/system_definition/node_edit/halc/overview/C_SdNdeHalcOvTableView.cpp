@@ -53,7 +53,7 @@ C_SdNdeHalcOvTableView::C_SdNdeHalcOvTableView(QWidget * const opc_Parent) :
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
    this->mc_SortProxyModel.setSortRole(static_cast<sintn>(Qt::EditRole));
-   this->setModel(&mc_SortProxyModel);
+   this->C_SdNdeHalcOvTableView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
 

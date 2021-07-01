@@ -58,7 +58,7 @@ void C_OgePubUseCaseNav::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
    QBrush c_Brush;
-   QPixmap c_Pixmap = this->icon().pixmap(44, 45);
+   const QPixmap c_Pixmap = this->icon().pixmap(44, 45);
 
    const QColor c_ColBackground(71, 71, 99, 255);
    const QColor c_ColBackgroundDark(19, 19, 45, 255);

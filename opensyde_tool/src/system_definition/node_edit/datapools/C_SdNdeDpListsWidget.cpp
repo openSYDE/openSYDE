@@ -47,6 +47,8 @@ using namespace stw_opensyde_gui_logic;
 C_SdNdeDpListsWidget::C_SdNdeDpListsWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListsWidget),
+   mu32_NodeIndex(0),
+   mu32_DataPoolIndex(0),
    mu32_LastKnownListSelectionCount(0),
    mu32_LastKnownTableSelectionCount(0)
 {

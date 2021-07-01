@@ -46,7 +46,7 @@ C_OSCHalcConfigUtil::C_OSCHalcConfigUtil()
    \param[out]      orc_ConfigStandalone  Standalone HALC configuration as result with the configuration of orc_Config
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfigUtil::h_GetConfigStandalone(const stw_opensyde_core::C_OSCHalcConfig & orc_Config,
+void C_OSCHalcConfigUtil::h_GetConfigStandalone(const C_OSCHalcConfig & orc_Config,
                                                 C_OSCHalcConfigStandalone & orc_ConfigStandalone)
 {
    uint32 u32_DomainCounter;
@@ -103,7 +103,7 @@ void C_OSCHalcConfigUtil::h_GetConfigStandalone(const stw_opensyde_core::C_OSCHa
    \retval   C_RANGE    ou32_DomainIndex or ou32_ChannelIndex is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(const stw_opensyde_core::C_OSCHalcConfig & orc_Config,
+sint32 C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(const C_OSCHalcConfig & orc_Config,
                                                          const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
                                                          const bool oq_DomainOnly,
                                                          C_OSCHalcConfigStandalone & orc_ConfigStandalone)
@@ -153,7 +153,7 @@ sint32 C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(const stw_opensyde_core
                {
                   // Remove the not necessary channels of the original configuration
                   if ((c_StandaloneDomain.c_ChannelConfigs.size() > 1) &&
-                      (ou32_ChannelIndex < (c_StandaloneDomain.c_ChannelConfigs.size() - 1UL)))
+                      (ou32_ChannelIndex < static_cast<uint32>(c_StandaloneDomain.c_ChannelConfigs.size() - 1UL)))
                   {
                      const uint32 u32_NextIndex = (ou32_ChannelIndex + 1UL);
                      c_StandaloneDomain.c_ChannelConfigs.erase(

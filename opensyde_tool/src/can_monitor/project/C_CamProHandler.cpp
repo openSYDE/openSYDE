@@ -959,7 +959,7 @@ QString C_CamProHandler::GetCurrentProjDir(void) const
 
    if (this->mc_File != "")
    {
-      c_Return = QFileInfo(this->mc_File).dir().absolutePath();
+      c_Return = static_cast<QFileInfo>(this->mc_File).dir().absolutePath();
    }
 
    return c_Return;
@@ -1046,8 +1046,8 @@ sint32 C_CamProHandler::LoadFromFile(const stw_scl::C_SCLString & orc_Path)
 sint32 C_CamProHandler::SaveToFile(const stw_scl::C_SCLString & orc_Path)
 {
    sint32 s32_Return = C_NO_ERR;
-   QFileInfo c_File(orc_Path.c_str());
-   QDir c_Directory(c_File.absolutePath());
+   const QFileInfo c_File(orc_Path.c_str());
+   const QDir c_Directory(c_File.absolutePath());
 
    if (c_Directory.exists() == false)
    {

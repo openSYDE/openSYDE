@@ -56,7 +56,7 @@ C_OSCHalcDefContentBitmaskItem::~C_OSCHalcDefContentBitmaskItem()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set mask value by string
 
-   \param[in] orc_Item Mask string
+   \param[in]  orc_Item    Mask string
 
    \return
    C_NO_ERR All fine
@@ -73,7 +73,7 @@ sint32 C_OSCHalcDefContentBitmaskItem::SetValueByString(const stw_scl::C_SCLStri
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCHalcDefContentBitmaskItem::CalcHash(uint32 & oru32_HashValue) const
@@ -85,10 +85,25 @@ void C_OSCHalcDefContentBitmaskItem::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calculates the hash value over structure only
+
+   The hash value is a 32 bit CRC value.
+
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcDefContentBitmaskItem::CalcHashStructure(uint32 & oru32_HashValue) const
+{
+   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Display.c_str(), this->c_Display.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u64_Value, sizeof(this->u64_Value), oru32_HashValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Parse uint value from string
 
-   \param[in] orc_Item    Generic value string
-   \param[in] oru64_Value Value to set
+   \param[in]  orc_Item       Generic value string
+   \param[in]  oru64_Value    Value to set
 
    \return
    C_NO_ERR All fine

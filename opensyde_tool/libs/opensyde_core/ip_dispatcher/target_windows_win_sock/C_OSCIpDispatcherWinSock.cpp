@@ -12,8 +12,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <winsock.h> //Windows WinSock
 #include <winsock2.h>
+#include <winsock.h> //Windows WinSock
 #include <cstring>
 #include <iphlpapi.h> //Windows IP helper utilities
 #include "stwtypes.h"

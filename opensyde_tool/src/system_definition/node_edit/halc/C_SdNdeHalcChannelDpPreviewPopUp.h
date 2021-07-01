@@ -13,6 +13,7 @@
 #include "stwtypes.h"
 #include "C_OgePopUpDialog.h"
 #include "C_OSCHalcDefDomain.h"
+#include "C_OSCHALCMagicianDatapoolListHandler.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -66,6 +67,7 @@ private:
                                  const stw_scl::C_SCLString & orc_ListName,
                                  const stw_scl::C_SCLString & orc_DomainSingularName, QString & orc_Text,
                                  const stw_opensyde_core::C_OSCHalcDefDomain & orc_Domain,
+                                 const stw_opensyde_core::C_OSCHALCMagicianDatapoolListHandler & orc_DpHandler,
                                  const bool oq_AddSpecialVars = false);
    static void mh_AddListEntry(const stw_scl::C_SCLString & orc_ListName, bool & orq_ListAdded,
                                const stw_scl::C_SCLString & orc_VarName, const stw_scl::C_SCLString & orc_VarComment,

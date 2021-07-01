@@ -12,6 +12,7 @@
 
 #include "stwtypes.h"
 
+#include "TGLUtils.h"
 #include "C_SyvDaPeProgressBar.h"
 #include "ui_C_SyvDaPeProgressBar.h"
 
@@ -220,6 +221,9 @@ void C_SyvDaPeProgressBar::SetType(const C_PuiSvDbProgressBar::E_Type oe_Type)
 {
    switch (oe_Type)
    {
+   case C_PuiSvDbProgressBar::eTYPE_1:
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE1);
+      break;
    case C_PuiSvDbProgressBar::eTYPE_2:
       this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE2);
       break;
@@ -227,7 +231,7 @@ void C_SyvDaPeProgressBar::SetType(const C_PuiSvDbProgressBar::E_Type oe_Type)
       this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE3);
       break;
    default:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE1);
+      tgl_assert(false);
       break;
    }
 
@@ -244,6 +248,9 @@ void C_SyvDaPeProgressBar::SetAlignment(const C_PuiSvDbProgressBar::E_Alignment 
 {
    switch (oe_Alignment)
    {
+   case C_PuiSvDbProgressBar::eTOP:
+      this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_TOP);
+      break;
    case C_PuiSvDbProgressBar::eLEFT:
       this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_LEFT);
       break;
@@ -254,7 +261,7 @@ void C_SyvDaPeProgressBar::SetAlignment(const C_PuiSvDbProgressBar::E_Alignment 
       this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_BOTTOM);
       break;
    default:
-      this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_TOP);
+      tgl_assert(false);
       break;
    }
 }

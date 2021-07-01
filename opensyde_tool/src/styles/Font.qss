@@ -133,10 +133,11 @@ stw_opensyde_gui_elements--C_OgeSpxInt64Properties,
 stw_opensyde_gui_elements--C_OgeSpxFactorProperties,
 stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeTedPropertiesComment,
+stw_opensyde_gui_elements--C_OgeTedDbComment,
 stw_opensyde_gui_elements--C_OgeTebReport,
 stw_opensyde_gui--C_TblTreDataElementView,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView,
-stw_opensyde_gui--C_SdCodeGenerationView,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget,
 stw_opensyde_gui_elements--C_OgeChxDefaultSmall,
 stw_opensyde_gui_elements--C_OgeLeProperties,
@@ -241,6 +242,7 @@ font-weight: bold;
 /* STYLE_GUIDE_FONT_REGULAR_16 */
 stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroupBig,
 stw_opensyde_gui_elements--C_OgeLabHeadingGroupBold,
+stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled[Font="16"][SemiBold="false"][Bold="false"],
 stw_opensyde_gui_elements--C_OgeLabStatusInformation,
 stw_opensyde_gui_elements--C_OgeRabCheckBox,
 stw_opensyde_gui_elements--C_OgeLabListHeader,
@@ -375,7 +377,8 @@ font-weight: normal;
 
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_30 */
-stw_opensyde_gui_elements--C_OgeLabCategoryHeading
+stw_opensyde_gui_elements--C_OgeLabCategoryHeading,
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="30"][SemiBold="false"][Bold="false"]
 {
 font-family: "Segoe UI";
 font-size: 30px;

@@ -54,7 +54,8 @@ using namespace stw_opensyde_gui_logic;
 C_SyvDcExistingNodeList::C_SyvDcExistingNodeList(QWidget * const opc_Parent) :
    QListWidget(opc_Parent),
    mu32_ViewIndex(0),
-   mq_ShowAssignment(false)
+   mq_ShowAssignment(false),
+   mq_GridSizeSet(false)
 {
    //UI Settings
    this->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -314,6 +315,13 @@ sint32 C_SyvDcExistingNodeList::m_AppendNode(const uint32 ou32_NodeIndex, const 
 
    //Style first
    C_OgeWiUtil::h_ApplyStylesheetProperty(pc_Widget, "First", this->count() == 1);
+
+   if (this->mq_GridSizeSet == false)
+   {
+      // Set the grid size for one time. The size hint seems not to be enough since Qt 5.15.2
+      this->mq_GridSizeSet = true;
+      this->setGridSize(QSize(pc_Widget->width(), pc_Widget->height()));
+   }
 
    //Connects
    connect(pc_Widget, &C_SyvDcExistingNodeWidget::SigConnect, this, &C_SyvDcExistingNodeList::SigConnect);

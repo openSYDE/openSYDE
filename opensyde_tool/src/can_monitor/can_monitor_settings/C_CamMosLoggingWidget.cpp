@@ -243,7 +243,7 @@ void C_CamMosLoggingWidget::m_LoadFolderConfig(void) const
    // use default logging directory
    if (rc_LoggingData.c_Directory == "")
    {
-      QString c_DefaultDir = "./CANlogs";
+      const QString c_DefaultDir = "./CANlogs";
       C_CamProHandler::h_GetInstance()->SetLoggingDirectory(c_DefaultDir);
       this->mpc_Ui->pc_LeFolder->SetPath(c_DefaultDir, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
    }
@@ -488,7 +488,7 @@ void C_CamMosLoggingWidget::m_CheckAndStartLogging()
       // eventually add timestamp
       if (rc_LoggingData.e_OverwriteMode == C_CamProLoggingData::eADD_TIMESTAMP)
       {
-         QDateTime c_Time = QDateTime::currentDateTime();
+         const QDateTime c_Time = QDateTime::currentDateTime();
          c_FilePath += c_Time.toString("__yyyy_MM_dd__HH_mm_ss");
       }
 

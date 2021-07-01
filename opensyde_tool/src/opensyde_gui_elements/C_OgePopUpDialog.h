@@ -65,7 +65,6 @@ Q_SIGNALS:
 
 protected:
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-   virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void closeEvent(QCloseEvent * const opc_Event) override;
 
 private:

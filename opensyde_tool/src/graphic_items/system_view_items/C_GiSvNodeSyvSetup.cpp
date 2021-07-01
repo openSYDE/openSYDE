@@ -30,6 +30,7 @@ using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
+
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -65,7 +66,7 @@ C_GiSvNodeSyvSetup::C_GiSvNodeSyvSetup(const uint32 ou32_ViewIndex, const sint32
    this->m_InitCheckBox();
 
    this->mc_DefaultCursor = static_cast<QCursor>(Qt::ArrowCursor);
-   this->RestoreDefaultCursor();
+   this->C_GiSvNodeSyvSetup::RestoreDefaultCursor();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

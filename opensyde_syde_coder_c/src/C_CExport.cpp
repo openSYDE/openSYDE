@@ -80,10 +80,11 @@ C_OsyCodeExportBase::E_ResultCode C_CExport::m_CreateApplicationCode(const C_OSC
                                                                      const C_SCLString & orc_OutputPath,
                                                                      std::vector<C_SCLString> & orc_CreatedFiles)
 {
-   const C_SCLString c_SydeCoderCInfo = stw_tgl::TGL_ExtractFileName(mc_ExeName) + " " + mc_ExeVersion +
-                                        ", MD5-Checksum: " + stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash();
-   const sint32 s32_Return = C_OSCExportNode::h_CreateSourceCode(orc_Node, ou16_ApplicationIndex, orc_OutputPath,
-                                                                 orc_CreatedFiles, c_SydeCoderCInfo);
+   const C_SCLString c_SydeCoderCVersion = mc_ExeVersion + ", MD5-Checksum: " +
+                                           stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash();
+   const sint32 s32_Return =
+      C_OSCExportNode::h_CreateSourceCode(orc_Node, ou16_ApplicationIndex, orc_OutputPath, orc_CreatedFiles,
+                                          stw_tgl::TGL_ExtractFileName(mc_ExeName), c_SydeCoderCVersion);
 
    return (s32_Return == C_NO_ERR) ? eRESULT_OK : eRESULT_CODE_GENERATION_ERROR;
 }
@@ -110,14 +111,14 @@ void C_CExport::m_PrintBanner(void)
 /*! \brief   main
 
    \param[in]   osn_Argc     Number of command line arguments
-   \param[in]   oapcn_Argv   Command line arguments
+   \param[in]   opacn_Argv   Command line arguments
 
    \retval
    0     no problems
    else  trouble (see definition of C_CExport::E_ResultCode constants)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn main(const sintn osn_Argc, charn * const oapcn_Argv[])
+sintn main(const sintn osn_Argc, charn * const opacn_Argv[])
 {
    C_CExport c_TheCExport;
 
@@ -127,7 +128,7 @@ sintn main(const sintn osn_Argc, charn * const oapcn_Argv[])
 
    if (e_Result == C_OsyCodeExportBase::eRESULT_OK)
    {
-      e_Result = c_TheCExport.ParseCommandLine(osn_Argc, oapcn_Argv);
+      e_Result = c_TheCExport.ParseCommandLine(osn_Argc, opacn_Argv);
    }
    if (e_Result == C_OsyCodeExportBase::eRESULT_OK)
    {

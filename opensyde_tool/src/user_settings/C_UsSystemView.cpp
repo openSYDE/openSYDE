@@ -51,7 +51,10 @@ C_UsSystemView::C_UsSystemView(void) :
    mc_DashboardToolboxPos(-1, -1),
    mc_DashboardToolboxSize(600, 400),
    mq_DashboardToolboxMaximized(true),
-   ms32_DashboardSelectedTabIndex(-1)
+   ms32_DashboardSelectedTabIndex(-1),
+   mq_SetupPermission(false),
+   mq_UpdatePermission(false),
+   mq_DashboardPermission(false)
 {
 }
 
@@ -78,7 +81,10 @@ C_UsSystemView::C_UsSystemView(const sintn osn_SetupViewZoom, const QPoint & orc
    mc_DashboardToolboxPos(-1, -1),
    mc_DashboardToolboxSize(600, 400),
    mq_DashboardToolboxMaximized(true),
-   ms32_DashboardSelectedTabIndex(-1)
+   ms32_DashboardSelectedTabIndex(-1),
+   mq_SetupPermission(false),
+   mq_UpdatePermission(false),
+   mq_DashboardPermission(false)
 {
 }
 
@@ -289,7 +295,7 @@ C_UsSystemViewNode C_UsSystemView::GetSvNode(const QString & orc_NodeName) const
    \param[in]  orc_ExpandedFlags    Expanded flags
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemView::SetNodeSectionsExpanded(const QString & orc_NodeName, const QMap<uint32, bool> & orc_ExpandedFlags)
+void C_UsSystemView::SetNodeSectionsExpanded(const QString & orc_NodeName, const QVector<bool> & orc_ExpandedFlags)
 {
    if (this->mc_Nodes.contains(orc_NodeName) == true)
    {
@@ -542,4 +548,73 @@ stw_types::sint32 C_UsSystemView::GetDashboardSelectedTabIndex(void) const
 void C_UsSystemView::SetDashboardSelectedTabIndex(const stw_types::sint32 os32_Value)
 {
    this->ms32_DashboardSelectedTabIndex = os32_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get setup permission
+
+   \return
+   Current setup permission
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_UsSystemView::GetSetupPermission() const
+{
+   return this->mq_SetupPermission;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  \brief  Set setup permission
+
+   \param[in]  oq_Value   New setup permission
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsSystemView::SetSetupPermission(const bool oq_Value)
+{
+   this->mq_SetupPermission = oq_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get update permission
+
+   \return
+   Current update permission
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_UsSystemView::GetUpdatePermission() const
+{
+   return this->mq_UpdatePermission;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  \brief  Set update permission
+
+   \param[in]  oq_Value   New update permission
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsSystemView::SetUpdatePermission(const bool oq_Value)
+{
+   this->mq_UpdatePermission = oq_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get dashboard permission
+
+   \return
+   Current dashboard permission
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_UsSystemView::GetDashboardPermission() const
+{
+   return this->mq_DashboardPermission;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  \brief  Set dashboard permission
+
+   \param[in]  oq_Value   New dashboard permission
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsSystemView::SetDashboardPermission(const bool oq_Value)
+{
+   this->mq_DashboardPermission = oq_Value;
 }

@@ -180,6 +180,8 @@ void C_CamProMessageData::SetMessageUint32Value(const C_CamProMessageData::E_Gen
    case eGUIDS_CYCLIC_TIME:
       this->u32_CyclicTriggerTime = ou32_Value;
       break;
+   default:
+      break;
    }
 }
 
@@ -203,6 +205,8 @@ void C_CamProMessageData::SetMessageBoolValue(const C_CamProMessageData::E_Gener
       break;
    case eGBODS_DO_CYCLIC:
       this->q_DoCyclicTrigger = oq_Value;
+      break;
+   default:
       break;
    }
 }

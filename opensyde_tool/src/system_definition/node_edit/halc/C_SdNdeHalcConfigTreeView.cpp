@@ -44,7 +44,7 @@ using namespace stw_opensyde_gui_elements;
 C_SdNdeHalcConfigTreeView::C_SdNdeHalcConfigTreeView(QWidget * const opc_Parent) :
    C_OgeTreeViewToolTipBase(opc_Parent)
 {
-   this->setModel(&this->mc_Model);
+   this->C_SdNdeHalcConfigTreeView::setModel(&this->mc_Model);
    this->setItemDelegate(&this->mc_Delegate);
 
    this->setSelectionMode(QAbstractItemView::NoSelection);
@@ -111,7 +111,7 @@ void C_SdNdeHalcConfigTreeView::SetHalcChannelUseCase(const uint32 ou32_DomainIn
       // children
       for (sint32 s32_RowChild = 0; s32_RowChild < this->mc_Model.rowCount(rc_CurrentParent); s32_RowChild++)
       {
-         const QModelIndex & rc_CurrentChild = rc_CurrentParent.child(s32_RowChild, s32_Col);
+         const QModelIndex & rc_CurrentChild = this->mc_Model.index(s32_RowChild, s32_Col, rc_CurrentParent);
 
          if (this->mc_Model.flags(rc_CurrentChild).testFlag(Qt::ItemIsEditable) == true)
          {

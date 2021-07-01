@@ -47,6 +47,7 @@ public:
    void InitStaticNames(void) const;
    void SaveUserSettings(void) const;
    std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> GetSelectedDataElements(void) const;
+   void PrepareCleanUp(void);
 
 protected:
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;

@@ -141,6 +141,7 @@ sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
 
             if (pc_Dp != NULL)
             {
+               //lint -e{413} //false positive; opc_DatapoolNames is checked to be != NULL a few lines above
                opc_DatapoolNames->push_back(pc_Dp->c_Name.c_str());
             }
          }
@@ -330,21 +331,27 @@ QString C_SdUtil::h_ConvertByteOrderToName(const C_OSCCanSignal::E_ByteOrderType
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get error tooltip suggestion
 
-   \param[in]   ou32_NodeIndex      Node index (identifier)
-   \param[in]   orc_Indices         Invalid datapool indices
-   \param[in]   oq_NvmSizeInvalid   Flag if NVM size invalid
-   \param[out]  orc_Heading         Heading suggestion
-   \param[out]  orc_Content         Content suggestion
+   \param[in]   ou32_NodeIndex          Node index (identifier)
+   \param[in]   orc_Indices             Invalid datapool indices
+   \param[in]   oq_NvmSizeInvalid       Flag if NVM size invalid
+   \param[in]   oq_NvmOverlapDetected   Flag if NVM overlap of at least two Datapools detected
+   \param[out]  orc_Heading             Heading suggestion
+   \param[out]  orc_Content             Content suggestion
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std::vector<uint32> & orc_Indices,
-                                          const bool oq_NvmSizeInvalid, QString & orc_Heading, QString & orc_Content)
+                                          const bool oq_NvmSizeInvalid, const bool oq_NvmOverlapDetected,
+                                          QString & orc_Heading, QString & orc_Content)
 {
    orc_Heading = C_GtGetText::h_GetText("Datapools with invalid content:");
    orc_Content = "";
    if (oq_NvmSizeInvalid == true)
    {
       orc_Content += C_GtGetText::h_GetText("NVM Datapool sizes over node limit.\n");
+   }
+   if (oq_NvmOverlapDetected == true)
+   {
+      orc_Content += C_GtGetText::h_GetText("NVM Datapools overlapping detected.\n");
    }
    for (uint32 u32_ItDataPool = 0;
         (u32_ItDataPool < orc_Indices.size()) && (u32_ItDataPool < mu32_TOOL_TIP_MAXIMUM_ITEMS);
@@ -1168,8 +1175,11 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
    bool q_NameEmpty;
    bool q_NodeIdInvalid;
 
-   const bool q_DataPoolsSizeConflict =
-      C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
+   bool q_DatapoolNvmSizeConflict;
+   bool q_DatapoolNvmOverlapConflict;
+   const bool q_DataPoolNvmConflict =
+      C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex, &q_DatapoolNvmSizeConflict,
+                                                                         &q_DatapoolNvmOverlapConflict);
    bool q_DataPoolsInvalid;
    bool q_ApplicationsInvalid;
    bool q_DomainsInvalid;
@@ -1185,7 +1195,7 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
    if (s32_Retval == C_NO_ERR)
    {
       if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
-             (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_DataPoolsSizeConflict == true)) ||
+             (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_DataPoolNvmConflict == true)) ||
           (q_NameEmpty == true))
       {
          orq_ErrorDetected = true;
@@ -1236,12 +1246,12 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
             }
             orc_Text += "\n";
          }
-         if ((q_DataPoolsInvalid == true) || (q_DataPoolsSizeConflict == true))
+         if ((q_DataPoolsInvalid == true) || (q_DataPoolNvmConflict == true))
          {
             QString c_Heading;
             QString c_Content;
-            C_SdUtil::h_GetErrorToolTipDataPools(oru32_NodeIndex, c_InvalidDataPoolIndices, q_DataPoolsSizeConflict,
-                                                 c_Heading, c_Content);
+            C_SdUtil::h_GetErrorToolTipDataPools(oru32_NodeIndex, c_InvalidDataPoolIndices, q_DatapoolNvmSizeConflict,
+                                                 q_DatapoolNvmOverlapConflict, c_Heading, c_Content);
             orc_Text += c_Heading + "\n";
             orc_Text += c_Content;
             orc_Text += "\n";
@@ -1607,7 +1617,8 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
          c_ToolTipContent.append("\n");
 
          // case NVM
-         if (pc_Datapool->e_Type == C_OSCNodeDataPool::eNVM)
+         if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eNVM) ||
+             (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
          {
             // data size
             c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Data size: "));
@@ -1741,7 +1752,9 @@ void C_SdUtil::h_SortIndicesDescendingAndSync(std::vector<stw_types::uint32> & o
    if (h_CheckSortedDescending(orc_IndicesTmp) == false)
    {
       std::vector<stw_types::uint32> c_IndicesTmp;
+      //lint -e{8080} //template naming not correctly handled by naming convention checker
       std::vector<T> c_OSCContentTmp;
+      //lint -e{8080} //template naming not correctly handled by naming convention checker
       std::vector<U> c_UIContentTmp;
       //Step 1: Fill new vector in sorted order with which element should be copied to which position
       const std::vector<stw_types::sint32> c_IndexMap = C_Uti::h_CreateAscendingIndexMap(orc_IndicesTmp);
@@ -1812,7 +1825,9 @@ void C_SdUtil::h_SortIndicesAscendingAndSync(std::vector<stw_types::uint32> & or
    if (C_Uti::h_CheckSortedAscending(orc_IndicesTmp) == false)
    {
       std::vector<stw_types::uint32> c_IndicesTmp;
+      //lint -e{8080} //template naming not correctly handled by naming convention checker
       std::vector<T> c_OSCContentTmp;
+      //lint -e{8080} //template naming not correctly handled by naming convention checker
       std::vector<U> c_UIContentTmp;
       //Step 1: Fill new vector in sorted order with which element should be copied to which position
       const std::vector<stw_types::sint32> c_IndexMap = C_Uti::h_CreateAscendingIndexMap(orc_IndicesTmp);

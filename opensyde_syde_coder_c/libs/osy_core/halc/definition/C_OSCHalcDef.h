@@ -27,6 +27,7 @@ public:
    virtual stw_types::uint32 GetDomainSize(void) const;
    virtual const C_OSCHalcDefDomain * GetDomainDefDataConst(const stw_types::uint32 ou32_Index) const;
    virtual void AddDomain(const C_OSCHalcDefDomain & orc_Domain);
+   virtual void HandleFileLoadPostProcessing(void);
 
 private:
    std::vector<C_OSCHalcDefDomain> mc_Domains; ///< Domains of HALC definition

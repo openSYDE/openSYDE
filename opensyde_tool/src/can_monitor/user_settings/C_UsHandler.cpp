@@ -452,7 +452,7 @@ void C_UsHandler::GetMostRecentFolder(QString & orc_Str) const
    }
    else
    {
-      QFileInfo c_FileInfo(this->mc_RecentProjects[0]);
+      const QFileInfo c_FileInfo(this->mc_RecentProjects[0]);
       QDir c_Dir(c_FileInfo.path());
       q_Exists = c_Dir.exists();
       if (q_Exists == true)
@@ -895,7 +895,7 @@ sint32 C_UsHandler::h_GetParentFolder(const QString & orc_CompletePath, QString 
       //RemoveFile
       if (orq_CompletePathContainsFile == true)
       {
-         QFileInfo c_File(orc_CompletePath);
+         const QFileInfo c_File(orc_CompletePath);
          c_Path = c_File.absoluteDir().absolutePath();
       }
       else

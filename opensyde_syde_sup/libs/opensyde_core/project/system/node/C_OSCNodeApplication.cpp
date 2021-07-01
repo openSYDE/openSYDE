@@ -51,9 +51,11 @@ C_OSCNodeApplication::C_OSCNodeApplication(void) :
    c_IDECall(""),
    c_CodeGeneratorPath(""),
    c_GeneratePath(""),
-   u16_GenCodeVersion(0),
-   c_ResultPath("")
+   u16_GenCodeVersion(0)
 {
+   // default: one output file
+   c_ResultPaths.resize(1);
+   c_ResultPaths[0] = "";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,7 +80,11 @@ void C_OSCNodeApplication::CalcHash(uint32 & oru32_HashValue) const
                                       this->c_CodeGeneratorPath.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_GeneratePath.c_str(), this->c_GeneratePath.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_GenCodeVersion, sizeof(this->u16_GenCodeVersion), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_ResultPath.c_str(), this->c_ResultPath.Length(), oru32_HashValue);
+   for (uint32 u32_Counter = 0U; u32_Counter < this->c_ResultPaths.size(); ++u32_Counter)
+   {
+      stw_scl::C_SCLChecksums::CalcCRC32(this->c_ResultPaths[u32_Counter].c_str(),
+                                         this->c_ResultPaths[u32_Counter].Length(), oru32_HashValue);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -101,6 +107,9 @@ C_SCLString C_OSCNodeApplication::h_ApplicationToString(const C_OSCNodeApplicati
       break;
    case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
       c_Retval = "programming_application";
+      break;
+   case C_OSCNodeApplication::ePARAMETER_SET_HALC:
+      c_Retval = "parameter_set_halc";
       break;
    default:
       c_Retval = "invalid";
@@ -126,6 +135,10 @@ void C_OSCNodeApplication::h_StringToApplication(const C_SCLString & orc_String,
    else if (orc_String == "programming_application")
    {
       ore_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
+   }
+   else if (orc_String == "parameter_set_halc")
+   {
+      ore_Type = C_OSCNodeApplication::ePARAMETER_SET_HALC;
    }
    else
    {

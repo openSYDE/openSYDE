@@ -72,7 +72,8 @@ C_SebUnoSetupStyleCommand::~C_SebUnoSetupStyleCommand(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::InitPrevious(void)
 {
-   std::vector<QGraphicsItem *> c_Items = m_GetSceneItems();
+   const std::vector<QGraphicsItem *> c_Items = m_GetSceneItems();
+
    m_CreateMapAndSaveState(c_Items, this->mc_MapIDToTypeAndIndexPrevious, this->mpc_PreviousState);
 }
 
@@ -82,7 +83,8 @@ void C_SebUnoSetupStyleCommand::InitPrevious(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::InitNext(void)
 {
-   std::vector<QGraphicsItem *> c_Items = m_GetSceneItems();
+   const std::vector<QGraphicsItem *> c_Items = m_GetSceneItems();
+
    m_CreateMapAndSaveState(c_Items, this->mc_MapIDToTypeAndIndexNext, this->mpc_NextState);
 }
 

@@ -61,7 +61,8 @@ C_SdNdeHalcChannelWidget::C_SdNdeHalcChannelWidget(QWidget * const opc_Parent) :
    mu32_NodeIndex(0),
    mu32_DomainIndex(0),
    mu32_ChannelIndex(0),
-   mq_UseChannelIndex(true)
+   mq_UseChannelIndex(true),
+   ms32_LastComboboxUseCaseIndex(0)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -93,6 +94,10 @@ C_SdNdeHalcChannelWidget::C_SdNdeHalcChannelWidget(QWidget * const opc_Parent) :
    // remove strings
    this->mpc_Ui->pc_LabChannelCurrent->setText("");
    this->mpc_Ui->pc_ChxSafety->setText("");
+   this->mpc_Ui->pc_LabSafetyState->setText("");
+
+   // label safety state is invisible on default
+   this->mpc_Ui->pc_LabSafetyState->setVisible(false);
 
    // enable tab key navigation
    this->mpc_Ui->pc_TreeConfig->setTabKeyNavigation(true);
@@ -100,6 +105,7 @@ C_SdNdeHalcChannelWidget::C_SdNdeHalcChannelWidget(QWidget * const opc_Parent) :
    // connects
    connect(this->mpc_Ui->pc_LeName, &C_OgeLePropertiesName::textChanged,
            this, &C_SdNdeHalcChannelWidget::m_CheckName);
+
    this->m_ConnectWidgets(true); // special handling of widgets that write to data handling
 }
 
@@ -290,6 +296,33 @@ void C_SdNdeHalcChannelWidget::m_OnSafetyToggled(const bool oq_Checked) const
    tgl_assert(s32_Return == C_NO_ERR);
 
    // no update of any other GUI element necessary here
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Honors the Halc Safety Mode and makes SafetyRelevant read-only accordingly
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcChannelWidget::m_HandleHalcNvmFlag(void)
+{
+   const C_OSCHalcConfig * const pc_HalcConfig = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+
+   if (pc_HalcConfig->e_SafetyMode == C_OSCHalcConfig::eONE_LEVEL_ALL_SAFE)
+   {
+      this->mpc_Ui->pc_ChxSafety->setVisible(false);
+      this->mpc_Ui->pc_LabSafetyState->setVisible(true);
+      this->mpc_Ui->pc_LabSafetyState->setText("ON");
+   }
+   else if (pc_HalcConfig->e_SafetyMode == C_OSCHalcConfig::eONE_LEVEL_ALL_NON_SAFE)
+   {
+      this->mpc_Ui->pc_ChxSafety->setVisible(false);
+      this->mpc_Ui->pc_LabSafetyState->setVisible(true);
+      this->mpc_Ui->pc_LabSafetyState->setText("OFF");
+   }
+   else
+   {
+      this->mpc_Ui->pc_ChxSafety->setVisible(true);
+      this->mpc_Ui->pc_LabSafetyState->setVisible(false);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -492,6 +525,7 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
          this->m_ConnectWidgets(false);
 
          // adapt GUI elements
+         this->m_HandleHalcNvmFlag();
          this->mpc_Ui->pc_LeName->setText(pc_Channel->c_Name.c_str());
          this->mpc_Ui->pc_LeName->setReadOnly(!this->mq_UseChannelIndex); // disable name editing in domain case
          this->mpc_Ui->pc_TedComment->setText(pc_Channel->c_Comment.c_str());
@@ -507,6 +541,8 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
             break;
          case C_OSCHalcDefDomain::eCA_OTHER:
             this->mpc_Ui->pc_LabImage->SetSvg("://images/system_definition/NodeEdit/halc/OtherLargeCenterActive.svg");
+            break;
+         default:
             break;
          }
 
@@ -602,7 +638,7 @@ void C_SdNdeHalcChannelWidget::m_EmitUpdateSignal(void)
    \param[in]  oq_Connect  true: connect; false: disconnect
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelWidget::m_ConnectWidgets(const bool oq_Connect)
+void C_SdNdeHalcChannelWidget::m_ConnectWidgets(const bool oq_Connect) const
 {
    if (oq_Connect == true)
    {

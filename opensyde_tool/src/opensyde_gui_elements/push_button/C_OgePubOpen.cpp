@@ -14,8 +14,11 @@
 #include "precomp_headers.h"
 
 #include "C_OgePubOpen.h"
+#include "C_OgeWiUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_types;
+using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -42,4 +45,15 @@ C_OgePubOpen::C_OgePubOpen(QWidget * const opc_Parent) :
    C_OgePubToolTipBase(opc_Parent)
 {
    this->setIcon(QIcon("://images/IconBrowse.svg"));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set background color (stylesheet color index)
+
+   \param[in] osn_Value New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgePubOpen::SetBackgroundColor(const sintn osn_Value)
+{
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Background", osn_Value);
 }

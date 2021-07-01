@@ -58,6 +58,42 @@ sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & 
    sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser, orc_FilePath,
                                                                         "opensyde-node-core-definition");
 
+   //File version
+   if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading node definition", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading node definition", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != 1U)
+         {
+            osc_write_log_error("Loading node definition",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      c_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading node definition", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
    if (s32_Retval == C_NO_ERR)
    {
       if (c_XMLParser.SelectNodeChild("node") == "node")
@@ -98,8 +134,16 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
                                   const stw_scl::C_SCLString & orc_BasePath)
 {
    sint32 s32_Retval;
+   bool q_AutoNvmStartAddressHere;
 
    orc_Node.Initialize();
+
+   //Check optional auto nvm start address
+   q_AutoNvmStartAddressHere = orc_XMLParser.AttributeExists("datapool-auto-nvm-start-address");
+   if (q_AutoNvmStartAddressHere == true)
+   {
+      orc_Node.q_DatapoolAutoNvMStartAddress = orc_XMLParser.GetAttributeBool("datapool-auto-nvm-start-address");
+   }
 
    //Type
    if (orc_XMLParser.SelectNodeChild("type") == "type")
@@ -108,6 +152,7 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
       //Return
       orc_XMLParser.SelectNodeParent(); //back up to node
    }
+
    s32_Retval = mh_LoadProperties(orc_Node.c_Properties, orc_XMLParser);
    if (s32_Retval == C_NO_ERR)
    {
@@ -207,6 +252,7 @@ sint32 C_OSCNodeFiler::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase
 {
    sint32 s32_Retval;
 
+   orc_XMLParser.SetAttributeBool("datapool-auto-nvm-start-address", orc_Node.q_DatapoolAutoNvMStartAddress);
    //Type
    orc_XMLParser.CreateNodeChild("type", orc_Node.c_DeviceType);
    mh_SaveProperties(orc_Node.c_Properties, orc_XMLParser);
@@ -1130,14 +1176,62 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
 
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("result-path") == "result-path"))
             {
-               c_CurApplication.c_ResultPath = orc_XMLParser.GetNodeContent();
+               c_CurApplication.c_ResultPaths.resize(1);
+               c_CurApplication.c_ResultPaths[0] = orc_XMLParser.GetNodeContent();
                //Return
                tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
+            }
+            else if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("result") == "result"))
+            {
+               uint32 u32_ExpectedOutputfileNumber = 0UL;
+               const bool q_ExpectedSizeForOutputFiles = orc_XMLParser.AttributeExists("length");
+               c_CurApplication.c_ResultPaths.clear();
+
+               //Check optional length
+               if (q_ExpectedSizeForOutputFiles == true)
+               {
+                  u32_ExpectedOutputfileNumber = orc_XMLParser.GetAttributeUint32("length");
+                  c_CurApplication.c_ResultPaths.reserve(u32_ExpectedOutputfileNumber);
+               }
+
+               c_CurNode = orc_XMLParser.SelectNodeChild("output-file");
+               if (c_CurNode == "output-file")
+               {
+                  do
+                  {
+                     c_CurApplication.c_ResultPaths.push_back(orc_XMLParser.GetNodeContent());
+                     c_CurNode = orc_XMLParser.SelectNodeNext("output-file");
+                  }
+                  while (c_CurNode == "output-file");
+
+                  //Compare length
+                  if (q_ExpectedSizeForOutputFiles == true)
+                  {
+                     if (u32_ExpectedOutputfileNumber != c_CurApplication.c_ResultPaths.size())
+                     {
+                        C_SCLString c_Tmp;
+                        c_Tmp.PrintFormatted("Unexpected output file count, expected: %i, got %i",
+                                             u32_ExpectedOutputfileNumber, c_CurApplication.c_ResultPaths.size());
+                        osc_write_log_warning("Load file", c_Tmp.c_str());
+                     }
+                  }
+
+                  //Return
+                  tgl_assert(orc_XMLParser.SelectNodeParent() == "result");
+                  // Return
+                  tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
+               }
+               else
+               {
+                  // At least one output file must be provided in list
+                  s32_Retval = C_CONFIG;
+               }
             }
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_ResultPath = "";
+               c_CurApplication.c_ResultPaths.resize(1);
+               c_CurApplication.c_ResultPaths[0] = "";
             }
 
             orc_NodeApplications.push_back(c_CurApplication);
@@ -1200,7 +1294,14 @@ void C_OSCNodeFiler::mh_SaveApplications(const std::vector<C_OSCNodeApplication>
       orc_XMLParser.CreateNodeChild("ide-call", rc_CurApplication.c_IDECall);
       orc_XMLParser.CreateNodeChild("code-generator-path", rc_CurApplication.c_CodeGeneratorPath);
       orc_XMLParser.CreateNodeChild("generate-path", rc_CurApplication.c_GeneratePath);
-      orc_XMLParser.CreateNodeChild("result-path", rc_CurApplication.c_ResultPath);
+      tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("result") == "result");
+      orc_XMLParser.SetAttributeUint32("length", rc_CurApplication.c_ResultPaths.size());
+      for (uint32 u32_ItOutFile = 0UL; u32_ItOutFile < rc_CurApplication.c_ResultPaths.size(); ++u32_ItOutFile)
+      {
+         orc_XMLParser.CreateNodeChild("output-file", rc_CurApplication.c_ResultPaths[u32_ItOutFile]);
+      }
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "applications");
    }

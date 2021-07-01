@@ -1498,7 +1498,7 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_ResultPath = "";
+               c_CurApplication.c_ProjectPath = "";
             }
 
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("ide-call") == "ide-call"))
@@ -1510,7 +1510,7 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_ResultPath = "";
+               c_CurApplication.c_IDECall = "";
             }
 
             if ((s32_Retval == C_NO_ERR) &&
@@ -1523,7 +1523,7 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_ResultPath = "";
+               c_CurApplication.c_CodeGeneratorPath = "";
             }
 
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("generate-path") == "generate-path"))
@@ -1535,19 +1535,21 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_ResultPath = "";
+               c_CurApplication.c_GeneratePath = "";
             }
 
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("result-path") == "result-path"))
             {
-               c_CurApplication.c_ResultPath = orc_XMLParser.GetNodeContent();
+               c_CurApplication.c_ResultPaths.resize(1);
+               c_CurApplication.c_ResultPaths[0] = orc_XMLParser.GetNodeContent();
                //Return
                tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
             }
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_ResultPath = "";
+               c_CurApplication.c_ResultPaths.resize(1);
+               c_CurApplication.c_ResultPaths[0] = "";
             }
 
             orc_NodeApplications.push_back(c_CurApplication);
@@ -1608,7 +1610,7 @@ void C_OSCNodeFilerV2::mh_SaveApplications(const std::vector<C_OSCNodeApplicatio
       orc_XMLParser.CreateNodeChild("ide-call", rc_CurApplication.c_IDECall);
       orc_XMLParser.CreateNodeChild("code-generator-path", rc_CurApplication.c_CodeGeneratorPath);
       orc_XMLParser.CreateNodeChild("generate-path", rc_CurApplication.c_GeneratePath);
-      orc_XMLParser.CreateNodeChild("result-path", rc_CurApplication.c_ResultPath);
+      orc_XMLParser.CreateNodeChild("result-path", rc_CurApplication.c_ResultPaths[0]);
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "applications");
    }

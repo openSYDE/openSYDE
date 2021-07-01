@@ -91,7 +91,6 @@ C_SyvUpSummaryWidget::C_SyvUpSummaryWidget(QWidget * const opc_Parent) :
 C_SyvUpSummaryWidget::~C_SyvUpSummaryWidget()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
 }
 
 //----------------------------------------------------------------------------------------------------------------------

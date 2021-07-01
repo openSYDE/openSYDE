@@ -1324,6 +1324,9 @@ sintn C_SdBueComIfDescriptionWidget::mh_GetIndexOfProtocol(const C_OSCCanProtoco
    case C_OSCCanProtocol::eLAYER2:
       sn_Index = 0;
       break;
+   default:
+      tgl_assert(false);
+      break;
    }
 
    return sn_Index;
@@ -1713,8 +1716,10 @@ void C_SdBueComIfDescriptionWidget::m_UpdateText(void)
             for (u32_ProtocolCounter = 0U; u32_ProtocolCounter <= static_cast<uint32>(C_OSCCanProtocol::eECES);
                  ++u32_ProtocolCounter)
             {
-               q_AllProtocolsUsedOnBus &= this->mc_ProtocolUsedOnBus[u32_ProtocolCounter][u32_InterfaceCounter];
-               q_AtLeastOneIsUsedOnBus |= this->mc_ProtocolUsedOnBus[u32_ProtocolCounter][u32_InterfaceCounter];
+               q_AllProtocolsUsedOnBus = q_AllProtocolsUsedOnBus &&
+                                         this->mc_ProtocolUsedOnBus[u32_ProtocolCounter][u32_InterfaceCounter];
+               q_AtLeastOneIsUsedOnBus = q_AtLeastOneIsUsedOnBus ||
+                                         this->mc_ProtocolUsedOnBus[u32_ProtocolCounter][u32_InterfaceCounter];
             }
 
             if (q_AllProtocolsUsedOnBus == false)

@@ -76,10 +76,12 @@ C_CamMosDatabaseBusSelectionPopup::C_CamMosDatabaseBusSelectionPopup(
    // initialize data
    this->mc_Busses = orc_Busses;
    this->m_InitComboBox();
+
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    this->mpc_Ui->pc_LabelDatabaseValue->setText(C_Uti::h_MinimizePath(orc_Database.c_Name,
                                                                       mc_STYLE_GUIDE_FONT_REGULAR_12, 750, 4));
-   this->mpc_Ui->pc_LabelDatabaseValue->
-   SetToolTipInformation("", C_CamUti::h_GetAbsPathFromProj(orc_Database.c_Name));
+
+   this->mpc_Ui->pc_LabelDatabaseValue->SetToolTipInformation("", C_CamUti::h_GetAbsPathFromProj(orc_Database.c_Name));
 
    // after combo box initialization
    sint32 s32_IndexLastKnownBus = orc_Database.s32_BusIndex;

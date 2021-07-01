@@ -23,6 +23,8 @@
 #include "C_UsHandler.h"
 #include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
+#include "TGLUtils.h"
+#include "stwerrors.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -126,8 +128,8 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
            &C_SdNdeNodeEditWidget::m_ReloadDataPools);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigOwnedDataPoolsChanged, this,
            &C_SdNdeNodeEditWidget::m_ReloadDataPools);
-   connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigOpenDataPool, this,
-           &C_SdNdeNodeEditWidget::m_OpenDataPool);
+   connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigHalcLoadedFromTSP, this,
+           &C_SdNdeNodeEditWidget::m_HalcLoadedFromTSP);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -271,6 +273,18 @@ void C_SdNdeNodeEditWidget::OpenDetail(const sint32 os32_MainIndex, const sint32
    else
    {
       // nothing to do
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Wrapper to call C_SdNdeDbViewWidget::AddFromTSP()
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::AddFromTSP(void)
+{
+   if (this->mpc_Ui->pc_WidgetApplications != NULL)
+   {
+      this->mpc_Ui->pc_WidgetApplications->AddFromTSP();
    }
 }
 
@@ -454,6 +468,7 @@ void C_SdNdeNodeEditWidget::m_TabClicked(const sintn osn_Index) const
 void C_SdNdeNodeEditWidget::m_ReloadDataPools(void) const
 {
    this->mpc_Ui->pc_DataPoolEditWidget->SetNode(this->mu32_NodeIndex);
+   this->mpc_Ui->pc_WidgetApplications->UpdateApplications();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -469,12 +484,21 @@ void C_SdNdeNodeEditWidget::m_ReloadCommMessages(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show data pool properties
-
-   \param[in]  ou32_DataPoolIndex   Data pool index
+/*! \brief  runs the HALC magician, reloads datapool Tab and HALC Tab Screen
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodeEditWidget::m_OpenDataPool(const uint32 ou32_DataPoolIndex) const
+void C_SdNdeNodeEditWidget::m_HalcLoadedFromTSP(void) const
 {
-   this->OpenDetail(ou32_DataPoolIndex, -1, -1, 0);
+   // run magician
+   const sint32 s32_Result = C_PuiSdHandler::h_GetInstance()->HALCGenerateDatapools(this->mu32_NodeIndex);
+
+   tgl_assert((s32_Result == stw_errors::C_NO_ERR) || (s32_Result == stw_errors::C_NOACT));
+
+   // assign HALC Datapools to Data Block if possible
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->AssignAllHalcNvmDataPools(this->mu32_NodeIndex) == stw_errors::C_NO_ERR);
+
+   // reload tabs to update GUI
+   this->m_ReloadDataPools();
+   this->mpc_Ui->pc_TabHalc->SetNode(this->mu32_NodeIndex);
+   this->mpc_Ui->pc_WidgetApplications->UpdateApplications();
 }

@@ -22,8 +22,6 @@ namespace stw_opensyde_core
 class C_OSCExportUti
 {
 public:
-   C_OSCExportUti();
-
    static stw_scl::C_SCLString h_GetSectionSeparator(const stw_scl::C_SCLString & orc_SectionName);
    static stw_scl::C_SCLString h_GetHeaderSeparator(void);
    static stw_scl::C_SCLString h_GetCreationToolInfo(const stw_scl::C_SCLString & orc_ExportToolInfo);
@@ -36,7 +34,8 @@ public:
    static stw_types::sint32 h_SaveToFile(stw_scl::C_SCLStringList & orc_Data, const stw_scl::C_SCLString & orc_Path,
                                          const stw_scl::C_SCLString & orc_FileName, const bool oq_HeaderFile);
    static void h_CollectFilePaths(std::vector<stw_scl::C_SCLString> & orc_FilePaths,
-                                  const stw_scl::C_SCLString & orc_Path, const stw_scl::C_SCLString & orc_FileName);
+                                  const stw_scl::C_SCLString & orc_Path, const stw_scl::C_SCLString & orc_FileName,
+                                  const bool oq_SourceCode);
 
    static stw_scl::C_SCLString h_GetTypePrefix(const C_OSCNodeDataPoolContent::E_Type oe_Type, const bool oq_IsArray);
    static stw_scl::C_SCLString h_GetElementCName(const stw_scl::C_SCLString & orc_Name, const bool oq_IsArray,

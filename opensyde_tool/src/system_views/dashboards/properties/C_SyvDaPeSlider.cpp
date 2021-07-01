@@ -12,6 +12,7 @@
 
 #include "stwtypes.h"
 
+#include "TGLUtils.h"
 #include "C_SyvDaPeSlider.h"
 #include "ui_C_SyvDaPeSlider.h"
 
@@ -188,6 +189,10 @@ void C_SyvDaPeSlider::SetType(const C_PuiSvDbSlider::E_Type oe_Type) const
 {
    switch (oe_Type)
    {
+   case C_PuiSvDbSlider::eTYPE_SMALL_COLOR_1:
+      this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1);
+      this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1);
+      break;
    case C_PuiSvDbSlider::eTYPE_BIG_COLOR_1:
       this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1);
       this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2);
@@ -201,8 +206,7 @@ void C_SyvDaPeSlider::SetType(const C_PuiSvDbSlider::E_Type oe_Type) const
       this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1);
       break;
    default:
-      this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1);
-      this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1);
+      tgl_assert(false);
       break;
    }
 }

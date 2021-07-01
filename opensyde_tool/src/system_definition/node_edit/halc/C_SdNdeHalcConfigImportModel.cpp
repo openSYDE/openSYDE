@@ -52,7 +52,7 @@ C_SdNdeHalcConfigImportItem::C_SdNdeHalcConfigImportItem(void) :
 
    Set up model
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeHalcConfigImportModel::C_SdNdeHalcConfigImportModel(QObject * const opc_Parent) :
@@ -68,14 +68,21 @@ C_SdNdeHalcConfigImportModel::C_SdNdeHalcConfigImportModel(QObject * const opc_P
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeHalcConfigImportModel::~C_SdNdeHalcConfigImportModel(void)
 {
-   this->m_CleanUpLastModel();
+   try
+   {
+      this->m_CleanUpLastModel();
+   }
+   catch (...)
+   {
+      //not much we can do here ...
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialization of the model
 
-   \param[in]       orc_Config         HALC configuration of the current node
-   \param[in]       orc_ImportConfig   Imported HALC configuration for updating
+   \param[in]  orc_Config        HALC configuration of the current node
+   \param[in]  orc_ImportConfig  Imported HALC configuration for updating
 
    \retval   C_NO_ERR   No errors, model is initialized
    \retval   C_NOACT    No domains does match (Id does not match), nothing to import
@@ -217,7 +224,7 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Adapts the selected elements of the HALC configuration set by Init function and returns the new config
 
-   \param[out]    orc_AdaptedConfig   Adapted HALC configuration
+   \param[out]  orc_AdaptedConfig   Adapted HALC configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcConfigImportModel::GetAdaptedConfiguration(C_OSCHalcConfig & orc_AdaptedConfig)
@@ -308,8 +315,8 @@ void C_SdNdeHalcConfigImportModel::GetAdaptedConfiguration(C_OSCHalcConfig & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if selection of linked channels is valid
 
-   \param[out]     orc_DomainIndices            Domain indices corresponding to orc_MissingChannelIndices
-   \param[out]     orc_MissingChannelIndices    Indices of all linked channels that are not checked
+   \param[out]  orc_DomainIndices            Domain indices corresponding to orc_MissingChannelIndices
+   \param[out]  orc_MissingChannelIndices    Indices of all linked channels that are not checked
 
    \retval  true     For all selected linked channels the link buddies are also selected
    \retval  false    There exist linked channels where one is selected and the other one not
@@ -475,13 +482,13 @@ void C_SdNdeHalcConfigImportModel::CheckChannels(const std::vector<uint32> & orc
       for (uint32 u32_DomainCounter = 0; u32_DomainCounter < orc_DomainIndices.size(); u32_DomainCounter++)
       {
          const std::vector<uint32> & rc_ChannelIndices = orc_ChannelIndices[u32_DomainCounter];
-         const QModelIndex & rc_Domain = rc_VisibleRoot.child(orc_DomainIndices[u32_DomainCounter], 0);
+         const QModelIndex & rc_Domain = this->index(orc_DomainIndices[u32_DomainCounter], 0, rc_VisibleRoot);
 
          if (rc_Domain.isValid() == true)
          {
             for (uint32 u32_ChannelCounter = 0; u32_ChannelCounter < rc_ChannelIndices.size(); u32_ChannelCounter++)
             {
-               const QModelIndex & rc_Channel = rc_Domain.child(rc_ChannelIndices[u32_ChannelCounter], 0);
+               const QModelIndex & rc_Channel = this->index(rc_ChannelIndices[u32_ChannelCounter], 0, rc_Domain);
                this->setData(rc_Channel, static_cast<sintn>(Qt::Checked), static_cast<sintn>(Qt::CheckStateRole));
             }
          }
@@ -492,7 +499,7 @@ void C_SdNdeHalcConfigImportModel::CheckChannels(const std::vector<uint32> & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get tree column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -523,7 +530,7 @@ QVariant C_SdNdeHalcConfigImportModel::data(const QModelIndex & orc_Index, const
    {
       //lint -e{9079}  Result of Qt interface restrictions, set by index function
       C_SdNdeHalcConfigImportItem * const pc_TreeItem =
-         static_cast<C_SdNdeHalcConfigImportItem * const>(orc_Index.internalPointer());
+         static_cast<C_SdNdeHalcConfigImportItem *>(orc_Index.internalPointer());
 
       if (pc_TreeItem != NULL)
       {
@@ -561,7 +568,7 @@ bool C_SdNdeHalcConfigImportModel::setData(const QModelIndex & orc_Index, const 
       {
          //lint -e{9079}  Result of Qt interface restrictions, set by index function
          C_SdNdeHalcConfigImportItem * const pc_TreeItem =
-            static_cast<C_SdNdeHalcConfigImportItem * const>(orc_Index.internalPointer());
+            static_cast<C_SdNdeHalcConfigImportItem *>(orc_Index.internalPointer());
 
          if (pc_TreeItem != NULL)
          {
@@ -593,7 +600,7 @@ bool C_SdNdeHalcConfigImportModel::setData(const QModelIndex & orc_Index, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get item flags
 
-   \param[in] orc_Index Index
+   \param[in]  orc_Index   Index
 
    \return
    Item flags
@@ -607,7 +614,7 @@ Qt::ItemFlags C_SdNdeHalcConfigImportModel::flags(const QModelIndex & orc_Index)
    {
       //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_SdNdeHalcConfigImportItem * const pc_TreeItem =
-         static_cast<const C_SdNdeHalcConfigImportItem * const>(orc_Index.internalPointer());
+         static_cast<const C_SdNdeHalcConfigImportItem *>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
       {
          if (pc_TreeItem->q_Checkable == true)
@@ -623,9 +630,9 @@ Qt::ItemFlags C_SdNdeHalcConfigImportModel::flags(const QModelIndex & orc_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks all children (recursive) and adapts the check state to the state of the parent
 
-   \param[in,out]   opc_TreeItem   Parent to check its children
-   \param[in]       orc_ItemIndex  Index of the parent
-   \param[out]      orc_EndIndex   Last index of the last child
+   \param[in,out]  opc_TreeItem     Parent to check its children
+   \param[in]      orc_ItemIndex    Index of the parent
+   \param[out]     orc_EndIndex     Last index of the last child
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcConfigImportModel::m_CheckChildren(C_SdNdeHalcConfigImportItem * const opc_TreeItem,
@@ -634,7 +641,7 @@ void C_SdNdeHalcConfigImportModel::m_CheckChildren(C_SdNdeHalcConfigImportItem *
    if (opc_TreeItem->c_Children.size() > 0)
    {
       uint32 u32_ChildCounter;
-      const uint32 u32_IndexLastChild = opc_TreeItem->c_Children.size() - 1UL;
+      const uint32 u32_IndexLastChild = static_cast<uint32>(opc_TreeItem->c_Children.size()) - 1UL;
 
       orc_EndIndex = this->index(u32_IndexLastChild, 0, orc_ItemIndex);
 
@@ -659,9 +666,9 @@ void C_SdNdeHalcConfigImportModel::m_CheckChildren(C_SdNdeHalcConfigImportItem *
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks the parent (recursive) and adapts the check state to the state of the child
 
-   \param[in]       opc_TreeItem   Parent to check its children
-   \param[in]       orc_ItemIndex  Index of the child
-   \param[out]      orc_StartIndex First index of the first parent
+   \param[in]   opc_TreeItem     Parent to check its children
+   \param[in]   orc_ItemIndex    Index of the child
+   \param[out]  orc_StartIndex   First index of the first parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcConfigImportModel::m_CheckParent(const C_SdNdeHalcConfigImportItem * const opc_TreeItem,

@@ -234,7 +234,7 @@ void C_CamMosDllWidget::m_LoadConfig(void) const
    }
 
    // set line edit text to last known custom path
-   QString c_Path = C_CamProHandler::h_GetInstance()->GetCustomCANDllPath();
+   const QString c_Path = C_CamProHandler::h_GetInstance()->GetCustomCANDllPath();
    if (c_Path == "")
    {
       this->mpc_Ui->pc_LineEditCustomDllPath->SetPath("");
@@ -331,7 +331,7 @@ void C_CamMosDllWidget::m_UpdateCANDllPath(void) const
    }
    else if (this->mpc_Ui->pc_RadioButtonOther->isChecked() == true)
    {
-      QString c_Path = this->mpc_Ui->pc_LineEditCustomDllPath->GetPath();
+      const QString c_Path = this->mpc_Ui->pc_LineEditCustomDllPath->GetPath();
 
       // remember path in data handling
       C_CamProHandler::h_GetInstance()->SetCustomCANDllPath(c_Path);
@@ -373,7 +373,7 @@ void C_CamMosDllWidget::m_OnBrowse(void)
    const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("CAN DLL ")) + "(*.dll)";
    QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select CAN DLL"), c_Folder, c_Filter);
 
-   if ((c_Folder == "") || (QFileInfo(c_Folder).dir().exists() == false))
+   if ((c_Folder == "") || (static_cast<QFileInfo>(c_Folder).dir().exists() == false))
    {
       // use executable path if no existing directory is given
       c_Folder = C_Uti::h_GetExePath();
@@ -381,7 +381,7 @@ void C_CamMosDllWidget::m_OnBrowse(void)
    else
    {
       // get directory of dll path
-      c_Folder = QFileInfo(c_Folder).dir().absolutePath();
+      c_Folder = static_cast<QFileInfo>(c_Folder).dir().absolutePath();
    }
 
    c_Dialog.setDirectory(c_Folder);

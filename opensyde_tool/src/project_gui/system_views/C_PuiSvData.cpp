@@ -56,7 +56,11 @@ C_PuiSvData::C_PuiSvData(void) :
    mu16_UpdateRateSlow(1000U),
    mu32_DeviceConfigSelectedBitRate(125U),
    me_DeviceConfigMode(eDCM_ALL_CONNECTED_INTERFACES),
-   mq_DarkModeActive(false)
+   mq_DarkModeActive(false),
+   mq_IsServiceModeActive(false),
+   mq_IsServiceModeSetupActive(false),
+   mq_IsServiceModeUpdateActive(false),
+   mq_IsServiceModeDashboardActive(false)
 {
 }
 
@@ -135,6 +139,98 @@ uint32 C_PuiSvData::CalcUpdateHash(void) const
    }
 
    return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get service mode active
+
+   \return
+   Is service mode active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvData::GetServiceModeActive(void) const
+{
+   return this->mq_IsServiceModeActive;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get service mode setup active
+
+   \return
+   Is service mode setup active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvData::GetServiceModeSetupActive(void) const
+{
+   return this->mq_IsServiceModeSetupActive;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get service mode update active
+
+   \return
+   Is service mode update active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvData::GetServiceModeUpdateActive(void) const
+{
+   return this->mq_IsServiceModeUpdateActive;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get service mode dashboard active
+
+   \return
+   Is service mode dashboard active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvData::GetServiceModeDashboardActive(void) const
+{
+   return this->mq_IsServiceModeDashboardActive;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set service mode active
+
+   \param[in]  oq_NewValue    New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::SetServiceModeActive(const bool oq_NewValue)
+{
+   this->mq_IsServiceModeActive = oq_NewValue;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set service mode setup active
+
+   \param[in]  oq_NewValue    New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::SetServiceModeSetupActive(const bool oq_NewValue)
+{
+   this->mq_IsServiceModeSetupActive = oq_NewValue;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set service mode update active
+
+   \param[in]  oq_NewValue    New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::SetServiceModeUpdateActive(const bool oq_NewValue)
+{
+   this->mq_IsServiceModeUpdateActive = oq_NewValue;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set service mode dashboard active
+
+   \param[in]  oq_NewValue    New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::SetServiceModeDashboardActive(const bool oq_NewValue)
+{
+   this->mq_IsServiceModeDashboardActive = oq_NewValue;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -301,6 +397,60 @@ sint32 C_PuiSvData::SetNodeUpdateInformationParamInfo(const uint32 ou32_NodeInde
    {
       C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
       s32_Return = rc_UpdateInformation.SetParamInfo(ou32_Index, orc_Value);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information skip flag
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_Index        Index to access
+   \param[in]  oq_SkipFile       New skip flag
+   \param[in]  oe_Type           Selector for structure
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::SetNodeUpdateInformationSkipUpdateOfPath(const uint32 ou32_NodeIndex, const uint32 ou32_Index,
+                                                             const bool oq_SkipFile,
+                                                             const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      s32_Return = rc_UpdateInformation.SetSkipUpdateOfPath(ou32_Index, oq_SkipFile, oe_Type);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information parameter set skip flag
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_Index        Index to access
+   \param[in]  oq_SkipFile       New skip flag
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::SetNodeUpdateInformationSkipUpdateOfParamInfo(const uint32 ou32_NodeIndex, const uint32 ou32_Index,
+                                                                  const bool oq_SkipFile)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      s32_Return = rc_UpdateInformation.SetSkipUpdateOfParamInfo(ou32_Index, oq_SkipFile);
    }
 
    return s32_Return;
@@ -1180,7 +1330,7 @@ void C_PuiSvData::OnSyncNodeHALC(const uint32 ou32_Index, const std::map<C_PuiSv
                                                                  c_ItReadItem.key().u32_DataPoolIndex,
                                                                  e_Type) == C_NO_ERR)
             {
-               if (e_Type == C_OSCNodeDataPool::eHALC)
+               if ((e_Type == C_OSCNodeDataPool::eHALC) || (e_Type == C_OSCNodeDataPool::eHALC_NVM))
                {
                   //Manual compare because only base is necessary
                   for (std::map<C_PuiSvDbNodeDataPoolListElementId,
@@ -1216,6 +1366,120 @@ void C_PuiSvData::OnSyncNodeHALC(const uint32 ou32_Index, const std::map<C_PuiSv
    }
    this->mc_ReadRailAssignments.clear();
    this->mc_ReadRailAssignments = c_NewItems;
+   // Param widget
+   for (uint32 u32_ItDashboard = 0; u32_ItDashboard < this->mc_Dashboards.size(); ++u32_ItDashboard)
+   {
+      C_PuiSvDashboard & rc_Dashboard = this->mc_Dashboards[u32_ItDashboard];
+      for (uint32 u32_ItPa = 0UL; u32_ItPa < rc_Dashboard.GetParams().size(); ++u32_ItPa)
+      {
+         std::set<C_OSCNodeDataPoolListId> c_NewLists;
+         {
+            //Clean
+            const C_PuiSvDbParam * const pc_Param = rc_Dashboard.GetParam(u32_ItPa);
+            if (pc_Param != NULL)
+            {
+               bool q_ParamChanged = false;
+               C_PuiSvDbParam c_Tmp = *pc_Param;
+               if ((c_Tmp.c_DataPoolElementsConfig.size() == c_Tmp.c_DataSetSelectionIndices.size()) &&
+                   (c_Tmp.c_DataPoolElementsConfig.size() == c_Tmp.c_ListValues.size()))
+               {
+                  std::vector<C_PuiSvDbNodeDataElementConfig>::iterator c_ItEl = c_Tmp.c_DataPoolElementsConfig.begin();
+                  std::vector<sint32>::iterator c_ItData = c_Tmp.c_DataSetSelectionIndices.begin();
+                  std::vector<C_OSCNodeDataPoolContent>::iterator c_ItLi = c_Tmp.c_ListValues.begin();
+                  while (c_ItEl != c_Tmp.c_DataPoolElementsConfig.end())
+                  {
+                     const C_OSCNodeDataPool * const pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+                        c_ItEl->c_ElementId.u32_NodeIndex,
+                        c_ItEl->c_ElementId.u32_DataPoolIndex);
+                     if (pc_Dp != NULL)
+                     {
+                        if (pc_Dp->e_Type == C_OSCNodeDataPool::eHALC_NVM)
+                        {
+                           //Remove, validity not guaranteed anymore
+                           c_ItEl = c_Tmp.c_DataPoolElementsConfig.erase(c_ItEl);
+                           c_ItData = c_Tmp.c_DataSetSelectionIndices.erase(c_ItData);
+                           c_ItLi = c_Tmp.c_ListValues.erase(c_ItLi);
+                           q_ParamChanged = true;
+                           c_NewLists.insert(c_ItEl->c_ElementId);
+                        }
+                        else
+                        {
+                           ++c_ItEl;
+                           ++c_ItData;
+                           ++c_ItLi;
+                        }
+                     }
+                     else
+                     {
+                        //Just not existing
+                        c_ItEl = c_Tmp.c_DataPoolElementsConfig.erase(c_ItEl);
+                        c_ItData = c_Tmp.c_DataSetSelectionIndices.erase(c_ItData);
+                        c_ItLi = c_Tmp.c_ListValues.erase(c_ItLi);
+                        q_ParamChanged = true;
+                     }
+                  }
+               }
+               if (q_ParamChanged)
+               {
+                  //Remove HAL tree
+                  for (std::vector<C_PuiSvDbExpandedTreeIndex>::iterator c_ItTree = c_Tmp.c_ExpandedItems.begin();
+                       c_ItTree != c_Tmp.c_ExpandedItems.end();)
+                  {
+                     if (c_ItTree->u32_Layer >= 2UL)
+                     {
+                        const C_OSCNodeDataPool * const pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+                           c_ItTree->c_ExpandedId.u32_NodeIndex,
+                           c_ItTree->c_ExpandedId.u32_DataPoolIndex);
+                        if (pc_Dp != NULL)
+                        {
+                           if (pc_Dp->e_Type == C_OSCNodeDataPool::eHALC_NVM)
+                           {
+                              c_ItTree = c_Tmp.c_ExpandedItems.erase(c_ItTree);
+                           }
+                           else
+                           {
+                              ++c_ItTree;
+                           }
+                        }
+                        else
+                        {
+                           c_ItTree = c_Tmp.c_ExpandedItems.erase(c_ItTree);
+                        }
+                     }
+                     else
+                     {
+                        ++c_ItTree;
+                     }
+                  }
+                  rc_Dashboard.SetWidget(u32_ItPa, &c_Tmp, C_PuiSvDbDataElement::ePARAM);
+               }
+            }
+         }
+         //Re-add
+         if (c_NewLists.size() > 0UL)
+         {
+            for (std::set<C_OSCNodeDataPoolListId>::const_iterator c_ItLi = c_NewLists.cbegin();
+                 c_ItLi != c_NewLists.cend(); ++c_ItLi)
+            {
+               const C_OSCNodeDataPoolList * const pc_Li = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+                  c_ItLi->u32_NodeIndex,
+                  c_ItLi->u32_DataPoolIndex,
+                  c_ItLi->u32_ListIndex);
+               if (pc_Li != NULL)
+               {
+                  for (uint32 u32_ItEL = 0UL; u32_ItEL < pc_Li->c_Elements.size(); ++u32_ItEL)
+                  {
+                     const C_OSCNodeDataPoolListElementId c_Id(c_ItLi->u32_NodeIndex,
+                                                               c_ItLi->u32_DataPoolIndex,
+                                                               c_ItLi->u32_ListIndex, u32_ItEL);
+                     tgl_assert(this->AddDashboardParamNewDataPoolElement(u32_ItDashboard, u32_ItPa, c_Id,
+                                                                          NULL) == C_NO_ERR);
+                  }
+               }
+            }
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1394,7 +1658,7 @@ void C_PuiSvData::OnSyncNodeApplicationAdded(const uint32 ou32_NodeIndex, const 
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
       C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_Update.OnSyncNodeApplicationAdded(ou32_ApplicationIndex);
+      rc_Update.OnSyncNodeApplicationAdded(ou32_NodeIndex, ou32_ApplicationIndex);
    }
 }
 
@@ -1412,7 +1676,7 @@ void C_PuiSvData::OnSyncNodeApplicationMoved(const uint32 ou32_NodeIndex, const 
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
       C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_Update.OnSyncNodeApplicationMoved(ou32_ApplicationSourceIndex, ou32_ApplicationTargetIndex);
+      rc_Update.OnSyncNodeApplicationMoved(ou32_NodeIndex, ou32_ApplicationSourceIndex, ou32_ApplicationTargetIndex);
    }
 }
 
@@ -1428,7 +1692,63 @@ void C_PuiSvData::OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_NodeIn
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
       C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_Update.OnSyncNodeApplicationAboutToBeDeleted(ou32_ApplicationIndex);
+      rc_Update.OnSyncNodeApplicationAboutToBeDeleted(ou32_NodeIndex, ou32_ApplicationIndex);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
+
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::OnSyncNodeApplicationAboutToBeChangedFromParamSetHALC(const uint32 ou32_NodeIndex,
+                                                                        const uint32 ou32_ApplicationIndex)
+{
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_Update.OnSyncNodeApplicationAboutToBeChangedFromParamSetHALC(ou32_NodeIndex, ou32_ApplicationIndex);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
+
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::OnSyncNodeApplicationChangedToParamSetHALC(const uint32 ou32_NodeIndex,
+                                                             const uint32 ou32_ApplicationIndex)
+{
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_Update.OnSyncNodeApplicationChangedToParamSetHALC(ou32_NodeIndex, ou32_ApplicationIndex);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
+
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
+   \param[in]  ou32_OldSize            Size of application result path before change
+   \param[in]  ou32_NewSize            Size of application result path after change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::OnSyncNodeApplicationResultPathSizeChanged(const uint32 ou32_NodeIndex,
+                                                             const uint32 ou32_ApplicationIndex,
+                                                             const stw_types::uint32 ou32_OldSize,
+                                                             const stw_types::uint32 ou32_NewSize)
+{
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_Update.OnSyncNodeApplicationResultPathSizeChanged(ou32_NodeIndex, ou32_ApplicationIndex, ou32_OldSize,
+                                                           ou32_NewSize);
    }
 }
 
@@ -1775,8 +2095,8 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou32_No
    {
       const C_OSCNodeDataPoolListElementId c_TmpId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
                                                    ou32_ElementIndex);
-      QMap<C_OSCNodeDataPoolListElementId,
-           C_PuiSvReadDataConfiguration>::iterator c_It = this->mc_ReadRailAssignments.find(c_TmpId);
+      const QMap<C_OSCNodeDataPoolListElementId,
+                 C_PuiSvReadDataConfiguration>::iterator c_It = this->mc_ReadRailAssignments.find(c_TmpId);
       //Check if rail still exists (might have been removed earlier)
       if (c_It != this->mc_ReadRailAssignments.end())
       {
@@ -2777,9 +3097,11 @@ sint32 C_PuiSvData::SyncDashboardScalingInformation(const uint32 ou32_DashboardI
 /*! \brief   Fix invalid rail configurations
 
    Hint: may be introduced by unknown issue not cleaning up rail configurations properly
+
+   \param[in]  oq_PrintLog    Print log
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::FixInvalidRailConfig(void)
+void C_PuiSvData::FixInvalidRailConfig(const bool oq_PrintLog)
 {
    //Test all maps
    for (QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration>::iterator c_ItReadItem =
@@ -2817,13 +3139,16 @@ void C_PuiSvData::FixInvalidRailConfig(void)
       }
       if (u32_Count == 0UL)
       {
-         osc_write_log_warning("fix invalid rail config",
-                               static_cast<QString>(
-                                  "detected and removed unused rail (node-index: %1, datapool-index: %2, list-index: %3, element-index: %4)").arg(
-                                  c_ItReadItem.key().u32_NodeIndex).arg(c_ItReadItem.key().u32_DataPoolIndex).arg(
-                                  c_ItReadItem.key().
-                                  u32_ListIndex).arg(
-                                  c_ItReadItem.key().u32_ElementIndex).toStdString().c_str());
+         if (oq_PrintLog)
+         {
+            osc_write_log_warning("fix invalid rail config",
+                                  static_cast<QString>(
+                                     "detected and removed unused rail (node-index: %1, datapool-index: %2, list-index: %3, element-index: %4)").arg(
+                                     c_ItReadItem.key().u32_NodeIndex).arg(c_ItReadItem.key().u32_DataPoolIndex).arg(
+                                     c_ItReadItem.key().
+                                     u32_ListIndex).arg(
+                                     c_ItReadItem.key().u32_ElementIndex).toStdString().c_str());
+         }
          //New item at current position
          c_ItReadItem = this->mc_ReadRailAssignments.erase(c_ItReadItem);
       }
@@ -2872,6 +3197,9 @@ void C_PuiSvData::InitFromSystemDefintion(void)
          if (pc_Node != NULL)
          {
             std::vector<QString> c_ApplPaths;
+            std::vector<C_PuiSvNodeUpdateParamInfo> c_ParamInfos;
+            std::vector<bool> c_ApplSkipFlags;
+            std::vector<bool> c_ParamSetSkipFlags;
             C_PuiSvNodeUpdate c_Info;
             c_Info.u32_NodeUpdatePosition = u32_ItInfo;
             //Sync applications
@@ -2879,11 +3207,40 @@ void C_PuiSvData::InitFromSystemDefintion(void)
             for (uint32 u32_ItAppl = 0; u32_ItAppl < pc_Node->c_Applications.size(); ++u32_ItAppl)
             {
                const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItAppl];
-
-               c_ApplPaths.push_back(C_PuiUtil::h_MakeIndependentOfDbProjectPath(rc_Application.c_ProjectPath.c_str(),
-                                                                                 rc_Application.c_ResultPath.c_str()));
+               if (rc_Application.e_Type != C_OSCNodeApplication::ePARAMETER_SET_HALC)
+               {
+                  // Only in case of a HALC NVM Datapool the size 1 is possible
+                  tgl_assert(rc_Application.c_ResultPaths.size() == 1);
+                  c_ApplPaths.push_back(
+                     C_PuiUtil::h_MakeIndependentOfDbProjectPath(
+                        rc_Application.c_ProjectPath.c_str(),
+                        rc_Application.c_ResultPaths[0U].c_str()));
+               }
+               else
+               {
+                  uint32 u32_PathCounter;
+                  for (u32_PathCounter = 0; u32_PathCounter < rc_Application.c_ResultPaths.size(); ++u32_PathCounter)
+                  {
+                     C_PuiSvNodeUpdateParamInfo c_ParamInfo;
+                     // TODO BAY: Adaption necessary if a check of the default PSI File will be added
+                     c_ParamInfo.SetContent(C_PuiUtil::h_MakeIndependentOfDbProjectPath(
+                                               rc_Application.c_ProjectPath.c_str(),
+                                               rc_Application.c_ResultPaths[u32_PathCounter].c_str()),
+                                            0U);
+                     c_ParamInfos.push_back(c_ParamInfo);
+                  }
+               }
             }
+            c_ApplSkipFlags.resize(c_ApplPaths.size(), false);
             c_Info.SetPaths(c_ApplPaths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            c_Info.SetSkipUpdateOfPathsFlags(c_ApplSkipFlags, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+
+            if (c_ParamInfos.size() > 0)
+            {
+               c_ParamSetSkipFlags.resize(c_ParamInfos.size(), false);
+               c_Info.SetParamInfos(c_ParamInfos);
+               c_Info.SetSkipUpdateOfParamInfosFlags(c_ParamSetSkipFlags);
+            }
 
             this->mc_NodeUpdateInformation.push_back(c_Info);
          }
@@ -2898,7 +3255,7 @@ void C_PuiSvData::InitFromSystemDefintion(void)
 
       for (u32_Counter = 0U; u32_Counter < this->mc_NodeActiveFlags.size(); ++u32_Counter)
       {
-         this->mc_NodeActiveFlags[u32_Counter] = true;
+         this->mc_NodeActiveFlags[u32_Counter] = 1U;
       }
    }
    else

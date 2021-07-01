@@ -105,7 +105,7 @@ void C_SdBueMessageRxEntry::InitStaticNames(void) const
 
    this->mpc_Ui->pc_LabelTimeoutLink->SetToolTipInformation(
       C_GtGetText::h_GetText("Timeout"),
-      C_GtGetText::h_GetText("This property is relevant for code generation. "
+      C_GtGetText::h_GetText("This property is relevant for source code file generation. "
                              "\nWithin this interval a valid message should be received. "
                              "\nOtherwise the Process Data Exchange Stack (implemented on device) will report an "
                              "error."));

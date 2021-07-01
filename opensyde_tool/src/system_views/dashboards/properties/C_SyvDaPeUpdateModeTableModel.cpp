@@ -50,9 +50,9 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_ViewIndex View index
-   \param[in]     ou32_NodeIndex Node index
-   \param[in,out] opc_Parent     Optional pointer to parent
+   \param[in]      ou32_ViewIndex   View index
+   \param[in]      ou32_NodeIndex   Node index
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeTableModel::C_SyvDaPeUpdateModeTableModel(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
@@ -86,9 +86,9 @@ void C_SyvDaPeUpdateModeTableModel::ApplyData(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in] osn_Section    Section
-   \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in]  osn_Section       Section
+   \param[in]  oe_Orientation    Orientation
+   \param[in]  osn_Role          Role
 
    \return
    Header string
@@ -238,7 +238,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::headerData(const sintn osn_Section, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table row count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -260,7 +260,7 @@ sintn C_SyvDaPeUpdateModeTableModel::rowCount(const QModelIndex & orc_Parent) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -281,8 +281,8 @@ sintn C_SyvDaPeUpdateModeTableModel::columnCount(const QModelIndex & orc_Parent)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -469,6 +469,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                         uint32 u32_ParameterElementIndex;
                         bool q_IsUseCaseIndex;
                         bool q_IsChanNumIndex;
+                        bool q_IsSafetyFlagIndex;
 
                         if (C_PuiSdHandler::h_GetInstance()->TranslateToHALCIndex(rc_CurId, 0,
                                                                                   u32_DomainIndex, q_UseChannelIndex,
@@ -477,7 +478,8 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                                                                                   q_UseElementIndex,
                                                                                   u32_ParameterElementIndex,
                                                                                   q_IsUseCaseIndex,
-                                                                                  q_IsChanNumIndex) == C_NO_ERR)
+                                                                                  q_IsChanNumIndex,
+                                                                                  q_IsSafetyFlagIndex) == C_NO_ERR)
                         {
                            const C_OSCHalcDefDomain * const pc_Domain =
                               C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileDataConst(rc_CurId.u32_NodeIndex,
@@ -494,6 +496,9 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                                  break;
                               case C_OSCHalcDefDomain::eCA_OTHER:
                                  c_Tmp.push_back(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg");
+                                 break;
+                              default:
+                                 tgl_assert(false);
                                  break;
                               }
                            }
@@ -525,8 +530,14 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   case eUSAGE:
                      c_Retval = c_Inactive1;
                      break;
-                  default:
+                  case eICON:
+                  case eTRANSMISSION_MODE:
+                  case eCYCLIC_INTERVAL:
+                  case eTHRESHOLD:
                      c_Retval = c_Inactive2;
+                     break;
+                  default:
+                     tgl_assert(false);
                      break;
                   }
                }
@@ -592,9 +603,9 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data at index
 
-   \param[in] orc_Index Index
-   \param[in] orc_Value New data
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  orc_Value   New data
+   \param[in]  osn_Role    Data role
 
    \return
    True  Success
@@ -659,7 +670,7 @@ bool C_SyvDaPeUpdateModeTableModel::setData(const QModelIndex & orc_Index, const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get item flags
 
-   \param[in] orc_Index Index
+   \param[in]  orc_Index   Index
 
    \return
    Item flags
@@ -737,7 +748,7 @@ Qt::ItemFlags C_SyvDaPeUpdateModeTableModel::flags(const QModelIndex & orc_Index
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Column to enum conversion
 
-   \param[in]  os32_Column Column
+   \param[in]  os32_Column    Column
 
    \return
    Enum value
@@ -788,7 +799,7 @@ C_SyvDaPeUpdateModeTableModel::E_Columns C_SyvDaPeUpdateModeTableModel::h_Column
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Enum to column conversion
 
-   \param[in] oe_Value Enum value
+   \param[in]  oe_Value    Enum value
 
    \return
    Column
@@ -842,7 +853,7 @@ sint32 C_SyvDaPeUpdateModeTableModel::h_EnumToColumn(const E_Columns oe_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get index
 
-   \param[in] os32_Index Index
+   \param[in]  os32_Index  Index
 
    \return
    NULL Element not found
@@ -867,8 +878,7 @@ const C_OSCNodeDataPoolListElementId * C_SyvDaPeUpdateModeTableModel::GetIndex(c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
+   \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTableModel::m_Init(const uint32 ou32_NodeIndex)
@@ -964,7 +974,7 @@ void C_SyvDaPeUpdateModeTableModel::m_Init(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get transmission mode as string
 
-   \param[in] oe_TransmissionMode Transmission mode
+   \param[in]  oe_TransmissionMode  Transmission mode
 
    \return
    Readable string
@@ -995,7 +1005,7 @@ QString C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get rail index as string
 
-   \param[in] u8_RailIndex Rail index
+   \param[in]  ou8_RailIndex  Rail index
 
    \return
    Readable string
@@ -1032,7 +1042,7 @@ QString C_SyvDaPeUpdateModeTableModel::m_RailIndexToString(const uint8 ou8_RailI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get index for specified transmission mode
 
-   \param[in] oe_TransmissionMode Transmission mode
+   \param[in]  oe_TransmissionMode  Transmission mode
 
    \return
    Transmission mode index (Combo box)
@@ -1064,7 +1074,7 @@ sintn C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToIndex(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get transmission mode for specified index
 
-   \param[in] osn_Index Transmission mode index (Combo box)
+   \param[in]  osn_Index   Transmission mode index (Combo box)
 
    \return
    Transmission mode

@@ -184,8 +184,6 @@ C_SyvDcWidget::~C_SyvDcWidget(void)
 {
    this->CleanUp();
    delete mpc_Ui;
-   //lint -e{1579}  no memory leak because mpc_DcSequences is deleted in CleanUp
-   //lint -e{1740}  no memory leak because the ownership of these objects was never transferred to this class
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1284,7 +1282,9 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
          if (q_Manual == true)
          {
             C_OgeWiCustomMessage c_ConfirmationBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
-            const uint32 u32_WaitTimeSec = (u32_WaitTime / 1000UL) + (((u32_WaitTime % 1000UL) == 0UL) ? 0UL : 1UL);
+            const uint32 u32_WaitTimeSec = (u32_WaitTime / 1000UL) +
+                                           (((u32_WaitTime % 1000UL) ==
+                                             0UL) ? static_cast<uint32>(0UL) : static_cast<uint32>(1UL));
             c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
             c_ConfirmationBox.SetDetails(c_Details);
             c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
@@ -2000,6 +2000,8 @@ void C_SyvDcWidget::m_InitModeComboBox(void)
          this->mpc_Ui->pc_ComboBoxConfigurationMode->setCurrentIndex(
             C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ONLY_USED_INTERFACES);
          break;
+      default:
+         break;
       }
    }
 
@@ -2418,6 +2420,8 @@ void C_SyvDcWidget::m_Timer(void)
             }
 
             break;
+         default:
+            break;
          }
       }
 
@@ -2554,6 +2558,8 @@ bool C_SyvDcWidget::m_AreAllInterfacesToConfigure(void) const
          break;
       case C_PuiSvData::eDCM_ONLY_USED_INTERFACES:
          q_SetAllInterfaces = false;
+         break;
+      default:
          break;
       }
    }

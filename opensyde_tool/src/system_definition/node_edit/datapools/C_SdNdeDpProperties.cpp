@@ -62,7 +62,8 @@ const stw_types::sintn C_SdNdeDpProperties::mhsn_INDEX_PUBLIC = 1;
    \param[in]     os32_DataPoolIndex        Flag for new Datapool (-1 is new Datapool, >= 0 is existing Datapool)
    \param[in]     oru32_NodeIndex           Node index
    \param[in]     oq_SelectName             Selects the Datapool name for instant editing
-   \param[in]     oq_ShowApplicationSection Flag to show or hide application section
+   \param[in]     oq_NodeProgrammingSupport Flag if node has programming support.
+                                            If false the application and scope section will be hided
    \param[in]     opc_SharedDatapoolId      In case of a new shared Datapool, the Id is the shared Datapool of the new
                                             Datapool. In case of an edited or stand alone Datapool the pointer is NULL
 */
@@ -71,7 +72,7 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
                                          C_PuiSdNodeDataPool * const opc_UiDataPool,
                                          C_OSCCanProtocol::E_Type * const ope_ComProtocolType,
                                          const sint32 os32_DataPoolIndex, const uint32 & oru32_NodeIndex,
-                                         const bool oq_SelectName, const bool oq_ShowApplicationSection,
+                                         const bool oq_SelectName, const bool oq_NodeProgrammingSupport,
                                          const C_OSCNodeDataPoolId * const opc_SharedDatapoolId) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpProperties()),
@@ -80,7 +81,8 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
    mpc_UiDataPool(opc_UiDataPool),
    mpe_ComProtocolType(ope_ComProtocolType),
    mu32_NodeIndex(oru32_NodeIndex),
-   ms32_DataPoolIndex(os32_DataPoolIndex)
+   ms32_DataPoolIndex(os32_DataPoolIndex),
+   mq_DatapoolAutoNvMStartAddress(false)
 {
    bool q_IsShared;
 
@@ -91,6 +93,7 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
 
    //Ui restriction
    this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(32768);
+   this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMaximumCustom(32768);
 
    //Ui restriction
    this->mpc_Ui->pc_LineEditDatapoolName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
@@ -115,7 +118,8 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
       this->mpc_Ui->pc_CommentText->setText(this->mpc_OSCDataPool->c_Comment.c_str());
       this->mpc_Ui->pc_CheckBoxSafety->setChecked(this->mpc_OSCDataPool->q_IsSafety);
 
-      if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eHALC)
+      if ((this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eHALC) ||
+          (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
       {
          // In case of a HAL Datapool, the safety property is not editable
          if (this->mpc_OSCDataPool->q_IsSafety == true)
@@ -176,11 +180,42 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
             m_OnComTypeChange();
          }
       }
+      else if ((this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eNVM) ||
+               (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
+      {
+         // Get the flag for the NVM start address mode
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+         tgl_assert(pc_Node != NULL);
+         if (pc_Node != NULL)
+         {
+            this->mq_DatapoolAutoNvMStartAddress = pc_Node->q_DatapoolAutoNvMStartAddress;
+         }
+      }
+      else
+      {
+         // Nothing to do
+      }
 
       this->m_CheckDatapoolName();
 
       //Insert version
       this->mpc_Ui->pc_LineEditVersion_2->setText(c_Version);
+
+      //Application section
+      this->mpc_Ui->pc_ComboBoxApplication->setVisible(oq_NodeProgrammingSupport);
+      if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eHALC_NVM)
+      {
+         this->mpc_Ui->pc_LabelApplicationReadOnly->setVisible(!oq_NodeProgrammingSupport);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelApplicationReadOnly->setVisible(false);
+         this->mpc_Ui->pc_LabelRelatedApplication->setVisible(oq_NodeProgrammingSupport);
+      }
+
+      // Scope section
+      this->mpc_Ui->pc_LabelScope->setVisible(oq_NodeProgrammingSupport);
+      this->mpc_Ui->pc_ComboBoxScope->setVisible(oq_NodeProgrammingSupport);
    }
 
    this->m_UpdateSizePrediction();
@@ -190,10 +225,6 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
       this->mpc_Ui->pc_LineEditDatapoolName->setFocus();
       this->mpc_Ui->pc_LineEditDatapoolName->selectAll();
    }
-
-   //Application section
-   this->mpc_Ui->pc_LabelRelatedApplication->setVisible(oq_ShowApplicationSection);
-   this->mpc_Ui->pc_ComboBoxApplication->setVisible(oq_ShowApplicationSection);
 
    // Share Datapool configuration
    if (this->ms32_DataPoolIndex >= 0)
@@ -293,7 +324,7 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
            &C_SdNdeDpProperties::m_CheckDatapoolName);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxSize, static_cast<void (QSpinBox::*)(stw_types::sintn)>(&QSpinBox::valueChanged),
-           this, &C_SdNdeDpProperties::m_SpinBoxChanged);
+           this, &C_SdNdeDpProperties::m_SpinBoxSizeChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxProtocol, static_cast<void (QComboBox::*)(
                                                              sintn)>(&C_OgeCbxText::currentIndexChanged), this,
@@ -334,9 +365,11 @@ void C_SdNdeDpProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelScope->setText(C_GtGetText::h_GetText("Scope of Content"));
    this->mpc_Ui->pc_LabelSafetyContent->setText(C_GtGetText::h_GetText("Safety Relevant Content"));
    this->mpc_Ui->pc_LabelRelatedApplication->setText(C_GtGetText::h_GetText(
-                                                        "Related Programmable Application"));
+                                                        "Related Data Block"));
+   this->mpc_Ui->pc_LabelApplicationReadOnly->setText(C_GtGetText::h_GetText("<not assigned>"));
    this->mpc_Ui->pc_LabelComProt->setText(C_GtGetText::h_GetText("Communication Protocol"));
    this->mpc_Ui->pc_LabelDatapoolSize->setText(C_GtGetText::h_GetText("Datapool Size"));
+   this->mpc_Ui->pc_LabelDatapoolStartAddress->setText(C_GtGetText::h_GetText("Datapool Start Address"));
    this->mpc_Ui->pc_LabelDataPoolUsage->setText(C_GtGetText::h_GetText("Resulting Datapool Usage"));
    this->mpc_Ui->pc_LabelDataPoolReservation->setText(C_GtGetText::h_GetText("Resulting Node NVM Reservation"));
    this->mpc_Ui->pc_LabelDatapoolShareConfiguration->setText(C_GtGetText::h_GetText(
@@ -360,20 +393,26 @@ void C_SdNdeDpProperties::InitStaticNames(void)
 
    this->mpc_Ui->pc_LabelScope->SetToolTipInformation(
       C_GtGetText::h_GetText("Scope of Content"),
-      C_GtGetText::h_GetText("Private scope: The content of this Datapool can not be accessed by other programmable "
-                             "applications than the owner application.\n"
-                             "Public scope: All other programmable applications of the same node have access to the "
-                             "contents of this Datapool.\n"
-                             "This property is relevant for code generation."));
+      C_GtGetText::h_GetText("Private scope: The content of this Datapool can not be accessed by other Data Blocks "
+                             "than the owner Data Block.\n"
+                             "Public scope: All other Data Blocks of the same node and with file generation enabled "
+                             "have access to the contents of this Datapool.\n"
+                             "This property is relevant for source code file generation."));
    this->mpc_Ui->pc_LabelSafetyContent->SetToolTipInformation(
       C_GtGetText::h_GetText("Safety Relevant Content"),
       C_GtGetText::h_GetText("Does this Datapool contain safety relevant elements?"
-                             "\nThis property is relevant for code generation."));
+                             "\nThis property is relevant for source code file generation."));
 
    this->mpc_Ui->pc_LabelRelatedApplication->SetToolTipInformation(
-      C_GtGetText::h_GetText("Related Programmable Application"),
-      C_GtGetText::h_GetText("Which programmable application owns this Datapool? \n"
-                             "This property is relevant for code generation."));
+      C_GtGetText::h_GetText("Related Data Block"),
+      C_GtGetText::h_GetText("Which Data Block owns this Datapool? \n"
+                             "This property is relevant for file generation."));
+
+   this->mpc_Ui->pc_LabelApplicationReadOnly->SetToolTipInformation(
+      C_GtGetText::h_GetText("Related Data Block"),
+      C_GtGetText::h_GetText("NVM-based HAL Datapools are automatically assigned to the Data Block for which file "
+                             "generation is enabled. Create such a Data Block to use PSI file generation for this "
+                             "Datapool."));
 
    this->mpc_Ui->pc_LabelComProt->SetToolTipInformation(
       C_GtGetText::h_GetText("Communication Protocol"),
@@ -385,6 +424,10 @@ void C_SdNdeDpProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelDatapoolSize->SetToolTipInformation(
       C_GtGetText::h_GetText("Datapool Size"),
       C_GtGetText::h_GetText("Reserved size in bytes for this Datapool."));
+
+   this->mpc_Ui->pc_LabelDatapoolStartAddress->SetToolTipInformation(
+      C_GtGetText::h_GetText("Datapool Start Address"),
+      C_GtGetText::h_GetText("Starting Address of NVM memory for Datapool data."));
 
    this->mpc_Ui->pc_LabelDataPoolUsage->SetToolTipInformation(
       C_GtGetText::h_GetText("Resulting Datapool Usage"),
@@ -493,7 +536,7 @@ void C_SdNdeDpProperties::m_OkClicked(void)
    if (this->m_IsRelatedAppValid(s32_RelatedDataBlockIndex) == false)
    {
       c_Details += static_cast<QString>(
-         C_GtGetText::h_GetText("The selected related application \"%1\" already owns a Datapool of protocol type %2. "
+         C_GtGetText::h_GetText("The selected related Data Block \"%1\" already owns a Datapool of protocol type %2. "
                                 "Maximum one COMM Datapool for each of OSI Layer 2, ECeS and ECoS is allowed."))
                    .arg(this->mpc_Ui->pc_ComboBoxApplication->currentText())
                    .arg(C_PuiSdUtil::h_ConvertProtocolTypeToString(this->m_GetSelectedProtocol()));
@@ -522,6 +565,12 @@ void C_SdNdeDpProperties::m_OkClicked(void)
          this->mpc_OSCDataPool->c_Comment = this->mpc_Ui->pc_CommentText->toPlainText().toStdString().c_str();
          this->mpc_OSCDataPool->q_IsSafety = this->mpc_Ui->pc_CheckBoxSafety->isChecked();
          this->mpc_OSCDataPool->u32_NvMSize = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxSize->value());
+         if (this->mq_DatapoolAutoNvMStartAddress == false)
+         {
+            // Update only in manual mode
+            this->mpc_OSCDataPool->u32_NvMStartAddress =
+               static_cast<uint32>(this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->value());
+         }
          this->m_HandleDataPoolSafetyAdaptation();
          this->mpc_OSCDataPool->s32_RelatedDataBlockIndex = s32_RelatedDataBlockIndex;
          // HALC datablock assignment is done afterwards
@@ -591,19 +640,20 @@ void C_SdNdeDpProperties::m_ApplyType(const bool oq_SharedDatapool)
    {
       const QString c_DataPoolTypeString = C_PuiSdUtil::h_ConvertDataPoolTypeToString(this->mpc_OSCDataPool->e_Type);
       this->mpc_Ui->pc_LabDatapoolType->setText(c_DataPoolTypeString);
+      bool q_DatapoolWithNvm = false;
 
       if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eDIAG)
       {
          this->mpc_Ui->pc_LabelSafety->setVisible(false);
          this->mpc_Ui->pc_LabelComProt->setVisible(false);
          this->mpc_Ui->pc_ComboBoxProtocol->setVisible(false);
-         this->mpc_Ui->pc_LabelDatapoolSize->setVisible(false);
-         this->mpc_Ui->pc_SpinBoxSize->setVisible(false);
-         this->mpc_Ui->pc_LabelDataPoolUsage->setVisible(false);
-         this->mpc_Ui->pc_LabelDataPoolReservation->setVisible(false);
       }
       else if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eNVM)
       {
+         q_DatapoolWithNvm = true;
+
+         this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->setEnabled(!this->mq_DatapoolAutoNvMStartAddress);
+
          this->mpc_Ui->pc_LabelSafety->setVisible(false);
          this->mpc_Ui->pc_LabelComProt->setVisible(false);
          this->mpc_Ui->pc_ComboBoxProtocol->setVisible(false);
@@ -611,25 +661,35 @@ void C_SdNdeDpProperties::m_ApplyType(const bool oq_SharedDatapool)
       else if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eCOM)
       {
          this->mpc_Ui->pc_LabelSafety->setVisible(false);
-         this->mpc_Ui->pc_LabelDatapoolSize->setVisible(false);
-         this->mpc_Ui->pc_SpinBoxSize->setVisible(false);
-         this->mpc_Ui->pc_LabelDataPoolUsage->setVisible(false);
-         this->mpc_Ui->pc_LabelDataPoolReservation->setVisible(false);
       }
       else
       {
          // HAL Datapool
+         if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eHALC_NVM)
+         {
+            q_DatapoolWithNvm = true;
+
+            this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->setEnabled(false);
+            this->mpc_Ui->pc_SpinBoxSize->setEnabled(false);
+         }
+
          this->mpc_Ui->pc_LineEditDatapoolName->setEnabled(false);
+         this->mpc_Ui->pc_LineEditVersion_2->setEnabled(false);
+         this->mpc_Ui->pc_CommentText->setEnabled(false);
+
          this->mpc_Ui->pc_CheckBoxSafety->setVisible(false);
          this->mpc_Ui->pc_LabelSafety->setVisible(true);
 
          this->mpc_Ui->pc_LabelComProt->setVisible(false);
          this->mpc_Ui->pc_ComboBoxProtocol->setVisible(false);
-         this->mpc_Ui->pc_LabelDatapoolSize->setVisible(false);
-         this->mpc_Ui->pc_SpinBoxSize->setVisible(false);
-         this->mpc_Ui->pc_LabelDataPoolUsage->setVisible(false);
-         this->mpc_Ui->pc_LabelDataPoolReservation->setVisible(false);
       }
+
+      this->mpc_Ui->pc_LabelDataPoolUsage->setVisible(q_DatapoolWithNvm);
+      this->mpc_Ui->pc_LabelDataPoolReservation->setVisible(q_DatapoolWithNvm);
+      this->mpc_Ui->pc_LabelDatapoolSize->setVisible(q_DatapoolWithNvm);
+      this->mpc_Ui->pc_SpinBoxSize->setVisible(q_DatapoolWithNvm);
+      this->mpc_Ui->pc_LabelDatapoolStartAddress->setVisible(q_DatapoolWithNvm);
+      this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->setVisible(q_DatapoolWithNvm);
    }
 
    // Picture
@@ -653,7 +713,7 @@ void C_SdNdeDpProperties::m_ApplyType(const bool oq_SharedDatapool)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load code generation flag and application data
+/*! \brief   Load file generation flag and application data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpProperties::m_LoadCodeGenerationAndApplication(void) const
@@ -685,6 +745,9 @@ void C_SdNdeDpProperties::m_LoadCodeGenerationAndApplication(void) const
                //Important iteration step
                ++s32_Counter;
             }
+
+            // set read only info (relevant for HALC NVM Datapools)
+            this->mpc_Ui->pc_LabelApplicationReadOnly->setText(rc_DataBlock.c_Name.c_str());
          }
       }
    }
@@ -692,7 +755,12 @@ void C_SdNdeDpProperties::m_LoadCodeGenerationAndApplication(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpProperties::m_SpinBoxChanged(const stw_types::sintn osn_Value) const
+/*! \brief   Slot for NVM Datapool size
+
+   \param[in]       osn_Value     New value of spin box
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpProperties::m_SpinBoxSizeChanged(const stw_types::sintn osn_Value) const
 {
    Q_UNUSED(osn_Value)
 
@@ -720,7 +788,8 @@ void C_SdNdeDpProperties::m_UpdateSizePrediction(void) const
          // get the entire size of all NVM datapools. check all datapools of the lists
          for (u32_DpCounter = 0; u32_DpCounter < pc_Node->c_DataPools.size(); ++u32_DpCounter)
          {
-            if (pc_Node->c_DataPools[u32_DpCounter].e_Type == C_OSCNodeDataPool::eNVM)
+            if ((pc_Node->c_DataPools[u32_DpCounter].e_Type == C_OSCNodeDataPool::eNVM) ||
+                (pc_Node->c_DataPools[u32_DpCounter].e_Type == C_OSCNodeDataPool::eHALC_NVM))
             {
                if (this->ms32_DataPoolIndex < 0)
                {
@@ -809,7 +878,7 @@ void C_SdNdeDpProperties::m_CheckDatapoolName(void) const
    }
 
    //set invalid text property
-   //   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditDatapoolName, "Valid", q_NameIsValid);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditDatapoolName, "Valid", q_NameIsValid);
    if (q_NameIsValid == true)
    {
       this->mpc_Ui->pc_LineEditDatapoolName->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
@@ -875,9 +944,21 @@ void C_SdNdeDpProperties::m_InitSpinBox(void) const
 
             //Init spin box minimum
             this->mpc_Ui->pc_SpinBoxSize->SetMinimumCustom(1);
+            this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMinimumCustom(0);
             //Init spin box maximum
             this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(u32_Maximum);
+            if (u32_Maximum > 0U)
+            {
+               this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMaximumCustom(static_cast<sintn>(u32_Maximum - 1U));
+            }
+            else
+            {
+               this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMaximumCustom(0);
+            }
+
             this->mpc_Ui->pc_SpinBoxSize->setValue(static_cast<sint32>(this->mpc_OSCDataPool->u32_NvMSize));
+            this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->setValue(
+               static_cast<sint32>(this->mpc_OSCDataPool->u32_NvMStartAddress));
          }
       }
    }

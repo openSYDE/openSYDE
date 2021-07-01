@@ -294,7 +294,8 @@ void C_SdNdeDpListHeaderWidget::CheckError(void)
       bool q_UsageInvalid = false;
       bool q_OutOfDataPool = false;
       bool q_ElementsInvalid = false;
-      if (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eNVM)
+      if ((pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eNVM) ||
+          (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eHALC_NVM))
       {
          q_CheckSize = true;
       }
@@ -436,7 +437,7 @@ void C_SdNdeDpListHeaderWidget::PrepareExpandedMode(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::PopUp(void)
 {
-   QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this, false);
+   const QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this, false);
 
    C_SdNdeDpListPopUp * const pc_PopUp = new C_SdNdeDpListPopUp(*c_Dialog,
                                                                 this->mu32_NodeIndex,
@@ -472,7 +473,7 @@ void C_SdNdeDpListHeaderWidget::PopUp(void)
       }
 
       c_Dialog->HideOverlay();
-   }
+   } //lint !e429  //no memory leak because of the parent of the dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -560,7 +561,8 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
       //Data sets
       UpdateDataSetCount();
       //Size & address
-      if (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eNVM)
+      if ((pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eNVM) ||
+          (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eHALC_NVM))
       {
          const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
          const uint32 u32_Usage = this->mpc_Ui->pc_UsageWidget->SetUsage(pc_List->u32_NvMSize,
@@ -631,7 +633,7 @@ void C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked(void)
    if (this->mq_InitActive == false)
    {
       // open comment edit popup
-      QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
+      const QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
       C_SdNdeDpListCommentDialog * const pc_ArrayEditWidget =
          new C_SdNdeDpListCommentDialog(*c_Dialog, this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                         this->mu32_ListIndex);
@@ -686,7 +688,7 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
    C_OSCNodeDataPoolList c_OSCList;
    C_PuiSdNodeDataPoolList c_UIList;
 
-   QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
 
    if (C_PuiSdHandler::h_GetInstance()->GetDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                         this->mu32_ListIndex, c_OSCList, c_UIList) == C_NO_ERR)
@@ -805,7 +807,8 @@ void C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip(void) const
 
       std::vector<uint32> c_InvalidDataSetIndices;
       std::vector<uint32> c_InvalidElementIndices;
-      if (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eNVM)
+      if ((pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eNVM) ||
+          (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eHALC_NVM))
       {
          q_CheckSize = true;
       }
@@ -870,7 +873,7 @@ void C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip(void) const
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDataSetIndices.size())
             {
                c_Content += static_cast<QString>("+%1\n").arg(
-                  c_InvalidDataSetIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                  static_cast<uint32>(c_InvalidDataSetIndices.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             c_Content += "\n";
          }
@@ -895,7 +898,7 @@ void C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip(void) const
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidElementIndices.size())
             {
                c_Content += static_cast<QString>("+%1\n").arg(
-                  c_InvalidElementIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                  static_cast<uint32>(c_InvalidElementIndices.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             c_Content += "\n";
          }

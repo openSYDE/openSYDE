@@ -52,7 +52,7 @@ C_CamGenSigTableView::C_CamGenSigTableView(QWidget * const opc_Parent) :
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
    this->mc_SortProxyModel.setSortRole(static_cast<sintn>(Qt::EditRole));
-   this->setModel(&mc_SortProxyModel);
+   this->C_CamGenSigTableView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
 
@@ -70,6 +70,7 @@ C_CamGenSigTableView::C_CamGenSigTableView(QWidget * const opc_Parent) :
 
    //Style
    this->verticalHeader()->setDefaultSectionSize(30);
+   this->horizontalHeader()->setFixedHeight(27);
 
    //Buttons
    this->mpc_PushButtonScrollTop = new C_OgePubIconOnly(this->verticalScrollBar());
@@ -255,7 +256,7 @@ void C_CamGenSigTableView::keyPressEvent(QKeyEvent * const opc_Event)
    if ((((pc_SpinBox == NULL) && (pc_LineEdit == NULL)) && (pc_ComboBox == NULL)) && (pc_SpinBoxGroup == NULL))
    {
       //For some reason the tab key needs to be accepted to allow proper tab navigation
-      if (opc_Event->key() != Qt::Key_Tab)
+      if (opc_Event->key() != static_cast<sintn>(Qt::Key_Tab))
       {
          //Ignore event if no widget can accept it
          opc_Event->ignore();

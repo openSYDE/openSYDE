@@ -51,7 +51,7 @@ C_TblTreDataElementView::C_TblTreDataElementView(QWidget * const opc_Parent) :
    me_Mode(C_TblTreDataElementModel::eDATAPOOL_ELEMENT)
 {
    this->mc_SortModel.setSourceModel(&this->mc_Model);
-   this->setModel(&this->mc_SortModel);
+   this->C_TblTreDataElementView::setModel(&this->mc_SortModel);
 
    this->setHeaderHidden(true);
    //Configure filter
@@ -250,13 +250,22 @@ void C_TblTreDataElementView::SaveExpandedIndices(void)
 
       std::vector<std::vector<stw_types::uint32> > c_FoundItems;
       //THIS ONE HAS TO BE INVALID
-      QModelIndex c_Index;
+      const QModelIndex c_Index;
       //Handle children
       m_AppendExpandedIndices(c_FoundItems, c_Index, sn_Column);
 
       C_TblTreDataElementView::mhc_LastKnownExpandedIndices.remove(this->me_Mode);
       C_TblTreDataElementView::mhc_LastKnownExpandedIndices.insert(this->me_Mode, c_FoundItems);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Cleans up the last model configuration as preparation for the entire deletion
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblTreDataElementView::CleanUpLastView(void)
+{
+   this->mc_Model.CleanUpLastModel();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -135,6 +135,8 @@ C_SyvDaChaPlotHandlerWidget::C_SyvDaChaPlotHandlerWidget(QWidget * const opc_Par
    mf64_MeasuredTimeSecondCursor(0.0),
    mq_IsSecondCursorClicked(false)
 {
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
    //Menus
    this->mpc_MenuZoomMode = new C_OgeMuTabChartFit(this);
    this->mpc_MenuCursorMode = new C_OgeMuTabChartFit(this);
@@ -215,6 +217,9 @@ C_SyvDaChaPlotHandlerWidget::C_SyvDaChaPlotHandlerWidget(QWidget * const opc_Par
    // if there is more space stretch right widget (i.e. index 1)
    this->mpc_Ui->pc_Splitter->setStretchFactor(0, 0);
    this->mpc_Ui->pc_Splitter->setStretchFactor(1, 1);
+
+   // Handle the service mode
+   this->mpc_Ui->pc_ButtonAddData->setEnabled(!q_ServiceModeActive);
 
    connect(this->mpc_Ui->pc_Splitter, &C_OgeSpiStandard::splitterMoved,
            this, &C_SyvDaChaPlotHandlerWidget::m_OnSplitterMoved);
@@ -466,6 +471,8 @@ void C_SyvDaChaPlotHandlerWidget::SetData(const C_PuiSvDbTabChart & orc_Data, co
    this->m_ConfigureZoomVsDragMode(this->mc_Data.q_IsZoomModeActive);
    this->m_ConfigureYAxisMode(this->mc_Data.e_SettingYAxisMode);
    this->m_LoadState(this->mc_Data.q_IsPaused, this->mc_Data.q_AreSamplePointsShown, this->mc_Data.c_VisibleScreen);
+
+   this->m_UpdateDragAxesConfiguration();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -693,6 +700,7 @@ sint32 C_SyvDaChaPlotHandlerWidget::AddNewGraph(const C_PuiSvDbNodeDataPoolListE
          this->m_ResizeSelectorWidget(); // first add space before adding new selector item
          this->m_AddGraph(u32_NewIndex);
          this->m_UpdateElementCounter();
+         this->m_UpdateDragAxesConfiguration();
 
          s32_Return = C_NO_ERR;
       }
@@ -800,6 +808,9 @@ bool C_SyvDaChaPlotHandlerWidget::RemoveSpecificGraph(const uint32 ou32_DataPool
 
       // update counter
       this->m_UpdateElementCounter();
+
+      // The drag axes configuration must be updated due to a removed axis
+      this->m_UpdateDragAxesConfiguration();
    }
 
    return q_Return;
@@ -863,7 +874,6 @@ void C_SyvDaChaPlotHandlerWidget::SelectGraph(const uint32 ou32_DataPoolElementC
       }
 
       // Configure zoom and scaling behavior
-      pc_AxisRect->setRangeDragAxes(this->mpc_Ui->pc_Plot->xAxis, pc_ActiveYAxis);
       pc_AxisRect->setRangeZoomAxes(this->mpc_Ui->pc_Plot->xAxis, pc_ActiveYAxis);
 
       // Adapt the visualization of the trace when measurement is active
@@ -2597,6 +2607,21 @@ void C_SyvDaChaPlotHandlerWidget::m_ConfigureZoomMode(const C_PuiSvDbTabChart::E
          pc_AxisRect->setRangeZoom(Qt::Horizontal | Qt::Vertical);
          break;
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Short function description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaChaPlotHandlerWidget::m_UpdateDragAxesConfiguration(void)
+{
+   QCPAxisRect * const pc_AxisRect = this->mpc_Ui->pc_Plot->axisRect();
+
+   tgl_assert(pc_AxisRect != NULL);
+   if (pc_AxisRect != NULL)
+   {
+      pc_AxisRect->setRangeDragAxes(pc_AxisRect->axes(QCPAxis::atBottom), pc_AxisRect->axes(QCPAxis::atLeft));
    }
 }
 

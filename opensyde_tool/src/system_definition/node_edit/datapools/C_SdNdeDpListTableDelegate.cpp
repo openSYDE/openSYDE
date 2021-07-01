@@ -311,7 +311,7 @@ void C_SdNdeDpListTableDelegate::setEditorData(QWidget * const opc_Editor, const
       case C_SdNdeDpListTableModel::eUNIT:
          if (pc_LineEdit != NULL)
          {
-            QString c_Unit = orc_Index.data(static_cast<sintn>(Qt::EditRole)).toString();
+            const QString c_Unit = orc_Index.data(static_cast<sintn>(Qt::EditRole)).toString();
             if (c_Unit == "-")
             {
                pc_LineEdit->setText("");
@@ -523,7 +523,7 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
          const sint32 s32_Column = orc_Index.column();
          const C_SdNdeDpListTableModel::E_Columns e_Column = this->mpc_Model->ColumnToEnum(s32_Column);
          bool q_DrawX = false;
-         switch (e_Column)
+         switch (e_Column) //lint !e788 not columns get explicit handling
          {
          case C_SdNdeDpListTableModel::eAUTO_MIN_MAX:
          case C_SdNdeDpListTableModel::eFACTOR:

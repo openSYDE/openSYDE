@@ -57,7 +57,6 @@ C_OSCParamSetHandler::C_OSCParamSetHandler(void)
    \return
    C_NO_ERR   data saved
    C_RANGE    file already exists
-   C_CONFIG   Internal data invalid
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
 //----------------------------------------------------------------------------------------------------------------------

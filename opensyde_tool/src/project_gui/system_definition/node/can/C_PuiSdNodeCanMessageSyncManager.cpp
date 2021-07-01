@@ -391,7 +391,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageDirection(
                   const std::vector<C_OSCCanMessage> & rc_Messages = pc_MatchingMessageContainer->GetMessagesConst(
                      orq_NewMessageIsTx);
                   rc_MatchingMessage.q_MessageIsTx = orq_NewMessageIsTx;
-                  rc_MatchingMessage.u32_MessageIndex = rc_Messages.size() - 1UL;
+                  rc_MatchingMessage.u32_MessageIndex = static_cast<uint32>(rc_Messages.size()) - 1UL;
                }
             }
             //There should be only one entry with this node index and interface index
@@ -726,7 +726,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessage(const uint32 & oru32_Node
                                           orc_UISignalCommons, c_UIMessage);
       if (s32_Retval == C_NO_ERR)
       {
-         oru32_MessageIndex = rc_Messages.size() - 1UL;
+         oru32_MessageIndex = static_cast<uint32>(rc_Messages.size()) - 1UL;
       }
    }
    return s32_Retval;

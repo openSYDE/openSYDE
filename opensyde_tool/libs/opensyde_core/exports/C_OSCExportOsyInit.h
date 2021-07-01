@@ -29,9 +29,6 @@ namespace stw_opensyde_core
 class C_OSCExportOsyInit
 {
 public:
-   C_OSCExportOsyInit(void);
-   virtual ~C_OSCExportOsyInit(void);
-
    static stw_scl::C_SCLString h_GetFileName(void);
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_FilePath, const C_OSCNode & orc_Node,
                                                const bool oq_RunsDpd, const stw_types::uint16 ou16_ApplicationIndex,

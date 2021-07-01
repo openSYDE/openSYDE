@@ -57,7 +57,8 @@ using namespace stw_opensyde_core;
 C_SdBueNodeSelectorWidget::C_SdBueNodeSelectorWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueNodeSelectorWidget),
-   mu32_BusIndex(0U)
+   mu32_BusIndex(0U),
+   me_Protocol(C_OSCCanProtocol::eLAYER2)
 {
    mpc_Ui->setupUi(this);
 
@@ -206,7 +207,7 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
 /*! \brief   Updates in case of changed the items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorWidget::Refresh(void)
+void C_SdBueNodeSelectorWidget::Refresh(void) const
 {
    this->mpc_Ui->pc_NodeSelectorListWidget->Refresh();
 }

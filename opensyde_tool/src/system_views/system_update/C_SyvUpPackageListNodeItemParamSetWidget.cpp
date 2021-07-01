@@ -11,8 +11,10 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
-#include "TGLUtils.h"
 #include "stwerrors.h"
+
+#include "constants.h"
+#include "TGLUtils.h"
 #include "C_GtGetText.h"
 #include "C_PuiSvHandler.h"
 #include "C_OgePopUpDialog.h"
@@ -61,8 +63,8 @@ C_SyvUpPackageListNodeItemParamSetWidget::C_SyvUpPackageListNodeItemParamSetWidg
                                                                                    const bool oq_FileBased,
                                                                                    const bool oq_StwFlashloader,
                                                                                    QWidget * const opc_Parent) :
-   C_SyvUpUpdatePackageListNodeItemWidget(ou32_ViewIndex, ou32_NodeIndex, orc_DeviceName, oq_FileBased,
-                                          oq_StwFlashloader, opc_Parent)
+   C_SyvUpPackageListNodeItemWidget(ou32_ViewIndex, ou32_NodeIndex, orc_DeviceName, oq_FileBased,
+                                    oq_StwFlashloader, opc_Parent)
 {
 }
 
@@ -76,7 +78,7 @@ void C_SyvUpPackageListNodeItemParamSetWidget::SetParamInfo(
    const stw_opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo & orc_ParamInfo)
 {
    this->mc_ParamsetInfo = orc_ParamInfo;
-   this->SetAppFile(this->mc_ParamsetInfo.GetPath(), false);
+   this->SetAppFile(this->mc_ParamsetInfo.GetPath(), (orc_ParamInfo.GetPath() == this->GetDefaultFilePath()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,6 +91,18 @@ void C_SyvUpPackageListNodeItemParamSetWidget::SetParamInfo(
 stw_opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo C_SyvUpPackageListNodeItemParamSetWidget::GetParamInfo(void) const
 {
    return mc_ParamsetInfo;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of the item
+
+   \return
+   Type of return values, e.g. STW error codes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SyvUpPackageListNodeItemParamSetWidget::GetType(void) const
+{
+   return mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -139,18 +153,6 @@ bool C_SyvUpPackageListNodeItemParamSetWidget::IsViewFileInfoPossible(void) cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Returns the flag if it is possible to show the user hint label
-
-   \retval   true   The user hint label can be shown
-   \retval   false  The user hint label can not be shown
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpPackageListNodeItemParamSetWidget::IsUserHintPossible(void) const
-{
-   return false;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load application information.
 
    \param[out]    orq_FileExists          true: file exists  false: file not found
@@ -165,9 +167,12 @@ bool C_SyvUpPackageListNodeItemParamSetWidget::IsUserHintPossible(void) const
 void C_SyvUpPackageListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_FileExists, bool & orq_FlashwareWarning,
                                                                      bool & orq_TriggerRemove)
 {
-   C_SyvUpUpdatePackageListNodeItemWidget::m_LoadFileInformation(orq_FileExists, orq_FlashwareWarning,
-                                                                 orq_TriggerRemove);
-   if (orq_FileExists)
+   C_SyvUpPackageListNodeItemWidget::m_LoadFileInformation(orq_FileExists, orq_FlashwareWarning,
+                                                           orq_TriggerRemove);
+
+   // Special case: In case of a NVM HALC datablock with used default path, no check is acitve
+   if ((this->IsDefaultPathActive() == false) &&
+       (orq_FileExists == true))
    {
       //Special handling required
       QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
@@ -201,7 +206,7 @@ void C_SyvUpPackageListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_
             else
             {
                //User discarded file
-               orq_TriggerRemove = false;
+               orq_TriggerRemove = true;
             }
          }
          else
@@ -240,7 +245,7 @@ void C_SyvUpPackageListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_
          c_Message.SetCustomMinHeight(180, 250);
          c_Message.Execute();
          //File invalid
-         orq_TriggerRemove = false;
+         orq_TriggerRemove = true;
       }
 
       if (c_New != NULL)
@@ -248,4 +253,20 @@ void C_SyvUpPackageListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_
          c_New->HideOverlay();
       }
    } //lint !e429  //no memory leak because of the parent of pc_InfoDialog and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Creates and returns the title specific tool tip content
+
+   \return
+   Tool tip title
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SyvUpPackageListNodeItemParamSetWidget::m_CreateToolTipTitle(void) const
+{
+   QString c_Title = static_cast<QString>("%1: Parameter Set Image File #%2").
+                     arg(this->mc_OwnerSectionName).
+                     arg(this->mu32_Number + 1U);
+
+   return c_Title;
 }

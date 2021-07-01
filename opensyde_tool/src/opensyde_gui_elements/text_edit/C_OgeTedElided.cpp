@@ -38,7 +38,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTedElided::C_OgeTedElided(QWidget * const opc_Parent) :
@@ -54,7 +54,7 @@ C_OgeTedElided::C_OgeTedElided(QWidget * const opc_Parent) :
    Implemented like:
    http://doc.qt.io/qt-5/qtwidgets-widgets-elidedlabel-example.html
 
-   \param[in,out] opc_Event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedElided::paintEvent(QPaintEvent * const opc_Event)
@@ -82,7 +82,7 @@ void C_OgeTedElided::paintEvent(QPaintEvent * const opc_Event)
          if (sn_Counter < c_Content.length())
          {
             // minimum one char is left, check the length
-            sn_ActLineWidth += c_FontMetrics.charWidth(c_Content, sn_Counter);
+            sn_ActLineWidth += c_FontMetrics.horizontalAdvance(c_Content[sn_Counter]);
 
             if ((sn_ActLineWidth < sn_LineWidth) &&
                 (c_Content.at(sn_Counter) != '\n'))

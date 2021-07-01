@@ -231,7 +231,7 @@ void C_OgePubSvgIconOnly::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgePubSvgIconOnly::event(QEvent * const opc_Event)
 {
-   bool q_Retval = C_OgePubToolTipBase::event(opc_Event);
+   const bool q_Retval = C_OgePubToolTipBase::event(opc_Event);
 
    if (opc_Event->type() == QEvent::HoverLeave)
    {

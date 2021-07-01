@@ -548,7 +548,8 @@ bool C_CamDbOsy::CheckHashForMessage(const QString & orc_Message, const uint32 o
 {
    bool q_Retval = false;
 
-   QMap<QString, C_CamDbOsyMessageId>::const_iterator c_It = this->mc_FoundMessagesId.find(orc_Message);
+   const QMap<QString, C_CamDbOsyMessageId>::const_iterator c_It = this->mc_FoundMessagesId.find(orc_Message);
+
    if (c_It != this->mc_FoundMessagesId.end())
    {
       if (c_It->u32_Hash == ou32_Hash)

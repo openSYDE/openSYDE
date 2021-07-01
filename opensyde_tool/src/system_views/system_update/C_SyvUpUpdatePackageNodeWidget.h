@@ -20,8 +20,11 @@
 #include "C_SyvUpDeviceInfo.h"
 #include "C_SyvUpUpdatePackageConfig.h"
 #include "C_OSCSuSequences.h"
-#include "C_SyvUpUpdatePackageListNodeWidget.h"
-#include "C_SyvUpUpdatePackageListNodeItemWidget.h"
+#include "C_SyvUpPackageSectionNodeWidget.h"
+#include "C_SyvUpPackageSectionNodeDatablockWidget.h"
+#include "C_SyvUpPackageSectionNodeFilesWidget.h"
+#include "C_SyvUpPackageListNodeItemWidget.h"
+#include "C_OgeFraSeparator.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -47,8 +50,6 @@ public:
                                            QWidget * const opc_Parent = NULL);
    ~C_SyvUpUpdatePackageNodeWidget(void);
 
-   void InitStaticNames(void) const;
-
    void SetConnected(void);
    void SetUpdateStarted(void) const;
    void SetUpdateApplicationStarted(void) const;
@@ -63,9 +64,9 @@ public:
    void UpdatePositionNumber(const stw_types::uint32 ou32_PositionNumber);
 
    void AddNewFile(const QString & orc_File, const bool oq_Paramset);
-   void AdaptFile(const QString & orc_File, C_SyvUpUpdatePackageListNodeItemWidget * const opc_App);
-   void RevertFile(C_SyvUpUpdatePackageListNodeItemWidget * const opc_App) const;
-   void RemoveFile(C_SyvUpUpdatePackageListNodeItemWidget * const opc_App) const;
+   void AdaptFile(const QString & orc_File, C_SyvUpPackageListNodeItemWidget * const opc_App);
+   void RevertFile(C_SyvUpPackageListNodeItemWidget * const opc_App) const;
+   void RemoveFile(C_SyvUpPackageListNodeItemWidget * const opc_App) const;
    void RemoveAllFiles(void) const;
 
    void PrepareExportConfig(stw_opensyde_gui_logic::C_SyvUpUpdatePackageConfigNode & orc_NodeConfig) const;
@@ -77,10 +78,10 @@ public:
                                    QStringList * const opc_MissingParamFiles = NULL,
                                    QStringList * const opc_MissingFiles = NULL) const;
 
-   C_SyvUpUpdatePackageListNodeWidget * GetSectionList(const QPoint & orc_Pos) const;
-   C_SyvUpUpdatePackageListNodeItemWidget * GetAndSelectApplication(const QPoint & orc_Pos) const;
-   C_SyvUpUpdatePackageListNodeItemWidget * GetApplication(const QPoint & orc_Pos,
-                                                           stw_types::uint32 * const opu32_Number = NULL) const;
+   C_SyvUpPackageSectionNodeWidget * GetSectionList(const QPoint & orc_Pos) const;
+   C_SyvUpPackageListNodeItemWidget * GetAndSelectApplication(const QPoint & orc_Pos) const;
+   C_SyvUpPackageListNodeItemWidget * GetApplication(const QPoint & orc_Pos,
+                                                     stw_types::uint32 * const opu32_Number = NULL) const;
 
    stw_types::uint32 GetNodeIndex(void) const;
    stw_types::uint32 GetViewIndex(void) const;
@@ -113,6 +114,7 @@ private:
    QString mc_DeviceType;
 
    bool mq_FileBased;
+   bool mq_NvmHalcBased;
    bool mq_StwFlashloader;
    bool mq_Connected;
    bool mq_EmptyOptionalSectionsVisible;
@@ -120,24 +122,28 @@ private:
    stw_types::uint32 mu32_PositionNumber;
    stw_types::uint32 mu32_FilesUpdated;
 
+   QVector<C_SyvUpPackageSectionNodeDatablockWidget *> mc_DatablockWidgets;
+   C_SyvUpPackageSectionNodeFilesWidget * mpc_FilesWidget;
+   stw_opensyde_gui_elements::C_OgeFraSeparator * mpc_FilesWidgetSeparator;
+
    //Avoid call
    C_SyvUpUpdatePackageNodeWidget(const C_SyvUpUpdatePackageNodeWidget &);
    C_SyvUpUpdatePackageNodeWidget & operator =(const C_SyvUpUpdatePackageNodeWidget &);
 
    void m_Init(void);
+   void m_AddSeparatorToScrollArea(const bool oq_FilesWidgetSeparator);
    void m_UpdateTitle(void) const;
 
    stw_types::uint32 m_GetFileCount(void) const;
-   C_SyvUpUpdatePackageListNodeWidget * m_GetNextListInUpdateOrder(void) const;
-   void m_SetApplicationsUnselected(const C_SyvUpUpdatePackageListNodeWidget * const opc_List) const;
-   C_SyvUpUpdatePackageListNodeWidget * m_GetAppParentList(
-      C_SyvUpUpdatePackageListNodeItemWidget * const opc_App) const;
+   C_SyvUpPackageSectionNodeWidget * m_GetNextListInUpdateOrder(void) const;
+   void m_SetApplicationsUnselected(const C_SyvUpPackageSectionNodeWidget * const opc_List) const;
+   C_SyvUpPackageSectionNodeWidget * m_GetAppParentList(C_SyvUpPackageListNodeItemWidget * const opc_App) const;
    bool m_CheckFileAlreadyContained(const QString & orc_File);
    bool m_CheckMime(const QMimeData * const opc_Mime, const QPoint & orc_Pos,
                     QStringList * const opc_FilePathsDatablocks = NULL,
                     QStringList * const opc_FilePathsParamsets = NULL,
                     QStringList * const opc_FilePathsFileBased = NULL,
-                    C_SyvUpUpdatePackageListNodeItemWidget ** const oppc_App = NULL) const;
+                    C_SyvUpPackageListNodeItemWidget ** const oppc_App = NULL) const;
 
    static const stw_types::sint32 mhs32_LAYOUT_THRESHOLD;
 };

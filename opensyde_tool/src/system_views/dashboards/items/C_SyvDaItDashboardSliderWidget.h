@@ -39,8 +39,8 @@ public:
    void SetCurrentStyle(const stw_opensyde_gui_logic::C_PuiSvDbSlider::E_Style oe_Style, const bool oq_IsDark) const;
    void SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbSlider::E_Type oe_Type) const;
    void AdjustFontToSize(void) const;
-   void SetMin(const stw_types::sintn osn_Value, const QString & orc_String);
-   void SetMax(const stw_types::sintn osn_Value, const QString & orc_String);
+   void SetMinMax(const stw_types::sintn osn_MinValue, const QString & orc_MinString,
+                  const stw_types::sintn osn_MaxValue, const QString & orc_MaxString);
    void SetShowMinMax(const bool oq_Value);
    void SetValue(const stw_types::sintn osn_Value) const;
    stw_types::sintn GetValue(void) const;

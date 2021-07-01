@@ -84,16 +84,16 @@
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnSaveProj">
+        <widget class="stw_opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnSaveProjAs">
          <property name="text">
-          <string>Save Proj</string>
+          <string>Save Proj as</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnSaveProjAs">
+        <widget class="stw_opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnCreateServiceProj">
          <property name="text">
-          <string>Save Proj as</string>
+          <string>Create Service</string>
          </property>
         </widget>
        </item>

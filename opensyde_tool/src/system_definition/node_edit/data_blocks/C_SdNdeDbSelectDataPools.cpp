@@ -293,7 +293,7 @@ void C_SdNdeDbSelectDataPools::m_UpdateSelection(const sintn osn_SelectionCount)
 bool C_SdNdeDbSelectDataPools::m_IsCommDatapoolSelectionValid(void)
 {
    bool q_Return = true;
-   const C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
    QString c_Details = "";
 
    std::map<C_OSCCanProtocol::E_Type, uint32> c_Counter;

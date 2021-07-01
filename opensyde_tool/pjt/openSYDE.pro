@@ -27,8 +27,16 @@ opensyde_core_skip_modules += opensyde_core_skip_protocol_logging
 include(../libs/opensyde_core/opensyde_core.pri)
 
 SOURCES += ../src/main.cpp \
+    ../libs/opensyde_core/C_OSCAesFile.cpp \
+    ../libs/opensyde_core/aes/AES.cpp \
     ../libs/opensyde_core/C_OSCZipData.cpp \
     ../libs/opensyde_core/C_OSCZipFile.cpp \
+    ../src/navigable_gui/C_NagServiceModeInfo.cpp \
+    ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.cpp \
+    ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.cpp \
+    ../src/project_operations/C_PopCreateServiceProjDialogWidget.cpp \
+    ../src/project_operations/C_PopPasswordDialogWidget.cpp \
+    ../src/project_operations/C_PopServiceProjSettingsModel.cpp \
     ../src/system_definition/C_SdTopologyWidget.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.cpp \
     ../src/system_views/C_SyvHandlerWidget.cpp \
@@ -199,7 +207,7 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddSpecificCommand.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemUsageWidget.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpListsWidget.cpp \
-    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorUsageWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpViewUsageWidget.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabStatusInformation.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabStatusInformationSmall.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpUtil.cpp \
@@ -555,8 +563,8 @@ SOURCES += ../src/main.cpp \
     ../src/graphic_items/system_view_items/C_GiSvNodeSyvBase.cpp \
     ../src/system_views/system_update/C_SyvUpUpdatePackageWidget.cpp \
     ../src/system_views/system_update/C_SyvUpUpdatePackageListWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeItemWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageSectionNodeWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemWidget.cpp \
     ../src/system_views/system_update/C_SyvUpSummaryWidget.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabStateInfo.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubUpdate.cpp \
@@ -683,7 +691,6 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabDoubleClick.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetTitle.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetSubSubTitle.cpp \
-    ../src/system_definition/node_edit/data_blocks/C_SdNdeDbAdd.cpp \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbListDelegate.cpp \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbListWidget.cpp \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbViewWidget.cpp \
@@ -728,9 +735,8 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemDatablockWidget.cpp \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemFileWidget.cpp \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemParamSetWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeParamSetsWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeDatablocksWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeFilesWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageSectionNodeDatablockWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageSectionNodeFilesWidget.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubSystemCommissioningEdit.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconWithTextBase.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxSystemCommisioningEdit.cpp \
@@ -816,7 +822,6 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabElided.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.cpp \
     ../src/system_definition/C_SdCodeGenerationDialog.cpp \
-    ../src/system_definition/C_SdCodeGenerationView.cpp \
     ../src/system_definition/C_SdCodeGenerationModel.cpp \
     ../src/system_views/dashboards/C_SyvDaDashboardSceneWidget.cpp \
     ../src/system_views/dashboards/C_SyvDaDashboardContentBaseWidget.cpp \
@@ -831,7 +836,10 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubAddChartDataElement.cpp \
     ../src/opensyde_gui_elements/frame/C_OgeFraGeneric.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxTiny.cpp \
-    ../src/opensyde_gui_elements/push_button/C_OgePubIconChart.cpp
+    ../src/opensyde_gui_elements/push_button/C_OgePubIconChart.cpp \
+    ../src/opensyde_gui_elements/C_OgeTreeViewToolTipBaseCheckable.cpp \
+    ../src/opensyde_gui_elements/C_OgeTreeViewCheckable.cpp \
+    ../src/table_base/tree_base/C_TblTreeModelCheckable.cpp
 
 #using our standard compiler warning switches we will get some (non-critical) warnings in miniz.c
 #we do not want to modify that library (as it is not maintained by us)
@@ -859,9 +867,17 @@ win32-msvc* {
 PRECOMPILED_HEADER = ../src/precompiled_headers/gui/precomp_headers.h
 
 HEADERS  += \
+    ../libs/opensyde_core/C_OSCAesFile.h \
+    ../libs/opensyde_core/aes/AES.h \
     ../libs/opensyde_core/C_OSCZipData.h \
     ../libs/opensyde_core/C_OSCZipFile.h \
     ../libs/opensyde_core/miniz/miniz.h \
+    ../src/navigable_gui/C_NagServiceModeInfo.h \
+    ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.h \
+    ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.h \
+    ../src/project_operations/C_PopCreateServiceProjDialogWidget.h \
+    ../src/project_operations/C_PopPasswordDialogWidget.h \
+    ../src/project_operations/C_PopServiceProjSettingsModel.h \
     ../src/system_definition/C_SdTopologyWidget.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.h \
     ../src/system_views/C_SyvHandlerWidget.h \
@@ -1034,7 +1050,7 @@ HEADERS  += \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddSpecificCommand.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemUsageWidget.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpListsWidget.h \
-    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorUsageWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpViewUsageWidget.h \
     ../src/opensyde_gui_elements/label/C_OgeLabStatusInformation.h \
     ../src/opensyde_gui_elements/label/C_OgeLabStatusInformationSmall.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpUtil.h \
@@ -1390,8 +1406,8 @@ HEADERS  += \
     ../src/graphic_items/system_view_items/C_GiSvNodeSyvBase.h \
     ../src/system_views/system_update/C_SyvUpUpdatePackageWidget.h \
     ../src/system_views/system_update/C_SyvUpUpdatePackageListWidget.h \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeWidget.h \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeItemWidget.h \
+    ../src/system_views/system_update/C_SyvUpPackageSectionNodeWidget.h \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemWidget.h \
     ../src/system_views/system_update/C_SyvUpSummaryWidget.h \
     ../src/opensyde_gui_elements/label/C_OgeLabStateInfo.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubUpdate.h \
@@ -1528,7 +1544,6 @@ HEADERS  += \
     ../src/opensyde_gui_elements/label/C_OgeLabDoubleClick.h \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetTitle.h \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetSubSubTitle.h \
-    ../src/system_definition/node_edit/data_blocks/C_SdNdeDbAdd.h \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbListDelegate.h \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbListWidget.h \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbViewWidget.h \
@@ -1573,9 +1588,8 @@ HEADERS  += \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemDatablockWidget.h \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemFileWidget.h \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemParamSetWidget.h \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeParamSetsWidget.h \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeDatablocksWidget.h \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeFilesWidget.h \
+    ../src/system_views/system_update/C_SyvUpPackageSectionNodeDatablockWidget.h \
+    ../src/system_views/system_update/C_SyvUpPackageSectionNodeFilesWidget.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubSystemCommissioningEdit.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconWithTextBase.h \
     ../src/opensyde_gui_elements/check_box/C_OgeChxSystemCommisioningEdit.h \
@@ -1661,7 +1675,6 @@ HEADERS  += \
     ../src/opensyde_gui_elements/label/C_OgeLabElided.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.h \
     ../src/system_definition/C_SdCodeGenerationDialog.h \
-    ../src/system_definition/C_SdCodeGenerationView.h \
     ../src/system_definition/C_SdCodeGenerationModel.h \
     ../src/system_views/dashboards/C_SyvDaDashboardSceneWidget.h \
     ../src/system_views/dashboards/C_SyvDaDashboardContentBaseWidget.h \
@@ -1676,9 +1689,15 @@ HEADERS  += \
     ../src/opensyde_gui_elements/push_button/C_OgePubAddChartDataElement.h \
     ../src/opensyde_gui_elements/frame/C_OgeFraGeneric.h \
     ../src/opensyde_gui_elements/check_box/C_OgeChxTiny.h \
-    ../src/opensyde_gui_elements/push_button/C_OgePubIconChart.h
+    ../src/opensyde_gui_elements/push_button/C_OgePubIconChart.h \
+    ../src/opensyde_gui_elements/C_OgeTreeViewToolTipBaseCheckable.h \
+    ../src/opensyde_gui_elements/C_OgeTreeViewCheckable.h \
+    ../src/table_base/tree_base/C_TblTreeModelCheckable.h
 
 FORMS    += \
+    ../src/navigable_gui/C_NagServiceModeInfo.ui \
+    ../src/project_operations/C_PopCreateServiceProjDialogWidget.ui \
+    ../src/project_operations/C_PopPasswordDialogWidget.ui \
     ../src/system_definition/C_SdTopologyWidget.ui \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.ui \
     ../src/system_views/C_SyvHandlerWidget.ui \
@@ -1761,8 +1780,8 @@ FORMS    += \
     ../src/system_views/device_configuration/C_SyvDcExistingNodeDropAreaWidget.ui \
     ../src/system_views/device_configuration/C_SyvDcConnectedNodeWidget.ui \
     ../src/system_views/system_update/C_SyvUpUpdatePackageWidget.ui \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeWidget.ui \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeItemWidget.ui \
+    ../src/system_views/system_update/C_SyvUpPackageSectionNodeWidget.ui \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemWidget.ui \
     ../src/system_views/system_update/C_SyvUpSummaryWidget.ui \
     ../src/system_definition/node_edit/C_SdNdeIpAddressConfigurationWidget.ui \
     ../src/system_views/system_update/C_SyvUpProgressLog.ui \
@@ -1785,7 +1804,6 @@ FORMS    += \
     ../src/navigable_gui/C_NagViewItem.ui \
     ../src/navigable_gui/C_NagAboutDialog.ui \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbWidget.ui \
-    ../src/system_definition/node_edit/data_blocks/C_SdNdeDbAdd.ui \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbViewWidget.ui \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbSelectDataPools.ui \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbAddNewProject.ui \
@@ -1902,6 +1920,7 @@ INCLUDEPATH += ../src \
                ../src/gettext \
                ../src/util \
                ../src/precompiled_headers/gui \
+               ../libs/opensyde_core/aes \
                ../libs/opensyde_core/miniz \
                ../libs/gettext \
                ../libs/dbc_driver_library/src/ \
@@ -1921,6 +1940,9 @@ LIBS += -lIphlpapi #IP helper API
 
 #add windows API libraries
 LIBS += -lversion
+
+#do not warn about c++11 - we need it for Qt anyway and would else get issues with warnings in qobjectdefs_impl.h
+QMAKE_CXXFLAGS += -Wno-c++11-compat
 
 QMAKE_TARGET_COMPANY = STW
 QMAKE_TARGET_PRODUCT = openSYDE

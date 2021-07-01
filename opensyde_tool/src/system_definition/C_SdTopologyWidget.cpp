@@ -10,9 +10,11 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QGraphicsItem>
+#include <QScreen>
 #include <QMimeData>
+#include <QGraphicsItem>
 #include <QDesktopWidget>
+#include <QGuiApplication>
 
 #include "stwtypes.h"
 
@@ -53,7 +55,7 @@ const sintn C_SdTopologyWidget::mhsn_ToolboxInitPosY = 150;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent        Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyWidget::C_SdTopologyWidget(QWidget * const opc_Parent) :
@@ -127,7 +129,7 @@ C_SdTopologyWidget::~C_SdTopologyWidget()
 
    The toolbox will be placed on the parent widget.
 
-   \param[in,out] opc_Parent   Pointer to toolbox
+   \param[in,out]  opc_Parent    Pointer to toolbox
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
@@ -155,10 +157,17 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
          // needed to make the toolbox stay inside graphics view (maybe depends on size of navibar)
          const sintn sn_ToolboxOffset = 308;
          // use available desktop space to have real information about screen (widget sizes are not reliable here)
-         const QDesktopWidget * const pc_Desktop = QApplication::desktop();
-         this->mpc_Toolbox->setGeometry(((pc_Desktop->availableGeometry().width() - sn_ToolboxWidth) -
-                                         mhsn_WidgetBorder) - sn_ToolboxOffset,
-                                        mhsn_ToolboxInitPosY, sn_ToolboxWidth, sn_ToolboxHeight);
+         {
+            sintn sn_MaxWidth = 0;
+            const QList<QScreen *> c_Desktop = QGuiApplication::screens();
+            for (const QScreen * const pc_It : c_Desktop)
+            {
+               sn_MaxWidth = std::max(sn_MaxWidth, pc_It->availableGeometry().width());
+            }
+            this->mpc_Toolbox->setGeometry(((sn_MaxWidth - sn_ToolboxWidth) -
+                                            mhsn_WidgetBorder) - sn_ToolboxOffset,
+                                           mhsn_ToolboxInitPosY, sn_ToolboxWidth, sn_ToolboxHeight);
+         }
          this->mpc_Toolbox->SetMaximizedHeight(sn_ToolboxHeight);
       }
       else
@@ -215,7 +224,7 @@ void C_SdTopologyWidget::SaveToData(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Hide or show the entire widget with the toolbox
 
-   \param[in]  oq_Hide     Flag for hiding or showing
+   \param[in]  oq_Hide  Flag for hiding or showing
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyWidget::HideAll(const bool oq_Hide)
@@ -257,7 +266,7 @@ void C_SdTopologyWidget::PrepareToClose(void) const
 
    Move the toolbox.
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyWidget::resizeEvent(QResizeEvent * const opc_Event)

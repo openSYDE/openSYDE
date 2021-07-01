@@ -9,7 +9,7 @@
 #define C_SYVUPPACKAGELISTNODEITEMPARAMWIDGET_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_SyvUpUpdatePackageListNodeItemWidget.h"
+#include "C_SyvUpPackageListNodeItemWidget.h"
 
 #include "C_PuiSvNodeUpdateParamInfo.h"
 
@@ -21,7 +21,7 @@ namespace stw_opensyde_gui
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvUpPackageListNodeItemParamSetWidget :
-   public C_SyvUpUpdatePackageListNodeItemWidget
+   public C_SyvUpPackageListNodeItemWidget
 {
 public:
    C_SyvUpPackageListNodeItemParamSetWidget(const stw_types::uint32 ou32_ViewIndex,
@@ -33,13 +33,14 @@ public:
 
    stw_opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo GetParamInfo(void) const;
 
+   virtual stw_types::uint32 GetType(void) const override;
    virtual void ViewFileInfo(void) override;
    virtual bool IsViewFileInfoPossible(void) const override;
-   virtual bool IsUserHintPossible(void) const override;
 
 protected:
    virtual void m_LoadFileInformation(bool & orq_FileExists, bool & orq_FlashwareWarning,
                                       bool & orq_TriggerRemove) override;
+   virtual QString m_CreateToolTipTitle(void) const override;
 
 private:
    stw_opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo mc_ParamsetInfo;

@@ -178,7 +178,7 @@ void C_PopSaveAsDialogWidget::m_InitDefaultProjectName(void) const
 {
    const QString c_ProjectPath = C_PuiProject::h_GetInstance()->GetPath();
    QString c_Proposal;
-   QString c_AbsolutePath = QFileInfo(m_GetValidPath(c_ProjectPath)).absoluteDir().absolutePath();
+   QString c_AbsolutePath = static_cast<QFileInfo>(m_GetValidPath(c_ProjectPath)).absoluteDir().absolutePath();
 
    c_AbsolutePath.remove(c_AbsolutePath.lastIndexOf("/"), c_AbsolutePath.length());
 
@@ -260,7 +260,7 @@ QString C_PopSaveAsDialogWidget::m_GetValidPath(const QString & orc_Path) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopSaveAsDialogWidget::m_OnBrowse(void)
 {
-   QString c_Folder = m_GetValidPath(this->mpc_Ui->pc_LineEditPath->GetPath());
+   const QString c_Folder = m_GetValidPath(this->mpc_Ui->pc_LineEditPath->GetPath());
 
    const QString c_Path =
       QFileDialog::getExistingDirectory(this, C_GtGetText::h_GetText("Select Project Location"), c_Folder,
@@ -290,7 +290,7 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
    {
       const QString c_Path = c_BasePath + '/' + c_Name;
       const QString c_FilePathAndName = c_Path + '/' + c_Name + ".syde";
-      QDir c_Dir(c_Path);
+      const QDir c_Dir(c_Path);
 
       if (c_Dir.exists() == false)
       {

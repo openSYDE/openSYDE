@@ -164,7 +164,7 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
             break;
          }
          //Add spacing for sorting arrow
-         c_Header += "    ";
+         c_Header += "   ";
          c_Retval = c_Header;
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)

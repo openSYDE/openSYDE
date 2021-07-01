@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Dialog for code generation report (header)
+   \brief       Dialog for file generation report (header)
 
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -37,8 +37,8 @@ public:
    public:
       QString c_NodeName;                ///< Node name where the Data Block belongs to
       QString c_AppName;                 ///< Data Block name
-      QString c_CodeGeneratorPath;       ///< Path of used code generator
-      stw_types::uint16 u16_CodeVersion; ///< Path of used code generator
+      QString c_CodeGeneratorPath;       ///< Path of used file generator
+      stw_types::uint16 u16_CodeVersion; ///< File structure version
       QString c_Directory;               ///< Directory where generated files were saved at
       QStringList c_GeneratedFiles;      ///< List absolute file paths of all generated files
    };

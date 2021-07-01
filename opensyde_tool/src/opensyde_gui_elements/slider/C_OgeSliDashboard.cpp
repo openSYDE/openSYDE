@@ -20,6 +20,7 @@
 #include "stwtypes.h"
 #include "C_OgeWiUtil.h"
 #include "C_OgeSliDashboard.h"
+#include "TGLUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -127,8 +128,13 @@ void C_OgeSliDashboard::HandleResize(void)
    case C_PuiSvDbSlider::eTYPE_SMALL_COLOR_2:
       sn_GrooveHeight = std::max(this->height() / 10, 1);
       break;
-   default:
+   case C_PuiSvDbSlider::eTYPE_BIG_COLOR_1:
+   case C_PuiSvDbSlider::eTYPE_BIG_COLOR_2:
       sn_GrooveHeight = std::max(this->height() / 5, 1);
+      break;
+   default:
+      tgl_assert(false);
+      sn_GrooveHeight = 0;
       break;
    }
    sn_AvailableHeight = this->height() - sn_GrooveHeight;
@@ -270,6 +276,9 @@ void C_OgeSliDashboard::m_ReinitStyle(void)
             this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleSkeuomorphDark1.svg");
          }
          break;
+      default:
+         tgl_assert(false);
+         break;
       }
       break;
    case C_PuiSvDbSlider::eTYPE_BIG_COLOR_2:
@@ -309,9 +318,13 @@ void C_OgeSliDashboard::m_ReinitStyle(void)
             this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleSkeuomorphDark2.svg");
          }
          break;
+      default:
+         tgl_assert(false);
+         break;
       }
       break;
    default:
+      tgl_assert(false);
       break;
    }
 }

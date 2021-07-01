@@ -55,11 +55,11 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in]     oru32_ViewIndex        Index of system view
-   \param[in]     oru32_DashboardIndex   Index of dashboard in system view
-   \param[in]     ors32_DataIndex        Index of data element in dashboard in system view
-   \param[in]     oru64_ID               Unique ID
-   \param[in,out] opc_Parent             Optional pointer to parent
+   \param[in]      oru32_ViewIndex        Index of system view
+   \param[in]      oru32_DashboardIndex   Index of dashboard in system view
+   \param[in]      ors32_DataIndex        Index of data element in dashboard in system view
+   \param[in]      oru64_ID               Unique ID
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaSliderBase::C_GiSvDaSliderBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
@@ -100,8 +100,8 @@ sintn C_GiSvDaSliderBase::type(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply style
 
-   \param[in] oe_Style    New style type
-   \param[in] oq_DarkMode Flag if dark mode is active
+   \param[in]  oe_Style       New style type
+   \param[in]  oq_DarkMode    Flag if dark mode is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
@@ -209,7 +209,7 @@ void C_GiSvDaSliderBase::DeleteData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active Flag if connection is active or not active now
+   \param[in]  oq_Active   Flag if connection is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::ConnectionActiveChanged(const bool oq_Active)
@@ -376,8 +376,8 @@ bool C_GiSvDaSliderBase::CallProperties(void)
 
    Warning: Only use for preview
 
-   \param[in] oe_Type        Type
-   \param[in] oq_ShowMinMax  Show minimum / maximum
+   \param[in]  oe_Type        Type
+   \param[in]  oq_ShowMinMax  Show minimum / maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::UpdateTypePe(const C_PuiSvDbSlider::E_Type oe_Type, const bool oq_ShowMinMax)
@@ -394,17 +394,16 @@ void C_GiSvDaSliderBase::UpdateTypePe(const C_PuiSvDbSlider::E_Type oe_Type, con
 
    Warning: Only use for preview
 
-   \param[in] osn_Value   New value
-   \param[in] osn_Min     New min value
-   \param[in] osn_Max     New max value
+   \param[in]  osn_Value   New value
+   \param[in]  osn_Min     New min value
+   \param[in]  osn_Max     New max value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::SetValuePe(const sintn osn_Value, const sintn osn_Min, const sintn osn_Max)
 {
    if (this->mpc_SliderWidget != NULL)
    {
-      this->mpc_SliderWidget->SetMin(osn_Min, QString::number(osn_Min));
-      this->mpc_SliderWidget->SetMax(osn_Max, QString::number(osn_Max));
+      this->mpc_SliderWidget->SetMinMax(osn_Min, QString::number(osn_Min), osn_Max, QString::number(osn_Max));
       this->mpc_SliderWidget->SetValue(osn_Value);
    }
 }
@@ -449,17 +448,16 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                   {
                      if (u64_Steps > 0)
                      {
-                        QString c_Text;
                         if (u64_Steps <= static_cast<uint64>(std::numeric_limits<uint32>::max()))
                         {
                            //Standard
                            const sint32 s32_Max =
                               static_cast<sint32>(static_cast<sint64>(std::numeric_limits<sint32>::lowest()) +
                                                   static_cast<sint64>(u64_Steps));
-                           c_Text = this->GetUnscaledValueAsScaledString(f64_Min);
-                           this->mpc_SliderWidget->SetMin(std::numeric_limits<sint32>::lowest(), c_Text);
-                           c_Text = this->GetUnscaledValueAsScaledString(f64_Max);
-                           this->mpc_SliderWidget->SetMax(s32_Max, c_Text);
+                           const QString c_MinText = this->GetUnscaledValueAsScaledString(f64_Min);
+                           const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_Max);
+                           this->mpc_SliderWidget->SetMinMax(
+                              std::numeric_limits<sint32>::lowest(), c_MinText, s32_Max, c_MaxText);
                            this->ms32_SliderMin = std::numeric_limits<sint32>::lowest();
                            //Default
                            this->mf64_SliderFactor = 1.0;
@@ -487,10 +485,10 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                            const sint32 s32_Max =
                               static_cast<sint32>(static_cast<sint64>(std::numeric_limits<sint32>::lowest()) +
                                                   (static_cast<sint64>(f64_Temp)));
-                           c_Text = this->GetUnscaledValueAsScaledString(f64_Min);
-                           this->mpc_SliderWidget->SetMin(std::numeric_limits<sint32>::lowest(), c_Text);
-                           c_Text = this->GetUnscaledValueAsScaledString(f64_Max);
-                           this->mpc_SliderWidget->SetMax(s32_Max, c_Text);
+                           const QString c_MinText = this->GetUnscaledValueAsScaledString(f64_Min);
+                           const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_Max);
+                           this->mpc_SliderWidget->SetMinMax(
+                              std::numeric_limits<sint32>::lowest(), c_MinText, s32_Max, c_MaxText);
                            this->ms32_SliderMin = std::numeric_limits<sint32>::lowest();
                            //Tool tip (BEFORE start value)
                            this->mpc_SliderWidget->SetToolTipParameters(static_cast<float64>(this->ms32_SliderMin),
@@ -504,8 +502,7 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                      else
                      {
                         //No range at all
-                        this->mpc_SliderWidget->SetMin(0, QString::number(f64_Min));
-                        this->mpc_SliderWidget->SetMax(0, QString::number(f64_Min));
+                        this->mpc_SliderWidget->SetMinMax(0, QString::number(f64_Min), 0, QString::number(f64_Min));
                         this->ms32_SliderMin = 0;
                         //Default
                         this->mf64_SliderFactor = 1.0;
@@ -517,11 +514,11 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                   }
                   else
                   {
-                     QString c_Text;
-                     c_Text = this->GetUnscaledValueAsScaledString(f64_Min);
-                     this->mpc_SliderWidget->SetMin(std::numeric_limits<sint32>::lowest(), c_Text);
-                     c_Text = this->GetUnscaledValueAsScaledString(f64_Max);
-                     this->mpc_SliderWidget->SetMax(std::numeric_limits<sint32>::max(), c_Text);
+                     const QString c_MinText = this->GetUnscaledValueAsScaledString(f64_Min);
+                     const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_Max);
+                     this->mpc_SliderWidget->SetMinMax(
+                        std::numeric_limits<sint32>::lowest(), c_MinText, std::numeric_limits<sint32>::max(),
+                        c_MaxText);
                      this->ms32_SliderMin = std::numeric_limits<sint32>::lowest();
                      //factor for uint32::max steps
                      this->mf64_SliderFactor = (f64_Max - f64_Min) /

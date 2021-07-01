@@ -42,13 +42,13 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_NagViewList::C_NagViewList(QWidget * const opc_Parent) :
    QListView(opc_Parent)
 {
-   this->setModel(&this->mc_Model);
+   this->C_NagViewList::setModel(&this->mc_Model);
    this->setItemDelegate(&this->mc_Delegate);
    this->mc_Delegate.SetListView(this);
 
@@ -151,8 +151,8 @@ void C_NagViewList::UpdateNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Trigger update of decoration role
 
-   \param[in] oq_CheckOnlyThisView Flag to reduce view error check to one item
-   \param[in] ou32_ViewIndex       Index to specify which view changed (only used if oq_CheckOnlyThisView set)
+   \param[in]  oq_CheckOnlyThisView    Flag to reduce view error check to one item
+   \param[in]  ou32_ViewIndex          Index to specify which view changed (only used if oq_CheckOnlyThisView set)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::UpdateDeco(const bool oq_CheckOnlyThisView, const uint32 ou32_ViewIndex) const
@@ -202,8 +202,8 @@ sint32 C_NagViewList::GetMaximumRequiredHeight(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set active state
 
-   \param[in] ou32_ViewIndex Active view index
-   \param[in] os32_SubMode   New active sub mode
+   \param[in]  ou32_ViewIndex    Active view index
+   \param[in]  os32_SubMode      New active sub mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::SetActive(const uint32 ou32_ViewIndex, const sint32 os32_SubMode) const
@@ -228,7 +228,7 @@ void C_NagViewList::SetActive(const uint32 ou32_ViewIndex, const sint32 os32_Sub
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get item widget at index
 
-   \param[in] osn_Index Item index
+   \param[in]  osn_Index   Item index
 
    \return
    NULL Item not found
@@ -241,11 +241,20 @@ C_NagViewItem * C_NagViewList::GetItemAt(const sintn osn_Index) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle service mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagViewList::HandleServiceMode(void)
+{
+   this->Init();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten drag enter event slot
 
    Here: Accept drag
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::dragEnterEvent(QDragEnterEvent * const opc_Event)
@@ -267,7 +276,7 @@ void C_NagViewList::dragEnterEvent(QDragEnterEvent * const opc_Event)
 
    Here: Accept drag
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::dragMoveEvent(QDragMoveEvent * const opc_Event)
@@ -289,7 +298,7 @@ void C_NagViewList::dragMoveEvent(QDragMoveEvent * const opc_Event)
 
    Here: Trigger view move
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::dropEvent(QDropEvent * const opc_Event)
@@ -340,7 +349,7 @@ void C_NagViewList::dropEvent(QDropEvent * const opc_Event)
 
    Here: send custom drag event
 
-   \param[in] oc_SupportedActions Supported actions
+   \param[in]  oc_SupportedActions  Supported actions
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::startDrag(const Qt::DropActions oc_SupportedActions)
@@ -373,7 +382,7 @@ void C_NagViewList::m_AfterDrag(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start drag action
 
-   \param[in] orc_Index Selected index
+   \param[in]  orc_Index   Selected index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_StartDrag(const QModelIndex & orc_Index)
@@ -396,7 +405,7 @@ void C_NagViewList::m_StartDrag(const QModelIndex & orc_Index)
       pc_Item->SetDragged(true);
 
       // create the screenshot
-      pc_Item->render(&c_Screenshot, QPoint(3, 1), QRegion(c_Rect));
+      pc_Item->render(&c_Screenshot, QPoint(3, 1), static_cast<QRegion>(c_Rect));
 
       //Overwrite first two rows
       {
@@ -425,7 +434,7 @@ void C_NagViewList::m_StartDrag(const QModelIndex & orc_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle start drag action
 
-   \param[in] opc_Sender Sender
+   \param[in]  opc_Sender  Sender
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnStartDrag(const C_NagViewItem * const opc_Sender)
@@ -443,7 +452,7 @@ void C_NagViewList::m_OnStartDrag(const C_NagViewItem * const opc_Sender)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle expand action
 
-   \param[in] opc_Sender Sender
+   \param[in]  opc_Sender  Sender
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnExpand(const C_NagViewItem * const opc_Sender)
@@ -462,7 +471,7 @@ void C_NagViewList::m_OnExpand(const C_NagViewItem * const opc_Sender)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle delete action
 
-   \param[in] opc_Sender Sender
+   \param[in]  opc_Sender  Sender
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnDelete(const C_NagViewItem * const opc_Sender)
@@ -480,7 +489,7 @@ void C_NagViewList::m_OnDelete(const C_NagViewItem * const opc_Sender)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle duplicate action
 
-   \param[in] opc_Sender Sender
+   \param[in]  opc_Sender  Sender
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnDuplicate(const C_NagViewItem * const opc_Sender)
@@ -503,8 +512,8 @@ void C_NagViewList::m_OnDuplicate(const C_NagViewItem * const opc_Sender)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle set name
 
-   \param[in] opc_Sender Sender
-   \param[in] orc_Name   Name
+   \param[in]  opc_Sender  Sender
+   \param[in]  orc_Name    Name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnSetName(const C_NagViewItem * const opc_Sender, const QString & orc_Name)
@@ -521,10 +530,10 @@ void C_NagViewList::m_OnSetName(const C_NagViewItem * const opc_Sender, const QS
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle select
 
-   \param[in] opc_Sender         Sender
-   \param[in] os32_SubMode       Selected sub mode
-   \param[in] orc_Name           Name to display
-   \param[in] orc_SubSubItemName Selected sub sub mode name
+   \param[in]  opc_Sender           Sender
+   \param[in]  os32_SubMode         Selected sub mode
+   \param[in]  orc_Name             Name to display
+   \param[in]  orc_SubSubItemName   Selected sub sub mode name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnSelect(const C_NagViewItem * const opc_Sender, const sint32 os32_SubMode,

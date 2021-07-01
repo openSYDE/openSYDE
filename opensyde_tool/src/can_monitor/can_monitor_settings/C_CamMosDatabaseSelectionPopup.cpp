@@ -110,6 +110,7 @@ C_CamMosDatabaseSelectionPopup::C_CamMosDatabaseSelectionPopup(stw_opensyde_gui_
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} never took ownership of any context menu item
 C_CamMosDatabaseSelectionPopup::~C_CamMosDatabaseSelectionPopup(void)
 {
    delete this->mpc_Ui;
@@ -354,7 +355,7 @@ void C_CamMosDatabaseSelectionPopup::m_SetupContextMenu(const bool & orq_MultiSe
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
-   QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
+   const QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
 
    // check if position is on tree view
    if (this->mpc_Ui->pc_TreeView->geometry().contains(orc_Pos))

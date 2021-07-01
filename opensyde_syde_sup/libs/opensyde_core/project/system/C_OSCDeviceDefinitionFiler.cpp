@@ -164,8 +164,38 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
          }
          else
          {
-            c_Text = c_XML.SelectNodeChild("file-version");
-            if (c_Text != "file-version")
+            if (c_XML.SelectNodeChild("file-version") == "file-version")
+            {
+               uint16 u16_FileVersion = 0U;
+               try
+               {
+                  u16_FileVersion = static_cast<uint16>(c_XML.GetNodeContent().ToInt());
+               }
+               catch (...)
+               {
+                  osc_write_log_error("Loading device definition",
+                                      "\"file-version\" could not be converted to a number.");
+                  s32_Return = C_CONFIG;
+               }
+
+               //is the file version one we know ?
+               if (s32_Return == C_NO_ERR)
+               {
+                  osc_write_log_info("Loading device definition", "Value of \"file-version\": " +
+                                     C_SCLString::IntToStr(u16_FileVersion));
+                  //Check file version
+                  if (u16_FileVersion != mhu16_FILE_VERSION)
+                  {
+                     osc_write_log_error("Loading device definition",
+                                         "Version defined by \"file-version\" is not supported.");
+                     s32_Return = C_CONFIG;
+                  }
+               }
+
+               //Return
+               c_XML.SelectNodeParent();
+            }
+            else
             {
                osc_write_log_error("Loading device definition", "XML node \"file-version\" not found.");
                s32_Return = C_CONFIG;

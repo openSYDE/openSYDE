@@ -326,7 +326,7 @@ std::vector<uint32> C_Uti::h_UniquifyAndSortDescending(const std::vector<uint32>
    c_Retval.reserve(c_Ascending.size());
    for (uint32 u32_It = c_Ascending.size(); u32_It > 0UL; --u32_It)
    {
-      c_Retval.push_back(c_Ascending[u32_It - 1UL]);
+      c_Retval.push_back(c_Ascending[static_cast<uintn>(u32_It - 1UL)]);
    }
    return c_Retval;
 }
@@ -763,7 +763,7 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
 
       // does the full path fit?
       c_MinimizedPath = c_Path;
-      sn_CurrentWidth = c_FontMetrics.width(c_MinimizedPath);
+      sn_CurrentWidth = c_FontMetrics.horizontalAdvance(c_MinimizedPath);
       if (sn_CurrentWidth > static_cast<sintn>(u32_AvailableWidth))
       {
          // no, full path does not fit
@@ -771,7 +771,7 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
          // does the drive and file name alone with placeholder string fit?
          // check length of drive and file name plus placeholder
          c_MinimizedPath = c_DriveName + c_Placeholder + c_FileName;
-         sn_CurrentWidth = c_FontMetrics.width(c_MinimizedPath);
+         sn_CurrentWidth = c_FontMetrics.horizontalAdvance(c_MinimizedPath);
          if (sn_CurrentWidth < static_cast<sintn>(u32_AvailableWidth))
          {
             // yes, try to reduce folders recursively
@@ -786,7 +786,7 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
                                  c_MinimizedPath.right((c_MinimizedPath.length() - sn_DelimPos) - 1);
 
                sn_DelimPos = static_cast<QString>(c_DriveName + c_Placeholder).length();
-               sn_CurrentWidth = c_FontMetrics.width(c_MinimizedPath);
+               sn_CurrentWidth = c_FontMetrics.horizontalAdvance(c_MinimizedPath);
             }
             // second condition should not occur and is only defensive
             while ((sn_CurrentWidth > (static_cast<sintn>(u32_AvailableWidth))) || (sn_DelimPos == -1));
@@ -1261,7 +1261,7 @@ QString C_Uti::h_GetHashValueAsQString(void)
 /*! \brief  Get value as hex
 
    \param[in]  ou64_Value        Value
-   \param[in]  ou32_FieldWidth   Minimum amount of space that argument a shall occupy
+   \param[in]  ou8_FieldWidth    Field width
 
    \return
    Hexadecimal representation of value
@@ -1275,8 +1275,8 @@ QString C_Uti::h_GetValueAsHex(const uint64 ou64_Value, const uint8 ou8_FieldWid
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get value as hex
 
-   \param[in]  ou64_Value        Value
-   \param[in]  ou32_FieldWidth   Minimum amount of space that argument a shall occupy
+   \param[in]  ou32_Value        Value
+   \param[in]  ou8_FieldWidth    Field width
 
    \return
    Hexadecimal representation of value
@@ -1285,6 +1285,42 @@ QString C_Uti::h_GetValueAsHex(const uint64 ou64_Value, const uint8 ou8_FieldWid
 QString C_Uti::h_GetValueAsHex(const uint32 ou32_Value, const uint8 ou8_FieldWidth)
 {
    return C_Uti::h_GetValueAsHex(static_cast<uint64>(ou32_Value), ou8_FieldWidth);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Parses a specific folder for files
+
+   All files will be added to orc_FilePaths and all found folders will be checked recursively.
+   orc_FilePaths will not be cleared
+
+   \param[in]      orc_FolderPath   Path for searching files and other folders
+   \param[in,out]  orc_FilePaths    Found file paths with absolute paths
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_Uti::h_GetAllFilePathsInFolder(const QString & orc_FolderPath, std::vector<C_SCLString> & orc_FilePaths)
+{
+   const QDir c_Dir(orc_FolderPath);
+   const QStringList c_AllFiles = c_Dir.entryList(QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot);
+   sintn sn_Counter;
+
+   for (sn_Counter = 0; sn_Counter < c_AllFiles.size(); ++sn_Counter)
+   {
+      const QString c_Path = orc_FolderPath + c_AllFiles[sn_Counter];
+      const QFileInfo c_File(c_Path);
+
+      if (c_File.isDir() == true)
+      {
+         h_GetAllFilePathsInFolder(c_Path + "/", orc_FilePaths);
+      }
+      else if (c_File.isFile() == true)
+      {
+         orc_FilePaths.push_back(c_Path.toStdString().c_str());
+      }
+      else
+      {
+         // Nothing to do
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1303,6 +1339,7 @@ void C_Uti::h_SortIndicesAscendingAndSync(std::vector<uint32> & orc_IndicesTmp, 
    if (C_Uti::h_CheckSortedAscending(orc_IndicesTmp) == false)
    {
       std::vector<stw_types::uint32> c_IndicesTmp;
+      //lint -e{8080} //template naming not correctly handled by naming convention checker
       std::vector<T> c_SyncContentTmp;
       //Step 1: Fill new vector in sorted order with which element should be copied to which position
       const std::vector<stw_types::sint32> c_IndexMap = C_Uti::h_CreateAscendingIndexMap(orc_IndicesTmp);

@@ -80,6 +80,7 @@ C_SyvUpUpdatePackageListWidget::C_SyvUpUpdatePackageListWidget(QWidget * const o
    mpc_ShowFileInfoAction(NULL),
    mpc_RemoveAllNodeFilesAction(NULL),
    mpc_HideShowOptionalSectionsAction(NULL),
+   mpc_SkipUpdateOfFile(NULL),
    mpc_ShowInExplorerAction(NULL),
    mc_LastPath(""),
    mu32_ViewIndex(0U),
@@ -738,7 +739,7 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
          const stw_types::uint32 u32_ActiveBusIndex = pc_View->GetPcData().GetBusIndex();
 
          // active nodes
-         const std::vector<uint8> c_ActiveNodes = pc_View->GetNodeActiveFlags();
+         std::vector<uint8> c_ActiveNodes = pc_View->GetNodeActiveFlags();
 
          // update applications of nodes, update position of nodes,
          std::vector<C_OSCSuSequences::C_DoFlash> c_ApplicationsToWrite;
@@ -751,6 +752,19 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
          C_SCLString c_Error;
          if (s32_Return == C_NO_ERR)
          {
+            // In case of skipped files, check if some nodes does not need to be active for the package anymore
+            uint32 u32_NodeCounter;
+
+            tgl_assert(c_ActiveNodes.size() == c_ApplicationsToWrite.size());
+            for (u32_NodeCounter = 0; u32_NodeCounter < c_ApplicationsToWrite.size(); ++u32_NodeCounter)
+            {
+               if ((c_ApplicationsToWrite[u32_NodeCounter].c_FilesToFlash.size() == 0) &&
+                   (c_ApplicationsToWrite[u32_NodeCounter].c_FilesToWriteToNvm.size() == 0))
+               {
+                  c_ActiveNodes[u32_NodeCounter] = 0U;
+               }
+            }
+
             s32_Return = C_OSCSuServiceUpdatePackage::h_CreatePackage(c_FullPackagePath.toStdString().c_str(),
                                                                       rc_SystemDefinition,
                                                                       u32_ActiveBusIndex,
@@ -1223,6 +1237,16 @@ void C_SyvUpUpdatePackageListWidget::m_OnCustomContextMenuRequested(const QPoint
             this->mpc_AddFileAction->setVisible(!(this->mpc_SelectedSection->Type() ==
                                                   mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK));
             this->mpc_SelectFileAction->setVisible(true);
+            this->mpc_SkipUpdateOfFile->setVisible(true);
+            if (this->mpc_SelectedApp->GetSkipOfUpdateFile() == true)
+            {
+               this->mpc_SkipUpdateOfFile->setText(C_GtGetText::h_GetText("Unskip Update of this File"));
+            }
+            else
+            {
+               this->mpc_SkipUpdateOfFile->setText(C_GtGetText::h_GetText("Skip Update of this File"));
+            }
+
             this->mpc_RemoveFileAction->setVisible(true);
             this->mpc_RemoveFileAction->setEnabled(
                (this->mpc_SelectedSection->Type() != mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK) ||
@@ -1236,6 +1260,7 @@ void C_SyvUpUpdatePackageListWidget::m_OnCustomContextMenuRequested(const QPoint
          else
          {
             this->mpc_SelectFileAction->setVisible(false);
+            this->mpc_SkipUpdateOfFile->setVisible(false);
             this->mpc_RevertFileAction->setVisible(false);
             this->mpc_RemoveFileAction->setVisible(false);
             this->mpc_ShowFileInfoAction->setVisible(false);
@@ -1291,6 +1316,12 @@ void C_SyvUpUpdatePackageListWidget::m_SetupContextMenu(void)
    this->mpc_ShowInExplorerAction = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText("Show in Explorer"), this,
       &C_SyvUpUpdatePackageListWidget::m_ShowInExplorer);
+
+   this->mpc_ContextMenu->addSeparator();
+
+   this->mpc_SkipUpdateOfFile = this->mpc_ContextMenu->addAction(
+      C_GtGetText::h_GetText("Skip/Unskip Update of this File"), this,
+      &C_SyvUpUpdatePackageListWidget::m_SkipUpdateOfFile);
 
    this->mpc_ContextMenu->addSeparator();
 
@@ -1396,12 +1427,12 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
       QString c_Filter = "";
       const QString c_Folder = this->m_GetDialogPath();
 
-      if ((this->mpc_SelectedApp != NULL) && (this->mpc_SelectedSection != NULL))
+      if (this->mpc_SelectedApp != NULL)
       {
          bool q_HexFile = false;
 
          // Get the correct type
-         switch (this->mpc_SelectedSection->Type())
+         switch (this->mpc_SelectedApp->GetType())
          {
          case mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK:
             if (this->mpc_SelectedNode->IsFileBased() == false)
@@ -1595,6 +1626,20 @@ void C_SyvUpUpdatePackageListWidget::m_HideShowOptionalSections(void)
          // set visibility of empty optional sections
          pc_WidgetItem->SetEmptyOptionalSectionsVisible(this->mq_EmptyOptionalSectionsVisible);
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Toggle skipping update of a specific file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpUpdatePackageListWidget::m_SkipUpdateOfFile(void)
+{
+   if ((this->mpc_SelectedApp != NULL) &&
+       (this->mpc_SelectedSection != NULL))
+   {
+      this->mpc_SelectedSection->SetSkipOfUpdateFile(!this->mpc_SelectedApp->GetSkipOfUpdateFile(),
+                                                     this->mpc_SelectedApp);
    }
 }
 

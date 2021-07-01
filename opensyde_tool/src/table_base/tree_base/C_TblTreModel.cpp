@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblTreModel::C_TblTreModel(QObject * const opc_Parent) :
@@ -51,8 +51,8 @@ C_TblTreModel::C_TblTreModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -68,7 +68,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
       {
          //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
-            static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
+            static_cast<const C_TblTreItem *>(orc_Index.internalPointer());
          if (pc_TreeItem != NULL)
          {
             c_Retval = pc_TreeItem->c_Name;
@@ -78,7 +78,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
       {
          //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
-            static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
+            static_cast<const C_TblTreItem *>(orc_Index.internalPointer());
          if (pc_TreeItem != NULL)
          {
             c_Retval = pc_TreeItem->c_Icon;
@@ -88,7 +88,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
       {
          //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
-            static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
+            static_cast<const C_TblTreItem *>(orc_Index.internalPointer());
          if (pc_TreeItem != NULL)
          {
             c_Retval = pc_TreeItem->c_ToolTipHeading;
@@ -98,7 +98,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
       {
          //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
-            static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
+            static_cast<const C_TblTreItem *>(orc_Index.internalPointer());
          if (pc_TreeItem != NULL)
          {
             c_Retval = pc_TreeItem->c_ToolTipContent;
@@ -116,7 +116,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get item flags
 
-   \param[in] orc_Index Index
+   \param[in]  orc_Index   Index
 
    \return
    Item flags
@@ -129,7 +129,7 @@ Qt::ItemFlags C_TblTreModel::flags(const QModelIndex & orc_Index) const
    {
       //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreItem * const pc_TreeItem =
-         static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
+         static_cast<const C_TblTreItem *>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
       {
          if (pc_TreeItem->q_Enabled == true)

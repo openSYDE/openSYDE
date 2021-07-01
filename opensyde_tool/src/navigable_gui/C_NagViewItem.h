@@ -12,6 +12,7 @@
 #define C_NAGVIEWITEM_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <QIcon>
 #include <QWidget>
 #include "stwtypes.h"
 
@@ -45,6 +46,7 @@ public:
    void Init(const stw_types::uint32 ou32_ViewIndex);
    void SetActive(const bool oq_Active, const stw_types::sint32 os32_SubMode);
    void SetHovered(const bool oq_Hovered) const;
+   void HandleServiceMode(void);
 
    virtual QSize sizeHint(void) const override;
 
@@ -75,6 +77,9 @@ private:
    static const stw_types::sintn mhsn_SizeSub;
    static const stw_types::sintn mhsn_FixSizeBottom;
    bool mq_ButtonPressed;
+   QMetaObject::Connection mc_Conn;
+   const QIcon mc_IconBulletList;
+   const QIcon mc_IconBulletListActive;
 
    //Avoid call
    C_NagViewItem(const C_NagViewItem &);
@@ -84,6 +89,8 @@ private:
    void m_OnNameEditFinished(void);
    void m_OnNameEditCancelled(void);
    void m_SetExpanded(const bool oq_Expanded);
+   void m_HandleExpandIcon(const bool oq_Expanded);
+   void m_HandleSubItemNames(void);
    void m_OnExpand(void);
    void m_OnDelete(void);
    void m_OnStartDrag(void);
@@ -92,9 +99,11 @@ private:
    void m_OnSetupClicked(void);
    void m_OnUpdateClicked(void);
    void m_OnDashboardClicked(void);
+   void m_HandleServiceModeColors(void);
 
    void m_ButtonPressed(void);
    void m_ButtonReleased(void);
+   static QIcon mh_PrepareIcon(const QString & orc_Path);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -38,7 +38,14 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCHalcDefBase::C_OSCHalcDefBase(void) :
-   u32_ContentVersion(0UL)
+   u32_ContentVersion(0UL),
+   e_SafetyMode(eTWO_LEVELS_WITH_DROPPING),
+   u8_NumConfigCopies(1U),
+   q_NvMBasedConfig(false),
+   u32_NvMReservedListSizeParameters(100UL),
+   u32_NvMReservedListSizeInputValues(100UL),
+   u32_NvMReservedListSizeOutputValues(100UL),
+   u32_NvMReservedListSizeStatusValues(100UL)
 {
 }
 
@@ -123,6 +130,15 @@ void C_OSCHalcDefBase::Clear()
    this->c_DeviceName = "";
    this->c_FileString = "";
    this->c_OriginalFileName = "";
+   this->e_SafetyMode = eTWO_LEVELS_WITH_DROPPING;
+   this->u8_NumConfigCopies = 1U;
+   this->q_NvMBasedConfig = false;
+   this->c_NvMNonSafeAddressOffset.clear();
+   this->c_NvMSafeAddressOffset.clear();
+   this->u32_NvMReservedListSizeParameters = 100UL;
+   this->u32_NvMReservedListSizeInputValues = 100UL;
+   this->u32_NvMReservedListSizeOutputValues = 100UL;
+   this->u32_NvMReservedListSizeStatusValues = 100UL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -139,7 +155,16 @@ bool C_OSCHalcDefBase::IsClear(void) const
    if ((this->u32_ContentVersion == 0UL) &&
        (this->c_DeviceName == "") &&
        (this->c_FileString == "") &&
-       (this->c_OriginalFileName == ""))
+       (this->c_OriginalFileName == "") &&
+       (this->e_SafetyMode == eTWO_LEVELS_WITH_DROPPING) &&
+       (this->u8_NumConfigCopies == 1U) &&
+       (this->q_NvMBasedConfig == false) &&
+       (this->c_NvMNonSafeAddressOffset.size() == 0UL) &&
+       (this->c_NvMSafeAddressOffset.size() == 0UL) &&
+       (this->u32_NvMReservedListSizeParameters == 100UL) &&
+       (this->u32_NvMReservedListSizeInputValues == 100UL) &&
+       (this->u32_NvMReservedListSizeOutputValues == 100UL) &&
+       (this->u32_NvMReservedListSizeStatusValues == 100UL))
    {
       q_Return = true;
    }
@@ -162,6 +187,27 @@ void C_OSCHalcDefBase::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_FileString.c_str(), this->c_FileString.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_OriginalFileName.c_str(),
                                       this->c_OriginalFileName.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_SafetyMode, sizeof(this->e_SafetyMode), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_NumConfigCopies, sizeof(this->u8_NumConfigCopies), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_NvMBasedConfig, sizeof(this->q_NvMBasedConfig), oru32_HashValue);
+   for (uint32 u32_It = 0UL; u32_It < this->c_NvMNonSafeAddressOffset.size(); ++u32_It)
+   {
+      const uint32 u32_Tmp = this->c_NvMNonSafeAddressOffset[u32_It];
+      stw_scl::C_SCLChecksums::CalcCRC32(&u32_Tmp, sizeof(u32_Tmp), oru32_HashValue);
+   }
+   for (uint32 u32_It = 0UL; u32_It < this->c_NvMSafeAddressOffset.size(); ++u32_It)
+   {
+      const uint32 u32_Tmp = this->c_NvMSafeAddressOffset[u32_It];
+      stw_scl::C_SCLChecksums::CalcCRC32(&u32_Tmp, sizeof(u32_Tmp), oru32_HashValue);
+   }
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMReservedListSizeParameters,
+                                      sizeof(this->u32_NvMReservedListSizeParameters), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMReservedListSizeInputValues,
+                                      sizeof(this->u32_NvMReservedListSizeInputValues), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMReservedListSizeOutputValues,
+                                      sizeof(this->u32_NvMReservedListSizeOutputValues), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMReservedListSizeStatusValues,
+                                      sizeof(this->u32_NvMReservedListSizeStatusValues), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -150,6 +150,8 @@ public:
    C_OSCNodeProperties c_Properties;           ///< General node properties
    std::vector<C_OSCNodeDataPool> c_DataPools; ///< All datapools assigned to this node, expected type order:
    ///< DIAG, NVM then COM
+   bool q_DatapoolAutoNvMStartAddress; ///< Flag if the Datapool NvM start will be calculate automatically
+
    std::vector<C_OSCNodeApplication> c_Applications; ///< All data blocks assigned to this node
    std::vector<C_OSCCanProtocol> c_ComProtocols;     ///< All node specific information
    ///< for related communication protocol.

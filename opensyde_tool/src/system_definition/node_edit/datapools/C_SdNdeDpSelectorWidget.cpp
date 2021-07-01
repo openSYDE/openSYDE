@@ -67,6 +67,7 @@ C_SdNdeDpSelectorWidget::C_SdNdeDpSelectorWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_PushButtonScrollLeft->setSizePolicy(c_SizePolicy);
    this->mpc_Ui->pc_PushButtonScrollRight->setSizePolicy(c_SizePolicy);
    this->mpc_Ui->pc_IndexViewWidget->setSizePolicy(c_SizePolicy);
+   //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_IndexViewWidget->SetColor(mc_STYLE_GUIDE_COLOR_4, mc_STYLE_GUIDE_COLOR_10);
 
    // configure the label for the dynamic icons
@@ -113,6 +114,9 @@ C_SdNdeDpSelectorWidget::C_SdNdeDpSelectorWidget(QWidget * const opc_Parent) :
            this, &C_SdNdeDpSelectorWidget::m_OnErrorCheck);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDpSelectorListWidget::SigNoDataPoolSelected,
            this, &C_SdNdeDpSelectorWidget::SigNoDataPoolSelected);
+   connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDpSelectorListWidget::SigDataPoolHoverStateChanged,
+           this, &C_SdNdeDpSelectorWidget::SigDataPoolHoverStateChanged);
+
    connect(this->mpc_Ui->pc_PushButtonAdd, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked,
            this, &C_SdNdeDpSelectorWidget::m_AddNewDatapool);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDpSelectorListWidget::SigHideOtherToolTips, this,
@@ -135,7 +139,6 @@ C_SdNdeDpSelectorWidget::C_SdNdeDpSelectorWidget(QWidget * const opc_Parent) :
 C_SdNdeDpSelectorWidget::~C_SdNdeDpSelectorWidget()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_LabelStateImg and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -247,6 +250,11 @@ bool C_SdNdeDpSelectorWidget::SetTypeAndNode(const stw_opensyde_core::C_OSCNodeD
    {
       this->ErrorCheck();
    }
+   else
+   {
+      // Deactivate a possible left over error state.
+      this->mpc_LabelStateImg->setVisible(false);
+   }
 
    this->m_UpdateWidget();
 
@@ -288,6 +296,15 @@ void C_SdNdeDpSelectorWidget::SetCurrentDataPoolConflict(const sintn osn_DataPoo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the widget for the all Datapools
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorWidget::UpdateDataPools(void)
+{
+   this->mpc_Ui->pc_ListWidget->UpdateDataPools();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the widgets for the actual datapool
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -306,21 +323,24 @@ void C_SdNdeDpSelectorWidget::ErrorCheck(void)
    QString c_Content;
 
    std::vector<uint32> c_InvalidDatapoolIndices;
-   bool q_NvmProblem = false;
+   bool q_DatapoolNvmSizeConflict = false;
+   bool q_DatapoolNvmOverlapConflict = false;
    bool q_Error = this->mpc_Ui->pc_ListWidget->CheckDataPoolsForConflict(&c_InvalidDatapoolIndices);
 
-   if (this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eNVM)
+   if ((this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eNVM) ||
+       (this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM))
    {
       // check the entire NVM size
-      if (C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(this->mu32_NodeIndex) == true)
+      if (C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(this->mu32_NodeIndex,
+                                                                             &q_DatapoolNvmSizeConflict,
+                                                                             &q_DatapoolNvmOverlapConflict) == true)
       {
-         q_NvmProblem = true;
          q_Error = true;
       }
    }
 
-   C_SdUtil::h_GetErrorToolTipDataPools(this->mu32_NodeIndex, c_InvalidDatapoolIndices, q_NvmProblem, c_Heading,
-                                        c_Content);
+   C_SdUtil::h_GetErrorToolTipDataPools(this->mu32_NodeIndex, c_InvalidDatapoolIndices, q_DatapoolNvmSizeConflict,
+                                        q_DatapoolNvmOverlapConflict, c_Heading, c_Content);
 
    this->mpc_LabelStateImg->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
    //Update the group label (items should have updated labels already)
@@ -395,6 +415,7 @@ void C_SdNdeDpSelectorWidget::keyPressEvent(QKeyEvent * const opc_Event)
    bool q_CallOrig = true;
 
    if ((this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC) &&
+       (this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM) &&
        (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == true))
    {
       switch (opc_Event->key())
@@ -522,7 +543,8 @@ void C_SdNdeDpSelectorWidget::m_OnErrorCheck(void)
 void C_SdNdeDpSelectorWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    // For HAL Datapools no context menu is necessary
-   if (this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC)
+   if ((this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC) &&
+       (this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM))
    {
       this->mpc_ContextMenu->popup(this->mapToGlobal(orc_Pos));
    }
@@ -580,7 +602,8 @@ void C_SdNdeDpSelectorWidget::m_UpdateErrorToolTip(void)
       QString c_Heading;
       QString c_Content;
       bool q_Error = false;
-      bool q_NvmProblem = false;
+      bool q_DatapoolNvmSizeConflict = false;
+      bool q_DatapoolNvmOverlapConflict = false;
       std::vector<uint32> c_InvalidDataPoolIndices;
 
       for (sintn sn_ItDp = 0; sn_ItDp < this->mpc_Ui->pc_ListWidget->GetItemCount(); ++sn_ItDp)
@@ -605,19 +628,21 @@ void C_SdNdeDpSelectorWidget::m_UpdateErrorToolTip(void)
          }
       }
 
-      if (this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eNVM)
+      if ((this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eNVM) ||
+          (this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM))
       {
          // check the entire NVM size
-         if (C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(this->mu32_NodeIndex) == true)
+         if (C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(this->mu32_NodeIndex,
+                                                                                &q_DatapoolNvmSizeConflict,
+                                                                                &q_DatapoolNvmOverlapConflict) == true)
          {
             q_Error = true;
-            q_NvmProblem = true;
          }
       }
       if (q_Error == true)
       {
-         C_SdUtil::h_GetErrorToolTipDataPools(this->mu32_NodeIndex, c_InvalidDataPoolIndices, q_NvmProblem, c_Heading,
-                                              c_Content);
+         C_SdUtil::h_GetErrorToolTipDataPools(this->mu32_NodeIndex, c_InvalidDataPoolIndices, q_DatapoolNvmSizeConflict,
+                                              q_DatapoolNvmOverlapConflict, c_Heading, c_Content);
       }
       this->mpc_LabelStateImg->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
    }

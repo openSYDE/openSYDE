@@ -51,7 +51,7 @@ C_GiLiInteractionPoint::C_GiLiInteractionPoint(const sint32 & ors32_PointIndex, 
    this->setFlag(ItemSendsGeometryChanges);
 
    this->mc_DefaultCursor = static_cast<QCursor>(Qt::SizeBDiagCursor);
-   this->RestoreDefaultCursor();
+   this->C_GiLiInteractionPoint::RestoreDefaultCursor();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

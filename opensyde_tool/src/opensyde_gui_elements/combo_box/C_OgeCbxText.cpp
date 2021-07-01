@@ -65,7 +65,7 @@ C_OgeCbxText::C_OgeCbxText(QWidget * const opc_Parent) :
 
    this->setContextMenuPolicy(Qt::NoContextMenu);
 
-   connect(this, static_cast<void (QComboBox::*)(const QString &)>(&C_OgeCbxText::activated), this,
+   connect(this, static_cast<void (QComboBox::*)(const QString &)>(&C_OgeCbxText::textActivated), this,
            &C_OgeCbxText::m_Activated);
 }
 

@@ -95,7 +95,7 @@ static bool m_CheckUncShare(const C_SCLString & orc_Path)
       // check beginning of path for "//" or "\\"
       if ((orc_Path.SubString(1, 2) == "//") || (orc_Path.SubString(1, 2) == "\\\\"))
       {
-         size_t un_CharIndex = orc_Path.AsStdString()->find_first_of("\\/", 2);
+         const size_t un_CharIndex = orc_Path.AsStdString()->find_first_of("\\/", 2);
          // check if no deeper UNC path like "\\mypc\shared"
          if ((un_CharIndex == orc_Path.Length()) || // case path ends on slash
              (un_CharIndex == std::string::npos))   // case path does not contain another slash
@@ -145,10 +145,10 @@ bool stw_tgl::TGL_FileAgeString(const C_SCLString & orc_FileName, C_SCLString & 
    if (q_Return == true)
    {
       c_DateTime.mu16_Day    = static_cast<uint16>(u16_Date & 0x1FU);
-      c_DateTime.mu16_Month  = static_cast<uint16>((u16_Date >> 5) & 0x0FU);
-      c_DateTime.mu16_Year   = static_cast<uint16>((u16_Date >> 9) + 1980U);
-      c_DateTime.mu16_Hour   = static_cast<uint16>(u16_Time >> 11);
-      c_DateTime.mu16_Minute = static_cast<uint16>((u16_Time >> 5) & 0x3FU);
+      c_DateTime.mu16_Month  = static_cast<uint16>((u16_Date >> 5U) & 0x0FU);
+      c_DateTime.mu16_Year   = static_cast<uint16>((u16_Date >> 9U) + 1980U);
+      c_DateTime.mu16_Hour   = static_cast<uint16>(u16_Time >> 11U);
+      c_DateTime.mu16_Minute = static_cast<uint16>((u16_Time >> 5U) & 0x3FU);
       c_DateTime.mu16_Second = static_cast<uint16>((u16_Time & 0x1FU) * 2U);
    }
    else

@@ -88,7 +88,6 @@ private:
    const E_Type me_Mode;
    QColor mc_Color;
    QColor mc_InnerLineColor;
-   stw_types::sint32 ms32_LineStyle;
 
    QLabel * mpc_LabelColor;
    QLabel * mpc_LabelColorInner;

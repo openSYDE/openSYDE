@@ -10,6 +10,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "TGLUtils.h"
 #include "constants.h"
 #include "C_OgeWiUtil.h"
 #include "C_SyvDaItDashboardLabelWidget.h"
@@ -153,8 +154,11 @@ void C_SyvDaItDashboardLabelWidget::SetDisplayStyle(const C_PuiSvDbLabel::E_Type
    case C_PuiSvDbLabel::eTRANSPARENT:
       C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Type", "TRANSPARENT");
       break;
-   default:
+   case C_PuiSvDbLabel::eDEFAULT:
       C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Type", "DEFAULT");
+      break;
+   default:
+      tgl_assert(false);
       break;
    }
    this->mpc_Ui->pc_LabelCaption->setVisible(oq_ShowCaption);

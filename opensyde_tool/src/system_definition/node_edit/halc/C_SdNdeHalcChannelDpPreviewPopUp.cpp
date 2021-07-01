@@ -209,7 +209,7 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDpSection(const uint32 ou32_NodeInd
                   "</td>";
       orc_Text += "</tr>";
       orc_Text += "<tr>";
-      orc_Text += "<td>" + static_cast<QString>(C_GtGetText::h_GetText("Mapped Datablock:")) + "</td>";
+      orc_Text += "<td>" + static_cast<QString>(C_GtGetText::h_GetText("Mapped Datablock: ")) + "</td>";
 
       if ((pc_Datapool != NULL) && (pc_Datapool->s32_RelatedDataBlockIndex >= 0))
       {
@@ -253,6 +253,7 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
    const QString c_ColumnContentHeadingTagStart =
       static_cast<QString>("<td style=\"padding: 30px %1 6px %1;font-weight: bold;\">").
       arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
+   const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
 
    orc_Text += "<h3>";
    orc_Text += C_GtGetText::h_GetText("Used Datapool Elements");
@@ -277,7 +278,16 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
    orc_Text += C_GtGetText::h_GetText("Description");
    orc_Text += "</td>";
    orc_Text += "</tr>";
+   if (pc_OSCNode != NULL)
    {
+      const C_OSCHALCMagicianDatapoolListHandler c_DpHandlerLP(pc_OSCNode->c_HALCConfig, C_OSCHalcDefDomain::eVA_PARAM,
+                                                               true /*irrelevant here*/);
+      const C_OSCHALCMagicianDatapoolListHandler c_DpHandlerLI(pc_OSCNode->c_HALCConfig, C_OSCHalcDefDomain::eVA_INPUT,
+                                                               true /*irrelevant here*/);
+      const C_OSCHALCMagicianDatapoolListHandler c_DpHandlerLO(pc_OSCNode->c_HALCConfig, C_OSCHalcDefDomain::eVA_OUTPUT,
+                                                               true /*irrelevant here*/);
+      const C_OSCHALCMagicianDatapoolListHandler c_DpHandlerLS(pc_OSCNode->c_HALCConfig, C_OSCHalcDefDomain::eVA_STATUS,
+                                                               true /*irrelevant here*/);
       std::vector<uint32> c_ParameterIndices;
       std::vector<uint32> c_InputIndices;
       std::vector<uint32> c_OutputIndices;
@@ -310,38 +320,38 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_ChannelValues.c_Parameters,
                                                                       c_ParameterIndices, c_ListName1,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, true);
+                                                                      *pc_Domain, c_DpHandlerLP, true);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_ChannelValues.c_InputValues,
                                                                       c_InputIndices, c_ListName2,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, false);
+                                                                      *pc_Domain, c_DpHandlerLI, false);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_ChannelValues.c_OutputValues,
                                                                       c_OutputIndices, c_ListName3,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, false);
+                                                                      *pc_Domain, c_DpHandlerLO, false);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_ChannelValues.c_StatusValues,
                                                                       c_StatusIndices, c_ListName4,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, false);
+                                                                      *pc_Domain, c_DpHandlerLS, false);
                }
                else
                {
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_DomainValues.c_Parameters,
                                                                       c_ParameterIndices, c_ListName1,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, true);
+                                                                      *pc_Domain, c_DpHandlerLP, true);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_DomainValues.c_InputValues,
                                                                       c_InputIndices, c_ListName2,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, false);
+                                                                      *pc_Domain, c_DpHandlerLI, false);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_DomainValues.c_OutputValues,
                                                                       c_OutputIndices, c_ListName3,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, false);
+                                                                      *pc_Domain, c_DpHandlerLO, false);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_DomainValues.c_StatusValues,
                                                                       c_StatusIndices, c_ListName4,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, false);
+                                                                      *pc_Domain, c_DpHandlerLS, false);
                }
             }
          }
@@ -394,6 +404,7 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddUseCase(const uint32 ou32_NodeIndex
    \param[in]      orc_DomainSingularName    Domain singular name
    \param[in,out]  orc_Text                  Text
    \param[in]      orc_Domain                Domain
+   \param[in]      orc_DpHandler             Datapool handler
    \param[in]      oq_AddSpecialVars         Add special vars
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -403,6 +414,7 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(const std::vector<C_OSC
                                                          const stw_scl::C_SCLString & orc_DomainSingularName,
                                                          QString & orc_Text,
                                                          const stw_opensyde_core::C_OSCHalcDefDomain & orc_Domain,
+                                                         const C_OSCHALCMagicianDatapoolListHandler & orc_DpHandler,
                                                          const bool oq_AddSpecialVars)
 {
    bool q_AddedList = false;
@@ -411,14 +423,14 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(const std::vector<C_OSC
    {
       if (oq_AddSpecialVars)
       {
-         if (C_OSCHALCMagicianUtil::h_CheckChanNumVariableNecessary(orc_Domain))
+         if (orc_DpHandler.CheckChanNumVariableNecessary(orc_Domain))
          {
             const C_OSCNodeDataPoolListElement c_Tmp = C_OSCHALCMagicianUtil::h_GetChanNumVariable(
                orc_DomainSingularName, true /*irrelevant here*/, 1UL, false);
             C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(orc_ListName, q_AddedList, c_Tmp.c_Name, c_Tmp.c_Comment,
                                                               orc_Text);
          }
-         if (C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(orc_Domain))
+         if (orc_DpHandler.CheckUseCaseVariableNecessary(orc_Domain))
          {
             const C_OSCNodeDataPoolListElement c_Tmp = C_OSCHALCMagicianUtil::h_GetUseCaseVariable(
                orc_DomainSingularName, true /*irrelevant here*/, 1UL, false);

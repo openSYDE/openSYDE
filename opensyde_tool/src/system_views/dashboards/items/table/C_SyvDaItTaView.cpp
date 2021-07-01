@@ -16,6 +16,7 @@
 #include <QHeaderView>
 #include <QMouseEvent>
 #include "stwtypes.h"
+#include "TGLUtils.h"
 #include "C_OgeWiUtil.h"
 #include "C_PuiSdHandler.h"
 #include "C_SyvDaItTaView.h"
@@ -53,7 +54,7 @@ C_SyvDaItTaView::C_SyvDaItTaView(C_PuiSvDbDataElementHandler * const opc_Data, Q
    mc_Model(opc_Data)
 {
    //Model
-   this->setModel(&mc_Model);
+   this->C_SyvDaItTaView::setModel(&mc_Model);
 
    //Drawing delegate
    this->setItemDelegate(&mc_Delegate);
@@ -314,6 +315,9 @@ void C_SyvDaItTaView::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Styl
       this->setGridStyle(Qt::SolidLine);
       this->setShowGrid(true);
       this->setAlternatingRowColors(false);
+      break;
+   default:
+      tgl_assert(false);
       break;
    }
 }

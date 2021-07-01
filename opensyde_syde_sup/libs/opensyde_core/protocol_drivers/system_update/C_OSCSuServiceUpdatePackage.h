@@ -90,9 +90,6 @@ protected:
                                                           const std::vector<stw_types::uint32> & orc_NodesUpdateOrder,
                                                           const std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite);
 
-   static stw_types::sint32 mh_CopyFile(const stw_scl::C_SCLString & orc_SourceFile,
-                                        const stw_scl::C_SCLString & orc_TargetFile);
-
    static void mh_CreateUpdatePackageDefFile(const stw_scl::C_SCLString & orc_Path,
                                              const C_SupDefContent & orc_SupDefContent);
 
@@ -112,9 +109,6 @@ protected:
    static stw_types::sint32 mh_SetNodesUpdateOrder(const std::map<stw_types::uint32,
                                                                   stw_types::uint32> & orc_UpdateOrderByNodes,
                                                    std::vector<stw_types::uint32> & orc_NodesUpdateOrder);
-   static void mh_AppendFilesRelative(std::set<stw_scl::C_SCLString> & orc_Set,
-                                      const std::vector<stw_scl::C_SCLString> & orc_Files,
-                                      const stw_scl::C_SCLString & orc_BasePath);
    static void mh_LoadFilesSection(std::vector<stw_scl::C_SCLString> & orc_Files,
                                    const stw_types::uint32 ou32_NodeCounter, const stw_types::uint32 ou32_UpdatePos,
                                    std::map<stw_types::uint32,

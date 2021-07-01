@@ -60,9 +60,6 @@ void TGL_PACKAGE TGL_HandleSystemMessages(void);
 stw_types::sint32 TGL_PACKAGE TGL_SetEnvironmentVariable(const stw_scl::C_SCLString & orc_Name,
                                                          const stw_scl::C_SCLString & orc_Value);
 
-//resource string handling:
-stw_scl::C_SCLString TGL_PACKAGE TGL_LoadStr(const stw_types::uint16 ou16_StringIndex);
-
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 

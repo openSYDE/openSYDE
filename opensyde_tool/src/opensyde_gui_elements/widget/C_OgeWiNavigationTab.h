@@ -35,9 +35,10 @@ public:
    explicit C_OgeWiNavigationTab(QWidget * const opc_Parent = NULL);
    ~C_OgeWiNavigationTab(void);
 
+   void SetEnabled(const bool oq_Enabled);
    void SetIncludeLeftBorder(const bool oq_Include);
    void SetActive(const bool oq_Active);
-   void SetIconSvg(const QString & orc_IconSvg) const;
+   void SetIconSvg(const QString & orc_IconSvg, const QString & orc_IconSvgDisabled);
    void SetText(const QString & orc_NewText) const;
 
 protected:
@@ -47,6 +48,8 @@ protected:
 private:
    Ui::C_OgeWiNavigationTab * mpc_Ui;
    bool mq_Active;
+   QString mc_IconEnabled;
+   QString mc_IconDisabled;
 
    //Avoid call
    C_OgeWiNavigationTab(const C_OgeWiNavigationTab &);

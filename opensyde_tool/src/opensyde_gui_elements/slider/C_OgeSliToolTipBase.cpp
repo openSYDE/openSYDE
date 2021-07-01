@@ -50,7 +50,8 @@ C_OgeSliToolTipBase::C_OgeSliToolTipBase(QWidget * const opc_Parent) :
    mf64_ToolTipRangeOffset(0.0),
    mf64_ToolTipOffset(0.0),
    mf64_ToolTipFactor(1.0),
-   me_RepresentationType(C_OSCNodeDataPoolContent::eSINT32)
+   me_RepresentationType(C_OSCNodeDataPoolContent::eSINT32),
+   ms32_ToolTipCoordY(0)
 {
    connect(this, &C_OgeSliToolTipBase::valueChanged, this, &C_OgeSliToolTipBase::m_OnValueChange);
 }
@@ -207,7 +208,6 @@ void C_OgeSliToolTipBase::m_MoveToolTip(void)
    if (this->m_GetToolTip() != NULL)
    {
       QPoint c_ToolTipPos;
-
       c_ToolTipPos.setX(QStyle::sliderPositionFromValue(this->minimum(), this->maximum(), this->value(),
                                                         this->width() - 12)); // 2x border width + 2x margin
       c_ToolTipPos.setY(ms32_ToolTipCoordY);

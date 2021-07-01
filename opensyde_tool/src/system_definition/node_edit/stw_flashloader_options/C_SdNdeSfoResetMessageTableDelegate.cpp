@@ -12,6 +12,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "TGLUtils.h"
 #include "constants.h"
 #include "C_GtGetText.h"
 #include "C_OgeCbxTable.h"
@@ -208,7 +209,6 @@ void C_SdNdeSfoResetMessageTableDelegate::setModelData(QWidget * const opc_Edito
       case C_SdNdeSfoResetMessageTableModel::eBYTE6:
       case C_SdNdeSfoResetMessageTableModel::eBYTE7:
       case C_SdNdeSfoResetMessageTableModel::eBYTE8:
-
          pc_SpinBox = dynamic_cast<QSpinBox *>(opc_Editor);
          if (pc_SpinBox != NULL)
          {
@@ -216,12 +216,14 @@ void C_SdNdeSfoResetMessageTableDelegate::setModelData(QWidget * const opc_Edito
          }
          break;
       case C_SdNdeSfoResetMessageTableModel::eEXTENDED_FORMAT:
-
          pc_ComboBox = dynamic_cast<QComboBox *>(opc_Editor);
          if (pc_ComboBox != NULL)
          {
             opc_Model->setData(orc_Index, pc_ComboBox->currentIndex());
          }
+         break;
+      default:
+         tgl_assert(false);
          break;
       }
    }

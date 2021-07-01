@@ -75,14 +75,17 @@ void C_PuiBsLineBase::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
 
    stw_scl::C_SCLChecksums::CalcCRC32(&this->s32_UIWidthPixels, sizeof(this->s32_UIWidthPixels), oru32_HashValue);
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_ZOrder, sizeof(this->f64_ZOrder), oru32_HashValue);
 
    for (u32_Counter = 0U; u32_Counter < this->c_UIInteractionPoints.size(); ++u32_Counter)
    {
       f64_Value = this->c_UIInteractionPoints[u32_Counter].x();
+      //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
       stw_scl::C_SCLChecksums::CalcCRC32(&f64_Value, sizeof(f64_Value), oru32_HashValue);
 
       f64_Value = this->c_UIInteractionPoints[u32_Counter].y();
+      //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
       stw_scl::C_SCLChecksums::CalcCRC32(&f64_Value, sizeof(f64_Value), oru32_HashValue);
    }
 }

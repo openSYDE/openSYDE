@@ -56,6 +56,43 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComProtocolFile(C_OSCCanProtocol & orc_Node
    sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser, orc_FilePath,
                                                                         "opensyde-comm-core-definition");
 
+   //File version
+   if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading node definition", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading node definition", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != 1U)
+         {
+            osc_write_log_error("Loading node definition",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      c_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading node definition", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
+
    if (s32_Retval == C_NO_ERR)
    {
       if (c_XMLParser.SelectNodeChild("com-protocol") == "com-protocol")

@@ -39,10 +39,16 @@ public:
    virtual ~C_NagMainWidget();
 
    void InitText(void) const;
+   void LoadInitialProject(void);
    void LoadProject(const QString & orc_FilePath);
    void UpdateRecentProjects(void);
    void OnSaveProjAs(void);
+   void OnCreateServiceProj(void);
    void OpenColorPicker(void);
+   void HandleServiceMode(void) const;
+
+   static void h_GetFirstValidViewForServiceMode(stw_types::uint32 & oru32_ViewIndex, stw_types::sint32 & ors32_SubMode,
+                                                 bool & orq_Found);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -74,11 +80,13 @@ private:
    void m_UpdateCurrProjInfo(void);
    void m_OnNewProj(void);
    void m_OnOpenProj(void);
-   void m_OnSaveProj(void);
+   void m_OnCreateServiceProj(void);
    void m_OnEdit(void) const;
    void m_OnEditFinished(void);
    void m_OnClear(void);
    void m_OnIndexClicked(const QModelIndex & orc_ModelIndex);
+   stw_types::sint32 m_LoadConcreteProject(stw_types::uint16 * const opu16_FileVersion);
+   stw_types::sint32 m_GetPassword(QString & orc_Password);
 
    Ui::C_NagMainWidget * mpc_Ui;
 };

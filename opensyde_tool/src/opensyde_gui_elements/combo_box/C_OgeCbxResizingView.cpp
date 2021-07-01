@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeCbxResizingView::C_OgeCbxResizingView(QWidget * const opc_Parent) :
@@ -65,7 +65,7 @@ void C_OgeCbxResizingView::ResizeViewToContents(void) const
       for (sint32 s32_ItItem = 0; s32_ItItem < this->count(); ++s32_ItItem)
       {
          s32_MaxWidth =
-            std::max(s32_MaxWidth, static_cast<sint32>(c_Metrics.width(this->itemText(s32_ItItem))));
+            std::max(s32_MaxWidth, static_cast<sint32>(c_Metrics.horizontalAdvance(this->itemText(s32_ItItem))));
       }
       //Use combo box size as minimum, otherwise use longest entry
       //+ magic number (some offset to avoid cutting of any text)

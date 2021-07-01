@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Dialog for code generation report (implementation)
+   \brief       Dialog for file generation report (implementation)
 
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -60,7 +60,7 @@ C_ImpCodeGenerationReportWidget::C_ImpCodeGenerationReportWidget(
    this->mrc_ParentDialog.SetWidget(this);
 
    // set main title
-   this->mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("Code Generation")));
+   this->mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("File Generation")));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Report"));
 
    // connects
@@ -90,7 +90,7 @@ void C_ImpCodeGenerationReportWidget::InitStaticNames(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Create report for code generation in HTML.
+/*! \brief   Create report for file generation in HTML.
 
    \param[in]  orc_ExportInfo    Information containing exported file paths for each Data Block
 */
@@ -115,9 +115,9 @@ const
       // open new table
       c_MessageResultText += "<table><tr>";
 
-      // first table row:  | Code Generator: | C:/path/to/syde_coder.exe |
+      // first table row:  | File Generator: | C:/path/to/syde_coder.exe |
       c_MessageResultText += mhc_HTML_TABLE_DATA_START;
-      c_MessageResultText += C_GtGetText::h_GetText("Code Generator:");
+      c_MessageResultText += C_GtGetText::h_GetText("File Generator:");
       c_MessageResultText += "</td>";
       c_MessageResultText += mhc_HTML_TABLE_DATA_START;
       c_MessageResultText +=
@@ -126,10 +126,10 @@ const
       c_MessageResultText += "</td>";
       c_MessageResultText += "</tr>";
 
-      // second table row:  | Code Structure Version: | 3 |
+      // second table row:  | File Structure Version: | 3 |
       c_MessageResultText += "<tr>";
       c_MessageResultText += mhc_HTML_TABLE_DATA_START;
-      c_MessageResultText += C_GtGetText::h_GetText("Code Structure:");
+      c_MessageResultText += C_GtGetText::h_GetText("File Structure:");
       c_MessageResultText += "</td>";
       c_MessageResultText += mhc_HTML_TABLE_DATA_START;
       c_MessageResultText += C_GtGetText::h_GetText("Version ");

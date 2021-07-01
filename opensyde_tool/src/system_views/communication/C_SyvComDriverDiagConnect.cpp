@@ -332,8 +332,8 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
                            arg(c_FailedNodesElementNumber[rc_Id.u32_NodeIndex] - 1U);
                         this->mc_ErrorMessageDetails += static_cast<QString>("Tried to register %1 transmissions.\n"
                                                                              "To fix this adjust 'Max number of cyclic/event driven "
-                                                                             "transmissions' in 'Code Generation Settings' of"
-                                                                             " the node properties.\n\n").
+                                                                             "transmissions' in 'File Generation Settings' of"
+                                                                             " the node's properties.\n\n").
                                                         arg(c_NodesElementNumber[rc_Id.u32_NodeIndex]);
                      }
                   }

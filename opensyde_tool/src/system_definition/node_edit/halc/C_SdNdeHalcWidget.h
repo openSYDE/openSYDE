@@ -77,6 +77,7 @@ private:
    void m_OnChannelUpdate(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
                           const bool oq_UseChannelIndex) const;
    bool m_LoadHalcDefinitionFile(stw_opensyde_core::C_OSCHalcConfig & orc_HalcConfig, QString & orc_HalcDefPath);
+   void m_CleanUpHalcDefinition(void) const;
    void m_UpdateNodeData(void) const;
    void m_UpdatePinCount(void) const;
    void m_UpdateDisplayedData(void) const;

@@ -142,7 +142,8 @@ void C_SdNdeDpEditWidget::OpenDetail(const sint32 os32_DataPoolIndex, const sint
 
       if ((os32_ListIndex >= 0) &&
           (e_Type != C_OSCNodeDataPool::eCOM) &&
-          (e_Type != C_OSCNodeDataPool::eHALC))
+          (e_Type != C_OSCNodeDataPool::eHALC) &&
+          (e_Type != C_OSCNodeDataPool::eHALC_NVM))
       {
          this->mpc_Ui->pc_ListsWidget->OpenDetail(os32_ListIndex, os32_DataElementIndex);
       }
@@ -204,7 +205,8 @@ void C_SdNdeDpEditWidget::m_OpenDataPoolContent(const uint32 ou32_DataPoolIndex)
          q_ShowInternalWidget = false;
       }
       // Comment this else if block out, to get the HAL Datapool in the list edit widget
-      else if (e_Type == C_OSCNodeDataPool::eHALC)
+      else if ((e_Type == C_OSCNodeDataPool::eHALC) ||
+               (e_Type == C_OSCNodeDataPool::eHALC_NVM))
       {
          Q_EMIT (this->SigSwitchToHalc());
          q_ShowInternalWidget = false;

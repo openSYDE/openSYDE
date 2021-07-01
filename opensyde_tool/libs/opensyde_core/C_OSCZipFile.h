@@ -38,6 +38,12 @@ public:
    static stw_types::sint32 h_UnpackZipFile(const stw_scl::C_SCLString & orc_SourcePath,
                                             const stw_scl::C_SCLString & orc_TargetUnzipPath,
                                             stw_scl::C_SCLString * const opc_ErrorText = NULL);
+
+   static void h_AppendFilesRelative(std::set<stw_scl::C_SCLString> & orc_Set,
+                                     const std::vector<stw_scl::C_SCLString> & orc_Files,
+                                     const stw_scl::C_SCLString & orc_BasePath);
+
+   static stw_types::sint32 h_IsZipFile(const stw_scl::C_SCLString & orc_FilePath);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

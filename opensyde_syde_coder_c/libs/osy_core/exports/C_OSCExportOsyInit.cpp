@@ -46,24 +46,6 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Constructor
-
-   Initialize all elements with default values
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_OSCExportOsyInit::C_OSCExportOsyInit(void)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_OSCExportOsyInit::~C_OSCExportOsyInit(void)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Return filename (without extension)
 
    \return filename
@@ -628,7 +610,8 @@ uint32 C_OSCExportOsyInit::mh_GetSizeOfLargestDataPoolElement(const std::vector<
    {
       for (uint32 u32_List = 0U; u32_List < orc_DataPools[u32_DataPool].c_Lists.size(); u32_List++)
       {
-         if (orc_DataPools[u32_DataPool].e_Type == C_OSCNodeDataPool::eNVM)
+         if ((orc_DataPools[u32_DataPool].e_Type == C_OSCNodeDataPool::eNVM) ||
+             (orc_DataPools[u32_DataPool].e_Type == C_OSCNodeDataPool::eHALC_NVM))
          {
             const uint32 u32_NumBytesUsed = orc_DataPools[u32_DataPool].c_Lists[u32_List].GetNumBytesUsed() +
                                             ((orc_DataPools[u32_DataPool].c_Lists[u32_List].q_NvMCRCActive ==

@@ -111,7 +111,7 @@ C_SdNdeDbAddNewProject::~C_SdNdeDbAddNewProject(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::InitStaticNames(void) const
 {
-   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Add Data Blocks"));
+   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Import TSP"));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Extract from openSYDE Target Support Package"));
    this->mpc_Ui->pc_LabelHeadingPreview->setText(C_GtGetText::h_GetText("Properties"));
    this->mpc_Ui->pc_LabelTSP->setText(C_GtGetText::h_GetText("openSYDE Target Support Package"));
@@ -192,17 +192,27 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OS
    {
       QString c_CodeGeneratorPath;
       const C_OSCTSPApplication & rc_SelectedApp = this->mc_Package.c_Applications[ou32_TSPIndex];
+      const QString c_ProjectPath =
+         C_Uti::h_ConcatPathIfNecessary(this->mpc_Ui->pc_LineEditCreateIn->GetPath(),
+                                        rc_SelectedApp.c_ProjectFolder.c_str());
       orc_Application.c_Name = rc_SelectedApp.c_Name;
       orc_Application.c_Comment = rc_SelectedApp.c_Comment;
       orc_Application.c_GeneratePath = rc_SelectedApp.c_GeneratePath;
-      orc_Application.c_ResultPath = rc_SelectedApp.c_ResultPath;
+      orc_Application.c_ResultPaths = rc_SelectedApp.c_ResultPaths;
       orc_Application.u8_ProcessId = rc_SelectedApp.u8_ProcessId;
       // do not concatenate project path with syde-file path because we support relative paths here
-      orc_Application.c_ProjectPath =
-         C_Uti::h_ConcatPathIfNecessary(this->mpc_Ui->pc_LineEditCreateIn->GetPath(),
-                                        rc_SelectedApp.c_ProjectFolder.c_str()).toStdString().c_str();
+      orc_Application.c_ProjectPath = c_ProjectPath.toStdString().c_str();
       orc_Application.c_IDECall = rc_SelectedApp.c_IdeCall;
       orc_Application.u16_GenCodeVersion = rc_SelectedApp.u16_GenCodeVersion;
+
+      // for psi generation the generation path can not be edited and therefore should be empty;
+      // its functionality is taken over by the project path.
+      if (rc_SelectedApp.q_GeneratesPsiFiles == true)
+      {
+         orc_Application.c_GeneratePath = "";
+         orc_Application.c_ProjectPath =
+            C_Uti::h_ConcatPathIfNecessary(c_ProjectPath, rc_SelectedApp.c_GeneratePath.c_str()).toStdString().c_str();
+      }
 
       //do not allow to save higher value as highest known code structure version
       if (orc_Application.u16_GenCodeVersion > mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION)
@@ -214,7 +224,7 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OS
                              arg(orc_Application.c_Name.c_str()).arg(mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION));
       }
 
-      //Handle default code generator flag
+      //Handle default file generator flag
       if (rc_SelectedApp.q_IsStandardSydeCoderC == true)
       {
          c_CodeGeneratorPath = C_ImpUtil::h_GetSydeCoderCPath();
@@ -225,20 +235,27 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OS
       }
       orc_Application.c_CodeGeneratorPath = c_CodeGeneratorPath.toStdString().c_str();
 
-      // Handle is-programmable flag
+      // Handle file generation flags
       if (rc_SelectedApp.q_IsProgrammable == true)
       {
-         orc_Application.e_Type = C_OSCNodeApplication::E_Type::ePROGRAMMABLE_APPLICATION;
+         orc_Application.e_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
       }
       else
       {
-         orc_Application.e_Type = C_OSCNodeApplication::E_Type::eBINARY;
+         if (rc_SelectedApp.q_GeneratesPsiFiles == true)
+         {
+            orc_Application.e_Type = C_OSCNodeApplication::ePARAMETER_SET_HALC;
+         }
+         else
+         {
+            orc_Application.e_Type = C_OSCNodeApplication::eBINARY;
+         }
       }
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle code gen config
+/*! \brief   Handle file generation configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::HandleCodeGenerationConfig(void) const
@@ -253,6 +270,36 @@ void C_SdNdeDbAddNewProject::HandleCodeGenerationConfig(void) const
 
    C_PuiSdHandler::h_GetInstance()->SetNodeOpenSYDEServerSettings(this->mu32_NodeIndex, c_DPDSettings);
    C_PuiSdHandler::h_GetInstance()->SetNodeCodeExportSettings(this->mu32_NodeIndex, c_GeneralSettings);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  returns path to halc def as it is in TSP
+
+   \retval   QString   path to syde_halc_def file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdNdeDbAddNewProject::GetHalcDefinitionFileName()
+{
+   QString c_HalcDefPath = mc_Package.c_HalcDefPath.c_str();
+
+   return c_HalcDefPath.remove(0, 2);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  returns path to halc def file at location user chose in Import Dialog
+
+   \retval   QString   path to syde_halc_def file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdNdeDbAddNewProject::GetProcessedHalcDefinitionPath(void)
+{
+   QString const c_Path = this->mpc_Ui->pc_LineEditCreateIn->GetPath();
+   QString c_HalcDefPath = mc_Package.c_HalcDefPath.c_str();
+
+   c_HalcDefPath.remove(0, 1);
+   c_HalcDefPath = c_Path + c_HalcDefPath;
+
+   return c_HalcDefPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -294,152 +341,212 @@ void C_SdNdeDbAddNewProject::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_OkClicked(void)
 {
-   bool q_Continue = false;
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   QDir c_CreateInFolder(
+      C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath()));
 
-   if (this->ms32_TSPReadResult != C_NO_ERR)
+   if (pc_Node != NULL)
    {
-      QString c_Details;
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
-      switch (this->ms32_TSPReadResult)
+      bool q_Continue = false;
+      bool q_ValidTsp = false;
+      if (this->ms32_TSPReadResult != C_NO_ERR)
       {
-      case C_RANGE:
-         c_Details = C_GtGetText::h_GetText("Specified openSYDE Target Support Package does not exist.");
-         break;
-      case C_NOACT:
-         c_Details =
-            C_GtGetText::h_GetText("Specified file is present but its structure is invalid (e.g. invalid XML file).");
-         break;
-      case C_CONFIG:
-         c_Details = C_GtGetText::h_GetText("In specified file is a XML node or attribute missing.");
-         break;
-      default:
-         c_Details = C_GtGetText::h_GetText("Unknown error occurred.");
-         break;
-      }
-      c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                       "Could not load specified openSYDE Target Support Package.")));
-      c_Message.SetDetails(c_Details);
-      c_Message.SetCustomMinHeight(180, 250);
-      c_Message.Execute();
-   }
-   else
-   {
-      QDir c_CreateInFolder(
-         C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath()));
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-
-      if (this->mpc_Ui->pc_LineEditTSP->GetPath() == "")
-      {
+         QString c_Details;
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
-         c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                          "No openSYDE Target Support Package specified")));
-         c_Message.SetCustomMinHeight(180, 180);
-         c_Message.Execute();
-      }
-      else if ((pc_Node != NULL) && (this->mc_Package.c_DeviceName != pc_Node->c_DeviceType))
-      {
-         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
-         c_Message.SetDescription(
-            static_cast<QString>(C_GtGetText::h_GetText(
-                                    "The openSYDE Target Support Package device \"%1\" does not match the "
-                                    "device \"%2\" of this node")).
-            arg(this->mc_Package.c_DeviceName.c_str()).
-            arg(pc_Node->c_DeviceType.c_str()));
-         c_Message.SetCustomMinHeight(230, 180);
-         c_Message.Execute();
-      }
-      else if (this->mpc_Ui->pc_LineEditCreateIn->GetPath().isEmpty() == true)
-      {
-         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
-         c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                          "Define a directory for the project here.")));
-         c_Message.SetCustomMinHeight(180, 180);
-         c_Message.Execute();
-      }
-      else if ((c_CreateInFolder.exists() == true) &&
-               (c_CreateInFolder.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).count() != 0))
-      {
-         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
-         c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
-         c_Message.SetNOButtonText(C_GtGetText::h_GetText("Continue without Clearing"));
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Clear and Continue"));
-         c_Message.SetDescription(
-            static_cast<QString>(C_GtGetText::h_GetText(
-                                    "Directory \"%1\" is not empty. \n\nShould this directory be cleared? "
-                                    "Attention: Your data will be lost!")).arg(c_CreateInFolder.
-                                                                               absolutePath()));
-         c_Message.SetCustomMinHeight(230, 230);
-         c_Message.SetCustomMinWidth(800);
-
-         switch (c_Message.Execute())
+         c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+         switch (this->ms32_TSPReadResult)
          {
-         case C_OgeWiCustomMessage::eYES:
-            QApplication::setOverrideCursor(Qt::WaitCursor);
-            if (c_CreateInFolder.removeRecursively() == true)
+         case C_RANGE:
+            c_Details = C_GtGetText::h_GetText("Specified openSYDE Target Support Package does not exist.");
+            break;
+         case C_NOACT:
+            c_Details =
+               C_GtGetText::h_GetText(
+                  "Specified file is present but its structure is invalid (e.g. invalid XML file).");
+            break;
+         case C_CONFIG:
+            c_Details = C_GtGetText::h_GetText("In specified file is a XML node or attribute missing.");
+            break;
+         default:
+            c_Details = C_GtGetText::h_GetText("Unknown error occurred.");
+            break;
+         }
+         c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Could not load specified openSYDE Target Support Package.")));
+         c_Message.SetDetails(c_Details);
+         c_Message.SetCustomMinHeight(180, 250);
+         c_Message.Execute();
+      }
+      else
+      {
+         // no error on parsing TSP (see m_OnLoadTSP())
+         q_ValidTsp = true;
+
+         if (this->mc_Package.c_DeviceName != pc_Node->c_DeviceType)
+         {
+            C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+            c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+            c_Message.SetDescription(
+               static_cast<QString>(C_GtGetText::h_GetText(
+                                       "The openSYDE Target Support Package device \"%1\" does not match the "
+                                       "device \"%2\" of this node")).
+               arg(this->mc_Package.c_DeviceName.c_str()).
+               arg(pc_Node->c_DeviceType.c_str()));
+            c_Message.SetCustomMinHeight(230, 180);
+            c_Message.Execute();
+         }
+         // No output dir
+         else if (this->mpc_Ui->pc_LineEditCreateIn->GetPath().isEmpty() == true)
+         {
+            C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+            c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+            c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                             "Define a directory for the project here.")));
+            c_Message.SetCustomMinHeight(180, 180);
+            c_Message.Execute();
+         }
+         // TSP device matches current node and dialog is executed properly -> user may continue
+         else
+         {
+            q_Continue = true;
+         }
+      }
+
+      if ((q_Continue == true) && (q_ValidTsp == true))
+      {
+         bool q_IsWarningSet = true;
+
+         C_OgeWiCustomMessage c_Warning(this, C_OgeWiCustomMessage::eWARNING);
+         c_Warning.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+         c_Warning.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+         c_Warning.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
+
+         // Currently there are datablocks for this node and the TSP contains datablocks AND additionally
+         // there is a current halc config and TSP contains a halc config -> both gets deleted
+         if (((pc_Node->c_Applications.empty() == false) && (mc_Package.c_Applications.size() > 0)) &&
+             ((pc_Node->c_HALCConfig.IsClear() == false) && (mc_Package.c_HalcDefPath != "")))
+         {
+            c_Warning.SetDescription(C_GtGetText::h_GetText(
+                                        "All existing Data Blocks will be deleted and the hardware configuration will be cleared. Do you really want to continue?"));
+         }
+         // Currently there are datablocks for this node and the TSP contains datablocks. (No check for halc -> see case
+         // above)
+         else if ((pc_Node->c_Applications.empty() == false) && (mc_Package.c_Applications.size() > 0))
+         {
+            c_Warning.SetDescription(C_GtGetText::h_GetText(
+                                        "All existing Data Blocks will be deleted. Do you really want to continue?"));
+         }
+         // Currently there is a halc def and TSP contains halc def.
+         else if ((pc_Node->c_HALCConfig.IsClear() == false) && (mc_Package.c_HalcDefPath != ""))
+         {
+            c_Warning.SetDescription(C_GtGetText::h_GetText(
+                                        "The existing hardware configuration will be cleared. Do you really want to continue?"));
+         }
+         // Cases this else gets reached (no warning needed):
+         // No current datablocks or halc
+         // There is a current halc, but none in TSP
+         // There are current datablocks, but none in TSP
+         else
+         {
+            q_IsWarningSet = false;
+         }
+
+         if (q_IsWarningSet == true)
+         {
+            // only if warning is set the message box is executed. User cancels message box -> shall not continue
+            if (c_Warning.Execute() != C_OgeWiCustomMessage::eOK)
             {
+               q_Continue = false;
+            }
+         }
+         // when no warning is set user may continue
+      }
+
+      if (q_Continue == true)
+      {
+         if ((c_CreateInFolder.exists() == true) &&
+             (c_CreateInFolder.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).count() != 0))
+         {
+            q_Continue = false;
+
+            C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
+            c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+            c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
+            c_Message.SetNOButtonText(C_GtGetText::h_GetText("Continue without Clearing"));
+            c_Message.SetOKButtonText(C_GtGetText::h_GetText("Clear and Continue"));
+            c_Message.SetDescription(
+               static_cast<QString>(C_GtGetText::h_GetText(
+                                       "Directory \"%1\" is not empty. \n\nShould this directory be cleared? "
+                                       "Attention: Your data will be lost!")).arg(c_CreateInFolder.
+                                                                                  absolutePath()));
+            c_Message.SetCustomMinHeight(230, 230);
+            c_Message.SetCustomMinWidth(800);
+
+            switch (c_Message.Execute())
+            {
+            case C_OgeWiCustomMessage::eYES:
+               QApplication::setOverrideCursor(Qt::WaitCursor);
+               if (c_CreateInFolder.removeRecursively() == true)
+               {
+                  q_Continue = true;
+                  QApplication::restoreOverrideCursor();
+               }
+               else
+               {
+                  C_OgeWiCustomMessage c_Message2(this, C_OgeWiCustomMessage::eERROR);
+                  c_Message2.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+                  c_Message2.SetDescription(
+                     static_cast<QString>(C_GtGetText::h_GetText("Could not clear directory \"%1\".")).
+                     arg(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath())));
+                  QApplication::restoreOverrideCursor();
+                  c_Message2.SetCustomMinHeight(180, 180);
+                  c_Message2.Execute();
+               }
+               break;
+            case C_OgeWiCustomMessage::eNO:
                q_Continue = true;
+               break;
+            case C_OgeWiCustomMessage::eCANCEL:
+            default:
+               //Abort
+               break;
+            }
+         }
+         // if folder does not exist yet, q_Continue remains true
+
+         if (q_Continue == true)
+         {
+            const QFileInfo c_TSPFileInfo(this->GetTSPPath()); // file path -> use absoluteDir() to get directory of
+                                                               // file
+            stw_scl::C_SCLString c_ErrorText;
+            const QString c_Path =
+               QDir::cleanPath(c_TSPFileInfo.absoluteDir().absoluteFilePath(this->mc_Package.c_TemplatePath.c_str()));
+            QApplication::setOverrideCursor(Qt::WaitCursor);
+            if (C_OSCZipFile::h_UnpackZipFile(c_Path.toStdString().c_str(),
+                                              C_PuiUtil::h_GetAbsolutePathFromProject(
+                                                 this->mpc_Ui->pc_LineEditCreateIn->GetPath()).toStdString().c_str(),
+                                              &c_ErrorText) == C_NO_ERR)
+            {
+               this->mrc_ParentDialog.accept();
                QApplication::restoreOverrideCursor();
             }
             else
             {
-               C_OgeWiCustomMessage c_Message2(this, C_OgeWiCustomMessage::eERROR);
-               c_Message2.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
-               c_Message2.SetDescription(
-                  static_cast<QString>(C_GtGetText::h_GetText("Could not clear directory \"%1\".")).
-                  arg(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath())));
+               C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+               c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+               c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                                "Could not extract openSYDE Target Support Package "
+                                                                "from file \"%1\" to directory \"%2\".")).arg(
+                                           c_Path).
+                                        arg(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->
+                                                                                    GetPath())));
+               c_Message.SetCustomMinWidth(800);
+               c_Message.SetDetails(c_ErrorText.c_str());
+               c_Message.SetCustomMinHeight(230, 300);
                QApplication::restoreOverrideCursor();
-               c_Message2.SetCustomMinHeight(180, 180);
-               c_Message2.Execute();
+               c_Message.Execute();
             }
-            break;
-         case C_OgeWiCustomMessage::eNO:
-            q_Continue = true;
-            break;
-         default:
-            //Abort
-            break;
          }
-      }
-      else
-      {
-         q_Continue = true;
-      }
-   }
-   if (q_Continue == true)
-   {
-      const QFileInfo c_TSPFileInfo(this->GetTSPPath()); // file path -> use absoluteDir() to get directory of file
-      stw_scl::C_SCLString c_ErrorText;
-      const QString c_Path =
-         QDir::cleanPath(c_TSPFileInfo.absoluteDir().absoluteFilePath(this->mc_Package.c_TemplatePath.c_str()));
-      QApplication::setOverrideCursor(Qt::WaitCursor);
-      if (C_OSCZipFile::h_UnpackZipFile(c_Path.toStdString().c_str(),
-                                        C_PuiUtil::h_GetAbsolutePathFromProject(
-                                           this->mpc_Ui->pc_LineEditCreateIn->GetPath()).toStdString().c_str(),
-                                        &c_ErrorText) == C_NO_ERR)
-      {
-         this->mrc_ParentDialog.accept();
-         QApplication::restoreOverrideCursor();
-      }
-      else
-      {
-         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
-         c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                          "Could not extract openSYDE Target Support Package "
-                                                          "from file \"%1\" to directory \"%2\".")).arg(
-                                     c_Path).
-                                  arg(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->
-                                                                              GetPath())));
-         c_Message.SetCustomMinWidth(800);
-         c_Message.SetDetails(c_ErrorText.c_str());
-         c_Message.SetCustomMinHeight(230, 300);
-         QApplication::restoreOverrideCursor();
-         c_Message.Execute();
       }
    }
 }
@@ -552,7 +659,7 @@ void C_SdNdeDbAddNewProject::m_OnLoadTSP(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_AddTopSection(QString & orc_Content) const
 {
-   orc_Content += "<h4>" + static_cast<QString>(C_GtGetText::h_GetText("openSYDE Target Support Package")) + "</h4>";
+   orc_Content += "<h3>" + static_cast<QString>(C_GtGetText::h_GetText("openSYDE Target Support Package")) + "</h3>";
    orc_Content += "<table>";
    orc_Content += "<tr>";
    orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;
@@ -601,6 +708,31 @@ void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
       orc_Content += "</td>";
       orc_Content += C_SdNdeDbAddNewProject::mhc_ContinueTD;
       orc_Content += rc_Template.c_Comment.c_str();
+      orc_Content += "</td>";
+      orc_Content += "</tr>";
+      orc_Content += "</table>";
+   }
+
+   // if we have a HALC Config in TSP we want to display the path to the halc_def-file and a comment
+   if ((mc_Package.c_HalcDefPath != "") && (mc_Package.c_HalcComment != ""))
+   {
+      orc_Content += "<h4>" + static_cast<QString>(C_GtGetText::h_GetText("Hardware Configuration")) +
+                     "</h4>";
+      orc_Content += "<table>";
+      orc_Content += "<tr>";
+      orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;
+      orc_Content += C_GtGetText::h_GetText("HALC definition file:");
+      orc_Content += "</td>";
+      orc_Content += C_SdNdeDbAddNewProject::mhc_ContinueTD;
+      orc_Content += this->mc_Package.c_HalcDefPath.c_str();
+      orc_Content += "</td>";
+      orc_Content += "</tr>";
+      orc_Content += "<tr>";
+      orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;
+      orc_Content += C_GtGetText::h_GetText("Comment: ");
+      orc_Content += "</td>";
+      orc_Content += C_SdNdeDbAddNewProject::mhc_ContinueTD;
+      orc_Content += this->mc_Package.c_HalcComment.c_str();
       orc_Content += "</td>";
       orc_Content += "</tr>";
       orc_Content += "</table>";

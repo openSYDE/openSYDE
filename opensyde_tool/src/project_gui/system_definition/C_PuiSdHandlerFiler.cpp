@@ -269,7 +269,7 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPoolList(C_PuiSdNodeDataPoolList & orc_Dat
 sint32 C_PuiSdHandlerFiler::h_LoadDataPoolListElements(
    std::vector<C_PuiSdNodeDataPoolListElement> & orc_DataPoolListElements, C_OSCXMLParserBase & orc_XMLParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   const sint32 s32_Retval = C_NO_ERR;
 
    C_SCLString c_CurrentDataPoolListElementNode;
    uint32 u32_ExpectedSize = 0UL;
@@ -543,6 +543,43 @@ sint32 C_PuiSdHandlerFiler::h_LoadSharedDatapoolsFile(const QString & orc_FilePa
                                                                         "opensyde-shared-datapools-ui-definition");
 
    orc_SharedDatapools.c_SharedDatapools.clear();
+
+   //File version
+   if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading shared Datapools UI", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading shared Datapools UI", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != 1U)
+         {
+            osc_write_log_error("Loading shared Datapools UI",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      c_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading shared Datapools UI", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -1846,6 +1883,43 @@ sint32 C_PuiSdHandlerFiler::h_LoadSystemDefinitionUiFile(const QString & orc_Fil
                                                                         orc_FilePath.toStdString().c_str(),
                                                                         "opensyde-system-ui-definition");
 
+   //File version
+   if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading UI system definition", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading UI system definition", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != 1U)
+         {
+            osc_write_log_error("Loading UI system definition",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      c_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading UI system definition", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
+
    if (s32_Retval == C_NO_ERR)
    {
       //Nodes
@@ -1993,6 +2067,43 @@ sint32 C_PuiSdHandlerFiler::mh_LoadNodeFile(C_PuiSdNode & orc_Node, const QStrin
                                                                         orc_FilePath.toStdString().c_str(),
                                                                         "opensyde-node-ui-definition");
 
+   //File version
+   if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading UI node", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading UI node", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != 1U)
+         {
+            osc_write_log_error("Loading UI node",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      c_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading UI node", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
+
    if (s32_Retval == C_NO_ERR)
    {
       if (c_XMLParser.SelectNodeChild("node") == "node")
@@ -2031,6 +2142,43 @@ sint32 C_PuiSdHandlerFiler::mh_LoadDatapoolFile(C_PuiSdNodeDataPool & orc_DataPo
                                                                         orc_FilePath.toStdString().c_str(),
                                                                         "opensyde-dp-ui-definition");
 
+   //File version
+   if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading UI datapool", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading UI datapool", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != 1U)
+         {
+            osc_write_log_error("Loading UI datapool",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      c_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading UI datapool", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
+
    if (s32_Retval == C_NO_ERR)
    {
       if (c_XMLParser.SelectNodeChild("data-pool") == "data-pool")
@@ -2068,6 +2216,43 @@ sint32 C_PuiSdHandlerFiler::mh_LoadCommFile(C_PuiSdNodeCanProtocol & orc_UICanPr
    sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser,
                                                                         orc_FilePath.toStdString().c_str(),
                                                                         "opensyde-comm-ui-definition");
+
+   //File version
+   if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading UI comm definition", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading UI comm definition", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != 1U)
+         {
+            osc_write_log_error("Loading UI comm definition",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      c_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading UI comm definition", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -2168,9 +2353,8 @@ sint32 C_PuiSdHandlerFiler::mh_LoadNode(C_PuiSdNode & orc_Node, C_OSCXMLParserBa
                            {
                               do
                               {
-                                 QPointF c_Point(orc_XMLParser.GetAttributeFloat64(
-                                                    "x"), orc_XMLParser.GetAttributeFloat64(
-                                                    "y"));
+                                 const QPointF c_Point(orc_XMLParser.GetAttributeFloat64("x"),
+                                                       orc_XMLParser.GetAttributeFloat64("y"));
                                  c_UIConnection.c_UINodeConnectionInteractionPoints.push_back(c_Point);
                                  c_Text = orc_XMLParser.SelectNodeNext("interaction-point");
                               }

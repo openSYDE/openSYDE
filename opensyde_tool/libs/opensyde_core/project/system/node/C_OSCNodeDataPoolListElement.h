@@ -31,6 +31,7 @@ public:
 
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
    void CalcHashElement(stw_types::uint32 & oru32_HashValue, const stw_types::uint32 ou32_Index) const;
+   void CalcHashStructure(stw_types::uint32 & oru32_HashValue) const;
 
    stw_types::uint32 GetSizeByte(void) const;
 

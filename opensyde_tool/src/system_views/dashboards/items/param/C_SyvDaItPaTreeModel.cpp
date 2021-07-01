@@ -2570,7 +2570,7 @@ void C_SyvDaItPaTreeModel::h_DecodeIndex(const QModelIndex & orc_Index, C_OSCNod
    {
       //lint -e{9079}  Result of Qt interface restrictions, set by index function
       const C_TblTreItem * const pc_TreeItem =
-         static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
+         static_cast<const C_TblTreItem *>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
       {
          const C_TblTreItem * const pc_FirstParent = dynamic_cast<const C_TblTreItem * const>(pc_TreeItem->pc_Parent);

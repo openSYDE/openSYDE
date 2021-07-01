@@ -54,6 +54,7 @@ const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_GENERATE_CODE = 1U;
 const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_IMPORT = 2U;
 const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_EXPORT = 3U;
 const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_RTF_EXPORT = 4U;
+const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_TSP_IMPORT = 5U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -84,23 +85,27 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    ms32_SubMode(-1),
    mu32_Index(0U),
    mq_DataChanged(false),
-   mc_TOOLTIP_GENERAT_CODE_HEADING(C_GtGetText::h_GetText("Generate Code")),
+   mc_TOOLTIP_GENERAT_CODE_HEADING(C_GtGetText::h_GetText("Generate Files")),
    mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF(C_GtGetText::h_GetText(
-                                             "Generate Code for all nodes with programming support based on defined SYSTEM DEFINITION."
+                                             "Generate files for all nodes with file generation support based on defined SYSTEM DEFINITION."
                                              "\n - openSYDE server initialization wrapper"
-                                             "\n   Create a .c and .h file providing initialization structures for the OSS DPD and DPH init functions."
+                                             "\n   Create source code providing initialization structures for the OSS DPD and DPH init functions."
                                              "\n - COMM stack definition"
-                                             "\n   Create a .c and .h file providing entire communication stack configuration."
+                                             "\n   Create source code providing entire communication stack configuration."
                                              "\n - Datapools"
-                                             "\n   Generate code for Datapool settings of an openSYDE node.")),
+                                             "\n   Create source code for Datapool settings of an openSYDE node."
+                                             "\n - NVM-based Hardware Configuration"
+                                             "\n   Generate parameter set image file(s) for hardware configuration of an openSYDE node.")),
    mc_TOOLTIP_GENERAT_CODE_CONTENT_NODE(C_GtGetText::h_GetText(
-                                           "Generate Code for current node based on defined SYSTEM DEFINITION."
+                                           "Generate files for current node based on defined SYSTEM DEFINITION."
                                            "\n - openSYDE server initialization wrapper"
-                                           "\n   Create a .c and .h file providing initialization structures for the OSS DPD and DPH init functions."
+                                           "\n   Create source code providing initialization structures for the OSS DPD and DPH init functions."
                                            "\n - COMM stack definition"
-                                           "\n   Create a .c and .h file providing entire communication stack configuration."
+                                           "\n   Create source code providing entire communication stack configuration."
                                            "\n - Datapools"
-                                           "\n   Generate code for Datapool settings of current openSYDE node."))
+                                           "\n   Create source code for Datapool settings of current openSYDE node."
+                                           "\n - NVM-based Hardware Configuration"
+                                           "\n   Generate parameter set image file(s) for hardware configuration of current openSYDE node."))
 {
    sintn sn_Index;
 
@@ -134,7 +139,7 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 
    // Function index 1: mhu32_USER_INPUT_FUNC_GENERATE_CODE
-   c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Generate Code");
+   c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Generate Files");
    c_ButtonProperties.c_ToolTipHeading = mc_TOOLTIP_GENERAT_CODE_HEADING;
    c_ButtonProperties.c_ToolTipContent = mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF;
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
@@ -157,6 +162,13 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Report");
    c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Report");
    c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Export the SYSTEM DEFINITION as RTF document file.");
+   this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
+
+   // Function index 5: mhu32_USER_INPUT_FUNC_TSP_IMPORT
+   c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Import TSP");
+   c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Import TSP");
+   c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText(
+      "Import node configuration from openSYDE Target Support Package (*.syde_tsp)");
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 }
 
@@ -227,6 +239,9 @@ void C_SdHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
          this->mpc_Topology->SaveToData();
       }
       this->m_RtfExport();
+      break;
+   case mhu32_USER_INPUT_FUNC_TSP_IMPORT:
+      this->m_TspImport();
       break;
    default:
       break;
@@ -368,6 +383,7 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
    const QIcon c_IconExport("://images/IconExportDbc.svg");
    const QIcon c_IconImport("://images/IconImportFile.svg");
    const QIcon c_IconRtfExport("://images/IconExportRtf.svg");
+   const QIcon c_IconTspImport("://images/IconImportFile");
 
    // set the icons. this can not be done in constructor
    Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, c_IconSave));
@@ -375,6 +391,7 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
    Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_IMPORT, c_IconImport));
    Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, c_IconExport));
    Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, c_IconRtfExport));
+   Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_TSP_IMPORT, c_IconTspImport));
 
    // if the submode is topology it can be the initial call or a kind of refresh because
    // of the toolbar, so do it always
@@ -450,6 +467,7 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_IMPORT, false));
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, false));
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, false));
+      Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_TSP_IMPORT, false));
 
       //Set indices as soon as possible (after clean up) to have additional checks directly compare with the current
       // indices to avoid calling the system definition change more than once on rapid use-case change calls
@@ -499,6 +517,8 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
          Q_EMIT (this->SigSetToolTipForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE,
                                                      this->mc_TOOLTIP_GENERAT_CODE_HEADING,
                                                      this->mc_TOOLTIP_GENERAT_CODE_CONTENT_NODE));
+         // show tsp import button
+         Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_TSP_IMPORT, true));
 
          if (this->mpc_ActNodeEdit != NULL)
          {
@@ -670,7 +690,7 @@ void C_SdHandlerWidget::m_ErrorChange(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle generate code action
+/*! \brief   Handle generate file action
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::m_GenerateCode(void) const
@@ -830,7 +850,7 @@ void C_SdHandlerWidget::m_Export(void)
                   for (c_TxIter = c_TxMsgs.begin(); c_TxIter != c_TxMsgs.end(); ++c_TxIter)
                   {
                      C_CieConverter::C_CIENodeMessage c_CurrentMessage;
-                     s32_Error |= C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(this->mu32_Index, e_ComType,
+                     s32_Error += C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(this->mu32_Index, e_ComType,
                                                                                         *c_TxIter, c_CurrentMessage,
                                                                                         c_Warnings);
                      c_CurrentCIENode.c_TxMessages.push_back(c_CurrentMessage);
@@ -850,7 +870,7 @@ void C_SdHandlerWidget::m_Export(void)
                   for (c_RxIter = rc_RxMsgs.begin(); c_RxIter != rc_RxMsgs.end(); ++c_RxIter)
                   {
                      C_CieConverter::C_CIENodeMessage c_CurrentMessage;
-                     s32_Error |= C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(this->mu32_Index, e_ComType,
+                     s32_Error += C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(this->mu32_Index, e_ComType,
                                                                                         *c_RxIter, c_CurrentMessage,
                                                                                         c_Warnings);
                      c_CurrentCIENode.c_RxMessages.push_back(c_CurrentMessage);
@@ -1024,6 +1044,43 @@ void C_SdHandlerWidget::m_RtfExport(void)
             c_PopUpDialog->HideOverlay();
          }
       } //lint !e429  //no memory leak because of the parent of pc_DialogExportReport and the Qt memory management
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  calls wrapper function in C_SdNdeNodeEditWidget when button for TSP import is clicked
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::m_TspImport()
+{
+   if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
+   {
+      // warn user
+      C_OgeWiCustomMessage c_MessageBox(this);
+      c_MessageBox.SetType(C_OgeWiCustomMessage::eWARNING);
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                     "This project is not saved yet. Adding Data Blocks might cause "
+                                     "problems with file or directory paths."));
+      c_MessageBox.SetDetails(C_GtGetText::h_GetText(
+                                 "Paths that are handled as relative to *.syde file can not be resolved correctly!"));
+      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+      c_MessageBox.SetCustomMinHeight(230, 270);
+      c_MessageBox.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
+      if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eOK)
+      {
+         if (mpc_ActNodeEdit != NULL)
+         {
+            mpc_ActNodeEdit->AddFromTSP();
+         }
+      }
+   }
+   else
+   {
+      if (mpc_ActNodeEdit != NULL)
+      {
+         mpc_ActNodeEdit->AddFromTSP();
+      }
    }
 }
 

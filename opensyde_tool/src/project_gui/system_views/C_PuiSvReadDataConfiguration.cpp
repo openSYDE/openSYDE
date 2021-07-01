@@ -13,6 +13,7 @@
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
+#include "TGLUtils.h"
 #include "CSCLChecksums.h"
 #include "C_PuiSvReadDataConfiguration.h"
 
@@ -101,14 +102,14 @@ sint32 C_PuiSvReadDataConfiguration::InitDefaultThreshold(const stw_opensyde_cor
             {
                const uint8 u8_Min = orc_Min.GetValueU8();
                const uint8 u8_Max = orc_Max.GetValueU8();
-               this->c_ChangeThreshold.SetValueU8((u8_Max - u8_Min) / static_cast<uint8>(10U));
+               this->c_ChangeThreshold.SetValueU8(static_cast<uint8>(u8_Max - u8_Min) / static_cast<uint8>(10U));
                break;
             }
          case C_OSCNodeDataPoolContent::eUINT16:
             {
                const uint16 u16_Min = orc_Min.GetValueU16();
                const uint16 u16_Max = orc_Max.GetValueU16();
-               this->c_ChangeThreshold.SetValueU16((u16_Max - u16_Min) / static_cast<uint16>(10U));
+               this->c_ChangeThreshold.SetValueU16(static_cast<uint16>(u16_Max - u16_Min) / static_cast<uint16>(10U));
                break;
             }
          case C_OSCNodeDataPoolContent::eUINT32:
@@ -167,6 +168,9 @@ sint32 C_PuiSvReadDataConfiguration::InitDefaultThreshold(const stw_opensyde_cor
                this->c_ChangeThreshold.SetValueF64((f64_Max - f64_Min) / 10.0);
                break;
             }
+         default:
+            tgl_assert(false);
+            break;
          }
       }
       else
@@ -184,15 +188,17 @@ sint32 C_PuiSvReadDataConfiguration::InitDefaultThreshold(const stw_opensyde_cor
                   {
                      const uint8 u8_Min = orc_Min.GetValueAU8Element(u32_ItElement);
                      const uint8 u8_Max = orc_Max.GetValueAU8Element(u32_ItElement);
-                     this->c_ChangeThreshold.SetValueAU8Element((u8_Max - u8_Min) / static_cast<uint8>(10U),
-                                                                u32_ItElement);
+                     this->c_ChangeThreshold.SetValueAU8Element(
+                        static_cast<uint8>(u8_Max - u8_Min) / static_cast<uint8>(10U),
+                        u32_ItElement);
                      break;
                   }
                case C_OSCNodeDataPoolContent::eUINT16:
                   {
                      const uint16 u16_Min = orc_Min.GetValueAU16Element(u32_ItElement);
                      const uint16 u16_Max = orc_Max.GetValueAU16Element(u32_ItElement);
-                     this->c_ChangeThreshold.SetValueAU16Element((u16_Max - u16_Min) / static_cast<uint16>(10U),
+                     this->c_ChangeThreshold.SetValueAU16Element(static_cast<uint16>(u16_Max - u16_Min) /
+                                                                 static_cast<uint16>(10U),
                                                                  u32_ItElement);
                      break;
                   }
@@ -254,6 +260,9 @@ sint32 C_PuiSvReadDataConfiguration::InitDefaultThreshold(const stw_opensyde_cor
                      this->c_ChangeThreshold.SetValueAF64Element((f64_Max - f64_Min) / 10.0, u32_ItElement);
                      break;
                   }
+               default:
+                  tgl_assert(false);
+                  break;
                }
             }
          }

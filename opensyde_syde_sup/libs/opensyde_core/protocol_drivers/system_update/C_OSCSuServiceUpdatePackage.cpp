@@ -199,11 +199,11 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
          for (c_Iter = c_ApplicationsToWrite.begin(); c_Iter != c_ApplicationsToWrite.end(); ++c_Iter)
          {
             const C_OSCSuSequences::C_DoFlash c_DoFlash = *c_Iter; // current node
+            // for service_update_package.syde_supdef we need relative paths!
             //Files
-            C_OSCSuServiceUpdatePackage::mh_AppendFilesRelative(c_SupFiles, c_DoFlash.c_FilesToFlash, c_PackagePathTmp);
+            C_OSCZipFile::h_AppendFilesRelative(c_SupFiles, c_DoFlash.c_FilesToFlash, c_PackagePathTmp);
             //Parameter set files
-            C_OSCSuServiceUpdatePackage::mh_AppendFilesRelative(c_SupFiles, c_DoFlash.c_FilesToWriteToNvm,
-                                                                c_PackagePathTmp);
+            C_OSCZipFile::h_AppendFilesRelative(c_SupFiles, c_DoFlash.c_FilesToWriteToNvm, c_PackagePathTmp);
          }
       }
 
@@ -278,7 +278,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
          const C_SCLString c_TargetFileName = TGL_ExtractFileName(*c_Iter);
          c_SupFiles.insert(c_TargetFileName);
          const C_SCLString c_TargetFilePath = c_PackagePathTmp + c_TargetFileName;
-         s32_Return = mh_CopyFile(*c_Iter, c_TargetFilePath);
+         s32_Return = C_OSCUtils::h_CopyFile(*c_Iter, c_TargetFilePath, NULL, &mhc_ErrorMessage);
          if (s32_Return != C_NO_ERR)
          {
             mhc_ErrorMessage = "Could not save device definition file \"" +
@@ -696,66 +696,6 @@ sint32 C_OSCSuServiceUpdatePackage::mh_CheckParamsToCreatePackage(const C_SCLStr
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Copies a file from source to target folder (internal function).
-
-   Assumptions:
-   * read permission of source folder
-   * write permission of target folder
-
-   \param[in]  orc_SourceFile            source file (full path required)
-   \param[in]  orc_TargetFile            target file (        -"-       )
-
-   \return
-   C_NO_ERR    success
-   C_RD_WR     read/write error (see log file)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSuServiceUpdatePackage::mh_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLString & orc_TargetFile)
-{
-   sint32 s32_Return = C_NO_ERR;
-
-   //copy file
-   std::fstream c_Input(orc_SourceFile.c_str(), std::fstream::in | std::fstream::binary);
-   if (c_Input.fail() == true)
-   {
-      mhc_ErrorMessage = "Could not read \"" + orc_SourceFile + "\".";
-      osc_write_log_error("Copying file", mhc_ErrorMessage);
-      s32_Return = C_RD_WR;
-   }
-   else
-   {
-      c_Input << &std::noskipws;
-
-      const std::istream_iterator<uint8> c_Begin(c_Input);
-      const std::istream_iterator<uint8> c_End;
-
-      std::fstream c_Output(
-         orc_TargetFile.c_str(), std::fstream::out | std::fstream::trunc | std::fstream::binary);
-      if (c_Output.fail() == true)
-      {
-         mhc_ErrorMessage = "Could not write \"" + orc_TargetFile + "\".";
-         osc_write_log_error("Copying file", mhc_ErrorMessage);
-         s32_Return = C_RD_WR;
-      }
-      else
-      {
-         const std::ostream_iterator<uint8> c_Begin2(c_Output);
-         try
-         {
-            std::copy(c_Begin, c_End, c_Begin2);
-         }
-         catch (...)
-         {
-            mhc_ErrorMessage = "Could not write stream of \"" + orc_TargetFile + "\".";
-            osc_write_log_error("Copying file", mhc_ErrorMessage);
-            s32_Return = C_RD_WR;
-         }
-      }
-   }
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Creates update package definition file (internal function).
 
    Version 1.0
@@ -1053,31 +993,6 @@ sint32 C_OSCSuServiceUpdatePackage::mh_SetNodesUpdateOrder(const map<uint32, uin
    }
 
    return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Append files to set as relative paths
-
-   \param[in,out] orc_Set      Set to appen paths to
-   \param[in]     orc_Files    Vector of files to append
-   \param[in]     orc_BasePath Path the files will be raltive to
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OSCSuServiceUpdatePackage::mh_AppendFilesRelative(std::set<C_SCLString> & orc_Set,
-                                                         const std::vector<C_SCLString> & orc_Files,
-                                                         const C_SCLString & orc_BasePath)
-{
-   for (uint32 u32_PosFilesToFlash = 0;
-        u32_PosFilesToFlash < orc_Files.size();
-        u32_PosFilesToFlash++)
-   {
-      // for service_update_package.syde_supdef we need relative paths!
-      C_SCLString c_RelativeFilePath = orc_Files[u32_PosFilesToFlash];
-      c_RelativeFilePath = c_RelativeFilePath.SubString(
-         orc_BasePath.Length() + 1,
-         c_RelativeFilePath.Length() - orc_BasePath.Length());
-      orc_Set.insert(c_RelativeFilePath);
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

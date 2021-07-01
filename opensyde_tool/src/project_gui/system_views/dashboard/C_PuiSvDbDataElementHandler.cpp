@@ -1637,6 +1637,9 @@ QString C_PuiSvDbDataElementHandler::mh_GetStringForScaledValue(const float64 of
    case C_OSCNodeDataPoolContent::eFLOAT64:
       c_Retval = QString::number(of64_Value);
       break;
+   default:
+      tgl_assert(false);
+      break;
    }
    return c_Retval;
 }

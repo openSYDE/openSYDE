@@ -18,7 +18,7 @@
 #include "C_OgeHorizontalListWidget.h"
 #include "C_SyvUpUpdatePackageListDelegate.h"
 #include "C_SyvUpUpdatePackageNodeWidget.h"
-#include "C_SyvUpUpdatePackageListNodeItemWidget.h"
+#include "C_SyvUpPackageListNodeItemWidget.h"
 
 #include "C_OgeContextMenu.h"
 #include "C_OSCSuSequences.h"
@@ -106,6 +106,7 @@ private:
    void m_RemoveAllSectionFiles(void);
    void m_RemoveAllNodeFiles(void);
    void m_HideShowOptionalSections(void);
+   void m_SkipUpdateOfFile(void);
    void m_ShowInExplorer(void) const;
 
    void m_AdaptFile(const QString & orc_Path);
@@ -114,8 +115,8 @@ private:
    C_SyvUpUpdatePackageListDelegate mc_Delegate;
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
    C_SyvUpUpdatePackageNodeWidget * mpc_SelectedNode;
-   C_SyvUpUpdatePackageListNodeWidget * mpc_SelectedSection;
-   C_SyvUpUpdatePackageListNodeItemWidget * mpc_SelectedApp;
+   C_SyvUpPackageSectionNodeWidget * mpc_SelectedSection;
+   C_SyvUpPackageListNodeItemWidget * mpc_SelectedApp;
    QAction * mpc_AddFileAction;
    QAction * mpc_SelectFileAction;
    QAction * mpc_RevertFileAction;
@@ -124,6 +125,7 @@ private:
    QAction * mpc_RemoveAllSectionFilesAction;
    QAction * mpc_RemoveAllNodeFilesAction;
    QAction * mpc_HideShowOptionalSectionsAction;
+   QAction * mpc_SkipUpdateOfFile;
    QAction * mpc_ShowInExplorerAction;
 
    QString mc_LastPath;

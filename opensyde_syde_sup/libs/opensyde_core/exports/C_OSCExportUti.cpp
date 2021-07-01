@@ -39,14 +39,6 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Default constructor
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_OSCExportUti::C_OSCExportUti(void)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create 120 characters long section separator.
 
    \param[in]  orc_SectionName   Name of the following code section (e.g. Includes, Global Variables, ...)
@@ -223,16 +215,24 @@ sint32 C_OSCExportUti::h_SaveToFile(stw_scl::C_SCLStringList & orc_Data, const s
    \param[in,out]  orc_FilePaths    List of file paths
    \param[in]      orc_Path         Base path of files to add
    \param[in]      orc_FileName     File base name of files to add
+   \param[in]      oq_SourceCode    Flag if source code (.c and .h) or parameter set image (.syde_psi)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportUti::h_CollectFilePaths(std::vector<C_SCLString> & orc_FilePaths, const C_SCLString & orc_Path,
-                                        const C_SCLString & orc_FileName)
+                                        const C_SCLString & orc_FileName, const bool oq_SourceCode)
 {
    C_SCLString c_FileName;
 
    c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + orc_FileName;
-   orc_FilePaths.push_back(c_FileName + ".h");
-   orc_FilePaths.push_back(c_FileName + ".c");
+   if (oq_SourceCode == true)
+   {
+      orc_FilePaths.push_back(c_FileName + ".h");
+      orc_FilePaths.push_back(c_FileName + ".c");
+   }
+   else
+   {
+      orc_FilePaths.push_back(c_FileName); // file suffix already included in this case
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -340,7 +340,7 @@ C_SCLString C_OSCExportUti::h_FloatToStrG(const float32 of32_Value, bool * const
    C_SCLString c_Return;
    bool q_InfOrNan;
 
-   c_Return.StringPrintFormatted("%.*g", 9, of32_Value);
+   c_Return.StringPrintFormatted("%.*g", 9, static_cast<float64>(of32_Value));
    // do not use '#' option of print formatted, as it also adds trailing zeroes
 
    q_InfOrNan = h_CheckInfOrNan(c_Return);

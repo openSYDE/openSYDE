@@ -217,7 +217,7 @@ void C_CamUtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString
             QString c_Entry;
             const QString & rc_Element = orc_ScrollBarElements[u32_ItElement];
             c_Entry = static_cast<QString>("%1%2").arg(rc_Element, rc_Property.c_PropertyName);
-            if (u32_ItElement < (orc_ScrollBarElements.size() - 1UL))
+            if (u32_ItElement < (static_cast<uint32>(orc_ScrollBarElements.size()) - 1UL))
             {
                c_Entry += ",";
             }

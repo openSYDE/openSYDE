@@ -44,9 +44,9 @@ C_SyvDcExistingNodeDropAreaWidget::C_SyvDcExistingNodeDropAreaWidget(QWidget * c
    mpc_Ui(new Ui::C_SyvDcExistingNodeDropAreaWidget),
    mq_Assigned(false)
 {
-   const QPixmap c_Device = QPixmap("://images/system_views/DeviceSmall.svg").scaled(QSize(16, 16),
-                                                                                     Qt::KeepAspectRatio,
-                                                                                     Qt::SmoothTransformation);
+   const QPixmap c_Device =
+      static_cast<QPixmap>("://images/system_views/DeviceSmall.svg").scaled(QSize(16, 16), Qt::KeepAspectRatio,
+                                                                            Qt::SmoothTransformation);
 
    mpc_Ui->setupUi(this);
 
@@ -58,7 +58,7 @@ C_SyvDcExistingNodeDropAreaWidget::C_SyvDcExistingNodeDropAreaWidget(QWidget * c
    this->mpc_Ui->pc_LabelIcon->setText("");
    this->mpc_Ui->pc_PushButtonClose->setText("");
    this->mpc_Ui->pc_LabelIcon->setPixmap(c_Device);
-   this->mpc_Ui->pc_PushButtonClose->setIcon(QPixmap("://images/system_views/IconTabClose.svg"));
+   this->mpc_Ui->pc_PushButtonClose->setIcon(static_cast<QPixmap>("://images/system_views/IconTabClose.svg"));
 
    //Default
    this->SetContent(false, "");

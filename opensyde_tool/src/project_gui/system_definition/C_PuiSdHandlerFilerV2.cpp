@@ -258,7 +258,7 @@ sint32 C_PuiSdHandlerFilerV2::h_LoadDataPoolList(C_PuiSdNodeDataPoolList & orc_D
 sint32 C_PuiSdHandlerFilerV2::h_LoadDataPoolListElements(
    std::vector<C_PuiSdNodeDataPoolListElement> & orc_DataPoolListElements, C_OSCXMLParserBase & orc_XMLParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   const sint32 s32_Retval = C_NO_ERR;
 
    C_SCLString c_CurrentDataPoolListElementNode;
    uint32 u32_ExpectedSize = 0UL;
@@ -1086,7 +1086,7 @@ void C_PuiSdHandlerFilerV2::h_SaveNodes(const std::vector<C_PuiSdNode> & orc_Nod
       for (uint32 u32_Index = 0U; u32_Index < orc_Nodes.size(); u32_Index++)
       {
          C_PuiSdHandlerFilerV2::mh_SaveNode(orc_Nodes[u32_Index], orc_XMLParser);
-         if (u32_Index < (orc_Nodes.size() - 1UL))
+         if (u32_Index < (static_cast<uint32>(orc_Nodes.size()) - 1UL))
          {
             tgl_assert(orc_XMLParser.SelectNodeNext("node") == "node"); //next node
          }
@@ -1181,7 +1181,7 @@ void C_PuiSdHandlerFilerV2::h_SaveBuses(const std::vector<C_PuiSdBus> & orc_Buse
       for (uint32 u32_Index = 0U; u32_Index < orc_Buses.size(); u32_Index++)
       {
          C_PuiSdHandlerFilerV2::mh_SaveBus(orc_Buses[u32_Index], orc_XMLParser);
-         if (u32_Index < (orc_Buses.size() - 1UL))
+         if (u32_Index < (static_cast<uint32>(orc_Buses.size()) - 1UL))
          {
             orc_XMLParser.SelectNodeNext("bus"); //next bus
          }
@@ -1346,9 +1346,9 @@ sint32 C_PuiSdHandlerFilerV2::mh_LoadNode(C_PuiSdNode & orc_Node, C_OSCXMLParser
                               {
                                  do
                                  {
-                                    QPointF c_Point(orc_XMLParser.GetAttributeFloat64(
-                                                       "x"), orc_XMLParser.GetAttributeFloat64(
-                                                       "y"));
+                                    const QPointF c_Point(orc_XMLParser.GetAttributeFloat64(
+                                                             "x"), orc_XMLParser.GetAttributeFloat64(
+                                                             "y"));
                                     c_UIConnection.c_UINodeConnectionInteractionPoints.push_back(c_Point);
                                     c_Text = orc_XMLParser.SelectNodeNext("interaction-point");
                                  }

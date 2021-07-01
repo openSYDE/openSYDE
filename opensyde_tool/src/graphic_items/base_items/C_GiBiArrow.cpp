@@ -81,7 +81,7 @@ C_GiBiArrow::C_GiBiArrow(const uint64 & oru64_ID, const std::vector<QPointF> * c
 
    //Default
    this->mpc_LinePath->SetLineStyle(me_LineType);
-   this->SetWidth(1);
+   this->C_GiBiArrow::SetWidth(1);
    this->SetColor(Qt::black);
    //Z value
    if (opc_Points != NULL)

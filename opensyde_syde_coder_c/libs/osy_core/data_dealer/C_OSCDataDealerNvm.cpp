@@ -332,7 +332,7 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8> & orc
       const uint32 u32_SizeElement = pc_Element->GetSizeByte();
       const uint32 u32_Index = pc_Element->u32_NvMStartAddress - orc_List.u32_NvMStartAddress;
 
-      if (orc_Values.size() >= (u32_Index + u32_SizeElement))
+      if (orc_Values.size() >= static_cast<size_t>(u32_Index + u32_SizeElement))
       {
          std::vector<uint8> c_ElementData;
 

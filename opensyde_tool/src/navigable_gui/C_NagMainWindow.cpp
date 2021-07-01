@@ -116,15 +116,18 @@ C_NagMainWindow::C_NagMainWindow(const uint16 ou16_Timer) :
    this->mpc_Ui->pc_Splitter->setStretchFactor(1, 1);
 
    // load devices so they are known to UI
+   //lint -e{1938}  static const is guaranteed preinitialized before main
    stw_opensyde_core::C_OSCSystemDefinition::hc_Devices.LoadFromFile(
       C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str(), false);
 
+   //lint -e{1938}  static const is guaranteed preinitialized before main
    stw_opensyde_core::C_OSCSystemDefinition::hc_Devices.LoadFromFile(
       C_Uti::h_GetAbsolutePathFromExe("../devices/user_devices.ini").toStdString().c_str(), true);
 
    this->mpc_MainWidget = new C_NagMainWidget(this->mpc_Ui->pc_workAreaWidget);
    this->mpc_UseCaseWidget = new C_NagUseCaseViewWidget(this->mpc_Ui->pc_workAreaWidget);
 
+   this->mpc_Ui->pc_WidgetServiceModeInfo->setVisible(false);
    this->m_ShowStartView();
 
    // connect to C_NagNaviBarWidget
@@ -406,8 +409,12 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
       // Save as on F12
       else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F12))
       {
-         // open save as dialog
-         this->mpc_MainWidget->OnSaveProjAs();
+         // Save as is not allowed for service projects
+         if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive() == false)
+         {
+            // open save as dialog
+            this->mpc_MainWidget->OnSaveProjAs();
+         }
       }
       // Open color picker
       else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F8))
@@ -571,7 +578,7 @@ void C_NagMainWindow::dragMoveEvent(QDragMoveEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten drop event slot
 
-   Here: Handle dropped *.syde file
+   Here: Handle dropped *.syde and *.syde_sp files
 
    \param[in,out]  opc_Event  Event identification and information
 */
@@ -609,6 +616,9 @@ void C_NagMainWindow::dropEvent(QDropEvent * const opc_Event)
             }
             else
             {
+               // after a project file is dropped in openSYDE we want to have the focus back on the application
+               // especially with *.syde_sp files to be immediately able to enter the password
+               this->activateWindow();
                this->mpc_MainWidget->LoadProject(c_FilePath);
             }
          }
@@ -630,13 +640,7 @@ void C_NagMainWindow::dropEvent(QDropEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_LoadInitialProject(void)
 {
-   uint16 u16_Version;
-   QString c_LoadedProject;
-
-   // Initial load (command line or first recent project)
-   const sint32 s32_Error = C_PuiProject::h_GetInstance()->LoadInitialProject(&u16_Version, c_LoadedProject);
-
-   C_PopErrorHandling::h_ProjectLoadErr(s32_Error, c_LoadedProject, this->mpc_MainWidget, u16_Version);
+   this->mpc_MainWidget->LoadInitialProject();
 
    // Handle use case switch
    this->m_ProjectLoaded(C_PuiProject::h_GetInstance()->GetSwitchUseCaseFlag());
@@ -1016,7 +1020,8 @@ bool C_NagMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
             c_File.setFile(c_PathList[0]);
             if (c_File.exists() == true)
             {
-               if (c_File.suffix().compare("syde") == 0)
+               if ((c_File.suffix().compare("syde") == 0) ||
+                   (c_File.suffix().compare("syde_sp") == 0))
                {
                   q_Retval = true;
                   if (opc_FilePath != NULL)
@@ -1088,6 +1093,10 @@ void C_NagMainWindow::m_PrepareProjectLoad(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_ProjectLoaded(const bool & orq_SwitchToLastKnownMode)
 {
+   bool q_ValidViewForServiceModeFound = false;
+
+   this->m_HandleServiceMode();
+
    C_UsHandler::h_GetInstance()->LoadActiveProject(C_PuiProject::h_GetInstance()->GetPath());
 
    C_UsHandler::h_GetInstance()->GetProjLastScreenMode(this->ms32_SdSubMode, this->mu32_SdIndex, this->mu32_SdFlag,
@@ -1098,45 +1107,110 @@ void C_NagMainWindow::m_ProjectLoaded(const bool & orq_SwitchToLastKnownMode)
    this->mu32_SdIndex = 0U;
    this->mu32_SdFlag = 0U;
 
-   //Update system views (after project was loaded
+   //Update system views (after project was loaded)
    this->mpc_Ui->pc_NaviBar->InitSysView();
+   {
+      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_SvIndex);
 
-   if (C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_SvIndex) == NULL)
-   {
-      this->ms32_SvSubMode = ms32_SUBMODE_SYSVIEW_SETUP;
-      this->mu32_SvIndex = 0U;
-      this->mu32_SvFlag = 0U;
-   }
-   else
-   {
-      // Special case: Handle system view PC reconnect
-      if (this->ms32_SvSubMode != ms32_SUBMODE_SYSVIEW_SETUP)
+      if (pc_View == NULL)
       {
-         bool q_Reconnect;
-         tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckViewReconnectNecessary(this->mu32_SvIndex,
-                                                                                 q_Reconnect) == C_NO_ERR);
-         if (q_Reconnect == true)
+         this->ms32_SvSubMode = ms32_SUBMODE_SYSVIEW_SETUP;
+         this->mu32_SvIndex = 0U;
+         this->mu32_SvFlag = 0U;
+      }
+      else
+      {
+         // Special case: Handle system view PC reconnect
+         if (this->ms32_SvSubMode != ms32_SUBMODE_SYSVIEW_SETUP)
          {
-            this->ms32_SvSubMode = ms32_SUBMODE_SYSVIEW_SETUP;
+            bool q_Reconnect;
+            tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckViewReconnectNecessary(this->mu32_SvIndex,
+                                                                                    q_Reconnect) == C_NO_ERR);
+            if (q_Reconnect == true)
+            {
+               this->ms32_SvSubMode = ms32_SUBMODE_SYSVIEW_SETUP;
+            }
+         }
+      }
+
+      if (orq_SwitchToLastKnownMode == true)
+      {
+         this->ms32_Mode = C_UsHandler::h_GetInstance()->GetProjLastMode();
+         //Service mode: only allow switch to available view
+         if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive())
+         {
+            if ((this->ms32_Mode != ms32_MODE_SYSVIEW) || (pc_View == NULL) ||
+                (pc_View->GetServiceModeActive() == false))
+            {
+               this->ms32_Mode = ms32_MODE_NONE;
+            }
+            else
+            {
+               switch (this->ms32_SvSubMode)
+               {
+               case ms32_SUBMODE_SYSVIEW_SETUP:
+                  if (!pc_View->GetServiceModeSetupActive())
+                  {
+                     this->ms32_Mode = ms32_MODE_NONE;
+                  }
+                  else
+                  {
+                     q_ValidViewForServiceModeFound = true;
+                  }
+                  break;
+               case ms32_SUBMODE_SYSVIEW_UPDATE:
+                  if (!pc_View->GetServiceModeUpdateActive())
+                  {
+                     this->ms32_Mode = ms32_MODE_NONE;
+                  }
+                  else
+                  {
+                     q_ValidViewForServiceModeFound = true;
+                  }
+                  break;
+               case ms32_SUBMODE_SYSVIEW_DASHBOARD:
+                  if (!pc_View->GetServiceModeDashboardActive())
+                  {
+                     this->ms32_Mode = ms32_MODE_NONE;
+                  }
+                  else
+                  {
+                     q_ValidViewForServiceModeFound = true;
+                  }
+                  break;
+               default:
+                  this->ms32_Mode = ms32_MODE_NONE;
+                  break;
+               }
+            }
+         }
+         switch (this->ms32_Mode)
+         {
+         case ms32_MODE_SYSDEF:
+            this->ms32_SdSubMode = ms32_SUBMODE_SYSDEF_TOPOLOGY;
+            this->m_ChangeUseCase(this->ms32_Mode, this->ms32_SdSubMode);
+            break;
+         case ms32_MODE_SYSVIEW:
+            this->m_ChangeUseCase(this->ms32_Mode, this->ms32_SvSubMode);
+            break;
+         default:
+            break;
+         }
+      }
+      else
+      {
+         //Always switch to main
+         if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive())
+         {
+            this->ms32_Mode = ms32_MODE_NONE;
          }
       }
    }
-
-   if (orq_SwitchToLastKnownMode == true)
+   //Always adapt initial view for service mode
+   if ((!q_ValidViewForServiceModeFound) && (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive()))
    {
-      this->ms32_Mode = C_UsHandler::h_GetInstance()->GetProjLastMode();
-      switch (this->ms32_Mode)
-      {
-      case ms32_MODE_SYSDEF:
-         this->ms32_SdSubMode = ms32_SUBMODE_SYSDEF_TOPOLOGY;
-         this->m_ChangeUseCase(this->ms32_Mode, this->ms32_SdSubMode);
-         break;
-      case ms32_MODE_SYSVIEW:
-         this->m_ChangeUseCase(this->ms32_Mode, this->ms32_SvSubMode);
-         break;
-      default:
-         break;
-      }
+      bool q_Found;
+      C_NagMainWidget::h_GetFirstValidViewForServiceMode(this->mu32_SvIndex, this->ms32_SvSubMode, q_Found);
    }
 }
 
@@ -1149,13 +1223,11 @@ void C_NagMainWindow::m_CloseAndPrepareProjectLoad(void)
    // close active project
    if (this->mpc_ActiveWidget != NULL)
    {
-      if (this->mpc_ActiveWidget->PrepareToClose() == true)
-      {
-         this->m_RemoveUseCaseWidget();
+      tgl_assert(this->mpc_ActiveWidget->PrepareToClose() == true);
+      this->m_RemoveUseCaseWidget();
 
-         // prepare project load
-         m_PrepareProjectLoad();
-      }
+      // prepare project load
+      m_PrepareProjectLoad();
    }
 }
 
@@ -1302,6 +1374,17 @@ void C_NagMainWindow::m_HandleDuplicateSysViewRequest(const uint32 ou32_Index)
    {
       this->mc_SystemViewManager.DuplicateSysView(ou32_Index);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle service mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWindow::m_HandleServiceMode(void) const
+{
+   this->mpc_Ui->pc_WidgetServiceModeInfo->setVisible(C_PuiSvHandler::h_GetInstance()->GetServiceModeActive());
+   this->mpc_MainWidget->HandleServiceMode();
+   this->mpc_Ui->pc_NaviBar->HandleServiceMode();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

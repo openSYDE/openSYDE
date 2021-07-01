@@ -63,10 +63,6 @@ protected:
    stw_types::sintn msn_ActualLine;
 
 private:
-   //Avoid call
-   C_OgeHorizontalListWidget(const C_OgeHorizontalListWidget &);
-   C_OgeHorizontalListWidget & operator =(const C_OgeHorizontalListWidget &);
-
    void m_DragTimeout(void);
    void m_StopDragTimer(void);
 

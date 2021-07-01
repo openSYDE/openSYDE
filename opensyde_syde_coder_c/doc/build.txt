@@ -5,11 +5,11 @@ Content:   How to build this project
 
 Used Compiler:
 ==============
-MinGW: 5.3.0
+MinGW: 8.1.0
 
 Editor:
 =======
-Qt Creator 4.0.2
+Qt Creator 4.14.2
 Other IDEs that can handle cmakelists.txt should also do the job.
 
 build

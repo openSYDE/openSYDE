@@ -449,25 +449,37 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                pc_UpdateInformation->GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED);
             if (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == false)
             {
+               uint32 u32_ItApplication;
+               uint32 u32_ItApplicationPath = 0U;
                std::vector<QString> c_FinalApplicationPaths;
                const std::vector<QString> & rc_ApplicationPaths = pc_UpdateInformation->GetPaths(
                   C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
                c_FinalApplicationPaths.reserve(pc_Node->c_Applications.size());
-               //Parse all application paths
-               for (uint32 u32_ItApplication = 0; u32_ItApplication < rc_ApplicationPaths.size(); ++u32_ItApplication)
+
+               for (u32_ItApplication = 0U; u32_ItApplication < pc_Node->c_Applications.size();
+                    ++u32_ItApplication)
                {
-                  const QString & rc_ViewApplicationPath = rc_ApplicationPaths[u32_ItApplication];
-                  if (rc_ViewApplicationPath.compare("") == 0)
+                  const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItApplication];
+
+                  // The HALC NVM param files files will be handled with the other param files
+                  if (rc_Application.e_Type != C_OSCNodeApplication::ePARAMETER_SET_HALC)
                   {
-                     const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItApplication];
-                     c_FinalApplicationPaths.push_back(
-                        C_PuiUtil::h_GetResolvedAbsPathFromDbProject(rc_Application.c_ProjectPath.c_str(),
-                                                                     rc_Application.c_ResultPath.c_str()));
-                  }
-                  else
-                  {
-                     c_FinalApplicationPaths.push_back(C_PuiUtil::h_GetResolvedAbsPathFromProject(
-                                                          rc_ViewApplicationPath));
+                     const QString & rc_ViewApplicationPath = rc_ApplicationPaths[u32_ItApplicationPath];
+                     if (rc_ViewApplicationPath.compare("") == 0)
+                     {
+                        // In not NVM HALC case, only 1 path for each datablock exists
+                        c_FinalApplicationPaths.push_back(
+                           C_PuiUtil::h_GetResolvedAbsPathFromDbProject(rc_Application.c_ProjectPath.c_str(),
+                                                                        rc_Application.c_ResultPaths[0].c_str()));
+                     }
+                     else
+                     {
+                        c_FinalApplicationPaths.push_back(C_PuiUtil::h_GetResolvedAbsPathFromProject(
+                                                             rc_ViewApplicationPath));
+                     }
+
+                     // The application paths match only 1:1 in case of an application which is not the type NVM_HALC
+                     ++u32_ItApplicationPath;
                   }
                }
 

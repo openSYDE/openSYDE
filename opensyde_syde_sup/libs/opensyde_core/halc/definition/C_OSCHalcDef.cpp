@@ -52,7 +52,7 @@ uint32 C_OSCHalcDef::GetDomainSize(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get domain
 
-   \param[in] ou32_Index Index
+   \param[in]  ou32_Index  Index
 
    \return
    NULL Invalid index
@@ -73,10 +73,21 @@ const C_OSCHalcDefDomain * C_OSCHalcDef::GetDomainDefDataConst(const uint32 ou32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add domain
 
-   \param[in] orc_Domain Domain
+   \param[in]  orc_Domain  Domain
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCHalcDef::AddDomain(const C_OSCHalcDefDomain & orc_Domain)
 {
    this->mc_Domains.push_back(orc_Domain);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle file load post processing
+
+    Note: not necessary here
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
+void C_OSCHalcDef::HandleFileLoadPostProcessing(void)
+{
 }

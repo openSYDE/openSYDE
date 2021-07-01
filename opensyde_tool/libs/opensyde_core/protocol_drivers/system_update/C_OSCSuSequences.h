@@ -278,10 +278,6 @@ private:
    stw_types::uint32 m_GetAdaptedTransferDataTimeout(const stw_types::uint32 ou32_DeviceTransferDataTimeout,
                                                      const stw_types::uint32 ou32_MaxBlockLength,
                                                      const stw_types::uint8 ou8_BusIdentifier) const;
-
-   static stw_types::sint32 mh_CopyFile(const stw_scl::C_SCLString & orc_SourceFile,
-                                        const stw_scl::C_SCLString & orc_TargetFile,
-                                        stw_scl::C_SCLString * const opc_ErrorPath = NULL);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

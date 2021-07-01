@@ -86,9 +86,9 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Add(void)
          {
             //Message id
             this->mc_Message[u32_ItStep].q_IsExtended = false;
-            if ((this->mc_Message[u32_ItStep].u32_CanId % 2) == 0)
+            if ((this->mc_Message[u32_ItStep].u32_CanId % 2U) == 0U)
             {
-               --this->mc_Message[u32_ItStep].u32_CanId;
+               this->mc_Message[u32_ItStep].u32_CanId = this->mc_Message[u32_ItStep].u32_CanId - 1U;
             }
             if (this->mc_Message[u32_ItStep].u32_CanId < mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN)
             {
@@ -101,16 +101,16 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Add(void)
             //Tx method
             this->mc_Message[u32_ItStep].e_TxMethod = C_OSCCanMessage::eTX_METHOD_CYCLIC;
             //Dlc
-            this->mc_Message[u32_ItStep].u16_Dlc = 8;
+            this->mc_Message[u32_ItStep].u16_Dlc = 8U;
          }
          else
          {
             //Layer 2 -> all
          }
          //Cycle time
-         if (this->mc_Message[u32_ItStep].u32_CycleTimeMs == 0)
+         if (this->mc_Message[u32_ItStep].u32_CycleTimeMs == 0U)
          {
-            this->mc_Message[u32_ItStep].u32_CycleTimeMs = 1;
+            this->mc_Message[u32_ItStep].u32_CycleTimeMs = 1U;
          }
          tgl_assert(this->mpc_MessageSyncManager->AddCanMessage(this->mc_LastMessageId[u32_ItStep].u32_NodeIndex,
                                                                 this->mc_LastMessageId[u32_ItStep].e_ComProtocol,
@@ -123,7 +123,7 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Add(void)
                                                                 this->mc_UISignals[u32_ItStep],
                                                                 this->mc_LastMessageId[u32_ItStep].u32_MessageIndex) ==
                     C_NO_ERR);
-         for (uint32 u32_ItMessage = 0; u32_ItMessage < this->mc_MatchingIds[u32_ItStep].size(); ++u32_ItMessage)
+         for (uint32 u32_ItMessage = 0U; u32_ItMessage < this->mc_MatchingIds[u32_ItStep].size(); ++u32_ItMessage)
          {
             const C_OSCCanMessageIdentificationIndices & rc_CurMessageId =
                this->mc_MatchingIds[u32_ItStep][u32_ItMessage];
@@ -142,10 +142,11 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Add(void)
                if (rc_CurMessageId.q_MessageIsTx == true)
                {
                   const C_OSCCanMessageContainer * const pc_Container =
-                     C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(rc_CurMessageId.u32_NodeIndex,
-                                                                                     this->mc_LastMessageId[u32_ItStep].e_ComProtocol,
-                                                                                     rc_CurMessageId.u32_InterfaceIndex,
-                                                                                     rc_CurMessageId.u32_DatapoolIndex);
+                     C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(
+                        rc_CurMessageId.u32_NodeIndex,
+                        this->mc_LastMessageId[u32_ItStep].e_ComProtocol,
+                        rc_CurMessageId.u32_InterfaceIndex,
+                        rc_CurMessageId.u32_DatapoolIndex);
 
                   if ((pc_Container != NULL) && (pc_Container->c_RxMessages.size() > 0UL))
                   {

@@ -487,7 +487,7 @@ QModelIndex C_SdNdeHalcChannelTreeModel::GetModelIndexFromIndexes(const uint32 o
 
    if (oq_ChannelCase)
    {
-      c_ModelIndex = c_ModelIndex.child(ou32_ChannelIndex, 0);
+      c_ModelIndex = this->index(ou32_ChannelIndex, 0, c_ModelIndex);
    }
 
    return c_ModelIndex;
@@ -519,7 +519,7 @@ void C_SdNdeHalcChannelTreeModel::mh_SetChannelText(C_TblTreItem * const opc_Ite
    Don't call this too often. Calling for every channel was too time expensive.
 
    \param[in]  oe_Category    Category
-   \param[in]  oq_DomainIcon  Domain icon
+   \param[in]  oq_Large       Large
    \param[in]  oq_Error       Error
    \param[in]  oq_Linked      Linked
 
@@ -576,7 +576,7 @@ QIcon C_SdNdeHalcChannelTreeModel::mh_InitIcon(const C_OSCHalcDefDomain::E_Categ
 /*! \brief  Get icon depending on properties
 
    \param[in]  oe_Category    Category (input, output, other)
-   \param[in]  oq_DomainIcon  Domain icon
+   \param[in]  oq_Large       Large
    \param[in]  oq_Error       Error
    \param[in]  oq_Linked      Linked
 
@@ -609,7 +609,7 @@ QIcon C_SdNdeHalcChannelTreeModel::m_GetIcon(const C_OSCHalcDefDomain::E_Categor
     ... etc. ...
 
    \param[in]  oe_Category    Category
-   \param[in]  oq_DomainIcon  Domain icon
+   \param[in]  oq_Large       Large
    \param[in]  oq_Error       Error
    \param[in]  oq_Linked      Linked
 

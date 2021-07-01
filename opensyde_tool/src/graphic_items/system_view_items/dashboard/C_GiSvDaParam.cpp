@@ -69,7 +69,7 @@ C_GiSvDaParam::C_GiSvDaParam(const uint32 & oru32_ViewIndex, const uint32 & oru3
    //Activate child handles its own events for combo box pop up
    this->setHandlesChildEvents(false);
    //Handle initial edit mode
-   this->EditModeActiveChanged(true);
+   this->C_GiSvDaParam::EditModeActiveChanged(true);
 
    //Connections
    connect(this->mpc_ParamWidget, &C_SyvDaItPaWidgetNew::SigNvmReadList, this, &C_GiSvDaParam::SigNvmReadList);
@@ -119,6 +119,7 @@ void C_GiSvDaParam::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style,
 /*! \brief   Adjust font to current size
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
 void C_GiSvDaParam::ReInitializeSize(void)
 {
    //Nothing to do, yet...
@@ -148,7 +149,7 @@ void C_GiSvDaParam::LoadData(void)
             else
             {
                //Initialize with default values
-               std::vector<stw_types::sint32> c_Empty;
+               const std::vector<stw_types::sint32> c_Empty;
                this->mpc_ParamWidget->SetColumnWidth(c_Empty);
             }
             this->mpc_ParamWidget->SetAllExpandedTreeItems(pc_Box->c_ExpandedItems);

@@ -61,7 +61,7 @@ C_SyvDaItPaTreeView::C_SyvDaItPaTreeView(QWidget * const opc_Parent) :
    //Make sure to install event filter to have handling for mouse move events
    pc_Tmp->installEventFilter(this);
 
-   this->setModel(&this->mc_Model);
+   this->C_SyvDaItPaTreeView::setModel(&this->mc_Model);
    this->setItemDelegate(&mc_Delegate);
 
    //Configure

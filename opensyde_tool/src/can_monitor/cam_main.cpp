@@ -42,19 +42,19 @@ using namespace stw_types;
    Set up and start application.
 
    \param[in]   osn_Argc     Number of command line arguments
-   \param[in]   oapcn_Argv   Command line arguments
+   \param[in]   opacn_Argv   Command line arguments
 
    \return
    0: success
    else: error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn main(sintn osn_Argc, charn * oapcn_Argv[])
+sintn main(sintn osn_Argc, charn * opacn_Argv[])
 {
    // turn on the DPI support**
    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-   QApplication c_Appl(osn_Argc, oapcn_Argv);
+   QApplication c_Appl(osn_Argc, opacn_Argv);
    {
       const QString c_BinaryHash = stw_opensyde_gui_logic::C_Uti::h_GetHashValueAsQString();
       const QString c_FilePath = stw_opensyde_gui_logic::C_Uti::h_GetCompleteLogFileLocation(".syde_cam_log");

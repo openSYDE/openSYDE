@@ -761,7 +761,7 @@ bool C_CamMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
 void C_CamMainWindow::mh_ThreadFunc(void * const opv_Instance)
 {
    //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_CamMainWindow * const pc_Instance = reinterpret_cast<C_CamMainWindow * const>(opv_Instance);
+   C_CamMainWindow * const pc_Instance = reinterpret_cast<C_CamMainWindow *>(opv_Instance);
 
    tgl_assert(pc_Instance != NULL);
    if (pc_Instance != NULL)

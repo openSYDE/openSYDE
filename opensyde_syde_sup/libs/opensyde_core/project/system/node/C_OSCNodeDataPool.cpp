@@ -63,7 +63,7 @@ C_OSCNodeDataPool::C_OSCNodeDataPool(void) :
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::CalcHash(uint32 & oru32_HashValue) const
@@ -93,7 +93,7 @@ void C_OSCNodeDataPool::CalcHash(uint32 & oru32_HashValue) const
    Only essential data are covered.
    It is endian-safe, so it may be used on systems with different endianness.
 
-   \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::CalcDefinitionHash(uint32 & oru32_HashValue) const
@@ -136,8 +136,8 @@ void C_OSCNodeDataPool::CalcDefinitionHash(uint32 & oru32_HashValue) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Move list in data pool
 
-   \param[in] oru32_Start  Start index
-   \param[in] oru32_Target Target index
+   \param[in]  oru32_Start    Start index
+   \param[in]  oru32_Target   Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::MoveList(const stw_types::uint32 & oru32_Start, const stw_types::uint32 & oru32_Target)
@@ -150,7 +150,8 @@ void C_OSCNodeDataPool::MoveList(const stw_types::uint32 & oru32_Start, const st
       this->c_Lists.erase(this->c_Lists.begin() + oru32_Start);
       //Insert
       this->c_Lists.insert(this->c_Lists.begin() + oru32_Target, c_ListData);
-      if (this->e_Type == C_OSCNodeDataPool::eNVM)
+      if ((this->e_Type == C_OSCNodeDataPool::eNVM) ||
+          (this->e_Type == C_OSCNodeDataPool::eHALC_NVM))
       {
          RecalculateAddress();
       }
@@ -163,7 +164,7 @@ void C_OSCNodeDataPool::MoveList(const stw_types::uint32 & oru32_Start, const st
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::RecalculateAddress(void)
 {
-   if (this->e_Type == C_OSCNodeDataPool::eNVM)
+   if ((this->e_Type == C_OSCNodeDataPool::eNVM) || (this->e_Type == C_OSCNodeDataPool::eHALC_NVM))
    {
       uint32 u32_Offset = this->u32_NvMStartAddress;
 
@@ -230,15 +231,15 @@ uint32 C_OSCNodeDataPool::GetListsSize(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check error for specified list
 
-   \param[in]  oru32_ListIndex           Node data pool list index
-   \param[out] opq_NameConflict          Name conflict
-   \param[out] opq_NameInvalid           Name not usable as variable
-   \param[out] opq_UsageInvalid          Usage over 100.0%
-   \param[out] opq_OutOfDataPool         List out of data pool borders
-   \param[out] opq_DataSetsInvalid       One or more elements are invalid
-   \param[out] opq_ElementsInvalid       One or more elements are invalid
-   \param[out] opc_InvalidDataSetIndices Indices of invalid data sets
-   \param[out] opc_InvalidElementIndices Indices of invalid elements
+   \param[in]   oru32_ListIndex              Node data pool list index
+   \param[out]  opq_NameConflict             Name conflict
+   \param[out]  opq_NameInvalid              Name not usable as variable
+   \param[out]  opq_UsageInvalid             Usage over 100.0%
+   \param[out]  opq_OutOfDataPool            List out of data pool borders
+   \param[out]  opq_DataSetsInvalid          One or more elements are invalid
+   \param[out]  opq_ElementsInvalid          One or more elements are invalid
+   \param[out]  opc_InvalidDataSetIndices    Indices of invalid data sets
+   \param[out]  opc_InvalidElementIndices    Indices of invalid elements
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru32_ListIndex, bool * const opq_NameConflict,

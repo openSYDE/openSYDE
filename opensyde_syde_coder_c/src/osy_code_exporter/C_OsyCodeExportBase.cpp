@@ -110,12 +110,12 @@ C_SCLString C_OsyCodeExportBase::h_GetApplicationVersion(const C_SCLString & orc
       {
          //reinterpret_cast required due to function interface
          if (VerQueryValueA(pu8_Buffer, "\\",
-                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e929
+                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e9176
                             &un_ValSize) != FALSE)
          {
-            c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16),
+            c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16U),
                                      pt_Info->dwFileVersionMS & 0x0000FFFFUL,
-                                     (pt_Info->dwFileVersionLS >> 16));
+                                     (pt_Info->dwFileVersionLS >> 16U));
          }
       }
       delete[] pu8_Buffer;
@@ -189,15 +189,16 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
    Parse command line parameters. If required parameters are not present, print a list of options to the console.
 
    \param[in]   osn_Argc     number of command line arguments
-   \param[in]   oapcn_Argv   command line arguments
+   \param[in]   opacn_Argv   command line arguments
 
    \retval   eRESULT_OK                                Init OK
    \retval   eRESULT_HELPING                           Command line switch "help" detected
    \retval   eRESULT_COMMAND_LINE_INVALID_PARAMETERS   Parameter error
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{952}  the function getopt_long expects a non const opacn_Argv parameter
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const sintn osn_Argc,
-                                                                        charn * const oapcn_Argv[])
+                                                                        charn * const opacn_Argv[])
 {
    E_ResultCode e_Return = eRESULT_OK;
    sintn sn_Result;
@@ -241,7 +242,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
    {
       sintn sn_Index;
 
-      sn_Result = getopt_long(osn_Argc, oapcn_Argv, "s:d:o:n:a:he", &ac_Options[0], &sn_Index);
+      sn_Result = getopt_long(osn_Argc, opacn_Argv, "s:d:o:n:a:he", &ac_Options[0], &sn_Index);
       if (sn_Result != -1)
       {
          switch (sn_Result)
@@ -378,7 +379,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
          if (rc_Application.c_Name.UpperCase() == mc_ApplicationName.UpperCase())
          {
             std::vector<C_SCLString> c_CreatedFiles;
-            if (rc_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+            if ((rc_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION) &&
+                (rc_Application.e_Type != C_OSCNodeApplication::ePARAMETER_SET_HALC))
             {
                e_Return = eRESULT_APPLICATION_NOT_PROGRAMMABLE;
                this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application, false,
@@ -413,7 +415,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
            u32_Application++)
       {
          const C_OSCNodeApplication & rc_Application = orc_Node.c_Applications[u32_Application];
-         if (rc_Application.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+         if ((rc_Application.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION) ||
+             (rc_Application.e_Type == C_OSCNodeApplication::ePARAMETER_SET_HALC))
          {
             std::vector<C_SCLString> c_CreatedFiles;
             q_AtLeastOne = true;
@@ -444,8 +447,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
       }
       if (q_AtLeastOne == false)
       {
-         C_SCLString c_Info = "Not generating code for device \"" + orc_Node.c_Properties.c_Name +
-                              "\" as it has no programmable application defined.";
+         const C_SCLString c_Info = "Not generating code for device \"" + orc_Node.c_Properties.c_Name +
+                                    "\" as it has no programmable application defined.";
          std::cout << c_Info.c_str() << &std::endl;
          osc_write_log_info("Code Generation", c_Info);
       }

@@ -387,8 +387,8 @@ const
 
             if (q_NodeFound == true)
             {
-               const uint8 u8_DataPoolIndex = static_cast<uint8>(ou32_DataPoolIdentifier >> 18) & 0x1FU;
-               const uint8 u8_ListIndex = static_cast<uint8>(ou32_DataPoolIdentifier >> 11) & 0x7FU;
+               const uint8 u8_DataPoolIndex = static_cast<uint8>(ou32_DataPoolIdentifier >> 18U) & 0x1FU;
+               const uint8 u8_ListIndex = static_cast<uint8>(ou32_DataPoolIdentifier >> 11U) & 0x7FU;
                const uint16 u16_ElementIndex = static_cast<uint16>(ou32_DataPoolIdentifier) & 0x7FFU;
 
                // Get the datapool element if it exists

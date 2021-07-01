@@ -227,7 +227,8 @@ sint32 C_SdBueSortHelper::h_SortOneMessageVector(std::vector<C_OSCCanMessage> & 
       {
          //Compare each element and swap if necessary
          for (uint32 u32_ItMessagePair = 0;
-              (u32_ItMessagePair < (orc_OSCMessages.size() - 1UL)) && (s32_Retval == C_NO_ERR); ++u32_ItMessagePair)
+              (u32_ItMessagePair < (static_cast<uint32>(orc_OSCMessages.size()) - 1UL)) && (s32_Retval == C_NO_ERR);
+              ++u32_ItMessagePair)
          {
             const C_OSCCanMessage & rc_CurrentMessage = orc_OSCMessages[u32_ItMessagePair];
             const C_OSCCanMessage & rc_NextMessage =
@@ -262,7 +263,8 @@ bool C_SdBueSortHelper::mh_CheckMessagesSorted(const std::vector<C_OSCCanMessage
 
    if (orc_OSCMessages.size() > 0UL)
    {
-      for (uint32 u32_ItMessagePair = 0; u32_ItMessagePair < (orc_OSCMessages.size() - 1UL); ++u32_ItMessagePair)
+      for (uint32 u32_ItMessagePair = 0; u32_ItMessagePair < (static_cast<uint32>(orc_OSCMessages.size()) - 1UL);
+           ++u32_ItMessagePair)
       {
          const C_OSCCanMessage & rc_CurrentMessage = orc_OSCMessages[u32_ItMessagePair];
          const C_OSCCanMessage & rc_NextMessage =

@@ -234,7 +234,7 @@ bool C_CamGenSigUtil::h_GetBit(const uint32 ou32_BitPos, const std::vector<uint8
    if (ou32_BitPos < 64UL)
    {
       //Which byte (CAN)
-      const uint16 u16_InBytePos = ou32_BitPos / 8U;
+      const uint16 u16_InBytePos = static_cast<uint16>(ou32_BitPos / 8U);
       if (u16_InBytePos < orc_Bytes.size())
       {
          const uint8 u8_Byte = orc_Bytes[u16_InBytePos];
@@ -260,7 +260,7 @@ void C_CamGenSigUtil::h_SetBit(const uint32 ou32_BitPos, std::vector<uint8> & or
    if (ou32_BitPos < 64UL)
    {
       //Which byte (output)
-      const uint16 u16_OutBytePos = ou32_BitPos / 8U;
+      const uint16 u16_OutBytePos = static_cast<uint16>(ou32_BitPos / 8U);
       if (u16_OutBytePos < orc_Bytes.size())
       {
          //Which bit (output)

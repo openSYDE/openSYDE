@@ -38,6 +38,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvNodeUpdateParamInfo::C_PuiSvNodeUpdateParamInfo(void) :
+   mc_FilePath(""),
    mu32_LastKnownCrc(0UL)
 {
 }

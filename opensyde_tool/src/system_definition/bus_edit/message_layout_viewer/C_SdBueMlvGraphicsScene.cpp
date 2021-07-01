@@ -47,6 +47,7 @@ const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderDefault = 0.0;
 const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderInteraction = 1.0;
 const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderEmptyItem = 10000.0;
 const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderHintItem = 10001.0;
+const stw_types::uint8 C_SdBueMlvGraphicsScene::mhu8_NUM_COLORS = 64U;
 
 const C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::mhac_SignalsColors[64] =
 {
@@ -151,7 +152,7 @@ C_SdBueMlvGraphicsScene::C_SdBueMlvGraphicsScene(QObject * const opc_Parent) :
    ms32_LastGridIndex(-1),
    mq_SignalChanged(false)
 {
-   //Init
+   //Initialize
    this->m_PrepareNextColorSection();
 
    this->m_InitBorderItems();
@@ -231,7 +232,7 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
       if (this->me_Protocol == C_OSCCanProtocol::eECES)
       {
          // special case DLC is always 8, but byte 7 and byte 8 are reserved for message counter and CRC
-         this->mu16_MaximumCountBits = mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX;
+         this->mu16_MaximumCountBits = static_cast<uint16>(mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX);
          this->mapc_ECeSHints[0]->setVisible(true);
          this->mapc_ECeSHints[1]->setVisible(true);
       }
@@ -377,8 +378,7 @@ void C_SdBueMlvGraphicsScene::DisplayToolTip(const QPointF & orc_ScenePos)
       const sint32 s32_GridIndex = this->m_GetGridIndex(orc_ScenePos);
 
       // Check for multiple signals on one spot
-      if ((s32_GridIndex >= 0) &&
-          (s32_GridIndex < 64) &&
+      if ((s32_GridIndex >= 0) && (s32_GridIndex < mhu8_NUM_COLORS) &&
           (this->mac_SetGridState[s32_GridIndex].size() > 1))
       {
          // More than one signal on the position
@@ -718,7 +718,7 @@ void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
    uint8 u8_Counter;
 
    // fill the vector
-   for (u8_Counter = 0U; u8_Counter < 64U; ++u8_Counter)
+   for (u8_Counter = 0U; u8_Counter < mhu8_NUM_COLORS; ++u8_Counter)
    {
       C_SdBueMlvEmptyItem * const pc_Item = new C_SdBueMlvEmptyItem(u8_Counter);
       this->mc_VecEmptyItems.push_back(pc_Item);
@@ -1053,7 +1053,7 @@ void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMapping(C_SdBueMlvSignalMana
 {
    uint16 u16_Counter;
 
-   for (u16_Counter = 0U; u16_Counter < 64U; ++u16_Counter)
+   for (u16_Counter = 0U; u16_Counter < mhu8_NUM_COLORS; ++u16_Counter)
    {
       this->m_RemoveSignalFromGridMappingPosition(opc_Item, u16_Counter);
    }
@@ -1064,7 +1064,7 @@ void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMappingPosition(C_SdBueMlvSi
                                                                     const uint16 ou16_Pos)
 {
    // search the item
-   std::set<C_SdBueMlvSignalManager *>::iterator c_ItItem = this->mac_SetGridState[ou16_Pos].find(opc_Item);
+   const std::set<C_SdBueMlvSignalManager *>::iterator c_ItItem = this->mac_SetGridState[ou16_Pos].find(opc_Item);
 
    if (c_ItItem != this->mac_SetGridState[ou16_Pos].end())
    {
@@ -1096,7 +1096,7 @@ void C_SdBueMlvGraphicsScene::m_CheckGridMappingPositionForError(const uint16 ou
 
       if (this->mac_SetGridState[ou16_Pos].size() > 0)
       {
-         std::set<C_SdBueMlvSignalManager *>::iterator c_ItItem = this->mac_SetGridState[ou16_Pos].begin();
+         const std::set<C_SdBueMlvSignalManager *>::iterator c_ItItem = this->mac_SetGridState[ou16_Pos].begin();
          const C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConf = (*c_ItItem)->GetColorConfiguration();
          this->mc_VecEmptyItems[ou16_Pos]->SetFontColor(c_ColorConf.c_FontColor);
       }
@@ -1147,7 +1147,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNo
    // Use the oldest section, if a free color is available
    for (u32_SectionNumber = 0U; u32_SectionNumber < this->mc_SignalsColorsUsed.size(); ++u32_SectionNumber)
    {
-      for (u32_ItFree = 0UL; u32_ItFree < 64U; ++u32_ItFree)
+      for (u32_ItFree = 0UL; u32_ItFree < mhu8_NUM_COLORS; ++u32_ItFree)
       {
          if (this->mc_SignalsColorsUsed[u32_SectionNumber][u32_ItFree] == false)
          {
@@ -1174,7 +1174,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNo
    // search a not used color with a random number in a section with at least one free entry
    do
    {
-      sn_ColorCounter = rand() % 64;
+      sn_ColorCounter = rand() % static_cast<sintn>(mhu8_NUM_COLORS);
 
       if (this->mc_SignalsColorsUsed[u32_SectionNumber][sn_ColorCounter] == false)
       {
@@ -1208,7 +1208,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcre
    C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConfig;
 
    // search the color to set the flag
-   for (u32_ColorCounter = 0U; u32_ColorCounter < 64U; ++u32_ColorCounter)
+   for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_NUM_COLORS; ++u32_ColorCounter)
    {
       if (ou8_Index == C_SdBueMlvGraphicsScene::mhac_SignalsColors[u32_ColorCounter].u8_Index)
       {
@@ -1269,7 +1269,7 @@ void C_SdBueMlvGraphicsScene::m_SetColorsUnused(const C_SdBueMlvSignalManager::C
       bool q_ColorFound = false;
       bool q_OtherColorUsed = false;
 
-      for (u32_ColorCounter = 0U; u32_ColorCounter < 64U; ++u32_ColorCounter)
+      for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_NUM_COLORS; ++u32_ColorCounter)
       {
          if ((C_SdBueMlvGraphicsScene::mhac_SignalsColors[u32_ColorCounter].u8_Index == orc_Colors.u8_Index) &&
              ((*c_ItSection)[u32_ColorCounter] == true))
@@ -1321,7 +1321,7 @@ void C_SdBueMlvGraphicsScene::m_PrepareNextColorSection(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_SceneRectChanged(void)
 {
-   // update the size values of a signgle item
+   // update the size values of a single item
    this->mf64_SingleItemWidth = (this->sceneRect().width() - (8.0 * C_SdBueMlvGraphicsScene::mhf64_Space)) / 9.0;
    this->mf64_SingleItemHeight = (this->sceneRect().height() - (8.0 * C_SdBueMlvGraphicsScene::mhf64_Space)) / 9.0;
 
@@ -1337,7 +1337,7 @@ void C_SdBueMlvGraphicsScene::m_SearchClickedItem(const QPointF & orc_Pos)
    this->mpc_ActualSignal = NULL;
    this->ms32_LastGridIndex = -1;
 
-   if (s32_Counter >= 0)
+   if ((s32_Counter >= 0) && (s32_Counter < mhu8_NUM_COLORS))
    {
       if (this->mac_SetGridState[s32_Counter].size() > 0)
       {
@@ -1404,8 +1404,8 @@ sint32 C_SdBueMlvGraphicsScene::m_GetGridIndex(const QPointF & orc_Pos) const
 
    for (s32_Counter = 0; s32_Counter < this->mc_VecEmptyItems.size(); ++s32_Counter)
    {
-      QRectF c_Rect(this->mc_VecEmptyItems[s32_Counter]->pos(),
-                    this->mc_VecEmptyItems[s32_Counter]->boundingRect().size());
+      const QRectF c_Rect(this->mc_VecEmptyItems[s32_Counter]->pos(),
+                          this->mc_VecEmptyItems[s32_Counter]->boundingRect().size());
 
       if (c_Rect.contains(orc_Pos) == true)
       {
@@ -1430,7 +1430,7 @@ void C_SdBueMlvGraphicsScene::m_HandleHideToolTip(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Init context menu entries
+/*! \brief   Initialize context menu entries
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_SetupContextMenu(void)
@@ -1530,7 +1530,7 @@ void C_SdBueMlvGraphicsScene::m_ActionPaste(void)
       s32_Counter = 0;
    }
 
-   if (this->mc_VecSignals.size() < 64)
+   if (this->mc_VecSignals.size() < mhu8_NUM_COLORS)
    {
       Q_EMIT (this->SigPasteSignal(this->mc_MessageId, static_cast<uint16>(s32_Counter)));
    }

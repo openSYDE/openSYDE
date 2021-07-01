@@ -52,12 +52,12 @@ public:
    virtual void SetSubMode(const stw_types::sint32 os32_SubMode, const stw_types::uint32 ou32_Index,
                            const stw_types::uint32 ou32_Flag) override;
    virtual bool GlobalUserKeyPress(QKeyEvent * const opc_Event) override;
-   virtual void CallHelp(void);
+   virtual void CallHelp(void) override;
 
 private:
    //Avoid call
    C_SdHandlerWidget(const C_SdHandlerWidget &);
-   C_SdHandlerWidget & operator =(const C_SdHandlerWidget &);
+   C_SdHandlerWidget & operator =(const C_SdHandlerWidget &); //lint !e1511 //we want to hide the base
 
    void m_DataChanged(void);
    void m_NodeChanged(const stw_types::uint32 ou32_Index);
@@ -71,6 +71,7 @@ private:
    void m_Export(void);
    void m_Import(void) const;
    void m_RtfExport(void);
+   void m_TspImport(void);
    void m_GenerateHalcDatapools(void) const;
 
    Ui::C_SdHandlerWidget * mpc_Ui;
@@ -78,6 +79,7 @@ private:
 
    C_SdNdeNodeEditWidget * mpc_ActNodeEdit;
    C_SdBueBusEditWidget * mpc_ActBusEdit;
+
    stw_types::sintn msn_NodeEditTabIndex;
    stw_types::sintn msn_BusEditTabIndex;
    stw_types::sint32 ms32_SubMode;
@@ -89,6 +91,7 @@ private:
    static const stw_types::uint32 mhu32_USER_INPUT_FUNC_IMPORT;
    static const stw_types::uint32 mhu32_USER_INPUT_FUNC_EXPORT;
    static const stw_types::uint32 mhu32_USER_INPUT_FUNC_RTF_EXPORT;
+   static const stw_types::uint32 mhu32_USER_INPUT_FUNC_TSP_IMPORT;
 
    const QString mc_TOOLTIP_GENERAT_CODE_HEADING;
    const QString mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF;

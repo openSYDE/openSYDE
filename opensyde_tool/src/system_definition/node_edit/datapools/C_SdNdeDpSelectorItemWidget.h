@@ -71,6 +71,7 @@ Q_SIGNALS:
    void SigClicked(const stw_types::uint32 ou32_Index);
    void SigDoubleClicked(const stw_types::uint32 ou32_Index);
    void SigContextMenuRequested(const QPoint & orc_Pos, const stw_types::uint32 ou32_Index);
+   void SigHoverStateChanged(const stw_types::uint32 ou32_DataPoolIndex, const bool oq_Hovered);
 
 protected:
    virtual void mousePressEvent(QMouseEvent * const opc_Event) override;

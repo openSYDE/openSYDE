@@ -129,7 +129,12 @@ void C_GiSvDaSpinBoxBase::LoadData(void)
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
-         this->LoadSvBasicData(*pc_Box);
+         //Load twice to fix initial size font issue
+         C_PuiSvDbSpinBox c_Copy = *pc_Box;
+         c_Copy.f64_Width += 1.0;
+         this->LoadSvBasicData(c_Copy);
+         c_Copy.f64_Width = pc_Box->f64_Width;
+         this->LoadSvBasicData(c_Copy);
          this->m_UpdateStaticValues();
          if (this->mpc_SpinBoxWidget != NULL)
          {

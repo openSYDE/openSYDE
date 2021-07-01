@@ -53,7 +53,7 @@ public:
    virtual ~C_OsyCodeExportBase(void);
 
    E_ResultCode Init(void);
-   E_ResultCode ParseCommandLine(const stw_types::sintn osn_Argc, stw_types::charn * const oapcn_Argv[]);
+   E_ResultCode ParseCommandLine(const stw_types::sintn osn_Argc, stw_types::charn * const opacn_Argv[]);
    E_ResultCode LoadSystemDefinition(void);
    E_ResultCode GenerateSourceCode(void);
    E_ResultCode Exit(const E_ResultCode oe_ResultCode);

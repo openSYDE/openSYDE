@@ -184,8 +184,8 @@ void C_SyvDaPeUpdateModeConfiguration::m_CancelClicked(void)
 void C_SyvDaPeUpdateModeConfiguration::m_ConfigureClicked(void) const
 {
    //Set parent for better hierarchy handling via window manager
-   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
-   C_SyvDaDashboardSettings * pc_Dialog = new C_SyvDaDashboardSettings(*c_New, this->mu32_ViewIndex);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
+   C_SyvDaDashboardSettings * const pc_Dialog = new C_SyvDaDashboardSettings(*c_New, this->mu32_ViewIndex);
 
    //Resize
    c_New->SetSize(QSize(600, 430));

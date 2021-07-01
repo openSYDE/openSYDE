@@ -27,19 +27,13 @@
     <number>0</number>
    </property>
    <item row="0" column="0">
-    <layout class="QVBoxLayout" name="pc_VerticalLayout" stretch="0,0,0,1">
+    <layout class="QVBoxLayout" name="pc_VerticalLayout" stretch="0,0,1">
      <property name="spacing">
-      <number>4</number>
+      <number>5</number>
      </property>
      <item>
       <layout class="QVBoxLayout" name="pc_VerticalLayout2">
        <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>3</number>
-       </property>
-       <property name="rightMargin">
         <number>0</number>
        </property>
        <item>
@@ -169,27 +163,11 @@
       </layout>
      </item>
      <item>
-      <spacer name="pc_VerticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>16</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
       <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelNoDatablocks">
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>50</height>
+         <height>80</height>
         </size>
        </property>
        <property name="text">
@@ -214,25 +192,25 @@
    <header>C_OgeLabGroupItem.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.h</header>
+   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabHeadingGroupBold.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubSvgIconOnly</class>
    <extends>QPushButton</extends>
    <header>C_OgePubSvgIconOnly.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubIconOnly.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui::C_SdNdeDbListWidget</class>

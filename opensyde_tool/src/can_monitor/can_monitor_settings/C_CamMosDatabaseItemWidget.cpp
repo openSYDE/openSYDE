@@ -62,7 +62,8 @@ C_CamMosDatabaseItemWidget::C_CamMosDatabaseItemWidget(const C_CamProDatabaseDat
    me_State(eLOADING),
    mq_AlreadyAskedUserReload(true),
    mq_AlreadyAskedUserDelete(false),
-   mq_ButtonPressed(false)
+   mq_ButtonPressed(false),
+   mq_SuppressChangeSignal(false)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -217,14 +218,16 @@ void C_CamMosDatabaseItemWidget::SetState(const C_CamMosDatabaseItemWidget::E_Lo
    // in error case only set unchecked
    if (q_Error == true)
    {
+      this->mq_SuppressChangeSignal = true;
       this->mpc_Ui->pc_CheckBox->setChecked(false);
+      this->mq_SuppressChangeSignal = false;
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set bus index of database data.
 
-   \param[in]  ou32_BusIndex   bus index
+   \param[in]  ou32_BusIndex  bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::SetBusIndex(const uint32 ou32_BusIndex)
@@ -700,13 +703,16 @@ void C_CamMosDatabaseItemWidget::m_OnRemove()
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_OnChxToggle(const bool & orq_Checked)
 {
-   // inform list about check box toggle
-   const bool q_Result = Q_EMIT (this->SigEnableDatabase(this, orq_Checked));
-
-   this->mc_Database.q_Enabled = q_Result;
-   if (q_Result != orq_Checked)
+   if (!this->mq_SuppressChangeSignal)
    {
-      this->mpc_Ui->pc_CheckBox->setChecked(true);
+      // inform list about check box toggle
+      const bool q_Result = Q_EMIT (this->SigEnableDatabase(this, orq_Checked));
+
+      this->mc_Database.q_Enabled = q_Result;
+      if (q_Result != orq_Checked)
+      {
+         this->mpc_Ui->pc_CheckBox->setChecked(true);
+      }
    }
 }
 

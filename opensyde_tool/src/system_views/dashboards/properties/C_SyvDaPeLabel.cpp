@@ -10,6 +10,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "TGLUtils.h"
 #include "C_GtGetText.h"
 #include "C_GiSvDaLabelBase.h"
 #include "C_SyvDaPeLabel.h"
@@ -185,12 +186,13 @@ void C_SyvDaPeLabel::SetType(const C_PuiSvDbLabel::E_Type oe_Type) const
    switch (oe_Type)
    {
    case C_PuiSvDbLabel::eTRANSPARENT:
-
       this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeLabel::mhsn_INDEX_STYLE_TYPE_TRANSPARENT);
       break;
-   default:
-
+   case C_PuiSvDbLabel::eDEFAULT:
       this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeLabel::mhsn_INDEX_STYLE_TYPE_DEFAULT);
+      break;
+   default:
+      tgl_assert(false);
       break;
    }
 }

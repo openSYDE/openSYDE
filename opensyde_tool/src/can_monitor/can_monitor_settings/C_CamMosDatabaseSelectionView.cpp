@@ -13,6 +13,7 @@
 #include "precomp_headers.h"
 
 #include <QScrollBar>
+#include <QMouseEvent>
 
 #include "stwtypes.h"
 #include "C_CamMosDatabaseSelectionView.h"
@@ -47,7 +48,7 @@ C_CamMosDatabaseSelectionView::C_CamMosDatabaseSelectionView(QWidget * const opc
    C_OgeTreeViewToolTipBase(opc_Parent)
 {
    this->mc_SortModel.setSourceModel(&this->mc_Model);
-   this->setModel(&this->mc_SortModel);
+   this->C_CamMosDatabaseSelectionView::setModel(&this->mc_SortModel);
 
    this->setHeaderHidden(true);
    //Configure filter

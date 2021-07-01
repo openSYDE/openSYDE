@@ -14,6 +14,7 @@
 
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "TGLUtils.h"
 #include "C_GtGetText.h"
 #include "C_SdTooltipUtil.h"
 #include "C_SdNdeDpContentUtil.h"
@@ -100,6 +101,9 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
       c_ToolTipContent +=
          static_cast<QString>(static_cast<QString>("   ") +
                               C_GtGetText::h_GetText("But not later than: %1\n")).arg(orc_Message.u32_CycleTimeMs);
+      break;
+   default:
+      tgl_assert(false);
       break;
    }
    return c_ToolTipContent;

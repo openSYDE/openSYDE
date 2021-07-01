@@ -65,16 +65,23 @@ C_SyvComMessageMonitor::~C_SyvComMessageMonitor(void)
 {
    if (this->mpc_LoadingThread != NULL)
    {
-      if (this->mpc_LoadingThread->isRunning() == true)
+      try
       {
-         this->mpc_LoadingThread->requestInterruption();
-
-         if (this->mpc_LoadingThread->wait(2000U) == false)
+         if (this->mpc_LoadingThread->isRunning() == true)
          {
-            // Not finished yet
-            osc_write_log_warning("Closing message monitor",
-                                  "Waiting time for stopping loading thread was not enough");
+            this->mpc_LoadingThread->requestInterruption();
+
+            if (this->mpc_LoadingThread->wait(2000U) == false)
+            {
+               // Not finished yet
+               osc_write_log_warning("Closing message monitor",
+                                     "Waiting time for stopping loading thread was not enough");
+            }
          }
+      }
+      catch (...)
+      {
+         //not much we can do here ...
       }
       delete mpc_LoadingThread;
       mpc_LoadingThread = NULL;
@@ -852,7 +859,7 @@ bool C_SyvComMessageMonitor::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_M
 bool C_SyvComMessageMonitor::m_CheckInterpretation(stw_opensyde_core::C_OSCComMessageLoggerData & orc_MessageData)
 {
    bool q_Return = false;
-   const C_CieConverter::C_CIECanMessage * pc_DbcMessage = this->m_CheckDbcFile(orc_MessageData.c_CanMsg);
+   const C_CieConverter::C_CIECanMessage * const pc_DbcMessage = this->m_CheckDbcFile(orc_MessageData.c_CanMsg);
 
    if (pc_DbcMessage != NULL)
    {
@@ -1188,8 +1195,8 @@ void C_SyvComMessageMonitor::mh_InterpretDbcFileCanSignal(C_OSCComMessageLoggerD
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComMessageMonitor::mh_ThreadFunc(void * const opv_Instance)
 {
-   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_SyvComMessageMonitor * const pc_Instance = reinterpret_cast<C_SyvComMessageMonitor * const>(opv_Instance);
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
+   C_SyvComMessageMonitor * const pc_Instance = reinterpret_cast<C_SyvComMessageMonitor *>(opv_Instance);
 
    tgl_assert(pc_Instance != NULL);
    if (pc_Instance != NULL)
@@ -1208,9 +1215,6 @@ void C_SyvComMessageMonitor::m_ThreadFunc(void)
 {
    switch (this->me_LoadingActivity)
    {
-   case eNOT_ACTIVE:
-      // Nothing to do. Should not happen.
-      break;
    case eADD_OSY_SYSDEF_WITHOUT_BUSINDEX:
       this->ms32_Result = this->AddOsySysDef(this->mc_Path, this->mc_Busses);
       break;
@@ -1219,6 +1223,10 @@ void C_SyvComMessageMonitor::m_ThreadFunc(void)
       break;
    case eADD_DBC_FILE:
       this->ms32_Result = this->m_AddDbcFile(this->mc_Path);
+      break;
+   case eNOT_ACTIVE:
+   default:
+      // Nothing to do. Should not happen.
       break;
    }
 

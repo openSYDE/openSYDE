@@ -1062,23 +1062,20 @@ void C_PuiSvDashboard::OnSyncNodeHALC(const uint32 ou32_Index, const std::map<C_
    m_GetAllWidgetItems(c_Widgets);
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
-      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
-      if (pc_Widget != NULL)
+      const C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Param == NULL)
       {
-         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+
+         if (pc_Widget != NULL)
          {
-            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
-            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
-            h_OnSyncNodeHALC(rc_DataElementId, ou32_Index, orc_MapCurToNew);
-         }
-      }
-      if (pc_Param != NULL)
-      {
-         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
-         {
-            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
-            h_OnSyncNodeHALC(rc_DataElementConfig.c_ExpandedId, ou32_Index, orc_MapCurToNew);
+            for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+            {
+               C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
+                  pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+               C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+               h_OnSyncNodeHALC(rc_DataElementId, ou32_Index, orc_MapCurToNew);
+            }
          }
       }
    }
@@ -1925,10 +1922,10 @@ void C_PuiSvDashboard::h_OnSyncNodeHALC(C_PuiSvDbNodeDataPoolListElementId & orc
                if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(ou32_Index, orc_DataElementId.u32_DataPoolIndex,
                                                                     e_Type) == C_NO_ERR)
                {
-                  if (e_Type == C_OSCNodeDataPool::eHALC)
+                  if ((e_Type == C_OSCNodeDataPool::eHALC) || (e_Type == C_OSCNodeDataPool::eHALC_NVM))
                   {
                      //Delete
-                     orc_DataElementId.MarkInvalid(C_OSCNodeDataPool::eHALC,
+                     orc_DataElementId.MarkInvalid(e_Type,
                                                    C_GtGetText::h_GetText("Unknown HAL data element"));
                   }
                }
@@ -3027,15 +3024,14 @@ void C_PuiSvDashboard::HandleCompatibilityChart(std::vector<C_PuiSvDashboard> & 
    for (const C_PuiSvDbChart & rc_Chart : this->GetCharts())
    {
       C_PuiSvDashboard c_NewDashboard;
-      const QString c_NewTabName = QString("%1_Chart_%2").arg(this->GetName()).arg(u32_Counter + 1UL);
+      const QString c_NewTabName = static_cast<QString>("%1_Chart_%2").arg(this->GetName()).arg(u32_Counter + 1UL);
       C_PuiSvDbTabChart c_NewChart;
       C_PuiBsTextElement c_NewTextElement;
       uint8 u8_ColorCounter;
       //Text
       c_NewTextElement.c_UIText =
-         QString(C_GtGetText::h_GetText(
-                    "This version of the chart is no longer supported, and was replaced by tab \"%1\"")).arg(
-            c_NewTabName);
+         static_cast<QString>(C_GtGetText::h_GetText("This version of the chart is no longer supported, "
+                                                     "and was replaced by tab \"%1\"")).arg(c_NewTabName);
       //New text element
       c_NewTextElement.f64_ZOrder = rc_Chart.f64_ZOrder;
       c_NewTextElement.f64_Height = rc_Chart.f64_Height;

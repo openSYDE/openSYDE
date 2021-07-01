@@ -15,6 +15,7 @@
 #include <limits>
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "TGLUtils.h"
 #include "C_SdNdeUnoAedDataPoolListDataChangeCommand.h"
 #include "C_PuiSdHandler.h"
 #include "C_OSCNodeDataPoolDataSet.h"
@@ -140,6 +141,9 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
                   this->mu32_ItemIndex);
          }
          break;
+      default:
+         tgl_assert(false);
+         break;
       }
       //Copy new value
       C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData, c_Generic,
@@ -166,6 +170,9 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
                                                                              this->mu32_ElementIndex,
                                                                              this->mu32_DataSetIndex,
                                                                              this->mu32_ItemIndex, c_Generic);
+         break;
+      default:
+         tgl_assert(false);
          break;
       }
       //Adapt data set values to min/max changes (only if necessary)

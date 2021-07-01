@@ -624,6 +624,18 @@ QString C_UsHandler::GetLastKnownHalcExportPath(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known service project file path
+
+   \return
+   Last known service project file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownServiceProjectPath() const
+{
+   return this->mc_LastKnownServiceProjectPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get last known import path
 
    \return
@@ -770,6 +782,29 @@ sintn C_UsHandler::GetProjLastSysDefNodeTabIndex(void) const
 sintn C_UsHandler::GetProjLastSysDefBusTabIndex(void) const
 {
    return this->msn_SysDefBusEditTabIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get view permissions for specified view
+
+   \param[in]       orc_ViewName     name of view
+
+   \return
+   array of booleans with permission flags
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::array<bool, 3> C_UsHandler::GetViewPermissions(const QString & orc_ViewName)
+{
+   std::array<bool, 3> c_Retval;
+   if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
+   {
+      C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
+
+      c_Retval[0] = rc_View.GetSetupPermission();
+      c_Retval[1] = rc_View.GetUpdatePermission();
+      c_Retval[2] = rc_View.GetDashboardPermission();
+   }
+   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1169,6 +1204,17 @@ void C_UsHandler::SetLastKnownHalcImportPath(const QString & orc_NewPath)
 void C_UsHandler::SetLastKnownHalcExportPath(const QString & orc_NewPath)
 {
    this->mc_LastKnownHalcExportPath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known service project file path
+
+   \param[in]  orc_NewPath    service project file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownServiceProjectPath(const QString & orc_NewPath)
+{
+   this->mc_LastKnownServiceProjectPath = orc_NewPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1966,7 +2012,7 @@ void C_UsHandler::SetProjSvUpdateEmptyOptionalSectionsVisible(const QString & or
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvUpdateSectionsExpandedFlags(const QString & orc_ViewName, const QString & orc_NodeName,
-                                                       const QMap<uint32, bool> & orc_SectionsExpanded)
+                                                       const QVector<bool> & orc_SectionsExpanded)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
    {
@@ -2176,6 +2222,25 @@ void C_UsHandler::CopyProjSvSettings(const QString & orc_SourceViewName, const Q
    {
       const C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_SourceViewName);
       this->mc_ProjSvSetupView.insert(orc_TargetViewName, rc_View);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sets permissions for setup, update, dashboard for specified view
+
+   \param[in]       orc_ViewName     View name
+   \param[in]      orc_Permissions   Array of permissions for Setup, Update, Dashboard
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetViewPermission(const QString & orc_ViewName, std::array<bool, 3> & orc_Permissions)
+{
+   if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
+   {
+      C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
+
+      rc_View.SetSetupPermission(orc_Permissions[0]);
+      rc_View.SetUpdatePermission(orc_Permissions[1]);
+      rc_View.SetDashboardPermission(orc_Permissions[2]);
    }
 }
 

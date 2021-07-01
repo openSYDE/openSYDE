@@ -466,23 +466,27 @@ void C_SyvDaChaWidget::m_DataPoolElementsChanged(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
-   if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F5))
+   // Actions only allowed if service mode is deactivated
+   if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive() == false)
    {
-      this->mpc_Ui->pc_ChartWidget->RefreshColors();
-   }
-   else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Delete))
-   {
-      this->m_RemoveDataElement();
-   }
-   else if ((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
-            ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Plus)) ||
-             (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_BracketRight))))
-   {
-      this->m_AddNewDataElement();
-   }
-   else
-   {
-      // Nothing to do
+      if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F5))
+      {
+         this->mpc_Ui->pc_ChartWidget->RefreshColors();
+      }
+      else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Delete))
+      {
+         this->m_RemoveDataElement();
+      }
+      else if ((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
+               ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Plus)) ||
+                (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_BracketRight))))
+      {
+         this->m_AddNewDataElement();
+      }
+      else
+      {
+         // Nothing to do
+      }
    }
 
    C_SyvDaDashboardContentBaseWidget::keyPressEvent(opc_KeyEvent);
@@ -617,6 +621,14 @@ void C_SyvDaChaWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 
          if (q_ElementUnderCursor == true)
          {
+            const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
+            // Handle the service mode
+            this->mpc_ActionAdd->setEnabled(!q_ServiceModeActive);
+            this->mpc_ActionRemove->setEnabled(!q_ServiceModeActive);
+            this->mpc_ActionRemoveAll->setEnabled(!q_ServiceModeActive);
+            this->mpc_ActionConfigDataElement->setEnabled(!q_ServiceModeActive);
+
             // Configure context menu
             this->mpc_ActionRemove->setVisible(q_AtLeastOneElementExist);
             this->mpc_ActionRemoveAll->setVisible(q_AtLeastOneElementExist);
@@ -709,6 +721,7 @@ void C_SyvDaChaWidget::m_AddNewDataElement(void)
       if (c_New != NULL)
       {
          pc_Dialog->SaveUserSettings();
+         pc_Dialog->PrepareCleanUp();
          c_New->HideOverlay();
       }
    } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
@@ -897,7 +910,8 @@ void C_SyvDaChaWidget::m_CallProperties(void)
                {
                   if (pc_Datapool != NULL)
                   {
-                     if (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC)
+                     if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC) ||
+                         (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
                      {
                         c_WidgetName = C_PuiSvHandler::h_GetShortNamespace(c_ElementId);
                      }

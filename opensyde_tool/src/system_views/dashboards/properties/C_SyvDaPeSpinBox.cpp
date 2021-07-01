@@ -12,6 +12,7 @@
 
 #include "stwtypes.h"
 
+#include "TGLUtils.h"
 #include "C_SyvDaPeSpinBox.h"
 #include "ui_C_SyvDaPeSpinBox.h"
 
@@ -163,11 +164,14 @@ void C_SyvDaPeSpinBox::SetType(const C_PuiSvDbSpinBox::E_Type oe_Type) const
 {
    switch (oe_Type)
    {
+   case C_PuiSvDbSpinBox::eTYPE1:
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE1);
+      break;
    case C_PuiSvDbSpinBox::eTYPE2:
       this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE2);
       break;
    default:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE1);
+      tgl_assert(false);
       break;
    }
 }

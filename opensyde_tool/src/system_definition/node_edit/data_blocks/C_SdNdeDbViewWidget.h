@@ -15,6 +15,7 @@
 #include <QWidget>
 #include "stwtypes.h"
 #include "C_OSCNodeApplication.h"
+#include "C_SdNdeDbAddNewProject.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -42,6 +43,8 @@ public:
    void ShowApplication(const stw_types::uint32 ou32_ApplicationIndex) const;
    void AddApp(void);
    void UpdateApplications(void) const;
+   void AddFromTSP(void);
+   void AddHalcDefFromTSP(stw_opensyde_gui::C_SdNdeDbAddNewProject * const opc_Dialog);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -49,8 +52,8 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigErrorChange(void);
-   void SigOpenDataPool(const stw_types::uint32 ou32_DataPoolIndex);
    void SigOwnedDataPoolsChanged(void) const;
+   void SigHalcLoadedFromTSP(void);
 
 private:
    //Avoid call
@@ -58,12 +61,13 @@ private:
    C_SdNdeDbViewWidget & operator =(const C_SdNdeDbViewWidget &);
 
    void m_OnDelete(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ApplicationIndex);
+   void m_DeleteAllDatablocks(const stw_types::uint32 ou32_NodeIndex,
+                              const std::vector<stw_opensyde_core::C_OSCNodeApplication> & orc_Applications);
    void m_OnAppDisplay() const;
    void m_HandleNoDatablocksLabel() const;
-   void m_AddFromTSP(void);
    void m_UpdateCount(void) const;
    void m_ProgrammingOptions(void) const;
-   void m_AddManualApplication(const stw_opensyde_core::C_OSCNodeApplication::E_Type oe_Type);
+   void m_AddManualApplication(void);
    void m_HandleCodeGenerationSettingsButtonAvailability(void) const;
    void m_HandleAddButtonAvailability(void) const;
    stw_types::uint32 m_AddApplication(const stw_opensyde_core::C_OSCNodeApplication::E_Type oe_Type) const;
@@ -71,7 +75,6 @@ private:
 
    Ui::C_SdNdeDbViewWidget * mpc_Ui;
    stw_types::uint32 mu32_NodeIndex;
-   static const QString mhc_DefaultDataBlockName;
 };
 }
 

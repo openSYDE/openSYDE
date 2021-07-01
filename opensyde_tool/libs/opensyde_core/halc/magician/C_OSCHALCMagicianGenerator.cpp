@@ -64,10 +64,25 @@ sint32 C_OSCHALCMagicianGenerator::GenerateHALCDatapools(std::vector<C_OSCNodeDa
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = m_FillHALCDatapools(orc_Datapools);
-   }
+      if (s32_Retval == C_NO_ERR)
+      {
+         //last step as the resulting structure is then unknown
+         mh_CleanUpHALCDatapools(orc_Datapools);
 
-   //last step as the resulting structure is then unknown
-   mh_CleanUpHALCDatapools(orc_Datapools);
+         //After all variables are present
+         s32_Retval = this->m_HandleCopies(orc_Datapools);
+
+         if (s32_Retval == C_NO_ERR)
+         {
+            //After everything is finished
+            s32_Retval = this->m_HandleNVM(orc_Datapools);
+            if (s32_Retval == C_NO_ERR)
+            {
+               m_FillEmptySpaceHALCDatapools(orc_Datapools);
+            }
+         }
+      }
+   }
 
    osc_write_log_performance_stop(u16_TimerId, "Generation of HAL Datapools");
 
@@ -93,6 +108,17 @@ const
    {
       orc_Datapools.clear();
       {
+         const C_OSCHALCMagicianDatapoolListHandler c_DpHandlerLP(this->mpc_Node->c_HALCConfig,
+                                                                  C_OSCHalcDefDomain::eVA_PARAM, false);
+         const C_OSCHALCMagicianDatapoolListHandler c_DpHandlerLPSafe(this->mpc_Node->c_HALCConfig,
+                                                                      C_OSCHalcDefDomain::eVA_PARAM, true);
+         const bool q_BothNecessary = this->m_CheckTwoDp();
+         const bool q_SafeDpNecessary = q_BothNecessary ||
+                                        (this->mpc_Node->c_HALCConfig.e_SafetyMode ==
+                                         C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE);
+         const bool q_NonSafeDpNecessary = q_BothNecessary ||
+                                           (this->mpc_Node->c_HALCConfig.e_SafetyMode ==
+                                            C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE);
          //Generate datapool
          C_OSCNodeDataPool c_HALCDpSafe;
          C_OSCNodeDataPoolList c_HALCListParamSafe;
@@ -105,34 +131,56 @@ const
          C_OSCNodeDataPoolList c_HALCListOutput;
          C_OSCNodeDataPoolList c_HALCListStatus;
          //Datapool config
-         c_HALCDp.e_Type = C_OSCNodeDataPool::eHALC;
-         c_HALCDpSafe.e_Type = C_OSCNodeDataPool::eHALC;
-         c_HALCDp.c_Name = C_OSCHALCMagicianUtil::h_GetDatapoolName(false);
-         c_HALCDpSafe.c_Name = C_OSCHALCMagicianUtil::h_GetDatapoolName(true);
-         c_HALCDp.q_IsSafety = false;
-         c_HALCDpSafe.q_IsSafety = true;
+         if (q_NonSafeDpNecessary)
+         {
+            c_HALCDp.e_Type = C_OSCNodeDataPool::eHALC;
+            c_HALCDp.c_Name = C_OSCHALCMagicianUtil::h_GetDatapoolName(false, 0UL);
+            this->m_HandleVersion(c_HALCDp);
+            c_HALCDp.c_Comment = C_OSCHALCMagicianUtil::h_GetDatapoolComment(false, 0UL);
+            c_HALCDp.q_IsSafety = false;
+         }
+         if (q_SafeDpNecessary)
+         {
+            c_HALCDpSafe.e_Type = C_OSCNodeDataPool::eHALC;
+            c_HALCDpSafe.c_Name = C_OSCHALCMagicianUtil::h_GetDatapoolName(true, 0UL);
+            this->m_HandleVersion(c_HALCDpSafe);
+            c_HALCDpSafe.c_Comment = C_OSCHALCMagicianUtil::h_GetDatapoolComment(true, 0UL);
+            c_HALCDpSafe.q_IsSafety = true;
+         }
          //Lists
-         c_HALCDp.c_Lists.clear();
-         c_HALCDpSafe.c_Lists.clear();
+         if (q_NonSafeDpNecessary)
+         {
+            c_HALCDp.c_Lists.clear();
+         }
+         if (q_SafeDpNecessary)
+         {
+            c_HALCDpSafe.c_Lists.clear();
+         }
          //Generate lists
-         C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListParamSafe,
-                                                 C_OSCHALCMagicianUtil::h_GetListName(
-                                                    C_OSCHalcDefDomain::eVA_PARAM), true);
-         C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListInputSafe,
-                                                 C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_INPUT));
-         C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListOutputSafe,
-                                                 C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_OUTPUT));
-         C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListStatusSafe,
-                                                 C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_STATUS));
-         C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListParam,
-                                                 C_OSCHALCMagicianUtil::h_GetListName(
-                                                    C_OSCHalcDefDomain::eVA_PARAM), true);
-         C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListInput,
-                                                 C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_INPUT));
-         C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListOutput,
-                                                 C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_OUTPUT));
-         C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListStatus,
-                                                 C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_STATUS));
+         if (q_NonSafeDpNecessary)
+         {
+            C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListParam,
+                                                    C_OSCHALCMagicianUtil::h_GetListName(
+                                                       C_OSCHalcDefDomain::eVA_PARAM), true);
+            C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListInput,
+                                                    C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_INPUT));
+            C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListOutput,
+                                                    C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_OUTPUT));
+            C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListStatus,
+                                                    C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_STATUS));
+         }
+         if (q_SafeDpNecessary)
+         {
+            C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListParamSafe,
+                                                    C_OSCHALCMagicianUtil::h_GetListName(
+                                                       C_OSCHalcDefDomain::eVA_PARAM), true);
+            C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListInputSafe,
+                                                    C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_INPUT));
+            C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListOutputSafe,
+                                                    C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_OUTPUT));
+            C_OSCHALCMagicianGenerator::mh_InitList(c_HALCListStatusSafe,
+                                                    C_OSCHALCMagicianUtil::h_GetListName(C_OSCHalcDefDomain::eVA_STATUS));
+         }
          //Generate variables
          for (uint32 u32_It = 0UL; u32_It < this->mpc_Node->c_HALCConfig.GetDomainSize(); ++u32_It)
          {
@@ -141,31 +189,46 @@ const
             tgl_assert(pc_Config != NULL);
             if (pc_Config != NULL)
             {
-               s32_Retval = C_OSCHALCMagicianGenerator::mh_GenerateVariablesForDomain(*pc_Config, c_HALCListParamSafe,
-                                                                                      c_HALCListInputSafe,
-                                                                                      c_HALCListOutputSafe,
-                                                                                      c_HALCListStatusSafe, true);
-               if (s32_Retval == C_NO_ERR)
+               if (q_NonSafeDpNecessary)
                {
                   s32_Retval = C_OSCHALCMagicianGenerator::mh_GenerateVariablesForDomain(*pc_Config, c_HALCListParam,
                                                                                          c_HALCListInput,
                                                                                          c_HALCListOutput,
-                                                                                         c_HALCListStatus, false);
+                                                                                         c_HALCListStatus, false,
+                                                                                         c_DpHandlerLP);
+               }
+               if (s32_Retval == C_NO_ERR)
+               {
+                  if (q_SafeDpNecessary)
+                  {
+                     s32_Retval = C_OSCHALCMagicianGenerator::mh_GenerateVariablesForDomain(*pc_Config,
+                                                                                            c_HALCListParamSafe,
+                                                                                            c_HALCListInputSafe,
+                                                                                            c_HALCListOutputSafe,
+                                                                                            c_HALCListStatusSafe, true,
+                                                                                            c_DpHandlerLPSafe);
+                  }
                }
             }
          }
          if (s32_Retval == C_NO_ERR)
          {
-            c_HALCDp.c_Lists.push_back(c_HALCListParam);
-            c_HALCDp.c_Lists.push_back(c_HALCListInput);
-            c_HALCDp.c_Lists.push_back(c_HALCListOutput);
-            c_HALCDp.c_Lists.push_back(c_HALCListStatus);
-            orc_Datapools.push_back(c_HALCDp);
-            c_HALCDpSafe.c_Lists.push_back(c_HALCListParamSafe);
-            c_HALCDpSafe.c_Lists.push_back(c_HALCListInputSafe);
-            c_HALCDpSafe.c_Lists.push_back(c_HALCListOutputSafe);
-            c_HALCDpSafe.c_Lists.push_back(c_HALCListStatusSafe);
-            orc_Datapools.push_back(c_HALCDpSafe);
+            if (q_NonSafeDpNecessary)
+            {
+               c_HALCDp.c_Lists.push_back(c_HALCListParam);
+               c_HALCDp.c_Lists.push_back(c_HALCListInput);
+               c_HALCDp.c_Lists.push_back(c_HALCListOutput);
+               c_HALCDp.c_Lists.push_back(c_HALCListStatus);
+               orc_Datapools.push_back(c_HALCDp);
+            }
+            if (q_SafeDpNecessary)
+            {
+               c_HALCDpSafe.c_Lists.push_back(c_HALCListParamSafe);
+               c_HALCDpSafe.c_Lists.push_back(c_HALCListInputSafe);
+               c_HALCDpSafe.c_Lists.push_back(c_HALCListOutputSafe);
+               c_HALCDpSafe.c_Lists.push_back(c_HALCListStatusSafe);
+               orc_Datapools.push_back(c_HALCDpSafe);
+            }
          }
       }
    }
@@ -191,37 +254,83 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapools(std::vector<C_OSCNodeData
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   if ((this->mpc_Node != NULL) && (orc_Datapools.size() == 2UL))
+   if (this->mpc_Node != NULL)
    {
-      C_OSCNodeDataPool & rc_DatapoolNonSafe = orc_Datapools[0UL];
-      C_OSCNodeDataPool & rc_DatapoolSafe = orc_Datapools[1UL];
-      if ((rc_DatapoolNonSafe.c_Lists.size() == 4UL) && (rc_DatapoolSafe.c_Lists.size() == 4UL))
+      if (this->m_CheckTwoDp())
       {
-         C_OSCNodeDataPoolList & rc_ListNonSafe = rc_DatapoolNonSafe.c_Lists[0UL];
-         C_OSCNodeDataPoolList & rc_ListSafe = rc_DatapoolSafe.c_Lists[0UL];
-         const C_OSCHALCMagicianDatapoolListHandler c_Handler(this->mpc_Node->c_HALCConfig);
-         for (uint32 u32_ItDomain = 0UL;
-              (u32_ItDomain < this->mpc_Node->c_HALCConfig.GetDomainSize()) && (s32_Retval == C_NO_ERR); ++u32_ItDomain)
+         if  (orc_Datapools.size() == 2UL)
          {
-            const C_OSCHalcConfigDomain * const pc_Config =
-               this->mpc_Node->c_HALCConfig.GetDomainConfigDataConst(u32_ItDomain);
-            tgl_assert(pc_Config != NULL);
-            if (pc_Config != NULL)
+            C_OSCNodeDataPool & rc_DatapoolNonSafe = orc_Datapools[0UL];
+            C_OSCNodeDataPool & rc_DatapoolSafe = orc_Datapools[1UL];
+            if ((rc_DatapoolNonSafe.c_Lists.size() == 4UL) && (rc_DatapoolSafe.c_Lists.size() == 4UL))
             {
-               this->m_FillHALCDatapoolsDomain(rc_ListNonSafe, *pc_Config, c_Handler, u32_ItDomain, false);
-               this->m_FillHALCDatapoolsDomain(rc_ListSafe, *pc_Config, c_Handler, u32_ItDomain, true);
+               C_OSCNodeDataPoolList & rc_ListNonSafe = rc_DatapoolNonSafe.c_Lists[0UL];
+               C_OSCNodeDataPoolList & rc_ListSafe = rc_DatapoolSafe.c_Lists[0UL];
+               const C_OSCHALCMagicianDatapoolListHandler c_Handler(this->mpc_Node->c_HALCConfig,
+                                                                    C_OSCHalcDefDomain::eVA_PARAM, false);
+               const C_OSCHALCMagicianDatapoolListHandler c_HandlerSafe(this->mpc_Node->c_HALCConfig,
+                                                                        C_OSCHalcDefDomain::eVA_PARAM, true);
+               for (uint32 u32_ItDomain = 0UL;
+                    (u32_ItDomain < this->mpc_Node->c_HALCConfig.GetDomainSize()) && (s32_Retval == C_NO_ERR);
+                    ++u32_ItDomain)
+               {
+                  const C_OSCHalcConfigDomain * const pc_Config =
+                     this->mpc_Node->c_HALCConfig.GetDomainConfigDataConst(u32_ItDomain);
+                  tgl_assert(pc_Config != NULL);
+                  if (pc_Config != NULL)
+                  {
+                     this->m_FillHALCDatapoolsDomain(rc_ListNonSafe, *pc_Config, c_Handler, u32_ItDomain);
+                     this->m_FillHALCDatapoolsDomain(rc_ListSafe, *pc_Config, c_HandlerSafe, u32_ItDomain);
+                  }
+               }
             }
+            else
+            {
+               s32_Retval = C_CONFIG;
+            }
+         }
+         else
+         {
+            s32_Retval = C_CONFIG;
+            osc_write_log_warning("HALC datapool generation", "node not assigned or unexpected datapool size");
          }
       }
       else
       {
-         s32_Retval = C_CONFIG;
+         if  (orc_Datapools.size() == 1UL)
+         {
+            C_OSCNodeDataPool & rc_SingleDatapool = orc_Datapools[0UL];
+            if (rc_SingleDatapool.c_Lists.size() == 4UL)
+            {
+               C_OSCNodeDataPoolList & rc_List = rc_SingleDatapool.c_Lists[0UL];
+               const C_OSCHALCMagicianDatapoolListHandler c_Handler(this->mpc_Node->c_HALCConfig,
+                                                                    C_OSCHalcDefDomain::eVA_PARAM,
+                                                                    this->mpc_Node->c_HALCConfig.e_SafetyMode ==
+                                                                    C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE);
+               for (uint32 u32_ItDomain = 0UL;
+                    (u32_ItDomain < this->mpc_Node->c_HALCConfig.GetDomainSize()) && (s32_Retval == C_NO_ERR);
+                    ++u32_ItDomain)
+               {
+                  const C_OSCHalcConfigDomain * const pc_Config =
+                     this->mpc_Node->c_HALCConfig.GetDomainConfigDataConst(u32_ItDomain);
+                  tgl_assert(pc_Config != NULL);
+                  if (pc_Config != NULL)
+                  {
+                     this->m_FillHALCDatapoolsDomain(rc_List, *pc_Config, c_Handler, u32_ItDomain);
+                  }
+               }
+            }
+            else
+            {
+               s32_Retval = C_CONFIG;
+            }
+         }
+         else
+         {
+            s32_Retval = C_CONFIG;
+            osc_write_log_warning("HALC datapool generation", "node not assigned or unexpected datapool size");
+         }
       }
-   }
-   else
-   {
-      s32_Retval = C_CONFIG;
-      osc_write_log_warning("HALC datapool generation", "node not assigned or unexpected datapool size");
    }
    return s32_Retval;
 }
@@ -233,7 +342,6 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapools(std::vector<C_OSCNodeData
    \param[in]      orc_Domain       Domain
    \param[in]      orc_Handler      Handler
    \param[in]      ou32_ItDomain    Iterator domain
-   \param[in]      oq_IsSafe        Is safe
 
    \return
    C_NO_ERR Datapool definition generated
@@ -243,12 +351,12 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapools(std::vector<C_OSCNodeData
 sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolList & orc_List,
                                                              const C_OSCHalcConfigDomain & orc_Domain,
                                                              const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
-                                                             const uint32 ou32_ItDomain, const bool oq_IsSafe) const
+                                                             const uint32 ou32_ItDomain) const
 {
    sint32 s32_Retval = C_NO_ERR;
    //Count
-   const uint32 u32_CountRelevant = C_OSCHALCMagicianDatapoolListHandler::h_CountRelevantItems(
-      orc_Domain.c_ChannelConfigs, orc_Domain.c_DomainConfig, oq_IsSafe);
+   const uint32 u32_CountRelevant = orc_Handler.CountRelevantItems(
+      orc_Domain.c_ChannelConfigs, orc_Domain.c_DomainConfig);
 
    if (u32_CountRelevant > 0UL)
    {
@@ -258,7 +366,7 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
       if (orc_Domain.c_ChannelConfigs.size() == 0UL)
       {
          //Fill domain values
-         if (orc_Domain.c_DomainConfig.q_SafetyRelevant == oq_IsSafe)
+         if (orc_Handler.CheckChanPresent(orc_Domain.c_DomainConfig))
          {
             if (orc_Domain.GetRelevantIndicesForSelectedUseCase(0UL, false, &c_RelevantParameters, NULL,
                                                                 NULL, NULL) == C_NO_ERR)
@@ -273,6 +381,21 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
                s32_Retval = C_CONFIG;
                osc_write_log_warning("HALC datapool generation", "unexpected error: failed relevancy check");
             }
+
+            if (s32_Retval == C_NO_ERR)
+            {
+               if (orc_Handler.CheckSafetyFlagVariableNecessary())
+               {
+                  //Fill Use-case
+                  s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsSafetyFlag(orc_List, orc_Handler,
+                                                                                         ou32_ItDomain,
+                                                                                         u32_ItRelevantChannel,
+                                                                                         orc_Domain.c_DomainConfig.q_SafetyRelevant);
+               }
+            }
+            //Check assumptions, assert if not filled but required/generated
+            tgl_assert(orc_Handler.CheckChanNumVariableNecessary(orc_Domain) == false);
+            tgl_assert(orc_Handler.CheckUseCaseVariableNecessary(orc_Domain) == false);
          }
       }
 
@@ -281,19 +404,38 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
            (u32_ItChannel < orc_Domain.c_ChannelConfigs.size()) && (s32_Retval == C_NO_ERR); ++u32_ItChannel)
       {
          const C_OSCHalcConfigChannel & rc_Channel = orc_Domain.c_ChannelConfigs[u32_ItChannel];
-         if (rc_Channel.q_SafetyRelevant == oq_IsSafe)
+         if (orc_Handler.CheckChanPresent(rc_Channel))
          {
             //Fill channel
-            s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsChanNum(orc_List, orc_Handler, ou32_ItDomain,
-                                                                                oq_IsSafe, u32_ItRelevantChannel,
-                                                                                u32_ItChannel);
+            if (orc_Handler.CheckChanNumVariableNecessary(orc_Domain))
+            {
+               s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsChanNum(orc_List, orc_Handler, ou32_ItDomain,
+                                                                                   u32_ItRelevantChannel,
+                                                                                   u32_ItChannel);
+            }
 
             if (s32_Retval == C_NO_ERR)
             {
-               //Fill Use-case
-               s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsUseCase(orc_List, orc_Handler, ou32_ItDomain,
-                                                                                   oq_IsSafe, u32_ItRelevantChannel,
-                                                                                   rc_Channel.u32_UseCaseIndex);
+               if (orc_Handler.CheckSafetyFlagVariableNecessary())
+               {
+                  //Fill Use-case
+                  s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsSafetyFlag(orc_List, orc_Handler,
+                                                                                         ou32_ItDomain,
+                                                                                         u32_ItRelevantChannel,
+                                                                                         rc_Channel.q_SafetyRelevant);
+               }
+            }
+
+            if (s32_Retval == C_NO_ERR)
+            {
+               if (orc_Handler.CheckUseCaseVariableNecessary(orc_Domain))
+               {
+                  //Fill Use-case
+                  s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsUseCase(orc_List, orc_Handler,
+                                                                                      ou32_ItDomain,
+                                                                                      u32_ItRelevantChannel,
+                                                                                      rc_Channel.u32_UseCaseIndex);
+               }
             }
 
             if (s32_Retval == C_NO_ERR)
@@ -325,7 +467,6 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
    \param[in,out]  orc_List            List
    \param[in]      orc_Handler         Handler
    \param[in]      ou32_ItDomain       Iterator domain
-   \param[in]      oq_IsSafe           Is safe
    \param[in]      ou32_RelevantIndex  Relevant index
    \param[in]      ou32_ChanNum        Channel number
 
@@ -336,14 +477,14 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsChanNum(C_OSCNodeDataPoolList & orc_List,
                                                               const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
-                                                              const uint32 ou32_ItDomain, const bool oq_IsSafe,
+                                                              const uint32 ou32_ItDomain,
                                                               const uint32 ou32_RelevantIndex,
                                                               const uint32 ou32_ChanNum) const
 {
    sint32 s32_Retval = C_NO_ERR;
    C_OSCNodeDataPoolListElement * const pc_ChanNumElement = orc_Handler.GetChanNumListElement(
       ou32_ItDomain,
-      orc_List, oq_IsSafe);
+      orc_List);
 
    if (pc_ChanNumElement != NULL)
    {
@@ -376,12 +517,65 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsChanNum(C_OSCNodeDataPoolL
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fill HALC datapools safety flag
+
+   \param[in,out]  orc_List               List
+   \param[in]      orc_Handler            Handler
+   \param[in]      ou32_ItDomain          Iterator domain
+   \param[in]      ou32_RelevantIndex     Relevant index
+   \param[in]      oq_IsSafetyRelevant    Is safety relevant
+
+   \return
+   C_NO_ERR Datapool definition generated
+   C_CONFIG Configuration invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsSafetyFlag(C_OSCNodeDataPoolList & orc_List,
+                                                                 const C_OSCHALCMagicianDatapoolListHandler & orc_Handler, const uint32 ou32_ItDomain, const uint32 ou32_RelevantIndex,
+                                                                 const bool oq_IsSafetyRelevant) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+   C_OSCNodeDataPoolListElement * const pc_ChanNumElement = orc_Handler.GetSafetyFlagListElement(
+      ou32_ItDomain,
+      orc_List);
+
+   if (pc_ChanNumElement != NULL)
+   {
+      if (pc_ChanNumElement->c_DataSetValues.size() > 0UL)
+      {
+         const uint8 u8_SafetyVal = oq_IsSafetyRelevant ? 1U : 0U;
+         C_OSCNodeDataPoolContent & rc_Content = pc_ChanNumElement->c_DataSetValues[0UL];
+         tgl_assert(rc_Content.GetType() == C_OSCNodeDataPoolContent::eUINT8);
+         if (pc_ChanNumElement->GetArray())
+         {
+            rc_Content.SetValueAU8Element(u8_SafetyVal,
+                                          ou32_RelevantIndex);
+         }
+         else
+         {
+            rc_Content.SetValueU8(u8_SafetyVal);
+         }
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+         osc_write_log_warning("HALC datapool generation", "unexpected number of datasets");
+      }
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+      osc_write_log_warning("HALC datapool generation", "unexpected number of list elements");
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Fill HALC datapools use case
 
    \param[in,out]  orc_List            List
    \param[in]      orc_Handler         Handler
    \param[in]      ou32_ItDomain       Iterator domain
-   \param[in]      oq_IsSafe           Is safe
    \param[in]      ou32_RelevantIndex  Relevant index
    \param[in]      ou32_UseCase        Use case
 
@@ -392,14 +586,14 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsChanNum(C_OSCNodeDataPoolL
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsUseCase(C_OSCNodeDataPoolList & orc_List,
                                                               const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
-                                                              const uint32 ou32_ItDomain, const bool oq_IsSafe,
+                                                              const uint32 ou32_ItDomain,
                                                               const uint32 ou32_RelevantIndex,
                                                               const uint32 ou32_UseCase) const
 {
    sint32 s32_Retval = C_NO_ERR;
    C_OSCNodeDataPoolListElement * const pc_UseCaseElement = orc_Handler.GetUseCaseListElement(
       ou32_ItDomain,
-      orc_List, oq_IsSafe);
+      orc_List);
 
    if (pc_UseCaseElement != NULL)
    {
@@ -488,9 +682,7 @@ const
                   ou32_ItDomain,
                   u32_ItParam,
                   u32_ItElem,
-                  orc_List,
-                  C_OSCHalcDefDomain::eVA_PARAM,
-                  orc_Channel.q_SafetyRelevant);
+                  orc_List);
                //Use user value
                if (q_IsRelevant)
                {
@@ -517,9 +709,7 @@ const
                ou32_ItDomain,
                u32_ItParam,
                0UL,
-               orc_List,
-               C_OSCHalcDefDomain::eVA_PARAM,
-               orc_Channel.q_SafetyRelevant);
+               orc_List);
             //Use user value
             if (q_IsRelevant)
             {
@@ -590,6 +780,7 @@ sint32 C_OSCHALCMagicianGenerator::mh_FillHALCElement(C_OSCNodeDataPoolListEleme
    \param[in,out]  orc_HALCListOutput  HALC list output
    \param[in,out]  orc_HALCListStatus  HALC list status
    \param[in]      oq_IsSafe           Is safe
+   \param[in]      orc_DpHandler       Datapool handler
 
    \return
    C_NO_ERR Datapool definition generated
@@ -601,24 +792,33 @@ sint32 C_OSCHALCMagicianGenerator::mh_GenerateVariablesForDomain(const C_OSCHalc
                                                                  C_OSCNodeDataPoolList & orc_HALCListInput,
                                                                  C_OSCNodeDataPoolList & orc_HALCListOutput,
                                                                  C_OSCNodeDataPoolList & orc_HALCListStatus,
-                                                                 const bool oq_IsSafe)
+                                                                 const bool oq_IsSafe,
+                                                                 const C_OSCHALCMagicianDatapoolListHandler & orc_DpHandler)
 {
    sint32 s32_Retval = C_NO_ERR;
    //Count
-   const uint32 u32_CountRelevant = C_OSCHALCMagicianDatapoolListHandler::h_CountRelevantItems(
-      orc_Domain.c_ChannelConfigs, orc_Domain.c_DomainConfig, oq_IsSafe);
+   const uint32 u32_CountRelevant = orc_DpHandler.CountRelevantItems(
+      orc_Domain.c_ChannelConfigs, orc_Domain.c_DomainConfig);
 
    if (u32_CountRelevant > 0UL)
    {
       //Channels
-      if (C_OSCHALCMagicianUtil::h_CheckChanNumVariableNecessary(orc_Domain))
+      if (orc_DpHandler.CheckChanNumVariableNecessary(orc_Domain))
       {
          const C_OSCNodeDataPoolListElement c_Tmp =
             C_OSCHALCMagicianUtil::h_GetChanNumVariable(orc_Domain.c_SingularName, oq_IsSafe, u32_CountRelevant, true);
          orc_HALCListParam.c_Elements.push_back(c_Tmp);
       }
+      //Safety flag
+      if (orc_DpHandler.CheckSafetyFlagVariableNecessary())
+      {
+         const C_OSCNodeDataPoolListElement c_Tmp =
+            C_OSCHALCMagicianUtil::h_GetSafetyFlagVariable(orc_Domain.c_SingularName, oq_IsSafe, u32_CountRelevant,
+                                                           true);
+         orc_HALCListParam.c_Elements.push_back(c_Tmp);
+      }
       //Use cases
-      if (C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(orc_Domain))
+      if (orc_DpHandler.CheckUseCaseVariableNecessary(orc_Domain))
       {
          const C_OSCNodeDataPoolListElement c_Tmp =
             C_OSCHALCMagicianUtil::h_GetUseCaseVariable(orc_Domain.c_SingularName, oq_IsSafe, u32_CountRelevant, true);
@@ -1120,6 +1320,7 @@ void C_OSCHALCMagicianGenerator::mh_InitList(C_OSCNodeDataPoolList & orc_List, c
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCHALCMagicianGenerator::mh_CleanUpHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools)
 {
+   //Unused elements
    for (std::vector<C_OSCNodeDataPool>::iterator c_ItDp = orc_Datapools.begin(); c_ItDp != orc_Datapools.end();
         ++c_ItDp)
    {
@@ -1146,5 +1347,300 @@ void C_OSCHALCMagicianGenerator::mh_CleanUpHALCDatapools(std::vector<C_OSCNodeDa
             c_ItList->c_Elements.push_back(c_Empty);
          }
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fill empty space HALC datapools
+
+   \param[in,out]  orc_Datapools    Datapools
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHALCMagicianGenerator::m_FillEmptySpaceHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools) const
+{
+   if (this->mpc_Node->c_HALCConfig.q_NvMBasedConfig)
+   {
+      for (std::vector<C_OSCNodeDataPool>::iterator c_ItDp = orc_Datapools.begin(); c_ItDp != orc_Datapools.end();
+           ++c_ItDp)
+      {
+         for (std::vector<C_OSCNodeDataPoolList>::iterator c_ItList = c_ItDp->c_Lists.begin();
+              c_ItList != c_ItDp->c_Lists.end(); ++c_ItList)
+         {
+            //CRC
+            uint32 u32_ProjectedSize = 2UL;
+            for (std::vector<C_OSCNodeDataPoolListElement>::const_iterator c_ItEl = c_ItList->c_Elements.begin();
+                 c_ItEl != c_ItList->c_Elements.end(); ++c_ItEl)
+            {
+               u32_ProjectedSize += c_ItEl->GetSizeByte();
+            }
+            if (u32_ProjectedSize < c_ItList->u32_NvMSize)
+            {
+               const uint32 u32_Diff = c_ItList->u32_NvMSize - u32_ProjectedSize;
+               C_OSCNodeDataPoolListElement c_Reserved;
+               c_Reserved.c_Name = "Reserved";
+               c_Reserved.c_Comment =
+                  "Reserved data element to ensure empty space is set to zero";
+               c_Reserved.e_Access =
+                  c_ItDp->q_IsSafety ? C_OSCNodeDataPoolListElement::eACCESS_RO : C_OSCNodeDataPoolListElement::
+                  eACCESS_RW;
+               if (u32_Diff == 1UL)
+               {
+                  c_Reserved.SetArray(false);
+                  c_Reserved.SetType(C_OSCNodeDataPoolContent::eUINT8);
+                  c_Reserved.c_MinValue.SetValueU8(0U);
+                  c_Reserved.c_MaxValue.SetValueU8(0U);
+                  c_Reserved.c_NvmValue.SetValueU8(0U);
+                  c_Reserved.c_Value.SetValueU8(0U);
+                  for (uint32 u32_ItDataSet = 0UL; u32_ItDataSet < c_ItList->c_DataSets.size(); ++u32_ItDataSet)
+                  {
+                     c_Reserved.c_DataSetValues.push_back(c_Reserved.c_Value);
+                  }
+               }
+               else
+               {
+                  c_Reserved.SetArray(true);
+                  c_Reserved.SetType(C_OSCNodeDataPoolContent::eUINT8);
+                  c_Reserved.SetArraySize(u32_Diff);
+                  for (uint32 u32_ItAr = 0UL; u32_ItAr < u32_Diff; ++u32_ItAr)
+                  {
+                     c_Reserved.c_MinValue.SetValueAU8Element(0U, u32_ItAr);
+                     c_Reserved.c_MaxValue.SetValueAU8Element(0U, u32_ItAr);
+                     c_Reserved.c_NvmValue.SetValueAU8Element(0U, u32_ItAr);
+                     c_Reserved.c_Value.SetValueAU8Element(0U, u32_ItAr);
+                  }
+                  for (uint32 u32_ItDataSet = 0UL; u32_ItDataSet < c_ItList->c_DataSets.size(); ++u32_ItDataSet)
+                  {
+                     c_Reserved.c_DataSetValues.push_back(c_Reserved.c_Value);
+                  }
+               }
+               c_ItList->c_Elements.push_back(c_Reserved);
+            }
+         }
+         c_ItDp->RecalculateAddress();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check two datapools scenario
+
+   \return
+   Is two datapools scenario
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCHALCMagicianGenerator::m_CheckTwoDp(void) const
+{
+   return (this->mpc_Node->c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING) ||
+          (this->mpc_Node->c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle copies
+
+   \param[in,out]  orc_Datapools    Datapools
+
+   \return
+   C_NO_ERR Datapool generated
+   C_CONFIG Configuration invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHALCMagicianGenerator::m_HandleCopies(std::vector<C_OSCNodeDataPool> & orc_Datapools) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if ((this->mpc_Node != NULL) && (this->mpc_Node->c_HALCConfig.u8_NumConfigCopies >= 1U))
+   {
+      const std::vector<C_OSCNodeDataPool> c_Initial = orc_Datapools;
+      for (uint8 u8_ItCopy = 0U; u8_ItCopy < (this->mpc_Node->c_HALCConfig.u8_NumConfigCopies - 1U); ++u8_ItCopy)
+      {
+         for (uint32 u32_ItInit = 0UL; u32_ItInit < c_Initial.size(); ++u32_ItInit)
+         {
+            C_OSCNodeDataPool c_Tmp = c_Initial[u32_ItInit];
+            //lint -e{9114} kept for readability
+            c_Tmp.c_Name = C_OSCHALCMagicianUtil::h_GetDatapoolName(c_Initial[u32_ItInit].q_IsSafety, u8_ItCopy + 1UL);
+            //lint -e{9114} kept for readability
+            c_Tmp.c_Comment = C_OSCHALCMagicianUtil::h_GetDatapoolComment(c_Initial[u32_ItInit].q_IsSafety,
+                                                                          u8_ItCopy + 1UL);
+            //Remove datasets
+            for (std::vector<C_OSCNodeDataPoolList>::iterator c_ItList = c_Tmp.c_Lists.begin();
+                 c_ItList != c_Tmp.c_Lists.end(); ++c_ItList)
+            {
+               c_ItList->c_DataSets.clear();
+               for (std::vector<C_OSCNodeDataPoolListElement>::iterator c_ItEl = c_ItList->c_Elements.begin();
+                    c_ItEl != c_ItList->c_Elements.end(); ++c_ItEl)
+               {
+                  c_ItEl->c_DataSetValues.clear();
+               }
+            }
+            orc_Datapools.push_back(c_Tmp);
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+      osc_write_log_warning("HALC datapool generation", "node has unexpected number of copies");
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle NVM
+
+   \param[in,out]  orc_Datapools    Datapools
+
+   \return
+   C_NO_ERR Datapool generated
+   C_CONFIG Configuration invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHALCMagicianGenerator::m_HandleNVM(std::vector<C_OSCNodeDataPool> & orc_Datapools) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->mpc_Node != NULL)
+   {
+      if (this->mpc_Node->c_HALCConfig.q_NvMBasedConfig)
+      {
+         const bool q_BothDps = this->m_CheckTwoDp();
+         if (q_BothDps || (this->mpc_Node->c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE))
+         {
+            s32_Retval = m_HandleNVMDpOffset(orc_Datapools, this->mpc_Node->c_HALCConfig.c_NvMSafeAddressOffset, true);
+         }
+         if ((s32_Retval == C_NO_ERR) &&
+             (q_BothDps || (this->mpc_Node->c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)))
+         {
+            s32_Retval = m_HandleNVMDpOffset(orc_Datapools, this->mpc_Node->c_HALCConfig.c_NvMNonSafeAddressOffset,
+                                             false);
+         }
+         //ALL DPs
+         if (s32_Retval == C_NO_ERR)
+         {
+            for (uint32 u32_ItDP = 0UL; (u32_ItDP < orc_Datapools.size()) && (s32_Retval == C_NO_ERR); ++u32_ItDP)
+            {
+               orc_Datapools[u32_ItDP].e_Type = C_OSCNodeDataPool::eHALC_NVM;
+               //Lists
+               if (orc_Datapools[u32_ItDP].c_Lists.size() == 4UL)
+               {
+                  C_OSCNodeDataPoolList & rc_ListParam = orc_Datapools[u32_ItDP].c_Lists[0UL];
+                  C_OSCNodeDataPoolList & rc_ListInput = orc_Datapools[u32_ItDP].c_Lists[1UL];
+                  C_OSCNodeDataPoolList & rc_ListOutput = orc_Datapools[u32_ItDP].c_Lists[2UL];
+                  C_OSCNodeDataPoolList & rc_ListStatus = orc_Datapools[u32_ItDP].c_Lists[3UL];
+                  //CRC (always)
+                  rc_ListParam.q_NvMCRCActive = true;
+                  rc_ListInput.q_NvMCRCActive = true;
+                  rc_ListOutput.q_NvMCRCActive = true;
+                  rc_ListStatus.q_NvMCRCActive = true;
+                  //List size
+                  rc_ListParam.u32_NvMSize = this->mpc_Node->c_HALCConfig.u32_NvMReservedListSizeParameters;
+
+                  rc_ListInput.u32_NvMSize = this->mpc_Node->c_HALCConfig.u32_NvMReservedListSizeInputValues;
+                  rc_ListOutput.u32_NvMSize = this->mpc_Node->c_HALCConfig.u32_NvMReservedListSizeOutputValues;
+                  rc_ListStatus.u32_NvMSize = this->mpc_Node->c_HALCConfig.u32_NvMReservedListSizeStatusValues;
+                  //DP size
+                  {
+                     uint32 u32_Sum = 0UL;
+                     u32_Sum += this->mpc_Node->c_HALCConfig.u32_NvMReservedListSizeParameters;
+                     u32_Sum += this->mpc_Node->c_HALCConfig.u32_NvMReservedListSizeInputValues;
+                     u32_Sum += this->mpc_Node->c_HALCConfig.u32_NvMReservedListSizeOutputValues;
+                     u32_Sum += this->mpc_Node->c_HALCConfig.u32_NvMReservedListSizeStatusValues;
+                     orc_Datapools[u32_ItDP].u32_NvMSize = u32_Sum;
+                  }
+                  //Everything else
+                  orc_Datapools[u32_ItDP].RecalculateAddress();
+               }
+               else
+               {
+                  s32_Retval = C_CONFIG;
+                  osc_write_log_warning("HALC datapool generation",
+                                        "unexpected number of lists found in datapool");
+               }
+            }
+         }
+      }
+      else
+      {
+         for (uint32 u32_ItDP = 0UL; u32_ItDP < orc_Datapools.size(); ++u32_ItDP)
+         {
+            orc_Datapools[u32_ItDP].e_Type = C_OSCNodeDataPool::eHALC;
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle NVM datapool offsets
+
+   \param[in,out]  orc_Datapools    Datapools
+   \param[in]      orc_Offsets      Offsets
+   \param[in]      oq_IsSafe        Is safe
+
+   \return
+   C_NO_ERR Datapool generated
+   C_CONFIG Configuration invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHALCMagicianGenerator::m_HandleNVMDpOffset(std::vector<C_OSCNodeDataPool> & orc_Datapools,
+                                                       const std::vector<stw_types::uint32> & orc_Offsets,
+                                                       const bool oq_IsSafe) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->mpc_Node != NULL)
+   {
+      uint32 u32_ItOffset = 0UL;
+      for (uint32 u32_ItDP = 0UL; (u32_ItDP < orc_Datapools.size()) && (s32_Retval == C_NO_ERR); ++u32_ItDP)
+      {
+         if (orc_Datapools[u32_ItDP].q_IsSafety == oq_IsSafe)
+         {
+            if (u32_ItOffset < orc_Offsets.size())
+            {
+               orc_Datapools[u32_ItDP].u32_NvMStartAddress = orc_Offsets[u32_ItOffset];
+               //Iterate
+               ++u32_ItOffset;
+            }
+            else
+            {
+               s32_Retval = C_CONFIG;
+               osc_write_log_warning("HALC datapool generation",
+                                     "unexpected number of offset addresses for the datapools");
+            }
+         }
+      }
+      if (u32_ItOffset != orc_Offsets.size())
+      {
+         s32_Retval = C_CONFIG;
+         osc_write_log_warning("HALC datapool generation",
+                               "unexpected number of offset addresses for the datapools");
+      }
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle version
+
+   \param[in,out]  orc_Datapool  Datapool
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHALCMagicianGenerator::m_HandleVersion(C_OSCNodeDataPool & orc_Datapool) const
+{
+   if (this->mpc_Node != NULL)
+   {
+      orc_Datapool.au8_Version[0] =
+         static_cast<uint8>((this->mpc_Node->c_HALCConfig.u32_ContentVersion & 0xF000UL) >> 12UL);
+      orc_Datapool.au8_Version[1] =
+         static_cast<uint8>((this->mpc_Node->c_HALCConfig.u32_ContentVersion & 0x0FF0UL) >> 4UL);
+      orc_Datapool.au8_Version[2] =
+         static_cast<uint8>(this->mpc_Node->c_HALCConfig.u32_ContentVersion & 0xF000FUL);
    }
 }

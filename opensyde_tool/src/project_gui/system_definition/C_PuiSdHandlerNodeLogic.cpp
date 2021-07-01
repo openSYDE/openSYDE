@@ -438,7 +438,7 @@ void C_PuiSdHandlerNodeLogic::SetUINodeBox(const uint32 ou32_NodeIndex, const C_
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_PuiSdHandlerNodeLogic::AddNodeAndSort(C_OSCNode & orc_OSCNode, const C_PuiSdNode & orc_UINode)
 {
-   uint32 u32_Index = mc_CoreDefinition.c_Nodes.size();
+   const uint32 u32_Index = mc_CoreDefinition.c_Nodes.size();
    //Extract device name if the device was already set
    const C_SCLString c_DeviceName = (orc_OSCNode.pc_DeviceDefinition !=
                                      NULL) ? orc_OSCNode.pc_DeviceDefinition->GetDisplayName() : "";
@@ -856,7 +856,8 @@ sint32 C_PuiSdHandlerNodeLogic::AddDataPool(const uint32 & oru32_NodeIndex, cons
       const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
       uint32 u32_ItTargetIndex = 0;
       //Handle correct array segment position
-      if (orc_OSCContent.e_Type != C_OSCNodeDataPool::eHALC)
+      if ((orc_OSCContent.e_Type != C_OSCNodeDataPool::eHALC) &&
+          (orc_OSCContent.e_Type != C_OSCNodeDataPool::eHALC_NVM))
       {
          const C_OSCNodeDataPool * pc_DataPool;
 
@@ -1226,6 +1227,61 @@ sint32 C_PuiSdHandlerNodeLogic::AssignDataPoolApplication(const uint32 ou32_Node
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Assign all HALC NVM Datapools to the PSI Data Block if possible.
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   C_NO_ERR OK
+   C_RANGE  Something out of range
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerNodeLogic::AssignAllHalcNvmDataPools(const uint32 ou32_NodeIndex)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      sint32 s32_DataBlockPsi = -1;
+
+      // search for Data Block of type PSI generation
+      if ((rc_Node.c_HALCConfig.q_NvMBasedConfig == true) && (rc_Node.c_HALCConfig.IsClear() == false))
+      {
+         for (uint32 u32_ItDataBlock = 0UL; u32_ItDataBlock < rc_Node.c_Applications.size(); ++u32_ItDataBlock)
+         {
+            const C_OSCNodeApplication & rc_CurDataBlock = rc_Node.c_Applications[u32_ItDataBlock];
+            if (rc_CurDataBlock.e_Type == C_OSCNodeApplication::ePARAMETER_SET_HALC)
+            {
+               s32_DataBlockPsi = static_cast<sint32>(u32_ItDataBlock);
+               break;
+            }
+         }
+      }
+
+      // assign all HALC NVM Datapools
+      if (s32_DataBlockPsi >= 0)
+      {
+         for (uint32 u32_ItDataPool = 0UL; (u32_ItDataPool < rc_Node.c_DataPools.size()) && (s32_Retval == C_NO_ERR);
+              ++u32_ItDataPool)
+         {
+            const C_OSCNodeDataPool & rc_DataPool = rc_Node.c_DataPools[u32_ItDataPool];
+            if (rc_DataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM)
+            {
+               s32_Retval = AssignDataPoolApplication(ou32_NodeIndex, u32_ItDataPool, s32_DataBlockPsi);
+            }
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data pool
 
    \param[in]   oru32_NodeIndex        Node index
@@ -1565,45 +1621,6 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check all NVM datapools of a node for size error
-
-   \param[in]  ou32_NodeIndex    Node index
-
-   \return
-   true  Conflict
-   false No conflict
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdHandlerNodeLogic::CheckNodeNvmDataPoolsSizeConflict(const uint32 ou32_NodeIndex) const
-{
-   bool q_Return = true;
-   const C_OSCNode * const pc_Node = this->GetOSCNodeConst(ou32_NodeIndex);
-
-   if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
-   {
-      uint32 u32_Counter;
-      uint32 u32_SizeDataPools = 0U;
-
-      // get the size of all NVM datapools
-      for (u32_Counter = 0U; u32_Counter < pc_Node->c_DataPools.size(); ++u32_Counter)
-      {
-         if (pc_Node->c_DataPools[u32_Counter].e_Type == C_OSCNodeDataPool::eNVM)
-         {
-            u32_SizeDataPools += pc_Node->c_DataPools[u32_Counter].u32_NvMSize;
-         }
-      }
-
-      if (u32_SizeDataPools <= pc_Node->pc_DeviceDefinition->u32_UserEepromSizeBytes)
-      {
-         // no error
-         q_Return = false;
-      }
-   }
-
-   return q_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the shared datapools configuration
 
    \return
@@ -1625,6 +1642,203 @@ C_PuiSdSharedDatapools & C_PuiSdHandlerNodeLogic::GetSharedDatapools(void)
 const C_PuiSdSharedDatapools & C_PuiSdHandlerNodeLogic::GetSharedDatapoolsConst(void) const
 {
    return this->mc_SharedDatapools;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor for interface class
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea::C_PuiSdHandlerNodeLogicNvmArea(void) :
+   u32_StartAddress(0U),
+   u32_Size(0U),
+   q_InRange(true)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current smaller than orc_Cmp
+
+   Comparing by start address
+
+   \param[in]  orc_Cmp  Compared instance
+
+   \return
+   true  Current smaller than orc_Cmp
+   false orc_Cmp equal or bigger than current
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea::operator <(
+   const C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & orc_Cmp) const
+{
+   bool q_Return;
+
+   if (this->u32_StartAddress < orc_Cmp.u32_StartAddress)
+   {
+      q_Return = true;
+   }
+   else if ((this->u32_StartAddress == orc_Cmp.u32_StartAddress) &&
+            (this->u32_Size < orc_Cmp.u32_Size))
+   {
+      q_Return = true;
+   }
+   else
+   {
+      q_Return = false;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Assignment operator
+
+   \param[in]  orc_Source  Reference to source
+
+   \return
+   reference to new instance
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea &  C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea::
+operator =(const C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & orc_Source)
+{
+   if (this != &orc_Source)
+   {
+      this->u32_StartAddress = orc_Source.u32_StartAddress;
+      this->u32_Size = orc_Source.u32_Size;
+      this->q_InRange = orc_Source.q_InRange;
+      this->c_DataPoolIndexes = orc_Source.c_DataPoolIndexes;
+   }
+
+   return (*this);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check all NVM Datapools of a node for size error
+
+   \param[in]   ou32_NodeIndex         Node index
+   \param[out]  opq_SizeConflict       Optional parameter for flag when a size conflict was detected
+   \param[out]  opq_OverlapConflict    Optional parameter for flag when an overlap conflict was detected
+
+   \return
+   true  Conflict
+   false No conflict
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSdHandlerNodeLogic::CheckNodeNvmDataPoolsSizeConflict(const uint32 ou32_NodeIndex,
+                                                                bool * const opq_SizeConflict,
+                                                                bool * const opq_OverlapConflict) const
+{
+   bool q_Return = true;
+   const C_OSCNode * const pc_Node = this->GetOSCNodeConst(ou32_NodeIndex);
+
+   if (opq_SizeConflict != NULL)
+   {
+      *opq_SizeConflict = false;
+   }
+   if (opq_OverlapConflict != NULL)
+   {
+      *opq_OverlapConflict = false;
+   }
+
+   if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+   {
+      std::vector<C_PuiSdHandlerNodeLogicNvmArea> c_Areas;
+      if (this->GetNodeNvmDataPoolAreas(ou32_NodeIndex, c_Areas) == C_NO_ERR)
+      {
+         uint32 u32_Counter;
+         uint32 u32_SizeUsedAreas = 0U;
+         bool q_OutOfRange = false;
+         bool q_OverlapDetected = false;
+
+         // get the size of all used NVM areas and check for overlaps
+         for (u32_Counter = 0; u32_Counter < c_Areas.size(); ++u32_Counter)
+         {
+            if (c_Areas[u32_Counter].c_DataPoolIndexes.size() > 0)
+            {
+               u32_SizeUsedAreas += c_Areas[u32_Counter].u32_Size;
+               //lint -e{514}  Using operator with a bool value was intended and is no accident
+               q_OutOfRange |= (!c_Areas[u32_Counter].q_InRange);
+
+               if (c_Areas[u32_Counter].c_DataPoolIndexes.size() > 1)
+               {
+                  q_OverlapDetected = true;
+               }
+            }
+         }
+
+         if ((u32_SizeUsedAreas <= pc_Node->pc_DeviceDefinition->u32_UserEepromSizeBytes) &&
+             (q_OverlapDetected == false) &&
+             (q_OutOfRange == false))
+         {
+            // No errors detected
+            q_Return = false;
+         }
+         else
+         {
+            // Return detailed information about the error when needed
+            if (opq_SizeConflict != NULL)
+            {
+               *opq_SizeConflict = (u32_SizeUsedAreas > pc_Node->pc_DeviceDefinition->u32_UserEepromSizeBytes) ||
+                                   q_OutOfRange;
+            }
+            if (opq_OverlapConflict != NULL)
+            {
+               *opq_OverlapConflict = q_OverlapDetected;
+            }
+         }
+      }
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Analyzing the NVM memory areas of the node and its Datapools
+
+   All NVM based Datapools are considered. Overlapping of areas or not enough space are not handled as error here.
+   Three different scenarios can occur:
+   c_DatapoolNames has
+   * 0 elements:  Free area
+   * 1 element:   One Datapool is in this area
+   * >1 elements: At least two Datapools are in this area and has overlapping memory addresses
+
+   If the flag q_InRange is set to false of at least one area, the NVM memory of the node is not big enough for the
+   current configuration.
+
+   \param[in]   ou32_NodeIndex   Node index
+   \param[out]  orc_Areas        All detected areas
+
+   \retval   C_NO_ERR   No error
+   \retval   C_RANGE    Parameter out of range
+                        Device definition of node not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerNodeLogic::GetNodeNvmDataPoolAreas(const uint32 ou32_NodeIndex,
+                                                        std::vector<C_PuiSdHandlerNodeLogicNvmArea> & orc_Areas)
+const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   orc_Areas.clear();
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+
+      if (rc_Node.pc_DeviceDefinition != NULL)
+      {
+         C_PuiSdHandlerNodeLogic::mh_GetNodeNvmDataPoolAreas(rc_Node, orc_Areas);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1756,7 +1970,27 @@ sint32 C_PuiSdHandlerNodeLogic::SetApplication(const uint32 ou32_NodeIndex, cons
       C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       if (ou32_ApplicationIndex < rc_Node.c_Applications.size())
       {
+         const C_OSCNodeApplication::E_Type e_PreviousType = rc_Node.c_Applications[ou32_ApplicationIndex].e_Type;
+
+         // inform SC about incoming Data Block change from PSI to binary type (before change!)
+         if ((e_PreviousType == C_OSCNodeApplication::ePARAMETER_SET_HALC) &&
+             (orc_OSCContent.e_Type == C_OSCNodeApplication::eBINARY))
+         {
+            Q_EMIT (C_PuiSdHandler::h_GetInstance()->
+                    SigSyncNodeApplicationAboutToBeChangedFromParamSetHALC(ou32_NodeIndex, ou32_ApplicationIndex));
+         }
+
+         // set data
          rc_Node.c_Applications[ou32_ApplicationIndex] = orc_OSCContent;
+
+         // inform SC about Data Block change from binary to PSI type (after change!)
+         if ((e_PreviousType == C_OSCNodeApplication::eBINARY) &&
+             (orc_OSCContent.e_Type == C_OSCNodeApplication::ePARAMETER_SET_HALC))
+         {
+            Q_EMIT (C_PuiSdHandler::h_GetInstance()->
+                    SigSyncNodeApplicationChangedToParamSetHALC(ou32_NodeIndex, ou32_ApplicationIndex));
+         }
+
          //Check if there is a new programmable application
          m_HandleNodeAutomatedProgrammableApplicationUpdate(ou32_NodeIndex);
       }
@@ -2063,15 +2297,15 @@ std::vector<const C_OSCNodeApplication *> C_PuiSdHandlerNodeLogic::GetProgrammab
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all indices of programmable applications for one node
+/*! \brief   Get all indices of file generation Data Blocks for one node
 
    \param[in]  ou32_NodeIndex    Node index (ID)
 
    \return
-   All known programmable applications for this node (empty if index invalid)
+   All known file generation Data Blocks for this node (empty if index invalid)
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_PuiSdHandlerNodeLogic::GetProgrammableAppIndices(const uint32 ou32_NodeIndex) const
+std::vector<uint32> C_PuiSdHandlerNodeLogic::GetFileGenAppIndices(const uint32 ou32_NodeIndex) const
 {
    std::vector<uint32> c_Return;
    if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
@@ -2080,7 +2314,7 @@ std::vector<uint32> C_PuiSdHandlerNodeLogic::GetProgrammableAppIndices(const uin
       for (uint32 u32_ItAppl = 0; u32_ItAppl < rc_Node.c_Applications.size(); ++u32_ItAppl)
       {
          const C_OSCNodeApplication & rc_Application = rc_Node.c_Applications[u32_ItAppl];
-         if (rc_Application.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+         if (rc_Application.e_Type != C_OSCNodeApplication::eBINARY)
          {
             c_Return.push_back(u32_ItAppl);
          }
@@ -4081,6 +4315,7 @@ QString C_PuiSdHandlerNodeLogic::h_GetElementTypeName(const C_OSCNodeDataPool::E
       c_Retval = "Signal";
       break;
    case C_OSCNodeDataPool::eHALC:
+   case C_OSCNodeDataPool::eHALC_NVM:
       c_Retval = "HAL Data Element";
       break;
    default:
@@ -4171,6 +4406,9 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListElementMinArray(const uint32 & or
                      break;
                   case C_OSCNodeDataPoolContent::eFLOAT64:
                      rc_Element.c_MinValue.SetValueAF64Element(orc_OSCContent.GetValueF64(), oru32_ArrayIndex);
+                     break;
+                  default:
+                     tgl_assert(false);
                      break;
                   }
 
@@ -4309,6 +4547,9 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListElementMaxArray(const uint32 & or
                      break;
                   case C_OSCNodeDataPoolContent::eFLOAT64:
                      rc_Element.c_MaxValue.SetValueAF64Element(orc_OSCContent.GetValueF64(), oru32_ArrayIndex);
+                     break;
+                  default:
+                     tgl_assert(false);
                      break;
                   }
 
@@ -4454,6 +4695,9 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListElementDataSetArray(const uint32 
                         break;
                      case C_OSCNodeDataPoolContent::eFLOAT64:
                         rc_DataSet.SetValueAF64Element(orc_OSCContent.GetValueF64(), oru32_ArrayIndex);
+                        break;
+                     default:
+                        tgl_assert(false);
                         break;
                      }
 
@@ -5085,7 +5329,7 @@ void C_PuiSdHandlerNodeLogic::m_SyncNodeApplicationAdded(const uint32 ou32_NodeI
             }
          }
       }
-      //Code generation settings
+      //File generation settings
       //Only sync valid indices
       if (rc_Node.c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex >= 0)
       {
@@ -5155,7 +5399,7 @@ void C_PuiSdHandlerNodeLogic::m_SyncNodeApplicationMoved(const uint32 ou32_NodeI
             }
          }
       }
-      //Code generation settings
+      //File generation settings
       //Only sync valid indices
       if (rc_Node.c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex >= 0)
       {
@@ -5233,7 +5477,7 @@ void C_PuiSdHandlerNodeLogic::m_SyncNodeApplicationAboutToBeDeleted(const uint32
             }
          }
       }
-      //Code generation settings
+      //File generation settings
       //Only sync valid indices
       if (rc_Node.c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex >= 0)
       {
@@ -5258,7 +5502,7 @@ void C_PuiSdHandlerNodeLogic::m_SyncNodeApplicationAboutToBeDeleted(const uint32
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle automated programmable application assignment for code generation settings
+/*! \brief   Handle automated programmable application assignment for file generation settings
 
    \param[in]  ou32_NodeIndex    Node index (ID)
 
@@ -5459,5 +5703,270 @@ void C_PuiSdHandlerNodeLogic::m_CleanUpComDataPool(const uint32 & oru32_NodeInde
             break;
          }
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Analyzing the NVM memory areas of the node and its Datapools
+
+   All NVM based Datapools are considered. Overlapping of areas or not enough space are not handled as error here.
+   Three different scenarios can occur:
+   c_DatapoolNames has
+   * 0 elements:  Free area
+   * 1 element:   One Datapool is in this area
+   * >1 elements: At least two Datapools are in this area and has overlapping memory addresses
+
+   If the flag q_InRange is set to false of at least one area, the NVM memory of the node is not big enough for the
+   current configuration.
+
+   \param[in]   orc_Node   Node
+   \param[out]  orc_Areas  All detected areas
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::mh_GetNodeNvmDataPoolAreas(const C_OSCNode & orc_Node,
+                                                         std::vector<C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea> & orc_Areas)
+{
+   const uint32 u32_NvmSize = orc_Node.pc_DeviceDefinition->u32_UserEepromSizeBytes;
+   uint32 u32_DatapoolCounter;
+   uint32 u32_AreaCounter;
+
+   // Reserve the lowest potential number of areas
+   orc_Areas.reserve(orc_Node.c_DataPools.size());
+
+   // Getting all areas
+   for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < orc_Node.c_DataPools.size(); ++u32_DatapoolCounter)
+   {
+      const stw_opensyde_core::C_OSCNodeDataPool * const pc_Datapool = &orc_Node.c_DataPools[u32_DatapoolCounter];
+
+      // Checking each NVM based Datapool
+      if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eNVM) ||
+          (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
+      {
+         // Prepare the original Datapool area
+         C_PuiSdHandlerNodeLogicNvmArea c_CurrentDatapoolArea;
+         c_CurrentDatapoolArea.u32_StartAddress = pc_Datapool->u32_NvMStartAddress;
+         c_CurrentDatapoolArea.u32_Size = pc_Datapool->u32_NvMSize;
+         c_CurrentDatapoolArea.c_DataPoolIndexes.push_back(u32_DatapoolCounter);
+
+         // Compare and adapt the area against the already registered areas
+         C_PuiSdHandlerNodeLogic::mh_AddAndAdaptNvmDataPoolArea(c_CurrentDatapoolArea, orc_Areas);
+      }
+   }
+
+   // Check if the areas fits into the NVM memory
+   for (u32_AreaCounter = 0U; u32_AreaCounter < orc_Areas.size(); ++u32_AreaCounter)
+   {
+      C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & rc_Area = orc_Areas[u32_AreaCounter];
+      rc_Area.q_InRange = ((rc_Area.u32_StartAddress + rc_Area.u32_Size) <= u32_NvmSize);
+   }
+
+   // Check if a gap exists at the beginning
+   if (orc_Areas.size() > 0)
+   {
+      if (orc_Areas[0].u32_StartAddress > 0)
+      {
+         // Gap found
+         C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea c_GapArea;
+
+         c_GapArea.u32_StartAddress = 0U;
+         c_GapArea.u32_Size = orc_Areas[0].u32_StartAddress;
+         orc_Areas.push_back(c_GapArea);
+
+         std::sort(orc_Areas.begin(), orc_Areas.end());
+      }
+   }
+
+   // Filling the gaps with "free" areas
+   for (u32_AreaCounter = 1U; u32_AreaCounter < orc_Areas.size(); ++u32_AreaCounter)
+   {
+      const C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & rc_FirstArea =
+         orc_Areas[static_cast<uint32>(u32_AreaCounter - 1U)];
+      const C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & rc_SecondArea = orc_Areas[u32_AreaCounter];
+
+      if ((rc_SecondArea.u32_StartAddress > 0U) &&
+          ((rc_FirstArea.u32_StartAddress + rc_FirstArea.u32_Size) < (rc_SecondArea.u32_StartAddress - 1U)))
+      {
+         // Gap found
+         C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea c_GapArea;
+
+         c_GapArea.u32_StartAddress = rc_FirstArea.u32_StartAddress + rc_FirstArea.u32_Size;
+         c_GapArea.u32_Size = rc_SecondArea.u32_StartAddress - c_GapArea.u32_StartAddress;
+         orc_Areas.push_back(c_GapArea);
+
+         std::sort(orc_Areas.begin(), orc_Areas.end());
+      }
+   }
+
+   // Check the last potential gap till the end
+   if (orc_Areas.size() > 0)
+   {
+      const C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & rc_LastArea = orc_Areas[orc_Areas.size() - 1];
+
+      if ((u32_NvmSize > 0U) &&
+          ((rc_LastArea.u32_StartAddress + rc_LastArea.u32_Size) < (u32_NvmSize - 1U)))
+      {
+         C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea c_GapArea;
+
+         c_GapArea.u32_StartAddress = rc_LastArea.u32_StartAddress + rc_LastArea.u32_Size;
+         c_GapArea.u32_Size = u32_NvmSize - c_GapArea.u32_StartAddress;
+         orc_Areas.push_back(c_GapArea);
+
+         std::sort(orc_Areas.begin(), orc_Areas.end());
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking and adapting a new NVM area to the area result
+
+   orc_Areas must be sorted for start address.
+
+   Different conditions:
+      1: No Overlap
+      2: Overlap
+      2.1: The current block starts before an other block
+      2.2: The current block starts in an other block
+      2.3: The current block has the same start address
+      2.4: The current block ends after it
+      2.5: The current block ends in it
+      2.6: The current block ends on the same address
+
+   In case of condition 2.4 the new created block for the area after the detected block,
+   a recursive check must be run.
+   In all other conditions 2.x the loop can be aborted due to the sorting.
+
+   \param[in]      orc_CurrentArea  NVM memory area for adding to orc_Areas
+   \param[in,out]  orc_Areas        All detected areas
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::mh_AddAndAdaptNvmDataPoolArea(
+   C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & orc_CurrentArea,
+   std::vector<C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea> & orc_Areas)
+{
+   uint32 u32_AreaCounter;
+   bool q_OverlapDetected = false;
+
+   for (u32_AreaCounter = 0U; u32_AreaCounter < orc_Areas.size(); ++u32_AreaCounter)
+   {
+      C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & rc_ComparedArea = orc_Areas[u32_AreaCounter];
+      C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea c_AreaBefore;
+      bool q_AddAreaBefore = false;
+
+      // Check for 2.1
+      if ((orc_CurrentArea.u32_StartAddress < rc_ComparedArea.u32_StartAddress) &&
+          ((orc_CurrentArea.u32_StartAddress + orc_CurrentArea.u32_Size) > rc_ComparedArea.u32_StartAddress))
+      {
+         // Create the area "before" based on the current area and add it to the result
+         c_AreaBefore = orc_CurrentArea;
+         c_AreaBefore.u32_Size = (rc_ComparedArea.u32_StartAddress - orc_CurrentArea.u32_StartAddress);
+         q_AddAreaBefore = true;
+
+         // Adapt the current area to the "rest". The further handling will be made in check for 2.3
+         orc_CurrentArea.u32_Size = (orc_CurrentArea.u32_StartAddress + orc_CurrentArea.u32_Size) -
+                                    rc_ComparedArea.u32_StartAddress;
+         orc_CurrentArea.u32_StartAddress = rc_ComparedArea.u32_StartAddress;
+
+         q_OverlapDetected = true;
+      }
+
+      // Check for 2.2
+      if ((orc_CurrentArea.u32_StartAddress > rc_ComparedArea.u32_StartAddress) &&
+          (orc_CurrentArea.u32_StartAddress < (rc_ComparedArea.u32_StartAddress  + rc_ComparedArea.u32_Size)))
+      {
+         // Create the area "before" based on the compared area and add it to the result
+         c_AreaBefore = rc_ComparedArea;
+         c_AreaBefore.u32_Size = (orc_CurrentArea.u32_StartAddress - rc_ComparedArea.u32_StartAddress);
+         q_AddAreaBefore = true;
+
+         // Adapt the compared area to the "rest". The further handling will be made in check for 2.3
+         rc_ComparedArea.u32_Size = (rc_ComparedArea.u32_StartAddress + rc_ComparedArea.u32_Size) -
+                                    orc_CurrentArea.u32_StartAddress;
+         rc_ComparedArea.u32_StartAddress = orc_CurrentArea.u32_StartAddress;
+
+         q_OverlapDetected = true;
+      }
+
+      // Check for 2.3 (or continuing 2.1 and 2.2)
+      if ((orc_CurrentArea.u32_StartAddress == rc_ComparedArea.u32_StartAddress) &&
+          (orc_CurrentArea.u32_Size > 0U) &&
+          (rc_ComparedArea.u32_Size > 0U))
+      {
+         q_OverlapDetected = true;
+
+         // Check for 2.4
+         if (orc_CurrentArea.u32_Size > rc_ComparedArea.u32_Size)
+         {
+            // Merging of areas to mark the same usage on the area
+            C_PuiSdHandlerNodeLogic::mh_MergeNvmDataPoolAreas(orc_CurrentArea, rc_ComparedArea);
+
+            // Adapt the current area to the area "behind" the merged area
+            orc_CurrentArea.u32_Size = orc_CurrentArea.u32_Size - rc_ComparedArea.u32_Size;
+            orc_CurrentArea.u32_StartAddress = rc_ComparedArea.u32_StartAddress + rc_ComparedArea.u32_Size;
+
+            // Recheck this adapted area with the entire function again. Maybe it overlaps an other area
+            C_PuiSdHandlerNodeLogic::mh_AddAndAdaptNvmDataPoolArea(orc_CurrentArea, orc_Areas);
+         }
+         // Check for 2.5
+         else if (orc_CurrentArea.u32_Size < rc_ComparedArea.u32_Size)
+         {
+            // Merging of areas to mark the same usage on the area
+            C_PuiSdHandlerNodeLogic::mh_MergeNvmDataPoolAreas(rc_ComparedArea, orc_CurrentArea);
+
+            // Adapt the compared area to the area "behind" the merged area
+            rc_ComparedArea.u32_Size = rc_ComparedArea.u32_Size - orc_CurrentArea.u32_Size;
+            rc_ComparedArea.u32_StartAddress = orc_CurrentArea.u32_StartAddress + orc_CurrentArea.u32_Size;
+
+            // Add the current area
+            orc_Areas.push_back(orc_CurrentArea);
+         }
+         // Check for 2.6
+         else
+         {
+            // Merging of areas is enough. The current area must no be added to the result
+            C_PuiSdHandlerNodeLogic::mh_MergeNvmDataPoolAreas(orc_CurrentArea, rc_ComparedArea);
+         }
+      }
+
+      if (q_OverlapDetected == true)
+      {
+         if (q_AddAreaBefore == true)
+         {
+            // Adding at the end to avoid problems when the vector must resize and the elements could get a new address
+            orc_Areas.push_back(c_AreaBefore);
+         }
+
+         // All overlaps separated due to the recursive handling of 2.4.
+         break;
+      }
+   }
+
+   if (q_OverlapDetected == false)
+   {
+      // Condition 1: Add the original unedited area
+      orc_Areas.push_back(orc_CurrentArea);
+   }
+
+   // Sorting for start address each time to make sure the sequence works in any case
+   std::sort(orc_Areas.begin(), orc_Areas.end());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Merges two NMV Datapool areas
+
+   \param[in]      orc_AreaToAdd    Area for adding to orc_AreaToMerge area
+   \param[in,out]  orc_AreaToMerge  Merged area
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::mh_MergeNvmDataPoolAreas(
+   const C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & orc_AreaToAdd,
+   C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea & orc_AreaToMerge)
+{
+   uint32 u32_Counter;
+
+   orc_AreaToMerge.c_DataPoolIndexes.reserve(
+      orc_AreaToMerge.c_DataPoolIndexes.size() + orc_AreaToAdd.c_DataPoolIndexes.size());
+   for (u32_Counter = 0; u32_Counter < orc_AreaToAdd.c_DataPoolIndexes.size(); ++u32_Counter)
+   {
+      orc_AreaToMerge.c_DataPoolIndexes.push_back(orc_AreaToAdd.c_DataPoolIndexes[u32_Counter]);
    }
 }

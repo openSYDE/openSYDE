@@ -76,16 +76,21 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_zipping) {
    message("opensyde_core_skip_zipping not detected ... dragging in package")
 
    INCLUDEPATH += \
+               $${PWD}/aes \
                $${PWD}/miniz
 
    SOURCES += \
+    $${PWD}/C_OSCAesFile.cpp \
     $${PWD}/C_OSCZipData.cpp \
     $${PWD}/C_OSCZipFile.cpp \
+    $${PWD}/aes/AES.cpp \
     $${PWD}/miniz/miniz.c
 
    HEADERS += \
+    $${PWD}/C_OSCAesFile.h \
     $${PWD}/C_OSCZipData.h \
     $${PWD}/C_OSCZipFile.h \
+    $${PWD}/aes/AES.h \
     $${PWD}/miniz/miniz.h
 }
 
@@ -107,7 +112,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_imports) {
     $${PWD}/imports/C_OSCImportEdsDcf.h
 }
 
-# optional: code generation
+# optional: file generation
 contains(opensyde_core_skip_modules, opensyde_core_skip_code_generation) {
    message("opensyde_core_skip_code_generation detected ... skipping package")
 } else {
@@ -122,6 +127,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_code_generation) {
     $${PWD}/exports/C_OSCExportHalc.cpp \
     $${PWD}/exports/C_OSCExportNode.cpp \
     $${PWD}/exports/C_OSCExportOsyInit.cpp \
+    $${PWD}/exports/C_OSCExportParamSet.cpp \
     $${PWD}/exports/C_OSCExportUti.cpp
 
    HEADERS += \
@@ -130,6 +136,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_code_generation) {
     $${PWD}/exports/C_OSCExportHalc.h \
     $${PWD}/exports/C_OSCExportNode.h \
     $${PWD}/exports/C_OSCExportOsyInit.h \
+    $${PWD}/exports/C_OSCExportParamSet.h \
     $${PWD}/exports/C_OSCExportUti.h
 }
 
@@ -294,6 +301,43 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/can/C_OSCCanUtil.h
 }
 
+# optional: parameter set handling (reading and writing syde_psi files)
+contains(opensyde_core_skip_modules, opensyde_core_skip_param_set) {
+   message("opensyde_core_skip_param_set detected ... skipping package")
+} else {
+   message("opensyde_core_skip_param_set not detected ... dragging in package")
+
+   INCLUDEPATH += $${PWD}/data_dealer/paramset
+
+   SOURCES += $${PWD}/data_dealer/paramset/C_OSCParamSetDataPoolInfo.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetFilerBase.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetHandler.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedData.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedDataPool.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedElement.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedFileInfoData.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedList.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedNode.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedNodeFiler.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetRawEntry.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetRawNode.cpp \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetRawNodeFiler.cpp
+
+   HEADERS += $${PWD}/data_dealer/paramset/C_OSCParamSetDataPoolInfo.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetFilerBase.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetHandler.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedData.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedDataPool.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedElement.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedFileInfoData.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedList.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedNode.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedNodeFiler.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetRawEntry.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetRawNode.h \
+              $${PWD}/data_dealer/paramset/C_OSCParamSetRawNodeFiler.h
+}
+
 # optional: protocol drivers (openSYDE, STW Flashloader, KEFEX, Windows CAN and Ethernet Dispatchers, Data Dealer)
 contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
    message("opensyde_core_skip_protocol_drivers detected ... skipping package")
@@ -306,7 +350,6 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
                   $${PWD}/ip_dispatcher/target_windows_win_sock \
                   $${PWD}/ip_dispatcher/dispatcher \
                   $${PWD}/data_dealer \
-                  $${PWD}/data_dealer/paramset \
                   $${PWD}/protocol_drivers \
                   $${PWD}/protocol_drivers/routing \
                   $${PWD}/protocol_drivers/communication \
@@ -320,19 +363,6 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/data_dealer/C_OSCDataDealer.cpp \
               $${PWD}/data_dealer/C_OSCDataDealerNvm.cpp \
               $${PWD}/data_dealer/C_OSCDataDealerNvmSafe.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetDataPoolInfo.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetFilerBase.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetHandler.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedData.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedDataPool.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedElement.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedFileInfoData.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedList.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedNode.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedNodeFiler.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetRawEntry.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetRawNode.cpp \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetRawNodeFiler.cpp \
               $${PWD}/ip_dispatcher/target_windows_win_sock/C_OSCIpDispatcherWinSock.cpp \
               $${PWD}/kefex_diaglib/CDLReportEvents.cpp \
               $${PWD}/kefex_diaglib/CHexFile.cpp \
@@ -372,19 +402,6 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/data_dealer/C_OSCDataDealer.h \
               $${PWD}/data_dealer/C_OSCDataDealerNvm.h \
               $${PWD}/data_dealer/C_OSCDataDealerNvmSafe.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetDataPoolInfo.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetFilerBase.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetHandler.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedData.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedDataPool.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedElement.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedFileInfoData.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedList.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedNode.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetInterpretedNodeFiler.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetRawEntry.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetRawNode.h \
-              $${PWD}/data_dealer/paramset/C_OSCParamSetRawNodeFiler.h \
               $${PWD}/ip_dispatcher/dispatcher/C_OSCIpDispatcher.h \
               $${PWD}/ip_dispatcher/target_windows_win_sock/C_OSCIpDispatcherWinSock.h \
               $${PWD}/kefex_diaglib/CDLReportEvents.h \
@@ -416,7 +433,8 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/routing/C_OSCRoutingRoute.h \
               $${PWD}/protocol_drivers/system_update/C_OSCSuSequences.h \
               $${PWD}/protocol_drivers/system_update/C_OSCSuServiceUpdatePackage.h \
-              $${PWD}/protocol_drivers/system_update/C_OsyHexFile.h
+              $${PWD}/protocol_drivers/system_update/C_OsyHexFile.h \
+              $${PWD}/protocol_drivers/DiagLib_config.h
 }
 
 # optional: protocol logging

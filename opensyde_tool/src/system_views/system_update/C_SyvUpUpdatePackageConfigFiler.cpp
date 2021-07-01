@@ -17,6 +17,7 @@
 #include "TGLFile.h"
 #include "TGLUtils.h"
 #include "CSCLString.h"
+#include "C_OSCLoggingHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -67,7 +68,32 @@ sint32 C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(const QString & orc_FilePat
          {
             if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
             {
-               //nothing to do with the file version yet ...
+               uint16 u16_FileVersion = 0U;
+               try
+               {
+                  u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+               }
+               catch (...)
+               {
+                  osc_write_log_error("Loading Update Package Configuration",
+                                      "\"file-version\" could not be converted to a number.");
+                  s32_Return = C_CONFIG;
+               }
+
+               //is the file version one we know ?
+               if (s32_Return == C_NO_ERR)
+               {
+                  osc_write_log_info("Loading Update Package Configuration", "Value of \"file-version\": " +
+                                     C_SCLString::IntToStr(u16_FileVersion));
+                  //Check file version
+                  if (u16_FileVersion != hu16_FILE_VERSION_LATEST)
+                  {
+                     osc_write_log_error("Loading Update Package Configuration",
+                                         "Version defined by \"file-version\" is not supported.");
+                     s32_Return = C_CONFIG;
+                  }
+               }
+
                //Return
                tgl_assert(c_XMLParser.SelectNodeParent() == "opensyde-update-package-configuration");
 
@@ -84,6 +110,7 @@ sint32 C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(const QString & orc_FilePat
             }
             else
             {
+               osc_write_log_error("Loading Update Package Configuration", "Could not find \"file-version\" node.");
                s32_Return = C_CONFIG;
             }
          }

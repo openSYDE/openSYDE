@@ -25,7 +25,6 @@
 
 #include "C_OSCNodeDataPoolContent.h"
 #include "C_OSCLoggingHandler.h"
-#include "C_CieUtil.h"
 #include "C_OSCNodeDataPoolContentUtil.h"
 #include "C_OSCUtils.h"
 #include "C_SdNdeDpContentUtil.h"
@@ -154,7 +153,7 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
          std::set<std::string>::const_iterator c_Iter;
          for (c_Iter = c_MessageAssignment.begin(); c_Iter != c_MessageAssignment.end(); ++c_Iter)
          {
-            if (oq_AddUnmappedMessages)
+            if (oq_AddUnmappedMessages == true)
             {
                for (const auto c_DbcMessage : c_DbcNetwork.messages)
                {

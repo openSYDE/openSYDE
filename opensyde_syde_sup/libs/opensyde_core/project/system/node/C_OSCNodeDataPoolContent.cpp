@@ -194,6 +194,20 @@ void C_OSCNodeDataPoolContent::CalcHashElement(uint32 & oru32_HashValue, const u
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calculates the hash value over structure only
+
+   The hash value is a 32 bit CRC value.
+
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeDataPoolContent::CalcHashStructure(uint32 & oru32_HashValue) const
+{
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_Type, sizeof(this->me_Type), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_Array, sizeof(this->mq_Array), oru32_HashValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: set current value for simply type of any type
 
    \param[in]  orc_Value   New value
@@ -2733,8 +2747,8 @@ bool C_OSCNodeDataPoolContent::CompareArrayGreater(const C_OSCNodeDataPoolConten
 /*! \brief   Get all value as scaled string
 
    Info: - floats doubles and any scaled value will be displayed in exponential format with 6 digits precision,
-           e.g. 2.45823e+006
-         - The postfix e+001 will be skipped (if the number has less than 6 digits)
+           e.g. 2.45823e+06
+         - The postfix e+01 will be skipped (if the number has less than 6 digits)
          - The last digit will get rounded if necessary
 
    \param[in]   of64_Factor               Scaling factor

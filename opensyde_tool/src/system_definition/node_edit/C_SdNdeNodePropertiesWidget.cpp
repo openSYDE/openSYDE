@@ -89,16 +89,6 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    // init UI
    mpc_Ui->setupUi(this);
 
-   //SSI:
-   //hide technical spec group
-   // - Communication IF section is more important (4cs-gw: 11 IFs)
-   // Where to move the info?
-   // NVM Size: Datapool properties (done)
-   // Flash access? Is a flashloader thing, but not important to show in a extra line (TBD)
-   mpc_Ui->pc_GroupBoxTechnicalSpecHeader->setVisible(false);
-   mpc_Ui->pc_FramSperator1_5->setVisible(false);
-   mpc_Ui->pc_GroupTechnicalSpec->setVisible(false);
-
    //load STW logo
    c_ImgLogo.load("://images/STW_Logo_Dark.png");
    c_ImgLogo = c_ImgLogo.scaled((c_ImgLogo.width() / 22), (c_ImgLogo.height() / 22),
@@ -253,8 +243,6 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonFlashloaderOptions->setText(static_cast<QString>(' ') +
                                                           C_GtGetText::h_GetText("STW Flashloader Settings"));
 
-   this->mpc_Ui->pc_LabelFlashAccess->setText(C_GtGetText::h_GetText("Flash Access"));
-
    //table column text
    //fake padding with Spaces. No other solution known so far
    c_InterfaceString = "          ";
@@ -294,8 +282,8 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                             C_GtGetText::h_GetText(
                                                                "This property shows if the device is user programmable."
                                                                "\nDefined in read only *.syde_devdef file."
-                                                               "\n\nIf enabled, Data Blocks of type \"Programmable Application\" can be created "
-                                                               "and code generation feature can be used."));
+                                                               "\n\nIf enabled, the source code generation feature can "
+                                                               "be activated for Data Blocks ."));
 
    this->mpc_Ui->pc_LabelProtocol->SetToolTipInformation(C_GtGetText::h_GetText("Protocol Support"),
                                                          C_GtGetText::h_GetText(
@@ -534,28 +522,6 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
 
          //load device type name
          this->mpc_Ui->pc_LabelNodeType->setText(pc_DevDef->GetDisplayName().c_str());
-
-         //load nvm size
-         this->mpc_Ui->pc_LabelNvmSizeValue->setText(QString::number(
-                                                        pc_DevDef->u32_UserEepromSizeBytes) + " Bytes (EEPROM)");
-
-         //flash access
-         if (pc_Node->IsAnyUpdateAvailable() == true)
-         {
-            if (pc_DevDef->q_FlashloaderOpenSydeIsFileBased == true)
-            {
-               this->mpc_Ui->pc_LabelFlashAccessValue->setText(C_GtGetText::h_GetText("File based"));
-            }
-            else
-            {
-               this->mpc_Ui->pc_LabelFlashAccessValue->setText(C_GtGetText::h_GetText("Address based"));
-            }
-         }
-         else
-         {
-            this->mpc_Ui->pc_LabelFlashAccessValue->setText(C_GtGetText::h_GetText(
-                                                               "No Flashloader support."));
-         }
 
          //clear table
          this->mpc_Ui->pc_TableWidgetComIfSettings->setRowCount(0);

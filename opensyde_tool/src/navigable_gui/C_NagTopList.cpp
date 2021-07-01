@@ -43,7 +43,7 @@ using namespace stw_opensyde_gui_elements;
 C_NagTopList::C_NagTopList(QWidget * const opc_Parent) :
    C_OgeListViewToolTipBase(opc_Parent)
 {
-   this->setModel(&mc_Model);
+   this->C_NagTopList::setModel(&mc_Model);
    this->setItemDelegate(&mc_Delegate);
 
    this->setSelectionMode(QAbstractItemView::NoSelection);

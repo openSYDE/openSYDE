@@ -75,7 +75,7 @@ C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
    this->mc_SortProxyModel.setSortRole(msn_USER_ROLE_SORT);
-   this->setModel(&mc_SortProxyModel);
+   this->C_CamMetTreeView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
 
@@ -89,6 +89,8 @@ C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
    //Buttons
    this->mpc_PushButtonScrollTop = new C_OgePubIconOnly(this->verticalScrollBar());
    this->mpc_PushButtonScrollBottom = new C_OgePubIconOnly(this->verticalScrollBar());
+
+   this->header()->setFixedHeight(27);
 
    // Size is necessary for correct drawing of the images
    this->mpc_PushButtonScrollTop->setGeometry(0, 0, 17, 46);
@@ -144,10 +146,18 @@ C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} never took ownership of any context menu item or button
 C_CamMetTreeView::~C_CamMetTreeView()
 {
-   mc_ThreadGUIBuffer.quit();
-   mc_ThreadGUIBuffer.wait();
+   try
+   {
+      mc_ThreadGUIBuffer.quit();
+      mc_ThreadGUIBuffer.wait();
+   }
+   catch (...)
+   {
+      //not much we can do here ...
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -318,7 +328,7 @@ void C_CamMetTreeView::SetDisplayTimestampAbsoluteTimeOfDay(const bool oq_Value)
 
    This will affect the maximum shown messages in the trace view
 
-   \param[in]       ou32_Value     New size of trace buffer
+   \param[in]  ou32_Value  New size of trace buffer
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::SetTraceBufferSize(const uint32 ou32_Value)
@@ -355,10 +365,10 @@ bool C_CamMetTreeView::GetDisplayTimestampRelative() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Search a matching item
 
-   \param[in]       orc_SearchString     String to search in model
-   \param[in]       oq_Next              Flag for search direction
-                                          true:  Search the next entry, forward
-                                          false: Search the previous entry, backward
+   \param[in]  orc_SearchString  String to search in model
+   \param[in]  oq_Next           Flag for search direction
+                                 true:  Search the next entry, forward
+                                 false: Search the previous entry, backward
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::SearchTrace(const QString & orc_SearchString, const bool oq_Next)
@@ -384,7 +394,10 @@ void C_CamMetTreeView::SearchTrace(const QString & orc_SearchString, const bool 
          // Signal of message
          const QModelIndex c_ParentIndex =
             this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(sn_Row, 0));
-         const QModelIndex c_ChildIndex = c_ParentIndex.child(sn_RowSignal, 0);
+         const QModelIndex c_ChildIndex =
+            this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(sn_RowSignal, 0,
+                                                                       this->mc_SortProxyModel.mapToSource(
+                                                                          c_ParentIndex)));
          QModelIndex c_SelectIndex = c_ChildIndex;
 
          // Expand the parent message
@@ -393,7 +406,10 @@ void C_CamMetTreeView::SearchTrace(const QString & orc_SearchString, const bool 
          // Check for a multiplexed signal as result
          if (sn_RowMultiplexedSignal >= 0)
          {
-            c_SelectIndex = c_ChildIndex.child(sn_RowMultiplexedSignal, 0);
+            c_SelectIndex =
+               this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(sn_RowMultiplexedSignal, 0,
+                                                                          this->mc_SortProxyModel.mapToSource(
+                                                                             c_ChildIndex)));
             this->expand(c_ChildIndex);
          }
 
@@ -520,7 +536,8 @@ void C_CamMetTreeView::selectionChanged(const QItemSelection & orc_Selected, con
          if (c_CurIndex.parent().isValid() == true)
          {
             this->mc_Model.SetSelection(
-               c_CurIndex.parent().parent().isValid() ? c_CurIndex.parent().parent().row() : c_CurIndex.parent().row(),
+               c_CurIndex.parent().parent().isValid() ?
+               static_cast<sint32>(c_CurIndex.parent().parent().row()) : static_cast<sint32>(c_CurIndex.parent().row()),
                static_cast<sint32>(this->mc_Model.TranslateTreeRowsToSignalIndex(c_CurIndex)));
          }
          else
@@ -696,7 +713,7 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
 sintn C_CamMetTreeView::sizeHintForColumn(const sintn osn_Column) const
 {
    sintn sn_Size;
-   static const sintn hasn_Sizes[C_CamMetTreeModel::eCAN_COUNTER + 1] =
+   static const sintn hasn_Sizes[static_cast<sintn>(C_CamMetTreeModel::eCAN_COUNTER) + 1] =
    {
       mhsn_COL_WIDTH_TIME_STAMP,
       mhsn_COL_WIDTH_CAN_ID,
@@ -707,7 +724,7 @@ sintn C_CamMetTreeView::sizeHintForColumn(const sintn osn_Column) const
       mhsn_COL_WIDTH_CAN_COUNTER
    };
 
-   if (osn_Column <= C_CamMetTreeModel::eCAN_COUNTER)
+   if ((osn_Column <= static_cast<sintn>(C_CamMetTreeModel::eCAN_COUNTER)) && (osn_Column >= 0))
    {
       sn_Size = hasn_Sizes[osn_Column];
    }
@@ -720,7 +737,7 @@ sintn C_CamMetTreeView::sizeHintForColumn(const sintn osn_Column) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Init context menu entries
+/*! \brief  Initialize context menu entries
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_SetupContextMenu(void)

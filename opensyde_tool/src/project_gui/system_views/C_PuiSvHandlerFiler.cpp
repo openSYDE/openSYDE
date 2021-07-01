@@ -500,7 +500,8 @@ void C_PuiSvHandlerFiler::h_SaveReadRails(const QMap<C_OSCNodeDataPoolListElemen
    C_CONFIG    error loading information
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandlerFiler::h_LoadLastKnownHalcCrcs(std::map<C_PuiSvDbNodeDataPoolListElementId, uint32> & orc_Crcs,
+sint32 C_PuiSvHandlerFiler::h_LoadLastKnownHalcCrcs(std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                                             C_PuiSvLastKnownHalElementId> & orc_Crcs,
                                                     C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -519,8 +520,24 @@ sint32 C_PuiSvHandlerFiler::h_LoadLastKnownHalcCrcs(std::map<C_PuiSvDbNodeDataPo
             if (orc_XMLParser.AttributeExists("crc"))
             {
                const uint32 u32_Crc = orc_XMLParser.GetAttributeUint32("crc");
+               QString c_DpName;
+               if (orc_XMLParser.SelectNodeChild("hal-data-pool-name") == "hal-data-pool-name")
+               {
+                  c_DpName = orc_XMLParser.GetNodeContent().c_str();
+                  //Return
+                  tgl_assert(orc_XMLParser.SelectNodeParent() == "last-known-halc-crc");
+               }
+               else
+               {
+                  const C_OSCNodeDataPool * const pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+                     c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex);
+                  if (pc_Dp != NULL)
+                  {
+                     c_DpName = pc_Dp->c_Name.c_str();
+                  }
+               }
                //Insert
-               orc_Crcs[c_Id] = u32_Crc;
+               orc_Crcs[c_Id] = C_PuiSvLastKnownHalElementId(u32_Crc, c_DpName);
             }
             else
             {
@@ -546,16 +563,19 @@ sint32 C_PuiSvHandlerFiler::h_LoadLastKnownHalcCrcs(std::map<C_PuiSvDbNodeDataPo
    \param[in,out]  orc_XMLParser    XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandlerFiler::h_SaveLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolListElementId, uint32> & orc_Crcs,
+void C_PuiSvHandlerFiler::h_SaveLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                                                 C_PuiSvLastKnownHalElementId> & orc_Crcs,
                                                   C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild("last-known-halc-crcs");
-   for (std::map<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_It = orc_Crcs.begin();
+   for (std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvLastKnownHalElementId>::const_iterator c_It =
+           orc_Crcs.begin();
         c_It != orc_Crcs.end(); ++c_It)
    {
       orc_XMLParser.CreateAndSelectNodeChild("last-known-halc-crc");
       mh_SaveUiIndex(c_It->first, orc_XMLParser);
-      orc_XMLParser.SetAttributeUint32("crc", c_It->second);
+      orc_XMLParser.SetAttributeUint32("crc", c_It->second.u32_Crc);
+      orc_XMLParser.CreateNodeChild("hal-data-pool-name", c_It->second.c_HalDpName.toStdString().c_str());
 
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "last-known-halc-crcs");
@@ -787,6 +807,7 @@ sint32 C_PuiSvHandlerFiler::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate & 
                                                             const C_OSCNode & orc_Node)
 {
    std::vector<QString> c_Paths;
+   std::vector<bool> c_SkipFlags;
    const sint32 s32_Retval = C_NO_ERR;
 
    if (orc_XMLParser.AttributeExists("position") == true)
@@ -814,10 +835,15 @@ sint32 C_PuiSvHandlerFiler::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate & 
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "paths");
       }
+
+      // Adapt size for skip flags for compatibility
+      c_SkipFlags.resize(orc_Node.c_Applications.size(), false);
+
       if (orc_Node.c_Applications.size() == c_Paths.size())
       {
          //matching size
          orc_NodeUpdateInformation.SetPaths(c_Paths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+         orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_SkipFlags, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
       }
       else
       {
@@ -825,6 +851,7 @@ sint32 C_PuiSvHandlerFiler::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate & 
          c_Paths.clear();
          c_Paths.resize(orc_Node.c_Applications.size(), "");
          orc_NodeUpdateInformation.SetPaths(c_Paths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+         orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_SkipFlags, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
       }
       //Return
       orc_XMLParser.SelectNodeParent();
@@ -832,13 +859,56 @@ sint32 C_PuiSvHandlerFiler::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate & 
    else
    {
       std::vector<C_PuiSvNodeUpdateParamInfo> c_ParamInfo;
+      std::vector<QString> c_FileBasedPaths;
+      std::vector<bool> c_PathSkipFlags;
+      std::vector<bool> c_ParamSetSkipFlags;
+      std::vector<bool> c_FileBasedSkipFlags;
+
       //New format
       C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationPaths(c_Paths, "data-block-path", orc_XMLParser);
       orc_NodeUpdateInformation.SetPaths(c_Paths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+
       C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationParam(c_ParamInfo, orc_XMLParser);
       orc_NodeUpdateInformation.SetParamInfos(c_ParamInfo);
-      C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationPaths(c_Paths, "file-based-path", orc_XMLParser);
-      orc_NodeUpdateInformation.SetPaths(c_Paths, C_PuiSvNodeUpdate::eFTP_FILE_BASED);
+
+      C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationPaths(c_FileBasedPaths, "file-based-path", orc_XMLParser);
+      orc_NodeUpdateInformation.SetPaths(c_FileBasedPaths, C_PuiSvNodeUpdate::eFTP_FILE_BASED);
+
+      // Handling of the skip flags
+      C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationSkipUpdateOfFiles(c_SkipFlags, orc_XMLParser);
+      // Check for a correct loading of the flags
+      if (c_SkipFlags.size() == (c_Paths.size() + c_ParamInfo.size() + c_FileBasedPaths.size()))
+      {
+         if (c_Paths.size() > 0)
+         {
+            std::copy(c_SkipFlags.begin(), c_SkipFlags.begin() + c_Paths.size(), std::back_inserter(c_PathSkipFlags));
+            c_SkipFlags.erase(c_SkipFlags.begin(), c_SkipFlags.begin() + c_Paths.size());
+         }
+
+         if (c_ParamInfo.size() > 0)
+         {
+            std::copy(c_SkipFlags.begin(), c_SkipFlags.begin() + c_ParamInfo.size(),
+                      std::back_inserter(c_ParamSetSkipFlags));
+            c_SkipFlags.erase(c_SkipFlags.begin(), c_SkipFlags.begin() + c_Paths.size());
+         }
+
+         if (c_FileBasedPaths.size() > 0)
+         {
+            std::copy(c_SkipFlags.begin(), c_SkipFlags.begin() + c_FileBasedPaths.size(),
+                      std::back_inserter(c_FileBasedSkipFlags));
+         }
+      }
+      else
+      {
+         // Adapt for compatibility
+         c_PathSkipFlags.resize(c_Paths.size(), false);
+         c_ParamSetSkipFlags.resize(c_ParamInfo.size(), false);
+         c_FileBasedSkipFlags.resize(c_FileBasedPaths.size(), false);
+      }
+
+      orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_PathSkipFlags, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+      orc_NodeUpdateInformation.SetSkipUpdateOfParamInfosFlags(c_ParamSetSkipFlags);
+      orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_FileBasedSkipFlags, C_PuiSvNodeUpdate::eFTP_FILE_BASED);
    }
 
    return s32_Retval;
@@ -898,6 +968,41 @@ void C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationParam(std::vector<C_PuiSvN
          while (c_CurrentPathNode == "param-set");
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "param-sets");
+      }
+      //Return
+      orc_XMLParser.SelectNodeParent();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load node skip of file update flags update information
+
+   \param[out]     orc_Flags        Parsed skip flags
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set
+                                    to the "node-update-information" or
+                                    "node-specific-update-information" element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationSkipUpdateOfFiles(std::vector<bool> & orc_Flags,
+                                                                        C_OSCXMLParserBase & orc_XMLParser)
+{
+   // No error in case of not existing flags due to compatibility
+   orc_Flags.clear();
+   if (orc_XMLParser.SelectNodeChild("skip-update-of-files") == "skip-update-of-files")
+   {
+      C_SCLString c_CurrentNodeActiveFlagNode = orc_XMLParser.SelectNodeChild("skip-update-of-file");
+      if (c_CurrentNodeActiveFlagNode == "skip-update-of-file")
+      {
+         do
+         {
+            const bool q_CurrentValue = orc_XMLParser.GetAttributeBool("state");
+            orc_Flags.push_back(q_CurrentValue);
+            //Next
+            c_CurrentNodeActiveFlagNode = orc_XMLParser.SelectNodeNext("skip-update-of-file");
+         }
+         while (c_CurrentNodeActiveFlagNode == "skip-update-of-file");
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "skip-update-of-files");
       }
       //Return
       orc_XMLParser.SelectNodeParent();
@@ -970,6 +1075,43 @@ sint32 C_PuiSvHandlerFiler::mh_LoadViewFile(C_PuiSvData & orc_View, const QStrin
                                                                         orc_FilePath.toStdString().c_str(),
                                                                         "opensyde-view-definition");
 
+   //File version
+   if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading view", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading view", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if ((u16_FileVersion != 1U) && (u16_FileVersion != 2U))
+         {
+            osc_write_log_error("Loading view",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      c_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading view", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
+
    if (s32_Retval == C_NO_ERR)
    {
       if (c_XMLParser.SelectNodeChild("opensyde-system-view") == "opensyde-system-view")
@@ -1024,6 +1166,61 @@ sint32 C_PuiSvHandlerFiler::mh_LoadView(C_PuiSvData & orc_View, C_OSCXMLParserBa
    {
       //Default
       orc_View.SetDeviceConfigSelectedBitRate(125U);
+   }
+   if (orc_XMLParser.SelectNodeChild("service-mode") == "service-mode")
+   {
+      if (orc_XMLParser.AttributeExists("active"))
+      {
+         orc_View.SetServiceModeActive(orc_XMLParser.GetAttributeBool("active"));
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+         osc_write_log_error("Loading view",
+                             "Attribute \"active\" not found in node \"service-mode\".");
+      }
+      if (orc_XMLParser.SelectNodeChild("availability") == "availability")
+      {
+         if (orc_XMLParser.AttributeExists("setup"))
+         {
+            orc_View.SetServiceModeSetupActive(orc_XMLParser.GetAttributeBool("setup"));
+         }
+         else
+         {
+            s32_Retval = C_CONFIG;
+            osc_write_log_error("Loading view",
+                                "Attribute \"setup\" not found in node \"availability\".");
+         }
+         if (orc_XMLParser.AttributeExists("update"))
+         {
+            orc_View.SetServiceModeUpdateActive(orc_XMLParser.GetAttributeBool("update"));
+         }
+         else
+         {
+            s32_Retval = C_CONFIG;
+            osc_write_log_error("Loading view",
+                                "Attribute \"update\" not found in node \"availability\".");
+         }
+         if (orc_XMLParser.AttributeExists("dashboard"))
+         {
+            orc_View.SetServiceModeDashboardActive(orc_XMLParser.GetAttributeBool("dashboard"));
+         }
+         else
+         {
+            s32_Retval = C_CONFIG;
+            osc_write_log_error("Loading view",
+                                "Attribute \"dashboard\" not found in node \"availability\".");
+         }
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "service-mode");
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+         osc_write_log_error("Loading view",
+                             "Node \"availability\" not found in node \"service-mode\".");
+      }
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-view");
    }
    if (orc_XMLParser.SelectNodeChild("name") == "name")
    {
@@ -3039,8 +3236,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToTabChartSettingZoomMode(const QString & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to source type
 
-   \param[in]   orc_String    String to interpret
-   \param[out]  ore_YAxisMode Y axis mode
+   \param[in]   orc_String       String to interpret
+   \param[out]  ore_YAxisMode    Y axis mode
 
    \return
    C_NO_ERR   no error
@@ -3112,6 +3309,13 @@ void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformation(const std::vector<C_PuiSv
       const std::vector<C_PuiSvNodeUpdateParamInfo> & rc_ParamSetPaths = rc_NodeUpdateInformation.GetParamInfos();
       const std::vector<QString> & rc_FileBasedPaths = rc_NodeUpdateInformation.GetPaths(
          C_PuiSvNodeUpdate::eFTP_FILE_BASED);
+      std::vector<bool> c_SkipFlags;
+      const std::vector<bool> & rc_PathSkipFlags = rc_NodeUpdateInformation.GetSkipUpdateOfPathsFlags(
+         C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+      const std::vector<bool> & rc_ParamSetSkipFlags = rc_NodeUpdateInformation.GetSkipUpdateOfParamInfosFlags();
+      const std::vector<bool> & rc_FileBasedSkipFlags = rc_NodeUpdateInformation.GetSkipUpdateOfPathsFlags(
+         C_PuiSvNodeUpdate::eFTP_FILE_BASED);
+
       orc_XMLParser.CreateAndSelectNodeChild("node-specific-update-information");
       orc_XMLParser.SetAttributeUint32("position", rc_NodeUpdateInformation.u32_NodeUpdatePosition);
 
@@ -3120,6 +3324,24 @@ void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformation(const std::vector<C_PuiSv
       mh_SaveNodeUpdateInformationParamInfo(rc_ParamSetPaths, orc_XMLParser);
 
       C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformationPaths(rc_FileBasedPaths, "file-based-path", orc_XMLParser);
+
+      // Save the skip flags
+      if (rc_PathSkipFlags.size() > 0)
+      {
+         std::copy(rc_PathSkipFlags.begin(), rc_PathSkipFlags.begin() + rc_PathSkipFlags.size(),
+                   std::back_inserter(c_SkipFlags));
+      }
+      if (rc_ParamSetSkipFlags.size() > 0)
+      {
+         std::copy(rc_ParamSetSkipFlags.begin(), rc_ParamSetSkipFlags.begin() + rc_ParamSetSkipFlags.size(),
+                   std::back_inserter(c_SkipFlags));
+      }
+      if (rc_FileBasedSkipFlags.size() > 0)
+      {
+         std::copy(rc_FileBasedSkipFlags.begin(), rc_FileBasedSkipFlags.begin() + rc_FileBasedSkipFlags.size(),
+                   std::back_inserter(c_SkipFlags));
+      }
+      mh_SaveNodeUpdateInformationSkipUpdateOfFiles(c_SkipFlags, orc_XMLParser);
 
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "node-update-information");
@@ -3174,6 +3396,29 @@ void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformationParamInfo(
       orc_XMLParser.CreateNodeChild("path", rc_ParamSetInfo.GetPath().toStdString().c_str());
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "param-sets");
+   }
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "node-specific-update-information");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save skip of file update flags update information
+
+   \param[in]      orc_Flags        Skip flags
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set
+                                    to the "node-specific-update-information" element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformationSkipUpdateOfFiles(const std::vector<bool> & orc_Flags,
+                                                                        C_OSCXMLParserBase & orc_XMLParser)
+{
+   orc_XMLParser.CreateAndSelectNodeChild("skip-update-of-files");
+   for (uint32 u32_ItSkipFlag = 0U; u32_ItSkipFlag < orc_Flags.size(); ++u32_ItSkipFlag)
+   {
+      orc_XMLParser.CreateAndSelectNodeChild("skip-update-of-file");
+      orc_XMLParser.SetAttributeBool("state", orc_Flags[u32_ItSkipFlag]);
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "skip-update-of-files");
    }
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "node-specific-update-information");
@@ -3255,6 +3500,17 @@ void C_PuiSvHandlerFiler::mh_SaveView(const C_PuiSvData & orc_View, C_OSCXMLPars
    orc_XMLParser.SetAttributeUint32("device-config-selected-bit-rate", orc_View.GetDeviceConfigSelectedBitRate());
    orc_XMLParser.CreateAndSelectNodeChild("name");
    orc_XMLParser.SetNodeContent(orc_View.GetName().toStdString().c_str());
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-view");
+   //Service mode
+   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("service-mode") == "service-mode");
+   orc_XMLParser.SetAttributeBool("active", orc_View.GetServiceModeActive());
+   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("availability") == "availability");
+   orc_XMLParser.SetAttributeBool("setup", orc_View.GetServiceModeSetupActive());
+   orc_XMLParser.SetAttributeBool("update", orc_View.GetServiceModeUpdateActive());
+   orc_XMLParser.SetAttributeBool("dashboard", orc_View.GetServiceModeDashboardActive());
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "service-mode");
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-view");
    orc_XMLParser.CreateNodeChild("device-config-mode", mh_DeviceConfigModeToString(
@@ -4282,7 +4538,7 @@ QString C_PuiSvHandlerFiler::mh_TabChartZoomModeToString(const C_PuiSvDbTabChart
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform chart zoom mode to string
 
-   \param[in]  oe_YAxisMode    Y axis mode
+   \param[in]  oe_YAxisMode   Y axis mode
 
    \return
    Stringified zoom mode setting

@@ -121,10 +121,9 @@ void C_SyvDaPeUpdateModeTreeWidget::Init(const uint32 ou32_ViewIndex)
          }
          else
          {
-            delete (pc_Tmp);
+            delete pc_Tmp;
          }
-         //lint -e{593} Cleaned up at later point
-      }
+      } //lint !e593    //Cleaned up at later point
       //Step 2: Based on model count initialize internal tree structure and assign widgets (Qt takes ownership)
       this->clear();
       for (uint32 u32_ItModel = 0; u32_ItModel < this->mc_Models.size(); ++u32_ItModel)
@@ -150,7 +149,7 @@ void C_SyvDaPeUpdateModeTreeWidget::Init(const uint32 ou32_ViewIndex)
                pc_Table->setModel(pc_Model);
                //Init after model
                pc_Table->InitColumns();
-               pc_Table->AdjustToItems(true, (u32_ItModel == (this->mc_Models.size() - 1UL)));
+               pc_Table->AdjustToItems(true, (u32_ItModel == (static_cast<uint32>(this->mc_Models.size()) - 1UL)));
 
                //Connects
                connect(pc_Header, &C_SyvDaPeUpdateModeNodeHeader::SigExpand, this,

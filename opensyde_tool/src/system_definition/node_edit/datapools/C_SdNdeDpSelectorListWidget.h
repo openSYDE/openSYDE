@@ -48,6 +48,7 @@ public:
                        const stw_types::uint32 ou32_NodeIndex, const bool oq_UsageViewActive);
    void SetSelected(const bool oq_Selected);
    bool SetActualDataPoolConflict(const stw_types::sintn osn_DataPoolWidgetIndex, const bool oq_Active) const;
+   void UpdateDataPools(void);
    void UpdateActualDataPool(void);
    void AddNewDatapool(void);
    void Paste(void);
@@ -77,6 +78,7 @@ Q_SIGNALS:
    void SigUpdateLists(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex);
    void SigNoDataPoolSelected(void);
    void SigHideOtherToolTips(void);
+   void SigDataPoolHoverStateChanged(const stw_types::uint32 ou32_DataPoolIndex, const bool oq_Hovered);
 
 protected:
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
@@ -101,7 +103,7 @@ private:
    bool m_OpenDataPoolDialog(stw_opensyde_core::C_OSCNodeDataPool & orc_OSCDataPool,
                              stw_opensyde_gui_logic::C_PuiSdNodeDataPool & orc_UiDataPool,
                              const stw_opensyde_core::C_OSCNodeDataPoolId * const opc_SharedDatapoolId,
-                             const bool oq_ShowApplicationSection, const stw_types::sint32 os32_DataPoolIndex = -1,
+                             const bool oq_NodeProgrammingSupport, const stw_types::sint32 os32_DataPoolIndex = -1,
                              const bool oq_SelectName = false);
    void m_AddNewDataPool(const stw_opensyde_core::C_OSCNodeDataPool & orc_OSCDataPool,
                          const stw_opensyde_gui_logic::C_PuiSdNodeDataPool & orc_UIDataPool,

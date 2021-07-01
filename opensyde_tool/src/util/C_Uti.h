@@ -85,6 +85,8 @@ public:
    static QString h_GetHashValueAsQString(void);
    static QString h_GetValueAsHex(const stw_types::uint64 ou64_Value, const stw_types::uint8 ou8_FieldWidth = 0);
    static QString h_GetValueAsHex(const stw_types::uint32 ou32_Value, const stw_types::uint8 ou8_FieldWidth = 0);
+   static void h_GetAllFilePathsInFolder(const QString & orc_FolderPath,
+                                         std::vector<stw_scl::C_SCLString> & orc_FilePaths);
 
 private:
    C_Uti(void);

@@ -16,6 +16,7 @@
 #include <QObject>
 #include "C_OSCNode.h"
 #include "C_PuiSvData.h"
+#include "C_PuiSvLastKnownHalElementId.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -38,10 +39,13 @@ public:
    //Get
    const C_PuiSvData * GetView(const stw_types::uint32 ou32_Index) const;
    stw_types::uint32 GetViewCount(void) const;
-   const std::map<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32> & GetLastKnownHalcCrcs(void) const;
+   const std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvLastKnownHalElementId> & GetLastKnownHalcCrcs(void) const;
+   bool GetServiceModeActive(void) const;
 
    //Set
-   void SetLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32> & orc_Value);
+   void SetServiceModeActive(const bool oq_NewValue);
+   void SetLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                            C_PuiSvLastKnownHalElementId> & orc_Value);
    stw_types::sint32 SetViewName(const stw_types::uint32 ou32_Index, const QString & orc_Name);
    stw_types::sint32 SetViewNodeCheckedState(const stw_types::uint32 ou32_ViewIndex,
                                              const stw_types::uint32 ou32_NodeIndex, const bool oq_Checked);
@@ -51,6 +55,10 @@ public:
                                         const stw_types::uint32 ou32_BusIndex);
    stw_types::sint32 SetViewPCCANDll(const stw_types::uint32 ou32_Index, const C_PuiSvPc::E_CANDllType oe_Type,
                                      const QString & orc_DllPath);
+   stw_types::sint32 SetViewServiceModeActive(const stw_types::uint32 ou32_Index, const bool oq_NewValue);
+   stw_types::sint32 SetViewServiceModeSetupActive(const stw_types::uint32 ou32_Index, const bool oq_NewValue);
+   stw_types::sint32 SetViewServiceModeUpdateActive(const stw_types::uint32 ou32_Index, const bool oq_NewValue);
+   stw_types::sint32 SetViewServiceModeDashboardActive(const stw_types::uint32 ou32_Index, const bool oq_NewValue);
    stw_types::sint32 SetDashboardName(const stw_types::uint32 ou32_ViewIndex,
                                       const stw_types::uint32 ou32_DashboardIndex, const QString & orc_Name);
    stw_types::sint32 SetDashboardComment(const stw_types::uint32 ou32_ViewIndex,
@@ -106,6 +114,15 @@ public:
                                                        const stw_types::uint32 ou32_NodeIndex,
                                                        const stw_types::uint32 ou32_Index,
                                                        const C_PuiSvNodeUpdateParamInfo & orc_Value);
+   stw_types::sint32 SetNodeUpdateInformationSkipUpdateOfPath(const stw_types::uint32 ou32_ViewIndex,
+                                                              const stw_types::uint32 ou32_NodeIndex,
+                                                              const stw_types::uint32 ou32_Index,
+                                                              const bool oq_SkipFile,
+                                                              const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+   stw_types::sint32 SetNodeUpdateInformationSkipUpdateOfParamInfo(const stw_types::uint32 ou32_ViewIndex,
+                                                                   const stw_types::uint32 ou32_NodeIndex,
+                                                                   const stw_types::uint32 ou32_Index,
+                                                                   const bool oq_SkipFile);
    stw_types::sint32 SetNodeUpdateInformationParamInfoContent(const stw_types::uint32 ou32_ViewIndex,
                                                               const stw_types::uint32 ou32_NodeIndex,
                                                               const stw_types::uint32 ou32_Index,
@@ -249,7 +266,8 @@ protected:
 
    stw_types::sint32 m_LoadFromFile(const QString & orc_Path,
                                     const std::vector<stw_opensyde_core::C_OSCNode> & orc_OSCNodes);
-   void m_AddLastKnownHalcCrc(const C_PuiSvDbNodeDataPoolListElementId & orc_Id, const stw_types::uint32 ou32_Crc);
+   void m_AddLastKnownHalcCrc(const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
+                              const C_PuiSvLastKnownHalElementId & orc_Crc);
 
    //Avoid call (protected access for test)
    explicit C_PuiSvHandler(QObject * const opc_Parent = NULL);
@@ -279,6 +297,14 @@ private:
                                      const stw_types::uint32 ou32_ApplicationTargetIndex);
    void m_OnSyncNodeApplicationAboutToBeDeleted(const stw_types::uint32 ou32_NodeIndex,
                                                 const stw_types::uint32 ou32_ApplicationIndex);
+   void m_OnSyncNodeApplicationAboutToBeChangedFromParamSetHALC(const stw_types::uint32 ou32_NodeIndex,
+                                                                const stw_types::uint32 ou32_ApplicationIndex);
+   void m_OnSyncNodeApplicationChangedToParamSetHALC(const stw_types::uint32 ou32_NodeIndex,
+                                                     const stw_types::uint32 ou32_ApplicationIndex);
+   void m_OnSyncNodeApplicationResultPathSizeChanged(const stw_types::uint32 ou32_NodeIndex,
+                                                     const stw_types::uint32 ou32_ApplicationIndex,
+                                                     const stw_types::uint32 ou32_OldSize,
+                                                     const stw_types::uint32 ou32_NewSize);
    void m_OnSyncNodeDataPoolListAdded(const stw_types::uint32 ou32_NodeIndex,
                                       const stw_types::uint32 ou32_DataPoolIndex,
                                       const stw_types::uint32 ou32_ListIndex);
@@ -341,7 +367,8 @@ private:
    stw_types::uint32 mu32_CalculatedHashSystemViews;
    stw_types::uint32 mu32_PreviousSystemDefintionHash;
 
-   std::map<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32> mc_LastKnownHalcCrcs;
+   bool mq_IsServiceModeActive;
+   std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvLastKnownHalElementId> mc_LastKnownHalcCrcs;
 
    class C_PuiSvViewErrorDetails
    {

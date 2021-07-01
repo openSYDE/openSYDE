@@ -163,6 +163,7 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
    QString c_Id;
    QString c_Device;
    const sintn sn_Height = 72;
+   const sintn sn_Width = 227;
 
    if (this->mc_Info.q_SerialNumberValid == true)
    {
@@ -200,16 +201,20 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
    }
    this->mpc_Ui->pc_LabelDeviceType->setText(static_cast<QString>("Type: %1").arg(c_Device));
    //Resize
-   this->resize(this->width(), sn_Height);
+   this->resize(sn_Width, sn_Height);
    this->setMinimumHeight(sn_Height);
    this->setMaximumHeight(sn_Height);
+   this->setMinimumWidth(sn_Width);
+   this->setMaximumWidth(sn_Width);
    if (this->mpc_ListWidgetItem != NULL)
    {
-      this->mpc_ListWidgetItem->setSizeHint(QSize(this->mpc_ListWidgetItem->sizeHint().width(), sn_Height));
+      this->mpc_ListWidgetItem->setSizeHint(QSize(sn_Width, sn_Height));
    }
    else
    {
       //Adapted for missing borders
+      this->setMinimumWidth(sn_Width);
+      this->setMaximumWidth(sn_Width);
       this->setMinimumHeight(sn_Height);
       this->setMaximumHeight(sn_Height);
    }

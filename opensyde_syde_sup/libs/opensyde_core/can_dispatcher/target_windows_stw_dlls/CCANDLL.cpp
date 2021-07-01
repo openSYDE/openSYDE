@@ -73,61 +73,88 @@ sint32 C_CAN_DLL::m_Init(const charn * const opcn_DLLPath)
    mpv_DLL = LoadLibraryA(opcn_DLLPath);
    if (mpv_DLL != NULL) //load DLL
    {
+      //Using intermediate casts to "void (*)(void)" is a workaround for a GCC >= 8.1(?) compiler warning regarding
+      // incompatible function types (while still being compatible with other compilers)
       //lint -save -e929  //casting the result of GetProcAddress is the only way to convert into a function pointer
-      mpr_CAN_Init           = reinterpret_cast<PR_CAN_INIT>(GetProcAddress(mpv_DLL, "CAN_Init"));
-      mpr_CAN_Exit           = reinterpret_cast<PR_CAN_EXIT>(GetProcAddress(mpv_DLL, "CAN_Exit"));
-      mpr_CAN_Bitrate        = reinterpret_cast<PR_CAN_BITRATE>(GetProcAddress(mpv_DLL, "CAN_Bitrate"));
-      mpr_CAN_Read_Msg       = reinterpret_cast<PR_CAN_READ_MSG>(GetProcAddress(mpv_DLL, "CAN_Read_Msg"));
-      mpr_CAN_Send_Msg       = reinterpret_cast<PR_CAN_SEND_MSG>(GetProcAddress(mpv_DLL, "CAN_Send_Msg"));
-      mpr_CAN_Send_RTR       = reinterpret_cast<PR_CAN_SEND_RTR>(GetProcAddress(mpv_DLL, "CAN_Send_RTR"));
-      mpr_CAN_Reset          = reinterpret_cast<PR_CAN_RESET>(GetProcAddress(mpv_DLL, "CAN_Reset"));
-      mpr_CAN_InterfaceSetup = reinterpret_cast<PR_CAN_INTERFACESETUP>(GetProcAddress(mpv_DLL, "CAN_InterfaceSetup"));
+      mpr_CAN_Init           = reinterpret_cast<PR_CAN_INIT>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Init")));
+      mpr_CAN_Exit           = reinterpret_cast<PR_CAN_EXIT>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Exit")));
+      mpr_CAN_Bitrate        = reinterpret_cast<PR_CAN_BITRATE>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Bitrate")));
+      mpr_CAN_Read_Msg       = reinterpret_cast<PR_CAN_READ_MSG>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Read_Msg")));
+      mpr_CAN_Send_Msg       = reinterpret_cast<PR_CAN_SEND_MSG>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Send_Msg")));
+      mpr_CAN_Send_RTR       = reinterpret_cast<PR_CAN_SEND_RTR>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Send_RTR")));
+      mpr_CAN_Reset          = reinterpret_cast<PR_CAN_RESET>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Reset")));
+      mpr_CAN_InterfaceSetup = reinterpret_cast<PR_CAN_INTERFACESETUP>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_InterfaceSetup")));
 
       //"optional" functions:
-      mpr_CAN_Status         = reinterpret_cast<PR_CAN_STATUS>(GetProcAddress(mpv_DLL, "CAN_Status"));
-      mpr_CAN_DLL_Info       = reinterpret_cast<PR_CAN_DLL_INFO>(GetProcAddress(mpv_DLL, "CAN_DLL_Info"));
-      mpr_CAN_Read_extMsg    = reinterpret_cast<PR_CAN_READ_EXTMSG>(GetProcAddress(mpv_DLL, "CAN_Read_extMsg"));
-      mpr_CAN_Send_extMsg    = reinterpret_cast<PR_CAN_SEND_EXTMSG>(GetProcAddress(mpv_DLL, "CAN_Send_extMsg"));
-      mpr_CAN_Send_extRTR    = reinterpret_cast<PR_CAN_SEND_EXTRTR>(GetProcAddress(mpv_DLL, "CAN_Send_extRTR"));
-      mpr_CAN_Init_One_ID    = reinterpret_cast<PR_CAN_INIT_ONE_ID>(GetProcAddress(mpv_DLL, "CAN_Init_One_ID"));
+      mpr_CAN_Status         = reinterpret_cast<PR_CAN_STATUS>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Status")));
+      mpr_CAN_DLL_Info       = reinterpret_cast<PR_CAN_DLL_INFO>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_DLL_Info")));
+      mpr_CAN_Read_extMsg    = reinterpret_cast<PR_CAN_READ_EXTMSG>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Read_extMsg")));
+      mpr_CAN_Send_extMsg    = reinterpret_cast<PR_CAN_SEND_EXTMSG>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Send_extMsg")));
+      mpr_CAN_Send_extRTR    = reinterpret_cast<PR_CAN_SEND_EXTRTR>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Send_extRTR")));
+      mpr_CAN_Init_One_ID    = reinterpret_cast<PR_CAN_INIT_ONE_ID>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CAN_Init_One_ID")));
 
       //modem functions
-      mpr_CANTAPI_CONNECT    = reinterpret_cast<PR_CANTAPI_CONNECT>(GetProcAddress(mpv_DLL, "CANTAPI_Connect"));
-      mpr_CANTAPI_DISCONNECT = reinterpret_cast<PR_CANTAPI_DISCONNECT>(GetProcAddress(mpv_DLL, "CANTAPI_Disconnect"));
+      mpr_CANTAPI_CONNECT    = reinterpret_cast<PR_CANTAPI_CONNECT>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANTAPI_Connect")));
+      mpr_CANTAPI_DISCONNECT = reinterpret_cast<PR_CANTAPI_DISCONNECT>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANTAPI_Disconnect")));
 
       //stream functions:
-      mpr_SER_GET_TX_BUF_COUNT = reinterpret_cast<PR_SER_GET_TX_BUF_COUNT>(GetProcAddress(mpv_DLL,
-                                                                                          "SER_Get_TX_Buf_Count"));
-      mpr_SER_GET_RX_BUF_COUNT = reinterpret_cast<PR_SER_GET_RX_BUF_COUNT>(GetProcAddress(mpv_DLL,
-                                                                                          "SER_Get_RX_Buf_Count"));
-      mpr_SER_SEND_BYTES       = reinterpret_cast<PR_SER_SEND_BYTES>(GetProcAddress(mpv_DLL, "SER_Send_Bytes"));
-      mpr_SER_READ_BYTES       = reinterpret_cast<PR_SER_READ_BYTES>(GetProcAddress(mpv_DLL, "SER_Read_Bytes"));
+      mpr_SER_GET_TX_BUF_COUNT = reinterpret_cast<PR_SER_GET_TX_BUF_COUNT>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "SER_Get_TX_Buf_Count")));
+      mpr_SER_GET_RX_BUF_COUNT = reinterpret_cast<PR_SER_GET_RX_BUF_COUNT>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "SER_Get_RX_Buf_Count")));
+      mpr_SER_SEND_BYTES       = reinterpret_cast<PR_SER_SEND_BYTES>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "SER_Send_Bytes")));
+      mpr_SER_READ_BYTES       = reinterpret_cast<PR_SER_READ_BYTES>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "SER_Read_Bytes")));
 
       //new style "ext" functions:
-      mpr_CANext_Init             = reinterpret_cast<PR_CANext_Init>(GetProcAddress(mpv_DLL, "CANext_Init"));
-      mpr_CANext_Exit             = reinterpret_cast<PR_CANext_Exit>(GetProcAddress(mpv_DLL, "CANext_Exit"));
-      mpr_CANext_Bitrate          = reinterpret_cast<PR_CANext_Bitrate>(GetProcAddress(mpv_DLL, "CANext_Bitrate"));
-      mpr_CANext_Read_Msg         = reinterpret_cast<PR_CANext_Read_Msg>(GetProcAddress(mpv_DLL, "CANext_Read_Msg"));
-      mpr_CANext_Send_Msg         = reinterpret_cast<PR_CANext_Send_Msg>(GetProcAddress(mpv_DLL, "CANext_Send_Msg"));
-      mpr_CANext_InterfaceSetup   = reinterpret_cast<PR_CANext_InterfaceSetup>(GetProcAddress(mpv_DLL,
-                                                                                              "CANext_InterfaceSetup"));
-      mpr_CANext_Status           = reinterpret_cast<PR_CANext_Status>(GetProcAddress(mpv_DLL, "CANext_Status"));
-      mpr_CANext_Init_One_ID      = reinterpret_cast<PR_CANext_Init_One_ID>(GetProcAddress(mpv_DLL,
-                                                                                           "CANext_Init_One_ID"));
-      mpr_CANext_DLL_Info         = reinterpret_cast<PR_CANext_DLL_Info>(GetProcAddress(mpv_DLL, "CANext_DLL_Info"));
-      mpr_CANext_Get_Num_Channels = reinterpret_cast<PR_CANext_Get_Num_Channels>(GetProcAddress(mpv_DLL,
-                                                                                                "CANext_Get_Num_Channels"));
-      mpr_CANext_Get_System_Time  = reinterpret_cast<PR_CANext_Get_System_Time>(GetProcAddress(mpv_DLL,
-                                                                                               "CANext_Get_System_Time"));
+      mpr_CANext_Init             = reinterpret_cast<PR_CANext_Init>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Init")));
+      mpr_CANext_Exit             = reinterpret_cast<PR_CANext_Exit>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Exit")));
+      mpr_CANext_Bitrate          = reinterpret_cast<PR_CANext_Bitrate>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Bitrate")));
+      mpr_CANext_Read_Msg         = reinterpret_cast<PR_CANext_Read_Msg>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Read_Msg")));
+      mpr_CANext_Send_Msg         = reinterpret_cast<PR_CANext_Send_Msg>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Send_Msg")));
+      mpr_CANext_InterfaceSetup   = reinterpret_cast<PR_CANext_InterfaceSetup>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_InterfaceSetup")));
+      mpr_CANext_Status           = reinterpret_cast<PR_CANext_Status>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Status")));
+      mpr_CANext_Init_One_ID      = reinterpret_cast<PR_CANext_Init_One_ID>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Init_One_ID")));
+      mpr_CANext_DLL_Info         = reinterpret_cast<PR_CANext_DLL_Info>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_DLL_Info")));
+      mpr_CANext_Get_Num_Channels = reinterpret_cast<PR_CANext_Get_Num_Channels>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Get_Num_Channels")));
+      mpr_CANext_Get_System_Time  = reinterpret_cast<PR_CANext_Get_System_Time>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Get_System_Time")));
       mpr_CANext_Get_Num_Supported_Bitrates = reinterpret_cast<PR_CANext_Get_Num_Supported_Bitrates>(
-         GetProcAddress(mpv_DLL, "CANext_Get_Num_Supported_Bitrates"));
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Get_Num_Supported_Bitrates")));
       mpr_CANext_Get_Supported_Bitrate = reinterpret_cast<PR_CANext_Get_Supported_Bitrate>(
-         GetProcAddress(mpv_DLL, "CANext_Get_Supported_Bitrate"));
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANext_Get_Supported_Bitrate")));
 
-      mpr_CANtcp_Read_Device_List_From_Server = reinterpret_cast<PR_CANtcp_Read_Device_List_From_Server>
-                                                (GetProcAddress(mpv_DLL, "CANtcp_ReadDeviceListFromServer"));
-      mpr_CANtcp_Get_Device_Name = reinterpret_cast<PR_CANtcp_Get_Device_Name>(GetProcAddress(mpv_DLL,
-                                                                                              "CANtcp_GetDeviceName"));
+      mpr_CANtcp_Read_Device_List_From_Server = reinterpret_cast<PR_CANtcp_Read_Device_List_From_Server>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANtcp_ReadDeviceListFromServer")));
+      mpr_CANtcp_Get_Device_Name = reinterpret_cast<PR_CANtcp_Get_Device_Name>(
+         reinterpret_cast<void (*)(void)>(GetProcAddress(mpv_DLL, "CANtcp_GetDeviceName")));
       //lint -restore
 
       if ((mpr_CAN_Init == NULL) ||

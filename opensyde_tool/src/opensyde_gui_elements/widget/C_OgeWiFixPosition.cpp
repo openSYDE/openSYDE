@@ -50,7 +50,7 @@ static const sintn msn_SHADOW_WIDTH = 8;
    \param[in,out] orc_Geometry Position of fix position widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgeWiFixPosition::C_OgeWiFixPosition(QString oc_Title, QString oc_IconPath, QRect const & orc_Geometry,
+C_OgeWiFixPosition::C_OgeWiFixPosition(const QString oc_Title, const QString oc_IconPath, QRect const & orc_Geometry,
                                        QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiFixPosition)

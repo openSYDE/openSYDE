@@ -147,6 +147,8 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
    {
       C_OgeSpxInt64::fixup(orc_Input);
    }
+
+   Q_UNUSED(sn_Pos) // last value is irrelevant
 }
 
 //----------------------------------------------------------------------------------------------------------------------

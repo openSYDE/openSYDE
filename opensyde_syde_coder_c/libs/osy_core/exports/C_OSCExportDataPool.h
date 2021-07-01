@@ -30,9 +30,6 @@ namespace stw_opensyde_core
 class C_OSCExportDataPool
 {
 public:
-   C_OSCExportDataPool(void);
-   virtual ~C_OSCExportDataPool(void);
-
    enum E_Linkage ///< Flag for Datapool-application-relation when generating source code files
    {
       eLOCAL = 0,   ///< Generate code for Datapool owner

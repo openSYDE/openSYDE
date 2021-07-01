@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Dialog for generate code
+   \brief       Dialog for file generation
    \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -14,6 +14,7 @@
 #include "stwtypes.h"
 #include "C_OgePopUpDialog.h"
 #include "C_OSCNode.h"
+#include "C_SdCodeGenerationModel.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -37,7 +38,7 @@ public:
    ~C_SdCodeGenerationDialog(void);
 
    void InitStaticNames(void) const;
-   void PrepareDialog(const std::vector<stw_types::uint32> & orc_NodesIndices) const;
+   void PrepareDialog(const std::vector<stw_types::uint32> & orc_NodesIndices);
    void GetCheckedItems(std::vector<stw_types::uint32> & orc_NodeIndices,
                         std::vector<std::vector<stw_types::uint32> > & orc_AppIndicesPerNode) const;
 
@@ -48,6 +49,7 @@ private:
    Ui::C_SdCodeGenerationDialog * mpc_Ui;
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
+   stw_opensyde_gui_logic::C_SdCodeGenerationModel mc_Model;
 
    void m_OkClicked(void);
    void m_OnCancel(void);

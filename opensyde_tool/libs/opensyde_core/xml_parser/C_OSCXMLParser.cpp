@@ -467,13 +467,49 @@ sint64 C_OSCXMLParserBase::GetAttributeSint64(const C_SCLString & orc_Name) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get attribute value of selected node
 
+   Return one attribute value of selected node as sint64 value.
+   Can handle "0x" notation to interpret hex values.
+
+   \param[in]  orc_Name    name of attribute
+
+   \return
+   value (zero on error)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint64 C_OSCXMLParserBase::GetAttributeUint64(const C_SCLString & orc_Name) const
+{
+   uint64 u64_Value = 0;
+   C_SCLString c_Text;
+
+   //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
+   c_Text = this->GetAttributeString(orc_Name);
+   if (c_Text != "")
+   {
+      if ((c_Text.Length() >= 2) && ((c_Text[1] == '0') && (c_Text[2] == 'x')))
+      {
+         std::istringstream c_Stream(c_Text.SubString(3UL, c_Text.Length() - 2UL).c_str());
+         c_Stream >> std::hex >> u64_Value;
+      }
+      else
+      {
+         std::istringstream c_Stream(c_Text.c_str());
+         c_Stream >> u64_Value;
+      }
+   }
+   return u64_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
+
    Return one attribute value of selected node as bool value.
+   "0" resp. "1" and "false" resp. "true" are accepted as valid values.
 
    \param[in]  orc_Name   name of attribute
 
    \return
-   true   attribute value is "1"
-   false  attribute value is "0" (also returned on error)
+   true   attribute value is true
+   false  attribute value is false (also returned on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name) const
@@ -743,11 +779,28 @@ void C_OSCXMLParserBase::SetAttributeSint64(const C_SCLString & orc_Name, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set uint64 content of attribute of currently selected node.
+
+   Set content of one attribute of currently selected node from an sint64.
+
+   \param[in]  orc_Name    name of attribute
+   \param[in]  ou64_Value  new value of attribute
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCXMLParserBase::SetAttributeUint64(const C_SCLString & orc_Name, const uint64 ou64_Value)
+{
+   if (mpc_CurrentNode != NULL)
+   {
+      mpc_CurrentNode->SetAttribute(orc_Name.c_str(), static_cast<uint64_t>(ou64_Value));
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set bool content of attribute of currently selected node.
 
    Set content of one attribute of currently selected node from a bool.
-   "true" will be written as "1"
-   "false" will be written as "0"
+   true will be written as "true"
+   false will be written as "false"
 
    \param[in]  orc_Name    name of attribute
    \param[in]  oq_Value    new value of attribute

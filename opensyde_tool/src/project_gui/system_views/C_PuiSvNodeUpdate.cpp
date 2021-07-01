@@ -13,10 +13,12 @@
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
+#include "TGLUtils.h"
 #include "CSCLString.h"
 #include "C_GtGetText.h"
 #include "CSCLChecksums.h"
 #include "C_PuiSvNodeUpdate.h"
+#include "C_PuiSdHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -42,6 +44,8 @@ using namespace stw_opensyde_gui_logic;
 C_PuiSvNodeUpdate::C_PuiSvNodeUpdate(void) :
    u32_NodeUpdatePosition(0U)
 {
+   // For each type of file
+   this->mc_SkipUpdateOfFiles.resize(3);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,6 +78,15 @@ void C_PuiSvNodeUpdate::CalcHash(uint32 & oru32_HashValue) const
       const C_PuiSvNodeUpdateParamInfo & rc_Test = this->mc_ParamSetPaths[u32_It];
       rc_Test.CalcHash(oru32_HashValue);
    }
+   for (uint32 u32_It = 0; u32_It < this->mc_SkipUpdateOfFiles.size(); ++u32_It)
+   {
+      for (uint32 u32_SubIt = 0; u32_SubIt < this->mc_SkipUpdateOfFiles[u32_It].size(); ++u32_SubIt)
+      {
+         const bool q_Value = this->mc_SkipUpdateOfFiles[u32_It][u32_SubIt];
+         stw_scl::C_SCLChecksums::CalcCRC32(&q_Value, sizeof(q_Value), oru32_HashValue);
+      }
+   }
+   stw_scl::C_SCLChecksums::CalcCRC32(&u32_NodeUpdatePosition, sizeof(u32_NodeUpdatePosition), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,6 +96,7 @@ void C_PuiSvNodeUpdate::CalcHash(uint32 & oru32_HashValue) const
 void C_PuiSvNodeUpdate::ClearParamPaths(void)
 {
    this->mc_ParamSetPaths.clear();
+   this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,16 +107,20 @@ void C_PuiSvNodeUpdate::ClearParamPaths(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::ClearPathsAsAppropriate(const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
 {
+   const sintn sn_Type = static_cast<sintn>(oe_Type);
+
    if (oe_Type == eFTP_DATA_BLOCK)
    {
       for (uint32 u32_It = 0UL; u32_It < this->mc_DataBlockPaths.size(); ++u32_It)
       {
          this->mc_DataBlockPaths[u32_It] = C_GtGetText::h_GetText("<Add File>");
+         this->mc_SkipUpdateOfFiles[sn_Type][u32_It] = false;
       }
    }
    else
    {
       this->mc_FileBasedPaths.clear();
+      this->mc_SkipUpdateOfFiles[sn_Type].clear();
    }
 }
 
@@ -140,6 +158,32 @@ const std::vector<QString> & C_PuiSvNodeUpdate::GetPaths(const E_GenericFileType
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get parameter set skip flags
+
+   \return
+   Current application skip flags
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<bool> & C_PuiSvNodeUpdate::GetSkipUpdateOfParamInfosFlags(void) const
+{
+   return this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX];
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get application skip flags
+
+   \param[in]  oe_Type  Selector for structure
+
+   \return
+   Current application skip flags
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<bool> & C_PuiSvNodeUpdate::GetSkipUpdateOfPathsFlags(const E_GenericFileType oe_Type) const
+{
+   return this->mc_SkipUpdateOfFiles[static_cast<sintn>(oe_Type)];
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set parameter set paths
 
    \param[in]  orc_Value   New parameter set paths
@@ -167,6 +211,29 @@ void C_PuiSvNodeUpdate::SetPaths(const std::vector<QString> & orc_Value, const E
    {
       this->mc_FileBasedPaths = orc_Value;
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set parameter set skip flags
+
+   \param[in]  orc_Value   New parameter set skip flags
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvNodeUpdate::SetSkipUpdateOfParamInfosFlags(const std::vector<bool> & orc_Value)
+{
+   this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX] = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set application skip flags
+
+   \param[in]  orc_Value   New application skip flags
+   \param[in]  oe_Type     Selector for structure
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvNodeUpdate::SetSkipUpdateOfPathsFlags(const std::vector<bool> & orc_Value, const E_GenericFileType oe_Type)
+{
+   this->mc_SkipUpdateOfFiles[static_cast<sintn>(oe_Type)] = orc_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -215,6 +282,7 @@ void C_PuiSvNodeUpdate::AddPath(const QString & orc_Path, const C_PuiSvNodeUpdat
    {
       this->mc_FileBasedPaths.push_back(orc_Path);
    }
+   this->mc_SkipUpdateOfFiles[static_cast<sintn>(oe_Type)].push_back(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -226,6 +294,7 @@ void C_PuiSvNodeUpdate::AddPath(const QString & orc_Path, const C_PuiSvNodeUpdat
 void C_PuiSvNodeUpdate::AddParamInfo(const C_PuiSvNodeUpdateParamInfo & orc_Value)
 {
    this->mc_ParamSetPaths.push_back(orc_Value);
+   this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].push_back(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -297,6 +366,62 @@ sint32 C_PuiSvNodeUpdate::SetParamInfo(const uint32 ou32_Index, const C_PuiSvNod
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information path
+
+   \param[in]  ou32_Index  Index to access
+   \param[in]  oq_SkipFile Flag if file will be skipped when updating
+   \param[in]  oe_Type     Selector for structure
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvNodeUpdate::SetSkipUpdateOfPath(const uint32 ou32_Index, const bool oq_SkipFile,
+                                              const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+{
+   sint32 s32_Retval = C_NO_ERR;
+   const sintn sn_Type = static_cast<sintn>(oe_Type);
+
+   if (ou32_Index < this->mc_SkipUpdateOfFiles[sn_Type].size())
+   {
+      this->mc_SkipUpdateOfFiles[sn_Type][ou32_Index] = oq_SkipFile;
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information parameter set information
+
+   \param[in]  ou32_Index  Index to access
+   \param[in]  oq_SkipFile Flag if file will be skipped when updating
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvNodeUpdate::SetSkipUpdateOfParamInfo(const uint32 ou32_Index, const bool oq_SkipFile)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_Index < this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].size())
+   {
+      this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX][ou32_Index] = oq_SkipFile;
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove node update information path
 
    \param[in]  ou32_Index  Index to remove
@@ -333,6 +458,20 @@ sint32 C_PuiSvNodeUpdate::RemovePath(const uint32 ou32_Index, const C_PuiSvNodeU
          s32_Retval = C_RANGE;
       }
    }
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      const sintn sn_Type = static_cast<sintn>(oe_Type);
+      if (ou32_Index < this->mc_SkipUpdateOfFiles[sn_Type].size())
+      {
+         this->mc_SkipUpdateOfFiles[sn_Type].erase(this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_Index);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+
    return s32_Retval;
 }
 
@@ -358,56 +497,278 @@ sint32 C_PuiSvNodeUpdate::RemoveParamInfo(const uint32 ou32_Index)
    {
       s32_Retval = C_RANGE;
    }
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      if (ou32_Index < this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].size())
+      {
+         this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].erase(
+            this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].begin() + ou32_Index);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+
    return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
+   \param[in]  ou32_NodeIndex          Node index
    \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvNodeUpdate::OnSyncNodeApplicationAdded(const uint32 ou32_ApplicationIndex)
+void C_PuiSvNodeUpdate::OnSyncNodeApplicationAdded(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
 {
-   if (ou32_ApplicationIndex <= this->mc_DataBlockPaths.size())
+   const stw_opensyde_core::C_OSCNodeApplication * const pc_App = C_PuiSdHandler::h_GetInstance()->GetApplication(
+      ou32_NodeIndex,
+      ou32_ApplicationIndex);
+
+   tgl_assert(pc_App != NULL);
+   if (pc_App != NULL)
    {
-      this->mc_DataBlockPaths.insert(this->mc_DataBlockPaths.begin() + ou32_ApplicationIndex, QString());
+      if (pc_App->e_Type != stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC)
+      {
+         if (ou32_ApplicationIndex <= this->mc_DataBlockPaths.size())
+         {
+            const sintn sn_Type = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            this->mc_DataBlockPaths.insert(this->mc_DataBlockPaths.begin() + ou32_ApplicationIndex, QString());
+            this->mc_SkipUpdateOfFiles[sn_Type].insert(
+               this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationIndex, false);
+         }
+      }
+      else
+      {
+         uint32 u32_PathCounter;
+
+         for (u32_PathCounter = 0U; u32_PathCounter < pc_App->c_ResultPaths.size(); ++u32_PathCounter)
+         {
+            this->mc_ParamSetPaths.insert(this->mc_ParamSetPaths.begin() + u32_PathCounter,
+                                          C_PuiSvNodeUpdateParamInfo());
+            this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].insert(
+               this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].begin() + u32_PathCounter, false);
+         }
+      }
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
+   \param[in]  ou32_NodeIndex          Node index
    \param[in]  ou32_ApplicationSourceIndex   Application source index
    \param[in]  ou32_ApplicationTargetIndex   Application target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvNodeUpdate::OnSyncNodeApplicationMoved(const uint32 ou32_ApplicationSourceIndex,
+void C_PuiSvNodeUpdate::OnSyncNodeApplicationMoved(const uint32 ou32_NodeIndex,
+                                                   const uint32 ou32_ApplicationSourceIndex,
                                                    const uint32 ou32_ApplicationTargetIndex)
 {
-   QString c_Entry;
+   const stw_opensyde_core::C_OSCNodeApplication * const pc_AppOne = C_PuiSdHandler::h_GetInstance()->GetApplication(
+      ou32_NodeIndex,
+      ou32_ApplicationSourceIndex);
+   const stw_opensyde_core::C_OSCNodeApplication * const pc_AppTwo = C_PuiSdHandler::h_GetInstance()->GetApplication(
+      ou32_NodeIndex,
+      ou32_ApplicationTargetIndex);
 
-   if (ou32_ApplicationSourceIndex < this->mc_DataBlockPaths.size())
+   tgl_assert(pc_AppOne != NULL);
+   tgl_assert(pc_AppTwo != NULL);
+   // Moving only affects the update configuration of the applications if both applications are not NVM HALC datablocks.
+   if ((pc_AppOne != NULL) && (pc_AppTwo != NULL) &&
+       (pc_AppOne->e_Type  != stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC) &&
+       (pc_AppTwo->e_Type  != stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC))
    {
-      c_Entry = this->mc_DataBlockPaths[ou32_ApplicationSourceIndex];
-      this->mc_DataBlockPaths.erase(this->mc_DataBlockPaths.begin() + ou32_ApplicationSourceIndex);
-   }
-   if (ou32_ApplicationTargetIndex <= this->mc_DataBlockPaths.size())
-   {
-      this->mc_DataBlockPaths.insert(this->mc_DataBlockPaths.begin() + ou32_ApplicationTargetIndex, c_Entry);
+      QString c_Entry;
+
+      bool q_Entry = false;
+      const sintn sn_Type = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+
+      if (ou32_ApplicationSourceIndex < this->mc_DataBlockPaths.size())
+      {
+         c_Entry = this->mc_DataBlockPaths[ou32_ApplicationSourceIndex];
+         this->mc_DataBlockPaths.erase(this->mc_DataBlockPaths.begin() + ou32_ApplicationSourceIndex);
+
+         q_Entry = this->mc_SkipUpdateOfFiles[sn_Type][ou32_ApplicationSourceIndex];
+         this->mc_SkipUpdateOfFiles[sn_Type].erase(
+            this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationSourceIndex);
+      }
+      if (ou32_ApplicationTargetIndex <= this->mc_DataBlockPaths.size())
+      {
+         this->mc_DataBlockPaths.insert(this->mc_DataBlockPaths.begin() + ou32_ApplicationTargetIndex, c_Entry);
+         this->mc_SkipUpdateOfFiles[sn_Type].insert(
+            this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationTargetIndex, q_Entry);
+      }
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
+   \param[in]  ou32_NodeIndex          Node index
    \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvNodeUpdate::OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_ApplicationIndex)
+void C_PuiSvNodeUpdate::OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_NodeIndex,
+                                                              const uint32 ou32_ApplicationIndex)
 {
-   if (ou32_ApplicationIndex < this->mc_DataBlockPaths.size())
+   const stw_opensyde_core::C_OSCNodeApplication * const pc_App = C_PuiSdHandler::h_GetInstance()->GetApplication(
+      ou32_NodeIndex,
+      ou32_ApplicationIndex);
+
+   // Application still exists. Deletion will be done after this function
+   tgl_assert(pc_App != NULL);
+   if (pc_App != NULL)
    {
-      this->mc_DataBlockPaths.erase(this->mc_DataBlockPaths.begin() + ou32_ApplicationIndex);
+      if (pc_App->e_Type != stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC)
+      {
+         if (ou32_ApplicationIndex < this->mc_DataBlockPaths.size())
+         {
+            const sintn sn_Type = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            this->mc_DataBlockPaths.erase(this->mc_DataBlockPaths.begin() + ou32_ApplicationIndex);
+            this->mc_SkipUpdateOfFiles[sn_Type].erase(
+               this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationIndex);
+         }
+      }
+      else
+      {
+         if (pc_App->c_ResultPaths.size() > 0U)
+         {
+            const uintn un_EraseRange = pc_App->c_ResultPaths.size();
+
+            this->mc_ParamSetPaths.erase(this->mc_ParamSetPaths.begin(),
+                                         this->mc_ParamSetPaths.begin() + un_EraseRange);
+            this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].erase(
+               this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].begin(),
+               this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].begin() + un_EraseRange);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
+
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvNodeUpdate::OnSyncNodeApplicationAboutToBeChangedFromParamSetHALC(const uint32 ou32_NodeIndex,
+                                                                              const uint32 ou32_ApplicationIndex)
+{
+   const stw_opensyde_core::C_OSCNodeApplication * const pc_App = C_PuiSdHandler::h_GetInstance()->GetApplication(
+      ou32_NodeIndex,
+      ou32_ApplicationIndex);
+
+   // Application still exists. Deletion will be done after this function
+   tgl_assert(pc_App != NULL);
+   if (pc_App != NULL)
+   {
+      // Must be still the same type
+      tgl_assert(pc_App->e_Type == stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC);
+      if (pc_App->e_Type == stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC)
+      {
+         // Delete the param set specific information about the datablock
+         this->OnSyncNodeApplicationAboutToBeDeleted(ou32_NodeIndex, ou32_ApplicationIndex);
+
+         // Add as "normal" datablock
+         if (ou32_ApplicationIndex <= this->mc_DataBlockPaths.size())
+         {
+            const sintn sn_Type = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            this->mc_DataBlockPaths.insert(this->mc_DataBlockPaths.begin() + ou32_ApplicationIndex, QString());
+            this->mc_SkipUpdateOfFiles[sn_Type].insert(
+               this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationIndex, false);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
+
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvNodeUpdate::OnSyncNodeApplicationChangedToParamSetHALC(const uint32 ou32_NodeIndex,
+                                                                   const uint32 ou32_ApplicationIndex)
+{
+   const stw_opensyde_core::C_OSCNodeApplication * const pc_App = C_PuiSdHandler::h_GetInstance()->GetApplication(
+      ou32_NodeIndex,
+      ou32_ApplicationIndex);
+
+   // Application still exists. Deletion will be done after this function
+   tgl_assert(pc_App != NULL);
+   if (pc_App != NULL)
+   {
+      tgl_assert(pc_App->e_Type == stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC);
+      if (pc_App->e_Type == stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC)
+      {
+         // Delete the "normal" datablock configuration
+         if (ou32_ApplicationIndex < this->mc_DataBlockPaths.size())
+         {
+            const sintn sn_Type = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            this->mc_DataBlockPaths.erase(this->mc_DataBlockPaths.begin() + ou32_ApplicationIndex);
+            this->mc_SkipUpdateOfFiles[sn_Type].erase(
+               this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationIndex);
+         }
+
+         // Add as param set datablock
+         this->OnSyncNodeApplicationAdded(ou32_NodeIndex, ou32_ApplicationIndex);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
+
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
+   \param[in]  ou32_OldSize            Size of application result path before change
+   \param[in]  ou32_NewSize            Size of application result path after change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvNodeUpdate::OnSyncNodeApplicationResultPathSizeChanged(const uint32 ou32_NodeIndex,
+                                                                   const uint32 ou32_ApplicationIndex,
+                                                                   const stw_types::uint32 ou32_OldSize,
+                                                                   const stw_types::uint32 ou32_NewSize)
+{
+   const stw_opensyde_core::C_OSCNodeApplication * const pc_App = C_PuiSdHandler::h_GetInstance()->GetApplication(
+      ou32_NodeIndex,
+      ou32_ApplicationIndex);
+
+   // Application still exists. Deletion will be done after this function
+   tgl_assert(pc_App != NULL);
+   if (pc_App != NULL)
+   {
+      tgl_assert(pc_App->e_Type == stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC);
+      if (pc_App->e_Type == stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC)
+      {
+         if (ou32_OldSize < ou32_NewSize)
+         {
+            // 1 to 2
+            // Insert one
+            tgl_assert((ou32_OldSize == 1U) && (ou32_NewSize == 2U));
+            this->mc_ParamSetPaths.insert(this->mc_ParamSetPaths.begin() + 1,
+                                          C_PuiSvNodeUpdateParamInfo());
+            this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].insert(
+               this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].begin() + 1, false);
+         }
+         else if (ou32_NewSize < ou32_OldSize)
+         {
+            // 2 to 1
+            // Delete the second entry
+            tgl_assert((ou32_OldSize == 2U) && (ou32_NewSize == 1U));
+            this->mc_ParamSetPaths.erase(this->mc_ParamSetPaths.begin() + 1);
+            this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].erase(
+               this->mc_SkipUpdateOfFiles[mhsn_PARAMETER_SET_INDEX].begin() + 1);
+         }
+         else
+         {
+            // Same size, nothing to do.
+         }
+      }
    }
 }

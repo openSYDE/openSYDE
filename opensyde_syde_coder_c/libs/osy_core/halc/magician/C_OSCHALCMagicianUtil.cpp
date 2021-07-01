@@ -44,16 +44,42 @@ C_OSCHALCMagicianUtil::C_OSCHALCMagicianUtil(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get datapool name
 
-   \param[in]  oq_IsSafe   Safe Datapool flag
+   \param[in]  oq_IsSafe         Safe Datapool flag
+   \param[in]  ou32_CopyIndex    Copy index
 
    \return
    Datapool name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolName(const bool oq_IsSafe)
+stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolName(const bool oq_IsSafe, const uint32 ou32_CopyIndex)
 {
-   const stw_scl::C_SCLString c_Retval = (oq_IsSafe == true) ? "HAL_SAFE" : "HAL_NON_SAFE";
+   stw_scl::C_SCLString c_Retval = (oq_IsSafe == true) ? "HAL_SAFE" : "HAL_NON_SAFE";
+   if (ou32_CopyIndex > 0UL)
+   {
+      c_Retval += "_COPY_" + stw_scl::C_SCLString::IntToStr(ou32_CopyIndex + 1UL);
+   }
+   return c_Retval;
+}
 
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get datapool comment
+
+   \param[in]  oq_IsSafe         Is safe
+   \param[in]  ou32_CopyIndex    Copy index
+
+   \return
+   Datapool comment
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolComment(const bool oq_IsSafe, const uint32 ou32_CopyIndex)
+{
+   const stw_scl::C_SCLString c_Info = (oq_IsSafe == true) ? "safe" : "non safe";
+
+   stw_scl::C_SCLString c_Retval = "Automatically generated Datapool for HAL " + c_Info + " variable storage.";
+   if (ou32_CopyIndex > 0UL)
+   {
+      c_Retval += " This instance is a redundant copy of the original HAL datapool for backup purposes.";
+   }
    return c_Retval;
 }
 
@@ -258,6 +284,68 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(const stw_s
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get safety flag variable
+
+   \param[in]  orc_DomainSingularName  Domain singular name
+   \param[in]  oq_IsSafe               Is safe
+   \param[in]  ou32_NumChannels        Num channels
+   \param[in]  oq_AddDataset           Add dataset
+
+   \return
+   Safety flag variable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetSafetyFlagVariable(
+   const stw_scl::C_SCLString & orc_DomainSingularName, const bool oq_IsSafe, const uint32 ou32_NumChannels,
+   const bool oq_AddDataset)
+{
+   const uint8 u8_MaxValue = 1U;
+   C_OSCNodeDataPoolListElement c_Element;
+
+   c_Element.c_Name = C_OSCHALCMagicianUtil::h_GetSafetyFlagVariableName(orc_DomainSingularName);
+   c_Element.c_Comment = "Information about which channel is safety relevant";
+
+   //Defined defaults
+   h_SetCommonDpElementDefaults(c_Element);
+
+   // Access
+   c_Element.e_Access = oq_IsSafe ? C_OSCNodeDataPoolListElement::eACCESS_RO : C_OSCNodeDataPoolListElement::eACCESS_RW;
+
+   //Type
+   C_OSCHALCMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, false);
+
+   //Special value max
+   if (ou32_NumChannels > 1UL)
+   {
+      for (uint32 u32_It = 0UL; u32_It < ou32_NumChannels; ++u32_It)
+      {
+         c_Element.c_MaxValue.SetValueAU8Element(u8_MaxValue, u32_It);
+      }
+   }
+   else
+   {
+      c_Element.c_MaxValue.SetValueU8(u8_MaxValue);
+   }
+
+   return c_Element;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get safety flag variable name
+
+   \param[in]  orc_DomainSingularName  Domain singular name
+
+   \return
+   Safety flag variable name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetSafetyFlagVariableName(
+   const stw_scl::C_SCLString & orc_DomainSingularName)
+{
+   return C_OSCHALCMagicianUtil::h_CombineVariableName(orc_DomainSingularName, "SafetyRelevant");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set common datapool element defaults
 
    \param[in,out]  orc_Element   Element
@@ -271,38 +359,6 @@ void C_OSCHALCMagicianUtil::h_SetCommonDpElementDefaults(C_OSCNodeDataPoolListEl
    orc_Element.q_DiagEventCall = false;
    orc_Element.q_NvmValueIsValid = false;
    orc_Element.q_NvMValueChanged = false;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check channel number variable necessary
-
-   \param[in]  orc_Domain  Domain
-
-   \return
-
-   \retval   true   Necessary
-   \retval   false  Not necessary
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHALCMagicianUtil::h_CheckChanNumVariableNecessary(const C_OSCHalcConfigDomain & orc_Domain)
-{
-   return orc_Domain.c_ChannelConfigs.size() > 0UL;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check use case variable necessary
-
-   \param[in]  orc_Domain  Domain
-
-   \return
-
-   \retval   true   Necessary
-   \retval   false  Not necessary
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(const C_OSCHalcConfigDomain & orc_Domain)
-{
-   return orc_Domain.c_ChannelUseCases.size() > 0UL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

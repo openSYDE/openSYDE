@@ -148,7 +148,7 @@ void C_GiSyColorPicker::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    this->m_SetColorFromPosition(opc_Event->pos() - contentsRect().topLeft());
    this->repaint();
-   Q_EMIT NewColor(this->msn_Hue, this->msn_Sat);
+   Q_EMIT SigNewColor(this->msn_Hue, this->msn_Sat);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -160,7 +160,7 @@ void C_GiSyColorPicker::mouseMoveEvent(QMouseEvent * const opc_Event)
 void C_GiSyColorPicker::mousePressEvent(QMouseEvent * const opc_Event)
 {
    this->m_SetColorFromPosition(opc_Event->pos() - contentsRect().topLeft());
-   Q_EMIT NewColor(this->msn_Hue, this->msn_Sat);
+   Q_EMIT SigNewColor(this->msn_Hue, this->msn_Sat);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -172,7 +172,7 @@ void C_GiSyColorPicker::mousePressEvent(QMouseEvent * const opc_Event)
 void C_GiSyColorPicker::mouseReleaseEvent(QMouseEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
-   Q_EMIT ColorSelected();
+   Q_EMIT SigColorSelected();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -190,6 +190,7 @@ void C_GiSyColorPicker::resizeEvent(QResizeEvent * const opc_Event)
    sintn * psn_Pixel = reinterpret_cast<sintn *>(c_Image.scanLine(0));
    for (sintn sn_YValue = 0; sn_YValue < (height() - (frameWidth() * 2)); sn_YValue++)
    {
+      //lint -e{9016,9114}  See Qt documentation for interface
       const sintn * const psn_End = psn_Pixel + (width() - (frameWidth() * 2));
       sintn sn_XValue = 0;
       //lint -e{946}  operator is necessary for painting the brightness

@@ -106,6 +106,7 @@ C_SdNdeDpListTableView::C_SdNdeDpListTableView(QWidget * const opc_Parent) :
    this->setHorizontalHeader(new C_SdNdeSingleHeaderView(Qt::Horizontal));
    this->horizontalHeader()->setResizeContentsPrecision(-1);
    this->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+   this->horizontalHeader()->setFixedHeight(40);
 
    //Row Height
    this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);

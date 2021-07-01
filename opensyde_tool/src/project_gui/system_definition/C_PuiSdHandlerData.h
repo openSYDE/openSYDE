@@ -87,6 +87,14 @@ Q_SIGNALS:
                                     const stw_types::uint32 ou32_DataPoolTargetIndex);
    void SigSyncNodeApplicationAboutToBeDeleted(const stw_types::uint32 ou32_NodeIndex,
                                                const stw_types::uint32 ou32_DataPoolIndex);
+   void SigSyncNodeApplicationAboutToBeChangedFromParamSetHALC(const stw_types::uint32 ou32_NodeIndex,
+                                                               const stw_types::uint32 ou32_DataBlockIndex);
+   void SigSyncNodeApplicationChangedToParamSetHALC(const stw_types::uint32 ou32_NodeIndex,
+                                                    const stw_types::uint32 ou32_DataBlockIndex);
+   void SigSyncNodeApplicationResultPathSizeChanged(const stw_types::uint32 ou32_NodeIndex,
+                                                    const stw_types::uint32 ou32_DataBlockIndex,
+                                                    const stw_types::uint32 ou32_OldSize,
+                                                    const stw_types::uint32 ou32_NewSize);
    void SigSyncNodeDataPoolListAdded(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
                                      const stw_types::uint32 ou32_ListIndex);
    void SigSyncNodeDataPoolListMoved(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,

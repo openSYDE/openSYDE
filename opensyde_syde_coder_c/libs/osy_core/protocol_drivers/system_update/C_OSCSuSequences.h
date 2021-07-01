@@ -82,12 +82,16 @@ public:
    {
       eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_START = 0,
       eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR,
+      eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_WARNING,
+      eACTIVATE_FLASHLOADER_OSY_ECU_RESET_WARNING,
       eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR,
+      eACTIVATE_FLASHLOADER_XFL_ECU_RESET_WARNING,
       eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR,
       eACTIVATE_FLASHLOADER_OSY_XFL_BC_ENTER_FLASHLOADER_START,
       eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR,
       eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR,
       eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START,
+      eACTIVATE_FLASHLOADER_OSY_RECONNECT_WARNING,
       eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR,
       eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR,
       eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR,
@@ -274,10 +278,6 @@ private:
    stw_types::uint32 m_GetAdaptedTransferDataTimeout(const stw_types::uint32 ou32_DeviceTransferDataTimeout,
                                                      const stw_types::uint32 ou32_MaxBlockLength,
                                                      const stw_types::uint8 ou8_BusIdentifier) const;
-
-   static stw_types::sint32 mh_CopyFile(const stw_scl::C_SCLString & orc_SourceFile,
-                                        const stw_scl::C_SCLString & orc_TargetFile,
-                                        stw_scl::C_SCLString * const opc_ErrorPath = NULL);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -473,6 +473,9 @@ void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    const QString c_ViewIdDashboardCount = static_cast<QString>("%1Dashboard_count").arg(orc_ViewIdBase);
    const QList<QString> & rc_DashboardKeyList = orc_View.GetDashboardKeysInternal();
    const QList<QString> & rc_NodesKeyList = orc_View.GetViewNodesKeysInternal();
+   const QString c_ViewIdSetupPermission = static_cast<QString>("%1_setup_permission").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdatePermission = static_cast<QString>("%1_update_permission").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardPermission = static_cast<QString>("%1_dashboard_permission").arg(orc_ViewIdBase);
    sintn sn_Iterator;
 
    //Name
@@ -585,6 +588,14 @@ void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
       //Important iterator step
       ++sn_Iterator;
    }
+
+   //Permissions
+   orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
+                     c_ViewIdSetupPermission.toStdString().c_str(), orc_View.GetSetupPermission());
+   orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
+                     c_ViewIdUpdatePermission.toStdString().c_str(), orc_View.GetUpdatePermission());
+   orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
+                     c_ViewIdDashboardPermission.toStdString().c_str(), orc_View.GetDashboardPermission());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -643,26 +654,26 @@ void C_UsFiler::mh_SaveViewNode(C_SCLIniFile & orc_Ini, const QString & orc_Sect
 {
    const QString c_NodeIdName = static_cast<QString>("%1Name").arg(orc_ViewNodeIdBase);
    const QString c_NodeIdUpdateDataRateBaseId = static_cast<QString>("%1_update_data_rate").arg(orc_ViewNodeIdBase);
-   const QMap<uint32, bool> & rc_ExpandedFlags = orc_ViewNode.GetSectionsExpanded();
+   const QVector<bool> & rc_ExpandedFlags = orc_ViewNode.GetSectionsExpanded();
+   sintn sn_SectionCounter;
+
    QString c_NodeIdExpandedFlag;
-
-   std::vector<uint32> c_Types;
-
-   c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK);
-   c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET);
-   c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE);
 
    // Name
    orc_Ini.WriteString(orc_SectionName.toStdString().c_str(),
                        c_NodeIdName.toStdString().c_str(), orc_NodeName.toStdString().c_str());
 
    //Section expanded flags
-
-   for (std::vector<uint32>::const_iterator c_It = c_Types.begin(); c_It != c_Types.end(); ++c_It)
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        static_cast<QString>("%1SectionCount").arg(orc_ViewNodeIdBase).toStdString().c_str(),
+                        rc_ExpandedFlags.size());
+   for (sn_SectionCounter = 0; sn_SectionCounter < rc_ExpandedFlags.size(); ++sn_SectionCounter)
    {
-      c_NodeIdExpandedFlag = static_cast<QString>("%1Section%2").arg(orc_ViewNodeIdBase).arg(*c_It);
-      orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(), c_NodeIdExpandedFlag.toStdString().c_str(),
-                        rc_ExpandedFlags[*c_It]);
+      c_NodeIdExpandedFlag = static_cast<QString>("%1Section%2").arg(orc_ViewNodeIdBase).arg(sn_SectionCounter);
+
+      orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
+                        c_NodeIdExpandedFlag.toStdString().c_str(),
+                        rc_ExpandedFlags.at(sn_SectionCounter));
    }
 
    //Data rate
@@ -929,7 +940,7 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_tsp_path",
                           orc_UserSettings.GetProjSdTopologyLastKnownTSPPath().toStdString().c_str());
 
-      //Code generation
+      //File generation
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_code_export_path",
                           orc_UserSettings.GetProjSdTopologyLastKnownCodeExportPath().toStdString().c_str());
 
@@ -960,6 +971,9 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
                           orc_UserSettings.GetLastKnownHalcImportPath().toStdString().c_str());
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_halc_export_path",
                           orc_UserSettings.GetLastKnownHalcExportPath().toStdString().c_str());
+      //Service Project Path
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_service_project_path",
+                          orc_UserSettings.GetLastKnownServiceProjectPath().toStdString().c_str());
 
       // Last tab index in system definition
       orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value",
@@ -1351,11 +1365,15 @@ void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
       orc_ViewIdBase);
    const QString c_ViewIdDashboardSelectedTabIndex = static_cast<QString>("%1_selected_tab_index").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardCount = static_cast<QString>("%1Dashboard_count").arg(orc_ViewIdBase);
-
+   const QString c_ViewIdSetupPermission = static_cast<QString>("%1_setup_permission").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdatePermission = static_cast<QString>("%1_update_permission").arg(orc_ViewIdBase);
+   const QString c_ViewIdDashboardPermission = static_cast<QString>("%1_dashboard_permission").arg(orc_ViewIdBase);
    QPoint c_Pos;
    QSize c_Size;
    sintn sn_Value;
    bool q_Value;
+
+   std::array<bool, 3> c_ViewConfigs;
 
    //Navigation
    q_Value = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
@@ -1470,6 +1488,18 @@ void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
       const QString c_DashboardIdBase = static_cast<QString>("%1Dashboard%2").arg(orc_ViewIdBase).arg(sn_ItDashboard);
       mh_LoadDashboard(orc_Ini, orc_SectionName, c_DashboardIdBase, orc_ViewName, orc_UserSettings);
    }
+
+   //Permissions
+   c_ViewConfigs[0] = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                                       c_ViewIdSetupPermission.toStdString().c_str(),
+                                       false);
+   c_ViewConfigs[1] = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                                       c_ViewIdUpdatePermission.toStdString().c_str(),
+                                       false);
+   c_ViewConfigs[2] = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                                       c_ViewIdDashboardPermission.toStdString().c_str(),
+                                       false);
+   orc_UserSettings.SetViewPermission(orc_ViewName, c_ViewConfigs);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1539,21 +1569,21 @@ void C_UsFiler::mh_LoadViewNode(C_SCLIniFile & orc_Ini, const QString & orc_Sect
 
    if (c_ViewNodeName.compare("") != 0)
    {
-      QMap<uint32, bool> c_ExpandedFlags;
-      std::vector<uint32> c_Types;
-
-      c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK);
-      c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET);
-      c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE);
+      QVector<bool> c_ExpandedFlags;
+      sintn sn_SectionCounter;
+      const sintn sn_SectionCount = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                                        static_cast<QString>("%1SectionCount").
+                                                        arg(orc_ViewNodeIdBase).toStdString().c_str(), 1);
+      c_ExpandedFlags.resize(sn_SectionCount);
 
       //Section expanded flags
-      for (std::vector<uint32>::const_iterator c_It = c_Types.begin(); c_It != c_Types.end(); ++c_It)
+      for (sn_SectionCounter = 0; sn_SectionCounter < sn_SectionCount; ++sn_SectionCounter)
       {
-         const bool q_Value =
+         c_ExpandedFlags[sn_SectionCounter] =
             orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
-                             static_cast<QString>("%1Section%2").arg(orc_ViewNodeIdBase).arg(
-                                *c_It).toStdString().c_str(), true);
-         c_ExpandedFlags[*c_It] = q_Value;
+                             static_cast<QString>("%1Section%2").
+                             arg(orc_ViewNodeIdBase).
+                             arg(sn_SectionCounter).toStdString().c_str(), true);
       }
 
       // Append
@@ -1884,7 +1914,7 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
          orc_Ini.ReadString(
             orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_tsp_path", "").c_str());
 
-      //Code generation
+      //File generation
       orc_UserSettings.SetProjSdTopologyLastKnownCodeExportPath(
          orc_Ini.ReadString(
             orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_code_export_path", "").c_str());
@@ -1922,6 +1952,11 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
          orc_Ini.ReadString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_halc_import_path", "").c_str());
       orc_UserSettings.SetLastKnownHalcExportPath(
          orc_Ini.ReadString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_halc_export_path", "").c_str());
+
+      //Service Project Path
+      orc_UserSettings.SetLastKnownServiceProjectPath(
+         orc_Ini.ReadString(
+            orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_service_project_path", "").c_str());
 
       // Last tab index in system definition
       s32_Value = orc_Ini.ReadInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value", 0);
@@ -1994,7 +2029,7 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
       // Last screen mode
       orc_UserSettings.SetProjLastScreenMode(0, 0, 0, 0, 0, 0);
 
-      //Code generation
+      //File generation
       orc_UserSettings.SetProjSdTopologyLastKnownCodeExportPath("");
 
       //Import

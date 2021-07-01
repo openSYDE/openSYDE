@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui;
 
    Set up the color brightness picker with all its functions.
 
-   \param[in,out]   opc_Parent Pointer to parent
+   \param[in,out]  opc_Parent    Pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSyColorBrightnessPicker::C_GiSyColorBrightnessPicker(QWidget * const opc_Parent) :
@@ -64,9 +64,9 @@ C_GiSyColorBrightnessPicker::~C_GiSyColorBrightnessPicker()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set a hue, sat and value to the brightness picker and repaint it
 
-   \param[in]   osn_Hue     New hue value
-   \param[in]   osn_Sat     New sat value
-   \param[in]   osn_Value   New value value
+   \param[in]  osn_Hue     New hue value
+   \param[in]  osn_Sat     New sat value
+   \param[in]  osn_Value   New value value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorBrightnessPicker::SetColorWithHSV(const sintn osn_Hue, const sintn osn_Sat, const sintn osn_Value)
@@ -82,19 +82,19 @@ void C_GiSyColorBrightnessPicker::SetColorWithHSV(const sintn osn_Hue, const sin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Receives from a hue, sat chooser and relays.
 
-   \param[in,out]   osn_Hue   New hue value
-   \param[in,out]   osn_Sat   New sat value
+   \param[in,out]  osn_Hue    New hue value
+   \param[in,out]  osn_Sat    New sat value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorBrightnessPicker::SetColorWithHS(const sintn osn_Hue, const sintn osn_Sat)
 {
-   Q_EMIT NewHsv(osn_Hue, osn_Sat, this->msn_Value);
+   Q_EMIT SigNewHsv(osn_Hue, osn_Sat, this->msn_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Paint the brightness picker with the white "Balken" which show the current brightness
 
-   \param[in,out]   opc_Event   Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorBrightnessPicker::paintEvent(QPaintEvent * const opc_Event)
@@ -112,6 +112,7 @@ void C_GiSyColorBrightnessPicker::paintEvent(QPaintEvent * const opc_Event)
       sintn * psn_Pixel = reinterpret_cast<sintn *>(c_Image.scanLine(0));
       for (sintn sn_YValue = 0; sn_YValue < c_Rect.height(); sn_YValue++)
       {
+         //lint -e{9016}  See Qt documentation for interface
          sintn * const psn_End = psn_Pixel + c_Rect.width();
          std::fill(psn_Pixel, psn_End, QColor::fromHsv(this->msn_Hue,
                                                        this->msn_Sat,
@@ -125,8 +126,8 @@ void C_GiSyColorBrightnessPicker::paintEvent(QPaintEvent * const opc_Event)
    {
       QPainter c_Painter(this);
       c_Painter.drawPixmap(1, 0, *this->mp_Pixmap);
-      c_Painter.setPen(palette().foreground().color());
-      c_Painter.setBrush(palette().foreground());
+      c_Painter.setPen(palette().windowText().color());
+      c_Painter.setBrush(palette().windowText());
       QPolygon c_Polygon;
       const sintn sn_YValue = ((255 - this->msn_Value) * (height() - 1)) / 255;
       c_Polygon.setPoints(4, width(), sn_YValue, width() - 36, sn_YValue, width(), sn_YValue + 1,
@@ -140,7 +141,7 @@ void C_GiSyColorBrightnessPicker::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten mouse move event slot
 
-   \param[in,out]   opc_Event   Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorBrightnessPicker::mouseMoveEvent(QMouseEvent * const opc_Event)
@@ -153,13 +154,13 @@ void C_GiSyColorBrightnessPicker::mouseMoveEvent(QMouseEvent * const opc_Event)
    delete this->mp_Pixmap;
    this->mp_Pixmap = NULL;
    repaint();
-   Q_EMIT NewHsv(this->msn_Hue, this->msn_Sat, this->msn_Value);
+   Q_EMIT SigNewHsv(this->msn_Hue, this->msn_Sat, this->msn_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten mouse press event slot
 
-   \param[in,out]   opc_Event   Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorBrightnessPicker::mousePressEvent(QMouseEvent * const opc_Event)
@@ -172,17 +173,17 @@ void C_GiSyColorBrightnessPicker::mousePressEvent(QMouseEvent * const opc_Event)
    delete this->mp_Pixmap;
    this->mp_Pixmap = NULL;
    repaint();
-   Q_EMIT NewHsv(this->msn_Hue, this->msn_Sat, this->msn_Value);
+   Q_EMIT SigNewHsv(this->msn_Hue, this->msn_Sat, this->msn_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten mouse release event slot
 
-   \param[in,out]   opc_Event   Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorBrightnessPicker::mouseReleaseEvent(QMouseEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
-   Q_EMIT ColorSelected();
+   Q_EMIT SigColorSelected();
 }

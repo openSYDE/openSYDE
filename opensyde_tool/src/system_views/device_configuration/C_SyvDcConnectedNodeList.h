@@ -49,6 +49,7 @@ protected:
    virtual QMimeData * mimeData(const QList<QListWidgetItem *> oc_Items) const override;
 
 private:
+   bool mq_GridSizeSet;
    std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceInformation> mc_Data;
    static const QString mhc_MimeData;
    static const QString mhc_MimeDataDevice;

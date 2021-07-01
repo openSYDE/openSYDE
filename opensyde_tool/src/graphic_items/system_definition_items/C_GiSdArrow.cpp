@@ -56,7 +56,7 @@ C_GiSdArrow::C_GiSdArrow(const sint32 & ors32_Index, const uint64 & oru64_ID,
       {
          C_PuiBsLineArrow & rc_ArrowData = C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows[this->ms32_Index];
          m_Init(rc_ArrowData.c_UIInteractionPoints);
-         this->LoadData();
+         this->C_GiSdArrow::LoadData();
       }
    }
 

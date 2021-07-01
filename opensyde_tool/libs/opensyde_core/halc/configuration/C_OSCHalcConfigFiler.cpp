@@ -151,9 +151,44 @@ sint32 C_OSCHalcConfigFiler::h_SaveFile(const C_OSCHalcConfig & orc_IOData, cons
 sint32 C_OSCHalcConfigFiler::h_LoadData(C_OSCHalcConfig & orc_IOData, C_OSCXMLParserBase & orc_XMLParser,
                                         const C_SCLString & orc_BasePath)
 {
-   sint32 s32_Retval;
+   sint32 s32_Retval = mh_LoadIODataBase(orc_IOData, orc_XMLParser, orc_BasePath);
 
-   s32_Retval = mh_LoadIODataBase(orc_IOData, orc_XMLParser, orc_BasePath);
+   //File version
+   if (orc_XMLParser.SelectNodeChild("file-version") == "file-version")
+   {
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(orc_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading IO description", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading IO description", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != mhu16_FILE_VERSION_1)
+         {
+            osc_write_log_error("Loading IO description",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
+      //Return
+      orc_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      osc_write_log_error("Loading IO description", "Could not find \"file-version\" node.");
+      s32_Retval = C_CONFIG;
+   }
    if (s32_Retval == C_NO_ERR)
    {
       if (orc_XMLParser.SelectNodeChild("ref-content-version") == "ref-content-version")

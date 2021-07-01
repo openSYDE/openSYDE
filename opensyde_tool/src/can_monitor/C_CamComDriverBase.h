@@ -47,10 +47,6 @@ public:
    virtual void RemoveAllCyclicCanMessages(void) override;
 
 private:
-   //Avoid call
-   C_CamComDriverBase(const C_CamComDriverBase &);
-   C_CamComDriverBase & operator =(const C_CamComDriverBase &);
-
    // It is mutable because of the constness of the getter functions. Without the keyword mutable the getter functions
    // must be non const and that is not wanted.
    mutable stw_tgl::C_TGLCriticalSection mc_CriticalSectionMsg;

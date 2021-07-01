@@ -43,8 +43,8 @@ public:
 class C_OSCXMLParserBase
 {
 private:
-   C_OSCXMLParserBase(const C_OSCXMLParserBase & orc_Souce);               ///< not implemented: prevent copying
-   C_OSCXMLParserBase & operator = (const C_OSCXMLParserBase & orc_Souce); ///< not implemented: prevent assignment
+   C_OSCXMLParserBase(const C_OSCXMLParserBase & orc_Source);               ///< not implemented: prevent copying
+   C_OSCXMLParserBase & operator = (const C_OSCXMLParserBase & orc_Source); ///< not implemented: prevent assignment
 
    tinyxml2::XMLElement * mpc_CurrentNode;
 
@@ -94,6 +94,7 @@ public:
    void SetAttributeSint32(const stw_scl::C_SCLString & orc_Name, const stw_types::sint32 os32_Value);
    void SetAttributeUint32(const stw_scl::C_SCLString & orc_Name, const stw_types::uint32 ou32_Value);
    void SetAttributeSint64(const stw_scl::C_SCLString & orc_Name, const stw_types::sint64 os64_Value);
+   void SetAttributeUint64(const stw_scl::C_SCLString & orc_Name, const stw_types::uint64 ou64_Value);
    void SetAttributeBool(const stw_scl::C_SCLString & orc_Name, const bool oq_Value);
    void SetAttributeFloat32(const stw_scl::C_SCLString & orc_Name, const stw_types::float32 of32_Value);
    void SetAttributeFloat64(const stw_scl::C_SCLString & orc_Name, const stw_types::float64 of64_Value);
@@ -103,6 +104,7 @@ public:
    stw_types::sint32 GetAttributeSint32(const stw_scl::C_SCLString & orc_Name) const;
    stw_types::uint32 GetAttributeUint32(const stw_scl::C_SCLString & orc_Name) const;
    stw_types::sint64 GetAttributeSint64(const stw_scl::C_SCLString & orc_Name) const;
+   stw_types::uint64 GetAttributeUint64(const stw_scl::C_SCLString & orc_Name) const;
    bool GetAttributeBool(const stw_scl::C_SCLString & orc_Name) const;
    stw_types::float32 GetAttributeFloat32(const stw_scl::C_SCLString & orc_Name) const;
    stw_types::float64 GetAttributeFloat64(const stw_scl::C_SCLString & orc_Name) const;
@@ -119,9 +121,9 @@ class C_OSCXMLParser :
 {
 private:
    //not implemented -> prevent copying
-   C_OSCXMLParser(const C_OSCXMLParser & orc_Souce);
+   C_OSCXMLParser(const C_OSCXMLParser & orc_Source);
    //not implemented -> prevent assignment
-   C_OSCXMLParser & operator = (const C_OSCXMLParser & orc_Souce); //lint !e1511 //we want to hide the base function
+   C_OSCXMLParser & operator = (const C_OSCXMLParser & orc_Source); //lint !e1511 //we want to hide the base function
 
 public:
    C_OSCXMLParser(void);
@@ -140,9 +142,9 @@ class C_OSCXMLParserString :
 {
 private:
    // not implemented -> prevent copying
-   C_OSCXMLParserString(const C_OSCXMLParserString & orc_Souce);
+   C_OSCXMLParserString(const C_OSCXMLParserString & orc_Source);
    // not implemented -> prevent assignment
-   C_OSCXMLParserString & operator = (const C_OSCXMLParserString & orc_Souce); //lint !e1511 //we want to hide the base
+   C_OSCXMLParserString & operator = (const C_OSCXMLParserString & orc_Source); //lint !e1511 //we want to hide the base
 
 public:
    C_OSCXMLParserString(void);

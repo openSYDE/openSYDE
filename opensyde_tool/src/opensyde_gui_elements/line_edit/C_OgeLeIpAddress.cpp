@@ -78,22 +78,22 @@ C_OgeLeIpAddress::~C_OgeLeIpAddress()
 
    Convert uint8 to IP Address format.
 
-   \param[in]  oau8_IPAddress    IP address in uint8 format
+   \param[in]  opu8_IPAddress    IP address in uint8 format (must point to 4 uint8s)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeLeIpAddress::SetIPAddress(const uint8 oau8_IPAddress[])
+void C_OgeLeIpAddress::SetIPAddress(const uint8 * const opu8_IPAddress)
 {
    QString c_HelpString;
 
    // set IP address (padded with blanks)
    c_HelpString = "";
-   c_HelpString.append(static_cast<QString>("%1").arg(oau8_IPAddress[0], 3, 10, QChar(' ')));
+   c_HelpString.append(static_cast<QString>("%1").arg(opu8_IPAddress[0], 3, 10, QChar(' ')));
    c_HelpString.append(".");
-   c_HelpString.append(static_cast<QString>("%1").arg(oau8_IPAddress[1], 3, 10, QChar(' ')));
+   c_HelpString.append(static_cast<QString>("%1").arg(opu8_IPAddress[1], 3, 10, QChar(' ')));
    c_HelpString.append(".");
-   c_HelpString.append(static_cast<QString>("%1").arg(oau8_IPAddress[2], 3, 10, QChar(' ')));
+   c_HelpString.append(static_cast<QString>("%1").arg(opu8_IPAddress[2], 3, 10, QChar(' ')));
    c_HelpString.append(".");
-   c_HelpString.append(static_cast<QString>("%1").arg(oau8_IPAddress[3], 3, 10, QChar(' ')));
+   c_HelpString.append(static_cast<QString>("%1").arg(opu8_IPAddress[3], 3, 10, QChar(' ')));
 
    this->setText(c_HelpString);
 }
@@ -111,7 +111,7 @@ std::vector<sint32> C_OgeLeIpAddress::GetIPAddress(void) const
    std::vector<sint32> c_Return;
 
    const QString c_HelpString = this->text();
-   const QStringList c_Parts = c_HelpString.split(".", QString::SkipEmptyParts);
+   const QStringList c_Parts = c_HelpString.split(".", Qt::SplitBehaviorFlags::SkipEmptyParts);
 
    tgl_assert(c_Parts.size() == 4);
    if (c_Parts.size() == 4)

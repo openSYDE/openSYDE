@@ -38,8 +38,10 @@ public:
    static void h_ExportCodeNodes(const std::vector<stw_types::uint32> & orc_NodeIndices, QWidget * const opc_Parent);
    static stw_types::sint32 h_OpenIDE(const QString & orc_IdeExeCall);
    static QString h_GetSydeCoderCPath(void);
-   static QString h_GetAbsoluteGeneratedDir(const stw_opensyde_core::C_OSCNodeApplication * const opc_Application,
+   static QString h_GetAbsoluteGeneratedDir(const stw_opensyde_core::C_OSCNodeApplication & orc_Application,
                                             const stw_scl::C_SCLString & orc_NodeName);
+   static QString h_GetDefaultGeneratedDir(const stw_scl::C_SCLString & orc_ApplicationName,
+                                           const stw_scl::C_SCLString & orc_NodeName);
    static bool h_CheckProjForCodeGeneration(QWidget * const opc_Parent);
    static QString h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QString & orc_Path,
                                               const QString & orc_AbsoluteReferenceDir);
@@ -61,6 +63,7 @@ private:
    static stw_types::sint32 mh_ExportCodeNode(const stw_types::uint32 ou32_NodeIndex,
                                               const std::vector<stw_types::uint32> & orc_AppIndices,
                                               std::vector<stw_opensyde_gui::C_ImpCodeGenerationReportWidget::C_ReportData> & orc_ExportInfo, const bool & orq_Erase);
+   //lint -e{8080} //using type expected by the library for API compatibility
    static WINBOOL CALLBACK mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM os32_LParam);
 };
 

@@ -61,9 +61,11 @@ void C_PuiSdNodeConnection::CalcHash(uint32 & oru32_HashValue) const
    for (u32_Counter = 0U; u32_Counter < this->c_UINodeConnectionInteractionPoints.size(); ++u32_Counter)
    {
       f64_Value = this->c_UINodeConnectionInteractionPoints[u32_Counter].x();
+      //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
       stw_scl::C_SCLChecksums::CalcCRC32(&f64_Value, sizeof(f64_Value), oru32_HashValue);
 
       f64_Value = this->c_UINodeConnectionInteractionPoints[u32_Counter].y();
+      //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
       stw_scl::C_SCLChecksums::CalcCRC32(&f64_Value, sizeof(f64_Value), oru32_HashValue);
    }
 }

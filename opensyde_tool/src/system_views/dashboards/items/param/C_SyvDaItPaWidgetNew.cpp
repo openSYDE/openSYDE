@@ -129,7 +129,6 @@ C_SyvDaItPaWidgetNew::C_SyvDaItPaWidgetNew(const uint32 & oru32_ViewIndex,
 C_SyvDaItPaWidgetNew::~C_SyvDaItPaWidgetNew()
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the mpc_ComDriver because of handling it on an other position
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -206,7 +205,7 @@ void C_SyvDaItPaWidgetNew::UpdateECUValues(void) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
 {
-   bool q_Return = this->mq_ReadActive;
+   const bool q_Return = this->mq_ReadActive;
    sint32 s32_Result = os32_Result;
 
    if (q_Return == true)
@@ -484,6 +483,7 @@ void C_SyvDaItPaWidgetNew::ButtonAddClicked(void)
       if (c_New != NULL)
       {
          pc_Dialog->SaveUserSettings();
+         pc_Dialog->PrepareCleanUp();
          c_New->HideOverlay();
       }
    } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management

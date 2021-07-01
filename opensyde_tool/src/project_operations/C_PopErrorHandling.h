@@ -30,6 +30,7 @@ public:
    static void h_ProjectLoadErr(const stw_types::sint32 & ors32_Err, const QString & orc_Path,
                                 QWidget * const opc_Parent, const stw_types::uint16 ou16_SystemDefinitionVersion);
    static void h_ProjectSaveErr(const stw_types::sint32 & ors32_Err, QWidget * const opc_Parent);
+   static void h_ServiceProjectSaveErr(const stw_types::sint32 & ors32_Err, QWidget * const opc_Parent);
    static void h_GetTextInitializeErr(const stw_types::sint32 & ors32_Err);
 
 private:

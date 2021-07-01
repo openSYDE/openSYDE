@@ -176,8 +176,12 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
          case ePATH:
             c_Font = mc_STYLE_GUIDE_FONT_REGULAR_12;
             break;
-         default:
+         case eVERSION:
+         case eNAME:
             c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
+            break;
+         default:
+            tgl_assert(false);
             break;
          }
          //Convert point to pixel
@@ -195,8 +199,12 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
          case ePATH:
             c_Retval = mc_STYLE_GUIDE_COLOR_10;
             break;
-         default:
+         case eVERSION:
+         case eNAME:
             c_Retval = mc_STYLE_GUIDE_COLOR_12;
+            break;
+         default:
+            tgl_assert(false);
             break;
          }
       }
@@ -227,13 +235,26 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
                QFileInfo c_ProjectFileInfo;
                c_ProjectFileInfo.setFile(rc_RecentFilePaths);
                QString c_TooltipContent;
+               QString c_CreationTime;
+               QString c_ModificationTime;
+               // if it's a syde_sp file we don't have access to creation and modification time
+               if (c_ProjectFileInfo.completeSuffix().compare("syde_sp") == 0)
+               {
+                  c_CreationTime = "N/A";
+                  c_ModificationTime = "N/A";
+               }
+               else
+               {
+                  c_CreationTime = C_OSCProject::h_GetTimeFormatted(rc_RecentProject.c_CreationTime).c_str();
+                  c_ModificationTime = C_OSCProject::h_GetTimeFormatted(rc_RecentProject.c_ModificationTime).c_str();
+               }
                c_TooltipContent =
                   static_cast<QString>(C_GtGetText::h_GetText("Version: %1 \nAuthor: %2 \nCreated: %3 \n"
                                                               "Last modified: %4 (by %5) \nUsed openSYDE version: %6")).
                   arg(rc_RecentProject.c_Version.c_str()).
                   arg(rc_RecentProject.c_Author.c_str()).
-                  arg(C_OSCProject::h_GetTimeFormatted(rc_RecentProject.c_CreationTime).c_str()).
-                  arg(C_OSCProject::h_GetTimeFormatted(rc_RecentProject.c_ModificationTime).c_str()).
+                  arg(c_CreationTime).
+                  arg(c_ModificationTime).
                   arg(rc_RecentProject.c_Editor.c_str()).
                   arg(C_Uti::h_ConvertVersionToSTWStyle(rc_RecentProject.c_OpenSYDEVersion.c_str()));
                if (c_ProjectFileInfo.exists() == true)

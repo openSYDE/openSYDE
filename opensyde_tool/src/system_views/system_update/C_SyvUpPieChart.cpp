@@ -118,8 +118,10 @@ void C_SyvUpPieChart::paintEvent(QPaintEvent * const opc_Event)
 {
    const QRect c_CompleteRect = this->rect();
    const sint32 s32_Height = std::min(c_CompleteRect.width(), c_CompleteRect.height());
-   const sint32 s32_X = c_CompleteRect.x() + ((c_CompleteRect.width() - s32_Height) / 2);
-   const sint32 s32_Y = c_CompleteRect.y() + ((c_CompleteRect.height() - s32_Height) / 2);
+   const sint32 s32_X = static_cast<sint32>(c_CompleteRect.x()) +
+                        ((static_cast<sint32>(c_CompleteRect.width()) - s32_Height) / 2);
+   const sint32 s32_Y = static_cast<sint32>(c_CompleteRect.y()) +
+                        ((static_cast<sint32>(c_CompleteRect.height()) - s32_Height) / 2);
    QPainter c_Painter(this);
 
    if ((this->mq_FinishedAnimation == true) && (this->mpc_Movie != NULL))

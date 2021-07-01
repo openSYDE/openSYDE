@@ -214,6 +214,18 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_SyvDaPeDataElementBrowse::GetS
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Cleans up the last view configuration as preparation for the entire deletion
+
+   In some constellations it is problematic if the model still has the mpc_InvisibleRootItem set, when it hides with
+   the dialog in the background waiting to die.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeDataElementBrowse::PrepareCleanUp(void)
+{
+   this->mpc_Ui->pc_TreeView->CleanUpLastView();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases

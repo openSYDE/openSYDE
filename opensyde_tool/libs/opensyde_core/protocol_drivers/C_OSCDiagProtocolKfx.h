@@ -53,9 +53,9 @@ private:
    static const stw_types::uint16 mhu16_KFX_RAM_MAX_NUM_ELEMENTS = 1024U;
 
    //not implemented -> prevent copying
-   C_OSCDiagProtocolKfx(const C_OSCDiagProtocolKfx & orc_Souce);
+   C_OSCDiagProtocolKfx(const C_OSCDiagProtocolKfx & orc_Source);
    //not implemented -> prevent assignment
-   C_OSCDiagProtocolKfx & operator = (const C_OSCDiagProtocolKfx & orc_Souce); //lint !e1511 //we want to hide the base
+   C_OSCDiagProtocolKfx & operator = (const C_OSCDiagProtocolKfx & orc_Source); //lint !e1511 //we want to hide the base
 
    static stw_types::uint16 mh_PackDataPoolIndex(const stw_types::uint16 ou16_List,
                                                  const stw_types::uint16 ou16_Variable);

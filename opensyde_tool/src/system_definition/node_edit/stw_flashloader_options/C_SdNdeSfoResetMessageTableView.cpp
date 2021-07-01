@@ -62,6 +62,7 @@ C_SdNdeSfoResetMessageTableView::C_SdNdeSfoResetMessageTableView(QWidget * const
    this->horizontalHeader()->setResizeContentsPrecision(-1);
    this->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
    this->horizontalHeader()->setStretchLastSection(false);
+   this->horizontalHeader()->setFixedHeight(27);
    //Row Height
    this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
    this->verticalHeader()->setMinimumSectionSize(30);
@@ -71,7 +72,7 @@ C_SdNdeSfoResetMessageTableView::C_SdNdeSfoResetMessageTableView(QWidget * const
    //Hide vertical header
    this->verticalHeader()->hide();
 
-   this->setModel(&mc_Model);
+   this->C_SdNdeSfoResetMessageTableView::setModel(&mc_Model);
    this->setItemDelegate(&mc_Delegate);
 }
 

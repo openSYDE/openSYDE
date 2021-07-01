@@ -56,9 +56,16 @@ C_SyvComMessageLoggerFileBlf::C_SyvComMessageLoggerFileBlf(const stw_scl::C_SCLS
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvComMessageLoggerFileBlf::~C_SyvComMessageLoggerFileBlf(void)
 {
-   if (this->mc_File.is_open() == true)
+   try
    {
-      this->mc_File.close();
+      if (this->mc_File.is_open() == true)
+      {
+         this->mc_File.close();
+      }
+   }
+   catch (...)
+   {
+      //not much we can do here ...
    }
 }
 
@@ -123,11 +130,11 @@ void C_SyvComMessageLoggerFileBlf::AddMessageToFile(const C_OSCComMessageLoggerD
       c_CanObj.flags = 0U;
       if (orc_MessageData.q_IsTx == true)
       {
-         c_CanObj.flags |= 0x01;
+         c_CanObj.flags |= static_cast<uint8>(0x01);
       }
       if (orc_MessageData.c_CanMsg.u8_RTR > 0U)
       {
-         c_CanObj.flags |= 0x80;
+         c_CanObj.flags |= static_cast<uint8>(0x80);
       }
 
       // CAN Id and extended flag

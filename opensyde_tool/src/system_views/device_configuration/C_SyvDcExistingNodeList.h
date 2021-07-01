@@ -51,6 +51,7 @@ Q_SIGNALS:
 private:
    stw_types::uint32 mu32_ViewIndex;
    bool mq_ShowAssignment;
+   bool mq_GridSizeSet;
 
    stw_types::sint32 m_Init(void);
    stw_types::sint32 m_AppendNode(const stw_types::uint32 ou32_NodeIndex,

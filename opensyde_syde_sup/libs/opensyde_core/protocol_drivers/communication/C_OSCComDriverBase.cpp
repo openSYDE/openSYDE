@@ -120,8 +120,6 @@ C_OSCComDriverBase::C_OSCComDriverBase(void) :
 C_OSCComDriverBase::~C_OSCComDriverBase(void)
 {
    this->mpc_CanDispatcher = NULL; //do not delete ! not owned by us
-
-   //lint -e{1740}  no memory leak because the ownership of mpc_CanDispatcher was never transferred to this class
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -185,6 +183,7 @@ sint32 C_OSCComDriverBase::StartLogging(const stw_types::sint32 os32_Bitrate)
    if (this->mpc_CanDispatcher != NULL)
    {
       uintn un_Counter;
+      s32_Return = C_NO_ERR;
 
       this->mq_Started = true;
       this->mq_Paused = false;
@@ -194,7 +193,7 @@ sint32 C_OSCComDriverBase::StartLogging(const stw_types::sint32 os32_Bitrate)
       this->mu32_CanTxCounter = 0U;
       this->mu32_CanTxErrors = 0U;
 
-      // Inform all logger about the start
+      // Inform all loggers about the start
       for (un_Counter = 0U; un_Counter < this->mc_Logger.size(); ++un_Counter)
       {
          this->mc_Logger[un_Counter]->Start();
@@ -642,5 +641,7 @@ uint32 C_OSCComDriverBase::mh_GetCanMessageSizeInBits(const T_STWCAN_Msg_RX & or
    // Stuff bits dependent of DLC +
    // minimum size of CAN message with standard identifier +
    // Optional extended id with 18 bits for the extended id itself, SRR, additional reserved bit and the 3 stuff bits
-   return (static_cast<uint32>(orc_Msg.u8_DLC) * 10U) + 47U + ((orc_Msg.u8_XTD == 1U) ? 23U : 0U);
+   const uint8 u8_ExtendedBits = ((orc_Msg.u8_XTD == 1U) ? 23U : 0U);
+
+   return ((static_cast<uint32>(orc_Msg.u8_DLC) * 10U) + 47U + u8_ExtendedBits);
 }

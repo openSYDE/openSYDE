@@ -71,6 +71,7 @@ void C_OSCNode::Initialize(void)
    c_DeviceType = "Custom";
    c_Properties.Initialize();
    c_DataPools.resize(0);
+   q_DatapoolAutoNvMStartAddress = true;
    c_Applications.resize(0);
    c_ComProtocols.resize(0);
    c_HALCConfig.Clear();
@@ -828,6 +829,8 @@ void C_OSCNode::CalcHash(uint32 & oru32_HashValue) const
    uint32 u32_Counter;
 
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_DeviceType.c_str(), this->c_DeviceType.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_DatapoolAutoNvMStartAddress, sizeof(this->q_DatapoolAutoNvMStartAddress),
+                                      oru32_HashValue);
 
    this->c_Properties.CalcHash(oru32_HashValue);
 
@@ -984,7 +987,8 @@ uint32 C_OSCNode::GetListsSize(void) const
    for (uint32 u32_ItDataPool = 0; u32_ItDataPool < this->c_DataPools.size(); ++u32_ItDataPool)
    {
       const C_OSCNodeDataPool & rc_NodeDataPool = this->c_DataPools[u32_ItDataPool];
-      if (rc_NodeDataPool.e_Type == C_OSCNodeDataPool::eNVM)
+      if ((rc_NodeDataPool.e_Type == C_OSCNodeDataPool::eNVM) ||
+          (rc_NodeDataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM))
       {
          u32_Retval += rc_NodeDataPool.GetListsSize();
       }
@@ -1006,7 +1010,8 @@ uint32 C_OSCNode::GetDataPoolsSize(void) const
    for (uint32 u32_ItDataPool = 0; u32_ItDataPool < this->c_DataPools.size(); ++u32_ItDataPool)
    {
       const C_OSCNodeDataPool & rc_NodeDataPool = this->c_DataPools[u32_ItDataPool];
-      if (rc_NodeDataPool.e_Type == C_OSCNodeDataPool::eNVM)
+      if ((rc_NodeDataPool.e_Type == C_OSCNodeDataPool::eNVM) ||
+          (rc_NodeDataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM))
       {
          u32_Retval += rc_NodeDataPool.u32_NvMSize;
       }
@@ -1031,7 +1036,8 @@ uint32 C_OSCNode::GetDataPoolAbsoluteAddress(const uint32 ou32_DataPoolIndex) co
         ++u32_ItDataPool)
    {
       const C_OSCNodeDataPool & rc_NodeDataPool = this->c_DataPools[u32_ItDataPool];
-      if (rc_NodeDataPool.e_Type == C_OSCNodeDataPool::eNVM)
+      if ((rc_NodeDataPool.e_Type == C_OSCNodeDataPool::eNVM) ||
+          (rc_NodeDataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM))
       {
          u32_Retval += rc_NodeDataPool.u32_NvMSize;
       }
@@ -1109,7 +1115,9 @@ uint32 C_OSCNode::GetElementAbsoluteAddress(const uint32 ou32_DataPoolIndex, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get HAL data pool of specified type
+/*! \brief  Get first HAL data pool of specified type
+
+   Returns the first found HAL datapool (HALC or HALC_NVM) of specified type and ignores all other datapool copies.
 
    \param[in]  oq_SafeDatapool   Flag to differ HAL safe datapool and HAL nonsafe datapool
 
@@ -1125,7 +1133,8 @@ const C_OSCNodeDataPool * C_OSCNode::GetHalDataPoolConst(const bool oq_SafeDatap
    for (uint32 u32_ItDatapools = 0; u32_ItDatapools < this->c_DataPools.size(); ++u32_ItDatapools)
    {
       const C_OSCNodeDataPool & rc_Datapool = this->c_DataPools[u32_ItDatapools];
-      if ((rc_Datapool.e_Type == C_OSCNodeDataPool::eHALC) && (rc_Datapool.q_IsSafety == oq_SafeDatapool))
+      if (((rc_Datapool.e_Type == C_OSCNodeDataPool::eHALC) || (rc_Datapool.e_Type == C_OSCNodeDataPool::eHALC_NVM)) &&
+          (rc_Datapool.q_IsSafety == oq_SafeDatapool))
       {
          pc_Retval = &this->c_DataPools[u32_ItDatapools];
          break;
@@ -1625,7 +1634,8 @@ void C_OSCNode::CheckErrorDataPool(const uint32 ou32_DataPoolIndex, bool * const
             bool q_DataSetsInvalid;
             bool q_ElementsInvalid;
 
-            if (rc_CheckedDataPool.e_Type == C_OSCNodeDataPool::eNVM)
+            if ((rc_CheckedDataPool.e_Type == C_OSCNodeDataPool::eNVM) ||
+                (rc_CheckedDataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM))
             {
                q_CheckSize = true;
             }
@@ -1973,9 +1983,16 @@ void C_OSCNode::RecalculateAddress(void)
    for (uint32 u32_ItDataPool = 0UL; u32_ItDataPool < this->c_DataPools.size(); ++u32_ItDataPool)
    {
       C_OSCNodeDataPool & rc_DataPool = this->c_DataPools[u32_ItDataPool];
-      if (rc_DataPool.e_Type == C_OSCNodeDataPool::eNVM)
+      if ((rc_DataPool.e_Type == C_OSCNodeDataPool::eNVM) ||
+          (rc_DataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM))
       {
-         rc_DataPool.u32_NvMStartAddress = u32_Offset;
+         if (this->q_DatapoolAutoNvMStartAddress == true)
+         {
+            // Updating the Datapool start address only if the auto mode is activated
+            // This configuration affects the Datapool start address only. The lists and elements are calculated
+            // automatically always
+            rc_DataPool.u32_NvMStartAddress = u32_Offset;
+         }
          rc_DataPool.RecalculateAddress();
          u32_Offset += rc_DataPool.u32_NvMSize;
       }

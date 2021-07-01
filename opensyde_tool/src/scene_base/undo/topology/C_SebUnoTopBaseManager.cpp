@@ -128,6 +128,7 @@ void C_SebUnoTopBaseManager::SaveBusConnectorInitialPoints(const C_GiLiBusConnec
    \param[in] orc_Items Items
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
 void C_SebUnoTopBaseManager::DoDelete(const QList<QGraphicsItem *> & orc_Items)
 {
    Q_UNUSED(orc_Items)

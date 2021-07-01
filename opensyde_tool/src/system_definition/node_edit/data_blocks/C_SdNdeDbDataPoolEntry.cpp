@@ -92,8 +92,9 @@ void C_SdNdeDbDataPoolEntry::m_Init(const stw_types::uint32 ou32_NodeIndex, cons
 {
    const C_OSCNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(ou32_NodeIndex,
                                                                                                  ou32_DataPoolIndex);
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
 
-   if (pc_Datapool != NULL)
+   if ((pc_Node != NULL) && (pc_Datapool != NULL))
    {
       QString c_Text;
 
@@ -110,5 +111,10 @@ void C_SdNdeDbDataPoolEntry::m_Init(const stw_types::uint32 ou32_NodeIndex, cons
       c_Text += ")";
       this->mpc_Ui->pc_LabelName->setText(c_Text);
       this->SetToolTipInformation(c_Text, pc_Datapool->c_Comment.c_str());
+
+      if ((pc_Node->pc_DeviceDefinition != NULL) && (pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == false))
+      {
+         this->mpc_Ui->pc_PushButtonDelete->setVisible(false);
+      }
    }
 }

@@ -85,7 +85,6 @@ stw_opensyde_gui--C_SdNdeDpProperties,
 stw_opensyde_gui--C_SdNdeDpSelectorAddWidget,
 stw_opensyde_gui--C_SyvDaDashboardSettings,
 stw_opensyde_gui--C_SyvDcWidget,
-stw_opensyde_gui--C_SdNdeDbAdd,
 stw_opensyde_gui--C_SdNdeDbProperties,
 stw_opensyde_gui_elements--C_OgeSaMain,
 stw_opensyde_gui--C_SyvDaDashboardWidget,
@@ -114,6 +113,7 @@ stw_opensyde_gui--C_SyvDaItPaImportReport,
 stw_opensyde_gui--C_SyvDaItPaImageRecordWidget,
 stw_opensyde_gui--C_SyvDaDashboardTabProperties,
 stw_opensyde_gui--C_PopSaveAsDialogWidget,
+stw_opensyde_gui--C_PopCreateServiceProjDialogWidget,
 stw_opensyde_gui--C_NagAboutDialog,
 stw_opensyde_gui--C_GiSyColorSelectWidget,
 QScrollArea#pc_ScrollAreaChart,
@@ -125,7 +125,7 @@ stw_opensyde_gui--C_SyvDaPeUpdateModeTableView QHeaderView,
 stw_opensyde_gui--C_SdNdeDpListTableView QHeaderView,
 stw_opensyde_gui--C_TblTreDataElementView QHeaderView,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView QHeaderView,
-stw_opensyde_gui--C_SdCodeGenerationView QHeaderView,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable QHeaderView,
 stw_opensyde_gui--C_SyvDaItTaView QHeaderView,
 stw_opensyde_gui--C_SyvDaItPaTreeView QHeaderView,
 stw_opensyde_gui--C_SdNdeDpListDataSetView QHeaderView,
@@ -199,7 +199,7 @@ stw_opensyde_gui--C_SyvDaPeUpdateModeTableView::item,
 stw_opensyde_gui--C_SdNdeDpListTableView::item,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF::item,
 stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QWidget#pc_ScrollAreaWidgetContents,
-stw_opensyde_gui--C_SyvUpUpdatePackageListNodeWidget QWidget#pc_ScrollAreaWidgetContents,
+stw_opensyde_gui--C_SyvUpPackageSectionNodeWidget QWidget#pc_ScrollAreaWidgetContents,
 stw_opensyde_gui--C_SyvDaItPaArView QTableCornerButton::section,
 stw_opensyde_gui--C_SdNdeDpListArrayEditView QTableCornerButton::section,
 stw_opensyde_gui--C_SdNdeDpListDataSetView QTableCornerButton::section,
@@ -305,7 +305,7 @@ stw_opensyde_gui_elements--C_OgeTawPageNavi::pane,
 stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar,
 stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab,
 stw_opensyde_gui_elements--C_OgeTawSelector::pane,
-stw_opensyde_gui--C_SyvUpUpdatePackageListNodeWidget QAbstractScrollArea,
+stw_opensyde_gui--C_SyvUpPackageSectionNodeWidget QAbstractScrollArea,
 stw_opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"],
 stw_opensyde_gui--C_SyvDaPeUpdateModeTableView::item:alternate:!selected:!focus,
 stw_opensyde_gui--C_SdNdeDpListTableView::item:alternate:!selected:!focus,
@@ -333,6 +333,7 @@ stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeSpxTableDouble,
 stw_opensyde_gui_elements--C_OgeGbxGrayedEdit[Edit="true"][DarkMode="false"],
 stw_opensyde_gui_elements--C_OgeTedTable,
+stw_opensyde_gui_elements--C_OgeTedDbComment,
 stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch,
 stw_opensyde_gui_elements--C_OgeLabToolBarNoSearchResult,
 stw_opensyde_gui--C_SdNdeDpListPopUp,
@@ -358,10 +359,12 @@ stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::item:selected:!hover,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:selected:!hover,
-stw_opensyde_gui--C_SdCodeGenerationView,
-stw_opensyde_gui--C_SdCodeGenerationView::item:selected:!hover,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgeChxTiny::indicator:enabled:!checked[Style="OPENSYDE_BRIGHT"],
-stw_opensyde_gui_elements--C_OgePubAddChartDataElement:hover[Style="OPENSYDE_BRIGHT"]
+stw_opensyde_gui_elements--C_OgePubAddChartDataElement:hover[Style="OPENSYDE_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeLeProperties[Background="0"],
+stw_opensyde_gui_elements--C_OgePubOpen[Background="0"]:!hover:!open:!pressed
 {
 background-color: rgb(255, 255, 255);
 }
@@ -424,8 +427,8 @@ stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::item,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::item,
-stw_opensyde_gui--C_SdCodeGenerationView,
-stw_opensyde_gui--C_SdCodeGenerationView::item
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable::item
 {
 color: rgb(19, 19, 45);
 }
@@ -485,6 +488,7 @@ background-color: rgba(141, 141, 161, 255);
 /* STYLE_GUIDE_COLOR_3 */
 /* color */
 stw_opensyde_gui_elements--C_OgeLabHeadingGroupBold,
+stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled[Foreground="3"],
 stw_opensyde_gui_elements--C_OgeLabPopUpTitle,
 stw_opensyde_gui_elements--C_OgeLabPopUpSubTitle,
 stw_opensyde_gui_elements--C_OgeLabHeadingMessage,
@@ -584,6 +588,7 @@ stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeSpxTableDouble,
 stw_opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeTedTable,
+stw_opensyde_gui_elements--C_OgeTedDbComment,
 stw_opensyde_gui_elements--C_OgeLabListHeaderHeading,
 stw_opensyde_gui_elements--C_OgeLabDescriptionMessage,
 stw_opensyde_gui_elements--C_OgeLabGroupItemValue,
@@ -624,9 +629,9 @@ stw_opensyde_gui--C_TblTreDataElementView::item:closed:!selected,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:open,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:selected,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:closed:!selected,
-stw_opensyde_gui--C_SdCodeGenerationView::item:open,
-stw_opensyde_gui--C_SdCodeGenerationView::item:selected,
-stw_opensyde_gui--C_SdCodeGenerationView::item:closed:!selected,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable::item:open,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable::item:selected,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable::item:closed:!selected,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::item:selected,
 stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled,
 stw_opensyde_gui_elements--C_OgeChxDefaultSmall,
@@ -677,7 +682,7 @@ color: rgb(71, 71, 99);
 /* background-color */
 stw_opensyde_gui--C_NagMainWidget,
 stw_opensyde_gui--C_NagNaviBarWidget,
-stw_opensyde_gui_elements--C_OgeWiNavigationTab[Active="false"],
+stw_opensyde_gui_elements--C_OgeWiNavigationTab:enabled[Active="false"],
 stw_opensyde_gui_elements--C_OgePubProjAction,
 stw_opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_DARK"],
 stw_opensyde_gui_elements--C_OgePubIconChart:open[Style="OPENSYDE_DARK"],
@@ -756,6 +761,11 @@ stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="6"],
 stw_opensyde_gui_elements--C_OgePubTextOnly
 {
 color: rgb(86, 86, 104);
+}
+
+stw_opensyde_gui_elements--C_OgeWiNavigationTab:disabled
+{
+background-color: rgb(86, 86, 104);
 }
 
 /* --------------------------------------------------------------------- */
@@ -848,6 +858,7 @@ stw_opensyde_gui_elements--C_OgeLabToolBarSearchResultTitle,
 stw_opensyde_gui_elements--C_OgeLabToolBarSearchResultSubtitle,
 stw_opensyde_gui_elements--C_OgeLabToolBarNoSearchResult,
 stw_opensyde_gui_elements--C_OgeLabProgressLogItem,
+stw_opensyde_gui_elements--C_OgePubNavigationHover:disabled,
 stw_opensyde_gui_elements--C_OgeLabDashboardChart[Style="OPENSYDE_BRIGHT"][Selected="true"][Active="false"],
 stw_opensyde_gui_elements--C_OgeLabDashboardChart[Style="OPENSYDE_BRIGHT"][Selected="false"][Active="false"],
 stw_opensyde_gui_elements--C_OgeLabDashboardChart[Style="OPENSYDE_DARK"][Selected="true"][Active="false"],
@@ -874,6 +885,7 @@ background-color: rgb(130, 130, 143);
 
 /* border-color */
 stw_opensyde_gui_elements--C_OgePubTextWithBorderEdit:disabled,
+stw_opensyde_gui_elements--C_OgePubProjAction:disabled,
 stw_opensyde_gui_elements--C_OgeGbxMouseMove[Type="QUESTION"],
 stw_opensyde_gui_elements--C_OgeGbxHover[DarkMode="false"],
 stw_opensyde_gui_elements--C_OgeGbxGrayedEdit[Edit="false"][DarkMode="true"]
@@ -894,6 +906,7 @@ stw_opensyde_gui_elements--C_OgePubOptions:disabled,
 stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="9"],
 stw_opensyde_gui_elements--C_OgeLabDashboardTab[DarkMode="false"]:disabled,
+stw_opensyde_gui_elements--C_OgeTedDbComment,
 stw_opensyde_gui_elements--C_OgeLabProgressText:!enabled,
 stw_opensyde_gui_elements--C_OgePubToolBar:disabled,
 stw_opensyde_gui_elements--C_OgePubOptions:disabled,
@@ -935,13 +948,14 @@ stw_opensyde_gui_elements--C_OgeLabGroupItemValue:!enabled,
 stw_opensyde_gui_elements--C_OgeChxProperties:!enabled,
 stw_opensyde_gui_elements--C_OgeRabProperties:!enabled,
 stw_opensyde_gui_elements--C_OgeLabGroupSubItem:!enabled,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable:!enabled,
 stw_opensyde_gui_elements--C_OgeSpxNumber:!enabled,
 stw_opensyde_gui_elements--C_OgePubConfigure:!enabled,
 stw_opensyde_gui_elements--C_OgeSpxDoubleProperties:!enabled,
 stw_opensyde_gui_elements--C_OgeSpxInt64Properties:!enabled,
 stw_opensyde_gui--C_TblTreDataElementView::item:!enabled,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::item:!enabled,
-stw_opensyde_gui--C_SdCodeGenerationView::item:!enabled,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable::item:!enabled,
 stw_opensyde_gui_elements--C_OgeCbxParam:!enabled,
 stw_opensyde_gui_elements--C_OgeCbxTable:!enabled,
 stw_opensyde_gui_elements--C_OgeCbxFontProperties:disabled,
@@ -964,7 +978,8 @@ stw_opensyde_gui_elements--C_OgeLabDashboardChart[Style="OPENSYDE_DARK"][Selecte
 stw_opensyde_gui_elements--C_OgePubAddChartDataElement:disabled[Style="OPENSYDE_BRIGHT"],
 stw_opensyde_gui_elements--C_OgePubAddChartDataElement[Style="OPENSYDE_DARK"],
 stw_opensyde_gui_elements--C_OgePubAddChartDataElement:hover:pressed[Style="OPENSYDE_DARK"],
-stw_opensyde_gui_elements--C_OgeMuTabChartFit::item[DarkMode="true"]
+stw_opensyde_gui_elements--C_OgeMuTabChartFit::item[DarkMode="true"],
+stw_opensyde_gui_elements--C_OgeTedPropertiesComment:disabled
 {
 color: rgb(206, 206, 217);
 }
@@ -1030,6 +1045,7 @@ stw_opensyde_gui_elements--C_OgePubPathVariables,
 stw_opensyde_gui_elements--C_OgeLePropertiesName,
 stw_opensyde_gui_elements--C_OgeTebMessageDetails,
 stw_opensyde_gui_elements--C_OgeTedPropertiesComment,
+stw_opensyde_gui_elements--C_OgeTedDbComment,
 stw_opensyde_gui_elements--C_OgeTebReport,
 stw_opensyde_gui_elements--C_OgeGbxGrayed,
 stw_opensyde_gui_elements--C_OgeCbxParam,
@@ -1078,7 +1094,7 @@ stw_opensyde_gui_elements--C_OgeCbxTableHalc QListView,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView,
-stw_opensyde_gui--C_SdCodeGenerationView,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable,
 stw_opensyde_gui_elements--C_OgeSpxEditProperties::down-button,
 stw_opensyde_gui_elements--C_OgeSpxEditProperties::up-button,
 stw_opensyde_gui_elements--C_OgeSpxEditProperties,
@@ -1210,8 +1226,8 @@ stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:dis
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:enabled:!checked,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:disabled,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:!checked,
-stw_opensyde_gui--C_SdCodeGenerationView::indicator:disabled,
-stw_opensyde_gui--C_SdCodeGenerationView::indicator:enabled:!checked,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:disabled,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:enabled:!checked,
 stw_opensyde_gui_elements--C_OgePubOpen:hover:!pressed,
 stw_opensyde_gui_elements--C_OgePubOpen:hover:!open,
 stw_opensyde_gui_elements--C_OgePubPathVariables:enabled:hover,
@@ -1247,7 +1263,7 @@ stw_opensyde_gui--C_NagTopList::item,
 stw_opensyde_gui_elements--C_OgePubZoomNotification,
 stw_opensyde_gui_elements--C_OgeLeDark,
 stw_opensyde_gui_elements--C_OgeLeNavigation,
-stw_opensyde_gui_elements--C_OgePubNavigationHover,
+stw_opensyde_gui_elements--C_OgePubNavigationHover:enabled,
 stw_opensyde_gui_elements--C_OgePubNavigation,
 stw_opensyde_gui_elements--C_OgePubTextOnlyUnderline,
 stw_opensyde_gui_elements--C_OgePubProjAction,
@@ -1434,8 +1450,8 @@ stw_opensyde_gui_elements--C_OgeChxTristate::indicator:enabled:checked,
 stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:enabled:checked,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:checked,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:indeterminate,
-stw_opensyde_gui--C_SdCodeGenerationView::indicator:enabled:checked,
-stw_opensyde_gui--C_SdCodeGenerationView::indicator:enabled:indeterminate
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:enabled:checked,
+stw_opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:enabled:indeterminate
 {
 background-color: rgb(203, 235, 193);
 }
@@ -1493,7 +1509,8 @@ color: rgb(230, 58, 63);
 stw_opensyde_gui_elements--C_OgeTedToolTipContent[Type="ERROR"],
 stw_opensyde_gui_elements--C_OgeLabHeadingToolTip[Type="ERROR"],
 stw_opensyde_gui_elements--C_OgeGbxToolTip[Type="ERROR"],
-stw_opensyde_gui_elements--C_OgeWiOnlyBackground[Background="24"]
+stw_opensyde_gui_elements--C_OgeWiOnlyBackground[Background="24"],
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Background="24"]
 {
 background-color: rgb(230, 58, 63);
 }
@@ -1579,6 +1596,7 @@ stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeSpxTableDouble,
 stw_opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeTedTable,
+stw_opensyde_gui_elements--C_OgeTedDbComment,
 stw_opensyde_gui_elements--C_OgeLabListHeaderHeading,
 stw_opensyde_gui_elements--C_OgeLabDescriptionMessage,
 stw_opensyde_gui_elements--C_OgeLabGroupItemValue,
@@ -2066,7 +2084,7 @@ border-color: rgb(66, 66, 66);
 /* background-color */
 stw_opensyde_gui--C_NagViewItem[Dragged="false"],
 stw_opensyde_gui_elements--C_OgeGbxNavigationSection[SpecialBackground="true"],
-stw_opensyde_gui_elements--C_OgeWiNavigationTab[Active="true"]
+stw_opensyde_gui_elements--C_OgeWiNavigationTab:enabled[Active="true"]
 {
 background-color: rgb(32, 31, 67);
 }
@@ -2233,6 +2251,12 @@ background-color: rgb(245, 247, 248);
 stw_opensyde_gui_elements--C_OgeContextMenu::item
 {
 border-color: rgb(245, 247, 248);
+}
+/* --------------------------------------------------------------------- */
+/* STYLE_GUIDE_COLOR_1357 */
+stw_opensyde_gui--C_NagServiceModeInfo
+{
+background-color: rgb(247, 231, 195);
 }
 
 /* --------------------------------------------------------------------- */

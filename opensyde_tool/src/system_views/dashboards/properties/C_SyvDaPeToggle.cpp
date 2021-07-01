@@ -12,6 +12,7 @@
 
 #include "stwtypes.h"
 
+#include "TGLUtils.h"
 #include "C_SyvDaPeToggle.h"
 #include "ui_C_SyvDaPeToggle.h"
 
@@ -113,6 +114,9 @@ C_PuiSvDbToggle::E_Type C_SyvDaPeToggle::GetType(void) const
 
    switch (this->mpc_Ui->pc_ComboBoxType->currentIndex())
    {
+   case C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE1:
+      e_Retval = C_PuiSvDbToggle::eTYPE1;
+      break;
    case C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE2:
       e_Retval = C_PuiSvDbToggle::eTYPE2;
       break;
@@ -137,6 +141,9 @@ void C_SyvDaPeToggle::SetType(const C_PuiSvDbToggle::E_Type oe_Type) const
 {
    switch (oe_Type)
    {
+   case C_PuiSvDbToggle::eTYPE1:
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE1);
+      break;
    case C_PuiSvDbToggle::eTYPE2:
       this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE2);
       break;
@@ -144,7 +151,7 @@ void C_SyvDaPeToggle::SetType(const C_PuiSvDbToggle::E_Type oe_Type) const
       this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE3);
       break;
    default:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE1);
+      tgl_assert(false);
       break;
    }
 }

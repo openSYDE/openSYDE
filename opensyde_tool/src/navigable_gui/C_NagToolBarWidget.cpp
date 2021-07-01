@@ -53,7 +53,7 @@ const stw_types::sintn C_NagToolBarWidget::mhsn_SPACER_SIZE = 24;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_NagToolBarWidget::C_NagToolBarWidget(QWidget * const opc_Parent) :
@@ -226,7 +226,7 @@ void C_NagToolBarWidget::ResetButtons(void)
 
    Necessary because of top level scroll area
 
-   \param[in,out] opc_Widget Top widget
+   \param[in,out]  opc_Widget    Top widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::SetTopWidget(QWidget * const opc_Widget)
@@ -271,7 +271,7 @@ void C_NagToolBarWidget::RestoreAllButtonsVisibility(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Showing the search
 
-   \param[in]     oq_Active      Flag for showing search
+   \param[in]  oq_Active   Flag for showing search
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::ShowSearch(const bool oq_Active)
@@ -298,8 +298,8 @@ void C_NagToolBarWidget::Search(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten event filter slot
 
-   \param[in,out] opc_Object Sender object information
-   \param[in,out] opc_Event  Event identification and information
+   \param[in,out]  opc_Object    Sender object information
+   \param[in,out]  opc_Event     Event identification and information
 
    \return
    true     the event will be filtered
@@ -440,7 +440,7 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::paintEvent(QPaintEvent * const opc_Event)
@@ -452,6 +452,8 @@ void C_NagToolBarWidget::paintEvent(QPaintEvent * const opc_Event)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot function for button
+
+   \param[in]  ou32_Index  Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_BtnClicked(const uint32 ou32_Index)
@@ -529,9 +531,9 @@ void C_NagToolBarWidget::m_SetIconForBtn(const uint32 ou32_Index, const QIcon & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the tool tip of the button
 
-   \param[in]     ou32_Index            Index of button
-   \param[in]     orc_ToolTipHeading    New tool tip heading
-   \param[in]     orc_ToolTipContent    New tool tip content
+   \param[in]  ou32_Index           Index of button
+   \param[in]  orc_ToolTipHeading   New tool tip heading
+   \param[in]  orc_ToolTipContent   New tool tip content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_SetToolTipForBtn(const uint32 ou32_Index, const QString & orc_ToolTipHeading,
@@ -605,7 +607,7 @@ void C_NagToolBarWidget::m_FocusOut(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get button string width
 
-   \param[in] orc_Text Button text
+   \param[in]  orc_Text    Button text
 
    \return
    Button string width
@@ -625,7 +627,7 @@ sint32 C_NagToolBarWidget::mh_GetButtonStringWidth(const QString & orc_Text)
    else
    {
       const QFontMetrics c_Metric(c_Font);
-      s32_Retval = c_Metric.width(orc_Text);
+      s32_Retval = c_Metric.horizontalAdvance(orc_Text);
    }
    return s32_Retval;
 }

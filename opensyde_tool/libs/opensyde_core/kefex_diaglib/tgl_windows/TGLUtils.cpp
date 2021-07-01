@@ -21,9 +21,6 @@
 #include "stwtypes.h"
 #include "TGLUtils.h"
 #include "CSCLString.h"
-#include "CSCLResourceStrings.h"
-#define STR_TABLE_INCLUDE  //we really want the symbols from the DLStrings.h header
-#include "DLStrings.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -37,7 +34,6 @@ using namespace stw_scl;
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
-static C_SCLResourceStrings mc_ResourceStrings;
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
@@ -102,7 +98,7 @@ void TGL_PACKAGE stw_tgl::TGL_ReportAssertionDetail(const charn * const opcn_Det
 bool TGL_PACKAGE stw_tgl::TGL_GetSystemUserName(C_SCLString & orc_UserName)
 {
    charn acn_WinUserName[UNLEN + 1];
-   uint32 u32_Size = sizeof(acn_WinUserName);
+   DWORD u32_Size = sizeof(acn_WinUserName);
    bool q_Return;
 
    q_Return = (GetUserNameA(acn_WinUserName, &u32_Size) == 0) ? false : true;
@@ -135,37 +131,6 @@ void TGL_PACKAGE stw_tgl::TGL_HandleSystemMessages(void)
       TranslateMessage(&t_Msg);
       DispatchMessage(&t_Msg);
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   load resource string
-
-   Load resource strings from resource table.
-   For Windows this is easy as calling "LoadString".
-   For other target we will have to use the C_SCLResourceStrings class
-    and fill a singleton of it with the application strings (e.g. VisLibString.h).
-   So we probably will need an init function as well.
-
-   Note: this is only useful for application using an numeric-index-based localization approach.
-   This is for example not compatible with string-index-based approaches like gettext.
-
-   \param[in]    ou16_StringIndex     Index of string
-
-   \return
-   string
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString TGL_PACKAGE stw_tgl::TGL_LoadStr(const uint16 ou16_StringIndex)
-{
-   static bool hq_Initialized = false;
-
-   if (hq_Initialized == false)
-   {
-      mc_ResourceStrings.SetStringTable(gac_DIAG_LIB_RESOURCE_STRINGS, gu16_DIAGLIB_NR_RES_STRNGS);
-      hq_Initialized = true;
-   }
-
-   return mc_ResourceStrings.LoadStr(ou16_StringIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

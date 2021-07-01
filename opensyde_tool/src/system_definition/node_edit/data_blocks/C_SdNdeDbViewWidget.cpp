@@ -12,16 +12,15 @@
 #include "stwerrors.h"
 #include "C_UsHandler.h"
 #include "C_GtGetText.h"
-#include "C_SdNdeDbAdd.h"
 #include "C_PuiProject.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeDbViewWidget.h"
 #include "C_SdNdeDbProperties.h"
 #include "C_OgeWiCustomMessage.h"
 #include "ui_C_SdNdeDbViewWidget.h"
-#include "C_SdNdeDbAddNewProject.h"
 #include "C_PopSaveAsDialogWidget.h"
 #include "C_SdNdeProgrammingOptions.h"
+#include "C_OSCHalcDefFiler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -33,7 +32,6 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SdNdeDbViewWidget::mhc_DefaultDataBlockName = "DataBlock";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -75,8 +73,6 @@ C_SdNdeDbViewWidget::C_SdNdeDbViewWidget(QWidget * const opc_Parent) :
            &C_SdNdeDbViewWidget::m_OnAppDisplay);
    connect(this->mpc_Ui->pc_PushButtonAdd, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked, this,
            &C_SdNdeDbViewWidget::AddApp);
-   connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigOpenDataPool, this,
-           &C_SdNdeDbViewWidget::SigOpenDataPool);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigOwnedDataPoolsChanged, this,
            &C_SdNdeDbViewWidget::SigOwnedDataPoolsChanged);
    connect(this->mpc_Ui->pc_PushButtonCodeGenerationOptions, &QPushButton::clicked, this,
@@ -101,24 +97,21 @@ C_SdNdeDbViewWidget::~C_SdNdeDbViewWidget()
 void C_SdNdeDbViewWidget::InitStaticNames(void) const
 {
    //Tool tips
-   this->mpc_Ui->pc_LabelApplicationName->SetToolTipInformation(C_GtGetText::h_GetText("Data Blocks"),
-                                                                C_GtGetText::h_GetText(
-                                                                   "Data Blocks specify files that must be updated to the node."
-                                                                   "\n\n"
-                                                                   "Types of Data Blocks:\n"
-                                                                   " - Programmable Application \n"
-                                                                   "   Application developed by using the openSYDE \"code generation\" feature.\n"
-                                                                   "   Available for devices with programming support. \n\n"
-                                                                   " - Binary\n"
-                                                                   "   Any kind of application or data created by another tool chain."));
+   this->mpc_Ui->pc_LabelApplicationName->SetToolTipInformation(
+      C_GtGetText::h_GetText("Data Blocks"),
+      C_GtGetText::h_GetText(
+         "Data Blocks specify files that must be updated to the node.\n\n"
+         "Those files can represent any kind of application or data. They can be either created by another tool chain "
+         "or developed by using the openSYDE file generation feature. The second is available for devices with "
+         "programming support or with NVM-based hardware configuration. "));
 
    this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
                                                          C_GtGetText::h_GetText("Add new Data Block."));
 
    this->mpc_Ui->pc_PushButtonCodeGenerationOptions->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                                              "Code Generation Settings"),
+                                                                              "Source Code Generation Settings"),
                                                                            C_GtGetText::h_GetText(
-                                                                              "Edit code generation settings."));
+                                                                              "Edit source code generation settings."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -200,46 +193,16 @@ void C_SdNdeDbViewWidget::AddApp(void)
       {
          if (pc_Node->IsAnyUpdateAvailable() == true)
          {
-            QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
-            const C_SdNdeDbAdd * const pc_Dialog = new C_SdNdeDbAdd(*c_New, this->mu32_NodeIndex);
-
-            //Resize
-            c_New->SetSize(QSize(710, 390));
-
-            if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
-            {
-               if (pc_Dialog->GetApplicationType() == C_OSCNodeApplication::eBINARY)
-               {
-                  m_AddManualApplication(pc_Dialog->GetApplicationType());
-               }
-               else
-               {
-                  if (pc_Dialog->GetFromTSP() == true)
-                  {
-                     m_AddFromTSP();
-                     //Final reload: show data blocks as they were imported
-                     this->SetNodeIndex(this->mu32_NodeIndex);
-                  }
-                  else
-                  {
-                     m_AddManualApplication(C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION);
-                  }
-               }
-            }
-
-            if (c_New != NULL)
-            {
-               c_New->HideOverlay();
-            }
-         } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+            this->m_AddManualApplication();
+         }
          else
          {
             //no fbl support
             C_OgeWiCustomMessage c_MessageBox(this);
             c_MessageBox.SetType(C_OgeWiCustomMessage::E_Type::eWARNING);
             c_MessageBox.SetHeading(C_GtGetText::h_GetText("Add Datablocks"));
-            c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                           "There is no Flashloader support for this device type. Data Blocks cannot be added."));
+            c_MessageBox.SetDescription(C_GtGetText::h_GetText("There is no Flashloader support for this device type. "
+                                                               "Data Blocks cannot be added."));
             c_MessageBox.SetCustomMinHeight(180, 180);
             c_MessageBox.Execute();
          }
@@ -254,6 +217,157 @@ void C_SdNdeDbViewWidget::AddApp(void)
 void C_SdNdeDbViewWidget::UpdateApplications(void) const
 {
    this->mpc_Ui->pc_ListWidget->UpdateApplications();
+   this->m_OnAppDisplay();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new project action
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbViewWidget::AddFromTSP(void)
+{
+   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   C_SdNdeDbAddNewProject * const pc_Dialog = new C_SdNdeDbAddNewProject(this->mu32_NodeIndex, *c_New);
+   C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_NodeIndex);
+
+   //Help
+   //connect(pc_New, &C_OgePopUpDialog::SigHelp, pc_SettingsWidget, &C_GiSyLineWidget::HandleHelp);
+
+   //Resize
+   c_New->SetSize(QSize(800, 745));
+
+   //init
+   pc_Dialog->SetTSPPath(C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownTSPPath());
+
+   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      QString const c_HalcFileName = pc_Dialog->GetHalcDefinitionFileName();
+      C_OgeWiCustomMessage c_Message(this);
+      c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
+      QString c_Description = "";
+      if (c_HalcFileName == "")
+      {
+         c_Description = static_cast<QString>(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).")).
+                         arg(pc_Dialog->GetTSPApplicationCount());
+      }
+      else
+      {
+         c_Description = static_cast<QString>(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).\n"
+                                                                     "Hardware Configurator: Hardware Definition File (%2) selected."))
+                         .arg(pc_Dialog->GetTSPApplicationCount()).arg(c_HalcFileName);
+      }
+      QString c_Details = "";
+      c_Message.SetCustomMinHeight(180, 180);
+      c_Message.SetCustomMinWidth(650);
+
+      // check if there are existing datablocks
+      if ((pc_Node != NULL) && (pc_Node->c_Applications.empty() == false))
+      {
+         m_DeleteAllDatablocks(mu32_NodeIndex, pc_Node->c_Applications);
+      }
+
+      for (uint32 u32_It = 0; u32_It < pc_Dialog->GetTSPApplicationCount(); ++u32_It)
+      {
+         C_OSCNodeApplication c_Tmp;
+         c_Tmp.e_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
+         c_Tmp.q_Active = true;
+         pc_Dialog->AddSelectedProject(u32_It, c_Tmp, c_Details);
+         m_AddApplication(c_Tmp);
+      }
+      pc_Dialog->HandleCodeGenerationConfig();
+      // last step, import halc definition from TSP
+      AddHalcDefFromTSP(pc_Dialog);
+      // Add warnings if any
+      if (c_Details.isEmpty() == false)
+      {
+         c_Message.SetType(C_OgeWiCustomMessage::eWARNING);
+         c_Description += C_GtGetText::h_GetText(" Some warnings occured. See details for more information.");
+         c_Message.SetCustomMinHeight(180, 300);
+         c_Message.SetDetails(c_Details);
+      }
+
+      c_Message.SetDescription(c_Description);
+      c_Message.Execute();
+   }
+
+   if (c_New != NULL)
+   {
+      C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownTSPPath(pc_Dialog->GetTSPPath());
+      c_New->HideOverlay();
+   }
+} //lint !e593  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  imports HALC definition from TSP
+ *          Loads syde_halc_def from TSP, loads it, clears HALC config, if there is any and then
+ *          sets the new config. Emits a signal to C_SdNdeNodeEditWidget to run the magician and update datapool
+ *          and HALC tab.
+
+   \param[in]       opc_Dialog     TSP Import dialog widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbViewWidget::AddHalcDefFromTSP(C_SdNdeDbAddNewProject * const opc_Dialog)
+{
+   bool q_IsClear = false;
+
+   const QString c_HalcPath = C_PuiProject::h_GetInstance()->GetFolderPath() +
+                              opc_Dialog->GetProcessedHalcDefinitionPath();
+
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->IsHalcClear(this->mu32_NodeIndex, q_IsClear) == C_NO_ERR);
+
+   uint32 u32_NotHALCDpCount = 0UL;
+   {
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+      if (pc_Node != NULL)
+      {
+         for (uint32 u32_ItDP = 0UL; u32_ItDP < pc_Node->c_DataPools.size(); ++u32_ItDP)
+         {
+            const C_OSCNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDP];
+            if (rc_Dp.e_Type != C_OSCNodeDataPool::eHALC)
+            {
+               ++u32_NotHALCDpCount;
+            }
+         }
+      }
+   }
+   if (u32_NotHALCDpCount > (C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE - 2UL))
+   {
+      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR);
+
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Select Hardware Description"));
+      c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
+                                                          "Cannot select hardware description,\n"
+                                                          "because HAL Datapools may not be created,\n"
+                                                          "as the max Datapool count (%1) would be exceeded.")).arg(
+                                     C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE));
+      c_MessageBox.SetCustomMinHeight(200, 270);
+      c_MessageBox.Execute();
+   }
+   else
+   {
+      C_OSCHalcConfig c_HalcConfig;
+
+      const sint32 s32_LoadResult = C_OSCHalcDefFiler::h_LoadFile(c_HalcConfig, c_HalcPath.toStdString().c_str());
+
+      if (s32_LoadResult == C_NO_ERR)
+      {
+         // clean up if necessary
+         if (q_IsClear == false)
+         {
+            // Clear configuration
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->ClearHALCConfig(this->mu32_NodeIndex) == C_NO_ERR);
+
+            // Remove HAL Datapools
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->HALCRemoveDatapools(this->mu32_NodeIndex) == C_NO_ERR);
+         }
+
+         // set the HALC definition
+         tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHALCConfig(this->mu32_NodeIndex, c_HalcConfig) == C_NO_ERR);
+
+         // run HALC magician and update GUI
+         Q_EMIT (this->SigHalcLoadedFromTSP());
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -361,7 +475,6 @@ uint32 C_SdNdeDbViewWidget::m_AddApplication(C_OSCNodeApplication & orc_Applicat
                                                                     orc_Application) == C_NO_ERR);
       //No reload required
       this->mpc_Ui->pc_ListWidget->AddApplication(this->mu32_NodeIndex, u32_Retval);
-
       this->m_UpdateCount();
       this->m_HandleAddButtonAvailability();
       this->m_HandleCodeGenerationSettingsButtonAvailability();
@@ -394,74 +507,30 @@ void C_SdNdeDbViewWidget::m_OnAppDisplay() const
 void C_SdNdeDbViewWidget::m_OnDelete(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
 {
    tgl_assert(this->mu32_NodeIndex == ou32_NodeIndex);
-   if (C_PuiSdHandler::h_GetInstance()->RemoveApplication(ou32_NodeIndex, ou32_ApplicationIndex) == C_NO_ERR)
-   {
-      //Trigger reload (also important for index update)
-      this->SetNodeIndex(ou32_NodeIndex);
-   }
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveApplication(ou32_NodeIndex, ou32_ApplicationIndex) == C_NO_ERR);
 
-   this->m_UpdateCount();
-   this->m_HandleNoDatablocksLabel();
-   this->m_HandleAddButtonAvailability();
-   this->m_HandleCodeGenerationSettingsButtonAvailability();
+   //Trigger reload (also important for index update)
+   this->SetNodeIndex(ou32_NodeIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new project action
+/*! \brief  Deletes all the node's applications
+
+   \param[in]       ou32_NodeIndex     Index of selected node
+   \param[in]      orc_Applications   Array of the node's applications
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::m_AddFromTSP(void)
+void C_SdNdeDbViewWidget::m_DeleteAllDatablocks(const uint32 ou32_NodeIndex,
+                                                const std::vector<C_OSCNodeApplication> & orc_Applications)
 {
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
-   C_SdNdeDbAddNewProject * const pc_Dialog = new C_SdNdeDbAddNewProject(this->mu32_NodeIndex, *c_New);
-
-   //Help
-   //connect(pc_New, &C_OgePopUpDialog::SigHelp, pc_SettingsWidget, &C_GiSyLineWidget::HandleHelp);
-
-   //Resize
-   c_New->SetSize(QSize(800, 680));
-
-   //init
-   pc_Dialog->SetTSPPath(C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownTSPPath());
-
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   tgl_assert(this->mu32_NodeIndex == ou32_NodeIndex);
+   while (orc_Applications.size() > 0)
    {
-      C_OgeWiCustomMessage c_Message(this);
-      QString c_Description = static_cast<QString>(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).")).
-                              arg(pc_Dialog->GetTSPApplicationCount());
-      QString c_Details = "";
-      c_Message.SetHeading(C_GtGetText::h_GetText("Add new Data Blocks"));
-      c_Message.SetCustomMinHeight(180, 180);
-      for (uint32 u32_It = 0; u32_It < pc_Dialog->GetTSPApplicationCount(); ++u32_It)
-      {
-         C_OSCNodeApplication c_Tmp;
-         c_Tmp.e_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
-         c_Tmp.q_Active = true;
-         pc_Dialog->AddSelectedProject(u32_It, c_Tmp, c_Details);
-         m_AddApplication(c_Tmp);
-      }
-      //Last step
-      pc_Dialog->HandleCodeGenerationConfig();
-
-      // Add warnings if any
-      if (c_Details.isEmpty() == false)
-      {
-         c_Message.SetType(C_OgeWiCustomMessage::eWARNING);
-         c_Description += C_GtGetText::h_GetText(" Some warnings occured. See details for more information.");
-         c_Message.SetCustomMinHeight(180, 300);
-         c_Message.SetDetails(c_Details);
-      }
-
-      c_Message.SetDescription(c_Description);
-      c_Message.Execute();
+      // as the vector gets smaller, we just remove the first element till it's empty
+      tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveApplication(ou32_NodeIndex, 0) == C_NO_ERR);
    }
-
-   if (c_New != NULL)
-   {
-      C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownTSPPath(pc_Dialog->GetTSPPath());
-      c_New->HideOverlay();
-   }
-} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+   this->SetNodeIndex(ou32_NodeIndex);
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update data block count
@@ -491,8 +560,9 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
    if (c_ProgrammableApplications.size() > 0)
    {
       //Set parent for better hierarchy handling via window manager
-      QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
-      QPointer<const C_SdNdeProgrammingOptions> c_Dialog = new C_SdNdeProgrammingOptions(*c_New, this->mu32_NodeIndex);
+      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
+      QPointer<const C_SdNdeProgrammingOptions> const c_Dialog = new C_SdNdeProgrammingOptions(*c_New,
+                                                                                               this->mu32_NodeIndex);
 
       //Help
       //connect(pc_New, &C_OgePopUpDialog::SigHelp, pc_SettingsWidget, &C_GiSyLineWidget::HandleHelp);
@@ -516,10 +586,10 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
    else
    {
       C_OgeWiCustomMessage c_Message(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Code generation settings"));
+      c_Message.SetHeading(C_GtGetText::h_GetText("File generation settings"));
       c_Message.SetDescription(C_GtGetText::h_GetText(
-                                  "Code generation settings are not available. "
-                                  "\nThere are no Data Blocks of type programmable applications declared."));
+                                  "File generation settings are not available. "
+                                  "\nThere are no Data Blocks with active file generation declared."));
       c_Message.SetCustomMinHeight(180, 180);
       c_Message.Execute();
    }
@@ -531,43 +601,24 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
    \param[in] oe_Type Application type to create
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::m_AddManualApplication(const C_OSCNodeApplication::E_Type oe_Type)
+void C_SdNdeDbViewWidget::m_AddManualApplication(void)
 {
-   C_OSCNodeApplication c_Tmp;
-
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
    C_SdNdeDbProperties * const pc_Dialog = new C_SdNdeDbProperties(this->mu32_NodeIndex, -1, *c_New);
 
-   //Resize (200 -> use minimum possible height automatically)
-   if (oe_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
-   {
-      c_New->SetSize(C_SdNdeDbProperties::h_GetBinaryWindowSize());
-   }
-   else
-   {
-      c_New->SetSize(C_SdNdeDbProperties::h_GetDefaultWindowSize());
-   }
-
-   //default
-   c_Tmp.c_Name = C_PuiSdHandler::h_GetInstance()->GetUniqueApplicationName(this->mu32_NodeIndex,
-                                                                            C_SdNdeDbViewWidget::mhc_DefaultDataBlockName.toStdString().c_str());
-   c_Tmp.u8_ProcessId = C_PuiSdHandler::h_GetInstance()->GetUniqueApplicationProcessId(this->mu32_NodeIndex, 0);
-   c_Tmp.e_Type = oe_Type;
-   c_Tmp.q_Active = true;
-
-   //init
-   pc_Dialog->LoadFromData(c_Tmp);
+   //Resize
+   c_New->SetSize(C_SdNdeDbProperties::h_GetBinaryWindowSize());
 
    if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
    {
+      C_OSCNodeApplication c_Tmp;
+
       uint32 u32_Index;
       pc_Dialog->ApplyNewData(c_Tmp);
       u32_Index = m_AddApplication(c_Tmp);
       pc_Dialog->HandleDataPools(u32_Index);
-      // Inform about change (for Datapool tab tooltips)
+      // Inform about change (this also triggers this->UpdateApplications())
       Q_EMIT (this->SigOwnedDataPoolsChanged());
-      //Reload data pool section
-      this->UpdateApplications();
    }
 
    if (c_New != NULL)
@@ -577,7 +628,7 @@ void C_SdNdeDbViewWidget::m_AddManualApplication(const C_OSCNodeApplication::E_T
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle visibility of button "Code generation settings"
+/*! \brief   Handle visibility of button "File generation settings"
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_HandleCodeGenerationSettingsButtonAvailability(void) const

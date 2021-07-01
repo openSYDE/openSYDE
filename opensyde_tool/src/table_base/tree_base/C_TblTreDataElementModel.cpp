@@ -25,7 +25,6 @@
 #include "C_TblTreDataElementItem.h"
 #include "C_SyvRoRouteCalculation.h"
 #include "C_TblTreDataElementModel.h"
-#include "C_OSCHALCMagicianDatapoolListHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -90,7 +89,7 @@ C_TblTreDataElementModel::C_TblTreDataElementModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 C_TblTreDataElementModel::~C_TblTreDataElementModel(void)
 {
-   m_CleanUpLastModel();
+   CleanUpLastModel();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,7 +111,7 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
    this->me_Mode = C_TblTreDataElementModel::eDATAPOOLS;
 
    //Clear
-   m_CleanUpLastModel();
+   CleanUpLastModel();
    this->mpc_InvisibleRootItem = new C_TblTreItem();
 
    //Static
@@ -232,6 +231,7 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
             pc_ComItem->AddChild(pc_DataPoolItem);
             break;
          case C_OSCNodeDataPool::eHALC:
+         case C_OSCNodeDataPool::eHALC_NVM:
             q_DataPoolHalcValid = true;
             pc_HalcItem->AddChild(pc_DataPoolItem);
             break;
@@ -310,7 +310,7 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
    this->me_Mode = oe_Mode;
    this->beginResetModel();
    //Clear
-   m_CleanUpLastModel();
+   CleanUpLastModel();
    //Init
    switch (this->me_Mode)
    {
@@ -375,10 +375,10 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
       }
       else
       {
-         this->mpc_InvisibleRootItem = new C_TblTreItem();
-         m_InitNvmList(ou32_ViewIndex);
          //Clean up (old values probably not necessary in future);
          mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsNL);
+         this->mpc_InvisibleRootItem = new C_TblTreItem();
+         m_InitNvmList(ou32_ViewIndex);
          //Directly store the model (after filling it-> for sync managers)
          C_TblTreDataElementModel::mhc_ViewSetupsNL.insert(
             c_Hashes,
@@ -490,7 +490,7 @@ QModelIndex C_TblTreDataElementModel::GetIndexForItem(const std::vector<uint32> 
             const QModelIndex c_Tmp = this->index(sn_ItChild, sn_Column, c_PreviousParent);
             //lint -e{9079}  Result of Qt interface restrictions, set by index function
             const C_TblTreItem * const pc_TreeItem =
-               static_cast<const C_TblTreItem * const>(c_Tmp.internalPointer());
+               static_cast<const C_TblTreItem *>(c_Tmp.internalPointer());
             if (pc_TreeItem != NULL)
             {
                if (pc_TreeItem->u32_Index == orc_ItemIndices[u32_Counter])
@@ -530,7 +530,7 @@ const
    while (c_CurItem.isValid() == true)
    {
       //lint -e{9079}  Result of Qt interface restrictions, set by index function
-      const C_TblTreItem * const pc_TreeItem = static_cast<const C_TblTreItem * const>(c_CurItem.internalPointer());
+      const C_TblTreItem * const pc_TreeItem = static_cast<const C_TblTreItem *>(c_CurItem.internalPointer());
       if (pc_TreeItem != NULL)
       {
          c_Retval.insert(c_Retval.begin(), pc_TreeItem->u32_Index);
@@ -572,7 +572,7 @@ void C_TblTreDataElementModel::C_TblTreDataElementModelState::CleanUp(void)
    Warning: pointer might be invalid after call of this function
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblTreDataElementModel::m_CleanUpLastModel(void)
+void C_TblTreDataElementModel::CleanUpLastModel(void)
 {
    if (this->mpc_InvisibleRootItem != NULL)
    {
@@ -584,10 +584,13 @@ void C_TblTreDataElementModel::m_CleanUpLastModel(void)
             if (mh_Contains(C_TblTreDataElementModel::mhc_ViewSetupsNL, this->mpc_InvisibleRootItem) == false)
             {
                delete (this->mpc_InvisibleRootItem);
-               this->mpc_InvisibleRootItem = NULL;
             }
          }
       }
+      // Setting always to NULL. The saved items for each case will be assigned again when necessary.
+      // But it could be that the pointer will get invalid, if a new dialog will replace the saved item and delete
+      // the old one.
+      this->mpc_InvisibleRootItem = NULL;
    }
 }
 
@@ -1009,6 +1012,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32 ou32_ViewInde
                         pc_ComItem->AddChild(pc_DataPoolItem);
                         break;
                      case C_OSCNodeDataPool::eHALC:
+                     case C_OSCNodeDataPool::eHALC_NVM:
                         pc_HalcItem->AddChild(pc_DataPoolItem);
                         break;
                      default:
@@ -1070,18 +1074,18 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32 ou32_ViewInde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Init datapool element HALC
 
-   \param[in,out]  opc_DpItem                 Datapool item
-   \param[out]     orq_HALCValid              HALC valid
-   \param[in]      orc_Node                   Node
-   \param[in]      orc_Dp                     Datapool
-   \param[in]      ou32_NodeIndex             Node index
-   \param[in]      ou32_DpIndex               Datapool index
-   \param[in]      oq_ShowOnlyWriteElements   Show only write elements
-   \param[in]      oq_ShowArrayElements       Show array elements
-   \param[in]      oq_ShowArrayIndexElements  Show array index elements
-   \param[in]      oq_Show64BitValues         Show64 bit values
-   \param[in]      opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
-                                              will be marked as used an will be disabled
+   \param[in,out]  opc_DpItem                   Datapool item
+   \param[out]     orq_HALCValid                HALC valid
+   \param[in]      orc_Node                     Node
+   \param[in]      orc_Dp                       Datapool
+   \param[in]      ou32_NodeIndex               Node index
+   \param[in]      ou32_DpIndex                 Datapool index
+   \param[in]      oq_ShowOnlyWriteElements     Show only write elements
+   \param[in]      oq_ShowArrayElements         Show array elements
+   \param[in]      oq_ShowArrayIndexElements    Show array index elements
+   \param[in]      oq_Show64BitValues           Show64 bit values
+   \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
+                                                will be marked as used an will be disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_InitDatapoolElementsHALC(C_TblTreItem * const opc_DpItem, bool & orq_HALCValid,
@@ -1093,12 +1097,23 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALC(C_TblTreItem * const 
                                                            const bool oq_Show64BitValues,
                                                            const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
 {
-   if ((opc_DpItem != NULL) && (orc_Dp.e_Type == C_OSCNodeDataPool::eHALC))
+   if ((opc_DpItem != NULL) &&
+       ((orc_Dp.e_Type == C_OSCNodeDataPool::eHALC) || (orc_Dp.e_Type == C_OSCNodeDataPool::eHALC_NVM)))
    {
+      const C_OSCHALCMagicianDatapoolListHandler c_DpHandler(orc_Node.c_HALCConfig, C_OSCHalcDefDomain::eVA_PARAM,
+                                                             orc_Dp.q_IsSafety);
       uint32 u32_CounterParam = 0UL;
       uint32 u32_CounterInput = 0UL;
       uint32 u32_CounterOutput = 0UL;
       uint32 u32_CounterStatus = 0UL;
+      C_TblTreItem * const pc_UnusedChannelsItem = new C_TblTreItem();
+      bool q_UnusedNodeValid = false;
+      //Init current channels
+      pc_UnusedChannelsItem->u32_Index = 0UL;
+      pc_UnusedChannelsItem->c_Name = C_GtGetText::h_GetText("Unused Channels");
+      pc_UnusedChannelsItem->c_ToolTipHeading = C_GtGetText::h_GetText("Unused Channels");
+      pc_UnusedChannelsItem->c_ToolTipContent = C_GtGetText::h_GetText("Channels which are not used by this datapool");
+      pc_UnusedChannelsItem->q_Selectable = false;
       for (uint32 u32_ItDomain = 0UL; u32_ItDomain < orc_Node.c_HALCConfig.GetDomainSize(); ++u32_ItDomain)
       {
          const C_OSCHalcDefDomain * const pc_DomainDef = orc_Node.c_HALCConfig.GetDomainDefDataConst(u32_ItDomain);
@@ -1106,8 +1121,8 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALC(C_TblTreItem * const 
             u32_ItDomain);
          if ((pc_DomainConfig != NULL) && (pc_DomainDef != NULL))
          {
-            const uint32 u32_RelevantChannels = C_OSCHALCMagicianDatapoolListHandler::h_CountRelevantItems(
-               pc_DomainConfig->c_ChannelConfigs, pc_DomainConfig->c_DomainConfig, orc_Dp.q_IsSafety);
+            const uint32 u32_RelevantChannels = c_DpHandler.CountRelevantItems(
+               pc_DomainConfig->c_ChannelConfigs, pc_DomainConfig->c_DomainConfig);
             if (pc_DomainConfig->c_ChannelConfigs.size() > 0UL)
             {
                uint32 u32_RelevantChannelIndex = 0UL;
@@ -1118,17 +1133,22 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALC(C_TblTreItem * const 
                for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_DomainConfig->c_ChannelConfigs.size(); ++u32_ItConfig)
                {
                   const C_OSCHalcConfigChannel & rc_Config = pc_DomainConfig->c_ChannelConfigs[u32_ItConfig];
-                  if (rc_Config.q_SafetyRelevant == orc_Dp.q_IsSafety)
+                  if (c_DpHandler.CheckChanPresent(rc_Config))
                   {
+                     //Move section to appropriate node
+                     C_TblTreItem * const pc_BaseItem =
+                        c_DpHandler.CheckChanRelevant(rc_Config) ? opc_DpItem : pc_UnusedChannelsItem;
+                     bool * const pq_Valid =
+                        c_DpHandler.CheckChanRelevant(rc_Config) ? &orq_HALCValid : &q_UnusedNodeValid;
                      //Each iteration these should be same value
                      u32_CurCounterParam = u32_CounterParam;
                      u32_CurCounterInput = u32_CounterInput;
                      u32_CurCounterOutput = u32_CounterOutput;
                      u32_CurCounterStatus = u32_CounterStatus;
-                     C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(opc_DpItem, orq_HALCValid,
-                                                                                 *pc_DomainDef, rc_Config,
-                                                                                 pc_DomainDef->c_ChannelValues,
-                                                                                 pc_DomainDef->c_Channels, orc_Dp,
+                     C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(pc_BaseItem, *pq_Valid,
+                                                                                 *pc_DomainDef, *pc_DomainConfig,
+                                                                                 rc_Config,
+                                                                                 pc_DomainDef->c_ChannelValues, orc_Dp,
                                                                                  ou32_NodeIndex, ou32_DpIndex,
                                                                                  u32_ItConfig,
                                                                                  u32_RelevantChannelIndex,
@@ -1137,14 +1157,10 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALC(C_TblTreItem * const 
                                                                                  u32_CurCounterOutput,
                                                                                  u32_CurCounterStatus,
                                                                                  u32_RelevantChannels,
-                                                                                 C_OSCHALCMagicianUtil::h_CheckChanNumVariableNecessary(
-                                                                                    *pc_DomainConfig),
-                                                                                 C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(
-                                                                                    *pc_DomainConfig),
                                                                                  oq_ShowOnlyWriteElements,
                                                                                  oq_ShowArrayElements,
                                                                                  oq_ShowArrayIndexElements,
-                                                                                 oq_Show64BitValues,
+                                                                                 oq_Show64BitValues, c_DpHandler,
                                                                                  opc_AlreasyUsedElements);
                      //Iterate channel
                      ++u32_RelevantChannelIndex;
@@ -1158,71 +1174,94 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALC(C_TblTreItem * const 
             }
             else
             {
-               if (pc_DomainConfig->c_DomainConfig.q_SafetyRelevant == orc_Dp.q_IsSafety)
+               if (c_DpHandler.CheckChanPresent(pc_DomainConfig->c_DomainConfig))
                {
-                  C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(opc_DpItem, orq_HALCValid,
-                                                                              *pc_DomainDef,
+                  //Move section to appropriate node
+                  C_TblTreItem * const pc_BaseItem =
+                     c_DpHandler.CheckChanRelevant(pc_DomainConfig->c_DomainConfig) ? opc_DpItem : pc_UnusedChannelsItem;
+                  bool * const pq_Valid =
+                     c_DpHandler.CheckChanRelevant(pc_DomainConfig->c_DomainConfig) ? &orq_HALCValid :
+                     &q_UnusedNodeValid;
+                  C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(pc_BaseItem, *pq_Valid,
+                                                                              *pc_DomainDef, *pc_DomainConfig,
                                                                               pc_DomainConfig->c_DomainConfig,
-                                                                              pc_DomainDef->c_DomainValues,
-                                                                              pc_DomainDef->c_Channels, orc_Dp,
+                                                                              pc_DomainDef->c_DomainValues, orc_Dp,
                                                                               ou32_NodeIndex, ou32_DpIndex,
                                                                               0UL, 0UL, u32_CounterParam,
                                                                               u32_CounterInput,
                                                                               u32_CounterOutput,
                                                                               u32_CounterStatus,
                                                                               u32_RelevantChannels,
-                                                                              C_OSCHALCMagicianUtil::h_CheckChanNumVariableNecessary(
-                                                                                 *pc_DomainConfig),
-                                                                              C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(
-                                                                                 *pc_DomainConfig),
                                                                               oq_ShowOnlyWriteElements,
                                                                               oq_ShowArrayElements,
                                                                               oq_ShowArrayIndexElements,
-                                                                              oq_Show64BitValues,
+                                                                              oq_Show64BitValues, c_DpHandler,
                                                                               opc_AlreasyUsedElements);
                }
             }
          }
       }
-   }
+      //lint -e{774,948} Invalid warning
+      if (q_UnusedNodeValid == true)
+      {
+         opc_DpItem->AddChild(pc_UnusedChannelsItem);
+         orq_HALCValid = true;
+      }
+   } //lint !e429 !e593 //Deleted at a later point
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Init datapool elements HALC config
 
-   \param[in,out]  opc_DpItem                 Datapool item
-   \param[in,out]  orq_HALCValid              HALC valid
-   \param[in]      orc_DomainDef              Domain def
-   \param[in]      orc_ChannelConfig          Channel config
-   \param[in]      orc_Values                 Values
-   \param[in]      orc_Channels               Channels
-   \param[in]      orc_Dp                     Datapool
-   \param[in]      ou32_NodeIndex             Node index
-   \param[in]      ou32_DpIndex               Datapool index
-   \param[in]      ou32_ChannelIndex          Channel index
-   \param[in]      ou32_ChannelArrayIndex     Channel array index
-   \param[in,out]  oru32_CounterParam         Counter param
-   \param[in,out]  oru32_CounterInput         Counter input
-   \param[in,out]  oru32_CounterOutput        Counter output
-   \param[in,out]  oru32_CounterStatus        Counter status
-   \param[in]      ou32_RelevantChannelNumber Relevant channel number
-   \param[in]      oq_ChanNumVarNecessary     Chan num variable necessary
-   \param[in]      oq_UseCaseVarNecessary     Use case variable necessary
-   \param[in]      oq_ShowOnlyWriteElements   Show only write elements
-   \param[in]      oq_ShowArrayElements       Show array elements
-   \param[in]      oq_ShowArrayIndexElements  Show array index elements
-   \param[in]      oq_Show64BitValues         Show64 bit values
-   \param[in]      opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
-                                              will be marked as used an will be disabled
+   \param[in,out]  opc_DpItem                   Datapool item
+   \param[in,out]  orq_HALCValid                HALC valid
+   \param[in]      orc_DomainDef                Domain def
+   \param[in]      orc_DomainConfig             Domain config
+   \param[in]      orc_ChannelConfig            Channel config
+   \param[in]      orc_Values                   Values
+   \param[in]      orc_Dp                       Datapool
+   \param[in]      ou32_NodeIndex               Node index
+   \param[in]      ou32_DpIndex                 Datapool index
+   \param[in]      ou32_ChannelIndex            Channel index
+   \param[in]      ou32_ChannelArrayIndex       Channel array index
+   \param[in,out]  oru32_CounterParam           Counter param
+   \param[in,out]  oru32_CounterInput           Counter input
+   \param[in,out]  oru32_CounterOutput          Counter output
+   \param[in,out]  oru32_CounterStatus          Counter status
+   \param[in]      ou32_RelevantChannelNumber   Relevant channel number
+   \param[in]      oq_ShowOnlyWriteElements     Show only write elements
+   \param[in]      oq_ShowArrayElements         Show array elements
+   \param[in]      oq_ShowArrayIndexElements    Show array index elements
+   \param[in]      oq_Show64BitValues           Show64 bit values
+   \param[in]      orc_DpHandler                Dp handler
+   \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
+                                                will be marked as used an will be disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(C_TblTreItem * const opc_DpItem, bool & orq_HALCValid,
                                                                  const C_OSCHalcDefDomain & orc_DomainDef,
+                                                                 const C_OSCHalcConfigDomain & orc_DomainConfig,
                                                                  const C_OSCHalcConfigChannel & orc_ChannelConfig,
                                                                  const C_OSCHalcDefChannelValues & orc_Values,
-                                                                 const std::vector<C_OSCHalcDefChannelDef> & orc_Channels, const C_OSCNodeDataPool & orc_Dp, const uint32 ou32_NodeIndex, const uint32 ou32_DpIndex, const uint32 ou32_ChannelIndex, const uint32 ou32_ChannelArrayIndex, uint32 & oru32_CounterParam, uint32 & oru32_CounterInput, uint32 & oru32_CounterOutput, uint32 & oru32_CounterStatus, const uint32 ou32_RelevantChannelNumber, const bool oq_ChanNumVarNecessary, const bool oq_UseCaseVarNecessary, const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
+                                                                 const C_OSCNodeDataPool & orc_Dp,
+                                                                 const uint32 ou32_NodeIndex, const uint32 ou32_DpIndex,
+                                                                 const uint32 ou32_ChannelIndex,
+                                                                 const uint32 ou32_ChannelArrayIndex,
+                                                                 uint32 & oru32_CounterParam,
+                                                                 uint32 & oru32_CounterInput,
+                                                                 uint32 & oru32_CounterOutput,
+                                                                 uint32 & oru32_CounterStatus,
+                                                                 const uint32 ou32_RelevantChannelNumber,
+                                                                 const bool oq_ShowOnlyWriteElements,
+                                                                 const bool oq_ShowArrayElements,
+                                                                 const bool oq_ShowArrayIndexElements,
+                                                                 const bool oq_Show64BitValues,
+                                                                 const stw_opensyde_core::C_OSCHALCMagicianDatapoolListHandler & orc_DpHandler,
                                                                  const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
 {
+   const bool q_ChanNumVarNecessary = orc_DpHandler.CheckChanNumVariableNecessary(orc_DomainConfig);
+   const bool q_UseCaseVarNecessary = orc_DpHandler.CheckUseCaseVariableNecessary(orc_DomainConfig);
+   const bool q_SafetyFlagVarNecessary = orc_DpHandler.CheckSafetyFlagVariableNecessary();
    C_TblTreItem * const pc_ChannelItem = new C_TblTreItem();
    bool q_ChannelValid = false;
    QString c_HalChannelOrDomainName = orc_DomainDef.c_SingularName.c_str();
@@ -1230,9 +1269,9 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(C_TblTreItem * 
    //Init current channel
    pc_ChannelItem->u32_Index = ou32_ChannelIndex;
    pc_ChannelItem->c_Name = orc_ChannelConfig.c_Name.c_str();
-   if (ou32_ChannelIndex < orc_Channels.size())
+   if (ou32_ChannelIndex < orc_DomainDef.c_Channels.size())
    {
-      const C_OSCHalcDefChannelDef & rc_Channel = orc_Channels[ou32_ChannelIndex];
+      const C_OSCHalcDefChannelDef & rc_Channel = orc_DomainDef.c_Channels[ou32_ChannelIndex];
       pc_ChannelItem->c_Name += static_cast<QString>(" (%1)").arg(rc_Channel.c_Name.c_str());
       c_HalChannelOrDomainName = rc_Channel.c_Name.c_str();
    }
@@ -1267,8 +1306,9 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(C_TblTreItem * 
                                                                          ou32_DpIndex, u32_ItList,
                                                                          orc_ChannelConfig.u32_UseCaseIndex,
                                                                          oru32_CounterParam, ou32_RelevantChannelNumber,
-                                                                         oq_ChanNumVarNecessary,
-                                                                         oq_UseCaseVarNecessary, true,
+                                                                         q_ChanNumVarNecessary,
+                                                                         q_UseCaseVarNecessary,
+                                                                         q_SafetyFlagVarNecessary, true,
                                                                          orc_DomainDef.c_SingularName,
                                                                          oq_ShowOnlyWriteElements,
                                                                          oq_ShowArrayElements,
@@ -1284,8 +1324,9 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(C_TblTreItem * 
                                                                          ou32_DpIndex, u32_ItList,
                                                                          orc_ChannelConfig.u32_UseCaseIndex,
                                                                          oru32_CounterInput, ou32_RelevantChannelNumber,
-                                                                         oq_ChanNumVarNecessary,
-                                                                         oq_UseCaseVarNecessary, false,
+                                                                         q_ChanNumVarNecessary,
+                                                                         q_UseCaseVarNecessary,
+                                                                         q_SafetyFlagVarNecessary, false,
                                                                          orc_DomainDef.c_SingularName,
                                                                          oq_ShowOnlyWriteElements,
                                                                          oq_ShowArrayElements,
@@ -1302,8 +1343,9 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(C_TblTreItem * 
                                                                          orc_ChannelConfig.u32_UseCaseIndex,
                                                                          oru32_CounterOutput,
                                                                          ou32_RelevantChannelNumber,
-                                                                         oq_ChanNumVarNecessary,
-                                                                         oq_UseCaseVarNecessary, false,
+                                                                         q_ChanNumVarNecessary,
+                                                                         q_UseCaseVarNecessary,
+                                                                         q_SafetyFlagVarNecessary, false,
                                                                          orc_DomainDef.c_SingularName,
                                                                          oq_ShowOnlyWriteElements,
                                                                          oq_ShowArrayElements,
@@ -1320,8 +1362,9 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(C_TblTreItem * 
                                                                          orc_ChannelConfig.u32_UseCaseIndex,
                                                                          oru32_CounterStatus,
                                                                          ou32_RelevantChannelNumber,
-                                                                         oq_ChanNumVarNecessary,
-                                                                         oq_UseCaseVarNecessary, false,
+                                                                         q_ChanNumVarNecessary,
+                                                                         q_UseCaseVarNecessary,
+                                                                         q_SafetyFlagVarNecessary, false,
                                                                          orc_DomainDef.c_SingularName,
                                                                          oq_ShowOnlyWriteElements,
                                                                          oq_ShowArrayElements,
@@ -1350,28 +1393,29 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(C_TblTreItem * 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Init datapool elements HALC config list
 
-   \param[in,out]  opc_ChannelItem            Channel item
-   \param[out]     orq_ChannelValid           Channel valid
-   \param[in]      orc_Values                 Values
-   \param[in]      orc_List                   List
-   \param[in]      ou32_ChannelArrayIndex     Channel array index
-   \param[in]      ou32_NodeIndex             Node index
-   \param[in]      ou32_DpIndex               Datapool index
-   \param[in]      ou32_ListIndex             List index
-   \param[in]      ou32_UseCase               Use case
-   \param[in,out]  oru32_Counter              Counter
-   \param[in]      ou32_RelevantChannelNumber Relevant channel number
-   \param[in]      oq_ChanNumVarNecessary     Chan num variable necessary
-   \param[in]      oq_UseCaseVarNecessary     Use case variable necessary
-   \param[in]      oq_IsParam                 Is parameter
-   \param[in]      orc_DomainSingularName     Domain singular name
-   \param[in]      oq_ShowOnlyWriteElements   Show only write elements
-   \param[in]      oq_ShowArrayElements       Show array elements
-   \param[in]      oq_ShowArrayIndexElements  Show array index elements
-   \param[in]      oq_Show64BitValues         Show64 bit values
-   \param[in]      opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
-                                              will be marked as used an will be disabled
-   \param[in]      orc_HalChannelOrDomainName Hal channel or domain name
+   \param[in,out]  opc_ChannelItem              Channel item
+   \param[out]     orq_ChannelValid             Channel valid
+   \param[in]      orc_Values                   Values
+   \param[in]      orc_List                     List
+   \param[in]      ou32_ChannelArrayIndex       Channel array index
+   \param[in]      ou32_NodeIndex               Node index
+   \param[in]      ou32_DpIndex                 Datapool index
+   \param[in]      ou32_ListIndex               List index
+   \param[in]      ou32_UseCase                 Use case
+   \param[in,out]  oru32_Counter                Counter
+   \param[in]      ou32_RelevantChannelNumber   Relevant channel number
+   \param[in]      oq_ChanNumVarNecessary       Chan num variable necessary
+   \param[in]      oq_UseCaseVarNecessary       Use case variable necessary
+   \param[in]      oq_SafetyFlagVarNecessary    Safety flag var necessary
+   \param[in]      oq_IsParam                   Is parameter
+   \param[in]      orc_DomainSingularName       Domain singular name
+   \param[in]      oq_ShowOnlyWriteElements     Show only write elements
+   \param[in]      oq_ShowArrayElements         Show array elements
+   \param[in]      oq_ShowArrayIndexElements    Show array index elements
+   \param[in]      oq_Show64BitValues           Show64 bit values
+   \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
+                                                will be marked as used an will be disabled
+   \param[in]      orc_HalChannelOrDomainName   Hal channel or domain name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfigList(C_TblTreItem * const opc_ChannelItem,
@@ -1386,6 +1430,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfigList(C_TblTreIte
                                                                      const uint32 ou32_RelevantChannelNumber,
                                                                      const bool oq_ChanNumVarNecessary,
                                                                      const bool oq_UseCaseVarNecessary,
+                                                                     const bool oq_SafetyFlagVarNecessary,
                                                                      const bool oq_IsParam,
                                                                      const stw_scl::C_SCLString & orc_DomainSingularName, const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues, const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements,
                                                                      const QString & orc_HalChannelOrDomainName)
@@ -1405,9 +1450,10 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfigList(C_TblTreIte
    pc_ListItem->q_Selectable = false;
    //Init other item
    pc_OtherItem->u32_Index = 0UL;
-   pc_OtherItem->c_Name = C_GtGetText::h_GetText("Other");
-   pc_OtherItem->c_ToolTipHeading = C_GtGetText::h_GetText("Other");
-   pc_OtherItem->c_ToolTipContent = C_GtGetText::h_GetText("Other items not relevant for current use-case");
+   pc_OtherItem->c_Name = C_GtGetText::h_GetText("Unused Dataelements");
+   pc_OtherItem->c_ToolTipHeading = C_GtGetText::h_GetText("Unused Dataelements");
+   pc_OtherItem->c_ToolTipContent = C_GtGetText::h_GetText(
+      "Unused Dataelements which are not relevant for current use-case");
    pc_OtherItem->q_Enabled = true;
    pc_OtherItem->q_Selectable = false;
    //Fill
@@ -1421,6 +1467,25 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfigList(C_TblTreIte
          c_Id.SetHalChannelName(orc_HalChannelOrDomainName);
          C_TblTreDataElementModel::mh_AddHALCTreeItem(pc_ListItem,
                                                       C_OSCHALCMagicianUtil::h_GetChanNumVariableName(
+                                                         orc_DomainSingularName).c_str(), c_Id, ou32_RelevantChannelNumber != 1UL,
+                                                      oq_ShowOnlyWriteElements,
+                                                      oq_ShowArrayElements,
+                                                      oq_ShowArrayIndexElements,
+                                                      oq_Show64BitValues,
+                                                      opc_AlreasyUsedElements);
+         //Iterate
+         ++oru32_Counter;
+         //Mark valid
+         q_ListValid = true;
+      }
+      if (oq_SafetyFlagVarNecessary)
+      {
+         C_PuiSvDbNodeDataPoolListElementId c_Id(ou32_NodeIndex, ou32_DpIndex, ou32_ListIndex, oru32_Counter,
+                                                 C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
+                                                 ou32_RelevantChannelNumber != 1UL, ou32_ChannelArrayIndex, true);
+         c_Id.SetHalChannelName(orc_HalChannelOrDomainName);
+         C_TblTreDataElementModel::mh_AddHALCTreeItem(pc_ListItem,
+                                                      C_OSCHALCMagicianUtil::h_GetSafetyFlagVariableName(
                                                          orc_DomainSingularName).c_str(), c_Id, ou32_RelevantChannelNumber != 1UL,
                                                       oq_ShowOnlyWriteElements,
                                                       oq_ShowArrayElements,
@@ -1571,6 +1636,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfigList(C_TblTreIte
    \param[in]      oq_ShowArrayElements         Show array elements
    \param[in]      oq_ShowArrayIndexElements    Show array index elements
    \param[in]      oq_Show64BitValues           Show64 bit values
+   \param[in]      opc_AlreasyUsedElements      Alreasy used elements
    \param[in]      orc_HalChannelOrDomainName   Hal channel or domain name
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1604,16 +1670,16 @@ void C_TblTreDataElementModel::mh_AddHALCItem(C_TblTreItem * const opc_BaseItem,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add HALC item
 
-   \param[in,out]  opc_ListItem               List item
-   \param[in]      orc_Name                   Name
-   \param[in]      orc_Id                     Id
-   \param[in]      oq_IsArray                 Is array
-   \param[in]      oq_ShowOnlyWriteElements   Show only write elements
-   \param[in]      oq_ShowArrayElements       Show array elements
-   \param[in]      oq_ShowArrayIndexElements  Show array index elements
-   \param[in]      oq_Show64BitValues         Show64 bit values
-   \param[in]      opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
-                                              will be marked as used an will be disabled
+   \param[in,out]  opc_ListItem                 List item
+   \param[in]      orc_Name                     Name
+   \param[in]      orc_Id                       Id
+   \param[in]      oq_IsArray                   Is array
+   \param[in]      oq_ShowOnlyWriteElements     Show only write elements
+   \param[in]      oq_ShowArrayElements         Show array elements
+   \param[in]      oq_ShowArrayIndexElements    Show array index elements
+   \param[in]      oq_Show64BitValues           Show64 bit values
+   \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
+                                                will be marked as used an will be disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_AddHALCTreeItem(C_TblTreItem * const opc_ListItem, const QString & orc_Name,
@@ -1651,18 +1717,18 @@ void C_TblTreDataElementModel::mh_AddHALCTreeItem(C_TblTreItem * const opc_ListI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialize COMM Datapool elements
 
-   \param[in,out]  opc_DpItem                 Datapool tree item
-   \param[out]     orq_COMValid               COM Datapool valid
-   \param[in]      orc_Node                   Node
-   \param[in]      orc_Dp                     Datapool
-   \param[in]      ou32_NodeIndex             Node index
-   \param[in]      ou32_DpIndex               Datapool index
-   \param[in]      oq_ShowOnlyWriteElements   Show only write elements
-   \param[in]      oq_ShowArrayElements       Show array elements
-   \param[in]      oq_ShowArrayIndexElements  Show array index elements
-   \param[in]      oq_Show64BitValues         Show64 bit values
-   \param[in]      opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
-                                              will be marked as used an will be disabled
+   \param[in,out]  opc_DpItem                   Datapool tree item
+   \param[out]     orq_COMValid                 COM Datapool valid
+   \param[in]      orc_Node                     Node
+   \param[in]      orc_Dp                       Datapool
+   \param[in]      ou32_NodeIndex               Node index
+   \param[in]      ou32_DpIndex                 Datapool index
+   \param[in]      oq_ShowOnlyWriteElements     Show only write elements
+   \param[in]      oq_ShowArrayElements         Show array elements
+   \param[in]      oq_ShowArrayIndexElements    Show array index elements
+   \param[in]      oq_Show64BitValues           Show64 bit values
+   \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
+                                                will be marked as used an will be disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_InitDatapoolElementsCOMM(C_TblTreItem * const opc_DpItem, bool & orq_COMValid,
@@ -1735,15 +1801,15 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsCOMM(C_TblTreItem * const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add COMM message item
 
-   \param[in,out]  opc_BaseItem               Base item
-   \param[in]      orc_MessageIds             Message identification indices
-   \param[in]      oe_IdType                  Id type
-   \param[in]      oq_ShowOnlyWriteElements   Show only write elements
-   \param[in]      oq_ShowArrayElements       Show array elements
-   \param[in]      oq_ShowArrayIndexElements  Show array index elements
-   \param[in]      oq_Show64BitValues         Show64 bit values
-   \param[in]      opc_AlreasyUsedElements    Optional pointer to vector with already used elements. All added elements
-                                              will be marked as used an will be disabled
+   \param[in,out]  opc_BaseItem                 Base item
+   \param[in]      orc_MessageIds               Message identification indices
+   \param[in]      oe_IdType                    Id type
+   \param[in]      oq_ShowOnlyWriteElements     Show only write elements
+   \param[in]      oq_ShowArrayElements         Show array elements
+   \param[in]      oq_ShowArrayIndexElements    Show array index elements
+   \param[in]      oq_Show64BitValues           Show64 bit values
+   \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
+                                                will be marked as used an will be disabled
 
    \retval  true     At least one message with at least one signal was added to opc_BaseItem
    \retval  false    Nothing was added.
@@ -2036,9 +2102,9 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
                         //Signal
                         q_NodeValid = true;
                         q_DataPoolValid = true;
-                        if (rc_DataPool.e_Type == C_OSCNodeDataPool::eNVM)
+                        if ((rc_DataPool.e_Type == C_OSCNodeDataPool::eNVM) ||
+                            (rc_DataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM))
                         {
-                           q_DataPoolNvmValid = true;
                            //Check usage
                            if (pc_View->CheckNvmParamListUsage(C_OSCNodeDataPoolListId(u32_ItNode, u32_ItDataPool,
                                                                                        u32_ItList)) == true)
@@ -2051,6 +2117,14 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
                            {
                               pc_ListItem->q_Selectable = true;
                               pc_ListItem->q_Enabled = true;
+                           }
+                           if (rc_DataPool.e_Type == C_OSCNodeDataPool::eNVM)
+                           {
+                              q_DataPoolNvmValid = true;
+                           }
+                           else
+                           {
+                              q_DataPoolHalcValid = true;
                            }
                         }
                         //Add
@@ -2075,6 +2149,7 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
                         pc_ComItem->AddChild(pc_DataPoolItem);
                         break;
                      case C_OSCNodeDataPool::eHALC:
+                     case C_OSCNodeDataPool::eHALC_NVM:
                         pc_HalcItem->AddChild(pc_DataPoolItem);
                         break;
                      default:
@@ -2148,7 +2223,7 @@ const
    std::vector<C_PuiSvDbNodeDataPoolListElementId> c_Retval;
    //lint -e{9079}  Result of Qt interface restrictions, set by index function
    const C_TblTreItem * const pc_TreeItem =
-      static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
+      static_cast<const C_TblTreItem *>(orc_Index.internalPointer());
 
    if (pc_TreeItem != NULL)
    {
@@ -2212,7 +2287,7 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetA
    std::vector<C_PuiSvDbNodeDataPoolListElementId> c_Retval;
    //lint -e{9079}  Result of Qt interface restrictions, set by index function
    const C_TblTreItem * const pc_TreeItem =
-      static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
+      static_cast<const C_TblTreItem *>(orc_Index.internalPointer());
 
    if (pc_TreeItem != NULL)
    {
@@ -2245,7 +2320,7 @@ const
    std::vector<C_PuiSvDbNodeDataPoolListElementId> c_Retval;
    //lint -e{9079}  Result of Qt interface restrictions, set by index function
    const C_TblTreItem * const pc_TreeItem =
-      static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
+      static_cast<const C_TblTreItem *>(orc_Index.internalPointer());
 
    if (pc_TreeItem != NULL)
    {
@@ -2339,6 +2414,7 @@ void C_TblTreDataElementModel::mh_CleanUp(QMap<std::vector<uint32>, C_TblTreData
    {
       c_It.value().CleanUp();
    }
+   orc_Map.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2387,6 +2463,9 @@ std::vector<uint32> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32 ou32
    {
       bool q_Data;
       uint32 u32_Data;
+      uint32 u32_DashboardCounter;
+      const std::vector<C_PuiSvDashboard> & rc_Dashboards = pc_View->GetDashboards();
+
       const std::vector<uint8> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
       u32_Hash = 0xFFFFFFFFUL;
       //Active flags
@@ -2400,6 +2479,26 @@ std::vector<uint32> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32 ou32
       u32_Data = pc_View->GetPcData().GetBusIndex();
       stw_scl::C_SCLChecksums::CalcCRC32(&q_Data, sizeof(q_Data), u32_Hash);
       stw_scl::C_SCLChecksums::CalcCRC32(&u32_Data, sizeof(u32_Data), u32_Hash);
+
+      // The parameter widget has an unique configuration which has side effects to the selection model too and
+      // must be added to the view hash
+      for (u32_DashboardCounter = 0U; u32_DashboardCounter < rc_Dashboards.size(); ++u32_DashboardCounter)
+      {
+         uint32 u32_ParamCounter;
+         const std::vector<C_PuiSvDbParam> & rc_Params = rc_Dashboards[u32_DashboardCounter].GetParams();
+
+         for (u32_ParamCounter = 0U; u32_ParamCounter < rc_Params.size(); ++u32_ParamCounter)
+         {
+            uint32 u32_ElementConfigCounter;
+            for (u32_ElementConfigCounter = 0U;
+                 u32_ElementConfigCounter < rc_Params[u32_ParamCounter].c_DataPoolElementsConfig.size();
+                 ++u32_ElementConfigCounter)
+            {
+               // Only the element configuration of the parameter widget is relevant for this hash calculation
+               rc_Params[u32_ParamCounter].c_DataPoolElementsConfig[u32_ElementConfigCounter].CalcHash(u32_Hash);
+            }
+         }
+      }
    }
    else
    {

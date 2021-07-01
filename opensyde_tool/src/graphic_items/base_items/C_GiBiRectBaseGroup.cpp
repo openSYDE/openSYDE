@@ -116,7 +116,7 @@ C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64 & oru64_ID, const float64 
 
    //Mouse cursor
    this->mc_DefaultCursor = static_cast<QCursor>(Qt::SizeAllCursor);
-   this->RestoreDefaultCursor();
+   this->C_GiBiRectBaseGroup::RestoreDefaultCursor();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -597,6 +597,7 @@ void C_GiBiRectBaseGroup::ApplySizeChange(const QPointF & orc_NewPos, const QSiz
    \param[in] opc_GuidelineItem Detailed input parameter description
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_GiBiRectBaseGroup::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 {
    Q_UNUSED(opc_GuidelineItem)

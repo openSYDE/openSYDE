@@ -17,4 +17,4 @@ Call the binary without any parameters or with "-h" to print the available comma
 
 Help:
 =====
-See openSYDE user manual (section SYDE coder C) for further information.
+See openSYDE user manual (section SYDE Coder C) for further information.

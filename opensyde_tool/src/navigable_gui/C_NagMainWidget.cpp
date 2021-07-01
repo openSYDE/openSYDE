@@ -25,6 +25,7 @@
 
 #include "C_PuiSvHandler.h"
 #include "C_PuiSvData.h"
+#include "C_PuiUtil.h"
 #include "C_PopUtil.h"
 #include "C_UsHandler.h"
 #include "C_PuiProject.h"
@@ -36,6 +37,8 @@
 #include "C_OSCProjectFiler.h"
 #include "C_Uti.h"
 #include "C_GiSyColorSelectWidget.h"
+#include "C_PopCreateServiceProjDialogWidget.h"
+#include "C_PopPasswordDialogWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -62,7 +65,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_NagMainWidget::C_NagMainWidget(QWidget * const opc_Parent) :
@@ -84,8 +87,9 @@ C_NagMainWidget::C_NagMainWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_BtnAbout, &QPushButton::clicked, this, &C_NagMainWidget::m_AboutClicked);
    connect(this->mpc_Ui->pc_BtnNewProj, &C_OgePubProjAction::clicked, this, &C_NagMainWidget::m_OnNewProj);
    connect(this->mpc_Ui->pc_BtnOpenProj, &C_OgePubProjAction::clicked, this, &C_NagMainWidget::m_OnOpenProj);
-   connect(this->mpc_Ui->pc_BtnSaveProj, &QPushButton::clicked, this, &C_NagMainWidget::m_OnSaveProj);
    connect(this->mpc_Ui->pc_BtnSaveProjAs, &C_OgePubProjAction::clicked, this, &C_NagMainWidget::OnSaveProjAs);
+   connect(this->mpc_Ui->pc_BtnCreateServiceProj, &C_OgePubProjAction::clicked, this,
+           &C_NagMainWidget::m_OnCreateServiceProj);
    connect(this->mpc_Ui->pc_BtnEdit, &C_OgePubIconOnly::clicked, this, &C_NagMainWidget::m_OnEdit);
    connect(this->mpc_Ui->pc_LabelVersion, &C_OgeLabDoubleClick::SigDoubleClicked, this, &C_NagMainWidget::m_OnEdit);
    connect(this->mpc_Ui->pc_LineEditVersion, &C_OgeLeDark::editingFinished, this, &C_NagMainWidget::m_OnEditFinished);
@@ -109,7 +113,7 @@ C_NagMainWidget::~C_NagMainWidget()
 
    Draws the background element
 
-   \param[in,out] opc_Event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::paintEvent(QPaintEvent * const opc_Event)
@@ -131,7 +135,7 @@ void C_NagMainWidget::paintEvent(QPaintEvent * const opc_Event)
 
    Here: Handle edit leave
 
-   \param[in,out] opc_Event   Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::keyPressEvent(QKeyEvent * const opc_Event)
@@ -168,8 +172,8 @@ void C_NagMainWidget::InitText(void) const
    this->mpc_Ui->pc_BtnAbout->setText(C_GtGetText::h_GetText("About"));
    this->mpc_Ui->pc_BtnNewProj->setText(C_GtGetText::h_GetText("New Project"));
    this->mpc_Ui->pc_BtnOpenProj->setText(C_GtGetText::h_GetText("Open Project"));
-   this->mpc_Ui->pc_BtnSaveProj->setText(C_GtGetText::h_GetText("Save Project"));
    this->mpc_Ui->pc_BtnSaveProjAs->setText(C_GtGetText::h_GetText("Save Project As"));
+   this->mpc_Ui->pc_BtnCreateServiceProj->setText(C_GtGetText::h_GetText("Create Service Project"));
    this->mpc_Ui->pc_LabelCurProjTitle->setText(C_GtGetText::h_GetText("Current Project"));
    this->mpc_Ui->pc_LabelNoRecentProj->setText(C_GtGetText::h_GetText(
                                                   "No recent projects found, use \"Open Project\"."));
@@ -180,18 +184,19 @@ void C_NagMainWidget::InitText(void) const
                                                       C_GtGetText::h_GetText("Create new empty project."));
    this->mpc_Ui->pc_BtnOpenProj->SetToolTipInformation(C_GtGetText::h_GetText("Open Project"),
                                                        C_GtGetText::h_GetText("Browse to open existing project."));
-   this->mpc_Ui->pc_BtnSaveProj->SetToolTipInformation(C_GtGetText::h_GetText("Save Project"),
-                                                       C_GtGetText::h_GetText("Save current project."));
    this->mpc_Ui->pc_BtnSaveProjAs->SetToolTipInformation(C_GtGetText::h_GetText("Save Project As"),
                                                          C_GtGetText::h_GetText(
                                                             "Select name and location to save the project."));
+   this->mpc_Ui->pc_BtnCreateServiceProj->SetToolTipInformation(C_GtGetText::h_GetText("Create Service Project"),
+                                                                C_GtGetText::h_GetText(
+                                                                   "Set a password and select the views that shall be accessible in your Service Project"));
    this->mpc_Ui->pc_BtnAbout->SetToolTipInformation(C_GtGetText::h_GetText("About"),
                                                     C_GtGetText::h_GetText("Show information about openSYDE tool."));
    this->mpc_Ui->pc_BtnSysDef->SetToolTipInformation(C_GtGetText::h_GetText("SYSTEM DEFINITION"),
                                                      C_GtGetText::h_GetText("Define your Network "
                                                                             "Topology, Nodes properties, Datapools, "
                                                                             "Interface description, "
-                                                                            "generate code and more."));
+                                                                            "generate files and more."));
    this->mpc_Ui->pc_BtnSysView->SetToolTipInformation(C_GtGetText::h_GetText("SYSTEM COMMISSIONING"),
                                                       C_GtGetText::h_GetText("Manage your system views, "
                                                                              "update your system, analyze your system "
@@ -205,21 +210,59 @@ void C_NagMainWidget::InitText(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Perform initial project load.
+
+   Instantiate C_PuiProject, perform initial project load, handle errors and update GUI.
+
+   Do not try to load other recent projects, just open an empty project.
+   (If the last recent project is invalid, all others might be invalid too, e.g. because of invalid
+   devices.ini. In this case the user would be forced to close n message boxes if there are n recent projects
+   in user settings - very annoying).
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::LoadInitialProject(void)
+{
+   uint16 u16_Version = 0U;
+   QString c_LoadedProject;
+   sint32 s32_Error = C_NO_ERR;
+
+   if (C_PuiProject::h_GetInstance()->PrepareLoadInitialProject() == C_CHECKSUM)
+   {
+      QString c_Password;
+      // The initial project is a service project with password. Get a password
+      s32_Error = this->m_GetPassword(c_Password);
+
+      if (s32_Error == C_NO_ERR)
+      {
+         C_PuiProject::h_GetInstance()->SetPassword(c_Password);
+      }
+   }
+
+   if (s32_Error == C_NO_ERR)
+   {
+      // Initial load (command line or first recent project)
+      s32_Error = C_PuiProject::h_GetInstance()->LoadInitialProject(&u16_Version, c_LoadedProject);
+   }
+
+   C_PopErrorHandling::h_ProjectLoadErr(s32_Error, c_LoadedProject, this, u16_Version);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Open a project.
 
-   \param[in]     orc_FilePath      path to project file
+   \param[in]  orc_FilePath   path to project file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
 {
    if (orc_FilePath.compare("") != 0)
    {
-      uint16 u16_Version;
+      uint16 u16_Version = 0U;
       stw_types::sint32 s32_Result;
 
       Q_EMIT (this->SigBeforeOtherProjectLoad());
       C_PuiProject::h_GetInstance()->SetPath(orc_FilePath);
-      s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
+      s32_Result = this->m_LoadConcreteProject(&u16_Version);
       C_PopErrorHandling::h_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
 
       if (s32_Result == C_NO_ERR)
@@ -253,7 +296,7 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
             }
          }
 
-         s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
+         s32_Result = this->m_LoadConcreteProject(&u16_Version);
 
          // very unlikely, but the previous project could be corrupt -> check it and load empty project else
          if (s32_Result == C_NO_ERR)
@@ -289,6 +332,25 @@ void C_NagMainWidget::UpdateRecentProjects(void)
       {
          c_Files.push_back(*c_ItList);
          c_Projects.push_back(c_Tmp);
+      }
+      // if h_Load fails it still could be a syde_sp-file
+      else
+      {
+         const QFileInfo c_FileInfo(*c_ItList);
+         if (c_FileInfo.completeSuffix().compare("syde_sp") == 0)
+         {
+            // create a dummy project and append to c_Projects. Otherwise checks in UpdateData(l.360) will fail and
+            // we want to display at least "???" for those properties we cannot get the information from .syde-file
+            // date properties are handled in model class directly
+            c_Tmp.c_Author = "N/A";
+            c_Tmp.c_Editor = "N/A";
+            c_Tmp.c_OpenSYDEVersion = "N/A";
+            c_Tmp.c_Template = "N/A";
+            c_Tmp.c_Version = "N/A";
+
+            c_Files.push_back(*c_ItList);
+            c_Projects.push_back(c_Tmp);
+         }
       }
    }
    if (c_Files.size() > 0)
@@ -331,6 +393,143 @@ void C_NagMainWidget::OnSaveProjAs(void)
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot function for create service project button click.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::OnCreateServiceProj(void)
+{
+   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   C_PopCreateServiceProjDialogWidget * const pc_Dialog = new C_PopCreateServiceProjDialogWidget(*c_New);
+
+   // get views for tree visualization of the project permissions
+   std::vector<uint32> c_ViewIndices;
+   c_ViewIndices.reserve(C_PuiSvHandler::h_GetInstance()->GetViewCount());
+   for (uint32 u32_ItView = 0; u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount(); ++u32_ItView)
+   {
+      c_ViewIndices.push_back(u32_ItView);
+   }
+
+   // initializes tree model/view
+   pc_Dialog->PrepareDialog(c_ViewIndices);
+
+   // if user confirms everything in C_PopCreateServiceProjDialogWidget::m_OkClicked
+   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      // save inputs as user settings
+      const QString c_SpPath = C_PuiUtil::h_GetAbsolutePathFromProject(pc_Dialog->GetSpPath());
+      C_UsHandler::h_GetInstance()->SetLastKnownServiceProjectPath(c_SpPath);
+
+      // create service project
+      const sint32 s32_Result = pc_Dialog->SaveCurrentProjectForServiceMode();
+      C_PopErrorHandling::h_ServiceProjectSaveErr(s32_Result, pc_Dialog);
+      if (s32_Result == C_NO_ERR)
+      {
+         C_OgeWiCustomMessage c_FinishMessage(this, C_OgeWiCustomMessage::E_Type::eINFORMATION);
+         const QString c_Details =
+            static_cast<QString>("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
+            arg(C_GtGetText::h_GetText("File saved at ")).
+            arg(static_cast<QString>(c_SpPath.toStdString().c_str())).
+            arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
+            arg(static_cast<QString>(c_SpPath.toStdString().c_str()));
+         c_FinishMessage.SetHeading(C_GtGetText::h_GetText("Create Service Project"));
+         c_FinishMessage.SetDescription(C_GtGetText::h_GetText(
+                                           "Service Project created successfully."));
+         c_FinishMessage.SetOKButtonText(C_GtGetText::h_GetText("OK"));
+         c_FinishMessage.SetDetails(c_Details);
+         c_FinishMessage.SetCustomMinHeight(180, 250);
+         c_FinishMessage.Execute();
+      }
+   }
+   if (c_New != NULL)
+   {
+      c_New->HideOverlay();
+   }
+} //lint !e593  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open color picker
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::OpenColorPicker(void)
+{
+   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, mc_STYLE_GUIDE_COLOR_7);
+
+   //Resize
+   c_Popup->SetSize(QSize(412, 620));
+
+   // open color picker dialog
+   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      pc_ColorWidget->ChooseSelectedColor();
+   }
+
+   if (c_Popup != NULL)
+   {
+      c_Popup->HideOverlay();
+   }
+} //lint !e429  //no memory leak because of the parent of pc_ColorWidget and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle service mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::HandleServiceMode(void) const
+{
+   const bool q_ServiceMode = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
+   this->mpc_Ui->pc_BtnSysDef->setEnabled(!q_ServiceMode);
+   this->mpc_Ui->pc_BtnEdit->setEnabled(!q_ServiceMode);
+   this->mpc_Ui->pc_BtnCreateServiceProj->setEnabled(!q_ServiceMode);
+   this->mpc_Ui->pc_BtnSaveProjAs->setEnabled(!q_ServiceMode);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get first valid view for service mode
+
+   \param[out]  oru32_ViewIndex  View index
+   \param[out]  ors32_SubMode    Sub mode
+   \param[out]  orq_Found        Found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::h_GetFirstValidViewForServiceMode(uint32 & oru32_ViewIndex, sint32 & ors32_SubMode,
+                                                        bool & orq_Found)
+{
+   orq_Found = false;
+
+   for (uint32 u32_ItView = 0UL; (u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount()) && (!orq_Found);
+        ++u32_ItView)
+   {
+      const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(u32_ItView);
+      if (pc_ViewData != NULL)
+      {
+         if (pc_ViewData->GetServiceModeActive())
+         {
+            oru32_ViewIndex = u32_ItView;
+            if (pc_ViewData->GetServiceModeSetupActive())
+            {
+               ors32_SubMode = ms32_SUBMODE_SYSVIEW_SETUP;
+               orq_Found = true;
+            }
+            else if (pc_ViewData->GetServiceModeUpdateActive())
+            {
+               ors32_SubMode = ms32_SUBMODE_SYSVIEW_UPDATE;
+               orq_Found = true;
+            }
+            else if (pc_ViewData->GetServiceModeDashboardActive())
+            {
+               ors32_SubMode = ms32_SUBMODE_SYSVIEW_DASHBOARD;
+               orq_Found = true;
+            }
+            else
+            {
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initializes paths of disabled icons.
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -345,13 +544,14 @@ void C_NagMainWidget::m_InitIcons(void) const
                                               "://images/main_page_and_navi_bar/Icon_new_project_disabled.svg");
    this->mpc_Ui->pc_BtnOpenProj->SetCustomIcon("://images/main_page_and_navi_bar/Icon_open_project.svg",
                                                "://images/main_page_and_navi_bar/Icon_open_project_disabled.svg");
-   this->mpc_Ui->pc_BtnSaveProj->SetCustomIcon("://images/main_page_and_navi_bar/Icon_save.svg",
-                                               "://images/main_page_and_navi_bar/Icon_save_disabled.svg");
    this->mpc_Ui->pc_BtnSaveProjAs->SetCustomIcon("://images/main_page_and_navi_bar/Icon_save_as.svg",
                                                  "://images/main_page_and_navi_bar/Icon_save_as_disabled.svg");
+   this->mpc_Ui->pc_BtnCreateServiceProj->SetCustomIcon("://images/main_page_and_navi_bar/IconServiceProjEnabled.svg",
+                                                        "://images/main_page_and_navi_bar/IconServiceProjDisabled.svg");
 
    // edit button
-   this->mpc_Ui->pc_BtnEdit->setIcon(QIcon("://images/main_page_and_navi_bar/IconEdit.svg"));
+   this->mpc_Ui->pc_BtnEdit->SetCustomIcons("://images/main_page_and_navi_bar/IconEdit.svg", "", "",
+                                            "://images/main_page_and_navi_bar/IconEditDisabled.svg");
    this->mpc_Ui->pc_BtnEdit->setIconSize(mc_ICON_SIZE_24);
 
    // clear button
@@ -472,12 +672,29 @@ void C_NagMainWidget::m_SysDefClicked()
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_SysViewClicked()
 {
-   QString c_SubMode;
-   QString c_SubSubMode;
+   uint32 u32_ViewIndex = 0UL;
+   sint32 s32_Mode = ms32_SUBMODE_SYSVIEW_SETUP;
+   bool q_Found = false;
 
-   C_SyvUtil::h_GetViewDisplayName(0U, ms32_SUBMODE_SYSVIEW_SETUP, c_SubMode, c_SubSubMode);
+   //Check system view service mode availability
+   if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive())
+   {
+      C_NagMainWidget::h_GetFirstValidViewForServiceMode(u32_ViewIndex, s32_Mode, q_Found);
+   }
+   else
+   {
+      q_Found = true;
+   }
+   if (q_Found)
+   {
+      QString c_SubMode;
+      QString c_SubSubMode;
 
-   Q_EMIT (this->SigChangeMode(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP, 0, c_SubMode, c_SubSubMode));
+      C_SyvUtil::h_GetViewDisplayName(u32_ViewIndex, s32_Mode, c_SubMode, c_SubSubMode);
+
+      Q_EMIT (this->SigChangeMode(ms32_MODE_SYSVIEW, s32_Mode, u32_ViewIndex, c_SubMode,
+                                  c_SubSubMode));
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -528,7 +745,7 @@ void C_NagMainWidget::m_OnOpenProj(void)
    if (C_PopUtil::h_AskUserToContinue(this) == true)
    {
       QString c_Folder = "";
-      const QString c_Suffix = "*.syde";
+      const QString c_Suffix = "*.syde;*.syde_sp";
       const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("openSYDE project")) + " (" + c_Suffix + ")";
 
       C_UsHandler::h_GetInstance()->GetMostRecentFolder(c_Folder);
@@ -543,22 +760,12 @@ void C_NagMainWidget::m_OnOpenProj(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for save project button click.
+/*! \brief  Slot function for create service project button click
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWidget::m_OnSaveProj(void)
+void C_NagMainWidget::m_OnCreateServiceProj()
 {
-   if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
-   {
-      // open save as dialog
-      this->OnSaveProjAs();
-   }
-   else
-   {
-      // save current existing project
-      C_PopErrorHandling::h_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
-      this->UpdateRecentProjects();
-   }
+   this->OnCreateServiceProj();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -567,11 +774,14 @@ void C_NagMainWidget::m_OnSaveProj(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_OnEdit(void) const
 {
-   this->mpc_Ui->pc_LabelVersion->setVisible(false);
-   this->mpc_Ui->pc_LineEditVersion->setText(C_PuiProject::h_GetInstance()->c_Version.c_str());
-   this->mpc_Ui->pc_LineEditVersion->setVisible(true);
-   this->mpc_Ui->pc_LineEditVersion->selectAll();
-   this->mpc_Ui->pc_LineEditVersion->setFocus();
+   if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive() == false)
+   {
+      this->mpc_Ui->pc_LabelVersion->setVisible(false);
+      this->mpc_Ui->pc_LineEditVersion->setText(C_PuiProject::h_GetInstance()->c_Version.c_str());
+      this->mpc_Ui->pc_LineEditVersion->setVisible(true);
+      this->mpc_Ui->pc_LineEditVersion->selectAll();
+      this->mpc_Ui->pc_LineEditVersion->setFocus();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -627,6 +837,8 @@ void C_NagMainWidget::m_OnClear(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot function for table click
+
+   \param[in]  orc_ModelIndex    Model index
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -645,25 +857,91 @@ void C_NagMainWidget::m_OnIndexClicked(const QModelIndex & orc_ModelIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Open color picker
+/*! \brief   Loads the concrete project
+
+   The functions checks if the project needs a password for opening. If necessary the dialog for the password
+   will be opened.
+
+   \param[in]  opu16_FileVersion    Optional storage for system definition file version
+
+   \return
+   C_RD_WR     Problems accessing file system (e.g. no read access to file)
+   C_RANGE     A project file does not exist
+   C_NOACT     A project file is present but structure is invalid (e.g. invalid XML file)
+   C_CONFIG    Content of a project file is invalid or incomplete
+   C_COM       Device definition not found for project
+   C_OVERFLOW  node in system definition references a device not part of the device definitions
+   C_CHECKSUM  password is incorrect
+   C_BUSY      Problems with removing temporary folders
+   C_WARN      User canceled the password dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWidget::OpenColorPicker(void)
+sint32 C_NagMainWidget::m_LoadConcreteProject(uint16 * const opu16_FileVersion)
 {
-   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
-   C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, mc_STYLE_GUIDE_COLOR_7);
+   sint32 s32_Result = C_NO_ERR;
 
-   //Resize
-   c_Popup->SetSize(QSize(412, 620));
-
-   // open color picker dialog
-   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   // Check if a password is necessary
+   if (C_PuiProject::h_GetInstance()->IsPasswordNecessary() == true)
    {
-      pc_ColorWidget->ChooseSelectedColor();
+      QString c_Password;
+      // Password loop until the right one has been entered
+      do
+      {
+         // Get the password
+         s32_Result = this->m_GetPassword(c_Password);
+
+         if (s32_Result == C_NO_ERR)
+         {
+            // Load project with given password
+            C_PuiProject::h_GetInstance()->SetPassword(c_Password);
+            s32_Result = C_PuiProject::h_GetInstance()->Load(opu16_FileVersion);
+
+            if (s32_Result == C_CHECKSUM)
+            {
+               C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+               c_Message.SetHeading(C_GtGetText::h_GetText("Open Service Project"));
+               c_Message.SetDescription(C_GtGetText::h_GetText("You entered the wrong password. Please try again."));
+               c_Message.SetOKButtonText(C_GtGetText::h_GetText("OK"));
+               c_Message.SetCustomMinHeight(180, 180);
+               c_Message.exec();
+            }
+         }
+      }
+      while (s32_Result == C_CHECKSUM);
+   }
+   else
+   {
+      // No password, just load the project
+      s32_Result = C_PuiProject::h_GetInstance()->Load(opu16_FileVersion);
    }
 
-   if (c_Popup != NULL)
+   return s32_Result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Shows the password dialog and returns the password entered by the user
+
+   \param[out]  orc_Password  Password entered by user
+
+   \return
+   C_NO_ERR    User entered the password
+   C_WARN      User canceled the dialog
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_NagMainWidget::m_GetPassword(QString & orc_Password)
+{
+   sint32 s32_Return = C_WARN;
+
+   orc_Password = "";
+
+   // show password dialog
+   C_PopPasswordDialogWidget * const pc_Dialog = new C_PopPasswordDialogWidget(this);
+
+   if (pc_Dialog->exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      c_Popup->HideOverlay();
+      orc_Password = pc_Dialog->GetPassword();
+      s32_Return = C_NO_ERR;
    }
-} //lint !e429  //no memory leak because of the parent of pc_ColorWidget and the Qt memory management
+
+   return s32_Return;
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management

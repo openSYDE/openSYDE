@@ -195,13 +195,17 @@ void C_SdNdeDpSelectorItemUsageWidget::paintEvent(QPaintEvent * const opc_Event)
             ((this->mu32_PercentageUsed > 0U) && (this->mu32_PercentageReserved == 100U)))
    {
       // only two bars are visible
-      uint32 u32_UsedWidth;
+      uint32 u32_UsedWidth = 1U;
       QColor c_SecondBarColor = this->mc_ColorFree;
 
       if ((this->mu32_PercentageUsed >= this->mu32_PercentageReserved) &&
           (this->mu32_PercentageUsed != 0U))
       {
-         u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / (10000U / this->mu32_PercentageUsed);
+         const uint32 u32_Divider = 10000U / this->mu32_PercentageUsed;
+         if (u32_Divider != 0)
+         {
+            u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / u32_Divider;
+         }
 
          if (this->mq_UsedOverReserved == false)
          {
@@ -217,7 +221,11 @@ void C_SdNdeDpSelectorItemUsageWidget::paintEvent(QPaintEvent * const opc_Event)
       else if ((this->mu32_PercentageUsed == 0U) && (this->mu32_PercentageReserved > 0U))
       {
          // special case: only one reservation bar and no usage bar
-         u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / (10000U / this->mu32_PercentageReserved);
+         const uint32 u32_Divider = 10000U / this->mu32_PercentageReserved;
+         if (u32_Divider != 0)
+         {
+            u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / u32_Divider;
+         }
          this->mc_Brush.setColor(this->mc_ColorReserved);
       }
       else
@@ -225,12 +233,16 @@ void C_SdNdeDpSelectorItemUsageWidget::paintEvent(QPaintEvent * const opc_Event)
          // special case: reservation is 100% and usage bar has minimum 1% -> No error and no free area
          if (this->mu32_PercentageUsed != 0)
          {
-            u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / (10000U / this->mu32_PercentageUsed);
+            const uint32 u32_Divider = 10000U / this->mu32_PercentageUsed;
+            if (u32_Divider != 0)
+            {
+               u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / u32_Divider;
+            }
          }
          else
          {
             // shall not happen
-            u32_UsedWidth = 1;
+            u32_UsedWidth = 1U;
          }
          this->mc_Brush.setColor(mc_STYLE_GUIDE_COLOR_7);
          c_SecondBarColor = this->mc_ColorReserved;

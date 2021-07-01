@@ -57,7 +57,7 @@ C_OgeContextMenu::C_OgeContextMenu(QWidget * const opc_Parent) :
    //shadow
    {
       QColor c_Color;
-      QGraphicsDropShadowEffect * pc_Shadow  = new QGraphicsDropShadowEffect(this);
+      QGraphicsDropShadowEffect * const pc_Shadow  = new QGraphicsDropShadowEffect(this);
 
       pc_Shadow->setBlurRadius(4.0);
       pc_Shadow->setOffset(4.0);

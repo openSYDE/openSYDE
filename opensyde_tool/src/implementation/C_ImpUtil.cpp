@@ -68,7 +68,7 @@ C_ImpUtil::C_ImpUtil(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Wrapper function to export code for all nodes
+/*! \brief   Wrapper function to export files for all nodes
 
    Errors are handled internally.
 
@@ -87,7 +87,7 @@ void C_ImpUtil::h_ExportCodeAll(QWidget * const opc_Parent)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Export code for all specified nodes and specified applications
+/*! \brief   Export files for all specified nodes and specified applications
 
    Errors are handled internally.
 
@@ -122,7 +122,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
             orc_NodeIndices[u32_ItInNode]);
          if (pc_Node != NULL)
          {
-            //Only check nodes that really have programmable applications
+            //Only check nodes that really have programmable applications (assignment not mandatory for PSI generation)
             if (C_PuiSdHandler::h_GetInstance()->GetProgrammableApplications(orc_NodeIndices[u32_ItInNode]).size() > 0)
             {
                for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
@@ -144,9 +144,9 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       if (q_Continue == false)
       {
          c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Code generation"));
+         c_Message.SetHeading(C_GtGetText::h_GetText("File Generation"));
          c_Message.SetDescription(C_GtGetText::h_GetText(
-                                     "Cannot generate code. Assign all Datapools and retry."));
+                                     "Cannot generate files. Assign all Datapools and retry."));
          c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText(
                                                       "The following Datapools have no assigned application:\n%1")).arg(
                                  c_DataPoolErrorMessage));
@@ -182,9 +182,9 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       if (q_SysDefInvalid == true)
       {
          C_OgeWiCustomMessage c_Question(opc_Parent, C_OgeWiCustomMessage::E_Type::eWARNING);
-         c_Question.SetHeading("CONFIRM CODE GENERATION");
+         c_Question.SetHeading("CONFIRM FILE GENERATION");
          c_Question.SetDescription(C_GtGetText::h_GetText("There are SYSTEM DEFINITION errors. "
-                                                          "Do you really want to generate code?"));
+                                                          "Do you really want to generate files?"));
          c_Question.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
          c_Question.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
          c_Question.SetCustomMinHeight(180, 180);
@@ -199,7 +199,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       }
    }
 
-   // inform user which code will get generated, check if all code generators are not empty and ask for confirmation
+   // inform user which files will get generated, check if all file generators are not empty and ask for confirmation
    if (q_Continue == true)
    {
       QString c_DataBlockInfoMessage;
@@ -207,7 +207,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       QString c_ErrorMessage;
       bool q_CodeGeneratorMissing = false;
 
-      c_DataBlockInfoMessage += C_GtGetText::h_GetText("There will be code generated for the following node(s):<br>");
+      c_DataBlockInfoMessage += C_GtGetText::h_GetText("There will be files generated for the following node(s):<br>");
       for (uint32 u32_ItNode = 0; u32_ItNode < orc_NodeIndices.size(); ++u32_ItNode)
       {
          const C_OSCNode * const pc_Node =
@@ -230,7 +230,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
                         pc_Node->c_Properties.c_Name.c_str()).arg(pc_Application->c_Name.c_str());
 
                   // message for erase information
-                  const QDir c_GenerationDir(h_GetAbsoluteGeneratedDir(pc_Application, pc_Node->c_Properties.c_Name));
+                  const QDir c_GenerationDir(h_GetAbsoluteGeneratedDir(*pc_Application, pc_Node->c_Properties.c_Name));
                   // only show already existing directories (if directory does not exist erasing is no problem)
                   if (c_GenerationDir.exists() == true)
                   {
@@ -239,7 +239,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
                      c_EraseInfoMessage += "<br>";
                   }
 
-                  // check if code generator is missing and adapt error message
+                  // check if file generator is missing and adapt error message
                   if (pc_Application->c_CodeGeneratorPath == "")
                   {
                      q_CodeGeneratorMissing = true;
@@ -251,7 +251,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          }
       }
 
-      // every data block has non-empty code generator path
+      // every data block has non-empty file generator path
       if (q_CodeGeneratorMissing == false)
       {
          QString c_Description;
@@ -266,7 +266,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
             c_Message.SetType(C_OgeWiCustomMessage::E_Type::eQUESTION);
             c_Message.SetHeading(C_GtGetText::h_GetText("Erase target directories"));
             c_Message.SetDescription(c_Description);
-            c_Message.SetOKButtonText(C_GtGetText::h_GetText("Generate Code"));
+            c_Message.SetOKButtonText(C_GtGetText::h_GetText("Generate Files"));
             c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
             c_Message.SetDetails("<a/>" + c_EraseInfoMessage + c_DataBlockInfoMessage);
             c_Message.SetCustomMinHeight(200, 400);
@@ -277,15 +277,15 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
             }
          }
       }
-      // tell user to set code generators for every data block
+      // tell user to set file generators for every data block
       else
       {
          c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Code generation"));
-         c_Message.SetDescription(C_GtGetText::h_GetText("Cannot generate code. "
-                                                         "Set a code generator for every Data Block."));
+         c_Message.SetHeading(C_GtGetText::h_GetText("File generation"));
+         c_Message.SetDescription(C_GtGetText::h_GetText("Cannot generate files. "
+                                                         "Set a file generator for every Data Block."));
          c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("<a/>The following Data Blocks "
-                                                                          "have no code generator:<br>%1")).arg(
+                                                                          "have no file generator:<br>%1")).arg(
                                  c_ErrorMessage));
          c_Message.SetCustomMinHeight(180, 300);
          c_Message.Execute();
@@ -293,12 +293,12 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       }
    }
 
-   // finally we are ready to generate code
+   // finally we are ready to generate file
    if (q_Continue == true)
    {
       std::vector<C_ImpCodeGenerationReportWidget::C_ReportData> c_ExportInfo;
 
-      // export code for each node
+      // export files for each node
       QApplication::setOverrideCursor(Qt::WaitCursor);
       for (uint32 u32_ItNode = 0; (u32_ItNode < orc_NodeIndices.size()) && (s32_Result == C_NO_ERR); ++u32_ItNode)
       {
@@ -309,7 +309,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       QApplication::restoreOverrideCursor();
 
       // give user detailed feedback about success or fail
-      if (s32_Result == C_NO_ERR) // inform about success with code generation report
+      if (s32_Result == C_NO_ERR) // inform about success with file generation report
       {
          QPointer<C_OgePopUpDialog> const c_PopUpDialogReportDialog = new C_OgePopUpDialog(opc_Parent, opc_Parent);
          C_ImpCodeGenerationReportWidget * const pc_DialogExportReport =  new C_ImpCodeGenerationReportWidget(
@@ -330,14 +330,14 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       {
          C_OgeWiCustomMessage c_MessageResult(opc_Parent);
          c_MessageResult.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
-         c_MessageResult.SetHeading(C_GtGetText::h_GetText("Code generation"));
-         c_MessageResult.SetDescription(C_GtGetText::h_GetText("Code generation failed."));
+         c_MessageResult.SetHeading(C_GtGetText::h_GetText("File generation"));
+         c_MessageResult.SetDescription(C_GtGetText::h_GetText("File generation failed."));
          //Update log file
          C_OSCLoggingHandler::h_Flush();
          const QString c_Details = C_GtGetText::h_GetText("For details see ") +
                                    C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLESHEET_GUIDE_COLOR_LINK,
                                                     C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
-                                   C_GtGetText::h_GetText(" or log file(s) of code generator(s).");
+                                   C_GtGetText::h_GetText(" or log file(s) of file generator(s).");
          c_MessageResult.SetDetails(c_Details);
          c_MessageResult.SetCustomMinHeight(180, 250);
          c_MessageResult.Execute();
@@ -346,10 +346,10 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Export code for valid nodes
+/*! \brief   Export files for valid nodes
 
-   Check given nodes for valid ones (i.e. ones with programmable applications)
-   and export code for them.
+   Check given nodes for valid ones (i.e. ones with file generation Data Blocks)
+   and export files for them.
 
    \param[in]  orc_NodeIndices   node indices (can be a single node too - wrapped in a 1-length-vector)
    \param[in]  opc_Parent        parent widget
@@ -362,7 +362,7 @@ void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, Q
    std::vector<std::vector<uint32> > c_AllProgApps;
    C_OgeWiCustomMessage c_Message(opc_Parent);
 
-   // get valid nodes (i.e. nodes with programmable applications)
+   // get valid nodes (i.e. ones with file generation Data Blocks)
    for (uint32 u32_ItInNode = 0; u32_ItInNode < orc_NodeIndices.size(); ++u32_ItInNode)
    {
       c_ProgAppsNodeIndices.clear();
@@ -370,41 +370,41 @@ void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, Q
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
       {
-         c_ProgAppsNodeIndices = C_PuiSdHandler::h_GetInstance()->GetProgrammableAppIndices(
+         c_ProgAppsNodeIndices = C_PuiSdHandler::h_GetInstance()->GetFileGenAppIndices(
             orc_NodeIndices[u32_ItInNode]);
          if (c_ProgAppsNodeIndices.size() > 0)
          {
             // add node to valid nodes
             c_ValidNodeIndices.push_back(orc_NodeIndices[u32_ItInNode]);
-            //add programmable applications to programmable applications
+            //add Data Blocks
             c_AllProgApps.push_back(c_ProgAppsNodeIndices);
          }
       }
    }
 
-   // inform user that there is no programmable application
+   // inform user that there is no file generation Data Block
    if (c_ValidNodeIndices.size() == 0)
    {
       QString c_Text;
       if (orc_NodeIndices.size() == 1)
       {
          c_Text = C_GtGetText::h_GetText(
-            "There are no Data Blocks of type \"programmable application\" found. "
-            "\nCode cannot be generated.");
+            "There are no Data Blocks with enabled file generation found. "
+            "\nFiles cannot be generated.");
       }
       else
       {
          c_Text = C_GtGetText::h_GetText(
-            "There are no nodes with Data Blocks of type \"programmable application\" found."
-            "\nCode cannot be generated.");
+            "There are no nodes with Data Blocks with enabled file generation found."
+            "\nFiles cannot be generated.");
       }
       c_Message.SetType(C_OgeWiCustomMessage::E_Type::eINFORMATION);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Code generation"));
+      c_Message.SetHeading(C_GtGetText::h_GetText("File generation"));
       c_Message.SetDescription(c_Text);
       c_Message.SetCustomMinHeight(180, 180);
       c_Message.Execute();
    }
-   // generate code
+   // generate files
    else
    {
       C_ImpUtil::h_ExportCode(c_ValidNodeIndices, c_AllProgApps, opc_Parent);
@@ -412,12 +412,12 @@ void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, Q
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Export code for specified node
+/*! \brief   Export files for specified node
 
    \param[in]   ou32_NodeIndex   Node index
    \param[in]   orc_AppIndices   Application indices
    \param[out]  orc_ExportInfo   data structure containing information for report
-   \param[in]   orq_Erase        flag for code generator: true -> erase target folder and all sub-folders
+   \param[in]   orq_Erase        flag for file generator: true -> erase target folder and all sub-folders
 
    \return
    C_NO_ERR       Operation success
@@ -434,7 +434,7 @@ sint32 C_ImpUtil::mh_ExportCodeNode(const uint32 ou32_NodeIndex, const std::vect
 
    if (C_PuiSdHandler::h_GetInstance()->GetSortedOSCNodeConst(ou32_NodeIndex, c_Node) == C_NO_ERR)
    {
-      // call code generator for each application
+      // call file generator for each application
       for (uint32 u32_Pos = 0; (u32_Pos < orc_AppIndices.size()) && (s32_Retval == C_NO_ERR); u32_Pos++)
       {
          // check if valid application index
@@ -446,7 +446,7 @@ sint32 C_ImpUtil::mh_ExportCodeNode(const uint32 ou32_NodeIndex, const std::vect
             if (pc_Application != NULL)
             {
                const QString c_CompleteExportFolderName =
-                  h_GetAbsoluteGeneratedDir(pc_Application, c_Node.c_Properties.c_Name);
+                  h_GetAbsoluteGeneratedDir(*pc_Application, c_Node.c_Properties.c_Name);
                const QString c_CompleteCodeGenerator =
                   C_PuiUtil::h_GetResolvedAbsPathFromExe(
                      pc_Application->c_CodeGeneratorPath.c_str(),
@@ -564,7 +564,7 @@ sint32 C_ImpUtil::h_OpenIDE(const QString & orc_IdeExeCall)
 
       if (q_ContinueWithExeOpening == true)
       {
-         const bool q_Temp = QProcess::startDetached(orc_IdeExeCall);
+         const bool q_Temp = QProcess::startDetached(orc_IdeExeCall, QStringList());
 
          if (q_Temp == false)
          {
@@ -585,7 +585,7 @@ sint32 C_ImpUtil::h_OpenIDE(const QString & orc_IdeExeCall)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get location of syde coder c (standard code generator)
+/*! \brief   Get location of syde coder c (standard file generator)
 
    \return
    Connectors directory location
@@ -597,50 +597,66 @@ QString C_ImpUtil::h_GetSydeCoderCPath()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get directory of generated code of application.
+/*! \brief   Get directory of generated files of application.
 
    Combine paths for given application to get absolute path of directory
-   at which code should get generated.
+   at which files should get generated.
 
-   \param[in]  opc_Application   Data block for which path is requested
+   \param[in]  orc_Application   Data block for which path is requested
    \param[in]  orc_NodeName      Node name of node where application belongs to
 
    \return
-   Absolute path to location of generated code.
+   Absolute path to location of generated files.
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OSCNodeApplication * const opc_Application,
+QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OSCNodeApplication & orc_Application,
                                              const C_SCLString & orc_NodeName)
 {
    QString c_Return;
-   QString c_GenerateDir = opc_Application->c_GeneratePath.c_str();
+   QString c_GenerateDir = orc_Application.c_GeneratePath.c_str();
 
    // check generate path: empty? --> use default relative path
-   if (c_GenerateDir.isEmpty() == true)
+   if ((c_GenerateDir.isEmpty() == true) && (orc_Application.e_Type != C_OSCNodeApplication::ePARAMETER_SET_HALC))
    {
-      C_SCLString c_Temp = "./opensyde_generated/";
-      c_Temp += C_OSCUtils::h_NiceifyStringForFileName(orc_NodeName);
-      c_Temp += "/";
-      c_Temp += C_OSCUtils::h_NiceifyStringForFileName(opc_Application->c_Name);
-      c_GenerateDir = c_Temp.c_str();
+      c_GenerateDir = h_GetDefaultGeneratedDir(orc_Application.c_Name, orc_NodeName);
    }
 
    // resolve path variables and make absolute
-   c_Return = C_PuiUtil::h_GetResolvedAbsPathFromDbProject(opc_Application->c_ProjectPath.c_str(), c_GenerateDir);
+   c_Return = C_PuiUtil::h_GetResolvedAbsPathFromDbProject(orc_Application.c_ProjectPath.c_str(), c_GenerateDir);
 
    return c_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief Check project saving before code generation.
+/*! \brief  Get default directory for generated files
 
-   Show error message if user wants to generate code without
+   \param[in]  orc_ApplicationName  Application name
+   \param[in]  orc_NodeName         Node name
+
+   \return
+   Default directory for generated files
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_ImpUtil::h_GetDefaultGeneratedDir(const C_SCLString & orc_ApplicationName, const C_SCLString & orc_NodeName)
+{
+   C_SCLString c_Return = "./opensyde_generated/";
+
+   c_Return += C_OSCUtils::h_NiceifyStringForFileName(orc_NodeName);
+   c_Return += "/";
+   c_Return += C_OSCUtils::h_NiceifyStringForFileName(orc_ApplicationName);
+   return c_Return.c_str();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief Check project saving before file generation.
+
+   Show error message if user wants to generate file without
    saving an empty project.
 
    \param[in]  opc_Parent  Parent widget (for message box)
 
    \return
-      true     project was saved -> can continue with code generation
+      true     project was saved -> can continue with file generation
       false    project was not saved -> do not continue
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -654,10 +670,10 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
       if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
       {
          C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Code generation"));
-         c_Message.SetDescription(C_GtGetText::h_GetText("Code cannot be generated without a valid project path."));
+         c_Message.SetHeading(C_GtGetText::h_GetText("File generation"));
+         c_Message.SetDescription(C_GtGetText::h_GetText("Files cannot be generated without a valid project path."));
          c_Message.SetDetails(C_GtGetText::h_GetText(
-                                 "The path where the generated code is saved must be set. "
+                                 "The path where the generated files are saved must be set. "
                                  "Save the project to set a default path."));
          c_Message.SetCustomMinHeight(180, 250);
          c_Message.Execute();
@@ -848,12 +864,11 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
    Path:         <orc_FilePath>
    Read Content: <orc_ReadContent>
 
-   \param[in]       orc_FilePath     File path of source file
-   \param[in]       orc_ReadContent  Summary of read content
+   \param[in]  orc_FilePath      File path of source file
+   \param[in]  orc_ReadContent   Summary of read content
 
    \return
    HTML table formatted string
-
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_ImpUtil::h_FormatSourceFileInfoForReport(const QString & orc_FilePath, const QString & orc_ReadContent)
@@ -945,14 +960,17 @@ void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName
    TRUE, FALSE
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{8080} //using type expected by the library for compatibility
 WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM os32_LParam)
 {
+   //lint -e{9010} //interface defined by Windows API
    T_HandleData & rc_Data = *reinterpret_cast<T_HandleData *>(os32_LParam);
    uint32 u32_ProcessId = 0;
    bool q_IsMainWindow = false;
 
    GetWindowThreadProcessId(opc_Handle, &u32_ProcessId);
 
+   //lint -e{9010} //interface defined by Windows API
    if (GetWindow(opc_Handle, GW_OWNER) == reinterpret_cast<HWND>(NULL))
    {
       if (IsWindowVisible(opc_Handle) == true)
@@ -969,12 +987,12 @@ WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Call external code generation tool.
+/*! \brief   Call external file generation tool.
 
-   Standard code generator is osy_syde_coder_c.exe, but it is not used as default,
+   Standard file generator is osy_syde_coder_c.exe, but it is not used as default,
    so the openSYDE user must provide one.
 
-   Assumption to non-default code-generator mygenerator.exe or mygenerator.bat:
+   Assumption to non-default file-generator mygenerator.exe or mygenerator.bat:
    Behave like osy_syde_coder_c.exe, i.e.
       - same console parameters
       - same return values
@@ -983,21 +1001,21 @@ WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM
    The paths provided as arguments must be absolute.
    Path checks are done by QProcess or by executable.
 
-   \param[in]      orc_NodeName        name of node to generate code for
-   \param[in]      orc_AppName         name of application to generate code for
-   \param[in]      orc_ExportFolder    path where exported code files get saved at
-   \param[out]     orc_ExportedFiles   Exported files
-   \param[in]      orc_CodeGenerator   code generator executable or batch file
-   \param[in]      orq_Erase           flag for code generator: true -> erase target folder and all sub-folders
+   \param[in]   orc_NodeName        name of node to generate files for
+   \param[in]   orc_AppName         name of application to generate files for
+   \param[in]   orc_ExportFolder    path where exported files get saved at
+   \param[out]  orc_ExportedFiles   Exported files
+   \param[in]   orc_CodeGenerator   file generator executable or batch file
+   \param[in]   orq_Erase           flag for file generator: true -> erase target folder and all sub-folders
 
    \return
    C_NO_ERR       everything worked
    C_UNKNOWN_ERR  unknown error occurred
    C_RD_WR        problems accessing file system
-                  (could not read or write code generation .exe or system definition or file list)
-   C_NOACT        Could not generate code for at least one application.
+                  (could not read or write file generation .exe or system definition or file list)
+   C_NOACT        Could not generate file for at least one application.
    C_CONFIG       Application or device for given node has wrong configuration
-   C_TIMEOUT      Timeout for code generator call.
+   C_TIMEOUT      Timeout for file generator call.
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QString & orc_AppName,
@@ -1036,7 +1054,7 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
       c_Arguments.push_back("-e"); // erase folder (only if user confirmed)
    }
 
-   // call code generation exe with arguments
+   // call file generation exe with arguments
    pc_Process->start(c_CodeGenFileInfo.absoluteFilePath(), c_Arguments);
    bool q_Tmp = pc_Process->waitForStarted();
    if (q_Tmp == true)
@@ -1064,20 +1082,20 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
             }
             else
             {
-               osc_write_log_warning("Generate Code", static_cast<QString>("Could not open file list file: \"" +
-                                                                           c_FileListFile.fileName() +
-                                                                           "\"").toStdString().c_str());
+               osc_write_log_warning("Generate Files", static_cast<QString>("Could not open file list file: \"" +
+                                                                            c_FileListFile.fileName() +
+                                                                            "\"").toStdString().c_str());
                // no error code because generation worked, only result file was not found
             }
             break;
          case 11: // eRESULT_ERASE_FILE_LIST_ERROR
             c_ErrorText =
-               "Could not remove pre-existing file list file of code generator (lies next to code generator exe).";
+               "Could not remove pre-existing file list file of generator (lies next to file generator exe).";
             s32_Return = C_RD_WR;
             break;
          case 12: // eRESULT_WRITE_FILE_LIST_ERROR
             c_ErrorText =
-               "Could not remove pre-existing file list file of code generator (lies next to code generator exe).";
+               "Could not remove pre-existing file list file of generator (lies next to file generator exe).";
             s32_Return = C_RD_WR;
             break;
          case 13: // eRESULT_ERASE_TARGET_FOLDER_ERROR
@@ -1094,7 +1112,7 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
             break;
          case 20: // eRESULT_INVALID_CLI_PARAMETERS
             c_ErrorText =
-               ("Code generator could not parse command line arguments: " +
+               ("File generator could not parse command line arguments: " +
                 c_Arguments.join(" ").toStdString()).c_str();
             s32_Return = C_CONFIG;
             break;
@@ -1103,7 +1121,7 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
             s32_Return = C_RD_WR;
             break;
          case 40: // eRESULT_CODE_GENERATION_ERROR
-            c_ErrorText = "Could not generate code for at least one application.";
+            c_ErrorText = "Could not generate files for at least one Data Block.";
             s32_Return = C_NOACT;
             break;
          case 41: // eRESULT_DEVICE_NOT_FOUND
@@ -1115,15 +1133,15 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
             s32_Return = C_CONFIG;
             break;
          case 43: // eRESULT_APPLICATION_NOT_FOUND
-            c_ErrorText = "Could not find application.";
+            c_ErrorText = "Could not find Data Block.";
             s32_Return = C_CONFIG;
             break;
          case 44: // eRESULT_APPLICATION_NOT_PROGRAMMABLE
-            c_ErrorText = "Application is not defined as programmable.";
+            c_ErrorText = "Data Block is not defined as programmable.";
             s32_Return = C_CONFIG;
             break;
          case 45: // eRESULT_APPLICATION_UNKNOWN_CODE_VERSION
-            c_ErrorText = "Application has unknown code structure version.";
+            c_ErrorText = "Data Block has unknown file structure version.";
             s32_Return = C_CONFIG;
             break;
          case 9009: // error code if a batch script includes unrecognized commands (e.g. missing executable)
@@ -1138,8 +1156,8 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
          }
          if (s32_Return != C_NO_ERR)
          {
-            //clarify that this is a problem that was reported by the invoked code generator
-            c_ErrorText = "Code generator call reported problems: " + c_ErrorText;
+            //clarify that this is a problem that was reported by the invoked file generator
+            c_ErrorText = "File generator call reported problems: " + c_ErrorText;
          }
       }
    }
@@ -1152,30 +1170,30 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
       {
       case QProcess::FailedToStart:
          c_ErrorText =
-            static_cast<QString>("Could not start code generator most likely due to insufficient permissions to "
+            static_cast<QString>("Could not start file generator most likely due to insufficient permissions to "
                                  "invoke this program or the executable is missing: " +
                                  c_CodeGenFileInfo.absoluteFilePath()).toStdString().c_str();
          s32_Return = C_UNKNOWN_ERR;
          break;
       case QProcess::Crashed:
-         c_ErrorText = "Code generator crashed some time after starting successfully.";
+         c_ErrorText = "File generator crashed some time after starting successfully.";
          s32_Return = C_CONFIG;
          break;
       case QProcess::Timedout:
-         c_ErrorText = "Timeout for code generator after 30 seconds.";
+         c_ErrorText = "Timeout for file generator after 30 seconds.";
          s32_Return = C_TIMEOUT;
          break;
       case QProcess::ReadError:
-         c_ErrorText = "Error when attempting to read from code generator process.";
+         c_ErrorText = "Error when attempting to read from file generator process.";
          s32_Return = C_RD_WR;
          break;
       case QProcess::WriteError:
-         c_ErrorText = "Error when attempting to write to the code generator process.";
+         c_ErrorText = "Error when attempting to write to the file generator process.";
          s32_Return = C_RD_WR;
          break;
       case QProcess::UnknownError:
       default:
-         c_ErrorText = "Execution of code generator process not successful. Can't get any more information.";
+         c_ErrorText = "Execution of file generator process not successful. Can't get any more information.";
          s32_Return = C_UNKNOWN_ERR;
          break;
       }
@@ -1186,7 +1204,7 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
    // write text to log
    if (s32_Return != C_NO_ERR)
    {
-      osc_write_log_error("Generate Code", c_ErrorText);
+      osc_write_log_error("Generate Files", c_ErrorText);
    }
 
    return s32_Return; //lint !e429  //no memory leak for pc_Process because of the Qt memory management

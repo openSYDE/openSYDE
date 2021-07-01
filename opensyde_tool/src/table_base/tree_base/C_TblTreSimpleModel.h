@@ -27,7 +27,7 @@ public:
 
    virtual QModelIndex index(const stw_types::sintn osn_Row, const stw_types::sintn osn_Column,
                              const QModelIndex & orc_Parent = QModelIndex()) const override;
-   virtual QModelIndex parent(const QModelIndex & orc_Index) const override;
+   virtual QModelIndex parent(const QModelIndex & orc_Index) const override; //lint !e1511  False positive
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
 
 protected:

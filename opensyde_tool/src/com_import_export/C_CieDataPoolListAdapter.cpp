@@ -44,7 +44,7 @@ using namespace stw_scl;
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
-static const stw_scl::C_SCLString mhc_MessageLineBreak = "\n"; // must be '\n' for later converting in HTML tag <br>
+static const stw_scl::C_SCLString mc_MessageLineBreak = "\n"; // must be '\n' for later converting in HTML tag <br>
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
@@ -131,7 +131,7 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDS
          {
             const stw_scl::C_SCLString & rc_OneMessage = rc_MessagesForOneCANMessage[u32_ItGroupedMessage];
             c_CombinedMessages += rc_OneMessage.c_str();
-            c_CombinedMessages += mhc_MessageLineBreak.c_str();
+            c_CombinedMessages += mc_MessageLineBreak.c_str();
          }
          if (u32_ItInfoMessage < orc_OSCRxMessageData.size())
          {
@@ -181,7 +181,7 @@ void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDBCValues(
          for (uint32 u32_Pos = 0; u32_Pos < c_CanMessageIter->c_Warnings.GetCount(); u32_Pos++)
          {
             c_Tmp += c_CanMessageIter->c_Warnings.Strings[u32_Pos];
-            c_Tmp += mhc_MessageLineBreak;
+            c_Tmp += mc_MessageLineBreak;
          }
          orc_WarningMessages.push_back(c_Tmp.c_str());
       }

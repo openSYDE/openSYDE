@@ -514,3 +514,30 @@ void C_OSCHalcDefContent::CalcHashElement(uint32 & oru32_HashValue, const uint32
       this->mc_BitmaskItems[u32_It].CalcHash(oru32_HashValue);
    }
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calculates the hash value over structure only
+
+   The hash value is a 32 bit CRC value.
+
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcDefContent::CalcHashStructure(uint32 & oru32_HashValue) const
+{
+   C_OSCNodeDataPoolContent::CalcHashStructure(oru32_HashValue);
+
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_ComplexType, sizeof(this->me_ComplexType), oru32_HashValue);
+
+   for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = this->mc_EnumItems.begin();
+        c_It != this->mc_EnumItems.end(); ++c_It)
+   {
+      stw_scl::C_SCLChecksums::CalcCRC32(c_It->first.c_str(), c_It->first.Length(), oru32_HashValue);
+      c_It->second.CalcHash(oru32_HashValue);
+   }
+
+   for (uint32 u32_It = 0UL; u32_It < this->mc_BitmaskItems.size(); ++u32_It)
+   {
+      this->mc_BitmaskItems[u32_It].CalcHashStructure(oru32_HashValue);
+   }
+}

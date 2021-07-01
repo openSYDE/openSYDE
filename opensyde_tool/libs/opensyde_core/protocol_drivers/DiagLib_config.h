@@ -13,6 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "SCLDynamicArray.h"
+#include "C_OSCUtils.h"
 
 /* -- Defines ------------------------------------------------------------------------------------------------------- */
 //if the diaglib shall become part of a bigger library a keyword to export classes and functions might be required
@@ -31,6 +32,9 @@
 //disable logging functionality of KEFEX protocol driver
 //so the dependency from the CCMONProtocol classes is resolved:
 #define DIAGLIB_KEFEX_PROTOCOL_NO_LOGGING
+
+//DiagLib needs TGL_LoadStr; we have our own implementation:
+#define TGL_LoadStr stw_opensyde_core::C_OSCUtils::h_LoadString
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 

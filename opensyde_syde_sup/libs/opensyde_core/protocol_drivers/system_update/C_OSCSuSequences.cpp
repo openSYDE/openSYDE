@@ -12,8 +12,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <fstream>
-#include <iterator>
 #include <set>
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -1681,14 +1679,6 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
             //file(s) defined for inactive node -> cry
             s32_Return = C_NOACT;
          }
-         if ((orc_ActiveNodes[u16_Node] == 1U) &&
-             (orc_Nodes[u16_Node].pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == false) &&
-             (orc_ApplicationsToWrite[u16_Node].c_FilesToFlash.size() != orc_Nodes[u16_Node].c_Applications.size()))
-         {
-            //different number of files for node than applications
-            // Check is not relevant for file based servers
-            s32_Return = C_NOACT;
-         }
 
          if (s32_Return == C_NO_ERR)
          {
@@ -1847,7 +1837,7 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                }
 
                //copy file
-               s32_Return = mh_CopyFile(c_SourceFileName, c_TargetFileName, opc_ErrorPath);
+               s32_Return = C_OSCUtils::h_CopyFile(c_SourceFileName, c_TargetFileName, opc_ErrorPath);
                if (s32_Return == C_NO_ERR)
                {
                   c_NodesToFlashNewPaths[u16_Node].c_FilesToFlash[u16_File] = c_TargetFileName;
@@ -1872,7 +1862,7 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                   TGL_ExtractFileName(orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm[u16_File]);
 
                //copy file
-               s32_Return = mh_CopyFile(c_SourceFileName, c_TargetFileName, opc_ErrorPath);
+               s32_Return = C_OSCUtils::h_CopyFile(c_SourceFileName, c_TargetFileName, opc_ErrorPath);
                if (s32_Return == C_NO_ERR)
                {
                   c_NodesToFlashNewPaths[u16_Node].c_FilesToWriteToNvm[u16_File] = c_TargetFileName;
@@ -3855,74 +3845,4 @@ uint32 C_OSCSuSequences::m_GetAdaptedTransferDataTimeout(const uint32 ou32_Devic
                       C_SCLString::IntToStr(u32_AdaptedTime) + "ms");
 
    return u32_AdaptedTime;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Copies a file from source to target folder (internal function).
-
-   Assumptions:
-   * read permission of source folder
-   * write permission of target folder
-
-   \param[in]  orc_SourceFile            source file (full path required)
-   \param[in]  orc_TargetFile            target file (        -"-       )
-   \param[out] opc_ErrorPath             if != NULL and the function fails:
-                                          file path (source or target) that caused the problem
-
-   \return
-   C_NO_ERR    success
-   C_RD_WR     read/write error (see log file for details)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSuSequences::mh_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLString & orc_TargetFile,
-                                     C_SCLString * const opc_ErrorPath)
-{
-   sint32 s32_Return = C_NO_ERR;
-
-   std::fstream c_Input(orc_SourceFile.c_str(), std::fstream::in | std::fstream::binary);
-   if (c_Input.fail() == true)
-   {
-      osc_write_log_error("Copying file", "Could not read \"" + orc_SourceFile + "\".");
-      s32_Return = C_RD_WR;
-      if (opc_ErrorPath != NULL)
-      {
-         *opc_ErrorPath = orc_SourceFile;
-      }
-   }
-   else
-   {
-      c_Input << &std::noskipws;
-
-      const std::istream_iterator<uint8> c_Begin(c_Input);
-      const std::istream_iterator<uint8> c_End;
-
-      std::fstream c_Output(orc_TargetFile.c_str(), std::fstream::out | std::fstream::trunc | std::fstream::binary);
-      if (c_Output.fail() == true)
-      {
-         osc_write_log_error("Copying file", "Could not write \"" + orc_TargetFile + "\".");
-         s32_Return = C_RD_WR;
-         if (opc_ErrorPath != NULL)
-         {
-            *opc_ErrorPath = orc_TargetFile;
-         }
-      }
-      else
-      {
-         const std::ostream_iterator<uint8> c_Begin2(c_Output);
-         try
-         {
-            std::copy(c_Begin, c_End, c_Begin2);
-         }
-         catch (...)
-         {
-            osc_write_log_error("Copying file", "Could not write stream of \"" + orc_TargetFile + "\".");
-            s32_Return = C_RD_WR;
-            if (opc_ErrorPath != NULL)
-            {
-               *opc_ErrorPath = orc_TargetFile;
-            }
-         }
-      }
-   }
-   return s32_Return;
 }

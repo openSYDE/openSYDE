@@ -11,10 +11,10 @@
 #define CONSTANTS_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "stwtypes.h"
 #include <QColor>
 #include <QFont>
 #include <QSize>
+#include "stwtypes.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -43,7 +43,7 @@ const stw_types::sintn msn_TIMER_INTERVAL = 10; //ms
 //GUI refresh timer
 const stw_types::sintn msn_TIMER_GUI_REFRESH = 100; //ms
 
-//Dashboard timeot factor
+//Dashboard timeout factor
 const stw_types::uint32 mu32_DASHBOARD_TIMEOUT_FACTOR = 10U;
 const stw_types::uint32 mu32_DASHBOARD_TIMEOUT_TOLERANCE = 20; // Tolerance in percentage
 
@@ -147,7 +147,7 @@ const QFont mc_STYLE_GUIDE_FONT_REGULAR_48  = QFont("Segoe UI", 48);
 //Double spin boxes
 const stw_types::sintn msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT = 300;
 
-//Transparence configuration for timeout visualization
+//Transparency configuration for timeout visualization
 const stw_types::sintn msn_TRANSPARENCY_START = 80;
 const stw_types::sintn msn_TRANSPARENCY_END = 255;
 
@@ -191,7 +191,7 @@ const QString mc_PATH_VARIABLE_DATABLOCK_PROJ = "%{PROJECT_DIR}";
 const QString mc_PATH_VARIABLE_USER_NAME = "%{USER_NAME}";
 const QString mc_PATH_VARIABLE_COMPUTER_NAME = "%{COMPUTER_NAME}";
 
-// Identifier of update package subsections
+// Identifier of update package subsections or items
 const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK = 0U;
 const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET = 1U;
 const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE = 2U;

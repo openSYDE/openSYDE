@@ -68,7 +68,7 @@ C_GiSvDaArrow::C_GiSvDaArrow(const uint32 & oru32_ViewIndex, const uint32 & oru3
                if (pc_Item != NULL)
                {
                   m_Init(pc_Item->c_UIInteractionPoints);
-                  this->LoadData();
+                  this->C_GiSvDaArrow::LoadData();
                }
             }
          }

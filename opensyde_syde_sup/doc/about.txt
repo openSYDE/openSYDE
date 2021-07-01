@@ -6,12 +6,12 @@ Content:   Information about this project
 Description:
 ============
 SYDEsup is a console application for updating your system with a Service
-Update Package created with openSYDE.
+Update Package created with openSYDE GUI.
 
 Features:
 * Unpack Service Update Package and update system with resulting information
 * Communication via CAN or Ethernet
-* Configuration through command line parameters (call .exe without parameters to get a list of options)
+* Configuration through command line parameters (run SYDEsup without parameters to get a list of options)
 
 Non-Features:
 * Update system without previous use of openSYDE to create Service Update Package

@@ -29,7 +29,7 @@ public:
    explicit C_OgeLeIpAddress(QWidget * const opc_Parent = NULL);
    ~C_OgeLeIpAddress(void);
 
-   void SetIPAddress(const stw_types::uint8 oau8_IPAddress[]);
+   void SetIPAddress(const stw_types::uint8 * const opu8_IPAddress);
    std::vector<stw_types::sint32> GetIPAddress(void) const;
 
 protected:

@@ -1183,9 +1183,9 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 
          {
             //comm error: no data read even though it was reported by ioctl
             osc_write_log_error("openSYDE IP-TP",
-                                 "ReadUdp unexpected error: data reported as available but reading failed. Reported size: " +
-                                 C_SCLString::IntToStr(
-                                    orc_Data.size()) + " Read size: " + C_SCLString::IntToStr(sn_Return));
+                                "ReadUdp unexpected error: data reported as available but reading failed. Reported size: " +
+                                C_SCLString::IntToStr(
+                                   orc_Data.size()) + " Read size: " + C_SCLString::IntToStr(sn_Return));
             s32_Return = C_RD_WR;
          }
       }

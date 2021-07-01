@@ -56,6 +56,7 @@ C_GiSyBoundaryWidget::C_GiSyBoundaryWidget(C_GiSyBaseWidget & orc_Parent) :
 {
    QPixmap c_Pic;
 
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    c_Pic.load(mc_PATH_BACKGROUND_IMG);
 
    mpc_Ui->setupUi(this);

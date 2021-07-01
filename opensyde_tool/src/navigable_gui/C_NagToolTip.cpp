@@ -12,11 +12,13 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QApplication>
+#include <QScreen>
+#include <QGuiApplication>
 #include <QDesktopWidget>
 #include <QAbstractTextDocumentLayout>
 #include <QGraphicsDropShadowEffect>
 #include "stwtypes.h"
+#include "TGLUtils.h"
 #include "constants.h"
 #include "C_OgeWiUtil.h"
 #include "C_NagToolTip.h"
@@ -43,9 +45,9 @@ std::vector<QPointer<C_NagToolTip> > C_NagToolTip::mhc_ExistingToolTips;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in] orc_Heading Optional heading
-   \param[in] orc_Content Optional content
-   \param[in] opc_Parent  Optional parent
+   \param[in]  orc_Heading    Optional heading
+   \param[in]  orc_Content    Optional content
+   \param[in]  opc_Parent     Optional parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_NagToolTip::C_NagToolTip(const QString & orc_Heading, const QString & orc_Content, QWidget * const opc_Parent) :
@@ -88,7 +90,7 @@ C_NagToolTip::~C_NagToolTip()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new heading
 
-   \param[in] orc_Heading New heading
+   \param[in]  orc_Heading    New heading
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolTip::SetHeading(const QString & orc_Heading) const
@@ -107,7 +109,7 @@ void C_NagToolTip::SetHeading(const QString & orc_Heading) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new content
 
-   \param[in] orc_Content New content
+   \param[in]  orc_Content    New content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolTip::SetContent(const QString & orc_Content) const
@@ -126,7 +128,7 @@ void C_NagToolTip::SetContent(const QString & orc_Content) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set tooltip type
 
-   \param[in] oe_Type Tooltip type
+   \param[in]  oe_Type  Tooltip type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolTip::SetType(const C_NagToolTip::E_Type oe_Type) const
@@ -144,6 +146,9 @@ void C_NagToolTip::SetType(const C_NagToolTip::E_Type oe_Type) const
    case eERROR:
       c_NewType = "ERROR";
       break;
+   default:
+      tgl_assert(false);
+      break;
    }
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->mpc_GroupBox, "Type", c_NewType);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->mpc_Heading, "Type", c_NewType);
@@ -153,42 +158,47 @@ void C_NagToolTip::SetType(const C_NagToolTip::E_Type oe_Type) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move widget position
 
-   \param[in] orc_GlobalPos Global target position of top left corner
+   \param[in]  orc_GlobalPos  Global target position of top left corner
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolTip::DoMove(const QPoint & orc_GlobalPos)
 {
    // get available space of monitor where tool-tip was requested (e.g. subtract windows task bar from whole monitor)
-   const QDesktopWidget * const pc_Desktop = QApplication::desktop();
-   const QRect c_RectMonitor = pc_Desktop->availableGeometry(orc_GlobalPos);
+   const QScreen * const pc_Screen = QGuiApplication::screenAt(orc_GlobalPos);
 
-   stw_types::sintn sn_NewY = orc_GlobalPos.y();
-   stw_types::sintn sn_NewX = orc_GlobalPos.x();
-   const sintn sn_DistanceToBorder = 20; //space between tooltip and boarder
-
-   this->updateGeometry();
-
-   // x coordinate out of monitor
-   if ((sn_NewX + this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width()) >
-       (c_RectMonitor.x() + c_RectMonitor.width()))
+   if (pc_Screen != NULL)
    {
-      // max of left border of monitor and right border of monitor minus tool-tip-width
-      sn_NewX = std::max(c_RectMonitor.x() + sn_DistanceToBorder,
-                         (c_RectMonitor.x() + c_RectMonitor.width()) -
-                         (this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width() + sn_DistanceToBorder));
-   }
+      const QRect c_RectMonitor = pc_Screen->availableGeometry();
 
-   // y coordinate out of monitor
-   if ((sn_NewY + this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) >
-       (c_RectMonitor.y() + c_RectMonitor.height()))
-   {
-      //display tooltip above global pos (otheriwse the global pos is inside the tooltip
-      // which usally means the mouse is inside the tooltip which then will trigger the tooltip to instantly hide
-      // Also include the distance to the border so the mouse does not even touch the tooltip
-      sn_NewY = (orc_GlobalPos.y() - this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) - sn_DistanceToBorder;
-   }
+      stw_types::sintn sn_NewY = orc_GlobalPos.y();
+      stw_types::sintn sn_NewX = orc_GlobalPos.x();
+      const sintn sn_DistanceToBorder = 20; //space between tooltip and boarder
 
-   this->move(QPoint(sn_NewX, sn_NewY));
+      this->updateGeometry();
+
+      // x coordinate out of monitor
+      if ((sn_NewX + this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width()) >
+          (c_RectMonitor.x() + c_RectMonitor.width()))
+      {
+         // max of left border of monitor and right border of monitor minus tool-tip-width
+         sn_NewX = std::max(c_RectMonitor.x() + sn_DistanceToBorder,
+                            (c_RectMonitor.x() + c_RectMonitor.width()) -
+                            (this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width() + sn_DistanceToBorder));
+      }
+
+      // y coordinate out of monitor
+      if ((sn_NewY + this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) >
+          (c_RectMonitor.y() + c_RectMonitor.height()))
+      {
+         //display tooltip above global pos (otheriwse the global pos is inside the tooltip
+         // which usally means the mouse is inside the tooltip which then will trigger the tooltip to instantly hide
+         // Also include the distance to the border so the mouse does not even touch the tooltip
+         sn_NewY = (orc_GlobalPos.y() - this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) -
+                   sn_DistanceToBorder;
+      }
+
+      this->move(QPoint(sn_NewX, sn_NewY));
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -230,7 +240,7 @@ bool C_NagToolTip::h_HideAll(void)
 
    Here: Handle all existing tooltips if necessary
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolTip::showEvent(QShowEvent * const opc_Event)
@@ -276,7 +286,7 @@ void C_NagToolTip::showEvent(QShowEvent * const opc_Event)
 
    Here: Hide tool-tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolTip::leaveEvent(QEvent * const opc_Event)

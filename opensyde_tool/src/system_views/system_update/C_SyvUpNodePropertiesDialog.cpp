@@ -10,6 +10,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include "TGLUtils.h"
+
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
 #include "C_OgeWiCustomMessage.h"
@@ -59,6 +61,7 @@ C_SyvUpNodePropertiesDialog::C_SyvUpNodePropertiesDialog(stw_opensyde_gui_elemen
    mpc_HexFileInfos(NULL),
    mpc_HexAppInfoAmbiguous(NULL),
    mpc_ParamFileInfos(NULL),
+   mpc_FileInfos(NULL),
    mpc_STWDevice(NULL),
    mpc_OSYDevice(NULL),
    mq_UpdateFailed(oq_UpdateFailed),
@@ -114,7 +117,6 @@ C_SyvUpNodePropertiesDialog::C_SyvUpNodePropertiesDialog(stw_opensyde_gui_elemen
 C_SyvUpNodePropertiesDialog::~C_SyvUpNodePropertiesDialog(void)
 {
    delete mpc_Ui;
-   //lint -e{1740} Never took ownership of mpc_FileInfos, mpc_STWDevice, mpc_OSYDevice
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -280,7 +282,7 @@ void C_SyvUpNodePropertiesDialog::m_InitStatus(void) const
 {
    QIcon c_Icon;
 
-   if (this->mq_ValidStatus)
+   if (this->mq_ValidStatus == true)
    {
       switch (this->me_Status)
       {
@@ -296,9 +298,13 @@ void C_SyvUpNodePropertiesDialog::m_InitStatus(void) const
          c_Icon = QIcon("://images/Error_iconV2.svg");
          this->mpc_Ui->pc_LabelDescription->setText(C_GtGetText::h_GetText("Node not found. Check connection!"));
          break;
-      default:
+      case C_SyvUtil::eI_UPDATE_DISABLED:
+      case C_SyvUtil::eI_UNKNOWN:
          c_Icon = QIcon("");
          this->mpc_Ui->pc_LabelDescription->setText("");
+         break;
+      default:
+         tgl_assert(false);
          break;
       }
    }

@@ -282,7 +282,7 @@ void C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived(void * const op
 {
    //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
    C_OSCCanDispatcherOsyRouter * const pc_Dispatcher =
-      reinterpret_cast<C_OSCCanDispatcherOsyRouter * const>(opv_Instance);
+      reinterpret_cast<C_OSCCanDispatcherOsyRouter *>(opv_Instance);
 
    tgl_assert(pc_Dispatcher != NULL);
    if (pc_Dispatcher != NULL)

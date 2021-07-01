@@ -154,7 +154,7 @@ public:
                                           stw_opensyde_core::C_OSCHalcDefDomain::E_VariableSelector & ore_Selector,
                                           stw_types::uint32 & oru32_ParameterIndex, bool & orq_UseElementIndex,
                                           stw_types::uint32 & oru32_ParameterElementIndex, bool & orq_IsUseCaseIndex,
-                                          bool & orq_IsChanNumIndex) const;
+                                          bool & orq_IsChanNumIndex, bool & orq_IsSafetyFlagIndex) const;
    stw_types::sint32 IsHalcClear(const stw_types::uint32 ou32_NodeIndex, bool & orq_IsClear);
    stw_types::sint32 CheckHALCDomainChannelLinked(const stw_types::uint32 ou32_NodeIndex,
                                                   const stw_types::uint32 ou32_DomainIndex,
@@ -182,6 +182,7 @@ public:
    stw_types::sint32 HALCGenerateDatapools(const stw_types::uint32 ou32_NodeIndex);
    stw_types::sint32 HALCRemoveDatapools(const stw_types::uint32 ou32_NodeIndex,
                                          const bool oq_SuppressSyncSignal = false);
+   stw_types::sint32 HALCResetDataBlocks(const stw_types::uint32 ou32_NodeIndex);
    bool CheckHALCChannelNameAvailable(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DomainIndex,
                                       const stw_scl::C_SCLString & orc_ChannelName,
                                       const stw_types::uint32 * const opu32_ChannelIndexToSkip = NULL) const;
@@ -189,6 +190,9 @@ public:
 private:
    static C_PuiSdNodeDataPool mh_GetUiDatapoolForOSCDataPool(
       const stw_opensyde_core::C_OSCNodeDataPool & orc_OSCDatapool);
+
+   std::map<stw_types::uint32, stw_types::uint32> mc_PreviousHashes; // key: node index, value: previous hash
+   // value
 
    static stw_types::sint32 mh_GetIndexInVector(const std::vector<stw_opensyde_core::C_OSCHalcDefStruct> & orc_Structs,
                                                 const stw_types::uint32 ou32_StartingIndex,

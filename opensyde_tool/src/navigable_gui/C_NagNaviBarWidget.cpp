@@ -62,7 +62,7 @@ static const sintn msn_MINIMIZED_WIDTH = 36; //36 = min size of minimize/maximiz
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
@@ -113,10 +113,12 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_WidgetTabSc->SetIncludeLeftBorder(true);
 
    //Set SVGs
-   this->mpc_Ui->pc_WidgetTabSd->SetIconSvg("://images/IconSystemDefinition.svg");
-   this->mpc_Ui->pc_WidgetTabSc->SetIconSvg("://images/IconSystemCommissioning.svg");
+   this->mpc_Ui->pc_WidgetTabSd->SetIconSvg("://images/IconSystemDefinition.svg",
+                                            "://images/IconSystemDefinitionGray.svg");
+   this->mpc_Ui->pc_WidgetTabSc->SetIconSvg("://images/IconSystemCommissioning.svg",
+                                            "://images/IconSystemCommissioning.svg");
    this->mpc_Ui->pc_PushButtonAddSysView->SetCustomIcon("://images/main_page_and_navi_bar/Icon_new_project.svg",
-                                                        "://images/main_page_and_navi_bar/Icon_new_project.svg");
+                                                        "://images/main_page_and_navi_bar/Icon_new_project_disabled.svg");
    this->mpc_Ui->pc_PushButtonCanMonitor->SetCustomIcon(":/images/CanMonitorIcon_Navibar.png",
                                                         ":/images/CanMonitorIcon_Navibar.png");
 
@@ -182,7 +184,6 @@ C_NagNaviBarWidget::~C_NagNaviBarWidget()
    SaveUserSettings();
 
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent all elements and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -210,7 +211,7 @@ void C_NagNaviBarWidget::UpdateNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle view icons update
 
-   \param[in] ou32_ViewIndex       Index to specify which view changed
+   \param[in]  ou32_ViewIndex    Index to specify which view changed
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::UpdateViewIcons(const uint32 ou32_ViewIndex) const
@@ -230,7 +231,7 @@ void C_NagNaviBarWidget::UpdateAllViewsIcons(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle all screens icons update
 
-   \param[in] oq_CheckAll Flag if all icons should be checked
+   \param[in]  oq_CheckAll    Flag if all icons should be checked
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::UpdateAllScreenIcons(const bool oq_CheckAll) const
@@ -356,7 +357,7 @@ void C_NagNaviBarWidget::MarkModeForDataChanged(const bool oq_Changed, const boo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Specific function to reset any change use-case request to its original state
 
-   \param[in] os32_Mode Use-case to revert to
+   \param[in]  os32_Mode   Use-case to revert to
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::ResetUseCaseAfterChangeFailure(const sint32 os32_Mode) const
@@ -453,11 +454,22 @@ void C_NagNaviBarWidget::SaveUserSettings(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle service mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagNaviBarWidget::HandleServiceMode(void) const
+{
+   this->mpc_Ui->pc_WidgetTabSd->SetEnabled(!C_PuiSvHandler::h_GetInstance()->GetServiceModeActive());
+   this->mpc_Ui->pc_ListViewViews->HandleServiceMode();
+   this->mpc_Ui->pc_PushButtonAddSysView->setEnabled(!C_PuiSvHandler::h_GetInstance()->GetServiceModeActive());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten hide event slot
 
    Here: Save splitter position
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::hideEvent(QHideEvent * const opc_Event)
@@ -471,7 +483,7 @@ void C_NagNaviBarWidget::hideEvent(QHideEvent * const opc_Event)
 
    Here: handle the system view size
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::resizeEvent(QResizeEvent * const opc_Event)
@@ -486,7 +498,7 @@ void C_NagNaviBarWidget::resizeEvent(QResizeEvent * const opc_Event)
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::paintEvent(QPaintEvent * const opc_Event)
@@ -641,6 +653,9 @@ void C_NagNaviBarWidget::m_OpenCanMonitor(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle rename view action
+
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  orc_Name          Name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_SysViewRenameClicked(const stw_types::uint32 ou32_ViewIndex, const QString & orc_Name)
@@ -650,6 +665,8 @@ void C_NagNaviBarWidget::m_SysViewRenameClicked(const stw_types::uint32 ou32_Vie
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle delete view action
+
+   \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_SysViewDeleteClicked(const stw_types::uint32 ou32_ViewIndex)
@@ -659,6 +676,8 @@ void C_NagNaviBarWidget::m_SysViewDeleteClicked(const stw_types::uint32 ou32_Vie
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle duplicate view action
+
+   \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_SysViewDuplicateClicked(const stw_types::uint32 ou32_ViewIndex)
@@ -773,7 +792,7 @@ void C_NagNaviBarWidget::m_UpdateBusErrors(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle bus click
 
-   \param[in] osn_Index Selected index
+   \param[in]  osn_Index   Selected index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_OnClickBus(const sintn osn_Index)
@@ -792,7 +811,7 @@ void C_NagNaviBarWidget::m_OnClickBus(const sintn osn_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle node click
 
-   \param[in] osn_Index Selected index
+   \param[in]  osn_Index   Selected index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_OnClickNode(const sintn osn_Index)
@@ -812,10 +831,10 @@ void C_NagNaviBarWidget::m_OnClickNode(const sintn osn_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Select view
 
-   \param[in] ou32_ViewIndex     View index
-   \param[in] os32_SubMode       Sub mode
-   \param[in] orc_Name           Selected view name
-   \param[in] orc_SubSubItemName Selected sub sub mode name
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  os32_SubMode         Sub mode
+   \param[in]  orc_Name             Selected view name
+   \param[in]  orc_SubSubItemName   Selected sub sub mode name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_SelectView(const uint32 ou32_ViewIndex, const sint32 os32_SubMode, const QString & orc_Name,
@@ -829,8 +848,8 @@ void C_NagNaviBarWidget::m_SelectView(const uint32 ou32_ViewIndex, const sint32 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   update all view icons (depends on current state)
 
-   \param[in] oq_CheckOnlyThisView Flag to reduce view error check to one item (only used in view state)
-   \param[in] ou32_ViewIndex       Index to specify which view changed (only used if oq_CheckOnlyThisView set)
+   \param[in]  oq_CheckOnlyThisView    Flag to reduce view error check to one item (only used in view state)
+   \param[in]  ou32_ViewIndex          Index to specify which view changed (only used if oq_CheckOnlyThisView set)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_UpdateViewIcons(const bool oq_CheckOnlyThisView, const uint32 ou32_ViewIndex) const

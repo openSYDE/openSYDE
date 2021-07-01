@@ -35,6 +35,8 @@ private:
                                     C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_ParseApplication(C_OSCTargetSupportPackage & orc_TargetSupportPackage,
                                                 C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_ParseHalcSection(C_OSCTargetSupportPackage & orc_TargetSupportPackage,
+                                                C_OSCXMLParserBase & orc_XMLParser);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

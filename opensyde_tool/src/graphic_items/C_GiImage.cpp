@@ -67,7 +67,7 @@ C_GiImage::C_GiImage(const QPixmap & orc_Pixmap, const float64 of64_Width, const
    C_GiBiSizeableItem(of64_Width, of64_Height),
    mc_OriginalPixmap(orc_Pixmap)
 {
-   this->Redraw();
+   this->C_GiImage::Redraw();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

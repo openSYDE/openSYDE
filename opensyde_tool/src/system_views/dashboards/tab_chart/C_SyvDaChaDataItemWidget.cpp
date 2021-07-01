@@ -178,7 +178,8 @@ void C_SyvDaChaDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementConfi
       {
          if (pc_Datapool != NULL)
          {
-            if (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC)
+            if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC) ||
+                (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
             {
                c_Name = C_PuiSvHandler::h_GetShortNamespace(orc_DataPoolElementId);
             }
@@ -666,7 +667,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
    }
    else
    {
-      // HAL datapool
+      // HAL or HAL_NVM datapool
       const C_OSCHalcDefDomain::E_Category e_Category = C_PuiSdHandler::h_GetInstance()->GetDomainCategoryFromDpId(
          this->mc_DataPoolElementId, this->mc_DataPoolElementId.GetArrayElementIndexOrZero());
 

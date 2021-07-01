@@ -80,7 +80,7 @@ void C_CamGenSigTableDelegate::setEditorData(QWidget * const opc_Editor, const Q
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeCbxTableBase * C_CamGenSigTableDelegate::m_CreateComboBox(QWidget * const opc_Parent) const
 {
-   C_CamOgeCbxTable * pc_Combobox = new C_CamOgeCbxTable(opc_Parent);
+   C_CamOgeCbxTable * const pc_Combobox = new C_CamOgeCbxTable(opc_Parent);
 
    return pc_Combobox;
 }

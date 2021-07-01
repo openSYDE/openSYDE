@@ -72,7 +72,7 @@ void C_OgeSpxFactor::stepBy(const sintn osn_Steps)
    }
    else
    {
-      const sintn sn_StepsPos = osn_Steps * -1;
+      const sintn sn_StepsPos = std::abs(osn_Steps);
       if (f64_CurValue > (static_cast<float64>(sn_StepsPos) * 1.0))
       {
          C_OgeSpxDoubleToolTipBase::stepBy(osn_Steps);

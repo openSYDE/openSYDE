@@ -352,6 +352,7 @@ void C_GiSvPc::UpdateData(void)
 /*! \brief   Delete data in system views
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
 void C_GiSvPc::DeleteData(void)
 {
    //Not allowed
@@ -572,26 +573,24 @@ void C_GiSvPc::m_DetectIconSize(void)
 {
    const uint32 u32_ScaleCategory = this->m_GetScaleCategory();
 
-   if (u32_ScaleCategory == mhu32_ScaleCategory0)
+   switch (u32_ScaleCategory)
    {
+   case mhu32_ScaleCategory0:
       this->ms32_IconSize = 24;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory1)
-   {
+      break;
+   case mhu32_ScaleCategory1:
       this->ms32_IconSize = 36;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory2)
-   {
+      break;
+   case mhu32_ScaleCategory2:
       this->ms32_IconSize = 48;
-   }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory3)
-   {
+      break;
+   case mhu32_ScaleCategory3:
       this->ms32_IconSize = 72;
-   }
-   else
-   {
+      break;
+   default:
       // fallback
       this->ms32_IconSize = 24;
+      break;
    }
 }
 

@@ -744,6 +744,9 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
                }
             }
             break;
+         case eSAFETY_RELEVANT:
+            // No text
+            break;
          default:
             break;
          }
@@ -878,6 +881,8 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
                            }
                         }
                         break;
+                     default:
+                        break;
                      }
                      c_Tmp.push_back(c_Path);
                   }
@@ -919,6 +924,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
          case eTYPE:
          case eDATAPOOL:
          case eDATABLOCK_ASSIGNMENT:
+         default:
             c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
             break;
          }

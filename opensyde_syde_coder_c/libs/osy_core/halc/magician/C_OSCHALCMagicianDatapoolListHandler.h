@@ -22,56 +22,62 @@ namespace stw_opensyde_core
 class C_OSCHALCMagicianDatapoolListHandler
 {
 public:
-   C_OSCHALCMagicianDatapoolListHandler(const C_OSCHalcConfig & orc_HalcConfig);
+   C_OSCHALCMagicianDatapoolListHandler(const C_OSCHalcConfig & orc_HalcConfig,
+                                        const C_OSCHalcDefDomain::E_VariableSelector oe_Selector, const bool oq_IsSafe);
 
    C_OSCNodeDataPoolListElement * GetListElement(const stw_types::uint32 ou32_DomainIndex,
                                                  const stw_types::uint32 ou32_ParameterStructIndex,
                                                  const stw_types::uint32 ou32_ParameterStructElementIndex,
-                                                 C_OSCNodeDataPoolList & orc_List,
-                                                 const C_OSCHalcDefDomain::E_VariableSelector oe_Selector,
-                                                 const bool oq_IsSafe) const;
+                                                 C_OSCNodeDataPoolList & orc_List) const;
    const C_OSCNodeDataPoolListElement * GetListElementConst(const stw_types::uint32 ou32_DomainIndex,
                                                             const stw_types::uint32 ou32_ParameterStructIndex,
                                                             const stw_types::uint32 ou32_ParameterStructElementIndex,
-                                                            const C_OSCNodeDataPoolList & orc_List,
-                                                            const C_OSCHalcDefDomain::E_VariableSelector oe_Selector,
-                                                            const bool oq_IsSafe)
+                                                            const C_OSCNodeDataPoolList & orc_List)
    const;
    C_OSCNodeDataPoolListElement * GetUseCaseListElement(const stw_types::uint32 ou32_DomainIndex,
-                                                        C_OSCNodeDataPoolList & orc_List, const bool oq_IsSafe) const;
+                                                        C_OSCNodeDataPoolList & orc_List) const;
    const C_OSCNodeDataPoolListElement * GetUseCaseListElementConst(const stw_types::uint32 ou32_DomainIndex,
-                                                                   const C_OSCNodeDataPoolList & orc_List,
-                                                                   const bool oq_IsSafe)
+                                                                   const C_OSCNodeDataPoolList & orc_List)
    const;
    C_OSCNodeDataPoolListElement * GetChanNumListElement(const stw_types::uint32 ou32_DomainIndex,
-                                                        C_OSCNodeDataPoolList & orc_List, const bool oq_IsSafe) const;
+                                                        C_OSCNodeDataPoolList & orc_List) const;
    const C_OSCNodeDataPoolListElement * GetChanNumListElementConst(const stw_types::uint32 ou32_DomainIndex,
-                                                                   const C_OSCNodeDataPoolList & orc_List,
-                                                                   const bool oq_IsSafe)
+                                                                   const C_OSCNodeDataPoolList & orc_List)
+   const;
+   C_OSCNodeDataPoolListElement * GetSafetyFlagListElement(const stw_types::uint32 ou32_DomainIndex,
+                                                           C_OSCNodeDataPoolList & orc_List) const;
+   const C_OSCNodeDataPoolListElement * GetSafetyFlagListElementConst(const stw_types::uint32 ou32_DomainIndex,
+                                                                      const C_OSCNodeDataPoolList & orc_List)
    const;
 
-   static stw_types::uint32 h_CountRelevantItems(const std::vector<C_OSCHalcConfigChannel> & orc_Channels,
-                                                 const C_OSCHalcConfigChannel & orc_DomainConfig, const bool oq_IsSafe);
+   stw_types::uint32 CountRelevantItems(const std::vector<C_OSCHalcConfigChannel> & orc_Channels,
+                                        const C_OSCHalcConfigChannel & orc_DomainConfig) const;
 
    static stw_types::uint32 h_CountElements(const std::vector<C_OSCHalcDefStruct> & orc_Structs);
    static stw_types::uint32 h_CountElements(const C_OSCHalcDefStruct & orc_Struct);
+   bool CheckChanPresent(const C_OSCHalcConfigChannel & orc_ChannelConfig) const;
+   bool CheckChanRelevant(const C_OSCHalcConfigChannel & orc_ChannelConfig) const;
+   bool CheckChanNumVariableNecessary(const C_OSCHalcConfigDomain & orc_ChannelConfig) const;
+   bool CheckSafetyFlagVariableNecessary(void) const;
+   bool CheckUseCaseVariableNecessary(const C_OSCHalcConfigDomain & orc_Domain) const;
 
 private:
    //lint -e{1725} it is indeed a reference (improves performance)
    const C_OSCHalcConfig & mrc_HalcConfig;
+   const C_OSCHalcDefDomain::E_VariableSelector me_Selector;
+   const bool mq_IsSafe;
 
    stw_types::sint32 m_GetListIndex(const stw_types::uint32 ou32_DomainIndex,
                                     const stw_types::uint32 ou32_ParameterStructIndex,
                                     const stw_types::uint32 ou32_ParameterStructElementIndex,
-                                    stw_types::uint32 & oru32_ListIndex,
-                                    const C_OSCHalcDefDomain::E_VariableSelector oe_Selector,
-                                    const bool oq_GetUseCaseIndex, const bool oq_GetChanNumIndex,
-                                    const bool oq_IsSafe) const;
+                                    stw_types::uint32 & oru32_ListIndex, const bool oq_GetUseCaseIndex,
+                                    const bool oq_GetChanNumIndex, const bool oq_GetSafetyFlagIndex) const;
 
    static stw_types::sint32 mh_GetSubElementIndex(const stw_types::uint32 ou32_Index,
                                                   const stw_types::uint32 ou32_ElementIndex,
                                                   const std::vector<C_OSCHalcDefStruct> & orc_Values,
                                                   stw_types::uint32 & oru32_ListIndex);
+   bool m_CheckIgnoreFlag(void) const;
 
    //Avoid call
    C_OSCHALCMagicianDatapoolListHandler(const C_OSCHALCMagicianDatapoolListHandler &);

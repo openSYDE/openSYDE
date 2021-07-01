@@ -862,6 +862,8 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                      c_Retval = pc_CurMessage->c_Counter.c_str();
                   }
                   break;
+               default:
+                  break;
                }
             }
          }
@@ -1448,6 +1450,7 @@ sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, con
                      q_SearchMessageResult = this->m_CheckDataForSearch(c_CopyData, orc_SearchString, oq_Next,
                                                                         sn_CurrentSignalIndexMultiplexed,
                                                                         q_LastMessageDummy);
+                     Q_UNUSED(q_LastMessageDummy)
 
                      if (q_SearchMessageResult == true)
                      {
@@ -2351,7 +2354,7 @@ bool C_CamMetTreeModel::m_CheckDataForSearch(const C_CamMetTreeLoggerData & orc_
                while (q_SearchFinished == false);
 
                // Check if the last signal was reached. Not relevant if it matched or not
-               if (u32_Counter == (orc_Data.c_Signals.size() - 1UL))
+               if (u32_Counter == (static_cast<uint32>(orc_Data.c_Signals.size()) - 1UL))
                {
                   orq_LastSignalChecked = true;
                }
@@ -2574,7 +2577,7 @@ void C_CamMetTreeModel::m_GetMultiplexedMsgSignalRow(const std::vector<C_OSCComM
 
                if (sn_Value >= 0)
                {
-                  uint16 u16_Value = static_cast<uint16>(sn_Value);
+                  const uint16 u16_Value = static_cast<uint16>(sn_Value);
                   if (u16_Value <= rc_OscSginalToCheck.u16_MultiplexValue)
                   {
                      // In this case, this is the row of the multiplexer signal
@@ -2978,7 +2981,7 @@ uint32 C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(
             {
                //Just use first multiplexer
                u32_Retval = u32_ItSigL1;
-               //lint -e{1960} break is more efficient
+               //lint -e{9011} break is more efficient
                break;
             }
          }

@@ -98,9 +98,11 @@ bool C_SdNdeHalcChannelCopyPaste::h_Paste(QWidget * const opc_Parent, const uint
       bool q_LinkedChange = false;
 
       // check prerequisites
-      if ((mh_CheckDataFromClipboard(ou32_NodeIndex, c_Data, c_ErrorDescription) == true) &&
-          (mh_CheckSelectedChannels(ou32_NodeIndex, c_Data, orc_TargetIndexes, q_ChannelCase,
-                                    c_ErrorDescription, q_LinkedChange) == true))
+      const bool q_CheckClipBoardResult = mh_CheckDataFromClipboard(ou32_NodeIndex, c_Data, c_ErrorDescription);
+      const bool q_CheckChannelsResult = mh_CheckSelectedChannels(ou32_NodeIndex, c_Data, orc_TargetIndexes,
+                                                                  q_ChannelCase, c_ErrorDescription, q_LinkedChange);
+
+      if ((q_CheckClipBoardResult == true) && (q_CheckChannelsResult == true))
       {
          bool q_Continue = true;
 

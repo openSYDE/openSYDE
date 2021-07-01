@@ -447,6 +447,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                }
             }
             break;
+         case eINDEX:
          case eNAME:
          case eCOMMENT:
          case eEXTENDED:
@@ -455,6 +456,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
          case eTX_METHOD:
          case eCYCLE_TIME:
          case eNOT_EARLIER_THAN:
+         case eNOT_LATER_THAN:
          case eTRANSMITTER:
          case eRECEIVER:
          default:
@@ -471,6 +473,8 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
          case eCOMMENT:
             c_Font = mc_STYLE_GUIDE_FONT_REGULAR_12;
             break;
+         case eINDEX:
+         case eICON:
          case eNAME:
          case eEXTENDED:
          case eCAN_ID:
@@ -478,9 +482,9 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
          case eTX_METHOD:
          case eCYCLE_TIME:
          case eNOT_EARLIER_THAN:
+         case eNOT_LATER_THAN:
          case eTRANSMITTER:
          case eRECEIVER:
-         case eICON:
          default:
             c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
             break;

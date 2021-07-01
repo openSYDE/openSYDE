@@ -22,7 +22,7 @@ openSYDE CAN Monitor  GPL V3                    opensyde_tool\src
 openSYDE Core         GPL V3 or proprietary     opensyde_tool\libs\opensyde_core                   
 SYDE Coder C          GPL V3 or proprietary     opensyde_syde_coder_c                              
 SYDEsup               GPL V3 or proprietary     opensyde_syde_sup                                  
-Qt 5.7.0              LGPL 3; some parts GPL 3  <no sources provided> (*)                          http://doc.qt.io/qt-5/licensing.html
+Qt 5.15.2             LGPL 3                    <no sources provided> (*)                          http://doc.qt.io/qt-5/licensing.html
 gettext               LPGL 2.1                  libraries\gettext-0.19.7                           https://www.gnu.org/software/gettext/
 QCustomPlot           GPL 3                     libraries\qcustomplot-2.0.1                        https://www.qcustomplot.com/index.php/introduction
 Vector::BLF Module    GPL 3                     libraries\vector_blf-1.0.0                         https://bitbucket.org/tobylorenz/vector_blf
@@ -30,10 +30,11 @@ Vector::DBC Module    GPL 3                     opensyde_tool\libs\dbc_driver_li
 TinyXML-2             zlib license              <no sources provided>                              http://leethomason.github.io/tinyxml2/
 MinGW Runtime         MIT Style                 <no sources provided>                              http://www.mingw.org/license
 Miniz                 MIT                       <no sources provided>                              https://github.com/richgel999/miniz
+AES                   MIT                       <no sources provided>                              https://github.com/SergeyBel/AES
 
 (*) Copies of the (unmodified) Qt library sources have not been placed in the openSYDE GitHub repository.
 These can be 
-- found e.g. under http://download.qt.io/new_archive/qt/5.7/5.7.0/single/
+- found e.g. under https://download.qt.io/archive/qt/5.15/5.15.2/
 - obtained by contacting STW
 
 The Qt libraries drag in a few other libraries with different licensing terms.

@@ -224,8 +224,8 @@ void C_SdTopologyListWidget::startDrag(const Qt::DropActions oc_SupportedActions
       if (pc_Item != NULL)
       {
          QPixmap c_Pix;
-         QDrag * pc_Drag = new QDrag(this);
-         QMimeData * pc_MimeData = new QMimeData();
+         QDrag * const pc_Drag = new QDrag(this);
+         QMimeData * const pc_MimeData = new QMimeData();
 
          pc_MimeData->setText(pc_Item->data(msn_USER_ROLE_ADDITIONAL_INFORMATION).toString());
          pc_MimeData->setData(C_SdTopologyListWidget::hc_GroupName, this->mc_Name.toStdString().c_str());

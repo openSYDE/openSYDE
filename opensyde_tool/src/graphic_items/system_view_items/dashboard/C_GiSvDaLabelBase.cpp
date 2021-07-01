@@ -450,7 +450,7 @@ void C_GiSvDaLabelBase::m_UpdateCaption(const C_PuiSvDbLabel & orc_Data) const
                                                                           rc_CurItem.c_ElementId.u32_DataPoolIndex,
                                                                           rc_CurItem.c_ElementId.u32_ListIndex,
                                                                           rc_CurItem.c_ElementId.u32_ElementIndex);
-            const C_OSCNodeDataPool * pc_Datapool =
+            const C_OSCNodeDataPool * const pc_Datapool =
                C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(rc_CurItem.c_ElementId.u32_NodeIndex,
                                                                rc_CurItem.c_ElementId.u32_DataPoolIndex);
 
@@ -459,7 +459,8 @@ void C_GiSvDaLabelBase::m_UpdateCaption(const C_PuiSvDbLabel & orc_Data) const
                QString c_Caption;
                if (pc_Datapool != NULL)
                {
-                  if (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC)
+                  if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC) ||
+                      (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
                   {
                      c_Caption = C_PuiSvHandler::h_GetShortNamespace(rc_CurItem.c_ElementId);
                   }

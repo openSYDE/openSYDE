@@ -271,7 +271,7 @@ void C_TblModelAction::MoveSelectedItems(const std::vector<uint32> & orc_Selecte
          }
          else
          {
-            if (u32_ItSection == (c_ContiguousSections.size() - 1UL))
+            if (u32_ItSection == (static_cast<uint32>(c_ContiguousSections.size()) - 1UL))
             {
                q_Continue = false;
             }

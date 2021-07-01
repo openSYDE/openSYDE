@@ -123,6 +123,7 @@ void C_GiSvDaTableBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_St
 /*! \brief   Adjust font to current size
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
 void C_GiSvDaTableBase::ReInitializeSize(void)
 {
    //Required by interface
@@ -776,6 +777,7 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
       if (c_New != NULL)
       {
          pc_Dialog->SaveUserSettings();
+         pc_Dialog->PrepareCleanUp();
          c_New->HideOverlay();
       }
    } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management

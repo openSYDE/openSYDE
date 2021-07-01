@@ -39,7 +39,9 @@ protected:
 private:
    //Avoid call
    C_SdManUnoTopologySetupStyleCommand(const C_SdManUnoTopologySetupStyleCommand &);
-   C_SdManUnoTopologySetupStyleCommand & operator =(const C_SdManUnoTopologySetupStyleCommand &);
+   C_SdManUnoTopologySetupStyleCommand & operator =(const C_SdManUnoTopologySetupStyleCommand &); //lint !e1511 //we
+                                                                                                  // want to hide the
+                                                                                                  // base
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

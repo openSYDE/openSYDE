@@ -58,6 +58,7 @@ public:
                                     const QString & orc_DefaultFileName,
                                     const QFileDialog::Options & orc_Option = QFileDialog::Options());
    static void h_ShowPathInvalidError(QWidget * const opc_Parent, const QString & orc_InvalidPaths);
+   static stw_types::sint32 h_AskOverwriteFile(QWidget * const opc_Parent, const QString & orc_FilePath);
 
 private:
    static QString mh_GetFileName(QWidget * const opc_Parent, const QString & orc_Heading,

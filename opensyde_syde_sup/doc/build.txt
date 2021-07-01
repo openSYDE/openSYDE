@@ -6,22 +6,23 @@ Content:   How to build this project
 Used Compiler:
 ==============
 Windows: 
-   MinGW 5.3.0
-   CMake 3.18.1
+   MinGW 8.1.0
+   CMake 3.19.2
+   Ninja 1.7.2
 Ubuntu 20.04: 
    GCC 9.3.0 (32-bit)
    CMake 3.16.3
 
 Editor:
 =======
-Windows: Qt Creator 4.0.2
-Ubuntu: Qt Creator 4.11.0 
+Windows: Qt Creator 4.14.2
+Ubuntu: Qt Creator 4.11.0
 
 How to build:
 =============
 Windows:
-   cd ../bat 
-   build.bat
+   cd ../bat
+   build.bat (paths to compiler, cmake, ninja might need to be adapted in this file depending on the installation)
 Ubuntu: 
    cd ../bat
    chmod +x ./build.sh

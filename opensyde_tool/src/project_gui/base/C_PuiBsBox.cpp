@@ -67,11 +67,16 @@ void C_PuiBsBox::CalcHash(uint32 & oru32_HashValue) const
    float64 f64_Value;
 
    f64_Value = this->c_UIPosition.x();
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw_scl::C_SCLChecksums::CalcCRC32(&f64_Value, sizeof(f64_Value), oru32_HashValue);
    f64_Value = this->c_UIPosition.y();
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw_scl::C_SCLChecksums::CalcCRC32(&f64_Value, sizeof(f64_Value), oru32_HashValue);
 
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Width, sizeof(this->f64_Width), oru32_HashValue);
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Height, sizeof(this->f64_Height), oru32_HashValue);
+   //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
    stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_ZOrder, sizeof(this->f64_ZOrder), oru32_HashValue);
 }

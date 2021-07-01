@@ -326,6 +326,9 @@ void C_GiSvDaRectBaseGroup::RegisterDataPoolElementCyclicError(
       QString c_Info;
       QString c_AdditionalInfo;
 
+      //Clean up any left over items in buffer
+      this->UpdateShowValue();
+
       switch (ou8_ErrorCode)
       {
       case 0x22:

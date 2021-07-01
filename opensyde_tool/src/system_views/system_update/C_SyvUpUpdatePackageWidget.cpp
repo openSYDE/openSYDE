@@ -16,6 +16,7 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_GtGetText.h"
 #include "constants.h"
+#include "C_PuiSvHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -48,6 +49,7 @@ C_SyvUpUpdatePackageWidget::C_SyvUpUpdatePackageWidget(QWidget * const opc_Paren
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvUpUpdatePackageWidget)
 {
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
    QSizePolicy c_SizePolicy;
 
    // Init UI
@@ -70,6 +72,9 @@ C_SyvUpUpdatePackageWidget::C_SyvUpUpdatePackageWidget(QWidget * const opc_Paren
    this->mc_MissingFiles = QStringList("dummy");
    this->mc_FlashwareWarningsApps = QStringList("dummy");
    this->m_SetUpdatePackageStatusNotLocked(QStringList(), QStringList(), QStringList(), QStringList());
+
+   // Handle service mode
+   this->mpc_Ui->pc_PushButtonCreatePackage->setEnabled(!q_ServiceModeActive);
 
    connect(this->mpc_Ui->pc_PushButtonScrollLeft, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked,
            this, &C_SyvUpUpdatePackageWidget::m_ButtonLeftClicked);
@@ -253,6 +258,8 @@ void C_SyvUpUpdatePackageWidget::SetUpdateFinished(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageWidget::SetDisconnected(void)
 {
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
    this->mpc_Ui->pc_ListWidget->SetDisconnected();
 
    this->m_StartCheck(true);
@@ -261,7 +268,7 @@ void C_SyvUpUpdatePackageWidget::SetDisconnected(void)
    this->mpc_Ui->pc_PushButtonClearAll->setEnabled(true);
    this->mpc_Ui->pc_PushButtonExport->setEnabled(true);
    this->mpc_Ui->pc_PushButtonImport->setEnabled(true);
-   this->mpc_Ui->pc_PushButtonCreatePackage->setEnabled(true);
+   this->mpc_Ui->pc_PushButtonCreatePackage->setEnabled(!q_ServiceModeActive);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -415,6 +422,7 @@ void C_SyvUpUpdatePackageWidget::m_UpdateWidget(void)
 void C_SyvUpUpdatePackageWidget::m_FileCheckTimer(void)
 {
    uint32 u32_CountFiles = 0U;
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
 
    QStringList c_FlashwareWarningsApps;
    QStringList c_MissingDataBlocks;
@@ -458,7 +466,8 @@ void C_SyvUpUpdatePackageWidget::m_FileCheckTimer(void)
                                               c_FlashwareWarningsApps);
    }
 
-   this->mpc_Ui->pc_PushButtonCreatePackage->setEnabled(s32_Return == C_NO_ERR);
+   this->mpc_Ui->pc_PushButtonCreatePackage->setEnabled((s32_Return == C_NO_ERR) &&
+                                                        (q_ServiceModeActive == false));
 
    Q_EMIT (this->SigUpdatePackageState(s32_Return));
 

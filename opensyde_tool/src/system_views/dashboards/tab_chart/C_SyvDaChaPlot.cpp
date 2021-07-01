@@ -458,7 +458,7 @@ C_SyvDaChaPlot::C_SyvDaChaPlot(QWidget * const opc_Parent) :
    QCustomPlot(opc_Parent),
    mq_DragMouseCursorAdapted(false),
    mpc_ClickedCursor(NULL),
-   mc_LastItemLineEvent(QEvent::None, QPointF(), QPointF(), QPointF(), Qt::NoButton, 0, 0)
+   mc_LastItemLineEvent(QEvent::None, QPointF(), QPointF(), QPointF(), Qt::NoButton, Qt::NoButton, Qt::NoModifier)
 {
    QPen c_Pen = this->selectionRect()->pen();
    QBrush c_Brush = this->selectionRect()->brush();
@@ -708,7 +708,7 @@ void C_SyvDaChaPlot::wheelEvent(QWheelEvent * const opc_Event)
          c_Orientations = pc_AxisRect->rangeZoom();
 
          // Check mouse position
-         QList<QCPLayerable *> c_ClickedItems = this->layerableListAt(opc_Event->pos(), false);
+         QList<QCPLayerable *> c_ClickedItems = this->layerableListAt(opc_Event->position(), false);
          if (c_ClickedItems.isEmpty() == false)
          {
             QCPLayerable * const pc_ItemClicked = c_ClickedItems.first();

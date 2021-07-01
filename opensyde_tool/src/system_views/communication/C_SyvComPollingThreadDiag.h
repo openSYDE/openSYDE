@@ -98,7 +98,7 @@ public:
    stw_types::sint32 GetNvmSafeWriteChangedValuesOutput(
       std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ChangedElements) const;
    stw_types::sint32 StartNvmSafeReadValues(stw_opensyde_gui_logic::C_SyvComDataDealer & orc_Dealer);
-   stw_types::sint32 GetNvmSafeReadValuesOutput(const stw_opensyde_core::C_OSCNode * (&orpc_ParamNodeValues)) const;
+   stw_types::sint32 GetNvmSafeReadValuesOutput(const stw_opensyde_core::C_OSCNode * & orpc_ParamNodeValues) const;
    stw_types::sint32 StartNvmSafeWriteCrcs(stw_opensyde_gui_logic::C_SyvComDataDealer & orc_Dealer);
    stw_types::sint32 StartNvmNotifyOfChanges(stw_opensyde_gui_logic::C_SyvComDataDealer & orc_Dealer,
                                              const stw_types::uint8 ou8_DataPoolIndex,

@@ -16,6 +16,7 @@
 #include <limits>
 #include <QFlags>
 #include <QSpinBox>
+#include <QAbstractItemView>
 
 #include "TGLUtils.h"
 #include "C_SdUtil.h"
@@ -1080,7 +1081,7 @@ void C_SdBueSignalPropertiesWidget::m_HandleMuxValueRange(const C_OSCCanMessage 
          const C_OSCCanSignal & rc_Signal = orc_Message.c_Signals[u32_ItSig];
          if (rc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
          {
-            const uint64 u64_Max = (1ULL << rc_Signal.u16_ComBitLength) - 1ULL;
+            const uint64 u64_Max = (static_cast<uint64>(1ULL) << rc_Signal.u16_ComBitLength) - 1ULL;
             sn_Max = static_cast<sintn>(u64_Max);
             q_Max = true;
          }

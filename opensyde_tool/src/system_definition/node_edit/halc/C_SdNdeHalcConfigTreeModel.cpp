@@ -681,7 +681,7 @@ bool C_SdNdeHalcConfigTreeModel::mh_GetParameterElementIndexe(const QModelIndex 
    {
       // Decode model index: parent or child?
       //lint -e{9079}  Result of Qt interface restrictions, set by index function
-      const C_TblTreItem * const pc_CurrentItem = static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
+      const C_TblTreItem * const pc_CurrentItem = static_cast<const C_TblTreItem *>(orc_Index.internalPointer());
       if (pc_CurrentItem != NULL)
       {
          const C_TblTreItem * const pc_Parent = dynamic_cast<const C_TblTreItem * const>(pc_CurrentItem->pc_Parent);

@@ -67,6 +67,7 @@ C_GiTextElementBus::C_GiTextElementBus(const sint32 & ors32_Index, const uint64 
    this->mpc_SvgRenderer = new QSvgRenderer(c_SvgString);
 
    // Set default font
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    c_Font = mc_STYLE_GUIDE_FONT_REGULAR_16;
    //Convert point to pixel
    c_Font.setPixelSize(c_Font.pointSize());

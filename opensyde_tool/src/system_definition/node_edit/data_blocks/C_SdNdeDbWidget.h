@@ -37,7 +37,7 @@ public:
    virtual ~C_SdNdeDbWidget();
 
    void InitStaticNames(void) const;
-   void UpdateDataPools(void);
+   void UpdateApplication(void);
    void UpdateApplicationIndex(const stw_types::uint32 ou32_ApplicationIndex);
    stw_types::uint32 GetNodeIndex(void) const;
    stw_types::uint32 GetApplicationIndex(void) const;
@@ -50,8 +50,10 @@ Q_SIGNALS:
    //lint -restore
    void SigDelete(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ApplicationIndex);
    void SigCheckNodeId(void);
-   void SigOpenDataPool(const stw_types::uint32 ou32_DataPoolIndex);
    void SigOwnedDataPoolsChanged(void) const;
+
+protected:
+   virtual void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
 
 private:
    //Avoid call
@@ -59,21 +61,19 @@ private:
    C_SdNdeDbWidget & operator =(const C_SdNdeDbWidget &);
 
    void m_LoadData(void);
-   void m_HandleType(void) const;
    void m_OnEdit(void);
-   void m_ShowProperties(void);
    void m_OnDelete(void);
-   void m_OnDataPoolLinkClicked(const QString & orc_Link);
+   void m_OnOpenIdeClicked(void);
+   void m_OnCommentToggled(const bool oq_Checked);
    void m_UnassignAllAssociatedDataPools(void) const;
    stw_opensyde_core::C_OSCNodeApplication::E_Type m_GetType(void) const;
    stw_types::uint32 m_CountAllAssociatedDataPools(void) const;
-   void m_OnOpenIdeClicked(void);
+   QString m_GetAllAssociatedDataPoolNames(void) const;
+   QString m_GetAllOutputFiles(void) const;
 
    Ui::C_SdNdeDbWidget * mpc_Ui;
    stw_types::uint32 mu32_ApplicationIndex;
    const stw_types::uint32 mu32_NodeIndex;
-   stw_opensyde_gui_elements::C_OgeLabGroupItem * mpc_DataPoolLabel;
-   bool mq_MessageBoxVisible;
 };
 }
 

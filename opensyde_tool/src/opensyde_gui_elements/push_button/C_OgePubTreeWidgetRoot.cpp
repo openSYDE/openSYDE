@@ -54,7 +54,7 @@ C_OgePubTreeWidgetRoot::C_OgePubTreeWidgetRoot(QWidget * const opc_Parent) :
 void C_OgePubTreeWidgetRoot::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
-   QPixmap c_Pixmap = this->icon().pixmap(this->msn_IconSize, this->msn_IconSize);
+   const QPixmap c_Pixmap = this->icon().pixmap(this->msn_IconSize, this->msn_IconSize);
 
    Q_UNUSED(opc_Event)
 

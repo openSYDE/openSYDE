@@ -1,5 +1,5 @@
-# cmake toolchain file for ubuntu 32 bit compilation
-# usage: cmake ../pjt -DCMAKE_TOOLCHAIN_FILE=../pjt/toolchain_ubuntu.cmake 
+# cmake toolchain file for Windows 32 bit compilation
+# usage: cmake ../pjt -DCMAKE_TOOLCHAIN_FILE=../pjt/toolchain_windows.cmake 
 
 set(CMAKE_SYSTEM_NAME Windows)
 set(CMAKE_SYSTEM_PROCESSOR i386)

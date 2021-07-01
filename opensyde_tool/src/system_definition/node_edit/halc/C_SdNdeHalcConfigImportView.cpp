@@ -42,7 +42,7 @@ using namespace stw_opensyde_gui;
 C_SdNdeHalcConfigImportView::C_SdNdeHalcConfigImportView(QWidget * const opc_Parent) :
    C_OgeTreeViewToolTipBase(opc_Parent)
 {
-   this->setModel(&this->mc_Model);
+   this->C_SdNdeHalcConfigImportView::setModel(&this->mc_Model);
    this->setItemDelegate(&this->mc_Delegate);
 
    this->setHeaderHidden(true);

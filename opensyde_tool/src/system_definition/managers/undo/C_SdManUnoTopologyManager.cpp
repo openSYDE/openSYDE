@@ -282,6 +282,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
               &C_SdManUnoTopologyManager::m_OnErrorChange);
       c_IDs.clear();
       c_IDs.push_back(orc_FourUniqueIds[2]);
+      //lint -e{423}  //no memory leak because of Qt memory management and redo engine handling
       pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
                                                       C_SdManUnoTopologyAddCommand::eBUS_CONNECTOR,
                                                       orc_BusPosition,
@@ -295,6 +296,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
               &C_SdManUnoTopologyManager::m_OnErrorChange);
       c_IDs.clear();
       c_IDs.push_back(orc_FourUniqueIds[3]);
+      //lint -e{423}  //no memory leak because of Qt memory management and redo engine handling
       pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
                                                       C_SdManUnoTopologyAddCommand::eBUS_CONNECTOR,
                                                       orc_BusPosition,
@@ -307,7 +309,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
               &C_SdManUnoTopologyManager::m_OnErrorChange);
       this->m_DoPushAndSignalError(pc_UndoCommand);
-   }
+   } //lint !e429  //no memory leak because of Qt memory management and redo engine handling
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -355,6 +357,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const 
       C_SdManUnoTopologyAddCommand * pc_TmpAddCmd;
       c_IDs.clear();
       c_IDs.push_back(orc_TwoUniqueIds[0]);
+      //lint -e{423}  //no memory leak because of Qt memory management and redo engine handling
       pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
                                                       C_SdManUnoTopologyAddCommand::eBUS_CONNECTOR,
                                                       orc_Node1Position, oru64_Node1UniqueID, oru64_BusUniqueID,
@@ -367,6 +370,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const 
               &C_SdManUnoTopologyManager::m_OnErrorChange);
       c_IDs.clear();
       c_IDs.push_back(orc_TwoUniqueIds[1]);
+      //lint -e{423}  //no memory leak because of Qt memory management and redo engine handling
       pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
                                                       C_SdManUnoTopologyAddCommand::eBUS_CONNECTOR,
                                                       orc_Node2Position, oru64_Node2UniqueID, oru64_BusUniqueID,
@@ -378,7 +382,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const 
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
               &C_SdManUnoTopologyManager::m_OnErrorChange);
       this->m_DoPushAndSignalError(pc_UndoCommand);
-   }
+   } //lint !e429  //no memory leak because of Qt memory management and redo engine handling
 }
 
 //----------------------------------------------------------------------------------------------------------------------

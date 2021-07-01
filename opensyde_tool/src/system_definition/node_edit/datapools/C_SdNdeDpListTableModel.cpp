@@ -843,7 +843,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                               if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDataSetIndices.size())
                               {
                                  c_Output += static_cast<QString>("+%1\n").arg(
-                                    c_InvalidDataSetIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                                    static_cast<uint32>(c_InvalidDataSetIndices.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
                               }
                               c_Output += "\n";
                            }
@@ -1315,6 +1315,9 @@ bool C_SdNdeDpListTableModel::setData(const QModelIndex & orc_Index, const QVari
             case eINDEX:
                //No edit
                break;
+            case eICON:
+               //No edit
+               break;
             case eNAME:
                Q_EMIT this->SigDataChange(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                           this->mu32_ListIndex,
@@ -1413,6 +1416,9 @@ bool C_SdNdeDpListTableModel::setData(const QModelIndex & orc_Index, const QVari
                //No edit
                break;
             case eEVENT_CALL:
+               //No edit
+               break;
+            case eUNKNOWN:
                //No edit
                break;
             default:

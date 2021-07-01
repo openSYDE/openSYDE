@@ -71,8 +71,8 @@ protected:
    C_OSCDiagProtocolBase * mpc_DiagProtocol;
 
 private:
-   C_OSCDataDealer(const C_OSCDataDealer & orc_Souce);               //not implemented -> prevent copying
-   C_OSCDataDealer & operator = (const C_OSCDataDealer & orc_Souce); //not implemented -> prevent assignment
+   C_OSCDataDealer(const C_OSCDataDealer & orc_Source);               //not implemented -> prevent copying
+   C_OSCDataDealer & operator = (const C_OSCDataDealer & orc_Source); //not implemented -> prevent assignment
 
    void m_Init(void);
 

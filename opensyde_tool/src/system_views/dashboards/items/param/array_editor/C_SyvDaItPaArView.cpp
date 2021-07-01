@@ -79,7 +79,7 @@ C_SyvDaItPaArView::C_SyvDaItPaArView(QWidget * const opc_Parent) :
    //Corner button
    this->setCornerButtonEnabled(false);
 
-   this->setModel(&mc_Model);
+   this->C_SyvDaItPaArView::setModel(&mc_Model);
    this->mc_Delegate.SetModel(&mc_Model);
    this->setItemDelegate(&mc_Delegate);
 
@@ -88,18 +88,15 @@ C_SyvDaItPaArView::C_SyvDaItPaArView(QWidget * const opc_Parent) :
 
    //Corner button label
    this->mpc_LabelCorner = new QLabel(this);
-   if (this->mpc_LabelCorner != NULL)
-   {
-      this->mpc_LabelCorner->setAlignment(Qt::AlignCenter);
-      this->mpc_LabelCorner->setAttribute(Qt::WA_TransparentForMouseEvents);
-      this->mpc_LabelCorner->setText(C_GtGetText::h_GetText("Index"));
-      connect(
-         this->verticalHeader(), &QHeaderView::geometriesChanged, this,
-         &C_SyvDaItPaArView::m_UpdateCornerButton);
-      connect(
-         this->horizontalHeader(), &QHeaderView::geometriesChanged, this,
-         &C_SyvDaItPaArView::m_UpdateCornerButton);
-   }
+   this->mpc_LabelCorner->setAlignment(Qt::AlignCenter);
+   this->mpc_LabelCorner->setAttribute(Qt::WA_TransparentForMouseEvents);
+   this->mpc_LabelCorner->setText(C_GtGetText::h_GetText("Index"));
+   connect(
+      this->verticalHeader(), &QHeaderView::geometriesChanged, this,
+      &C_SyvDaItPaArView::m_UpdateCornerButton);
+   connect(
+      this->horizontalHeader(), &QHeaderView::geometriesChanged, this,
+      &C_SyvDaItPaArView::m_UpdateCornerButton);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

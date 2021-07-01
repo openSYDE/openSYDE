@@ -169,6 +169,7 @@ bool C_SdBueBusEditWidget::WasChanged(void) const
 /*! \brief   Saves the actual data into the core but not in the files
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
 void C_SdBueBusEditWidget::Save(void) const
 {
 }

@@ -28,6 +28,7 @@ public:
    stw_types::sint32 SetValueByString(const stw_scl::C_SCLString & orc_Item);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+   virtual void CalcHashStructure(stw_types::uint32 & oru32_HashValue) const;
 
    stw_scl::C_SCLString c_Display; ///< Name to display to user
    stw_scl::C_SCLString c_Comment; ///< Description to display to user

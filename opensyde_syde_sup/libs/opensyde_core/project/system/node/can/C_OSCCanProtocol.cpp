@@ -248,12 +248,13 @@ C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComList(C_OSCNodeDataPool & orc_D
 sint32 C_OSCCanProtocol::h_GetComListIndex(const C_OSCNodeDataPool & orc_DataPool, const uint32 ou32_InterfaceIndex,
                                            const bool oq_IsTx, uint32 & oru32_ListIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const uint32 u32_ListIndex = ou32_InterfaceIndex * 2UL;
 
    if ((u32_ListIndex + 1UL) < orc_DataPool.c_Lists.size())
    {
       const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u32_ListIndex];
+      s32_Retval = C_NO_ERR;
       if (h_ListIsComTx(rc_List) == oq_IsTx)
       {
          oru32_ListIndex = u32_ListIndex;

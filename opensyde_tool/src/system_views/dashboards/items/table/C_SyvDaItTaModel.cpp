@@ -234,7 +234,8 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
                      {
                         if (pc_Datapool != NULL)
                         {
-                           if (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC)
+                           if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC) ||
+                               (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
                            {
                               this->mc_Names.push_back(C_PuiSvHandler::h_GetShortNamespace(*pc_ElementId));
                            }
@@ -695,6 +696,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                                  c_Retval = c_Icons;
                                  break;
                               case C_OSCNodeDataPool::eHALC:
+                              case C_OSCNodeDataPool::eHALC_NVM:
                                  c_Icons.append(this->mc_IconHALOtherWarning); // in warning case no different HAL icons
                                  c_Retval = c_Icons;
                                  break;
@@ -728,6 +730,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                                  c_Retval = c_Icons;
                                  break;
                               case C_OSCNodeDataPool::eHALC:
+                              case C_OSCNodeDataPool::eHALC_NVM:
                                  switch (e_Category)
                                  {
                                  case C_OSCHalcDefDomain::eCA_INPUT:
@@ -779,6 +782,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                                  c_Retval = c_Icons;
                                  break;
                               case C_OSCNodeDataPool::eHALC:
+                              case C_OSCNodeDataPool::eHALC_NVM:
                                  switch (e_Category)
                                  {
                                  case C_OSCHalcDefDomain::eCA_INPUT:
@@ -1067,6 +1071,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                         c_Retval = c_Icons;
                         break;
                      case C_OSCNodeDataPool::eHALC:
+                     case C_OSCNodeDataPool::eHALC_NVM:
                         c_Icons.append(this->mc_IconHALOtherWarning); // in warning case no different HAL icons
                         c_Retval = c_Icons;
                         break;

@@ -45,8 +45,9 @@ C_OSCTSPApplication::C_OSCTSPApplication(void) :
    c_ProjectFolder(""),
    c_GeneratePath(""),
    u16_GenCodeVersion(0),
-   c_ResultPath("")
+   q_GeneratesPsiFiles(false)
 {
+   c_ResultPaths.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +63,9 @@ C_OSCTargetSupportPackage::C_OSCTargetSupportPackage(void) :
    u8_MaxParallelTransmissions(64U),
    u16_MaxMessageBufferTx(585U),
    u16_MaxRoutingMessageBufferRx(585U),
-   c_TemplatePath("")
+   c_TemplatePath(""),
+   c_HalcDefPath(""),
+   c_HalcComment("")
 {
    c_Applications.clear();
    c_CodeExportSettings.Initialize();

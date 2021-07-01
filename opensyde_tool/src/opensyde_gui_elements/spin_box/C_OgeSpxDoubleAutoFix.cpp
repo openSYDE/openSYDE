@@ -106,6 +106,8 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
    {
       C_OgeSpxDoubleToolTipBase::fixup(orc_String);
    }
+
+   Q_UNUSED(sn_Pos) // last value is irrelevant
 }
 
 //----------------------------------------------------------------------------------------------------------------------

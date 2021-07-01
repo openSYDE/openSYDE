@@ -92,3 +92,25 @@ void C_OSCHalcConfigChannel::CheckConfigValid(bool * const opq_NameInvalid) cons
       }
    }
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle file load post processing
+
+   \param[in]  oe_SafetyMode  Safety mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfigChannel::HandleFileLoadPostProcessing(const C_OSCHalcDefBase::E_SafetyMode oe_SafetyMode)
+{
+   if (oe_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE)
+   {
+      this->q_SafetyRelevant = true;
+   }
+   else if (oe_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
+   {
+      this->q_SafetyRelevant = false;
+   }
+   else
+   {
+      //Nothing to do
+   }
+}

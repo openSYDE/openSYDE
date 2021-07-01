@@ -217,6 +217,7 @@ void C_OgeTreeToolTipBase::m_HideToolTip(void)
 /*! \brief  Do any potential last minute tooltip update actions
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
 void C_OgeTreeToolTipBase::m_LastMinuteToolTipUpdate(void)
 {
 }

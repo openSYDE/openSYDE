@@ -105,7 +105,31 @@ sint32 C_OSCParamSetFilerBase::h_CheckFileVersion(C_OSCXMLParserBase & orc_XMLPa
 
    if (orc_XMLParser.SelectNodeChild("file-version") == "file-version")
    {
-      //nothing to do with the file version yet ...
+      uint16 u16_FileVersion = 0U;
+      try
+      {
+         u16_FileVersion = static_cast<uint16>(orc_XMLParser.GetNodeContent().ToInt());
+      }
+      catch (...)
+      {
+         osc_write_log_error("Loading Dataset data", "\"file-version\" could not be converted to a number.");
+         s32_Retval = C_CONFIG;
+      }
+
+      //is the file version one we know ?
+      if (s32_Retval == C_NO_ERR)
+      {
+         osc_write_log_info("Loading Dataset data", "Value of \"file-version\": " +
+                            C_SCLString::IntToStr(u16_FileVersion));
+         //Check file version
+         if (u16_FileVersion != mhu16_FileVersion)
+         {
+            osc_write_log_error("Loading Dataset data",
+                                "Version defined by \"file-version\" is not supported.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-parameter-sets");
    }

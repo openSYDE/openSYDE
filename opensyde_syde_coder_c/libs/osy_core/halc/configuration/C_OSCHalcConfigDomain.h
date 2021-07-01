@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "CSCLString.h"
+#include "C_OSCHalcDefBase.h"
 #include "C_OSCHalcDefDomain.h"
 #include "C_OSCHalcConfigChannel.h"
 
@@ -47,6 +48,7 @@ public:
                                                           std::vector<stw_types::uint32> * const opc_OutputIndices,
                                                           std::vector<stw_types::uint32> * const opc_StatusIndices)
    const;
+   void HandleFileLoadPostProcessing(const C_OSCHalcDefBase::E_SafetyMode oe_SafetyMode);
 
    C_OSCHalcConfigChannel c_DomainConfig;                ///< Domain specific configuration
    std::vector<C_OSCHalcConfigChannel> c_ChannelConfigs; ///< Channels of domain of IO description (synced with

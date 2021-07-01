@@ -11,7 +11,6 @@
 
 namespace stw_diag_lib
 {
-
 //----------------------------------------------------------------------------------------------------------------------
 
 //Name of KEFEX protocol:
@@ -47,14 +46,14 @@ public:
    bool q_CommProtocolRAW;
    bool q_CommProtocolHLP;
    bool q_DirectCheckSumHandling;
-     //true  -> direct handling of checksums in EEPROM
-     //false -> more abstract services: check_checksum + update_checksum
+   //true  -> direct handling of checksums in EEPROM
+   //false -> more abstract services: check_checksum + update_checksum
    bool q_ChecksumInIndexedMode;
-     //true  -> checking/updating checksums is also expected/supported in indexed mode
-     //         only should be used
-     //         - in combination with q_DirectCheckSumHandling == false
-     //         - in combination with q_CyclicTransmissions == false
-     //false -> checking/updating checksums shall not be performed in indexed mode
+   //true  -> checking/updating checksums is also expected/supported in indexed mode
+   //         only should be used
+   //         - in combination with q_DirectCheckSumHandling == false
+   //         - in combination with q_CyclicTransmissions == false
+   //false -> checking/updating checksums shall not be performed in indexed mode
 
    bool q_EEPROMWriteSSL; //true: EEPROM writing with application layer CRC over data supported
 
@@ -66,11 +65,12 @@ public:
 //----------------------------------------------------------------------------------------------------------------------
 
 //use 32bit index in all functions for future enhancements (e.g. CANopen Index/Subindex) ...
-typedef void (*PR_KFXCommCyclicTransmissionCallBack)(void * const opv_Instance, const stw_types::uint32 ou32_Index,
-                                                     const stw_types::sint64 os64_Value,
-                                                     const stw_types::uint32 os32_TimeStamp,
-                                                     const bool oq_IsTimeStamped, const bool oq_Error);
-typedef void (*PR_KFXCommECUResetCallBack)(void * const opv_Instance);
+typedef void (* PR_KFXCommCyclicTransmissionCallBack)(void * const opv_Instance, const stw_types::uint32 ou32_Index,
+                                                      const stw_types::sint64 os64_Value,
+                                                      const stw_types::uint32 os32_TimeStamp,
+                                                      const bool oq_IsTimeStamped,
+                                                      const bool oq_Error);
+typedef void (* PR_KFXCommECUResetCallBack)(void * const opv_Instance);
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -78,8 +78,9 @@ typedef void (*PR_KFXCommECUResetCallBack)(void * const opv_Instance);
 class STW_DIAGLIB_EXPORT C_KFXCommunicationBase
 {
 private:
-   C_KFXCommunicationBase(const C_KFXCommunicationBase & orc_Souce);             //not implemented -> prevent copying
-   C_KFXCommunicationBase& operator = (const C_KFXCommunicationBase & orc_Souce);//not implemented -> prevent assignment
+   C_KFXCommunicationBase(const C_KFXCommunicationBase & orc_Source);               //not implemented -> prevent copying
+   C_KFXCommunicationBase & operator = (const C_KFXCommunicationBase & orc_Source); //not implemented -> prevent
+                                                                                    // assignment
 
 protected:
    //reset callback handler:
@@ -100,8 +101,7 @@ public:
 
    stw_types::uint16 GetLastErrorResponse(void) const;
 
-   virtual void InstallECUResetHandler(const PR_KFXCommECUResetCallBack opr_Callback,
-                                       void * const opv_Instance);
+   virtual void InstallECUResetHandler(const PR_KFXCommECUResetCallBack opr_Callback, void * const opv_Instance);
    virtual void InstallCyclicTransmissionCallback(const PR_KFXCommCyclicTransmissionCallBack opr_Callback,
                                                   void * const opv_Instance);
 
@@ -127,9 +127,10 @@ public:
                                      stw_types::uint8 * const opu8_Data);
 
    //integer + float variables:
-   virtual stw_types::sint32 ReadNumericVariable(const stw_types::uint32 ou32_Index, const stw_types::uint8 ou8_NumBytes,
-                                                 stw_types::sint64 & ors64_Value);
-   virtual stw_types::sint32 WriteNumericVariable(const stw_types::uint32 ou32_Index, const stw_types::uint8 ou8_NumBytes,
+   virtual stw_types::sint32 ReadNumericVariable(const stw_types::uint32 ou32_Index,
+                                                 const stw_types::uint8 ou8_NumBytes, stw_types::sint64 & ors64_Value);
+   virtual stw_types::sint32 WriteNumericVariable(const stw_types::uint32 ou32_Index,
+                                                  const stw_types::uint8 ou8_NumBytes,
                                                   const stw_types::sint64 os64_Value);
 
    //aggregate types (arrays, structs, whatever ...)
@@ -198,7 +199,8 @@ public:
 
 //---------------------------------------------------------------------------
 ///Wrapper for IV-style higher level layers (saves us from putting this in a component of its own)
-class C_KFXCommunicationIV : public C_KFXCommunicationBase
+class C_KFXCommunicationIV :
+   public C_KFXCommunicationBase
 {
 public:
    C_KFXCommunicationIV(void);
@@ -209,8 +211,6 @@ public:
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-
 }
 
 #endif
-

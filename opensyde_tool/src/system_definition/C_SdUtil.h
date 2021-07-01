@@ -50,7 +50,8 @@ public:
    static QString h_ConvertByteOrderToName(const stw_opensyde_core::C_OSCCanSignal::E_ByteOrderType & ore_Type);
    static void h_GetErrorToolTipDataPools(const stw_types::uint32 ou32_NodeIndex,
                                           const std::vector<stw_types::uint32> & orc_Indices,
-                                          const bool oq_NvmSizeInvalid, QString & orc_Heading, QString & orc_Content);
+                                          const bool oq_NvmSizeInvalid, const bool oq_NvmOverlapDetected,
+                                          QString & orc_Heading, QString & orc_Content);
 
    static void h_SortSourceDescending(std::vector<stw_types::uint32> & orc_Source,
                                       std::vector<stw_types::uint32> & orc_Target);

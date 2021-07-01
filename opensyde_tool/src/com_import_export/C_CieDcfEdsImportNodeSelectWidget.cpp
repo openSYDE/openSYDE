@@ -63,6 +63,7 @@ C_CieDcfEdsImportNodeSelectWidget::C_CieDcfEdsImportNodeSelectWidget(
    // initialize content
    this->InitStaticNames();
    this->mpc_Ui->pc_LabPath->setText(orc_FilePath);
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    this->mpc_Ui->pc_LabPath->setText(
       C_Uti::h_MinimizePath(orc_FilePath, C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13), 500, 0));
    this->mpc_Ui->pc_LabPath->SetToolTipInformation("", orc_FilePath);

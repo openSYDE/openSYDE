@@ -135,7 +135,6 @@ C_GiLiBusConnectorBase::~C_GiLiBusConnectorBase(void)
    this->mpc_GenericSignalItem = NULL;
    this->mpc_GenericPositionItem = NULL;
    this->mpc_BusItem = NULL;
-   //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
 }
 
 //----------------------------------------------------------------------------------------------------------------------

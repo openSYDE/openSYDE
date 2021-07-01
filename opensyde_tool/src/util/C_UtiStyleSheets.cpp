@@ -41,7 +41,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTableView",
    "stw_opensyde_gui--C_SdNdeDpListTableView",
    "stw_opensyde_gui--C_SdNdeHalcConfigImportView",
-   "stw_opensyde_gui--C_SdCodeGenerationView",
+   "stw_opensyde_gui_elements--C_OgeTreeViewCheckable",
    "stw_opensyde_gui--C_TblTreDataElementView",
    "stw_opensyde_gui--C_SyvDaItTaView",
    "stw_opensyde_gui--C_SyvDaItPaTreeView",
@@ -58,7 +58,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui_elements--C_OgeTebReport",
    "stw_opensyde_gui--C_SebGraphicsView",
    "stw_opensyde_gui--C_SyvUpUpdatePackageListWidget",
-   "stw_opensyde_gui--C_SyvUpUpdatePackageListNodeWidget",
+   "stw_opensyde_gui--C_SyvUpPackageSectionNodeWidget",
    "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget",
    "stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView",
    "stw_opensyde_gui_elements--C_OgeSmoothScrollArea",
@@ -139,7 +139,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTableView QScrollBar",
    "stw_opensyde_gui--C_SdNdeDpListTableView QScrollBar",
    "stw_opensyde_gui--C_SdNdeHalcConfigImportView QScrollBar",
-   "stw_opensyde_gui--C_SdCodeGenerationView QScrollBar",
+   "stw_opensyde_gui_elements--C_OgeTreeViewCheckable QScrollBar",
    "stw_opensyde_gui--C_TblTreDataElementView QScrollBar",
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget QScrollBar",
    "stw_opensyde_gui_elements--C_OgeTableWidgetComIF QScrollBar",
@@ -159,7 +159,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui_elements--C_OgeTebReport QScrollBar",
    "stw_opensyde_gui--C_SebGraphicsView QScrollBar[DarkMode=\"false\"]",
    "stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar",
-   "stw_opensyde_gui--C_SyvUpUpdatePackageListNodeWidget QScrollBar",
+   "stw_opensyde_gui--C_SyvUpPackageSectionNodeWidget QScrollBar",
    "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_BRIGHT\"]",
    "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"FLAT_BRIGHT\"]",
    "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_BRIGHT\"]",
@@ -463,7 +463,7 @@ void C_UtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString> &
             QString c_Entry;
             const QString & rc_Element = orc_ScrollBarElements[u32_ItElement];
             c_Entry = static_cast<QString>("%1%2").arg(rc_Element, rc_Property.c_PropertyName);
-            if (u32_ItElement < (orc_ScrollBarElements.size() - 1UL))
+            if (u32_ItElement < (static_cast<uint32>(orc_ScrollBarElements.size()) - 1UL))
             {
                c_Entry += ",";
             }

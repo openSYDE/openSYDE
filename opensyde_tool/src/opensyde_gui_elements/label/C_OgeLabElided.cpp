@@ -42,6 +42,7 @@ using namespace stw_opensyde_gui;
 C_OgeLabElided::C_OgeLabElided(QWidget * const opc_Parent) :
    C_OgeLabGenericNoPaddingNoMargins(opc_Parent),
    mc_CompleteText(""),
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    mc_Font(mc_STYLE_GUIDE_FONT_SEMIBOLD_14)
 {
 }

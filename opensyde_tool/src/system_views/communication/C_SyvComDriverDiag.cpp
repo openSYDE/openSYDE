@@ -2456,7 +2456,7 @@ sint32 C_SyvComDriverDiag::m_Cycle(void)
 void C_SyvComDriverDiag::mh_ThreadFunc(void * const opv_Instance)
 {
    //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_SyvComDriverDiag * const pc_ComDriver = reinterpret_cast<C_SyvComDriverDiag * const>(opv_Instance);
+   C_SyvComDriverDiag * const pc_ComDriver = reinterpret_cast<C_SyvComDriverDiag *>(opv_Instance);
 
    tgl_assert(pc_ComDriver != NULL);
    if (pc_ComDriver != NULL)

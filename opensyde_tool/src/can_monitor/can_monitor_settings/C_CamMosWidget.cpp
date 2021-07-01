@@ -395,6 +395,7 @@ void C_CamMosWidget::m_OnExpandSettings(const bool oq_Expand)
       case C_UsHandler::eLOGGING:
          this->mpc_Ui->pc_PbLogging->setChecked(true);
          break;
+      case C_UsHandler::eNONE:
       default:
          break;
       }

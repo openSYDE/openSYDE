@@ -52,11 +52,8 @@ C_PuiSdHandler * C_PuiSdHandler::h_GetInstance(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandler::h_Destroy(void)
 {
-   if (C_PuiSdHandler::mhpc_Singleton != NULL)
-   {
-      delete (C_PuiSdHandler::mhpc_Singleton);
-      C_PuiSdHandler::mhpc_Singleton = NULL;
-   }
+   delete C_PuiSdHandler::mhpc_Singleton;
+   C_PuiSdHandler::mhpc_Singleton = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

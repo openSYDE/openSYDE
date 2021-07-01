@@ -14,6 +14,8 @@
 
 #include "stwtypes.h"
 #include "stwerrors.h"
+
+#include "constants.h"
 #include "C_GtGetText.h"
 #include "TGLUtils.h"
 #include "C_PuiSdHandler.h"
@@ -21,7 +23,7 @@
 #include "C_OgePopUpDialog.h"
 
 #include "C_SyvUpPackageListNodeItemDatablockWidget.h"
-#include "ui_C_SyvUpUpdatePackageListNodeItemWidget.h"
+#include "ui_C_SyvUpPackageListNodeItemWidget.h"
 
 #include "C_PuiSvHandler.h"
 #include "C_OsyHexFile.h"
@@ -66,11 +68,23 @@ C_SyvUpPackageListNodeItemDatablockWidget::C_SyvUpPackageListNodeItemDatablockWi
                                                                                      const bool oq_FileBased,
                                                                                      const bool oq_StwFlashloader,
                                                                                      QWidget * const opc_Parent) :
-   C_SyvUpUpdatePackageListNodeItemWidget(ou32_ViewIndex, ou32_NodeIndex, orc_DeviceName, oq_FileBased,
-                                          oq_StwFlashloader, opc_Parent),
+   C_SyvUpPackageListNodeItemWidget(ou32_ViewIndex, ou32_NodeIndex, orc_DeviceName, oq_FileBased,
+                                    oq_StwFlashloader, opc_Parent),
    mc_ProjectName("NA"),
    mc_Version("")
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of the item
+
+   \return
+   Type of return values, e.g. STW error codes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SyvUpPackageListNodeItemDatablockWidget::GetType(void) const
+{
+   return mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,10 +105,10 @@ bool C_SyvUpPackageListNodeItemDatablockWidget::IsFileIdentical(const QString & 
                                                                 const QString & orc_AppBuildTime,
                                                                 const QString & orc_AppBuildDate) const
 {
-   bool q_Return = C_SyvUpUpdatePackageListNodeItemWidget::IsFileIdentical(orc_AppName,
-                                                                           orc_AppVersion,
-                                                                           orc_AppBuildTime,
-                                                                           orc_AppBuildDate);
+   bool q_Return = C_SyvUpPackageListNodeItemWidget::IsFileIdentical(orc_AppName,
+                                                                     orc_AppVersion,
+                                                                     orc_AppBuildTime,
+                                                                     orc_AppBuildDate);
 
    if (q_Return == true)
    {
@@ -150,18 +164,6 @@ bool C_SyvUpPackageListNodeItemDatablockWidget::IsViewFileInfoPossible(void) con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Returns the flag if it is possible to show the user hint label
-
-   \retval   true   The user hint label can be shown
-   \retval   false  The user hint label can not be shown
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpPackageListNodeItemDatablockWidget::IsUserHintPossible(void) const
-{
-   return true;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load application information.
 
    \param[out]  orq_FileExists         true: file exists  false: file not found
@@ -178,8 +180,8 @@ void C_SyvUpPackageListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq
                                                                       bool & orq_TriggerRemove)
 {
    // For general file information (call before hex file load!)
-   C_SyvUpUpdatePackageListNodeItemWidget::m_LoadFileInformation(orq_FileExists, orq_FlashwareWarning,
-                                                                 orq_TriggerRemove);
+   C_SyvUpPackageListNodeItemWidget::m_LoadFileInformation(orq_FileExists, orq_FlashwareWarning,
+                                                           orq_TriggerRemove);
 
    // Default text
    this->mc_ProjectName = C_GtGetText::h_GetText("NA");
@@ -369,7 +371,7 @@ QString C_SyvUpPackageListNodeItemDatablockWidget::m_CreateToolTipContent(void) 
    }
    else
    {
-      c_Content = C_SyvUpUpdatePackageListNodeItemWidget::m_CreateToolTipContent();
+      c_Content = C_SyvUpPackageListNodeItemWidget::m_CreateToolTipContent();
    }
 
    return c_Content;

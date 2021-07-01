@@ -52,7 +52,8 @@ const QString C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid = "stw_opensyde_
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcConnectedNodeList::C_SyvDcConnectedNodeList(QWidget * const opc_Parent) :
-   QListWidget(opc_Parent)
+   QListWidget(opc_Parent),
+   mq_GridSizeSet(false)
 {
    //UI Settings
    this->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -150,11 +151,13 @@ void C_SyvDcConnectedNodeList::startDrag(const Qt::DropActions oc_Actions)
       QPixmap c_Screenshot(c_Rect.size());
       //Manual drag
       QDrag * const pc_Drag = new QDrag(this);
+      QRegion c_Region;
 
       Q_EMIT (this->SigStartDrag(pc_Widget->GetDeviceName(), pc_Widget->GetDeviceNameValid()));
 
       // create the screenshot
-      pc_Widget->render(&c_Screenshot, QPoint(), QRegion(c_Rect));
+      c_Region.setRects(&c_Rect, 1);
+      pc_Widget->render(&c_Screenshot, QPoint(), c_Region);
 
       pc_Drag->setPixmap(c_Screenshot);
 
@@ -197,7 +200,8 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataDevice,
                                pc_Widget->GetDeviceName().toStdString().c_str());
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid,
-                               QString::number(pc_Widget->GetDeviceNameValid()).toStdString().c_str());
+                               QString::number(static_cast<sintn>(pc_Widget->GetDeviceNameValid())).
+                               toStdString().c_str());
          }
       }
    }
@@ -237,6 +241,13 @@ void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc
 
    //Style first
    C_OgeWiUtil::h_ApplyStylesheetProperty(pc_Widget, "First", this->count() == 1);
+
+   if (this->mq_GridSizeSet == false)
+   {
+      // Set the grid size for one time. The size hint seems not to be enough since Qt 5.15.2
+      this->mq_GridSizeSet = true;
+      this->setGridSize(QSize(pc_Widget->width(), pc_Widget->height()));
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

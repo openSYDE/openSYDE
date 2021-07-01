@@ -112,7 +112,15 @@ C_OSCComMessageLogger::C_OSCComMessageLogger(void) :
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLogger::~C_OSCComMessageLogger(void)
 {
-   this->RemoveAllLogFiles();
+   try
+   {
+      C_OSCComMessageLogger::RemoveAllLogFiles();
+   }
+   catch (...)
+   {
+   }
+   mpc_OsySysDefMessage = NULL;
+   mpc_OsySysDefDataPoolList = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

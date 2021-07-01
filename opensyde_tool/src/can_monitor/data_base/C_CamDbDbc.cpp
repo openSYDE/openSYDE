@@ -308,14 +308,14 @@ const std::vector<QString> C_CamDbDbc::GetFoundMessages(void) const
    std::vector<QString> c_Retval;
    QList<QString> c_Keys = this->mc_FoundMessagesNodes.keys();
    //Nodes
-   c_Retval.reserve(this->mc_FoundMessagesNodes.size() + this->mc_FoundMessagesUnmapped.size());
-   for (QList<QString>::const_iterator c_It = c_Keys.begin(); c_It != c_Keys.end(); ++c_It)
+   c_Retval.reserve(static_cast<uint>(this->mc_FoundMessagesNodes.size() + this->mc_FoundMessagesUnmapped.size()));
+   for (QList<QString>::const_iterator c_It = c_Keys.cbegin(); c_It != c_Keys.cend(); ++c_It)
    {
       c_Retval.push_back(*c_It);
    }
    //Unmapped
    c_Keys = this->mc_FoundMessagesUnmapped.keys();
-   for (QList<QString>::const_iterator c_It = c_Keys.begin(); c_It != c_Keys.end(); ++c_It)
+   for (QList<QString>::const_iterator c_It = c_Keys.cbegin(); c_It != c_Keys.cend(); ++c_It)
    {
       c_Retval.push_back(*c_It);
    }
@@ -411,9 +411,10 @@ bool C_CamDbDbc::CheckHashForMessage(const QString & orc_Message, const uint32 o
 {
    bool q_Retval = false;
 
-   QMap<QString, C_CamDbDbcMessageId>::const_iterator c_ItMapped = this->mc_FoundMessagesNodes.find(orc_Message);
-   QMap<QString, C_CamDbDbcUnmappedMessageId>::const_iterator c_ItUnmapped = this->mc_FoundMessagesUnmapped.find(
-      orc_Message);
+   const QMap<QString, C_CamDbDbcMessageId>::const_iterator c_ItMapped = this->mc_FoundMessagesNodes.find(orc_Message);
+   const QMap<QString, C_CamDbDbcUnmappedMessageId>::const_iterator c_ItUnmapped =
+      this->mc_FoundMessagesUnmapped.find(orc_Message);
+
    if (c_ItMapped != this->mc_FoundMessagesNodes.end())
    {
       if (c_ItMapped->u32_Hash == ou32_Hash)

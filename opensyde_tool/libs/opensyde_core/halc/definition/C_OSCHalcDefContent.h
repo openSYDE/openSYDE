@@ -52,6 +52,7 @@ public:
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
    virtual void CalcHashElement(stw_types::uint32 & oru32_HashValue, const stw_types::uint32 ou32_Index) const;
+   virtual void CalcHashStructure(stw_types::uint32 & oru32_HashValue) const;
 
 private:
    E_ComplexType me_ComplexType;

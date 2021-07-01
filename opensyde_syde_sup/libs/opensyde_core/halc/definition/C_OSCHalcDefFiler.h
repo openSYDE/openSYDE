@@ -38,6 +38,12 @@ private:
 
    C_OSCHalcDefFiler(void);
 
+   static stw_types::sint32 mh_LoadNVMData(C_OSCHalcDefBase & orc_IOData, C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadNVMAddressOffsetData(std::vector<stw_types::uint32> & orc_Vector,
+                                                        const C_OSCXMLParserBase & orc_XMLParser,
+                                                        const C_OSCHalcDefBase::E_SafetyMode oe_SafetyMode,
+                                                        const stw_types::uint8 ou8_NumConfigCopies,
+                                                        const bool oq_IsSafeVector);
    static stw_types::sint32 mh_SaveFile(const C_OSCHalcDefBase & orc_IOData, const stw_scl::C_SCLString & orc_Path);
    static stw_types::sint32 mh_SaveIODomain(const C_OSCHalcDefDomain & orc_IODataDomain,
                                             C_OSCXMLParserBase & orc_XMLParser);
@@ -67,7 +73,7 @@ private:
                                                       std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability,
                                                       const stw_types::uint32 ou32_NumChannels);
    static stw_scl::C_SCLString mh_GetAvailabilityString(
-      const std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability);
+      const std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability, const bool oq_OnlySaveOnce);
    static stw_types::sint32 mh_SaveUseCase(const C_OSCHalcDefChannelUseCase & orc_UseCase,
                                            C_OSCXMLParserBase & orc_XMLParser);
    static stw_scl::C_SCLString mh_DomainCategoryEnumToString(const C_OSCHalcDefDomain::E_Category oe_Category);
@@ -78,6 +84,10 @@ private:
    static stw_types::sint32 mh_CheckDuplicateNames(const stw_scl::C_SCLString & orc_Section,
                                                    const stw_scl::C_SCLString & orc_DomainSingularName,
                                                    std::vector<stw_scl::C_SCLString> & orc_Names);
+   static stw_scl::C_SCLString mh_SafetyModeToString(
+      const C_OSCHalcDefBase::E_SafetyMode & ore_NodeDataPoolElementAccess);
+   static stw_types::sint32 mh_StringToSafetyMode(const stw_scl::C_SCLString & orc_String,
+                                                  C_OSCHalcDefBase::E_SafetyMode & ore_Type);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

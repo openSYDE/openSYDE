@@ -62,6 +62,7 @@ C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * co
    mq_IgnoreSelectAllCheckboxChanges(false)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
    QString c_Name;
 
    mpc_Ui->setupUi(this);
@@ -91,6 +92,9 @@ C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * co
    this->mpc_Ui->pc_GraphicsView->SetSceneAndConnect(this->mpc_Scene);
 
    this->InitText();
+
+   // Handle the service mode
+   this->mpc_Ui->pc_PbConfirm->setEnabled(!q_ServiceModeActive);
 
    // make all generic connects
    //Connect for tool tip
@@ -236,7 +240,8 @@ void C_SyvSeSetupWidget::SetEditMode(const bool oq_Active, const bool oq_WithSav
    else
    {
       //Handle button
-      this->mpc_Ui->pc_PbConfirm->SetSvg("://images/main_page_and_navi_bar/IconEdit.svg");
+      this->mpc_Ui->pc_PbConfirm->SetSvg("://images/main_page_and_navi_bar/IconEdit.svg",
+                                         "://images/IconEditDisabledBright.svg");
       this->mpc_Ui->pc_PbConfirm->SetMargins(10, 28); // put a bit more space in between
       this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Edit"));
 

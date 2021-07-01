@@ -90,15 +90,20 @@ else()
    message("OPENSYDE_CORE_SKIP_ZIPPING not detected ... dragging in package")
 
    set(OPENSYDE_CORE_ZIPPING_SOURCES
+      ${CMAKE_CURRENT_SOURCE_DIR}/C_OSCAesFile.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/C_OSCZipData.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/C_OSCZipFile.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/aes/AES.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/miniz/miniz.c
+      ${CMAKE_CURRENT_SOURCE_DIR}/C_OSCAesFile.h
       ${CMAKE_CURRENT_SOURCE_DIR}/C_OSCZipData.h
       ${CMAKE_CURRENT_SOURCE_DIR}/C_OSCZipFile.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/aes/AES.h
       ${CMAKE_CURRENT_SOURCE_DIR}/miniz/miniz.h
    )
 
    set(OPENSYDE_CORE_ZIPPING_INCLUDE_DIRECTORIES
+      ${CMAKE_CURRENT_SOURCE_DIR}/aes
       ${CMAKE_CURRENT_SOURCE_DIR}/miniz
    )
 endif()
@@ -133,12 +138,14 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportHalc.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportNode.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportOsyInit.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportParamSet.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportUti.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportCommunicationStack.h
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportDataPool.h
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportHalc.h
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportNode.h
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportOsyInit.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportParamSet.h
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportUti.h
    )
 
@@ -311,18 +318,13 @@ else()
    )
 endif()
 
-# communication protocol drivers (openSYDE, STW Flashloader, KEFEX, Data Dealer, Dispatcher interface)
-if(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS)
-   message("OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS detected ... skipping package")
+# param set handling (reading and writing syde_psi files)
+if(OPENSYDE_CORE_SKIP_PARAM_SET)
+   message("OPENSYDE_CORE_SKIP_PARAM_SET detected ... skipping package")
 else()
-   message("OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS not detected ... dragging in package")
+   message("OPENSYDE_CORE_SKIP_PARAM_SET not detected ... dragging in package")
 
-   set(OPENSYDE_CORE_PROTOCOL_DRIVERS_SOURCES
-      ${CMAKE_CURRENT_SOURCE_DIR}/can_dispatcher/dispatcher/CCANBase.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/can_dispatcher/dispatcher/CCANDispatcher.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OSCDataDealer.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OSCDataDealerNvm.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OSCDataDealerNvmSafe.cpp
+   set(OPENSYDE_CORE_PARAM_SET_SOURCES
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetDataPoolInfo.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetFilerBase.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetHandler.cpp
@@ -336,6 +338,39 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetRawEntry.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetRawNode.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetRawNodeFiler.cpp
+
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetDataPoolInfo.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetFilerBase.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetHandler.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedData.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedDataPool.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedElement.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedFileInfoData.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedList.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedNode.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedNodeFiler.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetRawEntry.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetRawNode.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetRawNodeFiler.h
+   )
+
+   set(OPENSYDE_CORE_PARAM_SET_INCLUDE_DIRECTORIES
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset
+   )
+endif()
+
+# communication protocol drivers (openSYDE, STW Flashloader, KEFEX, Data Dealer, Dispatcher interface)
+if(OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS)
+   message("OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS detected ... skipping package")
+else()
+   message("OPENSYDE_CORE_SKIP_PROTOCOL_DRIVERS not detected ... dragging in package")
+
+   set(OPENSYDE_CORE_PROTOCOL_DRIVERS_SOURCES
+      ${CMAKE_CURRENT_SOURCE_DIR}/can_dispatcher/dispatcher/CCANBase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/can_dispatcher/dispatcher/CCANDispatcher.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OSCDataDealer.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OSCDataDealerNvm.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OSCDataDealerNvmSafe.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CDLReportEvents.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CHexFile.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CKFXComm.cpp
@@ -372,19 +407,6 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OSCDataDealer.h
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OSCDataDealerNvm.h
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/C_OSCDataDealerNvmSafe.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetDataPoolInfo.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetFilerBase.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetHandler.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedData.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedDataPool.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedElement.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedFileInfoData.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedList.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedNode.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetInterpretedNodeFiler.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetRawEntry.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetRawNode.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset/C_OSCParamSetRawNodeFiler.h
       ${CMAKE_CURRENT_SOURCE_DIR}/ip_dispatcher/dispatcher/C_OSCIpDispatcher.h
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CDLReportEvents.h
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CHexFile.h
@@ -423,7 +445,6 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/can_dispatcher/dispatcher
       ${CMAKE_CURRENT_SOURCE_DIR}/ip_dispatcher/dispatcher
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer
-      ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer/paramset
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication
@@ -535,6 +556,7 @@ set(OPENSYDE_CORE_SOURCES
    ${OPENSYDE_CORE_IMPORTS_SOURCES}
    ${OPENSYDE_CORE_CODE_GENERATION_SOURCES}
    ${OPENSYDE_CORE_PROJECT_HANDLING_SOURCES}
+   ${OPENSYDE_CORE_PARAM_SET_SOURCES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_SOURCES}
    ${OPENSYDE_CORE_WINDOWS_DRIVERS_SOURCES}
    ${OPENSYDE_CORE_WINDOWS_TARGET_SOURCES}
@@ -548,6 +570,7 @@ set(OPENSYDE_CORE_INCLUDE_DIRECTORIES
    ${OPENSYDE_CORE_IMPORTS_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_CODE_GENERATION_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PROJECT_HANDLING_INCLUDE_DIRECTORIES}
+   ${OPENSYDE_CORE_PARAM_SET_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PROTOCOL_DRIVERS_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_WINDOWS_DRIVERS_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_WINDOWS_TARGET_INCLUDE_DIRECTORIES}

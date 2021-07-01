@@ -220,7 +220,7 @@ std::vector<C_OgePubIconOnly *> C_SebToolboxUtil::h_AddNewUserHeading(const QStr
       c_Icons.push_back(pc_ClearAllUserNodesButton);
    }
    return c_Icons;
-}
+} //lint !e593  //no memory leak because of the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add free elements to specified list widget
@@ -270,14 +270,14 @@ void C_SebToolboxUtil::h_AddElementToList(QListWidget * const opc_ListWidget, co
       pc_Item = opc_ListWidget->item(opc_ListWidget->count() - 1);
       c_Icon = C_SdUtil::h_InitStaticIconSvg(orc_IconPath, opc_ListWidget->iconSize());
       pc_Item->setData(msn_USER_ROLE_ADDITIONAL_INFORMATION, orc_Text);
-      pc_Item->setData(msn_USER_ROLE_PIXMAP_BRIGHT_MODE, QPixmap(orc_IconPath));
+      pc_Item->setData(msn_USER_ROLE_PIXMAP_BRIGHT_MODE, static_cast<QPixmap>(orc_IconPath));
       if (orc_IconPathDark.compare("") == 0)
       {
-         pc_Item->setData(msn_USER_ROLE_PIXMAP_DARK_MODE, QPixmap(orc_IconPath));
+         pc_Item->setData(msn_USER_ROLE_PIXMAP_DARK_MODE, static_cast<QPixmap>(orc_IconPath));
       }
       else
       {
-         pc_Item->setData(msn_USER_ROLE_PIXMAP_DARK_MODE, QPixmap(orc_IconPathDark));
+         pc_Item->setData(msn_USER_ROLE_PIXMAP_DARK_MODE, static_cast<QPixmap>(orc_IconPathDark));
       }
       pc_Item->setData(msn_USER_ROLE_TOOL_TIP_HEADING, orc_ToolTipHeading);
       pc_Item->setData(msn_USER_ROLE_TOOL_TIP_CONTENT, orc_ToolTipContent);

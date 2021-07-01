@@ -79,6 +79,8 @@ sint32 C_OSCHalcDefFiler::h_LoadFile(C_OSCHalcDefBase & orc_IOData, const C_SCLS
             C_OSCUtils::h_FileToString(orc_Path, orc_IOData.c_FileString);
             //Remember name
             orc_IOData.c_OriginalFileName = TGL_ExtractFileName(orc_Path);
+            //Trigger postprocessing before finish
+            orc_IOData.HandleFileLoadPostProcessing();
          }
       }
       else
@@ -247,6 +249,57 @@ sint32 C_OSCHalcDefFiler::h_LoadData(C_OSCHalcDefBase & orc_IOData, C_OSCXMLPars
    }
    if (s32_Retval == C_NO_ERR)
    {
+      if (orc_XMLParser.SelectNodeChild("safety-mode") == "safety-mode")
+      {
+         const C_SCLString c_NodeContent = orc_XMLParser.GetNodeContent();
+         if (C_OSCHalcDefFiler::mh_StringToSafetyMode(c_NodeContent, orc_IOData.e_SafetyMode) != C_NO_ERR)
+         {
+            osc_write_log_error("Loading HALC definition", "Unknown type in \"safety-mode\" node.");
+            s32_Retval = C_CONFIG;
+         }
+         //Return
+         orc_XMLParser.SelectNodeParent();
+      }
+      else
+      {
+         orc_IOData.e_SafetyMode = C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING;
+      }
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      if (orc_XMLParser.SelectNodeChild("number-of-configuration-copies") == "number-of-configuration-copies")
+      {
+         const C_SCLString c_NodeContent = orc_XMLParser.GetNodeContent();
+         try
+         {
+            orc_IOData.u8_NumConfigCopies = static_cast<uint8>(c_NodeContent.ToInt());
+            if (orc_IOData.u8_NumConfigCopies > 4U)
+            {
+               osc_write_log_error("Loading HALC definition",
+                                   "Number out of valid range in \"number-of-configuration-copies\" node.");
+               s32_Retval = C_CONFIG;
+            }
+         }
+         catch (...)
+         {
+            osc_write_log_error("Loading HALC definition",
+                                "Number not valid in \"number-of-configuration-copies\" node.");
+            s32_Retval = C_CONFIG;
+         }
+         //Return
+         orc_XMLParser.SelectNodeParent();
+      }
+      else
+      {
+         orc_IOData.u8_NumConfigCopies = 1U;
+      }
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = C_OSCHalcDefFiler::mh_LoadNVMData(orc_IOData, orc_XMLParser);
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
       C_SCLString c_DomainNode = orc_XMLParser.SelectNodeChild("domain");
       if (c_DomainNode == "domain")
       {
@@ -304,6 +357,49 @@ sint32 C_OSCHalcDefFiler::h_SaveData(const C_OSCHalcDefBase & orc_IOData, C_OSCX
    //Device
    tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("device-name") == "device-name");
    orc_XMLParser.SetNodeContent(orc_IOData.c_DeviceName);
+   //Return
+   orc_XMLParser.SelectNodeParent();
+   //Safety mode
+   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("safety-mode") == "safety-mode");
+   orc_XMLParser.SetNodeContent(mh_SafetyModeToString(orc_IOData.e_SafetyMode));
+   //Return
+   orc_XMLParser.SelectNodeParent();
+   //Num copies
+   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild(
+                 "number-of-configuration-copies") == "number-of-configuration-copies");
+   orc_XMLParser.SetNodeContent(stw_scl::C_SCLString::IntToStr(orc_IOData.u8_NumConfigCopies));
+   //Return
+   orc_XMLParser.SelectNodeParent();
+   //NVM config
+   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("nvm-config") == "nvm-config");
+   orc_XMLParser.SetAttributeBool("active", orc_IOData.q_NvMBasedConfig);
+   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild(
+                 "datapools-start-address-offset") == "datapools-start-address-offset");
+   for (uint32 u32_It = 0UL; u32_It < orc_IOData.c_NvMNonSafeAddressOffset.size(); ++u32_It)
+   {
+      const stw_scl::C_SCLString c_AttributeName = "address-offset-datapool-" + stw_scl::C_SCLString::IntToStr(
+         u32_It + 1UL) + "-non-safe";
+      orc_XMLParser.SetAttributeUint32(c_AttributeName, orc_IOData.c_NvMNonSafeAddressOffset[u32_It]);
+   }
+   for (uint32 u32_It = 0UL; u32_It < orc_IOData.c_NvMSafeAddressOffset.size(); ++u32_It)
+   {
+      const stw_scl::C_SCLString c_AttributeName = "address-offset-datapool-" + stw_scl::C_SCLString::IntToStr(
+         u32_It + 1UL) + "-safe";
+      orc_XMLParser.SetAttributeUint32(c_AttributeName, orc_IOData.c_NvMSafeAddressOffset[u32_It]);
+   }
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "nvm-config");
+   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild(
+                 "lists-reserved-size") == "lists-reserved-size");
+   orc_XMLParser.SetAttributeUint32("parameters-list-size", orc_IOData.u32_NvMReservedListSizeParameters);
+   orc_XMLParser.SetAttributeUint32("input-values-list-size",
+                                    orc_IOData.u32_NvMReservedListSizeInputValues);
+   orc_XMLParser.SetAttributeUint32("output-values-list-size",
+                                    orc_IOData.u32_NvMReservedListSizeOutputValues);
+   orc_XMLParser.SetAttributeUint32("status-values-list-size",
+                                    orc_IOData.u32_NvMReservedListSizeStatusValues);
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "nvm-config");
    //Return
    orc_XMLParser.SelectNodeParent();
    for (uint32 u32_ItDomain = 0UL; (u32_ItDomain < orc_IOData.GetDomainSize()) && (s32_Retval == C_NO_ERR);
@@ -449,6 +545,183 @@ sint32 C_OSCHalcDefFiler::h_CheckDomainDisplayNames(const C_OSCHalcDefDomain & o
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCHalcDefFiler::C_OSCHalcDefFiler(void)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load NVM data
+
+   \param[in,out]  orc_IOData       IO data
+   \param[in,out]  orc_XMLParser    XML parser
+
+   \return
+   C_NO_ERR    data read
+   C_CONFIG    IO definition content is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcDefFiler::mh_LoadNVMData(C_OSCHalcDefBase & orc_IOData, C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   orc_IOData.c_NvMNonSafeAddressOffset.clear();
+   orc_IOData.c_NvMSafeAddressOffset.clear();
+   if (orc_XMLParser.SelectNodeChild("nvm-config") == "nvm-config")
+   {
+      if (orc_XMLParser.AttributeExists("active"))
+      {
+         orc_IOData.q_NvMBasedConfig = orc_XMLParser.GetAttributeBool("active");
+      }
+      else
+      {
+         osc_write_log_error("Loading HALC definition",
+                             "\"active\" attribute of \"nvm-config\" section is missing.");
+         s32_Retval = C_CONFIG;
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         if (orc_XMLParser.SelectNodeChild("datapools-start-address-offset") == "datapools-start-address-offset")
+         {
+            s32_Retval = mh_LoadNVMAddressOffsetData(orc_IOData.c_NvMNonSafeAddressOffset, orc_XMLParser,
+                                                     orc_IOData.e_SafetyMode, orc_IOData.u8_NumConfigCopies, false);
+            if (s32_Retval == C_NO_ERR)
+            {
+               s32_Retval = mh_LoadNVMAddressOffsetData(orc_IOData.c_NvMSafeAddressOffset, orc_XMLParser,
+                                                        orc_IOData.e_SafetyMode, orc_IOData.u8_NumConfigCopies, true);
+            }
+            //Return
+            orc_XMLParser.SelectNodeParent();
+         }
+         else
+         {
+            if (orc_IOData.q_NvMBasedConfig)
+            {
+               osc_write_log_error("Loading HALC definition",
+                                   "node \"datapools-start-address-offset\" within \"nvm-config\" section is missing, but nvm-config is active.");
+               s32_Retval = C_CONFIG;
+            }
+         }
+         if (orc_XMLParser.SelectNodeChild("lists-reserved-size") == "lists-reserved-size")
+         {
+            if (orc_XMLParser.AttributeExists("parameters-list-size"))
+            {
+               orc_IOData.u32_NvMReservedListSizeParameters = orc_XMLParser.GetAttributeUint32(
+                  "parameters-list-size");
+            }
+            else
+            {
+               osc_write_log_error("Loading HALC definition",
+                                   "\"parameters-list-size\" attribute of \"nvm-config\" section is missing, but nvm-config is active.");
+               s32_Retval = C_CONFIG;
+            }
+            if (orc_XMLParser.AttributeExists("input-values-list-size"))
+            {
+               orc_IOData.u32_NvMReservedListSizeInputValues = orc_XMLParser.GetAttributeUint32(
+                  "input-values-list-size");
+            }
+            else
+            {
+               osc_write_log_error("Loading HALC definition",
+                                   "\"input-values-list-size\" attribute of \"nvm-config\" section is missing, but nvm-config is active.");
+               s32_Retval = C_CONFIG;
+            }
+            if (orc_XMLParser.AttributeExists("output-values-list-size"))
+            {
+               orc_IOData.u32_NvMReservedListSizeOutputValues = orc_XMLParser.GetAttributeUint32(
+                  "output-values-list-size");
+            }
+            else
+            {
+               osc_write_log_error("Loading HALC definition",
+                                   "\"output-values-list-size\" attribute of \"nvm-config\" section is missing, but nvm-config is active.");
+               s32_Retval = C_CONFIG;
+            }
+            if (orc_XMLParser.AttributeExists("status-values-list-size"))
+            {
+               orc_IOData.u32_NvMReservedListSizeStatusValues = orc_XMLParser.GetAttributeUint32(
+                  "status-values-list-size");
+            }
+            else
+            {
+               osc_write_log_error("Loading HALC definition",
+                                   "\"status-values-nvm-list-size\" attribute of \"nvm-config\" section is missing, but nvm-config is active.");
+               s32_Retval = C_CONFIG;
+            }
+            //Return
+            orc_XMLParser.SelectNodeParent();
+         }
+         else
+         {
+            if (orc_IOData.q_NvMBasedConfig)
+            {
+               osc_write_log_error("Loading HALC definition",
+                                   "node \"lists-reserved-size\" within \"nvm-config\" section is missing, but nvm-config is active.");
+               s32_Retval = C_CONFIG;
+            }
+         }
+      }
+      //Return
+      orc_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      orc_IOData.q_NvMBasedConfig = false;
+      orc_IOData.u32_NvMReservedListSizeParameters = 100UL;
+      orc_IOData.u32_NvMReservedListSizeInputValues = 100UL;
+      orc_IOData.u32_NvMReservedListSizeOutputValues = 100UL;
+      orc_IOData.u32_NvMReservedListSizeStatusValues = 100UL;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load NVM address offset data
+
+   \param[in,out]  orc_Vector             Vector
+   \param[in,out]  orc_XMLParser          XML parser
+   \param[in]      oe_SafetyMode          Safety mode
+   \param[in]      ou8_NumConfigCopies    Number of config copies
+   \param[in]      oq_IsSafeVector        Is safe vector
+
+   \return
+   C_NO_ERR    data read
+   C_CONFIG    IO definition content is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcDefFiler::mh_LoadNVMAddressOffsetData(std::vector<uint32> & orc_Vector,
+                                                      const C_OSCXMLParserBase & orc_XMLParser,
+                                                      const C_OSCHalcDefBase::E_SafetyMode oe_SafetyMode,
+                                                      const stw_types::uint8 ou8_NumConfigCopies,
+                                                      const bool oq_IsSafeVector)
+{
+   sint32 s32_Retval = C_NO_ERR;
+   const stw_scl::C_SCLString c_StartingPart = "address-offset-datapool-";
+   const stw_scl::C_SCLString c_ClosingPart = oq_IsSafeVector ? "-safe" : "-non-safe";
+
+   for (uint8 u8_It = 0U; u8_It < ou8_NumConfigCopies; ++u8_It)
+   {
+      //lint -e{9114} kept for readability
+      const stw_scl::C_SCLString c_CompleteAttributeName = c_StartingPart + stw_scl::C_SCLString::IntToStr(u8_It + 1U) +
+                                                           c_ClosingPart;
+      if (orc_XMLParser.AttributeExists(c_CompleteAttributeName))
+      {
+         orc_Vector.push_back(orc_XMLParser.GetAttributeUint32(c_CompleteAttributeName));
+      }
+      else
+      {
+         if ((((oe_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING) ||
+               (oe_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING)) ||
+              ((oe_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE) &&
+               (oq_IsSafeVector == false))) ||
+             ((oe_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE) &&
+              (oq_IsSafeVector == true)))
+         {
+            osc_write_log_error("Loading HALC definition",
+                                "\"" + c_CompleteAttributeName +
+                                "\" attribute of \"datapools-start-address-offset\" section is missing, but nvm-config is active.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+   }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1596,37 +1869,63 @@ sint32 C_OSCHalcDefFiler::mh_HandleNumberSectionEnd(const std::vector<sintn> & o
 /*! \brief  Get availability string
 
    \param[in]  orc_Availability  Availability
+   \param[in]  oq_OnlySaveOnce   Only save once
 
    \return
    Availability string
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCHalcDefFiler::mh_GetAvailabilityString(
-   const std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability)
+   const std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability, const bool oq_OnlySaveOnce)
 {
    C_SCLString c_Retval;
 
    for (uint32 u32_ItAva = 0UL; u32_ItAva < orc_Availability.size(); ++u32_ItAva)
    {
       const C_OSCHalcDefChannelAvailability & rc_Avail = orc_Availability[u32_ItAva];
-      if (c_Retval.IsEmpty() == false)
-      {
-         c_Retval += ",";
-      }
       if (rc_Avail.c_DependentValues.size() == 0UL)
       {
+         if (c_Retval.IsEmpty() == false)
+         {
+            c_Retval += ",";
+         }
          c_Retval += C_SCLString::IntToStr(rc_Avail.u32_ValueIndex);
       }
       else
       {
-         c_Retval += "{";
-         c_Retval += C_SCLString::IntToStr(rc_Avail.u32_ValueIndex);
-         for (uint32 u32_ItDep = 0UL; u32_ItDep < rc_Avail.c_DependentValues.size(); ++u32_ItDep)
+         bool q_Continue = true;
+         if (oq_OnlySaveOnce)
          {
-            c_Retval += ",";
-            c_Retval += C_SCLString::IntToStr(rc_Avail.c_DependentValues[u32_ItDep]);
+            //Check sorted ascending (only save each pairing exactly once)
+            uint32 u32_RefVal = rc_Avail.u32_ValueIndex;
+            for (uint32 u32_ItDep = 0UL; u32_ItDep < rc_Avail.c_DependentValues.size(); ++u32_ItDep)
+            {
+               if (u32_RefVal < rc_Avail.c_DependentValues[u32_ItDep])
+               {
+                  u32_RefVal = rc_Avail.c_DependentValues[u32_ItDep];
+               }
+               else
+               {
+                  q_Continue = false;
+                  break;
+               }
+            }
          }
-         c_Retval += "}";
+         if (q_Continue)
+         {
+            if (c_Retval.IsEmpty() == false)
+            {
+               c_Retval += ",";
+            }
+            c_Retval += "{";
+            c_Retval += C_SCLString::IntToStr(rc_Avail.u32_ValueIndex);
+            for (uint32 u32_ItDep = 0UL; u32_ItDep < rc_Avail.c_DependentValues.size(); ++u32_ItDep)
+            {
+               c_Retval += ",";
+               c_Retval += C_SCLString::IntToStr(rc_Avail.c_DependentValues[u32_ItDep]);
+            }
+            c_Retval += "}";
+         }
       }
    }
    return c_Retval;
@@ -1652,7 +1951,7 @@ sint32 C_OSCHalcDefFiler::mh_SaveUseCase(const C_OSCHalcDefChannelUseCase & orc_
    orc_XMLParser.SetAttributeString("display", orc_UseCase.c_Display);
    s32_Retval = C_OSCHalcDefStructFiler::h_SaveSimpleValueAsAttribute("value", orc_XMLParser, orc_UseCase.c_Value);
    orc_XMLParser.SetAttributeString("availability",
-                                    C_OSCHalcDefFiler::mh_GetAvailabilityString(orc_UseCase.c_Availability));
+                                    C_OSCHalcDefFiler::mh_GetAvailabilityString(orc_UseCase.c_Availability, true));
    {
       std::vector<C_OSCHalcDefChannelAvailability> c_TmpAvailabilities;
       for (uint32 u32_It = 0UL; u32_It < orc_UseCase.c_DefaultChannels.size(); ++u32_It)
@@ -1664,7 +1963,7 @@ sint32 C_OSCHalcDefFiler::mh_SaveUseCase(const C_OSCHalcDefChannelUseCase & orc_
       if (c_TmpAvailabilities.size() > 0UL)
       {
          orc_XMLParser.SetAttributeString("is-default-for",
-                                          C_OSCHalcDefFiler::mh_GetAvailabilityString(c_TmpAvailabilities));
+                                          C_OSCHalcDefFiler::mh_GetAvailabilityString(c_TmpAvailabilities, false));
       }
    }
    tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("comment") == "comment");
@@ -1799,6 +2098,79 @@ sint32 C_OSCHalcDefFiler::mh_CheckDuplicateNames(const C_SCLString & orc_Section
             }
          }
       }
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Safety mode to string
+
+   \param[in]  ore_NodeDataPoolElementAccess    Node data pool element access
+
+   \return
+   Safety mode as string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCHalcDefFiler::mh_SafetyModeToString(
+   const C_OSCHalcDefBase::E_SafetyMode & ore_NodeDataPoolElementAccess)
+{
+   C_SCLString c_Retval;
+
+   switch (ore_NodeDataPoolElementAccess)
+   {
+   case C_OSCHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING:
+      c_Retval = "two-levels-without-dropping";
+      break;
+   case C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE:
+      c_Retval = "one-level-all-safe";
+      break;
+   case C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE:
+      c_Retval = "one-level-all-non-safe";
+      break;
+   case C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING:
+   default:
+      c_Retval = "two-levels-with-dropping";
+      break;
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  String to safety mode
+
+   \param[in]   orc_String    String
+   \param[out]  ore_Type      Type
+
+   \return
+   C_NO_ERR    valid type
+   C_RANGE     unknown type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcDefFiler::mh_StringToSafetyMode(const C_SCLString & orc_String,
+                                                C_OSCHalcDefBase::E_SafetyMode & ore_Type)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_String == "two-levels-with-dropping")
+   {
+      ore_Type = C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING;
+   }
+   else if (orc_String == "two-levels-without-dropping")
+   {
+      ore_Type = C_OSCHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING;
+   }
+   else if (orc_String == "one-level-all-safe")
+   {
+      ore_Type = C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE;
+   }
+   else if (orc_String == "one-level-all-non-safe")
+   {
+      ore_Type = C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE;
+   }
+   else
+   {
+      ore_Type = C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING;
+      s32_Retval = C_RANGE;
    }
    return s32_Retval;
 }

@@ -102,7 +102,7 @@ void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)
          c_Link.pszWindow =    NULL;
          c_Link.fIndexOnFail = TRUE;
          //this->mpr_HtmlHelp(GetDesktopWindow(), mh_GetHelpLocation().toStdString().c_str(), HH_DISPLAY_TOPIC, 0);
-         //lint -e{923,1924} Required by API interface
+         //lint -e{923,1924,9091} Required by API interface
          this->mpr_HtmlHelp(GetDesktopWindow(),
                             this->m_GetHelpLocation().toStdString().c_str(), HH_KEYWORD_LOOKUP, (DWORD) &c_Link);
          delete[] (pcn_Text);
@@ -162,7 +162,7 @@ C_HeHandler::C_HeHandler() :
    if (this->mpv_InstHtmlHelp != NULL)
    {
       //Load function
-      //lint -e{740,929,1924} Working code
+      //lint -e{740,929,1924,9176} Working code
       (FARPROC &)mpr_HtmlHelp = GetProcAddress(this->mpv_InstHtmlHelp, "HtmlHelpA");
    }
    else
@@ -210,7 +210,7 @@ void C_HeHandler::m_InitSpecialHelpPages(void)
                                       "Node to Node - Connection Setup");
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDpProperties", "Datapool Properties");
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDpListDataSetWidget", "Datasets");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeProgrammingOptions", "Code Generation - Settings");
+   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeProgrammingOptions", "File Generation - Settings");
 
    //System Commissioning
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvSeSetupWidget", "Setup");

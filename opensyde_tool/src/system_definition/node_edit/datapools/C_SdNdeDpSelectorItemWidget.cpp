@@ -293,7 +293,7 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
       }
 
       // Application
-      c_ToolTipText += C_GtGetText::h_GetText("\n   Related Programmable Application: ");
+      c_ToolTipText += C_GtGetText::h_GetText("\n   Related Data Block: ");
       if (pc_OSCDataPool->s32_RelatedDataBlockIndex >= 0)
       {
          const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
@@ -337,6 +337,7 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
       {
          uint32 u32_PercentageUsed;
          uint32 u32_PercentageReserved;
+         QString c_StartAddress;
          QString c_TextUsage;
          QString c_TextReservation;
          QString c_Label("%1% %2");
@@ -360,7 +361,11 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
          this->mpc_Ui->pc_LabelUsage->setText(c_Label);
 
          // udpate the tool tip
+         c_StartAddress = static_cast<QString>("   %1: %2\n").arg(C_GtGetText::h_GetText("Start Address"),
+                                                                  QString::number(pc_OSCDataPool->u32_NvMStartAddress));
+
          c_TextUsage = "   " + static_cast<QString>("%1% %2 (%3 / %4)\n").arg(QString::number(u32_PercentageUsed),
+
                                                                               C_GtGetText::h_GetText(
                                                                                  "used by parameters"),
                                                                               C_Uti::h_GetByteCountAsString(this->
@@ -376,7 +381,7 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
                                                                                   C_Uti::h_GetByteCountAsString(this->
                                                                                                                 mu32_Size));
 
-         c_ToolTipText += "NVM Statistics:\n" + c_TextUsage + c_TextReservation;
+         c_ToolTipText += "Memory Usage:\n" + c_StartAddress + c_TextUsage + c_TextReservation;
       }
 
       // update the tool tip
@@ -621,30 +626,31 @@ void C_SdNdeDpSelectorItemWidget::showEvent(QShowEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpSelectorItemWidget::event(QEvent * const opc_Event)
 {
-   if (this->mq_Selected == false)
+   if (opc_Event->type() == QEvent::Leave)
    {
-      if (opc_Event->type() == QEvent::Leave)
+      if ((this->mq_Selected == false) &&
+          (this->mpc_LabelShareImg != NULL) &&
+          (this->mpc_LabelShareImgHovered != NULL))
       {
-         if ((this->mpc_LabelShareImg != NULL) &&
-             (this->mpc_LabelShareImgHovered != NULL))
-         {
-            this->mpc_LabelShareImg->setVisible(this->mq_Shared);
-            this->mpc_LabelShareImgHovered->setVisible(false);
-         }
+         this->mpc_LabelShareImg->setVisible(this->mq_Shared);
+         this->mpc_LabelShareImgHovered->setVisible(false);
       }
-      else if (opc_Event->type() == QEvent::Enter)
+      Q_EMIT (this->SigHoverStateChanged(this->mc_DatapoolId.u32_DataPoolIndex, false));
+   }
+   else if (opc_Event->type() == QEvent::Enter)
+   {
+      if ((this->mq_Selected == false) &&
+          (this->mpc_LabelShareImg != NULL) &&
+          (this->mpc_LabelShareImgHovered != NULL))
       {
-         if ((this->mpc_LabelShareImg != NULL) &&
-             (this->mpc_LabelShareImgHovered != NULL))
-         {
-            this->mpc_LabelShareImgHovered->setVisible(this->mq_Shared);
-            this->mpc_LabelShareImg->setVisible(false);
-         }
+         this->mpc_LabelShareImgHovered->setVisible(this->mq_Shared);
+         this->mpc_LabelShareImg->setVisible(false);
       }
-      else
-      {
-         // Nothing to do
-      }
+      Q_EMIT (this->SigHoverStateChanged(this->mc_DatapoolId.u32_DataPoolIndex, true));
+   }
+   else
+   {
+      // Nothing to do
    }
 
    return C_OgeWiWithToolTip::event(opc_Event);

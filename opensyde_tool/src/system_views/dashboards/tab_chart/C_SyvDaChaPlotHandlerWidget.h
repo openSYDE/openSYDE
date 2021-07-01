@@ -227,6 +227,9 @@ private:
    void m_OnChangeZoomMode(const stw_opensyde_gui_logic::C_PuiSvDbTabChart::E_SettingZoomMode oe_SettingZoomMode);
    void m_ConfigureZoomMode(const stw_opensyde_gui_logic::C_PuiSvDbTabChart::E_SettingZoomMode oe_SettingZoomMode);
 
+   // Configuration of drag mode
+   void m_UpdateDragAxesConfiguration(void);
+
    // Switching between drag and zoom mode
    void m_SetZoomVsDragMode(const bool oq_Active);
    void m_ConfigureZoomVsDragMode(const bool oq_Active);

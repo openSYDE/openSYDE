@@ -9,9 +9,9 @@
 #include "TGLTasks.h"
 #include "CCANDispatcher.h"
 #ifndef DIAGLIB_KEFEX_PROTOCOL_NO_LOGGING
-#include "CCMONProtocol.h"       //for protocolling HLP to text file
+#include "CCMONProtocol.h" //for protocolling HLP to text file
 #ifdef CMONPROTOCOL_ALLOW_RAMVIEW_PROJECT_MAPPING
-#include "CKFXVariableLists.h"   //for protocolling HLP to text file
+#include "CKFXVariableLists.h" //for protocolling HLP to text file
 #endif
 #endif
 
@@ -19,7 +19,6 @@
 
 namespace stw_diag_lib
 {
-
 //---------------------------------------------------------------------------
 
 const stw_types::uint8 KFX_PROTOCOL_SRR                          = 0x01U;
@@ -59,10 +58,10 @@ const stw_types::uint8 KFX_PROTOCOL_SRR_CF                       = 0x43U;
 class C_KFXProcotolResponse
 {
 public:
-   stw_types::uint8  u8_Service;        ///< ID of service
+   stw_types::uint8 u8_Service; ///< ID of service
    stw_types::uint32 u32_IndexOrAddress;
-   stw_types::uint8  au8_Data[7];       ///< Value or error code
-   stw_types::uint8  u8_Size;           ///< number of bytes of dwValue in use
+   stw_types::uint8 au8_Data[7]; ///< Value or error code
+   stw_types::uint8 u8_Size;     ///< number of bytes of dwValue in use
    bool q_Overrun;
    bool q_NewValue;
    bool q_Error;
@@ -75,12 +74,12 @@ public:
 
 //function prototypes
 //do not use __closure to stay independent of Borland C++
-typedef void (*PR_KFXProtECUResetCallBack)(void * const opv_InstancePointer);
-typedef void (*PR_KFXProtNewCyclicTransmissionReceived)(void * const opv_Instance,
-                                                        const stw_types::uint32 ou32_Index,
-                                                        const stw_types::sint64 os64_Value,
-                                                        const stw_types::uint32 ou32_TimeStamp,
-                                                        const bool oq_IsTimeStamped, const bool oq_Error);
+typedef void (* PR_KFXProtECUResetCallBack)(void * const opv_InstancePointer);
+typedef void (* PR_KFXProtNewCyclicTransmissionReceived)(void * const opv_Instance, const stw_types::uint32 ou32_Index,
+                                                         const stw_types::sint64 os64_Value,
+                                                         const stw_types::uint32 ou32_TimeStamp,
+                                                         const bool oq_IsTimeStamped,
+                                                         const bool oq_Error);
 
 //---------------------------------------------------------------------------
 
@@ -88,8 +87,8 @@ typedef void (*PR_KFXProtNewCyclicTransmissionReceived)(void * const opv_Instanc
 class STW_DIAGLIB_EXPORT C_KFXProtocol
 {
 private:
-   C_KFXProtocol(const C_KFXProtocol & orc_Souce);              ///< not implemented -> prevent copying
-   C_KFXProtocol& operator = (const C_KFXProtocol & orc_Souce); ///< not implemented -> prevent assignment
+   C_KFXProtocol(const C_KFXProtocol & orc_Source);               ///< not implemented -> prevent copying
+   C_KFXProtocol & operator = (const C_KFXProtocol & orc_Source); ///< not implemented -> prevent assignment
 
 protected:
    //for protocolling to file:
@@ -146,8 +145,7 @@ public:
    stw_types::sint32 ConfigChanged(void);
 
    stw_types::sint32 SendLogonRequest(const stw_types::uint16 ou16_TypeAddressCRC,
-                                      const stw_types::uint8 ou8_ProjectIndex,
-                                      const stw_types::uint16 ou16_DataVersion,
+                                      const stw_types::uint8 ou8_ProjectIndex, const stw_types::uint16 ou16_DataVersion,
                                       const stw_types::uint16 ou16_NumOfVariables);
    stw_types::sint32 SendLogoffRequest(void);
    stw_types::sint32 SendServiceReadRequest(const stw_types::uint16 ou16_VariableIndex);
@@ -168,7 +166,7 @@ public:
                                      const stw_types::uint16 ou16_Interval);
 
    stw_types::sint32 SendAbortIndividualResponseRequest(const stw_types::uint16 ou16_VariableIndex,
-                                                       const bool oq_Handshake);
+                                                        const bool oq_Handshake);
    stw_types::sint32 SendAbortAllResponsesRequest(const bool oq_Handshake);
    stw_types::sint32 SendImmediateWriteRequest(const stw_types::uint16 ou16_VariableIndex,
                                                const stw_types::uint32 ou32_Value);
@@ -187,7 +185,7 @@ public:
    stw_types::sint32 SegmentedSRRTransfer(const stw_types::uint16 ou16_Index,
                                           const stw_types::uint32 ou32_NumBytesExpected,
                                           stw_types::uint8 * const opu8_Data,
-                                          stw_types::uint16 * const  opu16_Error = NULL);
+                                          stw_types::uint16 * const opu16_Error = NULL);
    stw_types::sint32 SegmentedIWRTransfer(const stw_types::uint16 ou16_Index, const stw_types::uint32 ou32_NumBytes,
                                           const stw_types::uint8 * opu8_Data);
 
@@ -207,7 +205,6 @@ public:
 };
 
 //---------------------------------------------------------------------------
-
 }
 
 #endif

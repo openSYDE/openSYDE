@@ -9,6 +9,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "TGLUtils.h"
 #include "C_GtGetText.h"
 #include "C_SyvUpParamSetFileInfoComparisonDescription.h"
 
@@ -58,6 +59,9 @@ QString C_SyvUpParamSetFileInfoComparisonDescription::GetResultText(void) const
       break;
    case eRT_NOT_FOUND:
       c_Retval = C_GtGetText::h_GetText("-");
+      break;
+   default:
+      tgl_assert(false);
       break;
    }
 

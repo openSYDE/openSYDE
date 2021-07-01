@@ -113,8 +113,6 @@ C_OSCComMessageLogger::C_OSCComMessageLogger(void) :
 C_OSCComMessageLogger::~C_OSCComMessageLogger(void)
 {
    this->RemoveAllLogFiles();
-
-   //lint -e{1579} Never took ownership of mpc_OsySysDefMessage and mpc_OsySysDefDataPoolList
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1411,7 +1409,7 @@ void C_OSCComMessageLogger::m_ConvertCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
       }
       else
       {
-         ++c_ItCounter->second;
+         c_ItCounter->second = c_ItCounter->second + 1;
          this->mc_HandledCanMessage.c_Counter = C_SCLString::IntToStr(c_ItCounter->second);
       }
    }

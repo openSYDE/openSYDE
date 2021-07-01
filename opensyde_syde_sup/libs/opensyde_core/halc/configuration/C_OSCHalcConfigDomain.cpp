@@ -430,6 +430,21 @@ sint32 C_OSCHalcConfigDomain::GetRelevantIndicesForSelectedUseCase(const uint32 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle file load post processing
+
+   \param[in]  oe_SafetyMode  Safety mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfigDomain::HandleFileLoadPostProcessing(const C_OSCHalcDefBase::E_SafetyMode oe_SafetyMode)
+{
+   for (uint32 u32_It = 0UL; u32_It < this->c_ChannelConfigs.size(); ++u32_It)
+   {
+      this->c_ChannelConfigs[u32_It].HandleFileLoadPostProcessing(oe_SafetyMode);
+   }
+   this->c_DomainConfig.HandleFileLoadPostProcessing(oe_SafetyMode);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add parameters
 
    \param[in]      orc_Parameters   Parameters

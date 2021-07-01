@@ -12,8 +12,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <fstream>
-#include <iterator>
 #include <set>
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -1064,15 +1062,17 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
          C_SCLString c_TransferExitResult;
          if ((s32_Return == C_NO_ERR) || (q_RejectedByTargetLayer == true))
          {
-            s32_Return = this->mpc_ComDriver->SendOsyRequestFileBasedTransferExitResult(mc_CurrentNode,
-                                                                                        c_TransferExitResult,
-                                                                                        &u8_NrCode);
-            if (s32_Return != C_NO_ERR)
+            //do not overwrite s32_Return; this function shall still fail if finalize failed
+            sint32 s32_LocalReturn;
+            s32_LocalReturn = this->mpc_ComDriver->SendOsyRequestFileBasedTransferExitResult(
+               mc_CurrentNode, c_TransferExitResult, &u8_NrCode);
+            if (s32_LocalReturn != C_NO_ERR)
             {
-               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR, s32_Return,
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR, s32_LocalReturn,
                                       u8_ProgressPercentage, mc_CurrentNode,
                                       "Could not read exit result text. Details: " +
-                                      C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return, u8_NrCode));
+                                      C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_LocalReturn,
+                                                                                               u8_NrCode));
                s32_Return = C_COM;
                c_TransferExitResult = "unkown (reading information failed)";
             }
@@ -1679,14 +1679,6 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
             //file(s) defined for inactive node -> cry
             s32_Return = C_NOACT;
          }
-         if ((orc_ActiveNodes[u16_Node] == 1U) &&
-             (orc_Nodes[u16_Node].pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == false) &&
-             (orc_ApplicationsToWrite[u16_Node].c_FilesToFlash.size() != orc_Nodes[u16_Node].c_Applications.size()))
-         {
-            //different number of files for node than applications
-            // Check is not relevant for file based servers
-            s32_Return = C_NOACT;
-         }
 
          if (s32_Return == C_NO_ERR)
          {
@@ -1845,7 +1837,7 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                }
 
                //copy file
-               s32_Return = mh_CopyFile(c_SourceFileName, c_TargetFileName, opc_ErrorPath);
+               s32_Return = C_OSCUtils::h_CopyFile(c_SourceFileName, c_TargetFileName, opc_ErrorPath);
                if (s32_Return == C_NO_ERR)
                {
                   c_NodesToFlashNewPaths[u16_Node].c_FilesToFlash[u16_File] = c_TargetFileName;
@@ -1870,7 +1862,7 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                   TGL_ExtractFileName(orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm[u16_File]);
 
                //copy file
-               s32_Return = mh_CopyFile(c_SourceFileName, c_TargetFileName, opc_ErrorPath);
+               s32_Return = C_OSCUtils::h_CopyFile(c_SourceFileName, c_TargetFileName, opc_ErrorPath);
                if (s32_Return == C_NO_ERR)
                {
                   c_NodesToFlashNewPaths[u16_Node].c_FilesToWriteToNvm[u16_File] = c_TargetFileName;
@@ -2008,6 +2000,7 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
       this->mc_TimeoutNodes.clear();
       this->mc_TimeoutNodes.resize(this->mc_ActiveNodes.size(), 0U);
 
+      // First set the request programming flag
       for (uint16 u16_Node = 0U; u16_Node < this->mpc_SystemDefinition->c_Nodes.size(); u16_Node++)
       {
          C_OSCNodeProperties::E_FlashLoaderProtocol e_ProtocolType;
@@ -2020,29 +2013,94 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
             // Continue with nodes without routing
             if (s32_Return == C_NOACT)
             {
+               // STW Flashloader does not have a request programming flag
                if (e_ProtocolType == C_OSCNodeProperties::eFL_OPEN_SYDE)
                {
                   s32_Return = this->mpc_ComDriver->ReConnectNode(mc_CurrentNode);
 
                   if (s32_Return != C_NO_ERR)
                   {
-                     (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR, s32_Return, 10U,
-                                            mc_CurrentNode,
-                                            "Could not reconnect to node");
+                     // In this case, the node did not connect.
+                     // Errors in case of not reachable nodes will be handled when
+                     // the state eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START was set the first time to have
+                     // the same process sequence like using CAN.
+                     // Therefore do not abort and send only a warning as progress information.
+                     // This can only happen in case of Ethernet. The node is not connected, so the next
+                     // request did not make any sense to send and will be skipped till the
+                     // "EnterPreProgrammingSession" broadcasts. By skipping the other request,
+                     // further sending errors will be avoided which would occur a "real" sending error.
+                     (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_RECONNECT_WARNING, s32_Return,
+                                            10U, mc_CurrentNode,
+                                            "Device does not respond to RequestProgramming request.");
 
-                     // Node is not reachable
-                     this->mc_TimeoutNodes[u16_Node] = static_cast<uint8>(s32_Return == C_BUSY);
-
-                     s32_Return = C_COM;
+                     s32_Return = C_NO_ERR;
                   }
-
-                  if (s32_Return == C_NO_ERR)
+                  else
                   {
                      // Set the request programming flag to bring the server into flashloader
                      s32_Return = this->mpc_ComDriver->SendOsyRequestProgramming(mc_CurrentNode);
 
-                     // Reset the server
-                     if (s32_Return == C_NO_ERR)
+                     this->mpc_ComDriver->DisconnectNode(mc_CurrentNode);
+
+                     if (s32_Return != C_NO_ERR)
+                     {
+                        // In this case, the node does not respond and maybe the next step can help to bring
+                        // it into the flashloader by sending EnterPreProgrammingSession as broadcast
+                        // Therefore do not abort and send only a warning as progress information.
+                        (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_WARNING, s32_Return,
+                                               10U, mc_CurrentNode,
+                                               "Device does not respond to RequestProgramming request.");
+
+                        s32_Return = C_NO_ERR;
+                     }
+                  }
+               }
+               else
+               {
+                  // No error, nothing to do for STW Flashloader nodes here, reset the error code
+                  s32_Return = C_NO_ERR;
+               }
+            }
+         }
+      }
+
+      if (s32_Return == C_NO_ERR)
+      {
+         // Sending the reset commandos
+         for (uint16 u16_Node = 0U; u16_Node < this->mpc_SystemDefinition->c_Nodes.size(); u16_Node++)
+         {
+            C_OSCNodeProperties::E_FlashLoaderProtocol e_ProtocolType;
+            const bool q_IsActive = m_IsNodeActive(u16_Node, this->mu32_ActiveBusIndex, e_ProtocolType, mc_CurrentNode);
+
+            if (q_IsActive == true)
+            {
+               s32_Return = this->mpc_ComDriver->IsRoutingNecessary(u16_Node);
+
+               // Continue with nodes without routing
+               if (s32_Return == C_NOACT)
+               {
+                  if (e_ProtocolType == C_OSCNodeProperties::eFL_OPEN_SYDE)
+                  {
+                     s32_Return = this->mpc_ComDriver->ReConnectNode(mc_CurrentNode);
+
+                     if (s32_Return != C_NO_ERR)
+                     {
+                        // In this case, the node did not connect.
+                        // Errors in case of not reachable nodes will be handled when
+                        // the state eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START was set the first time to have
+                        // the same process sequence like using CAN.
+                        // Therefore do not abort and send only a warning as progress information.
+                        // This can only happen in case of Ethernet. The node is not connected, so the next
+                        // request did not make any sense to send and will be skipped till the
+                        // "EnterPreProgrammingSession" broadcasts. By skipping the other request,
+                        // further sending errors will be avoided which would occur a "real" sending error.
+                        (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_RECONNECT_WARNING, s32_Return,
+                                               15U, mc_CurrentNode,
+                                               "Device does not respond to RequestProgramming request.");
+
+                        s32_Return = C_NO_ERR;
+                     }
+                     else
                      {
                         s32_Return = this->mpc_ComDriver->SendOsyEcuReset(
                            mc_CurrentNode,
@@ -2052,34 +2110,45 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
 
                         if (s32_Return != C_NO_ERR)
                         {
-                           (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR, s32_Return,
+                           // In this case, the node will not get the request, maybe the next step can help to bring
+                           // it into the flashloader by sending EnterPreProgrammingSession as broadcast
+                           // Therefore do not abort and send only a warning as progress information.
+                           (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_ECU_RESET_WARNING, s32_Return,
                                                   10U, mc_CurrentNode,
                                                   "EcuReset request for device failed.");
+
+                           s32_Return = C_NO_ERR;
+                        }
+                     }
+                  }
+                  else
+                  {
+                     //STW Flashloader node
+                     s32_Return = this->mpc_ComDriver->SendStwRequestNodeReset(this->mc_CurrentNode);
+                     if (s32_Return != C_NO_ERR)
+                     {
+                        if (s32_Return == C_NOACT)
+                        {
+                           // No reset message configured. The next step can help to bring
+                           // it into the flashloader by sending STW Flashloader "FLASH"
+                           // Therefore do not abort and send only a warning as progress information.
+                           // All other errors are errors which can not be "healed" by the next step
+                           (void)m_ReportProgress(eACTIVATE_FLASHLOADER_XFL_ECU_RESET_WARNING, s32_Return, 15U,
+                                                  mc_CurrentNode,
+                                                  "No EcuReset message configured.");
+
+                           s32_Return = C_NO_ERR;
+                        }
+                        else
+                        {
+                           // All other errors are errors which can not be "healed" by the next step
+                           (void)m_ReportProgress(eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR, s32_Return, 15U,
+                                                  mc_CurrentNode,
+                                                  "Sending EcuReset request failed.");
+
                            s32_Return = C_COM;
                         }
                      }
-                     else
-                     {
-                        (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR, s32_Return,
-                                               10U, mc_CurrentNode,
-                                               "RequestProgramming request for device failed.");
-
-                        // Node is not reachable
-                        this->mc_TimeoutNodes[u16_Node] = static_cast<uint8>(s32_Return == C_TIMEOUT);
-
-                        s32_Return = C_COM;
-                     }
-                  }
-               }
-               else
-               {
-                  //STW Flashloader node
-                  s32_Return = this->mpc_ComDriver->SendStwRequestNodeReset(this->mc_CurrentNode);
-                  if (s32_Return != C_NO_ERR)
-                  {
-                     (void)m_ReportProgress(eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR, s32_Return, 10U,
-                                            mc_CurrentNode,
-                                            "Sending request failed.");
                   }
                }
             }
@@ -2427,6 +2496,8 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
                               (void)m_ReportProgress(eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR, s32_Return, 50U,
                                                      mc_CurrentNode,
                                                      "Sending request failed.");
+
+                              s32_Return = C_COM;
                            }
 
                            if (s32_Return == C_NO_ERR)
@@ -3774,74 +3845,4 @@ uint32 C_OSCSuSequences::m_GetAdaptedTransferDataTimeout(const uint32 ou32_Devic
                       C_SCLString::IntToStr(u32_AdaptedTime) + "ms");
 
    return u32_AdaptedTime;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Copies a file from source to target folder (internal function).
-
-   Assumptions:
-   * read permission of source folder
-   * write permission of target folder
-
-   \param[in]  orc_SourceFile            source file (full path required)
-   \param[in]  orc_TargetFile            target file (        -"-       )
-   \param[out] opc_ErrorPath             if != NULL and the function fails:
-                                          file path (source or target) that caused the problem
-
-   \return
-   C_NO_ERR    success
-   C_RD_WR     read/write error (see log file for details)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSuSequences::mh_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLString & orc_TargetFile,
-                                     C_SCLString * const opc_ErrorPath)
-{
-   sint32 s32_Return = C_NO_ERR;
-
-   std::fstream c_Input(orc_SourceFile.c_str(), std::fstream::in | std::fstream::binary);
-   if (c_Input.fail() == true)
-   {
-      osc_write_log_error("Copying file", "Could not read \"" + orc_SourceFile + "\".");
-      s32_Return = C_RD_WR;
-      if (opc_ErrorPath != NULL)
-      {
-         *opc_ErrorPath = orc_SourceFile;
-      }
-   }
-   else
-   {
-      c_Input << &std::noskipws;
-
-      const std::istream_iterator<uint8> c_Begin(c_Input);
-      const std::istream_iterator<uint8> c_End;
-
-      std::fstream c_Output(orc_TargetFile.c_str(), std::fstream::out | std::fstream::trunc | std::fstream::binary);
-      if (c_Output.fail() == true)
-      {
-         osc_write_log_error("Copying file", "Could not write \"" + orc_TargetFile + "\".");
-         s32_Return = C_RD_WR;
-         if (opc_ErrorPath != NULL)
-         {
-            *opc_ErrorPath = orc_TargetFile;
-         }
-      }
-      else
-      {
-         const std::ostream_iterator<uint8> c_Begin2(c_Output);
-         try
-         {
-            std::copy(c_Begin, c_End, c_Begin2);
-         }
-         catch (...)
-         {
-            osc_write_log_error("Copying file", "Could not write stream of \"" + orc_TargetFile + "\".");
-            s32_Return = C_RD_WR;
-            if (opc_ErrorPath != NULL)
-            {
-               *opc_ErrorPath = orc_TargetFile;
-            }
-         }
-      }
-   }
-   return s32_Return;
 }

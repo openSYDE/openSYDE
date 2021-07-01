@@ -38,19 +38,19 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Paint marked section
 
-   \param[in,out] opc_Painter                  Painter
-   \param[in]     orc_CellRect                 Cell rectangle to draw in
-   \param[in]     orc_Index                    Index
-   \param[in]     oq_Selected                  Flag if item is selected
-   \param[in]     orc_DefaultBackgroundColor   Default background color
-   \param[in]     orc_DefaultBorderColor       Default border color
-   \param[in]     orc_DefaultFont              Default font
-   \param[in]     orc_HighlightForegroundColor Highlight foreground color
-   \param[in]     orc_HighlightBackgroundColor Highlight background color
-   \param[in]     orc_HighlightBorderColor     Highlight border color
-   \param[in]     orc_HighlightFont            Highlight font
-   \param[in]     osn_HexSpacing               In between spacing when using HEX format
-   \param[in]     osn_DecimalSpacing           In between spacing when using decimal format
+   \param[in,out]  opc_Painter                     Painter
+   \param[in]      orc_CellRect                    Cell rectangle to draw in
+   \param[in]      orc_Index                       Index
+   \param[in]      oq_Selected                     Flag if item is selected
+   \param[in]      orc_DefaultBackgroundColor      Default background color
+   \param[in]      orc_DefaultBorderColor          Default border color
+   \param[in]      orc_DefaultFont                 Default font
+   \param[in]      orc_HighlightForegroundColor    Highlight foreground color
+   \param[in]      orc_HighlightBackgroundColor    Highlight background color
+   \param[in]      orc_HighlightBorderColor        Highlight border color
+   \param[in]      orc_HighlightFont               Highlight font
+   \param[in]      osn_HexSpacing                  In between spacing when using HEX format
+   \param[in]      osn_DecimalSpacing              In between spacing when using decimal format
 
    \return
    True  Section painted
@@ -101,7 +101,7 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
          bool q_Start = true;
          sintn sn_ItTransparency = 0;
          QPoint c_CurTopLeft = orc_CellRect.topLeft();
-         const sint32 s32_HalfSpaceWidth = static_cast<sint32>(c_MetricsDefault.width(" ") / 2);
+         const sint32 s32_HalfSpaceWidth = static_cast<sint32>(c_MetricsDefault.horizontalAdvance(" ") / 2);
 
          //Handle dynamic section width
          if (q_IsHex)
@@ -244,18 +244,18 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
 
    Warning: painter is not saved/restored
 
-   \param[in,out] opc_Painter      Painter
-   \param[in,out] orc_TopLeft      Top left of current position to draw at (updated if anything gets drawn
-   \param[in]     orc_CompleteCell Complete cell to always draw in
-   \param[in]     orc_Text         Text to draw
-   \param[in]     orc_Background   Background color
-   \param[in]     orc_Border       Border color
-   \param[in]     orc_Foreground   Foreground color
-   \param[in]     orc_Font         Font
-   \param[in]     orc_Alignment    Text alignment flags
-   \param[in]     os32_CellWidth   Cell width to use if possible
-   \param[in]     os32_MarginFront Margin at front if any
-   \param[in]     os32_MarginBack  Margin at back if any
+   \param[in,out]  opc_Painter         Painter
+   \param[in,out]  orc_TopLeft         Top left of current position to draw at (updated if anything gets drawn
+   \param[in]      orc_CompleteCell    Complete cell to always draw in
+   \param[in]      orc_Text            Text to draw
+   \param[in]      orc_Background      Background color
+   \param[in]      orc_Border          Border color
+   \param[in]      orc_Foreground      Foreground color
+   \param[in]      orc_Font            Font
+   \param[in]      orc_Alignment       Text alignment flags
+   \param[in]      os32_CellWidth      Cell width to use if possible
+   \param[in]      os32_MarginFront    Margin at front if any
+   \param[in]      os32_MarginBack     Margin at back if any
 
    \return
    True  Text got cut off by complete cell restrictions
@@ -310,14 +310,14 @@ C_TblDelegateUtil::C_TblDelegateUtil(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get segment width for the current text, restricted to the cell width
 
-   \param[in]     orc_TopLeft      Top left of current position to draw at (updated if anything gets drawn
-   \param[in]     orc_CompleteCell Complete cell to always draw in
-   \param[in,out] orc_DrawnText    Text to draw
-   \param[in]     orc_Font         Font
-   \param[in]     os32_CellWidth   Cell width to use if possible
-   \param[in]     os32_MarginFront Margin at front if any
-   \param[in]     os32_MarginBack  Margin at back if any
-   \param[in,out] orq_Changed      Flag if cell end was reached
+   \param[in]      orc_TopLeft         Top left of current position to draw at (updated if anything gets drawn
+   \param[in]      orc_CompleteCell    Complete cell to always draw in
+   \param[in,out]  orc_DrawnText       Text to draw
+   \param[in]      orc_Font            Font
+   \param[in]      os32_CellWidth      Cell width to use if possible
+   \param[in]      os32_MarginFront    Margin at front if any
+   \param[in]      os32_MarginBack     Margin at back if any
+   \param[in,out]  orq_Changed         Flag if cell end was reached
 
    \return
    Calculated segment width
@@ -337,11 +337,11 @@ sint32 C_TblDelegateUtil::mh_GetSegmentWidth(const QPoint & orc_TopLeft, const Q
    //If user does not specify anything use the metrics width instead
    if (s32_SegmentWidth < 0)
    {
-      s32_SegmentWidth = os32_MarginFront + c_Metrics.width(orc_DrawnText) + os32_MarginBack;
+      s32_SegmentWidth = os32_MarginFront + c_Metrics.horizontalAdvance(orc_DrawnText) + os32_MarginBack;
    }
    //Check if the segment width does exceed the complete cell boundaries
    if ((static_cast<sint32>(orc_TopLeft.x()) + s32_SegmentWidth) >
-       static_cast<sint32>(orc_CompleteCell.topLeft().x() + orc_CompleteCell.width()))
+       (static_cast<sint32>(orc_CompleteCell.topLeft().x()) + static_cast<sint32>(orc_CompleteCell.width())))
    {
       s32_SegmentWidth =
          static_cast<sint32>((orc_CompleteCell.topLeft().x() + orc_CompleteCell.width()) - orc_TopLeft.x()) -
@@ -355,8 +355,8 @@ sint32 C_TblDelegateUtil::mh_GetSegmentWidth(const QPoint & orc_TopLeft, const Q
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create string list from input and standardize the segment lengths as necessary
 
-   \param[in]     orc_Input Input to segment and standardize
-   \param[in,out] orq_IsHex Utility parameter to identify if the values are hex or decimal
+   \param[in]      orc_Input  Input to segment and standardize
+   \param[in,out]  orq_IsHex  Utility parameter to identify if the values are hex or decimal
 
    \return
    Segmented and standardized string parts
@@ -364,7 +364,7 @@ sint32 C_TblDelegateUtil::mh_GetSegmentWidth(const QPoint & orc_TopLeft, const Q
 //----------------------------------------------------------------------------------------------------------------------
 QStringList C_TblDelegateUtil::mh_CreateAndStandardizeStringList(const QString & orc_Input, bool & orq_IsHex)
 {
-   QStringList c_Retval = orc_Input.split(" ", QString::SkipEmptyParts);
+   QStringList c_Retval = orc_Input.split(" ", Qt::SkipEmptyParts);
 
    if (orc_Input.size() > 3)
    {
@@ -387,8 +387,8 @@ QStringList C_TblDelegateUtil::mh_CreateAndStandardizeStringList(const QString &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get color with specified transparency value
 
-   \param[in] orc_ColorBase    Base color
-   \param[in] ocn_Transparency Desired transparency value
+   \param[in]  orc_ColorBase     Base color
+   \param[in]  ocn_Transparency  Desired transparency value
 
    \return
    Color with specified transparency value

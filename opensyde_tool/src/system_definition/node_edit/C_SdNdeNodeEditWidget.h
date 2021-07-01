@@ -46,6 +46,7 @@ public:
    void SetFlag(const stw_types::uint32 ou32_Flag) const;
    void OpenDetail(const stw_types::sint32 os32_MainIndex, const stw_types::sint32 os32_ListIndex,
                    const stw_types::sint32 os32_ElementIndex, const stw_types::sint32 os32_Flag) const;
+   void AddFromTSP(void);
    stw_types::sintn GetTabIndex(void) const;
 
    static const stw_types::sintn hsn_TabIndexProperties;
@@ -87,7 +88,7 @@ private:
    void m_TabClicked(const stw_types::sintn osn_Index) const;
    void m_ReloadDataPools(void) const;
    void m_ReloadCommMessages(void) const;
-   void m_OpenDataPool(const stw_types::uint32 ou32_DataPoolIndex) const;
+   void m_HalcLoadedFromTSP(void) const;
 
    Ui::C_SdNdeNodeEditWidget * mpc_Ui;
    const stw_types::uint32 mu32_NodeIndex;

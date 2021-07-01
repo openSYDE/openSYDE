@@ -11,6 +11,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
+#include "stwerrors.h"
 
 #include <limits>
 
@@ -31,6 +32,7 @@
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
+using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
@@ -212,11 +214,10 @@ sintn C_OgeWiUtil::h_UpdateFontSize(QWidget * const opc_Widget, const QString & 
          }
          else
          {
-            sintn sn_MarginLeft;
-            sintn sn_MarginTop;
-            sintn sn_MarginRight;
-            sintn sn_MarginBottom;
-            opc_Widget->getContentsMargins(&sn_MarginLeft, &sn_MarginTop, &sn_MarginRight, &sn_MarginBottom);
+            const sintn sn_MarginLeft = opc_Widget->contentsMargins().left();
+            const sintn sn_MarginTop = opc_Widget->contentsMargins().top();
+            const sintn sn_MarginRight = opc_Widget->contentsMargins().right();
+            const sintn sn_MarginBottom = opc_Widget->contentsMargins().bottom();
             c_EffectiveSize = QSize(opc_Widget->size().width() - (sn_MarginLeft + sn_MarginRight),
                                     opc_Widget->size().height() - (sn_MarginTop + sn_MarginBottom));
          }
@@ -271,9 +272,10 @@ sintn C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize
             c_Font.setPointSize(sn_Retval);
             {
                const QFontMetrics c_Metric(c_Font);
-               if ((c_Metric.width(orc_Text) > orc_Size.width()) || (c_Metric.height() > sn_WidgetHeight))
+               if ((c_Metric.horizontalAdvance(orc_Text) > orc_Size.width()) || (c_Metric.height() > sn_WidgetHeight))
                {
                   //Assuming previous one was ok
+                  //lint -e{850} No problem because of break
                   sn_Retval -= sn_StepWidth;
                   break;
                }
@@ -291,7 +293,8 @@ sintn C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize
                c_Font.setPointSize(sn_Retval);
                {
                   const QFontMetrics c_Metric(c_Font);
-                  if ((c_Metric.width(orc_Text) <= orc_Size.width()) && (c_Metric.height() <= sn_WidgetHeight))
+                  if ((c_Metric.horizontalAdvance(orc_Text) <= orc_Size.width()) &&
+                      (c_Metric.height() <= sn_WidgetHeight))
                   {
                      break;
                   }
@@ -405,7 +408,6 @@ bool C_OgeWiUtil::h_CheckGlobalKey(const QKeyEvent * const opc_Event)
    Furthermore we have to forbid some characters, like German umlauts. The reason for that is that our file base
    classes like the XML parser cannot handle such characters.
 
-
    \param[in,out]  opc_Parent          Parent widget
    \param[in]      orc_Heading         QFileDialog heading
    \param[in]      orc_StartingFolder  QFileDialog starting folder
@@ -466,6 +468,51 @@ void C_OgeWiUtil::h_ShowPathInvalidError(QWidget * const opc_Parent, const QStri
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Checks if the given file is existing.
+
+            If file exists a message is shown "Overwrite existing file". When confirmed old file gets deleted.
+
+
+   \param[in]       opc_Parent     Parent widget
+   \param[out]      orc_FilePath   File path to check
+
+  \return
+   C_NO_ERR    user wants to overwrite
+   C_NOACT     user does not want to overwrite
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OgeWiUtil::h_AskOverwriteFile(QWidget * const opc_Parent, const QString & orc_FilePath)
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   const QFile c_File(orc_FilePath);
+
+   if (c_File.exists())
+   {
+      C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::E_Type::eQUESTION);
+      C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
+
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Save File"));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText("File does already exist. Do you want to overwrite?"));
+      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
+      c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
+      c_MessageBox.SetCustomMinHeight(180, 180);
+      e_ReturnMessageBox = c_MessageBox.Execute();
+
+      if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
+      {
+         s32_Return = C_NO_ERR;
+      }
+      else
+      {
+         // user does not want to overwrite
+         s32_Return = C_NOACT;
+      }
+   }
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get save file name via QFileDialog
 
    \param[in,out]  opc_Parent             Parent widget
@@ -473,6 +520,7 @@ void C_OgeWiUtil::h_ShowPathInvalidError(QWidget * const opc_Parent, const QStri
    \param[in]      orc_StartingFolder     QFileDialog starting folder
    \param[in]      orc_Filter             QFileDialog filter
    \param[in]      orc_DefaultFileName    QFileDialog default file name
+   \param[in]      orc_DefaultSuffix      Default suffix
    \param[in]      orc_SaveOrOpen         Save or open
    \param[in]      orc_Option             QFileDialog option
 
@@ -515,7 +563,7 @@ QString C_OgeWiUtil::mh_GetFileName(QWidget * const opc_Parent, const QString & 
             {
                C_OgeWiUtil::h_ShowPathInvalidError(opc_Parent, c_FullFilePath);
                // update file path (open dialog on last "failed" location, not on startup location)
-               c_FileDialog.setDirectory(QFileInfo(c_FullFilePath).dir());
+               c_FileDialog.setDirectory(static_cast<QFileInfo>(c_FullFilePath).dir());
             }
          }
          else

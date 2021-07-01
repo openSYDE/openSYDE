@@ -137,6 +137,18 @@ void C_OSCHalcConfig::AddDomain(const C_OSCHalcDefDomain & orc_Domain)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle file load post processing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfig::HandleFileLoadPostProcessing(void)
+{
+   for (uint32 u32_It = 0UL; u32_It < this->mc_Domains.size(); ++u32_It)
+   {
+      this->mc_Domains[u32_It].HandleFileLoadPostProcessing(this->e_SafetyMode);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set domain config
 
    \param[in]  ou32_Index  Index

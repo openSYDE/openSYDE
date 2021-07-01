@@ -81,6 +81,7 @@ sintn C_GiSvPcBusConnector::type(void) const
 /*! \brief   Generate hint
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in this implementation
 void C_GiSvPcBusConnector::GenerateHint(void)
 {
    //No hint

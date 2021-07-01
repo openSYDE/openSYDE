@@ -22,6 +22,7 @@
 #include "C_GtGetText.h"
 #include "C_HeHandler.h"
 #include "C_PuiProject.h"
+#include "C_PuiSvHandler.h"
 #include "C_PopErrorHandling.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_TblTreDataElementModel.h"
@@ -171,10 +172,10 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
 
    // set the icons. this can not be done in constructor
    QIcon c_IconApply("://images/IconSave.svg");
-   c_IconApply.addPixmap(QPixmap("://images/IconSaveDisabled.svg"), QIcon::Disabled);
-   Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, c_IconApply)); //QIcon(":images/IconSave.svg"));
+   c_IconApply.addPixmap(static_cast<QPixmap>("://images/IconSaveDisabled.svg"), QIcon::Disabled);
+   Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, c_IconApply));
    QIcon c_IconSettings("://images/SettingsIcon.svg");
-   c_IconSettings.addPixmap(QPixmap("://images/SettingsIconDisabled.svg"), QIcon::Disabled);
+   c_IconSettings.addPixmap(static_cast<QPixmap>("://images/SettingsIconDisabled.svg"), QIcon::Disabled);
    Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, c_IconSettings));
 
    // if the submode is setup it can be the initial call or a kind of refresh because
@@ -248,25 +249,23 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, true));
 
          QIcon c_IconDevice("://images/system_views/Device.svg");
-         c_IconDevice.addPixmap(QPixmap("://images/system_views/DeviceDisabled.svg"), QIcon::Disabled);
+         c_IconDevice.addPixmap(static_cast<QPixmap>("://images/system_views/DeviceDisabled.svg"), QIcon::Disabled);
          Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, c_IconDevice));
 
          this->mpc_SetupWidget = new C_SyvSeSetupWidget(ou32_Index, this);
-         if (this->mpc_SetupWidget != NULL)
-         {
-            connect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigChanged, this, &C_SyvHandlerWidget::m_DataChanged);
-            connect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigCheckViewError, this,
-                    &C_SyvHandlerWidget::m_ErrorChanged);
-            connect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigEnableConfiguration,
-                    this, &C_SyvHandlerWidget::m_EnableConfiguration);
-            this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_SetupWidget);
 
-            sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_SetupWidget);
-            this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+         connect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigChanged, this, &C_SyvHandlerWidget::m_DataChanged);
+         connect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigCheckViewError, this,
+                 &C_SyvHandlerWidget::m_ErrorChanged);
+         connect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigEnableConfiguration,
+                 this, &C_SyvHandlerWidget::m_EnableConfiguration);
+         this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_SetupWidget);
 
-            this->mpc_SetupWidget->LoadScene();
-            this->mpc_SetupWidget->show();
-         }
+         sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_SetupWidget);
+         this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+
+         this->mpc_SetupWidget->LoadScene();
+         this->mpc_SetupWidget->show();
       }
       if (os32_SubMode == ms32_SUBMODE_SYSVIEW_UPDATE)
       {
@@ -274,22 +273,21 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true));
 
          this->mpc_UpdateWidget = new C_SyvUpUpdateWidget(ou32_Index, this->parentWidget(), this);
-         if (this->mpc_UpdateWidget != NULL)
-         {
-            connect(this->mpc_UpdateWidget, &C_SyvUpUpdateWidget::SigChanged, this, &C_SyvHandlerWidget::m_DataChanged);
-            connect(this->mpc_UpdateWidget, &C_SyvUpUpdateWidget::SigBlockDragAndDrop, this,
-                    &C_SyvHandlerWidget::SigBlockDragAndDrop);
-            this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_UpdateWidget);
 
-            sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_UpdateWidget);
-            this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+         connect(this->mpc_UpdateWidget, &C_SyvUpUpdateWidget::SigChanged, this, &C_SyvHandlerWidget::m_DataChanged);
+         connect(this->mpc_UpdateWidget, &C_SyvUpUpdateWidget::SigBlockDragAndDrop, this,
+                 &C_SyvHandlerWidget::SigBlockDragAndDrop);
+         this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_UpdateWidget);
 
-            this->mpc_UpdateWidget->LoadScene();
-            this->mpc_UpdateWidget->show();
-         }
+         sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_UpdateWidget);
+         this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+
+         this->mpc_UpdateWidget->LoadScene();
+         this->mpc_UpdateWidget->show();
       }
       if (os32_SubMode == ms32_SUBMODE_SYSVIEW_DASHBOARD)
       {
+         const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
          this->mc_Interaction = new C_SyvDaDashboardInteraction();
          this->mc_Interaction->SetPushButtonConnectSvg("://images/system_views/IconDisconnected.svg", false);
          connect(this->mc_Interaction, &C_SyvDaDashboardInteraction::SigPushButtonDarkModePressed, this,
@@ -301,33 +299,31 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true));
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true));
 
-         Q_EMIT (this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true));
+         Q_EMIT (this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, !q_ServiceModeActive));
 
          this->mpc_DashboardsWidget = new C_SyvDaDashboardsWidget(ou32_Index, this->parentWidget(), this);
-         if (this->mpc_DashboardsWidget != NULL)
-         {
-            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigChanged, this,
-                    &C_SyvHandlerWidget::m_DataChanged);
-            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigNumberDashboardsChanged, this,
-                    &C_SyvHandlerWidget::m_DashboardCountChanged);
-            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetDarkModePushButtonIcon,
-                    this, &C_SyvHandlerWidget::m_SetPushButtonDarkIconSvg);
-            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetConnectPushButtonIcon,
-                    this, &C_SyvHandlerWidget::m_SetConnectPushButtonIcon);
-            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetConfigurationAvailable,
-                    this, &C_SyvHandlerWidget::m_SetConfigurationAvailable);
-            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigBlockDragAndDrop,
-                    this, &C_SyvHandlerWidget::SigBlockDragAndDrop);
-            this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_DashboardsWidget);
 
-            sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_DashboardsWidget);
-            this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+         connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigChanged, this,
+                 &C_SyvHandlerWidget::m_DataChanged);
+         connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigNumberDashboardsChanged, this,
+                 &C_SyvHandlerWidget::m_DashboardCountChanged);
+         connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetDarkModePushButtonIcon,
+                 this, &C_SyvHandlerWidget::m_SetPushButtonDarkIconSvg);
+         connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetConnectPushButtonIcon,
+                 this, &C_SyvHandlerWidget::m_SetConnectPushButtonIcon);
+         connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetConfigurationAvailable,
+                 this, &C_SyvHandlerWidget::m_SetConfigurationAvailable);
+         connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigBlockDragAndDrop,
+                 this, &C_SyvHandlerWidget::SigBlockDragAndDrop);
+         this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_DashboardsWidget);
 
-            this->mpc_DashboardsWidget->LoadDarkMode();
-            //Do error check AFTER connections are up
-            this->mpc_DashboardsWidget->CheckError();
-            this->mpc_DashboardsWidget->show();
-         }
+         sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_DashboardsWidget);
+         this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+
+         this->mpc_DashboardsWidget->LoadDarkMode();
+         //Do error check AFTER connections are up
+         this->mpc_DashboardsWidget->CheckError();
+         this->mpc_DashboardsWidget->show();
       }
 
       // update of the index values
@@ -457,8 +453,12 @@ bool C_SyvHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
    }
    else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F12))
    {
-      // open project save
-      this->SaveAs();
+      // Save as is not allowed for service projects
+      if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive() == false)
+      {
+         // open project save
+         this->SaveAs();
+      }
    }
    else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F8))
    {
@@ -566,7 +566,9 @@ void C_SyvHandlerWidget::m_OnPushButtonConnectPress(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::m_SetConfigurationAvailable(const bool oq_State)
 {
-   Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, oq_State);
+   const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
+
+   Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, oq_State && (!q_ServiceModeActive));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

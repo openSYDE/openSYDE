@@ -586,6 +586,7 @@ sint32 C_PuiSvHandlerFilerV1::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate 
       if (c_CurrentNodeUpdateInformationNode == "path")
       {
          std::vector<QString> c_Paths;
+         std::vector<bool> c_PathsSkipFlags;
          do
          {
             c_Paths.push_back(orc_XMLParser.GetNodeContent().c_str());
@@ -593,10 +594,15 @@ sint32 C_PuiSvHandlerFilerV1::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate 
             c_CurrentNodeUpdateInformationNode = orc_XMLParser.SelectNodeNext("path");
          }
          while (c_CurrentNodeUpdateInformationNode == "path");
+
+         // Adapt size for skip flags for compatibility
+         c_PathsSkipFlags.resize(orc_Node.c_Applications.size(), false);
+
          if (orc_Node.c_Applications.size() == c_Paths.size())
          {
             //matching size
             orc_NodeUpdateInformation.SetPaths(c_Paths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_PathsSkipFlags, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
          }
          else
          {
@@ -604,6 +610,7 @@ sint32 C_PuiSvHandlerFilerV1::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate 
             c_Paths.clear();
             c_Paths.resize(orc_Node.c_Applications.size(), "");
             orc_NodeUpdateInformation.SetPaths(c_Paths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_PathsSkipFlags, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
          }
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "paths");

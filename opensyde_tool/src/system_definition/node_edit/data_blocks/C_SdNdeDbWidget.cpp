@@ -54,9 +54,9 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]     ou32_NodeIndex        Node index
-   \param[in]     ou32_ApplicationIndex Application index
-   \param[in,out] opc_Parent            Optional pointer to parent
+   \param[in]      ou32_NodeIndex         Node index
+   \param[in]      ou32_ApplicationIndex  Application index
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex,
@@ -64,56 +64,76 @@ C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDbWidget),
    mu32_ApplicationIndex(ou32_ApplicationIndex),
-   mu32_NodeIndex(ou32_NodeIndex),
-   mpc_DataPoolLabel(NULL),
-   mq_MessageBoxVisible(false)
+   mu32_NodeIndex(ou32_NodeIndex)
 {
    const QIcon c_IconError = QIcon("://images/Error_iconV2.svg");
 
    this->mpc_Ui->setupUi(this);
 
-   this->mpc_Ui->pc_ScrollAreaCommentWidget->SetBackgroundColor(-1);
-   this->mpc_Ui->pc_ScrollAreaDataPoolWidget->SetBackgroundColor(-1);
-
    InitStaticNames();
 
+   // Configure
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "C_SdNdeDbWidget", true);
+   this->mpc_Ui->pc_LabName->SetForegroundColor(4);
+   this->mpc_Ui->pc_LabName->SetFontPixel(13);
+   this->mpc_Ui->pc_LabFileGenActive->SetForegroundColor(4);
+   this->mpc_Ui->pc_LabFileGenActive->SetFontPixel(13);
+   this->mpc_Ui->pc_LabOwned->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabOwned->SetFontPixel(13);
+   this->mpc_Ui->pc_LabOwnedCount->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabOwnedCount->SetFontPixel(13, false, true);
+   this->mpc_Ui->pc_LabOutput->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabOutput->SetFontPixel(13);
+   this->mpc_Ui->pc_LabOutputCount->SetForegroundColor(4);
+   this->mpc_Ui->pc_LabOutputCount->SetFontPixel(13, false, true);
+   this->mpc_Ui->pc_WiOutput->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_WiOwned->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_TedComment->setReadOnly(true);
+   this->mpc_Ui->pc_PubComment->setCheckable(true);
+   this->mpc_Ui->pc_PubComment->setChecked(true);
+   this->m_OnCommentToggled(true);
+   this->mpc_Ui->pc_PubComment->setVisible(false); // disable comment button because dynamic resize does not work
 
    //Remove debug string
-   this->mpc_Ui->pc_PushButtonEdit->setText("");
-   this->mpc_Ui->pc_PushButtonDelete->setText("");
-   this->mpc_Ui->pc_PushButtonOpenIde->setText("");
-   this->mpc_Ui->pc_LabelErrorIcon->setText("");
+   this->mpc_Ui->pc_PubEdit->setText("");
+   this->mpc_Ui->pc_PubDelete->setText("");
+   this->mpc_Ui->pc_PubOpenIde->setText("");
+   this->mpc_Ui->pc_LabErrorIcon->setText("");
+   this->mpc_Ui->pc_LabFileGenIcon->setText("");
+   this->mpc_Ui->pc_LabOwnedIcon->setText("");
+   this->mpc_Ui->pc_LabOutputIcon->setText("");
 
-   //Error icon
-   this->mpc_Ui->pc_LabelErrorIcon->setPixmap(c_IconError.pixmap(mc_ICON_SIZE_24));
+   //Icons
+   const QSize c_IconSize(16, 16);
+   this->mpc_Ui->pc_LabErrorIcon->setPixmap(c_IconError.pixmap(mc_ICON_SIZE_24));
+   this->mpc_Ui->pc_PubEdit->setIconSize(c_IconSize);
+   this->mpc_Ui->pc_PubEdit->SetCustomIcons("://images/IconEditSmallActive.svg", "://images/IconEditSmallActive.svg",
+                                            "://images/IconEditSmallActive.svg", "://images/IconEditSmallActive.svg");
+   this->mpc_Ui->pc_PubDelete->setIconSize(c_IconSize);
+   this->mpc_Ui->pc_PubDelete->SetCustomIcons("://images/system_views/IconTabClose.svg",
+                                              "://images/system_views/IconTabCloseHover.svg",
+                                              "://images/IconCloseClicked.svg",
+                                              "://images/IconCloseDisabled.svg");
+   this->mpc_Ui->pc_PubOpenIde->setIconSize(c_IconSize);
+   this->mpc_Ui->pc_PubOpenIde->SetCustomIcons("://images/system_definition/IconOpenExternalTool.svg",
+                                               "://images/system_definition/IconOpenExternalTool.svg",
+                                               "://images/system_definition/IconOpenExternalTool.svg",
+                                               "://images/system_definition/IconOpenExternalTool.svg");
+   // comment button: checked = comment visible = arrow up
+   this->mpc_Ui->pc_PubComment->SetSvg("://images/system_definition/IconCommentDataBlockDown.svg", "", "",
+                                       "://images/system_definition/IconCommentDataBlockUp.svg");
+   this->mpc_Ui->pc_LabFileGenIcon->SetSvg("://images/system_definition/IconGenerateCodeSmall.svg");
+   this->mpc_Ui->pc_LabOwnedIcon->SetSvg("://images/system_definition/IconDataPoolOwned.svg");
+   this->mpc_Ui->pc_LabOutputIcon->SetSvg("://images/system_definition/IconOutputFile.svg");
 
-   //Edit Icon (SVG)
-   this->mpc_Ui->pc_PushButtonEdit->setIconSize(mc_ICON_SIZE_24);
-   this->mpc_Ui->pc_PushButtonEdit->SetCustomIcons("://images/IconEditActive.svg", "://images/IconEditHovered.svg",
-                                                   "://images/IconEditClicked.svg",
-                                                   "://images/IconEditDisabledBright.svg");
-
-   //Delete Icon (SVG)
-   this->mpc_Ui->pc_PushButtonDelete->setIconSize(mc_ICON_SIZE_24);
-   this->mpc_Ui->pc_PushButtonDelete->SetCustomIcons("://images/system_views/IconTabClose.svg",
-                                                     "://images/system_views/IconTabCloseHover.svg",
-                                                     "://images/IconCloseClicked.svg",
-                                                     "://images/IconCloseDisabled.svg");
-
-   this->mpc_Ui->pc_PushButtonOpenIde->setIconSize(mc_ICON_SIZE_24);
-   this->mpc_Ui->pc_PushButtonOpenIde->SetCustomIcons("://images/system_definition/IconOpenExternalTool.svg",
-                                                      "://images/system_definition/IconOpenExternalTool.svg",
-                                                      "://images/system_definition/IconOpenExternalTool.svg",
-                                                      "://images/system_definition/IconOpenExternalTool.svg");
-
-   //Also does data connect!
+   // Load data
    m_LoadData();
 
    //Visual connections
-   connect(this->mpc_Ui->pc_PushButtonEdit, &QPushButton::clicked, this, &C_SdNdeDbWidget::m_OnEdit);
-   connect(this->mpc_Ui->pc_PushButtonDelete, &QPushButton::clicked, this, &C_SdNdeDbWidget::m_OnDelete);
-   connect(this->mpc_Ui->pc_PushButtonOpenIde, &QPushButton::clicked, this, &C_SdNdeDbWidget::m_OnOpenIdeClicked);
+   connect(this->mpc_Ui->pc_PubEdit, &QPushButton::clicked, this, &C_SdNdeDbWidget::m_OnEdit);
+   connect(this->mpc_Ui->pc_PubDelete, &QPushButton::clicked, this, &C_SdNdeDbWidget::m_OnDelete);
+   connect(this->mpc_Ui->pc_PubOpenIde, &QPushButton::clicked, this, &C_SdNdeDbWidget::m_OnOpenIdeClicked);
+   connect(this->mpc_Ui->pc_PubComment, &QPushButton::toggled, this, &C_SdNdeDbWidget::m_OnCommentToggled);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -125,7 +145,6 @@ C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_
 C_SdNdeDbWidget::~C_SdNdeDbWidget(void)
 {
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_DataPoolLabel and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -134,139 +153,40 @@ C_SdNdeDbWidget::~C_SdNdeDbWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::InitStaticNames(void) const
 {
-   this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
-   this->mpc_Ui->pc_LabelType->setText(C_GtGetText::h_GetText("Type"));
-   this->mpc_Ui->pc_LabelDataPoolEmpty->setText(C_GtGetText::h_GetText("none"));
-   this->mpc_Ui->pc_LabelDataPoolDescription->setText(C_GtGetText::h_GetText("Owned Datapools"));
-
-   //Update application index
-   this->mpc_Ui->pc_LabelNamePrefix->setText(static_cast<QString>(C_GtGetText::h_GetText("#%1 -")).arg(this->
-                                                                                                       mu32_ApplicationIndex
-                                                                                                       +
-                                                                                                       1));
+   this->mpc_Ui->pc_LabOwned->setText(C_GtGetText::h_GetText("Owned\nDatapools"));
+   this->mpc_Ui->pc_LabOutput->setText(C_GtGetText::h_GetText("Output\nFiles"));
 
    //Tool tips
-   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
-                                                     C_GtGetText::h_GetText(
-                                                        "Symbolic Data Block name. Unique within node\n"
-                                                        "\nFollowing C naming conventions are required:"
-                                                        "\n - must not be empty"
-                                                        "\n - only alphanumeric characters and \"_\""
-                                                        "\n - should not be longer than 31 characters"));
-   this->mpc_Ui->pc_LabelType->SetToolTipInformation(C_GtGetText::h_GetText("Type"),
-                                                     C_GtGetText::h_GetText("Type of Data Block."));
-   this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
-                                                        C_GtGetText::h_GetText("Comment for this Data Block."));
-   this->mpc_Ui->pc_LabelDataPoolDescription->SetToolTipInformation(C_GtGetText::h_GetText("Owned Datapools"),
-                                                                    C_GtGetText::h_GetText(
-                                                                       "List of all Datapools which are mapped to this programmable application."
-                                                                       "\n(Relevant for code generation)"));
-
-   this->mpc_Ui->pc_PushButtonOpenIde->SetToolTipInformation(C_GtGetText::h_GetText("Open IDE"),
-                                                             C_GtGetText::h_GetText(
-                                                                "Execute IDE Call specified in project properties."));
-
-   this->mpc_Ui->pc_PushButtonEdit->SetToolTipInformation(C_GtGetText::h_GetText("Edit"),
-                                                          C_GtGetText::h_GetText("Edit Data Block properties."));
-
-   this->mpc_Ui->pc_PushButtonDelete->SetToolTipInformation(C_GtGetText::h_GetText("Delete"),
-                                                            C_GtGetText::h_GetText("Delete Data Block."));
+   this->mpc_Ui->pc_PubOpenIde->SetToolTipInformation(C_GtGetText::h_GetText("Open IDE"),
+                                                      C_GtGetText::h_GetText(
+                                                         "Execute IDE Call specified in project properties."));
+   this->mpc_Ui->pc_PubEdit->SetToolTipInformation(C_GtGetText::h_GetText("Edit"),
+                                                   C_GtGetText::h_GetText("Edit Data Block properties."));
+   this->mpc_Ui->pc_PubDelete->SetToolTipInformation(C_GtGetText::h_GetText("Delete"),
+                                                     C_GtGetText::h_GetText("Delete Data Block."));
+   this->mpc_Ui->pc_PubComment->SetToolTipInformation(
+      C_GtGetText::h_GetText("Comment"),
+      C_GtGetText::h_GetText("Show or hide comment for this Data Block."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update data pool section
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbWidget::UpdateDataPools(void)
+void C_SdNdeDbWidget::UpdateApplication(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-   uint8 u8_OwnedDpCounter = 0;
-
-   if (pc_Node != NULL)
-   {
-      //Clear existing
-      if (this->mpc_DataPoolLabel != NULL)
-      {
-         this->mpc_DataPoolLabel->hide();
-         this->mpc_DataPoolLabel = NULL;
-      }
-
-      //Add new
-      if (pc_Node->c_DataPools.size() > 0UL)
-      {
-         QString c_Text;
-         QString c_Temp;
-         //Add link for each data pool
-         for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
-         {
-            const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
-            if (rc_DataPool.s32_RelatedDataBlockIndex >= 0)
-            {
-               if (static_cast<uint32>(rc_DataPool.s32_RelatedDataBlockIndex) == this->mu32_ApplicationIndex)
-               {
-                  //increase counter
-                  ++u8_OwnedDpCounter;
-
-                  if (c_Text.isEmpty() == false)
-                  {
-                     c_Text += "<br/>";
-                  }
-
-                  c_Temp = rc_DataPool.c_Name.c_str();
-                  c_Temp += " (" + C_PuiSdUtil::h_ConvertDataPoolTypeToString(rc_DataPool.e_Type);
-                  if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
-                  {
-                     c_Temp += ", ";
-                     c_Temp += C_GtGetText::h_GetText("Protocol: ");
-                     c_Temp += C_PuiSdUtil::h_ConvertProtocolTypeToString(C_PuiSdUtil::h_GetRelatedCANProtocolType(
-                                                                             this->mu32_NodeIndex, u32_ItDataPool));
-                  }
-                  c_Temp += ")";
-                  c_Text +=
-                     static_cast<QString>(C_Uti::h_GetLink(c_Temp, mc_STYLE_GUIDE_COLOR_6,
-                                                           QString::number(u32_ItDataPool)));
-               }
-            }
-         }
-         if (c_Text.isEmpty() == false)
-         {
-            C_OgeLabGroupItem * const pc_NewLabel = new C_OgeLabGroupItem(this);
-            //Configure label
-            pc_NewLabel->setMaximumWidth(275);
-            pc_NewLabel->setWordWrap(false);
-            pc_NewLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-            pc_NewLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
-            pc_NewLabel->setFocusPolicy(Qt::NoFocus);
-            connect(pc_NewLabel, &QLabel::linkActivated, this, &C_SdNdeDbWidget::m_OnDataPoolLinkClicked);
-            //Set text (last!)
-            pc_NewLabel->setText(c_Text);
-            //Add to UI
-            this->mpc_Ui->verticalLayout_5->insertWidget(0, pc_NewLabel, 1);
-            //Store internally
-            this->mpc_DataPoolLabel = pc_NewLabel;
-         }
-      }
-
-      //update owned dp count
-      this->mpc_Ui->pc_LabelDataPoolDescription->setText(static_cast<QString>(C_GtGetText::h_GetText(
-                                                                                 "Owned Datapools (%1)")).arg(
-                                                            u8_OwnedDpCounter));
-   }
-   //Conditional visibility for empty data pool label
-   this->mpc_Ui->pc_LabelDataPoolEmpty->setVisible(this->mpc_DataPoolLabel == NULL);
+   this->m_LoadData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the application index
 
-   \param[in]     ou32_ApplicationIndex          New index of the application
+   \param[in]  ou32_ApplicationIndex   New index of the application
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::UpdateApplicationIndex(const uint32 ou32_ApplicationIndex)
 {
    this->mu32_ApplicationIndex = ou32_ApplicationIndex;
-
-   this->InitStaticNames();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -311,16 +231,30 @@ void C_SdNdeDbWidget::CheckProcessIdError(void) const
       c_Info =
          C_SdUtil::h_InitUsedIdsString(c_UsedIds, pc_Node->c_Properties.c_Name.c_str(), C_GtGetText::h_GetText("node"));
    }
-   this->mpc_Ui->pc_LabelErrorIcon->setVisible(!q_Valid);
+   this->mpc_Ui->pc_LabErrorIcon->setVisible(!q_Valid);
    if (q_Valid == false)
    {
       const QString c_Heading = C_GtGetText::h_GetText("Data block: Process ID invalid");
-      this->mpc_Ui->pc_LabelErrorIcon->SetToolTipInformation(c_Heading, c_Info, C_NagToolTip::eERROR);
+      this->mpc_Ui->pc_LabErrorIcon->SetToolTipInformation(c_Heading, c_Info, C_NagToolTip::eERROR);
    }
    else
    {
-      this->mpc_Ui->pc_LabelErrorIcon->SetToolTipInformation("", "", C_NagToolTip::eERROR);
+      this->mpc_Ui->pc_LabErrorIcon->SetToolTipInformation("", "", C_NagToolTip::eERROR);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden mouse double click event slot
+
+   Here: Enter edit mode
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbWidget::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
+{
+   QWidget::mouseDoubleClickEvent(opc_Event);
+   this->m_OnEdit();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -335,36 +269,63 @@ void C_SdNdeDbWidget::m_LoadData(void)
 
    if ((pc_Application != NULL) && (pc_Node != NULL))
    {
-      const C_OSCDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
-      if (pc_DevDef != NULL)
+      this->mpc_Ui->pc_LabName->setText(static_cast<QString>("#%1 - %2").
+                                        arg(this->mu32_ApplicationIndex + 1).
+                                        arg(pc_Application->c_Name.c_str()));
+      if (pc_Application->c_Comment == "")
       {
-         //Update name label
-         this->mpc_Ui->pc_LabelName->setText(pc_Application->c_Name.c_str());
-         if (pc_Application->c_Comment == "")
+         this->mpc_Ui->pc_TedComment->setText(C_GtGetText::h_GetText("<No comment>"));
+      }
+      else
+      {
+         this->mpc_Ui->pc_TedComment->setText(pc_Application->c_Comment.c_str());
+      }
+
+      if (pc_Application->e_Type == C_OSCNodeApplication::eBINARY)
+      {
+         this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: Disabled"));
+         this->mpc_Ui->pc_LabFileGenActive->setDisabled(true);
+         this->mpc_Ui->pc_LabOwned->setDisabled(true);
+         this->mpc_Ui->pc_LabFileGenActive->SetForegroundColor(9);
+         this->mpc_Ui->pc_LabOwned->SetForegroundColor(9);
+         this->mpc_Ui->pc_LabOwnedCount->SetForegroundColor(9);
+         this->mpc_Ui->pc_LabFileGenIcon->SetSvg("://images/system_definition/IconGenerateCodeSmallDisabled.svg");
+         this->mpc_Ui->pc_LabOwnedIcon->SetSvg("://images/system_definition/IconDataPoolOwnedDisabled.svg");
+      }
+      else
+      {
+         if (pc_Application->e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
          {
-            this->mpc_Ui->pc_LabelCommentValue->setText(C_GtGetText::h_GetText("<No comment>"));
+            this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: Source Code"));
          }
          else
          {
-            this->mpc_Ui->pc_LabelCommentValue->setText(pc_Application->c_Comment.c_str());
+            this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: Parameter Set Image"));
          }
-
-         UpdateDataPools();
-
-         switch (pc_Application->e_Type)
-         {
-         case C_OSCNodeApplication::E_Type::ePROGRAMMABLE_APPLICATION:
-            this->mpc_Ui->pc_LabelTypeValue->setText(C_GtGetText::h_GetText("Programmable Application"));
-            break;
-         case C_OSCNodeApplication::E_Type::eBINARY:
-            this->mpc_Ui->pc_LabelTypeValue->setText(C_GtGetText::h_GetText("Binary"));
-            break;
-         }
+         this->mpc_Ui->pc_LabFileGenActive->setDisabled(false);
+         this->mpc_Ui->pc_LabOwned->setDisabled(false);
+         this->mpc_Ui->pc_LabFileGenActive->SetForegroundColor(6);
+         this->mpc_Ui->pc_LabOwned->SetForegroundColor(6);
+         this->mpc_Ui->pc_LabOwnedCount->SetForegroundColor(4);
+         this->mpc_Ui->pc_LabFileGenIcon->SetSvg("://images/system_definition/IconGenerateCodeSmall.svg");
+         this->mpc_Ui->pc_LabOwnedIcon->SetSvg("://images/system_definition/IconDataPoolOwned.svg");
       }
 
-      //This section has to be after the application type combo box is set
-      // (also does not change data so there is no conflict with the warning above)
-      m_HandleType();
+      // File count
+      this->mpc_Ui->pc_LabOutputCount->setText(QString::number(pc_Application->c_ResultPaths.size()));
+      this->mpc_Ui->pc_WiOutput->SetToolTipInformation(
+         static_cast<QString>(C_GtGetText::h_GetText("Output Files (%1)")).arg(pc_Application->c_ResultPaths.size()),
+         this->m_GetAllOutputFiles());
+
+      // Datapool count
+      const uint32 u32_DpCount = this->m_CountAllAssociatedDataPools();
+      this->mpc_Ui->pc_LabOwnedCount->setText(static_cast<QString>("%1").arg(u32_DpCount));
+      if (u32_DpCount > 0)
+      {
+         this->mpc_Ui->pc_WiOwned->SetToolTipInformation(
+            static_cast<QString>(C_GtGetText::h_GetText("Owned Datapools (%1)")).arg(u32_DpCount),
+            this->m_GetAllAssociatedDataPoolNames());
+      }
 
       //Initial error check
       CheckProcessIdError();
@@ -372,42 +333,10 @@ void C_SdNdeDbWidget::m_LoadData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   handle show or hide of data pool section
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbWidget::m_HandleType(void) const
-{
-   C_OSCNodeApplication::E_Type e_Type = m_GetType();
-   const bool q_Visible = (e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION);
-
-   //Data pool
-   this->mpc_Ui->pc_GroupBoxDataPoolDescription->setVisible(q_Visible);
-   this->mpc_Ui->pc_ScrollAreaDataPool->setVisible(q_Visible);
-
-   //Project
-   this->mpc_Ui->pc_PushButtonOpenIde->setVisible(q_Visible);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   On edit action
+/*! \brief   On edit action: show properties dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_OnEdit(void)
-{
-   //Previous implementation
-   //this->mpc_Ui->pc_LabelName->setVisible(false);
-   //this->mpc_Ui->pc_LineEditName->setVisible(true);
-   //this->mpc_Ui->pc_LineEditName->selectAll();
-   //this->mpc_Ui->pc_LineEditName->setFocus();
-
-   m_ShowProperties();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show properties
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbWidget::m_ShowProperties(void)
 {
    const C_OSCNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
       this->mu32_NodeIndex, this->mu32_ApplicationIndex);
@@ -418,7 +347,7 @@ void C_SdNdeDbWidget::m_ShowProperties(void)
       C_SdNdeDbProperties * const pc_Dialog = new C_SdNdeDbProperties(this->mu32_NodeIndex,
                                                                       this->mu32_ApplicationIndex, *c_New);
 
-      //Resize (200 -> use minimum possible height automatically)
+      //Resize
       if (pc_Application->e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
       {
          c_New->SetSize(C_SdNdeDbProperties::h_GetBinaryWindowSize());
@@ -431,14 +360,17 @@ void C_SdNdeDbWidget::m_ShowProperties(void)
       if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
       {
          C_OSCNodeApplication c_Copy = *pc_Application;
+
+         // get new data
          pc_Dialog->ApplyNewData(c_Copy);
+
+         // update application and Datapools
          tgl_assert(C_PuiSdHandler::h_GetInstance()->SetApplication(this->mu32_NodeIndex, this->mu32_ApplicationIndex,
                                                                     c_Copy) == C_NO_ERR);
          pc_Dialog->HandleDataPools(this->mu32_ApplicationIndex);
-         // Inform about change (for Datapool tab tooltips)
+
+         // Inform about change (this also triggers reload off all Data Block tiles including this one)
          Q_EMIT (this->SigOwnedDataPoolsChanged());
-         //Reload all
-         this->m_LoadData();
       }
 
       if (c_New != NULL)
@@ -510,18 +442,58 @@ void C_SdNdeDbWidget::m_OnDelete(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle data pool link clicked
+/*! \brief   Trigger open IDE
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbWidget::m_OnDataPoolLinkClicked(const QString & orc_Link)
+void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
 {
-   bool q_Ok;
-   const uint32 u32_Index = orc_Link.toUInt(&q_Ok);
+   const C_OSCNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
+      this->mu32_NodeIndex, this->mu32_ApplicationIndex);
 
-   if (q_Ok == true)
+   if (pc_Application != NULL)
    {
-      Q_EMIT this->SigOpenDataPool(u32_Index);
+      const QString c_IDECall =
+         static_cast<QString>(C_PuiUtil::h_ResolvePlaceholderVariables(
+                                 pc_Application->c_IDECall.c_str(),
+                                 C_PuiUtil::h_GetResolvedAbsPathFromProject(pc_Application->c_ProjectPath.c_str())));
+
+      if (c_IDECall == "")
+      {
+         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
+                                           C_GtGetText::h_GetText("No IDE provided. Edit Data Block properties and "
+                                                                  "insert an IDE call."));
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
+         c_MessageBox.SetCustomMinHeight(180, 180);
+         c_MessageBox.Execute();
+      }
+      else if (C_ImpUtil::h_OpenIDE(c_IDECall) != C_NO_ERR)
+      {
+         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
+                                           C_GtGetText::h_GetText("Could not start IDE. Possible reasons: "
+                                                                  "Insufficient permissions or missing executable."));
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
+         c_MessageBox.SetDetails(static_cast<QString>(C_GtGetText::h_GetText(
+                                                         "The following call returned an error: \n%1")).
+                                 arg(c_IDECall));
+         c_MessageBox.SetCustomMinHeight(200, 270);
+         c_MessageBox.Execute();
+      }
+      else
+      {
+         // Nothing to do
+      }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On comment toggled
+
+   \param[in]  oq_Checked  Checked
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbWidget::m_OnCommentToggled(const bool oq_Checked)
+{
+   this->mpc_Ui->pc_TedComment->setVisible(oq_Checked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -582,6 +554,7 @@ uint32 C_SdNdeDbWidget::m_CountAllAssociatedDataPools(void) const
 
    if (pc_Node != NULL)
    {
+      C_PuiSdHandler::h_GetInstance()->AssignAllHalcNvmDataPools(mu32_NodeIndex);
       for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
       {
          const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
@@ -596,45 +569,73 @@ uint32 C_SdNdeDbWidget::m_CountAllAssociatedDataPools(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Trigger open IDE
+/*! \brief  Get all associated Datapool names for tooltip
+
+   \return
+   all associated Datapool names concatenated
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
+QString C_SdNdeDbWidget::m_GetAllAssociatedDataPoolNames(void) const
 {
-   const C_OSCNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
-      this->mu32_NodeIndex, this->mu32_ApplicationIndex);
+   QString c_Retval = "";
+
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+      {
+         const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+         if ((rc_DataPool.s32_RelatedDataBlockIndex >= 0) &&
+             (static_cast<uint32>(rc_DataPool.s32_RelatedDataBlockIndex) == this->mu32_ApplicationIndex))
+         {
+            c_Retval += rc_DataPool.c_Name.c_str();
+            c_Retval += " (";
+            c_Retval += C_PuiSdUtil::h_ConvertDataPoolTypeToString(rc_DataPool.e_Type);
+            if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
+            {
+               c_Retval += ", ";
+               c_Retval += C_GtGetText::h_GetText("Protocol: ");
+               c_Retval += C_PuiSdUtil::h_ConvertProtocolTypeToString(C_PuiSdUtil::h_GetRelatedCANProtocolType(
+                                                                         this->mu32_NodeIndex, u32_ItDataPool));
+            }
+            c_Retval += ")\n";
+         }
+      }
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all output files for tooltip
+
+   \return
+   all output files concatenated
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdNdeDbWidget::m_GetAllOutputFiles(void) const
+{
+   QString c_Retval;
+
+   const C_OSCNodeApplication * const pc_Application =
+      C_PuiSdHandler::h_GetInstance()->GetApplication(this->mu32_NodeIndex, this->mu32_ApplicationIndex);
 
    if (pc_Application != NULL)
    {
-      const QString c_IDECall =
-         static_cast<QString>(C_PuiUtil::h_ResolvePlaceholderVariables(
-                                 pc_Application->c_IDECall.c_str(),
-                                 C_PuiUtil::h_GetResolvedAbsPathFromProject(pc_Application->c_ProjectPath.c_str())));
-
-      if (c_IDECall == "")
+      for (uint32 u32_ItOutputFiles = 0; u32_ItOutputFiles < pc_Application->c_ResultPaths.size(); u32_ItOutputFiles++)
       {
-         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
-                                           C_GtGetText::h_GetText("No IDE provided. Edit Data Block properties and "
-                                                                  "insert an IDE call."));
-         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
-         c_MessageBox.SetCustomMinHeight(180, 180);
-         c_MessageBox.Execute();
-      }
-      else if (C_ImpUtil::h_OpenIDE(c_IDECall) != C_NO_ERR)
-      {
-         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
-                                           C_GtGetText::h_GetText("Could not start IDE. Possible reasons: "
-                                                                  "Insufficient permissions or missing executable."));
-         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
-         c_MessageBox.SetDetails(static_cast<QString>(C_GtGetText::h_GetText(
-                                                         "The following call returned an error: \n%1")).
-                                 arg(c_IDECall));
-         c_MessageBox.SetCustomMinHeight(200, 270);
-         c_MessageBox.Execute();
-      }
-      else
-      {
-         // Nothing to do
+         c_Retval += static_cast<QString>(C_GtGetText::h_GetText("Output File"));
+         if (pc_Application->c_ResultPaths.size() > 1)
+         {
+            c_Retval += " ";
+            c_Retval += QString::number(u32_ItOutputFiles + 1);
+         }
+         c_Retval += ": ";
+         c_Retval += pc_Application->c_ResultPaths[u32_ItOutputFiles].c_str();
+         c_Retval += "\n";
       }
    }
+
+   return c_Retval;
 }
