@@ -14,6 +14,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include "stwtypes.h"
+#include "C_NagToolTip.h"
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
 #include "C_PuiSvDbWidgetBase.h"
 
@@ -36,8 +37,20 @@ public:
       eI_UNKNOWN
    };
 
-   static bool h_CheckViewSetupError(const stw_types::uint32 ou32_ViewIndex, QString & orc_ErrorLabelHeadingText,
-                                     QString & orc_ErrorLabelText, QString & orc_ErrorTooltipText);
+   enum E_NodeUpdateStatus
+   {
+      eU_UPDATING,
+      eU_WAITING,
+      eU_UP_TO_DATE,
+      eU_UPDATE_SUCCESS,
+      eU_UPDATE_DISABLED,
+      eU_UNKNOWN
+   };
+
+   static bool h_GetViewSetupLabelInfo(const stw_types::uint32 ou32_ViewIndex, QString & orc_ErrorLabelHeadingText,
+                                       QString & orc_ErrorLabelText, QString & orc_ErrorTooltipText,
+                                       stw_opensyde_gui::C_NagToolTip::E_Type & ore_TooltipType, QString & orc_IconPath,
+                                       stw_types::sintn & orsn_ColorID);
    static stw_types::sint32 h_GetIndicesFromBusId(const stw_types::uint8 ou8_BusIdentifier,
                                                   const stw_types::uint8 ou8_NodeIdentifier,
                                                   stw_types::uint32 & oru32_NodeIndex,

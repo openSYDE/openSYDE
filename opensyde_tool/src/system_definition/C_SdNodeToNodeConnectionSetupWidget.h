@@ -42,13 +42,7 @@ public:
 
    void InitStaticNames(void) const;
    stw_types::uint32 GetSelectedInterface1(void) const;
-   stw_types::uint8 GetNodeId1(void) const;
    stw_types::uint32 GetSelectedInterface2(void) const;
-   stw_types::uint8 GetNodeId2(void) const;
-   void GetComDataPoolConfigurationNode1(bool & orq_ComProtocolL2, bool & orq_ComProtocolECeS,
-                                         bool & orq_ComProtocolECoS) const;
-   void GetComDataPoolConfigurationNode2(bool & orq_ComProtocolL2, bool & orq_ComProtocolECeS,
-                                         bool & orq_ComProtocolECoS) const;
    stw_opensyde_core::C_OSCSystemBus::E_Type GetBusType(void) const;
    stw_types::uint32 GetBusIndex(void) const;
    QString GetBusName(void) const;
@@ -68,6 +62,8 @@ private:
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
    const stw_types::uint32 mu32_Node1Index;
    const stw_types::uint32 mu32_Node2Index;
+   stw_types::uint32 mu32_NodeID1;
+   stw_types::uint32 mu32_NodeID2;
    std::vector<stw_types::uint32> mc_UsedNodeIds;
    std::vector<stw_types::uint32> mc_BusIndices;
    bool mq_InteractionPossible;
@@ -76,11 +72,6 @@ private:
    void m_CancelClicked(void);
    void m_InitFromData(void);
    void m_HandleTypeChange(void) const;
-   void m_HandleBusChange(void);
-   void m_InitDynamicContent(void);
-   void m_OnNodeId1Change(const stw_types::sint32 & ors32_Value);
-   void m_OnNodeId2Change(const stw_types::sint32 & ors32_Value);
-   void m_CheckNodeIds(void);
    void m_OnBusNameChange(const QString & orc_Value) const;
    void m_OnNewOrExistingChange(void);
    void m_OnBusTypeChange(void) const;
@@ -89,9 +80,6 @@ private:
                                 stw_opensyde_core::C_OSCSystemBus::E_Type & ore_NewBusType,
                                 bool & orq_ExistingBusExists, bool & orq_ExistingBusRestricted,
                                 stw_opensyde_core::C_OSCSystemBus::E_Type & ore_ExistingBusType) const;
-   bool m_CheckDatapoolNumberNodes(void) const;
-   bool m_CheckDatapoolNumberNode1(void) const;
-   bool m_CheckDatapoolNumberNode2(void) const;
 
    const QString mc_BUS_TYPE_CAN;
    const QString mc_BUS_TYPE_ETHERNET;

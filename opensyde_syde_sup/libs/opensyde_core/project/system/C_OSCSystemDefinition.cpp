@@ -67,7 +67,7 @@ C_OSCSystemDefinition::~C_OSCSystemDefinition(void)
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinition::CalcHash(uint32 & oru32_HashValue) const
@@ -89,7 +89,7 @@ void C_OSCSystemDefinition::CalcHash(uint32 & oru32_HashValue) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add bus
 
-   \param[in] orc_Bus Bus value
+   \param[in]  orc_Bus  Bus value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinition::AddBus(const C_OSCSystemBus & orc_Bus)
@@ -100,8 +100,8 @@ void C_OSCSystemDefinition::AddBus(const C_OSCSystemBus & orc_Bus)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert bus
 
-   \param[in] ou32_BusIndex  Bus index
-   \param[in] orc_Bus        Bus value
+   \param[in]  ou32_BusIndex  Bus index
+   \param[in]  orc_Bus        Bus value
 
    \return
    C_NO_ERR Done
@@ -124,7 +124,7 @@ sint32 C_OSCSystemDefinition::InsertBus(const uint32 ou32_BusIndex, const C_OSCS
               ++u32_ItInterface)
          {
             C_OSCNodeComInterfaceSettings & rc_ComInterface = rc_Node.c_Properties.c_ComInterfaces[u32_ItInterface];
-            if (rc_ComInterface.q_IsBusConnected == true)
+            if (rc_ComInterface.GetBusConnected() == true)
             {
                if (rc_ComInterface.u32_BusIndex >= ou32_BusIndex)
                {
@@ -149,7 +149,7 @@ sint32 C_OSCSystemDefinition::InsertBus(const uint32 ou32_BusIndex, const C_OSCS
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete bus
 
-   \param[in] ou32_BusIndex  Bus index
+   \param[in]  ou32_BusIndex  Bus index
 
    \return
    C_NO_ERR Done
@@ -171,7 +171,7 @@ sint32 C_OSCSystemDefinition::DeleteBus(const uint32 ou32_BusIndex)
               ++u32_ItInterface)
          {
             C_OSCNodeComInterfaceSettings & rc_ComInterface = rc_Node.c_Properties.c_ComInterfaces[u32_ItInterface];
-            if (rc_ComInterface.q_IsBusConnected == true)
+            if (rc_ComInterface.GetBusConnected() == true)
             {
                if (rc_ComInterface.u32_BusIndex == ou32_BusIndex)
                {
@@ -201,9 +201,9 @@ sint32 C_OSCSystemDefinition::DeleteBus(const uint32 ou32_BusIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new connection from specified node to specified bus using specified interface number
 
-   \param[in] ou32_NodeIndex   Node to connect from
-   \param[in] ou32_BusIndex    Bus to connect to
-   \param[in] ou8_Interface    Interface number to use
+   \param[in]  ou32_NodeIndex    Node to connect from
+   \param[in]  ou32_BusIndex     Bus to connect to
+   \param[in]  ou8_Interface     Interface number to use
 
    \return
    C_NO_ERR Done
@@ -224,8 +224,7 @@ sint32 C_OSCSystemDefinition::AddConnection(const uint32 ou32_NodeIndex, const u
       if (pc_Interface != NULL)
       {
          C_OSCNodeComInterfaceSettings c_Tmp = *pc_Interface;
-         c_Tmp.q_IsBusConnected = true;
-         c_Tmp.u32_BusIndex = ou32_BusIndex;
+         c_Tmp.AddConnection(ou32_BusIndex);
          rc_Node.c_Properties.SetComInterface(c_Tmp);
       }
    }
@@ -240,9 +239,9 @@ sint32 C_OSCSystemDefinition::AddConnection(const uint32 ou32_NodeIndex, const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if com interface of node allows specified connection
 
-   \param[in] ou32_NodeIndex Node index
-   \param[in] ou32_ComIndex  Communication interface
-   \param[in] ou8_ComNodeID  Node ID
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_ComIndex     Communication interface
+   \param[in]  ou8_ComNodeID     Node ID
 
    \return
    false Conflict
@@ -263,27 +262,33 @@ bool C_OSCSystemDefinition::CheckInterfaceIsAvailable(const uint32 ou32_NodeInde
       {
          const C_OSCNodeComInterfaceSettings & rc_CurComInterface =
             rc_CurNode.c_Properties.c_ComInterfaces[ou32_ComIndex];
+         //Skip if not connected
+         const bool q_CurInterfaceIsConnectedInternally = this->IsInterfaceConnectedInDevice(ou32_NodeIndex,
+                                                                                             rc_CurComInterface.e_InterfaceType,
+                                                                                             rc_CurComInterface.u8_InterfaceNumber);
          //Check com interface has bus connected
-         if (rc_CurComInterface.q_IsBusConnected == true)
+         if ((rc_CurComInterface.GetBusConnected() == true) && (q_CurInterfaceIsConnectedInternally))
          {
-            //Check all nodes for connected bus
-            for (uint32 u32_ItNode = 0; u32_ItNode < this->c_Nodes.size(); ++u32_ItNode)
+            std::vector<uint32> c_NodeIndices;
+            std::vector<uint32> c_InterfaceIndices;
+            this->GetNodeIndexesOfBus(rc_CurComInterface.u32_BusIndex, c_NodeIndices, c_InterfaceIndices);
+            if (c_NodeIndices.size() == c_InterfaceIndices.size())
             {
-               const C_OSCNode & rc_Node = this->c_Nodes[u32_ItNode];
-               //Check all com interfaces
-               for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_Node.c_Properties.c_ComInterfaces.size();
-                    ++u32_ItComInterface)
+               for (uint32 u32_ItFound = 0; u32_ItFound < c_NodeIndices.size(); ++u32_ItFound)
                {
                   //Skip selected com interface
-                  if (((ou32_NodeIndex == u32_ItNode) && (u32_ItComInterface == ou32_ComIndex)) == false)
+                  if (((ou32_NodeIndex == c_NodeIndices[u32_ItFound]) &&
+                       (c_InterfaceIndices[u32_ItFound] == ou32_ComIndex)) == false)
                   {
-                     //Check if connected bus matches
-                     const C_OSCNodeComInterfaceSettings & rc_ComInterface =
-                        rc_Node.c_Properties.c_ComInterfaces[u32_ItComInterface];
-                     if (rc_ComInterface.q_IsBusConnected == true)
+                     if (c_NodeIndices[u32_ItFound] < this->c_Nodes.size())
                      {
-                        if (rc_ComInterface.u32_BusIndex == rc_CurComInterface.u32_BusIndex)
+                        const C_OSCNode & rc_Node = this->c_Nodes[c_NodeIndices[u32_ItFound]];
+                        //Check all com interfaces
+                        if (c_InterfaceIndices[u32_ItFound] < rc_Node.c_Properties.c_ComInterfaces.size())
                         {
+                           //Check if connected bus matches
+                           const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+                              rc_Node.c_Properties.c_ComInterfaces[c_InterfaceIndices[u32_ItFound]];
                            if (rc_ComInterface.u8_NodeID == ou8_ComNodeID)
                            {
                               //Report collision
@@ -303,9 +308,9 @@ bool C_OSCSystemDefinition::CheckInterfaceIsAvailable(const uint32 ou32_NodeInde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if any bus uses the provided bus id
 
-   \param[in] ou8_BusId            Bus id to check for
-   \param[in] opu32_BusIndexToSkip Optional parameter to skip one index
-                                   (Use-case: skip current bus to avoid conflict with itself)
+   \param[in]  ou8_BusId               Bus id to check for
+   \param[in]  opu32_BusIndexToSkip    Optional parameter to skip one index
+                                       (Use-case: skip current bus to avoid conflict with itself)
 
    \return
    true  Available
@@ -341,7 +346,7 @@ bool C_OSCSystemDefinition::CheckBusIdAvailable(const uint8 ou8_BusId, const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get new unused bus id
 
-   \param[out] oru8_BusId Bus id result value
+   \param[out]  oru8_BusId    Bus id result value
 
    \return
    C_NO_ERR Valid bus id found
@@ -377,18 +382,18 @@ sint32 C_OSCSystemDefinition::GetNextFreeBusId(uint8 & oru8_BusId) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check error for node
 
-   \param[in]     ou32_NodeIndex                Node index
-   \param[out]    opq_NameConflict              Name conflict
-   \param[out]    opq_NameInvalid               Name not usable as variable
-   \param[out]    opq_NodeIdInvalid             true: Node index is not usable
-   \param[out]    opq_DataPoolsInvalid          true: error in data pool was detected
-   \param[out]    opq_ApplicationsInvalid       true: error in application was detected
-   \param[out]    opq_DomainsInvalid            true: error in HALC configuration was detected
-   \param[in]     orq_AllowComDataPoolException true: allow exception to skip check for connected interface
-   \param[in,out] opc_InvalidInterfaceIndices   Optional storage for invalid interface indices
-   \param[in,out] opc_InvalidDataPoolIndices    Optional storage for invalid datapool indices
-   \param[in,out] opc_InvalidApplicationIndices Optional storage for invalid application indices
-   \param[in,out] opc_InvalidDomainIndices      Optional storage for invalid application indices
+   \param[in]      ou32_NodeIndex                  Node index
+   \param[out]     opq_NameConflict                Name conflict
+   \param[out]     opq_NameInvalid                 Name not usable as variable
+   \param[out]     opq_NodeIdInvalid               true: Node index is not usable
+   \param[out]     opq_DataPoolsInvalid            true: error in data pool was detected
+   \param[out]     opq_ApplicationsInvalid         true: error in application was detected
+   \param[out]     opq_DomainsInvalid              true: error in HALC configuration was detected
+   \param[in]      orq_AllowComDataPoolException   true: allow exception to skip check for connected interface
+   \param[in,out]  opc_InvalidInterfaceIndices     Optional storage for invalid interface indices
+   \param[in,out]  opc_InvalidDataPoolIndices      Optional storage for invalid datapool indices
+   \param[in,out]  opc_InvalidApplicationIndices   Optional storage for invalid application indices
+   \param[in,out]  opc_InvalidDomainIndices        Optional storage for invalid application indices
 
    \return
    C_NO_ERR Operation success
@@ -418,8 +423,23 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
          {
             if (u32_ItNode != ou32_NodeIndex)
             {
-               const C_OSCNode & rc_CurrentNode = this->c_Nodes[u32_ItNode];
-               if (rc_CheckedNode.c_Properties.c_Name.LowerCase() == rc_CurrentNode.c_Properties.c_Name.LowerCase())
+               uint32 u32_GroupIndex;
+               stw_scl::C_SCLString c_CurName;
+               if (C_OSCNodeSquad::h_CheckIsMultiDevice(u32_ItNode, this->c_NodeSquads, &u32_GroupIndex))
+               {
+                  tgl_assert(u32_GroupIndex < this->c_NodeSquads.size());
+                  if (u32_GroupIndex < this->c_NodeSquads.size())
+                  {
+                     const C_OSCNodeSquad & rc_Group = this->c_NodeSquads[u32_GroupIndex];
+                     c_CurName = rc_Group.c_BaseName;
+                  }
+               }
+               else
+               {
+                  const C_OSCNode & rc_CurrentNode = this->c_Nodes[u32_ItNode];
+                  c_CurName = rc_CurrentNode.c_Properties.c_Name;
+               }
+               if (rc_CheckedNode.c_Properties.c_Name.LowerCase() == c_CurName.LowerCase())
                {
                   *opq_NameConflict = true;
                   break;
@@ -429,12 +449,26 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
       }
       if (opq_NameInvalid != NULL)
       {
-         //check for valid node name
-         *opq_NameInvalid = !C_OSCUtils::h_CheckValidCName(rc_CheckedNode.c_Properties.c_Name);
+         uint32 u32_GroupIndex;
+
+         if (C_OSCNodeSquad::h_CheckIsMultiDevice(ou32_NodeIndex, this->c_NodeSquads, &u32_GroupIndex))
+         {
+            tgl_assert(u32_GroupIndex < this->c_NodeSquads.size());
+            if (u32_GroupIndex < this->c_NodeSquads.size())
+            {
+               const C_OSCNodeSquad & rc_Group = this->c_NodeSquads[u32_GroupIndex];
+               *opq_NameInvalid = !C_OSCUtils::h_CheckValidCName(rc_Group.c_BaseName);
+            }
+         }
+         else
+         {
+            //check for valid node name
+            *opq_NameInvalid = !C_OSCUtils::h_CheckValidCName(rc_CheckedNode.c_Properties.c_Name);
+         }
       }
       if (opq_NodeIdInvalid != NULL)
       {
-         //chaeck for valid node ID
+         //check for valid node ID
          *opq_NodeIdInvalid = false;
 
          for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_CheckedNode.c_Properties.c_ComInterfaces.size();
@@ -655,13 +689,46 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Is interface connected internally in device
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  oe_Type              Interface type
+   \param[in]  ou8_InterfaceNumber  Interface number
+
+   \return
+   Flag if interface is connected internally in device
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCSystemDefinition::IsInterfaceConnectedInDevice(const uint32 ou32_NodeIndex,
+                                                         const C_OSCSystemBus::E_Type oe_Type,
+                                                         const uint8 ou8_InterfaceNumber) const
+{
+   bool q_Retval = true;
+
+   if (ou32_NodeIndex < this->c_Nodes.size())
+   {
+      const C_OSCNode rc_CurNode = this->c_Nodes[ou32_NodeIndex];
+      if (rc_CurNode.pc_DeviceDefinition != NULL)
+      {
+         const uint32 u32_SubDev = rc_CurNode.u32_SubDeviceIndex;
+         if (u32_SubDev < rc_CurNode.pc_DeviceDefinition->c_SubDevices.size())
+         {
+            const C_OSCSubDeviceDefinition & rc_CurSubDevice = rc_CurNode.pc_DeviceDefinition->c_SubDevices[u32_SubDev];
+            q_Retval = rc_CurSubDevice.IsConnected(oe_Type, ou8_InterfaceNumber);
+         }
+      }
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check error for bus & connected node data pools
 
-   \param[in]     ou32_BusIndex        Bus index
-   \param[out]    opq_NameConflict     Name conflict
-   \param[out]    opq_NameInvalid      Name not usable as variable
-   \param[out]    opq_IdInvalid        Id out of range
-   \param[out]    opq_DataPoolsInvalid An error found for a data pool
+   \param[in]   ou32_BusIndex          Bus index
+   \param[out]  opq_NameConflict       Name conflict
+   \param[out]  opq_NameInvalid        Name not usable as variable
+   \param[out]  opq_IdInvalid          Id out of range
+   \param[out]  opq_DataPoolsInvalid   An error found for a data pool
 
    \return
    C_NO_ERR Done
@@ -861,11 +928,11 @@ sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message id valid
 
-   \param[in]  ou32_BusIndex   Bus index
-   \param[in]  ou32_MessageId  Message id
-   \param[out] orq_Valid       Flag if valid
-   \param[in]  opc_SkipMessage Optional parameter to skip one message
-                               (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   ou32_BusIndex    Bus index
+   \param[in]   ou32_MessageId   Message id
+   \param[out]  orq_Valid        Flag if valid
+   \param[in]   opc_SkipMessage  Optional parameter to skip one message
+                                 (Use-case: skip current message to avoid conflict with itself)
 
    \return
    C_NO_ERR Done
@@ -933,11 +1000,11 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message id valid
 
-   \param[in]  ou32_BusIndex   Bus index
-   \param[in]  orc_MessageName Message name
-   \param[out] orq_Valid       Flag if valid
-   \param[in]  opc_SkipMessage Optional parameter to skip one message
-                               (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   ou32_BusIndex    Bus index
+   \param[in]   orc_MessageName  Message name
+   \param[out]  orq_Valid        Flag if valid
+   \param[in]   opc_SkipMessage  Optional parameter to skip one message
+                                 (Use-case: skip current message to avoid conflict with itself)
 
    \return
    C_NO_ERR Done
@@ -1005,10 +1072,10 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if specified messages match
 
-   \param[in]  orc_MessageId1            First message identification indices
-   \param[in]  orc_MessageId2            Second message identification indices
-   \param[out] orq_IsMatch               Flag if messages match
-   \param[in]  oq_IgnoreMessageDirection Flag to compare messages without message direction check
+   \param[in]   orc_MessageId1               First message identification indices
+   \param[in]   orc_MessageId2               Second message identification indices
+   \param[out]  orq_IsMatch                  Flag if messages match
+   \param[in]   oq_IgnoreMessageDirection    Flag to compare messages without message direction check
 
    \return
    C_NO_ERR Done
@@ -1232,9 +1299,9 @@ sint32 C_OSCSystemDefinition::CheckMessageMatch(const C_OSCCanMessageIdentificat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all node indexes which are connected to the bus
 
-   \param[in]     ou32_BusIndex        Bus index
-   \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
-   \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
+   \param[in]   ou32_BusIndex          Bus index
+   \param[out]  orc_NodeIndexes        Vector with all node ids which are connected to the bus
+   \param[out]  orc_InterfaceIndexes   Vector with all node interface ids which are connected to the bus
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinition::GetNodeIndexesOfBus(const uint32 ou32_BusIndex, std::vector<uint32> & orc_NodeIndexes,
@@ -1246,10 +1313,10 @@ void C_OSCSystemDefinition::GetNodeIndexesOfBus(const uint32 ou32_BusIndex, std:
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all node and Datapool indexes which are connected to the bus
 
-   \param[in]     ou32_BusIndex        Bus index
-   \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
-   \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
-   \param[out]    orc_DatapoolIndexes  Vector with all Datapool ids which are connected to the bus and are associated
+   \param[in]   ou32_BusIndex          Bus index
+   \param[out]  orc_NodeIndexes        Vector with all node ids which are connected to the bus
+   \param[out]  orc_InterfaceIndexes   Vector with all node interface ids which are connected to the bus
+   \param[out]  orc_DatapoolIndexes    Vector with all Datapool ids which are connected to the bus and are associated
                                        to the protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1265,11 +1332,11 @@ void C_OSCSystemDefinition::GetNodeAndComDpIndexesOfBus(const uint32 ou32_BusInd
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all node and Datapool indexes which are connected to the bus and have a specific protocol type
 
-   \param[in]     ou32_BusIndex        Bus index
-   \param[in]     ore_ComProtocol      Specific protocol
-   \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
-   \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
-   \param[out]    orc_DatapoolIndexes  Vector with all Datapool ids which are connected to the bus and are associated
+   \param[in]   ou32_BusIndex          Bus index
+   \param[in]   ore_ComProtocol        Specific protocol
+   \param[out]  orc_NodeIndexes        Vector with all node ids which are connected to the bus
+   \param[out]  orc_InterfaceIndexes   Vector with all node interface ids which are connected to the bus
+   \param[out]  orc_DatapoolIndexes    Vector with all Datapool ids which are connected to the bus and are associated
                                        to the protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1292,21 +1359,214 @@ void C_OSCSystemDefinition::GetNodeAndComDpIndexesOfBus(const uint32 ou32_BusInd
    Caller is responsible to pass a node referring to a "c_DeviceType" that is part of "hc_Devices".
    Otherwise the behavior is undefined (function will throw an assertion)
 
-   \param[in,out] orc_Node  node value (out: with added pointer to device type)
+   \param[in,out]  orc_Node            node value (out: with added pointer to device type)
+   \param[in]      orc_SubDeviceName   Sub device name
+   \param[in]      orc_MainDeviceName  Main device name (empty if none)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSystemDefinition::AddNode(C_OSCNode & orc_Node)
+void C_OSCSystemDefinition::AddNode(C_OSCNode & orc_Node, const stw_scl::C_SCLString & orc_SubDeviceName,
+                                    const stw_scl::C_SCLString & orc_MainDeviceName)
 {
-   orc_Node.pc_DeviceDefinition = C_OSCSystemDefinition::hc_Devices.LookForDevice(orc_Node.c_DeviceType);
+   const stw_scl::C_SCLString c_SubDeviceName = orc_SubDeviceName.IsEmpty() ? orc_Node.c_DeviceType : orc_SubDeviceName;
+
+   orc_Node.pc_DeviceDefinition = C_OSCSystemDefinition::hc_Devices.LookForDevice(c_SubDeviceName,
+                                                                                  orc_MainDeviceName,
+                                                                                  orc_Node.u32_SubDeviceIndex);
    tgl_assert(orc_Node.pc_DeviceDefinition != NULL);
    this->c_Nodes.push_back(orc_Node);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append a new node squad and its sub nodes at the end of the node squads and nodes.
+
+   * appends squad node at the end of the squad node list
+   * appends nodes at the end of the node list
+   * updates pointer to device definition
+
+   Caller is responsible to pass nodes referring to a "c_DeviceType" that is part of "hc_Devices".
+   Otherwise the behavior is undefined (function will throw an assertion)
+
+   \param[in,out]  orc_Nodes           nodes values (out: with added pointer to device type)
+   \param[in]      orc_SubDeviceNames  Sub device names
+   \param[in]      orc_MainDeviceName  Main device name (empty if none)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCSystemDefinition::AddNodeSquad(std::vector<C_OSCNode> & orc_Nodes,
+                                         const std::vector<stw_scl::C_SCLString> & orc_SubDeviceNames,
+                                         const stw_scl::C_SCLString & orc_MainDeviceName)
+{
+   tgl_assert(orc_SubDeviceNames.size() == orc_SubDeviceNames.size());
+   if (orc_SubDeviceNames.size() == orc_SubDeviceNames.size())
+   {
+      uint32 u32_Counter;
+
+      C_OSCNodeSquad c_NewNodeSquad;
+
+      tgl_assert(orc_Nodes.size() > 0);
+
+      for (u32_Counter = 0U; u32_Counter < orc_Nodes.size(); ++u32_Counter)
+      {
+         const uint32 u32_NodeIndex = this->c_Nodes.size();
+
+         this->AddNode(orc_Nodes[u32_Counter], orc_SubDeviceNames[u32_Counter], orc_MainDeviceName);
+         c_NewNodeSquad.c_SubNodeIndexes.push_back(u32_NodeIndex);
+      }
+
+      this->c_NodeSquads.push_back(c_NewNodeSquad);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove node
+
+   In case of a node which is a sub node of a squad node, the entire squad node will be removed
+
+   \param[in]  ou32_NodeIndex    Node index (0 -> first node)
+
+   \return
+   C_NO_ERR Done
+   C_RANGE  Node index invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCSystemDefinition::DeleteNode(const uint32 ou32_NodeIndex)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->c_Nodes.size())
+   {
+      uint32 u32_SquadNodeIndexToDelete = 0U;
+
+      sint32 s32_NodeIndexToDeleteCounter;
+
+      std::vector<uint32> c_AllNodeIndexToRemove;
+      const sint32 s32_ReturnSquadNode = this->GetNodeSquadIndexWithNodeIndex(
+         ou32_NodeIndex,
+         u32_SquadNodeIndexToDelete);
+
+      if (s32_ReturnSquadNode == C_NO_ERR)
+      {
+         // Get all node indexes of all sub nodes of the node squad
+         c_AllNodeIndexToRemove = this->c_NodeSquads[u32_SquadNodeIndexToDelete].c_SubNodeIndexes;
+      }
+      else
+      {
+         // No squad node
+         c_AllNodeIndexToRemove.push_back(ou32_NodeIndex);
+      }
+
+      // Start with the last index due to the highest index. Avoiding problems with deleting and changing orders for
+      // the other node index
+      for (s32_NodeIndexToDeleteCounter = (static_cast<sint32>(c_AllNodeIndexToRemove.size()) - 1);
+           s32_NodeIndexToDeleteCounter >= 0;
+           --s32_NodeIndexToDeleteCounter)
+      {
+         uint32 u32_NodeSquadCounter;
+         const uint32 u32_CurrentNodeIndex =  c_AllNodeIndexToRemove[s32_NodeIndexToDeleteCounter];
+
+         this->c_Nodes.erase(this->c_Nodes.begin() + u32_CurrentNodeIndex);
+
+         // Synchronizing the other node squads
+         for (u32_NodeSquadCounter = 0U; u32_NodeSquadCounter < this->c_NodeSquads.size(); ++u32_NodeSquadCounter)
+         {
+            // No adaption of the node squad which will be deleted necessary
+            if ((s32_ReturnSquadNode != C_NO_ERR) ||
+                (u32_NodeSquadCounter != u32_SquadNodeIndexToDelete))
+            {
+               uint32 u32_NodexIndexToSyncCounter;
+               C_OSCNodeSquad & rc_NodeSquad = this->c_NodeSquads[u32_NodeSquadCounter];
+
+               for (u32_NodexIndexToSyncCounter =
+                       0U; u32_NodexIndexToSyncCounter < rc_NodeSquad.c_SubNodeIndexes.size();
+                    ++u32_NodexIndexToSyncCounter)
+               {
+                  uint32 & ru32_SubNodeIndex = rc_NodeSquad.c_SubNodeIndexes[u32_NodexIndexToSyncCounter];
+                  if (ru32_SubNodeIndex > u32_CurrentNodeIndex)
+                  {
+                     --ru32_SubNodeIndex;
+                  }
+               }
+            }
+         }
+      }
+
+      if (s32_ReturnSquadNode == C_NO_ERR)
+      {
+         // Remove the node squad if the node to delete is part of a node squad
+         this->c_NodeSquads.erase(this->c_NodeSquads.begin() + u32_SquadNodeIndexToDelete);
+      }
+
+      s32_Return = C_NO_ERR;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the name for a node or its squad if it is part of one
+
+   In case of a squad node, the new name will be the new base name of the squad. All sub nodes will be get
+   its new node name by the node squad
+
+   \param[in]  ou32_NodeIndex    Index of node which gets a new name
+   \param[in]  orc_NodeName      New name of node
+
+   \retval   C_NO_ERR   Node squad with specific sub node with node index found
+   \retval   C_RANGE    No node squad found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCSystemDefinition::SetNodeName(const uint32 ou32_NodeIndex, const C_SCLString & orc_NodeName)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->c_Nodes.size())
+   {
+      uint32 u32_SquadIndex = 0U;
+      const sint32 s32_SquadReturn = this->GetNodeSquadIndexWithNodeIndex(ou32_NodeIndex, u32_SquadIndex);
+
+      if (s32_SquadReturn == C_NO_ERR)
+      {
+         // Node is sub node of a squad. Name will be set for all sub nodes based on the new base name and the node
+         // specific part
+         s32_Return = this->c_NodeSquads[u32_SquadIndex].SetBaseName(this->c_Nodes, orc_NodeName);
+      }
+      else
+      {
+         // Normal node, simple assignment
+         this->c_Nodes[ou32_NodeIndex].c_Properties.c_Name = orc_NodeName;
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Search the node squad with a specific node index as potential sub node
+
+   \param[in]   ou32_NodeIndex         Searched node index of a sub node of a squad node
+   \param[out]  oru32_NodeSquadIndex   Found squad node index if return value is C_NO_ERR
+
+   \retval   C_NO_ERR   Node squad with specific sub node with node index found
+   \retval   C_RANGE    No node squad found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCSystemDefinition::GetNodeSquadIndexWithNodeIndex(const uint32 ou32_NodeIndex,
+                                                             stw_types::uint32 & oru32_NodeSquadIndex) const
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (C_OSCNodeSquad::h_CheckIsMultiDevice(ou32_NodeIndex, this->c_NodeSquads, &oru32_NodeSquadIndex))
+   {
+      s32_Return = C_NO_ERR;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get hash for datapool
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 
    \return
    Hash for datapool
@@ -1331,8 +1591,8 @@ uint32 C_OSCSystemDefinition::m_GetDataPoolHash(const uint32 ou32_NodeIndex, con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get hash for protocol
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 
    \return
    Hash for protocol
@@ -1358,11 +1618,11 @@ uint32 C_OSCSystemDefinition::m_GetRelatedProtocolHash(const uint32 ou32_NodeInd
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all node and Datapool indexes which are connected to the bus
 
-   \param[in]     ou32_BusIndex        Bus index
-   \param[in]     ope_ComProtocol      Optional: Specific protocol
-   \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
-   \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
-   \param[out]    opc_DatapoolIndexes  Optional: Vector with all Datapool ids which are connected to the bus
+   \param[in]   ou32_BusIndex          Bus index
+   \param[in]   ope_ComProtocol        Optional: Specific protocol
+   \param[out]  orc_NodeIndexes        Vector with all node ids which are connected to the bus
+   \param[out]  orc_InterfaceIndexes   Vector with all node interface ids which are connected to the bus
+   \param[out]  opc_DatapoolIndexes    Optional: Vector with all Datapool ids which are connected to the bus
                                        If ope_ComProtocol is not NULL the Datapool will be checked if it is
                                        associated to the protocol type
 */
@@ -1386,11 +1646,19 @@ void C_OSCSystemDefinition::m_GetNodeAndComDpIndexesOfBus(const uint32 ou32_BusI
            u32_ComInterfaces < rc_Node.c_Properties.c_ComInterfaces.size();
            ++u32_ComInterfaces)
       {
+         const C_OSCNodeComInterfaceSettings & rc_CurComInterface =
+            rc_Node.c_Properties.c_ComInterfaces[u32_ComInterfaces];
+         //Skip if not connected
+         const bool q_IsInterfaceConnectedInternally =
+            this->IsInterfaceConnectedInDevice(
+               u32_NodeIndex,
+               rc_CurComInterface.e_InterfaceType,
+               rc_CurComInterface.u8_InterfaceNumber);
          // is the bus connected
-         if (rc_Node.c_Properties.c_ComInterfaces[u32_ComInterfaces].q_IsBusConnected == true)
+         if ((rc_CurComInterface.GetBusConnected() == true) && (q_IsInterfaceConnectedInternally))
          {
             // check the connections
-            if (rc_Node.c_Properties.c_ComInterfaces[u32_ComInterfaces].u32_BusIndex == ou32_BusIndex)
+            if (rc_CurComInterface.u32_BusIndex == ou32_BusIndex)
             {
                // node is connected to the bus
                if (opc_DatapoolIndexes == NULL)

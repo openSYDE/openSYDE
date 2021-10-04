@@ -145,8 +145,12 @@ public:
                                                          const stw_types::uint32 ou32_ElementIndex);
 
    const C_OSCDeviceDefinition * pc_DeviceDefinition; ///< Pointer to device definition
-   stw_scl::C_SCLString c_DeviceType;                 ///< Node type: reference to name of device type in Device
-   ///< Definition
+   stw_types::uint32 u32_SubDeviceIndex;
+   stw_scl::C_SCLString c_DeviceType; ///< Node type: for non multi-cpu devices (C_OSCDeviceDefinition::c_DeviceName =
+   ///< C_OSCNode::c_DeviceType) for multi-cpu devices (C_OSCSubDeviceDefinition::c_DeviceName =
+   ///< C_OSCNode::c_DeviceType).
+   ///< Simply put: When the device type of multi-cpu device is needed:
+   ///< "C_OSCNode::pc_DeviceDefinition->c_DeviceName" will do the trick.
    C_OSCNodeProperties c_Properties;           ///< General node properties
    std::vector<C_OSCNodeDataPool> c_DataPools; ///< All datapools assigned to this node, expected type order:
    ///< DIAG, NVM then COM

@@ -239,7 +239,9 @@ void C_SdNdeDbWidget::CheckProcessIdError(void) const
    }
    else
    {
-      this->mpc_Ui->pc_LabErrorIcon->SetToolTipInformation("", "", C_NagToolTip::eERROR);
+      this->mpc_Ui->pc_LabErrorIcon->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                           C_GtGetText::h_GetText(""),
+                                                           C_NagToolTip::eERROR);
    }
 }
 
@@ -554,7 +556,6 @@ uint32 C_SdNdeDbWidget::m_CountAllAssociatedDataPools(void) const
 
    if (pc_Node != NULL)
    {
-      C_PuiSdHandler::h_GetInstance()->AssignAllHalcNvmDataPools(mu32_NodeIndex);
       for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
       {
          const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];

@@ -203,7 +203,7 @@ C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_AddressInformationToText(
                  ++u32_InterfaceCounter)
             {
                if ((q_SourceNodeFound == false) &&
-                   (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].q_IsBusConnected == true) &&
+                   (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].GetBusConnected() == true) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u8_NodeID ==
                     ort_CanAddressInformation.t_NodeIdSource.u8_NodeId) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u32_BusIndex == u32_SourceBusIndex))
@@ -214,7 +214,7 @@ C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_AddressInformationToText(
                }
 
                if ((q_TargetNodeFound == false) &&
-                   (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].q_IsBusConnected == true) &&
+                   (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].GetBusConnected() == true) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u8_NodeID ==
                     ort_CanAddressInformation.t_NodeIdTarget.u8_NodeId) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u32_BusIndex == u32_TargetBusIndex))
@@ -375,7 +375,7 @@ const
             for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_Node.c_Properties.c_ComInterfaces.size();
                  ++u32_InterfaceCounter)
             {
-               if ((rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].q_IsBusConnected == true) &&
+               if ((rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].GetBusConnected() == true) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u8_NodeID == u8_NodeId) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u32_BusIndex == u32_BusIndexWithNode))
                {

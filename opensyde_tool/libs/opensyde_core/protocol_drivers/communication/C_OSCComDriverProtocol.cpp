@@ -2449,7 +2449,7 @@ sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
                                                                rc_LastHop.u8_OutInterfaceNumber);
                if (pc_Interface != NULL)
                {
-                  if (pc_Interface->q_IsBusConnected == true)
+                  if (pc_Interface->GetBusConnected() == true)
                   {
                      //Explicit bus
                      u32_BusIndex = pc_Interface->u32_BusIndex;
@@ -2491,7 +2491,7 @@ sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
                {
                   const C_OSCNodeComInterfaceSettings & rc_CurComInterface =
                      rc_ComInterfaces[u32_ItComInterface];
-                  if (rc_CurComInterface.q_IsBusConnected == true)
+                  if (rc_CurComInterface.GetBusConnected() == true)
                   {
                      if (rc_CurComInterface.u32_BusIndex == u32_BusIndex)
                      {

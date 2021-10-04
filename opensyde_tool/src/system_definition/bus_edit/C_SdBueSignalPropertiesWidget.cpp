@@ -780,7 +780,9 @@ void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErr
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditName, "Valid", q_Combined);
       if (q_Combined == true)
       {
-         this->mpc_Ui->pc_LineEditName->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+         this->mpc_Ui->pc_LineEditName->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                              C_GtGetText::h_GetText(""),
+                                                              C_NagToolTip::eDEFAULT);
       }
       else
       {
@@ -829,7 +831,9 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXType(const bool & orq_SignalErrorC
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ComboBoxMuxType, "Valid", !q_MuxTypeInvalid);
       if (q_MuxTypeInvalid == false)
       {
-         this->mpc_Ui->pc_ComboBoxMuxType->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+         this->mpc_Ui->pc_ComboBoxMuxType->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                                 C_GtGetText::h_GetText(""),
+                                                                 C_NagToolTip::eDEFAULT);
       }
       else
       {

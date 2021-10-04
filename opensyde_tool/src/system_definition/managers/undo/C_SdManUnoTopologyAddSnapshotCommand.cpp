@@ -13,8 +13,9 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
-#include "C_SdManUnoTopologyAddSnapshotCommand.h"
+#include "C_PuiSdUtil.h"
 #include "C_SdTopologyScene.h"
+#include "C_SdManUnoTopologyAddSnapshotCommand.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -37,12 +38,12 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Scene               Pointer to currently active scene
-   \param[in]     orc_InitialSnapshotData Initial snapshot data
-   \param[in]     orc_IDs                 Affected unique IDs
-   \param[in]     orc_NewPos              New position
-   \param[in]     of64_HighestUsedZValue  Highest used Z value
-   \param[in,out] opc_Parent              Optional pointer to parent
+   \param[in,out]  opc_Scene                 Pointer to currently active scene
+   \param[in]      orc_InitialSnapshotData   Initial snapshot data
+   \param[in]      orc_IDs                   Affected unique IDs
+   \param[in]      orc_NewPos                New position
+   \param[in]      of64_HighestUsedZValue    Highest used Z value
+   \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddSnapshotCommand::C_SdManUnoTopologyAddSnapshotCommand(QGraphicsScene * const opc_Scene,
@@ -84,13 +85,20 @@ void C_SdManUnoTopologyAddSnapshotCommand::m_AddNew(void)
       if (u32_ItemCount <= c_AllIDs.size())
       {
          //Map IDs
+         uint32 u32_Counter = 0UL;
 
          //Nodes
          for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.c_UINodes.size(); ++u32_ItItem)
          {
-            c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::eNODE),
-                                                  u32_ItItem), c_AllIDs[u32_ItID]);
-            ++u32_ItID;
+            const bool q_IsFirst = C_PuiSdUtil::h_CheckIsFirstInAnyGroupOrNotInAny(u32_ItItem,
+                                                                                   c_InitialData.c_OSCNodeGroups);
+            if (q_IsFirst)
+            {
+               c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::eNODE),
+                                                     u32_Counter), c_AllIDs[u32_ItID]);
+               ++u32_ItID;
+               ++u32_Counter;
+            }
          }
          //Buses
          for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.c_OSCBuses.size(); ++u32_ItItem)

@@ -87,6 +87,7 @@ private:
    void m_OnIndexClicked(const QModelIndex & orc_ModelIndex);
    stw_types::sint32 m_LoadConcreteProject(stw_types::uint16 * const opu16_FileVersion);
    stw_types::sint32 m_GetPassword(QString & orc_Password);
+   void m_CancelPasswordDialog(stw_types::uint16 ou16_ProjectFileVersion);
 
    Ui::C_NagMainWidget * mpc_Ui;
 };

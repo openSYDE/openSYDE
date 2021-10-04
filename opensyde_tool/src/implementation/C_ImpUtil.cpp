@@ -965,7 +965,7 @@ WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM
 {
    //lint -e{9010} //interface defined by Windows API
    T_HandleData & rc_Data = *reinterpret_cast<T_HandleData *>(os32_LParam);
-   uint32 u32_ProcessId = 0;
+   DWORD u32_ProcessId = 0;
    bool q_IsMainWindow = false;
 
    GetWindowThreadProcessId(opc_Handle, &u32_ProcessId);

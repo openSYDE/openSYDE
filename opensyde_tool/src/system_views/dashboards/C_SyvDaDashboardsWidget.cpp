@@ -421,15 +421,25 @@ void C_SyvDaDashboardsWidget::CheckError(void) const
    QString c_ErrorText;
    QString c_ErrorTextHeading;
    QString c_ErrorTextTooltip;
-   const bool q_ViewSetupError =
-      C_SyvUtil::h_CheckViewSetupError(this->mu32_ViewIndex, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip);
+
+   C_NagToolTip::E_Type e_ToolTipType;
+   QString c_IconPath;
+   sintn sn_ColorID;
+   const bool q_ViewSetupError = C_SyvUtil::h_GetViewSetupLabelInfo(
+      this->mu32_ViewIndex, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip, e_ToolTipType,
+      c_IconPath, sn_ColorID);
 
    if (q_ViewSetupError == true)
    {
-      this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
+      this->mpc_Ui->pc_ErrorLabelIcon->SetSvg(c_IconPath);
+      this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
+                                                             c_ErrorTextTooltip, e_ToolTipType);
+      this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(sn_ColorID);
       this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
-      this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
-      this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip);
+      this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
+                                                              c_ErrorTextTooltip, e_ToolTipType);
+      this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(sn_ColorID);
+      this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip, e_ToolTipType);
       this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
    }
    else
@@ -797,7 +807,7 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
       if (C_PuiSvHandler::h_GetInstance()->CheckViewError(this->mu32_ViewIndex, &q_NameInvalid,
                                                           &q_PCNotConnected, &q_RoutingInvalid,
                                                           &q_UpdateDisabledButDataBlocks,
-                                                          &q_SysDefInvalid, &q_NoNodesActive, NULL) == C_NO_ERR)
+                                                          &q_SysDefInvalid, &q_NoNodesActive, NULL, NULL) == C_NO_ERR)
       {
          if ((((((q_NameInvalid == false) && (q_PCNotConnected == false)) && (q_RoutingInvalid == false)) &&
                (q_SysDefInvalid == false)) && (q_NoNodesActive == false)) && (q_UpdateDisabledButDataBlocks == false))

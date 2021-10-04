@@ -14,6 +14,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include "C_OSCNode.h"
+#include "C_OSCNodeSquad.h"
 #include "C_OSCSystemBus.h"
 #include "C_OSCCanMessageIdentificationIndices.h"
 #include "stwtypes.h"
@@ -78,11 +79,21 @@ public:
                                     std::vector<stw_types::uint32> & orc_InterfaceIndexes,
                                     std::vector<stw_types::uint32> & orc_DatapoolIndexes) const;
 
-   void AddNode(C_OSCNode & orc_Node);
+   void AddNode(C_OSCNode & orc_Node, const stw_scl::C_SCLString & orc_SubDeviceName = "",
+                const stw_scl::C_SCLString & orc_MainDeviceName = "");
+   void AddNodeSquad(std::vector<C_OSCNode> & orc_Nodes, const std::vector<stw_scl::C_SCLString> & orc_SubDeviceNames,
+                     const stw_scl::C_SCLString & orc_MainDeviceName);
 
-   static C_OSCDeviceManager hc_Devices; ///< container of device types known in the system
-   std::vector<C_OSCNode> c_Nodes;       ///< all nodes that are part of this system definition
-   std::vector<C_OSCSystemBus> c_Buses;  ///< all buses that are part of this system definition
+   stw_types::sint32 DeleteNode(const stw_types::uint32 ou32_NodeIndex);
+
+   stw_types::sint32 SetNodeName(const stw_types::uint32 ou32_NodeIndex, const stw_scl::C_SCLString & orc_NodeName);
+   stw_types::sint32 GetNodeSquadIndexWithNodeIndex(const stw_types::uint32 ou32_NodeIndex,
+                                                    stw_types::uint32 & oru32_NodeSquadIndex) const;
+
+   static C_OSCDeviceManager hc_Devices;     ///< container of device types known in the system
+   std::vector<C_OSCNode> c_Nodes;           ///< all nodes that are part of this system definition
+   std::vector<C_OSCNodeSquad> c_NodeSquads; ///< all multi CPU based devices with sub nodes of this system definition
+   std::vector<C_OSCSystemBus> c_Buses;      ///< all buses that are part of this system definition
 
 private:
    stw_types::uint32 m_GetDataPoolHash(const stw_types::uint32 ou32_NodeIndex,

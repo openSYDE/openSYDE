@@ -13,6 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QFontMetrics>
+#include "stwtypes.h"
 #include "C_OgeLabToolTipBase.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -30,7 +31,9 @@ class C_OgeLabFrameError :
 public:
    C_OgeLabFrameError(QWidget * const opc_Parent = NULL);
 
-   void SetCompleteText(const QString & orc_Text, const QString & orc_Tooltip);
+   void SetForegroundColor(const stw_types::sintn osn_Value);
+   void SetCompleteText(const QString & orc_Text, const QString & orc_Tooltip,
+                        const stw_opensyde_gui::C_NagToolTip::E_Type oe_TooltipType);
    virtual QSize sizeHint(void) const override;
    virtual QSize minimumSizeHint(void) const override;
 

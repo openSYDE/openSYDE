@@ -14,11 +14,11 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
-#include "C_SyvUtil.h"
 #include "C_GiInfo.h"
-#include "C_OsyHexFile.h"
+#include "C_SyvUtil.h"
 #include "C_SyvUpDeviceInfo.h"
 #include "C_GiSvNodeSyvBase.h"
+#include "C_GiSvNodeData.h"
 #include "C_SyvUpNodePropertiesDialog.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -43,12 +43,15 @@ public:
    void SetConnected(const bool oq_Active);
    void SetUpdating(const bool oq_Active);
    void SetNodeUpdateInProgress(const bool oq_Active, const bool oq_Aborted,
-                                const stw_types::uint32 ou32_FailedApplicationIndex);
-   void CheckThirdParty(void);
-   void SetNoResponse(void);
+                                const stw_types::uint32 ou32_FailedApplicationIndex,
+                                const stw_types::uint32 ou32_NodeIndex);
+   void SetNoResponse(const stw_types::uint32 ou32_NodeIndex);
    void ShowInfo(void);
-   void UpdateInitialPackageStatus(const stw_opensyde_gui_logic::C_SyvUpDeviceInfo & orc_DeviceApplicationInfos);
+   void UpdateInitialPackageStatus(const stw_opensyde_gui_logic::C_SyvUpDeviceInfo & orc_DeviceApplicationInfos,
+                                   const stw_types::uint32 ou32_NodeIndex);
    bool HasNoResponseAndIsActive(void) const;
+   std::vector<stw_types::uint32> GetAllNotRespondingAndActiveIndices(void) const;
+   std::vector<stw_types::uint32> GetAllActiveSTWDeviceIndices(void) const;
    bool IsActiveInView(void) const;
    bool IsStwDevice(void) const;
    void UpdateIcons(void);
@@ -64,43 +67,18 @@ Q_SIGNALS:
    void SigDiscardInfo(const stw_types::uint32 ou32_NodeIndex);
 
 private:
-   enum E_UpdateStatus
-   {
-      eU_UPDATING,
-      eU_WAITING,
-      eU_UP_TO_DATE,
-      eU_UPDATE_SUCCESS,
-      eU_UPDATE_DISABLED,
-      eU_UNKNOWN
-   };
-
    //Avoid call
    C_GiSvNodeSyvUpdate(const C_GiSvNodeSyvUpdate &);
    C_GiSvNodeSyvUpdate & operator =(const C_GiSvNodeSyvUpdate &); //lint !e1511 //we want to hide the base func.
 
    void m_InitIcons(void);
-   bool m_CheckAlwaysUpdate(void) const;
-   bool m_CheckUpdateDisabledState(QString * const opc_TooltipText = NULL) const;
    void m_RefreshDialog(void);
 
-   bool mq_UpdateConnected;
-   bool mq_UpdateInProgress;
-   stw_opensyde_gui_logic::C_SyvUtil::E_NodeUpdateInitialStatus me_InitialStatus;
-   E_UpdateStatus me_UpdateStatus;
-   bool mq_UpdateFailed;
-   bool mq_UpdateSuccess;
-   bool mq_ValidStatus;
-   bool mq_Discarded;
-   stw_types::uint32 mu32_FailedApplicationIndex;
-   std::vector<stw_diag_lib::C_XFLECUInformation> mc_HexFileInfos;
-   std::vector<QString> mc_ParamFileInfos;
-   std::vector<QString> mc_FileInfos;
-   std::vector<bool> mc_HexAppInfoAmiguous;
-   const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * mpc_STWDevice;
-   const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * mpc_OSYDevice;
    C_GiInfo * mpc_IconTopLeft;
    C_GiInfo * mpc_IconBottom;
    C_SyvUpNodePropertiesDialog * mpc_InfoDialog;
+
+   C_GiSvNodeData mc_NodeData;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

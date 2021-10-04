@@ -333,7 +333,14 @@ sint32 C_CieUtil::mh_ImportDBCFile(const uint32 ou32_BusIndex, const C_OSCCanPro
          C_OgeWiCustomMessage c_NodesError(opc_Parent, C_OgeWiCustomMessage::eERROR);
          c_NodesError.SetHeading(C_GtGetText::h_GetText("DBC file import"));
          c_NodesError.SetDescription(C_GtGetText::h_GetText("No nodes or messages found in selected DBC file."));
-         c_NodesError.SetCustomMinHeight(180, 180);
+         c_NodesError.SetDetails(static_cast<QString>(
+                                    "%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
+                                 arg(C_GtGetText::h_GetText(
+                                        "For possible parsing errors, warnings and detailed information see ")).
+                                 arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                                 arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
+                                 arg(C_GtGetText::h_GetText("log file")));
+         c_NodesError.SetCustomMinHeight(180, 270);
          c_NodesError.Execute();
       }
       else
@@ -553,7 +560,14 @@ sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCan
                   C_OgeWiCustomMessage c_Message(opc_Parent);
                   c_Message.SetHeading(C_GtGetText::h_GetText("Nothing found"));
                   c_Message.SetDescription(C_GtGetText::h_GetText("No messages found in file."));
-                  c_Message.SetCustomMinHeight(180, 180);
+                  c_Message.SetDetails(static_cast<QString>(
+                                          "%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
+                                       arg(C_GtGetText::h_GetText(
+                                              "For possible parsing errors, warnings and detailed information see ")).
+                                       arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                                       arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
+                                       arg(C_GtGetText::h_GetText("log file")));
+                  c_Message.SetCustomMinHeight(180, 270);
                   c_Message.Execute();
                }
             }

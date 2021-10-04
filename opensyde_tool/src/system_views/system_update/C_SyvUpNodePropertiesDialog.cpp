@@ -12,14 +12,17 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "TGLUtils.h"
 
+#include "TGLUtils.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_OgeWiCustomMessage.h"
 
 #include "C_SyvUpNodePropertiesDialog.h"
 #include "ui_C_SyvUpNodePropertiesDialog.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_diag_lib;
 using namespace stw_opensyde_gui;
@@ -28,6 +31,10 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const QString C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartMain = "<td style=\"padding: 0px 40px 10px 0px;\">";
+const QString C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent =
+   "<td valign=\"middle\" style=\"padding: 0px 30px 0px 0px;\">";
+const QString C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartStatus = "<td style=\"padding: 0px 5px 0px 0px;\">";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -44,34 +51,20 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out]  orc_Parent                   Reference to parent
-   \param[in]      ou32_NodeIndex               Node index
-   \param[in]      oq_UpdateFailed              Flag if update somehow failed
-   \param[in]      ou32_FailedApplicationIndex  Optional info about which application did fail
+   \param[in,out]  orc_Parent       Reference to parent
+   \param[in]      ou32_NodeIndex   Node index
+   \param[in]      orc_NodeData     Node data
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpNodePropertiesDialog::C_SyvUpNodePropertiesDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                         const uint32 ou32_NodeIndex, const bool oq_UpdateFailed,
-                                                         const uint32 ou32_FailedApplicationIndex) :
+                                                         const uint32 ou32_NodeIndex,
+                                                         const C_GiSvNodeData & orc_NodeData) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvUpNodePropertiesDialog),
    mrc_ParentDialog(orc_Parent),
    mu32_NodeIndex(ou32_NodeIndex),
-   me_Status(C_SyvUtil::eI_UNKNOWN),
-   mpc_HexFileInfos(NULL),
-   mpc_HexAppInfoAmbiguous(NULL),
-   mpc_ParamFileInfos(NULL),
-   mpc_FileInfos(NULL),
-   mpc_STWDevice(NULL),
-   mpc_OSYDevice(NULL),
-   mq_UpdateFailed(oq_UpdateFailed),
-   mq_UpdateSuccessful(false),
-   mq_Discarded(false),
-   mq_ValidStatus(false),
-   mu32_FailedApplicationIndex(ou32_FailedApplicationIndex)
+   mc_NodeData(orc_NodeData)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-
    mpc_Ui->setupUi(this);
 
    InitStaticNames();
@@ -81,9 +74,6 @@ C_SyvUpNodePropertiesDialog::C_SyvUpNodePropertiesDialog(stw_opensyde_gui_elemen
 
    //Deactivate text for icon
    this->mpc_Ui->pc_LabelIcon->setText("");
-
-   //deactivate debug text
-   this->mpc_Ui->pc_GroupBoxIcon->setTitle("");
 
    //Deactivate text edit interaction
    this->mpc_Ui->pc_TextEditDataBlocks->setReadOnly(true);
@@ -97,10 +87,8 @@ C_SyvUpNodePropertiesDialog::C_SyvUpNodePropertiesDialog(stw_opensyde_gui_elemen
    this->mrc_ParentDialog.SetWidget(this);
 
    // set main title
-   if (pc_Node != NULL)
-   {
-      this->mrc_ParentDialog.SetTitle(pc_Node->c_Properties.c_Name.c_str());
-   }
+   this->mrc_ParentDialog.SetTitle(C_PuiSdUtil::h_GetNodeBaseNameOrName(this->mu32_NodeIndex));
+
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Device Status Information"));
 
    // connects
@@ -125,10 +113,8 @@ C_SyvUpNodePropertiesDialog::~C_SyvUpNodePropertiesDialog(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::InitStaticNames(void) const
 {
-   this->mpc_Ui->pc_TabWidget->setTabText(0, C_GtGetText::h_GetText("Data Blocks Information"));
+   this->mpc_Ui->pc_TabWidget->setTabText(0, C_GtGetText::h_GetText("Update File(s)"));
    this->mpc_Ui->pc_TabWidget->setTabText(1, C_GtGetText::h_GetText("Flashloader Information"));
-   this->mpc_Ui->pc_LabelDetails->setText(C_GtGetText::h_GetText("Details"));
-   this->mpc_Ui->pc_LabelHeadingFlash->setText(C_GtGetText::h_GetText("Details"));
    this->mpc_Ui->pc_PushButtonDiscard->setText(C_GtGetText::h_GetText("Force Update"));
    this->mpc_Ui->pc_PushButtonDiscard->SetToolTipInformation(
       C_GtGetText::h_GetText("Force Update"),
@@ -138,41 +124,15 @@ void C_SyvUpNodePropertiesDialog::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update status
 
-   \param[in]  oe_Status                  Node status
-   \param[in]  opc_HexFileInfos           File information (HEX)
-   \param[in]  opc_HexAppInfoAmbiguous    Hex app info ambiguous
-   \param[in]  opc_ParamFileInfos         File information (Parameter set image)
-   \param[in]  opc_FileInfos              File information
-   \param[in]  opc_STWDevice              STW device information
-   \param[in]  opc_OSYDevice              OSY device information
-   \param[in]  oq_UpdateSuccessful        Flag if update was successful
-   \param[in]  oq_ValidStatus             Flag if status is valid
-   \param[in]  oq_Discarded               Discarded flag
+   \param[in]  orc_NodeData   Node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpNodePropertiesDialog::SetStatus(const C_SyvUtil::E_NodeUpdateInitialStatus oe_Status,
-                                            const std::vector<C_XFLECUInformation> * const opc_HexFileInfos,
-                                            const std::vector<bool> * const opc_HexAppInfoAmbiguous,
-                                            const std::vector<QString> * const opc_ParamFileInfos,
-                                            const std::vector<QString> * const opc_FileInfos,
-                                            const C_OSCSuSequences::C_XflDeviceInformation * const opc_STWDevice,
-                                            const C_OSCSuSequences::C_OsyDeviceInformation * const opc_OSYDevice,
-                                            const bool oq_UpdateSuccessful, const bool oq_ValidStatus,
-                                            const bool oq_Discarded)
+void C_SyvUpNodePropertiesDialog::SetStatus(const C_GiSvNodeData & orc_NodeData)
 {
-   this->me_Status = oe_Status;
-   this->mpc_HexFileInfos = opc_HexFileInfos;
-   this->mpc_HexAppInfoAmbiguous = opc_HexAppInfoAmbiguous;
-   this->mpc_ParamFileInfos = opc_ParamFileInfos;
-   this->mpc_FileInfos = opc_FileInfos;
-   this->mpc_STWDevice = opc_STWDevice;
-   this->mpc_OSYDevice = opc_OSYDevice;
-   this->mq_UpdateSuccessful = oq_UpdateSuccessful;
-   this->mq_ValidStatus = oq_ValidStatus;
-   this->mq_Discarded = oq_Discarded;
+   this->mc_NodeData = orc_NodeData;
 
    //Handle initial no info state
-   if ((this->mpc_HexFileInfos != NULL) && (this->mpc_HexFileInfos->size() > 0UL))
+   if (this->mc_NodeData.IsThereAnyHexFileInformation())
    {
       this->mpc_Ui->pc_PushButtonDiscard->setEnabled(true);
    }
@@ -185,39 +145,58 @@ void C_SyvUpNodePropertiesDialog::SetStatus(const C_SyvUtil::E_NodeUpdateInitial
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get overall status
+/*! \brief  Copy initial status
 
-   \return
-   Current overall status
+   \param[in,out]  orc_NodeData  Node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUtil::E_NodeUpdateInitialStatus C_SyvUpNodePropertiesDialog::GetStatus(void) const
+void C_SyvUpNodePropertiesDialog::CopyInitialStatus(C_GiSvNodeData & orc_NodeData) const
 {
-   return this->me_Status;
+   this->mc_NodeData.CopyInitialStatus(orc_NodeData);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get STW device status
+/*! \brief  Copy update status
 
-   \return
-   Current STW device status
+   \param[in,out]  orc_NodeData  Node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCSuSequences::C_XflDeviceInformation * C_SyvUpNodePropertiesDialog::GetSTWDevice(void) const
+void C_SyvUpNodePropertiesDialog::CopyUpdateStatus(C_GiSvNodeData & orc_NodeData) const
 {
-   return this->mpc_STWDevice;
+   this->mc_NodeData.CopyUpdateStatus(orc_NodeData);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get OSY device status
+/*! \brief  Copy STW device info
 
-   \return
-   Current OSY device status
+   \param[in,out]  orc_NodeData  Node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCSuSequences::C_OsyDeviceInformation * C_SyvUpNodePropertiesDialog::GetOSYDevice(void) const
+void C_SyvUpNodePropertiesDialog::CopySTWDeviceInfo(C_GiSvNodeData & orc_NodeData) const
 {
-   return this->mpc_OSYDevice;
+   this->mc_NodeData.CopySTWDeviceInfo(orc_NodeData);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy OSY device info
+
+   \param[in,out]  orc_NodeData  Node data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::CopyOSYDeviceInfo(C_GiSvNodeData & orc_NodeData) const
+{
+   this->mc_NodeData.CopyOSYDeviceInfo(orc_NodeData);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy discarded status
+
+   \param[in,out]  orc_NodeData  Node data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::CopyDiscardedStatus(C_GiSvNodeData & orc_NodeData) const
+{
+   this->mc_NodeData.CopyDiscardedStatus(orc_NodeData);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -254,18 +233,6 @@ void C_SyvUpNodePropertiesDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get discard status
-
-   \return
-   Discard status
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpNodePropertiesDialog::GetDiscardedStatus(void) const
-{
-   return mq_Discarded;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of Ok button click
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -282,9 +249,9 @@ void C_SyvUpNodePropertiesDialog::m_InitStatus(void) const
 {
    QIcon c_Icon;
 
-   if (this->mq_ValidStatus == true)
+   if (this->mc_NodeData.AreAllNodesValid())
    {
-      switch (this->me_Status)
+      switch (this->mc_NodeData.GetOverallInitialState())
       {
       case C_SyvUtil::eI_APPLICATION_MATCH:
          c_Icon = QIcon("://images/system_views/IconUpdateSuccess.svg");
@@ -314,7 +281,6 @@ void C_SyvUpNodePropertiesDialog::m_InitStatus(void) const
       this->mpc_Ui->pc_LabelDescription->setText(C_GtGetText::h_GetText("Requesting info ..."));
    }
    //Apply default icon size
-   this->mpc_Ui->pc_GroupBoxIcon->setVisible(!c_Icon.isNull());
    this->mpc_Ui->pc_LabelIcon->setPixmap(c_Icon.pixmap(64, 64));
 }
 
@@ -324,271 +290,96 @@ void C_SyvUpNodePropertiesDialog::m_InitStatus(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
    QString c_Content = "<html><body>";
+   const std::vector<uint32> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+      this->mu32_NodeIndex);
 
-   if ((this->mq_ValidStatus) && (this->me_Status != C_SyvUtil::eI_NO_RESPONSE))
+   tgl_assert(c_NodeIndices.size() == this->mc_NodeData.GetSubNodeCount());
+   if (c_NodeIndices.size() == this->mc_NodeData.GetSubNodeCount())
+   {
+      for (uint32 u32_ItDevice = 0UL; u32_ItDevice < c_NodeIndices.size(); ++u32_ItDevice)
+      {
+         const C_OSCNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndices[u32_ItDevice]);
+         const C_GiSvSubNodeData * const pc_SubDevice =
+            this->mc_NodeData.GetSubNodeByNodeIndex(c_NodeIndices[u32_ItDevice]);
+         tgl_assert((pc_Node != NULL) && (pc_SubDevice != NULL));
+         if ((pc_Node != NULL) && (pc_SubDevice != NULL))
+         {
+            C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(*pc_SubDevice,
+                                                                      c_Content,
+                                                                      *pc_Node, c_NodeIndices.size() > 1UL);
+         }
+      }
+   }
+
+   c_Content += "</body></html>";
+   this->mpc_Ui->pc_TextEditDataBlocks->setHtml(c_Content);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Init data block table for node
+
+   \param[in]      orc_NodeInfo        Node info
+   \param[in,out]  orc_Content         Content
+   \param[in]      orc_Node            Node
+   \param[in]      oq_IsMultiDevice    Is multi device
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(const C_GiSvSubNodeData & orc_NodeInfo,
+                                                               QString & orc_Content, const C_OSCNode & orc_Node,
+                                                               const bool oq_IsMultiDevice)
+{
+   QString c_NewContent;
+
+   if ((orc_NodeInfo.GetValidStatus()) &&
+       (orc_NodeInfo.GetInitialStatus() != C_SyvUtil::eI_NO_RESPONSE))
    {
       //Each application
-      if (((this->mpc_HexFileInfos != NULL) && (this->mpc_HexAppInfoAmbiguous != NULL)) && (pc_Node != NULL))
+      if (orc_NodeInfo.GetDataBlockFoundStatus())
       {
-         c_Content += "<h3>";
-         c_Content += C_GtGetText::h_GetText("Data Blocks");
-         c_Content += "</h3>";
-         if (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == true)
+         tgl_assert(orc_Node.u32_SubDeviceIndex < orc_Node.pc_DeviceDefinition->c_SubDevices.size());
+         if (orc_Node.pc_DeviceDefinition->c_SubDevices[orc_Node.u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased ==
+             true)
          {
-            c_Content += "<p>";
-            c_Content += C_GtGetText::h_GetText("No status request supported. Update required.");
-            c_Content += "</p>";
+            c_NewContent += "<p>";
+            c_NewContent += C_GtGetText::h_GetText("No status request supported. Update required.");
+            c_NewContent += "</p>";
          }
          else
          {
-            if (pc_Node->c_Applications.size() > 0)
+            if (orc_Node.c_Applications.size() > 0)
             {
-               if (pc_Node->c_Applications.size() == this->mpc_HexFileInfos->size())
+               if (orc_Node.c_Applications.size() == orc_NodeInfo.GetHexFileInfosCount())
                {
-                  for (uint32 u32_ItFile = 0; u32_ItFile < this->mpc_HexFileInfos->size(); ++u32_ItFile)
+                  for (uint32 u32_ItFile = 0; u32_ItFile < orc_NodeInfo.GetHexFileInfosCount();
+                       ++u32_ItFile)
                   {
-                     const C_XFLECUInformation & rc_FileInfo = this->mpc_HexFileInfos->at(u32_ItFile);
-                     const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItFile];
-
-                     const QString c_Column1TagStart = static_cast<QString>("<td style=\"padding: 0 9px 0 18px;\">");
-                     const QString c_ColumnContentTagStart = static_cast<QString>(
-                        "<td valign=\"middle\" style=\"padding: 0 9px 0 9px;\">");
-                     const QString c_FileProjectName = rc_FileInfo.acn_ProjectName;
-                     const QString c_FileVersion = rc_FileInfo.acn_ProjectVersion;
-                     const QString c_FileBuild = static_cast<QString>(rc_FileInfo.acn_Date) + " " +
-                                                 rc_FileInfo.acn_Time;
-                     QString c_DeviceProjectName = C_GtGetText::h_GetText("<b>Missing</b>");
-                     QString c_DeviceVersion = C_GtGetText::h_GetText("<b>Missing</b>");
-                     QString c_DeviceBuild = C_GtGetText::h_GetText("<b>Missing</b>");
-                     QString c_DeviceValid = C_GtGetText::h_GetText("<b>Missing</b>");
-                     bool q_Missing = true;
-                     bool q_Match = true;
-
-                     //Check, exceptions:
-                     //If update successfull all applications have to be up to date
-                     //If no node information is available skip this as this probably means: discarded information
-                     //If error happend also skip this
-                     if (((((this->me_Status == C_SyvUtil::eI_APPLICATION_MATCH) || (this->mq_UpdateSuccessful)) &&
-                           ((this->mpc_OSYDevice != NULL) || (this->mpc_STWDevice != NULL))) &&
-                          (this->mq_UpdateFailed == false)) && (this->mq_Discarded == false))
-                     {
-                        //Assuming known application status
-                        c_DeviceProjectName = c_FileProjectName;
-                        c_DeviceVersion = c_FileVersion;
-                        c_DeviceBuild = c_FileBuild;
-                        if (this->mpc_OSYDevice != NULL)
-                        {
-                           c_DeviceValid = C_GtGetText::h_GetText("Yes");
-                        }
-                        else
-                        {
-                           c_DeviceValid = C_GtGetText::h_GetText("Not available");
-                        }
-                        q_Missing = false;
-                     }
-                     else if (((this->mq_UpdateFailed == true) && (u32_ItFile < this->mu32_FailedApplicationIndex)) &&
-                              (this->mq_Discarded == false))
-                     {
-                        //Assuming known application status
-                        c_DeviceProjectName = c_FileProjectName;
-                        c_DeviceVersion = c_FileVersion;
-                        c_DeviceBuild = c_FileBuild;
-                        if (this->mpc_STWDevice != NULL)
-                        {
-                           c_DeviceValid = C_GtGetText::h_GetText("Yes");
-                        }
-                        else
-                        {
-                           c_DeviceValid = C_GtGetText::h_GetText("Not available");
-                        }
-                        q_Missing = false;
-                     }
-                     else if (((this->mq_UpdateFailed == true) && (u32_ItFile == this->mu32_FailedApplicationIndex)) ||
-                              (this->mq_Discarded == true))
-                     {
-                        //Assuming known application status
-                        q_Missing = true;
-                     }
-                     // Another exception: HEX files with multiple application blocks need to be flashed anyway
-                     else if (this->mpc_HexAppInfoAmbiguous->at(u32_ItFile) == true)
-                     {
-                        // update required
-                        q_Match = false;
-                        q_Missing = false;
-                     }
-                     else
-                     {
-                        if (this->mpc_STWDevice != NULL)
-                        {
-                           for (sint32 s32_ItDeviceInfoBlock = 0;
-                                s32_ItDeviceInfoBlock <
-                                this->mpc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks.GetLength();
-                                ++s32_ItDeviceInfoBlock)
-                           {
-                              const C_XFLECUInformation & rc_STWDeviceInfo =
-                                 this->mpc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks[s32_ItDeviceInfoBlock];
-                              //Search for name match
-                              if (c_FileProjectName.compare(rc_STWDeviceInfo.acn_ProjectName) == 0)
-                              {
-                                 //Signal found
-                                 q_Missing = false;
-                                 //Apply
-                                 c_DeviceProjectName = rc_STWDeviceInfo.acn_ProjectName;
-                                 c_DeviceVersion = rc_STWDeviceInfo.acn_ProjectVersion;
-                                 c_DeviceBuild = static_cast<QString>(rc_STWDeviceInfo.acn_Date) + " " +
-                                                 rc_STWDeviceInfo.acn_Time;
-                                 //Highlighting
-                                 if (c_FileProjectName.compare(c_DeviceProjectName) != 0)
-                                 {
-                                    c_DeviceProjectName = "<b>" + c_DeviceProjectName + "</b>";
-                                    q_Match = false;
-                                 }
-                                 if (c_FileVersion.compare(c_DeviceVersion) != 0)
-                                 {
-                                    c_DeviceVersion = "<b>" + c_DeviceVersion + "</b>";
-                                    q_Match = false;
-                                 }
-                                 if (c_FileBuild.compare(c_DeviceBuild) != 0)
-                                 {
-                                    c_DeviceBuild = "<b>" + c_DeviceBuild + "</b>";
-                                    q_Match = false;
-                                 }
-
-                                 // Valid flag is not available for STW Flashloader
-                                 c_DeviceValid = C_GtGetText::h_GetText("Not available");
-                              }
-                           }
-                        }
-                        else if (this->mpc_OSYDevice != NULL)
-                        {
-                           //Skip first application because this is the flashloader (OSY ONLY!)
-                           for (uint32 u32_ItOsyApplication = 1;
-                                u32_ItOsyApplication < this->mpc_OSYDevice->c_Applications.size();
-                                ++u32_ItOsyApplication)
-                           {
-                              const C_OSCProtocolDriverOsy::C_FlashBlockInfo & rc_OsyDeviceInfo =
-                                 this->mpc_OSYDevice->c_Applications[u32_ItOsyApplication];
-                              //Search for name match
-                              if (c_FileProjectName.compare(rc_OsyDeviceInfo.c_ApplicationName.c_str()) == 0)
-                              {
-                                 //Signal found
-                                 q_Missing = false;
-                                 //Apply
-                                 c_DeviceProjectName = rc_OsyDeviceInfo.c_ApplicationName.c_str();
-                                 c_DeviceVersion = rc_OsyDeviceInfo.c_ApplicationVersion.c_str();
-                                 c_DeviceBuild =
-                                    (rc_OsyDeviceInfo.c_BuildDate + " " + rc_OsyDeviceInfo.c_BuildTime).c_str();
-                                 //Highlighting
-                                 if (c_FileProjectName != c_DeviceProjectName)
-                                 {
-                                    c_DeviceProjectName = "<b>" + c_DeviceProjectName + "</b>";
-                                    q_Match = false;
-                                 }
-                                 if (c_FileVersion != c_DeviceVersion)
-                                 {
-                                    c_DeviceVersion = "<b>" + c_DeviceVersion + "</b>";
-                                    q_Match = false;
-                                 }
-                                 if (c_FileBuild != c_DeviceBuild)
-                                 {
-                                    c_DeviceBuild = "<b>" + c_DeviceBuild + "</b>";
-                                    q_Match = false;
-                                 }
-
-                                 if (rc_OsyDeviceInfo.u8_SignatureValid == 0U)
-                                 {
-                                    c_DeviceValid = C_GtGetText::h_GetText("Yes");
-                                 }
-                                 else
-                                 {
-                                    c_DeviceValid = C_GtGetText::h_GetText("<b>No</b>");
-                                    q_Match = false;
-                                 }
-                                 break;
-                              }
-                           }
-                        }
-                        else
-                        {
-                           //No information available: probably discarded
-                        }
-                     }
-
-                     //Heading
-                     c_Content += "<h3>";
-                     c_Content += "<table>";
-                     c_Content += "<tr>";
-                     c_Content += "<td valign=\"middle\">";
-                     c_Content += static_cast<QString>("#%1 - %2 ").arg(u32_ItFile + 1).arg(
-                        rc_Application.c_Name.c_str());
-                     c_Content += "</td>";
-                     c_Content += "<td valign=\"middle\">";
-                     //Image
-                     if (q_Missing == true)
-                     {
-                        c_Content += "<img src=\"://images/system_views/IconUpdateWaiting.svg\""
-                                     "alt=\"Application unknown\"";
-                     }
-                     else
-                     {
-                        if (q_Match == true)
-                        {
-                           c_Content += "<img src=\"://images/system_views/IconUpdateSuccess.svg\""
-                                        "alt=\"Application match\"";
-                        }
-                        else
-                        {
-                           c_Content += "<img src=\"://images/system_views/IconUpdateWaiting.svg\""
-                                        "alt=\"Application deviation\"";
-                        }
-                     }
-                     c_Content += "style=\"vertical-align: middle;\"/>";
-                     c_Content += "</td>";
-                     c_Content += "</tr>";
-                     c_Content += "</table>";
-                     c_Content += "</h3>";
-                     c_Content += "<p/>";
-
-                     if (this->mpc_HexAppInfoAmbiguous->at(u32_ItFile) == true)
-                     {
-                        c_Content += C_GtGetText::h_GetText("HEX file has multiple application blocks and therefore "
-                                                            "information is ambiguous.");
-                     }
-                     else
-                     {
-                        //Content
-                        c_Content += "<table style=\"width:100%;\">";
-                        c_Content += "<tr>";
-                        c_Content += c_Column1TagStart + "<b>" + C_GtGetText::h_GetText("Property") + "</b>" + "</td>";
-                        c_Content += c_ColumnContentTagStart + "<b>" + C_GtGetText::h_GetText("Update Package") +
-                                     "</b>" + "</td>";
-                        c_Content += c_ColumnContentTagStart + "<b>" + C_GtGetText::h_GetText("Device Status") +
-                                     "</b>" + "</td>";
-                        c_Content += "</tr>";
-                        c_Content += "<tr>";
-                        c_Content += c_Column1TagStart + C_GtGetText::h_GetText("Project Name") + "</td>";
-                        c_Content += c_ColumnContentTagStart + c_FileProjectName + "</td>";
-                        c_Content += c_ColumnContentTagStart + c_DeviceProjectName + "</td>";
-                        c_Content += "</tr>";
-                        c_Content += "<tr>";
-                        c_Content += c_Column1TagStart + C_GtGetText::h_GetText("Version") + "</td>";
-                        c_Content += c_ColumnContentTagStart + c_FileVersion + "</td>";
-                        c_Content += c_ColumnContentTagStart + c_DeviceVersion + "</td>";
-                        c_Content += "</tr>";
-                        c_Content += "<tr>";
-                        c_Content += c_Column1TagStart + C_GtGetText::h_GetText("Timestamp") + "</td>";
-                        c_Content += c_ColumnContentTagStart + c_FileBuild + "</td>";
-                        c_Content += c_ColumnContentTagStart + c_DeviceBuild + "</td>";
-                        c_Content += "</tr>";
-                        c_Content += "<tr>";
-                        c_Content += c_Column1TagStart + C_GtGetText::h_GetText("Signature Valid") + "</td>";
-                        c_Content += c_ColumnContentTagStart + "-" + "</td>";
-                        c_Content += c_ColumnContentTagStart + c_DeviceValid + "</td>";
-                        c_Content += "</tr>";
-                        c_Content += "</table>";
-                     }
+                     QString c_FileProjectName;
+                     QString c_FileVersion;
+                     QString c_FileBuild;
+                     QString c_ApplicationName;
+                     QString c_Icon;
+                     QString c_State;
+                     QString c_DeviceProjectName;
+                     QString c_DeviceVersion;
+                     QString c_DeviceBuild;
+                     QString c_DeviceValid;
+                     QString c_DetailsPart;
+                     C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(
+                        orc_NodeInfo, orc_Node, u32_ItFile, c_ApplicationName, c_Icon, c_State, c_DeviceValid,
+                        c_FileProjectName, c_DeviceProjectName, c_FileVersion, c_DeviceVersion,
+                        c_FileBuild, c_DeviceBuild);
+                     C_SyvUpNodePropertiesDialog::mh_ExtractDetailsPartFromDataForNode(orc_NodeInfo.GetHexAppInfoAmbiguous(
+                                                                                          u32_ItFile),
+                                                                                       c_FileProjectName,
+                                                                                       c_DeviceProjectName,
+                                                                                       c_FileVersion, c_DeviceVersion,
+                                                                                       c_FileBuild, c_DeviceBuild,
+                                                                                       c_DetailsPart);
+                     C_SyvUpNodePropertiesDialog::mh_AppendApplicationForNode(
+                        u32_ItFile, c_ApplicationName, c_Icon, c_State, c_DeviceValid,
+                        c_DetailsPart, c_NewContent);
                   }
                }
                else
@@ -598,38 +389,517 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
             }
             else
             {
-               c_Content += "<p>";
-               c_Content += C_GtGetText::h_GetText("No Data Block available. No update required.");
-               c_Content += "</p>";
+               c_NewContent += "<p>";
+               c_NewContent += C_GtGetText::h_GetText("No Data Block available. No update required.");
+               c_NewContent += "</p>";
             }
          }
       }
-      //Each parameter set file
-      if ((this->mpc_ParamFileInfos != NULL) && (this->mpc_ParamFileInfos->size() > 0UL))
+   }
+   C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableOtherSectionForNode(orc_NodeInfo, orc_Content);
+   C_SyvUpNodePropertiesDialog::mh_HandleSectionAppend(c_NewContent, orc_Content, orc_Node, oq_IsMultiDevice);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get application data for node
+
+   \param[in]      orc_NodeInfo              Node info
+   \param[in]      orc_Node                  Node
+   \param[in]      ou32_ApplicationIndex     Application index
+   \param[in,out]  orc_ApplicationName       Application name
+   \param[in,out]  orc_ApplicationStateIcon  Application state icon
+   \param[in,out]  orc_ApplicationState      Application state
+   \param[in,out]  orc_DeviceValidStatus     Device valid status
+   \param[in,out]  orc_FileProjectName       File project name
+   \param[in,out]  orc_DeviceProjectName     Device project name
+   \param[in,out]  orc_FileVersion           File version
+   \param[in,out]  orc_DeviceFileVersion     Device file version
+   \param[in,out]  orc_FileBuildDate         File build date
+   \param[in,out]  orc_DeviceBuildDate       Device build date
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNodeData & orc_NodeInfo,
+                                                               const C_OSCNode & orc_Node,
+                                                               const uint32 ou32_ApplicationIndex,
+                                                               QString & orc_ApplicationName,
+                                                               QString & orc_ApplicationStateIcon,
+                                                               QString & orc_ApplicationState,
+                                                               QString & orc_DeviceValidStatus,
+                                                               QString & orc_FileProjectName,
+                                                               QString & orc_DeviceProjectName,
+                                                               QString & orc_FileVersion,
+                                                               QString & orc_DeviceFileVersion,
+                                                               QString & orc_FileBuildDate,
+                                                               QString & orc_DeviceBuildDate)
+{
+   const C_XFLECUInformation * const pc_FileInfo = orc_NodeInfo.GetHexFileInfo(
+      ou32_ApplicationIndex);
+   const C_OSCNodeApplication & rc_Application = orc_Node.c_Applications[ou32_ApplicationIndex];
+   bool q_Missing = true;
+   bool q_Match = true;
+   const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
+
+   tgl_assert(pc_FileInfo != NULL);
+   if (pc_FileInfo != NULL)
+   {
+      orc_FileProjectName = pc_FileInfo->acn_ProjectName;
+      orc_FileVersion = pc_FileInfo->acn_ProjectVersion;
+      orc_FileBuildDate = static_cast<QString>(pc_FileInfo->acn_Date) + " " +
+                          pc_FileInfo->acn_Time;
+   }
+
+   orc_ApplicationName = rc_Application.c_Name.c_str();
+   orc_ApplicationStateIcon = "";
+   orc_ApplicationState = "";
+   orc_DeviceProjectName = C_GtGetText::h_GetText("<b>Not present</b>");
+   orc_DeviceFileVersion = C_GtGetText::h_GetText("<b>Not present</b>");
+   orc_DeviceBuildDate = C_GtGetText::h_GetText("<b>Not present</b>");
+   orc_DeviceValidStatus = C_GtGetText::h_GetText("<b>Not present</b>");
+
+   //Check, exceptions:
+   //If update successful all applications have to be up to date
+   //If no node information is available skip this as this probably means: discarded information
+   //If error happened also skip this
+   if (((((orc_NodeInfo.GetInitialStatus() == C_SyvUtil::eI_APPLICATION_MATCH) ||
+          (orc_NodeInfo.GetUpdateSuccessStatus())) &&
+         ((c_DeviceInfo.pc_OSYDevice != NULL) ||
+          (c_DeviceInfo.pc_STWDevice != NULL))) &&
+        (orc_NodeInfo.GetUpdateFailedStatus() == false)) &&
+       (orc_NodeInfo.IsDeviceInfoDiscarded() == false))
+   {
+      //Assuming known application status
+      orc_DeviceProjectName = orc_FileProjectName;
+      orc_DeviceFileVersion = orc_FileVersion;
+      orc_DeviceBuildDate = orc_FileBuildDate;
+      if (c_DeviceInfo.pc_OSYDevice != NULL)
       {
-         c_Content += "<h3>";
-         c_Content += C_GtGetText::h_GetText("Parameter Sets");
-         c_Content += "</h3>";
-         c_Content += "<p/>";
-         c_Content += "<p>";
-         c_Content += C_GtGetText::h_GetText("No status request supported. Update required.");
-         c_Content += "</p>";
+         orc_DeviceValidStatus = C_GtGetText::h_GetText("Valid");
       }
-      //Any other file
-      if ((this->mpc_FileInfos != NULL) && (this->mpc_FileInfos->size() > 0UL))
+      else
       {
-         c_Content += "<h3>";
-         c_Content += C_GtGetText::h_GetText("Files");
-         c_Content += "</h3>";
-         c_Content += "<p/>";
-         c_Content += "<p>";
-         c_Content += C_GtGetText::h_GetText("No status request supported. Update required.");
-         c_Content += "</p>";
+         orc_DeviceValidStatus = C_GtGetText::h_GetText("Not available");
+      }
+      q_Missing = false;
+   }
+   else if (((orc_NodeInfo.GetUpdateFailedStatus() == true) &&
+             (ou32_ApplicationIndex < orc_NodeInfo.GetFailedApplicationIndex())) &&
+            (orc_NodeInfo.IsDeviceInfoDiscarded() == false))
+   {
+      //Assuming known application status
+      orc_DeviceProjectName = orc_FileProjectName;
+      orc_DeviceFileVersion = orc_FileVersion;
+      orc_DeviceBuildDate = orc_FileBuildDate;
+      if (c_DeviceInfo.pc_STWDevice != NULL)
+      {
+         orc_DeviceValidStatus = C_GtGetText::h_GetText("Valid");
+      }
+      else
+      {
+         orc_DeviceValidStatus = C_GtGetText::h_GetText("Not available");
+      }
+      q_Missing = false;
+   }
+   else if (((orc_NodeInfo.GetUpdateFailedStatus() == true) &&
+             (ou32_ApplicationIndex == orc_NodeInfo.GetFailedApplicationIndex())) ||
+            (orc_NodeInfo.IsDeviceInfoDiscarded() == true))
+   {
+      //Assuming known application status
+      q_Missing = true;
+   }
+   // Another exception: HEX files with multiple application blocks need to be flashed anyway
+   else if (orc_NodeInfo.GetHexAppInfoAmbiguous(ou32_ApplicationIndex) == true)
+   {
+      // update required
+      q_Match = false;
+      q_Missing = false;
+   }
+   else
+   {
+      if (c_DeviceInfo.pc_STWDevice != NULL)
+      {
+         C_SyvUpNodePropertiesDialog::mh_ExtractSTWDeviceInformation(orc_NodeInfo, orc_FileProjectName,
+                                                                     orc_DeviceProjectName,
+                                                                     orc_FileVersion, orc_DeviceFileVersion,
+                                                                     orc_FileBuildDate, orc_DeviceBuildDate,
+                                                                     orc_DeviceValidStatus, q_Missing, q_Match);
+      }
+      else if (c_DeviceInfo.pc_OSYDevice != NULL)
+      {
+         C_SyvUpNodePropertiesDialog::mh_ExtractOSYDeviceInformation(orc_NodeInfo, orc_FileProjectName,
+                                                                     orc_DeviceProjectName,
+                                                                     orc_FileVersion, orc_DeviceFileVersion,
+                                                                     orc_FileBuildDate, orc_DeviceBuildDate,
+                                                                     orc_DeviceValidStatus, q_Missing, q_Match);
+      }
+      else
+      {
+         //No information available: probably discarded
       }
    }
 
-   c_Content += "</body></html>";
-   this->mpc_Ui->pc_TextEditDataBlocks->setHtml(c_Content);
+   //Icon
+   if (q_Missing == true)
+   {
+      orc_ApplicationStateIcon += "<img src=\"://images/system_views/IconUpdateWaiting.svg\"";
+      orc_ApplicationState = C_GtGetText::h_GetText("Update required");
+   }
+   else
+   {
+      if (q_Match == true)
+      {
+         orc_ApplicationStateIcon += "<img src=\"://images/system_views/IconUpdateSuccess.svg\"";
+         orc_ApplicationState = C_GtGetText::h_GetText("Up to date");
+      }
+      else
+      {
+         orc_ApplicationStateIcon += "<img src=\"://images/system_views/IconUpdateWaiting.svg\"";
+         orc_ApplicationState = C_GtGetText::h_GetText("Update required");
+      }
+   }
+   orc_ApplicationStateIcon += "style=\"vertical-align: middle;\"/>";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Extract STW device information
+
+   \param[in]      orc_NodeInfo           Node info
+   \param[in]      orc_FileProjectName    File project name
+   \param[in,out]  orc_DeviceProjectName  Device project name
+   \param[in]      orc_FileVersion        File version
+   \param[in,out]  orc_DeviceFileVersion  Device file version
+   \param[in]      orc_FileBuildDate      File build date
+   \param[in,out]  orc_DeviceBuildDate    Device build date
+   \param[in,out]  orc_DeviceValidStatus  Device valid status
+   \param[in,out]  orq_MissingStatus      Missing status
+   \param[in,out]  orq_MatchStatus        Match status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::mh_ExtractSTWDeviceInformation(const C_GiSvSubNodeData & orc_NodeInfo,
+                                                                 const QString & orc_FileProjectName,
+                                                                 QString & orc_DeviceProjectName,
+                                                                 const QString & orc_FileVersion,
+                                                                 QString & orc_DeviceFileVersion,
+                                                                 const QString & orc_FileBuildDate,
+                                                                 QString & orc_DeviceBuildDate,
+                                                                 QString & orc_DeviceValidStatus,
+                                                                 bool & orq_MissingStatus, bool & orq_MatchStatus)
+{
+   const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
+
+   for (sint32 s32_ItDeviceInfoBlock = 0;
+        s32_ItDeviceInfoBlock <
+        c_DeviceInfo.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks.
+        GetLength();
+        ++s32_ItDeviceInfoBlock)
+   {
+      const C_XFLECUInformation & rc_STWDeviceInfo =
+         c_DeviceInfo.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks[
+            s32_ItDeviceInfoBlock];
+      //Search for name match
+      if (orc_FileProjectName.compare(rc_STWDeviceInfo.acn_ProjectName) == 0)
+      {
+         //Signal found
+         orq_MissingStatus = false;
+         //Apply
+         orc_DeviceProjectName = rc_STWDeviceInfo.acn_ProjectName;
+         orc_DeviceFileVersion = rc_STWDeviceInfo.acn_ProjectVersion;
+         orc_DeviceBuildDate = static_cast<QString>(rc_STWDeviceInfo.acn_Date) + " " +
+                               rc_STWDeviceInfo.acn_Time;
+         //Highlighting
+         orq_MatchStatus = C_SyvUpNodePropertiesDialog::mh_HandleHighlighting(orc_FileProjectName,
+                                                                              orc_DeviceProjectName,
+                                                                              orc_FileVersion, orc_DeviceFileVersion,
+                                                                              orc_FileBuildDate, orc_DeviceBuildDate);
+
+         // Valid flag is not available for STW Flashloader
+         orc_DeviceValidStatus = C_GtGetText::h_GetText("Not available");
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Extract OSY device information
+
+   \param[in]      orc_NodeInfo           Node info
+   \param[in]      orc_FileProjectName    File project name
+   \param[in,out]  orc_DeviceProjectName  Device project name
+   \param[in]      orc_FileVersion        File version
+   \param[in,out]  orc_DeviceFileVersion  Device file version
+   \param[in]      orc_FileBuildDate      File build date
+   \param[in,out]  orc_DeviceBuildDate    Device build date
+   \param[in,out]  orc_DeviceValidStatus  Device valid status
+   \param[in,out]  orq_MissingStatus      Missing status
+   \param[in,out]  orq_MatchStatus        Match status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::mh_ExtractOSYDeviceInformation(const C_GiSvSubNodeData & orc_NodeInfo,
+                                                                 const QString & orc_FileProjectName,
+                                                                 QString & orc_DeviceProjectName,
+                                                                 const QString & orc_FileVersion,
+                                                                 QString & orc_DeviceFileVersion,
+                                                                 const QString & orc_FileBuildDate,
+                                                                 QString & orc_DeviceBuildDate,
+                                                                 QString & orc_DeviceValidStatus,
+                                                                 bool & orq_MissingStatus, bool & orq_MatchStatus)
+{
+   const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
+
+   //Skip first application because this is the flashloader (OSY ONLY!)
+   for (uint32 u32_ItOsyApplication = 1;
+        u32_ItOsyApplication <
+        c_DeviceInfo.pc_OSYDevice->c_Applications.size();
+        ++u32_ItOsyApplication)
+   {
+      const C_OSCProtocolDriverOsy::C_FlashBlockInfo & rc_OsyDeviceInfo =
+         c_DeviceInfo.pc_OSYDevice->c_Applications[u32_ItOsyApplication];
+      //Search for name match
+      if (orc_FileProjectName.compare(rc_OsyDeviceInfo.c_ApplicationName.c_str()) == 0)
+      {
+         //Signal found
+         orq_MissingStatus = false;
+         //Apply
+         orc_DeviceProjectName = rc_OsyDeviceInfo.c_ApplicationName.c_str();
+         orc_DeviceFileVersion = rc_OsyDeviceInfo.c_ApplicationVersion.c_str();
+         orc_DeviceBuildDate =
+            (rc_OsyDeviceInfo.c_BuildDate + " " + rc_OsyDeviceInfo.c_BuildTime).c_str();
+         //Highlighting
+         orq_MatchStatus = C_SyvUpNodePropertiesDialog::mh_HandleHighlighting(orc_FileProjectName,
+                                                                              orc_DeviceProjectName,
+                                                                              orc_FileVersion, orc_DeviceFileVersion,
+                                                                              orc_FileBuildDate, orc_DeviceBuildDate);
+
+         if (rc_OsyDeviceInfo.u8_SignatureValid == 0U)
+         {
+            orc_DeviceValidStatus = C_GtGetText::h_GetText("Valid");
+         }
+         else
+         {
+            orc_DeviceValidStatus = C_GtGetText::h_GetText("<b>Invalid</b>");
+            orq_MatchStatus = false;
+         }
+         break;
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle highlighting
+
+   \param[in]      orc_FileProjectName    File project name
+   \param[in,out]  orc_DeviceProjectName  Device project name
+   \param[in]      orc_FileVersion        File version
+   \param[in,out]  orc_DeviceFileVersion  Device file version
+   \param[in]      orc_FileBuildDate      File build date
+   \param[in,out]  orc_DeviceBuildDate    Device build date
+
+   \return
+   Matching status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpNodePropertiesDialog::mh_HandleHighlighting(const QString & orc_FileProjectName,
+                                                        QString & orc_DeviceProjectName,
+                                                        const QString & orc_FileVersion,
+                                                        QString & orc_DeviceFileVersion,
+                                                        const QString & orc_FileBuildDate,
+                                                        QString & orc_DeviceBuildDate)
+{
+   bool q_Match = true;
+
+   if (orc_FileProjectName != orc_DeviceProjectName)
+   {
+      orc_DeviceProjectName = "<b>" + orc_DeviceProjectName + "</b>";
+      q_Match = false;
+   }
+   if (orc_FileVersion != orc_DeviceFileVersion)
+   {
+      orc_DeviceFileVersion = "<b>" + orc_DeviceFileVersion + "</b>";
+      q_Match = false;
+   }
+   if (orc_FileBuildDate != orc_DeviceBuildDate)
+   {
+      orc_DeviceBuildDate = "<b>" + orc_DeviceBuildDate + "</b>";
+      q_Match = false;
+   }
+   return q_Match;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Extract content from data for node
+
+   \param[in]      oq_HexAppInfoAmbiguous    Hex app info ambiguous
+   \param[in,out]  orc_FileProjectName       File project name
+   \param[in]      orc_DeviceProjectName     Device project name
+   \param[in]      orc_FileVersion           File version
+   \param[in]      orc_DeviceFileVersion     Device file version
+   \param[in]      orc_FileBuildDate         File build date
+   \param[in]      orc_DeviceBuildDate       Device build date
+   \param[in,out]  orc_Content               Content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::mh_ExtractDetailsPartFromDataForNode(const bool oq_HexAppInfoAmbiguous,
+                                                                       const QString & orc_FileProjectName,
+                                                                       const QString & orc_DeviceProjectName,
+                                                                       const QString & orc_FileVersion,
+                                                                       const QString & orc_DeviceFileVersion,
+                                                                       const QString & orc_FileBuildDate,
+                                                                       const QString & orc_DeviceBuildDate,
+                                                                       QString & orc_Content)
+{
+   QString c_NewContent;
+
+   if (oq_HexAppInfoAmbiguous == true)
+   {
+      c_NewContent += C_GtGetText::h_GetText("HEX file has multiple application blocks and therefore "
+                                             "information is ambiguous.");
+   }
+   else
+   {
+      //Content
+      c_NewContent += "<table style=\"width:100%;\">";
+      c_NewContent += "<tr>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      //lint -e{1946} Qt interface
+      c_NewContent += QString("<u>") + C_GtGetText::h_GetText("Property") + "</u>";
+      c_NewContent += "</td>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      //lint -e{1946} Qt interface
+      c_NewContent += QString("<u>") + C_GtGetText::h_GetText("Update Package") + "</u>";
+      c_NewContent += "</td>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      //lint -e{1946} Qt interface
+      c_NewContent += QString("<u>") + C_GtGetText::h_GetText("Device Status") + "</u>";
+      c_NewContent += "</td>";
+      c_NewContent += "</tr>";
+      c_NewContent += "<tr>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      c_NewContent += C_GtGetText::h_GetText("Project Name");
+      c_NewContent += "</td>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      c_NewContent += orc_FileProjectName;
+      c_NewContent += "</td>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      c_NewContent += orc_DeviceProjectName;
+      c_NewContent += "</td>";
+      c_NewContent += "</tr>";
+      c_NewContent += "<tr>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      c_NewContent += C_GtGetText::h_GetText("Version");
+      c_NewContent += "</td>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      c_NewContent += orc_FileVersion;
+      c_NewContent += "</td>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      c_NewContent += orc_DeviceFileVersion;
+      c_NewContent += "</td>";
+      c_NewContent += "</tr>";
+      c_NewContent += "<tr>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      c_NewContent += C_GtGetText::h_GetText("Timestamp");
+      c_NewContent += "</td>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      c_NewContent += orc_FileBuildDate;
+      c_NewContent += "</td>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartContent;
+      c_NewContent += orc_DeviceBuildDate;
+      c_NewContent += "</td>";
+      c_NewContent += "</tr>";
+      c_NewContent += "</table>";
+   }
+   orc_Content = c_NewContent;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Append application for node
+
+   \param[in]      ou32_ApplicationIndex     Application index
+   \param[in]      orc_ApplicationName       Application name
+   \param[in]      orc_ApplicationStateIcon  Application state icon
+   \param[in]      orc_ApplicationState      Application state
+   \param[in]      orc_DeviceValidStatus     Device valid status
+   \param[in]      orc_DetailsPart           Details part
+   \param[in,out]  orc_Content               Content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::mh_AppendApplicationForNode(const uint32 ou32_ApplicationIndex,
+                                                              const QString & orc_ApplicationName,
+                                                              const QString & orc_ApplicationStateIcon,
+                                                              const QString & orc_ApplicationState,
+                                                              const QString & orc_DeviceValidStatus,
+                                                              const QString & orc_DetailsPart, QString & orc_Content)
+{
+   QString c_NewContent;
+
+   //Heading
+   c_NewContent += "<h4>";
+   c_NewContent += static_cast<QString>("#%1 - %2 ").
+                   arg(ou32_ApplicationIndex + 1).arg(orc_ApplicationName);
+   c_NewContent += "</h4>";
+
+   //Content
+   c_NewContent += "<table>";
+   c_NewContent += "<tr>";
+   c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartMain;
+   c_NewContent += C_GtGetText::h_GetText("Status");
+   c_NewContent += "</td>";
+   c_NewContent += "<td><table><tr>";
+   c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartStatus;
+   c_NewContent += orc_ApplicationStateIcon + "</td><td>" +
+                   orc_ApplicationState + "</td>";
+   c_NewContent += "</tr></table></td>";
+   c_NewContent += "</tr>";
+   c_NewContent += "<tr>";
+   c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartMain;
+   c_NewContent += C_GtGetText::h_GetText("Signature");
+   c_NewContent += "</td>";
+   c_NewContent += "<td>" + orc_DeviceValidStatus + "</td>";
+   c_NewContent += "</tr>";
+   c_NewContent += "<tr>";
+   c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartMain;
+   c_NewContent += C_GtGetText::h_GetText("Summary");
+   c_NewContent += "</td>";
+   c_NewContent += "<td>";
+   c_NewContent += orc_DetailsPart;
+   c_NewContent += "</td>";
+   c_NewContent += "</tr>";
+   c_NewContent += "</table>";
+
+   orc_Content += c_NewContent;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Init data block table other section for node
+
+   \param[in]      orc_NodeInfo  Node info
+   \param[in,out]  orc_Content   Content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableOtherSectionForNode(const C_GiSvSubNodeData & orc_NodeInfo,
+                                                                           QString & orc_Content)
+{
+   QString c_NewContent;
+
+   //Other files (parameter set images or for file based targets any file)
+   if ((orc_NodeInfo.GetParamFileInfosCount() > 0UL) ||
+       (orc_NodeInfo.GetFileInfosCount() > 0UL))
+   {
+      c_NewContent += "<h4>";
+      c_NewContent += C_GtGetText::h_GetText("Other Files");
+      c_NewContent += "</h4>";
+      c_NewContent += "<table><tr>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartMain;
+      c_NewContent += C_GtGetText::h_GetText("Status");
+      c_NewContent += "</td>";
+      c_NewContent += "<td><table><tr>";
+      c_NewContent += C_SyvUpNodePropertiesDialog::mhc_HtmlCellTagStartStatus;
+      c_NewContent +=
+         "<img src=\"://images/system_views/IconUpdateWaiting.svg\"style=\"vertical-align: middle;\"/></td><td>";
+      c_NewContent += C_GtGetText::h_GetText("No status request supported. Update required.");
+      c_NewContent += "</td>";
+      c_NewContent += "</tr></table></td>";
+      c_NewContent += "</tr>";
+      c_NewContent += "</table>";
+   }
+   orc_Content += c_NewContent;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -640,29 +910,92 @@ void C_SyvUpNodePropertiesDialog::m_InitFlashloaderTable(void) const
 {
    QString c_Content = "<html><body>";
 
+   const std::vector<uint32> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+      this->mu32_NodeIndex);
+
+   tgl_assert(c_NodeIndices.size() == this->mc_NodeData.GetSubNodeCount());
+   if (c_NodeIndices.size() == this->mc_NodeData.GetSubNodeCount())
+   {
+      for (uint32 u32_ItDevice = 0UL; u32_ItDevice < c_NodeIndices.size(); ++u32_ItDevice)
+      {
+         const C_OSCNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndices[u32_ItDevice]);
+         const C_GiSvSubNodeData * const pc_SubDevice =
+            this->mc_NodeData.GetSubNodeByNodeIndex(c_NodeIndices[u32_ItDevice]);
+         tgl_assert((pc_Node != NULL) && (pc_SubDevice != NULL));
+         if ((pc_Node != NULL) && (pc_SubDevice != NULL))
+         {
+            C_SyvUpNodePropertiesDialog::mh_InitFlashloaderTableForNode(*pc_SubDevice,
+                                                                        c_Content, *pc_Node,
+                                                                        c_NodeIndices.size() > 1UL);
+         }
+      }
+   }
+   c_Content += "</body></html>";
+   this->mpc_Ui->pc_TextEditFlash->setHtml(c_Content);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Init flashloader table for node
+
+   \param[in]      orc_NodeInfo        Node info
+   \param[in,out]  orc_Content         Content
+   \param[in]      orc_Node            Node
+   \param[in]      oq_IsMultiDevice    Is multi device
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::mh_InitFlashloaderTableForNode(const C_GiSvSubNodeData & orc_NodeInfo,
+                                                                 QString & orc_Content, const C_OSCNode & orc_Node,
+                                                                 const bool oq_IsMultiDevice)
+{
+   QString c_NewContent;
+   const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
+
    stw_scl::C_SCLStringList c_List;
 
-   if (this->mpc_OSYDevice != NULL)
+   if (c_DeviceInfo.pc_OSYDevice != NULL)
    {
-      C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(*this->mpc_OSYDevice, c_List);
+      C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(*c_DeviceInfo.pc_OSYDevice, c_List);
    }
-   else if (this->mpc_STWDevice != NULL)
+   else if (c_DeviceInfo.pc_STWDevice != NULL)
    {
-      C_OSCSuSequences::h_StwFlashloaderInformationToText(*this->mpc_STWDevice, c_List);
+      C_OSCSuSequences::h_StwFlashloaderInformationToText(*c_DeviceInfo.pc_STWDevice, c_List);
    }
    else
    {
       //Unexpected
    }
-   c_Content += "<p>";
-   for (sint32 s32_ItString = 0; s32_ItString < c_List.Strings.GetLength(); ++s32_ItString)
+   if (c_List.Strings.GetLength() > 1)
    {
-      c_Content += static_cast<QString>(c_List.Strings[s32_ItString].c_str()) + "<br/>";
+      c_NewContent += "<p>";
+      for (sint32 s32_ItString = 0; s32_ItString < c_List.Strings.GetLength(); ++s32_ItString)
+      {
+         c_NewContent += static_cast<QString>(c_List.Strings[s32_ItString].c_str()) + "<br/>";
+      }
+      c_NewContent += "</p>";
    }
-   c_Content += "</p>";
+   C_SyvUpNodePropertiesDialog::mh_HandleSectionAppend(c_NewContent, orc_Content, orc_Node, oq_IsMultiDevice);
+}
 
-   c_Content += "</body></html>";
-   this->mpc_Ui->pc_TextEditFlash->setHtml(c_Content);
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle section append
+
+   \param[in]      orc_NewPart            New part
+   \param[in,out]  orc_CompleteSection    Complete section
+   \param[in]      orc_Node               Node
+   \param[in]      oq_IsMultiDevice       Is multi device
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpNodePropertiesDialog::mh_HandleSectionAppend(const QString & orc_NewPart, QString & orc_CompleteSection,
+                                                         const C_OSCNode & orc_Node, const bool oq_IsMultiDevice)
+{
+   if ((!orc_NewPart.isEmpty()) && (oq_IsMultiDevice))
+   {
+      orc_CompleteSection += "<h3>";
+      orc_CompleteSection += orc_Node.c_Properties.c_Name.c_str();
+      orc_CompleteSection += "</h3>";
+   }
+   orc_CompleteSection += orc_NewPart;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -672,8 +1005,7 @@ void C_SyvUpNodePropertiesDialog::m_InitFlashloaderTable(void) const
 void C_SyvUpNodePropertiesDialog::m_OnDiscard(void)
 {
    //Trigger changes
-   this->me_Status = C_SyvUtil::eI_TO_BE_UPDATED;
-   this->mq_Discarded = true;
+   this->mc_NodeData.DiscardInfo();
    m_ReInitStatus();
 }
 

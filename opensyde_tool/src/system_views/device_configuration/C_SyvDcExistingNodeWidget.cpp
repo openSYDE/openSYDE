@@ -16,10 +16,12 @@
 #include <QDragLeaveEvent>
 
 #include "stwerrors.h"
+#include "TGLUtils.h"
 #include "C_OgeWiUtil.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_SyvDcExistingNodeWidget.h"
 #include "ui_C_SyvDcExistingNodeWidget.h"
@@ -35,6 +37,8 @@ using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDcExistingNodeWidget::mhc_MimeData = "stw_opensyde_connected_node";
+const QString C_SyvDcExistingNodeWidget::mhc_MimeDataExtFormat = "stw_opensyde_connected_node_ext_format";
+const QString C_SyvDcExistingNodeWidget::mhc_MimeDataManufacturerFormat = "stw_opensyde_connected_node_manu_format";
 const QString C_SyvDcExistingNodeWidget::mhc_MimeDataDevice = "stw_opensyde_connected_node_device";
 const QString C_SyvDcExistingNodeWidget::mhc_MimeDataDeviceValid = "stw_opensyde_connected_node_device_valid";
 
@@ -62,7 +66,7 @@ C_SyvDcExistingNodeWidget::C_SyvDcExistingNodeWidget(QWidget * const opc_Parent)
    mpc_ListWidgetItem(NULL),
    mu32_ViewIndex(0),
    mu32_NodeIndex(0),
-   ms32_ItemIndex(-1)
+   mq_PartOfSquad(false)
 {
    mpc_Ui->setupUi(this);
 
@@ -100,7 +104,7 @@ C_SyvDcExistingNodeWidget::~C_SyvDcExistingNodeWidget(void)
 
    \param[in] ou32_ViewIndex     View index
    \param[in] ou32_NodeIndex     Node index
-   \param[in] os32_ItemIndex     Item index
+   \param[in] oq_PartOfSquad     Flag if node is part of a squad
    \param[in] opc_Item           List item
    \param[in] oq_ShowAssignment  Show assignment flag
 
@@ -110,23 +114,13 @@ C_SyvDcExistingNodeWidget::~C_SyvDcExistingNodeWidget(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcExistingNodeWidget::SetIndex(const stw_types::uint32 ou32_ViewIndex,
-                                           const stw_types::uint32 ou32_NodeIndex, const sint32 os32_ItemIndex,
+                                           const stw_types::uint32 ou32_NodeIndex, const bool oq_PartOfSquad,
                                            QListWidgetItem * const opc_Item, const bool oq_ShowAssignment)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
-
-   if (pc_Node != NULL)
-   {
-      this->mc_DeviceName = pc_Node->c_DeviceType.c_str();
-   }
-   else
-   {
-      this->mc_DeviceName = "";
-   }
-
+   this->mc_DeviceName = "";
    this->mu32_ViewIndex = ou32_ViewIndex;
    this->mu32_NodeIndex = ou32_NodeIndex;
-   this->ms32_ItemIndex = os32_ItemIndex;
+   this->mq_PartOfSquad = oq_PartOfSquad;
    this->mpc_ListWidgetItem = opc_Item;
    this->mpc_Ui->pc_GroupBoxSerialNumber->setVisible(oq_ShowAssignment);
 
@@ -149,24 +143,24 @@ bool C_SyvDcExistingNodeWidget::CompareIndex(const uint32 ou32_NodeIndex) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Do assiment for specified serial number
+/*! \brief   Do assignment for specified serial number
 
-   \param[in] orc_SerialNumber Serial number
+   \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcExistingNodeWidget::ConnectSerialNumber(const QString & orc_SerialNumber) const
+void C_SyvDcExistingNodeWidget::ConnectSerialNumber(const C_OSCProtocolSerialNumber & orc_SerialNumber) const
 {
    this->mpc_Ui->pc_WidgetSerialNumber->SetContent(true, orc_SerialNumber);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetSerialNumber, "Assigned", true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Disconnect assiment for specified  serial number
+/*! \brief   Disconnect assignment for specified  serial number
 
-   \param[in] orc_SerialNumber Serial number
+   \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcExistingNodeWidget::DisconnectSerialNumber(const QString & orc_SerialNumber) const
+void C_SyvDcExistingNodeWidget::DisconnectSerialNumber(const C_OSCProtocolSerialNumber & orc_SerialNumber) const
 {
    this->mpc_Ui->pc_WidgetSerialNumber->SetContent(false, orc_SerialNumber);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetSerialNumber, "Assigned", false);
@@ -193,29 +187,42 @@ bool C_SyvDcExistingNodeWidget::IsAssigned(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::AppendDeviceConfig(std::vector<C_SyvDcDeviceConfiguation> & orc_Configs) const
 {
-   C_SyvDcDeviceConfiguation c_Config;
-   const stw_scl::C_SCLString c_SerialNumber =
-      this->mpc_Ui->pc_WidgetSerialNumber->GetPureSerialNumber().toStdString().c_str();
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
-   C_SyvDcDeviceInformation::h_SerialNumberFromStringToArray(c_SerialNumber, &c_Config.au8_SerialNumber[0]);
-   if (((pc_Node != NULL) && (pc_View != NULL)) && (pc_View->GetPcData().GetConnected() == true))
+   if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
    {
-      for (uint32 u32_ItInterface = 0; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
-           ++u32_ItInterface)
+      C_SyvDcDeviceConfiguation c_Config;
+      C_OSCProtocolSerialNumber c_SerialNumber;
+
+      // Prepare the config for all sub nodes with the same serial number
+      this->mpc_Ui->pc_WidgetSerialNumber->GetContent(c_SerialNumber);
+      c_Config.c_SerialNumber = c_SerialNumber;
+
+      const uint32 u32_ConnectedBusIndex = pc_View->GetPcData().GetBusIndex();
+      std::vector<uint32> c_AllRelevantNodeIndexes;
+      uint32 u32_NodeCounter;
+
+      if (this->mq_PartOfSquad == false)
       {
-         const C_OSCNodeComInterfaceSettings & rc_CurInterface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
-         if ((rc_CurInterface.q_IsBusConnected == true) &&
-             (rc_CurInterface.u32_BusIndex == pc_View->GetPcData().GetBusIndex()))
-         {
-            //Append current ID
-            c_Config.c_NodeIds.push_back(rc_CurInterface.u8_NodeID);
-            //Append to overall vector
-            orc_Configs.push_back(c_Config);
-            //Stop on first find
-            break;
-         }
+         c_AllRelevantNodeIndexes.push_back(this->mu32_NodeIndex);
+      }
+      else
+      {
+         uint32 u32_NodeSquadIndex;
+         tgl_assert(C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(this->mu32_NodeIndex,
+                                                                                    u32_NodeSquadIndex) == C_NO_ERR);
+         const C_OSCNodeSquad * const pc_Squad = C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquad(u32_NodeSquadIndex);
+
+         // In case of a node squad, use all node indexes for all sub nodes
+         c_AllRelevantNodeIndexes = pc_Squad->c_SubNodeIndexes;
+      }
+
+      for (u32_NodeCounter = 0U; u32_NodeCounter < c_AllRelevantNodeIndexes.size(); ++u32_NodeCounter)
+      {
+         const uint32 u32_CurNodeIndex = c_AllRelevantNodeIndexes[u32_NodeCounter];
+
+         // c_Config must be handled as copy
+         mh_AppendDeviceConfigForNode(u32_CurNodeIndex, u32_ConnectedBusIndex, c_Config, orc_Configs);
       }
    }
 }
@@ -342,8 +349,9 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
       //Disconnect previous one
       if (this->mpc_Ui->pc_WidgetSerialNumber->IsAssigned() == true)
       {
-         Q_EMIT this->SigDisconnect(this->mu32_NodeIndex,
-                                    this->mpc_Ui->pc_WidgetSerialNumber->GetPureSerialNumber());
+         C_OSCProtocolSerialNumber c_SerialNumber;
+         this->mpc_Ui->pc_WidgetSerialNumber->GetContent(c_SerialNumber);
+         Q_EMIT (this->SigDisconnect(this->mu32_NodeIndex, c_SerialNumber));
       }
       if ((this->mc_DeviceName.compare(c_DroppedDevice) == 0) ||
           (c_DroppedDeviceValid == "0"))
@@ -352,13 +360,34 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
          // The device type can be invalid if at least two nodes are found with the same node it
          // In this case, it is not possible to read the device name
 
-         QString c_SerialNumber;
+         QString c_SerialNumberString;
+         C_OSCProtocolSerialNumber c_SerialNumber;
+         bool q_ExtFormat = false;
+         uint8 u8_ManufacturerFormat = 0U;
+
          //Connect new one
          if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeData) == true)
          {
-            c_SerialNumber = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeData);
+            c_SerialNumberString = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeData);
          }
-         Q_EMIT this->SigConnect(this->mu32_NodeIndex, c_SerialNumber);
+         if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeDataExtFormat) == true)
+         {
+            const QString c_ExtFormat = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataExtFormat);
+            q_ExtFormat = (c_ExtFormat == "1") ? true : false;
+         }
+         if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeDataManufacturerFormat) == true)
+         {
+            const QString c_ManuFormat = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataManufacturerFormat);
+            u8_ManufacturerFormat = static_cast<uint8>(c_ManuFormat.toInt());
+         }
+
+         // Rebuild the serial number class
+         // POS serial number will reversed in this function
+         c_SerialNumber.SetExtSerialNumber(c_SerialNumberString.toStdString().c_str(), u8_ManufacturerFormat);
+         // But it is not detectable if extended or not in this function for this scenario, so overwrite the flag
+         c_SerialNumber.q_ExtFormatUsed = q_ExtFormat;
+
+         Q_EMIT (this->SigConnect(this->mu32_NodeIndex, c_SerialNumber));
       }
       else
       {
@@ -393,51 +422,63 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
    sint32 s32_Return = C_NO_ERR;
 
-   if (((pc_Node != NULL) && (pc_View != NULL)) && (pc_View->GetPcData().GetConnected() == true))
+   if (((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) && (pc_View != NULL)) &&
+       (pc_View->GetPcData().GetConnected() == true))
    {
       QString c_Ids;
-      //Translation: 1: Node name
-      this->mpc_Ui->pc_LabelName->setText(static_cast<QString>(C_GtGetText::h_GetText("%1")).arg(
-                                             pc_Node->c_Properties.c_Name.c_str()));
+      const QString c_BaseName = C_PuiSdUtil::h_GetNodeBaseNameOrName(this->mu32_NodeIndex);
 
-      for (uint32 u32_ItInt = 0; u32_ItInt < pc_Node->c_Properties.c_ComInterfaces.size(); ++u32_ItInt)
+      //Translation: 1: Node name
+      this->mpc_Ui->pc_LabelName->setText(c_BaseName);
+
+      if (this->mq_PartOfSquad == false)
       {
-         const C_OSCNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInt];
-         if ((rc_Interface.q_IsBusConnected == true) &&
-             (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex()))
+         for (uint32 u32_ItInt = 0; u32_ItInt < pc_Node->c_Properties.c_ComInterfaces.size(); ++u32_ItInt)
          {
-            if (c_Ids.compare("") == 0)
+            const C_OSCNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInt];
+            if ((rc_Interface.GetBusConnected() == true) &&
+                (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex()))
             {
-               c_Ids += QString::number(rc_Interface.u8_NodeID);
-               if (rc_Interface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
+               if (c_Ids.compare("") == 0)
                {
-                  c_Ids += " / IP: ";
-                  c_Ids += C_Uti::h_IpAddressToString(rc_Interface.c_Ip.au8_IpAddress);
-               }
-            }
-            else
-            {
-               if (rc_Interface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
-               {
-                  c_Ids += static_cast<QString>(", Node-ID: %1").arg(rc_Interface.u8_NodeID);
-                  c_Ids += " / IP: ";
-                  c_Ids += C_Uti::h_IpAddressToString(rc_Interface.c_Ip.au8_IpAddress);
+                  c_Ids += QString::number(rc_Interface.u8_NodeID);
+                  if (rc_Interface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
+                  {
+                     c_Ids += " / IP: ";
+                     c_Ids += C_Uti::h_IpAddressToString(rc_Interface.c_Ip.au8_IpAddress);
+                  }
                }
                else
                {
-                  c_Ids += static_cast<QString>(", %1").arg(rc_Interface.u8_NodeID);
+                  if (rc_Interface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
+                  {
+                     c_Ids += static_cast<QString>(", Node-ID: %1").arg(rc_Interface.u8_NodeID);
+                     c_Ids += " / IP: ";
+                     c_Ids += C_Uti::h_IpAddressToString(rc_Interface.c_Ip.au8_IpAddress);
+                  }
+                  else
+                  {
+                     c_Ids += static_cast<QString>(", %1").arg(rc_Interface.u8_NodeID);
+                  }
+                  s32_Return = C_CONFIG;
                }
-               s32_Return = C_CONFIG;
             }
          }
+         //Translation: 1: Node ID
+         this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>(C_GtGetText::h_GetText("Node-ID: %1")).arg(c_Ids));
       }
-      //Translation: 1: Node ID
-      this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>(C_GtGetText::h_GetText("Node-ID: %1")).arg(c_Ids));
+      else
+      {
+         //In case of a node squad, no concrete node id or IP address will be showed
+         this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>(C_GtGetText::h_GetText("Node-ID: <multiple>")));
+      }
+
+      this->mc_DeviceName = pc_Node->pc_DeviceDefinition->GetDisplayName().c_str();
+
       //Translation: 1: Node type
-      this->mpc_Ui->pc_LabelDeviceType->setText(static_cast<QString>(C_GtGetText::h_GetText("Type: %1")).arg(pc_Node->
-                                                                                                             c_DeviceType
-                                                                                                             .
-                                                                                                             c_str()));
+      this->mpc_Ui->pc_LabelDeviceType->setText(
+         static_cast<QString>(C_GtGetText::h_GetText("Type: %1")).
+         arg(pc_Node->pc_DeviceDefinition->GetDisplayName().c_str()));
    }
    //Resize
    this->resize(this->width(), sn_Height);
@@ -459,9 +500,50 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward request disconnect serial number
+
+   \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcExistingNodeWidget::m_OnDisconnectRequest(const QString & orc_SerialNumber)
+void C_SyvDcExistingNodeWidget::m_OnDisconnectRequest(const C_OSCProtocolSerialNumber & orc_SerialNumber)
 {
-   Q_EMIT this->SigDisconnect(this->mu32_NodeIndex, orc_SerialNumber);
+   Q_EMIT (this->SigDisconnect(this->mu32_NodeIndex, orc_SerialNumber));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append all configs for this node
+
+   \param[in]     ou32_NodeIndex         Node index for current node configuration
+   \param[in]     ou32_ConnectedBusIndex Bus index of in the view connected bus
+   \param[in]     orc_Config             Current config as copy for node with set serial number
+   \param[in,out] orc_Configs            All configs
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDcExistingNodeWidget::mh_AppendDeviceConfigForNode(const uint32 ou32_NodeIndex,
+                                                             const uint32 ou32_ConnectedBusIndex,
+                                                             C_SyvDcDeviceConfiguation oc_NodeConfig,
+                                                             std::vector<C_SyvDcDeviceConfiguation> & orc_Configs)
+{
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      for (uint32 u32_ItInterface = 0U; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
+           ++u32_ItInterface)
+      {
+         const C_OSCNodeComInterfaceSettings & rc_CurInterface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
+         if ((rc_CurInterface.GetBusConnected() == true) &&
+             (rc_CurInterface.u32_BusIndex == ou32_ConnectedBusIndex))
+         {
+            // Set the sub node id. In case of a not multiple CPU it is always 0
+            oc_NodeConfig.u8_SubNodeId = static_cast<uint8>(pc_Node->u32_SubDeviceIndex);
+
+            //Append current ID
+            oc_NodeConfig.c_NodeIds.push_back(rc_CurInterface.u8_NodeID);
+            //Append to overall vector
+            orc_Configs.push_back(oc_NodeConfig);
+            //Stop on first find
+            break;
+         }
+      }
+   }
 }

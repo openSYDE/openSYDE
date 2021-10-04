@@ -95,22 +95,25 @@ private:
    void m_StartConfigProper(void);
    void m_ShowConfigResult(void);
    void m_BackToScan(void);
-   void m_ShowConfigInfoOfDevice(const stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation & orc_Config,
+   void m_ShowConfigInfoOfDevice(const std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> & orc_Config,
                                  const stw_types::uint32 ou32_DeviceMaxCount,
                                  const stw_types::uint32 ou32_DeviceCounter, QString & orc_Text);
    void m_ShowConfigInfoOfCanInterface(const stw_opensyde_core::C_OSCNodeComInterfaceSettings & orc_IntfSetting,
                                        const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
-                                       const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus, const stw_types::uint32 ou32_Bitrate, QString & orc_Text);
+                                       const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus, const stw_types::uint32 ou32_Bitrate, const bool oq_SingleNodeOrFirstSubNode, const bool oq_NodeSquad, const QString & orc_SubNodeName, QString & orc_Text);
    void m_ShowConfigInfoOfEthInterface(const stw_opensyde_core::C_OSCNodeComInterfaceSettings & orc_IntfSetting,
                                        const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
-                                       const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus, const stw_opensyde_core::C_OSCNodeComInterfaceSettings::C_IpAddress & orc_IpAddress, QString & orc_Text);
+                                       const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus, const stw_opensyde_core::C_OSCNodeComInterfaceSettings::C_IpAddress & orc_IpAddress, const bool oq_SingleNodeOrFirstSubNode, const bool oq_NodeSquad, const QString & orc_SubNodeName, QString & orc_Text);
    void m_ShowConfigInfoOfInterface(const stw_opensyde_core::C_OSCNodeComInterfaceSettings & orc_IntfSetting,
                                     const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
                                     const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
-                                    QString & orc_Text, const bool oq_BusConnected, const bool oq_Configured);
+                                    const bool oq_SingleNodeOrFirstSubNode, const bool oq_NodeSquad,
+                                    const QString & orc_SubNodeName, QString & orc_Text, const bool oq_BusConnected,
+                                    const bool oq_Configured);
    void m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate);
    stw_types::sint32 m_GetRelevantConfigInfo(
       std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
+      std::vector<bool> & orc_OpenSydeSnrExtFormat,
       std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_StwIds, stw_types::uint32 & oru32_Bitrate);
    void m_ResetNetwork(const bool oq_ToFlashloader);
    void m_ShowReadInfo(const stw_types::sint32 os32_ActualResult);
@@ -146,8 +149,10 @@ private:
    void m_OnDeviceConfigModeChanged(void) const;
    stw_types::sint32 m_GetBitRateValue(stw_types::uint32 & oru32_Value) const;
 
-   void m_AssignmentConnect(const stw_types::uint32 ou32_NodeIndex, const QString & orc_SerialNumber) const;
-   void m_AssignmentDisconnect(const stw_types::uint32 ou32_NodeIndex, const QString & orc_SerialNumber) const;
+   void m_AssignmentConnect(const stw_types::uint32 ou32_NodeIndex,
+                            const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
+   void m_AssignmentDisconnect(const stw_types::uint32 ou32_NodeIndex,
+                               const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
    void m_AssignmentUpdateProgress(void) const;
 
    void m_Timer(void);

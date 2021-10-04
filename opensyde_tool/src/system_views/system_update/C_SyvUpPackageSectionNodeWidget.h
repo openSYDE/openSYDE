@@ -46,7 +46,7 @@ public:
 
    void InitWidget(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_PositionNumber,
                    const stw_types::uint32 ou32_NodeIndex, const QString & orc_NodeName,
-                   const stw_types::uint32 ou32_SectionNumber);
+                   const stw_types::uint32 ou32_SectionNumber, const stw_types::uint32 ou32_DataBlockPathNumber);
    void InitStaticNames(void);
 
    void SetConnected(void);
@@ -118,9 +118,10 @@ protected:
    QString mc_DeviceType;
    bool mq_FileBased;
    bool mq_StwFlashloader;
-   stw_types::uint32 mu32_FileCount;         // Count of all files
-   stw_types::uint32 mu32_PrimaryFileCount;  // Count of all section specific files without param set files
-   stw_types::uint32 mu32_ParamSetFileCount; // Count of all param set files in the section
+   stw_types::uint32 mu32_FileCount;           // Count of all files
+   stw_types::uint32 mu32_PrimaryFileCount;    // Count of all section specific files without param set files
+   stw_types::uint32 mu32_ParamSetFileCount;   // Count of all param set files in the section
+   stw_types::uint32 mu32_DataBlockPathNumber; // Index of Data Block path
    QString mc_Title;
    bool mq_ShowAddButton;
 

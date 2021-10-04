@@ -43,6 +43,7 @@ font-weight: normal;
 
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_12 */
+stw_opensyde_gui--C_NagTopTreeView,
 stw_opensyde_gui_elements--C_OgeTedToolTipContent,
 stw_opensyde_gui_elements--C_OgePubNavigationHover,
 stw_opensyde_gui_elements--C_OgeLabUpdateAppTitle,
@@ -248,7 +249,6 @@ stw_opensyde_gui_elements--C_OgeRabCheckBox,
 stw_opensyde_gui_elements--C_OgeLabListHeader,
 stw_opensyde_gui_elements--C_OgePubZoomNotification,
 stw_opensyde_gui_elements--C_OgeLabProgressText,
-stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab,
 stw_opensyde_gui_elements--C_OgeLabListHeaderHeading,
 stw_opensyde_gui_elements--C_OgeLeListHeader,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="16"][SemiBold="false"][Bold="false"],
@@ -267,6 +267,7 @@ stw_opensyde_gui_elements--C_OgeLabReadSub,
 stw_opensyde_gui_elements--C_OgePubProjAction,
 stw_opensyde_gui_elements--C_OgeLabUpdateNodeTitle,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="16"][SemiBold="true"][Bold="false"],
+/*stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab,*/
 stw_opensyde_gui_elements--C_OgeLabDashboardTab
 {
 font-family: "Segoe UI Semibold";

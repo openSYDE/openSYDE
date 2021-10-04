@@ -37,18 +37,15 @@ using namespace std;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out]  opc_Scene                 Pointer to currently active scene
-   \param[in]      orc_IDs                   Affected unique IDs
-   \param[in]      oru64_StartingItemID      Initial item ID
-   \param[in]      oru64_LastItemID          New item ID
-   \param[in]      orc_ConnectionPos         Event position
-   \param[in]      ors32_Interface           Interface to connect to
-   \param[in]      oru8_NodeId               New node id
-   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
-   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
-   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
-   \param[in]      orc_Description           Undo step description
-   \param[in,out]  opc_Parent                Optional pointer to parent
+   \param[in,out]  opc_Scene              Pointer to currently active scene
+   \param[in]      orc_IDs                Affected unique IDs
+   \param[in]      oru64_StartingItemID   Initial item ID
+   \param[in]      oru64_LastItemID       New item ID
+   \param[in]      orc_ConnectionPos      Event position
+   \param[in]      ors32_Interface        Interface to connect to
+   \param[in]      orc_NodeIds            Node ids
+   \param[in]      orc_Description        Undo step description
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyReconnectBaseCommand::C_SdManUnoTopologyReconnectBaseCommand(QGraphicsScene * const opc_Scene,
@@ -57,10 +54,7 @@ C_SdManUnoTopologyReconnectBaseCommand::C_SdManUnoTopologyReconnectBaseCommand(Q
                                                                                const uint64 & oru64_LastItemID,
                                                                                const QPointF & orc_ConnectionPos,
                                                                                const sint32 & ors32_Interface,
-                                                                               const uint8 & oru8_NodeId,
-                                                                               const bool oq_ActivateDatapoolL2,
-                                                                               const bool oq_ActivateDatapoolECeS,
-                                                                               const bool oq_ActivateDatapoolECoS,
+                                                                               const std::vector<uint8> & orc_NodeIds,
                                                                                const QString & orc_Description,
                                                                                QUndoCommand * const opc_Parent) :
    C_SebUnoBaseCommand(opc_Scene, orc_IDs, orc_Description, opc_Parent),
@@ -69,11 +63,8 @@ C_SdManUnoTopologyReconnectBaseCommand::C_SdManUnoTopologyReconnectBaseCommand(Q
    mc_ConnectionPos(orc_ConnectionPos),
    ms32_Interface(ors32_Interface),
    mu8_InitialInterface(255U),
-   mu8_NodeId(oru8_NodeId),
-   mu8_InitialNodeId(0),
-   mq_ActivateDatapoolL2(oq_ActivateDatapoolL2),
-   mq_ActivateDatapoolECeS(oq_ActivateDatapoolECeS),
-   mq_ActivateDatapoolECoS(oq_ActivateDatapoolECoS),
+   mc_NodeIds(orc_NodeIds),
+   mc_InitialNodeIds(),
    mq_Merged(false)
 {
 }
@@ -93,8 +84,7 @@ C_SdManUnoTopologyReconnectBaseCommand::~C_SdManUnoTopologyReconnectBaseCommand(
 void C_SdManUnoTopologyReconnectBaseCommand::undo(void)
 {
    m_Reconnect(this->mu64_LastItemID, this->mu64_StartingItemID, static_cast<sint32>(this->mu8_InitialInterface),
-               this->mu8_InitialNodeId, this->mq_ActivateDatapoolL2, this->mq_ActivateDatapoolECeS,
-               this->mq_ActivateDatapoolECoS);
+               this->mc_InitialNodeIds);
    QUndoCommand::undo();
 }
 
@@ -104,8 +94,7 @@ void C_SdManUnoTopologyReconnectBaseCommand::undo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyReconnectBaseCommand::redo(void)
 {
-   m_Reconnect(this->mu64_StartingItemID, this->mu64_LastItemID, this->ms32_Interface, this->mu8_NodeId,
-               this->mq_ActivateDatapoolL2, this->mq_ActivateDatapoolECeS, this->mq_ActivateDatapoolECoS);
+   m_Reconnect(this->mu64_StartingItemID, this->mu64_LastItemID, this->ms32_Interface, this->mc_NodeIds);
    QUndoCommand::redo();
 }
 

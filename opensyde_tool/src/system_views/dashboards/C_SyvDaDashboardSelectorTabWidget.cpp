@@ -70,7 +70,7 @@ C_SyvDaDashboardSelectorTabWidget::C_SyvDaDashboardSelectorTabWidget(QWidget * c
    this->mpc_PushButton->SetIconSize(24);
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_PushButton->setIcon(QIcon(C_SyvDaDashboardSelectorTabWidget::mhc_AddIconLight));
-   this->mpc_PushButton->SetToolTipInformation(C_GtGetText::h_GetText(""),
+   this->mpc_PushButton->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
                                                C_GtGetText::h_GetText("Add new Dashboard tab."));
    connect(this->mpc_PushButton, &QPushButton::clicked, this, &C_SyvDaDashboardSelectorTabWidget::m_OnAddClicked);
 

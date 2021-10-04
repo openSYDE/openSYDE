@@ -257,6 +257,8 @@ bool C_SdNdeHalcChannelCopyPaste::mh_CheckSelectedChannels(const uint32 ou32_Nod
 {
    bool q_Return = false;
 
+   orq_ChannelCase = false;
+
    if (orc_HalcConfig.c_Domains.size() == 1)
    {
       const C_OSCHalcConfigStandaloneDomain & rc_Domain = orc_HalcConfig.c_Domains[0];

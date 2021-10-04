@@ -486,9 +486,11 @@ float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Convert serial number array to string
+/*! \brief  Convert POS serial number array to string
 
-   Support of two serial number formats:
+   Converting the POS (Plain Old Serial) STW format in form of 6 BCD coded bytes to a string.
+
+   Support of two serial number variants of the formats:
       1: format up to and including 2019. E.g: 05.123456.1001
       2: format from 2020. E.g: 200012345678
 
@@ -498,7 +500,7 @@ float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 o
    serial number string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCUtils::h_SerialNumberToString(const uint8 * const opu8_SerialNumber)
+C_SCLString C_OSCUtils::h_PosSerialNumberToString(const uint8 * const opu8_SerialNumber)
 {
    C_SCLString c_Result;
 
@@ -517,6 +519,51 @@ C_SCLString C_OSCUtils::h_SerialNumberToString(const uint8 * const opu8_SerialNu
          c_Result.PrintFormatted("%02X%02X%02X%02X%02X%02X",
                                  opu8_SerialNumber[0], opu8_SerialNumber[1], opu8_SerialNumber[2], opu8_SerialNumber[3],
                                  opu8_SerialNumber[4], opu8_SerialNumber[5]);
+      }
+   }
+
+   return c_Result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert FSN serial number raw string to a formatted string
+
+   Converting the FSN (Flexible Serial Number) format in form of the defined ou8_ManufacturerFormat
+   orc_RawSerialNumber must have at least one byte and the maximum length is 29 byte
+
+   \param[in]  ou8_ManufacturerFormat    Manufacturer format which defines the type of serial number:
+                                         0:      STW POS format
+                                         1..255: reserved
+   \param[in]  orc_RawSerialNumber       Unedited raw serial number
+
+   \retval   string        formatted serial number string
+   \retval   empty string  if length of orc_RawSerialNumber does not match the expectations
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCUtils::h_FsnSerialNumberToString(const stw_types::uint8 ou8_ManufacturerFormat,
+                                                  const stw_scl::C_SCLString & orc_RawSerialNumber)
+{
+   C_SCLString c_Result;
+
+   if ((orc_RawSerialNumber.Length() > 0) &&
+       (orc_RawSerialNumber.Length() <= 29))
+   {
+      if (ou8_ManufacturerFormat == 0U)
+      {
+         // Must match exactly
+         if (orc_RawSerialNumber.Length() == 6)
+         {
+            // STW POS format
+            //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?&
+            // anyway
+            c_Result = C_OSCUtils::h_PosSerialNumberToString(
+               reinterpret_cast<const uint8 *>(orc_RawSerialNumber.c_str()));
+         }
+      }
+      else
+      {
+         // No concrete formats defined yet
+         c_Result = orc_RawSerialNumber;
       }
    }
 

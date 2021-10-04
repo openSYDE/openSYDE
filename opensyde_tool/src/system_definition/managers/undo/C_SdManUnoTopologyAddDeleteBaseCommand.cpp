@@ -14,10 +14,12 @@
 
 #include <limits>
 #include "stwtypes.h"
+#include "stwerrors.h"
 #include "C_SdManUnoTopologyAddDeleteBaseCommand.h"
 #include "C_SebUtil.h"
 #include "C_GiNode.h"
 #include "C_GiLiBus.h"
+#include "C_PuiSdUtil.h"
 #include "C_GiLiBusConnector.h"
 #include "C_GiBiArrow.h"
 #include "C_GiBiBoundary.h"
@@ -30,6 +32,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
+using namespace stw_errors;
 using namespace stw_tgl;
 using namespace std;
 using namespace stw_opensyde_gui_logic;
@@ -51,11 +54,11 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Scene               Pointer to currently active scene
-   \param[in]     orc_IDs                 Affected unique IDs
-   \param[in]     orc_Text                Command description
-   \param[in,out] opc_Parent              Optional pointer to parent
-   \param[in]     orc_InitialSnapshotData Initial snapshot data
+   \param[in,out]  opc_Scene                 Pointer to currently active scene
+   \param[in]      orc_IDs                   Affected unique IDs
+   \param[in]      orc_Text                  Command description
+   \param[in,out]  opc_Parent                Optional pointer to parent
+   \param[in]      orc_InitialSnapshotData   Initial snapshot data
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddDeleteBaseCommand::C_SdManUnoTopologyAddDeleteBaseCommand(QGraphicsScene * const opc_Scene,
@@ -79,9 +82,9 @@ C_SdManUnoTopologyAddDeleteBaseCommand::~C_SdManUnoTopologyAddDeleteBaseCommand(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Filter all relevant objects
 
-   \param[in]  orc_AllItems         All available items
-   \param[in]  orc_SelectedItems    All selected items
-   \param[out] orc_AllRelevantItems Filtered items
+   \param[in]   orc_AllItems           All available items
+   \param[in]   orc_SelectedItems      All selected items
+   \param[out]  orc_AllRelevantItems   Filtered items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::h_GetAllRelevantObjects(const QList<QGraphicsItem *> & orc_AllItems,
@@ -208,7 +211,7 @@ sint32 C_SdManUnoTopologyAddDeleteBaseCommand::m_GetTextElementType(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply position offset
 
-   \param[in] orc_NewPos Offset
+   \param[in]  orc_NewPos  Offset
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_SetDataPositionOffset(const QPointF & orc_NewPos)
@@ -219,7 +222,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SetDataPositionOffset(const QPoin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply Z value offset
 
-   \param[in] of64_HighestUsedZValue Highest used Z value
+   \param[in]  of64_HighestUsedZValue  Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_SetDataZOffset(const float64 of64_HighestUsedZValue)
@@ -230,10 +233,10 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SetDataZOffset(const float64 of64
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add all busses which are under influence of the selected node or bus
 
-   \param[in]  orc_AllItems         All available items
-   \param[in]  oru32_BusIndex       Bus index
-   \param[in]  oru32_NodeIndex      Node index
-   \param[out] orc_AllRelevantItems Filtered items
+   \param[in]   orc_AllItems           All available items
+   \param[in]   ors32_BusIndex         Bus index
+   \param[in]   ors32_NodeIndex        Node index
+   \param[out]  orc_AllRelevantItems   Filtered items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::mh_SearchAndAddAllAffectedBusConnectorsToTheFront(
@@ -274,9 +277,9 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::mh_SearchAndAddAllAffectedBusConnec
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add all busses which are under influence of the selected node or bus
 
-   \param[in]  orc_AllItems         All available items
-   \param[in]  ou32_BusIndex        Unique bus index
-   \param[out] orc_AllRelevantItems Filtered items
+   \param[in]   orc_AllItems           All available items
+   \param[in]   ou32_BusIndex          Unique bus index
+   \param[out]  orc_AllRelevantItems   Filtered items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::mh_SearchAndAddAllAffectedBusTextElementsToTheFront(
@@ -314,6 +317,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
    C_GiTextElementBus * pc_TextElementBus;
    C_PuiSdDataElement * pc_Data;
    C_GiUnique * pc_Unique;
+   uint32 u32_NodeCounter = 0UL;
 
    QMap<uint32, uint32> c_MapOldIndexToNewIndex;
 
@@ -343,30 +347,8 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
 
                //Backup scene data internally
                //Node
-
-               pc_Node = dynamic_cast<C_GiNode *>(*c_ItRelatedItem);
-               if (pc_Node != NULL)
-               {
-                  const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_Index);
-                  const C_PuiSdNode * const pc_UINode = C_PuiSdHandler::h_GetInstance()->GetUINode(u32_Index);
-                  if (pc_OSCNode != NULL)
-                  {
-                     this->mc_DataBackup.c_OSCNodes.push_back(*pc_OSCNode);
-                  }
-                  if (pc_UINode != NULL)
-                  {
-                     this->mc_DataBackup.c_UINodes.push_back(*pc_UINode);
-                  }
-                  if (this->mc_DataBackup.c_OSCNodes.size() == this->mc_DataBackup.c_UINodes.size())
-                  {
-                     this->mc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::
-                                                                                                    E_Type::eNODE),
-                                                                                this->mc_DataBackup.c_UINodes.size()
-                                                                                -
-                                                                                1UL),
-                                                         u64_CurUniqueID);
-                  }
-               }
+               this->m_SaveToDataNode(dynamic_cast<C_GiNode *>(*c_ItRelatedItem), u32_Index, u64_CurUniqueID,
+                                      u32_NodeCounter);
                //Bus
 
                pc_Bus = dynamic_cast<C_GiLiBus *>(*c_ItRelatedItem);
@@ -491,8 +473,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
       {
          C_OSCNodeComInterfaceSettings & rc_CurInterface =
             rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
-         rc_CurInterface.q_IsBusConnected = false;
-         rc_CurInterface.u32_BusIndex = 0;
+         rc_CurInterface.RemoveConnection();
       }
       rc_UINode.c_UIBusConnections.clear();
    }
@@ -504,6 +485,96 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
       rc_BusTextElement.u32_BusIndex = c_MapOldIndexToNewIndex.value(rc_BusTextElement.u32_BusIndex,
                                                                      std::numeric_limits<uint32>::max());
       tgl_assert(rc_BusTextElement.u32_BusIndex != std::numeric_limits<uint32>::max());
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save to data, node
+
+   \param[in]   opc_UiNodeItem      UI node item
+   \param[in]   ou32_NodeIndex      Node index
+   \param[in]   ou64_UniqueID       Unique ID
+   \param[out]  oru32_NodeCounter   Node counter
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToDataNode(const C_GiNode * const opc_UiNodeItem,
+                                                              const uint32 ou32_NodeIndex, const uint64 ou64_UniqueID,
+                                                              uint32 & oru32_NodeCounter)
+{
+   if (opc_UiNodeItem != NULL)
+   {
+      const bool q_IsMulti = C_OSCNodeSquad::h_CheckIsMultiDevice(ou32_NodeIndex,
+                                                                  C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_NodeSquads);
+      if (q_IsMulti)
+      {
+         this->m_SaveToDataMultiNode(ou32_NodeIndex);
+      }
+      else
+      {
+         const C_OSCNode * const pc_OSCNode =
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+         const C_PuiSdNode * const pc_UINode =
+            C_PuiSdHandler::h_GetInstance()->GetUINode(ou32_NodeIndex);
+         if (pc_OSCNode != NULL)
+         {
+            this->mc_DataBackup.c_OSCNodes.push_back(*pc_OSCNode);
+         }
+         if (pc_UINode != NULL)
+         {
+            this->mc_DataBackup.c_UINodes.push_back(*pc_UINode);
+         }
+      }
+      if (this->mc_DataBackup.c_OSCNodes.size() == this->mc_DataBackup.c_UINodes.size())
+      {
+         this->mc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(
+                                                                       C_PuiSdDataElement::
+                                                                       E_Type::eNODE), oru32_NodeCounter),
+                                             ou64_UniqueID);
+      }
+      ++oru32_NodeCounter;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save to data, multi node
+
+   \param[in]  ou32_NodeIndex    Node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToDataMultiNode(const uint32 ou32_NodeIndex)
+{
+   uint32 u32_GroupIndex;
+
+   if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(ou32_NodeIndex,
+                                                                       u32_GroupIndex) == C_NO_ERR)
+   {
+      const C_OSCNodeSquad * const pc_Group = C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(
+         u32_GroupIndex);
+      if (pc_Group != NULL)
+      {
+         const std::vector<uint32> c_Indices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+            ou32_NodeIndex);
+         C_OSCNodeSquad c_Group = *pc_Group;
+         c_Group.c_SubNodeIndexes.clear();
+         c_Group.c_SubNodeIndexes.reserve(c_Indices.size());
+         for (uint32 u32_ItNode = 0UL; u32_ItNode < c_Indices.size(); ++u32_ItNode)
+         {
+            const C_OSCNode * const pc_OSCNode =
+               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_Indices[u32_ItNode]);
+            const C_PuiSdNode * const pc_UINode =
+               C_PuiSdHandler::h_GetInstance()->GetUINode(c_Indices[u32_ItNode]);
+            c_Group.c_SubNodeIndexes.push_back(this->mc_DataBackup.c_OSCNodes.size());
+            if (pc_OSCNode != NULL)
+            {
+               this->mc_DataBackup.c_OSCNodes.push_back(*pc_OSCNode);
+            }
+            if (pc_UINode != NULL)
+            {
+               this->mc_DataBackup.c_UINodes.push_back(*pc_UINode);
+            }
+         }
+         this->mc_DataBackup.c_OSCNodeGroups.push_back(c_Group);
+      }
    }
 }
 

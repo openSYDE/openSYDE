@@ -2092,7 +2092,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::mh_GetNodeIndexesMatchingForMessage(
          const C_OSCNodeComInterfaceSettings & rc_ComInterface =
             pc_OrgNode->c_Properties.c_ComInterfaces[orc_MessageId.u32_InterfaceIndex];
          //Step 2: Find all other nodes and interfaces (if connected)
-         if ((rc_ComInterface.q_IsBusConnected == true) &&
+         if ((rc_ComInterface.GetBusConnected() == true) &&
              (pc_MessageContainer->q_IsComProtocolUsedByInterface == true))
          {
             C_PuiSdNodeCanMessageSyncManager::h_GetConnectedAndActiveInterfaces(rc_ComInterface.u32_BusIndex,
@@ -2450,7 +2450,7 @@ void C_PuiSdNodeCanMessageSyncManager::mh_Init(const uint32 & oru32_NodeIndex, c
                const C_OSCNodeComInterfaceSettings & rc_Interface =
                   pc_Node->c_Properties.c_ComInterfaces[oru32_InterfaceIndex];
                if ((rc_MessageContainer.q_IsComProtocolUsedByInterface == false) ||
-                   (rc_Interface.q_IsBusConnected == false))
+                   (rc_Interface.GetBusConnected() == false))
                {
                   C_OSCCanMessageIdentificationIndices c_MessageId(oru32_NodeIndex, ore_ComProtocol,
                                                                    oru32_InterfaceIndex, pc_Protcol->u32_DataPoolIndex,

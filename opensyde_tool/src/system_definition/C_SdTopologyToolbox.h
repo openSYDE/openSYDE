@@ -68,12 +68,12 @@ private:
    void m_FillToolboxStatic(void);
    void m_FillToolboxWithDynamicNodes(const stw_opensyde_core::C_OSCDeviceDefinition & orc_Device);
    void m_IconClearAllClicked(void);
-   void m_ErrorHandlingUserFeedback(const QStringList & orc_Errors, const QStringList & orc_PathGood,
-                                    const QStringList & orc_PathFail);
+   void m_ErrorHandlingUserFeedback(const QStringList & orc_Errors, const stw_types::sintn & orsn_AddDeviceCount,
+                                    const stw_types::sintn & orsn_DeviceCount);
    void m_FileBrowseDialog(void);
    void m_LoadUserDeviceDefinitionPaths(const QString & orc_Path, QStringList & orc_UserDeviceDefPaths,
-                                        QStringList & orc_Errors) const;
-   void m_AddUserNodesToIni (const QStringList & orc_UserDeviceDefPaths, QStringList & orc_Errors);
+                                        QStringList & orc_Errors, stw_types::sintn & orsn_DeviceCount) const;
+   stw_types::sintn m_AddUserNodesToIni (const QStringList & orc_UserDeviceDefPaths, QStringList & orc_Errors);
    void m_AddUserNodesToToolbox(void);
 
    stw_types::sint32 m_DeleteUserNode(const QPoint & orc_Pos);

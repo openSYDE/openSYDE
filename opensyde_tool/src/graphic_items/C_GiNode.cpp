@@ -82,11 +82,11 @@ const float64 C_GiNode::mhaf64_ScaleMinHeightNode[7] =
 
    Set up GUI with all elements.
 
-   \param[in]       ors32_Index          Index of data element in system definition
-   \param[in]       oru64_ID             Unique ID
-   \param[in]       orf64_Width          Width of node
-   \param[in]       orf64_Height         Height of node
-   \param[in,out]   opc_Parent           Optional pointer to parent
+   \param[in]      ors32_Index   Index of data element in system definition
+   \param[in]      oru64_ID      Unique ID
+   \param[in]      orf64_Width   Width of node
+   \param[in]      orf64_Height  Height of node
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiNode::C_GiNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const float64 & orf64_Width,
@@ -100,18 +100,38 @@ C_GiNode::C_GiNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const fl
    ms32_IconSize(24)
 {
    QString c_Name = "Node";
+   uint32 u32_SubNodesCount = 0;
+   uint32 u32_NodeSquadIndex;
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->ms32_Index);
 
    if (pc_Node != NULL)
    {
-      c_Name = pc_Node->c_Properties.c_Name.c_str();
+      c_Name = C_PuiSdUtil::h_GetNodeBaseNameOrName(this->ms32_Index);
+
+      //is part of squad?
+      if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(this->ms32_Index,
+                                                                          u32_NodeSquadIndex) == C_NO_ERR)
+      {
+         //squad node
+         const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_NodeSquadIndex);
+         if (pc_NodeSquad != NULL)
+         {
+            u32_SubNodesCount = static_cast<uint32>(pc_NodeSquad->c_SubNodeIndexes.size());
+         }
+      }
+      else
+      {
+         //no squad node
+         u32_SubNodesCount = 0;
+      }
    }
 
    //create boundary
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Boundary = new C_GiNodeBoundary(c_Name, std::max(mhf64_MinWidthNode, orf64_Width),
-                                             std::max(mhf64_MinHeightNode, orf64_Height));
+                                             std::max(mhf64_MinHeightNode, orf64_Height), u32_SubNodesCount);
    this->m_DetectIconSize();
 
    // Notify the base class about the boundary as biggest item as orientation. Very important!
@@ -378,8 +398,8 @@ C_GiNode::~C_GiNode()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Find closest point in shape to scene position
 
-   \param[in]  orc_ScenePoint Scene position
-   \param[out] orc_Closest    Closest point in shape
+   \param[in]   orc_ScenePoint   Scene position
+   \param[out]  orc_Closest      Closest point in shape
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
@@ -404,8 +424,8 @@ void C_GiNode::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Cl
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Find closest port in shape to scene position
 
-   \param[in]  orc_ScenePoint Scene position
-   \param[out] orpc_Closest   Closest port in shape
+   \param[in]   orc_ScenePoint   Scene position
+   \param[out]  orpc_Closest     Closest port in shape
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::FindClosestPort(const QPointF & orc_ScenePoint, C_GiPort * (&orpc_Closest)) const
@@ -440,7 +460,7 @@ sintn C_GiNode::type() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if node has at least one connection of this bus type
 
-   \param[in] oe_Type   Bus type
+   \param[in]  oe_Type  Bus type
 
    \return
    true     Node has connection of this type
@@ -487,8 +507,8 @@ bool C_GiNode::CheckConnectionAvailable(const C_OSCSystemBus::E_Type & ore_Type)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if the specified interface is available
 
-   \param[in] ore_Type       Bus type
-   \param[in] oru8_Interface Interface number
+   \param[in]  ore_Type          Bus type
+   \param[in]  oru8_Interface    Interface number
 
    \retval  true   interface available
    \retval  false  interface not available
@@ -508,7 +528,7 @@ bool C_GiNode::CheckInterfaceAvailable(const C_OSCSystemBus::E_Type & ore_Type, 
                                                                                                              oru8_Interface);
          if (pc_ComInterface != NULL)
          {
-            q_Retval = !pc_ComInterface->q_IsBusConnected;
+            q_Retval = !pc_ComInterface->GetBusConnectedRawValue();
          }
       }
    }
@@ -518,7 +538,7 @@ bool C_GiNode::CheckInterfaceAvailable(const C_OSCSystemBus::E_Type & ore_Type, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get index of specified connection
 
-   \param[in]   opc_Connection   Connection
+   \param[in]  opc_Connection    Connection
 
    \return
    index of specified connection
@@ -544,7 +564,7 @@ sint32 C_GiNode::GetIndexOfConnector(const C_GiLiBusConnector * const opc_Connec
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data node
 
-   \param[out]   orpc_Node   Node
+   \param[out]  orpc_Node  Node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::GetOSCNodeConst(const C_OSCNode * (&orpc_Node)) const
@@ -564,7 +584,7 @@ void C_GiNode::RestoreDefaultCursor(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Change mouse cursor temporarily
 
-   \param[in] orc_TemporaryCursor New mouse cursor
+   \param[in]  orc_TemporaryCursor  New mouse cursor
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::SetTemporaryCursor(const QCursor & orc_TemporaryCursor)
@@ -592,8 +612,7 @@ void C_GiNode::GenerateHint(void)
 
       if (pc_Node != NULL)
       {
-         const C_OSCDeviceDefinition * const pc_Device =
-            C_OSCSystemDefinition::hc_Devices.LookForDevice(pc_Node->c_DeviceType.c_str());
+         const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
          if (pc_Device != NULL)
          {
             bool q_Found;
@@ -601,11 +620,10 @@ void C_GiNode::GenerateHint(void)
             QString c_Entry;
             QString c_BusName;
             QString c_Title;
-            QString c_EnabledString;
             //Translation: 1 = bus name
             //tooltip title
             c_Title = this->GetText();
-            c_Title.append(static_cast<QString>(" (Type: %1)").arg(pc_Node->c_DeviceType.c_str()));
+            c_Title.append(static_cast<QString>(" (Type: %1)").arg(pc_Node->pc_DeviceDefinition->c_DeviceName.c_str()));
             this->SetDefaultToolTipHeading(c_Title);
 
             //comment
@@ -633,7 +651,7 @@ void C_GiNode::GenerateHint(void)
                      {
                         if (rc_Conn.u8_InterfaceNumber == u8_ItInterface)
                         {
-                           if (rc_Conn.q_IsBusConnected == true)
+                           if (rc_Conn.GetBusConnectedRawValue() == true)
                            {
                               const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
                                  rc_Conn.u32_BusIndex);
@@ -644,47 +662,9 @@ void C_GiNode::GenerateHint(void)
                                  //Bus + Node Id Info
                                  if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
                                  {
-                                    c_BusName.append(static_cast<QString>(" (Node ID: %1, Bitrate: %2 kbit/s);").
-                                                     arg(QString::number(rc_Conn.u8_NodeID),
-                                                         QString::number(pc_Bus->u64_BitRate / 1000ULL)));
+                                    c_BusName.append(static_cast<QString>(" (Bitrate: %1 kbit/s)").
+                                                     arg(QString::number(pc_Bus->u64_BitRate / 1000ULL)));
                                  }
-                                 else
-                                 {
-                                    c_BusName.append(static_cast<QString>(" (Node ID: %1);").arg(QString::number(rc_Conn
-                                                                                                                 .
-                                                                                                                 u8_NodeID)));
-                                 }
-
-                                 //Update enabled?
-                                 if (rc_Conn.q_IsUpdateEnabled == true)
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("YES");
-                                 }
-                                 else
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("NO");
-                                 }
-                                 c_BusName.append(static_cast<QString>(" Update: %1;").arg(c_EnabledString));
-                                 //Routing enabled?
-                                 if (rc_Conn.q_IsRoutingEnabled == true)
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("YES");
-                                 }
-                                 else
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("NO");
-                                 }
-                                 c_BusName.append(static_cast<QString>(" Routing: %1;").arg(c_EnabledString));
-                                 //Diagnostic enabled?
-                                 if (rc_Conn.q_IsDiagnosisEnabled == true)
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("YES");
-                                 }
-                                 else
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("NO");
-                                 }
-                                 c_BusName.append(static_cast<QString>(" Diagnostic: %1").arg(c_EnabledString));
                                  q_Found = true;
                               }
                            }
@@ -728,7 +708,7 @@ void C_GiNode::GenerateHint(void)
                      {
                         if (rc_Conn.u8_InterfaceNumber == u8_ItInterface)
                         {
-                           if (rc_Conn.q_IsBusConnected == true)
+                           if (rc_Conn.GetBusConnectedRawValue() == true)
                            {
                               const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
                                  rc_Conn.u32_BusIndex);
@@ -736,39 +716,7 @@ void C_GiNode::GenerateHint(void)
                               {
                                  c_BusName = C_GtGetText::h_GetText("Linked to ");
                                  c_BusName.append(pc_Bus->c_Name.c_str());
-                                 //Bus + Node Id Info
-                                 c_BusName.append(static_cast<QString>(" (Node ID: %1);").arg(QString::number(rc_Conn.
-                                                                                                              u8_NodeID)));
-                                 //Update enabled?
-                                 if (rc_Conn.q_IsUpdateEnabled == true)
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("YES");
-                                 }
-                                 else
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("NO");
-                                 }
-                                 c_BusName.append(static_cast<QString>(" Update: %1;").arg(c_EnabledString));
-                                 //Routing enabled?
-                                 if (rc_Conn.q_IsRoutingEnabled == true)
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("YES");
-                                 }
-                                 else
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("NO");
-                                 }
-                                 c_BusName.append(static_cast<QString>(" Routing: %1;").arg(c_EnabledString));
-                                 //Diagnostic enabled?
-                                 if (rc_Conn.q_IsDiagnosisEnabled == true)
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("YES");
-                                 }
-                                 else
-                                 {
-                                    c_EnabledString = C_GtGetText::h_GetText("NO");
-                                 }
-                                 c_BusName.append(static_cast<QString>(" Diagnostic: %1").arg(c_EnabledString));
+
                                  q_Found = true;
                               }
                            }
@@ -872,7 +820,7 @@ void C_GiNode::CheckNodeForChanges(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten mouse press event slot
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
@@ -886,7 +834,7 @@ void C_GiNode::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten mouse move event slot
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
@@ -918,7 +866,7 @@ void C_GiNode::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 
    Here: Hide tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
@@ -940,7 +888,7 @@ bool C_GiNode::m_UpdateError(void)
 {
    bool q_ErrorDetected;
 
-   C_SdUtil::h_GetErrorToolTipNode(static_cast<uint32>(this->ms32_Index), this->mc_ErrorText, q_ErrorDetected);
+   C_SdUtil::h_GetErrorToolTipNode(static_cast<uint32>(this->ms32_Index), this->mc_ErrorText, q_ErrorDetected, true);
    return q_ErrorDetected;
 }
 
@@ -1079,7 +1027,7 @@ bool C_GiNode::GetValid(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the white filter for the node drawing
 
-   \param[in]     oq_Active      Flag if filter is active or not
+   \param[in]  oq_Active   Flag if filter is active or not
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::SetDrawWhiteFilter(const bool oq_Active)
@@ -1101,7 +1049,7 @@ void C_GiNode::SetDrawWhiteFilter(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in]  of64_ZValue    New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::SetZValueCustom(const float64 of64_ZValue)
@@ -1124,7 +1072,7 @@ QString C_GiNode::GetText(void) const
 
    if (pc_Node != NULL)
    {
-      c_Name = pc_Node->c_Properties.c_Name.c_str();
+      c_Name = C_PuiSdUtil::h_GetNodeBaseNameOrName(this->ms32_Index);
    }
 
    return c_Name;
@@ -1137,17 +1085,13 @@ QString C_GiNode::GetText(void) const
 void C_GiNode::LoadData(void)
 {
    const C_PuiSdNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetUINode(ms32_Index);
-   const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ms32_Index);
 
    if (pc_Node != NULL)
    {
       this->LoadBasicData(*pc_Node);
    }
    //Object name for test
-   if (pc_OSCNode != NULL)
-   {
-      this->setObjectName(static_cast<QString>("Node: %1").arg(pc_OSCNode->c_Properties.c_Name.c_str()));
-   }
+   this->setObjectName(static_cast<QString>("Node: %1").arg(this->GetText()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1176,7 +1120,7 @@ void C_GiNode::UpdateData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove pointer to connection and all dependencies
 
-   \param[in]   opc_BusConnectorGraphicsItem   Referenced connection
+   \param[in]  opc_BusConnectorGraphicsItem  Referenced connection
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::RemoveConnector(const C_GiLiBusConnector * const opc_BusConnectorGraphicsItem)
@@ -1201,6 +1145,28 @@ void C_GiNode::RemoveConnector(const C_GiLiBusConnector * const opc_BusConnector
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check index relevant for this node
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   Is index relevant for this node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiNode::CheckIndexRelevantForThisNode(const uint32 ou32_NodeIndex) const
+{
+   bool q_Retval = false;
+
+   if (this->ms32_Index >= 0)
+   {
+      q_Retval =
+         C_PuiSdHandler::h_GetInstance()->CheckNodeIndexAssociatedWithAnotherNodeIndex(
+            static_cast<uint32>(this->ms32_Index), ou32_NodeIndex);
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete data in system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1213,7 +1179,7 @@ void C_GiNode::DeleteData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remember associated connection
 
-   \param[in,out]   opc_Connection   New connection
+   \param[in,out]  opc_Connection   New connection
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::AddConnection(C_GiLiBusConnector * const opc_Connection)
@@ -1224,56 +1190,56 @@ void C_GiNode::AddConnection(C_GiLiBusConnector * const opc_Connection)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new connection with data
 
-   \param[in,out] opc_Connection     New connection
-   \param[in,out] orc_NodeConnection New data
-   \param[in]     oru8_NodeId        New node id
-   \param[in,out] oru32_BusIndex     New bus index to connect to
+   \param[in,out]  opc_Connection      New connection
+   \param[in,out]  orc_NodeConnection  New data
+   \param[in]      orc_NodeIds         Node ids
+   \param[in,out]  oru32_BusIndex      New bus index to connect to
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::AddConnectionAndData(C_GiLiBusConnector * const opc_Connection,
-                                    const C_PuiSdNodeConnectionId & orc_NodeConnection, const uint8 & oru8_NodeId,
-                                    const uint32 & oru32_BusIndex)
+                                    const C_PuiSdNodeConnectionId & orc_NodeConnection,
+                                    const std::vector<uint8> & orc_NodeIds, const uint32 & oru32_BusIndex)
 {
    if (opc_Connection != NULL)
    {
       this->AddConnection(opc_Connection);
       C_PuiSdHandler::h_GetInstance()->AddConnection(
-         static_cast<uint32>(this->GetIndex()), orc_NodeConnection.u8_InterfaceNumber, oru8_NodeId, oru32_BusIndex);
+         static_cast<uint32>(this->GetIndex()), orc_NodeConnection.u8_InterfaceNumber, orc_NodeIds, oru32_BusIndex);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update internal connection data identified by specified C_GiLiBusConnector instance
 
-   \param[in] opc_Connection     Old connection for reference only
-   \param[in] orc_NodeConnection New connection data
-   \param[in] oru8_NodeId        New node id
-   \param[in] oru32_BusIndex     Bus index to use instead of last used one
+   \param[in]  opc_Connection       Old connection for reference only
+   \param[in]  orc_NodeConnection   New connection data
+   \param[in]  orc_NodeIds          Node ids
+   \param[in]  oru32_BusIndex       Bus index to use instead of last used one
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::UpdateConnection(const C_GiLiBusConnector * const opc_Connection,
-                                const C_PuiSdNodeConnectionId & orc_NodeConnection, const uint8 & oru8_NodeId,
-                                const uint32 & oru32_BusIndex) const
+                                const C_PuiSdNodeConnectionId & orc_NodeConnection,
+                                const std::vector<uint8> & orc_NodeIds, const uint32 & oru32_BusIndex) const
 {
    const C_PuiSdNodeConnectionId * const pc_PrevConn = this->GetNodeConnectionId(opc_Connection);
 
    if (pc_PrevConn != NULL)
    {
       C_PuiSdHandler::h_GetInstance()->ChangeCompleteConnection(static_cast<uint32>(this->ms32_Index), *pc_PrevConn,
-                                                                orc_NodeConnection, oru8_NodeId, oru32_BusIndex);
+                                                                orc_NodeConnection, orc_NodeIds, oru32_BusIndex);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reconnect bus connection to new interface
 
-   \param[in] ou8_Interface  New interface number
-   \param[in] opc_Connection Associated connection
-   \param[in] oru8_NodeId    Node id
+   \param[in]  ou8_Interface     New interface number
+   \param[in]  opc_Connection    Associated connection
+   \param[in]  orc_NodeIds       Node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::ChangeInterface(const uint8 ou8_Interface, const C_GiLiBusConnector * const opc_Connection,
-                               const uint8 & oru8_NodeId) const
+                               const std::vector<uint8> & orc_NodeIds) const
 {
    if (opc_Connection != NULL)
    {
@@ -1284,7 +1250,7 @@ void C_GiNode::ChangeInterface(const uint8 ou8_Interface, const C_GiLiBusConnect
          if (pc_ConnectionId != NULL)
          {
             C_PuiSdHandler::h_GetInstance()->ChangeConnection(static_cast<uint32>(this->ms32_Index), *pc_ConnectionId,
-                                                              ou8_Interface, oru8_NodeId);
+                                                              ou8_Interface, orc_NodeIds);
          }
          pc_Bus->GetType();
       }
@@ -1294,7 +1260,7 @@ void C_GiNode::ChangeInterface(const uint8 ou8_Interface, const C_GiLiBusConnect
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Search for id of connection
 
-   \param[in,out] opc_Connection Connection to search for
+   \param[in,out]  opc_Connection   Connection to search for
 
    \return
    NULL Error

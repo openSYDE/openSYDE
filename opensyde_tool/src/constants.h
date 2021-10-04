@@ -155,9 +155,9 @@ const stw_types::sintn msn_TRANSPARENCY_END = 255;
 const stw_types::sintn msn_C_ITEM_MAX_CHAR_COUNT = 31;
 
 //Node id restrictions
-const stw_types::uint8 mu8_NODE_ID_CLIENT = 126;
+const stw_types::uint8 mu8_NODE_ID_CLIENT = 126; //127 is reserved for broadcasts
 const stw_types::uint8 mu8_MAX_NODE_ID_OS = 125;
-const stw_types::uint8 mu8_MAX_NODE_ID_STW = static_cast<stw_types::uint8> (254);
+const stw_types::uint8 mu8_MAX_NODE_ID_STW = static_cast<stw_types::uint8> (254); //255 is reserved
 //Data pool sizes
 const stw_types::uint32 mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN = 0x101U;
 const stw_types::uint32 mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX = 0x17FU;

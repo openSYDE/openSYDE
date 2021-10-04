@@ -243,6 +243,14 @@ void C_NagMainWidget::LoadInitialProject(void)
       // Initial load (command line or first recent project)
       s32_Error = C_PuiProject::h_GetInstance()->LoadInitialProject(&u16_Version, c_LoadedProject);
    }
+   else if (s32_Error == C_WARN)
+   {
+      this->m_CancelPasswordDialog(u16_Version);
+   }
+   else
+   {
+      //No further steps necessary
+   }
 
    C_PopErrorHandling::h_ProjectLoadErr(s32_Error, c_LoadedProject, this, u16_Version);
 }
@@ -274,42 +282,7 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
       }
       else
       {
-         // we also want those projects in the "recent projects" list, which fail to load
-         C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
-         C_UsHandler::h_GetInstance()->Save();
-
-         // load last available recent project (where "available" here means: *.syde exists)
-         const QStringList c_RecentProjects = C_UsHandler::h_GetInstance()->GetRecentProjects();
-
-         Q_EMIT (this->SigBeforeOtherProjectLoad());
-         C_PuiProject::h_GetInstance()->SetPath("");
-
-         for (sint32 s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
-         {
-            QFileInfo c_File;
-            c_File.setFile(c_RecentProjects[s32_ItRecentProject]);
-            // do not load same project again
-            if ((c_File.exists() == true) && (c_RecentProjects[s32_ItRecentProject] != orc_FilePath))
-            {
-               C_PuiProject::h_GetInstance()->SetPath(c_RecentProjects[s32_ItRecentProject]);
-               break;
-            }
-         }
-
-         s32_Result = this->m_LoadConcreteProject(&u16_Version);
-
-         // very unlikely, but the previous project could be corrupt -> check it and load empty project else
-         if (s32_Result == C_NO_ERR)
-         {
-            C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
-            // Save recent project configuration
-            C_UsHandler::h_GetInstance()->Save();
-         }
-         else
-         {
-            C_PuiProject::h_GetInstance()->LoadEmpty();
-         }
-         Q_EMIT (this->SigOtherProjectLoaded(false));
+         this->m_CancelPasswordDialog(u16_Version);
       }
    }
 
@@ -642,8 +615,7 @@ void C_NagMainWidget::m_UpdateCurrProjInfo(void)
    {
       //New project
       this->mpc_Ui->pc_LabelCurProjName->setText(C_GtGetText::h_GetText("New project"));
-      this->mpc_Ui->pc_LabelCurProjName->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                                  "New project"),
+      this->mpc_Ui->pc_LabelCurProjName->SetToolTipInformation(C_GtGetText::h_GetText("New project"),
                                                                C_GtGetText::h_GetText("This project is not yet saved."));
       Q_EMIT (this->SigNewApplicationName(static_cast<QString>("openSYDE - ") +
                                           static_cast<QString>(C_GtGetText::h_GetText("New project"))));
@@ -945,3 +917,53 @@ sint32 C_NagMainWidget::m_GetPassword(QString & orc_Password)
 
    return s32_Return;
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Action that executed after cancel clicked on password dialog
+
+   \param[in]  ou16_ProjectFileVersion    Project file version
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::m_CancelPasswordDialog(uint16 ou16_ProjectFileVersion)
+{
+   sint32 s32_Result;
+
+   // we also want those projects in the "recent projects" list, which fail to load
+   C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
+   C_UsHandler::h_GetInstance()->Save();
+
+   // load last available recent project (where "available" here means: *.syde exists)
+   const QStringList c_RecentProjects = C_UsHandler::h_GetInstance()->GetRecentProjects();
+
+   Q_EMIT (this->SigBeforeOtherProjectLoad());
+   C_PuiProject::h_GetInstance()->SetPath("");
+
+   for (sint32 s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
+   {
+      QFileInfo c_File;
+      c_File.setFile(c_RecentProjects[s32_ItRecentProject]);
+      // do not load same project again
+      if ((c_File.exists() == true) &&
+          (c_RecentProjects[s32_ItRecentProject] != C_PuiProject::h_GetInstance()->GetPath()) &&
+          (c_File.suffix() == "syde"))
+      {
+         C_PuiProject::h_GetInstance()->SetPath(c_RecentProjects[s32_ItRecentProject]);
+         break;
+      }
+   }
+
+   s32_Result = this->m_LoadConcreteProject(&ou16_ProjectFileVersion);
+
+   // very unlikely, but the previous project could be corrupt -> check it and load empty project else
+   if (s32_Result == C_NO_ERR)
+   {
+      C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
+      // Save recent project configuration
+      C_UsHandler::h_GetInstance()->Save();
+   }
+   else
+   {
+      C_PuiProject::h_GetInstance()->LoadEmpty();
+   }
+   Q_EMIT (this->SigOtherProjectLoaded(false));
+}

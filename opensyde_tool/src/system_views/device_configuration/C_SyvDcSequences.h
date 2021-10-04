@@ -19,6 +19,7 @@
 #include "stwtypes.h"
 #include "CSCLString.h"
 
+#include "C_OSCProtocolSerialNumber.h"
 #include "C_OSCComSequencesBase.h"
 #include "C_SyvComDriverThread.h"
 #include "C_OSCNodeComInterfaceSettings.h"
@@ -40,24 +41,26 @@ public:
    C_SyvDcDeviceInformation(void);
 
    void SetDeviceName(const stw_scl::C_SCLString & orc_DeviceName);
-   void SetSerialNumber(const stw_types::uint8 (&orau8_SerialNumber)[6]);
    void SetNodeId(const stw_types::uint8 ou8_NodeId);
    void SetIpAddress(const stw_types::uint8 (&orau8_IpAddress)[4]);
+   void SetSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
+   void SetSubNodeId(const stw_types::uint8 ou8_SubNodeId);
 
-   static bool h_SerialNumberFromStringToArray(const stw_scl::C_SCLString & orc_SerialNumber,
-                                               stw_types::uint8 * const opu8_SerialNumer);
+   bool IsSerialNumberIdentical(const C_SyvDcDeviceInformation & orc_Cmp) const;
 
    stw_scl::C_SCLString c_DeviceName;
    bool q_DeviceNameValid;
-
-   stw_types::uint8 au8_SerialNumber[6];
-   bool q_SerialNumberValid;
 
    stw_types::uint8 u8_NodeId;
    bool q_NodeIdValid;
 
    stw_types::uint8 au8_IpAddress[4];
    bool q_IpAddressValid;
+
+   stw_opensyde_core::C_OSCProtocolSerialNumber c_SerialNumber;
+
+   stw_types::uint8 u8_SubNodeId;
+   bool q_SubNodeIdValid;
 };
 
 ///Target configuration for one device
@@ -68,7 +71,9 @@ public:
    C_SyvDcDeviceConfiguation & operator =(const C_SyvDcDeviceConfiguation & orc_Source);
 
    // Identifier of the device
-   stw_types::uint8 au8_SerialNumber[6];
+   stw_opensyde_core::C_OSCProtocolSerialNumber c_SerialNumber;
+   stw_types::uint8 u8_SubNodeId;
+
    // Configuration parameters for all interfaces
    std::vector<stw_types::uint8> c_NodeIds;
    std::vector<stw_types::uint8> c_BusIds;
@@ -114,8 +119,10 @@ public:
    stw_types::sint32 InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bitrate);
 
    stw_types::sint32 ReadBackCan(const std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
+                                 const std::vector<bool> & orc_OpenSydeSnrExtFormat,
                                  const std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_StwIds);
-   stw_types::sint32 ReadBackEth(const std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds);
+   stw_types::sint32 ReadBackEth(const std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
+                                 const std::vector<bool> & orc_OpenSydeSnrExtFormat);
 
    stw_types::sint32 GetResults(stw_types::sint32 & ors32_Result) const;
    stw_types::sint32 GetDeviceInfosResult(std::vector<C_SyvDcDeviceInformation> & orc_DeviceInfo) const;
@@ -216,6 +223,7 @@ private:
    // Input parameter for sequence
    std::vector<C_SyvDcDeviceConfiguation> mc_DeviceConfiguration; ///< desired device configuration
    std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> mc_OpenSydeIds;
+   std::vector<bool> mc_OpenSydeSnrExtFormat;
    std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> mc_StwIds;
    stw_types::uint32 mu32_CanBitrate;
    bool mq_ConfigureAllInterfaces; ///< flag if the bitrate for all connected interfaces sould be configured or

@@ -31,7 +31,12 @@ SOURCES += ../src/main.cpp \
     ../libs/opensyde_core/aes/AES.cpp \
     ../libs/opensyde_core/C_OSCZipData.cpp \
     ../libs/opensyde_core/C_OSCZipFile.cpp \
+    ../src/graphic_items/system_view_items/C_GiSvNodeData.cpp \
+    ../src/graphic_items/system_view_items/C_GiSvSubNodeData.cpp \
     ../src/navigable_gui/C_NagServiceModeInfo.cpp \
+    ../src/navigable_gui/C_NagTopTreeDelegate.cpp \
+    ../src/navigable_gui/C_NagTopTreeModel.cpp \
+    ../src/navigable_gui/C_NagTopTreeView.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.cpp \
     ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.cpp \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.cpp \
@@ -673,9 +678,6 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationTab.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationSection.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubNavigation.cpp \
-    ../src/navigable_gui/C_NagTopList.cpp \
-    ../src/navigable_gui/C_NagTopListDelegate.cpp \
-    ../src/navigable_gui/C_NagTopListModel.cpp \
     ../src/opensyde_gui_elements/C_OgeListViewToolTipBase.cpp \
     ../src/project_operations/C_PopFileTableDelegate.cpp \
     ../src/navigable_gui/C_NagViewListModel.cpp \
@@ -872,7 +874,12 @@ HEADERS  += \
     ../libs/opensyde_core/C_OSCZipData.h \
     ../libs/opensyde_core/C_OSCZipFile.h \
     ../libs/opensyde_core/miniz/miniz.h \
+    ../src/graphic_items/system_view_items/C_GiSvNodeData.h \
+    ../src/graphic_items/system_view_items/C_GiSvSubNodeData.h \
     ../src/navigable_gui/C_NagServiceModeInfo.h \
+    ../src/navigable_gui/C_NagTopTreeDelegate.h \
+    ../src/navigable_gui/C_NagTopTreeModel.h \
+    ../src/navigable_gui/C_NagTopTreeView.h \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.h \
     ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.h \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.h \
@@ -1526,9 +1533,6 @@ HEADERS  += \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationTab.h \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationSection.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubNavigation.h \
-    ../src/navigable_gui/C_NagTopList.h \
-    ../src/navigable_gui/C_NagTopListDelegate.h \
-    ../src/navigable_gui/C_NagTopListModel.h \
     ../src/opensyde_gui_elements/C_OgeListViewToolTipBase.h \
     ../src/project_operations/C_PopFileTableDelegate.h \
     ../src/navigable_gui/C_NagViewListModel.h \

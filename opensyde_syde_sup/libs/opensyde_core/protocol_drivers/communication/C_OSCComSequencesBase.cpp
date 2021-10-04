@@ -450,7 +450,7 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeOnLocalBusActive(
                      rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter];
 
                   if ((rc_ComIntf.u32_BusIndex == this->mu32_ActiveBusIndex) &&
-                      (rc_ComIntf.q_IsBusConnected == true))
+                      (rc_ComIntf.GetBusConnected() == true))
                   {
                      tgl_assert(this->mu32_ActiveBusIndex < this->mpc_SystemDefinition->c_Buses.size());
 

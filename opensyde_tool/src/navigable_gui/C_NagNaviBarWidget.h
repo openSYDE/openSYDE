@@ -108,6 +108,7 @@ private:
 
    void m_PbTopologyClick(void);
    void m_NodesChanged(void) const;
+   void m_NodeChanged(const stw_types::uint32 ou32_NodeIndex) const;
    void m_BussesChanged(void) const;
 
    void m_AddViewClicked(void);

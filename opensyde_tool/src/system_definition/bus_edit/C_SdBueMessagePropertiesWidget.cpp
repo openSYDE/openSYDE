@@ -1690,14 +1690,17 @@ void C_SdBueMessagePropertiesWidget::m_BusModeAdaptTransmitterComboBoxesValid(co
       //Set invalid
       this->mpc_Ui->pc_ComboBoxTransmitterNode->setCurrentIndex(-1);
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ComboBoxTransmitterNode, "Valid", false);
-      this->mpc_Ui->pc_ComboBoxTransmitterNode->SetToolTipInformation("", c_Content, C_NagToolTip::eERROR);
+      this->mpc_Ui->pc_ComboBoxTransmitterNode->SetToolTipInformation(C_GtGetText::h_GetText("Error"),
+                                                                      c_Content, C_NagToolTip::eERROR);
 
       this->mpc_Ui->pc_ComboBoxTransmitterDatapool->setVisible(false);
       this->mpc_Ui->pc_LabelTransmitterDatapool->setVisible(false);
    }
    else
    {
-      this->mpc_Ui->pc_ComboBoxTransmitterNode->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+      this->mpc_Ui->pc_ComboBoxTransmitterNode->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                                      C_GtGetText::h_GetText(""),
+                                                                      C_NagToolTip::eDEFAULT);
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ComboBoxTransmitterNode, "Valid", true);
 
       this->mpc_Ui->pc_ComboBoxTransmitterDatapool->setVisible(
@@ -2217,7 +2220,9 @@ void C_SdBueMessagePropertiesWidget::m_CheckMessageName(void) const
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditName, "Valid", q_NameIsValid);
       if (q_NameIsValid == true)
       {
-         this->mpc_Ui->pc_LineEditName->SetToolTipInformation("", "", stw_opensyde_gui::C_NagToolTip::eDEFAULT);
+         this->mpc_Ui->pc_LineEditName->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                              C_GtGetText::h_GetText(""),
+                                                              stw_opensyde_gui::C_NagToolTip::eDEFAULT);
       }
       else
       {

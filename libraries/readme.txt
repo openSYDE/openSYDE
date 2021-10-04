@@ -8,4 +8,4 @@ See the build instructions that come with each library on how to create the bina
 Building QCustomPlot
 ====================
 To create the binary library to be linked with the openSYDE GUI create a static library from "qcustomplot.cpp".
-Alternativ3ely qcustomplot.cpp could be added to the project sources, but this will increase build times.
+Alternatively qcustomplot.cpp could be added to the project sources, but this will increase build times.

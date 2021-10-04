@@ -54,6 +54,8 @@ public:
 
    const C_PuiSvPc & GetPcData(void) const;
    void SetPcData(const C_PuiSvPc & orc_Value);
+   bool GetNodeActive(const stw_types::uint32 ou32_NodeIndex) const;
+   bool GetNodeStatusDisplayedAsActive(const stw_types::uint32 ou32_NodeIndex) const;
    const std::vector<stw_types::uint8> & GetNodeActiveFlags(void) const;
    void SetNodeActiveFlags(const std::vector<stw_types::uint8> & orc_Value);
    const std::vector<C_PuiSvNodeUpdate> & GetAllNodeUpdateInformation(void) const;
@@ -212,7 +214,7 @@ public:
                                                       const stw_types::uint32 ou32_ElementIndex);
 
    //Specific setter
-   stw_types::sint32 SetNodeCheckedState(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_Checked);
+   void SetNodeCheckedState(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_Checked);
    void SetPCBox(const C_PuiBsBox & orc_Box);
    void SetPCConnection(const C_PuiBsLineBase & orc_Line);
    void SetPCConnected(const bool oq_Connected, const stw_types::uint32 ou32_BusIndex);
@@ -281,9 +283,12 @@ public:
    stw_types::sint32 SyncDashboardScalingInformation(const stw_types::uint32 ou32_DashboardIndex);
 
    //Other
+   void ActivateAllRelevantSubDevices(void);
+   std::vector<stw_types::uint32> DeactivateSubDevicesBasedOnErrors(const std::map<stw_types::uint32,
+                                                                                   QString> & orc_Errors);
    void FixInvalidRailConfig(const bool oq_PrintLog = true);
    void HandleCompatibilityChart(void);
-   void InitFromSystemDefintion(void);
+   void InitFromSystemDefinition(void);
    bool CheckDashboardName(const QString & orc_Proposal, const stw_types::uint32 * const opu32_DashboardIndex) const;
    QString GetUniqueDashboardName(const QString & orc_Proposal) const;
    bool CheckReadUsage(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id) const;

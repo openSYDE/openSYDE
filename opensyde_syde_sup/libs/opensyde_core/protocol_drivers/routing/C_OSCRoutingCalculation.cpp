@@ -177,7 +177,7 @@ bool C_OSCRoutingCalculation::CheckItfNumberForRouting(const stw_types::uint32 o
    // Check if the interface can be used for routing
    bool q_Return = false;
 
-   if (orc_ComItfSettings.q_IsBusConnected == true)
+   if (orc_ComItfSettings.GetBusConnected() == true)
    {
       if (ou32_TargetNodeIndex == this->mu32_TargetNodeIndex)
       {
@@ -309,7 +309,7 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
       {
          q_MinimumOneFunctionActive = true;
 
-         if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].q_IsBusConnected == true)
+         if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
          {
             // Minimum one com interface is relevant
             q_UsableBusFound = true;
@@ -320,7 +320,7 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
       {
          q_MinimumOneFunctionActive = true;
 
-         if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].q_IsBusConnected == true)
+         if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
          {
             // Minimum one com interface is relevant
             q_UsableBusFound = true;

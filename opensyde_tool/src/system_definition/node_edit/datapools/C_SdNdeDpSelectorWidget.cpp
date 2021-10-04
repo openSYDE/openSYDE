@@ -148,7 +148,7 @@ C_SdNdeDpSelectorWidget::~C_SdNdeDpSelectorWidget()
 void C_SdNdeDpSelectorWidget::InitStaticNames(void) const
 {
    //Tool tips
-   this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText(""),
+   this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
                                                          C_GtGetText::h_GetText("Add new Datapool."));
 }
 

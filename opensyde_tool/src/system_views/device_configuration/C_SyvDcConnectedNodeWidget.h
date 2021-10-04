@@ -37,13 +37,16 @@ class C_SyvDcConnectedNodeWidget :
 public:
    explicit C_SyvDcConnectedNodeWidget(QListWidgetItem * const opc_Item,
                                        const stw_opensyde_gui_logic::C_SyvDcDeviceInformation & orc_Info,
+                                       const std::set<stw_types::uint8> & orc_SubNodeIds,
                                        QWidget * const opc_Parent = NULL);
    ~C_SyvDcConnectedNodeWidget(void);
 
-   QString GetSerialNumberString(void) const;
+   QString GetPlainSerialNumberString(void) const;
+   bool GetExtFormat(void) const;
+   stw_types::uint8 GetManufacturerFormat(void) const;
    QString GetDeviceName(void) const;
    bool GetDeviceNameValid(void) const;
-   bool CompareSerialNumber(const QString & orc_SerialNumber) const;
+   bool CompareSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
 
 protected:
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
@@ -52,6 +55,7 @@ private:
    Ui::C_SyvDcConnectedNodeWidget * mpc_Ui;
    QListWidgetItem * mpc_ListWidgetItem;
    const stw_opensyde_gui_logic::C_SyvDcDeviceInformation mc_Info;
+   const std::set<stw_types::uint8> mc_SubNodeIds;
 
    void m_Init(void);
    //Avoid call

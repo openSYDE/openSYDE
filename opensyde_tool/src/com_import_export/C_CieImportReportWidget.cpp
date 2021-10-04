@@ -1147,7 +1147,8 @@ sint32 C_CieImportReportWidget::mh_InsertMessages(const uint32 ou32_NodeIndex, c
                      static_cast<uint32>(orc_MessageOverrideIndices[u32_ItMessage].second));
                   const C_OSCNodeComInterfaceSettings & rc_Interface =
                      pc_Node->c_Properties.c_ComInterfaces[ou32_InterfaceIndex];
-                  if ((rc_Interface.q_IsBusConnected == true) && (pc_Container->q_IsComProtocolUsedByInterface == true))
+                  if ((rc_Interface.GetBusConnected() == true) &&
+                      (pc_Container->q_IsComProtocolUsedByInterface == true))
                   {
                      const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_Id);
                      if (pc_Message != NULL)

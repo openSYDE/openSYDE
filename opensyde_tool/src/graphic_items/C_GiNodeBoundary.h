@@ -32,7 +32,7 @@ class C_GiNodeBoundary :
 {
 public:
    C_GiNodeBoundary(const QString & orc_Text, const stw_types::float64 of64_Width, const stw_types::float64 of64_Height,
-                    QGraphicsItem * const opc_Parent = NULL);
+                    const stw_types::uint32 ou32_SubNodesCount, QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiNodeBoundary();
 
    virtual QRectF boundingRect() const;
@@ -56,6 +56,7 @@ private:
    void m_DrawBackground(QPainter * const opc_Painter) const;
    bool mq_DrawBoder;
    bool mq_DrawWhiteFilter;
+   stw_types::uint32 mu32_SubNodesCount;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

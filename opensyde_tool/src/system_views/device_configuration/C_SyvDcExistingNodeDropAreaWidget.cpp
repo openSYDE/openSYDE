@@ -11,6 +11,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GtGetText.h"
+#include "C_OSCUtils.h"
 #include "C_OgeWiUtil.h"
 #include "C_SyvDcExistingNodeDropAreaWidget.h"
 #include "ui_C_SyvDcExistingNodeDropAreaWidget.h"
@@ -44,6 +45,7 @@ C_SyvDcExistingNodeDropAreaWidget::C_SyvDcExistingNodeDropAreaWidget(QWidget * c
    mpc_Ui(new Ui::C_SyvDcExistingNodeDropAreaWidget),
    mq_Assigned(false)
 {
+   const stw_opensyde_core::C_OSCProtocolSerialNumber c_EmptySerialNumber;
    const QPixmap c_Device =
       static_cast<QPixmap>("://images/system_views/DeviceSmall.svg").scaled(QSize(16, 16), Qt::KeepAspectRatio,
                                                                             Qt::SmoothTransformation);
@@ -61,7 +63,7 @@ C_SyvDcExistingNodeDropAreaWidget::C_SyvDcExistingNodeDropAreaWidget(QWidget * c
    this->mpc_Ui->pc_PushButtonClose->setIcon(static_cast<QPixmap>("://images/system_views/IconTabClose.svg"));
 
    //Default
-   this->SetContent(false, "");
+   this->SetContent(false, c_EmptySerialNumber);
 
    //Connects
    connect(this->mpc_Ui->pc_PushButtonClose, &stw_opensyde_gui_elements::C_OgePubTabClose::clicked, this,
@@ -91,16 +93,19 @@ void C_SyvDcExistingNodeDropAreaWidget::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set content and assignment state
 
-   \param[in] oq_ValidSerialNumber Flag if serial number valid
-   \param[in] orc_PureSerialNumber Serial number (only used if valid)
+   \param[in] oq_ValidSerialNumber   Flag if serial number valid
+   \param[in] orc_PureSerialNumber   Serial number (only used if valid)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeDropAreaWidget::SetContent(const bool oq_ValidSerialNumber,
-                                                   const QString & orc_PureSerialNumber)
+                                                   const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_PureSerialNumber)
 {
+   const QString c_ShowedSerialNumber = orc_PureSerialNumber.GetSerialNumberAsFormattedString().c_str();
+
    this->mc_PureSerialNumber = orc_PureSerialNumber;
-   this->mpc_Ui->pc_LabelSerialNumber->setText(static_cast<QString>(C_GtGetText::h_GetText("SN.: %1")).arg(this->
-                                                                                                           mc_PureSerialNumber));
+   this->mpc_Ui->pc_LabelSerialNumber->setText(
+      static_cast<QString>(C_GtGetText::h_GetText("SN.: %1")).arg(c_ShowedSerialNumber));
+
    if (oq_ValidSerialNumber == true)
    {
       this->mpc_Ui->pc_GroupBoxEmpty->setVisible(false);
@@ -129,15 +134,15 @@ bool C_SyvDcExistingNodeDropAreaWidget::IsAssigned(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get pure serial number
+/*! \brief   Returns content
 
-   \return
-   Current pure serial number
+   \param[out] orc_PureSerialNumber    Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDcExistingNodeDropAreaWidget::GetPureSerialNumber(void) const
+void C_SyvDcExistingNodeDropAreaWidget::GetContent(stw_opensyde_core::C_OSCProtocolSerialNumber & orc_PureSerialNumber)
+const
 {
-   return this->mc_PureSerialNumber;
+   orc_PureSerialNumber = this->mc_PureSerialNumber;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -162,5 +167,5 @@ void C_SyvDcExistingNodeDropAreaWidget::paintEvent(QPaintEvent * const opc_Event
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeDropAreaWidget::m_OnDisconnectRequest(void)
 {
-   Q_EMIT this->SigDisconnect(this->mc_PureSerialNumber);
+   Q_EMIT (this->SigDisconnect(this->mc_PureSerialNumber));
 }

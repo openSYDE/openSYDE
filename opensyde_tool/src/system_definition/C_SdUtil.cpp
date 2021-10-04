@@ -25,6 +25,7 @@
 #include "C_PuiSdUtil.h"
 #include "C_Uti.h"
 #include "C_GtGetText.h"
+#include "C_OSCNodeSquad.h"
 #include "C_SdTooltipUtil.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_SdNdeDpContentUtil.h"
@@ -65,13 +66,13 @@ C_SdUtil::C_SdUtil(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Generate node and interface names
 
-   \param[in]   orc_NodeIndices            Node indices (match with interface indices expected)
-   \param[in]   orc_InterfaceIndices       Interface indices (match with node indices expected)
-   \param[out]  orc_Names                  Generate node & interface names
-   \param[in]   oq_NameWithInterfaceAlways Flag if the interface name will be added always, or only in case of
-                                           multiple interfaces of node used
-   \param[in]   opc_DatapoolIndices        Optional pointer to Datapool indices (match with node indices expected)
-   \param[out]  opc_DatapoolNames          Optional pointer to found Datapool names
+   \param[in]   orc_NodeIndices              Node indices (match with interface indices expected)
+   \param[in]   orc_InterfaceIndices         Interface indices (match with node indices expected)
+   \param[out]  orc_Names                    Generate node & interface names
+   \param[in]   oq_NameWithInterfaceAlways   Flag if the interface name will be added always, or only in case of
+                                             multiple interfaces of node used
+   \param[in]   opc_DatapoolIndices          Optional pointer to Datapool indices (match with node indices expected)
+   \param[out]  opc_DatapoolNames            Optional pointer to found Datapool names
 
    \return
    C_NO_ERR Operation success
@@ -331,12 +332,12 @@ QString C_SdUtil::h_ConvertByteOrderToName(const C_OSCCanSignal::E_ByteOrderType
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get error tooltip suggestion
 
-   \param[in]   ou32_NodeIndex          Node index (identifier)
-   \param[in]   orc_Indices             Invalid datapool indices
-   \param[in]   oq_NvmSizeInvalid       Flag if NVM size invalid
-   \param[in]   oq_NvmOverlapDetected   Flag if NVM overlap of at least two Datapools detected
-   \param[out]  orc_Heading             Heading suggestion
-   \param[out]  orc_Content             Content suggestion
+   \param[in]   ou32_NodeIndex         Node index (identifier)
+   \param[in]   orc_Indices            Invalid datapool indices
+   \param[in]   oq_NvmSizeInvalid      Flag if NVM size invalid
+   \param[in]   oq_NvmOverlapDetected  Flag if NVM overlap of at least two Datapools detected
+   \param[out]  orc_Heading            Heading suggestion
+   \param[out]  orc_Content            Content suggestion
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std::vector<uint32> & orc_Indices,
@@ -560,9 +561,6 @@ uint32 C_SdUtil::h_GetActiveNodeInterface(const QComboBox & orc_ComboBox, const 
    \param[in]      ore_BusType               Bus type
    \param[in,out]  opc_ComboBox              ComboBox for using the node interfaces
    \param[in]      ors32_SpecialInterface    Special interface to allow and use as default, even if already connected
-   \param[out]     orq_ComProtocolL2         Flag if Layer 2 COM datapool exist
-   \param[out]     orq_ComProtocolECeS       Flag if ECeS COM datapool exist
-   \param[out]     orq_ComProtocolECoS       Flag if ECoS COM datapool exist
 
    \return
    True  At least one radio button is intractable
@@ -570,9 +568,7 @@ uint32 C_SdUtil::h_GetActiveNodeInterface(const QComboBox & orc_ComboBox, const 
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OSCNode & orc_Node, const C_OSCSystemBus::E_Type & ore_BusType,
-                                           QComboBox * const opc_ComboBox, const sint32 & ors32_SpecialInterface,
-                                           bool & orq_ComProtocolL2, bool & orq_ComProtocolECeS,
-                                           bool & orq_ComProtocolECoS)
+                                           QComboBox * const opc_ComboBox, const sint32 & ors32_SpecialInterface)
 {
    bool q_Retval = false;
    bool q_Chosen = false;
@@ -589,7 +585,7 @@ bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OSCNode & orc_Node, const C_O
       {
          const QString c_Name = C_PuiSdUtil::h_GetInterfaceName(ore_BusType, rc_Interface.u8_InterfaceNumber);
 
-         if (rc_Interface.q_IsBusConnected == true)
+         if (rc_Interface.GetBusConnected() == true)
          {
             if (ors32_SpecialInterface >= 0)
             {
@@ -617,29 +613,6 @@ bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OSCNode & orc_Node, const C_O
                }
             }
          }
-      }
-   }
-
-   // get the existence of COM datapools
-   orq_ComProtocolL2 = false;
-   orq_ComProtocolECoS = false;
-   orq_ComProtocolECeS = false;
-
-   for (u32_Counter = 0U; u32_Counter < orc_Node.c_ComProtocols.size(); ++u32_Counter)
-   {
-      switch (orc_Node.c_ComProtocols[u32_Counter].e_Type)
-      {
-      case C_OSCCanProtocol::eLAYER2:
-         orq_ComProtocolL2 = true;
-         break;
-      case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
-         orq_ComProtocolECoS = true;
-         break;
-      case C_OSCCanProtocol::eECES:
-         orq_ComProtocolECeS = true;
-         break;
-      default:
-         break;
       }
    }
 
@@ -694,7 +667,7 @@ std::vector<uint32> C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(con
                        (oru32_SpecialNodeIndex != c_NodeIndexes[u32_ItNode])) ||
                       (pc_Bus->e_Type != rc_CurComInterface.e_InterfaceType))
                   {
-                     if ((rc_CurComInterface.q_IsBusConnected == true) &&
+                     if ((rc_CurComInterface.GetBusConnected() == true) &&
                          (rc_CurComInterface.u32_BusIndex == oru32_BusIndex))
                      {
                         c_Retval.push_back(rc_CurComInterface.u8_NodeID);
@@ -908,33 +881,6 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OSCCanSignal & orc_Signal, const C_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapt used node ids label handling
-
-   \param[in]      orc_UsedNodeIds  Unused node ids (unique and sorted ascending)
-   \param[in]      orc_BusName      Bus name
-   \param[in,out]  opc_Label        Label to adapt
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdUtil::h_InitUsedNodeIdsLabel(const std::vector<uint32> & orc_UsedNodeIds, const QString & orc_BusName,
-                                      QLabel * const opc_Label)
-{
-   if (opc_Label != NULL)
-   {
-      if (orc_UsedNodeIds.size() == 0)
-      {
-         opc_Label->setVisible(false);
-      }
-      else
-      {
-         const QString c_BusIdsComplete = C_SdUtil::h_InitUsedIdsString(orc_UsedNodeIds, orc_BusName,
-                                                                        C_GtGetText::h_GetText("bus"));
-         opc_Label->setText(c_BusIdsComplete);
-         opc_Label->setVisible(true);
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt used ids string handling
 
    \param[in]  orc_UsedIds    Unused ids (unique and sorted ascending)
@@ -1065,7 +1011,7 @@ bool C_SdUtil::h_CheckNodeInterfaceAvailable(const std::vector<C_OSCNodeComInter
       const C_OSCNodeComInterfaceSettings & rc_Interface = orc_ComInterfaces[u32_ItInterface];
       if (rc_Interface.e_InterfaceType == ore_BusType)
       {
-         if (rc_Interface.q_IsBusConnected == false)
+         if (rc_Interface.GetBusConnectedRawValue() == false)
          {
             q_Retval = true;
             break;
@@ -1096,7 +1042,7 @@ bool C_SdUtil::h_CheckNodeInterfaceConnected(const std::vector<C_OSCNodeComInter
       const C_OSCNodeComInterfaceSettings & rc_Interface = orc_ComInterfaces[u32_ItInterface];
       if (rc_Interface.e_InterfaceType == ore_BusType)
       {
-         if (rc_Interface.q_IsBusConnected == true)
+         if (rc_Interface.GetBusConnectedRawValue() == true)
          {
             q_Retval = true;
             break;
@@ -1163,133 +1109,169 @@ bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const bool 
    \param[in]   oru32_NodeIndex     Node index
    \param[out]  orc_Text            Tool tip text
    \param[out]  orq_ErrorDetected   Flag if any errors detected
+   \param[in]   oq_CheckAll         Check all
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString & orc_Text, bool & orq_ErrorDetected)
+sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString & orc_Text, bool & orq_ErrorDetected,
+                                       const bool oq_CheckAll)
 {
-   bool q_NameConflict;
-   bool q_NameEmpty;
-   bool q_NodeIdInvalid;
+   bool q_IsMulti = C_OSCNodeSquad::h_CheckIsMultiDevice(oru32_NodeIndex,
+                                                         C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_NodeSquads);
 
-   bool q_DatapoolNvmSizeConflict;
-   bool q_DatapoolNvmOverlapConflict;
-   const bool q_DataPoolNvmConflict =
-      C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex, &q_DatapoolNvmSizeConflict,
-                                                                         &q_DatapoolNvmOverlapConflict);
-   bool q_DataPoolsInvalid;
-   bool q_ApplicationsInvalid;
-   bool q_DomainsInvalid;
+   std::vector<uint32> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+      oru32_NodeIndex);
+   sint32 s32_Retval = C_NO_ERR;
 
-   std::vector<uint32> c_InvalidInterfaceIndices;
-   std::vector<uint32> c_InvalidDataPoolIndices;
-   std::vector<uint32> c_InvalidApplicationIndices;
-   std::vector<uint32> c_InvalidDomainIndices;
-   const sint32 s32_Retval = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckErrorNode(
-      oru32_NodeIndex, &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid, &q_DataPoolsInvalid, &q_ApplicationsInvalid,
-      &q_DomainsInvalid, true, &c_InvalidInterfaceIndices, &c_InvalidDataPoolIndices, &c_InvalidApplicationIndices,
-      &c_InvalidDomainIndices);
-   if (s32_Retval == C_NO_ERR)
+   if (!oq_CheckAll)
    {
-      if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
-             (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_DataPoolNvmConflict == true)) ||
-          (q_NameEmpty == true))
+      //Only check one node
+      q_IsMulti = false;
+      c_NodeIndices.clear();
+      c_NodeIndices.push_back(oru32_NodeIndex);
+   }
+
+   //Starting value
+   orq_ErrorDetected = false;
+
+   for (uint32 u32_ItNode = 0UL; (u32_ItNode < c_NodeIndices.size()) && (s32_Retval == C_NO_ERR); ++u32_ItNode)
+   {
+      bool q_NameConflict;
+      bool q_NameEmpty;
+      bool q_NodeIdInvalid;
+
+      bool q_DatapoolNvmSizeConflict;
+      bool q_DatapoolNvmOverlapConflict;
+      const bool q_DataPoolNvmConflict =
+         C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(c_NodeIndices[u32_ItNode],
+                                                                            &q_DatapoolNvmSizeConflict,
+                                                                            &q_DatapoolNvmOverlapConflict);
+      bool q_DataPoolsInvalid;
+      bool q_ApplicationsInvalid;
+      bool q_DomainsInvalid;
+
+      std::vector<uint32> c_InvalidInterfaceIndices;
+      std::vector<uint32> c_InvalidDataPoolIndices;
+      std::vector<uint32> c_InvalidApplicationIndices;
+      std::vector<uint32> c_InvalidDomainIndices;
+      s32_Retval = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckErrorNode(
+         c_NodeIndices[u32_ItNode], &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid, &q_DataPoolsInvalid,
+         &q_ApplicationsInvalid,
+         &q_DomainsInvalid, true, &c_InvalidInterfaceIndices, &c_InvalidDataPoolIndices, &c_InvalidApplicationIndices,
+         &c_InvalidDomainIndices);
+      if (s32_Retval == C_NO_ERR)
       {
-         orq_ErrorDetected = true;
-         if (((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_NameEmpty == true))
+         if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
+                (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_DataPoolNvmConflict == true)) ||
+             (q_NameEmpty == true))
          {
-            orc_Text += C_GtGetText::h_GetText("Invalid properties:\n");
-            if (q_NameEmpty == true)
+            if (q_IsMulti)
             {
-               orc_Text += C_GtGetText::h_GetText("Node name is empty or contains invalid characters.\n");
-            }
-            if (q_NameConflict == true)
-            {
-               orc_Text += C_GtGetText::h_GetText("Duplicate node name detected.\n");
-            }
-            if (q_NodeIdInvalid == true)
-            {
-               if (c_InvalidInterfaceIndices.size() == 1UL)
+               const C_OSCNode * const pc_Node =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndices[u32_ItNode]);
+               if (pc_Node != NULL)
                {
-                  orc_Text += C_GtGetText::h_GetText("Duplicate node ID detected.\n");
+                  orc_Text += pc_Node->c_Properties.c_Name.c_str();
                }
-               else
+               orc_Text += "\n";
+            }
+            orq_ErrorDetected = true;
+            if (((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_NameEmpty == true))
+            {
+               orc_Text += C_GtGetText::h_GetText("Invalid properties:\n");
+               if (q_NameEmpty == true)
                {
-                  orc_Text += static_cast<QString>(C_GtGetText::h_GetText("%1 duplicate node IDs detected.\n")).arg(
-                     c_InvalidInterfaceIndices.size());
+                  orc_Text += C_GtGetText::h_GetText("Node name is empty or contains invalid characters.\n");
                }
-            }
-            orc_Text += "\n";
-         }
-         if (q_ApplicationsInvalid == true)
-         {
-            orc_Text += C_GtGetText::h_GetText("Invalid Data Blocks:\n");
-            for (uint32 u32_ItAppl = 0;
-                 (u32_ItAppl < c_InvalidApplicationIndices.size()) &&
-                 (u32_ItAppl < mu32_TOOL_TIP_MAXIMUM_ITEMS);
-                 ++u32_ItAppl)
-            {
-               const C_OSCNodeApplication * const pc_Appl = C_PuiSdHandler::h_GetInstance()->GetApplication(
-                  oru32_NodeIndex, c_InvalidApplicationIndices[u32_ItAppl]);
-               if (pc_Appl != NULL)
+               if (q_NameConflict == true)
                {
-                  orc_Text += static_cast<QString>("%1\n").arg(pc_Appl->c_Name.c_str());
+                  orc_Text += C_GtGetText::h_GetText("Duplicate node name detected.\n");
                }
-            }
-            if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidApplicationIndices.size())
-            {
-               orc_Text += static_cast<QString>("+%1\n").arg(
-                  c_InvalidApplicationIndices.size() - static_cast<sintn>(mu32_TOOL_TIP_MAXIMUM_ITEMS));
-            }
-            orc_Text += "\n";
-         }
-         if ((q_DataPoolsInvalid == true) || (q_DataPoolNvmConflict == true))
-         {
-            QString c_Heading;
-            QString c_Content;
-            C_SdUtil::h_GetErrorToolTipDataPools(oru32_NodeIndex, c_InvalidDataPoolIndices, q_DatapoolNvmSizeConflict,
-                                                 q_DatapoolNvmOverlapConflict, c_Heading, c_Content);
-            orc_Text += c_Heading + "\n";
-            orc_Text += c_Content;
-            orc_Text += "\n";
-         }
-         if (q_DomainsInvalid == true)
-         {
-            orc_Text += C_GtGetText::h_GetText("Invalid HALC Domains:\n");
-            for (uint32 u32_ItDomains = 0;
-                 (u32_ItDomains < c_InvalidDomainIndices.size()) && (u32_ItDomains < mu32_TOOL_TIP_MAXIMUM_ITEMS);
-                 ++u32_ItDomains)
-            {
-               const C_OSCHalcConfigDomain * const pc_Domain =
-                  C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(oru32_NodeIndex,
-                                                                                c_InvalidDomainIndices[u32_ItDomains]);
-               if (pc_Domain != NULL)
+               if (q_NodeIdInvalid == true)
                {
-                  orc_Text += static_cast<QString>("%1\n").arg(pc_Domain->c_Name.c_str());
+                  if (c_InvalidInterfaceIndices.size() == 1UL)
+                  {
+                     orc_Text += C_GtGetText::h_GetText("Duplicate node ID detected.\n");
+                  }
+                  else
+                  {
+                     orc_Text += static_cast<QString>(C_GtGetText::h_GetText("%1 duplicate node IDs detected.\n")).arg(
+                        c_InvalidInterfaceIndices.size());
+                  }
                }
+               orc_Text += "\n";
             }
-            if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDomainIndices.size())
+            if (q_ApplicationsInvalid == true)
             {
-               orc_Text +=
-                  static_cast<QString>("+%1\n").arg(c_InvalidDomainIndices.size() -
-                                                    static_cast<sintn>(mu32_TOOL_TIP_MAXIMUM_ITEMS));
+               orc_Text += C_GtGetText::h_GetText("Invalid Data Blocks:\n");
+               for (uint32 u32_ItAppl = 0;
+                    (u32_ItAppl < c_InvalidApplicationIndices.size()) &&
+                    (u32_ItAppl < mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                    ++u32_ItAppl)
+               {
+                  const C_OSCNodeApplication * const pc_Appl = C_PuiSdHandler::h_GetInstance()->GetApplication(
+                     c_NodeIndices[u32_ItNode], c_InvalidApplicationIndices[u32_ItAppl]);
+                  if (pc_Appl != NULL)
+                  {
+                     orc_Text += static_cast<QString>("%1\n").arg(pc_Appl->c_Name.c_str());
+                  }
+               }
+               if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidApplicationIndices.size())
+               {
+                  orc_Text += static_cast<QString>("+%1\n").arg(
+                     c_InvalidApplicationIndices.size() - static_cast<sintn>(mu32_TOOL_TIP_MAXIMUM_ITEMS));
+               }
+               orc_Text += "\n";
             }
-            orc_Text += "\n";
+            if ((q_DataPoolsInvalid == true) || (q_DataPoolNvmConflict == true))
+            {
+               QString c_Heading;
+               QString c_Content;
+               C_SdUtil::h_GetErrorToolTipDataPools(c_NodeIndices[u32_ItNode], c_InvalidDataPoolIndices,
+                                                    q_DatapoolNvmSizeConflict,
+                                                    q_DatapoolNvmOverlapConflict, c_Heading, c_Content);
+               orc_Text += c_Heading + "\n";
+               orc_Text += c_Content;
+               orc_Text += "\n";
+            }
+            if (q_DomainsInvalid == true)
+            {
+               orc_Text += C_GtGetText::h_GetText("Invalid HALC Domains:\n");
+               for (uint32 u32_ItDomains = 0;
+                    (u32_ItDomains < c_InvalidDomainIndices.size()) && (u32_ItDomains < mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                    ++u32_ItDomains)
+               {
+                  const C_OSCHalcConfigDomain * const pc_Domain =
+                     C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(c_NodeIndices[u32_ItNode],
+                                                                                   c_InvalidDomainIndices[u32_ItDomains]);
+                  if (pc_Domain != NULL)
+                  {
+                     orc_Text += static_cast<QString>("%1\n").arg(pc_Domain->c_Name.c_str());
+                  }
+               }
+               if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDomainIndices.size())
+               {
+                  orc_Text +=
+                     static_cast<QString>("+%1\n").arg(c_InvalidDomainIndices.size() -
+                                                       static_cast<sintn>(mu32_TOOL_TIP_MAXIMUM_ITEMS));
+               }
+               orc_Text += "\n";
+            }
          }
       }
       else
       {
-         orq_ErrorDetected = false;
-         orc_Text = C_GtGetText::h_GetText("None");
+         orq_ErrorDetected = true;
+         orc_Text = C_GtGetText::h_GetText("Unknown");
       }
    }
-   else
+
+   if (orc_Text.isEmpty())
    {
-      orq_ErrorDetected = true;
-      orc_Text = C_GtGetText::h_GetText("Unknown");
+      orc_Text = C_GtGetText::h_GetText("None");
    }
 
    return s32_Retval;
@@ -1871,115 +1853,3 @@ template
 void C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCNodeDataPoolListElement, C_PuiSdNodeDataPoolListElement>(
    std::vector<stw_types::uint32> & orc_IndicesTmp, std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContentTmp,
    std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContentTmp);
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapts the state of the COM datapools
-
-   If a specific COM datapool does not exist, it will be created
-
-   \param[in]  ou32_NodeIndex       Current node index
-   \param[in]  ou8_InterfaceNumber  Interface number
-   \param[in]  oq_ComProtocolL2     Flag if Layer 2 COM datapool exist
-   \param[in]  oq_ComProtocolECeS   Flag if ECeS COM datapool exist
-   \param[in]  oq_ComProtocolECoS   Flag if ECoS COM datapool exist
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdUtil::h_ConfigureComDatapools(const uint32 ou32_NodeIndex, const uint8 ou8_InterfaceNumber,
-                                       const bool oq_ComProtocolL2, const bool oq_ComProtocolECeS,
-                                       const bool oq_ComProtocolECoS)
-{
-   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
-
-   if (pc_OscNode != NULL)
-   {
-      uint32 u32_InterfaceIndex = 0UL;
-      bool q_Found = false;
-      for (uint32 u32_Counter = 0U; u32_Counter < pc_OscNode->c_Properties.c_ComInterfaces.size(); ++u32_Counter)
-      {
-         const C_OSCNodeComInterfaceSettings & rc_Interface = pc_OscNode->c_Properties.c_ComInterfaces[u32_Counter];
-         if (rc_Interface.u8_InterfaceNumber == ou8_InterfaceNumber)
-         {
-            u32_InterfaceIndex = u32_Counter;
-            q_Found = true;
-            break;
-         }
-      }
-      if (q_Found == true)
-      {
-         C_SdUtil::mh_ConfigureComDatapool(ou32_NodeIndex, u32_InterfaceIndex, C_OSCCanProtocol::eLAYER2,
-                                           oq_ComProtocolL2);
-         C_SdUtil::mh_ConfigureComDatapool(ou32_NodeIndex, u32_InterfaceIndex, C_OSCCanProtocol::eECES,
-                                           oq_ComProtocolECeS);
-         C_SdUtil::mh_ConfigureComDatapool(ou32_NodeIndex, u32_InterfaceIndex,
-                                           C_OSCCanProtocol::eCAN_OPEN_SAFETY,
-                                           oq_ComProtocolECoS);
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdUtil::mh_ConfigureComDatapool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
-                                       const C_OSCCanProtocol::E_Type oe_ProtocolType, const bool oq_Active)
-{
-   uint32 u32_Counter;
-   const uint32 u32_NodeIndex = ou32_NodeIndex;
-   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
-   bool q_ProtocolFound = false;
-   bool q_ActiveForInterface = false;
-
-   if (pc_OscNode != NULL)
-   {
-      for (u32_Counter = 0U; u32_Counter < pc_OscNode->c_ComProtocols.size(); ++u32_Counter)
-      {
-         const C_OSCCanProtocol & rc_Protocol = pc_OscNode->c_ComProtocols[u32_Counter];
-         if (rc_Protocol.e_Type == oe_ProtocolType)
-         {
-            // Protocol found
-            q_ProtocolFound = true;
-
-            tgl_assert(ou32_InterfaceIndex < rc_Protocol.c_ComMessages.size());
-            if (ou32_InterfaceIndex < rc_Protocol.c_ComMessages.size())
-            {
-               // State of the protocol for the interface
-               q_ActiveForInterface = rc_Protocol.c_ComMessages[ou32_InterfaceIndex].q_IsComProtocolUsedByInterface;
-            }
-            break;
-         }
-      }
-   }
-
-   // Using the implemented undo/redo commands of bus edit for handling the COM protocols.
-   // Only to prevent copied code, not using undo/redo here really.
-   if ((q_ProtocolFound == false) &&
-       (oq_Active == true))
-   {
-      // New COM datapool necessary
-      C_SdBueUnoBusProtNodeConnectAndCreateCommand c_Cmd(u32_NodeIndex, ou32_InterfaceIndex, oe_ProtocolType, NULL);
-      c_Cmd.redo();
-   }
-   else if (q_ProtocolFound == true)
-   {
-      if ((q_ActiveForInterface == true) &&
-          (oq_Active == false))
-      {
-         // Deactivate the COM protocol for this interface
-         C_SdBueUnoBusProtNodeDisconnectCommand c_Cmd(u32_NodeIndex, ou32_InterfaceIndex, oe_ProtocolType, NULL);
-         c_Cmd.redo();
-      }
-      else if ((q_ActiveForInterface == false) &&
-               (oq_Active == true))
-      {
-         // Activate the COM protocol for this interface
-         C_SdBueUnoBusProtNodeConnectCommand c_Cmd(u32_NodeIndex, ou32_InterfaceIndex, oe_ProtocolType, NULL);
-         c_Cmd.redo();
-      }
-      else
-      {
-         // Nothing to do
-      }
-   }
-   else
-   {
-      // Nothing to do
-   }
-}

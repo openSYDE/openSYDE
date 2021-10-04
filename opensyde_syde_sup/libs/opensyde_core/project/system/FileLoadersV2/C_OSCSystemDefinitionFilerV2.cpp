@@ -47,10 +47,10 @@ using namespace stw_scl;
    * Load system definition
    * for each node set a pointer to the used device definition
 
-   \param[out]    orc_SystemDefinition       Pointer to storage
-   \param[in]     orc_PathSystemDefinition   Path to system definition
-   \param[in]     orc_PathDeviceDefinitions  Path to device definition description file
-   \param[in]     oq_UseDeviceDefinitions    Flag for using device definitions, if the flag is true
+   \param[out]  orc_SystemDefinition         Pointer to storage
+   \param[in]   orc_PathSystemDefinition     Path to system definition
+   \param[in]   orc_PathDeviceDefinitions    Path to device definition description file
+   \param[in]   oq_UseDeviceDefinitions      Flag for using device definitions, if the flag is true
                                              orc_PathDeviceDefinitions can be an empty string.
                                              It is highly recommended to use the device definitions.
                                              Purpose for not using the device definition is when only read
@@ -103,8 +103,8 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinitionFile(C_OSCSystemDefin
    Will overwrite the file if it already exists.
    Does NOT write the device definition file(s)
 
-   \param[in]   orc_SystemDefinition Pointer to storage
-   \param[in]   orc_Path             Path of system definition
+   \param[in]  orc_SystemDefinition    Pointer to storage
+   \param[in]  orc_Path                Path of system definition
 
    \return
    C_NO_ERR   data saved
@@ -150,10 +150,10 @@ sint32 C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinitionFile(const C_OSCSyste
    * Load system definition from string
    * for each node set a pointer to the used device definition
 
-   \param[out]    orc_SystemDefinition       Pointer to storage
-   \param[in]     orc_Content                XML Content string
-   \param[in]     orc_PathDeviceDefinitions  Path to device definition description file
-   \param[in]     oq_UseDeviceDefinitions    Flag for using device definitions, if the flag is true
+   \param[out]  orc_SystemDefinition         Pointer to storage
+   \param[in]   orc_Content                  XML Content string
+   \param[in]   orc_PathDeviceDefinitions    Path to device definition description file
+   \param[in]   oq_UseDeviceDefinitions      Flag for using device definitions, if the flag is true
                                              orc_PathDeviceDefinitions can be an empty string.
                                              It is highly recommended to use the device definitions.
                                              Purpose for not using the device definition is when only read
@@ -194,8 +194,8 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinitionString(C_OSCSystemDef
    Save system definition
    Does NOT write the device definition file(s)
 
-   \param[in]     orc_SystemDefinition Pointer to storage
-   \param[out]    orc_Content          XML Content string
+   \param[in]   orc_SystemDefinition   Pointer to storage
+   \param[out]  orc_Content            XML Content string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinitionString(const C_OSCSystemDefinition & orc_SystemDefinition,
@@ -218,11 +218,11 @@ void C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinitionString(const C_OSCSyste
     The caller is responsible to provide a static life-time of orc_DeviceDefinitions.
     Otherwise the "device definition" pointers in C_OSCNode will point to invalid data.
 
-   \param[in]     ou16_XmlFormatVersion     version of XML format
-   \param[out]    orc_Nodes                 data storage
-   \param[in,out] orc_XMLParser             XML with "nodes" active
-   \param[in]     orc_DeviceDefinitions     List of known devices (must contain all device types used by nodes)
-   \param[in]     oq_UseDeviceDefinitions   Flag for using device definitions
+   \param[in]      ou16_XmlFormatVersion     version of XML format
+   \param[out]     orc_Nodes                 data storage
+   \param[in,out]  orc_XMLParser             XML with "nodes" active
+   \param[in]      orc_DeviceDefinitions     List of known devices (must contain all device types used by nodes)
+   \param[in]      oq_UseDeviceDefinitions   Flag for using device definitions
 
    \return
    C_NO_ERR    no error
@@ -293,7 +293,8 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadNodes(const uint16 ou16_XmlFormatVers
       for (uint32 u32_NodeIndex = 0U; u32_NodeIndex < orc_Nodes.size(); u32_NodeIndex++)
       {
          const C_OSCDeviceDefinition * const pc_Device =
-            orc_DeviceDefinitions.LookForDevice(orc_Nodes[u32_NodeIndex].c_DeviceType);
+            orc_DeviceDefinitions.LookForDevice(orc_Nodes[u32_NodeIndex].c_DeviceType, "",
+                                                orc_Nodes[u32_NodeIndex].u32_SubDeviceIndex);
          if (pc_Device == NULL)
          {
             s32_Retval = C_OVERFLOW;
@@ -305,6 +306,7 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadNodes(const uint16 ou16_XmlFormatVers
          }
          else
          {
+            orc_Nodes[u32_NodeIndex].u32_SubDeviceIndex = 0UL;
             orc_Nodes[u32_NodeIndex].pc_DeviceDefinition = pc_Device;
          }
       }
@@ -319,8 +321,8 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadNodes(const uint16 ou16_XmlFormatVers
    Load buses data.
    The bus data will be loaded and the bus will be added.
 
-   \param[in,out] orc_Buses     data storage
-   \param[in,out] orc_XMLParser XML with "buses" active
+   \param[in,out]  orc_Buses        data storage
+   \param[in,out]  orc_XMLParser    XML with "buses" active
 
    \return
    C_NO_ERR   no error
@@ -383,12 +385,8 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadBuses(std::vector<C_OSCSystemBus> & o
    Save nodes data.
    The node data will be saved and the node will be added.
 
-   \param[in]     orc_Nodes     data storage
-   \param[in,out] orc_XMLParser XML with "nodes" active
-
-   \return
-   C_NO_ERR   no error
-   C_CONFIG   content is invalid or incomplete
+   \param[in]      orc_Nodes        data storage
+   \param[in,out]  orc_XMLParser    XML with "nodes" active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinitionFilerV2::h_SaveNodes(const std::vector<C_OSCNode> & orc_Nodes,
@@ -410,12 +408,8 @@ void C_OSCSystemDefinitionFilerV2::h_SaveNodes(const std::vector<C_OSCNode> & or
    Save buses data.
    The bus data will be saved and the bus will be added to the system definition (sorted).
 
-   \param[in]     orc_Buses     data storage
-   \param[in,out] orc_XMLParser XML with "buses" active
-
-   \return
-   C_NO_ERR   no error
-   C_CONFIG   content is invalid or incomplete
+   \param[in]      orc_Buses        data storage
+   \param[in,out]  orc_XMLParser    XML with "buses" active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinitionFilerV2::h_SaveBuses(const std::vector<C_OSCSystemBus> & orc_Buses,
@@ -439,10 +433,10 @@ void C_OSCSystemDefinitionFilerV2::h_SaveBuses(const std::vector<C_OSCSystemBus>
    * Load system definition
    * for each node set a pointer to the used device definition
 
-   \param[out]    orc_SystemDefinition   Pointer to storage
-   \param[in,out] orc_XMLParser          XML with default state
-   \param[in]     orc_PathDeviceDefinitions  Path to device definition description file
-   \param[in]     oq_UseDeviceDefinitions    Flag for using device definitions
+   \param[out]     orc_SystemDefinition         Pointer to storage
+   \param[in,out]  orc_XMLParser                XML with default state
+   \param[in]      orc_PathDeviceDefinitions    Path to device definition description file
+   \param[in]      oq_UseDeviceDefinitions      Flag for using device definitions
 
    \return
    C_NO_ERR    data read
@@ -562,8 +556,8 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OSCSystemDefinitio
    Save system definition
    Does NOT write the device definition file(s)
 
-   \param[in]     orc_SystemDefinition Pointer to storage
-   \param[in,out] orc_XMLParser        XML with default state
+   \param[in]      orc_SystemDefinition   Pointer to storage
+   \param[in,out]  orc_XMLParser          XML with default state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinition(const C_OSCSystemDefinition & orc_SystemDefinition,

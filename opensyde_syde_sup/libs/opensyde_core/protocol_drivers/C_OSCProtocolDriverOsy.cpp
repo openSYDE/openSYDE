@@ -53,6 +53,7 @@ C_OSCProtocolDriverOsy::C_ListOfFeatures::C_ListOfFeatures(void)
    q_MaxNumberOfBlockLengthAvailable = false;
    q_EthernetToEthernetRoutingSupported = false;
    q_FileBasedTransferExitResultAvailable = false;
+   q_ExtendedSerialNumberModeImplemented = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -835,7 +836,7 @@ sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identif
    Send request and wait for response.
    See class description for general handling of "polled" services.
 
-   \param[out] orau8_SerialNumber    read serial number
+   \param[out] orc_SerialNumber      read serial number
    \param[out] opu8_NrCode           if != NULL: negative response code in case of an error response
 
    \return
@@ -848,7 +849,8 @@ sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identif
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(uint8 (&orau8_SerialNumber)[6], uint8 * const opu8_NrCode)
+sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(C_OSCProtocolSerialNumber & orc_SerialNumber,
+                                                      uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
 
@@ -858,7 +860,9 @@ sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(uint8 (&orau8_SerialNumber
    s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_ECU_SERIAL_NUMBER, 6U, true, c_Snr, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      (void)std::memcpy(&orau8_SerialNumber[0], &c_Snr[0], 6);
+      uint8 au8_SerialNumber[6];
+      (void)std::memcpy(&au8_SerialNumber[0], &c_Snr[0], 6);
+      orc_SerialNumber.SetPosSerialNumber(au8_SerialNumber);
    }
    if (opu8_NrCode != NULL)
    {
@@ -986,6 +990,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadListOfFeatures(C_ListOfFeatures & orc_List
       orc_ListOfFeatures.q_MaxNumberOfBlockLengthAvailable = ((c_Data[7] & 0x02U) == 0x02U) ? true : false;
       orc_ListOfFeatures.q_EthernetToEthernetRoutingSupported = ((c_Data[7] & 0x04U) == 0x04U) ? true : false;
       orc_ListOfFeatures.q_FileBasedTransferExitResultAvailable = ((c_Data[7] & 0x08U) == 0x08U) ? true : false;
+      orc_ListOfFeatures.q_ExtendedSerialNumberModeImplemented = ((c_Data[7] & 0x10U) == 0x10U) ? true : false;
       //we don't know anything about the meaning of the rest of the bits as we have no crystal ball
    }
    if (opu8_NrCode != NULL)
@@ -1335,6 +1340,119 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFileBasedTransferExitResult(C_SCLString & 
    }
 
    m_LogServiceError("ReadDataByIdentifier::FileBasedTransferExitResult", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadEcuSerialNumberExt service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+   Per specification the maximum length is 29 characters.
+
+   \param[out] orc_SerialNumberExt                 read extended serial number
+   \param[out] opu8_NrCode                         if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+   C_RANGE    length of read string or serial number does not match
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumberExt(C_OSCProtocolSerialNumber & orc_SerialNumberExt,
+                                                         uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+   uint8 u8_NrErrorCode = 0U;
+
+   std::vector<uint8> c_Data;
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_ECU_SERIAL_NUMBER_EXT, 3, false, c_Data, u8_NrErrorCode);
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   if (s32_Return == C_NO_ERR)
+   {
+      // At least 3 bytes are necessary
+      if (c_Data.size() > 2)
+      {
+         // Byte stream
+         const uint8 u8_SnrLength = c_Data[1];
+
+         // Maximum length of an extended serial number must be valid and
+         // length of string must match the expected size of the SNR
+         if ((u8_SnrLength <= 29U) &&
+             ((static_cast<uint32>(u8_SnrLength) + 2U) == c_Data.size()))
+         {
+            const uint8 u8_SerialNumberManufacturerFormat = c_Data[0];
+            // Erase the first two bytes to have the serial number data only
+            c_Data.erase(c_Data.begin(), c_Data.begin() + 2);
+            s32_Return = orc_SerialNumberExt.SetExtSerialNumber(c_Data, u8_SerialNumberManufacturerFormat);
+         }
+         else
+         {
+            s32_Return = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Return = C_RANGE;
+      }
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::ECUSerialNumberDataIdentifierExt", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadSubNodeId service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   Whether this service is available on the target can be checked with OsyReadListOfFeatures().
+
+   \param[out] oru8_SubNodeId                   read sub node id
+   \param[out] opu8_NrCode                      if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyReadSubNodeId(stw_types::uint8 & oru8_SubNodeId, uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+
+   std::vector<uint8> c_Data;
+   uint8 u8_NrErrorCode = 0U;
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_SUB_NODE_ID, 1U, true, c_Data, u8_NrErrorCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      //extract information:
+      oru8_SubNodeId = c_Data[0];
+   }
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::ReadMaxNumberOfBlockLength", s32_Return, u8_NrErrorCode);
 
    return s32_Return;
 }

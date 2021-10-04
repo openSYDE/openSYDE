@@ -39,11 +39,11 @@ public:
    ~C_SyvDcExistingNodeWidget(void);
 
    stw_types::sint32 SetIndex(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_NodeIndex,
-                              const stw_types::sint32 os32_ItemIndex, QListWidgetItem * const opc_Item,
+                              const bool oq_PartOfSquad, QListWidgetItem * const opc_Item,
                               const bool oq_ShowAssignment);
    bool CompareIndex(const stw_types::uint32 ou32_NodeIndex) const;
-   void ConnectSerialNumber(const QString & orc_SerialNumber) const;
-   void DisconnectSerialNumber(const QString & orc_SerialNumber) const;
+   void ConnectSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
+   void DisconnectSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
    bool IsAssigned(void) const;
    void AppendDeviceConfig(std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> & orc_Configs) const;
 
@@ -55,8 +55,9 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void SigConnect(const stw_types::uint32 ou32_NodeIndex, const QString & orc_SerialNumber);
-   void SigDisconnect(const stw_types::uint32 ou32_NodeIndex, const QString & orc_SerialNumber);
+   void SigConnect(const stw_types::uint32 ou32_NodeIndex,
+                   const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
+   void SigDisconnect(const stw_types::uint32 ou32_NodeIndex, const stw_opensyde_core::C_OSCProtocolSerialNumber);
 
 protected:
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
@@ -70,14 +71,20 @@ private:
    QListWidgetItem * mpc_ListWidgetItem;
    stw_types::uint32 mu32_ViewIndex;
    stw_types::uint32 mu32_NodeIndex;
-   stw_types::sint32 ms32_ItemIndex;
+   bool mq_PartOfSquad;
    QString mc_DeviceName;
    static const QString mhc_MimeData;
+   static const QString mhc_MimeDataExtFormat;
+   static const QString mhc_MimeDataManufacturerFormat;
    static const QString mhc_MimeDataDevice;
    static const QString mhc_MimeDataDeviceValid;
 
    stw_types::sint32 m_Init(void);
-   void m_OnDisconnectRequest(const QString & orc_SerialNumber);
+   void m_OnDisconnectRequest(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
+   static void mh_AppendDeviceConfigForNode(const stw_types::uint32 ou32_NodeIndex,
+                                            const stw_types::uint32 ou32_ConnectedBusIndex,
+                                            stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation oc_NodeConfig,
+                                            std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> & orc_Configs);
 
    //Avoid call
    C_SyvDcExistingNodeWidget(const C_SyvDcExistingNodeWidget &);

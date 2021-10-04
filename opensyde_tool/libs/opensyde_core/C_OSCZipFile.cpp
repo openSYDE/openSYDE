@@ -206,13 +206,14 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
    vector<mz_zip_archive_file_stat> c_Files; // to store content of zip archive
 
    // open archive
-   memset(&c_ZipArchive, 0, sizeof(c_ZipArchive));
+   (void)memset(&c_ZipArchive, 0, sizeof(c_ZipArchive));
    sn_MzStatus = mz_zip_reader_init_file(&c_ZipArchive, orc_SourcePath.c_str(), 0);
    if (sn_MzStatus == MZ_FALSE)
    {
       if (opc_ErrorText != NULL)
       {
-         (*opc_ErrorText) = "Could not open zip archive \"" + orc_SourcePath + "\".";
+         (*opc_ErrorText) = "Could not open zip archive \"" + orc_SourcePath + "\". Reason: \"" +
+                            mz_zip_get_error_string(c_ZipArchive.m_last_error) + "\".";
       }
       s32_Return = C_RD_WR;
    }

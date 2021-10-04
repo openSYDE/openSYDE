@@ -311,7 +311,9 @@ bool C_SyvDaDashboardTabProperties::m_CheckDashboardTabName(void) const
       // show error tooltip if invalid and no tooltip else
       if (q_ValidName == true)
       {
-         this->mpc_Ui->pc_LineEditName->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+         this->mpc_Ui->pc_LineEditName->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                              C_GtGetText::h_GetText(""),
+                                                              C_NagToolTip::eDEFAULT);
       }
       else
       {

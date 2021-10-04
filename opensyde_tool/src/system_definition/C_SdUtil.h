@@ -64,8 +64,7 @@ public:
    static bool h_InitNodeInterfaceComboBox(const stw_opensyde_core::C_OSCNode & orc_Node,
                                            const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_BusType,
                                            QComboBox * const opc_ComboBox,
-                                           const stw_types::sint32 & ors32_SpecialInterface, bool & orq_ComProtocolL2,
-                                           bool & orq_ComProtocolECeS, bool & orq_ComProtocolECoS);
+                                           const stw_types::sint32 & ors32_SpecialInterface);
    static std::vector<stw_types::uint32> h_GetUsedNodeIdsForBusUniqueAndSortedAscending(
       const stw_types::uint32 & oru32_BusIndex, const stw_types::uint32 & oru32_SpecialNodeIndex,
       const stw_types::sint32 & ors32_SpecialInterface);
@@ -80,8 +79,6 @@ public:
    static void h_AdaptSignalToProtocolType(stw_opensyde_core::C_OSCCanSignal & orc_Signal,
                                            const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Type,
                                            QStringList * const opc_AdaptationInfos);
-   static void h_InitUsedNodeIdsLabel(const std::vector<stw_types::uint32> & orc_UsedNodeIds,
-                                      const QString & orc_BusName, QLabel * const opc_Label);
    static QString h_InitUsedIdsString(const std::vector<stw_types::uint32> & orc_UsedIds, const QString & orc_ItemName,
                                       const QString & orc_ItemType, const bool oq_SkipItem = false);
    static stw_types::uint32 h_GetNextFreeNodeId(
@@ -98,7 +95,7 @@ public:
    static bool h_CheckDatapoolNumber(const stw_types::uint32 & oru32_NodeIndex, const bool & orq_AlreadyChecked,
                                      QWidget * const opc_Parent);
    static stw_types::sint32 h_GetErrorToolTipNode(const stw_types::uint32 & oru32_NodeIndex, QString & orc_Text,
-                                                  bool & orq_ErrorDetected);
+                                                  bool & orq_ErrorDetected, const bool oq_CheckAll);
    static void h_GetErrorToolTipBus(const stw_types::uint32 & oru32_BusIndex, QString & orc_Text);
    static QString h_GetToolTipContentDpList(const stw_types::uint32 & oru32_NodeIndex,
                                             const stw_types::uint32 & oru32_DatapoolIndex,
@@ -118,15 +115,6 @@ public:
    template <typename T, typename U>
    static void h_SortIndicesAscendingAndSync(std::vector<stw_types::uint32> & orc_IndicesTmp,
                                              std::vector<T> & orc_OSCContentTmp, std::vector<U> & orc_UIContentTmp);
-   static void h_ConfigureComDatapools(const stw_types::uint32 ou32_NodeIndex,
-                                       const stw_types::uint8 ou8_InterfaceNumber, const bool oq_ComProtocolL2,
-                                       const bool oq_ComProtocolECeS, const bool oq_ComProtocolECoS);
-
-private:
-   static void mh_ConfigureComDatapool(const stw_types::uint32 ou32_NodeIndex,
-                                       const stw_types::uint32 ou32_InterfaceIndex,
-                                       const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType,
-                                       const bool oq_Active);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

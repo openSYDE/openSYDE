@@ -60,12 +60,14 @@ public:
 
    // init node system - selects second node, if available; first node is declaration
    stw_scl::C_SCLString SelectRoot(void);
+   virtual stw_types::sint32 SelectRootError(const stw_scl::C_SCLString & orc_Name);
 
    // node navigation - returns current node
    // select first/next node (with name) after current node      (go forward)
    stw_scl::C_SCLString SelectNodeNext(const stw_scl::C_SCLString & orc_Name = "");
    // select first child node (with name) of current node        (go deeper)
    stw_scl::C_SCLString SelectNodeChild(const stw_scl::C_SCLString & orc_Name = "");
+   virtual stw_types::sint32 SelectNodeChildError(const stw_scl::C_SCLString & orc_Name);
    // select parent node of current node                         (go up)
    stw_scl::C_SCLString SelectNodeParent(void);
 
@@ -84,10 +86,8 @@ public:
    // node attribute operations
    bool AttributeExists(const stw_scl::C_SCLString & orc_Name) const;
 
-   stw_scl::C_SCLString GetCurrentNodeName(void) const
-   {
-      return (mpc_CurrentNode == NULL) ? "" : mpc_CurrentNode->Name();
-   }
+   stw_scl::C_SCLString GetCurrentNodeName(void) const;
+   stw_types::sintn GetFileLineForCurrentNode(void) const;
 
    // set attribute values
    void SetAttributeString(const stw_scl::C_SCLString & orc_Name, const stw_scl::C_SCLString & orc_Value);
@@ -100,14 +100,51 @@ public:
    void SetAttributeFloat64(const stw_scl::C_SCLString & orc_Name, const stw_types::float64 of64_Value);
 
    // get attribute values
-   stw_scl::C_SCLString GetAttributeString(const stw_scl::C_SCLString & orc_Name) const;
-   stw_types::sint32 GetAttributeSint32(const stw_scl::C_SCLString & orc_Name) const;
-   stw_types::uint32 GetAttributeUint32(const stw_scl::C_SCLString & orc_Name) const;
-   stw_types::sint64 GetAttributeSint64(const stw_scl::C_SCLString & orc_Name) const;
-   stw_types::uint64 GetAttributeUint64(const stw_scl::C_SCLString & orc_Name) const;
-   bool GetAttributeBool(const stw_scl::C_SCLString & orc_Name) const;
-   stw_types::float32 GetAttributeFloat32(const stw_scl::C_SCLString & orc_Name) const;
-   stw_types::float64 GetAttributeFloat64(const stw_scl::C_SCLString & orc_Name) const;
+   stw_scl::C_SCLString GetAttributeString(const stw_scl::C_SCLString & orc_Name,
+                                           const stw_scl::C_SCLString & orc_Default = "") const;
+   stw_types::sint32 GetAttributeSint32(const stw_scl::C_SCLString & orc_Name,
+                                        const stw_types::sint32 os32_Default = 0L) const;
+   stw_types::uint32 GetAttributeUint32(const stw_scl::C_SCLString & orc_Name,
+                                        const stw_types::uint32 ou32_Default = 0UL) const;
+   stw_types::sint64 GetAttributeSint64(const stw_scl::C_SCLString & orc_Name,
+                                        const stw_types::sint64 os64_Default = 0LL) const;
+   stw_types::uint64 GetAttributeUint64(const stw_scl::C_SCLString & orc_Name,
+                                        const stw_types::uint64 ou64_Default = 0ULL) const;
+   bool GetAttributeBool(const stw_scl::C_SCLString & orc_Name, const bool oq_Default = false) const;
+   stw_types::float32 GetAttributeFloat32(const stw_scl::C_SCLString & orc_Name,
+                                          const stw_types::float32 of32_Default = 0.0F) const;
+   stw_types::float64 GetAttributeFloat64(const stw_scl::C_SCLString & orc_Name,
+                                          const stw_types::float64 of64_Default = 0.0) const;
+
+   // get attribute values (includes error check)
+   virtual stw_types::sint32 GetAttributeStringError(const stw_scl::C_SCLString & orc_Name,
+                                                     stw_scl::C_SCLString & orc_Value) const;
+   virtual stw_types::sint32 GetAttributeSint32Error(const stw_scl::C_SCLString & orc_Name,
+                                                     stw_types::sint32 & ors32_Value) const;
+   virtual stw_types::sint32 GetAttributeUint32Error(const stw_scl::C_SCLString & orc_Name,
+                                                     stw_types::uint32 & oru32_Value) const;
+   virtual stw_types::sint32 GetAttributeSint64Error(const stw_scl::C_SCLString & orc_Name,
+                                                     stw_types::sint64 & ors64_Value) const;
+   virtual stw_types::sint32 GetAttributeUint64Error(const stw_scl::C_SCLString & orc_Name,
+                                                     stw_types::uint64 & oru64_Value) const;
+   virtual stw_types::sint32 GetAttributeBoolError(const stw_scl::C_SCLString & orc_Name, bool & orq_Value) const;
+   virtual stw_types::sint32 GetAttributeFloat32Error(const stw_scl::C_SCLString & orc_Name,
+                                                      stw_types::float32 & orf32_Value) const;
+   virtual stw_types::sint32 GetAttributeFloat64Error(const stw_scl::C_SCLString & orc_Name,
+                                                      stw_types::float64 & orf64_Value) const;
+
+   //Base reporting functions
+   virtual void ReportErrorForNodeContentAppendXMLContext(const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForAttributeContentAppendXMLContext(const stw_scl::C_SCLString & orc_Attribute,
+                                                               const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForNodeContentStartingWithXMLContext(const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForAttributeContentStartingWithXMLContext(const stw_scl::C_SCLString & orc_Attribute,
+                                                                     const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForNodeMissing(const stw_scl::C_SCLString & orc_MissingNodeName) const;
 
    // get all attributes
    std::vector<C_OSCXMLAttribute> GetAttributes(void) const;
@@ -132,28 +169,15 @@ public:
    // open xml file; create XML declaration
    virtual stw_types::sint32 LoadFromFile(const stw_scl::C_SCLString & orc_FileName);
    virtual stw_types::sint32 SaveToFile(const stw_scl::C_SCLString & orc_FileName);
-};
-
-//----------------------------------------------------------------------------------------------------------------------
-
-///string based parsing
-class C_OSCXMLParserString :
-   public C_OSCXMLParserBase
-{
-private:
-   // not implemented -> prevent copying
-   C_OSCXMLParserString(const C_OSCXMLParserString & orc_Source);
-   // not implemented -> prevent assignment
-   C_OSCXMLParserString & operator = (const C_OSCXMLParserString & orc_Source); //lint !e1511 //we want to hide the base
-
-public:
-   C_OSCXMLParserString(void);
-   virtual ~C_OSCXMLParserString(void);
 
    // parse xml string; create XML declaration
    stw_types::sint32 LoadFromString(const stw_scl::C_SCLString & orc_String);
    void SaveToString(stw_scl::C_SCLString & orc_String) const;
 };
+
+//----------------------------------------------------------------------------------------------------------------------
+//Add typedef for compatibility
+typedef C_OSCXMLParser C_OSCXMLParserString;
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }

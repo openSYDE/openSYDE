@@ -585,7 +585,8 @@ C_SYDEsup::E_Result C_SYDEsup::m_InitOptionalParameters(void)
    else if (TGL_DirectoryExists(mc_UnzipPath) == true)
    {
       // unzip to sub directory with name of update package
-      mc_UnzipPath = mc_UnzipPath + "\\" + TGL_ChangeFileExtension(TGL_ExtractFileName(mc_SUPFilePath), "");
+      mc_UnzipPath = TGL_FileIncludeTrailingDelimiter(mc_UnzipPath) +
+                     TGL_ChangeFileExtension(TGL_ExtractFileName(mc_SUPFilePath), "");
    }
    else
    {

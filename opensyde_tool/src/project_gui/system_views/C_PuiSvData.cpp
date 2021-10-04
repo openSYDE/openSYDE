@@ -257,6 +257,62 @@ void C_PuiSvData::SetPcData(const C_PuiSvPc & orc_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get node active
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   Status if node is active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvData::GetNodeActive(const uint32 ou32_NodeIndex) const
+{
+   bool q_Retval = false;
+
+   if (ou32_NodeIndex < this->mc_NodeActiveFlags.size())
+   {
+      if (this->mc_NodeActiveFlags[ou32_NodeIndex] == 0U)
+      {
+         q_Retval = false;
+      }
+      else
+      {
+         q_Retval = true;
+      }
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get node status displayed as active
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   Node status displayed as active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvData::GetNodeStatusDisplayedAsActive(const uint32 ou32_NodeIndex) const
+{
+   bool q_Retval = false;
+   const std::vector<uint32> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+      ou32_NodeIndex);
+
+   for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
+   {
+      if (c_NodeIndices[u32_ItNode] < this->mc_NodeActiveFlags.size())
+      {
+         if (this->mc_NodeActiveFlags[c_NodeIndices[u32_ItNode]] != 0U)
+         {
+            q_Retval = true;
+            break;
+         }
+      }
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get node active flags
 
    \return
@@ -2182,25 +2238,20 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint32 ou3
 
    \param[in]  ou32_NodeIndex    Node index
    \param[in]  ou8_Checked       Checked flag
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvData::SetNodeCheckedState(const uint32 ou32_NodeIndex, const uint8 ou8_Checked)
+void C_PuiSvData::SetNodeCheckedState(const uint32 ou32_NodeIndex, const uint8 ou8_Checked)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   const std::vector<uint32> c_NodeIndices =
+      C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
 
-   if (ou32_NodeIndex < this->mc_NodeActiveFlags.size())
+   for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
    {
-      this->mc_NodeActiveFlags[ou32_NodeIndex] = ou8_Checked;
+      if (c_NodeIndices[u32_ItNode] < this->mc_NodeActiveFlags.size())
+      {
+         this->mc_NodeActiveFlags[c_NodeIndices[u32_ItNode]] = ou8_Checked;
+      }
    }
-   else
-   {
-      s32_Retval = C_RANGE;
-   }
-   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3094,6 +3145,99 @@ sint32 C_PuiSvData::SyncDashboardScalingInformation(const uint32 ou32_DashboardI
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Activate all relevant sub devices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::ActivateAllRelevantSubDevices(void)
+{
+   const std::vector<C_OSCNodeSquad> & rc_Groups =
+      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_NodeSquads;
+
+   for (uint32 u32_ItGroup = 0UL; u32_ItGroup < rc_Groups.size(); ++u32_ItGroup)
+   {
+      const C_OSCNodeSquad & rc_Group = rc_Groups[u32_ItGroup];
+      if (rc_Group.c_SubNodeIndexes.size() > 0UL)
+      {
+         const bool q_IsActive = this->GetNodeStatusDisplayedAsActive(rc_Group.c_SubNodeIndexes[0UL]);
+         for (uint32 u32_ItSubDevice = 0UL; u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size(); ++u32_ItSubDevice)
+         {
+            const uint32 u32_CurIndex = rc_Group.c_SubNodeIndexes[u32_ItSubDevice];
+            if (this->GetNodeActive(u32_CurIndex) != q_IsActive)
+            {
+               if (u32_CurIndex < this->mc_NodeActiveFlags.size())
+               {
+                  if (q_IsActive)
+                  {
+                     this->mc_NodeActiveFlags[u32_CurIndex] = 1U;
+                  }
+                  else
+                  {
+                     this->mc_NodeActiveFlags[u32_CurIndex] = 0U;
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Deactivate sub devices based on errors
+
+   \param[in]  orc_Errors  Errors
+
+   \return
+   Deactivate sub devices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<uint32> C_PuiSvData::DeactivateSubDevicesBasedOnErrors(const std::map<uint32, QString> & orc_Errors)
+{
+   std::vector<uint32> c_Retval;
+   const std::vector<C_OSCNodeSquad> & rc_Groups =
+      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_NodeSquads;
+
+   for (uint32 u32_ItGroup = 0UL; u32_ItGroup < rc_Groups.size(); ++u32_ItGroup)
+   {
+      const C_OSCNodeSquad & rc_Group = rc_Groups[u32_ItGroup];
+      if (rc_Group.c_SubNodeIndexes.size() > 0UL)
+      {
+         const bool q_IsActive = this->GetNodeStatusDisplayedAsActive(rc_Group.c_SubNodeIndexes[0UL]);
+         if (q_IsActive)
+         {
+            bool q_OneSuccess = false;
+            for (uint32 u32_ItSubDevice = 0UL; (u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size()) && (!q_OneSuccess);
+                 ++u32_ItSubDevice)
+            {
+               const uint32 u32_CurIndex = rc_Group.c_SubNodeIndexes[u32_ItSubDevice];
+               if (orc_Errors.count(u32_CurIndex) == 0UL)
+               {
+                  q_OneSuccess = true;
+               }
+            }
+            if (q_OneSuccess)
+            {
+               for (uint32 u32_ItSubDevice = 0UL;
+                    u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size();
+                    ++u32_ItSubDevice)
+               {
+                  const uint32 u32_CurIndex = rc_Group.c_SubNodeIndexes[u32_ItSubDevice];
+                  if (orc_Errors.count(u32_CurIndex) != 0UL)
+                  {
+                     if (u32_CurIndex < this->mc_NodeActiveFlags.size())
+                     {
+                        c_Retval.push_back(u32_CurIndex);
+                        this->mc_NodeActiveFlags[u32_CurIndex] = 0U;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Fix invalid rail configurations
 
    Hint: may be introduced by unknown issue not cleaning up rail configurations properly
@@ -3183,7 +3327,7 @@ void C_PuiSvData::HandleCompatibilityChart(void)
 /*! \brief   Init from current system definition state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::InitFromSystemDefintion(void)
+void C_PuiSvData::InitFromSystemDefinition(void)
 {
    //Nodes only
    this->mc_NodeActiveFlags.resize(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(), static_cast<uint8>(true));

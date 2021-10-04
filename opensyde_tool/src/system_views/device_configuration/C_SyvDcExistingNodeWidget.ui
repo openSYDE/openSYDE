@@ -71,7 +71,7 @@
     <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxSerialNumber">
      <property name="minimumSize">
       <size>
-       <width>190</width>
+       <width>325</width>
        <height>0</height>
       </size>
      </property>
@@ -121,6 +121,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxTransparent.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabPropertiesSubHeading</class>
    <extends>QLabel</extends>
    <header>C_OgeLabPropertiesSubHeading.h</header>
@@ -129,12 +135,6 @@
    <class>stw_opensyde_gui_elements::C_OgeLabGroupSubItem</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupSubItem.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui::C_SyvDcExistingNodeDropAreaWidget</class>

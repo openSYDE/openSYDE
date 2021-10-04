@@ -6,12 +6,6 @@ border-width: 1px;
 border-top-width: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgeTawAlternative::pane,
-stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar
-{
-border-style: none;
-}
-
 stw_opensyde_gui_elements--C_OgeTawAlternative::tab-bar,
 stw_opensyde_gui_elements--C_OgeTawToolBox::tab-bar,
 stw_opensyde_gui_elements--C_OgeTawPageNavi::tab-bar,
@@ -36,16 +30,14 @@ padding-right: 0px;
 padding-top: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab
+stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab,
+stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab:selected
 {
 border-style: solid;
-border-left-width: 0px;
-border-top-width: 0px;
-border-bottom-width: 1px;
-border-right-width: 1px;
-padding-left: 0px;
-padding-right: 0px;
-padding-top: 10px;
+border-bottom-width:3px;
+margin-right: 19px;
+padding: 8px;
+padding-bottom: 4px;
 }
 
 stw_opensyde_gui_elements--C_OgeTawToolBox QTabBar::tab:selected
@@ -58,24 +50,6 @@ stw_opensyde_gui_elements--C_OgeTawToolBox QTabBar::tab:last
 border-right-width: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab:last
-{
-border-right-width: 0px;
-}
-
-/* --------------------------------------------------------------------- */
-/* Default TabWidget */
-stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab:selected
-{
-border-bottom-width: 5px;
-padding-bottom: 5px;
-}
-stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab
-{
-padding-bottom: 9px;
-min-height: 30px;
-}
- 
 /* --------------------------------------------------------------------- */
 /* Toolbox TabWidget */
 stw_opensyde_gui_elements--C_OgeTawToolBox QTabBar::tab:selected
@@ -93,10 +67,12 @@ min-height: 17px;
 /* --------------------------------------------------------------------- */
 /* NaviPage TabWidget */
 stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar,
+stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar,
 stw_opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"],
 stw_opensyde_gui--C_SyvDaDashboardSelectorTabBar,
 stw_opensyde_gui--C_SyvDaDashboardSelectorTabWidget::pane,
 stw_opensyde_gui_elements--C_OgeTawPageNavi::pane,
+stw_opensyde_gui_elements--C_OgeTawAlternative::pane,
 stw_opensyde_gui_elements--C_OgeTawSelector::pane
 {
 border-style: none;

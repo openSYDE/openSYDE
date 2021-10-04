@@ -679,7 +679,8 @@ void C_SdNdeDpSelectorItemWidget::m_UpdateLabel(void)
          this->mpc_LabelStateImg->setPixmap(this->mc_ConflictImg);
          this->mpc_LabelStateImg->setVisible(true);
          //Activate tool tip
-         this->mpc_LabelStateImg->SetToolTipInformation("Not visible", "Not visible");
+         this->mpc_LabelStateImg->SetToolTipInformation(C_GtGetText::h_GetText("Not visible"),
+                                                        C_GtGetText::h_GetText("Not visible"));
       }
       //safety icon deactivated so far (SSI, 13.03.18)
       // - Layout is awful

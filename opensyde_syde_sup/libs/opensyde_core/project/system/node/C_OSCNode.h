@@ -145,7 +145,8 @@ public:
                                                          const stw_types::uint32 ou32_ElementIndex);
 
    const C_OSCDeviceDefinition * pc_DeviceDefinition; ///< Pointer to device definition
-   stw_scl::C_SCLString c_DeviceType;                 ///< Node type: reference to name of device type in Device
+   stw_types::uint32 u32_SubDeviceIndex;
+   stw_scl::C_SCLString c_DeviceType; ///< Node type: reference to name of device type in Device
    ///< Definition
    C_OSCNodeProperties c_Properties;           ///< General node properties
    std::vector<C_OSCNodeDataPool> c_DataPools; ///< All datapools assigned to this node, expected type order:

@@ -1072,7 +1072,7 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolElementValue(C_OSCNodeDataPoolCon
          orc_NodeDataPoolContent.SetValueU32(orc_XMLParser.GetAttributeUint32("value"));
          break;
       case C_OSCNodeDataPoolContent::eUINT64:
-         orc_NodeDataPoolContent.SetValueU64(mh_GetAttributeUint64(orc_XMLParser, "value"));
+         orc_NodeDataPoolContent.SetValueU64(orc_XMLParser.GetAttributeUint64("value"));
          break;
       case C_OSCNodeDataPoolContent::eSINT8:
          orc_NodeDataPoolContent.SetValueS8(static_cast<sint8>(orc_XMLParser.GetAttributeSint64("value")));
@@ -1121,12 +1121,10 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolElementValue(C_OSCNodeDataPoolCon
                                                                                   "value")), u32_CurIndex);
                break;
             case C_OSCNodeDataPoolContent::eUINT32:
-               orc_NodeDataPoolContent.SetValueAU32Element(orc_XMLParser.GetAttributeUint32("value"),
-                                                           u32_CurIndex);
+               orc_NodeDataPoolContent.SetValueAU32Element(orc_XMLParser.GetAttributeUint32("value"), u32_CurIndex);
                break;
             case C_OSCNodeDataPoolContent::eUINT64:
-               orc_NodeDataPoolContent.SetValueAU64Element(mh_GetAttributeUint64(orc_XMLParser,
-                                                                                 "value"), u32_CurIndex);
+               orc_NodeDataPoolContent.SetValueAU64Element(orc_XMLParser.GetAttributeUint64("value"), u32_CurIndex);
                break;
             case C_OSCNodeDataPoolContent::eSINT8:
                orc_NodeDataPoolContent.SetValueAS8Element(static_cast<sint8>(orc_XMLParser.GetAttributeSint64(
@@ -1205,7 +1203,7 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolElementValue(const stw_scl::C_SCLSt
          orc_XMLParser.SetAttributeUint32("value", orc_NodeDataPoolContent.GetValueU32());
          break;
       case C_OSCNodeDataPoolContent::eUINT64:
-         mh_SetAttributeUint64(orc_XMLParser, "value", orc_NodeDataPoolContent.GetValueU64());
+         orc_XMLParser.SetAttributeUint64("value", orc_NodeDataPoolContent.GetValueU64());
          break;
       case C_OSCNodeDataPoolContent::eSINT8:
          orc_XMLParser.SetAttributeSint64("value", static_cast<sint64>(orc_NodeDataPoolContent.GetValueS8()));
@@ -1250,7 +1248,7 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolElementValue(const stw_scl::C_SCLSt
             orc_XMLParser.SetAttributeUint32("value", orc_NodeDataPoolContent.GetValueAU32Element(u32_ItElem));
             break;
          case C_OSCNodeDataPoolContent::eUINT64:
-            mh_SetAttributeUint64(orc_XMLParser, "value", orc_NodeDataPoolContent.GetValueAU64Element(u32_ItElem));
+            orc_XMLParser.SetAttributeUint64("value", orc_NodeDataPoolContent.GetValueAU64Element(u32_ItElem));
             break;
          case C_OSCNodeDataPoolContent::eSINT8:
             orc_XMLParser.SetAttributeSint64("value",
@@ -1319,7 +1317,7 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCo
          orc_XMLParser.SetAttributeUint32("value", orc_NodeDataPoolContent.GetValueU32());
          break;
       case C_OSCNodeDataPoolContent::eUINT64:
-         mh_SetAttributeUint64(orc_XMLParser, "value", orc_NodeDataPoolContent.GetValueU64());
+         orc_XMLParser.SetAttributeUint64("value", orc_NodeDataPoolContent.GetValueU64());
          break;
       case C_OSCNodeDataPoolContent::eSINT8:
          orc_XMLParser.SetAttributeSint64("value", static_cast<sint64>(orc_NodeDataPoolContent.GetValueS8()));
@@ -1366,7 +1364,7 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCo
             orc_XMLParser.SetAttributeUint32("content", orc_NodeDataPoolContent.GetValueAU32Element(u32_ItElem));
             break;
          case C_OSCNodeDataPoolContent::eUINT64:
-            mh_SetAttributeUint64(orc_XMLParser, "content", orc_NodeDataPoolContent.GetValueAU64Element(u32_ItElem));
+            orc_XMLParser.SetAttributeUint64("content", orc_NodeDataPoolContent.GetValueAU64Element(u32_ItElem));
             break;
          case C_OSCNodeDataPoolContent::eSINT8:
             orc_XMLParser.SetAttributeSint64("content",
@@ -1472,8 +1470,8 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolContentV1(C_OSCNodeDataPoolConten
                                                               u32_CurIndex);
                   break;
                case C_OSCNodeDataPoolContent::eUINT64:
-                  orc_NodeDataPoolContent.SetValueAU64Element(mh_GetAttributeUint64(orc_XMLParser,
-                                                                                    "content"), u32_CurIndex);
+                  orc_NodeDataPoolContent.SetValueAU64Element(orc_XMLParser.GetAttributeUint64("content"),
+                                                              u32_CurIndex);
                   break;
                case C_OSCNodeDataPoolContent::eSINT8:
                   orc_NodeDataPoolContent.SetValueAS8Element(static_cast<sint8>(orc_XMLParser.GetAttributeSint64(
@@ -1699,43 +1697,4 @@ sint32 C_OSCNodeDataPoolFilerV2::mh_StringToNodeDataPoolElementAccess(const C_SC
    }
 
    return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set unit64 attribute
-
-   \param[in,out] orc_XMLParser XML
-   \param[in]     orc_String    Attribute
-   \param[in]     ou64_Input    Value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFilerV2::mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_String,
-                                                     const uint64 ou64_Input)
-{
-   std::stringstream c_Stream;
-   c_Stream << ou64_Input;
-
-   orc_XMLParser.SetAttributeString(orc_String, std::string(c_Stream.str()).c_str());
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get unit64 attribute
-
-   \param[in] orc_XMLParser XML
-   \param[in] orc_String    Attribute
-
-   \return
-   Value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-uint64 C_OSCNodeDataPoolFilerV2::mh_GetAttributeUint64(const C_OSCXMLParserBase & orc_XMLParser,
-                                                       const C_SCLString & orc_String)
-{
-   uint64 u64_Retval = 0;
-
-   std::stringstream c_Stream;
-   c_Stream << orc_XMLParser.GetAttributeString(orc_String).c_str();
-
-   c_Stream >> u64_Retval;
-   return u64_Retval;
 }

@@ -78,6 +78,7 @@ C_SyvUpPackageSectionNodeWidget::C_SyvUpPackageSectionNodeWidget(QWidget * const
    mu32_FileCount(0U),
    mu32_PrimaryFileCount(0U),
    mu32_ParamSetFileCount(0U),
+   mu32_DataBlockPathNumber(0U),
    mq_ShowAddButton(false),
    mu32_PositionNumber(0U),
    //lint -e{1938}  static const is guaranteed preinitialized before main
@@ -131,22 +132,24 @@ C_SyvUpPackageSectionNodeWidget::~C_SyvUpPackageSectionNodeWidget()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialization of the widget
 
-   \param[in]  ou32_ViewIndex       View index
-   \param[in]  ou32_PositionNumber  Position number of node for showing
-   \param[in]  ou32_NodeIndex       Node index
-   \param[in]  orc_NodeName         Name of the node
-   \param[in]  ou32_SectionNumber   Number of node section in list
+   \param[in]  ou32_ViewIndex             View index
+   \param[in]  ou32_PositionNumber        Position number of node for showing
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  orc_NodeName               Name of the node
+   \param[in]  ou32_SectionNumber         Number of node section in list
+   \param[in]  ou32_DataBlockPathNumber   Number of Data Block output file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeWidget::InitWidget(const uint32 ou32_ViewIndex, const uint32 ou32_PositionNumber,
                                                  const uint32 ou32_NodeIndex, const QString & orc_NodeName,
-                                                 const uint32 ou32_SectionNumber)
+                                                 const uint32 ou32_SectionNumber, const uint32 ou32_DataBlockPathNumber)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
    this->mu32_NodeIndex = ou32_NodeIndex;
    this->mc_NodeName = orc_NodeName;
    this->mu32_PositionNumber = ou32_PositionNumber;
    this->mu32_SectionNumber = ou32_SectionNumber;
+   this->mu32_DataBlockPathNumber = ou32_DataBlockPathNumber;
 
    this->InitStaticNames();
 
@@ -303,8 +306,8 @@ void C_SyvUpPackageSectionNodeWidget::AdaptFile(const QString & orc_File,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the skip update file flag
 
-   \param[in]       oq_Skip     New skip flag
-   \param[in]       opc_App     Application widget
+   \param[in]  oq_Skip  New skip flag
+   \param[in]  opc_App  Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeWidget::SetSkipOfUpdateFile(const bool oq_Skip,
@@ -499,7 +502,7 @@ sint32 C_SyvUpPackageSectionNodeWidget::CheckAllFiles(stw_types::uint32 & oru32_
                   {
                      c_New =
                         static_cast<QString>(C_GtGetText::h_GetText(
-                                                "#%1 - %2 - %3 - 4%: Device type %5 does not match node type %6")).
+                                                "#%1 - %2 - %3 - %4: Device type %5 does not match node type %6")).
                         arg(this->mu32_PositionNumber + 1U).
                         arg(this->mc_NodeName).arg(this->mc_SectionName).
                         arg(pc_App->GetAppFileName()).
@@ -510,7 +513,7 @@ sint32 C_SyvUpPackageSectionNodeWidget::CheckAllFiles(stw_types::uint32 & oru32_
                   {
                      c_New =
                         static_cast<QString>(C_GtGetText::h_GetText(
-                                                "#%1 - %2 - %3 - 4%: HEX file has multiple application blocks.")).
+                                                "#%1 - %2 - %3 - %4: HEX file has multiple application blocks.")).
                         arg(this->mu32_PositionNumber + 1U).
                         arg(this->mc_NodeName).
                         arg(this->mc_SectionName).
@@ -955,7 +958,7 @@ void C_SyvUpPackageSectionNodeWidget::m_UpdateTitle(void)
 
    Default implementation does not change anything
 
-   \param[in]       ou32_Number     Unedited number of param set file
+   \param[in]  ou32_Number    Unedited number of param set file
 
    \return
    Adapted number of param set file
@@ -1139,8 +1142,8 @@ void C_SyvUpPackageSectionNodeWidget::m_SetState(const uint32 ou32_State)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the current path of a parameter set image file and checks its content
 
-   \param[in]     orc_File      New path
-   \param[in]     opc_App       Application widget
+   \param[in]  orc_File    New path
+   \param[in]  opc_App     Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeWidget::m_AdaptParamSetFile(const QString & orc_File,
@@ -1170,10 +1173,10 @@ void C_SyvUpPackageSectionNodeWidget::m_AdaptParamSetFile(const QString & orc_Fi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Short function description
+/*! \brief  Get paramset file info
 
-   \param[in]     orc_File          New path
-   \param[out]    orc_ParamFileInfo Read parameter set file information
+   \param[in]   orc_File            New path
+   \param[out]  orc_ParamFileInfo   Read parameter set file information
 
    \return
    C_NO_ERR    File read
@@ -1262,9 +1265,11 @@ sint32 C_SyvUpPackageSectionNodeWidget::m_GetParamsetFileInfo(const QString & or
       c_Message.SetHeading(C_GtGetText::h_GetText("Add file"));
       c_Message.SetDescription(
          static_cast<QString>(C_GtGetText::h_GetText(
-                                 "The file %1 is already contained in the Update Package for this node "
-                                 "and therefore not added again.")).
-         arg(C_PuiUtil::h_GetAbsolutePathFromProject(orc_File)));
+                                 "The file is already contained in the Update Package for this node "
+                                 "and therefore not added again.")));
+      c_Message.SetDetails(
+         static_cast<QString>(C_GtGetText::h_GetText("%1"))
+         .arg(C_PuiUtil::h_GetAbsolutePathFromProject(orc_File)));
       c_Message.Execute();
    }
 
@@ -1295,7 +1300,7 @@ void C_SyvUpPackageSectionNodeWidget::mousePressEvent(QMouseEvent * const opc_Ev
 
    The check decides based on the file extension.
 
-   \param[in]     orc_File      File to check
+   \param[in]  orc_File    File to check
 
    \retval   true    The file is a parameter set file
    \retval   false   The file is not a parameter set file
@@ -1346,7 +1351,9 @@ void C_SyvUpPackageSectionNodeWidget::m_InitItems(void)
       this->mc_DeviceType = pc_Node->c_DeviceType.c_str();
 
       tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
-      this->mq_FileBased = pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased;
+      tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
+      this->mq_FileBased =
+         pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased;
       this->mq_StwFlashloader = (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW);
 
       if (pc_View != NULL)

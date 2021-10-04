@@ -10,7 +10,7 @@
 #define C_SYVDACHAPLOT_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "QCustomPlot.h"
+#include "qcustomplot.h"
 
 #include "stwtypes.h"
 

@@ -548,7 +548,7 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
             pc_Node->c_Properties.c_ComInterfaces[orc_MessageId.u32_InterfaceIndex];
 
          //Confirm connected to bus state part 2 (interface) -> Bus mode
-         if ((rc_Interface.q_IsBusConnected == true) &&
+         if ((rc_Interface.GetBusConnected() == true) &&
              (pc_Container->q_IsComProtocolUsedByInterface == true))
          {
             std::vector<uint32> c_NodeIndexes;
@@ -603,7 +603,7 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                                                                           [
                                                                              u32_ItLastOwner]];
 
-                                 if ((rc_LastInterface.q_IsBusConnected == true) &&
+                                 if ((rc_LastInterface.GetBusConnected() == true) &&
                                      (rc_LastInterface.u32_BusIndex == rc_Interface.u32_BusIndex))
                                  {
                                     const C_OSCCanProtocol * const pc_Protocol =

@@ -43,22 +43,21 @@ public:
                                                      const C_OSCXMLParserBase & orc_XMLParser,
                                                      const stw_scl::C_SCLString & orc_AttributeName);
    static stw_types::sint32 h_GetTypeForSimplestTypeString(const stw_scl::C_SCLString & orc_TypeStr,
-                                                           C_OSCNodeDataPoolContent::E_Type & ore_Type);
+                                                           C_OSCNodeDataPoolContent::E_Type & ore_Type,
+                                                           const C_OSCXMLParserBase & orc_XMLParser);
    static stw_scl::C_SCLString h_GetTypeString(const C_OSCNodeDataPoolContent::E_Type oe_Type);
    static stw_types::sint32 h_SaveSimpleValueAsAttribute(const stw_scl::C_SCLString & orc_Node,
                                                          C_OSCXMLParserBase & orc_XMLParser,
                                                          const C_OSCNodeDataPoolContent & orc_Content);
    static stw_types::sint32 h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_OSCHalcDefContent & orc_Content,
                                       stw_scl::C_SCLString & orc_TypeStr, stw_scl::C_SCLString & orc_BaseTypeStr,
-                                      const stw_scl::C_SCLString & orc_CurrentNodeName,
-                                      const stw_scl::C_SCLString & orc_UseCaseForLog);
+                                      const stw_scl::C_SCLString & orc_CurrentNodeName);
    static stw_types::sint32 h_ParseAttributeIntoContent(C_OSCHalcDefContent & orc_Content,
                                                         const C_OSCXMLParserBase & orc_XMLParser,
                                                         const stw_scl::C_SCLString & orc_AttributeName,
                                                         const stw_scl::C_SCLString & orc_Type,
                                                         const stw_scl::C_SCLString & orc_BaseType,
-                                                        const bool oq_RequireAttribute,
-                                                        const stw_scl::C_SCLString & orc_CurrentNodeName);
+                                                        const bool oq_RequireAttribute);
 
    static const stw_types::uint32 hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH;
 
@@ -89,13 +88,15 @@ private:
                                                const stw_scl::C_SCLString & orc_SingleNodeName);
    static stw_types::sint32 mh_ParseAttributeAvailability(std::vector<stw_types::uint32> & orc_Availability,
                                                           const stw_scl::C_SCLString & orc_AttributeContent,
-                                                          const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases);
+                                                          const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases,
+                                                          const C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_GetAvailabilityString(const std::vector<stw_types::uint32> & orc_Availability,
                                                      const std::vector<C_OSCHalcDefChannelUseCase> & orc_UseCases,
                                                      stw_scl::C_SCLString & orc_Output);
    static void mh_SetMaxValForType(const stw_scl::C_SCLString & orc_TypeStr, C_OSCNodeDataPoolContent & orc_Content);
    static void mh_SetMinValForType(const stw_scl::C_SCLString & orc_TypeStr, C_OSCNodeDataPoolContent & orc_Content);
-   static bool mh_CheckInitialBitmaskContentValid(const C_OSCHalcDefContent & orc_Content);
+   static bool mh_CheckInitialBitmaskContentValid(const C_OSCHalcDefContent & orc_Content,
+                                                  const C_OSCXMLParserBase & orc_XMLParser);
    static stw_scl::C_SCLString mh_ConvertToHex(const stw_types::uint64 ou64_Value);
    static void mh_HandleEnumMinMax(C_OSCHalcDefElement & orc_Element);
    static stw_types::sint32 mh_CheckValidUint(const stw_scl::C_SCLString & orc_Item);

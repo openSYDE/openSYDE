@@ -53,14 +53,14 @@ public:
    void UpdateData(stw_opensyde_gui_logic::C_PuiSdNodeConnection * const opc_UIConnection) const;
    virtual void GenerateHint(void);
    const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId * GetConnectionData(void) const;
-   void ChangeInterface(const stw_types::uint8 & oru8_NewInterface, const stw_types::uint8 & oru8_NodeId);
+   void ChangeInterface(const stw_types::uint8 & oru8_NewInterface, const std::vector<stw_types::uint8> & orc_NodeIds);
    void Revert(C_GiNode * const opc_StartingNode, const C_GiNode * const opc_LastNode, const QPointF & orc_ScenePos);
    void Reconnect(C_GiNode * const opc_StartingNode, stw_opensyde_gui::C_GiNode * const opc_LastNode,
                   const QPointF & orc_ConnectionPos, const stw_types::sint32 & ors32_Interface,
-                  const stw_types::uint8 & oru8_NodeId);
+                  const std::vector<stw_types::uint8> & orc_NodeIds);
    void Reconnect(const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                   const stw_opensyde_gui::C_GiLiBus * const opc_LastBus, const QPointF & orc_ConnectionPos,
-                  const stw_types::sint32 & ors32_Interface, const stw_types::uint8 & oru8_NodeId);
+                  const stw_types::sint32 & ors32_Interface, const std::vector<stw_types::uint8> & orc_NodeIds);
    const C_GiPort * GetPortItem(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality

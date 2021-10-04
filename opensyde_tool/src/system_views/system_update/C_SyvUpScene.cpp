@@ -16,6 +16,7 @@
 #include "TGLUtils.h"
 #include "stwerrors.h"
 #include "C_OSCUtils.h"
+#include "C_PuiSdUtil.h"
 #include "C_SyvUpScene.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
@@ -47,8 +48,8 @@ const stw_types::float64 C_SyvUpScene::mhf64_BusAnimationTolerance = 0.001;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]     ou32_ViewIndex View index
-   \param[in,out] opc_Parent     Optional pointer to parent
+   \param[in]      ou32_ViewIndex   View index
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpScene::C_SyvUpScene(const uint32 ou32_ViewIndex, QObject * const opc_Parent) :
@@ -69,8 +70,8 @@ C_SyvUpScene::~C_SyvUpScene()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update connected status
 
-   \param[in] oq_Active      Flag if connected
-   \param[in] oq_SignalNodes Optional flag to signal nodes
+   \param[in]  oq_Active         Flag if connected
+   \param[in]  oq_SignalNodes    Optional flag to signal nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::SetConnected(const bool oq_Active, const bool oq_SignalNodes) const
@@ -105,7 +106,7 @@ void C_SyvUpScene::SetConnected(const bool oq_Active, const bool oq_SignalNodes)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal if update in progress
 
-   \param[in] oq_Active Flag if update in progress
+   \param[in]  oq_Active   Flag if update in progress
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::SetUpdating(const bool oq_Active) const
@@ -132,8 +133,8 @@ void C_SyvUpScene::SetUpdating(const bool oq_Active) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update device information
 
-   \param[in] orc_NodeIndexes       Node indices
-   \param[in] orc_DeviceInformation Device info
+   \param[in]  orc_NodeIndexes         Node indices
+   \param[in]  orc_DeviceInformation   Device info
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeIndexes,
@@ -157,10 +158,12 @@ void C_SyvUpScene::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeI
             {
                for (uint32 u32_ItDevice = 0; u32_ItDevice < orc_NodeIndexes.size(); ++u32_ItDevice)
                {
-                  if (static_cast<uint32>(pc_Node->GetIndex()) == orc_NodeIndexes[u32_ItDevice])
+                  const uint32 u32_TopologyNodeIndex =
+                     C_PuiSdUtil::h_GetIndexOfFirstNodeInGroup(orc_NodeIndexes[u32_ItDevice]);
+                  if (pc_Node->CheckIndexRelevantForThisNode(u32_TopologyNodeIndex))
                   {
-                     pc_Node->UpdateInitialPackageStatus(orc_DeviceInformation[u32_ItDevice]);
-
+                     pc_Node->UpdateInitialPackageStatus(orc_DeviceInformation[u32_ItDevice],
+                                                         orc_NodeIndexes[u32_ItDevice]);
                      break;
                   }
                }
@@ -205,7 +208,7 @@ void C_SyvUpScene::StartConnectionAnimation(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start progress animation
 
-   \param[out] ou32_NodeIndex SD node index
+   \param[out]  ou32_NodeIndex   SD node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
@@ -229,104 +232,8 @@ void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
             C_GiLiBusConnector * const pc_CurBusConnector = dynamic_cast<C_GiLiBusConnector *>(pc_CurItemParent);
             if (pc_CurBusConnector != NULL)
             {
-               const C_GiLiBus * const pc_ConnectedBus = pc_CurBusConnector->GetBusItem();
-               const C_GiNode * const pc_ConnectedNode = pc_CurBusConnector->GetNodeItem();
-               const C_PuiSdNodeConnectionId * const pc_ConnectionData = pc_CurBusConnector->GetConnectionData();
-               if (((pc_ConnectedBus != NULL) && (pc_ConnectedNode != NULL)) && (pc_ConnectionData != NULL))
-               {
-                  //On route
-                  bool q_Inverse = false;
-                  bool q_FoundOnRoute = false;
-                  //Check if target node
-                  if (static_cast<uint32>(pc_ConnectedNode->GetIndex()) == ou32_NodeIndex)
-                  {
-                     const C_OSCNode * const pc_NodeData = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
-                        ou32_NodeIndex);
-                     if (pc_NodeData != NULL)
-                     {
-                        uint32 u32_BusIndexToSearchFor = 0;
-                        if (pc_Route->c_VecRoutePoints.size() > 0)
-                        {
-                           //Search for last bus before the target node
-                           const C_OSCRoutingRoutePoint & rc_LastHop =
-                              pc_Route->c_VecRoutePoints[static_cast<std::vector< C_OSCRoutingRoutePoint>::size_type >
-                                                         (pc_Route->c_VecRoutePoints.size() - 1UL)];
-                           u32_BusIndexToSearchFor = rc_LastHop.u32_OutBusIndex;
-                        }
-                        else
-                        {
-                           //Search for PC bus if no routing necessary
-                           u32_BusIndexToSearchFor = pc_View->GetPcData().GetBusIndex();
-                        }
-                        //Search for first viable interface
-                        if ((pc_ConnectedBus->GetIndex() >= 0) &&
-                            (static_cast<uint32>(pc_ConnectedBus->GetIndex()) == u32_BusIndexToSearchFor))
-                        {
-                           for (uint32 u32_ItInterface = 0;
-                                u32_ItInterface < pc_NodeData->c_Properties.c_ComInterfaces.size(); ++u32_ItInterface)
-                           {
-                              const C_OSCNodeComInterfaceSettings & rc_ComInterface =
-                                 pc_NodeData->c_Properties.c_ComInterfaces[u32_ItInterface];
-                              if ((rc_ComInterface.q_IsBusConnected == true) &&
-                                  (rc_ComInterface.u32_BusIndex == u32_BusIndexToSearchFor))
-                              {
-                                 //Check if routing engine would choose this interface
-                                 if (c_Routing.CheckItfNumberForRouting(ou32_NodeIndex, rc_ComInterface) == true)
-                                 {
-                                    if (rc_ComInterface.u8_InterfaceNumber == pc_ConnectionData->u8_InterfaceNumber)
-                                    {
-                                       q_FoundOnRoute = true;
-                                       //Stop after first one
-                                       break;
-                                    }
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-                  else
-                  {
-                     for (uint32 u32_ItRoute = 0; u32_ItRoute < pc_Route->c_VecRoutePoints.size(); ++u32_ItRoute)
-                     {
-                        const C_OSCRoutingRoutePoint & rc_Point = pc_Route->c_VecRoutePoints[u32_ItRoute];
-                        //Check in or out
-                        if ((static_cast<uint32>(pc_ConnectedNode->GetIndex()) == rc_Point.u32_NodeIndex) &&
-                            (((static_cast<uint32>(pc_ConnectedBus->GetIndex()) == rc_Point.u32_InBusIndex) && (
-                                 pc_ConnectionData->u8_InterfaceNumber == rc_Point.u8_InInterfaceNumber)) ||
-                             ((static_cast<uint32>(pc_ConnectedBus->GetIndex()) == rc_Point.u32_OutBusIndex) && (
-                                 pc_ConnectionData->u8_InterfaceNumber == rc_Point.u8_OutInterfaceNumber))))
-                        {
-                           if (static_cast<uint32>(pc_ConnectedBus->GetIndex()) == rc_Point.u32_InBusIndex)
-                           {
-                              q_Inverse = false;
-                           }
-                           else
-                           {
-                              q_Inverse = true;
-                           }
-                           q_FoundOnRoute = true;
-                           break;
-                        }
-                     }
-                  }
-                  if (q_FoundOnRoute == false)
-                  {
-                     //Deactivate
-                     pc_CurBusConnector->SetAnimated(false, q_Inverse);
-                  }
-                  else
-                  {
-                     bool q_SpeedUp = false;
-                     if ((pc_CurBusConnector->GetBusItem() != NULL) &&
-                         (pc_CurBusConnector->GetBusItem()->GetType() == C_OSCSystemBus::eETHERNET))
-                     {
-                        q_SpeedUp = true;
-                     }
-                     //Activate
-                     pc_CurBusConnector->SetAnimated(true, q_Inverse, q_SpeedUp);
-                  }
-               }
+               m_HandleBusConnectorInProgressAnimationStart(*pc_CurBusConnector, c_Routing, *pc_Route, *pc_View,
+                                                            ou32_NodeIndex);
             }
             else
             {
@@ -354,13 +261,13 @@ void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
                   if (pc_Node != NULL)
                   {
                      //Check if currently updated node
-                     if (ou32_NodeIndex == static_cast<uint32>(pc_Node->GetIndex()))
+                     if (pc_Node->CheckIndexRelevantForThisNode(ou32_NodeIndex))
                      {
-                        pc_Node->SetNodeUpdateInProgress(true, false, 0);
+                        pc_Node->SetNodeUpdateInProgress(true, false, 0, ou32_NodeIndex);
                      }
                      else
                      {
-                        pc_Node->SetNodeUpdateInProgress(false, false, 0);
+                        pc_Node->SetNodeUpdateInProgress(false, false, 0, 0UL);
                      }
                   }
                }
@@ -377,9 +284,9 @@ void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Stop all progress animations
 
-   \param[in] oq_Abort                    Flag if action aborted
-   \param[in] ou32_FailedApplicationIndex If aborted and currently updating this is the currently updated application
-   \param[in] oq_StopUpdateingState       Flag to stop updating state
+   \param[in]  oq_Abort                      Flag if action aborted
+   \param[in]  ou32_FailedApplicationIndex   If aborted and currently updating this is the currently updated application
+   \param[in]  oq_StopUpdateingState         Flag to stop updating state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_FailedApplicationIndex,
@@ -434,7 +341,7 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
                      dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
                   if (pc_Node != NULL)
                   {
-                     pc_Node->SetNodeUpdateInProgress(false, oq_Abort, ou32_FailedApplicationIndex);
+                     pc_Node->SetNodeUpdateInProgress(false, oq_Abort, ou32_FailedApplicationIndex, 0UL);
                   }
                }
             }
@@ -446,11 +353,13 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set no response state for node
 
-   \param[in] ou32_NodeIndex Node index
+   \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::SetNoResponse(const uint32 ou32_NodeIndex) const
 {
+   const uint32 u32_TopologyNodeIndex = C_PuiSdUtil::h_GetIndexOfFirstNodeInGroup(ou32_NodeIndex);
+
    const QList<QGraphicsItem *> c_Items = this->items();
 
    //Search for matching bus
@@ -462,9 +371,10 @@ void C_SyvUpScene::SetNoResponse(const uint32 ou32_NodeIndex) const
          //Nodes
 
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
-         if ((pc_Node != NULL) && (static_cast<uint32>(pc_Node->GetIndex()) == ou32_NodeIndex))
+         if ((pc_Node != NULL) && (pc_Node->CheckIndexRelevantForThisNode(u32_TopologyNodeIndex)))
          {
-            pc_Node->SetNoResponse();
+            pc_Node->SetNoResponse(ou32_NodeIndex);
+            break;
          }
       }
    }
@@ -493,7 +403,11 @@ std::vector<uint32> C_SyvUpScene::GetActiveNoResponseNodeIndices(void) const
          const C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<const C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->HasNoResponseAndIsActive() == true))
          {
-            c_Retval.push_back(static_cast<uint32>(pc_Node->GetIndex()));
+            const std::vector<uint32> c_AllCurrent = pc_Node->GetAllNotRespondingAndActiveIndices();
+            for (std::vector<uint32>::const_iterator c_It = c_AllCurrent.cbegin(); c_It != c_AllCurrent.end(); ++c_It)
+            {
+               c_Retval.push_back(*c_It);
+            }
          }
       }
    }
@@ -526,7 +440,11 @@ std::vector<uint32> C_SyvUpScene::GetActiveNoneThirdPartyNodeIndices(void) const
          if ((((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true)) &&
              (pc_Node->IsStwDevice() == true))
          {
-            c_Retval.push_back(static_cast<uint32>(pc_Node->GetIndex()));
+            const std::vector<uint32> c_AllCurrent = pc_Node->GetAllActiveSTWDeviceIndices();
+            for (std::vector<uint32>::const_iterator c_It = c_AllCurrent.cbegin(); c_It != c_AllCurrent.end(); ++c_It)
+            {
+               c_Retval.push_back(*c_It);
+            }
          }
       }
    }
@@ -628,7 +546,7 @@ C_GiNode * C_SyvUpScene::m_CreateNode(const sint32 & ors32_Index, const uint64 &
 
    Here: handle item edit
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
@@ -665,7 +583,7 @@ void C_SyvUpScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Ev
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new node to scene and connect signals
 
-   \param[in,out] opc_NodeGraphicsItem Pointer to new node
+   \param[in,out]  opc_NodeGraphicsItem   Pointer to new node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
@@ -680,10 +598,157 @@ void C_SyvUpScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle bus connector in progress animation start
+
+   \param[in,out]  orc_BusConnector          Bus connector
+   \param[in]      orc_RoutingCalculation    Routing calculation
+   \param[in]      orc_Route                 Route
+   \param[in]      orc_View                  View
+   \param[in]      ou32_NodeIndex            Node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpScene::m_HandleBusConnectorInProgressAnimationStart(C_GiLiBusConnector & orc_BusConnector,
+                                                                const C_SyvRoRouteCalculation & orc_RoutingCalculation,
+                                                                const C_OSCRoutingRoute & orc_Route,
+                                                                const C_PuiSvData & orc_View,
+                                                                const uint32 ou32_NodeIndex) const
+{
+   const C_GiLiBus * const pc_ConnectedBus = orc_BusConnector.GetBusItem();
+   const C_GiNode * const pc_ConnectedNode = orc_BusConnector.GetNodeItem();
+   const C_PuiSdNodeConnectionId * const pc_ConnectionData = orc_BusConnector.GetConnectionData();
+
+   if (((pc_ConnectedBus != NULL) && (pc_ConnectedNode != NULL)) && (pc_ConnectionData != NULL))
+   {
+      //On route
+      bool q_Inverse = false;
+      bool q_FoundOnRoute = false;
+      //Check if target node
+      if (pc_ConnectedNode->CheckIndexRelevantForThisNode(ou32_NodeIndex))
+      {
+         q_FoundOnRoute = m_IsLastBusConnectorInProgressAnimationToNode(*pc_ConnectionData, *pc_ConnectedBus,
+                                                                        orc_RoutingCalculation, orc_Route, orc_View,
+                                                                        ou32_NodeIndex);
+      }
+      else
+      {
+         for (uint32 u32_ItRoute = 0; u32_ItRoute < orc_Route.c_VecRoutePoints.size(); ++u32_ItRoute)
+         {
+            const C_OSCRoutingRoutePoint & rc_Point = orc_Route.c_VecRoutePoints[u32_ItRoute];
+            //Check in or out
+            if ((pc_ConnectedNode->CheckIndexRelevantForThisNode(rc_Point.u32_NodeIndex)) &&
+                (((static_cast<uint32>(pc_ConnectedBus->GetIndex()) == rc_Point.u32_InBusIndex) && (
+                     pc_ConnectionData->u8_InterfaceNumber == rc_Point.u8_InInterfaceNumber)) ||
+                 ((static_cast<uint32>(pc_ConnectedBus->GetIndex()) == rc_Point.u32_OutBusIndex) && (
+                     pc_ConnectionData->u8_InterfaceNumber == rc_Point.u8_OutInterfaceNumber))))
+            {
+               if (static_cast<uint32>(pc_ConnectedBus->GetIndex()) == rc_Point.u32_InBusIndex)
+               {
+                  q_Inverse = false;
+               }
+               else
+               {
+                  q_Inverse = true;
+               }
+               q_FoundOnRoute = true;
+               break;
+            }
+         }
+      }
+      if (q_FoundOnRoute == false)
+      {
+         //Deactivate
+         orc_BusConnector.SetAnimated(false, q_Inverse);
+      }
+      else
+      {
+         bool q_SpeedUp = false;
+         if ((orc_BusConnector.GetBusItem() != NULL) &&
+             (orc_BusConnector.GetBusItem()->GetType() == C_OSCSystemBus::eETHERNET))
+         {
+            q_SpeedUp = true;
+         }
+         //Activate
+         orc_BusConnector.SetAnimated(true, q_Inverse, q_SpeedUp);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Is last bus connector in progress animation to node
+
+   \param[in,out]  orc_BusConnectionData     Bus connection data
+   \param[in]      orc_BusItem               Bus item
+   \param[in]      orc_RoutingCalculation    Routing calculation
+   \param[in]      orc_Route                 Route
+   \param[in]      orc_View                  View
+   \param[in]      ou32_NodeIndex            Node index
+
+   \return
+   True  Last connector
+   False Not last connector
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpScene::m_IsLastBusConnectorInProgressAnimationToNode(const C_PuiSdNodeConnectionId & orc_BusConnectionData,
+                                                                 const C_GiLiBus & orc_BusItem,
+                                                                 const C_SyvRoRouteCalculation & orc_RoutingCalculation,
+                                                                 const C_OSCRoutingRoute & orc_Route,
+                                                                 const C_PuiSvData & orc_View,
+                                                                 const uint32 ou32_NodeIndex) const
+{
+   bool q_FoundOnRoute = false;
+   const C_OSCNode * const pc_NodeData = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+      ou32_NodeIndex);
+
+   if (pc_NodeData != NULL)
+   {
+      uint32 u32_BusIndexToSearchFor = 0;
+      if (orc_Route.c_VecRoutePoints.size() > 0)
+      {
+         //Search for last bus before the target node
+         const C_OSCRoutingRoutePoint & rc_LastHop =
+            orc_Route.c_VecRoutePoints[static_cast<std::vector< C_OSCRoutingRoutePoint>::size_type >
+                                       (orc_Route.c_VecRoutePoints.size() - 1UL)];
+         u32_BusIndexToSearchFor = rc_LastHop.u32_OutBusIndex;
+      }
+      else
+      {
+         //Search for PC bus if no routing necessary
+         u32_BusIndexToSearchFor = orc_View.GetPcData().GetBusIndex();
+      }
+      //Search for first viable interface
+      if ((orc_BusItem.GetIndex() >= 0) &&
+          (static_cast<uint32>(orc_BusItem.GetIndex()) == u32_BusIndexToSearchFor))
+      {
+         for (uint32 u32_ItInterface = 0;
+              u32_ItInterface < pc_NodeData->c_Properties.c_ComInterfaces.size(); ++u32_ItInterface)
+         {
+            const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+               pc_NodeData->c_Properties.c_ComInterfaces[u32_ItInterface];
+            if ((rc_ComInterface.GetBusConnected() == true) &&
+                (rc_ComInterface.u32_BusIndex == u32_BusIndexToSearchFor))
+            {
+               //Check if routing engine would choose this interface
+               if (orc_RoutingCalculation.CheckItfNumberForRouting(ou32_NodeIndex, rc_ComInterface) == true)
+               {
+                  if (rc_ComInterface.u8_InterfaceNumber == orc_BusConnectionData.u8_InterfaceNumber)
+                  {
+                     q_FoundOnRoute = true;
+                     //Stop after first one
+                     break;
+                  }
+               }
+            }
+         }
+      }
+   }
+   return q_FoundOnRoute;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle bus progress animation start
 
-   \param[in] orc_Calc        Routes
-   \param[in] ou32_NodeIndex  Node index
+   \param[in]  orc_Calc          Routes
+   \param[in]  ou32_NodeIndex    Node index
 
    \return
    C_NO_ERR Operation success
@@ -767,7 +832,7 @@ sint32 C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculatio
          {
             const C_OSCNodeComInterfaceSettings & rc_Interface =
                pc_OSCNode->c_Properties.c_ComInterfaces[u32_ItInterface];
-            if ((rc_Interface.q_IsBusConnected == true) &&
+            if ((rc_Interface.GetBusConnected() == true) &&
                 (c_Busses[static_cast<std::vector< uint32>::size_type > (c_Busses.size() - 1UL)] ==
                  rc_Interface.u32_BusIndex))
             {
@@ -863,11 +928,11 @@ sint32 C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculatio
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculate animation path
 
-   \param[in]  orc_PointStart          Animation start point
-   \param[in]  orc_PointEnd            Animation end point
-   \param[in]  orc_UIInteractionPoints Bus interaction points
-   \param[out] orc_Path                Calculated animation path
-   \param[out] orq_Inverse             Flag if animation inverse (Necessary for start after end)
+   \param[in]   orc_PointStart            Animation start point
+   \param[in]   orc_PointEnd              Animation end point
+   \param[in]   orc_UIInteractionPoints   Bus interaction points
+   \param[out]  orc_Path                  Calculated animation path
+   \param[out]  orq_Inverse               Flag if animation inverse (Necessary for start after end)
 
    \return
    C_NO_ERR Operation success

@@ -30,9 +30,8 @@ public:
                                             const std::vector<stw_types::uint64> & orc_IDs,
                                             const stw_types::uint8 & oru8_PreviousInterface,
                                             const stw_types::uint8 & oru8_NewInterface,
-                                            const stw_types::uint8 & oru8_PreviousNodeId,
-                                            const stw_types::uint8 & oru8_NewNodeId, const bool oq_ActivateDatapoolL2,
-                                            const bool oq_ActivateDatapoolECeS, const bool oq_ActivateDatapoolECoS,
+                                            const std::vector<stw_types::uint8> & orc_PreviousNodeIds,
+                                            const std::vector<stw_types::uint8> & orc_NewNodeIds,
                                             QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SdManUnoTopologyChangeInterfaceCommand(void);
    virtual void undo(void) override;
@@ -41,13 +40,11 @@ public:
 private:
    const stw_types::uint8 mu8_PreviousInterface;
    const stw_types::uint8 mu8_NewInterface;
-   const stw_types::uint8 mu8_PreviousNodeId;
-   const stw_types::uint8 mu8_NewNodeId;
-   const bool mq_ActivateDatapoolL2;
-   const bool mq_ActivateDatapoolECeS;
-   const bool mq_ActivateDatapoolECoS;
+   const std::vector<stw_types::uint8> mc_PreviousNodeIds;
+   const std::vector<stw_types::uint8> mc_NewNodeIds;
 
-   void m_ChangeInterface(const stw_types::uint8 & oru8_NewInterface, const stw_types::uint8 & oru8_NodeId) const;
+   void m_ChangeInterface(const stw_types::uint8 & oru8_NewInterface,
+                          const std::vector<stw_types::uint8> & orc_NodeIds) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

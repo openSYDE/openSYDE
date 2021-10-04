@@ -32,8 +32,11 @@ public:
    C_SyvDcExistingNodeList(QWidget * const opc_Parent = NULL);
 
    stw_types::sint32 SetView(const stw_types::uint32 ou32_Index, const bool oq_ShowAssignment);
-   void ConnectSerialNumber(const stw_types::uint32 ou32_NodeIndex, const QString & orc_SerialNumber) const;
-   void DisconnectSerialNumber(const stw_types::uint32 ou32_NodeIndex, const QString & orc_SerialNumber) const;
+   void ConnectSerialNumber(const stw_types::uint32 ou32_NodeIndex,
+                            const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
+   void DisconnectSerialNumber(const stw_types::uint32 ou32_NodeIndex,
+                               const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
+   stw_types::uint32 GetCommunicatingNodeCount(void) const;
    stw_types::uint32 GetAssignmentCount(void) const;
    std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> GetConfigs(void) const;
 
@@ -45,17 +48,21 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void SigConnect(const stw_types::uint32 ou32_NodeIndex, const QString & orc_SerialNumber);
-   void SigDisconnect(const stw_types::uint32 ou32_NodeIndex, const QString & orc_SerialNumber);
+   void SigConnect(const stw_types::uint32 ou32_NodeIndex,
+                   const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
+   void SigDisconnect(const stw_types::uint32 ou32_NodeIndex,
+                      const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
 
 private:
    stw_types::uint32 mu32_ViewIndex;
    bool mq_ShowAssignment;
    bool mq_GridSizeSet;
+   // All communicating nodes including sub nodes
+   // Count of list equals all multi CPU nodes and normal nodes without counting the sub nodes
+   stw_types::uint32 mu32_CommunicatingNodeCount;
 
    stw_types::sint32 m_Init(void);
-   stw_types::sint32 m_AppendNode(const stw_types::uint32 ou32_NodeIndex,
-                                  const stw_types::sint32 os32_VisibleNodeIndex);
+   stw_types::sint32 m_AppendNode(const stw_types::uint32 ou32_NodeIndex, const bool oq_PartOfSquad);
 
    void m_ScrollBarRangeChangedVer(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
 };

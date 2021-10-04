@@ -699,7 +699,9 @@ void C_SdNdeHalcChannelWidget::m_CheckName(const QString & orc_NewName) const
 
    if ((q_NameIsUnique == true) && (q_NameIsValid == true))
    {
-      this->mpc_Ui->pc_LeName->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+      this->mpc_Ui->pc_LeName->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                     C_GtGetText::h_GetText(""),
+                                                     C_NagToolTip::eDEFAULT);
    }
    else
    {

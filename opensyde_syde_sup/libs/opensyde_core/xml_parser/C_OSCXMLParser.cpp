@@ -106,7 +106,7 @@ C_OSCXMLParser::~C_OSCXMLParser(void)
    Open XML file.
    If the file could not be opened the function will return an error and prepare an empty XML structure.
 
-   \param[in]   orc_FileName   path to XML file to open
+   \param[in]  orc_FileName   path to XML file to open
 
    \return
    C_NO_ERR   data was read from file
@@ -134,7 +134,7 @@ sint32 C_OSCXMLParser::LoadFromFile(const C_SCLString & orc_FileName)
 
    A pre-existing file will be replaced.
 
-   \param[in]   orc_FileName   path to XML file to write to
+   \param[in]  orc_FileName   path to XML file to write to
 
    \return
    C_NO_ERR   data was written to file
@@ -180,8 +180,8 @@ C_SCLString C_OSCXMLParserBase::SelectRoot(void)
 
    Select the next node on the same level as the current node as active element.
 
-   \param[in]  orc_Name   if != "": select first node with this name
-                          if == "": select first node with any name
+   \param[in]  orc_Name    if != "": select first node with this name
+                           if == "": select first node with any name
 
    \return
    name of selected element ("" on error)
@@ -221,8 +221,8 @@ C_SCLString C_OSCXMLParserBase::SelectNodeNext(const C_SCLString & orc_Name)
 
    Select the next node on the same level as the current node as active element.
 
-   \param[in]  orc_Name   if != "": select first child node with this name
-                          if == "": select first child node with any name
+   \param[in]  orc_Name    if != "": select first child node with this name
+                           if == "": select first child node with any name
 
    \return
    name of selected element ("" on error)
@@ -261,6 +261,31 @@ C_SCLString C_OSCXMLParserBase::SelectNodeChild(const C_SCLString & orc_Name)
       c_Name = mpc_CurrentNode->Name();
    }
    return c_Name;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Select next node as active element
+
+   Select the next node on the same level as the current node as active element.
+
+   \param[in]  orc_Name    Select first child node with this name
+
+   \return
+   Result of node switch
+
+   \retval   C_NO_ERR   Node switch success
+   \retval   C_CONFIG   Node switch failed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCXMLParserBase::SelectNodeChildError(const C_SCLString & orc_Name)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->SelectNodeChild(orc_Name) != orc_Name)
+   {
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -320,7 +345,7 @@ C_SCLString C_OSCXMLParserBase::GetNodeContent(void) const
 
    Check whether the specified attribute exists in the current element.
 
-   \param[in]   orc_Name   name of attribute to check for
+   \param[in]  orc_Name    name of attribute to check for
 
    \return
    true   attribute exists
@@ -347,15 +372,16 @@ bool C_OSCXMLParserBase::AttributeExists(const C_SCLString & orc_Name) const
 
    Return one attribute value of selected node as string.
 
-   \param[in]  orc_Name   name of attribute
+   \param[in]  orc_Name       name of attribute
+   \param[in]  orc_Default    Default
 
    \return
    Content of selected attribute ("" on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCXMLParserBase::GetAttributeString(const C_SCLString & orc_Name) const
+C_SCLString C_OSCXMLParserBase::GetAttributeString(const C_SCLString & orc_Name, const C_SCLString & orc_Default) const
 {
-   C_SCLString c_Value;
+   C_SCLString c_Value = orc_Default;
 
    if (mpc_CurrentNode != NULL)
    {
@@ -374,15 +400,16 @@ C_SCLString C_OSCXMLParserBase::GetAttributeString(const C_SCLString & orc_Name)
    Return one attribute value of selected node as sint32 value.
    Can handle "0x" notation to interpret hex values.
 
-   \param[in]  orc_Name   name of attribute
+   \param[in]  orc_Name       name of attribute
+   \param[in]  os32_Default   Default
 
    \return
    value (zero on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::GetAttributeSint32(const C_SCLString & orc_Name) const
+sint32 C_OSCXMLParserBase::GetAttributeSint32(const C_SCLString & orc_Name, const sint32 os32_Default) const
 {
-   sintn sn_Value = 0;
+   sintn sn_Value = os32_Default;
    C_SCLString c_Text;
 
    //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
@@ -406,15 +433,16 @@ sint32 C_OSCXMLParserBase::GetAttributeSint32(const C_SCLString & orc_Name) cons
    Return one attribute value of selected node as uint32 value.
    Can handle "0x" notation to interpret hex values.
 
-   \param[in]  orc_Name   name of attribute
+   \param[in]  orc_Name       name of attribute
+   \param[in]  ou32_Default   Default
 
    \return
    value (zero on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCXMLParserBase::GetAttributeUint32(const C_SCLString & orc_Name) const
+uint32 C_OSCXMLParserBase::GetAttributeUint32(const C_SCLString & orc_Name, const uint32 ou32_Default) const
 {
-   uintn un_Value = 0;
+   uintn un_Value = ou32_Default;
    C_SCLString c_Text;
 
    //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
@@ -438,15 +466,16 @@ uint32 C_OSCXMLParserBase::GetAttributeUint32(const C_SCLString & orc_Name) cons
    Return one attribute value of selected node as sint64 value.
    Can handle "0x" notation to interpret hex values.
 
-   \param[in]  orc_Name   name of attribute
+   \param[in]  orc_Name       name of attribute
+   \param[in]  os64_Default   Default
 
    \return
    value (zero on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint64 C_OSCXMLParserBase::GetAttributeSint64(const C_SCLString & orc_Name) const
+sint64 C_OSCXMLParserBase::GetAttributeSint64(const C_SCLString & orc_Name, const sint64 os64_Default) const
 {
-   sint64 s64_Value = 0;
+   sint64 s64_Value = os64_Default;
    C_SCLString c_Text;
 
    //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
@@ -467,19 +496,56 @@ sint64 C_OSCXMLParserBase::GetAttributeSint64(const C_SCLString & orc_Name) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get attribute value of selected node
 
+   Return one attribute value of selected node as uint64 value.
+   Can handle "0x" notation to interpret hex values.
+
+   \param[in]  orc_Name       name of attribute
+   \param[in]  ou64_Default   Default
+
+   \return
+   value (zero on error)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint64 C_OSCXMLParserBase::GetAttributeUint64(const C_SCLString & orc_Name, const uint64 ou64_Default) const
+{
+   uint64 u64_Value = ou64_Default;
+   C_SCLString c_Text;
+
+   //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
+   c_Text = this->GetAttributeString(orc_Name);
+   if (c_Text != "")
+   {
+      if ((c_Text.Length() >= 2) && ((c_Text[1] == '0') && (c_Text[2] == 'x')))
+      {
+         std::istringstream c_Stream(c_Text.SubString(3UL, c_Text.Length() - 2UL).c_str());
+         c_Stream >> std::hex >> u64_Value;
+      }
+      else
+      {
+         std::istringstream c_Stream(c_Text.c_str());
+         c_Stream >> u64_Value;
+      }
+   }
+   return u64_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
+
    Return one attribute value of selected node as bool value.
    "0" resp. "1" and "false" resp. "true" are accepted as valid values.
 
-   \param[in]  orc_Name   name of attribute
+   \param[in]  orc_Name    name of attribute
+   \param[in]  oq_Default  Default
 
    \return
    true   attribute value is true
    false  attribute value is false (also returned on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name) const
+bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name, const bool oq_Default) const
 {
-   bool q_Value = false;
+   bool q_Value = oq_Default;
 
    if (mpc_CurrentNode != NULL)
    {
@@ -497,22 +563,23 @@ bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name) const
 
    Return one attribute value of selected node as float32 value.
 
-   \param[in]  orc_Name   name of attribute
+   \param[in]  orc_Name       name of attribute
+   \param[in]  of32_Default   Default
 
    \return
    value (0.0F on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-float32 C_OSCXMLParserBase::GetAttributeFloat32(const C_SCLString & orc_Name) const
+float32 C_OSCXMLParserBase::GetAttributeFloat32(const C_SCLString & orc_Name, const float32 of32_Default) const
 {
-   float32 f32_Value = 0.0F;
+   float32 f32_Value = of32_Default;
 
    if (mpc_CurrentNode != NULL)
    {
       const tinyxml2::XMLError e_Error = mpc_CurrentNode->QueryFloatAttribute(orc_Name.c_str(), &f32_Value);
       if (e_Error != tinyxml2::XML_SUCCESS)
       {
-         f32_Value = 0.0F;
+         f32_Value = of32_Default;
       }
    }
    return f32_Value;
@@ -523,25 +590,280 @@ float32 C_OSCXMLParserBase::GetAttributeFloat32(const C_SCLString & orc_Name) co
 
    Return one attribute value of selected node as float64 value.
 
-   \param[in]  orc_Name   name of attribute
+   \param[in]  orc_Name       name of attribute
+   \param[in]  of64_Default   Default
 
    \return
    value (0.0 on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_OSCXMLParserBase::GetAttributeFloat64(const C_SCLString & orc_Name) const
+float64 C_OSCXMLParserBase::GetAttributeFloat64(const C_SCLString & orc_Name,
+                                                const stw_types::float64 of64_Default) const
 {
-   float64 f64_Value = 0.0;
+   float64 f64_Value = of64_Default;
 
    if (mpc_CurrentNode != NULL)
    {
       const tinyxml2::XMLError e_Error = mpc_CurrentNode->QueryDoubleAttribute(orc_Name.c_str(), &f64_Value);
       if (e_Error != tinyxml2::XML_SUCCESS)
       {
-         f64_Value = 0.0;
+         f64_Value = of64_Default;
       }
    }
    return f64_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
+
+   Get one attribute value of selected node as string.
+
+   \param[in]  orc_Name    name of attribute
+   \param[in]  orc_Value   Content of selected attribute ("" on error)
+
+   \return
+   Result of attribute check
+
+   \retval   C_NO_ERR   Attribute exists
+   \retval   C_CONFIG   Attribute missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCXMLParserBase::GetAttributeStringError(const C_SCLString & orc_Name, C_SCLString & orc_Value) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->AttributeExists(orc_Name))
+   {
+      orc_Value = this->GetAttributeString(orc_Name);
+   }
+   else
+   {
+      orc_Value = "";
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
+
+   Get one attribute value of selected node as sint32.
+   Can handle "0x" notation to interpret hex values.
+
+   \param[in]  orc_Name       name of attribute
+   \param[in]  ors32_Value    Content of selected attribute (0 on error)
+
+   \return
+   Result of attribute check
+
+   \retval   C_NO_ERR   Attribute exists
+   \retval   C_CONFIG   Attribute missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCXMLParserBase::GetAttributeSint32Error(const C_SCLString & orc_Name, sint32 & ors32_Value) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->AttributeExists(orc_Name))
+   {
+      ors32_Value = this->GetAttributeSint32(orc_Name);
+   }
+   else
+   {
+      ors32_Value = 0L;
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
+
+   Get one attribute value of selected node as uint32.
+   Can handle "0x" notation to interpret hex values.
+
+   \param[in]  orc_Name       name of attribute
+   \param[in]  oru32_Value    Content of selected attribute (0 on error)
+
+   \return
+   Result of attribute check
+
+   \retval   C_NO_ERR   Attribute exists
+   \retval   C_CONFIG   Attribute missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCXMLParserBase::GetAttributeUint32Error(const C_SCLString & orc_Name, uint32 & oru32_Value) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->AttributeExists(orc_Name))
+   {
+      oru32_Value = this->GetAttributeUint32(orc_Name);
+   }
+   else
+   {
+      oru32_Value = 0UL;
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
+
+   Get one attribute value of selected node as sint64.
+   Can handle "0x" notation to interpret hex values.
+
+   \param[in]  orc_Name       name of attribute
+   \param[in]  ors64_Value    Content of selected attribute (0 on error)
+
+   \return
+   Result of attribute check
+
+   \retval   C_NO_ERR   Attribute exists
+   \retval   C_CONFIG   Attribute missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCXMLParserBase::GetAttributeSint64Error(const C_SCLString & orc_Name, sint64 & ors64_Value) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->AttributeExists(orc_Name))
+   {
+      ors64_Value = this->GetAttributeSint64(orc_Name);
+   }
+   else
+   {
+      ors64_Value = 0LL;
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
+
+   Get one attribute value of selected node as uint64.
+   Can handle "0x" notation to interpret hex values.
+
+   \param[in]  orc_Name       name of attribute
+   \param[in]  oru64_Value    Content of selected attribute (0 on error)
+
+   \return
+   Result of attribute check
+
+   \retval   C_NO_ERR   Attribute exists
+   \retval   C_CONFIG   Attribute missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCXMLParserBase::GetAttributeUint64Error(const C_SCLString & orc_Name, uint64 & oru64_Value) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->AttributeExists(orc_Name))
+   {
+      oru64_Value = this->GetAttributeUint64(orc_Name);
+   }
+   else
+   {
+      oru64_Value = 0ULL;
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
+
+   Get one attribute value of selected node as sint64.
+   "0" resp. "1" and "false" resp. "true" are accepted as valid values.
+
+   \param[in]  orc_Name    name of attribute
+   \param[in]  orq_Value   Content of selected attribute (false on error)
+
+   \return
+   Result of attribute check
+
+   \retval   C_NO_ERR   Attribute exists
+   \retval   C_CONFIG   Attribute missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCXMLParserBase::GetAttributeBoolError(const C_SCLString & orc_Name, bool & orq_Value) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->AttributeExists(orc_Name))
+   {
+      orq_Value = this->GetAttributeBool(orc_Name);
+   }
+   else
+   {
+      orq_Value = false;
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
+
+   Get one attribute value of selected node as float32.
+
+   \param[in]  orc_Name       name of attribute
+   \param[in]  orf32_Value    Content of selected attribute (0 on error)
+
+   \return
+   Result of attribute check
+
+   \retval   C_NO_ERR   Attribute exists
+   \retval   C_CONFIG   Attribute missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCXMLParserBase::GetAttributeFloat32Error(const C_SCLString & orc_Name, float32 & orf32_Value) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->AttributeExists(orc_Name))
+   {
+      orf32_Value = this->GetAttributeFloat32(orc_Name);
+   }
+   else
+   {
+      orf32_Value = 0.0F;
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
+
+   Get one attribute value of selected node as float64.
+
+   \param[in]  orc_Name       name of attribute
+   \param[in]  orf64_Value    Content of selected attribute (0 on error)
+
+   \return
+   Result of attribute check
+
+   \retval   C_NO_ERR   Attribute exists
+   \retval   C_CONFIG   Attribute missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCXMLParserBase::GetAttributeFloat64Error(const C_SCLString & orc_Name, float64 & orf64_Value) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->AttributeExists(orc_Name))
+   {
+      orf64_Value = this->GetAttributeFloat64(orc_Name);
+   }
+   else
+   {
+      orf64_Value = 0.0;
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -580,8 +902,8 @@ std::vector<C_OSCXMLAttribute> C_OSCXMLParserBase::GetAttributes(void) const
    The current selection will not be changed.
    If no node is currently selected the new node will be added at the end of the document.
 
-   \param[in]  orc_Name     name of new node
-   \param[in]  orc_Content  content of new node
+   \param[in]  orc_Name       name of new node
+   \param[in]  orc_Content    content of new node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::CreateNodeChild(const C_SCLString & orc_Name, const C_SCLString & orc_Content)
@@ -609,7 +931,7 @@ void C_OSCXMLParserBase::CreateNodeChild(const C_SCLString & orc_Name, const C_S
    The current selection will be changed to the new node.
    If no node is currently selected the new node will be added at the end of the document.
 
-   \param[in]  orc_Name     name of new node
+   \param[in]  orc_Name    name of new node
 
    \return   name of the new node
 */
@@ -664,7 +986,7 @@ C_SCLString C_OSCXMLParserBase::DeleteNode(void)
 
    Set content of currently selected node from a string.
 
-   \param[in]  orc_Content   new content
+   \param[in]  orc_Content    new content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetNodeContent(const C_SCLString & orc_Content)
@@ -680,8 +1002,8 @@ void C_OSCXMLParserBase::SetNodeContent(const C_SCLString & orc_Content)
 
    Set content of one attribute of currently selected node from a string.
 
-   \param[in]  orc_Name   name of attribute
-   \param[in]  orc_Value  new value of attribute
+   \param[in]  orc_Name    name of attribute
+   \param[in]  orc_Value   new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetAttributeString(const C_SCLString & orc_Name, const C_SCLString & orc_Value)
@@ -744,6 +1066,23 @@ void C_OSCXMLParserBase::SetAttributeSint64(const C_SCLString & orc_Name, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set uint64 content of attribute of currently selected node.
+
+   Set content of one attribute of currently selected node from an sint64.
+
+   \param[in]  orc_Name    name of attribute
+   \param[in]  ou64_Value  new value of attribute
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCXMLParserBase::SetAttributeUint64(const C_SCLString & orc_Name, const uint64 ou64_Value)
+{
+   if (mpc_CurrentNode != NULL)
+   {
+      mpc_CurrentNode->SetAttribute(orc_Name.c_str(), static_cast<uint64_t>(ou64_Value));
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set bool content of attribute of currently selected node.
 
    Set content of one attribute of currently selected node from a bool.
@@ -767,8 +1106,8 @@ void C_OSCXMLParserBase::SetAttributeBool(const C_SCLString & orc_Name, const bo
 
    Set content of one attribute of currently selected node from a float32.
 
-   \param[in]  orc_Name      name of attribute
-   \param[in]  of32_Value    new value of attribute
+   \param[in]  orc_Name    name of attribute
+   \param[in]  of32_Value  new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetAttributeFloat32(const C_SCLString & orc_Name, const float32 of32_Value)
@@ -784,8 +1123,8 @@ void C_OSCXMLParserBase::SetAttributeFloat32(const C_SCLString & orc_Name, const
 
    Set content of one attribute of currently selected node from a float64.
 
-   \param[in]  orc_Name      name of attribute
-   \param[in]  of64_Value    new value of attribute
+   \param[in]  orc_Name    name of attribute
+   \param[in]  of64_Value  new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetAttributeFloat64(const C_SCLString & orc_Name, const float64 of64_Value)
@@ -797,35 +1136,19 @@ void C_OSCXMLParserBase::SetAttributeFloat64(const C_SCLString & orc_Name, const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Default constructor
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_OSCXMLParserString::C_OSCXMLParserString(void)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_OSCXMLParserString::~C_OSCXMLParserString(void)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Open XML data from string
 
    Parse XML data from string.
    If the data cannot be parsed the function will return an error and prepare an empty XML structure.
 
-   \param[in]   orc_String   string containing XML data
+   \param[in]  orc_String  string containing XML data
 
    \return
    C_NO_ERR   data was read from string
    C_NOACT    could not parse data from string
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserString::LoadFromString(const C_SCLString & orc_String)
+sint32 C_OSCXMLParser::LoadFromString(const C_SCLString & orc_String)
 {
    tinyxml2::XMLError e_Error;
    sint32 s32_Return = C_NO_ERR;
@@ -846,10 +1169,10 @@ sint32 C_OSCXMLParserString::LoadFromString(const C_SCLString & orc_String)
 
    Write XML data to string
 
-   \param[out]   orc_String   Resulting XML data
+   \param[out]  orc_String    Resulting XML data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserString::SaveToString(C_SCLString & orc_String) const
+void C_OSCXMLParser::SaveToString(C_SCLString & orc_String) const
 {
    tinyxml2::XMLPrinter c_Printer;
    this->mc_Document.Print(&c_Printer);

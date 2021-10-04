@@ -478,7 +478,8 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
-   if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+   if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) &&
+       (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
    {
       // is enough space available
       if (C_SdUtil::h_CheckDatapoolNumber(this->mu32_NodeIndex, false, this) == true)
@@ -561,7 +562,8 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
 
             // Open the Datapool properties dialog for the new Datapool
             if (this->m_OpenDataPoolDialog(c_NewDatapool, c_UIDataPool, opc_SharedDatapoolId,
-                                           pc_Node->pc_DeviceDefinition->q_ProgrammingSupport,
+                                           pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
+                                           q_ProgrammingSupport,
                                            -1) == true)
             {
                // Initialize the Datapool only when not shared
@@ -1305,6 +1307,7 @@ bool C_SdNdeDpSelectorListWidget::m_OpenDataPoolDialog(C_OSCNodeDataPool & orc_O
    if (c_New != NULL)
    {
       c_New->HideOverlay();
+      c_New->deleteLater();
    }
 
    return q_Return; //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
@@ -1634,7 +1637,8 @@ void C_SdNdeDpSelectorListWidget::m_Edit(const bool oq_SelectName)
 
             // open the dialog
             if (this->m_OpenDataPoolDialog(c_OSCDatapool, c_UIDataPool, NULL,
-                                           pc_Node->pc_DeviceDefinition->q_ProgrammingSupport, s32_DpIndex,
+                                           pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
+                                           q_ProgrammingSupport, s32_DpIndex,
                                            oq_SelectName) == true)
             {
                // Update crc active if safety
@@ -1911,7 +1915,6 @@ void C_SdNdeDpSelectorListWidget::m_ItemClicked(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::m_ItemDoubleClicked(const uint32 ou32_Index)
 {
-   std::cout << __PRETTY_FUNCTION__ << " " << ou32_Index << std::endl;
    if (static_cast<sintn>(ou32_Index) < this->mc_DpItems.size())
    {
       Q_EMIT (this->SigOpenDataPoolContent(ou32_Index));

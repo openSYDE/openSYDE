@@ -33,8 +33,8 @@ public:
    C_SyvDcConnectedNodeList(QWidget * const opc_Parent = NULL);
 
    void SetData(const std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceInformation> & orc_Infos);
-   void EnableSerialNumber(const QString & orc_SerialNumber) const;
-   void DisableSerialNumber(const QString & orc_SerialNumber) const;
+   void EnableSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
+   void DisableSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -52,11 +52,14 @@ private:
    bool mq_GridSizeSet;
    std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceInformation> mc_Data;
    static const QString mhc_MimeData;
+   static const QString mhc_MimeDataExtFormat;
+   static const QString mhc_MimeDataManufacturerFormat;
    static const QString mhc_MimeDataDevice;
    static const QString mhc_MimeDataDeviceValid;
 
    void m_Init(void);
-   void m_AppendNode(const stw_opensyde_gui_logic::C_SyvDcDeviceInformation & orc_Info);
+   void m_AppendNode(const stw_opensyde_gui_logic::C_SyvDcDeviceInformation & orc_Info,
+                     const std::set<stw_types::uint8> & orc_SubNodeIds);
 
    void m_ScrollBarRangeChangedVer(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
 };

@@ -40,9 +40,9 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_NodeIndex     Node index
-   \param[in]     ou32_DataPoolIndex Data pool index
-   \param[in,out] opc_Parent         Optional pointer to parent
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
+   \param[in,out]  opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbDataPoolEntry::C_SdNdeDbDataPoolEntry(const stw_types::uint32 ou32_NodeIndex,
@@ -55,7 +55,7 @@ C_SdNdeDbDataPoolEntry::C_SdNdeDbDataPoolEntry(const stw_types::uint32 ou32_Node
 
    this->mpc_Ui->pc_PushButtonDelete->SetSvg("://images/main_page_and_navi_bar/Icon_delete.svg");
 
-   this->mpc_Ui->pc_PushButtonDelete->SetToolTipInformation(C_GtGetText::h_GetText(""),
+   this->mpc_Ui->pc_PushButtonDelete->SetToolTipInformation(C_GtGetText::h_GetText("Remove"),
                                                             C_GtGetText::h_GetText("Remove Datapool from this list."));
 
    m_Init(ou32_NodeIndex, ou32_DataPoolIndex);
@@ -84,8 +84,8 @@ void C_SdNdeDbDataPoolEntry::m_OnDeleteClick(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init based on specified data pool
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbDataPoolEntry::m_Init(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex)
@@ -112,7 +112,9 @@ void C_SdNdeDbDataPoolEntry::m_Init(const stw_types::uint32 ou32_NodeIndex, cons
       this->mpc_Ui->pc_LabelName->setText(c_Text);
       this->SetToolTipInformation(c_Text, pc_Datapool->c_Comment.c_str());
 
-      if ((pc_Node->pc_DeviceDefinition != NULL) && (pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == false))
+      if ((pc_Node->pc_DeviceDefinition != NULL) &&
+          (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()) &&
+          (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_ProgrammingSupport == false))
       {
          this->mpc_Ui->pc_PushButtonDelete->setVisible(false);
       }

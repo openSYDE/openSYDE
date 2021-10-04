@@ -15,6 +15,7 @@
 #include "TGLFile.h"
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "C_OSCXMLParserLog.h"
 #include "C_OSCHalcConfigFiler.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCHalcConfigStandaloneFiler.h"
@@ -65,7 +66,8 @@ sint32 C_OSCHalcConfigStandaloneFiler::h_LoadFileStandalone(C_OSCHalcConfigStand
 
    if (TGL_FileExists(orc_Path) == true)
    {
-      C_OSCXMLParser c_XMLParser;
+      C_OSCXMLParserLog c_XMLParser;
+      c_XMLParser.SetLogHeading("Loading IO standalone data");
       s32_Retval = c_XMLParser.LoadFromFile(orc_Path);
       if (s32_Retval == C_NO_ERR)
       {

@@ -44,10 +44,7 @@ C_SdManTopologyBusConnectorReconnectManager::C_SdManTopologyBusConnectorReconnec
    mpc_LastBus(NULL),
    me_ConnectState(C_GiLiBusConnector::eTO_BUS),
    ms32_NewInterface(-1),
-   mu8_NodeId(0),
-   mq_ActivateDatapoolL2(false),
-   mq_ActivateDatapoolECeS(false),
-   mq_ActivateDatapoolECoS(false),
+   mc_NodeIds(),
    mq_ContextMenuActive(false)
 {
 }
@@ -103,24 +100,15 @@ void C_SdManTopologyBusConnectorReconnectManager::ContextMenuAboutToClose(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register interface accepted
 
-   \param[in]  ors32_Interface            Selected interface number
-   \param[in]  oru8_NodeId                New node id
-   \param[in]  oq_ActivateDatapoolL2      Activate datapool L2
-   \param[in]  oq_ActivateDatapoolECeS    Activate datapool ECeS
-   \param[in]  oq_ActivateDatapoolECoS    Activate datapool ECoS
+   \param[in]  ors32_Interface   Selected interface number
+   \param[in]  orc_NodeIds       Node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyBusConnectorReconnectManager::ContextMenuAccepted(const sint32 & ors32_Interface,
-                                                                      const uint8 & oru8_NodeId,
-                                                                      const bool oq_ActivateDatapoolL2,
-                                                                      const bool oq_ActivateDatapoolECeS,
-                                                                      const bool oq_ActivateDatapoolECoS)
+                                                                      const std::vector<uint8> & orc_NodeIds)
 {
    this->ms32_NewInterface = ors32_Interface;
-   this->mu8_NodeId = oru8_NodeId;
-   this->mq_ActivateDatapoolL2 = oq_ActivateDatapoolL2;
-   this->mq_ActivateDatapoolECeS = oq_ActivateDatapoolECeS;
-   this->mq_ActivateDatapoolECoS = oq_ActivateDatapoolECoS;
+   this->mc_NodeIds = orc_NodeIds;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -170,16 +158,12 @@ void C_SdManTopologyBusConnectorReconnectManager::m_FinishReconnect(void)
       {
          Q_EMIT this->SigReconnectBus(this->mpc_BusConnector, this->mpc_StartingBus, this->mpc_LastBus,
                                       this->mc_ConnectionPos,
-                                      this->ms32_NewInterface, this->mu8_NodeId,
-                                      this->mq_ActivateDatapoolL2, this->mq_ActivateDatapoolECeS,
-                                      this->mq_ActivateDatapoolECoS);
+                                      this->ms32_NewInterface, this->mc_NodeIds);
       }
       else
       {
          Q_EMIT this->SigReconnectNode(this->mpc_BusConnector, this->mpc_StartingNode, this->mpc_LastNode,
-                                       this->mc_ConnectionPos, this->ms32_NewInterface, this->mu8_NodeId,
-                                       this->mq_ActivateDatapoolL2, this->mq_ActivateDatapoolECeS,
-                                       this->mq_ActivateDatapoolECoS);
+                                       this->mc_ConnectionPos, this->ms32_NewInterface, this->mc_NodeIds);
       }
    }
    else

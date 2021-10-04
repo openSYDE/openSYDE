@@ -84,6 +84,7 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * 
    mq_ClearProgressLog(true),
    mq_StartUpdateAfterConnect(false),
    mq_ConnectFailed(false),
+   mq_ErrorDetected(false),
    mq_NodesPreconditionError(false),
    mu32_DisconnectTime(0U),
    mu32_UpdateTime(0U)
@@ -470,15 +471,28 @@ void C_SyvUpUpdateWidget::m_CheckError(void)
    QString c_ErrorText;
    QString c_ErrorTextHeading;
    QString c_ErrorTextTooltip;
-   const bool q_ViewSetupError =
-      C_SyvUtil::h_CheckViewSetupError(this->mu32_ViewIndex, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip);
 
-   if (q_ViewSetupError == true)
+   C_NagToolTip::E_Type e_ToolTipType;
+   QString c_IconPath;
+   sintn sn_ColorID;
+   this->mq_ErrorDetected = C_SyvUtil::h_GetViewSetupLabelInfo(
+      this->mu32_ViewIndex, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip, e_ToolTipType,
+      c_IconPath, sn_ColorID);
+
+   if (this->mq_ErrorDetected == true)
    {
-      this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
+      //Disable error if info only
+      this->mq_ErrorDetected = e_ToolTipType == C_NagToolTip::eERROR;
+
+      this->mpc_Ui->pc_ErrorLabelIcon->SetSvg(c_IconPath);
+      this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
+                                                             c_ErrorTextTooltip, e_ToolTipType);
+      this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(sn_ColorID);
       this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
-      this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
-      this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip);
+      this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
+                                                              c_ErrorTextTooltip, e_ToolTipType);
+      this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(sn_ColorID);
+      this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip, e_ToolTipType);
       this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
    }
    else
@@ -665,7 +679,7 @@ void C_SyvUpUpdateWidget::m_CleanUpSequence(void)
 void C_SyvUpUpdateWidget::m_UpdatePackageState(const sint32 os32_State)
 {
    if ((os32_State == C_NO_ERR) &&
-       (this->mpc_Ui->pc_GroupBoxErrorContent->isVisible() == false))
+       (this->mq_ErrorDetected == false))
    {
       this->mpc_Ui->pc_PbConnect->setEnabled(true);
       this->mpc_Ui->pc_PbUpdate->setEnabled(true);
@@ -898,6 +912,7 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
       for (u32_Counter = 0U; u32_Counter < c_NodeIndexes.size(); ++u32_Counter)
       {
          const C_OSCSuSequences::C_OsyDeviceInformation & rc_Info = c_DeviceInformation[u32_Counter];
+         QString c_Temp;
 
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText(
@@ -962,9 +977,19 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText("Flash count: %1")).arg(rc_Info.c_MoreInformation.
                                                                                 u32_FlashCount));
+         if (rc_Info.c_MoreInformation.c_AvailableFeatures.q_ExtendedSerialNumberModeImplemented == false)
+         {
+            c_Temp = C_GtGetText::h_GetText("(Format: Standard)");
+         }
+         else
+         {
+            c_Temp = static_cast<QString>(C_GtGetText::h_GetText("(Format: Extended with Manufacturer Format %1)")).arg(
+               QString::number(static_cast<uint32>(rc_Info.c_MoreInformation.c_SerialNumber.
+                                                   u8_SerialNumberManufacturerFormat)));
+         }
          this->m_UpdateReportText(
-            static_cast<QString>(C_GtGetText::h_GetText("Device serial number: %1")).arg(
-               C_OSCUtils::h_SerialNumberToString(&rc_Info.c_MoreInformation.au8_EcuSerialNumber[0]).c_str()));
+            static_cast<QString>(C_GtGetText::h_GetText("Device serial number: %1 %2")).arg(
+               rc_Info.c_MoreInformation.GetEcuSerialNumber().c_str(), c_Temp));
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText("Device article number: %1")).arg(rc_Info.
                                                                                           c_MoreInformation.
@@ -2083,6 +2108,11 @@ void C_SyvUpUpdateWidget::m_HandleConnectionFailure(void)
          }
       }
 
+      std::cout << "c_RespondedNodes:" << c_RespondedNodes.size() << std::endl;
+      std::cout << "c_ActiveNoneThirdPartyNodeIndices:" << c_ActiveNoneThirdPartyNodeIndices.size() << std::endl;
+      std::cout << "c_ActiveNoResponseNodeIndices:" << c_ActiveNoResponseNodeIndices.size() << std::endl;
+      std::cout << "u32_AddedNodes:" << u32_AddedNodes << std::endl;
+      std::cout << "c_NodeIndicesWhichRequireAResponse:" << c_NodeIndicesWhichRequireAResponse.size() << std::endl;
       //Check existing and added ones then compare with expected number for special case no response
       if ((c_ActiveNoResponseNodeIndices.size() + u32_AddedNodes) == c_NodeIndicesWhichRequireAResponse.size())
       {
@@ -2344,9 +2374,11 @@ std::vector<bool> C_SyvUpUpdateWidget::m_GetIsFileBasedFlagForEach(void) const
          if (rc_ActiveNodes[u32_ItActiveNode] == true)
          {
             const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItActiveNode);
-            if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+            if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) &&
+                (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
             {
-               if (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == true)
+               if (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
+                   q_FlashloaderOpenSydeIsFileBased == true)
                {
                   c_Retval.push_back(true);
                }

@@ -236,11 +236,18 @@ void C_NagViewItem::UpdateDeco(void) const
    QString c_ErrorTextHeading;
    QString c_ErrorTextTooltip;
 
-   if (C_SyvUtil::h_CheckViewSetupError(this->mu32_ViewIndex, c_ErrorTextHeading, c_Error, c_ErrorTextTooltip) == true)
+   C_NagToolTip::E_Type e_ToolTipType;
+   QString c_IconPath;
+   sintn sn_ColorID;
+   const bool q_Error = C_SyvUtil::h_GetViewSetupLabelInfo(this->mu32_ViewIndex, c_ErrorTextHeading, c_Error,
+                                                           c_ErrorTextTooltip,
+                                                           e_ToolTipType, c_IconPath, sn_ColorID);
+
+   if ((q_Error) && (e_ToolTipType == C_NagToolTip::eERROR))
    {
       //Error
       this->mpc_Ui->pc_LabelError->SetSvg("://images/Error_iconV2.svg");
-      this->mpc_Ui->pc_LabelError->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
+      this->mpc_Ui->pc_LabelError->SetToolTipInformation("Invalid", c_ErrorTextTooltip, C_NagToolTip::eERROR);
    }
    else
    {

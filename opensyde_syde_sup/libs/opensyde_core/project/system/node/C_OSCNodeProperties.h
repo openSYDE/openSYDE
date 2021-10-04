@@ -44,7 +44,7 @@ public:
    void SetComInterface(const C_OSCNodeComInterfaceSettings & orc_ComInterface);
    void DisconnectComInterface(const C_OSCSystemBus::E_Type oe_InterfaceType,
                                const stw_types::uint8 ou8_InterfaceNumber);
-   void CreateComInterfaces(const C_OSCDeviceDefinition & orc_Device);
+   void CreateComInterfaces(const C_OSCDeviceDefinition & orc_Device, const stw_types::uint32 ou32_SubDeviceIndex);
 
    ///possible types of diagnostic protocols
    enum E_DiagnosticServerProtocol

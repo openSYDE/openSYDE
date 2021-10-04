@@ -111,13 +111,20 @@ C_SdNdeDpListsWidget::~C_SdNdeDpListsWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsWidget::InitText(void) const
 {
-   this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"), "");
-   this->mpc_Ui->pc_PushButtonCopy->SetToolTipInformation(C_GtGetText::h_GetText("Copy"), "");
-   this->mpc_Ui->pc_PushButtonCut->SetToolTipInformation(C_GtGetText::h_GetText("Cut"), "");
-   this->mpc_Ui->pc_PushButtonPaste->SetToolTipInformation(C_GtGetText::h_GetText("Paste"), "");
-   this->mpc_Ui->pc_PushButtonDelete->SetToolTipInformation(C_GtGetText::h_GetText("Delete"), "");
-   this->mpc_Ui->pc_PushButtonMoveDown->SetToolTipInformation(C_GtGetText::h_GetText("Move down"), "");
-   this->mpc_Ui->pc_PushButtonMoveUp->SetToolTipInformation(C_GtGetText::h_GetText("Move up"), "");
+   this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
+                                                         C_GtGetText::h_GetText("Add new list"));
+   this->mpc_Ui->pc_PushButtonCopy->SetToolTipInformation(C_GtGetText::h_GetText("Copy"),
+                                                          C_GtGetText::h_GetText("Copy selected list(s)"));
+   this->mpc_Ui->pc_PushButtonCut->SetToolTipInformation(C_GtGetText::h_GetText("Cut"),
+                                                         C_GtGetText::h_GetText("Cut selected list(s)"));
+   this->mpc_Ui->pc_PushButtonPaste->SetToolTipInformation(C_GtGetText::h_GetText("Paste"),
+                                                           C_GtGetText::h_GetText("Paste list(s)"));
+   this->mpc_Ui->pc_PushButtonDelete->SetToolTipInformation(C_GtGetText::h_GetText("Delete"),
+                                                            C_GtGetText::h_GetText("Delete selected list(s)"));
+   this->mpc_Ui->pc_PushButtonMoveDown->SetToolTipInformation(C_GtGetText::h_GetText("Move down"),
+                                                              C_GtGetText::h_GetText("Move selected list(s) down"));
+   this->mpc_Ui->pc_PushButtonMoveUp->SetToolTipInformation(C_GtGetText::h_GetText("Move up"),
+                                                            C_GtGetText::h_GetText("Move selected list(s) up"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

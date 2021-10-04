@@ -15,6 +15,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <algorithm>
+
 #include "stwerrors.h"
 
 #include "TGLTime.h"
@@ -112,7 +114,15 @@ C_OSCComMessageLogger::C_OSCComMessageLogger(void) :
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLogger::~C_OSCComMessageLogger(void)
 {
-   this->RemoveAllLogFiles();
+   try
+   {
+      C_OSCComMessageLogger::RemoveAllLogFiles();
+   }
+   catch (...)
+   {
+   }
+   mpc_OsySysDefMessage = NULL;
+   mpc_OsySysDefDataPoolList = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -943,7 +953,7 @@ bool C_OSCComMessageLogger::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
             // Search an interface which is connected to the bus
             for (u32_IntfCounter = 0U; u32_IntfCounter < rc_Node.c_Properties.c_ComInterfaces.size(); ++u32_IntfCounter)
             {
-               if ((rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter].q_IsBusConnected == true) &&
+               if ((rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter].GetBusConnected() == true) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter].u32_BusIndex ==
                     c_ItSysDef->second.u32_BusIndex))
                {
@@ -1451,6 +1461,7 @@ void C_OSCComMessageLogger::m_InterpretSysDefCanSignal(C_OSCComMessageLoggerData
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::m_ResetCounter(void)
 {
+   //lint -e522 //false positive; call to std::fill has side effects
    std::fill(this->mc_MsgCounterStandardId.begin(), this->mc_MsgCounterStandardId.end(), 0U);
    this->mc_MsgCounterExtendedId.clear();
 }

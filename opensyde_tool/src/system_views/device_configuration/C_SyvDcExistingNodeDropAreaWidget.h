@@ -14,6 +14,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 
+#include "stwtypes.h"
+#include "C_OSCProtocolSerialNumber.h"
+
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
@@ -35,23 +38,24 @@ public:
    ~C_SyvDcExistingNodeDropAreaWidget(void);
 
    void InitStaticNames(void) const;
-   void SetContent(const bool oq_ValidSerialNumber, const QString & orc_PureSerialNumber);
+   void SetContent(const bool oq_ValidSerialNumber,
+                   const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_PureSerialNumber);
    bool IsAssigned(void) const;
-   QString GetPureSerialNumber(void) const;
+   void GetContent(stw_opensyde_core::C_OSCProtocolSerialNumber & orc_PureSerialNumber) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 
 Q_SIGNALS:
    //lint -restore
-   void SigDisconnect(const QString & orc_SerialNumber);
+   void SigDisconnect(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
 
 protected:
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
 
 private:
    Ui::C_SyvDcExistingNodeDropAreaWidget * mpc_Ui;
-   QString mc_PureSerialNumber;
+   stw_opensyde_core::C_OSCProtocolSerialNumber mc_PureSerialNumber;
    bool mq_Assigned;
 
    void m_OnDisconnectRequest(void);

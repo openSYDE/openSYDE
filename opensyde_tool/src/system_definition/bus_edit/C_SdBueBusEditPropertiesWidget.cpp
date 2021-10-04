@@ -69,7 +69,9 @@ C_SdBueBusEditPropertiesWidget::C_SdBueBusEditPropertiesWidget(QWidget * const o
    //Ui restriction
    this->mpc_Ui->pc_SpinBoxBusId->SetMaximumCustom(15);
 
-   this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+   this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                           C_GtGetText::h_GetText(""),
+                                                           C_NagToolTip::eDEFAULT);
 
    InitStaticNames();
 
@@ -230,7 +232,9 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
          }
          if (q_CurrentSetBitrateFound == true)
          {
-            this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+            this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                                    C_GtGetText::h_GetText(""),
+                                                                    C_NagToolTip::eDEFAULT);
          }
          else
          {
@@ -298,7 +302,9 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed(void) const
 {
-   this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+   this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                           C_GtGetText::h_GetText(""),
+                                                           C_NagToolTip::eDEFAULT);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -395,7 +401,9 @@ void C_SdBueBusEditPropertiesWidget::m_CheckBusName(void)
 
    if ((q_NameIsUnique == true) && (q_NameIsValid == true))
    {
-      this->mpc_Ui->pc_LineEditBusName->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+      this->mpc_Ui->pc_LineEditBusName->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                              C_GtGetText::h_GetText(""),
+                                                              C_NagToolTip::eDEFAULT);
    }
    else
    {

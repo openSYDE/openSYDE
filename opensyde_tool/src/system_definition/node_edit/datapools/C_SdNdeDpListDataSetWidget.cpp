@@ -150,13 +150,20 @@ void C_SdNdeDpListDataSetWidget::InitStaticNames(void) const
    mrc_Parent.SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Dataset Configuration")));
    this->mpc_Ui->pc_LabelReplacement->setText(C_GtGetText::h_GetText(
                                                  "No Dataset is declared, add any via the '+' button"));
-   this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"), "");
-   this->mpc_Ui->pc_PushButtonCopy->SetToolTipInformation(C_GtGetText::h_GetText("Copy"), "");
-   this->mpc_Ui->pc_PushButtonCut->SetToolTipInformation(C_GtGetText::h_GetText("Cut"), "");
-   this->mpc_Ui->pc_PushButtonPaste->SetToolTipInformation(C_GtGetText::h_GetText("Paste"), "");
-   this->mpc_Ui->pc_PushButtonDelete->SetToolTipInformation(C_GtGetText::h_GetText("Delete"), "");
-   this->mpc_Ui->pc_PushButtonMoveLeft->SetToolTipInformation(C_GtGetText::h_GetText("Move left"), "");
-   this->mpc_Ui->pc_PushButtonMoveRight->SetToolTipInformation(C_GtGetText::h_GetText("Move right"), "");
+   this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
+                                                         C_GtGetText::h_GetText("Add new Dataset"));
+   this->mpc_Ui->pc_PushButtonCopy->SetToolTipInformation(C_GtGetText::h_GetText("Copy"),
+                                                          C_GtGetText::h_GetText("Copy selected Dataset(s)"));
+   this->mpc_Ui->pc_PushButtonCut->SetToolTipInformation(C_GtGetText::h_GetText("Cut"),
+                                                         C_GtGetText::h_GetText("Cut selected Dataset(s)"));
+   this->mpc_Ui->pc_PushButtonPaste->SetToolTipInformation(C_GtGetText::h_GetText("Paste"),
+                                                           C_GtGetText::h_GetText("Paste Dataset(s)"));
+   this->mpc_Ui->pc_PushButtonDelete->SetToolTipInformation(C_GtGetText::h_GetText("Delete"),
+                                                            C_GtGetText::h_GetText("Delete selected Dataset(s)"));
+   this->mpc_Ui->pc_PushButtonMoveLeft->SetToolTipInformation(C_GtGetText::h_GetText("Move left"),
+                                                              C_GtGetText::h_GetText("Move selected Dataset(s) left"));
+   this->mpc_Ui->pc_PushButtonMoveRight->SetToolTipInformation(C_GtGetText::h_GetText("Move right"),
+                                                               C_GtGetText::h_GetText("Move selected Dataset(s) right"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

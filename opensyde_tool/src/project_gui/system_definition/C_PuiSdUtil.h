@@ -17,6 +17,7 @@
 #include <QString>
 #include "CSCLString.h"
 #include "stwtypes.h"
+#include "C_OSCNodeSquad.h"
 #include "C_OSCSystemBus.h"
 #include "C_OSCCanProtocol.h"
 #include "C_OSCNodeDataPool.h"
@@ -55,6 +56,11 @@ public:
    static QString h_GetNamespace(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id);
    static QString h_GetSignalNamespace(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id);
    static QString h_GetHALCNamespace(const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id);
+   static QString h_GetSubNodeDeviceName(const stw_types::uint32 ou32_NodeIndex);
+   static QString h_GetNodeBaseNameOrName(const stw_types::uint32 ou32_NodeIndex);
+   static stw_types::uint32 h_GetIndexOfFirstNodeInGroup(const stw_types::uint32 ou32_NodeIndex);
+   static bool h_CheckIsFirstInAnyGroupOrNotInAny(const stw_types::uint32 ou32_NodeIndex,
+                                                  const std::vector<stw_opensyde_core::C_OSCNodeSquad> & orc_AvailableGroups);
 
 private:
    C_PuiSdUtil(void);

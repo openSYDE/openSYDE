@@ -30,6 +30,7 @@
 #include "gitypes.h"
 #include "C_SebUtil.h"
 #include "TGLUtils.h"
+#include "C_PuiSdUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -89,8 +90,8 @@ const C_PuiBsElements * C_SdManTopologyCopyPasteManager::GetSnapshot(QWidget * c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy selected files to copy paste manager
 
-   \param[in] orc_SelectedItems     Selected items to copy
-   \param[in] orc_NormalizedZValues Normalized Z values for all copied items
+   \param[in]  orc_SelectedItems       Selected items to copy
+   \param[in]  orc_NormalizedZValues   Normalized Z values for all copied items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems,
@@ -99,7 +100,6 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
 {
    C_SdTopologyDataSnapshot c_Snapshot;
    uint32 u32_Index;
-   const C_GiNode * pc_Node;
    const C_GiLiBus * pc_Bus;
    const C_GiSdImageGroup * pc_Image;
    const C_GiSdBoundary * pc_Boundary;
@@ -133,24 +133,10 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
          switch (pc_CurItem->type())
          {
          case msn_GRAPHICS_ITEM_NODE:
-
-            pc_Node = dynamic_cast<const C_GiNode *>(pc_CurItem);
-            if (pc_Node != NULL)
-            {
-               u32_Index = static_cast<uint32>(pc_Node->GetIndex());
-               const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_Index);
-               const C_PuiSdNode * const pc_UINode = C_PuiSdHandler::h_GetInstance()->GetUINode(u32_Index);
-               if ((pc_OSCNode != NULL) && (pc_UINode != NULL))
-               {
-                  c_Snapshot.c_OSCNodes.push_back(*pc_OSCNode);
-                  c_Snapshot.c_UINodes.push_back(*pc_UINode);
-                  C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues,
-                                                                c_Snapshot.c_UINodes[static_cast<std::vector<C_PuiSdNode>
-                                                                                                 ::size_type>(
-                                                                                        c_Snapshot.c_UINodes.size() -
-                                                                                        1UL)]);
-               }
-            }
+            C_SdManTopologyCopyPasteManager::mh_CopyFromSceneToManagerHandleNode(dynamic_cast<const C_GiNode *>(
+                                                                                    pc_CurItem),
+                                                                                 c_Snapshot, orc_NormalizedZValues,
+                                                                                 *c_ItItem);
             break;
          case msn_GRAPHICS_ITEM_CANBUS: //Same data element
          case msn_GRAPHICS_ITEM_ETHERNETBUS:
@@ -282,10 +268,11 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
    for (uint32 u32_ItNode = 0; u32_ItNode < c_Snapshot.c_OSCNodes.size(); ++u32_ItNode)
    {
       C_OSCNode & rc_Node = c_Snapshot.c_OSCNodes[u32_ItNode];
-      for (uint32 u32_ItInterface = 0; u32_ItInterface < rc_Node.c_Properties.c_ComInterfaces.size(); ++u32_ItInterface)
+      for (uint32 u32_ItInterface = 0; u32_ItInterface < rc_Node.c_Properties.c_ComInterfaces.size();
+           ++u32_ItInterface)
       {
          C_OSCNodeComInterfaceSettings & rc_ComInterface = rc_Node.c_Properties.c_ComInterfaces[u32_ItInterface];
-         if (rc_ComInterface.q_IsBusConnected == true)
+         if (rc_ComInterface.GetBusConnectedRawValue() == true)
          {
             //Check if bus was copied
             //Replace
@@ -330,7 +317,7 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Indicator if copy paste manager has some content
 
-   Warning: is expected to be called bevore getting any data
+   Warning: is expected to be called before getting any data
 
    \return
    true: content
@@ -346,7 +333,7 @@ bool C_SdManTopologyCopyPasteManager::CheckValidContentAndPrepareData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Evaluate all items to get top left point
 
-   \param[in] opc_Data Data
+   \param[in]  opc_Data    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * const opc_Data)
@@ -388,11 +375,122 @@ void C_SdManTopologyCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElemen
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy from scene to manager, handle node
+
+   \param[in]      opc_UiNodeItem         UI node item
+   \param[in,out]  orc_Snapshot           Snapshot
+   \param[in]      orc_NormalizedZValues  Normalized Z values
+   \param[in]      opc_NodeItemOrigin     Node item origin
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManTopologyCopyPasteManager::mh_CopyFromSceneToManagerHandleNode(const C_GiNode * const opc_UiNodeItem,
+                                                                          C_SdTopologyDataSnapshot & orc_Snapshot,
+                                                                          const QMap<const QGraphicsItem *,
+                                                                                     float64> & orc_NormalizedZValues,
+                                                                          const QGraphicsItem * const opc_NodeItemOrigin)
+{
+   if (opc_UiNodeItem != NULL)
+   {
+      const uint32 u32_Index = static_cast<uint32>(opc_UiNodeItem->GetIndex());
+      const bool q_IsMulti = C_OSCNodeSquad::h_CheckIsMultiDevice(u32_Index,
+                                                                  C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_NodeSquads);
+      if (q_IsMulti)
+      {
+         C_SdManTopologyCopyPasteManager::mh_CopyFromSceneToManagerHandleMultiNode(u32_Index, orc_Snapshot,
+                                                                                   orc_NormalizedZValues,
+                                                                                   opc_NodeItemOrigin);
+      }
+      else
+      {
+         const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_Index);
+         const C_PuiSdNode * const pc_UINode = C_PuiSdHandler::h_GetInstance()->GetUINode(u32_Index);
+         if ((pc_OSCNode != NULL) && (pc_UINode != NULL))
+         {
+            orc_Snapshot.c_OSCNodes.push_back(*pc_OSCNode);
+            orc_Snapshot.c_UINodes.push_back(*pc_UINode);
+            C_SebBaseCopyPasteManager::mh_HandleZValueBox(opc_NodeItemOrigin, orc_NormalizedZValues,
+                                                          orc_Snapshot.c_UINodes[static_cast<std::vector<C_PuiSdNode>
+                                                                                             ::size_type>(
+                                                                                    orc_Snapshot.c_UINodes.size()
+                                                                                    -
+                                                                                    1UL)]);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy from scene to manager, handle multi node
+
+   \param[in]      ou32_NodeIndex         Node index
+   \param[in,out]  orc_Snapshot           Snapshot
+   \param[in]      orc_NormalizedZValues  Normalized Z values
+   \param[in]      opc_NodeItemOrigin     Node item origin
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManTopologyCopyPasteManager::mh_CopyFromSceneToManagerHandleMultiNode(const uint32 ou32_NodeIndex,
+                                                                               C_SdTopologyDataSnapshot & orc_Snapshot,
+                                                                               const QMap<const QGraphicsItem *,
+                                                                                          float64> & orc_NormalizedZValues,
+                                                                               const QGraphicsItem * const opc_NodeItemOrigin)
+{
+   const bool q_IsFirst = C_PuiSdUtil::h_CheckIsFirstInAnyGroupOrNotInAny(ou32_NodeIndex,
+                                                                          C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_NodeSquads);
+
+   if (q_IsFirst)
+   {
+      const std::vector<uint32> c_Indices =
+         C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+            ou32_NodeIndex);
+      uint32 u32_GroupIndex;
+      if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(ou32_NodeIndex,
+                                                                          u32_GroupIndex) == C_NO_ERR)
+      {
+         const C_OSCNodeSquad * const pc_Group =
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(
+               u32_GroupIndex);
+         if (pc_Group != NULL)
+         {
+            C_OSCNodeSquad c_Group = *pc_Group;
+            c_Group.c_SubNodeIndexes.clear();
+            c_Group.c_SubNodeIndexes.reserve(c_Indices.size());
+            for (uint32 u32_ItNode = 0UL; u32_ItNode < c_Indices.size(); ++u32_ItNode)
+            {
+               const C_OSCNode * const pc_OSCNode =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_Indices[u32_ItNode]);
+               const C_PuiSdNode * const pc_UINode =
+                  C_PuiSdHandler::h_GetInstance()->GetUINode(c_Indices[u32_ItNode]);
+               if ((pc_OSCNode != NULL) && (pc_UINode != NULL))
+               {
+                  c_Group.c_SubNodeIndexes.push_back(orc_Snapshot.c_OSCNodes.size());
+                  orc_Snapshot.c_OSCNodes.push_back(*pc_OSCNode);
+                  orc_Snapshot.c_UINodes.push_back(*pc_UINode);
+                  C_SebBaseCopyPasteManager::mh_HandleZValueBox(opc_NodeItemOrigin, orc_NormalizedZValues,
+                                                                orc_Snapshot.c_UINodes[static_cast<std::
+                                                                                                   vector<C_PuiSdNode>
+                                                                                                   ::
+                                                                                                   size_type>(
+                                                                                          orc_Snapshot.
+                                                                                          c_UINodes
+                                                                                          .
+                                                                                          size()
+                                                                                          -
+                                                                                          1UL)]);
+               }
+            }
+            tgl_assert(c_Group.c_SubNodeIndexes.size() == pc_Group->c_SubNodeIndexes.size());
+            orc_Snapshot.c_OSCNodeGroups.push_back(c_Group);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove connection from snap shot
 
-   \param[in,out] orc_Data         Snap shot data
-   \param[in]     oru32_NodeIndex  Node index
-   \param[in]     orc_ConnectionId Connection ID
+   \param[in,out]  orc_Data            Snap shot data
+   \param[in]      oru32_NodeIndex     Node index
+   \param[in]      orc_ConnectionId    Connection ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyCopyPasteManager::mh_RemoveConnection(C_SdTopologyDataSnapshot & orc_Data,

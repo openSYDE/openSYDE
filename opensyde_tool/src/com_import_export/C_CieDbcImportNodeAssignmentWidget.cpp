@@ -74,7 +74,8 @@ C_CieDbcImportNodeAssignmentWidget::C_CieDbcImportNodeAssignmentWidget(
    //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    this->mpc_Ui->pc_LabPath->setText(
       C_Uti::h_MinimizePath(orc_FilePath, C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13), 520, 0));
-   this->mpc_Ui->pc_LabPath->SetToolTipInformation("", orc_FilePath);
+   this->mpc_Ui->pc_LabPath->SetToolTipInformation(C_GtGetText::h_GetText("DBC Source File"),
+                                                   C_GtGetText::h_GetText(orc_FilePath.toStdString().c_str()));
 
    this->m_InitNodes(ou32_BusIndex, orc_CIECommDef);
 

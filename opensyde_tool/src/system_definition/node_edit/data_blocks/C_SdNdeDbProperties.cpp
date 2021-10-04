@@ -267,7 +267,7 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
       C_GtGetText::h_GetText("List of all Datapool(s) which are mapped to this Data Block"
                              "\n(Relevant for file generation)."));
 
-   this->mpc_Ui->pc_PushButtonAddDataPool->SetToolTipInformation(C_GtGetText::h_GetText(""),
+   this->mpc_Ui->pc_PushButtonAddDataPool->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
                                                                  C_GtGetText::h_GetText("Add Datapool(s) to list."));
 
    this->mpc_Ui->pc_CheckBoxFileGen->SetToolTipInformation(
@@ -281,10 +281,10 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
       C_GtGetText::h_GetText("Non Safe File"),
       C_GtGetText::h_GetText("File name of generated parameter set image for non-safe hardware configuration data."));
    this->mpc_Ui->pc_LabelSafeFileNone->SetToolTipInformation(
-      "",
+      "Safe Channel",
       C_GtGetText::h_GetText("The hardware definition for this node does not support safe channel configuration."));
    this->mpc_Ui->pc_LabelNonSafeFileNone->SetToolTipInformation(
-      "",
+      "Non Safe Channel",
       C_GtGetText::h_GetText("The hardware definition for this node does not support non-safe channel configuration."));
 
    this->mpc_Ui->pc_LabelProcessID->SetToolTipInformation(
@@ -913,10 +913,11 @@ void C_SdNdeDbProperties::m_LoadData(void)
       }
 
       //Handle file generation checkbox
-      if (pc_Node->pc_DeviceDefinition != NULL)
+      if ((pc_Node->pc_DeviceDefinition != NULL) &&
+          (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
       {
          bool q_FileGenEnabled = true;
-         if (pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == false)
+         if (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_ProgrammingSupport == false)
          {
             q_FileGenEnabled = false;
 
@@ -968,7 +969,7 @@ void C_SdNdeDbProperties::m_LoadData(void)
 
          if (q_FileGenEnabled == true)
          {
-            if (pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == true)
+            if (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_ProgrammingSupport == true)
             {
                this->mpc_Ui->pc_CheckBoxFileGen->setText(C_GtGetText::h_GetText("File Generation (Source Code)"));
             }
@@ -1067,6 +1068,9 @@ void C_SdNdeDbProperties::m_LoadDataBlock(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Show output file paths in corresponding label / line edit
+
+   \param[in]  orc_Application   Application
+   \param[in]  orc_ProjectPath   Project path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_LoadOutputFilePaths(const C_OSCNodeApplication & orc_Application,
@@ -1181,10 +1185,11 @@ void C_SdNdeDbProperties::m_OnFileGenerationChanged(const sintn osn_State)
       if (pc_Node != NULL)
       {
          // file generation depends on programmable flag and loaded hardware configuration
-         if (pc_Node->pc_DeviceDefinition != NULL)
+         if ((pc_Node->pc_DeviceDefinition != NULL) &&
+             (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
          {
             bool q_FileGenerationType = false;
-            if (pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == true)
+            if (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_ProgrammingSupport == true)
             {
                this->me_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
                q_FileGenerationType = true;
@@ -1466,7 +1471,9 @@ void C_SdNdeDbProperties::m_OnNameEdited(void) const
 
    if (q_Error)
    {
-      this->mpc_Ui->pc_LineEditName->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+      this->mpc_Ui->pc_LineEditName->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                           C_GtGetText::h_GetText(""),
+                                                           C_NagToolTip::eDEFAULT);
    }
    else
    {
@@ -1571,10 +1578,10 @@ void C_SdNdeDbProperties::m_UpdatePathsRelativeToGeneratedDir(void) const
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditFileGenerate->GetPath());
 
    this->mpc_Ui->pc_LabelSafeFileValue->
-   SetToolTipInformation("",
+   SetToolTipInformation(C_GtGetText::h_GetText("Safe File Value"),
                          C_Uti::h_ConcatPathIfNecessary(c_ProjectPath, this->mpc_Ui->pc_LabelSafeFileValue->text()));
    this->mpc_Ui->pc_LabelNonSafeFileValue->
-   SetToolTipInformation("",
+   SetToolTipInformation(C_GtGetText::h_GetText("Non Safe File Value"),
                          C_Uti::h_ConcatPathIfNecessary(c_ProjectPath, this->mpc_Ui->pc_LabelNonSafeFileValue->text()));
 }
 

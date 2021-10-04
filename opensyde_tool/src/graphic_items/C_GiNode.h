@@ -53,17 +53,20 @@ public:
    void AddConnection(C_GiLiBusConnector * const opc_Connection);
    void AddConnectionAndData(C_GiLiBusConnector * const opc_Connection,
                              const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId & orc_NodeConnection,
-                             const stw_types::uint8 & oru8_NodeId, const stw_types::uint32 & oru32_BusIndex);
+                             const std::vector<stw_types::uint8> & orc_NodeIds,
+                             const stw_types::uint32 & oru32_BusIndex);
    void UpdateConnection(const C_GiLiBusConnector * const opc_Connection,
                          const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId & orc_NodeConnection,
-                         const stw_types::uint8 & oru8_NodeId, const stw_types::uint32 & oru32_BusIndex) const;
+                         const std::vector<stw_types::uint8> & orc_NodeIds,
+                         const stw_types::uint32 & oru32_BusIndex) const;
    void ChangeInterface(const stw_types::uint8 ou8_Interface, const C_GiLiBusConnector * const opc_Connection,
-                        const stw_types::uint8 & oru8_NodeId) const;
+                        const std::vector<stw_types::uint8> & orc_NodeIds) const;
    const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId * GetNodeConnectionId(
       const C_GiLiBusConnector * const opc_Connection) const;
    virtual void LoadData(void) override;
    virtual void UpdateData(void) override;
    void RemoveConnector(const C_GiLiBusConnector * const opc_BusConnectorGraphicsItem);
+   bool CheckIndexRelevantForThisNode(const stw_types::uint32 ou32_NodeIndex) const;
    virtual void DeleteData(void);
    bool HasConnectionType(const stw_opensyde_core::C_OSCSystemBus::E_Type oe_Type) const;
    bool CheckConnectionAvailable(const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_Type) const;

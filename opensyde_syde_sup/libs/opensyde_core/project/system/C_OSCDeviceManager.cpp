@@ -48,20 +48,24 @@ using namespace stw_tgl;
    So the caller has to consider the lifetime of the used instance of this class when using
    the returned pointer.
 
-   \param[in]     orc_Name     Searched name
+   \param[in]   orc_Name               Searched name
+   \param[in]   orc_MainDeviceName     Main device name (empty if none exists)
+   \param[out]  oru32_SubDeviceIndex   Sub device index
 
    \return
    != NULL:  pointer to device definition
    NULL:     device definition not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCDeviceDefinition * C_OSCDeviceManager::LookForDevice(const C_SCLString & orc_Name) const
+const C_OSCDeviceDefinition * C_OSCDeviceManager::LookForDevice(const C_SCLString & orc_Name,
+                                                                const C_SCLString & orc_MainDeviceName,
+                                                                uint32 & oru32_SubDeviceIndex) const
 {
    const C_OSCDeviceDefinition * pc_Device = NULL;
 
    for (uint32 u32_ItDevice = 0U; u32_ItDevice < this->mc_DeviceGroups.size(); ++u32_ItDevice)
    {
-      pc_Device = this->mc_DeviceGroups[u32_ItDevice].LookForDevice(orc_Name);
+      pc_Device = this->mc_DeviceGroups[u32_ItDevice].LookForDevice(orc_Name, orc_MainDeviceName, oru32_SubDeviceIndex);
       if (pc_Device != NULL)
       {
          break;
@@ -77,9 +81,9 @@ const C_OSCDeviceDefinition * C_OSCDeviceManager::LookForDevice(const C_SCLStrin
    a existing device group or to a new device group when no
    device group is available and save it to an .ini file.
 
-   \param[in]        orc_DeviceDefinitionFile    Relative path of device definition file
-   \param[in]        orc_DeviceGroup             Name of device group where device will be added
-   \param[in,out]    orc_IniFile                 Path of .ini file where user devices will be saved
+   \param[in]      orc_DeviceDefinitionFile  Relative path of device definition file
+   \param[in]      orc_DeviceGroup           Name of device group where device will be added
+   \param[in,out]  orc_IniFile               Path of .ini file where user devices will be saved
 
    \return
    C_NO_ERR   Device added without problems
@@ -171,9 +175,9 @@ sint32 C_OSCDeviceManager::AddDevice(const stw_scl::C_SCLString & orc_DeviceDefi
    Delete a device from .ini file and set
    the rest of device definitions new.
 
-   \param[in]        orc_Devices        List of device definitions
-   \param[in]        orc_DeviceGroup    Name of device group where device will be added
-   \param[in,out]    orc_IniFile        Path of .ini file where devices will be saved
+   \param[in]      orc_Devices      List of device definitions
+   \param[in]      orc_DeviceGroup  Name of device group where device will be added
+   \param[in,out]  orc_IniFile      Path of .ini file where devices will be saved
 
    \return
    C_NO_ERR   Device deleted without problems
@@ -279,8 +283,8 @@ bool C_OSCDeviceManager::WasLoaded(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load all known devices
 
-   \param[in]   orc_File      Ini file path
-   \param[in]   oq_Optional   If optional: Type of log entry when file is missing is set to "INFO". Otherwise: "ERROR".
+   \param[in]  orc_File       Ini file path
+   \param[in]  oq_Optional    If optional: Type of log entry when file is missing is set to "INFO". Otherwise: "ERROR".
 
    \return
    C_NO_ERR   all information loaded without problems

@@ -209,7 +209,7 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDpSection(const uint32 ou32_NodeInd
                   "</td>";
       orc_Text += "</tr>";
       orc_Text += "<tr>";
-      orc_Text += "<td>" + static_cast<QString>(C_GtGetText::h_GetText("Mapped Datablock: ")) + "</td>";
+      orc_Text += "<td>" + static_cast<QString>(C_GtGetText::h_GetText("Mapped Data Block: ")) + "</td>";
 
       if ((pc_Datapool != NULL) && (pc_Datapool->s32_RelatedDataBlockIndex >= 0))
       {

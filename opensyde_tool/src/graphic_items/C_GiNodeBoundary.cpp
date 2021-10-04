@@ -46,13 +46,15 @@ using namespace stw_opensyde_gui;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiNodeBoundary::C_GiNodeBoundary(const QString & orc_Text, const stw_types::float64 of64_Width,
-                                   const stw_types::float64 of64_Height, QGraphicsItem * const opc_Parent) :
+                                   const stw_types::float64 of64_Height, const uint32 ou32_SubNodesCount,
+                                   QGraphicsItem * const opc_Parent) :
    QGraphicsItem(opc_Parent),
    C_GiBiSizeableItem(of64_Width, of64_Height),
    mc_Text(orc_Text),
    mpc_Shadow(NULL),
    mq_DrawBoder(false),
-   mq_DrawWhiteFilter(false)
+   mq_DrawWhiteFilter(false),
+   mu32_SubNodesCount(ou32_SubNodesCount)
 {
    this->setFlag(ItemIsMovable);
 
@@ -205,6 +207,7 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
       QRectF c_ShadowRect;
       const QRectF c_SurroundingRect = c_Rect;
       QRectF c_InsideRect;
+      QRectF c_MultiNodeIndicatorRect;
 
       if (this->mq_DrawBoder == true)
       {
@@ -275,6 +278,41 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
       opc_Painter->setPen(c_Pen);
 
       opc_Painter->drawRoundedRect(c_InsideRect, 10.0, 10.0);
+
+      //draw "multi node indicator"
+      if (this->mu32_SubNodesCount > 0)
+      {
+         const float64 f64_LeftMargin = 15.0;
+         const float64 f64_RightMargin = 20.0;
+         const float64 f64_TopMargin = static_cast<float64>(c_InsideRect.top() + (c_InsideRect.height() * 0.85));
+         const float64 f64_ButtomMargin = static_cast<float64>(c_InsideRect.height() - (c_InsideRect.height() * 0.94));
+         const float64 f64_FreeSpaceBetween = 5.0;
+         const float64 f64_SpaceEachNode =
+            static_cast<float64>(((c_InsideRect.width() - (f64_RightMargin - c_InsideRect.left())) -
+                                  (static_cast<float64>(this->mu32_SubNodesCount) * f64_FreeSpaceBetween)) /
+                                 static_cast<float64>(this->mu32_SubNodesCount));
+
+         opc_Painter->setPen(Qt::NoPen);
+         opc_Painter->setBrush(static_cast<QBrush>(QColor(178, 178, 189)));
+
+         for (uint8 u8_Counter = 0; u8_Counter < this->mu32_SubNodesCount; ++u8_Counter)
+         {
+            const float64 f64_X_Left =
+               static_cast<float64>(f64_LeftMargin + (static_cast<float64>(u8_Counter) * f64_FreeSpaceBetween) +
+                                    (static_cast<float64>(u8_Counter) * f64_SpaceEachNode));
+
+            const float64 f64_X_Right = f64_SpaceEachNode;
+
+            c_MultiNodeIndicatorRect.setRect(f64_X_Left,
+                                             f64_TopMargin, //const
+                                             f64_X_Right,
+                                             f64_ButtomMargin); //const
+
+            opc_Painter->drawRoundedRect(c_MultiNodeIndicatorRect,
+                                         static_cast<float64>(c_InsideRect.height() * 0.03),
+                                         static_cast<float64>(c_InsideRect.height() * 0.03));
+         }
+      }
 
       if (this->mq_DrawWhiteFilter == true)
       {

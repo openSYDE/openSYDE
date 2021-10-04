@@ -41,11 +41,8 @@ public:
    virtual ~C_SdNodeComIfSetupWidget(void);
 
    void InitStaticNames(void) const;
-   stw_types::uint32 GetSelectedInterface(void) const;
-   stw_types::uint8 GetNodeId(void) const;
+   stw_types::uint8 GetSelectedInterface(void) const;
    bool GetInteractionPossible(void) const;
-   void GetComDataPoolConfiguration(bool & orq_ComProtocolL2, bool & orq_ComProtocolECeS,
-                                    bool & orq_ComProtocolECoS) const;
 
 protected:
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
@@ -61,14 +58,11 @@ private:
    const stw_types::uint32 mu32_NodeIndex;
    const stw_types::uint32 mu32_BusIndex;
    const stw_types::sint32 ms32_SpecialInterface;
-   std::vector<stw_types::uint32> mc_UsedNodeIds;
    bool mq_InteractionPossible;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);
    void m_InitFromData(void);
-   void m_OnNodeIdChange(const stw_types::sint32 & ors32_Value);
-   bool m_CheckDatapoolNumber(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

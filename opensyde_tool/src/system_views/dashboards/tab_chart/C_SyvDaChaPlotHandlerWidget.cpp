@@ -303,18 +303,27 @@ void C_SyvDaChaPlotHandlerWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonOptions->setText("");
 
    // set tool tip information
-   this->mpc_Ui->pc_PushButtonPause->SetToolTipInformation("", C_GtGetText::h_GetText("Pause/Resume Update"));
-   this->mpc_Ui->pc_PushButtonZoomMode->SetToolTipInformation("", C_GtGetText::h_GetText("Select Zoom Mode"));
-   this->mpc_Ui->pc_PushButtonZoomOut->SetToolTipInformation("", C_GtGetText::h_GetText("Zoom Out"));
-   this->mpc_Ui->pc_PushButtonZoomIn->SetToolTipInformation("", C_GtGetText::h_GetText("Zoom In"));
-   this->mpc_Ui->pc_PushButtonZoomVsDragMode->SetToolTipInformation("", C_GtGetText::h_GetText(
+   this->mpc_Ui->pc_PushButtonPause->SetToolTipInformation(C_GtGetText::h_GetText("Play/Pause"),
+                                                           C_GtGetText::h_GetText("Pause/Resume Update"));
+   this->mpc_Ui->pc_PushButtonZoomMode->SetToolTipInformation(C_GtGetText::h_GetText("Zoom Mode"),
+                                                              C_GtGetText::h_GetText("Select Zoom Mode"));
+   this->mpc_Ui->pc_PushButtonZoomOut->SetToolTipInformation(C_GtGetText::h_GetText("Zoom Mode"),
+                                                             C_GtGetText::h_GetText("Zoom Out"));
+   this->mpc_Ui->pc_PushButtonZoomIn->SetToolTipInformation(C_GtGetText::h_GetText("Zoom Mode"),
+                                                            C_GtGetText::h_GetText("Zoom In"));
+   this->mpc_Ui->pc_PushButtonZoomVsDragMode->SetToolTipInformation(C_GtGetText::h_GetText("Zoom Mode"),
+                                                                    C_GtGetText::h_GetText(
                                                                        "Activate/Deactivate Drag Zoom Mode"));
-   this->mpc_Ui->pc_PushButtonFitXY->SetToolTipInformation("", C_GtGetText::h_GetText("Fit All Data Series"));
-   this->mpc_Ui->pc_PushButtonFitY->SetToolTipInformation("", C_GtGetText::h_GetText("Fit All Data Series Vertically"));
-   this->mpc_Ui->pc_PushButtonFitX->SetToolTipInformation("",
+   this->mpc_Ui->pc_PushButtonFitXY->SetToolTipInformation(C_GtGetText::h_GetText("All"),
+                                                           C_GtGetText::h_GetText("Fit All Data Series"));
+   this->mpc_Ui->pc_PushButtonFitY->SetToolTipInformation(C_GtGetText::h_GetText("Vertically"),
+                                                          C_GtGetText::h_GetText("Fit All Data Series Vertically"));
+   this->mpc_Ui->pc_PushButtonFitX->SetToolTipInformation(C_GtGetText::h_GetText("Horizontally"),
                                                           C_GtGetText::h_GetText("Fit All Data Series Horizontally"));
-   this->mpc_Ui->pc_PushButtonCursor->SetToolTipInformation("", C_GtGetText::h_GetText("Select Cursor"));
-   this->mpc_Ui->pc_PushButtonOptions->SetToolTipInformation("", C_GtGetText::h_GetText("Select Other Options"));
+   this->mpc_Ui->pc_PushButtonCursor->SetToolTipInformation(C_GtGetText::h_GetText("Select"),
+                                                            C_GtGetText::h_GetText("Select Cursor"));
+   this->mpc_Ui->pc_PushButtonOptions->SetToolTipInformation(C_GtGetText::h_GetText("Select"),
+                                                             C_GtGetText::h_GetText("Select Other Options"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

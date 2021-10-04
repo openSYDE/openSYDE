@@ -36,9 +36,51 @@ using namespace stw_diag_lib;
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
-extern void XFLSetInternalKey(const uint16 ou16_Key); //lint !e2701 //very special case here
+extern void XFLSetInternalKey(const uint16 ou16_Key); //lint !e526 !e2701 //very special case here
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the Ecu serial number dependent of the extended serial number flag and the manufacturer format
+
+   \return
+   Formatted serial number string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumber(void) const
+{
+   return this->c_SerialNumber.GetSerialNumberAsFormattedString();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the Ecu serial number description
+
+   Formats:
+   * Standard
+   * Extended
+   ** Manufacturer format
+
+   \return
+   String with description of the serial number format
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumberFormatDescription(void) const
+{
+   C_SCLString c_Return = "(Format: ";
+
+   if (this->c_AvailableFeatures.q_ExtendedSerialNumberModeImplemented == false)
+   {
+      c_Return += "Standard";
+   }
+   else
+   {
+      c_Return += "Extended with Manufacturer Format " +
+                  C_SCLString::IntToStr(this->c_SerialNumber.u8_SerialNumberManufacturerFormat);
+   }
+   c_Return += ")";
+
+   return c_Return;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
@@ -425,8 +467,8 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterDefaultSession(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read serial numbers of all devices on local bus
 
-   \param[out]    orc_Responses   information about all nodes that sent a response
-
+   \param[out]    orc_Responses           information about all nodes that sent a response
+   \param[out]    orc_ExtendedResponses   information about all nodes that sent an extended response
    \return
    C_NO_ERR   no problems; zero or more responses received; data placed in orc_Responses
    C_COM      could not send request
@@ -434,7 +476,9 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterDefaultSession(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyCanBroadcastReadSerialNumber(
-   std::vector<C_OSCProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberResults> & orc_Responses) const
+   std::vector<C_OSCProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberResults> & orc_Responses,
+   std::vector<C_OSCProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberExtendedResults> & orc_ExtendedResponses)
+const
 {
    sint32 s32_Return;
 
@@ -444,7 +488,8 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastReadSerialNumber(
    }
    else
    {
-      s32_Return = this->mpc_CanTransportProtocolBroadcast->BroadcastReadSerialNumber(orc_Responses);
+      s32_Return = this->mpc_CanTransportProtocolBroadcast->BroadcastReadSerialNumber(orc_Responses,
+                                                                                      orc_ExtendedResponses);
    }
 
    return s32_Return;
@@ -500,11 +545,12 @@ sint32 C_OSCComDriverFlash::SendOsyReadDeviceName(const C_OSCProtocolDriverOsyNo
 
    return s32_Return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reads the serial number by service ReadDataByIdentifier
 
    \param[in]     orc_ServerId          Server id for communication
-   \param[out]    orau8_SerialNumber    Read serial number
+   \param[out]    orc_SerialNumberExt   Read serial number
    \param[out]    opu8_NrCode           if != NULL and error response: negative response code
 
    \return
@@ -519,14 +565,15 @@ sint32 C_OSCComDriverFlash::SendOsyReadDeviceName(const C_OSCProtocolDriverOsyNo
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyReadSerialNumber(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                    uint8 (&orau8_SerialNumber)[6], uint8 * const opu8_NrCode)
+                                                    C_OSCProtocolSerialNumber & orc_SerialNumberExt,
+                                                    uint8 * const opu8_NrCode)
 {
    sint32 s32_Return = C_RANGE;
    C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
-      s32_Return = pc_ExistingProtocol->OsyReadEcuSerialNumber(orau8_SerialNumber, opu8_NrCode);
+      s32_Return = pc_ExistingProtocol->OsyReadEcuSerialNumber(orc_SerialNumberExt, opu8_NrCode);
    }
    else
    {
@@ -538,7 +585,57 @@ sint32 C_OSCComDriverFlash::SendOsyReadSerialNumber(const C_OSCProtocolDriverOsy
 
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = c_OsyProtocol.OsyReadEcuSerialNumber(orau8_SerialNumber, opu8_NrCode);
+         s32_Return = c_OsyProtocol.OsyReadEcuSerialNumber(orc_SerialNumberExt, opu8_NrCode);
+      }
+      else
+      {
+         s32_Return = C_COM;
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reads the serial number ext by service ReadDataByIdentifier
+
+   \param[in]  orc_ServerId                        Server id for communication
+   \param[out] orc_SerialNumberExt                 Read extended serial number
+   \param[out] opu8_NrCode                         if != NULL and error response: negative response code
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_RANGE    openSYDE protocol not found
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      error on creating temporary needed protocol
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverFlash::SendOsyReadSerialNumberExt(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                       C_OSCProtocolSerialNumber & orc_SerialNumberExt,
+                                                       uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return = C_RANGE;
+   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+
+   if (pc_ExistingProtocol != NULL)
+   {
+      s32_Return = pc_ExistingProtocol->OsyReadEcuSerialNumberExt(orc_SerialNumberExt, opu8_NrCode);
+   }
+   else
+   {
+      C_OSCProtocolDriverOsyTpCan c_TpCan;
+      C_OSCProtocolDriverOsy c_OsyProtocol;
+
+      // No device with this server id with openSYDE protocol exist. We need a temporary protocol.
+      s32_Return = this->m_PrepareTemporaryOsyProtocol(orc_ServerId, c_OsyProtocol, c_TpCan);
+
+      if (s32_Return == C_NO_ERR)
+      {
+         s32_Return = c_OsyProtocol.OsyReadEcuSerialNumberExt(orc_SerialNumberExt, opu8_NrCode);
       }
       else
       {
@@ -552,13 +649,14 @@ sint32 C_OSCComDriverFlash::SendOsyReadSerialNumber(const C_OSCProtocolDriverOsy
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node-id of node specified by serial number
 
-   \param[in]    orau8_SerialNumber   serial number of node to address
+   \param[in]    orc_SerialNumber     serial number of node to address
    \param[in]    orc_NewNodeId        node ID to set
 
    \return
    C_NO_ERR    no problems; one positive response received
    C_RANGE     invalid node ID (bus id or node-ID out of range); "0x7F" is not permitted as node ID as it's reserved for
                 broadcasts
+               invalid serial number
    C_WARN      negative response received
    C_COM       could not send requests
    C_CONFIG    no dispatcher installed or broadcast protocol not initialized
@@ -566,8 +664,8 @@ sint32 C_OSCComDriverFlash::SendOsyReadSerialNumber(const C_OSCProtocolDriverOsy
    C_OVERFLOW  multiple responses received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyCanBroadcastSetNodeIdBySerialNumber(const uint8 (&orau8_SerialNumber)[6],
-                                                                       const C_OSCProtocolDriverOsyNode & orc_NewNodeId)
+sint32 C_OSCComDriverFlash::SendOsyCanBroadcastSetNodeIdBySerialNumber(
+   const C_OSCProtocolSerialNumber & orc_SerialNumber, const C_OSCProtocolDriverOsyNode & orc_NewNodeId)
 const
 {
    sint32 s32_Return;
@@ -578,8 +676,48 @@ const
    }
    else
    {
-      s32_Return = this->mpc_CanTransportProtocolBroadcast->BroadcastSetNodeIdBySerialNumber(orau8_SerialNumber,
+      s32_Return = this->mpc_CanTransportProtocolBroadcast->BroadcastSetNodeIdBySerialNumber(orc_SerialNumber,
                                                                                              orc_NewNodeId);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node-id of node specified by serial number extended
+
+   \param[in]    orc_SerialNumber                     serial number of node to address (1 to 29 bytes allowed)
+   \param[in]    ou8_SubNodeId                        sub node id of sub node to address (in case of a device without sub nodes: 0)
+   \param[in]    orc_NewNodeId                        node ID to set
+
+   \return
+   C_NO_ERR    no problems; one positive response received
+   C_RANGE     invalid node ID (bus id or node-ID out of range); "0x7F" is not permitted as node ID as it's reserved for
+                broadcasts
+               invalid serial number
+   C_WARN      negative response received
+   C_COM       could not send requests
+   C_CONFIG    no dispatcher installed or broadcast protocol not initialized
+   C_TIMEOUT   no response within timeout (was SetNodeIdentifiersForBroadcasts() called ?)
+   C_OVERFLOW  multiple responses received
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverFlash::SendOsyCanBroadcastSetNodeIdBySerialNumberExtended(
+   const C_OSCProtocolSerialNumber & orc_SerialNumber, const uint8 ou8_SubNodeId,
+   const C_OSCProtocolDriverOsyNode & orc_NewNodeId) const
+{
+   sint32 s32_Return;
+
+   if (this->mpc_CanTransportProtocolBroadcast == NULL)
+   {
+      s32_Return = C_CONFIG;
+   }
+   else
+   {
+      s32_Return = this->mpc_CanTransportProtocolBroadcast->BroadcastSetNodeIdBySerialNumberExtended(
+         orc_SerialNumber,
+         ou8_SubNodeId,
+         orc_NewNodeId);
    }
 
    return s32_Return;
@@ -588,7 +726,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send broadcast to get device information via ETH-TP
 
-   \param[out]    orc_ReadDeviceInfoResults     received responses
+   \param[out]    orc_ReadDeviceInfoResults           received responses
+   \param[out]    orc_ReadDeviceInfoExtendedResults   received extended responses
 
    \return
    C_NO_ERR    no problems; zero or more responses received; data placed in c_ReadDeviceInfoResults
@@ -597,7 +736,9 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyEthBroadcastGetDeviceInformation(
-   std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults> & orc_ReadDeviceInfoResults) const
+   std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults> & orc_ReadDeviceInfoResults,
+   std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults> & orc_ReadDeviceInfoExtendedResults)
+const
 {
    sint32 s32_Return;
 
@@ -607,7 +748,8 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastGetDeviceInformation(
    }
    else
    {
-      s32_Return = this->mpc_IpTransportProtocolBroadcast->BroadcastGetDeviceInfo(orc_ReadDeviceInfoResults);
+      s32_Return = this->mpc_IpTransportProtocolBroadcast->BroadcastGetDeviceInfo(orc_ReadDeviceInfoResults,
+                                                                                  orc_ReadDeviceInfoExtendedResults);
    }
 
    return s32_Return;
@@ -622,11 +764,13 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastGetDeviceInformation(
 
    Incoming UDP responses to other services will be dumped: we are strictly handshaking here ...
 
-   \param[in]    orau8_SerialNumber    serial number of server to change IP on
+   \param[in]    orc_SerialNumber      serial number of server to change IP on
    \param[in]    orau8_NewIpAddress    IP address to set
    \param[in]    orau8_NetMask         Net mask to set
    \param[in]    orau8_DefaultGateway  Default gateway to set
    \param[in]    orc_NewNodeId         New bus id and node id for the interface
+   \param[out]   orau8_ResponseIp      IP address the response was received from
+   \param[out]   opu8_ErrorResult      if not NULL: code of error response (if C_WARN is returned)
 
    orau8_DefaultGateway
 
@@ -635,12 +779,14 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastGetDeviceInformation(
 
    \return
    C_NO_ERR    no problems; one OK response received; response IP placed in orau8_ResponseIp
+   C_WARN      error response
    C_COM       could not send request
    C_CONFIG    no dispatcher installed or ETH broadcast protocol not initialized
+   C_RANGE     serial number is invalid or wrong format of serial number is configured
    C_TIMEOUT   no response within timeout
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddress(const uint8 (&orau8_SerialNumber)[6],
+sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddress(const C_OSCProtocolSerialNumber & orc_SerialNumber,
                                                             const uint8 (&orau8_NewIpAddress)[4],
                                                             const uint8 (&orau8_NetMask)[4],
                                                             const uint8(&orau8_DefaultGateway)[4],
@@ -656,13 +802,71 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddress(const uint8 (&orau8_
    }
    else
    {
-      s32_Return = this->mpc_IpTransportProtocolBroadcast->BroadcastSetIpAddress(orau8_SerialNumber,
+      s32_Return = this->mpc_IpTransportProtocolBroadcast->BroadcastSetIpAddress(orc_SerialNumber,
                                                                                  orau8_NewIpAddress,
                                                                                  orau8_NetMask,
                                                                                  orau8_DefaultGateway,
                                                                                  orc_NewNodeId,
                                                                                  orau8_ResponseIp,
                                                                                  opu8_ErrorResult);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Send broadcast to set IP address extended via ETH-TP
+
+   Send broadcast to change the IP address of one specific node.
+   Only the node with a specified serial number is expected to send a response and change its IP address.
+   The function will return as soon as it has received one response.
+
+   Incoming UDP responses to other services will be dumped: we are strictly handshaking here ...
+
+   \param[in]    orc_SerialNumber                   serial number of server to change IP on
+   \param[in]    orau8_NewIpAddress                 IP address to set
+   \param[in]    orau8_NetMask                      Net mask to set
+   \param[in]    orau8_DefaultGateway               Default gateway to set
+   \param[in]    orc_NewNodeId                      New bus id and node id for the interface
+   \param[in]    ou8_SubNodeId                      Sub node id of node for identification in case of a multi CPU node
+   \param[out]   orau8_ResponseIp                   IP address the response was received from
+   \param[out]   opu8_ErrorResult                   if not NULL: code of error response (if C_WARN is returned)
+
+   \return
+   C_NO_ERR    no problems; one OK response received; response IP placed in orau8_ResponseIp
+   C_WARN      error response
+   C_COM       could not send request
+   C_CONFIG    no dispatcher installed or ETH broadcast protocol not initialized
+   C_RANGE     serial number is invalid or wrong format of serial number is configured
+   C_TIMEOUT   no response within timeout
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddressExtended(const C_OSCProtocolSerialNumber & orc_SerialNumber,
+                                                                    const uint8 (&orau8_NewIpAddress)[4],
+                                                                    const uint8 (&orau8_NetMask)[4],
+                                                                    const uint8(&orau8_DefaultGateway)[4],
+                                                                    const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
+                                                                    const stw_types::uint8 ou8_SubNodeId,
+                                                                    uint8 (&orau8_ResponseIp)[4],
+                                                                    uint8 * const opu8_ErrorResult) const
+{
+   sint32 s32_Return;
+
+   if (this->mpc_IpTransportProtocolBroadcast == NULL)
+   {
+      s32_Return = C_CONFIG;
+   }
+   else
+   {
+      s32_Return = this->mpc_IpTransportProtocolBroadcast->BroadcastSetIpAddressExtended(
+         orc_SerialNumber,
+         orau8_NewIpAddress,
+         orau8_NetMask,
+         orau8_DefaultGateway,
+         orc_NewNodeId,
+         ou8_SubNodeId,
+         orau8_ResponseIp,
+         opu8_ErrorResult);
    }
 
    return s32_Return;
@@ -835,11 +1039,6 @@ sint32 C_OSCComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OSCPro
 
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = pc_ExistingProtocol->OsyReadEcuSerialNumber(orc_Information.au8_EcuSerialNumber, opu8_NrCode);
-      }
-
-      if (s32_Return == C_NO_ERR)
-      {
          s32_Return = pc_ExistingProtocol->OsyReadHardwareNumber(orc_Information.u32_EcuArticleNumber, opu8_NrCode);
       }
 
@@ -869,6 +1068,18 @@ sint32 C_OSCComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OSCPro
       if (s32_Return == C_NO_ERR)
       {
          s32_Return = pc_ExistingProtocol->OsyReadListOfFeatures(orc_Information.c_AvailableFeatures, opu8_NrCode);
+      }
+
+      if (s32_Return == C_NO_ERR)
+      {
+         if (orc_Information.c_AvailableFeatures.q_ExtendedSerialNumberModeImplemented == false)
+         {
+            s32_Return = pc_ExistingProtocol->OsyReadEcuSerialNumber(orc_Information.c_SerialNumber, opu8_NrCode);
+         }
+         else
+         {
+            s32_Return = pc_ExistingProtocol->OsyReadEcuSerialNumberExt(orc_Information.c_SerialNumber, opu8_NrCode);
+         }
       }
 
       if ((s32_Return == C_NO_ERR) &&
@@ -1688,38 +1899,46 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalId(const C_OSCProtocolDriverOsyNod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Perform a wakeup with serial number
 
-   \param[in]     orau8_SerialNumber   Serial number to send
+   \param[in]     orc_SerialNumber     Serial number to send
    \param[out]    oru8_LocalId         Local id of server with the SN
 
    \return
    C_NO_ERR           no errors
    C_COM              no response from server
+   C_RANGE            invalid serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const uint8 (&orau8_SerialNumber)[6], uint8 & oru8_LocalId)
+sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const C_OSCProtocolSerialNumber & orc_SerialNumber,
+                                                           uint8 & oru8_LocalId)
 {
-   sint32 s32_Return;
-   C_XFLCompanyID c_ReceivedCompanyId;
+   sint32 s32_Return = C_RANGE;
 
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
-
-   // No concrete device. We need a temporary protocol.
-   this->m_InitFlashProtocolStw(&c_StwProtocol, 0);
-
-   s32_Return = c_StwProtocol.WakeupSerialNumber(orau8_SerialNumber, this->mc_CompanyId, oru8_LocalId,
-                                                 &c_ReceivedCompanyId);
-
-   if (s32_Return == C_WARN)
+   if ((orc_SerialNumber.q_IsValid == true) &&
+       (orc_SerialNumber.q_FsnSerialNumber == false) &&
+       (orc_SerialNumber.q_ExtFormatUsed == false))
    {
-      // An other company id
-      stw_scl::C_SCLString c_CompanyId;
+      C_XFLCompanyID c_ReceivedCompanyId;
 
-      C_OSCFlashProtocolStwFlashloader::CompIDStructToString(c_ReceivedCompanyId, c_CompanyId);
+      C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
-      osc_write_log_info("SendStwWakeupLocalId", "Other company id found: " + c_CompanyId);
+      // No concrete device. We need a temporary protocol.
+      this->m_InitFlashProtocolStw(&c_StwProtocol, 0);
 
-      // An other company id is no error
-      s32_Return = C_NO_ERR;
+      s32_Return = c_StwProtocol.WakeupSerialNumber(orc_SerialNumber.au8_SerialNumber, this->mc_CompanyId, oru8_LocalId,
+                                                    &c_ReceivedCompanyId);
+
+      if (s32_Return == C_WARN)
+      {
+         // An other company id
+         stw_scl::C_SCLString c_CompanyId;
+
+         C_OSCFlashProtocolStwFlashloader::CompIDStructToString(c_ReceivedCompanyId, c_CompanyId);
+
+         osc_write_log_info("SendStwWakeupLocalId", "Other company id found: " + c_CompanyId);
+
+         // An other company id is no error
+         s32_Return = C_NO_ERR;
+      }
    }
 
    return s32_Return;
@@ -2183,7 +2402,7 @@ bool C_OSCComDriverFlash::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfa
 {
    bool q_Return = false;
 
-   if ((orc_ComItfSettings.q_IsBusConnected == true) &&
+   if ((orc_ComItfSettings.GetBusConnected() == true) &&
        ((orc_ComItfSettings.q_IsRoutingEnabled == true) ||
         (orc_ComItfSettings.q_IsUpdateEnabled == true)))
    {
@@ -2434,25 +2653,38 @@ sint32 C_OSCComDriverFlash::m_GetMinimumFlashloaderResetWaitTime(
       {
          s32_Return = C_NO_ERR;
 
+         tgl_assert(rc_Node.u32_SubDeviceIndex < rc_Node.pc_DeviceDefinition->c_SubDevices.size());
          switch (oe_Type)
          {
          case C_OSCComDriverFlash::eNO_CHANGES_CAN:
-            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeNoChangesCan;
+            oru32_TimeValue =
+               rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
+               u32_FlashloaderResetWaitTimeNoChangesCan;
             break;
          case C_OSCComDriverFlash::eNO_CHANGES_ETHERNET:
-            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeNoChangesEthernet;
+            oru32_TimeValue =
+               rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
+               u32_FlashloaderResetWaitTimeNoChangesEthernet;
             break;
          case C_OSCComDriverFlash::eNO_FUNDAMENTAL_COM_CHANGES_CAN:
-            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeNoFundamentalChangesCan;
+            oru32_TimeValue =
+               rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
+               u32_FlashloaderResetWaitTimeNoFundamentalChangesCan;
             break;
          case C_OSCComDriverFlash::eNO_FUNDAMENTAL_COM_CHANGES_ETHERNET:
-            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet;
+            oru32_TimeValue =
+               rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
+               u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet;
             break;
          case C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_CAN:
-            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeFundamentalChangesCan;
+            oru32_TimeValue =
+               rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
+               u32_FlashloaderResetWaitTimeFundamentalChangesCan;
             break;
          case C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_ETHERNET:
-            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeFundamentalChangesEthernet;
+            oru32_TimeValue =
+               rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
+               u32_FlashloaderResetWaitTimeFundamentalChangesEthernet;
             break;
          default:
             tgl_assert(false);

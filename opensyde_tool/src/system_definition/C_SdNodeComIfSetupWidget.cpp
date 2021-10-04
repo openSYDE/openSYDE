@@ -64,23 +64,15 @@ C_SdNodeComIfSetupWidget::C_SdNodeComIfSetupWidget(stw_opensyde_gui_elements::C_
    // init UI
    this->mpc_Ui->setupUi(this);
 
-   //Ui restriction
-   this->mpc_Ui->pc_SpinBoxNodeId->SetMaximumCustom(126);
-
    this->mrc_ParentDialog.SetWidget(this);
 
    InitStaticNames();
    m_InitFromData();
 
-   this->mpc_Ui->pc_SpinBoxNodeId->SetMaximumCustom(C_SdUtil::h_GetNodeIdMaximum(this->mu32_NodeIndex));
-
    // connects
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_SdNodeComIfSetupWidget::m_OkClicked);
    connect(this->mpc_Ui->pc_BushButtonCancel, &QPushButton::clicked,
            this, &C_SdNodeComIfSetupWidget::m_CancelClicked);
-   //lint -e{929}  Qt interface
-   connect(this->mpc_Ui->pc_SpinBoxNodeId, static_cast<void (QSpinBox::*)(sintn)>(&QSpinBox::valueChanged), this,
-           &C_SdNodeComIfSetupWidget::m_OnNodeIdChange);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -103,10 +95,7 @@ void C_SdNodeComIfSetupWidget::InitStaticNames(void) const
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Communication Interface Setup"));
    this->mpc_Ui->pc_BushButtonOk->setText(C_GtGetText::h_GetText("OK"));
    this->mpc_Ui->pc_BushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
-   this->mpc_Ui->pc_LabelComInterfaceHeading->setText(C_GtGetText::h_GetText("1. Select COMM Interface"));
-   this->mpc_Ui->pc_LabelNodeIdHeading->setText(C_GtGetText::h_GetText("2. Define Node ID"));
-   this->mpc_Ui->pc_LabelNodeId->setText(C_GtGetText::h_GetText("Node ID"));
-   this->mpc_Ui->pc_LabelProtocolsNode->setText(C_GtGetText::h_GetText("Active protocols"));
+   this->mpc_Ui->pc_LabelComInterfaceHeading->setText(C_GtGetText::h_GetText("Select COMM Interface"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,7 +105,7 @@ void C_SdNodeComIfSetupWidget::InitStaticNames(void) const
    Selected node interface (Not necessarily the index)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNodeComIfSetupWidget::GetSelectedInterface(void) const
+uint8 C_SdNodeComIfSetupWidget::GetSelectedInterface(void) const
 {
    uint32 u32_Retval = 0;
    const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
@@ -126,19 +115,7 @@ uint32 C_SdNodeComIfSetupWidget::GetSelectedInterface(void) const
       u32_Retval = C_SdUtil::h_GetActiveNodeInterface(*this->mpc_Ui->pc_ComboBoxComIntf, this->mu32_NodeIndex,
                                                       pc_Bus->e_Type);
    }
-   return u32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get selected node id
-
-   \return
-   Selected node id
-*/
-//----------------------------------------------------------------------------------------------------------------------
-uint8 C_SdNodeComIfSetupWidget::GetNodeId(void) const
-{
-   return static_cast<uint8>(this->mpc_Ui->pc_SpinBoxNodeId->value());
+   return static_cast<uint8>(u32_Retval);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -152,22 +129,6 @@ uint8 C_SdNodeComIfSetupWidget::GetNodeId(void) const
 bool C_SdNodeComIfSetupWidget::GetInteractionPossible(void) const
 {
    return this->mq_InteractionPossible;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the COM datapool configuration
-
-   \param[out]    orq_ComProtocolL2          Flag if Layer 2 COM datapool exist
-   \param[out]    orq_ComProtocolECeS        Flag if ECeS COM datapool exist
-   \param[out]    orq_ComProtocolECoS        Flag if ECoS COM datapool exist
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNodeComIfSetupWidget::GetComDataPoolConfiguration(bool & orq_ComProtocolL2, bool & orq_ComProtocolECeS,
-                                                           bool & orq_ComProtocolECoS) const
-{
-   orq_ComProtocolL2 = this->mpc_Ui->pc_CheckBoxLayer2->isChecked();
-   orq_ComProtocolECeS = this->mpc_Ui->pc_CheckBoxECeS->isChecked();
-   orq_ComProtocolECoS = this->mpc_Ui->pc_CheckBoxECoS->isChecked();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -209,14 +170,7 @@ void C_SdNodeComIfSetupWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNodeComIfSetupWidget::m_OkClicked(void)
 {
-   if (m_CheckDatapoolNumber() == true)
-   {
-      this->mrc_ParentDialog.accept();
-   }
-   else
-   {
-      C_SdUtil::h_CheckDatapoolNumber(mu32_NodeIndex, true, this);
-   }
+   this->mrc_ParentDialog.accept();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -239,148 +193,12 @@ void C_SdNodeComIfSetupWidget::m_InitFromData(void)
 
    if ((pc_Bus != NULL) && (pc_Node != NULL))
    {
-      uint32 u32_Proposal;
-      bool q_DatapoolL2;
-      bool q_DatapoolECeS;
-      bool q_DatapoolECoS;
-
-      this->mc_UsedNodeIds = C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(this->mu32_BusIndex,
-                                                                                      this->mu32_NodeIndex,
-                                                                                      this->ms32_SpecialInterface);
-
       this->mq_InteractionPossible = C_SdUtil::h_InitNodeInterfaceComboBox(*pc_Node,
                                                                            pc_Bus->e_Type,
                                                                            this->mpc_Ui->pc_ComboBoxComIntf,
-                                                                           this->ms32_SpecialInterface,
-                                                                           q_DatapoolL2,
-                                                                           q_DatapoolECeS,
-                                                                           q_DatapoolECoS);
+                                                                           this->ms32_SpecialInterface);
 
-      this->mpc_Ui->pc_CheckBoxLayer2->setChecked(q_DatapoolL2);
-      this->mpc_Ui->pc_CheckBoxECeS->setChecked(q_DatapoolECeS);
-      this->mpc_Ui->pc_CheckBoxECoS->setChecked(q_DatapoolECoS);
-
-      // Only relevant for CAN
-      this->mpc_Ui->pc_GroupBoxProtocols->setVisible(pc_Bus->e_Type == C_OSCSystemBus::eCAN);
-
-      //Used bus ids
-      C_SdUtil::h_InitUsedNodeIdsLabel(this->mc_UsedNodeIds, pc_Bus->c_Name.c_str(), this->mpc_Ui->pc_LabelUsedNodeIds);
-      //Get next valid bus id
-      u32_Proposal = C_SdUtil::h_GetNextFreeNodeId(pc_Node->c_Properties.c_ComInterfaces, this->mc_UsedNodeIds,
-                                                   this->ms32_SpecialInterface);
-
-      this->mpc_Ui->pc_SpinBoxNodeId->setValue(u32_Proposal);
-      //Initial check value
-      m_OnNodeIdChange(u32_Proposal);
       //Node name
-      this->mrc_ParentDialog.SetTitle(pc_Node->c_Properties.c_Name.c_str());
+      this->mrc_ParentDialog.SetTitle(C_PuiSdUtil::h_GetNodeBaseNameOrName(this->mu32_NodeIndex));
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check new node id value
-
-   \param[in] ors32_Value New node id
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNodeComIfSetupWidget::m_OnNodeIdChange(const sint32 & ors32_Value)
-{
-   bool q_Valid = true;
-
-   for (uint32 u32_ItBusId = 0; u32_ItBusId < this->mc_UsedNodeIds.size(); ++u32_ItBusId)
-   {
-      if (static_cast<uint32>(ors32_Value) == this->mc_UsedNodeIds[u32_ItBusId])
-      {
-         q_Valid = false;
-         break;
-      }
-   }
-
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxNodeId, "Valid", q_Valid);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check the total number of datapools
-
-   The total number of datapools is bounded above by C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE.
-
-   \return
-      true:  total number is ok
-      false: total number exceeds maximum
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SdNodeComIfSetupWidget::m_CheckDatapoolNumber(void) const
-{
-   bool q_Return = false;
-   uint32 u32_Counter;
-   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(mu32_NodeIndex);
-
-   if (pc_OscNode != NULL)
-   {
-      bool q_L2ProtocolFound = false;
-      bool q_ECeSProtocolFound = false;
-      bool q_ECoSProtocolFound = false;
-
-      // ECoS
-      for (u32_Counter = 0U; u32_Counter < pc_OscNode->c_ComProtocols.size(); ++u32_Counter)
-      {
-         const C_OSCCanProtocol & rc_Protocol = pc_OscNode->c_ComProtocols[u32_Counter];
-         if (rc_Protocol.e_Type == C_OSCCanProtocol::eLAYER2)
-         {
-            // Protocol found
-            q_L2ProtocolFound = true;
-            break;
-         }
-      }
-
-      // ECeS
-      for (u32_Counter = 0U; u32_Counter < pc_OscNode->c_ComProtocols.size(); ++u32_Counter)
-      {
-         const C_OSCCanProtocol & rc_Protocol = pc_OscNode->c_ComProtocols[u32_Counter];
-         if (rc_Protocol.e_Type == C_OSCCanProtocol::eECES)
-         {
-            // Protocol found
-            q_ECeSProtocolFound = true;
-            break;
-         }
-      }
-
-      // ECoS
-      for (u32_Counter = 0U; u32_Counter < pc_OscNode->c_ComProtocols.size(); ++u32_Counter)
-      {
-         const C_OSCCanProtocol & rc_Protocol = pc_OscNode->c_ComProtocols[u32_Counter];
-         if (rc_Protocol.e_Type == C_OSCCanProtocol::eCAN_OPEN_SAFETY)
-         {
-            // Protocol found
-            q_ECoSProtocolFound = true;
-            break;
-         }
-      }
-
-      // is enough space available?
-      uint32 u32_DatapoolsToAdd = 0;
-      if ((this->mpc_Ui->pc_CheckBoxLayer2->isChecked() == true) && (q_L2ProtocolFound == false))
-      {
-         u32_DatapoolsToAdd++;
-      }
-
-      if ((this->mpc_Ui->pc_CheckBoxECeS->isChecked() == true) && (q_ECeSProtocolFound == false))
-      {
-         u32_DatapoolsToAdd++;
-      }
-
-      if ((this->mpc_Ui->pc_CheckBoxECoS->isChecked() == true) && (q_ECoSProtocolFound == false))
-      {
-         u32_DatapoolsToAdd++;
-      }
-
-      // check if the resulting total number of datapools is too high
-      if ((pc_OscNode->c_DataPools.size() + u32_DatapoolsToAdd) <= C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE)
-      {
-         // all OK
-         q_Return = true;
-      }
-   }
-
-   return q_Return;
 }

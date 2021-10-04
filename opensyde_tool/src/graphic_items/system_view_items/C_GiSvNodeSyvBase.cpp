@@ -39,12 +39,12 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]       ou32_ViewIndex       Index of system view
-   \param[in]       ors32_NodeIndex      Index of data element in system view
-   \param[in]       oru64_ID             Unique ID
-   \param[in]       orf64_Width          Width of node
-   \param[in]       orf64_Height         Height of node
-   \param[in,out]   opc_Parent           Optional pointer to parent
+   \param[in]      ou32_ViewIndex   Index of system view
+   \param[in]      ors32_NodeIndex  Index of data element in system view
+   \param[in]      oru64_ID         Unique ID
+   \param[in]      orf64_Width      Width of node
+   \param[in]      orf64_Height     Height of node
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvNodeSyvBase::C_GiSvNodeSyvBase(const uint32 ou32_ViewIndex, const sint32 & ors32_NodeIndex,
@@ -63,7 +63,7 @@ C_GiSvNodeSyvBase::C_GiSvNodeSyvBase(const uint32 ou32_ViewIndex, const sint32 &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the node connected state
 
-   \param[in]     oq_Connected   Flag if connected or not
+   \param[in]  oq_Connected   Flag if connected or not
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvBase::SetViewConnected(const bool oq_Connected)
@@ -87,12 +87,7 @@ void C_GiSvNodeSyvBase::LoadData(void)
 
       if (pc_SvData != NULL)
       {
-         const std::vector<uint8> & rc_NodeActiveFlags = pc_SvData->GetNodeActiveFlags();
-
-         if (rc_NodeActiveFlags.size() > static_cast<uint32>(this->ms32_Index))
-         {
-            this->SetViewConnected(static_cast<bool>(rc_NodeActiveFlags[this->ms32_Index]));
-         }
+         this->SetViewConnected(pc_SvData->GetNodeStatusDisplayedAsActive(static_cast<uint32>(this->ms32_Index)));
       }
    }
 }

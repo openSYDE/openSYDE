@@ -249,13 +249,19 @@ void C_SyvUpPackageListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq
                      bool q_FileIsOk = false;
                      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
                         this->mu32_NodeIndex);
-                     if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+                     if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) &&
+                         (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
                      {
                         for (uint32 u32_ItName = 0UL;
-                             u32_ItName < pc_Node->pc_DeviceDefinition->c_OtherAcceptedNames.size(); ++u32_ItName)
+                             u32_ItName <
+                             pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
+                             c_OtherAcceptedNames.
+                             size();
+                             ++u32_ItName)
                         {
                            const QString c_AllowedDevice =
-                              pc_Node->pc_DeviceDefinition->c_OtherAcceptedNames[u32_ItName].Trim().UpperCase().c_str();
+                              pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
+                              c_OtherAcceptedNames[u32_ItName].Trim().UpperCase().c_str();
                            if (QString::compare(c_AllowedDevice, this->mc_AppDeviceType, Qt::CaseInsensitive) == 0)
                            {
                               q_FileIsOk = true;

@@ -824,7 +824,7 @@ void C_SyvDaItPaWriteWidget::m_WriteCrcOfNode(void)
                         "NVM memory, but RAM copies were not updated. To update the RAM "
                         "copies choose one of these options: \n"
                         "Option 1: Use the following application notification (This option "
-                        "needs an implemented hook function \"osy_app_nvm_data_was_changed_event\".\n"
+                        "needs an implemented hook function \"osy_app_nvm_data_was_changed_event\").\n"
                         "Option 2: Reset your System."));
                   this->mpc_Ui->pc_BushButtonOk->setVisible(true);
                   this->mpc_Ui->pc_BushButtonCancel->setVisible(false);
@@ -894,16 +894,17 @@ void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
          this->mc_NotificationResult.push_back(q_Ack);
          if (this->mc_NotificationIterator != this->mc_RelevantLists.end())
          {
-            if (this->mrc_ComDriver.PollNvmNotifyOfChanges((*this->mc_NotificationIterator).u32_NodeIndex,
-                                                           static_cast<uint8>((*this->mc_NotificationIterator).
-                                                                              u32_DataPoolIndex),
-                                                           static_cast<uint16>((*this->mc_NotificationIterator).
-                                                                               u32_ListIndex)) ==
-                C_NO_ERR)
-            {
-               //Important iterator step (strange notation because of lint)
-               this->mc_NotificationIterator.operator ++();
-            }
+            sint32 s32_Tmp;
+            //Process thread finished event to allow next request
+            QApplication::processEvents();
+            //Start next thread
+            s32_Tmp = this->mrc_ComDriver.PollNvmNotifyOfChanges(
+               (*this->mc_NotificationIterator).u32_NodeIndex,
+               static_cast<uint8>((*this->mc_NotificationIterator).u32_DataPoolIndex),
+               static_cast<uint16>((*this->mc_NotificationIterator).u32_ListIndex));
+            tgl_assert(s32_Tmp == C_NO_ERR);
+            //Important iterator step (strange notation because of lint)
+            this->mc_NotificationIterator.operator ++();
          }
          else
          {
@@ -929,11 +930,8 @@ void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
                {
                   c_Result = C_GtGetText::h_GetText("OK");
                }
-               c_Text +=
-                  static_cast<QString>(C_GtGetText::h_GetText("%1 ended with %2\n")).arg(mh_GetId(*
-                                                                                                  c_NotificationIterator))
-                  .arg(
-                     c_Result);
+               c_Text += static_cast<QString>(C_GtGetText::h_GetText("%1 ended with %2\n")).
+                         arg(mh_GetId(*c_NotificationIterator)).arg(c_Result);
                //Important iterator step
                ++c_NotificationIterator;
             }

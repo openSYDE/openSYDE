@@ -78,7 +78,7 @@ C_OgeWiDashboardTab::C_OgeWiDashboardTab(QWidget * const opc_Parent, const bool 
    this->mpc_Ui->pc_LabelChartIcon->SetSvg("://images/system_views/dashboards/tab_chart/IconChartTab.svg");
 
    this->mpc_Ui->pc_PushButtonClose->setIconSize(QSize(16, 16));
-   this->mpc_Ui->pc_PushButtonClose->SetToolTipInformation(C_GtGetText::h_GetText(""),
+   this->mpc_Ui->pc_PushButtonClose->SetToolTipInformation(C_GtGetText::h_GetText("Delete"),
                                                            C_GtGetText::h_GetText("Delete Dashboard tab."));
 
    //Temporary remove of close action until reactivation feature is available

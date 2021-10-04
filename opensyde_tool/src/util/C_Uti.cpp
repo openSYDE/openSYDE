@@ -1229,7 +1229,8 @@ QString C_Uti::h_ResolveProjIndependentPlaceholderVariables(const QString & orc_
       // find out computer name is analogue to find out user name, but TGLUtils do not offer this
       QString c_UserName;
       charn acn_WinUserName[255];
-      uint32 u32_Size = sizeof(acn_WinUserName);
+      //lint -e{8080} //using type expected by the library for compatibility
+      DWORD u32_Size = sizeof(acn_WinUserName);
       const bool q_Return = (GetComputerNameA(acn_WinUserName, &u32_Size) == 0) ? false : true;
       if (q_Return == true)
       {

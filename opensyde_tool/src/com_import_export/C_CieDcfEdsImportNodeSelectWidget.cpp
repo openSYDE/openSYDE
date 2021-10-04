@@ -66,7 +66,9 @@ C_CieDcfEdsImportNodeSelectWidget::C_CieDcfEdsImportNodeSelectWidget(
    //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    this->mpc_Ui->pc_LabPath->setText(
       C_Uti::h_MinimizePath(orc_FilePath, C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13), 500, 0));
-   this->mpc_Ui->pc_LabPath->SetToolTipInformation("", orc_FilePath);
+   this->mpc_Ui->pc_LabPath->SetToolTipInformation(static_cast<QFileInfo>(orc_FilePath).completeSuffix().toUpper() +
+                                                   C_GtGetText::h_GetText(" Configuration File"),
+                                                   C_GtGetText::h_GetText(orc_FilePath.toStdString().c_str()));
    mrc_ParentDialog.SetSubTitle(static_cast<QFileInfo>(orc_FilePath).completeSuffix().toUpper() +
                                 C_GtGetText::h_GetText(" File"));
 

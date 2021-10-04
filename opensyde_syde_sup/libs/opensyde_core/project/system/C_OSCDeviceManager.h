@@ -26,7 +26,9 @@ namespace stw_opensyde_core
 class C_OSCDeviceManager
 {
 public:
-   const C_OSCDeviceDefinition * LookForDevice(const stw_scl::C_SCLString & orc_Name) const;
+   const C_OSCDeviceDefinition * LookForDevice(const stw_scl::C_SCLString & orc_Name,
+                                               const stw_scl::C_SCLString & orc_MainDeviceName,
+                                               stw_types::uint32 & oru32_SubDeviceIndex) const;
 
    stw_types::sint32 AddDevice(const stw_scl::C_SCLString & orc_DeviceDefinitionFile,
                                const stw_scl::C_SCLString & orc_DeviceGroup, const stw_scl::C_SCLString & orc_IniFile);

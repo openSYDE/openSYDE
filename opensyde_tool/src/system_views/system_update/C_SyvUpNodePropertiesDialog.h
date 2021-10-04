@@ -17,6 +17,7 @@
 #include "C_SyvUtil.h"
 #include "C_OgePopUpDialog.h"
 #include "C_SyvUpDeviceInfo.h"
+#include "C_GiSvNodeData.h"
 #include "C_PuiSvNodeUpdateParamInfo.h"
 
 namespace Ui
@@ -37,24 +38,16 @@ class C_SyvUpNodePropertiesDialog :
 
 public:
    explicit C_SyvUpNodePropertiesDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                        const stw_types::uint32 ou32_NodeIndex, const bool oq_UpdateFailed,
-                                        const stw_types::uint32 ou32_FailedApplicationIndex);
+                                        const stw_types::uint32 ou32_NodeIndex, const C_GiSvNodeData & orc_NodeData);
    ~C_SyvUpNodePropertiesDialog(void);
 
    void InitStaticNames(void) const;
-   void SetStatus(const stw_opensyde_gui_logic::C_SyvUtil::E_NodeUpdateInitialStatus oe_Status,
-                  const std::vector<stw_diag_lib::C_XFLECUInformation> * const opc_HexFileInfos,
-                  const std::vector<bool> * const opc_HexAppInfoAmbiguous,
-                  const std::vector<QString> * const opc_ParamFileInfos,
-                  const std::vector<QString> * const opc_FileInfos,
-                  const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * const opc_STWDevice,
-                  const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * const opc_OSYDevice,
-                  const bool oq_UpdateSuccessful, const bool oq_ValidStatus, const bool oq_Discarded);
-   stw_opensyde_gui_logic::C_SyvUtil::E_NodeUpdateInitialStatus GetStatus(void) const;
-   const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * GetSTWDevice(void) const;
-   const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * GetOSYDevice(void) const;
-
-   bool GetDiscardedStatus(void) const;
+   void SetStatus(const C_GiSvNodeData & orc_NodeData);
+   void CopyInitialStatus(C_GiSvNodeData & orc_NodeData) const;
+   void CopyUpdateStatus(C_GiSvNodeData & orc_NodeData) const;
+   void CopySTWDeviceInfo(C_GiSvNodeData & orc_NodeData) const;
+   void CopyOSYDeviceInfo(C_GiSvNodeData & orc_NodeData) const;
+   void CopyDiscardedStatus(C_GiSvNodeData & orc_NodeData) const;
 
 protected:
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
@@ -64,23 +57,60 @@ private:
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
    const stw_types::uint32 mu32_NodeIndex;
-   stw_opensyde_gui_logic::C_SyvUtil::E_NodeUpdateInitialStatus me_Status;
-   const std::vector<stw_diag_lib::C_XFLECUInformation> * mpc_HexFileInfos;
-   const std::vector<bool> * mpc_HexAppInfoAmbiguous;
-   const std::vector<QString> * mpc_ParamFileInfos;
-   const std::vector<QString> * mpc_FileInfos;
-   const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * mpc_STWDevice;
-   const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * mpc_OSYDevice;
-   const bool mq_UpdateFailed;
-   bool mq_UpdateSuccessful;
-   bool mq_Discarded;
-   bool mq_ValidStatus;
-   const stw_types::uint32 mu32_FailedApplicationIndex;
+
+   C_GiSvNodeData mc_NodeData;
+
+   static const QString mhc_HtmlCellTagStartMain;
+   static const QString mhc_HtmlCellTagStartContent;
+   static const QString mhc_HtmlCellTagStartStatus;
 
    void m_OkClicked(void);
    void m_InitStatus(void) const;
    void m_InitDataBlockTable(void) const;
+   static void mh_InitDataBlockTableForNode(const C_GiSvSubNodeData & orc_NodeInfo, QString & orc_Content,
+                                            const stw_opensyde_core::C_OSCNode & orc_Node, const bool oq_IsMultiDevice);
+   static void mh_GetApplicationDataForNode(const C_GiSvSubNodeData & orc_NodeInfo,
+                                            const stw_opensyde_core::C_OSCNode & orc_Node,
+                                            const stw_types::uint32 ou32_ApplicationIndex,
+                                            QString & orc_ApplicationName, QString & orc_ApplicationStateIcon,
+                                            QString & orc_ApplicationState, QString & orc_DeviceValidStatus,
+                                            QString & orc_FileProjectName, QString & orc_DeviceProjectName,
+                                            QString & orc_FileVersion, QString & orc_DeviceFileVersion,
+                                            QString & orc_FileBuildDate, QString & orc_DeviceBuildDate);
+   static void mh_ExtractSTWDeviceInformation(const C_GiSvSubNodeData & orc_NodeInfo,
+                                              const QString & orc_FileProjectName, QString & orc_DeviceProjectName,
+                                              const QString & orc_FileVersion, QString & orc_DeviceFileVersion,
+                                              const QString & orc_FileBuildDate, QString & orc_DeviceBuildDate,
+                                              QString & orc_DeviceValidStatus, bool & orq_MissingStatus,
+                                              bool & orq_MatchStatus);
+   static void mh_ExtractOSYDeviceInformation(const C_GiSvSubNodeData & orc_NodeInfo,
+                                              const QString & orc_FileProjectName, QString & orc_DeviceProjectName,
+                                              const QString & orc_FileVersion, QString & orc_DeviceFileVersion,
+                                              const QString & orc_FileBuildDate, QString & orc_DeviceBuildDate,
+                                              QString & orc_DeviceValidStatus, bool & orq_MissingStatus,
+                                              bool & orq_MatchStatus);
+   static bool mh_HandleHighlighting(const QString & orc_FileProjectName, QString & orc_DeviceProjectName,
+                                     const QString & orc_FileVersion, QString & orc_DeviceFileVersion,
+                                     const QString & orc_FileBuildDate, QString & orc_DeviceBuildDate);
+   static void mh_ExtractDetailsPartFromDataForNode(const bool oq_HexAppInfoAmbiguous,
+                                                    const QString & orc_FileProjectName,
+                                                    const QString & orc_DeviceProjectName,
+                                                    const QString & orc_FileVersion,
+                                                    const QString & orc_DeviceFileVersion,
+                                                    const QString & orc_FileBuildDate,
+                                                    const QString & orc_DeviceBuildDate, QString & orc_Content);
+   static void mh_AppendApplicationForNode(const stw_types::uint32 ou32_ApplicationIndex,
+                                           const QString & orc_ApplicationName,
+                                           const QString & orc_ApplicationStateIcon,
+                                           const QString & orc_ApplicationState, const QString & orc_DeviceValidStatus,
+                                           const QString & orc_DetailsPart, QString & orc_Content);
+   static void mh_InitDataBlockTableOtherSectionForNode(const C_GiSvSubNodeData & orc_NodeInfo, QString & orc_Content);
    void m_InitFlashloaderTable(void) const;
+   static void mh_InitFlashloaderTableForNode(const C_GiSvSubNodeData & orc_NodeInfo, QString & orc_Content,
+                                              const stw_opensyde_core::C_OSCNode & orc_Node,
+                                              const bool oq_IsMultiDevice);
+   static void mh_HandleSectionAppend(const QString & orc_NewPart, QString & orc_CompleteSection,
+                                      const stw_opensyde_core::C_OSCNode & orc_Node, const bool oq_IsMultiDevice);
    void m_OnDiscard(void);
    void m_ReInitStatus(void) const;
    //Avoid call

@@ -16,6 +16,7 @@
 
 #include "TGLFile.h"
 #include "stwerrors.h"
+#include "C_OSCXMLParserLog.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCHalcDefFiler.h"
 #include "C_OSCSystemFilerUtil.h"
@@ -64,7 +65,8 @@ sint32 C_OSCHalcConfigFiler::h_LoadFile(C_OSCHalcConfig & orc_IOData, const C_SC
 
    if (TGL_FileExists(orc_Path) == true)
    {
-      C_OSCXMLParser c_XMLParser;
+      C_OSCXMLParserLog c_XMLParser;
+      c_XMLParser.SetLogHeading("Loading IO data");
       s32_Retval = c_XMLParser.LoadFromFile(orc_Path);
       if (s32_Retval == C_NO_ERR)
       {
@@ -153,45 +155,45 @@ sint32 C_OSCHalcConfigFiler::h_LoadData(C_OSCHalcConfig & orc_IOData, C_OSCXMLPa
 {
    sint32 s32_Retval = mh_LoadIODataBase(orc_IOData, orc_XMLParser, orc_BasePath);
 
-   //File version
-   if (orc_XMLParser.SelectNodeChild("file-version") == "file-version")
+   if (s32_Retval == C_NO_ERR)
    {
-      uint16 u16_FileVersion = 0U;
-      try
-      {
-         u16_FileVersion = static_cast<uint16>(orc_XMLParser.GetNodeContent().ToInt());
-      }
-      catch (...)
-      {
-         osc_write_log_error("Loading IO description", "\"file-version\" could not be converted to a number.");
-         s32_Retval = C_CONFIG;
-      }
-
-      //is the file version one we know ?
+      s32_Retval = orc_XMLParser.SelectNodeChildError("file-version");
+      //File version
       if (s32_Retval == C_NO_ERR)
       {
-         osc_write_log_info("Loading IO description", "Value of \"file-version\": " +
-                            C_SCLString::IntToStr(u16_FileVersion));
-         //Check file version
-         if (u16_FileVersion != mhu16_FILE_VERSION_1)
+         uint16 u16_FileVersion = 0U;
+         try
          {
-            osc_write_log_error("Loading IO description",
-                                "Version defined by \"file-version\" is not supported.");
+            u16_FileVersion = static_cast<uint16>(orc_XMLParser.GetNodeContent().ToInt());
+         }
+         catch (...)
+         {
+            orc_XMLParser.ReportErrorForNodeContentStartingWithXMLContext("could not be converted to a number");
             s32_Retval = C_CONFIG;
          }
-      }
 
-      //Return
-      orc_XMLParser.SelectNodeParent();
-   }
-   else
-   {
-      osc_write_log_error("Loading IO description", "Could not find \"file-version\" node.");
-      s32_Retval = C_CONFIG;
+         //is the file version one we know ?
+         if (s32_Retval == C_NO_ERR)
+         {
+            osc_write_log_info("Loading IO description", "Value of \"file-version\": " +
+                               C_SCLString::IntToStr(u16_FileVersion));
+            //Check file version
+            if (u16_FileVersion != mhu16_FILE_VERSION_1)
+            {
+               osc_write_log_error("Loading IO description",
+                                   "Version defined by \"file-version\" is not supported.");
+               s32_Retval = C_CONFIG;
+            }
+         }
+
+         //Return
+         orc_XMLParser.SelectNodeParent();
+      }
    }
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("ref-content-version") == "ref-content-version")
+      s32_Retval = orc_XMLParser.SelectNodeChildError("ref-content-version");
+      if (s32_Retval == C_NO_ERR)
       {
          uint32 u32_RefId = 0UL;
          try
@@ -200,18 +202,17 @@ sint32 C_OSCHalcConfigFiler::h_LoadData(C_OSCHalcConfig & orc_IOData, C_OSCXMLPa
          }
          catch (...)
          {
-            osc_write_log_error("Loading IO description",
-                                "\"ref-content-version\" could not be converted to a number.");
+            orc_XMLParser.ReportErrorForNodeContentStartingWithXMLContext("could not be converted to a number");
             s32_Retval = C_CONFIG;
          }
          if (s32_Retval == C_NO_ERR)
          {
             if (u32_RefId != orc_IOData.u32_ContentVersion)
             {
-               osc_write_log_error("Loading IO description",
-                                   "\"ref-content-version\" mismatch between expected " +
-                                   C_SCLString::IntToStr(u32_RefId) +
-                                   " and current " + C_SCLString::IntToStr(orc_IOData.u32_ContentVersion) + ".");
+               orc_XMLParser.ReportErrorForNodeContentStartingWithXMLContext(
+                  "mismatch between expected " +
+                  C_SCLString::IntToStr(u32_RefId) +
+                  " and current " + C_SCLString::IntToStr(orc_IOData.u32_ContentVersion));
                s32_Retval = C_CHECKSUM;
             }
          }
@@ -221,23 +222,14 @@ sint32 C_OSCHalcConfigFiler::h_LoadData(C_OSCHalcConfig & orc_IOData, C_OSCXMLPa
             orc_XMLParser.SelectNodeParent();
          }
       }
-      else
-      {
-         osc_write_log_error("Loading IO description", "Could not find \"ref-content-version\" node.");
-         s32_Retval = C_CONFIG;
-      }
       if (s32_Retval == C_NO_ERR)
       {
-         if (orc_XMLParser.SelectNodeChild("general") == "general")
+         s32_Retval = orc_XMLParser.SelectNodeChildError("general");
+         if (s32_Retval == C_NO_ERR)
          {
             // No general section data. Nothing to do.
             //Return
             orc_XMLParser.SelectNodeParent();
-         }
-         else
-         {
-            osc_write_log_error("Loading IO description", "Could not find \"general\" node.");
-            s32_Retval = C_CONFIG;
          }
       }
       if (s32_Retval == C_NO_ERR)
@@ -385,9 +377,9 @@ sint32 C_OSCHalcConfigFiler::h_SaveIODomain(const C_OSCHalcConfigDomain & orc_IO
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfigFiler::h_LoadIODomain(C_OSCHalcConfigDomain & orc_IODomain, C_OSCXMLParserBase & orc_XMLParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = orc_XMLParser.SelectNodeChildError("config");
 
-   if (orc_XMLParser.SelectNodeChild("config") == "config")
+   if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = mh_LoadIOChannel(orc_IODomain.c_DomainConfig, orc_XMLParser, "config");
       if (s32_Retval == C_NO_ERR)
@@ -396,64 +388,55 @@ sint32 C_OSCHalcConfigFiler::h_LoadIODomain(C_OSCHalcConfigDomain & orc_IODomain
          tgl_assert(orc_XMLParser.SelectNodeParent() == "domain");
       }
    }
-   else
+   if (s32_Retval == C_NO_ERR)
    {
-      osc_write_log_error("Loading IO data", "Could not find \"config\" node.");
-      s32_Retval = C_CONFIG;
-   }
-   if (orc_XMLParser.SelectNodeChild("channels") == "channels")
-   {
-      if (orc_XMLParser.AttributeExists("length"))
-      {
-         const uint32 u32_ExpectedCount = orc_XMLParser.GetAttributeUint32("length");
-         uint32 u32_ActualCount = 0UL;
-         C_SCLString c_NodeChannel = orc_XMLParser.SelectNodeChild("channel");
-         //Clear any existing configuration
-         orc_IODomain.c_ChannelConfigs.clear();
-         if (c_NodeChannel == "channel")
-         {
-            do
-            {
-               C_OSCHalcConfigChannel c_Channel;
-               s32_Retval = mh_LoadIOChannel(c_Channel, orc_XMLParser, "channel");
-               if (s32_Retval == C_NO_ERR)
-               {
-                  orc_IODomain.c_ChannelConfigs.push_back(c_Channel);
-                  //Count
-                  ++u32_ActualCount;
-                  //Iterate
-                  c_NodeChannel = orc_XMLParser.SelectNodeNext("channel");
-               }
-            }
-            while ((c_NodeChannel == "channel") && (s32_Retval == C_NO_ERR));
-            if (s32_Retval == C_NO_ERR)
-            {
-               //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "channels");
-            }
-         }
-         if (u32_ExpectedCount != u32_ActualCount)
-         {
-            C_SCLString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected channel count, expected: %i, got %i", u32_ExpectedCount, u32_ActualCount);
-            osc_write_log_warning("Loading IO data", c_Tmp.c_str());
-         }
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"length\" attribute.");
-         s32_Retval = C_CONFIG;
-      }
+      s32_Retval = orc_XMLParser.SelectNodeChildError("channels");
       if (s32_Retval == C_NO_ERR)
       {
-         //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "domain");
+         uint32 u32_ExpectedCount;
+         s32_Retval = orc_XMLParser.GetAttributeUint32Error("length", u32_ExpectedCount);
+         if (s32_Retval == C_NO_ERR)
+         {
+            uint32 u32_ActualCount = 0UL;
+            C_SCLString c_NodeChannel = orc_XMLParser.SelectNodeChild("channel");
+            //Clear any existing configuration
+            orc_IODomain.c_ChannelConfigs.clear();
+            if (c_NodeChannel == "channel")
+            {
+               do
+               {
+                  C_OSCHalcConfigChannel c_Channel;
+                  s32_Retval = mh_LoadIOChannel(c_Channel, orc_XMLParser, "channel");
+                  if (s32_Retval == C_NO_ERR)
+                  {
+                     orc_IODomain.c_ChannelConfigs.push_back(c_Channel);
+                     //Count
+                     ++u32_ActualCount;
+                     //Iterate
+                     c_NodeChannel = orc_XMLParser.SelectNodeNext("channel");
+                  }
+               }
+               while ((c_NodeChannel == "channel") && (s32_Retval == C_NO_ERR));
+               if (s32_Retval == C_NO_ERR)
+               {
+                  //Return
+                  tgl_assert(orc_XMLParser.SelectNodeParent() == "channels");
+               }
+            }
+            if (u32_ExpectedCount != u32_ActualCount)
+            {
+               C_SCLString c_Tmp;
+               c_Tmp.PrintFormatted("Unexpected channel count, expected: %i, got %i", u32_ExpectedCount,
+                                    u32_ActualCount);
+               orc_XMLParser.ReportErrorForAttributeContentAppendXMLContext("length", c_Tmp);
+            }
+         }
+         if (s32_Retval == C_NO_ERR)
+         {
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "domain");
+         }
       }
-   }
-   else
-   {
-      osc_write_log_error("Loading IO data", "Could not find \"channels\" node.");
-      s32_Retval = C_CONFIG;
    }
    return s32_Retval;
 }
@@ -781,9 +764,10 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIOParameter(const C_OSCHalcConfigParameter &
    s32_Retval = C_OSCHalcDefStructFiler::h_SaveSimpleValueAsAttribute("value", orc_XMLParser, orc_Parameter.c_Value);
    if (s32_Retval == C_NO_ERR)
    {
-      const std::map<C_SCLString,
-                     C_OSCNodeDataPoolContent> & rc_EnumItems = orc_Parameter.c_Value.GetEnumItems();
-      for (std::map<C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = rc_EnumItems.begin();
+      const std::vector<std::pair<stw_scl::C_SCLString,
+                                  C_OSCNodeDataPoolContent> > & rc_EnumItems = orc_Parameter.c_Value.GetEnumItems();
+      for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+              rc_EnumItems.begin();
            (c_It != rc_EnumItems.end()) && (s32_Retval == C_NO_ERR); ++c_It)
       {
          tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("enum-item") == "enum-item");
@@ -834,9 +818,9 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIOParameter(const C_OSCHalcConfigParameter &
 sint32 C_OSCHalcConfigFiler::mh_LoadIODataBase(C_OSCHalcDefBase & orc_IOData, C_OSCXMLParserBase & orc_XMLParser,
                                                const C_SCLString & orc_BasePath)
 {
-   sint32 s32_Retval;
+   sint32 s32_Retval = orc_XMLParser.SelectNodeChildError("io-base-file");
 
-   if (orc_XMLParser.SelectNodeChild("io-base-file") == "io-base-file")
+   if (s32_Retval == C_NO_ERR)
    {
       if (orc_BasePath.IsEmpty())
       {
@@ -861,11 +845,6 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODataBase(C_OSCHalcDefBase & orc_IOData, C_
          s32_Retval = C_CONFIG;
       }
    }
-   else
-   {
-      osc_write_log_error("Loading IO data", "Could not find \"io-base-file\" node.");
-      s32_Retval = C_CONFIG;
-   }
    return s32_Retval;
 }
 
@@ -882,13 +861,14 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODataBase(C_OSCHalcDefBase & orc_IOData, C_
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfigFiler::mh_LoadIODomains(C_OSCHalcConfig & orc_IOData, C_OSCXMLParserBase & orc_XMLParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = orc_XMLParser.SelectNodeChildError("domains");
 
-   if (orc_XMLParser.SelectNodeChild("domains") == "domains")
+   if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.AttributeExists("length"))
+      uint32 u32_ExpectedCount;
+      s32_Retval = orc_XMLParser.GetAttributeUint32Error("length", u32_ExpectedCount);
+      if (s32_Retval == C_NO_ERR)
       {
-         const uint32 u32_ExpectedCount = orc_XMLParser.GetAttributeUint32("length");
          uint32 u32_ActualCount = 0UL;
          C_SCLString c_NodeDomain = orc_XMLParser.SelectNodeChild("domain");
          if (c_NodeDomain == "domain")
@@ -911,7 +891,7 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODomains(C_OSCHalcConfig & orc_IOData, C_OS
                }
                else
                {
-                  osc_write_log_error("Loading IO data", "Domain count higher than in io spec file");
+                  orc_XMLParser.ReportErrorForNodeContentAppendXMLContext("Domain count higher than in io spec file");
                   s32_Retval = C_CONFIG;
                }
             }
@@ -926,24 +906,14 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODomains(C_OSCHalcConfig & orc_IOData, C_OS
          {
             C_SCLString c_Tmp;
             c_Tmp.PrintFormatted("Unexpected domain count, expected: %i, got %i", u32_ExpectedCount, u32_ActualCount);
-            osc_write_log_warning("Loading IO data", c_Tmp.c_str());
+            orc_XMLParser.ReportErrorForAttributeContentAppendXMLContext("length", c_Tmp);
          }
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"length\" attribute.");
-         s32_Retval = C_CONFIG;
       }
       if (s32_Retval == C_NO_ERR)
       {
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-node-io-config");
       }
-   }
-   else
-   {
-      osc_write_log_error("Loading IO data", "Could not find \"domains\" node.");
-      s32_Retval = C_CONFIG;
    }
    return s32_Retval;
 }
@@ -963,56 +933,30 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODomains(C_OSCHalcConfig & orc_IOData, C_OS
 sint32 C_OSCHalcConfigFiler::mh_LoadIOChannel(C_OSCHalcConfigChannel & orc_IOChannel,
                                               C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_NodeName)
 {
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (orc_XMLParser.AttributeExists("safety-relevant"))
-   {
-      orc_IOChannel.q_SafetyRelevant = orc_XMLParser.GetAttributeBool("safety-relevant");
-   }
-   else
-   {
-      osc_write_log_error("Loading IO data", "Could not find \"safety-relevant\" attribute.");
-      s32_Retval = C_CONFIG;
-   }
+   sint32 s32_Retval = orc_XMLParser.GetAttributeBoolError("safety-relevant", orc_IOChannel.q_SafetyRelevant);
 
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.AttributeExists("use-case-index"))
-      {
-         orc_IOChannel.u32_UseCaseIndex = orc_XMLParser.GetAttributeUint32("use-case-index");
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"use-case-index\" attribute.");
-         s32_Retval = C_CONFIG;
-      }
+      s32_Retval = orc_XMLParser.GetAttributeUint32Error("use-case-index", orc_IOChannel.u32_UseCaseIndex);
    }
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("name") == "name")
+      s32_Retval = orc_XMLParser.SelectNodeChildError("name");
+      if (s32_Retval == C_NO_ERR)
       {
          orc_IOChannel.c_Name = orc_XMLParser.GetNodeContent();
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == orc_NodeName);
       }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"name\" node.");
-         s32_Retval = C_CONFIG;
-      }
    }
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("comment") == "comment")
+      s32_Retval = orc_XMLParser.SelectNodeChildError("comment");
+      if (s32_Retval == C_NO_ERR)
       {
          orc_IOChannel.c_Comment = orc_XMLParser.GetNodeContent();
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == orc_NodeName);
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"comment\" node.");
-         s32_Retval = C_CONFIG;
       }
    }
    if (s32_Retval == C_NO_ERR)
@@ -1038,27 +982,19 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOParameterStructs(
    std::vector<C_OSCHalcConfigParameterStruct> & orc_ParameterStructs, C_OSCXMLParserBase & orc_XMLParser,
    const C_SCLString & orc_NodeName)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = orc_XMLParser.SelectNodeChildError("parameter-structs");
 
-   if (orc_XMLParser.SelectNodeChild("parameter-structs") == "parameter-structs")
+   if (s32_Retval == C_NO_ERR)
    {
       uint32 u32_ExpectedLength = 0UL;
       //Clean up existing
       orc_ParameterStructs.clear();
-      //Reserve
-      if (orc_XMLParser.AttributeExists("length"))
-      {
-         u32_ExpectedLength = orc_XMLParser.GetAttributeUint32("length");
-         orc_ParameterStructs.reserve(u32_ExpectedLength);
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"length\" attribute.");
-         s32_Retval = C_CONFIG;
-      }
+      s32_Retval = orc_XMLParser.GetAttributeUint32Error("length", u32_ExpectedLength);
       if (s32_Retval == C_NO_ERR)
       {
          C_SCLString c_CurrentParameterNode = orc_XMLParser.SelectNodeChild("parameter-struct");
+         //Reserve
+         orc_ParameterStructs.reserve(u32_ExpectedLength);
          if (c_CurrentParameterNode == "parameter-struct")
          {
             do
@@ -1084,10 +1020,10 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOParameterStructs(
             //Check length
             if (u32_ExpectedLength != orc_ParameterStructs.size())
             {
-               osc_write_log_error("Loading IO data",
-                                   "Content of \"length\" attribute (" + C_SCLString::IntToStr(u32_ExpectedLength) +
-                                   ") mismatches with the number of found parameters (" +
-                                   C_SCLString::IntToStr(orc_ParameterStructs.size()) + ").");
+               orc_XMLParser.ReportErrorForAttributeContentAppendXMLContext(
+                  "length", "Content of attribute (" + C_SCLString::IntToStr(u32_ExpectedLength) +
+                  ") mismatches with the number of found parameters (" +
+                  C_SCLString::IntToStr(orc_ParameterStructs.size()) + ").");
                s32_Retval = C_CONFIG;
             }
          }
@@ -1097,11 +1033,6 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOParameterStructs(
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == orc_NodeName);
       }
-   }
-   else
-   {
-      osc_write_log_error("Loading IO data", "Could not find \"parameter-structs\" node.");
-      s32_Retval = C_CONFIG;
    }
    return s32_Retval;
 }
@@ -1156,20 +1087,12 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOParameters(std::vector<C_OSCHalcConfigPara
    if (orc_XMLParser.SelectNodeChild("parameters") == "parameters")
    {
       uint32 u32_ExpectedLength = 0UL;
-      //Reserve
-      if (orc_XMLParser.AttributeExists("length"))
-      {
-         u32_ExpectedLength = orc_XMLParser.GetAttributeUint32("length");
-         orc_Parameters.reserve(u32_ExpectedLength);
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"length\" attribute.");
-         s32_Retval = C_CONFIG;
-      }
+      s32_Retval = orc_XMLParser.GetAttributeUint32Error("length", u32_ExpectedLength);
       if (s32_Retval == C_NO_ERR)
       {
          C_SCLString c_CurrentParameterNode = orc_XMLParser.SelectNodeChild("parameter");
+         //Reserve
+         orc_Parameters.reserve(u32_ExpectedLength);
          if (c_CurrentParameterNode == "parameter")
          {
             do
@@ -1195,10 +1118,10 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOParameters(std::vector<C_OSCHalcConfigPara
             //Check length
             if (u32_ExpectedLength != orc_Parameters.size())
             {
-               osc_write_log_error("Loading IO data",
-                                   "Content of \"length\" attribute (" + C_SCLString::IntToStr(u32_ExpectedLength) +
-                                   ") mismatches with the number of found parameters (" +
-                                   C_SCLString::IntToStr(orc_Parameters.size()) + ").");
+               orc_XMLParser.ReportErrorForAttributeContentAppendXMLContext(
+                  "length", "Content of attribute (" + C_SCLString::IntToStr(u32_ExpectedLength) +
+                  ") mismatches with the number of found parameters (" +
+                  C_SCLString::IntToStr(orc_Parameters.size()) + ").");
                s32_Retval = C_CONFIG;
             }
          }
@@ -1227,22 +1150,20 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOParameters(std::vector<C_OSCHalcConfigPara
 sint32 C_OSCHalcConfigFiler::mh_LoadIOParameter(C_OSCHalcConfigParameter & orc_Parameter,
                                                 C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_BaseName)
 {
-   sint32 s32_Retval = C_NO_ERR;
-
    C_SCLString c_TypeStr;
    C_SCLString c_BaseTypeStr;
+   sint32 s32_Retval = orc_XMLParser.SelectNodeChildError("value");
 
-   if (orc_XMLParser.SelectNodeChild("value") == "value")
+   if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = C_OSCHalcDefStructFiler::h_SetType(orc_XMLParser, orc_Parameter.c_Value, c_TypeStr,
-                                                      c_BaseTypeStr, "value",
-                                                      "Loading IO description");
+                                                      c_BaseTypeStr, "value");
       if (s32_Retval == C_NO_ERR)
       {
          s32_Retval = C_OSCHalcDefStructFiler::h_ParseAttributeIntoContent(orc_Parameter.c_Value, orc_XMLParser,
                                                                            "value",
                                                                            c_TypeStr,
-                                                                           c_BaseTypeStr, true, "value");
+                                                                           c_BaseTypeStr, true);
       }
       if (s32_Retval == C_NO_ERR)
       {
@@ -1250,23 +1171,14 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOParameter(C_OSCHalcConfigParameter & orc_P
          tgl_assert(orc_XMLParser.SelectNodeParent() == orc_BaseName);
       }
    }
-   else
-   {
-      osc_write_log_error("Loading IO data", "Could not find \"value\" node.");
-      s32_Retval = C_CONFIG;
-   }
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("comment") == "comment")
+      s32_Retval = orc_XMLParser.SelectNodeChildError("comment");
+      if (s32_Retval == C_NO_ERR)
       {
          orc_Parameter.c_Comment = orc_XMLParser.GetNodeContent();
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == orc_BaseName);
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"comment\" node.");
-         s32_Retval = C_CONFIG;
       }
    }
    return s32_Retval;

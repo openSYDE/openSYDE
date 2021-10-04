@@ -626,10 +626,10 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
          {
             C_OSCNodeDataPoolContent::E_Type e_Type;
             s32_Retval = C_OSCHalcDefStructFiler::h_GetTypeForSimplestTypeString(orc_BaseTypeStr, e_Type);
-            orc_Content.SetType(e_Type);
-            orc_Content.SetComplexType(C_OSCHalcDefContent::eCT_ENUM);
             if (s32_Retval == C_NO_ERR)
             {
+               orc_Content.SetType(e_Type);
+               orc_Content.SetComplexType(C_OSCHalcDefContent::eCT_ENUM);
                if ((e_Type == C_OSCNodeDataPoolContent::eFLOAT32) || (e_Type == C_OSCNodeDataPoolContent::eFLOAT64))
                {
                   osc_write_log_error(
@@ -657,10 +657,10 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
          {
             C_OSCNodeDataPoolContent::E_Type e_Type;
             s32_Retval = C_OSCHalcDefStructFiler::h_GetTypeForSimplestTypeString(orc_BaseTypeStr, e_Type);
-            orc_Content.SetType(e_Type);
-            orc_Content.SetComplexType(C_OSCHalcDefContent::eCT_BIT_MASK);
             if (s32_Retval == C_NO_ERR)
             {
+               orc_Content.SetType(e_Type);
+               orc_Content.SetComplexType(C_OSCHalcDefContent::eCT_BIT_MASK);
                if ((e_Type == C_OSCNodeDataPoolContent::eFLOAT32) ||
                    (e_Type == C_OSCNodeDataPoolContent::eFLOAT64) ||
                    (e_Type == C_OSCNodeDataPoolContent::eSINT8)   ||

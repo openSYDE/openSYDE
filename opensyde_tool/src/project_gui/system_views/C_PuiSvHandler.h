@@ -232,11 +232,12 @@ public:
    stw_types::sint32 CheckViewError(const stw_types::uint32 ou32_Index, bool * const opq_NameInvalid,
                                     bool * const opq_PCNotConnected, bool * const opq_RoutingInvalid,
                                     bool * const opq_UpdateDisabledButDataBlocks, bool * const opq_SysDefInvalid,
-                                    bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails);
+                                    bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails,
+                                    QString * const opc_AutomaticallyDisabledSubDevices);
    void CheckUpdateEnabledForDataBlocks(const stw_types::uint32 ou32_ViewIndex, bool & orq_UpdateDisabledButDataBlocks,
                                         QString & orc_ErrorMessage) const;
-   stw_types::sint32 CheckRouting(const stw_types::uint32 ou32_ViewIndex, bool & orq_RoutingError,
-                                  QString & orc_ErrorMessage) const;
+   stw_types::sint32 CheckRouting(const stw_types::uint32 ou32_ViewIndex, std::map<stw_types::uint32,
+                                                                                   QString> & orc_ErrorDetails) const;
    stw_types::sint32 CheckViewReconnectNecessary(const stw_types::uint32 ou32_ViewIndex, bool & orq_ReconnectNecessary);
 
    //Misc
@@ -359,6 +360,11 @@ private:
    stw_types::uint32 m_CalcHashSystemViews(void) const;
    void m_FixInvalidRailConfig(void);
    void m_HandleCompatibilityChart(void);
+   stw_types::sint32 m_CheckRouting(const stw_types::uint32 ou32_ViewIndex, bool & orq_RoutingError,
+                                    QString & orc_ErrorMessage) const;
+   stw_types::sint32 m_CheckRoutingAndUpdateNodes(const stw_types::uint32 ou32_ViewIndex, bool & orq_RoutingError,
+                                                  QString & orc_ErrorMessage,
+                                                  std::vector<stw_types::uint32> & orc_AutomaticallyDisabledSubDevices);
    std::map<stw_scl::C_SCLString, bool> m_GetExistingViewNames(void) const;
 
    static C_PuiSvHandler * mhpc_Singleton;
@@ -380,10 +386,14 @@ private:
       bool q_SysDefInvalid;
       bool q_NoNodesActive;
       QString c_RoutingErrorDetails;
+      QString c_AutomaticallyDisabledSubDevices;
+      std::vector<stw_types::uint8> c_ResultingNodeActiveStatus;
 
       void GetResults(bool * const opq_NameInvalid, bool * const opq_PCNotConnected, bool * const opq_RoutingInvalid,
                       bool * const opq_UpdateDisabledButDataBlocks, bool * const opq_SysDefInvalid,
-                      bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails) const;
+                      bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails,
+                      QString * const opc_AutomaticallyDisabledSubDevices) const;
+      void ConstructAutomaticallyDisabledSubDevicesString(const std::vector<stw_types::uint32> & orc_Indices);
    };
 
    QMap<stw_types::uint32, C_PuiSvViewErrorDetails> mc_PreviousErrorCheckResults;

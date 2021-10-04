@@ -16,6 +16,7 @@
 #include <QMimeData>
 #include <QScrollBar>
 #include "constants.h"
+#include "TGLUtils.h"
 #include "C_OgeWiUtil.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
@@ -30,6 +31,8 @@ using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDcConnectedNodeList::mhc_MimeData = "stw_opensyde_connected_node";
+const QString C_SyvDcConnectedNodeList::mhc_MimeDataExtFormat = "stw_opensyde_connected_node_ext_format";
+const QString C_SyvDcConnectedNodeList::mhc_MimeDataManufacturerFormat = "stw_opensyde_connected_node_manu_format";
 const QString C_SyvDcConnectedNodeList::mhc_MimeDataDevice = "stw_opensyde_connected_node_device";
 const QString C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid = "stw_opensyde_connected_node_device_valid";
 
@@ -94,16 +97,17 @@ void C_SyvDcConnectedNodeList::SetData(const std::vector<C_SyvDcDeviceInformatio
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Enable serial number
 
-   \param[in] orc_SerialNumber Serial number
+   \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcConnectedNodeList::EnableSerialNumber(const QString & orc_SerialNumber) const
+void C_SyvDcConnectedNodeList::EnableSerialNumber(const C_OSCProtocolSerialNumber & orc_SerialNumber) const
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
       C_SyvDcConnectedNodeWidget * const pc_Widget =
          dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(this->item(sn_It)));
-      if ((pc_Widget != NULL) && (pc_Widget->CompareSerialNumber(orc_SerialNumber) == true))
+      if ((pc_Widget != NULL) &&
+          (pc_Widget->CompareSerialNumber(orc_SerialNumber) == true))
       {
          pc_Widget->setEnabled(true);
       }
@@ -113,16 +117,18 @@ void C_SyvDcConnectedNodeList::EnableSerialNumber(const QString & orc_SerialNumb
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Disable serial number
 
-   \param[in] orc_SerialNumber Serial number
+   \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcConnectedNodeList::DisableSerialNumber(const QString & orc_SerialNumber) const
+void C_SyvDcConnectedNodeList::DisableSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber)
+const
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
       C_SyvDcConnectedNodeWidget * const pc_Widget =
          dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(this->item(sn_It)));
-      if ((pc_Widget != NULL) && (pc_Widget->CompareSerialNumber(orc_SerialNumber) == true))
+      if ((pc_Widget != NULL) &&
+          (pc_Widget->CompareSerialNumber(orc_SerialNumber) == true))
       {
          pc_Widget->setEnabled(false);
       }
@@ -196,7 +202,13 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
          if (pc_Widget != NULL)
          {
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeData,
-                               pc_Widget->GetSerialNumberString().toStdString().c_str());
+                               pc_Widget->GetPlainSerialNumberString().toStdString().c_str());
+            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataExtFormat,
+                               QString::number(static_cast<sintn>(pc_Widget->GetExtFormat())).
+                               toStdString().c_str());
+            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataManufacturerFormat,
+                               QString::number(static_cast<sintn>(pc_Widget->GetManufacturerFormat())).
+                               toStdString().c_str());
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataDevice,
                                pc_Widget->GetDeviceName().toStdString().c_str());
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid,
@@ -214,28 +226,76 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::m_Init(void)
 {
+   uint32 u32_ItData;
+
+   std::vector<C_SyvDcDeviceInformation> c_DataUnique;
+   std::vector<std::set<uint8> > c_DataUniqueSubNodeIds;
+
    //Init/Reinit UI
    this->clear();
-   //No point if pc not connected
-   for (uint32 u32_ItData = 0; u32_ItData < this->mc_Data.size(); ++u32_ItData)
+
+   c_DataUnique.reserve(this->mc_Data.size());
+   c_DataUniqueSubNodeIds.reserve(this->mc_Data.size());
+
+   // Check for Multi-CPU nodes
+   for (u32_ItData = 0U; u32_ItData < this->mc_Data.size(); ++u32_ItData)
    {
-      m_AppendNode(this->mc_Data[u32_ItData]);
+      const C_SyvDcDeviceInformation & rc_Data = this->mc_Data[u32_ItData];
+      uint32 u32_ItDataUnique;
+      bool q_MatchingSubNodeFound = false;
+
+      // Check if already existing
+      for (u32_ItDataUnique = 0U; u32_ItDataUnique < c_DataUnique.size(); ++u32_ItDataUnique)
+      {
+         const C_SyvDcDeviceInformation & rc_DataUnique = c_DataUnique[u32_ItDataUnique];
+
+         if (rc_DataUnique.IsSerialNumberIdentical(rc_Data) == true)
+         {
+            // Serial number is identical, add the sub node id
+            c_DataUniqueSubNodeIds[u32_ItDataUnique].insert(rc_Data.u8_SubNodeId);
+            q_MatchingSubNodeFound = true;
+            break;
+         }
+      }
+
+      if (q_MatchingSubNodeFound == false)
+      {
+         std::set<uint8> c_SubNodeId;
+
+         c_SubNodeId.insert(rc_Data.u8_SubNodeId);
+
+         // New serial number
+         c_DataUnique.push_back(rc_Data);
+         c_DataUniqueSubNodeIds.push_back(c_SubNodeId);
+      }
+   }
+
+   tgl_assert(c_DataUnique.size() == c_DataUniqueSubNodeIds.size());
+
+   //No point if pc not connected
+   for (u32_ItData = 0U; u32_ItData < c_DataUnique.size(); ++u32_ItData)
+   {
+      m_AppendNode(c_DataUnique[u32_ItData], c_DataUniqueSubNodeIds[u32_ItData]);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append node to list
 
-   \param[in] ou32_NodeIndex Node index
+   \param[in] orc_Info        Read device information
+   \param[in] orc_SubNodeIds  Detected sub node ids with same serial number
+                              - In case of a normal node, exact one sub node id which should be 0
+                              - In case of a multiple CPU, at least two sub node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc_Info)
+void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc_Info,
+                                            const std::set<uint8> & orc_SubNodeIds)
 {
    C_SyvDcConnectedNodeWidget * pc_Widget;
 
    this->addItem("");
 
-   pc_Widget = new C_SyvDcConnectedNodeWidget(this->item(this->count() - 1), orc_Info, this);
+   pc_Widget = new C_SyvDcConnectedNodeWidget(this->item(this->count() - 1), orc_Info, orc_SubNodeIds, this);
 
    this->setItemWidget(this->item(this->count() - 1), pc_Widget);
 

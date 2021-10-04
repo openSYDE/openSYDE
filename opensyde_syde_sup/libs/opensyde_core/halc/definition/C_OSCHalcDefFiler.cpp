@@ -1346,7 +1346,10 @@ sint32 C_OSCHalcDefFiler::mh_LoadChannelUseCases(std::vector<C_OSCHalcDefChannel
       {
          C_OSCNodeDataPoolContent::E_Type e_Type;
          s32_Retval = C_OSCHalcDefStructFiler::h_GetTypeForSimplestTypeString(c_TypeStr, e_Type);
-         c_Value.SetType(e_Type);
+         if (s32_Retval == C_NO_ERR)
+         {
+            c_Value.SetType(e_Type);
+         }
       }
       else
       {

@@ -13,11 +13,10 @@
 
 #include "stwtypes.h"
 
-#include "C_SyvTopologyBaseScene.h"
-
 #include "C_GiNode.h"
-
+#include "C_PuiSvData.h"
 #include "C_SyvUpDeviceInfo.h"
+#include "C_SyvTopologyBaseScene.h"
 #include "C_SyvRoRouteCalculation.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -71,7 +70,7 @@ protected:
 
    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
 
-   virtual void m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem);
+   virtual void m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem) override;
 
 private:
    static const stw_types::float64 mhf64_BusAnimationTolerance;
@@ -80,6 +79,15 @@ private:
    C_SyvUpScene(const C_SyvUpScene &);
    C_SyvUpScene & operator =(const C_SyvUpScene &); //lint !e1511 //we want to hide the base func.
 
+   void m_HandleBusConnectorInProgressAnimationStart(C_GiLiBusConnector & orc_BusConnector,
+                                                     const stw_opensyde_gui_logic::C_SyvRoRouteCalculation & orc_RoutingCalculation, const stw_opensyde_core::C_OSCRoutingRoute & orc_Route, const stw_opensyde_gui_logic::C_PuiSvData & orc_View, const stw_types::uint32 ou32_NodeIndex)
+   const;
+   bool m_IsLastBusConnectorInProgressAnimationToNode(
+      const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId & orc_BusConnectionData, const C_GiLiBus & orc_BusItem,
+      const stw_opensyde_gui_logic::C_SyvRoRouteCalculation & orc_RoutingCalculation,
+      const stw_opensyde_core::C_OSCRoutingRoute & orc_Route, const stw_opensyde_gui_logic::C_PuiSvData & orc_View,
+      const stw_types::uint32 ou32_NodeIndex)
+   const;
    stw_types::sint32 m_StartProgressAnimationBusses(const stw_opensyde_gui_logic::C_SyvRoRouteCalculation & orc_Calc,
                                                     const stw_types::uint32 ou32_NodeIndex) const;
    static stw_types::sint32 mh_GetAnimationPath(const QPointF & orc_PointStart, const QPointF & orc_PointEnd,

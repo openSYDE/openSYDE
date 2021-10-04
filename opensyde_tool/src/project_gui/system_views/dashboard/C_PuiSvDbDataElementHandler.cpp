@@ -1103,7 +1103,7 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(voi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for any invalid elements
 
-   \param[out]   orc_FirstInvalidElementName    Name of first invalid element
+   \param[out]  orc_FirstInvalidElementName  Name of first invalid element
 
    \return
    true  Found
@@ -1248,7 +1248,7 @@ bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredBusesConnected(void) cons
                {
                   const C_OSCNodeComInterfaceSettings & rc_Interface =
                      pc_Node->c_Properties.c_ComInterfaces[c_MessageID.u32_InterfaceIndex];
-                  if (rc_Interface.q_IsBusConnected == true)
+                  if (rc_Interface.GetBusConnected() == true)
                   {
                      if (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())
                      {
@@ -1303,7 +1303,7 @@ bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredBusesConnected(void) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if requested node is active
 
-   \param[in] ou32_NodeIndex Node index to check
+   \param[in]  ou32_NodeIndex    Node index to check
 
    \return
    True  Definitely active
@@ -1333,7 +1333,7 @@ bool C_PuiSvDbDataElementHandler::m_CheckNodeActive(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if the specified ID is configured as on trigger
 
-   \param[in] orc_Id ID to check
+   \param[in]  orc_Id   ID to check
 
    \retval   true   Error occurred or on trigger configured
    \retval   false  Definitely not on trigger configured
@@ -1376,8 +1376,8 @@ bool C_PuiSvDbDataElementHandler::m_CheckIsOnTrigger(const C_PuiSvDbNodeDataPool
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if the element was already read, assuming the order was in the internally stored data element order
 
-   \param[in] ou32_ItemIndex Internally stored data element order index
-   \param[in] orc_Id         ID of the current index
+   \param[in]  ou32_ItemIndex    Internally stored data element order index
+   \param[in]  orc_Id            ID of the current index
 
    \retval   true    Already read
    \retval   false   New read required
@@ -1418,13 +1418,13 @@ void C_PuiSvDbDataElementHandler::m_DataPoolElementsChanged(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Short function description
+/*! \brief  Get error description for manual operation
 
-   \param[in]   os32_Result       Operation result
-   \param[in]   ou8_NRC           Negative response code, if any
-   \param[out]  orc_Description   Error description
-   \param[out]  orc_Details       Details for error
-   \param[out]  ors32_TextHeight  Necessary height of text
+   \param[in]   os32_Result         Operation result
+   \param[in]   ou8_NRC             Negative response code, if any
+   \param[out]  orc_Description     Error description
+   \param[out]  orc_Details         Details for error
+   \param[out]  ors32_TextHeight    Necessary height of text
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::m_GetErrorDescriptionForManualOperation(const sint32 os32_Result, const uint8 ou8_NRC,
@@ -1560,7 +1560,7 @@ const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & C_PuiSvDbDataElementHan
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all registered elements
 
-   \param[out]      orc_RegisteredElements   Vector with all elements
+   \param[out]  orc_RegisteredElements    Vector with all elements
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::m_GetAllRegisteredElements(

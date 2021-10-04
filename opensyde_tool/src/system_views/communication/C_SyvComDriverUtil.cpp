@@ -72,7 +72,7 @@ sint32 C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(const uint32 ou32_View
                                                                        &q_PCNotConnected, &q_RoutingInvalid,
                                                                        &q_UpdateDisabledButDataBlocks,
                                                                        &q_SysDefInvalid, &q_NoNodesActive,
-                                                                       NULL);
+                                                                       NULL, NULL);
 
    if ((((((((s32_Retval == C_NO_ERR) && (q_NameInvalid == false)) && (q_PCNotConnected == false)) &&
            (q_RoutingInvalid == false)) && (q_SysDefInvalid == false)) && (q_NoNodesActive == false))) &&

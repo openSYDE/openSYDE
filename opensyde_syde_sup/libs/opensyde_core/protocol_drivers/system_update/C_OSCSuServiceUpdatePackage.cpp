@@ -510,8 +510,10 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
                                                              c_XMLParser, mc_PARAM_FILES, mc_PARAM_FILE);
             if (orc_SystemDefinition.c_Nodes[u32_NodeCounter].pc_DeviceDefinition != NULL)
             {
+               const C_OSCNode & rc_CurNode = orc_SystemDefinition.c_Nodes[u32_NodeCounter];
+               tgl_assert(rc_CurNode.u32_SubDeviceIndex < rc_CurNode.pc_DeviceDefinition->c_SubDevices.size());
                c_DoFlash.c_OtherAcceptedDeviceNames =
-                  orc_SystemDefinition.c_Nodes[u32_NodeCounter].pc_DeviceDefinition->c_OtherAcceptedNames;
+                  rc_CurNode.pc_DeviceDefinition->c_SubDevices[rc_CurNode.u32_SubDeviceIndex].c_OtherAcceptedNames;
             }
          }
          u32_NodeCounter++;                            // next active node
@@ -903,7 +905,8 @@ sint32 C_OSCSuServiceUpdatePackage::mh_SupDefParamAdapter(const C_OSCSystemDefin
       }
 
       // get relative application path of node
-      const C_SCLString c_Folder = orc_SystemDefinition.c_Nodes[u32_Pos].c_Properties.c_Name;
+      const C_SCLString c_Folder =
+         C_OSCUtils::h_NiceifyStringForFileName(orc_SystemDefinition.c_Nodes[u32_Pos].c_Properties.c_Name);
       // get applications of node
       for (vector<C_SCLString>::const_iterator c_IterAppl = orc_ApplicationsToWrite[u32_Pos].c_FilesToFlash.begin();
            c_IterAppl != orc_ApplicationsToWrite[u32_Pos].c_FilesToFlash.end();

@@ -43,7 +43,9 @@ public:
    static stw_types::float64 h_GetValueUnscaled(const stw_types::float64 of64_Value,
                                                 const stw_types::float64 of64_Factor,
                                                 const stw_types::float64 of64_Offset);
-   static stw_scl::C_SCLString h_SerialNumberToString(const stw_types::uint8 * const opu8_SerialNumber);
+   static stw_scl::C_SCLString h_PosSerialNumberToString(const stw_types::uint8 * const opu8_SerialNumber);
+   static stw_scl::C_SCLString h_FsnSerialNumberToString(const stw_types::uint8 ou8_ManufacturerFormat,
+                                                         const stw_scl::C_SCLString & orc_RawSerialNumber);
    static void h_FileToString(const stw_scl::C_SCLString & orc_FilePath, stw_scl::C_SCLString & orc_OutputString);
    static void h_RangeCheckFloat(stw_types::float64 & orf64_Value);
    static stw_scl::C_SCLString h_LoadString(const stw_types::uint16 ou16_StringIndex);

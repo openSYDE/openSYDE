@@ -16,8 +16,9 @@
 #include "C_SdTopologyScene.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw_types;
 using namespace stw_opensyde_gui;
+using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -56,10 +57,7 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
    mu64_BusConnectorNodeID(0),
    mu64_BusConnectorBusID(0),
    mu8_InterfaceNumber(0),
-   mu8_NodeId(0),
-   mq_ActivateDatapoolL2(false),
-   mq_ActivateDatapoolECeS(false),
-   mq_ActivateDatapoolECoS(false),
+   mc_NodeIds(),
    mq_ForceUseAdditionalInformation(orq_ForceUseAdditionalInformation)
 {
 }
@@ -74,10 +72,7 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
    \param[in]      ou64_BusConnectorNodeID   Bus connector node ID
    \param[in]      ou64_BusConnectorBusID    Bus connector bus ID
    \param[in]      ou8_InterfaceNumber       Interface number
-   \param[in]      ou8_NodeId                Node id
-   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
-   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
-   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
+   \param[in]      orc_NodeIds               Node ids
    \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -87,10 +82,7 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
                                                            const stw_types::uint64 ou64_BusConnectorNodeID,
                                                            const stw_types::uint64 ou64_BusConnectorBusID,
                                                            const stw_types::uint8 ou8_InterfaceNumber,
-                                                           const stw_types::uint8 ou8_NodeId,
-                                                           const bool oq_ActivateDatapoolL2,
-                                                           const bool oq_ActivateDatapoolECeS,
-                                                           const bool oq_ActivateDatapoolECoS,
+                                                           const std::vector<uint8> & orc_NodeIds,
                                                            QUndoCommand * const opc_Parent) :
    C_SdManUnoTopologyAddBaseCommand(opc_Scene, orc_IDs, "Add drawing element(s)",
                                     opc_Parent),
@@ -99,10 +91,7 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
    mu64_BusConnectorNodeID(ou64_BusConnectorNodeID),
    mu64_BusConnectorBusID(ou64_BusConnectorBusID),
    mu8_InterfaceNumber(ou8_InterfaceNumber),
-   mu8_NodeId(ou8_NodeId),
-   mq_ActivateDatapoolL2(oq_ActivateDatapoolL2),
-   mq_ActivateDatapoolECeS(oq_ActivateDatapoolECeS),
-   mq_ActivateDatapoolECoS(oq_ActivateDatapoolECoS),
+   mc_NodeIds(orc_NodeIds),
    mq_ForceUseAdditionalInformation(false)
 {
 }
@@ -183,10 +172,8 @@ void C_SdManUnoTopologyAddCommand::m_AddNew(void)
             {
                if (pc_Node->CheckInterfaceAvailable(pc_Bus->GetType(), this->mu8_InterfaceNumber) == true)
                {
-                  pc_Scene->AddBusConnector(pc_Node, pc_Bus, this->mu8_InterfaceNumber, this->mu8_NodeId,
-                                            this->mq_ActivateDatapoolL2,
-                                            this->mq_ActivateDatapoolECeS,
-                                            this->mq_ActivateDatapoolECoS, this->mc_NewPos, &(c_IDs[0]));
+                  pc_Scene->AddBusConnector(pc_Node, pc_Bus, this->mu8_InterfaceNumber, this->mc_NodeIds,
+                                            this->mc_NewPos, &(c_IDs[0]));
                }
             }
             break;

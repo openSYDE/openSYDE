@@ -192,7 +192,7 @@ void C_OgeSpxDoubleAutoFix::m_Init(void)
    this->SetMaximumCustom(this->mf64_ScaledMax);
    //Decimals
    //Check factor and offset and use maximum number of decimals if both have a defined number of decimals
-   // Small addition: only do this if unerlying type DOES define a discrete number of steps
+   // Small addition: only do this if underlying type DOES define a discrete number of steps
    s32_DecimalsFactor = C_Uti::h_GetNumberOfDecimals(this->mf64_Factor);
    s32_DecimalsOffset = C_Uti::h_GetNumberOfDecimals(this->mf64_Offset);
    if (((s32_DecimalsFactor < 0) || (s32_DecimalsOffset < 0)) || (this->mu64_NumberOfStepsAvailable == 0ULL))
@@ -201,7 +201,7 @@ void C_OgeSpxDoubleAutoFix::m_Init(void)
    }
    else
    {
-      this->setDecimals(std::max(std::max(s32_DecimalsFactor, s32_DecimalsOffset), 1L));
+      this->setDecimals(std::max(std::max(s32_DecimalsFactor, s32_DecimalsOffset), static_cast<sint32>(1L)));
    }
    //Step width
    if (this->mu64_NumberOfStepsAvailable > 0)

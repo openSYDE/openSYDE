@@ -118,11 +118,11 @@ C_NagMainWindow::C_NagMainWindow(const uint16 ou16_Timer) :
    // load devices so they are known to UI
    //lint -e{1938}  static const is guaranteed preinitialized before main
    stw_opensyde_core::C_OSCSystemDefinition::hc_Devices.LoadFromFile(
-      C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str(), false);
+      C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str(), false, NULL);
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
    stw_opensyde_core::C_OSCSystemDefinition::hc_Devices.LoadFromFile(
-      C_Uti::h_GetAbsolutePathFromExe("../devices/user_devices.ini").toStdString().c_str(), true);
+      C_Uti::h_GetAbsolutePathFromExe("../devices/user_devices.ini").toStdString().c_str(), true, NULL);
 
    this->mpc_MainWidget = new C_NagMainWidget(this->mpc_Ui->pc_workAreaWidget);
    this->mpc_UseCaseWidget = new C_NagUseCaseViewWidget(this->mpc_Ui->pc_workAreaWidget);

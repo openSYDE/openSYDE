@@ -412,7 +412,7 @@ QVariant C_SdNdeHalcOvTableModel::headerData(const sintn osn_Section, const Qt::
             c_Retval = C_GtGetText::h_GetText("Datapool");
             break;
          case eDATABLOCK_ASSIGNMENT:
-            c_Retval = C_GtGetText::h_GetText("Datablock Assignment");
+            c_Retval = C_GtGetText::h_GetText("Data Block Assignment");
             break;
          default:
             break;
@@ -453,7 +453,7 @@ QVariant C_SdNdeHalcOvTableModel::headerData(const sintn osn_Section, const Qt::
             c_Retval = C_GtGetText::h_GetText("Datapool");
             break;
          case eDATABLOCK_ASSIGNMENT:
-            c_Retval = C_GtGetText::h_GetText("Datablock Assignment");
+            c_Retval = C_GtGetText::h_GetText("Data Block Assignment");
             break;
          default:
             break;
@@ -494,7 +494,7 @@ QVariant C_SdNdeHalcOvTableModel::headerData(const sintn osn_Section, const Qt::
             c_Retval = C_GtGetText::h_GetText("Datapool where this channel is stored");
             break;
          case eDATABLOCK_ASSIGNMENT:
-            c_Retval = C_GtGetText::h_GetText("The datablock which is assigned to this datapool");
+            c_Retval = C_GtGetText::h_GetText("The Data Block which is assigned to this Datapool");
             break;
          default:
             break;

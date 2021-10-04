@@ -68,6 +68,7 @@ C_OSCNode::~C_OSCNode(void)
 void C_OSCNode::Initialize(void)
 {
    pc_DeviceDefinition = NULL;
+   u32_SubDeviceIndex = 0UL;
    c_DeviceType = "Custom";
    c_Properties.Initialize();
    c_DataPools.resize(0);
@@ -329,12 +330,8 @@ sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type oe_ComProtocol, cons
                      //Delete old signals
                      for (uint32 u32_ItSignal = u32_PreviousSignalSize; u32_ItSignal > 0; --u32_ItSignal)
                      {
-                        const std::vector<C_OSCNodeDataPoolListElement>::size_type un_Add =
-                           static_cast<std::vector<C_OSCNodeDataPoolListElement>::size_type>(((
-                                                                                                 u32_DataPoolListElementIndex)
-                                                                                              +
-                                                                                              u32_ItSignal) - 1UL);
-                        pc_List->c_Elements.erase(pc_List->c_Elements.begin() + un_Add);
+                        const uint32 u32_Add = (u32_DataPoolListElementIndex + u32_ItSignal) - 1UL;
+                        pc_List->c_Elements.erase(pc_List->c_Elements.begin() + u32_Add);
                      }
                      //Insert new signals
                      for (uint32 u32_ItSignal = 0; u32_ItSignal < orc_SignalData.size(); ++u32_ItSignal)
@@ -412,12 +409,8 @@ sint32 C_OSCNode::DeleteMessage(const C_OSCCanProtocol::E_Type oe_ComProtocol, c
                {
                   for (uint32 u32_ItSignal = rc_Message.c_Signals.size(); u32_ItSignal > 0UL; --u32_ItSignal)
                   {
-                     const std::vector<C_OSCNodeDataPoolListElement>::size_type un_Add =
-                        static_cast<std::vector<C_OSCNodeDataPoolListElement>::size_type>(((
-                                                                                              u32_DataPoolListElementIndex)
-                                                                                           +
-                                                                                           u32_ItSignal) - 1UL);
-                     pc_ListData->c_Elements.erase(pc_ListData->c_Elements.begin() + un_Add);
+                     const uint32 u32_Add = (u32_DataPoolListElementIndex + u32_ItSignal) - 1UL;
+                     pc_ListData->c_Elements.erase(pc_ListData->c_Elements.begin() + u32_Add);
                   }
                }
                else
@@ -1937,7 +1930,10 @@ bool C_OSCNode::IsAnyUpdateAvailable(void) const
            (u32_ItInterface < this->c_Properties.c_ComInterfaces.size()) && (q_Retval == false); ++u32_ItInterface)
       {
          const C_OSCNodeComInterfaceSettings & rc_CurInterface = this->c_Properties.c_ComInterfaces[u32_ItInterface];
-         if (this->pc_DeviceDefinition->IsUpdateAvailable(rc_CurInterface.e_InterfaceType) == true)
+         tgl_assert(this->u32_SubDeviceIndex < this->pc_DeviceDefinition->c_SubDevices.size());
+         if (this->pc_DeviceDefinition->c_SubDevices[this->u32_SubDeviceIndex].IsUpdateAvailable(rc_CurInterface.
+                                                                                                 e_InterfaceType) ==
+             true)
          {
             q_Retval = true;
          }
@@ -1966,7 +1962,8 @@ bool C_OSCNode::IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_Type) const
    if ((this->pc_DeviceDefinition != NULL) &&
        (this->c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_OPEN_SYDE))
    {
-      q_Return = this->pc_DeviceDefinition->IsRoutingAvailable(oe_Type);
+      tgl_assert(this->u32_SubDeviceIndex < this->pc_DeviceDefinition->c_SubDevices.size());
+      q_Return = this->pc_DeviceDefinition->c_SubDevices[this->u32_SubDeviceIndex].IsRoutingAvailable(oe_Type);
    }
 
    return q_Return;

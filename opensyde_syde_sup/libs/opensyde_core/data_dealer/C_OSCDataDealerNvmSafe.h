@@ -66,7 +66,7 @@ public:
 private:
    static void mh_CreateInterpretedList(const C_OSCNodeDataPoolList & orc_List,
                                         C_OSCParamSetInterpretedList & orc_InterpretedList);
-   stw_types::sint32 m_CheckParameterFileContent(const C_OSCParamSetRawNode & orc_Node);
+   stw_types::sint32 m_CheckParameterFileContent(const C_OSCParamSetRawNode & orc_Node) const;
    stw_types::sint32 m_CreateRawEntryAndPrepareInterpretedData(C_OSCNodeDataPoolList & orc_List,
                                                                C_OSCParamSetRawEntry & orc_Entry,
                                                                stw_types::uint8 * const opu8_NrCode);

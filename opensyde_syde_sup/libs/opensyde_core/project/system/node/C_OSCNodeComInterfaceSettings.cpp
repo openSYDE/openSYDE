@@ -44,8 +44,9 @@ C_OSCNodeComInterfaceSettings::C_OSCNodeComInterfaceSettings(void) :
    q_IsUpdateEnabled(false),
    q_IsRoutingEnabled(false),
    q_IsDiagnosisEnabled(false),
-   q_IsBusConnected(false),
-   u32_BusIndex(0)
+   u32_BusIndex(0),
+   mq_IsBusConnected(false),
+   mq_IsInterfaceConnectedInDevice(true)
 {
 }
 
@@ -63,7 +64,7 @@ C_OSCNodeComInterfaceSettings::~C_OSCNodeComInterfaceSettings(void)
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeComInterfaceSettings::CalcHash(uint32 & oru32_HashValue) const
@@ -78,20 +79,20 @@ void C_OSCNodeComInterfaceSettings::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsUpdateEnabled, sizeof(this->q_IsUpdateEnabled), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsRoutingEnabled, sizeof(this->q_IsRoutingEnabled), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsDiagnosisEnabled, sizeof(this->q_IsDiagnosisEnabled), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsBusConnected, sizeof(this->q_IsBusConnected), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_IsBusConnected, sizeof(this->mq_IsBusConnected), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_BusIndex, sizeof(this->u32_BusIndex), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new connection
 
-   \param[in] oru32_BusIndex Bus index to add
+   \param[in]  oru32_BusIndex    Bus index to add
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeComInterfaceSettings::AddConnection(const uint32 & oru32_BusIndex)
 {
    this->u32_BusIndex = oru32_BusIndex;
-   this->q_IsBusConnected = true;
+   this->mq_IsBusConnected = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -101,7 +102,65 @@ void C_OSCNodeComInterfaceSettings::AddConnection(const uint32 & oru32_BusIndex)
 void C_OSCNodeComInterfaceSettings::RemoveConnection(void)
 {
    this->u32_BusIndex = 0;
-   this->q_IsBusConnected = false;
+   this->mq_IsBusConnected = false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get bus connected status
+
+   \return
+   Bus connected status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCNodeComInterfaceSettings::GetBusConnected() const
+{
+   return this->mq_IsBusConnected && this->mq_IsInterfaceConnectedInDevice;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get bus connected boolean raw value
+
+   \return
+   Bus connected boolean raw value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCNodeComInterfaceSettings::GetBusConnectedRawValue() const
+{
+   return this->mq_IsBusConnected;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set bus connected
+
+   \param[in]  oq_Value    Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeComInterfaceSettings::SetBusConnected(const bool oq_Value)
+{
+   this->mq_IsBusConnected = oq_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get interface connected in device raw value
+
+   \return
+   Status of interface connected in device
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCNodeComInterfaceSettings::GetInterfaceConnectedInDeviceRawValue() const
+{
+   return this->mq_IsInterfaceConnectedInDevice;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set interface connected in device
+
+   \param[in]  oq_Value    Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeComInterfaceSettings::SetInterfaceConnectedInDevice(const bool oq_Value)
+{
+   this->mq_IsInterfaceConnectedInDevice = oq_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

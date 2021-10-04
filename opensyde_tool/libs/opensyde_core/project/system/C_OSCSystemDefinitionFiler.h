@@ -60,6 +60,9 @@ public:
                                                    const stw_scl::C_SCLString & orc_BasePath,
                                                    std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles);
 
+   static void h_SplitDeviceType(const stw_scl::C_SCLString & orc_CompleteType, stw_scl::C_SCLString & orc_MainType,
+                                 stw_scl::C_SCLString & orc_SubType);
+
    ///known file versions
    static const stw_types::uint16 hu16_FILE_VERSION_1 = 1U;
    static const stw_types::uint16 hu16_FILE_VERSION_2 = 2U;

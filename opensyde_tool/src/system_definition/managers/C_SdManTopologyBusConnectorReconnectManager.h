@@ -38,9 +38,8 @@ public:
    void EnterWaitForContextMenuState(const QPointF & orc_ScenePos, stw_opensyde_gui::C_GiNode * const opc_Node,
                                      const stw_opensyde_gui::C_GiLiBus * const opc_Bus);
    void ContextMenuAboutToClose(void);
-   void ContextMenuAccepted(const stw_types::sint32 & ors32_Interface, const stw_types::uint8 & oru8_NodeId,
-                            const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
-                            const bool oq_ActivateDatapoolECoS);
+   void ContextMenuAccepted(const stw_types::sint32 & ors32_Interface,
+                            const std::vector<stw_types::uint8> & orc_NodeIds);
    void DeactivateReconnection(void);
    bool Active(void) const;
 
@@ -56,18 +55,14 @@ Q_SIGNALS:
    void SigReconnectNode(stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                          stw_opensyde_gui::C_GiNode * const opc_StartingNode,
                          stw_opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
-                         const stw_types::sint32 & ors32_Interface, const stw_types::uint8 & oru8_NodeId,
-                         const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
-                         const bool oq_ActivateDatapoolECoS);
+                         const stw_types::sint32 & ors32_Interface, const std::vector<stw_types::uint8> & orc_NodeIds);
    void SigRevertBus(stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                      const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                      const stw_opensyde_gui::C_GiLiBus * const opc_LastBus, const QPointF & orc_ScenePos);
    void SigReconnectBus(stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                         const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                         const stw_opensyde_gui::C_GiLiBus * const opc_LastBus, const QPointF & orc_ConnectionPos,
-                        const stw_types::sint32 & ors32_Interface, const stw_types::uint8 & oru8_NodeId,
-                        const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
-                        const bool oq_ActivateDatapoolECoS);
+                        const stw_types::sint32 & ors32_Interface, const std::vector<stw_types::uint8> & orc_NodeIds);
    void SigCleanUpTemporaryLine(void);
 
 private:
@@ -78,10 +73,7 @@ private:
    const stw_opensyde_gui::C_GiLiBus * mpc_LastBus;
    stw_opensyde_gui::C_GiLiBusConnector::E_ConnectState me_ConnectState;
    stw_types::sint32 ms32_NewInterface;
-   stw_types::uint8 mu8_NodeId;
-   bool mq_ActivateDatapoolL2;
-   bool mq_ActivateDatapoolECeS;
-   bool mq_ActivateDatapoolECoS;
+   std::vector<stw_types::uint8> mc_NodeIds;
    QPointF mc_ConnectionPos;
    QPointF mc_LastKnownInteractionPointPosition;
    bool mq_ContextMenuActive;

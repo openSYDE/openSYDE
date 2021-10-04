@@ -389,7 +389,7 @@ void C_OgeCbxMultiSelect::m_UpdateDisplayName(void)
 
    // set the item names to combo box
    this->SetDisplayText(c_Display);
-   this->SetToolTipInformation("Selected Elements:", c_ToolTip);
+   this->SetToolTipInformation(C_GtGetText::h_GetText("Selected Elements:"), c_ToolTip);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

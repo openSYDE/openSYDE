@@ -179,8 +179,8 @@ protected:
    stw_types::uint64 m_GetNewUniqueID(const QMap<
                                          stw_opensyde_gui_logic::C_PuiBsTemporaryDataID,
                                          stw_types::uint64> * const opc_IDMap = NULL,
-                                      const stw_types::sint32 os32_Type = -1,
-                                      const stw_types::uint32 & oru32_Index = 0);
+                                      const stw_types::sint32 os32_Type = -1, const stw_types::uint32 & oru32_Index = 0,
+                                      const bool oq_CheckExist = false);
 
    bool mq_BlockContextMenu;
    bool mq_ProxyWidgetInteractionActive;

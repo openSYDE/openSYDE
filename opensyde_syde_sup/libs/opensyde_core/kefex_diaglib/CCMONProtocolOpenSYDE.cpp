@@ -128,11 +128,14 @@ using namespace stw_can;
 #define UDC_H_DATAID_SYSTEM_SUPPLIER_ECU_HW_NUMBER          (0xF192U)
 #define UDC_H_DATAID_SYSTEM_SUPPLIER_ECU_HW_VERSION_NUMBER  (0xF193U)
 #define UDC_H_DATAID_UDS_VERSION                            (0xFF00U)
+#define UDC_H_DATAID_ECU_SERIAL_NUMBER_EXT                  (0xA81EU)
+#define UDC_H_DATAID_SUB_NODE_ID                            (0xA81FU)
 
 //routine IDs
 #define UDS_H_ROUTINE_CTRL_ROUTE_DIAGNOSIS_COMMUNICATION    (0x202U)
 #define UDS_H_ROUTINE_CTRL_SEND_CAN_MESSAGE                 (0x203U)
 #define UDS_H_ROUTINE_CTRL_TUNNEL_CAN_MESSAGES              (0x204U)
+#define UDS_H_ROUTINE_CTRL_ROUTE_IP_2_IP_COMMUNICATION      (0x205U)
 #define UDS_H_ROUTINE_CTRL_REQUEST_PROGRAMMING              (0x206U)
 #define UDS_H_ROUTINE_CTRL_SET_BITRATE                      (0x207U)
 #define FL_H_ROUTINE_CTRL_CHECK_FLASH_MEMORY_AVAILABLE      (0x208U)
@@ -1187,6 +1190,9 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 o
             u8_FirstRawByte = 3U; //finished here ...
          }
       }
+      break;
+   case UDC_H_DATAID_ECU_SERIAL_NUMBER_EXT:
+      c_Text = "EcuSerialNumberExtended";
       break;
    case UDC_H_DATAID_SYSTEM_SUPPLIER_ECU_HW_NUMBER:
       c_Text = "SystemSupplierEcuHardwareNumber";

@@ -12,10 +12,13 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "TGLUtils.h"
 #include "C_SebUtil.h"
+#include "C_PuiSdUtil.h"
 #include "C_SdTopologyDataSnapshot.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
@@ -62,6 +65,7 @@ void C_SdTopologyDataSnapshot::Clear(void)
    this->c_UINodes.clear();
    this->c_UIBuses.clear();
    this->c_OSCNodes.clear();
+   this->c_OSCNodeGroups.clear();
    this->c_OSCBuses.clear();
    this->c_BusConnections.clear();
    this->c_BusTextElements.clear();
@@ -80,12 +84,19 @@ uint32 C_SdTopologyDataSnapshot::Count(void) const
    uint32 u32_Retval = 0;
 
    u32_Retval += C_PuiBsElements::Count();
-   u32_Retval += this->c_UINodes.size();
    for (uint32 u32_ItNode = 0; u32_ItNode < this->c_UINodes.size(); ++u32_ItNode)
    {
-      const C_PuiSdNode & rc_UINode = this->c_UINodes[u32_ItNode];
-      u32_Retval += rc_UINode.c_UIBusConnections.size();
+      const bool q_IsFirst = C_PuiSdUtil::h_CheckIsFirstInAnyGroupOrNotInAny(u32_ItNode, this->c_OSCNodeGroups);
+      if (q_IsFirst)
+      {
+         const C_PuiSdNode & rc_UINode = this->c_UINodes[u32_ItNode];
+         //Node
+         ++u32_Retval;
+         //Connections
+         u32_Retval += rc_UINode.c_UIBusConnections.size();
+      }
    }
+
    u32_Retval += this->c_UIBuses.size();
    u32_Retval += this->c_BusConnections.size();
    u32_Retval += this->c_BusTextElements.size();
@@ -96,7 +107,7 @@ uint32 C_SdTopologyDataSnapshot::Count(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply position offset
 
-   \param[in] orc_NewPos Offset
+   \param[in]  orc_NewPos  Offset
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyDataSnapshot::SetDataPositionOffset(const QPointF & orc_NewPos)
@@ -136,7 +147,7 @@ void C_SdTopologyDataSnapshot::SetDataPositionOffset(const QPointF & orc_NewPos)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply Z value offset
 
-   \param[in] of64_HighestUsedZValue Highest used Z value
+   \param[in]  of64_HighestUsedZValue  Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyDataSnapshot::SetDataZOffset(const float64 of64_HighestUsedZValue)

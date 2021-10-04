@@ -507,7 +507,7 @@ QString C_PuiSdUtil::h_GetSignalNamespace(const C_OSCNodeDataPoolListElementId &
       {
          const C_OSCNodeComInterfaceSettings & rc_Interface =
             pc_Node->c_Properties.c_ComInterfaces[c_MessageID.u32_InterfaceIndex];
-         if (rc_Interface.q_IsBusConnected == true)
+         if (rc_Interface.GetBusConnected() == true)
          {
             const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(rc_Interface.u32_BusIndex);
             const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageID);
@@ -623,6 +623,141 @@ QString C_PuiSdUtil::h_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId
       }
    }
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get sub node name by node index.
+
+   Make sure the node is a sub node and the device definition exists, else this will return an empty string.
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   sub node name from sub device definition
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSdUtil::h_GetSubNodeDeviceName(const uint32 ou32_NodeIndex)
+{
+   QString c_Retval = "";
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+
+   if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+   {
+      if (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size())
+      {
+         c_Retval =
+            pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].c_SubDeviceName.c_str();
+      }
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get node base name or name
+
+   If the node belongs to a node squad, this will return the base name. Else it will simply return the node name.
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   node base name if sub node, else node name (or empty string if index is invalid)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSdUtil::h_GetNodeBaseNameOrName(const uint32 ou32_NodeIndex)
+{
+   QString c_Return = "";
+   uint32 u32_NodeSquadIndex;
+
+   if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(ou32_NodeIndex,
+                                                                       u32_NodeSquadIndex) == C_NO_ERR)
+   {
+      // part of a node squad
+      const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
+         C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_NodeSquadIndex);
+      if (pc_NodeSquad != NULL)
+      {
+         c_Return = pc_NodeSquad->c_BaseName.c_str();
+      }
+   }
+   else
+   {
+      // normal node
+      const stw_opensyde_core::C_OSCNode * const pc_Node =
+         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+      if (pc_Node != NULL)
+      {
+         c_Return = pc_Node->c_Properties.c_Name.c_str();
+      }
+   }
+
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get index of first node in squad
+
+   For node squads, this returns the index of the first node in the corresponding node squad.
+   For normal nodes this just returns the given node index.
+   This is useful because the index of the first node in a squad corresponds to the index on topology.
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   index of first node in squad
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_PuiSdUtil::h_GetIndexOfFirstNodeInGroup(const uint32 ou32_NodeIndex)
+{
+   uint32 u32_FirstNodeIndex = ou32_NodeIndex;
+
+   uint32 u32_NodeSquadIndex;
+
+   if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(ou32_NodeIndex,
+                                                                       u32_NodeSquadIndex) == C_NO_ERR)
+   {
+      const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
+         C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_NodeSquadIndex);
+      if ((pc_NodeSquad != NULL) && (pc_NodeSquad->c_SubNodeIndexes.size() > 0))
+      {
+         u32_FirstNodeIndex = pc_NodeSquad->c_SubNodeIndexes[0];
+      }
+   }
+
+   return u32_FirstNodeIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check is first in any group or not in any
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  orc_AvailableGroups  Available groups
+
+   \return
+   Is first in any group or not in any
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSdUtil::h_CheckIsFirstInAnyGroupOrNotInAny(const uint32 ou32_NodeIndex,
+                                                     const std::vector<C_OSCNodeSquad> & orc_AvailableGroups)
+{
+   bool q_IsFirst = true;
+
+   for (uint32 u32_ItGroup = 0; u32_ItGroup < orc_AvailableGroups.size(); ++u32_ItGroup)
+   {
+      const C_OSCNodeSquad & rc_Group = orc_AvailableGroups[u32_ItGroup];
+
+      for (uint32 u32_ItSubDevice = 0UL; u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size(); ++u32_ItSubDevice)
+      {
+         if (ou32_NodeIndex == rc_Group.c_SubNodeIndexes[u32_ItSubDevice])
+         {
+            if (u32_ItSubDevice != 0UL)
+            {
+               q_IsFirst = false;
+            }
+            break;
+         }
+      }
+   }
+   return q_IsFirst;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

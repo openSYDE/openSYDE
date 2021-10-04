@@ -58,13 +58,13 @@ using namespace stw_tgl;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent           Optional pointer to parent
-   \param[in,out] opc_ListWidgetItem   According list widget item
-   \param[in,out] opc_UndoManager      Undo manager
-   \param[in,out] opc_ModelViewManager Model view manager
-   \param[in]     ou32_NodeIndex       Node index
-   \param[in]     ou32_DataPoolIndex   Data pool index
-   \param[in]     ou32_ListIndex       List index
+   \param[in,out]  opc_Parent             Optional pointer to parent
+   \param[in,out]  opc_ListWidget         According list widget item
+   \param[in,out]  opc_UndoManager        Undo manager
+   \param[in,out]  opc_ModelViewManager   Model view manager
+   \param[in]      ou32_NodeIndex         Node index
+   \param[in]      ou32_DataPoolIndex     Data pool index
+   \param[in]      ou32_ListIndex         List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent, QTreeWidget * const opc_ListWidget,
@@ -190,12 +190,12 @@ C_SdNdeDpListHeaderWidget::~C_SdNdeDpListHeaderWidget(void)
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_TreeWidget       Tree widget to inform
-   \param[in,out] opc_UndoManager      Undo manager
-   \param[in,out] opc_ModelViewManager Model view manager
-   \param[in]     ou32_NodeIndex       Node index
-   \param[in]     ou32_DataPoolIndex   Data pool index
-   \param[in]     ou32_ListIndex       List index
+   \param[in,out]  opc_TreeWidget         Tree widget to inform
+   \param[in,out]  opc_UndoManager        Undo manager
+   \param[in,out]  opc_ModelViewManager   Model view manager
+   \param[in]      ou32_NodeIndex         Node index
+   \param[in]      ou32_DataPoolIndex     Data pool index
+   \param[in]      ou32_ListIndex         List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::SetInitParameters(QTreeWidget * const opc_TreeWidget,
@@ -215,7 +215,7 @@ void C_SdNdeDpListHeaderWidget::SetInitParameters(QTreeWidget * const opc_TreeWi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new index
 
-   \param[in] oru32_Value New index
+   \param[in]  oru32_Value    New index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::SetIndex(const uint32 & oru32_Value)
@@ -254,8 +254,8 @@ void C_SdNdeDpListHeaderWidget::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register expand or collapse
 
-   \param[in]     orq_Expanded true:  expanded
-                               false: collapsed
+   \param[in]  orq_Expanded   true:  expanded
+                              false: collapsed
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::RegisterExpandOrCollapse(const bool & orq_Expanded) const
@@ -382,7 +382,7 @@ void C_SdNdeDpListHeaderWidget::UpdateDataSetCount(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Notify widget if it is currently selected
 
-   \param[in] orq_Selected Flag if selected
+   \param[in]  orq_Selected   Flag if selected
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::NotifySelection(const bool & orq_Selected)
@@ -478,6 +478,8 @@ void C_SdNdeDpListHeaderWidget::PopUp(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle event push button expand clicked
+
+   \param[in]  oq_Checked  Checked
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::m_OnPushButtonExpandClicked(const bool oq_Checked)
@@ -547,7 +549,8 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
       this->mpc_Ui->pc_LineEditName->SetName(pc_List->c_Name.c_str());
       this->mpc_Ui->pc_LineEditName->SetCounter(pc_List->c_Elements.size());
       this->mpc_Ui->pc_LabelComment->SetCompleteText(c_SimplifiedComment);
-      this->mpc_Ui->pc_LabelComment->SetToolTipInformation("", pc_List->c_Comment.c_str());
+      this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
+                                                           pc_List->c_Comment.c_str());
 
       if (pc_List->c_Comment.IsEmpty() == true)
       {
@@ -565,6 +568,7 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
           (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eHALC_NVM))
       {
          const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
+         const uint32 u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
          const uint32 u32_Usage = this->mpc_Ui->pc_UsageWidget->SetUsage(pc_List->u32_NvMSize,
                                                                          pc_List->GetNumBytesUsed());
          this->mpc_Ui->pc_UsageWidget->update();
@@ -576,8 +580,12 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
          tgl_assert(pc_Device != NULL);
          if (pc_Device != NULL)
          {
-            const uint32 u32_Maximum = pc_Device->u32_UserEepromSizeBytes;
-            this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(static_cast<sintn>(u32_Maximum));
+            tgl_assert(u32_SubDeviceIndex < pc_Device->c_SubDevices.size());
+            if (u32_SubDeviceIndex < pc_Device->c_SubDevices.size())
+            {
+               const uint32 u32_Maximum = pc_Device->c_SubDevices[u32_SubDeviceIndex].u32_UserEepromSizeBytes;
+               this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(static_cast<sintn>(u32_Maximum));
+            }
          }
 
          //Size value
@@ -759,7 +767,9 @@ void C_SdNdeDpListHeaderWidget::m_CheckName(void) const
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditName, "Valid", q_NameIsValid);
    if (q_NameIsValid == true)
    {
-      this->mpc_Ui->pc_LineEditName->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+      this->mpc_Ui->pc_LineEditName->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                           C_GtGetText::h_GetText(""),
+                                                           C_NagToolTip::eDEFAULT);
    }
    else
    {

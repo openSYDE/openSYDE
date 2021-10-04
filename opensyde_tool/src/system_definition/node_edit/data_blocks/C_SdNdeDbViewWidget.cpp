@@ -46,7 +46,7 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbViewWidget::C_SdNdeDbViewWidget(QWidget * const opc_Parent) :
@@ -117,7 +117,7 @@ void C_SdNdeDbViewWidget::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node index
 
-   \param[in] ou32_NodeIndex Node index
+   \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::SetNodeIndex(const stw_types::uint32 ou32_NodeIndex)
@@ -146,7 +146,7 @@ void C_SdNdeDbViewWidget::SetNodeIndex(const stw_types::uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Scrolls to the application with the index ou32_ApplicationIndex
 
-   \param[in]     ou32_ApplicationIndex     Index of application
+   \param[in]  ou32_ApplicationIndex   Index of application
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::ShowApplication(const uint32 ou32_ApplicationIndex) const
@@ -299,11 +299,12 @@ void C_SdNdeDbViewWidget::AddFromTSP(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  imports HALC definition from TSP
+
  *          Loads syde_halc_def from TSP, loads it, clears HALC config, if there is any and then
  *          sets the new config. Emits a signal to C_SdNdeNodeEditWidget to run the magician and update datapool
  *          and HALC tab.
 
-   \param[in]       opc_Dialog     TSP Import dialog widget
+   \param[in]  opc_Dialog  TSP Import dialog widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::AddHalcDefFromTSP(C_SdNdeDbAddNewProject * const opc_Dialog)
@@ -432,7 +433,7 @@ void C_SdNdeDbViewWidget::m_HandleAddButtonAvailability(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new application
 
-   \param[in] oe_Type Application type
+   \param[in]  oe_Type  Application type
 
    \return
    Application position (in node)
@@ -456,7 +457,7 @@ uint32 C_SdNdeDbViewWidget::m_AddApplication(const C_OSCNodeApplication::E_Type 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new application
 
-   \param[in,out] orc_Application Application content
+   \param[in,out]  orc_Application  Application content
 
    \return
    Application position (in node)
@@ -484,9 +485,6 @@ uint32 C_SdNdeDbViewWidget::m_AddApplication(C_OSCNodeApplication & orc_Applicat
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   On App Display
-
-   \param[in] ou32_NodeIndex        Node index
-   \param[in] ou32_ApplicationIndex Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_OnAppDisplay() const
@@ -500,8 +498,8 @@ void C_SdNdeDbViewWidget::m_OnAppDisplay() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle delete
 
-   \param[in] ou32_NodeIndex        Node index
-   \param[in] ou32_ApplicationIndex Application index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_OnDelete(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
@@ -516,8 +514,8 @@ void C_SdNdeDbViewWidget::m_OnDelete(const uint32 ou32_NodeIndex, const uint32 o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Deletes all the node's applications
 
-   \param[in]       ou32_NodeIndex     Index of selected node
-   \param[in]      orc_Applications   Array of the node's applications
+   \param[in]  ou32_NodeIndex    Index of selected node
+   \param[in]  orc_Applications  Array of the node's applications
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_DeleteAllDatablocks(const uint32 ou32_NodeIndex,
@@ -597,8 +595,6 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new manual application
-
-   \param[in] oe_Type Application type to create
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_AddManualApplication(void)
@@ -641,14 +637,19 @@ void C_SdNdeDbViewWidget::m_HandleCodeGenerationSettingsButtonAvailability(void)
       tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
       if (pc_Node->pc_DeviceDefinition != NULL)
       {
-         if ((pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == true) &&
-             (C_PuiSdHandler::h_GetInstance()->GetProgrammableApplications(this->mu32_NodeIndex).size() > 0UL))
+         tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
+         if (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size())
          {
-            this->mpc_Ui->pc_PushButtonCodeGenerationOptions->setVisible(true);
-         }
-         else
-         {
-            this->mpc_Ui->pc_PushButtonCodeGenerationOptions->setVisible(false);
+            if ((pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_ProgrammingSupport ==
+                 true) &&
+                (C_PuiSdHandler::h_GetInstance()->GetProgrammableApplications(this->mu32_NodeIndex).size() > 0UL))
+            {
+               this->mpc_Ui->pc_PushButtonCodeGenerationOptions->setVisible(true);
+            }
+            else
+            {
+               this->mpc_Ui->pc_PushButtonCodeGenerationOptions->setVisible(false);
+            }
          }
       }
    }

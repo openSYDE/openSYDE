@@ -509,40 +509,49 @@ stw_types::uint32 C_PuiSdHandlerBusLogic::GetOSCBusesSize(void) const
 
    \param[in]  ou32_NodeIndex       Connected node index
    \param[in]  ou8_InterfaceNumber  Interface number of node
-   \param[in]  oru8_NodeId          New node id
+   \param[in]  orc_NodeIds          Node ids
    \param[in]  ou32_BusIndex        Connected bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::AddConnection(const uint32 ou32_NodeIndex, const uint8 ou8_InterfaceNumber,
-                                           const stw_types::uint8 & oru8_NodeId, const uint32 ou32_BusIndex)
+                                           const std::vector<uint8> & orc_NodeIds, const uint32 ou32_BusIndex)
 {
    const C_OSCSystemBus * const pc_Bus = this->GetOSCBus(ou32_BusIndex);
+   const std::vector<uint32> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
 
-   if ((ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size()) && (pc_Bus != NULL))
+   tgl_assert(c_Indices.size() == orc_NodeIds.size());
+   if (c_Indices.size() == orc_NodeIds.size())
    {
-      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      const C_OSCNodeComInterfaceSettings * const pc_CurComInterface = rc_Node.c_Properties.GetComInterface(
-         pc_Bus->e_Type, ou8_InterfaceNumber);
-      if (pc_CurComInterface != NULL)
+      for (uint32 u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
       {
-         if (this->mc_CoreDefinition.AddConnection(ou32_NodeIndex, ou32_BusIndex,
-                                                   pc_CurComInterface->u8_InterfaceNumber) == C_NO_ERR)
+         const uint32 u32_CurIndex = c_Indices[u32_ItIndex];
+         if ((u32_CurIndex < this->mc_CoreDefinition.c_Nodes.size()) && (pc_Bus != NULL))
          {
-            //Adapt node ID
-            C_OSCNodeComInterfaceSettings c_CurComInterface = *pc_CurComInterface;
-            c_CurComInterface.u8_NodeID = oru8_NodeId;
-            rc_Node.c_Properties.SetComInterface(c_CurComInterface);
-
-            C_PuiSdNodeConnection c_NewConnection;
-
-            //Add connection ID
-            c_NewConnection.c_ConnectionID.u8_InterfaceNumber = ou8_InterfaceNumber;
-            c_NewConnection.c_ConnectionID.e_InterfaceType = pc_Bus->e_Type;
-
-            if (ou32_NodeIndex < this->mc_UINodes.size())
+            C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_CurIndex];
+            const C_OSCNodeComInterfaceSettings * const pc_CurComInterface = rc_Node.c_Properties.GetComInterface(
+               pc_Bus->e_Type, ou8_InterfaceNumber);
+            if (pc_CurComInterface != NULL)
             {
-               //Also add corresponding UI element:
-               this->mc_UINodes[ou32_NodeIndex].c_UIBusConnections.push_back(c_NewConnection);
+               if (this->mc_CoreDefinition.AddConnection(u32_CurIndex, ou32_BusIndex,
+                                                         pc_CurComInterface->u8_InterfaceNumber) == C_NO_ERR)
+               {
+                  //Adapt node ID
+                  C_OSCNodeComInterfaceSettings c_CurComInterface = *pc_CurComInterface;
+                  c_CurComInterface.u8_NodeID = orc_NodeIds[u32_ItIndex];
+                  rc_Node.c_Properties.SetComInterface(c_CurComInterface);
+
+                  C_PuiSdNodeConnection c_NewConnection;
+
+                  //Add connection ID
+                  c_NewConnection.c_ConnectionID.u8_InterfaceNumber = ou8_InterfaceNumber;
+                  c_NewConnection.c_ConnectionID.e_InterfaceType = pc_Bus->e_Type;
+
+                  if (u32_CurIndex < this->mc_UINodes.size())
+                  {
+                     //Also add corresponding UI element:
+                     this->mc_UINodes[u32_CurIndex].c_UIBusConnections.push_back(c_NewConnection);
+                  }
+               }
             }
          }
       }
@@ -558,15 +567,22 @@ void C_PuiSdHandlerBusLogic::AddConnection(const uint32 ou32_NodeIndex, const ui
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::RemoveConnection(const uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ID)
 {
+   const std::vector<uint32> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
+
    //Check size & consistency
    tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
-   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
-   {
-      C_PuiSdNode & rc_UINode = this->mc_UINodes[ou32_NodeIndex];
-      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
 
-      rc_OSCNode.c_Properties.DisconnectComInterface(orc_ID.e_InterfaceType, orc_ID.u8_InterfaceNumber);
-      rc_UINode.DeleteConnection(orc_ID);
+   for (uint32 u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
+   {
+      const uint32 u32_CurIndex = c_Indices[u32_ItIndex];
+      if (u32_CurIndex < this->mc_CoreDefinition.c_Nodes.size())
+      {
+         C_PuiSdNode & rc_UINode = this->mc_UINodes[u32_CurIndex];
+         C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[u32_CurIndex];
+
+         rc_OSCNode.c_Properties.DisconnectComInterface(orc_ID.e_InterfaceType, orc_ID.u8_InterfaceNumber);
+         rc_UINode.DeleteConnection(orc_ID);
+      }
    }
 }
 
@@ -576,17 +592,18 @@ void C_PuiSdHandlerBusLogic::RemoveConnection(const uint32 ou32_NodeIndex, const
    \param[in]  ou32_NodeIndex    Index of node this interface is part of
    \param[in]  orc_ID            Previous interface ID
    \param[in]  ou8_NewInterface  New interface number
-   \param[in]  oru8_NodeId       New node id
+   \param[in]  orc_NodeIds       Node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::ChangeConnection(const uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ID,
-                                              const uint8 ou8_NewInterface, const uint8 & oru8_NodeId)
+                                              const uint8 ou8_NewInterface, const std::vector<uint8> & orc_NodeIds)
 {
    C_PuiSdNodeConnectionId c_Tmp;
 
    c_Tmp.e_InterfaceType = orc_ID.e_InterfaceType;
    c_Tmp.u8_InterfaceNumber = ou8_NewInterface;
-   ChangeCompleteConnection(ou32_NodeIndex, orc_ID, c_Tmp, oru8_NodeId);
+
+   ChangeCompleteConnection(ou32_NodeIndex, orc_ID, c_Tmp, orc_NodeIds);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -595,63 +612,76 @@ void C_PuiSdHandlerBusLogic::ChangeConnection(const uint32 ou32_NodeIndex, const
    \param[in]  ou32_NodeIndex    Index of node this interface is part of
    \param[in]  orc_PrevID        Previous interface ID
    \param[in]  orc_NewID         New interface ID
-   \param[in]  oru8_NodeId       Node id
+   \param[in]  orc_NodeIds       Node ids
    \param[in]  oru32_BusIndex    Bus index to use instead of last used one
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32 ou32_NodeIndex,
                                                       const C_PuiSdNodeConnectionId & orc_PrevID,
                                                       const C_PuiSdNodeConnectionId & orc_NewID,
-                                                      const uint8 & oru8_NodeId, const uint32 & oru32_BusIndex)
+                                                      const std::vector<uint8> & orc_NodeIds,
+                                                      const uint32 & oru32_BusIndex)
 {
-   //Check size & consistency
-   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
-   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
-   {
-      C_PuiSdNode & rc_UINode = this->mc_UINodes[ou32_NodeIndex];
-      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      uint32 u32_LastBus = 0;
-      //Unregister
-      for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_OSCNode.c_Properties.c_ComInterfaces.size();
-           ++u32_ItComInterface)
-      {
-         C_OSCNodeComInterfaceSettings & rc_ComInterface = rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
-         if ((rc_ComInterface.e_InterfaceType == orc_PrevID.e_InterfaceType) &&
-             (rc_ComInterface.u8_InterfaceNumber == orc_PrevID.u8_InterfaceNumber))
-         {
-            rc_ComInterface.q_IsBusConnected = false;
-            u32_LastBus = rc_ComInterface.u32_BusIndex;
-            rc_ComInterface.u32_BusIndex = 0;
-         }
-      }
-      //Register
-      for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_OSCNode.c_Properties.c_ComInterfaces.size();
-           ++u32_ItComInterface)
-      {
-         C_OSCNodeComInterfaceSettings & rc_ComInterface = rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
-         if ((rc_ComInterface.e_InterfaceType == orc_NewID.e_InterfaceType) &&
-             (rc_ComInterface.u8_InterfaceNumber == orc_NewID.u8_InterfaceNumber))
-         {
-            rc_ComInterface.q_IsBusConnected = true;
-            if (oru32_BusIndex >= this->mc_CoreDefinition.c_Buses.size())
-            {
-               rc_ComInterface.u32_BusIndex = u32_LastBus;
-            }
-            else
-            {
-               rc_ComInterface.u32_BusIndex = oru32_BusIndex;
-            }
-            rc_ComInterface.u8_NodeID = oru8_NodeId;
-         }
-      }
+   //Copy is necessary as the value changes during function call
+   const C_PuiSdNodeConnectionId c_PrevIDCopy = orc_PrevID;
+   const std::vector<uint32> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
 
-      //UI
-      for (uint32 u32_ItBusConn = 0; u32_ItBusConn < rc_UINode.c_UIBusConnections.size(); ++u32_ItBusConn)
+   //Check size & consistency
+   tgl_assert(c_Indices.size() == orc_NodeIds.size());
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+
+   for (uint32 u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
+   {
+      const uint32 u32_CurIndex = c_Indices[u32_ItIndex];
+      if (u32_CurIndex < this->mc_CoreDefinition.c_Nodes.size())
       {
-         C_PuiSdNodeConnection & rc_BusConn = rc_UINode.c_UIBusConnections[u32_ItBusConn];
-         if (rc_BusConn.c_ConnectionID == orc_PrevID)
+         C_PuiSdNode & rc_UINode = this->mc_UINodes[u32_CurIndex];
+         C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[u32_CurIndex];
+         uint32 u32_LastBus = 0;
+         //Unregister
+         for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_OSCNode.c_Properties.c_ComInterfaces.size();
+              ++u32_ItComInterface)
          {
-            rc_BusConn.c_ConnectionID = orc_NewID;
+            C_OSCNodeComInterfaceSettings & rc_ComInterface =
+               rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
+            if ((rc_ComInterface.e_InterfaceType == c_PrevIDCopy.e_InterfaceType) &&
+                (rc_ComInterface.u8_InterfaceNumber == c_PrevIDCopy.u8_InterfaceNumber))
+            {
+               u32_LastBus = rc_ComInterface.u32_BusIndex;
+               rc_ComInterface.RemoveConnection();
+            }
+         }
+         //Register
+         for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_OSCNode.c_Properties.c_ComInterfaces.size();
+              ++u32_ItComInterface)
+         {
+            C_OSCNodeComInterfaceSettings & rc_ComInterface =
+               rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
+            if ((rc_ComInterface.e_InterfaceType == orc_NewID.e_InterfaceType) &&
+                (rc_ComInterface.u8_InterfaceNumber == orc_NewID.u8_InterfaceNumber))
+            {
+               uint32 u32_BusIndex;
+               if (oru32_BusIndex >= this->mc_CoreDefinition.c_Buses.size())
+               {
+                  u32_BusIndex = u32_LastBus;
+               }
+               else
+               {
+                  u32_BusIndex = oru32_BusIndex;
+               }
+               rc_ComInterface.AddConnection(u32_BusIndex);
+               rc_ComInterface.u8_NodeID = orc_NodeIds[u32_ItIndex];
+            }
+         }
+
+         //UI
+         for (uint32 u32_ItBusConn = 0; u32_ItBusConn < rc_UINode.c_UIBusConnections.size(); ++u32_ItBusConn)
+         {
+            C_PuiSdNodeConnection & rc_BusConn = rc_UINode.c_UIBusConnections[u32_ItBusConn];
+            if (rc_BusConn.c_ConnectionID == c_PrevIDCopy)
+            {
+               rc_BusConn.c_ConnectionID = orc_NewID;
+            }
          }
       }
    }
@@ -667,10 +697,16 @@ void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32 ou32_NodeInde
 void C_PuiSdHandlerBusLogic::SetUINodeConnections(const uint32 ou32_NodeIndex,
                                                   const std::vector<C_PuiSdNodeConnection> & orc_Connections)
 {
-   if (ou32_NodeIndex < this->mc_UINodes.size())
+   const std::vector<uint32> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
+
+   for (uint32 u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
    {
-      C_PuiSdNode & rc_UINode = this->mc_UINodes[ou32_NodeIndex];
-      rc_UINode.c_UIBusConnections = orc_Connections;
+      const uint32 u32_CurIndex = c_Indices[u32_ItIndex];
+      if (u32_CurIndex < this->mc_UINodes.size())
+      {
+         C_PuiSdNode & rc_UINode = this->mc_UINodes[u32_CurIndex];
+         rc_UINode.c_UIBusConnections = orc_Connections;
+      }
    }
 }
 
@@ -685,12 +721,18 @@ void C_PuiSdHandlerBusLogic::SetUINodeConnections(const uint32 ou32_NodeIndex,
 void C_PuiSdHandlerBusLogic::SetUINodeConnectionId(const uint32 ou32_NodeIndex, const uint32 ou32_ConnectionIndex,
                                                    const C_PuiSdNodeConnectionId & orc_Id)
 {
-   if (ou32_NodeIndex < this->mc_UINodes.size())
+   const std::vector<uint32> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
+
+   for (uint32 u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
    {
-      C_PuiSdNode & rc_UINode = this->mc_UINodes[ou32_NodeIndex];
-      if (ou32_ConnectionIndex < rc_UINode.c_UIBusConnections.size())
+      const uint32 u32_CurIndex = c_Indices[u32_ItIndex];
+      if (u32_CurIndex < this->mc_UINodes.size())
       {
-         rc_UINode.c_UIBusConnections[ou32_ConnectionIndex].c_ConnectionID = orc_Id;
+         C_PuiSdNode & rc_UINode = this->mc_UINodes[u32_CurIndex];
+         if (ou32_ConnectionIndex < rc_UINode.c_UIBusConnections.size())
+         {
+            rc_UINode.c_UIBusConnections[ou32_ConnectionIndex].c_ConnectionID = orc_Id;
+         }
       }
    }
 }

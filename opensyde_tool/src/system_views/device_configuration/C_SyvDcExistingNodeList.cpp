@@ -48,14 +48,15 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcExistingNodeList::C_SyvDcExistingNodeList(QWidget * const opc_Parent) :
    QListWidget(opc_Parent),
    mu32_ViewIndex(0),
    mq_ShowAssignment(false),
-   mq_GridSizeSet(false)
+   mq_GridSizeSet(false),
+   mu32_CommunicatingNodeCount(0U)
 {
    //UI Settings
    this->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -84,8 +85,8 @@ C_SyvDcExistingNodeList::C_SyvDcExistingNodeList(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set view index
 
-   \param[in] ou32_Index         New view index
-   \param[in] oq_ShowAssignment  Show assignment flag
+   \param[in]  ou32_Index           New view index
+   \param[in]  oq_ShowAssignment    Show assignment flag
 
    \return
    C_NO_ERR    Initialization successful
@@ -103,11 +104,12 @@ sint32 C_SyvDcExistingNodeList::SetView(const uint32 ou32_Index, const bool oq_S
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do assignment for specified node and serial number
 
-   \param[in] ou32_NodeIndex   Node index
-   \param[in] orc_SerialNumber Serial number
+   \param[in] ou32_NodeIndex         Node index
+   \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcExistingNodeList::ConnectSerialNumber(const uint32 ou32_NodeIndex, const QString & orc_SerialNumber) const
+void C_SyvDcExistingNodeList::ConnectSerialNumber(const uint32 ou32_NodeIndex,
+                                                  const C_OSCProtocolSerialNumber & orc_SerialNumber) const
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
@@ -123,12 +125,13 @@ void C_SyvDcExistingNodeList::ConnectSerialNumber(const uint32 ou32_NodeIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Disconnect assignment for specified node and serial number
 
-   \param[in] ou32_NodeIndex   Node index
-   \param[in] orc_SerialNumber Serial number
+   \param[in] ou32_NodeIndex         Node index
+   \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeList::DisconnectSerialNumber(const uint32 ou32_NodeIndex,
-                                                     const QString & orc_SerialNumber) const
+                                                     const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber)
+const
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
@@ -139,6 +142,19 @@ void C_SyvDcExistingNodeList::DisconnectSerialNumber(const uint32 ou32_NodeIndex
          pc_Widget->DisconnectSerialNumber(orc_SerialNumber);
       }
    }
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of communicating nodes
+
+   Relevant nodes for communication (normal nodes and sub nodes of multi CPU nodes)
+
+   \return
+   Number of communicating nodes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SyvDcExistingNodeList::GetCommunicatingNodeCount(void) const
+{
+   return this->mu32_CommunicatingNodeCount;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -190,8 +206,8 @@ std::vector<C_SyvDcDeviceConfiguation> C_SyvDcExistingNodeList::GetConfigs(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepares the widget for starting drag and drop of connected nodes
 
-   \param[in]     orc_DeviceName         Device name (device type)
-   \param[in]     oq_DeviceNameValid     Flag if device name is valid
+   \param[in]  orc_DeviceName       Device name (device type)
+   \param[in]  oq_DeviceNameValid   Flag if device name is valid
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeList::StartDrag(const QString & orc_DeviceName, const bool oq_DeviceNameValid) const
@@ -239,49 +255,114 @@ sint32 C_SyvDcExistingNodeList::m_Init(void)
 
    //Init/Reinit UI
    this->clear();
+   this->mu32_CommunicatingNodeCount = 0U;
+
    //No point if PC not connected
    if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
    {
-      sint32 s32_VisibleNodeIndex = 1;
       const std::vector<uint8> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
       for (uint32 u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
       {
          //Active
          if (rc_NodeActiveFlags[u32_ItNode] == true)
          {
-            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
-            if (pc_Node != NULL)
-            {
-               bool q_Connected = false;
-               tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
-               for (uint32 u32_ItInterface = 0; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
-                    ++u32_ItInterface)
-               {
-                  const C_OSCNodeComInterfaceSettings & rc_Interface =
-                     pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
-                  //Connected to current bus
-                  if (((rc_Interface.q_IsBusConnected == true) &&
-                       (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())) &&
-                      (pc_Node->pc_DeviceDefinition->IsUpdateAvailable(rc_Interface.e_InterfaceType) == true))
-                  {
-                     q_Connected = true;
-                  }
-               }
-               //Check flashloader available
-               if (q_Connected == true)
-               {
-                  //All checks passed at node
-                  const sint32 s32_NodeReturn = m_AppendNode(u32_ItNode, s32_VisibleNodeIndex);
+            uint32 u32_SquadIndex;
+            const C_OSCNodeSquad * pc_Squad = NULL;
+            std::vector<uint32> c_RelevantNodeIndexes;
+            std::set<uint32> c_FirstSubNodeConnectedInterfaces;
+            uint32 u32_SubNodeCounter;
+            bool q_AllSubNodesAvailable = true;
 
-                  // Save the error case
-                  if (s32_Return == C_NO_ERR)
-                  {
-                     s32_Return = s32_NodeReturn;
-                  }
+            // Check for squad and get all node indexes which are part of the squad
+            // The indexes of the squad must be in order, so skip all the nodes after the first one in the first loop
+            if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(u32_ItNode, u32_SquadIndex) == C_NO_ERR)
+            {
+               pc_Squad = C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_SquadIndex);
+               tgl_assert(pc_Squad != NULL);
+               if (pc_Squad != NULL)
+               {
+                  c_RelevantNodeIndexes = pc_Squad->c_SubNodeIndexes;
                }
             }
-            //Increment visible node index
-            ++s32_VisibleNodeIndex;
+            else
+            {
+               // No squad, a normal node
+               c_RelevantNodeIndexes.push_back(u32_ItNode);
+            }
+
+            tgl_assert(c_RelevantNodeIndexes.size() > 0);
+
+            for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < c_RelevantNodeIndexes.size(); ++u32_SubNodeCounter)
+            {
+               const uint32 u32_CurNodeIndex = c_RelevantNodeIndexes[u32_SubNodeCounter];
+               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_CurNodeIndex);
+               bool q_Connected = false;
+
+               if (pc_Node != NULL)
+               {
+                  tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
+                  tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
+                  for (uint32 u32_ItInterface = 0; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
+                       ++u32_ItInterface)
+                  {
+                     const C_OSCNodeComInterfaceSettings & rc_Interface =
+                        pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
+                     //Connected to current bus
+                     if (((rc_Interface.GetBusConnected() == true) &&
+                          (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())) &&
+                         (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].IsUpdateAvailable(
+                             rc_Interface.e_InterfaceType) == true))
+                     {
+                        if (u32_SubNodeCounter == 0U)
+                        {
+                           // First sub node: Save all its connected interfaces. Only interfaces with all connected
+                           // sub nodes are supported
+                           c_FirstSubNodeConnectedInterfaces.insert(u32_ItInterface);
+                           q_Connected = true;
+                        }
+                        else
+                        {
+                           if (c_FirstSubNodeConnectedInterfaces.find(u32_ItInterface) !=
+                               c_FirstSubNodeConnectedInterfaces.end())
+                           {
+                              // Interface is used by previous sub node(s) too
+                              q_Connected = true;
+                           }
+                        }
+                     }
+                  }
+               }
+
+               if (q_Connected == false)
+               {
+                  // At least one sub node is not available, so it will be filtered out
+                  q_AllSubNodesAvailable = false;
+                  break;
+               }
+            }
+
+            //Check flashloader of all sub nodes or the normal node available
+            if (q_AllSubNodesAvailable == true)
+            {
+               //All checks passed at node
+               const sint32 s32_NodeReturn = m_AppendNode(u32_ItNode, (pc_Squad != NULL));
+
+               // Save the error case
+               if (s32_Return == C_NO_ERR)
+               {
+                  s32_Return = s32_NodeReturn;
+               }
+
+               // Count all communicating sub nodes and normal nodes
+               this->mu32_CommunicatingNodeCount += c_RelevantNodeIndexes.size();
+            }
+
+            // Skip the other sub nodes in case of a squad. Only the first node index of a squad will be used
+            if (pc_Squad != NULL)
+            {
+               //lint -e{850} Index modified for skipping index step
+               u32_ItNode += (static_cast<uint32>(c_RelevantNodeIndexes.size()) - 1U);
+            }
          }
       }
    }
@@ -292,14 +373,15 @@ sint32 C_SyvDcExistingNodeList::m_Init(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append node to list
 
-   \param[in] ou32_NodeIndex Node index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  oq_PartOfSquad          Flag if node is part of a squad
 
    \return
    C_NO_ERR    Initialization successful
    C_CONFIG    Node configuration invalid (too many connections to a bus)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcExistingNodeList::m_AppendNode(const uint32 ou32_NodeIndex, const sint32 os32_VisibleNodeIndex)
+sint32 C_SyvDcExistingNodeList::m_AppendNode(const uint32 ou32_NodeIndex, const bool oq_PartOfSquad)
 {
    C_SyvDcExistingNodeWidget * const pc_Widget = new C_SyvDcExistingNodeWidget(this);
    sint32 s32_Return;
@@ -310,8 +392,8 @@ sint32 C_SyvDcExistingNodeList::m_AppendNode(const uint32 ou32_NodeIndex, const 
    this->setItemWidget(this->item(this->count() - 1), pc_Widget);
 
    //Second step: configure widget
-   s32_Return = pc_Widget->SetIndex(this->mu32_ViewIndex, ou32_NodeIndex, os32_VisibleNodeIndex, this->item(
-                                       this->count() - 1), this->mq_ShowAssignment);
+   s32_Return = pc_Widget->SetIndex(this->mu32_ViewIndex, ou32_NodeIndex, oq_PartOfSquad,
+                                    this->item(this->count() - 1), this->mq_ShowAssignment);
 
    //Style first
    C_OgeWiUtil::h_ApplyStylesheetProperty(pc_Widget, "First", this->count() == 1);

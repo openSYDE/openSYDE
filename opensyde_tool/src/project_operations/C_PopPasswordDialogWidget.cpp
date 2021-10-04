@@ -20,6 +20,7 @@
 #include "C_PopPasswordDialogWidget.h"
 #include "C_OgeWiCustomMessage.h"
 #include "ui_C_PopPasswordDialogWidget.h"
+#include "C_PuiProject.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -174,6 +175,9 @@ void C_PopPasswordDialogWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
    this->mpc_Ui->pc_PubTogglePwd->setText("");
    this->mpc_Ui->pc_LabPassword->setText(C_GtGetText::h_GetText("Password"));
+   this->mpc_Ui->pc_LabProject->setText(C_GtGetText::h_GetText("Project"));
+   this->mpc_Ui->pc_LabProjectName->setText(C_GtGetText::h_GetText(
+                                               C_PuiProject::h_GetInstance()->GetName().toStdString().c_str()));
 
    // tooltip
    this->mpc_Ui->pc_LabPassword->SetToolTipInformation(C_GtGetText::h_GetText("Password"),

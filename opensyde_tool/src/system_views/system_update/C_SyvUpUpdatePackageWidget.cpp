@@ -519,8 +519,8 @@ void C_SyvUpUpdatePackageWidget::m_SetUpdatePackageStatusNotLocked(const QString
           (orc_MissingFiles.length() > 0))
       {
          const sint32 s32_TotalMissingFiles =
-            static_cast<sint32>(orc_MissingDataBlocks.length() + orc_MissingParamFiles.length() +
-                                orc_MissingFiles.length());
+            static_cast<sint32>(orc_MissingDataBlocks.length()) + orc_MissingParamFiles.length() +
+            orc_MissingFiles.length();
          c_TooltipHeading = C_GtGetText::h_GetText("Update Package Invalid");
          if (orc_MissingDataBlocks.length() > 0)
          {

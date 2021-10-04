@@ -182,24 +182,19 @@ void C_SdManUnoTopologyManager::DoAddBus(const C_SdManUnoTopologyAddCommand::E_E
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add one bus connector element
 
-   \param[in]  oru64_UniqueID             Unique ID
-   \param[in]  orc_NewPos                 Position
-   \param[in]  opc_Node                   Node for bus connector creation
-   \param[in]  opc_Bus                    Bus for bus connector creation
-   \param[in]  oru8_InterfaceNumber       Interface number for bus connector creation
-   \param[in]  oru8_NodeId                New node id
-   \param[in]  oq_ActivateDatapoolL2      Activate datapool L2
-   \param[in]  oq_ActivateDatapoolECeS    Activate datapool ECeS
-   \param[in]  oq_ActivateDatapoolECoS    Activate datapool ECoS
+   \param[in]  oru64_UniqueID          Unique ID
+   \param[in]  orc_NewPos              Position
+   \param[in]  opc_Node                Node for bus connector creation
+   \param[in]  opc_Bus                 Bus for bus connector creation
+   \param[in]  oru8_InterfaceNumber    Interface number for bus connector creation
+   \param[in]  orc_NodeIds             Node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID, const QPointF & orc_NewPos,
                                                   const QGraphicsItem * const opc_Node,
                                                   const QGraphicsItem * const opc_Bus,
                                                   const stw_types::uint8 & oru8_InterfaceNumber,
-                                                  const stw_types::uint8 & oru8_NodeId,
-                                                  const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
-                                                  const bool oq_ActivateDatapoolECoS)
+                                                  const std::vector<uint8> & orc_NodeIds)
 {
    vector<uint64> c_IDs;
    uint64 u64_NodeID;
@@ -212,9 +207,7 @@ void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID,
    pc_AddCommand = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
                                                     C_SdManUnoTopologyAddCommand::E_ElementType::eBUS_CONNECTOR,
                                                     orc_NewPos,
-                                                    u64_NodeID, u64_BusID, oru8_InterfaceNumber, oru8_NodeId,
-                                                    oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
-                                                    oq_ActivateDatapoolECoS);
+                                                    u64_NodeID, u64_BusID, oru8_InterfaceNumber, orc_NodeIds);
    connect(pc_AddCommand,
            &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this, &C_SdManUnoTopologyManager::m_OnErrorChange);
    this->m_DoPushAndSignalError(pc_AddCommand);
@@ -223,22 +216,16 @@ void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do add one node to node connection and create a new bus
 
-   \param[in]  orc_FourUniqueIds             Four unique IDs for the four new items created by this action
-   \param[in]  ore_BusType                   Bus type to create
-   \param[in]  orc_BusName                   Bus name to use initially
-   \param[in]  orc_BusPosition               Target bus position
-   \param[in]  oru64_Node1UniqueID           Node 1 unique ID
-   \param[in]  oru64_Node2UniqueID           Node 2 unique ID
-   \param[in]  oru8_Node1InterfaceNumber     Node 1 interface number
-   \param[in]  oru8_Node2InterfaceNumber     Node 2 interface number
-   \param[in]  oru8_Node1NodeID              Node 1 node ID
-   \param[in]  oru8_Node2NodeID              Node 2 node ID
-   \param[in]  oq_Node1ActivateDatapoolL2    Node1 activate datapool L2
-   \param[in]  oq_Node1ActivateDatapoolECeS  Node1 activate datapool ECeS
-   \param[in]  oq_Node1ActivateDatapoolECoS  Node1 activate datapool ECoS
-   \param[in]  oq_Node2ActivateDatapoolL2    Node2 activate datapool L2
-   \param[in]  oq_Node2ActivateDatapoolECeS  Node2 activate datapool ECeS
-   \param[in]  oq_Node2ActivateDatapoolECoS  Node2 activate datapool ECoS
+   \param[in]  orc_FourUniqueIds          Four unique IDs for the four new items created by this action
+   \param[in]  ore_BusType                Bus type to create
+   \param[in]  orc_BusName                Bus name to use initially
+   \param[in]  orc_BusPosition            Target bus position
+   \param[in]  oru64_Node1UniqueID        Node 1 unique ID
+   \param[in]  oru64_Node2UniqueID        Node 2 unique ID
+   \param[in]  oru8_Node1InterfaceNumber  Node 1 interface number
+   \param[in]  oru8_Node2InterfaceNumber  Node 2 interface number
+   \param[in]  orc_Node1NodeIDs           Node1 node I ds
+   \param[in]  orc_Node2NodeIDs           Node2 node I ds
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const std::vector<uint64> & orc_FourUniqueIds, const stw_opensyde_core::C_OSCSystemBus::E_Type
@@ -248,14 +235,8 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
                                                                          const uint64 & oru64_Node2UniqueID,
                                                                          const uint8 & oru8_Node1InterfaceNumber,
                                                                          const uint8 & oru8_Node2InterfaceNumber,
-                                                                         const uint8 & oru8_Node1NodeID,
-                                                                         const uint8 & oru8_Node2NodeID,
-                                                                         const bool oq_Node1ActivateDatapoolL2,
-                                                                         const bool oq_Node1ActivateDatapoolECeS,
-                                                                         const bool oq_Node1ActivateDatapoolECoS,
-                                                                         const bool oq_Node2ActivateDatapoolL2,
-                                                                         const bool oq_Node2ActivateDatapoolECeS,
-                                                                         const bool oq_Node2ActivateDatapoolECoS)
+                                                                         const std::vector<uint8> & orc_Node1NodeIDs,
+                                                                         const std::vector<uint8> & orc_Node2NodeIDs)
 {
    if (orc_FourUniqueIds.size() >= 4)
    {
@@ -288,8 +269,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
                                                       orc_BusPosition,
                                                       oru64_Node1UniqueID, orc_FourUniqueIds[0],
                                                       oru8_Node1InterfaceNumber,
-                                                      oru8_Node1NodeID, oq_Node1ActivateDatapoolL2,
-                                                      oq_Node1ActivateDatapoolECeS, oq_Node1ActivateDatapoolECoS,
+                                                      orc_Node1NodeIDs,
                                                       pc_UndoCommand);
       connect(pc_TmpAddCmd,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
@@ -302,8 +282,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
                                                       orc_BusPosition,
                                                       oru64_Node2UniqueID, orc_FourUniqueIds[0],
                                                       oru8_Node2InterfaceNumber,
-                                                      oru8_Node2NodeID, oq_Node2ActivateDatapoolL2,
-                                                      oq_Node2ActivateDatapoolECeS, oq_Node2ActivateDatapoolECoS,
+                                                      orc_Node2NodeIDs,
                                                       pc_UndoCommand);
       connect(pc_TmpAddCmd,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
@@ -313,42 +292,22 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Do add one node to node connection and use an existing bus
+/*! \brief   Do add one node to node connection and use an existing bus. Node 1 is new to the bus.
 
-   \param[in]  orc_TwoUniqueIds              Two unique IDs for the two new items created by this action
-   \param[in]  oru64_BusUniqueID             Bus unique ID
-   \param[in]  orc_Node1Position             Node 1 position
-   \param[in]  orc_Node2Position             Node 2 position
-   \param[in]  oru64_Node1UniqueID           Node 1 unique ID
-   \param[in]  oru64_Node2UniqueID           Node 2 unique ID
-   \param[in]  oru8_Node1InterfaceNumber     Node 1 interface number
-   \param[in]  oru8_Node2InterfaceNumber     Node 2 interface number
-   \param[in]  oru8_Node1NodeID              Node 1 node ID
-   \param[in]  oru8_Node2NodeID              Node 2 node ID
-   \param[in]  oq_Node1ActivateDatapoolL2    Node1 activate datapool L2
-   \param[in]  oq_Node1ActivateDatapoolECeS  Node1 activate datapool ECeS
-   \param[in]  oq_Node1ActivateDatapoolECoS  Node1 activate datapool ECoS
-   \param[in]  oq_Node2ActivateDatapoolL2    Node2 activate datapool L2
-   \param[in]  oq_Node2ActivateDatapoolECeS  Node2 activate datapool ECeS
-   \param[in]  oq_Node2ActivateDatapoolECoS  Node2 activate datapool ECoS
+   \param[in]  orc_TwoUniqueIds           Two unique IDs for the two new items created by this action
+   \param[in]  oru64_BusUniqueID          Bus unique ID
+   \param[in]  orc_Node1Position          Node 1 position
+   \param[in]  oru64_Node1UniqueID        Node 1 unique ID
+   \param[in]  oru8_Node1InterfaceNumber  Node 1 interface number
+   \param[in]  orc_Node1IDs               Node1 node Ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const std::vector<uint64> & orc_TwoUniqueIds,
                                                                           const uint64 & oru64_BusUniqueID,
                                                                           const QPointF & orc_Node1Position,
-                                                                          const QPointF & orc_Node2Position,
                                                                           const uint64 & oru64_Node1UniqueID,
-                                                                          const uint64 & oru64_Node2UniqueID,
                                                                           const uint8 & oru8_Node1InterfaceNumber,
-                                                                          const uint8 & oru8_Node2InterfaceNumber,
-                                                                          const uint8 & oru8_Node1NodeID,
-                                                                          const uint8 & oru8_Node2NodeID,
-                                                                          const bool oq_Node1ActivateDatapoolL2,
-                                                                          const bool oq_Node1ActivateDatapoolECeS,
-                                                                          const bool oq_Node1ActivateDatapoolECoS,
-                                                                          const bool oq_Node2ActivateDatapoolL2,
-                                                                          const bool oq_Node2ActivateDatapoolECeS,
-                                                                          const bool oq_Node2ActivateDatapoolECoS)
+                                                                          const std::vector<uint8> & orc_Node1IDs)
 {
    if (orc_TwoUniqueIds.size() >= 2)
    {
@@ -361,22 +320,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const 
       pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
                                                       C_SdManUnoTopologyAddCommand::eBUS_CONNECTOR,
                                                       orc_Node1Position, oru64_Node1UniqueID, oru64_BusUniqueID,
-                                                      oru8_Node1InterfaceNumber, oru8_Node1NodeID,
-                                                      oq_Node1ActivateDatapoolL2,
-                                                      oq_Node1ActivateDatapoolECeS, oq_Node1ActivateDatapoolECoS,
-                                                      pc_UndoCommand);
-      connect(pc_TmpAddCmd,
-              &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
-              &C_SdManUnoTopologyManager::m_OnErrorChange);
-      c_IDs.clear();
-      c_IDs.push_back(orc_TwoUniqueIds[1]);
-      //lint -e{423}  //no memory leak because of Qt memory management and redo engine handling
-      pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
-                                                      C_SdManUnoTopologyAddCommand::eBUS_CONNECTOR,
-                                                      orc_Node2Position, oru64_Node2UniqueID, oru64_BusUniqueID,
-                                                      oru8_Node2InterfaceNumber, oru8_Node2NodeID,
-                                                      oq_Node2ActivateDatapoolL2,
-                                                      oq_Node2ActivateDatapoolECeS, oq_Node2ActivateDatapoolECoS,
+                                                      oru8_Node1InterfaceNumber, orc_Node1IDs,
                                                       pc_UndoCommand);
       connect(pc_TmpAddCmd,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
@@ -410,23 +354,18 @@ void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64> & oru64_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reconnect to different node
 
-   \param[in]  opc_BusConnector           Bus connector to reconnect
-   \param[in]  opc_StartingNode           Initial node
-   \param[in]  opc_LastNode               New node
-   \param[in]  orc_ConnectionPos          Event position
-   \param[in]  ors32_Interface            Interface to connect to
-   \param[in]  oru8_NodeId                New node id
-   \param[in]  oq_ActivateDatapoolL2      Activate datapool L2
-   \param[in]  oq_ActivateDatapoolECeS    Activate datapool ECeS
-   \param[in]  oq_ActivateDatapoolECoS    Activate datapool E co S
+   \param[in]  opc_BusConnector     Bus connector to reconnect
+   \param[in]  opc_StartingNode     Initial node
+   \param[in]  opc_LastNode         New node
+   \param[in]  orc_ConnectionPos    Event position
+   \param[in]  ors32_Interface      Interface to connect to
+   \param[in]  orc_NodeIds          Node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const opc_BusConnector,
                                                 const C_GiNode * const opc_StartingNode,
                                                 const C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
-                                                const sint32 & ors32_Interface, const uint8 & oru8_NodeId,
-                                                const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
-                                                const bool oq_ActivateDatapoolECoS)
+                                                const sint32 & ors32_Interface, const std::vector<uint8> & orc_NodeIds)
 {
    if ((opc_StartingNode != NULL) && (opc_LastNode != NULL))
    {
@@ -439,9 +378,7 @@ void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const
       pc_ReconnectCommand = new C_SdManUnoTopologyReconnectNodeCommand(this->mpc_Scene, c_IDs,
                                                                        opc_StartingNode->GetID(),
                                                                        opc_LastNode->GetID(), orc_ConnectionPos,
-                                                                       ors32_Interface, oru8_NodeId,
-                                                                       oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
-                                                                       oq_ActivateDatapoolECoS);
+                                                                       ors32_Interface, orc_NodeIds);
       m_MergeWithPrev(pc_ReconnectCommand);
       //Deactivate due to data change
       this->m_PrepareAction();
@@ -456,23 +393,18 @@ void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reconnect to different bus
 
-   \param[in]  opc_BusConnector           Bus connector to reconnect
-   \param[in]  opc_StartingBus            Initial bus
-   \param[in]  opc_LastBus                Last bus
-   \param[in]  orc_ConnectionPos          Event position
-   \param[in]  ors32_Interface            Interface to connect to
-   \param[in]  oru8_NodeId                New node id
-   \param[in]  oq_ActivateDatapoolL2      Activate datapool L2
-   \param[in]  oq_ActivateDatapoolECeS    Activate datapool ECeS
-   \param[in]  oq_ActivateDatapoolECoS    Activate datapool ECoS
+   \param[in]  opc_BusConnector     Bus connector to reconnect
+   \param[in]  opc_StartingBus      Initial bus
+   \param[in]  opc_LastBus          Last bus
+   \param[in]  orc_ConnectionPos    Event position
+   \param[in]  ors32_Interface      Interface to connect to
+   \param[in]  orc_NodeIds          Node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const opc_BusConnector,
                                                const C_GiLiBus * const opc_StartingBus,
                                                const C_GiLiBus * const opc_LastBus, const QPointF & orc_ConnectionPos,
-                                               const sint32 & ors32_Interface, const uint8 & oru8_NodeId,
-                                               const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
-                                               const bool oq_ActivateDatapoolECoS)
+                                               const sint32 & ors32_Interface, const std::vector<uint8> & orc_NodeIds)
 {
    if ((opc_StartingBus != NULL) && (opc_LastBus != NULL))
    {
@@ -485,9 +417,7 @@ void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const 
       pc_ReconnectCommand = new C_SdManUnoTopologyReconnectBusCommand(this->mpc_Scene, c_IDs,
                                                                       opc_StartingBus->GetID(),
                                                                       opc_LastBus->GetID(), orc_ConnectionPos,
-                                                                      ors32_Interface, oru8_NodeId,
-                                                                      oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
-                                                                      oq_ActivateDatapoolECoS);
+                                                                      ors32_Interface, orc_NodeIds);
       m_MergeWithPrev(pc_ReconnectCommand);
       //Deactivate due to data change
       this->m_PrepareAction();
@@ -505,19 +435,15 @@ void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const 
    \param[in]  opc_BusConnector              Bus connector to change interface of
    \param[in]  oru8_PreviousInterfaceNumber  Last used interface number
    \param[in]  oru8_NewInterfaceNumber       New interface number to use
-   \param[in]  oru8_PreviousNodeId           Previous node id
-   \param[in]  oru8_NewNodeId                New node id
-   \param[in]  oq_ActivateDatapoolL2         Activate datapool L2
-   \param[in]  oq_ActivateDatapoolECeS       Activate datapool ECeS
-   \param[in]  oq_ActivateDatapoolECoS       Activate datapool ECoS
+   \param[in]  orc_PreviousNodeIds           Previous node ids
+   \param[in]  orc_NewNodeIds                New node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoChangeInterface(const C_GiLiBusConnector * const opc_BusConnector,
                                                   const uint8 & oru8_PreviousInterfaceNumber,
                                                   const uint8 & oru8_NewInterfaceNumber,
-                                                  const uint8 & oru8_PreviousNodeId, const uint8 & oru8_NewNodeId,
-                                                  const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
-                                                  const bool oq_ActivateDatapoolECoS)
+                                                  const std::vector<uint8> & orc_PreviousNodeIds,
+                                                  const std::vector<uint8> & orc_NewNodeIds)
 {
    if (opc_BusConnector != NULL)
    {
@@ -529,10 +455,8 @@ void C_SdManUnoTopologyManager::DoChangeInterface(const C_GiLiBusConnector * con
       c_IDs.push_back(u64_ID);
       pc_ReconnectCommand = new C_SdManUnoTopologyChangeInterfaceCommand(this->mpc_Scene, c_IDs,
                                                                          oru8_PreviousInterfaceNumber,
-                                                                         oru8_NewInterfaceNumber, oru8_PreviousNodeId,
-                                                                         oru8_NewNodeId, oq_ActivateDatapoolL2,
-                                                                         oq_ActivateDatapoolECeS,
-                                                                         oq_ActivateDatapoolECoS);
+                                                                         oru8_NewInterfaceNumber, orc_PreviousNodeIds,
+                                                                         orc_NewNodeIds);
       //Deactivate due to data change
       this->m_PrepareAction();
       //this->push(pc_ReconnectCommand);

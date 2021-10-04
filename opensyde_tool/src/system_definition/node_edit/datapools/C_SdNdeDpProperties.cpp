@@ -56,16 +56,17 @@ const stw_types::sintn C_SdNdeDpProperties::mhsn_INDEX_PUBLIC = 1;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent                Reference to parent
-   \param[in,out] opc_OSCDataPool           Pointer to the actual core Datapool object
-   \param[in,out] opc_UiDataPool            Pointer to the actual UI Datapool object
-   \param[in]     os32_DataPoolIndex        Flag for new Datapool (-1 is new Datapool, >= 0 is existing Datapool)
-   \param[in]     oru32_NodeIndex           Node index
-   \param[in]     oq_SelectName             Selects the Datapool name for instant editing
-   \param[in]     oq_NodeProgrammingSupport Flag if node has programming support.
-                                            If false the application and scope section will be hided
-   \param[in]     opc_SharedDatapoolId      In case of a new shared Datapool, the Id is the shared Datapool of the new
-                                            Datapool. In case of an edited or stand alone Datapool the pointer is NULL
+   \param[in,out]  orc_Parent                   Reference to parent
+   \param[in,out]  opc_OSCDataPool              Pointer to the actual core Datapool object
+   \param[in,out]  opc_UiDataPool               Pointer to the actual UI Datapool object
+   \param[out]     ope_ComProtocolType          Com protocol type
+   \param[in]      os32_DataPoolIndex           Flag for new Datapool (-1 is new Datapool, >= 0 is existing Datapool)
+   \param[in]      oru32_NodeIndex              Node index
+   \param[in]      oq_SelectName                Selects the Datapool name for instant editing
+   \param[in]      oq_NodeProgrammingSupport    Flag if node has programming support.
+                                                If false the application and scope section will be hided
+   \param[in]      opc_SharedDatapoolId         In case of a new shared Datapool, the Id is the shared Datapool of the new
+                                                Datapool. In case of an edited or stand alone Datapool the pointer is NULL
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNodeDataPool * const opc_OSCDataPool,
@@ -456,7 +457,7 @@ void C_SdNdeDpProperties::InitStaticNames(void)
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -625,10 +626,11 @@ void C_SdNdeDpProperties::m_CancelClicked(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply datapool type
+
    - Load correct picture
    - show correct interaction elements
 
-    \param[in]    oq_SharedDatapool    Flag if Datapool is a shared Datapool
+   \param[in]  oq_SharedDatapool    Flag if Datapool is a shared Datapool
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpProperties::m_ApplyType(const bool oq_SharedDatapool)
@@ -757,7 +759,7 @@ void C_SdNdeDpProperties::m_LoadCodeGenerationAndApplication(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot for NVM Datapool size
 
-   \param[in]       osn_Value     New value of spin box
+   \param[in]  osn_Value   New value of spin box
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpProperties::m_SpinBoxSizeChanged(const stw_types::sintn osn_Value) const
@@ -776,84 +778,94 @@ void C_SdNdeDpProperties::m_UpdateSizePrediction(void) const
    if (pc_Node != NULL)
    {
       const C_OSCDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
+      const uint32 u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
       tgl_assert(pc_DevDef != NULL);
       if (pc_DevDef != NULL)
       {
-         uint32 u32_SizeOfAllNvmDatapools = 0;
-         uint32 u32_PercentageReservation;
-         uint32 u32_PercentageUsage;
-         uint32 u32_DpCounter;
-         const uint32 u32_ActSize = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxSize->value());
-
-         // get the entire size of all NVM datapools. check all datapools of the lists
-         for (u32_DpCounter = 0; u32_DpCounter < pc_Node->c_DataPools.size(); ++u32_DpCounter)
+         tgl_assert(u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size());
+         if (u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size())
          {
-            if ((pc_Node->c_DataPools[u32_DpCounter].e_Type == C_OSCNodeDataPool::eNVM) ||
-                (pc_Node->c_DataPools[u32_DpCounter].e_Type == C_OSCNodeDataPool::eHALC_NVM))
+            uint32 u32_SizeOfAllNvmDatapools = 0;
+            uint32 u32_PercentageReservation;
+            uint32 u32_PercentageUsage;
+            uint32 u32_DpCounter;
+            const uint32 u32_ActSize = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxSize->value());
+
+            // get the entire size of all NVM datapools. check all datapools of the lists
+            for (u32_DpCounter = 0; u32_DpCounter < pc_Node->c_DataPools.size(); ++u32_DpCounter)
             {
-               if (this->ms32_DataPoolIndex < 0)
+               if ((pc_Node->c_DataPools[u32_DpCounter].e_Type == C_OSCNodeDataPool::eNVM) ||
+                   (pc_Node->c_DataPools[u32_DpCounter].e_Type == C_OSCNodeDataPool::eHALC_NVM))
                {
-                  // it is a new datapool
-                  u32_SizeOfAllNvmDatapools += pc_Node->c_DataPools[u32_DpCounter].u32_NvMSize;
-               }
-               else
-               {
-                  if (u32_DpCounter != static_cast<uint32>(this->ms32_DataPoolIndex))
+                  if (this->ms32_DataPoolIndex < 0)
                   {
-                     // it is not the actual edited datapool
+                     // it is a new datapool
                      u32_SizeOfAllNvmDatapools += pc_Node->c_DataPools[u32_DpCounter].u32_NvMSize;
                   }
                   else
                   {
-                     // it is the actual edited datapool. do not use the old value
-                     u32_SizeOfAllNvmDatapools += u32_ActSize;
+                     if (u32_DpCounter != static_cast<uint32>(this->ms32_DataPoolIndex))
+                     {
+                        // it is not the actual edited datapool
+                        u32_SizeOfAllNvmDatapools += pc_Node->c_DataPools[u32_DpCounter].u32_NvMSize;
+                     }
+                     else
+                     {
+                        // it is the actual edited datapool. do not use the old value
+                        u32_SizeOfAllNvmDatapools += u32_ActSize;
+                     }
                   }
                }
             }
-         }
-         if (this->ms32_DataPoolIndex < 0)
-         {
-            // it is a new datapool. add the new value separately
-            u32_SizeOfAllNvmDatapools += u32_ActSize;
-         }
+            if (this->ms32_DataPoolIndex < 0)
+            {
+               // it is a new datapool. add the new value separately
+               u32_SizeOfAllNvmDatapools += u32_ActSize;
+            }
 
-         // update the label with reservation prediction
-         if ((pc_DevDef->u32_UserEepromSizeBytes > 0U) &&
-             (u32_SizeOfAllNvmDatapools > 0U))
-         {
-            u32_PercentageReservation = (u32_SizeOfAllNvmDatapools * 100U) / pc_DevDef->u32_UserEepromSizeBytes;
-         }
-         else
-         {
-            u32_PercentageReservation = 0U;
-         }
+            // update the label with reservation prediction
+            if ((pc_DevDef->c_SubDevices[u32_SubDeviceIndex].u32_UserEepromSizeBytes > 0U) &&
+                (u32_SizeOfAllNvmDatapools > 0U))
+            {
+               u32_PercentageReservation = (u32_SizeOfAllNvmDatapools * 100U) /
+                                           pc_DevDef->c_SubDevices[u32_SubDeviceIndex].u32_UserEepromSizeBytes;
+            }
+            else
+            {
+               u32_PercentageReservation = 0U;
+            }
 
-         this->mpc_Ui->pc_LabelDataPoolReservation->setText(C_GtGetText::h_GetText("Resulting Node NVM Reservation: ") +
-                                                            QString::number(u32_PercentageReservation) +
-                                                            static_cast<QString>("%") +
-                                                            static_cast<QString>(" (Node NVM size = ") +
-                                                            QString::number(pc_DevDef->u32_UserEepromSizeBytes) +
-                                                            static_cast<QString>(" Bytes)"));
+            this->mpc_Ui->pc_LabelDataPoolReservation->setText(C_GtGetText::h_GetText(
+                                                                  "Resulting Node NVM Reservation: ") +
+                                                               QString::number(u32_PercentageReservation) +
+                                                               static_cast<QString>("%") +
+                                                               static_cast<QString>(" (Node NVM size = ") +
+                                                               QString::number(pc_DevDef->c_SubDevices[
+                                                                                  u32_SubDeviceIndex].
+                                                                               u32_UserEepromSizeBytes) +
+                                                               static_cast<QString>(" Bytes)"));
 
-         // update the label with usage prediction
-         if ((u32_ActSize > 0U) && (this->mpc_OSCDataPool != NULL))
-         {
-            u32_PercentageUsage = (this->mpc_OSCDataPool->GetNumBytesUsed() * 100U) / u32_ActSize;
-         }
-         else
-         {
-            u32_PercentageUsage = 100;
-         }
+            // update the label with usage prediction
+            if ((u32_ActSize > 0U) && (this->mpc_OSCDataPool != NULL))
+            {
+               u32_PercentageUsage = (this->mpc_OSCDataPool->GetNumBytesUsed() * 100U) / u32_ActSize;
+            }
+            else
+            {
+               u32_PercentageUsage = 100;
+            }
 
-         this->mpc_Ui->pc_LabelDataPoolUsage->setText(C_GtGetText::h_GetText("Resulting Datapool Usage: ") +
-                                                      QString::number(u32_PercentageUsage) +
-                                                      static_cast<QString>("%"));
+            this->mpc_Ui->pc_LabelDataPoolUsage->setText(C_GtGetText::h_GetText("Resulting Datapool Usage: ") +
+                                                         QString::number(u32_PercentageUsage) +
+                                                         static_cast<QString>("%"));
+         }
       }
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check datapool name
+
    - check input
    - show/hide invalid icon
 */
@@ -881,7 +893,9 @@ void C_SdNdeDpProperties::m_CheckDatapoolName(void) const
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditDatapoolName, "Valid", q_NameIsValid);
    if (q_NameIsValid == true)
    {
-      this->mpc_Ui->pc_LineEditDatapoolName->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+      this->mpc_Ui->pc_LineEditDatapoolName->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                                   C_GtGetText::h_GetText(""),
+                                                                   C_NagToolTip::eDEFAULT);
    }
    else
    {
@@ -893,7 +907,7 @@ void C_SdNdeDpProperties::m_CheckDatapoolName(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for duplicate data pool name
 
-   \param[in,out] opc_ExistingDatapoolNames Optional parameter to list all OTHER existing datapool names
+   \param[in,out]  opc_ExistingDatapoolNames    Optional parameter to list all OTHER existing datapool names
 
    \return
    True  Name valid
@@ -937,28 +951,33 @@ void C_SdNdeDpProperties::m_InitSpinBox(void) const
       if (pc_Node != NULL)
       {
          const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
+         const uint32 u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
          tgl_assert(pc_Device != NULL);
          if (pc_Device != NULL)
          {
-            const uint32 u32_Maximum = pc_Device->u32_UserEepromSizeBytes;
-
-            //Init spin box minimum
-            this->mpc_Ui->pc_SpinBoxSize->SetMinimumCustom(1);
-            this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMinimumCustom(0);
-            //Init spin box maximum
-            this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(u32_Maximum);
-            if (u32_Maximum > 0U)
+            tgl_assert(u32_SubDeviceIndex < pc_Device->c_SubDevices.size());
+            if (u32_SubDeviceIndex < pc_Device->c_SubDevices.size())
             {
-               this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMaximumCustom(static_cast<sintn>(u32_Maximum - 1U));
-            }
-            else
-            {
-               this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMaximumCustom(0);
-            }
+               const uint32 u32_Maximum = pc_Device->c_SubDevices[u32_SubDeviceIndex].u32_UserEepromSizeBytes;
 
-            this->mpc_Ui->pc_SpinBoxSize->setValue(static_cast<sint32>(this->mpc_OSCDataPool->u32_NvMSize));
-            this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->setValue(
-               static_cast<sint32>(this->mpc_OSCDataPool->u32_NvMStartAddress));
+               //Init spin box minimum
+               this->mpc_Ui->pc_SpinBoxSize->SetMinimumCustom(1);
+               this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMinimumCustom(0);
+               //Init spin box maximum
+               this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(u32_Maximum);
+               if (u32_Maximum > 0U)
+               {
+                  this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMaximumCustom(static_cast<sintn>(u32_Maximum - 1U));
+               }
+               else
+               {
+                  this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->SetMaximumCustom(0);
+               }
+
+               this->mpc_Ui->pc_SpinBoxSize->setValue(static_cast<sint32>(this->mpc_OSCDataPool->u32_NvMSize));
+               this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->setValue(
+                  static_cast<sint32>(this->mpc_OSCDataPool->u32_NvMStartAddress));
+            }
          }
       }
    }
@@ -967,7 +986,7 @@ void C_SdNdeDpProperties::m_InitSpinBox(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialization of the combo box with the different protocol types
 
-   \param[in]       oe_ComProtocolType     Protocol type to set initially
+   \param[in]  oe_ComProtocolType   Protocol type to set initially
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpProperties::m_InitComboBoxProtocols(const C_OSCCanProtocol::E_Type oe_ComProtocolType) const
@@ -1028,7 +1047,7 @@ void C_SdNdeDpProperties::m_OnComTypeChange(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle on safety flag state change
 
-   \param[in] oq_IsSafety Is safety activated
+   \param[in]  oq_IsSafety    Is safety activated
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpProperties::m_OnSafetyChange(const bool oq_IsSafety) const

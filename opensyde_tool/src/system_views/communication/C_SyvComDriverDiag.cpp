@@ -1493,7 +1493,7 @@ bool C_SyvComDriverDiag::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfac
 {
    bool q_Return = false;
 
-   if ((orc_ComItfSettings.q_IsBusConnected == true) &&
+   if ((orc_ComItfSettings.GetBusConnected() == true) &&
        ((orc_ComItfSettings.q_IsRoutingEnabled == true) ||
         (orc_ComItfSettings.q_IsDiagnosisEnabled == true)))
    {
@@ -2076,8 +2076,8 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
 
    All Datapool names will be read from the node and tried
 
-   \param[in]      ou32_ActiveNodeIndex      Active node index (mc_ActiveNodesIndexes)
-   \param[in,out]  orc_ErrorDetails          Details for current error
+   \param[in]      ou32_ActiveNodeIndex   Active node index (mc_ActiveNodesIndexes)
+   \param[in,out]  orc_ErrorDetails       Details for current error
 
    \return
    C_NO_ERR   Datapool metadata were read successfully
@@ -2169,8 +2169,8 @@ sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveNode
 
    m_GetAllDatapoolMetadata must be called before calling m_CheckDatapoolsAndCreateMapping
 
-   \param[in]      ou32_ActiveNodeIndex      Active node index (mc_ActiveNodesIndexes)
-   \param[in,out]  orc_ErrorDetails          Details for current error
+   \param[in]      ou32_ActiveNodeIndex   Active node index (mc_ActiveNodesIndexes)
+   \param[in,out]  orc_ErrorDetails       Details for current error
 
    \return
    C_NO_ERR   Datapools are as expected
@@ -2385,10 +2385,10 @@ sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the Datapool metadata and its index on the server with a specific Datapool name
 
-   \param[in]      ou32_ActiveNodeIndex      Active node index (mc_ActiveNodesIndexes)
-   \param[in]      orc_DatapoolName          Searched Datapool name
-   \param[out]     oru32_ServerDatapoolIndex Index of Datapool on server (only valid when return value is C_NO_ERR)
-   \param[out]     orc_Metadata              Metadata of Datapool on server (only valid when return value is C_NO_ERR)
+   \param[in]   ou32_ActiveNodeIndex         Active node index (mc_ActiveNodesIndexes)
+   \param[in]   orc_DatapoolName             Searched Datapool name
+   \param[out]  oru32_ServerDatapoolIndex    Index of Datapool on server (only valid when return value is C_NO_ERR)
+   \param[out]  orc_Metadata                 Metadata of Datapool on server (only valid when return value is C_NO_ERR)
 
    \retval   C_NO_ERR   Datapool was found
    \retval   C_RANGE    Datapool with the name orc_DatapoolName does not exist on the server

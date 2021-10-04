@@ -1297,7 +1297,7 @@ sint32 C_PuiSvHandler::InsertView(const uint32 ou32_Index, const C_PuiSvData & o
       C_PuiSvData c_TmpView = orc_View;
       if (oq_AutoAdaptContent == true)
       {
-         c_TmpView.InitFromSystemDefintion();
+         c_TmpView.InitFromSystemDefinition();
       }
       if (oq_AutoAdaptName == true)
       {
@@ -2255,15 +2255,16 @@ bool C_PuiSvHandler::GetErrorBus(const uint32 ou32_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check view error
 
-   \param[in]      ou32_Index                         View index
-   \param[in,out]  opq_NameInvalid                    Name conflict
-   \param[in,out]  opq_PCNotConnected                 PC not connected
-   \param[in,out]  opq_RoutingInvalid                 Routing invalid
-   \param[in,out]  opq_UpdateDisabledButDataBlocks    No interface supports update but there are data blocks
-   \param[in,out]  opq_SysDefInvalid                  System definition invalid
-   \param[in,out]  opq_NoNodesActive                  No nodes active
-   \param[in,out]  opc_RoutingErrorDetails            Error details for routing error if any
-                                                      Warning: only set if routing error checked
+   \param[in]      ou32_Index                            View index
+   \param[in,out]  opq_NameInvalid                       Name conflict
+   \param[in,out]  opq_PCNotConnected                    PC not connected
+   \param[in,out]  opq_RoutingInvalid                    Routing invalid
+   \param[in,out]  opq_UpdateDisabledButDataBlocks       No interface supports update but there are data blocks
+   \param[in,out]  opq_SysDefInvalid                     System definition invalid
+   \param[in,out]  opq_NoNodesActive                     No nodes active
+   \param[in,out]  opc_RoutingErrorDetails               Error details for routing error if any
+                                                         Warning: only set if routing error checked
+   \param[in,out]  opc_AutomaticallyDisabledSubDevices   Automatically disabled sub devices
 
    \return
    C_NO_ERR Operation success
@@ -2273,7 +2274,8 @@ bool C_PuiSvHandler::GetErrorBus(const uint32 ou32_Index) const
 sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_NameInvalid,
                                       bool * const opq_PCNotConnected, bool * const opq_RoutingInvalid,
                                       bool * const opq_UpdateDisabledButDataBlocks, bool * const opq_SysDefInvalid,
-                                      bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails)
+                                      bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails,
+                                      QString * const opc_AutomaticallyDisabledSubDevices)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -2287,6 +2289,7 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          const C_PuiSvData & rc_CheckedData = this->mc_Views[ou32_Index];
          C_PuiSvViewErrorDetails c_Details;
          QString c_Text;
+         std::vector<uint32> c_AutomaticallyDisabledSubDevices;
          bool q_Error = true;
          const std::vector<uint8> & rc_NodeActiveFlags = rc_CheckedData.GetNodeActiveFlags();
          //Name check
@@ -2305,7 +2308,9 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          //Check PC connected
          c_Details.q_PCNotConnected = !rc_CheckedData.GetPcData().GetConnected();
          //Check all routing details
-         tgl_assert(this->CheckRouting(ou32_Index, q_Error, c_Text) == C_NO_ERR);
+         tgl_assert(this->m_CheckRoutingAndUpdateNodes(ou32_Index, q_Error, c_Text,
+                                                       c_AutomaticallyDisabledSubDevices) == C_NO_ERR);
+         c_Details.ConstructAutomaticallyDisabledSubDevicesString(c_AutomaticallyDisabledSubDevices);
          c_Details.q_RoutingInvalid = q_Error;
          c_Details.c_RoutingErrorDetails = c_Text;
          //Check data block issues
@@ -2351,19 +2356,23 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
                break;
             }
          }
+         c_Details.c_ResultingNodeActiveStatus = rc_CheckedData.GetNodeActiveFlags();
 
          //Return error details
          c_Details.GetResults(opq_NameInvalid, opq_PCNotConnected, opq_RoutingInvalid,
                               opq_UpdateDisabledButDataBlocks, opq_SysDefInvalid, opq_NoNodesActive,
-                              opc_RoutingErrorDetails);
+                              opc_RoutingErrorDetails, opc_AutomaticallyDisabledSubDevices);
          //Store results
          this->mc_PreviousErrorCheckResults.insert(u32_Hash, c_Details);
       }
       else
       {
+         //Always update node active flags
+         C_PuiSvData & rc_CheckedData = this->mc_Views[ou32_Index];
+         rc_CheckedData.SetNodeActiveFlags(c_It.value().c_ResultingNodeActiveStatus);
          c_It.value().GetResults(opq_NameInvalid, opq_PCNotConnected, opq_RoutingInvalid,
                                  opq_UpdateDisabledButDataBlocks, opq_SysDefInvalid, opq_NoNodesActive,
-                                 opc_RoutingErrorDetails);
+                                 opc_RoutingErrorDetails, opc_AutomaticallyDisabledSubDevices);
       }
    }
    else
@@ -2441,17 +2450,15 @@ void C_PuiSvHandler::CheckUpdateEnabledForDataBlocks(const uint32 ou32_ViewIndex
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check routing error
 
-   \param[in]   ou32_ViewIndex      View index
-   \param[out]  orq_RoutingError    Routing error
-   \param[out]  orc_ErrorMessage    Error message
+   \param[in]      ou32_ViewIndex      View index
+   \param[in,out]  orc_ErrorDetails    Error details
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, bool & orq_RoutingError,
-                                    QString & orc_ErrorMessage) const
+sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, std::map<uint32, QString> & orc_ErrorDetails) const
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -2460,10 +2467,6 @@ sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, bool & orq_Rout
       const C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
       const std::vector<uint8> & rc_ActiveNodes = rc_View.GetNodeActiveFlags();
       uint32 u32_Counter;
-      QString c_Space = " ";
-
-      orq_RoutingError = false;
-      orc_ErrorMessage = C_GtGetText::h_GetText("Following nodes can not be reached by the PC:");
 
       // check connection state of all active nodes
       for (u32_Counter = 0U; u32_Counter < rc_ActiveNodes.size(); ++u32_Counter)
@@ -2486,10 +2489,8 @@ sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, bool & orq_Rout
                if ((c_RouteCalcUpdate.GetState() == C_CONFIG) ||
                    (c_RouteCalcDiag.GetState() == C_CONFIG))
                {
-                  orq_RoutingError = true;
-                  orc_ErrorMessage += c_Space + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
-                                      C_GtGetText::h_GetText(" (CAN to Ethernet routing not supported)");
-                  c_Space = ", ";
+                  orc_ErrorDetails[u32_Counter] = static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
+                                                  C_GtGetText::h_GetText(" (CAN to Ethernet routing not supported)");
                }
                else
                {
@@ -2502,30 +2503,26 @@ sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, bool & orq_Rout
                                                           (c_RouteCalcDiag.GetState() != C_NOACT)));
                   if (q_RoutingUpdateError == true)
                   {
-                     orq_RoutingError = true;
                      if (q_RoutingDiagnosticError == true)
                      {
                         //Combined error
-                        orc_ErrorMessage += c_Space + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
-                                            C_GtGetText::h_GetText(" (Update + Diagnostic)");
+                        orc_ErrorDetails[u32_Counter] = static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
+                                                        C_GtGetText::h_GetText(" (Update + Diagnostic)");
                      }
                      else
                      {
                         //Update error
-                        orc_ErrorMessage += c_Space + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
-                                            C_GtGetText::h_GetText(" (Update)");
+                        orc_ErrorDetails[u32_Counter] = static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
+                                                        C_GtGetText::h_GetText(" (Update)");
                      }
-                     c_Space = ", ";
                   }
                   else
                   {
                      if (q_RoutingDiagnosticError == true)
                      {
                         //Diagnostic error
-                        orq_RoutingError = true;
-                        orc_ErrorMessage += c_Space + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
-                                            C_GtGetText::h_GetText(" (Diagnostic)");
-                        c_Space = ", ";
+                        orc_ErrorDetails[u32_Counter] = static_cast<QString>(pc_Node->c_Properties.c_Name.c_str()) +
+                                                        C_GtGetText::h_GetText(" (Diagnostic)");
                      }
                   }
                }
@@ -2533,7 +2530,7 @@ sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, bool & orq_Rout
             else
             {
                // Should not happen
-               orq_RoutingError = true;
+               s32_Retval = C_RANGE;
             }
          }
       }
@@ -2565,6 +2562,9 @@ sint32 C_PuiSvHandler::CheckViewReconnectNecessary(const uint32 ou32_ViewIndex, 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
       const C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+      // Trigger view check
+      // includes hash and is necessary for node indices update, which should be done before loading any view
+      this->CheckViewError(ou32_ViewIndex, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
       //Check if bus exists
       if (rc_View.GetPcData().GetConnected() == true)
       {
@@ -2710,99 +2710,91 @@ sint32 C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32 ou32_ViewIndex, cons
 
    if (pc_View != NULL)
    {
-      const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
-      if (ou32_NodeIndex < rc_ActiveNodes.size())
+      if (pc_View->GetNodeActive(ou32_NodeIndex))
       {
-         if (rc_ActiveNodes[ou32_NodeIndex] == true)
+         const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+            ou32_NodeIndex);
+
+         if (pc_Node != NULL)
          {
-            const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
-               ou32_NodeIndex);
-
-            if (pc_Node != NULL)
+            // Check update routes
+            const C_SyvRoRouteCalculation c_RouteCalcUpdate(ou32_ViewIndex, ou32_NodeIndex,
+                                                            stw_opensyde_core::C_OSCRoutingCalculation::eUPDATE);
+            if (c_RouteCalcUpdate.GetState() == C_NO_ERR)
             {
-               // Check update routes
-               const C_SyvRoRouteCalculation c_RouteCalcUpdate(ou32_ViewIndex, ou32_NodeIndex,
-                                                               stw_opensyde_core::C_OSCRoutingCalculation::eUPDATE);
-               if (c_RouteCalcUpdate.GetState() == C_NO_ERR)
+               const C_OSCRoutingRoute * const pc_Route = c_RouteCalcUpdate.GetBestRoute();
+               if (pc_Route != NULL)
                {
-                  const C_OSCRoutingRoute * const pc_Route = c_RouteCalcUpdate.GetBestRoute();
-                  if (pc_Route != NULL)
+                  QString c_Name;
+
+                  //Calc CRC
+
+                  //Init
+                  oru32_Crc = 0xFFFFFFFFUL;
+
+                  if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(pc_View->GetPcData().GetBusIndex(),
+                                                                         c_Name) == C_NO_ERR)
                   {
-                     QString c_Name;
-
-                     //Calc CRC
-
-                     //Init
-                     oru32_Crc = 0xFFFFFFFFUL;
-
-                     if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(pc_View->GetPcData().GetBusIndex(),
-                                                                            c_Name) == C_NO_ERR)
+                     stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
+                     if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(pc_Route->u32_TargetNodeIndex,
+                                                                             c_Name) == C_NO_ERR)
                      {
                         stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
-                        if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(pc_Route->u32_TargetNodeIndex,
-                                                                                c_Name) == C_NO_ERR)
+
+                        for (uint32 u32_ItRoute = 0UL;
+                             (u32_ItRoute < pc_Route->c_VecRoutePoints.size()) && (s32_Retval == C_NO_ERR);
+                             ++u32_ItRoute)
                         {
-                           stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
+                           const C_OSCRoutingRoutePoint & rc_Route = pc_Route->c_VecRoutePoints[u32_ItRoute];
 
-                           for (uint32 u32_ItRoute = 0UL;
-                                (u32_ItRoute < pc_Route->c_VecRoutePoints.size()) && (s32_Retval == C_NO_ERR);
-                                ++u32_ItRoute)
+                           //Others
+                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.e_InInterfaceType,
+                                                              sizeof(rc_Route.e_InInterfaceType), oru32_Crc);
+                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.e_OutInterfaceType,
+                                                              sizeof(rc_Route.e_OutInterfaceType), oru32_Crc);
+                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_InInterfaceNumber,
+                                                              sizeof(rc_Route.u8_InInterfaceNumber), oru32_Crc);
+                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_OutInterfaceNumber,
+                                                              sizeof(rc_Route.u8_OutInterfaceNumber), oru32_Crc);
+                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_InNodeID,
+                                                              sizeof(rc_Route.u8_InNodeID), oru32_Crc);
+                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_OutNodeID,
+                                                              sizeof(rc_Route.u8_OutNodeID), oru32_Crc);
+
+                           //Names
+                           if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(rc_Route.u32_InBusIndex,
+                                                                                  c_Name) == C_NO_ERR)
                            {
-                              const C_OSCRoutingRoutePoint & rc_Route = pc_Route->c_VecRoutePoints[u32_ItRoute];
-
-                              //Others
-                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.e_InInterfaceType,
-                                                                 sizeof(rc_Route.e_InInterfaceType), oru32_Crc);
-                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.e_OutInterfaceType,
-                                                                 sizeof(rc_Route.e_OutInterfaceType), oru32_Crc);
-                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_InInterfaceNumber,
-                                                                 sizeof(rc_Route.u8_InInterfaceNumber), oru32_Crc);
-                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_OutInterfaceNumber,
-                                                                 sizeof(rc_Route.u8_OutInterfaceNumber), oru32_Crc);
-                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_InNodeID,
-                                                                 sizeof(rc_Route.u8_InNodeID), oru32_Crc);
-                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_OutNodeID,
-                                                                 sizeof(rc_Route.u8_OutNodeID), oru32_Crc);
-
-                              //Names
-                              if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(rc_Route.u32_InBusIndex,
+                              stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(),
+                                                                 c_Name.length(), oru32_Crc);
+                           }
+                           else
+                           {
+                              s32_Retval = C_RANGE;
+                           }
+                           if (s32_Retval == C_NO_ERR)
+                           {
+                              if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(rc_Route.u32_OutBusIndex,
                                                                                      c_Name) == C_NO_ERR)
                               {
                                  stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(),
                                                                     c_Name.length(), oru32_Crc);
-                              }
-                              else
-                              {
-                                 s32_Retval = C_RANGE;
-                              }
-                              if (s32_Retval == C_NO_ERR)
-                              {
-                                 if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(rc_Route.u32_OutBusIndex,
-                                                                                        c_Name) == C_NO_ERR)
+                                 if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(rc_Route.u32_NodeIndex,
+                                                                                         c_Name) == C_NO_ERR)
                                  {
                                     stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(),
                                                                        c_Name.length(), oru32_Crc);
-                                    if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(rc_Route.u32_NodeIndex,
-                                                                                            c_Name) == C_NO_ERR)
-                                    {
-                                       stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(),
-                                                                          c_Name.length(), oru32_Crc);
-                                    }
-                                    else
-                                    {
-                                       s32_Retval = C_RANGE;
-                                    }
                                  }
                                  else
                                  {
                                     s32_Retval = C_RANGE;
                                  }
                               }
+                              else
+                              {
+                                 s32_Retval = C_RANGE;
+                              }
                            }
-                        }
-                        else
-                        {
-                           s32_Retval = C_RANGE;
                         }
                      }
                      else
@@ -2820,10 +2812,10 @@ sint32 C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32 ou32_ViewIndex, cons
                   s32_Retval = C_RANGE;
                }
             }
-         }
-         else
-         {
-            s32_Retval = C_RANGE;
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
          }
       }
       else
@@ -4062,6 +4054,78 @@ void C_PuiSvHandler::m_HandleCompatibilityChart(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check routing
+
+   \param[in]      ou32_ViewIndex      View index
+   \param[out]     orq_RoutingError    Routing error
+   \param[in,out]  orc_ErrorMessage    Error message
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::m_CheckRouting(const uint32 ou32_ViewIndex, bool & orq_RoutingError,
+                                      QString & orc_ErrorMessage) const
+{
+   std::map<uint32, QString> c_ErrorDetails;
+   const sint32 s32_Retval = this->CheckRouting(ou32_ViewIndex, c_ErrorDetails);
+   QString c_Space = " ";
+
+   //Error
+   orq_RoutingError = c_ErrorDetails.size() != 0UL;
+
+   //Message
+   orc_ErrorMessage = C_GtGetText::h_GetText("Following nodes can not be reached by the PC:");
+   for (std::map<uint32, QString>::const_iterator c_It = c_ErrorDetails.begin(); c_It != c_ErrorDetails.end(); ++c_It)
+   {
+      orc_ErrorMessage += c_Space;
+      orc_ErrorMessage += c_It->second;
+      c_Space = ", ";
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check routing and update nodes
+
+   \param[in]      ou32_ViewIndex                        View index
+   \param[out]     orq_RoutingError                      Routing error
+   \param[in,out]  orc_ErrorMessage                      Error message
+   \param[in,out]  orc_AutomaticallyDisabledSubDevices   Automatically disabled sub devices
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::m_CheckRoutingAndUpdateNodes(const uint32 ou32_ViewIndex, bool & orq_RoutingError,
+                                                    QString & orc_ErrorMessage,
+                                                    std::vector<uint32> & orc_AutomaticallyDisabledSubDevices)
+{
+   orc_AutomaticallyDisabledSubDevices.clear();
+   //Only necessary for multi cpu
+   if (C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_NodeSquads.size() > 0UL)
+   {
+      if (ou32_ViewIndex < this->mc_Views.size())
+      {
+         C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+         std::map<uint32, QString> c_ErrorDetails;
+         //Step 1: activate all where only one active
+         rc_View.ActivateAllRelevantSubDevices();
+         //Step 2: check
+         if (this->CheckRouting(ou32_ViewIndex, c_ErrorDetails) == C_NO_ERR)
+         {
+            //Step 3: deactivate sub devices where at least one sub device was successful
+            orc_AutomaticallyDisabledSubDevices = rc_View.DeactivateSubDevicesBasedOnErrors(c_ErrorDetails);
+         }
+      }
+   }
+   return m_CheckRouting(ou32_ViewIndex, orq_RoutingError, orc_ErrorMessage);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get pointers to all currently registered view names
 
    \return
@@ -4082,20 +4146,22 @@ std::map<stw_scl::C_SCLString, bool> C_PuiSvHandler::m_GetExistingViewNames(void
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get error detail result.
 
-   \param[out]     opq_NameInvalid                    Name invalid
-   \param[out]     opq_PCNotConnected                 PC not connected
-   \param[out]     opq_RoutingInvalid                 Routing invalid
-   \param[out]     opq_UpdateDisabledButDataBlocks    Update disabled though Data Block exists
-   \param[out]     opq_SysDefInvalid                  System definition invalid
-   \param[out]     opq_NoNodesActive                  No nodes active
-   \param[in,out]  opc_RoutingErrorDetails            Routing error details
+   \param[out]     opq_NameInvalid                       Name invalid
+   \param[out]     opq_PCNotConnected                    PC not connected
+   \param[out]     opq_RoutingInvalid                    Routing invalid
+   \param[out]     opq_UpdateDisabledButDataBlocks       Update disabled though Data Block exists
+   \param[out]     opq_SysDefInvalid                     System definition invalid
+   \param[out]     opq_NoNodesActive                     No nodes active
+   \param[in,out]  opc_RoutingErrorDetails               Routing error details
+   \param[in,out]  opc_AutomaticallyDisabledSubDevices   Automatically disabled sub devices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::C_PuiSvViewErrorDetails::GetResults(bool * const opq_NameInvalid, bool * const opq_PCNotConnected,
                                                          bool * const opq_RoutingInvalid,
                                                          bool * const opq_UpdateDisabledButDataBlocks,
                                                          bool * const opq_SysDefInvalid, bool * const opq_NoNodesActive,
-                                                         QString * const opc_RoutingErrorDetails) const
+                                                         QString * const opc_RoutingErrorDetails,
+                                                         QString * const opc_AutomaticallyDisabledSubDevices) const
 {
    if (opq_NameInvalid != NULL)
    {
@@ -4124,5 +4190,33 @@ void C_PuiSvHandler::C_PuiSvViewErrorDetails::GetResults(bool * const opq_NameIn
    if (opq_NoNodesActive != NULL)
    {
       *opq_NoNodesActive = this->q_NoNodesActive;
+   }
+   if (opc_AutomaticallyDisabledSubDevices != NULL)
+   {
+      *opc_AutomaticallyDisabledSubDevices = this->c_AutomaticallyDisabledSubDevices;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Construct automatically disabled sub devices string
+
+   \param[in]  orc_Indices    Indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandler::C_PuiSvViewErrorDetails::ConstructAutomaticallyDisabledSubDevicesString(
+   const std::vector<uint32> & orc_Indices)
+{
+   this->c_AutomaticallyDisabledSubDevices = "";
+   for (uint32 u32_ItIndex = 0UL; u32_ItIndex < orc_Indices.size(); ++u32_ItIndex)
+   {
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_Indices[u32_ItIndex]);
+      if (pc_Node != NULL)
+      {
+         if (!this->c_AutomaticallyDisabledSubDevices.isEmpty())
+         {
+            this->c_AutomaticallyDisabledSubDevices += ", ";
+         }
+         this->c_AutomaticallyDisabledSubDevices += pc_Node->c_Properties.c_Name.c_str();
+      }
    }
 }

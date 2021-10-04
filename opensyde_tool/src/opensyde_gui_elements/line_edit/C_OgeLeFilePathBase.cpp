@@ -20,6 +20,7 @@
 #include "C_Uti.h"
 #include "constants.h"
 #include "C_OgeLeFilePathBase.h"
+#include "C_GtGetText.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
@@ -77,7 +78,7 @@ void C_OgeLeFilePathBase::SetPath(const QString & orc_New, const QString & orc_R
    this->mc_RelativeTo = c_Dir.absolutePath();
    if (this->mc_Path != "")
    {
-      C_OgeLeToolTipBase::SetToolTipInformation("", c_FileInfo.absoluteFilePath(),
+      C_OgeLeToolTipBase::SetToolTipInformation(C_GtGetText::h_GetText("Path"), c_FileInfo.absoluteFilePath(),
                                                 stw_opensyde_gui::C_NagToolTip::eDEFAULT);
    }
    else

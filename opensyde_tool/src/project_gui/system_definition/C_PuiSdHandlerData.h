@@ -71,6 +71,7 @@ protected:
 Q_SIGNALS:
    //lint -restore
    void SigNodesChanged(void);
+   void SigNodeChanged(const stw_types::uint32 ou32_Index);
    void SigBussesChanged(void);
    void SigSyncNodeAdded(const stw_types::uint32 ou32_Index);
    void SigSyncNodeHALC(const stw_types::uint32 ou32_Index);

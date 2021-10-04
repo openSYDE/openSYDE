@@ -31,16 +31,14 @@ public:
                                           const stw_types::uint64 & oru64_StartingNodeID,
                                           const stw_types::uint64 & oru64_LastNodeID, const QPointF & orc_ConnectionPos,
                                           const stw_types::sint32 & ors32_Interface,
-                                          const stw_types::sint8 & ors8_NodeId, const bool oq_ActivateDatapoolL2,
-                                          const bool oq_ActivateDatapoolECeS, const bool oq_ActivateDatapoolECoS,
+                                          const std::vector<stw_types::uint8> & orc_NodeIds,
                                           QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SdManUnoTopologyReconnectNodeCommand(void);
 
 protected:
    virtual void m_Reconnect(const stw_types::uint64 & oru64_StartingID, const stw_types::uint64 & oru64_LastID,
-                            const stw_types::sint32 & ors32_Interface, const stw_types::uint8 & oru8_NodeId,
-                            const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
-                            const bool oq_ActivateDatapoolECoS) override;
+                            const stw_types::sint32 & ors32_Interface,
+                            const std::vector<stw_types::uint8> & orc_NodeIds) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

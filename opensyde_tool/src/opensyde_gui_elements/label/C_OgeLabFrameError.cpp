@@ -13,7 +13,9 @@
 #include "precomp_headers.h"
 
 #include "C_Uti.h"
+#include "C_OgeWiUtil.h"
 #include "C_OgeLabFrameError.h"
+#include "C_GtGetText.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_logic;
@@ -45,16 +47,29 @@ C_OgeLabFrameError::C_OgeLabFrameError(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set new text content
+/*! \brief  Set foreground color (stylesheet color index)
 
-   \param[in]  orc_Text       New text
-   \param[in]  orc_Tooltip    New tooltip
+   \param[in]  osn_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeLabFrameError::SetCompleteText(const QString & orc_Text, const QString & orc_Tooltip)
+void C_OgeLabFrameError::SetForegroundColor(const stw_types::sintn osn_Value)
+{
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Foreground", osn_Value);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new text content
+
+   \param[in]  orc_Text          New text
+   \param[in]  orc_Tooltip       New tooltip
+   \param[in]  oe_TooltipType    Tooltip type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeLabFrameError::SetCompleteText(const QString & orc_Text, const QString & orc_Tooltip,
+                                         const stw_opensyde_gui::C_NagToolTip::E_Type oe_TooltipType)
 {
    this->mc_Text = orc_Text;
-   this->SetToolTipInformation("", orc_Tooltip, stw_opensyde_gui::C_NagToolTip::eERROR);
+   this->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"), orc_Tooltip, oe_TooltipType);
    m_OnSizeChange();
 }
 

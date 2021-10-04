@@ -69,7 +69,7 @@ void C_OgeCbxResizingView::ResizeViewToContents(void) const
       }
       //Use combo box size as minimum, otherwise use longest entry
       //+ magic number (some offset to avoid cutting of any text)
-      s32_MaxWidth = std::max(s32_MaxWidth + 10L, static_cast<sint32>(this->minimumSizeHint().width()));
+      s32_MaxWidth = std::max(static_cast<sintn>(s32_MaxWidth + 10L), this->minimumSizeHint().width());
       //5: Padding left
       this->view()->setMinimumWidth(static_cast<sintn>(s32_MaxWidth + 5L));
    }

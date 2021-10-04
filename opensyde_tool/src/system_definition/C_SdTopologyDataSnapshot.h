@@ -15,6 +15,7 @@
 #include <vector>
 #include "stwtypes.h"
 #include "C_PuiSdNode.h"
+#include "C_OSCNodeSquad.h"
 #include "C_PuiSdBus.h"
 #include "C_PuiBsElements.h"
 #include "C_PuiSdTextElementBus.h"
@@ -39,7 +40,8 @@ public:
    ///< stay synchronous with core arrays)
    std::vector<C_PuiSdBus> c_UIBuses; ///< UI information for buses (should always
    ///< stay synchronous with core arrays)
-   std::vector<stw_opensyde_core::C_OSCNode> c_OSCNodes; ///< all nodes that are part of this system
+   std::vector<stw_opensyde_core::C_OSCNode> c_OSCNodes;           ///< all nodes that are part of this system
+   std::vector<stw_opensyde_core::C_OSCNodeSquad> c_OSCNodeGroups; ///< all node groups that are part of this system
    ///< definition
    std::vector<stw_opensyde_core::C_OSCSystemBus> c_OSCBuses; ///< all buses that are part of this system
    ///< definition

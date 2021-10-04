@@ -81,7 +81,7 @@ bool C_OSCSuSequences::m_IsNodeActive(const uint32 ou32_NodeIndex, const uint32 
       {
          const C_OSCNodeComInterfaceSettings & rc_Settings = rc_Node.c_Properties.c_ComInterfaces[u16_Interface];
 
-         if ((rc_Settings.q_IsBusConnected == true) && (rc_Settings.u32_BusIndex == ou32_BusIndex) &&
+         if ((rc_Settings.GetBusConnected() == true) && (rc_Settings.u32_BusIndex == ou32_BusIndex) &&
              (rc_Settings.q_IsUpdateEnabled == true))
          {
             //we cannot know for sure whether the target is in flashloader or application mode
@@ -631,9 +631,11 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexData
             }
             else
             {
-               if (u32_RemainingBytes > (u32_MaxBlockLength - 5U))
+               //subtract 4 bytes from the reported size; compensated for an issue in older server implementations
+               // reporting an incorrect size; #62305
+               if (u32_RemainingBytes > (u32_MaxBlockLength - 4U))
                {
-                  c_Data.resize(static_cast<size_t>(u32_MaxBlockLength - 5U));
+                  c_Data.resize(static_cast<size_t>(u32_MaxBlockLength - 4U));
                }
                else
                {
@@ -960,9 +962,11 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
          }
          else
          {
-            if (u32_RemainingBytes > (u32_MaxBlockLength - 5U))
+            //subtract 4 bytes from the reported size; compensated for an issue in older server implementations
+            // reporting an incorrect size; #62305
+            if (u32_RemainingBytes > (u32_MaxBlockLength - 4U))
             {
-               c_Data.resize(static_cast<size_t>(u32_MaxBlockLength - 5U));
+               c_Data.resize(static_cast<size_t>(u32_MaxBlockLength - 4U));
             }
             else
             {
@@ -1469,8 +1473,11 @@ sint32 C_OSCSuSequences::m_ReadDeviceInformationOpenSyde(const uint8 ou8_Progres
       }
       else
       {
+         const C_OSCNode & rc_CurNode = this->mpc_SystemDefinition->c_Nodes[ou32_NodeIndex];
          //this information is only available for address based devices
-         if (this->mpc_SystemDefinition->c_Nodes[ou32_NodeIndex].pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased
+         tgl_assert(rc_CurNode.u32_SubDeviceIndex < rc_CurNode.pc_DeviceDefinition->c_SubDevices.size());
+         if (rc_CurNode.pc_DeviceDefinition->c_SubDevices[rc_CurNode.u32_SubDeviceIndex].
+             q_FlashloaderOpenSydeIsFileBased
              ==
              false)
          {
@@ -1721,7 +1728,10 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
          if (s32_Return == C_NO_ERR)
          {
             // Special case: File based nodes shall have unique file names
-            if (orc_Nodes[u16_Node].pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == true)
+            tgl_assert(
+               orc_Nodes[u16_Node].u32_SubDeviceIndex < orc_Nodes[u16_Node].pc_DeviceDefinition->c_SubDevices.size());
+            if (orc_Nodes[u16_Node].pc_DeviceDefinition->c_SubDevices[orc_Nodes[u16_Node].u32_SubDeviceIndex].
+                q_FlashloaderOpenSydeIsFileBased == true)
             {
                std::vector<C_SCLString> c_Files = orc_ApplicationsToWrite[u16_Node].c_FilesToFlash;
                //convert all file names to lower case to detects conflicts in the file system
@@ -1788,8 +1798,9 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
          {
             if (orc_ActiveNodes[u16_Node] == 1U)
             {
-               c_NodeTargetPaths[u16_Node] = TGL_FileIncludeTrailingDelimiter(
-                  orc_TargetPath + orc_Nodes[u16_Node].c_Properties.c_Name);
+               c_NodeTargetPaths[u16_Node] =
+                  TGL_FileIncludeTrailingDelimiter(orc_TargetPath + C_OSCUtils::h_NiceifyStringForFileName(
+                                                      orc_Nodes[u16_Node].c_Properties.c_Name));
 
                s32_Return = TGL_CreateDirectory(c_NodeTargetPaths[u16_Node]);
                if (s32_Return != 0)
@@ -1821,7 +1832,11 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                //compose target file name
                C_SCLString c_TargetFileName;
 
-               if (orc_Nodes[u16_Node].pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == true)
+               tgl_assert(
+                  orc_Nodes[u16_Node].u32_SubDeviceIndex <
+                  orc_Nodes[u16_Node].pc_DeviceDefinition->c_SubDevices.size());
+               if (orc_Nodes[u16_Node].pc_DeviceDefinition->c_SubDevices[orc_Nodes[u16_Node].u32_SubDeviceIndex].
+                   q_FlashloaderOpenSydeIsFileBased == true)
                {
                   // File based nodes need the unchanged file name and must be unique
                   c_TargetFileName = c_NodeTargetPaths[u16_Node] +
@@ -1941,23 +1956,21 @@ void C_OSCSuSequences::h_CheckForChangedApplications(
    Rough sequence:
    For local bus:
    * openSYDE nodes:
-   ** send "RequestProgramming" as broadcast
-   ** send "EcuReset" as broadcast
-   ** send "EnterPreProgrammingSession" as broadcast (for a few seconds in short intervals)
-   * STW Flashloader nodes:
+   ** send "RequestProgramming" to all nodes
+   ** send "EcuReset" to all nodes
+   ** if connected via CAN: send "EnterPreProgrammingSession" as broadcast (for a few seconds in short intervals)
+   * STW Flashloader nodes (CAN only):
    ** send all configured reset request messages
-   ** if connected via CAN: send "FLASH" (for a few seconds in short intervals;
-                            in parallel to the openSYDE "EnterPreProgrammingSession" service
+   ** send "FLASH" (for a few seconds in short intervals;
+      in parallel to the openSYDE "EnterPreProgrammingSession" broadcasts
    For confirmation:
    * use simple read service for all nodes that are expected to be present (as "ping")
 
-   Then recurse for all buses that can be reached through the first bus.
-
-   Different for routed target buses:
-   * address nodes individually; do not use broadcasts (except for the STW-Flashloader "FLASH" message)
+   Then recurse for all buses that can be reached through the first bus:
+   * set up routing and perform sequence bus-by-bus
 
    Result:
-   * all nodes on all buses are in flashloader mode
+   * all nodes defined to be present on all buses are in flashloader mode
 
    \param[in]   oq_FailOnFirstError   true: abort all further communication if connecting to one device fails
                                       false: try to continue with other devices in this case
@@ -3016,6 +3029,8 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
                   {
                      const C_OSCDeviceDefinition * const pc_DeviceDefinition =
                         this->mpc_SystemDefinition->c_Nodes[u32_NodeIndex].pc_DeviceDefinition;
+                     const uint32 u32_SubDeviceIndex =
+                        this->mpc_SystemDefinition->c_Nodes[u32_NodeIndex].u32_SubDeviceIndex;
                      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_START, C_NO_ERR, 10U, mc_CurrentNode,
                                             "Starting device update ...");
                      tgl_assert(pc_DeviceDefinition != NULL);
@@ -3050,21 +3065,23 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
                         if ((s32_Return == C_NO_ERR) &&
                             (orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash.size() > 0))
                         {
+                           tgl_assert(u32_SubDeviceIndex < pc_DeviceDefinition->c_SubDevices.size());
                            //address based or file based ?
-                           if (pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == false)
+                           if (pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased ==
+                               false)
                            {
                               s32_Return = m_FlashNodeOpenSydeHex(
                                  orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash,
                                  orc_ApplicationsToWrite[u32_NodeIndex].c_OtherAcceptedDeviceNames,
-                                 pc_DeviceDefinition->u32_FlashloaderOpenSydeRequestDownloadTimeout,
-                                 pc_DeviceDefinition->u32_FlashloaderOpenSydeTransferDataTimeout);
+                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeRequestDownloadTimeout,
+                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeTransferDataTimeout);
                            }
                            else
                            {
                               s32_Return = m_FlashNodeOpenSydeFile(
                                  orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash,
-                                 pc_DeviceDefinition->u32_FlashloaderOpenSydeRequestDownloadTimeout,
-                                 pc_DeviceDefinition->u32_FlashloaderOpenSydeTransferDataTimeout,
+                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeRequestDownloadTimeout,
+                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeTransferDataTimeout,
                                  c_AvailableFeatures);
                            }
                         }
@@ -3320,8 +3337,8 @@ void C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
                          orc_Info.c_MoreInformation.au8_ProtocolVersion[2]);
    orc_Text.Add(c_Line);
    orc_Text.Add("Flash count: " + C_SCLString::IntToStr(orc_Info.c_MoreInformation.u32_FlashCount));
-   c_Line = "Device serial number: " +
-            (C_OSCUtils::h_SerialNumberToString(&orc_Info.c_MoreInformation.au8_EcuSerialNumber[0]));
+   c_Line = "Device serial number: " + orc_Info.c_MoreInformation.GetEcuSerialNumber() + " " +
+            orc_Info.c_MoreInformation.GetEcuSerialNumberFormatDescription();
    orc_Text.Add(c_Line);
    orc_Text.Add("Device article number: " + C_SCLString::IntToStr(orc_Info.c_MoreInformation.u32_EcuArticleNumber));
    orc_Text.Add("Device article version: " + orc_Info.c_MoreInformation.c_EcuHardwareVersionNumber);

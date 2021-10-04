@@ -41,18 +41,23 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out]    opc_Item    Optional pointer to widget item
-   \param[in]        orc_Info    Device information
-   \param[in,out]    opc_Parent  Optional pointer to parent
+   \param[in,out]    opc_Item        Optional pointer to widget item
+   \param[in]        orc_Info        Device information
+   \param[in]        orc_SubNodeIds  Detected sub node ids with same serial number
+                                     - In case of a normal node, exact one sub node id which should be 0
+                                     - In case of a multiple CPU, at least two sub node ids
+   \param[in,out]    opc_Parent      Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcConnectedNodeWidget::C_SyvDcConnectedNodeWidget(QListWidgetItem * const opc_Item,
                                                        const C_SyvDcDeviceInformation & orc_Info,
+                                                       const std::set<uint8> & orc_SubNodeIds,
                                                        QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDcConnectedNodeWidget),
    mpc_ListWidgetItem(opc_Item),
-   mc_Info(orc_Info)
+   mc_Info(orc_Info),
+   mc_SubNodeIds(orc_SubNodeIds)
 {
    const QPixmap c_Device =
       static_cast<QPixmap>("://images/system_views/DeviceSmall.svg").scaled(QSize(16, 16), Qt::KeepAspectRatio,
@@ -86,9 +91,35 @@ C_SyvDcConnectedNodeWidget::~C_SyvDcConnectedNodeWidget(void)
    Pure serial number string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDcConnectedNodeWidget::GetSerialNumberString(void) const
+QString C_SyvDcConnectedNodeWidget::GetPlainSerialNumberString(void) const
 {
-   return static_cast<QString>(C_OSCUtils::h_SerialNumberToString(&this->mc_Info.au8_SerialNumber[0]).c_str());
+   return this->mc_Info.c_SerialNumber.GetSerialNumberAsPlainString().c_str();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flag for ext format of serial number
+
+   \return
+   Flag for ext format of serial number
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDcConnectedNodeWidget::GetExtFormat(void) const
+{
+   return this->mc_Info.c_SerialNumber.q_ExtFormatUsed;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get manufacturer format for ext format of serial number
+
+   In case of standard serial number the value is 0
+
+   \return
+   Manufacturer format for ext format of serial number
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint8 C_SyvDcConnectedNodeWidget::GetManufacturerFormat(void) const
+{
+   return this->mc_Info.c_SerialNumber.u8_SerialNumberManufacturerFormat;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -125,16 +156,24 @@ bool C_SyvDcConnectedNodeWidget::GetDeviceNameValid(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Compare if widget matches to serial number
 
-   \param[in] orc_SerialNumber Serial number
+   \param[in] orc_SerialNumber       Serial number
 
    \return
    True  Match
    False No match
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDcConnectedNodeWidget::CompareSerialNumber(const QString & orc_SerialNumber) const
+bool C_SyvDcConnectedNodeWidget::CompareSerialNumber(
+   const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const
 {
-   return (orc_SerialNumber.compare(this->GetSerialNumberString()) == 0);
+   bool q_Return = false;
+
+   if (orc_SerialNumber == this->mc_Info.c_SerialNumber)
+   {
+      q_Return = true;
+   }
+
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -163,27 +202,36 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
    QString c_Id;
    QString c_Device;
    const sintn sn_Height = 72;
-   const sintn sn_Width = 227;
+   const sintn sn_Width = 294;
 
-   if (this->mc_Info.q_SerialNumberValid == true)
+   if (this->mc_Info.c_SerialNumber.q_IsValid == true)
    {
-      c_Name = static_cast<QString>(C_OSCUtils::h_SerialNumberToString(&this->mc_Info.au8_SerialNumber[0]).c_str());
+      c_Name = this->mc_Info.c_SerialNumber.GetSerialNumberAsFormattedString().c_str();
    }
    else
    {
       c_Name = C_GtGetText::h_GetText("Unknown");
    }
+
    this->mpc_Ui->pc_LabelName->setText(static_cast<QString>("SN.: %1").arg(c_Name));
+
    if (this->mc_Info.q_NodeIdValid == true)
    {
-      c_Id = QString::number(this->mc_Info.u8_NodeId);
+      if (this->mc_SubNodeIds.size() > 1)
+      {
+         c_Id = C_GtGetText::h_GetText("<multiple>");
+      }
+      else
+      {
+         c_Id = QString::number(this->mc_Info.u8_NodeId);
+      }
    }
    else
    {
       c_Id = C_GtGetText::h_GetText("Unknown");
    }
 
-   if (this->mc_Info.q_IpAddressValid == true)
+   if ((this->mc_Info.q_IpAddressValid == true) && (this->mc_SubNodeIds.size() == 1))
    {
       // Show IP address if valid. If the IP address is valid, a Ethernet bus is used
       c_Id += " / IP: " + C_Uti::h_IpAddressToString(this->mc_Info.au8_IpAddress);

@@ -340,7 +340,7 @@ void C_SdSearchTreeWidget::m_SearchNodeContent(const C_OSCNode & orc_Node, const
 
    if (c_Name.contains(this->mc_SearchString, Qt::CaseInsensitive) == true)
    {
-      this->m_AddNodeResult(c_Name, ou32_NodeIndex, orc_Node.c_DeviceType.c_str());
+      this->m_AddNodeResult(c_Name, ou32_NodeIndex, orc_Node.pc_DeviceDefinition->c_DeviceName.c_str());
    }
 
    // search datapools and the content of the datapools

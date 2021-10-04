@@ -282,7 +282,7 @@ void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeI
                                                                             rc_ComInterface.u8_InterfaceNumber);
             QString c_BusName = "";
 
-            if (rc_ComInterface.q_IsBusConnected == true)
+            if (rc_ComInterface.GetBusConnected() == true)
             {
                const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
                   rc_ComInterface.u32_BusIndex);
@@ -366,7 +366,7 @@ void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeI
 
    Function is only usable in node mode
 
-   \param[in]       ou32_DataPoolIndexw     Index of a COMM Datapool
+   \param[in]  ou32_DataPoolIndexw  Index of a COMM Datapool
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::SetProtocolByDataPool(const uint32 ou32_DataPoolIndexw)
@@ -888,7 +888,7 @@ void C_SdBueComIfDescriptionWidget::m_Reload(void)
          const C_OSCNodeComInterfaceSettings & rc_ComInterface =
             pc_Node->c_Properties.c_ComInterfaces[this->mu32_InterfaceIndex];
 
-         if (rc_ComInterface.q_IsBusConnected == true)
+         if (rc_ComInterface.GetBusConnected() == true)
          {
             this->mpc_Ui->pc_LinkToBusLabel->setText(
                C_Uti::h_GetLink(this->mc_BusNames[this->mu32_InterfaceIndex] + " - COMM Messages",
@@ -1649,7 +1649,7 @@ void C_SdBueComIfDescriptionWidget::m_OnLinkSwitchToBus(const QString & orc_Link
       const C_OSCNodeComInterfaceSettings & rc_ComInterface =
          pc_Node->c_Properties.c_ComInterfaces[this->mu32_InterfaceIndex];
 
-      if (rc_ComInterface.q_IsBusConnected == true)
+      if (rc_ComInterface.GetBusConnected() == true)
       {
          Q_EMIT (this->SigSwitchToBus(rc_ComInterface.u32_BusIndex, orc_Link));
       }
@@ -1833,7 +1833,7 @@ void C_SdBueComIfDescriptionWidget::m_UpdateInterfaceText(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the text of the combo box for the specific interface
 
-   \param[in]  oe_Protocol    Current protocol
+   \param[in]  ou32_InterfaceIndex  Interface index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_UpdateInterfaceText(const uint32 ou32_InterfaceIndex) const
@@ -1861,10 +1861,10 @@ void C_SdBueComIfDescriptionWidget::m_UpdateInterfaceText(const uint32 ou32_Inte
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the message and signal count of a node without the sync manager direct from the node
 
-   \param[in]       oe_Protocol             Protocol type
-   \param[in]       ou32_InterfaceIndex     Interface of node
-   \param[out]      oru32_MessageCount      Detected message count of node
-   \param[out]      oru32_SignalCount       Detected signal count of node
+   \param[in]   oe_Protocol            Protocol type
+   \param[in]   ou32_InterfaceIndex    Interface of node
+   \param[out]  oru32_MessageCount     Detected message count of node
+   \param[out]  oru32_SignalCount      Detected signal count of node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_GetNodeMessageAndSignalCount(const C_OSCCanProtocol::E_Type oe_Protocol,

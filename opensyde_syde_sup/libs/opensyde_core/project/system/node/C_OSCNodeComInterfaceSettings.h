@@ -51,13 +51,22 @@ public:
    bool q_IsUpdateEnabled;         ///< Flag for update enabled using this bus
    bool q_IsRoutingEnabled;        ///< Flag for routing enabled using this bus
    bool q_IsDiagnosisEnabled;      ///< Flag for diagnosis enabled using this bus
-   bool q_IsBusConnected;          ///< Flag if there is a valid bus connected to this interface
    stw_types::uint32 u32_BusIndex; ///< Target bus index this interface connects to
    ///< (index in system definition)
    ///< Only valid if bus flag q_IsBusConnected is true
 
    void AddConnection(const stw_types::uint32 & oru32_BusIndex);
    void RemoveConnection(void);
+
+   bool GetBusConnected(void) const;
+   bool GetBusConnectedRawValue(void) const;
+   void SetBusConnected(const bool oq_Value);
+   bool GetInterfaceConnectedInDeviceRawValue(void) const;
+   void SetInterfaceConnectedInDevice(const bool oq_Value);
+
+private:
+   bool mq_IsBusConnected;               ///< Flag if there is a valid bus connected to this interface
+   bool mq_IsInterfaceConnectedInDevice; ///< Flag if the interface is active in device
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

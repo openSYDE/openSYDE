@@ -41,6 +41,7 @@ SOURCES += \
     $${PWD}/scl/CSCLString.cpp \
     $${PWD}/scl/CSCLStringList.cpp \
     $${PWD}/xml_parser/C_OSCXMLParser.cpp \
+    $${PWD}/xml_parser/C_OSCXMLParserLog.cpp \
     $${PWD}/xml_parser/C_OSCChecksummedXML.cpp \
     $${PWD}/xml_parser/tinyxml2/tinyxml2.cpp
 
@@ -66,6 +67,7 @@ HEADERS += \
     $${PWD}/stwerrors.h \
     $${PWD}/stwtypes/stwtypes.h \
     $${PWD}/xml_parser/C_OSCXMLParser.h \
+    $${PWD}/xml_parser/C_OSCXMLParserLog.h \
     $${PWD}/xml_parser/C_OSCChecksummedXML.h \
     $${PWD}/xml_parser/tinyxml2/tinyxml2.h
 
@@ -189,7 +191,9 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/C_OSCProject.cpp \
        $${PWD}/project/C_OSCProjectFiler.cpp \
        $${PWD}/project/system/C_OSCDeviceDefinitionFiler.cpp \
+       $${PWD}/project/system/C_OSCDeviceDefinitionFilerV1.cpp \
        $${PWD}/project/system/C_OSCDeviceDefinition.cpp \
+       $${PWD}/project/system/C_OSCSubDeviceDefinition.cpp \
        $${PWD}/project/system/C_OSCDeviceGroup.cpp \
        $${PWD}/project/system/C_OSCDeviceManager.cpp \
        $${PWD}/project/system/C_OSCSystemBus.cpp \
@@ -210,6 +214,8 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/can/C_OSCCanSignal.cpp \
        $${PWD}/project/system/node/can/C_OSCCanUtil.cpp \
        $${PWD}/project/system/node/C_OSCNode.cpp \
+       $${PWD}/project/system/node/C_OSCNodeSquad.cpp \
+       $${PWD}/project/system/node/C_OSCNodeSquadFiler.cpp \
        $${PWD}/project/system/node/C_OSCNodeApplication.cpp \
        $${PWD}/project/system/node/C_OSCNodeCodeExportSettings.cpp \
        $${PWD}/project/system/node/C_OSCNodeComInterfaceSettings.cpp \
@@ -261,6 +267,8 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/C_OSCProjectFiler.h \
        $${PWD}/project/system/C_OSCDeviceDefinition.h \
        $${PWD}/project/system/C_OSCDeviceDefinitionFiler.h \
+       $${PWD}/project/system/C_OSCDeviceDefinitionFilerV1.h \
+       $${PWD}/project/system/C_OSCSubDeviceDefinition.h \
        $${PWD}/project/system/C_OSCDeviceGroup.h \
        $${PWD}/project/system/C_OSCDeviceManager.h \
        $${PWD}/project/system/C_OSCSystemBus.h \
@@ -275,6 +283,8 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.h \
        $${PWD}/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.h \
        $${PWD}/project/system/node/C_OSCNode.h \
+       $${PWD}/project/system/node/C_OSCNodeSquad.h \
+       $${PWD}/project/system/node/C_OSCNodeSquadFiler.h \
        $${PWD}/project/system/node/C_OSCNodeApplication.h \
        $${PWD}/project/system/node/C_OSCNodeCodeExportSettings.h \
        $${PWD}/project/system/node/C_OSCNodeDataPoolContentUtil.h \
@@ -381,6 +391,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/C_OSCDiagProtocolKfx.cpp \
               $${PWD}/protocol_drivers/C_OSCDiagProtocolOsy.cpp \
               $${PWD}/protocol_drivers/C_OSCFlashProtocolStwFlashloader.cpp \
+              $${PWD}/protocol_drivers/C_OSCProtocolSerialNumber.cpp \
               $${PWD}/protocol_drivers/C_OSCProtocolDriverOsy.cpp \
               $${PWD}/protocol_drivers/C_OSCProtocolDriverOsyTpBase.cpp \
               $${PWD}/protocol_drivers/C_OSCProtocolDriverOsyTpCan.cpp \
@@ -421,6 +432,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/C_OSCDiagProtocolKfx.h \
               $${PWD}/protocol_drivers/C_OSCDiagProtocolOsy.h \
               $${PWD}/protocol_drivers/C_OSCFlashProtocolStwFlashloader.h \
+              $${PWD}/protocol_drivers/C_OSCProtocolSerialNumber.h \
               $${PWD}/protocol_drivers/C_OSCProtocolDriverOsy.h \
               $${PWD}/protocol_drivers/C_OSCProtocolDriverOsyTpBase.h \
               $${PWD}/protocol_drivers/C_OSCProtocolDriverOsyTpCan.h \

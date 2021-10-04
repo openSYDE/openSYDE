@@ -22,7 +22,7 @@ How to build:
 =============
 Windows:
    cd ../bat
-   build.bat (paths to compiler, cmake, ninja might need to be adapted in this file depending on the installation)
+   build.bat (paths to compiler, cmake, ninja might need to be adapted in "build_incremental.bat" depending on the installation)
 Ubuntu: 
    cd ../bat
    chmod +x ./build.sh

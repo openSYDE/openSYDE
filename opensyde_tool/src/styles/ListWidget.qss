@@ -1,6 +1,4 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_NagTopList,
-stw_opensyde_gui--C_NagTopList::item,
 stw_opensyde_gui--C_NagViewList,
 stw_opensyde_gui--C_SyvDcConnectedNodeList,
 stw_opensyde_gui--C_SyvDcExistingNodeList,
@@ -11,7 +9,6 @@ outline: none;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_NagTopList,
 stw_opensyde_gui--C_NagViewList,
 stw_opensyde_gui--C_SyvDcConnectedNodeList,
 stw_opensyde_gui--C_SyvDcExistingNodeList,

@@ -79,6 +79,9 @@ using namespace stw_can;
 #define OSY_DPD_SI_OS_WRITE_DATAPOOLDATA_BY_IDENTIFIER (0xBCU) ///< system supplier specific
 #define OSY_UDC_B_SI_READ_SERIAL_NUMBER                (0xBDU) ///< system supplier specific
 #define OSY_UDC_B_SI_SS_CAN_TUNNELING                  (0xBEU) ///< system supplier specific
+#define OSY_OS_READ_DATAPOOLDATA_EVENT_DRIVEN          (0xF1U) ///< STW-specific single frame specific
+#define OSY_OS_POS_STARTUP_MESSAGE                     (0xF3U) ///< STW-specific single frame specific
+#define OSY_OS_FSN_STARTUP_MESSAGE                     (0xF4U) ///< STW-specific single frame specific
 
 ///negative response byte:
 #define OSY_UDS_NR_SI       (0x7FU) ///< Negative response service identifier
@@ -121,6 +124,8 @@ using namespace stw_can;
 #define DPD_DATAID_APPLICATION_NAME                         (0xA81BU)
 #define DPD_DATAID_APPLICATION_VERSION                      (0xA81CU)
 #define DPD_DATAID_FILE_BASED_TRANSFER_EXIT_RESULT          (0xA81DU)
+#define UDC_H_DATAID_ECU_SERIAL_NUMBER_EXT                  (0xA81EU)
+#define UDC_H_DATAID_SUB_NODE_ID                            (0xA81FU)
 #define UDC_H_DATAID_BOOTSOFTWARE_IDENTIFICATION            (0xF180U)
 #define FL_H_DATAID_SOFTWARE_FINGERPRINT                    (0xF184U)
 #define UDC_H_DATAID_ACTIVE_DIAGNOSTIC_SESSION              (0xF186U)
@@ -130,22 +135,35 @@ using namespace stw_can;
 #define UDC_H_DATAID_UDS_VERSION                            (0xFF00U)
 
 //routine IDs
-#define UDS_H_ROUTINE_CTRL_ROUTE_DIAGNOSIS_COMMUNICATION    (0x202U)
-#define UDS_H_ROUTINE_CTRL_SEND_CAN_MESSAGE                 (0x203U)
-#define UDS_H_ROUTINE_CTRL_TUNNEL_CAN_MESSAGES              (0x204U)
-#define UDS_H_ROUTINE_CTRL_REQUEST_PROGRAMMING              (0x206U)
-#define UDS_H_ROUTINE_CTRL_SET_BITRATE                      (0x207U)
-#define FL_H_ROUTINE_CTRL_CHECK_FLASH_MEMORY_AVAILABLE      (0x208U)
-#define FL_H_ROUTINE_CTRL_READ_FLASHBLOCK_DATA              (0x209U)
+#define UDS_H_ROUTINE_CTRL_ROUTE_DIAGNOSIS_COMMUNICATION        (0x202U)
+#define UDS_H_ROUTINE_CTRL_SEND_CAN_MESSAGE                     (0x203U)
+#define UDS_H_ROUTINE_CTRL_TUNNEL_CAN_MESSAGES                  (0x204U)
+#define UDS_H_ROUTINE_CTRL_ROUTE_IP_2_IP_COMMUNICATION          (0x205U)
+#define UDS_H_ROUTINE_CTRL_REQUEST_PROGRAMMING                  (0x206U)
+#define UDS_H_ROUTINE_CTRL_SET_BITRATE                          (0x207U)
+#define FL_H_ROUTINE_CTRL_CHECK_FLASH_MEMORY_AVAILABLE          (0x208U)
+#define FL_H_ROUTINE_CTRL_READ_FLASHBLOCK_DATA                  (0x209U)
 #define UDS_H_ROUTINE_CTRL_CONFIG_FLALOAD_COMMUNICATION_CHANNEL (0x210U)
-#define DPD_ROUTINEID_READ_DATAPOOL_METADATA                (0x211U)
-#define DPD_ROUTINEID_VERIFY_DATAPOOL                       (0x212U)
-#define DPD_ROUTINEID_NOTIFY_NVM_CHANGED                    (0x213U)
-#define UDS_H_ROUTINE_CTRL_SET_NODEID_FOR_CHANNEL           (0x214U)
-#define UDS_H_ROUTINE_CTRL_SET_IP_ADDRESS_FOR_CHANNEL       (0x215U)
-#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART1 (0x216U)
-#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART2 (0x217U)
-#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART3 (0x218U)
+#define DPD_ROUTINEID_READ_DATAPOOL_METADATA                    (0x211U)
+#define DPD_ROUTINEID_VERIFY_DATAPOOL                           (0x212U)
+#define DPD_ROUTINEID_NOTIFY_NVM_CHANGED                        (0x213U)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_FOR_CHANNEL               (0x214U)
+#define UDS_H_ROUTINE_CTRL_SET_IP_ADDRESS_FOR_CHANNEL           (0x215U)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART1     (0x216U)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART2     (0x217U)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART3     (0x218U)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_1     (0x219U)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_2     (0x21AU)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_3     (0x21BU)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_4     (0x21CU)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_5     (0x21DU)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_6     (0x21EU)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_7     (0x21FU)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_8     (0x220U)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_9     (0x221U)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_10    (0x222U)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_11    (0x223U)
+#define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_12    (0x224U)
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -671,7 +689,26 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
       u8_FirstRawByte = 2U;
       break;
    case OSY_UDC_B_SI_READ_SERIAL_NUMBER:
-      if (q_IsResponse == true)
+      if (q_IsResponse == false)
+      {
+         if (ou8_ServiceSize == 3U)
+         {
+            // Special case: Extended request
+            c_Text += "Ext";
+            c_Text += "  BlockNumber: " + C_SCLString::IntToStr(opu8_ServiceData[1]);
+            // Byte 3 is reserved
+            u8_FirstRawByte = ou8_ServiceSize; //everything displayed ...
+         }
+         else if (ou8_ServiceSize == 1U)
+         {
+            // Standard format, nothing to interpret
+         }
+         else
+         {
+            c_Text = " error: unexpected DLC received";
+         }
+      }
+      else
       {
          if (ou8_ServiceSize != 7U)
          {
@@ -679,9 +716,69 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
          }
          else
          {
+            // For the response it is not possible to tell the difference between standard and extended format
             C_SCLString c_Snr;
+            const uint8 u8_BlockNumber = opu8_ServiceData[1] & 0x0FU;
+            const uint8 u8_SubNodeId = static_cast<uint8>((opu8_ServiceData[1] & 0xF0U) >> 4U);
+            const uint32 u32_UniqueId = (static_cast<uint32>(opu8_ServiceData[2]) << 16U) +
+                                        (static_cast<uint32>(opu8_ServiceData[3]) << 8U) +
+                                        static_cast<uint32>(opu8_ServiceData[4]);
+
+            // Interpret as standard format with POS
             c_Snr = this->mh_SerialNumberToString(&opu8_ServiceData[1]);
-            c_Text += "  SNR:" + c_Snr;
+            c_Text += "  Std SNR POS: " + c_Snr;
+
+            c_Text += "  Ext SNR BlockNumber: " + C_SCLString::IntToStr(u8_BlockNumber);
+            c_Text += "  SubNodeId: " + C_SCLString::IntToStr(u8_SubNodeId);
+            c_Text += "  UniqueId: " + C_SCLString::IntToHex(u32_UniqueId, 6);
+
+            if (u8_BlockNumber == 0)
+            {
+               // First byte reserved
+               c_Text += "  Manufacturer Format: " + C_SCLString::IntToStr(opu8_ServiceData[6]);
+            }
+            else if (u8_BlockNumber == 1)
+            {
+               C_SCLString c_Text2;
+
+               c_Text += "  Length: " + C_SCLString::IntToStr(opu8_ServiceData[5]);
+               c_Text += "  SNR FSN First sign: ";
+               c_Text += static_cast<charn>(opu8_ServiceData[6]);
+
+               // Potential STW BCD packed in extended service
+               c_Text2.PrintFormatted("  SNR POS First signs: %02x", opu8_ServiceData[6]);
+               c_Text += c_Text2;
+            }
+            else
+            {
+               C_SCLString c_Text2;
+
+               // The serial number itself
+               c_Text += "  SNR FSN Part: ";
+               c_Text += static_cast<charn>(opu8_ServiceData[5]);
+               if (opu8_ServiceData[6] != 0U)
+               {
+                  // Last byte is 0 if the FSN string is not a multiple of 2
+                  c_Text += static_cast<charn>(opu8_ServiceData[6]);
+               }
+
+               // Potential STW BCD packed in extended service
+               if (u8_BlockNumber <= 3U)
+               {
+                  c_Text2.PrintFormatted("  SNR POS Part: %02x%02x", opu8_ServiceData[5], opu8_ServiceData[6]);
+                  c_Text += c_Text2;
+               }
+               else if (u8_BlockNumber == 4U)
+               {
+                  c_Text2.PrintFormatted("  SNR POS Last signs: %02x", opu8_ServiceData[5]);
+                  c_Text += c_Text2;
+               }
+               else
+               {
+                  // Nothing to do, POS format would be finished already
+               }
+            }
+
             u8_FirstRawByte = 8U; //everything displayed ...
          }
       }
@@ -1142,6 +1239,21 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 o
          }
       }
       break;
+   case UDC_H_DATAID_SUB_NODE_ID:
+      c_Text = "SubNodeId";
+      if (oq_IsResponse == true)
+      {
+         if (ou8_PayloadSize != 1U)
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+         else
+         {
+            c_Text += "  SubNodeId: " + C_SCLString::IntToStr(opu8_Payload[0]);
+            u8_FirstRawByte = ou8_PayloadSize; //finished here ...
+         }
+      }
+      break;
    case FL_H_DATAID_SOFTWARE_FINGERPRINT:
       c_Text = "ApplicationSoftwareFingerPrint";
       break;
@@ -1187,6 +1299,35 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 o
             u8_FirstRawByte = 3U; //finished here ...
          }
       }
+      break;
+   case UDC_H_DATAID_ECU_SERIAL_NUMBER_EXT:
+      c_Text = "EcuSerialNumberExtended";
+      if (oq_IsResponse == true)
+      {
+         if (ou8_PayloadSize > 2U)
+         {
+            c_Text += "  SNR Manufacturer Format: " + C_SCLString::IntToStr(opu8_Payload[0]);
+            c_Text += "  SNR Length: " + C_SCLString::IntToStr(opu8_Payload[1]);
+            if (opu8_Payload[0] != 0U)
+            {
+               c_Text += "  SNR First sign: ";
+               c_Text += static_cast<charn>(opu8_Payload[2]);
+            }
+            else
+            {
+               C_SCLString c_Text2;
+               // STW BCD packed in extended service
+               c_Text2.PrintFormatted("  SNR First signs: %02x", opu8_Payload[2]);
+               c_Text += c_Text2;
+            }
+            u8_FirstRawByte = ou8_PayloadSize; //finished here ...
+         }
+         else
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+      }
+
       break;
    case UDC_H_DATAID_SYSTEM_SUPPLIER_ECU_HW_NUMBER:
       c_Text = "SystemSupplierEcuHardwareNumber";
@@ -1368,16 +1509,131 @@ C_SCLString C_CMONProtocolOpenSYDE::m_RoutineDataToText(const uint16 ou16_Routin
       c_Text = "SetIpAddressForChannel";
       break;
    case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART1:
-      //no details reported for now
       c_Text = "SetNodeIdBySerialNumberPart1";
+      if (oq_IsResponse == false)
+      {
+         if (ou8_DataSize == 3U)
+         {
+            C_SCLString c_Text2;
+            c_Text2.PrintFormatted("  SNR POS First Part: %02x%02x%02x", opu8_Data[0], opu8_Data[1], opu8_Data[2]);
+            c_Text += c_Text2;
+            u8_FirstRawByte = ou8_DataSize; //finished here ...
+         }
+         else
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+      }
       break;
    case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART2:
-      //no details reported for now
       c_Text = "SetNodeIdBySerialNumberPart2";
+      if (oq_IsResponse == false)
+      {
+         if (ou8_DataSize == 3U)
+         {
+            C_SCLString c_Text2;
+            c_Text2.PrintFormatted("  SNR POS Last Part: %02x%02x%02x", opu8_Data[0], opu8_Data[1], opu8_Data[2]);
+            c_Text += c_Text2;
+            u8_FirstRawByte = ou8_DataSize; //finished here ...
+         }
+         else
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+      }
       break;
    case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART3:
-      //no details reported for now
       c_Text = "SetNodeIdBySerialNumberPart3";
+      if (oq_IsResponse == false)
+      {
+         if (ou8_DataSize == 2U)
+         {
+            c_Text += "  BusId: " + C_SCLString::IntToStr(opu8_Data[0]);
+            c_Text += "  NodeId: " + C_SCLString::IntToStr(opu8_Data[1]);
+            u8_FirstRawByte = ou8_DataSize; //finished here ...
+         }
+         else
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+      }
+      break;
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_1:
+      c_Text = "SetNodeIdBySerialNumberExtPart1";
+      if (oq_IsResponse == false)
+      {
+         if (ou8_DataSize == 3U)
+         {
+            // Byte 0 is reserved
+            c_Text += "  BusId: " + C_SCLString::IntToStr(opu8_Data[1]);
+            c_Text += "  NodeId: " + C_SCLString::IntToStr(opu8_Data[2]);
+            u8_FirstRawByte = ou8_DataSize; //finished here ...
+         }
+         else
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+      }
+      break;
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_2:
+      c_Text = "SetNodeIdBySerialNumberExtPart2";
+      if (oq_IsResponse == false)
+      {
+         if (ou8_DataSize == 3U)
+         {
+            c_Text += "  SubNodeId: " + C_SCLString::IntToStr(opu8_Data[0]);
+            c_Text += "  SNR Manufacturer Format: " + C_SCLString::IntToStr(opu8_Data[1]);
+            c_Text += "  SNR Length: " + C_SCLString::IntToStr(opu8_Data[2]);
+            u8_FirstRawByte = ou8_DataSize; //finished here ...
+         }
+         else
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+      }
+      break;
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_3:  // Similar service
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_4:  // Similar service
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_5:  // Similar service
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_6:  // Similar service
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_7:  // Similar service
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_8:  // Similar service
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_9:  // Similar service
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_10: // Similar service
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_11: // Similar service
+   case UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_12: // Similar service
+      //no details reported for now
+      c_Text = "SetNodeIdBySerialNumberExtPart" + C_SCLString::IntToStr(
+         (ou16_RoutineIdentifier - UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_1) + 1U);
+
+      if (oq_IsResponse == false)
+      {
+         if (ou8_DataSize > 0U)
+         {
+            uint32 u32_SnrSignCounter;
+            // Show the parts of serial number as string
+            c_Text += "  SNR FSN Part: ";
+            for (u32_SnrSignCounter = 0U; u32_SnrSignCounter < ou8_DataSize; ++u32_SnrSignCounter)
+            {
+               c_Text += static_cast<charn>(opu8_Data[u32_SnrSignCounter]);
+            }
+
+            if ((ou8_DataSize == 3U) &&
+                ((ou16_RoutineIdentifier == UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_3) ||
+                 (ou16_RoutineIdentifier == UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_EXT_4)))
+            {
+               C_SCLString c_Text2;
+               // POS could be possible, but can not be differed. Show both possibilities
+               c_Text2.PrintFormatted("  SNR POS Part: %02x%02x%02x", opu8_Data[0], opu8_Data[1], opu8_Data[2]);
+               c_Text += c_Text2;
+            }
+            u8_FirstRawByte = ou8_DataSize; //finished here ...
+         }
+         else
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+      }
       break;
    default:
       c_Text = "unknownroutineidentifier (" + m_GetValueDecHex(ou16_RoutineIdentifier) + ")";
@@ -1530,11 +1786,7 @@ C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_
                break;
             case STWOPENSYDE_PCI_SF:
                c_Text += " OSF ";
-               if (orc_Msg.au8_Data[0] != 0xF1U) //only event driven transfer known ...
-               {
-                  c_Error = "unknown service" + m_GetByteAsStringFormat(orc_Msg.au8_Data[0] & 0x0FU);
-               }
-               else
+               if (orc_Msg.au8_Data[0] == OSY_OS_READ_DATAPOOLDATA_EVENT_DRIVEN)
                {
                   c_Text += " ReadDataPoolDataEventDriven ";
                   if (orc_Msg.u8_DLC < 3U) //not enough data
@@ -1554,6 +1806,76 @@ C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_
                         c_Text += m_RawDataToString(orc_Msg.u8_DLC - 4U, &orc_Msg.au8_Data[4]);
                      }
                   }
+               }
+               else if (orc_Msg.au8_Data[0] == OSY_OS_POS_STARTUP_MESSAGE)
+               {
+                  c_Text += " Startup message POS ";
+                  if (orc_Msg.u8_DLC < 8U) //not enough data
+                  {
+                     c_Error = "DLC too short (no dataPoolDataIdentifier)";
+                  }
+                  else
+                  {
+                     //we should have data:
+                     C_SCLString c_Snr;
+                     uint32 u32_SubNodeId = static_cast<uint32>(orc_Msg.au8_Data[1] & 0xF0U) >> 4U;
+                     c_Snr = this->mh_SerialNumberToString(&orc_Msg.au8_Data[2]);
+                     c_Text += "  SubNodeId: " + C_SCLString::IntToStr(u32_SubNodeId);
+                     c_Text += "  SNR: " + c_Snr;
+                  }
+               }
+               else if (orc_Msg.au8_Data[0] == OSY_OS_FSN_STARTUP_MESSAGE)
+               {
+                  c_Text += " Startup message FSN ";
+                  if (orc_Msg.u8_DLC < 2U) //not enough data
+                  {
+                     c_Error = "DLC too short";
+                  }
+                  else
+                  {
+                     //we should have data:
+                     uint32 u32_BlockNr =  static_cast<uint32>(orc_Msg.au8_Data[1] & 0x0FU);
+                     uint32 u32_SubNodeId = static_cast<uint32>(orc_Msg.au8_Data[1] & 0xF0U) >> 4U;
+                     uint32 u32_SnrSignStartIndex;
+                     uint32 u32_SnrSignCounter;
+                     bool q_DlcCorrect = true;
+
+                     c_Text += "  BlockNumber: " + C_SCLString::IntToStr(u32_BlockNr);
+                     c_Text += "  SubNodeId: " + C_SCLString::IntToStr(u32_SubNodeId);
+
+                     if ((u32_BlockNr == 0U) &&
+                         (orc_Msg.u8_DLC > 4U)) // SNR must have a length of at least 1
+                     {
+                        c_Text += "  SNR Manufacturer Format: " + C_SCLString::IntToStr(orc_Msg.au8_Data[2]);
+                        c_Text += "  SNR Length: " + C_SCLString::IntToStr(orc_Msg.au8_Data[3]);
+                        u32_SnrSignStartIndex = 4U;
+                     }
+                     else if (u32_BlockNr > 0U)
+                     {
+                        u32_SnrSignStartIndex = 2U;
+                     }
+                     else
+                     {
+                        q_DlcCorrect = false;
+                        c_Error = "DLC too short";
+                     }
+
+                     if (q_DlcCorrect == true)
+                     {
+                        // The rest of the message is a part of the SNR itself
+                        c_Text += "  SNR Block part: ";
+
+                        for (u32_SnrSignCounter = u32_SnrSignStartIndex; u32_SnrSignCounter < orc_Msg.u8_DLC;
+                             ++u32_SnrSignCounter)
+                        {
+                           c_Text += static_cast<charn>(orc_Msg.au8_Data[u32_SnrSignCounter]);
+                        }
+                     }
+                  }
+               }
+               else
+               {
+                  c_Error = "unknown service" + m_GetByteAsStringFormat(orc_Msg.au8_Data[0] & 0x0FU);
                }
                break;
 

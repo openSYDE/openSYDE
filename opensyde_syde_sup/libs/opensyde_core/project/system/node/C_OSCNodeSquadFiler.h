@@ -1,41 +1,34 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Delegate for topology list (header)
-
-   See cpp file for detailed description
-
-   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
+   \brief       NodeSquad reader/writer
+   \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_NAGTOPLISTDELEGATE_H
-#define C_NAGTOPLISTDELEGATE_H
+#ifndef C_OSCNODESQUADFILER_H
+#define C_OSCNODESQUADFILER_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QStyledItemDelegate>
-#include "stwtypes.h"
+#include "C_OSCNodeSquad.h"
+#include "C_OSCXMLParser.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
-namespace stw_opensyde_gui
+namespace stw_opensyde_core
 {
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-class C_NagTopListDelegate :
-   public QStyledItemDelegate
+class C_OSCNodeSquadFiler
 {
 public:
-   C_NagTopListDelegate(QObject * const opc_Parent = NULL);
+   C_OSCNodeSquadFiler();
 
-   void SetSelectedIndex(const stw_types::sint32 os32_Selected);
-
-   virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
-                      const QModelIndex & orc_Index) const override;
-   virtual QSize sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const override;
-
-private:
-   stw_types::sint32 ms32_Selected;
+   static stw_types::sint32 h_LoadNodeGroups(std::vector<C_OSCNodeSquad> & orc_NodeGroups,
+                                             C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 h_LoadNodeGroup(C_OSCNodeSquad & orc_NodeGroup, C_OSCXMLParserBase & orc_XMLParser);
+   static void h_SaveNodeGroups(const std::vector<C_OSCNodeSquad> & orc_NodeGroups, C_OSCXMLParserBase & orc_XMLParser);
+   static void h_SaveNodeGroup(const C_OSCNodeSquad & orc_NodeGroup, C_OSCXMLParserBase & orc_XMLParser);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

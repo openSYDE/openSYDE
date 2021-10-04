@@ -15,10 +15,15 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include "C_OgeTabBar.h"
+#include <QTabBar>
+
+#include "constants.h"
+#include "C_Uti.h"
 #include "C_OgeTawAlternative.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_opensyde_gui;
+using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -45,7 +50,11 @@ C_OgeTawAlternative::C_OgeTawAlternative(QWidget * const opc_Parent) :
    QTabWidget(opc_Parent)
 {
    this->setUsesScrollButtons(false);
-   this->setTabBar(new C_OgeTabBar(this));
+   this->tabBar()->setExpanding(false);
+
+   // need to set font here, because if setting in style sheet, tab width calculation does not work correctly
+   //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
+   this->tabBar()->setFont(C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_SEMIBOLD_16));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -82,9 +82,9 @@ add_subdirectory(${PROJECT_ROOT}/libs/opensyde_core ${CMAKE_BINARY_DIR}/opensyde
 # SET LIBRARIES
 set(SYDESUP_LINK_LIBRARIES_WINDOWS
    version
+   opensyde_core
    ws2_32   #WinSock
    Iphlpapi #IP helper API
-   opensyde_core
 )
 
 set(SYDESUP_LINK_LIBRARIES_LINUX

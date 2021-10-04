@@ -89,7 +89,6 @@ void C_OgeSpiHorizontalNavigationHandle::paintEvent(QPaintEvent * const opc_Even
    if (orientation() == Qt::Vertical)
    {
       const stw_types::sintn sn_RightBoxWidth = 89;
-      const stw_types::sintn sn_Margins = 11;
       const stw_types::sintn sn_HandleWidth = 20;
       const QPoint c_PLeftCenter = this->rect().center() + QPoint(sn_HandleWidth / 2, 0);
       const QPoint c_PRightCenter = this->rect().center() - QPoint(sn_HandleWidth / 2, 0);
@@ -101,7 +100,7 @@ void C_OgeSpiHorizontalNavigationHandle::paintEvent(QPaintEvent * const opc_Even
       c_Painter.setPen(mc_STYLE_GUIDE_COLOR_2706);
       c_Painter.setBrush(Qt::NoBrush);
       //Center
-      c_Painter.drawLine(this->rect().center() - QPoint((this->rect().width() / 2) - sn_Margins, 0),
+      c_Painter.drawLine(this->rect().center() - QPoint((this->rect().width() / 2), 0),
                          c_RightEnd);
       //Others
       c_Painter.drawLine(c_PLeftCenter + QPoint(0, 2), c_PRightCenter + QPoint(0, 2));

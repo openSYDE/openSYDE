@@ -88,7 +88,7 @@ void C_PopErrorHandling::h_ProjectLoadErr(const sint32 & ors32_Err, const QStrin
          c_Details = C_GtGetText::h_GetText("The content of a project file is invalid or incomplete.");
          break;
       case C_CHECKSUM:
-         c_Details = C_GtGetText::h_GetText("The entered password is incorrect.");
+         c_Details = C_GtGetText::h_GetText("UI part does not match core part.");
          break;
       case C_COM:
          c_Details = C_GtGetText::h_GetText("The device definition for the project was not found.");

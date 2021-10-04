@@ -34,9 +34,11 @@ public:
                                         const std::vector<stw_types::sint32> & orc_DefaultGateway);
    const C_PuiSdNode * GetUINode(const stw_types::uint32 & oru32_Index) const;
    const stw_opensyde_core::C_OSCNode * GetOSCNodeConst(const stw_types::uint32 & oru32_Index) const;
+   const stw_opensyde_core::C_OSCNodeSquad * GetOSCNodeSquadConst(const stw_types::uint32 & oru32_Index) const;
    stw_types::sint32 GetSortedOSCNodeConst(const stw_types::uint32 & oru32_Index,
                                            stw_opensyde_core::C_OSCNode & orc_Node) const;
    stw_opensyde_core::C_OSCNode * GetOSCNode(const stw_types::uint32 & oru32_Index);
+   stw_opensyde_core::C_OSCNodeSquad * GetOSCNodeSquad(const stw_types::uint32 & oru32_Index);
    stw_types::sint32 SetStwFlashloaderSettings(const stw_types::uint32 ou32_Index,
                                                const stw_opensyde_core::C_OSCNodeStwFlashloaderSettings & orc_Settings);
    stw_types::sint32 SetNodeOpenSYDEServerSettings(const stw_types::uint32 ou32_Index,
@@ -54,17 +56,30 @@ public:
                                      const std::vector<bool> & orc_RoutingFlags,
                                      const std::vector<bool> & orc_DiagnosisFlags);
    void SetUINodeBox(const stw_types::uint32 ou32_NodeIndex, const C_PuiBsBox & orc_Box);
-   stw_types::uint32 AddNodeAndSort(stw_opensyde_core::C_OSCNode & orc_OSCNode, const C_PuiSdNode & orc_UINode);
+   stw_types::uint32 AddNodeAndSort(stw_opensyde_core::C_OSCNode & orc_OSCNode, const C_PuiSdNode & orc_UINode,
+                                    const QString & orc_SubDeviceName, const QString & orc_MainDevice);
+   stw_types::uint32 AddNodeSquadAndSort(std::vector<stw_opensyde_core::C_OSCNode> & orc_OSCNodes,
+                                         const std::vector<C_PuiSdNode> & orc_UINodes,
+                                         const std::vector<QString> & orc_NodeNames, const QString & orc_MainDevice,
+                                         const QString & orc_NameProposal = "");
    void RemoveNode(const stw_types::uint32 ou32_NodeIndex);
    bool CheckNodeConflict(const stw_types::uint32 & oru32_NodeIndex) const;
    void GetSupportedCanBitrates(const std::vector<stw_types::uint32> & orc_Nodes,
                                 std::vector<stw_types::uint32> & orc_Bitrates) const;
    stw_types::uint32 GetOSCNodesSize(void) const;
+   stw_types::uint32 GetOSCNodeSquadsSize(void) const;
+   std::vector<stw_types::uint32> GetAllNodeGroupIndicesUsingNodeIndex(const stw_types::uint32 ou32_NodeIndex) const;
+   stw_types::sint32 GetNodeSquadIndexWithNodeIndex(const stw_types::uint32 ou32_NodeIndex,
+                                                    stw_types::uint32 & oru32_NodeSquadIndex) const;
+   void GetNodeToNodeSquadMapping(std::vector<stw_types::sint32> & orc_Mapping);
    bool CheckCriticalNameConflict(std::vector<QString> * const opc_CriticalNodeNames,
                                   std::vector<QString> * const opc_CriticalBusNames,
                                   std::vector<QString> * const opc_CriticalDatapoolNamespaceNames) const;
    stw_types::sint32 MapNodeNameToIndex(const QString & orc_NodeName, stw_types::uint32 & oru32_NodeIndex) const;
    stw_types::sint32 MapNodeIndexToName(const stw_types::uint32 ou32_NodeIndex, QString & orc_NodeName) const;
+   bool IsNodeAStwDevice(const stw_types::uint32 ou32_NodeIndex) const;
+   bool CheckNodeIndexAssociatedWithAnotherNodeIndex(const stw_types::uint32 ou32_FirstNodeIndex,
+                                                     const stw_types::uint32 ou32_SecondNodeIndex) const;
 
    //Datapool
    stw_types::sint32 AddDataPool(const stw_types::uint32 & oru32_NodeIndex,

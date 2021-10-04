@@ -51,8 +51,8 @@ using namespace stw_opensyde_gui_logic;
 
    Load system definition and store in information in our instance data.
 
-   \param[in] orc_Path          Path to system definition file
-   \param[in] opu16_FileVersion Optional storage for file version
+   \param[in]  orc_Path             Path to system definition file
+   \param[in]  opu16_FileVersion    Optional storage for file version
 
    \return
    C_NO_ERR    data read and placed into instance data
@@ -219,8 +219,8 @@ sint32 C_PuiSdHandlerData::LoadFromFile(const stw_scl::C_SCLString & orc_Path, u
 
    Save UI data part of system definition to XML file.
 
-   \param[in] orc_Path                     Path to system definition file
-   \param[in] oq_UseDeprecatedFileFormatV2 Flag to enable saving using the deprecated V2 file format
+   \param[in]  orc_Path                      Path to system definition file
+   \param[in]  oq_UseDeprecatedFileFormatV2  Flag to enable saving using the deprecated V2 file format
 
    \return
    C_NO_ERR   data saved
@@ -419,6 +419,7 @@ void C_PuiSdHandlerData::Clear(void)
 {
    this->mc_UIBuses.clear();
    this->mc_UINodes.clear();
+   this->mc_CoreDefinition.c_NodeSquads.clear();
    this->mc_CoreDefinition.c_Buses.clear();
    this->mc_CoreDefinition.c_Nodes.clear();
    this->c_Elements.Clear();
@@ -485,7 +486,7 @@ const C_OSCSystemDefinition & C_PuiSdHandlerData::GetOSCSystemDefinitionConst(vo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt given string to fulfill c variable name requirements
 
-   \param[in] orc_Input               String to process
+   \param[in]  orc_Input   String to process
 
    \return
    String fulfilling c variable name requirements
@@ -512,7 +513,7 @@ QString C_PuiSdHandlerData::h_AutomaticCStringAdaptation(const QString & orc_Inp
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdHandlerData::C_PuiSdHandlerData(QObject * const opc_Parent) :
@@ -524,8 +525,8 @@ C_PuiSdHandlerData::C_PuiSdHandlerData(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do sort of messages by name for specified node
 
-   \param[in,out] orc_OSCNode Node core part
-   \param[in,out] orc_UiNode  Node UI part
+   \param[in,out]  orc_OSCNode   Node core part
+   \param[in,out]  orc_UiNode    Node UI part
 
    \return
    C_NO_ERR Operation success
@@ -656,7 +657,7 @@ sint32 C_PuiSdHandlerData::mh_SortMessagesByName(C_OSCNode & orc_OSCNode, C_PuiS
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get hash for node
 
-   \param[in] ou32_NodeIndex Index
+   \param[in]  ou32_NodeIndex    Index
 
    \return
    Hash for bus
@@ -677,7 +678,7 @@ uint32 C_PuiSdHandlerData::m_GetHashNode(const uint32 ou32_NodeIndex) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get hash for bus
 
-   \param[in] ou32_BusIndex Index
+   \param[in]  ou32_BusIndex  Index
 
    \return
    Hash for bus
@@ -706,6 +707,12 @@ void C_PuiSdHandlerData::m_FixNameIssues(void)
       C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[u32_ItNode];
       rc_OSCNode.c_Properties.c_Name = C_PuiSdHandlerData::h_AutomaticCStringAdaptation(
          rc_OSCNode.c_Properties.c_Name.c_str()).toStdString().c_str();
+   }
+   for (uint32 u32_ItNodeGroup = 0; u32_ItNodeGroup < this->mc_CoreDefinition.c_NodeSquads.size(); ++u32_ItNodeGroup)
+   {
+      C_OSCNodeSquad & rc_OSCNodeGroup = this->mc_CoreDefinition.c_NodeSquads[u32_ItNodeGroup];
+      const QString c_Name = C_PuiSdHandlerData::h_AutomaticCStringAdaptation(rc_OSCNodeGroup.c_BaseName.c_str());
+      rc_OSCNodeGroup.SetBaseName(this->mc_CoreDefinition.c_Nodes, c_Name.toStdString().c_str());
    }
 }
 

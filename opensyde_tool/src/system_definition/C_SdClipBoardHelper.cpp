@@ -25,6 +25,7 @@
 #include "C_OSCNodeFiler.h"
 #include "TGLUtils.h"
 #include "C_OSCNodeCommFiler.h"
+#include "C_OSCNodeSquadFiler.h"
 #include "C_OSCSystemDefinitionFiler.h"
 #include "C_OSCHalcConfigStandaloneFiler.h"
 
@@ -1130,6 +1131,7 @@ void C_SdClipBoardHelper::h_StoreDataSnapShotToClipboard(const C_SdTopologyDataS
    C_OSCXMLParserString c_StringXml;
 
    c_StringXml.CreateAndSelectNodeChild("opensyde-system-definition");
+   C_OSCNodeSquadFiler::h_SaveNodeGroups(orc_Data.c_OSCNodeGroups, c_StringXml);
    c_StringXml.CreateAndSelectNodeChild("nodes-core");
    C_OSCSystemDefinitionFiler::h_SaveNodes(orc_Data.c_OSCNodes, c_StringXml, "", NULL);
    tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
@@ -1178,6 +1180,7 @@ sint32 C_SdClipBoardHelper::h_LoadDataSnapShotFromClipboard(C_SdTopologyDataSnap
 
    if (c_StringXml.SelectRoot() == "opensyde-system-definition")
    {
+      C_OSCNodeSquadFiler::h_LoadNodeGroups(orc_Data.c_OSCNodeGroups, c_StringXml);
       if (c_StringXml.SelectNodeChild("nodes-core") == "nodes-core")
       {
          s32_Retval = C_OSCSystemDefinitionFiler::h_LoadNodes(orc_Data.c_OSCNodes, c_StringXml,

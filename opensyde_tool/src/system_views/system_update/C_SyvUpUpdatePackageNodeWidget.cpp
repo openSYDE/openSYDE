@@ -1227,9 +1227,12 @@ void C_SyvUpUpdatePackageNodeWidget::m_Init(void)
    if (pc_Node != NULL)
    {
       uint32 u32_DatablockCounter;
+      uint32 u32_ViewDataBlockPathNumber = 0;
 
       tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
-      this->mq_FileBased = pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased;
+      tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
+      this->mq_FileBased =
+         pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased;
       this->mq_StwFlashloader = (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW);
       this->mc_DeviceType = pc_Node->c_DeviceType.c_str();
 
@@ -1242,7 +1245,8 @@ void C_SyvUpUpdatePackageNodeWidget::m_Init(void)
          this->mc_DatablockWidgets.push_back(pc_Datablock);
 
          pc_Datablock->InitWidget(this->mu32_ViewIndex, this->mu32_PositionNumber,
-                                  this->mu32_NodeIndex, this->mc_NodeName, u32_DatablockCounter);
+                                  this->mu32_NodeIndex, this->mc_NodeName, u32_DatablockCounter,
+                                  u32_ViewDataBlockPathNumber);
 
          // Special case, parameter set image files in a datablock. Necessary to know the reserved saved
          // paths of the parameter set image file for the files widget
@@ -1253,6 +1257,11 @@ void C_SyvUpUpdatePackageNodeWidget::m_Init(void)
          {
             // Special case: A HALC NVM node
             this->mq_NvmHalcBased = true;
+            tgl_assert(u32_DatablockParamSetFiles > 0);
+         }
+         else
+         {
+            ++u32_ViewDataBlockPathNumber;
          }
 
          // Add separator as long it is not the last widget
@@ -1273,8 +1282,9 @@ void C_SyvUpUpdatePackageNodeWidget::m_Init(void)
          this->mpc_Ui->pc_ScrollAreaLayout->addWidget(this->mpc_FilesWidget);
 
          this->mpc_FilesWidget->SetCountSkippedParamSetFiles(u32_DatablockParamSetFiles);
+         // last parameter is "0", since this case has no Data Block output files
          this->mpc_FilesWidget->InitWidget(this->mu32_ViewIndex, this->mu32_PositionNumber,
-                                           this->mu32_NodeIndex, this->mc_NodeName, pc_Node->c_Applications.size());
+                                           this->mu32_NodeIndex, this->mc_NodeName, pc_Node->c_Applications.size(), 0);
       }
    }
 
@@ -1286,6 +1296,8 @@ void C_SyvUpUpdatePackageNodeWidget::m_Init(void)
 /*! \brief   Adds a separator to the scroll area
 
    Used from generated code
+
+   \param[in]  oq_FilesWidgetSeparator    Files widget separator
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageNodeWidget::m_AddSeparatorToScrollArea(const bool oq_FilesWidgetSeparator)
@@ -1522,10 +1534,10 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckFileAlreadyContained(const QString &
       C_OgeWiCustomMessage c_Message(this);
       c_Message.SetHeading(C_GtGetText::h_GetText("Add file"));
       c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                       "The file %1 is already contained in the Update Package "
-                                                       "for this node and therefore not added again.")).
-                               arg(C_PuiUtil::h_GetResolvedAbsPathFromProject(orc_File)));
-      c_Message.SetCustomMinHeight(180, 180);
+                                                       "The file is already contained in the Update Package "
+                                                       "for this node and therefore not added again.")));
+      c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("%1"))
+                           .arg(C_PuiUtil::h_GetResolvedAbsPathFromProject(orc_File)));
       c_Message.Execute();
    }
 

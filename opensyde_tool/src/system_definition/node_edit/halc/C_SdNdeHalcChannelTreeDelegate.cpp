@@ -50,7 +50,7 @@ C_SdNdeHalcChannelTreeDelegate::C_SdNdeHalcChannelTreeDelegate(QObject * const o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Overridden paint event
 
-   Here: Draw special background of channel ID.
+   Here: Draw special background of channel ID and paint parent selected state.
 
    \param[in,out]  opc_Painter   Painter
    \param[in]      orc_Option    Option
@@ -62,10 +62,11 @@ void C_SdNdeHalcChannelTreeDelegate::paint(QPainter * const opc_Painter, const Q
 {
    if (orc_Index.parent().isValid() == true)
    {
-      // calculate width of special background box via text size
+      // channel case: draw special background of channel ID
       QStyleOptionViewItem c_Option = orc_Option;
       this->initStyleOption(&c_Option, orc_Index);
 
+      // calculate width of special background box via text size
       QStringList c_Texts = c_Option.text.split(' ');
 
       const QFontMetrics c_FontMetrics = QFontMetrics(C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13));

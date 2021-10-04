@@ -577,11 +577,7 @@ bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId &
    {
       if (orc_DataPoolElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
       {
-         const std::vector<uint8> & rc_ActiveFlags = pc_View->GetNodeActiveFlags();
-         if (orc_DataPoolElementId.u32_NodeIndex < rc_ActiveFlags.size())
-         {
-            q_Retval = static_cast<bool>(rc_ActiveFlags[orc_DataPoolElementId.u32_NodeIndex]);
-         }
+         q_Retval = pc_View->GetNodeActive(orc_DataPoolElementId.u32_NodeIndex);
       }
       else
       {
@@ -596,7 +592,7 @@ bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId &
             {
                const C_OSCNodeComInterfaceSettings & rc_Interface =
                   pc_Node->c_Properties.c_ComInterfaces[c_MessageID.u32_InterfaceIndex];
-               if (rc_Interface.q_IsBusConnected == true)
+               if (rc_Interface.GetBusConnected() == true)
                {
                   if (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())
                   {

@@ -828,8 +828,8 @@ void C_OSCNodeFiler::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderS
    pre-condition: the passed XML parser has the active node set to "properties"
    post-condition: the passed XML parser has the active node set to the same "properties"
 
-   \param[out]     orc_ComInterfaces      data storage
-   \param[in,out]  orc_XMLParser          XML with core active
+   \param[out]     orc_ComInterfaces   data storage
+   \param[in,out]  orc_XMLParser       XML with core active
 
    \return
    C_NO_ERR   data read
@@ -929,7 +929,15 @@ sint32 C_OSCNodeFiler::mh_LoadComInterface(std::vector<C_OSCNodeComInterfaceSett
          //Bus
          if (orc_XMLParser.SelectNodeChild("bus") == "bus")
          {
-            c_ComInterface.q_IsBusConnected = orc_XMLParser.GetAttributeBool("connected");
+            c_ComInterface.SetBusConnected(orc_XMLParser.GetAttributeBool("connected"));
+            if (orc_XMLParser.AttributeExists("interface-connected"))
+            {
+               c_ComInterface.SetInterfaceConnectedInDevice(orc_XMLParser.GetAttributeBool("interface-connected"));
+            }
+            else
+            {
+               c_ComInterface.SetInterfaceConnectedInDevice(true);
+            }
             c_ComInterface.u32_BusIndex = orc_XMLParser.GetAttributeUint32("bus-index");
             //Return
             tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
@@ -960,8 +968,8 @@ sint32 C_OSCNodeFiler::mh_LoadComInterface(std::vector<C_OSCNodeComInterfaceSett
    pre-condition: the passed XML parser has the active node set to "properties"
    post-condition: the passed XML parser has the active node set to the same "properties"
 
-   \param[in]      orc_ComInterfaces     data storage
-   \param[in,out]  orc_XMLParser         XML with core active
+   \param[in]      orc_ComInterfaces   data storage
+   \param[in,out]  orc_XMLParser       XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFiler::mh_SaveComInterface(const std::vector<C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
@@ -1010,7 +1018,8 @@ void C_OSCNodeFiler::mh_SaveComInterface(const std::vector<C_OSCNodeComInterface
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
       orc_XMLParser.CreateAndSelectNodeChild("bus");
-      orc_XMLParser.SetAttributeBool("connected", rc_CurComInterface.q_IsBusConnected);
+      orc_XMLParser.SetAttributeBool("connected", rc_CurComInterface.GetBusConnectedRawValue());
+      orc_XMLParser.SetAttributeBool("interface-connected", rc_CurComInterface.GetInterfaceConnectedInDeviceRawValue());
       orc_XMLParser.SetAttributeUint32("bus-index", rc_CurComInterface.u32_BusIndex);
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");

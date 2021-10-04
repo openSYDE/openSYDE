@@ -194,6 +194,14 @@
            <bool>true</bool>
           </property>
           <widget class="QWidget" name="pc_ScrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>284</width>
+             <height>360</height>
+            </rect>
+           </property>
            <layout class="QVBoxLayout" name="pc_VerticalLayout2" stretch="1,1">
             <property name="spacing">
              <number>0</number>
@@ -443,7 +451,7 @@
                         <property name="title">
                          <string/>
                         </property>
-                        <layout class="QHBoxLayout" name="horizontalLayout_7">
+                        <layout class="QVBoxLayout" name="verticalLayout_13">
                          <property name="spacing">
                           <number>0</number>
                          </property>
@@ -460,7 +468,7 @@
                           <number>0</number>
                          </property>
                          <item>
-                          <widget class="stw_opensyde_gui::C_NagTopList" name="pc_ListViewNodes">
+                          <widget class="stw_opensyde_gui::C_NagTopTreeView" name="pc_TreeViewNodes">
                            <property name="minimumSize">
                             <size>
                              <width>0</width>
@@ -641,7 +649,7 @@
                         <property name="title">
                          <string/>
                         </property>
-                        <layout class="QHBoxLayout" name="horizontalLayout_8">
+                        <layout class="QVBoxLayout" name="verticalLayout_14">
                          <property name="spacing">
                           <number>0</number>
                          </property>
@@ -658,7 +666,7 @@
                           <number>0</number>
                          </property>
                          <item>
-                          <widget class="stw_opensyde_gui::C_NagTopList" name="pc_ListViewBuses">
+                          <widget class="stw_opensyde_gui::C_NagTopTreeView" name="pc_TreeViewBuses">
                            <property name="minimumSize">
                             <size>
                              <width>0</width>
@@ -1031,11 +1039,6 @@
    <header>C_OgePubNavigation.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_NagTopList</class>
-   <extends>QListView</extends>
-   <header>C_NagTopList.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui::C_NagViewList</class>
    <extends>QListView</extends>
    <header>C_NagViewList.h</header>
@@ -1062,6 +1065,11 @@
    <extends>QGroupBox</extends>
    <header>C_OgeGbxNavigationHeadingBackground.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_NagTopTreeView</class>
+   <extends>QTreeView</extends>
+   <header>C_NagTopTreeView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

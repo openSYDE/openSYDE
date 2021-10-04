@@ -961,7 +961,7 @@ void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId &
       const QString c_Edit = C_PuiSvHandler::h_GetNamespace(orc_Id);
 
       this->mpc_Ui->pc_LineEditDataElement->setText(c_Edit);
-      this->mpc_Ui->pc_LineEditDataElement->SetToolTipInformation("", c_Edit);
+      this->mpc_Ui->pc_LineEditDataElement->SetToolTipInformation(C_GtGetText::h_GetText("Data Element"), c_Edit);
       this->mpc_Ui->pc_LabelNamespaceValue->setText(c_Edit);
       if (this->mc_DisplayName.compare("") == 0)
       {

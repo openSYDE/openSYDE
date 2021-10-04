@@ -59,8 +59,9 @@ C_CieDbcImportNodeAssignmentItemWidget::C_CieDbcImportNodeAssignmentItemWidget(
 {
    this->mpc_Ui->setupUi(this);
    this->mpc_Ui->pc_LabImportNode->setText(orc_DbcNode.c_Properties.c_Name.c_str());
-   this->mpc_Ui->pc_LabImportNode->SetToolTipInformation(orc_DbcNode.c_Properties.c_Name.c_str(),
-                                                         orc_DbcNode.c_Properties.c_Comment.c_str());
+   this->mpc_Ui->pc_LabImportNode->SetToolTipInformation(
+      C_GtGetText::h_GetText(orc_DbcNode.c_Properties.c_Name.c_str()),
+      C_GtGetText::h_GetText(orc_DbcNode.c_Properties.c_Comment.c_str()));
 
    this->mpc_Ui->pc_LabInfo->setText(static_cast<QString>("%1 Tx / %2 Rx").
                                      arg(orc_DbcNode.c_TxMessages.size()).arg(orc_DbcNode.c_RxMessages.size()));

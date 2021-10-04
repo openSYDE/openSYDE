@@ -1,4 +1,6 @@
 /* --------------------------------------------------------------------- */
+stw_opensyde_gui--C_NagTopTreeView,
+stw_opensyde_gui--C_NagTopTreeView::item,
 stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget,
 stw_opensyde_gui--C_SdNdeDpListsTreeWidget,
 stw_opensyde_gui--C_SyvDaItPaListTreeWidget,
@@ -17,6 +19,12 @@ outline: none;
 stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch::item
 {
 margin-right: 10px;
+}
+
+stw_opensyde_gui--C_NagTopTreeView::item
+{
+height: 30px;
+padding-left: 4px; /*padding on right hand side of expand/collapse arrow */
 }
 
 stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:!has-children,
@@ -135,6 +143,14 @@ image:url(://images/IconOpenListClicked.svg);
 padding: 5px;
 }
 
+stw_opensyde_gui--C_NagTopTreeView::branch:has-children:!has-siblings:closed,
+stw_opensyde_gui--C_NagTopTreeView::branch:closed:has-children:has-siblings
+{
+border-image: none;
+image:url(://images/main_page_and_navi_bar/Icon_open_list.svg);
+padding: 2px;
+}
+
 /* --------------------------------------------------------------------- */
 /* open and not selected */
 stw_opensyde_gui--C_SyvDaItPaTreeView::branch:open:has-children:!has-siblings,
@@ -160,6 +176,14 @@ stw_opensyde_gui--C_SdNdeHalcConfigTreeView::branch:open:has-children:has-siblin
 border-image: none;
 image:url(://images/IconArrowBottomClicked.svg);
 padding: 5px;
+}
+
+stw_opensyde_gui--C_NagTopTreeView::branch:open:has-children:!has-siblings,
+stw_opensyde_gui--C_NagTopTreeView::branch:open:has-children:has-siblings
+{
+border-image: none;
+image:url(://images/main_page_and_navi_bar/Icon_close_list.svg);
+padding: 2px;
 }
 
 /* --------------------------------------------------------------------- */

@@ -755,6 +755,7 @@ void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesC
                //One min for rounding errors has to be added before
                //-> we should round ceil (include the last seconds) but we are rounding floor (integer)
                const uint64 u64_WaitingTimeH = (u64_WaitingTimeMin + 1ULL) / 60ULL;
+               //lint -e{774,831,948} False positive
                if (u64_WaitingTimeH == 0ULL)
                {
                   this->mc_EstimatedTime =

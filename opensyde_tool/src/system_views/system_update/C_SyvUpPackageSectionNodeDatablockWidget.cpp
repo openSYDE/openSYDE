@@ -144,13 +144,19 @@ void C_SyvUpPackageSectionNodeDatablockWidget::AdaptFile(const QString & orc_Fil
                   {
                      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
                         this->mu32_NodeIndex);
-                     if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+                     if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) &&
+                         (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
                      {
                         for (uint32 u32_ItName = 0UL;
-                             u32_ItName < pc_Node->pc_DeviceDefinition->c_OtherAcceptedNames.size(); ++u32_ItName)
+                             u32_ItName <
+                             pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
+                             c_OtherAcceptedNames.
+                             size();
+                             ++u32_ItName)
                         {
                            const QString c_AllowedDevice =
-                              pc_Node->pc_DeviceDefinition->c_OtherAcceptedNames[u32_ItName].Trim().UpperCase().c_str();
+                              pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
+                              c_OtherAcceptedNames[u32_ItName].Trim().UpperCase().c_str();
                            if (QString::compare(c_AllowedDevice, c_AppDeviceType, Qt::CaseInsensitive) == 0)
                            {
                               q_FileIsOk = true;
@@ -220,7 +226,7 @@ void C_SyvUpPackageSectionNodeDatablockWidget::AdaptFile(const QString & orc_Fil
 
       tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationPath(this->mu32_ViewIndex,
                                                                                this->mu32_NodeIndex,
-                                                                               this->mu32_SectionNumber,
+                                                                               this->mu32_DataBlockPathNumber,
                                                                                orc_File,
                                                                                C_PuiSvNodeUpdate::
                                                                                eFTP_DATA_BLOCK) == C_NO_ERR);
@@ -230,8 +236,8 @@ void C_SyvUpPackageSectionNodeDatablockWidget::AdaptFile(const QString & orc_Fil
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a new file for the application
 
-   \param[in]  oq_Skip     New skip flag
-   \param[in]  opc_App     Application widget
+   \param[in]  oq_Skip  New skip flag
+   \param[in]  opc_App  Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeDatablockWidget::SetSkipOfUpdateFile(const bool oq_Skip,
@@ -247,7 +253,7 @@ void C_SyvUpPackageSectionNodeDatablockWidget::SetSkipOfUpdateFile(const bool oq
          tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationSkipUpdateOfPath(
                        this->mu32_ViewIndex,
                        this->mu32_NodeIndex,
-                       this->mu32_SectionNumber, oq_Skip,
+                       this->mu32_DataBlockPathNumber, oq_Skip,
                        C_PuiSvNodeUpdate::eFTP_DATA_BLOCK) == C_NO_ERR);
       }
       else
@@ -293,7 +299,7 @@ void C_SyvUpPackageSectionNodeDatablockWidget::RevertFile(C_SyvUpPackageListNode
                   // Remove the view specific path
                   tgl_assert(C_PuiSvHandler::h_GetInstance()->
                              SetNodeUpdateInformationPath(this->mu32_ViewIndex, this->mu32_NodeIndex,
-                                                          this->mu32_SectionNumber, "",
+                                                          this->mu32_DataBlockPathNumber, "",
                                                           C_PuiSvNodeUpdate::eFTP_DATA_BLOCK) == C_NO_ERR);
                }
                else
@@ -671,6 +677,7 @@ void C_SyvUpPackageSectionNodeDatablockWidget::m_InitSpecificItem(const stw_open
 {
    // mu32_SectionNumber equals in case of datablock widget the index of the datablock
    tgl_assert(this->mu32_SectionNumber < orc_Node.c_Applications.size());
+
    if (this->mu32_SectionNumber < orc_Node.c_Applications.size())
    {
       const C_OSCNodeApplication & rc_Datablock = orc_Node.c_Applications[this->mu32_SectionNumber];
@@ -686,7 +693,7 @@ void C_SyvUpPackageSectionNodeDatablockWidget::m_InitSpecificItem(const stw_open
                                                           this->mq_FileBased, this->mq_StwFlashloader, this);
 
          tgl_assert(rc_Datablock.c_ResultPaths.size() == 1);
-         tgl_assert(this->mu32_SectionNumber < c_ViewDatablockPaths.size());
+         tgl_assert(this->mu32_DataBlockPathNumber < c_ViewDatablockPaths.size());
 
          this->mc_SectionName = rc_Datablock.c_Name.c_str();
          this->me_Type = rc_Datablock.e_Type;
@@ -703,9 +710,9 @@ void C_SyvUpPackageSectionNodeDatablockWidget::m_InitSpecificItem(const stw_open
                                           rc_Datablock.c_ResultPaths[0].c_str()));
 
          // Check if a specific path is available
-         if (c_ViewDatablockPaths[this->mu32_SectionNumber] != "")
+         if (c_ViewDatablockPaths[this->mu32_DataBlockPathNumber] != "")
          {
-            pc_FileWidget->SetAppFile(c_ViewDatablockPaths[this->mu32_SectionNumber], false);
+            pc_FileWidget->SetAppFile(c_ViewDatablockPaths[this->mu32_DataBlockPathNumber], false);
          }
          else
          {
@@ -714,7 +721,7 @@ void C_SyvUpPackageSectionNodeDatablockWidget::m_InitSpecificItem(const stw_open
                                          rc_Datablock.c_ResultPaths[0].c_str()),
                                       true);
          }
-         pc_FileWidget->SetSkipOfUpdateFile(c_ViewDatablockSkipFlags[this->mu32_SectionNumber]);
+         pc_FileWidget->SetSkipOfUpdateFile(c_ViewDatablockSkipFlags[this->mu32_DataBlockPathNumber]);
 
          pc_FileWidget->SetAppNumber(0U);
          pc_FileWidget->SetOwnerSectionName(this->mc_SectionName);
@@ -811,7 +818,7 @@ void C_SyvUpPackageSectionNodeDatablockWidget::m_UpdateTitle(void)
 {
    const QString c_Title = "%1 #%2 - %3";
 
-   this->mc_Title = c_Title.arg(static_cast<QString>(C_GtGetText::h_GetText("Datablock")),
+   this->mc_Title = c_Title.arg(static_cast<QString>(C_GtGetText::h_GetText("Data Block")),
                                 QString::number(this->mu32_SectionNumber + 1U),
                                 this->mc_SectionName);
 

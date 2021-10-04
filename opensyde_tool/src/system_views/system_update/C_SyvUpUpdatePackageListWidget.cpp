@@ -155,9 +155,11 @@ void C_SyvUpUpdatePackageListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
                   {
                      // Add openSYDE devices only due the possibility to add parameter set image files always
                      tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
+                     tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
                      if (((pc_Node->c_Applications.size() > 0) ||
                           (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE)) ||
-                         (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == true))
+                         (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
+                          q_FlashloaderOpenSydeIsFileBased == true))
                      {
                         this->m_AddNodeWidget(u32_NodeUpdateCounter, pc_Node->c_Properties.c_Name.c_str());
                      }
@@ -929,7 +931,12 @@ sint32 C_SyvUpUpdatePackageListWidget::GetUpdatePackage(
             tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
             if (pc_Node->pc_DeviceDefinition != NULL)
             {
-               rc_Flash.c_OtherAcceptedDeviceNames = pc_Node->pc_DeviceDefinition->c_OtherAcceptedNames;
+               tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
+               if (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size())
+               {
+                  rc_Flash.c_OtherAcceptedDeviceNames =
+                     pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].c_OtherAcceptedNames;
+               }
             }
 
             if (s32_Return == C_NO_ERR)

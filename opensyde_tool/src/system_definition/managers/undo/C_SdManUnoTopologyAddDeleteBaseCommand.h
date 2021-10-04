@@ -15,6 +15,7 @@
 
 #include <QMap>
 #include <QObject>
+#include "C_GiNode.h"
 #include "C_SebUnoAddDeleteBaseCommand.h"
 #include "C_PuiSdDataElement.h"
 #include "C_SdTopologyDataSnapshot.h"
@@ -76,6 +77,10 @@ private:
                                                                    const stw_types::uint32 ou32_BusIndex,
                                                                    QList<QGraphicsItem *> & orc_AllRelevantItems);
    void m_SaveToData(void);
+   void m_SaveToDataNode(const stw_opensyde_gui::C_GiNode * const opc_UiNodeItem,
+                         const stw_types::uint32 ou32_NodeIndex, const stw_types::uint64 ou64_UniqueID,
+                         stw_types::uint32 & oru32_NodeCounter);
+   void m_SaveToDataMultiNode(const stw_types::uint32 ou32_NodeIndex);
    void m_Clear(void);
    void m_Delete(void);
 };

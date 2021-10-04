@@ -89,6 +89,14 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    // init UI
    mpc_Ui->setupUi(this);
 
+   //style of subnode information
+   this->mpc_Ui->pc_LabSubNodeTitle->SetBackgroundColor(0);
+   this->mpc_Ui->pc_LabSubNodeTitle->SetForegroundColor(4);
+   this->mpc_Ui->pc_LabSubNodeTitle->SetFontPixel(13);
+   this->mpc_Ui->pc_LabSubNodeName->SetBackgroundColor(11);
+   this->mpc_Ui->pc_LabSubNodeName->SetForegroundColor(1);
+   this->mpc_Ui->pc_LabSubNodeName->SetFontPixel(13);
+
    //load STW logo
    c_ImgLogo.load("://images/STW_Logo_Dark.png");
    c_ImgLogo = c_ImgLogo.scaled((c_ImgLogo.width() / 22), (c_ImgLogo.height() / 22),
@@ -225,6 +233,7 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    const sintn sn_ColRouting = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eROUTING);
    const sintn sn_ColDiagnostic = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
 
+   this->mpc_Ui->pc_LabSubNodeTitle->setText(C_GtGetText::h_GetText("Sub-Node"));
    this->mpc_Ui->pc_LabelName->setText(C_GtGetText::h_GetText("Name"));
    this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
    this->mpc_Ui->pc_LabelConfiguration->setText(C_GtGetText::h_GetText("Configuration"));
@@ -267,6 +276,9 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
 
    //Tool tips
+   this->mpc_Ui->pc_LabSubNodeTitle->SetToolTipInformation(C_GtGetText::h_GetText("Sub-Node"),
+                                                           C_GtGetText::h_GetText("Name of the Sub-Node."));
+
    this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
                                                      C_GtGetText::h_GetText(
                                                         "Symbolic node name. Unique within Network Topology.\n"
@@ -409,10 +421,12 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
    {
+      uint32 u32_NodeSquadIndex;
       QPixmap c_ImgNode;
       QString c_ComIfName;
       QString c_BusName;
       const C_OSCDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
+      const uint32 u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
       tgl_assert(pc_DevDef != NULL);
 
       //create delegate
@@ -422,390 +436,450 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
 
       if (pc_DevDef != NULL)
       {
-         QFileInfo c_FileInfo;
-         bool q_FileExists;
-         bool q_StwFlashloaderActive = false;
-
-         //name
-         this->mpc_Ui->pc_LineEditNodeName->setText(pc_Node->c_Properties.c_Name.c_str());
-
-         //comment
-         this->mpc_Ui->pc_TextEditComment->setText(pc_Node->c_Properties.c_Comment.c_str());
-
-         //protocol
-         if ((pc_DevDef->q_FlashloaderOpenSydeEthernet == true) ||
-             (pc_DevDef->q_FlashloaderOpenSydeCan == true) ||
-             (pc_DevDef->q_FlashloaderStwCan == true))
+         tgl_assert(u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size());
+         if (u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size())
          {
-            if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE)
+            QFileInfo c_FileInfo;
+            bool q_FileExists;
+            bool q_StwFlashloaderActive = false;
+
+            //node name
+            this->mpc_Ui->pc_LineEditNodeName->setText(C_PuiSdUtil::h_GetNodeBaseNameOrName(this->mu32_NodeIndex));
+
+            //sub node info
+            if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(this->mu32_NodeIndex,
+                                                                                u32_NodeSquadIndex) == C_NO_ERR)
             {
-               //open SYDE
-               this->mpc_Ui->pc_ComboBoxProtocol->setCurrentIndex(mu8_FL_INDEX_OS);
-            }
-            else if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
-            {
-               //STW
-               this->mpc_Ui->pc_ComboBoxProtocol->setCurrentIndex(mu8_FL_INDEX_STW);
-               q_StwFlashloaderActive = true;
+               //squad node
+               this->mpc_Ui->pc_SubNodeInfoWidget->setVisible(true);
+               this->mpc_Ui->pc_LabSubNodeName->setText(C_PuiSdUtil::h_GetSubNodeDeviceName(this->mu32_NodeIndex));
             }
             else
             {
-               //having "none" as flashloader is supported by the device definition structures;
-               // but not by the UI (yet)
-               tgl_assert(false);
+               //no squad node
+               this->mpc_Ui->pc_SubNodeInfoWidget->setVisible(false);
             }
 
-            if (((pc_DevDef->q_FlashloaderOpenSydeEthernet == true) ||
-                 (pc_DevDef->q_FlashloaderOpenSydeCan == true)) &&
-                (pc_DevDef->q_FlashloaderStwCan == true))
+            //comment
+            this->mpc_Ui->pc_TextEditComment->setText(pc_Node->c_Properties.c_Comment.c_str());
+
+            //protocol
+            if ((pc_DevDef->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeEthernet == true) ||
+                (pc_DevDef->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeCan == true) ||
+                (pc_DevDef->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderStwCan == true))
             {
-               // Hybrid node. Both variants are possible.
-               this->mpc_Ui->pc_ComboBoxProtocol->setEnabled(true);
-               // No support is not supported on node with protocol support
-               this->mpc_Ui->pc_ComboBoxProtocol->removeItem(mu8_FL_INDEX_NOSUPPORT);
-            }
-         }
-         else
-         {
-            //not supported
-            this->mpc_Ui->pc_ComboBoxProtocol->setCurrentIndex(mu8_FL_INDEX_NOSUPPORT);
-         }
-
-         //activate STW flashloader button (options)
-         this->mpc_Ui->pc_PushButtonFlashloaderOptions->setVisible(q_StwFlashloaderActive);
-
-         //programming
-         if (pc_DevDef->q_ProgrammingSupport == true)
-         {
-            this->mpc_Ui->pc_ComboBoxProgramming->setCurrentIndex(C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_ENABLED);
-         }
-         else
-         {
-            this->mpc_Ui->pc_ComboBoxProgramming->setCurrentIndex(C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_DISABLED);
-         }
-
-         //STW device? Assumption: If Flashloader support, its an STW device
-         if (pc_Node->IsAnyUpdateAvailable() == true)
-         {
-            //show STW logo
-            this->mpc_Ui->pc_StwLogo->setVisible(true);
-         }
-         else
-         {
-            //hide STW logo
-            this->mpc_Ui->pc_StwLogo->setVisible(false);
-         }
-
-         //load device picture
-         c_FileInfo.setFile(pc_DevDef->c_ImagePath.c_str());
-         q_FileExists = (c_FileInfo.exists() && c_FileInfo.isFile());
-
-         //check if file exists
-         if (q_FileExists == true)
-         {
-            c_ImgNode.load(pc_DevDef->c_ImagePath.c_str());
-            c_ImgNode = c_ImgNode.scaled(mu16_NODE_IMG_WIDTH, c_ImgNode.height(), //second parameter is not relevant
-                                         Qt::KeepAspectRatio, Qt::SmoothTransformation);
-            this->mpc_Ui->pc_LabelNoImageAvailable->setVisible(false);
-            this->mpc_Ui->pc_DatapoolTypeImage->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
-         }
-         else
-         {
-            //no image available
-            const QIcon c_Icon("://images/system_definition/Image_Grey.svg");
-            c_ImgNode = c_Icon.pixmap(QSize(mu16_NODE_IMG_WIDTH / 2, mu16_NODE_IMG_WIDTH / 2));
-            this->mpc_Ui->pc_LabelNoImageAvailable->setVisible(true);
-            this->mpc_Ui->pc_DatapoolTypeImage->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
-         }
-
-         this->mpc_Ui->pc_DatapoolTypeImage->setPixmap(c_ImgNode);
-
-         //load device type name
-         this->mpc_Ui->pc_LabelNodeType->setText(pc_DevDef->GetDisplayName().c_str());
-
-         //clear table
-         this->mpc_Ui->pc_TableWidgetComIfSettings->setRowCount(0);
-
-         //insert can+ethernet count of rows
-         this->mpc_Ui->pc_TableWidgetComIfSettings->setRowCount(static_cast<sintn> (pc_DevDef->u8_NumCanBusses) +
-                                                                static_cast<sintn> (pc_DevDef->u8_NumEthernetBusses));
-
-         {
-            //set new table max size (Header = 38 + row*40)
-            const sintn sn_MaxHeight = 38 + (this->mpc_Ui->pc_TableWidgetComIfSettings->rowCount() * 40);
-            //Minimum is slightly off the optimal value (3 rows are visible)
-            const sintn sn_MinHeight = 38 + (std::min(3, this->mpc_Ui->pc_TableWidgetComIfSettings->rowCount()) * 40);
-            this->mpc_Ui->pc_TableWidgetComIfSettings->setMinimumHeight(sn_MinHeight);
-            this->mpc_Ui->pc_TableWidgetComIfSettings->setMaximumHeight(sn_MaxHeight);
-         }
-
-         //insert com ifs
-         for (uint8 u8_ComIfCnt = 0;
-              u8_ComIfCnt <
-              (static_cast<sintn> (pc_DevDef->u8_NumCanBusses) + static_cast<sintn> (pc_DevDef->u8_NumEthernetBusses));
-              ++u8_ComIfCnt)
-         {
-            const sintn sn_ColInterface = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eINTERFACE);
-            const sintn sn_ColConnection = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eCONNECTION);
-            const sintn sn_ColNodeId = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID);
-            const sintn sn_ColIpAddress = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
-            const sintn sn_ColUpdate = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eUPDATE);
-            const sintn sn_ColRouting = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eROUTING);
-            const sintn sn_ColDiagnostic = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
-            bool q_IsUpdateAvailable;
-            bool q_IsRoutingAvailable;
-            bool q_IsDiagnosisAvailable;
-            if (u8_ComIfCnt < pc_DevDef->u8_NumCanBusses)
-            {
-               q_IsUpdateAvailable = pc_DevDef->IsUpdateAvailable(C_OSCSystemBus::eCAN);
-               q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(C_OSCSystemBus::eCAN);
-               q_IsDiagnosisAvailable = pc_DevDef->IsDiagnosisAvailable(C_OSCSystemBus::eCAN);
-            }
-            else
-            {
-               q_IsUpdateAvailable = pc_DevDef->IsUpdateAvailable(C_OSCSystemBus::eETHERNET);
-               q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(C_OSCSystemBus::eETHERNET);
-               q_IsDiagnosisAvailable = pc_DevDef->IsDiagnosisAvailable(C_OSCSystemBus::eETHERNET);
-            }
-
-            QString c_IpAddressString;
-
-            /**********************************************************************************************************/
-            //INTERFACE
-            this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(
-               u8_ComIfCnt, sn_ColInterface, new C_OgeChxTristateTransparentError(this));
-            //disable
-            this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColInterface)->setEnabled(false);
-
-            //set name
-            if (u8_ComIfCnt < pc_DevDef->u8_NumCanBusses)
-            {
-               //its a CAN interface
-               c_ComIfName = C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN, static_cast<uint8>(u8_ComIfCnt));
-            }
-            else
-            {
-               //its an Ethernet interface
-               c_ComIfName =
-                  C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eETHERNET,
-                                                  static_cast<uint8>(u8_ComIfCnt -
-                                                                     static_cast<sintn> (pc_DevDef->u8_NumCanBusses)));
-            }
-
-            dynamic_cast<C_OgeChxTristateTransparentError *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
-                                                                 u8_ComIfCnt, sn_ColInterface))->setText(c_ComIfName);
-
-            /**********************************************************************************************************/
-            //CONNECTED TO
-            this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColConnection,
-                                                                     new C_OgeLabNodePropComIfTable(this));
-
-            //set bus name
-            if (pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsBusConnected == true)
-            {
-               const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
-                  pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].u32_BusIndex);
-               //get bus name
-               if (pc_Bus != NULL)
+               if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE)
                {
-                  c_BusName = pc_Bus->c_Name.c_str();
+                  //openSYDE
+                  this->mpc_Ui->pc_ComboBoxProtocol->setCurrentIndex(mu8_FL_INDEX_OS);
+               }
+               else if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
+               {
+                  //STW
+                  this->mpc_Ui->pc_ComboBoxProtocol->setCurrentIndex(mu8_FL_INDEX_STW);
+                  q_StwFlashloaderActive = true;
+               }
+               else
+               {
+                  //having "none" as flashloader is supported by the device definition structures;
+                  // but not by the UI (yet)
+                  tgl_assert(false);
+               }
 
-                  if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
-                  {
-                     // add the bitrate
-                     c_BusName += " (" + QString::number(pc_Bus->u64_BitRate / 1000ULL) + " kbit/s)";
-                  }
+               if (((pc_DevDef->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeEthernet == true) ||
+                    (pc_DevDef->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeCan == true)) &&
+                   (pc_DevDef->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderStwCan == true))
+               {
+                  // Hybrid node. Both variants are possible.
+                  this->mpc_Ui->pc_ComboBoxProtocol->setEnabled(true);
+                  // No support is not supported on node with protocol support
+                  this->mpc_Ui->pc_ComboBoxProtocol->removeItem(mu8_FL_INDEX_NOSUPPORT);
                }
             }
             else
             {
-               c_BusName = "-"; // "not connected";
+               //not supported
+               this->mpc_Ui->pc_ComboBoxProtocol->setCurrentIndex(mu8_FL_INDEX_NOSUPPORT);
             }
 
-            dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
-                                       u8_ComIfCnt, sn_ColConnection))->setText(c_BusName);
+            //activate STW flashloader button (options)
+            this->mpc_Ui->pc_PushButtonFlashloaderOptions->setVisible(q_StwFlashloaderActive);
 
-            if (c_BusName != "-")
+            //programming
+            if (pc_DevDef->c_SubDevices[u32_SubDeviceIndex].q_ProgrammingSupport == true)
             {
-               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColConnection)->setEnabled(
-                  true);
-               C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                      ->cellWidget(u8_ComIfCnt, sn_ColConnection),
-                                                      "COMIF_TableCell_Hyperlink", true);
-            }
-            //if the node isn't connected to a bus, the link to bus definition shall not work
-            else
-            {
-               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColConnection)->setEnabled(
-                  false);
-            }
-
-            /**********************************************************************************************************/
-            //NODE ID
-            this->mpc_Ui->pc_TableWidgetComIfSettings->setItem(u8_ComIfCnt, sn_ColNodeId, new QTableWidgetItem(""));
-            //align center
-            this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_ColNodeId)
-            ->setTextAlignment(static_cast<sintn> (Qt::AlignCenter));
-            //set node value
-            this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_ColNodeId)->
-            setText(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].u8_NodeID));
-
-            this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_ColNodeId)->setFlags(
-               Qt::ItemIsEnabled | Qt::ItemIsEditable);
-
-            /**********************************************************************************************************/
-            //IP Address
-            this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColIpAddress,
-                                                                     new C_OgeLabNodePropComIfTable(this));
-
-            //set IP Address
-            if (u8_ComIfCnt >= static_cast<sintn> (pc_DevDef->u8_NumCanBusses))
-            {
-               c_IpAddressString.append(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].c_Ip.
-                                                        au8_IpAddress[0]));
-               c_IpAddressString.append(".");
-               c_IpAddressString.append(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].c_Ip.
-                                                        au8_IpAddress[1]));
-               c_IpAddressString.append(".");
-               c_IpAddressString.append(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].c_Ip.
-                                                        au8_IpAddress[2]));
-               c_IpAddressString.append(".");
-               c_IpAddressString.append(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].c_Ip.
-                                                        au8_IpAddress[3]));
+               this->mpc_Ui->pc_ComboBoxProgramming->setCurrentIndex(C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_ENABLED);
             }
             else
             {
-               c_IpAddressString = "-";
+               this->mpc_Ui->pc_ComboBoxProgramming->setCurrentIndex(
+                  C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_DISABLED);
             }
 
-            dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
-                                       u8_ComIfCnt, sn_ColIpAddress))->setText(c_IpAddressString);
-
-            dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
-                                       u8_ComIfCnt, sn_ColIpAddress))->setAlignment(Qt::AlignCenter);
-
-            //apply enabled/disabled style
-            //if CAN, disable per default
-            if (u8_ComIfCnt < pc_DevDef->u8_NumCanBusses)
+            //STW device? Assumption: If Flashloader support, its an STW device
+            if (pc_Node->IsAnyUpdateAvailable() == true)
             {
-               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
-                                                                     sn_ColIpAddress)->setEnabled(false);
+               //show STW logo
+               this->mpc_Ui->pc_StwLogo->setVisible(true);
             }
             else
             {
-               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
-                                                                     sn_ColIpAddress)->setEnabled(true);
-               //apply special style
-               C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                      ->cellWidget(u8_ComIfCnt,
-                                                                   sn_ColIpAddress), "COMIF_TableCell_Hyperlink", true);
+               //hide STW logo
+               this->mpc_Ui->pc_StwLogo->setVisible(false);
             }
 
-            //hide the ip address column for devices without Ethernet interfaces
-            if (pc_DevDef->u8_NumEthernetBusses == 0)
+            //load device picture
+            c_FileInfo.setFile(pc_DevDef->c_ImagePath.c_str());
+            q_FileExists = (c_FileInfo.exists() && c_FileInfo.isFile());
+
+            //check if file exists
+            if (q_FileExists == true)
             {
-               this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->hideSection(static_cast<sintn> (
-                                                                                             C_SdNdeComIfSettingsTableDelegate
-                                                                                             ::eIPADDRESS));
+               c_ImgNode.load(pc_DevDef->c_ImagePath.c_str());
+               c_ImgNode = c_ImgNode.scaled(mu16_NODE_IMG_WIDTH, c_ImgNode.height(), //second parameter is not relevant
+                                            Qt::KeepAspectRatio, Qt::SmoothTransformation);
+               this->mpc_Ui->pc_LabelNoImageAvailable->setVisible(false);
+               this->mpc_Ui->pc_DatapoolTypeImage->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+            }
+            else
+            {
+               //no image available
+               const QIcon c_Icon("://images/system_definition/Image_Grey.svg");
+               c_ImgNode = c_Icon.pixmap(QSize(mu16_NODE_IMG_WIDTH / 2, mu16_NODE_IMG_WIDTH / 2));
+               this->mpc_Ui->pc_LabelNoImageAvailable->setVisible(true);
+               this->mpc_Ui->pc_DatapoolTypeImage->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
             }
 
-            /**********************************************************************************************************/
-            // UPDATE
-            this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColUpdate, new C_OgeChxTristate(
-                                                                        this));
-            //set node value
-            if (q_IsUpdateAvailable == true)
+            this->mpc_Ui->pc_DatapoolTypeImage->setPixmap(c_ImgNode);
+
+            //load device type name
+            this->mpc_Ui->pc_LabelNodeType->setText(pc_DevDef->GetDisplayName().c_str());
+
+            //clear table
+            this->mpc_Ui->pc_TableWidgetComIfSettings->setRowCount(0);
+
+            //insert can+ethernet count of rows
+            this->mpc_Ui->pc_TableWidgetComIfSettings->setRowCount(static_cast<sintn> (pc_DevDef->u8_NumCanBusses) +
+                                                                   static_cast<sintn> (pc_DevDef->u8_NumEthernetBusses));
+
             {
-               //defensive move
-               if ((pc_DevDef->u8_NumCanBusses) > 0)
+               //set new table max size (Header = 38 + row*40)
+               const sintn sn_MaxHeight = 38 + (this->mpc_Ui->pc_TableWidgetComIfSettings->rowCount() * 40);
+               //Minimum is slightly off the optimal value (3 rows are visible)
+               const sintn sn_MinHeight = 38 +
+                                          (std::min(3, this->mpc_Ui->pc_TableWidgetComIfSettings->rowCount()) * 40);
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setMinimumHeight(sn_MinHeight);
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setMaximumHeight(sn_MaxHeight);
+            }
+
+            //insert com ifs
+            for (uint8 u8_ComIfCnt = 0;
+                 u8_ComIfCnt <
+                 (static_cast<sintn> (pc_DevDef->u8_NumCanBusses) +
+                  static_cast<sintn> (pc_DevDef->u8_NumEthernetBusses));
+                 ++u8_ComIfCnt)
+            {
+               bool q_InterfaceIsConnected = false;
+
+               const sintn sn_ColInterface = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eINTERFACE);
+               const sintn sn_ColConnection = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eCONNECTION);
+               const sintn sn_ColNodeId = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID);
+               const sintn sn_ColIpAddress = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
+               const sintn sn_ColUpdate = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eUPDATE);
+               const sintn sn_ColRouting = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eROUTING);
+               const sintn sn_ColDiagnostic = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
+               bool q_IsUpdateAvailable;
+               bool q_IsRoutingAvailable;
+               bool q_IsDiagnosisAvailable;
+               if (u8_ComIfCnt < pc_DevDef->u8_NumCanBusses)
                {
-                  // if Protocol Cbx is KEFEX and we got ETH interfaces update shall be disabled
-                  if ((q_StwFlashloaderActive == true) && (u8_ComIfCnt >= (pc_DevDef->u8_NumCanBusses)))
-                  {
-                     this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
-                                                                           sn_ColUpdate)->setEnabled(false);
+                  q_IsUpdateAvailable =
+                     pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsUpdateAvailable(C_OSCSystemBus::eCAN);
+                  q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(C_OSCSystemBus::eCAN);
+                  q_IsDiagnosisAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsDiagnosisAvailable(
+                     C_OSCSystemBus::eCAN);
+               }
+               else
+               {
+                  q_IsUpdateAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsUpdateAvailable(
+                     C_OSCSystemBus::eETHERNET);
+                  q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(C_OSCSystemBus::eETHERNET);
+                  q_IsDiagnosisAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsDiagnosisAvailable(
+                     C_OSCSystemBus::eETHERNET);
+               }
 
-                     dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                       ->cellWidget(u8_ComIfCnt, sn_ColUpdate))
-                     ->setChecked(false);
-                  }
-                  else
+               QString c_IpAddressString;
+
+               /**********************************************************************************************************/
+               //INTERFACE
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(
+                  u8_ComIfCnt, sn_ColInterface, new C_OgeChxTristateTransparentError(this));
+               //disable
+               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
+                                                                     sn_ColInterface)->setEnabled(false);
+
+               //set name
+               if (u8_ComIfCnt < pc_DevDef->u8_NumCanBusses)
+               {
+                  //its a CAN interface
+                  c_ComIfName =
+                     C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN, static_cast<uint8>(u8_ComIfCnt));
+               }
+               else
+               {
+                  //its an Ethernet interface
+                  c_ComIfName =
+                     C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eETHERNET,
+                                                     static_cast<uint8>(u8_ComIfCnt -
+                                                                        static_cast<sintn> (pc_DevDef->
+                                                                                            u8_NumCanBusses)));
+               }
+
+               dynamic_cast<C_OgeChxTristateTransparentError *> (this->mpc_Ui->pc_TableWidgetComIfSettings->
+                                                                 cellWidget(
+                                                                    u8_ComIfCnt,
+                                                                    sn_ColInterface))->setText(c_ComIfName);
+
+               /**********************************************************************************************************/
+               //CONNECTED TO
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColConnection,
+                                                                        new C_OgeLabNodePropComIfTable(this));
+
+               //set bus name
+               if (pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].GetBusConnected() == true)
+               {
+                  const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+                     pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].u32_BusIndex);
+                  //get bus name
+                  if (pc_Bus != NULL)
                   {
-                     dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                       ->cellWidget(u8_ComIfCnt, sn_ColUpdate))
-                     ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsUpdateEnabled);
+                     c_BusName = pc_Bus->c_Name.c_str();
+
+                     if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+                     {
+                        // add the bitrate
+                        c_BusName += " (" + QString::number(pc_Bus->u64_BitRate / 1000ULL) + " kbit/s)";
+                     }
                   }
                }
                else
                {
-                  tgl_assert((pc_DevDef->u8_NumCanBusses - 1) <= 0);
+                  c_BusName = "-"; // "not connected";
+               }
+
+               dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
+                                          u8_ComIfCnt, sn_ColConnection))->setText(c_BusName);
+
+               if (c_BusName != "-")
+               {
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColConnection)->setEnabled(
+                     true);
+                  C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                         ->cellWidget(u8_ComIfCnt, sn_ColConnection),
+                                                         "COMIF_TableCell_Hyperlink", true);
+               }
+               //if the node isn't connected to a bus, the link to bus definition shall not work
+               else
+               {
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColConnection)->setEnabled(
+                     false);
+               }
+
+               /**********************************************************************************************************/
+               //NODE ID
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setItem(u8_ComIfCnt, sn_ColNodeId,
+                                                                  new QTableWidgetItem(""));
+               //align center
+               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_ColNodeId)
+               ->setTextAlignment(static_cast<sintn> (Qt::AlignCenter));
+               //set node value
+               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_ColNodeId)->
+               setText(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].u8_NodeID));
+
+               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_ColNodeId)->setFlags(
+                  Qt::ItemIsEnabled | Qt::ItemIsEditable);
+
+               /**********************************************************************************************************/
+               //IP Address
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColIpAddress,
+                                                                        new C_OgeLabNodePropComIfTable(this));
+
+               //set IP Address
+               if (u8_ComIfCnt >= static_cast<sintn> (pc_DevDef->u8_NumCanBusses))
+               {
+                  c_IpAddressString.append(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].c_Ip.
+                                                           au8_IpAddress[0]));
+                  c_IpAddressString.append(".");
+                  c_IpAddressString.append(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].c_Ip.
+                                                           au8_IpAddress[1]));
+                  c_IpAddressString.append(".");
+                  c_IpAddressString.append(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].c_Ip.
+                                                           au8_IpAddress[2]));
+                  c_IpAddressString.append(".");
+                  c_IpAddressString.append(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].c_Ip.
+                                                           au8_IpAddress[3]));
+               }
+               else
+               {
+                  c_IpAddressString = "-";
+               }
+
+               dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
+                                          u8_ComIfCnt, sn_ColIpAddress))->setText(c_IpAddressString);
+
+               dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
+                                          u8_ComIfCnt, sn_ColIpAddress))->setAlignment(Qt::AlignCenter);
+
+               //apply enabled/disabled style
+               //if CAN, disable per default
+               if (u8_ComIfCnt < pc_DevDef->u8_NumCanBusses)
+               {
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
+                                                                        sn_ColIpAddress)->setEnabled(false);
+               }
+               else
+               {
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
+                                                                        sn_ColIpAddress)->setEnabled(true);
+                  //apply special style
+                  C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                         ->cellWidget(u8_ComIfCnt,
+                                                                      sn_ColIpAddress), "COMIF_TableCell_Hyperlink",
+                                                         true);
+               }
+
+               //hide the ip address column for devices without Ethernet interfaces
+               if (pc_DevDef->u8_NumEthernetBusses == 0)
+               {
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->hideSection(static_cast<sintn> (
+                                                                                                C_SdNdeComIfSettingsTableDelegate
+                                                                                                ::eIPADDRESS));
+               }
+
+               /**********************************************************************************************************/
+               // UPDATE
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColUpdate, new C_OgeChxTristate(
+                                                                           this));
+               //set node value
+               if (q_IsUpdateAvailable == true)
+               {
+                  //defensive move
+                  if ((pc_DevDef->u8_NumCanBusses) > 0)
+                  {
+                     // if Protocol Cbx is KEFEX and we got ETH interfaces update shall be disabled
+                     if ((q_StwFlashloaderActive == true) && (u8_ComIfCnt >= (pc_DevDef->u8_NumCanBusses)))
+                     {
+                        this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
+                                                                              sn_ColUpdate)->setEnabled(false);
+
+                        dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                          ->cellWidget(u8_ComIfCnt, sn_ColUpdate))
+                        ->setChecked(false);
+                     }
+                     else
+                     {
+                        dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                          ->cellWidget(u8_ComIfCnt, sn_ColUpdate))
+                        ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsUpdateEnabled);
+                     }
+                  }
+                  else
+                  {
+                     tgl_assert((pc_DevDef->u8_NumCanBusses - 1) <= 0);
+                  }
+               }
+               else
+               {
+                  //disable
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
+                                                                        sn_ColUpdate)->setEnabled(false);
+               }
+               //connect to RegisterChange
+               connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                         ->cellWidget(u8_ComIfCnt,
+                                                                      sn_ColUpdate)), &QCheckBox::stateChanged, this,
+                       &C_SdNdeNodePropertiesWidget::m_RegisterChange);
+
+               /**********************************************************************************************************/
+               // ROUTING
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(
+                  u8_ComIfCnt, sn_ColRouting, new C_OgeChxTristate(
+                     this));
+
+               if (q_IsRoutingAvailable == true)
+               {
+                  //set node value
+                  dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                    ->cellWidget(u8_ComIfCnt, sn_ColRouting))
+                  ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsRoutingEnabled);
+               }
+               else
+               {
+                  //disable
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColRouting)->
+                  setEnabled(false);
+               }
+
+               //connect to RegisterChange
+               connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                         ->cellWidget(u8_ComIfCnt,
+                                                                      sn_ColRouting)), &QCheckBox::stateChanged, this,
+                       &C_SdNdeNodePropertiesWidget::m_RegisterChange);
+
+               /**********************************************************************************************************/
+               // DIAGNOSTIC
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColDiagnostic, new C_OgeChxTristate(
+                                                                           this));
+
+               if (q_IsDiagnosisAvailable == true)
+               {
+                  //set node value
+                  dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                    ->cellWidget(u8_ComIfCnt, sn_ColDiagnostic))
+                  ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsDiagnosisEnabled);
+               }
+               else
+               {
+                  //disable
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColDiagnostic)->
+                  setEnabled(false);
+               }
+
+               //connect to RegisterChange
+               connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                         ->cellWidget(u8_ComIfCnt,
+                                                                      sn_ColDiagnostic)), &QCheckBox::stateChanged, this,
+                       &C_SdNdeNodePropertiesWidget::m_RegisterChange);
+
+               //hide rows if they are not connected (necessary for sub nodes)
+
+               //check if interface is connected
+               if (u8_ComIfCnt >= static_cast<sintn> (pc_DevDef->u8_NumCanBusses))
+               {
+                  //ETH
+                  q_InterfaceIsConnected =
+                     pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsConnected(C_OSCSystemBus::eETHERNET,
+                                                                             static_cast<uint8>(u8_ComIfCnt
+                                                                                                -
+                                                                                                static_cast<sintn>
+                                                                                                (
+                                                                                                   pc_DevDef->
+                                                                                                   u8_NumCanBusses)));
+               }
+               else
+               {
+                  //CAN
+                  q_InterfaceIsConnected =
+                     pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsConnected(C_OSCSystemBus::eCAN,
+                                                                             static_cast<uint8>(u8_ComIfCnt));
+               }
+
+               //hide row if not connected
+               if (q_InterfaceIsConnected == false)
+               {
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->hideRow(u8_ComIfCnt);
                }
             }
-            else
-            {
-               //disable
-               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColUpdate)->setEnabled(false);
-            }
-            //connect to RegisterChange
-
-            connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                      ->cellWidget(u8_ComIfCnt,
-                                                                   sn_ColUpdate)), &QCheckBox::stateChanged, this,
-                    &C_SdNdeNodePropertiesWidget::m_RegisterChange);
-
-            /**********************************************************************************************************/
-            // ROUTING
-            this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(
-               u8_ComIfCnt, sn_ColRouting, new C_OgeChxTristate(
-                  this));
-
-            if (q_IsRoutingAvailable == true)
-            {
-               //set node value
-
-               dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                 ->cellWidget(u8_ComIfCnt, sn_ColRouting))
-               ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsRoutingEnabled);
-            }
-            else
-            {
-               //disable
-               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColRouting)->
-               setEnabled(false);
-            }
-            //connect to RegisterChange
-
-            connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                      ->cellWidget(u8_ComIfCnt,
-                                                                   sn_ColRouting)), &QCheckBox::stateChanged, this,
-                    &C_SdNdeNodePropertiesWidget::m_RegisterChange);
-
-            /**********************************************************************************************************/
-            // DIAGNOSTIC
-            this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColDiagnostic, new C_OgeChxTristate(
-                                                                        this));
-
-            if (q_IsDiagnosisAvailable == true)
-            {
-               //set node value
-
-               dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                 ->cellWidget(u8_ComIfCnt, sn_ColDiagnostic))
-               ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsDiagnosisEnabled);
-            }
-            else
-            {
-               //disable
-               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColDiagnostic)->
-               setEnabled(false);
-            }
-
-            //connect to RegisterChange
-
-            connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                      ->cellWidget(u8_ComIfCnt,
-                                                                   sn_ColDiagnostic)), &QCheckBox::stateChanged, this,
-                    &C_SdNdeNodePropertiesWidget::m_RegisterChange);
          }
       }
    }
@@ -843,145 +917,173 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
    if (pc_Node != NULL)
    {
       const C_OSCDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
+      const uint32 u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
       tgl_assert(pc_DevDef != NULL);
 
       if (pc_DevDef != NULL)
       {
-         QString c_Name;
-         QString c_Comment;
-         C_OSCNodeProperties::E_DiagnosticServerProtocol e_DiagnosticServer;
-         C_OSCNodeProperties::E_FlashLoaderProtocol e_FlashLoader;
-         std::vector<uint8> c_NodeIds;
-         std::vector<bool> c_UpdateFlags;
-         std::vector<bool> c_RoutingFlags;
-         std::vector<bool> c_DiagnosisFlags;
-         const sintn sn_ColNodeId = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID);
-         const sintn sn_ColUpdate = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eUPDATE);
-         const sintn sn_ColRouting = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eROUTING);
-         const sintn sn_ColDiagnostic = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
-
-         //save data
-
-         //name
-         //Only accept new name if not in conflict
-         if (C_PuiSdHandler::h_GetInstance()->CheckNodeNameAvailable(
-                this->mpc_Ui->pc_LineEditNodeName->text().toStdString().c_str(), &this->mu32_NodeIndex, NULL))
+         tgl_assert(u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size());
+         if (u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size())
          {
-            c_Name = this->mpc_Ui->pc_LineEditNodeName->text();
-         }
-         else
-         {
-            //Restore previous name
-            c_Name = pc_Node->c_Properties.c_Name.c_str();
-         }
+            QString c_Name;
+            QString c_Comment;
+            C_OSCNodeProperties::E_DiagnosticServerProtocol e_DiagnosticServer;
+            C_OSCNodeProperties::E_FlashLoaderProtocol e_FlashLoader;
+            std::vector<uint8> c_NodeIds;
+            std::vector<bool> c_UpdateFlags;
+            std::vector<bool> c_RoutingFlags;
+            std::vector<bool> c_DiagnosisFlags;
+            const sintn sn_ColNodeId = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID);
+            const sintn sn_ColUpdate = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eUPDATE);
+            const sintn sn_ColRouting = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eROUTING);
+            const sintn sn_ColDiagnostic = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
 
-         //comment
-         c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText();
+            //save data
 
-         switch (this->mpc_Ui->pc_ComboBoxProtocol->currentIndex())
-         {
-         case mu8_FL_INDEX_OS:
-            e_FlashLoader = C_OSCNodeProperties::eFL_OPEN_SYDE;
-            e_DiagnosticServer = C_OSCNodeProperties::eDS_OPEN_SYDE;
-            break;
-         case mu8_FL_INDEX_STW:
-            e_FlashLoader = C_OSCNodeProperties::eFL_STW;
-            e_DiagnosticServer = C_OSCNodeProperties::eDS_KEFEX;
-            break;
-         default:
-            //Not supported
-            e_FlashLoader = C_OSCNodeProperties::eFL_NONE;
-            e_DiagnosticServer = C_OSCNodeProperties::eDS_NONE;
-            break;
-         }
-
-         //com interface settings
-         for (uint16 u16_ComIfCnt = 0;
-              (u16_ComIfCnt < pc_Node->c_Properties.c_ComInterfaces.size()) &&
-              (u16_ComIfCnt < this->mpc_Ui->pc_TableWidgetComIfSettings->rowCount());
-              ++u16_ComIfCnt)
-         {
-            bool q_NewValue;
-            const C_OSCNodeComInterfaceSettings & rc_CurInterface = pc_Node->c_Properties.c_ComInterfaces[u16_ComIfCnt];
-            const bool q_IsUpdateAvailable = pc_DevDef->IsUpdateAvailable(rc_CurInterface.e_InterfaceType);
-            const bool q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
-            const bool q_IsDiagnosisAvailable = pc_DevDef->IsDiagnosisAvailable(rc_CurInterface.e_InterfaceType);
-            //node id
-            c_NodeIds.push_back(static_cast<uint8> ((this->mpc_Ui->pc_TableWidgetComIfSettings->item(u16_ComIfCnt,
-                                                                                                     sn_ColNodeId)->text()
-                                                     .toInt())));
-
-            //update
-            if (q_IsUpdateAvailable == true)
+            //name
+            //Only accept new name if not in conflict
+            if (C_PuiSdHandler::h_GetInstance()->CheckNodeNameAvailable(
+                   this->mpc_Ui->pc_LineEditNodeName->text().toStdString().c_str(), &this->mu32_NodeIndex, NULL))
             {
-               //set state only if the cell is enabled (connected + available)
-               if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
-                                                                         sn_ColUpdate)->isEnabled() == true)
+               c_Name = this->mpc_Ui->pc_LineEditNodeName->text();
+            }
+            else
+            {
+               //Restore previous name
+               uint32 u32_NodeSquadIndex;
+
+               if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(this->mu32_NodeIndex,
+                                                                                   u32_NodeSquadIndex) == C_NO_ERR)
                {
-                  q_NewValue =
-                     dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                       ->cellWidget(u16_ComIfCnt, sn_ColUpdate))->isChecked();
+                  //squad node
+                  const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
+                     C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_NodeSquadIndex);
+                  if (pc_NodeSquad != NULL)
+                  {
+                     //name (base name)
+                     c_Name = pc_NodeSquad->c_BaseName.c_str();
+                  }
+               }
+               else
+               {
+                  //name
+                  c_Name = pc_Node->c_Properties.c_Name.c_str();
+               }
+            }
+
+            //comment
+            c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText();
+
+            switch (this->mpc_Ui->pc_ComboBoxProtocol->currentIndex())
+            {
+            case mu8_FL_INDEX_OS:
+               e_FlashLoader = C_OSCNodeProperties::eFL_OPEN_SYDE;
+               e_DiagnosticServer = C_OSCNodeProperties::eDS_OPEN_SYDE;
+               break;
+            case mu8_FL_INDEX_STW:
+               e_FlashLoader = C_OSCNodeProperties::eFL_STW;
+               e_DiagnosticServer = C_OSCNodeProperties::eDS_KEFEX;
+               break;
+            default:
+               //Not supported
+               e_FlashLoader = C_OSCNodeProperties::eFL_NONE;
+               e_DiagnosticServer = C_OSCNodeProperties::eDS_NONE;
+               break;
+            }
+
+            //com interface settings
+            for (uint16 u16_ComIfCnt = 0;
+                 (u16_ComIfCnt < pc_Node->c_Properties.c_ComInterfaces.size()) &&
+                 (u16_ComIfCnt < this->mpc_Ui->pc_TableWidgetComIfSettings->rowCount());
+                 ++u16_ComIfCnt)
+            {
+               bool q_NewValue;
+               const C_OSCNodeComInterfaceSettings & rc_CurInterface =
+                  pc_Node->c_Properties.c_ComInterfaces[u16_ComIfCnt];
+               const bool q_IsUpdateAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsUpdateAvailable(
+                  rc_CurInterface.e_InterfaceType);
+               const bool q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
+               const bool q_IsDiagnosisAvailable = pc_DevDef->c_SubDevices[u32_SubDeviceIndex].IsDiagnosisAvailable(
+                  rc_CurInterface.e_InterfaceType);
+               //node id
+               c_NodeIds.push_back(static_cast<uint8> ((this->mpc_Ui->pc_TableWidgetComIfSettings->item(u16_ComIfCnt,
+                                                                                                        sn_ColNodeId)->
+                                                        text()
+                                                        .toInt())));
+
+               //update
+               if (q_IsUpdateAvailable == true)
+               {
+                  //set state only if the cell is enabled (connected + available)
+                  if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
+                                                                            sn_ColUpdate)->isEnabled() == true)
+                  {
+                     q_NewValue =
+                        dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                          ->cellWidget(u16_ComIfCnt, sn_ColUpdate))->isChecked();
+                  }
+                  else
+                  {
+                     q_NewValue = false;
+                  }
                }
                else
                {
                   q_NewValue = false;
                }
-            }
-            else
-            {
-               q_NewValue = false;
-            }
-            c_UpdateFlags.push_back(q_NewValue);
+               c_UpdateFlags.push_back(q_NewValue);
 
-            //routing
-            if (q_IsRoutingAvailable == true)
-            {
-               //set state only if the cell is enabled (connected + available)
-               if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
-                                                                         sn_ColRouting)->isEnabled() == true)
+               //routing
+               if (q_IsRoutingAvailable == true)
                {
-                  q_NewValue =
-                     dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                       ->cellWidget(u16_ComIfCnt, sn_ColRouting))->isChecked();
+                  //set state only if the cell is enabled (connected + available)
+                  if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
+                                                                            sn_ColRouting)->isEnabled() == true)
+                  {
+                     q_NewValue =
+                        dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                          ->cellWidget(u16_ComIfCnt, sn_ColRouting))->isChecked();
+                  }
+                  else
+                  {
+                     q_NewValue = false;
+                  }
                }
                else
                {
                   q_NewValue = false;
                }
-            }
-            else
-            {
-               q_NewValue = false;
-            }
-            c_RoutingFlags.push_back(q_NewValue);
+               c_RoutingFlags.push_back(q_NewValue);
 
-            //diagnosis
-            if (q_IsDiagnosisAvailable == true)
-            {
-               //set state only if the cell is enabled (connected + available)
-               if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
-                                                                         sn_ColDiagnostic)->isEnabled() == true)
+               //diagnosis
+               if (q_IsDiagnosisAvailable == true)
                {
-                  q_NewValue =
-                     dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                       ->cellWidget(u16_ComIfCnt, sn_ColDiagnostic))->isChecked();
+                  //set state only if the cell is enabled (connected + available)
+                  if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
+                                                                            sn_ColDiagnostic)->isEnabled() == true)
+                  {
+                     q_NewValue =
+                        dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                          ->cellWidget(u16_ComIfCnt, sn_ColDiagnostic))->isChecked();
+                  }
+                  else
+                  {
+                     q_NewValue = false;
+                  }
                }
                else
                {
                   q_NewValue = false;
                }
+               c_DiagnosisFlags.push_back(q_NewValue);
             }
-            else
-            {
-               q_NewValue = false;
-            }
-            c_DiagnosisFlags.push_back(q_NewValue);
+
+            //save new node
+            C_PuiSdHandler::h_GetInstance()->SetOSCNodePropertiesDetailed(this->mu32_NodeIndex, c_Name, c_Comment,
+                                                                          e_DiagnosticServer, e_FlashLoader, c_NodeIds,
+                                                                          c_UpdateFlags, c_RoutingFlags,
+                                                                          c_DiagnosisFlags);
          }
-
-         //save new node
-         C_PuiSdHandler::h_GetInstance()->SetOSCNodePropertiesDetailed(this->mu32_NodeIndex, c_Name, c_Comment,
-                                                                       e_DiagnosticServer, e_FlashLoader, c_NodeIds,
-                                                                       c_UpdateFlags, c_RoutingFlags, c_DiagnosisFlags);
       }
    }
 }
@@ -1087,7 +1189,9 @@ void C_SdNdeNodePropertiesWidget::m_CheckNodeName(void)
 
    if ((q_NameIsUnique == true) && (q_NameIsValid == true))
    {
-      this->mpc_Ui->pc_LineEditNodeName->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+      this->mpc_Ui->pc_LineEditNodeName->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                               C_GtGetText::h_GetText(""),
+                                                               C_NagToolTip::eDEFAULT);
    }
    else
    {
@@ -1144,10 +1248,11 @@ void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
    {
       std::vector<stw_scl::C_SCLString> c_ExistingNames;
       hq_InProgress = true;
-      if (C_PuiSdHandler::h_GetInstance()->CheckNodeNameAvailable(this->mpc_Ui->pc_LineEditNodeName->text().toStdString()
-                                                                  .
-                                                                  c_str(), &this->mu32_NodeIndex,
-                                                                  &c_ExistingNames) == false)
+
+      if (C_PuiSdHandler::h_GetInstance()->CheckNodeNameAvailable(
+             this->mpc_Ui->pc_LineEditNodeName->text().toStdString().c_str(),
+             &this->mu32_NodeIndex,
+             &c_ExistingNames) == false)
       {
          const QString c_Description =
             static_cast<QString>(C_GtGetText::h_GetText(
@@ -1168,19 +1273,41 @@ void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
          c_Message.Execute();
          //Restore previous name
          {
+            uint32 u32_NodeSquadIndex;
             const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
             if (pc_Node != NULL)
             {
-               this->mpc_Ui->pc_LineEditNodeName->setText(pc_Node->c_Properties.c_Name.c_str());
+               if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(this->mu32_NodeIndex,
+                                                                                   u32_NodeSquadIndex) == C_NO_ERR)
+               {
+                  //squad node
+                  const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
+                     C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_NodeSquadIndex);
+                  if (pc_NodeSquad != NULL)
+                  {
+                     //name (base name)
+                     this->mpc_Ui->pc_LineEditNodeName->setText(pc_NodeSquad->c_BaseName.c_str());
+                  }
+               }
+               else
+               {
+                  //name
+                  this->mpc_Ui->pc_LineEditNodeName->setText(pc_Node->c_Properties.c_Name.c_str());
+               }
             }
          }
       }
       else
       {
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
          m_TrimNodeName();
          m_RegisterChange();
-         Q_EMIT (this->SigNameChanged(C_GtGetText::h_GetText(
-                                         "NETWORK TOPOLOGY"), this->mpc_Ui->pc_LineEditNodeName->text(), false));
+
+         if (pc_Node != NULL)
+         {
+            Q_EMIT (this->SigNameChanged(C_GtGetText::h_GetText(
+                                            "NETWORK TOPOLOGY"), pc_Node->c_Properties.c_Name.c_str(), false));
+         }
       }
       hq_InProgress = false; //lint !e838 its static and could be used on strange second call
    }
@@ -1232,31 +1359,6 @@ void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const ui
          }
          else
          {
-            //const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-
-            //SSI: 17.04.18
-            //Feature drop: Disable not connected interfaces
-            //Reason: Node IFs properties has to be defined also if the interface is not connected to a bus
-            //E.g.: No eds import permitted for node ids = 0.
-            //
-            //To avoid logic changes and to keep the possibility for quick feature revert
-            //the code snippet is still here
-            //         if (((pc_Node != NULL) && (u32_RowCounter < pc_Node->c_Properties.c_ComInterfaces.size())) &&
-            //             (pc_Node->c_Properties.c_ComInterfaces[u32_RowCounter].q_IsBusConnected == true))
-            //         {
-            //            //valid
-            //            this->mpc_Ui->pc_TableWidgetComIfSettings->model()->setData(
-            //               this->mpc_Ui->pc_TableWidgetComIfSettings->model()->index(u32_RowCounter, sn_ColNodeId),
-            //               mc_STYLE_GUIDE_COLOR_6, static_cast<sintn> (Qt::ForegroundRole));
-            //         }
-            //         else
-            //         {
-            //            //valid
-            //            this->mpc_Ui->pc_TableWidgetComIfSettings->model()->setData(
-            //               this->mpc_Ui->pc_TableWidgetComIfSettings->model()->index(u32_RowCounter, sn_ColNodeId),
-            //               mc_STYLE_GUIDE_COLOR_10, static_cast<sintn> (Qt::ForegroundRole));
-            //         }
-
             //valid
             this->mpc_Ui->pc_TableWidgetComIfSettings->model()->setData(
                this->mpc_Ui->pc_TableWidgetComIfSettings->model()->index(sn_RowCounter, sn_ColNodeId),
@@ -1264,7 +1366,6 @@ void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const ui
          }
 
          //handle invalid icon
-
          dynamic_cast<QCheckBox *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                     ->cellWidget(sn_RowCounter,
                                                  static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eINTERFACE)))
@@ -1286,7 +1387,7 @@ void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const ui
                {
                   const C_OSCNodeComInterfaceSettings & rc_Interface =
                      pc_Node->c_Properties.c_ComInterfaces[sn_RowCounter];
-                  if (rc_Interface.q_IsBusConnected == true)
+                  if (rc_Interface.GetBusConnected() == true)
                   {
                      const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
                         rc_Interface.u32_BusIndex);
@@ -1313,15 +1414,14 @@ void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const ui
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Short function description
+/*! \brief  Handle cell click
 
    Decides which column in Communication Interfaces Settings Table was clicked and which action to perform after click.
    If a IP-Address is clicked, a pop up to edit the IP-Address will show up.
    If a Bus-Bitrate was clicked, Tool jumps to "Edit Bus Properties" Screen.
 
-   \param[in]       ou32_Row        Table Row
-   \param[in]       ou32_Column     Table Column
-
+   \param[in]  ou32_Row       Table Row
+   \param[in]  ou32_Column    Table Column
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_HandleCellClick(const uint32 ou32_Row, const uint32 ou32_Column)
@@ -1352,7 +1452,7 @@ void C_SdNdeNodePropertiesWidget::m_HandleCellClick(const uint32 ou32_Row, const
 
    open Pop Up for clicked IP Cell
 
-   \param[in]  ou32_Row       Row
+   \param[in]  ou32_Row    Row
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32 ou32_Row)
@@ -1385,11 +1485,13 @@ void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32 ou32_Row)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  collects info about the bus, which got clicked in table and sends signal to change screen. Timer is needed
+
  *          to delay the signal, that a cell was clicked and the screen should change to bus properties. Without this
  *          opensyde crashes, because of unexpected behaviour of the table. It seems that the table still wants to
  *          perform actions after signal is out and screen is changed (while parent widget is already deleted).
 
-   \param[in]       ou32     Table Row
+   \param[in]  ou32_Row       Row
+   \param[in]  ou32_Column    Column
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_BusBitrateClick(const uint32 ou32_Row, const stw_types::uint32 ou32_Column)
@@ -1402,7 +1504,7 @@ void C_SdNdeNodePropertiesWidget::m_BusBitrateClick(const uint32 ou32_Row, const
    for (uint32 u32_It = 0; u32_It < c_ComInterfaces.size(); ++u32_It)
    {
       //check to which buses the node is connected
-      if (pc_Node->c_Properties.c_ComInterfaces[u32_It].q_IsBusConnected == true)
+      if (pc_Node->c_Properties.c_ComInterfaces[u32_It].GetBusConnected() == true)
       {
          const uint32 u32_BusIndex = c_ComInterfaces[u32_It].u32_BusIndex;
          //get name of connected bus
@@ -1433,6 +1535,7 @@ void C_SdNdeNodePropertiesWidget::m_BusBitrateClick(const uint32 ou32_Row, const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot for Timer::timeout to walk around the screen change on table-click.
+
  *          See m_BusBitrateClicked for details.
 */
 //----------------------------------------------------------------------------------------------------------------------

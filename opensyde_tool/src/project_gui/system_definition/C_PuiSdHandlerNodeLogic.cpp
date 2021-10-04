@@ -68,23 +68,31 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeNameAvailable(const C_SCLString & orc_Nam
       bool q_Skip = false;
       if (opu32_NodeIndexToSkip != NULL)
       {
-         if (*opu32_NodeIndexToSkip == u32_ItNode)
-         {
-            q_Skip = true;
-         }
+         q_Skip = this->CheckNodeIndexAssociatedWithAnotherNodeIndex(*opu32_NodeIndexToSkip, u32_ItNode);
       }
       if (q_Skip == false)
       {
-         const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_ItNode];
+         const stw_scl::C_SCLString c_CurName = C_PuiSdUtil::h_GetNodeBaseNameOrName(u32_ItNode).toStdString().c_str();
          //Check conflict
-         if (rc_Node.c_Properties.c_Name.LowerCase() == orc_Name.LowerCase())
+         if (c_CurName.LowerCase() == orc_Name.LowerCase())
          {
             q_Retval = false;
          }
          //Store other (not checked) node name
          if (opc_ExistingNames != NULL)
          {
-            opc_ExistingNames->push_back(rc_Node.c_Properties.c_Name);
+            bool q_Exists = false;
+            for (uint32 u32_It = 0UL; u32_It < opc_ExistingNames->size(); ++u32_It)
+            {
+               if ((*opc_ExistingNames)[u32_It] == c_CurName)
+               {
+                  q_Exists = true;
+               }
+            }
+            if (!q_Exists)
+            {
+               opc_ExistingNames->push_back(c_CurName);
+            }
          }
       }
    }
@@ -151,6 +159,33 @@ const C_PuiSdNode * C_PuiSdHandlerNodeLogic::GetUINode(const uint32 & oru32_Inde
    if (oru32_Index < this->mc_UINodes.size())
    {
       pc_Retval = &(this->mc_UINodes[oru32_Index]);
+   }
+   else
+   {
+      pc_Retval = NULL;
+   }
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get OSC node squad from array
+
+   Get OSC node squad from array
+
+   \param[in]  oru32_Index    Index
+
+   \return
+   NULL Data not found
+   Else Valid data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCNodeSquad * C_PuiSdHandlerNodeLogic::GetOSCNodeSquadConst(const uint32 & oru32_Index) const
+{
+   const C_OSCNodeSquad * pc_Retval;
+
+   if (oru32_Index < this->mc_CoreDefinition.c_NodeSquads.size())
+   {
+      pc_Retval = &(this->mc_CoreDefinition.c_NodeSquads[oru32_Index]);
    }
    else
    {
@@ -243,6 +278,7 @@ sint32 C_PuiSdHandlerNodeLogic::GetSortedOSCNodeConst(const uint32 & oru32_Index
    Else Valid data
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1762} no it cannot be const as it returns a non-const pointer; use const version of this function if needed
 C_OSCNode * C_PuiSdHandlerNodeLogic::GetOSCNode(const uint32 & oru32_Index)
 {
    C_OSCNode * pc_Retval;
@@ -250,6 +286,34 @@ C_OSCNode * C_PuiSdHandlerNodeLogic::GetOSCNode(const uint32 & oru32_Index)
    if (oru32_Index < this->mc_CoreDefinition.c_Nodes.size())
    {
       pc_Retval = &(this->mc_CoreDefinition.c_Nodes[oru32_Index]);
+   }
+   else
+   {
+      pc_Retval = NULL;
+   }
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get non const OSC node squad from array
+
+   Get non const OSC node squad from array
+
+   \param[in]  oru32_Index    Index
+
+   \return
+   NULL Data not found
+   Else Valid data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{1762} no it cannot be const as it returns a non-const pointer; use const version of this function if needed
+C_OSCNodeSquad * C_PuiSdHandlerNodeLogic::GetOSCNodeSquad(const uint32 & oru32_Index)
+{
+   C_OSCNodeSquad * pc_Retval;
+
+   if (oru32_Index < this->mc_CoreDefinition.c_NodeSquads.size())
+   {
+      pc_Retval = &(this->mc_CoreDefinition.c_NodeSquads[oru32_Index]);
    }
    else
    {
@@ -357,7 +421,7 @@ void C_PuiSdHandlerNodeLogic::SetOSCNodeProperties(const uint32 ou32_NodeIndex,
       C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       rc_OSCNode.c_Properties = orc_Properties;
       //Signal new name!
-      Q_EMIT this->SigNodesChanged();
+      Q_EMIT (this->SigNodeChanged(ou32_NodeIndex));
    }
 }
 
@@ -383,7 +447,11 @@ void C_PuiSdHandlerNodeLogic::SetOSCNodePropertiesDetailed(const uint32 ou32_Nod
    if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
       C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      rc_OSCNode.c_Properties.c_Name = orc_Name.toStdString().c_str();
+
+      //set name (special handling)
+      this->mc_CoreDefinition.SetNodeName(ou32_NodeIndex, orc_Name.toStdString().c_str());
+
+      //set other properties
       rc_OSCNode.c_Properties.c_Comment = orc_Comment.toStdString().c_str();
       rc_OSCNode.c_Properties.e_DiagnosticServer = oe_DiagnosticServer;
       rc_OSCNode.c_Properties.e_FlashLoader = oe_FlashLoader;
@@ -402,7 +470,7 @@ void C_PuiSdHandlerNodeLogic::SetOSCNodePropertiesDetailed(const uint32 ou32_Nod
          }
       }
       //Signal new name!
-      Q_EMIT this->SigNodesChanged();
+      Q_EMIT (this->SigNodeChanged(ou32_NodeIndex));
    }
 }
 
@@ -429,14 +497,17 @@ void C_PuiSdHandlerNodeLogic::SetUINodeBox(const uint32 ou32_NodeIndex, const C_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add node
 
-   \param[in,out]  orc_OSCNode   New OSC node (name might be modified by this function if not unique)
-   \param[in,out]  orc_UINode    New UI node
+   \param[in,out]  orc_OSCNode         New OSC node (name might be modified by this function if not unique)
+   \param[in,out]  orc_UINode          New UI node
+   \param[in]      orc_SubDeviceName   Sub device name
+   \param[in]      orc_MainDevice      Main device
 
    \return
    Index of node  (0 -> first node)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiSdHandlerNodeLogic::AddNodeAndSort(C_OSCNode & orc_OSCNode, const C_PuiSdNode & orc_UINode)
+uint32 C_PuiSdHandlerNodeLogic::AddNodeAndSort(C_OSCNode & orc_OSCNode, const C_PuiSdNode & orc_UINode,
+                                               const QString & orc_SubDeviceName, const QString & orc_MainDevice)
 {
    const uint32 u32_Index = mc_CoreDefinition.c_Nodes.size();
    //Extract device name if the device was already set
@@ -448,7 +519,9 @@ uint32 C_PuiSdHandlerNodeLogic::AddNodeAndSort(C_OSCNode & orc_OSCNode, const C_
    orc_OSCNode.c_Properties.c_Name = C_Uti::h_GetUniqueName(
       this->m_GetExistingNodeNames(), orc_OSCNode.c_Properties.c_Name, c_DefaultDeviceName);
 
-   mc_CoreDefinition.AddNode(orc_OSCNode); //add node and set device definition pointer
+   mc_CoreDefinition.AddNode(orc_OSCNode, orc_SubDeviceName.toStdString().c_str(),
+                             orc_MainDevice.toStdString().c_str()); //add node and set device definition
+   // pointer
 
    //insert UI part at same position as OSC part:
    this->mc_UINodes.insert(mc_UINodes.begin() + u32_Index, orc_UINode);
@@ -464,21 +537,115 @@ uint32 C_PuiSdHandlerNodeLogic::AddNodeAndSort(C_OSCNode & orc_OSCNode, const C_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add node squad
+
+   \param[in,out]  orc_OSCNodes        New OSC nodes (name might be modified by this function if not unique)
+   \param[in,out]  orc_UINodes         New UI nodes
+   \param[in]      orc_NodeNames       Node names
+   \param[in]      orc_MainDevice      Main device
+   \param[in]      orc_NameProposal    Name proposal
+
+   \return
+   Index of first node of node squad (0 -> first node)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_PuiSdHandlerNodeLogic::AddNodeSquadAndSort(std::vector<C_OSCNode> & orc_OSCNodes,
+                                                    const std::vector<C_PuiSdNode> & orc_UINodes,
+                                                    const std::vector<QString> & orc_NodeNames,
+                                                    const QString & orc_MainDevice, const QString & orc_NameProposal)
+{
+   const uint32 u32_NodeIndex = mc_CoreDefinition.c_Nodes.size();
+   const uint32 u32_NodeSquadIndex = mc_CoreDefinition.c_NodeSquads.size();
+
+   std::vector<stw_scl::C_SCLString> c_NodeNames;
+   C_SCLString c_Name;
+   uint32 u32_NodeCounter;
+
+   c_NodeNames.reserve(orc_NodeNames.size());
+   for (uint32 u32_ItNode = 0UL; u32_ItNode < orc_NodeNames.size(); ++u32_ItNode)
+   {
+      c_NodeNames.push_back(orc_NodeNames[u32_ItNode].toStdString().c_str());
+   }
+
+   tgl_assert(orc_OSCNodes.size() > 0);
+   tgl_assert(orc_OSCNodes.size() == orc_UINodes.size());
+   tgl_assert(orc_OSCNodes.size() == orc_NodeNames.size());
+   if (orc_OSCNodes.size() > 0)
+   {
+      // The device name of the first node is enough. Must be identical on all sub nodes
+      C_OSCNode & rc_OSCNode = orc_OSCNodes[0];
+      //Extract device name if the device was already set
+      const C_SCLString c_DeviceName = (rc_OSCNode.pc_DeviceDefinition !=
+                                        NULL) ? rc_OSCNode.pc_DeviceDefinition->GetDisplayName() : "";
+      const C_SCLString c_DefaultDeviceName =
+         C_PuiSdHandlerNodeLogic::h_AutomaticCStringAdaptation(c_DeviceName.c_str()).toStdString().c_str();
+      c_Name = orc_NameProposal.isEmpty() ? c_DefaultDeviceName : orc_NameProposal.toStdString().c_str();
+
+      // The proposed name would be identical for all sub nodes too. The sub node specific part of the name
+      // will be added with SetBaseName
+      c_Name = C_Uti::h_GetUniqueName(
+         this->m_GetExistingNodeNames(), c_Name, c_DefaultDeviceName);
+   }
+
+   this->mc_CoreDefinition.AddNodeSquad(orc_OSCNodes, c_NodeNames, orc_MainDevice.toStdString().c_str()); //add node and
+                                                                                                          // set device
+   // definition pointer
+
+   tgl_assert(u32_NodeSquadIndex < mc_CoreDefinition.c_NodeSquads.size());
+   this->mc_CoreDefinition.c_NodeSquads[u32_NodeSquadIndex].SetBaseName(this->mc_CoreDefinition.c_Nodes,
+                                                                        c_Name);
+
+   //insert UI part at same position as OSC part:
+   this->mc_UINodes.insert(mc_UINodes.begin() + u32_NodeIndex, orc_UINodes.begin(), orc_UINodes.end());
+
+   //signal "node change"
+   Q_EMIT (this->SigNodesChanged());
+   for (u32_NodeCounter = 0U; u32_NodeCounter < orc_OSCNodes.size(); ++u32_NodeCounter)
+   {
+      // Signals for all node indexes necessary
+      Q_EMIT (this->SigSyncNodeAdded(u32_NodeIndex + u32_NodeCounter));
+   }
+
+   // No adaption of the shared Datapools or already existing node squads necessary.
+   // The new node index is always higher than the already existing nodes indexes
+
+   return u32_NodeIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove node
+
+   In case of a node which is a sub node of a squad node, the entire squad node will be removed
 
    \param[in]  ou32_NodeIndex    Connector node index (0 -> first node)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::RemoveNode(const uint32 ou32_NodeIndex)
 {
-   //Synchronization engine (First!)
-   Q_EMIT (this->SigSyncNodeAboutToBeDeleted(ou32_NodeIndex));
+   sint32 s32_NodeIndexCounter;
 
-   this->mc_CoreDefinition.c_Nodes.erase(this->mc_CoreDefinition.c_Nodes.begin() + ou32_NodeIndex);
-   this->mc_UINodes.erase(this->mc_UINodes.begin() + ou32_NodeIndex);
+   const std::vector<uint32> c_AllNodeIndexToRemove = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
 
-   // Update shared Datapool configuration
-   this->mc_SharedDatapools.OnNodeRemoved(ou32_NodeIndex);
+   // Start with the last index due to the highest index. Avoiding problems with deleting and changing orders for
+   // the other node index
+   for (s32_NodeIndexCounter = (static_cast<sint32>(c_AllNodeIndexToRemove.size()) - 1); s32_NodeIndexCounter >= 0;
+        --s32_NodeIndexCounter)
+   {
+      //Synchronization engine (First!)
+      Q_EMIT (this->SigSyncNodeAboutToBeDeleted(c_AllNodeIndexToRemove[static_cast<uint32>(s32_NodeIndexCounter)]));
+   }
+
+   tgl_assert(this->mc_CoreDefinition.DeleteNode(ou32_NodeIndex) == C_NO_ERR);
+
+   for (s32_NodeIndexCounter = (static_cast<sint32>(c_AllNodeIndexToRemove.size()) - 1); s32_NodeIndexCounter >= 0;
+        --s32_NodeIndexCounter)
+   {
+      this->mc_UINodes.erase(
+         this->mc_UINodes.begin() + c_AllNodeIndexToRemove[static_cast<uint32>(s32_NodeIndexCounter)]);
+
+      // Update shared Datapool configuration
+      this->mc_SharedDatapools.OnNodeRemoved(c_AllNodeIndexToRemove[static_cast<uint32>(s32_NodeIndexCounter)]);
+   }
 
    //signal "node change"
    Q_EMIT (this->SigNodesChanged());
@@ -657,6 +824,104 @@ stw_types::uint32 C_PuiSdHandlerNodeLogic::GetOSCNodesSize(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get OSC Node squads size
+
+   \return
+   total number of node squads
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::uint32 C_PuiSdHandlerNodeLogic::GetOSCNodeSquadsSize(void) const
+{
+   return this->mc_CoreDefinition.c_NodeSquads.size();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all node group indices using node index
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   All node group indices using node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<uint32> C_PuiSdHandlerNodeLogic::GetAllNodeGroupIndicesUsingNodeIndex(const uint32 ou32_NodeIndex) const
+{
+   std::vector<uint32> c_Retval;
+   bool q_Found = false;
+   for (uint32 u32_ItGroup = 0UL; u32_ItGroup < this->mc_CoreDefinition.c_NodeSquads.size(); ++u32_ItGroup)
+   {
+      const C_OSCNodeSquad & rc_Group = this->mc_CoreDefinition.c_NodeSquads[u32_ItGroup];
+      for (uint32 u32_ItSubDevice = 0UL; u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size(); ++u32_ItSubDevice)
+      {
+         if (rc_Group.c_SubNodeIndexes[u32_ItSubDevice] == ou32_NodeIndex)
+         {
+            q_Found = true;
+            c_Retval.reserve(rc_Group.c_SubNodeIndexes.size());
+            for (uint32 u32_ItNewSubDevice = 0UL; u32_ItNewSubDevice < rc_Group.c_SubNodeIndexes.size();
+                 ++u32_ItNewSubDevice)
+            {
+               c_Retval.push_back(rc_Group.c_SubNodeIndexes[u32_ItNewSubDevice]);
+            }
+            break;
+         }
+      }
+   }
+   if (!q_Found)
+   {
+      c_Retval.push_back(ou32_NodeIndex);
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Search the node squad with a specific node index as potential sub node
+
+   \param[in]   ou32_NodeIndex         Searched node index of a sub node of a squad node
+   \param[out]  oru32_NodeSquadIndex   Found squad node index if return value is C_NO_ERR
+
+   \retval   C_NO_ERR   Node squad with specific sub node with node index found
+   \retval   C_RANGE    No node squad found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerNodeLogic::GetNodeSquadIndexWithNodeIndex(const uint32 ou32_NodeIndex,
+                                                               stw_types::uint32 & oru32_NodeSquadIndex) const
+{
+   return this->mc_CoreDefinition.GetNodeSquadIndexWithNodeIndex(ou32_NodeIndex, oru32_NodeSquadIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns a vector with a mapping to the node squads
+
+   The index of the vector equals the node index and the value has following definition:
+   Value < 0 : Node with node index is not part of a squad
+   Value >= 0: Node with node index is part of a node squad and the node squad has the index of the value
+
+   The vector will be cleared first.
+
+   \param[out]  orc_Mapping   Vector with mapping
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::GetNodeToNodeSquadMapping(std::vector<sint32> & orc_Mapping)
+{
+   uint32 u32_NodeCounter;
+
+   orc_Mapping.clear();
+
+   // Initialize with -1 for no squad node
+   orc_Mapping.resize(this->mc_CoreDefinition.c_Nodes.size(), -1);
+
+   for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_CoreDefinition.c_Nodes.size(); ++u32_NodeCounter)
+   {
+      uint32 u32_NodeSquadIndex = 0U;
+      if (this->mc_CoreDefinition.GetNodeSquadIndexWithNodeIndex(u32_NodeCounter, u32_NodeSquadIndex) == C_NO_ERR)
+      {
+         // Node is part of an node squad
+         orc_Mapping[u32_NodeCounter] = static_cast<sint32>(u32_NodeSquadIndex);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Detect critical name conflicts
 
    Warning: not performance optimized so the output is clear
@@ -825,6 +1090,79 @@ sint32 C_PuiSdHandlerNodeLogic::MapNodeIndexToName(const uint32 ou32_NodeIndex, 
    }
 
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if STW device
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   True  STW device
+   False Third party
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSdHandlerNodeLogic::IsNodeAStwDevice(const uint32 ou32_NodeIndex) const
+{
+   bool q_Retval = false;
+
+   const C_OSCNode * const pc_Node = this->GetOSCNodeConst(ou32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
+      const uint32 u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
+      tgl_assert(pc_Device != NULL);
+      if (pc_Device != NULL)
+      {
+         tgl_assert(u32_SubDeviceIndex < pc_Device->c_SubDevices.size());
+         if (u32_SubDeviceIndex < pc_Device->c_SubDevices.size())
+         {
+            if (((pc_Device->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderStwCan == false) &&
+                 (pc_Device->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeCan == false)) &&
+                (pc_Device->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeEthernet == false))
+            {
+               q_Retval = false;
+            }
+            else
+            {
+               q_Retval = true;
+            }
+         }
+      }
+   }
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check node index associated with another node index
+
+   \param[in]  ou32_FirstNodeIndex     First node index
+   \param[in]  ou32_SecondNodeIndex    Second node index
+
+   \return
+   True  Associated
+   False Not related
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSdHandlerNodeLogic::CheckNodeIndexAssociatedWithAnotherNodeIndex(const uint32 ou32_FirstNodeIndex,
+                                                                           const uint32 ou32_SecondNodeIndex) const
+{
+   bool q_Retval = false;
+
+   const std::vector<uint32> c_NodeIndices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_FirstNodeIndex);
+
+   for (uint32 u32_ItDevice = 0UL; u32_ItDevice < c_NodeIndices.size(); ++u32_ItDevice)
+   {
+      if (c_NodeIndices[u32_ItDevice] == ou32_SecondNodeIndex)
+      {
+         q_Retval = true;
+         break;
+      }
+   }
+
+   return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1740,7 +2078,8 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeNvmDataPoolsSizeConflict(const uint32 ou3
       *opq_OverlapConflict = false;
    }
 
-   if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+   if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) &&
+       (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
    {
       std::vector<C_PuiSdHandlerNodeLogicNvmArea> c_Areas;
       if (this->GetNodeNvmDataPoolAreas(ou32_NodeIndex, c_Areas) == C_NO_ERR)
@@ -1766,7 +2105,8 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeNvmDataPoolsSizeConflict(const uint32 ou3
             }
          }
 
-         if ((u32_SizeUsedAreas <= pc_Node->pc_DeviceDefinition->u32_UserEepromSizeBytes) &&
+         if ((u32_SizeUsedAreas <=
+              pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].u32_UserEepromSizeBytes) &&
              (q_OverlapDetected == false) &&
              (q_OutOfRange == false))
          {
@@ -1778,8 +2118,10 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeNvmDataPoolsSizeConflict(const uint32 ou3
             // Return detailed information about the error when needed
             if (opq_SizeConflict != NULL)
             {
-               *opq_SizeConflict = (u32_SizeUsedAreas > pc_Node->pc_DeviceDefinition->u32_UserEepromSizeBytes) ||
-                                   q_OutOfRange;
+               *opq_SizeConflict =
+                  (u32_SizeUsedAreas >
+                   pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].u32_UserEepromSizeBytes) ||
+                  q_OutOfRange;
             }
             if (opq_OverlapConflict != NULL)
             {
@@ -5155,6 +5497,8 @@ C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogic(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get pointers to all currently registered node names
 
+   The sub node part in the names will be removed. In case of a squad node, only the base name will be used
+
    \return
    Vector of pointers to all currently registered node names
 */
@@ -5164,7 +5508,23 @@ std::map<C_SCLString, bool> C_PuiSdHandlerNodeLogic::m_GetExistingNodeNames(void
    std::map<C_SCLString, bool> c_Retval;
    for (uint32 u32_ItNode = 0; u32_ItNode < this->mc_CoreDefinition.c_Nodes.size(); ++u32_ItNode)
    {
-      c_Retval[this->mc_CoreDefinition.c_Nodes[u32_ItNode].c_Properties.c_Name] = true;
+      uint32 u32_GroupIndex;
+      if (C_OSCNodeSquad::h_CheckIsMultiDevice(u32_ItNode, this->mc_CoreDefinition.c_NodeSquads, &u32_GroupIndex))
+      {
+         // Squad sub node. Only use base name
+         tgl_assert(u32_GroupIndex < this->mc_CoreDefinition.c_NodeSquads.size());
+         if (u32_GroupIndex < this->mc_CoreDefinition.c_NodeSquads.size())
+         {
+            const C_SCLString & rc_CurrentName = this->mc_CoreDefinition.c_NodeSquads[u32_GroupIndex].c_BaseName;
+            c_Retval[rc_CurrentName] = true;
+         }
+      }
+      else
+      {
+         // Normal node
+         const C_SCLString & rc_CurrentName = this->mc_CoreDefinition.c_Nodes[u32_ItNode].c_Properties.c_Name;
+         c_Retval[rc_CurrentName] = true;
+      }
    }
    return c_Retval;
 }
@@ -5726,7 +6086,8 @@ void C_PuiSdHandlerNodeLogic::m_CleanUpComDataPool(const uint32 & oru32_NodeInde
 void C_PuiSdHandlerNodeLogic::mh_GetNodeNvmDataPoolAreas(const C_OSCNode & orc_Node,
                                                          std::vector<C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogicNvmArea> & orc_Areas)
 {
-   const uint32 u32_NvmSize = orc_Node.pc_DeviceDefinition->u32_UserEepromSizeBytes;
+   const uint32 u32_NvmSize =
+      orc_Node.pc_DeviceDefinition->c_SubDevices[orc_Node.u32_SubDeviceIndex].u32_UserEepromSizeBytes;
    uint32 u32_DatapoolCounter;
    uint32 u32_AreaCounter;
 

@@ -28,7 +28,9 @@ class C_OSCDeviceGroup
 public:
    C_OSCDeviceGroup(void);
 
-   const C_OSCDeviceDefinition * LookForDevice(const stw_scl::C_SCLString & orc_Name) const;
+   const C_OSCDeviceDefinition * LookForDevice(const stw_scl::C_SCLString & orc_Name,
+                                               const stw_scl::C_SCLString & orc_MainDeviceName,
+                                               stw_types::uint32 & oru32_SubDeviceIndex) const;
    bool PreCheckDevice(const stw_scl::C_SCLString & orc_DeviceName, const stw_scl::C_SCLString & orc_DeviceNameAlias,
                        const stw_scl::C_SCLString & orc_DevicePath) const;
    stw_types::sint32 LoadGroup(stw_scl::C_SCLIniFile & orc_Ini, const stw_scl::C_SCLString & orc_BasePath);

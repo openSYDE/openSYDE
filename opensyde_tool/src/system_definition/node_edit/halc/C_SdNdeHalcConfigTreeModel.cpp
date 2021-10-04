@@ -100,7 +100,8 @@ sintn C_SdNdeHalcConfigTreeModel::columnCount(const QModelIndex & orc_Parent) co
 QVariant C_SdNdeHalcConfigTreeModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                                 const sintn osn_Role) const
 {
-   QVariant c_Retval = C_TblTreModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = C_TblTreModel::headerData(osn_Section,
+                                                 oe_Orientation, osn_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
@@ -197,7 +198,7 @@ QVariant C_SdNdeHalcConfigTreeModel::data(const QModelIndex & orc_Index, const s
          const C_OSCHalcConfigParameter * const pc_ParameterElement = m_GetParameterElement(orc_Index);
          if (pc_ParameterElement != NULL)
          {
-            const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> & rc_EnumItems =
+            const std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> > & rc_EnumItems =
                pc_ParameterElement->c_Value.GetEnumItems();
             uint32 u32_Counter = 0;
 
@@ -216,7 +217,7 @@ QVariant C_SdNdeHalcConfigTreeModel::data(const QModelIndex & orc_Index, const s
                case C_OSCHalcDefContent::eCT_ENUM:
                   c_Retval = C_GtGetText::h_GetText("unknown");
 
-                  for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It =
+                  for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
                           rc_EnumItems.begin(); c_It != rc_EnumItems.end(); ++c_It)
                   {
                      if (c_It->second == pc_ParameterElement->c_Value)
@@ -858,9 +859,11 @@ QStringList C_SdNdeHalcConfigTreeModel::mh_ConvertEnumsToStringList(const C_OSCH
 {
    QStringList c_Return;
 
-   const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> & rc_EnumItems = orc_Value.GetEnumItems();
+   const std::vector<std::pair<stw_scl::C_SCLString,
+                               C_OSCNodeDataPoolContent> > & rc_EnumItems = orc_Value.GetEnumItems();
 
-   for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = rc_EnumItems.begin();
+   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+           rc_EnumItems.begin();
         c_It != rc_EnumItems.end(); ++c_It)
    {
       c_Return.append(c_It->first.c_str());

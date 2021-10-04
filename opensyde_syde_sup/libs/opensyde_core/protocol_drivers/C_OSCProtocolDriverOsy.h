@@ -25,6 +25,7 @@
 #include <map>
 
 #include "stwtypes.h"
+#include "C_OSCProtocolSerialNumber.h"
 #include "C_OSCProtocolDriverOsyTpBase.h"
 #include "stw_can.h" //for CAN message type
 
@@ -161,6 +162,8 @@ private:
    static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_NAME            = 0xA81BU;
    static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_VERSION         = 0xA81CU;
    static const stw_types::uint16 mhu16_OSY_DI_FILE_BASED_TRANSFER_EXIT_RESULT = 0xA81DU;
+   static const stw_types::uint16 mhu16_OSY_DI_ECU_SERIAL_NUMBER_EXT       = 0xA81EU;
+   static const stw_types::uint16 mhu16_OSY_DI_SUB_NODE_ID                 = 0xA81FU;
    //routine identifiers
    static const stw_types::uint16 mhu16_OSY_RC_SID_ROUTE_DIAGNOSIS_COMMUNICATION     = 0x0202U;
    static const stw_types::uint16 mhu16_OSY_RC_SID_SEND_CAN_MESSAGE                  = 0x0203U;
@@ -253,6 +256,7 @@ public:
       bool q_MaxNumberOfBlockLengthAvailable;      ///< true: MaxNumberOfBlockLength can be read
       bool q_EthernetToEthernetRoutingSupported;   ///< true: E2E routing supported
       bool q_FileBasedTransferExitResultAvailable; ///< true: FileBasedTransferExitResult can be read
+      bool q_ExtendedSerialNumberModeImplemented;  ///< true: The device has the extended serial number format
    };
 
    C_OSCProtocolDriverOsy(void);
@@ -291,7 +295,7 @@ public:
                                                  stw_types::uint8 * const opu8_NrCode = NULL);
 
    //Device information services:
-   stw_types::sint32 OsyReadEcuSerialNumber(stw_types::uint8(&orau8_SerialNumber)[6],
+   stw_types::sint32 OsyReadEcuSerialNumber(C_OSCProtocolSerialNumber & orc_SerialNumber,
                                             stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadHardwareNumber(stw_types::uint32 & oru32_HardwareNumber,
                                            stw_types::uint8 * const opu8_NrCode = NULL);
@@ -327,6 +331,9 @@ public:
                                                            stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadFileBasedTransferExitResult(stw_scl::C_SCLString & orc_TransferExitResult,
                                                         stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadEcuSerialNumberExt(C_OSCProtocolSerialNumber & orc_SerialNumberExt,
+                                               stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadSubNodeId(stw_types::uint8 & oru8_SubNodeId, stw_types::uint8 * const opu8_NrCode = NULL);
 
    //Device configuration
    stw_types::sint32 OsySetNodeIdForChannel(const stw_types::uint8 ou8_ChannelType,

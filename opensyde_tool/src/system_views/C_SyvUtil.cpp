@@ -43,20 +43,25 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check system view errors
+/*! \brief   Get system view label info
 
-   \param[in]  ou32_ViewIndex            View index
-   \param[out] orc_ErrorLabelHeadingText Error heading information
-   \param[out] orc_ErrorLabelText        Detailed error information
-   \param[out] orc_ErrorTooltipText      Error tooltip information
+   \param[in]      ou32_ViewIndex               View index
+   \param[out]     orc_ErrorLabelHeadingText    Error heading information
+   \param[out]     orc_ErrorLabelText           Detailed error information
+   \param[out]     orc_ErrorTooltipText         Error tooltip information
+   \param[out]     ore_TooltipType              Tooltip type
+   \param[in,out]  orc_IconPath                 Icon path
+   \param[out]     orsn_ColorID                 Color ID
 
    \return
-   True  Error detected
-   False No error detected
+   True  Show label
+   False Hide label
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc_ErrorLabelHeadingText,
-                                      QString & orc_ErrorLabelText, QString & orc_ErrorTooltipText)
+bool C_SyvUtil::h_GetViewSetupLabelInfo(const uint32 ou32_ViewIndex, QString & orc_ErrorLabelHeadingText,
+                                        QString & orc_ErrorLabelText, QString & orc_ErrorTooltipText,
+                                        C_NagToolTip::E_Type & ore_TooltipType, QString & orc_IconPath,
+                                        sintn & orsn_ColorID)
 {
    bool q_Retval;
    bool q_NameInvalid;
@@ -66,6 +71,7 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
    bool q_SysDefInvalid;
    bool q_NoActiveNodes;
    QString c_RoutingErrorText;
+   QString c_AutomaticallyDeactivatedNodes;
    sint32 s32_Return;
 
    s32_Return = C_PuiSvHandler::h_GetInstance()->CheckViewError(ou32_ViewIndex,
@@ -73,7 +79,7 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
                                                                 &q_PcNotConnected,
                                                                 &q_RoutingInvalid, &q_UpdateDisabledButDataBlocks,
                                                                 &q_SysDefInvalid, &q_NoActiveNodes,
-                                                                &c_RoutingErrorText);
+                                                                &c_RoutingErrorText, &c_AutomaticallyDeactivatedNodes);
 
    if ((q_UpdateDisabledButDataBlocks == true) ||
        ((((((q_NameInvalid == true) || (q_PcNotConnected == true)) || ((q_RoutingInvalid == true)) ||
@@ -140,6 +146,29 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
       orc_ErrorLabelText = "";
       q_Retval = false;
    }
+   if (q_Retval)
+   {
+      ore_TooltipType = C_NagToolTip::eERROR;
+      orc_IconPath = "://images/Error_iconV2.svg";
+      orsn_ColorID = 24;
+   }
+   else
+   {
+      ore_TooltipType = C_NagToolTip::eDEFAULT;
+      orc_IconPath = "://images/Info_Icon_MessageBox.svg";
+      orsn_ColorID = 3;
+      if (!c_AutomaticallyDeactivatedNodes.isEmpty())
+      {
+         q_Retval = true;
+         orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Note:");
+         //lint -e{1946} Qt interface
+         orc_ErrorLabelText = QString(C_GtGetText::h_GetText(
+                                         "There are sub-nodes which can not be reached by the PC"
+                                         " and are not available in the Device Configuration,"
+                                         " Update and Dashboard screens. Affected sub-nodes: %1"))
+                              .arg(c_AutomaticallyDeactivatedNodes);
+      }
+   }
    //Combine strings for tooltip
    if ((orc_ErrorLabelHeadingText.isEmpty() == false) || (orc_ErrorLabelText.isEmpty() == false))
    {
@@ -151,10 +180,10 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert bus ID and node id to SD indices
 
-   \param[in]  ou8_BusIdentifier  Bus id
-   \param[in]  ou8_NodeIdentifier Node Id within bus
-   \param[out] oru32_NodeIndex    SD node index
-   \param[out] oru32_BusIndex     SD bus index
+   \param[in]   ou8_BusIdentifier   Bus id
+   \param[in]   ou8_NodeIdentifier  Node Id within bus
+   \param[out]  oru32_NodeIndex     SD node index
+   \param[out]  oru32_BusIndex      SD bus index
 
    \return
    C_NO_ERR Operation success
@@ -209,8 +238,8 @@ sint32 C_SyvUtil::h_GetIndicesFromBusId(const uint8 ou8_BusIdentifier, const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get update mode details for specified ID in specified view
 
-   \param[in] ou32_ViewIndex Current view index
-   \param[in] orc_Id         ID to get details for
+   \param[in]  ou32_ViewIndex    Current view index
+   \param[in]  orc_Id            ID to get details for
 
    \return
    Update mode details
@@ -368,10 +397,10 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get common dashboard item tool tip for specified ID in specified view
 
-   \param[in] ou32_ViewIndex Current view index
-   \param[in] orc_Id         ID to get details for
-   \param[in] oq_ReadItem    Read widget?
-   \param[in] oe_WriteMode   Write mode
+   \param[in]  ou32_ViewIndex    Current view index
+   \param[in]  orc_Id            ID to get details for
+   \param[in]  oq_ReadItem       Read widget?
+   \param[in]  oe_WriteMode      Write mode
 
    \return
    Common dashboard item tool tip
@@ -418,10 +447,10 @@ QString C_SyvUtil::h_GetCommonDashboardItemToolTip(const uint32 ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get view name to display
 
-   \param[in]  ou32_ViewIndex View index
-   \param[in]  os32_SubMode   Current sub mode (skipped if invalid)
-   \param[out] orc_SubMode    Sub mode heading
-   \param[out] orc_SubSubMode Sub sub mode heading
+   \param[in]   ou32_ViewIndex   View index
+   \param[in]   os32_SubMode     Current sub mode (skipped if invalid)
+   \param[out]  orc_SubMode      Sub mode heading
+   \param[out]  orc_SubSubMode   Sub sub mode heading
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUtil::h_GetViewDisplayName(const uint32 ou32_ViewIndex, const sint32 os32_SubMode, QString & orc_SubMode,

@@ -301,74 +301,87 @@ void C_GiSyColorSelectWidget::m_InitStandardColors(void)
 void C_GiSyColorSelectWidget::m_InitElements(void) const
 {
    this->mpc_Ui->pc_PushButtonLightBlue->SetColors(this->mc_LightBlue, QColor(87, 106, 164), QColor(99, 147, 203));
-   this->mpc_Ui->pc_PushButtonLightBlue->SetToolTipInformation(NULL,
-                                                               "HTML: " + this->mc_LightBlue.name().toUpper() +
-                                                               "\nRGBA: " + QString::number(this->mc_LightBlue.red()) +
-                                                               "/" + QString::number(this->mc_LightBlue.green()) +
-                                                               "/" + QString::number(this->mc_LightBlue.blue()) +
-                                                               "/" + QString::number(this->mc_LightBlue.alpha()));
+   this->mpc_Ui->pc_PushButtonLightBlue->SetToolTipInformation(
+      C_GtGetText::h_GetText("Light Blue"),
+      C_GtGetText::h_GetText(("HTML: " + this->mc_LightBlue.name().toUpper() +
+                              "\nRGBA: " + QString::number(this->mc_LightBlue.red()) +
+                              "/" + QString::number(this->mc_LightBlue.green()) +
+                              "/" + QString::number(this->mc_LightBlue.blue()) +
+                              "/" + QString::number(this->mc_LightBlue.alpha())).
+                             toStdString().c_str()));
    this->mpc_Ui->pc_PushButtonGreen->SetColors(this->mc_Green, QColor(101, 136, 70), QColor(117, 162, 88));
-   this->mpc_Ui->pc_PushButtonGreen->SetToolTipInformation(NULL,
-                                                           "HTML: " + this->mc_Green.name().toUpper() +
-                                                           "\nRGBA: " + QString::number(this->mc_Green.red()) +
-                                                           "/" + QString::number(this->mc_Green.green()) +
-                                                           "/" + QString::number(this->mc_Green.blue()) +
-                                                           "/" + QString::number(this->mc_Green.alpha()));
+   this->mpc_Ui->pc_PushButtonGreen->SetToolTipInformation(
+      C_GtGetText::h_GetText("Green"),
+      C_GtGetText::h_GetText(("HTML: " + this->mc_Green.name().toUpper() +
+                              "\nRGBA: " + QString::number(this->mc_Green.red()) +
+                              "/" + QString::number(this->mc_Green.green()) +
+                              "/" + QString::number(this->mc_Green.blue()) +
+                              "/" + QString::number(this->mc_Green.alpha()))
+                             .toStdString().c_str()));
    this->mpc_Ui->pc_PushButtonGold->SetColors(this->mc_Gold, QColor(181, 160, 67), QColor(219, 193, 72));
-   this->mpc_Ui->pc_PushButtonGold->SetToolTipInformation(NULL,
-                                                          "HTML: " + this->mc_Gold.name().toUpper() +
-                                                          "\nRGBA: " + QString::number(this->mc_Gold.red()) +
-                                                          "/" + QString::number(this->mc_Gold.green()) +
-                                                          "/" + QString::number(this->mc_Gold.blue()) +
-                                                          "/" + QString::number(this->mc_Gold.alpha()));
+   this->mpc_Ui->pc_PushButtonGold->SetToolTipInformation(
+      C_GtGetText::h_GetText("Gold"),
+      C_GtGetText::h_GetText(("HTML: " + this->mc_Gold.name().toUpper() +
+                              "\nRGBA: " + QString::number(this->mc_Gold.red()) +
+                              "/" + QString::number(this->mc_Gold.green()) +
+                              "/" + QString::number(this->mc_Gold.blue()) +
+                              "/" + QString::number(this->mc_Gold.alpha()))
+                             .toStdString().c_str()));
    this->mpc_Ui->pc_PushButtonOrange->SetColors(this->mc_Orange, QColor(153, 81, 38), QColor(211, 130, 30));
-   this->mpc_Ui->pc_PushButtonOrange->SetToolTipInformation(NULL,
-                                                            "HTML: " + this->mc_Orange.name().toUpper() +
-                                                            "\nRGBA: " + QString::number(this->mc_Orange.red()) +
-                                                            "/" + QString::number(this->mc_Orange.green()) +
-                                                            "/" + QString::number(this->mc_Orange.blue()) +
-                                                            "/" + QString::number(this->mc_Orange.alpha()));
+   this->mpc_Ui->pc_PushButtonOrange->SetToolTipInformation(
+      C_GtGetText::h_GetText("Orange"),
+      C_GtGetText::h_GetText(("HTML: " + this->mc_Orange.name().toUpper() +
+                              "\nRGBA: " + QString::number(this->mc_Orange.red()) +
+                              "/" + QString::number(this->mc_Orange.green()) +
+                              "/" + QString::number(this->mc_Orange.blue()) +
+                              "/" + QString::number(this->mc_Orange.alpha()))
+                             .toStdString().c_str()));
    this->mpc_Ui->pc_PushButtonRed->SetColors(this->mc_Red, QColor(140, 32, 21), QColor(176, 55, 43));
-   this->mpc_Ui->pc_PushButtonRed->SetToolTipInformation(NULL,
-                                                         "HTML: " + this->mc_Red.name().toUpper() +
-                                                         "\nRGBA: " + QString::number(this->mc_Red.red()) +
-                                                         "/" + QString::number(this->mc_Red.green()) +
-                                                         "/" + QString::number(this->mc_Red.blue()) +
-                                                         "/" + QString::number(this->mc_Red.alpha()));
+   this->mpc_Ui->pc_PushButtonRed->SetToolTipInformation(
+      C_GtGetText::h_GetText("Red"),
+      C_GtGetText::h_GetText(("HTML: " + this->mc_Red.name().toUpper() +
+                              "\nRGBA: " + QString::number(this->mc_Red.red()) +
+                              "/" + QString::number(this->mc_Red.green()) +
+                              "/" + QString::number(this->mc_Red.blue()) +
+                              "/" + QString::number(this->mc_Red.alpha()))
+                             .toStdString().c_str()));
    this->mpc_Ui->pc_PushButtonPurple->SetColors(this->mc_Purple, QColor(42, 40, 76), QColor(63, 61, 125));
-   this->mpc_Ui->pc_PushButtonPurple->SetToolTipInformation(NULL,
-                                                            "HTML: " + this->mc_Purple.name().toUpper() +
-                                                            "\nRGBA: " + QString::number(this->mc_Purple.red()) +
-                                                            "/" + QString::number(this->mc_Purple.green()) +
-                                                            "/" + QString::number(this->mc_Purple.blue()) +
-                                                            "/" + QString::number(this->mc_Purple.alpha()));
+   this->mpc_Ui->pc_PushButtonPurple->SetToolTipInformation(
+      C_GtGetText::h_GetText("Purple"),
+      C_GtGetText::h_GetText(("HTML: " + this->mc_Purple.name().toUpper() +
+                              "\nRGBA: " + QString::number(this->mc_Purple.red()) +
+                              "/" + QString::number(this->mc_Purple.green()) +
+                              "/" + QString::number(this->mc_Purple.blue()) +
+                              "/" + QString::number(this->mc_Purple.alpha()))
+                             .toStdString().c_str()));
    this->mpc_Ui->pc_PushButtonLightGreen->SetColors(this->mc_LightGreen, QColor(169, 198, 145), QColor(193, 219, 180));
-   this->mpc_Ui->pc_PushButtonLightGreen->SetToolTipInformation(NULL,
-                                                                "HTML: " + this->mc_LightGreen.name().toUpper() +
-                                                                "\nRGBA: " + QString::number(
-                                                                   this->mc_LightGreen.red()) +
-                                                                "/" + QString::number(this->mc_LightGreen.green()) +
-                                                                "/" + QString::number(this->mc_LightGreen.blue()) +
-                                                                "/" + QString::number(this->mc_LightGreen.alpha()));
+   this->mpc_Ui->pc_PushButtonLightGreen->SetToolTipInformation(
+      C_GtGetText::h_GetText("Light Green"),
+      C_GtGetText::h_GetText(("HTML: " + this->mc_LightGreen.name().toUpper() +
+                              "\nRGBA: " + QString::number(this->mc_LightGreen.red()) +
+                              "/" + QString::number(this->mc_LightGreen.green()) +
+                              "/" + QString::number(this->mc_LightGreen.blue()) +
+                              "/" + QString::number(this->mc_LightGreen.alpha()))
+                             .toStdString().c_str()));
    this->mpc_Ui->pc_PushButtonDarkBlueGreen->SetColors(this->mc_DarkBlueGreen, QColor(0, 100, 102),
                                                        QColor(0, 133, 113));
-   this->mpc_Ui->pc_PushButtonDarkBlueGreen->SetToolTipInformation(NULL,
-                                                                   "HTML: " + this->mc_DarkBlueGreen.name().toUpper() +
-                                                                   "\nRGBA: " +
-                                                                   QString::number(this->mc_DarkBlueGreen.red()) +
-                                                                   "/" + QString::number(
-                                                                      this->mc_DarkBlueGreen.green()) +
-                                                                   "/" + QString::number(
-                                                                      this->mc_DarkBlueGreen.blue()) +
-                                                                   "/" +
-                                                                   QString::number(this->mc_DarkBlueGreen.alpha()));
+   this->mpc_Ui->pc_PushButtonDarkBlueGreen->SetToolTipInformation(
+      C_GtGetText::h_GetText("Dark Blue Green"),
+      C_GtGetText::h_GetText(("HTML: " + this->mc_DarkBlueGreen.name().toUpper() +
+                              "\nRGBA: " + QString::number(this->mc_DarkBlueGreen.red()) +
+                              "/" + QString::number(this->mc_DarkBlueGreen.green()) +
+                              "/" + QString::number(this->mc_DarkBlueGreen.blue()) +
+                              "/" + QString::number(this->mc_DarkBlueGreen.alpha()))
+                             .toStdString().c_str()));
    this->mpc_Ui->pc_PushButtonLavendel->SetColors(this->mc_Lavendel, QColor(177, 180, 179), QColor(215, 215, 215));
-   this->mpc_Ui->pc_PushButtonLavendel->SetToolTipInformation(NULL,
-                                                              "HTML: " + this->mc_Lavendel.name().toUpper() +
-                                                              "\nRGBA: " + QString::number(this->mc_Lavendel.red()) +
-                                                              "/" + QString::number(this->mc_Lavendel.green()) +
-                                                              "/" + QString::number(this->mc_Lavendel.blue()) +
-                                                              "/" + QString::number(this->mc_Lavendel.alpha()));
+   this->mpc_Ui->pc_PushButtonLavendel->SetToolTipInformation(
+      C_GtGetText::h_GetText("Lavendel"),
+      C_GtGetText::h_GetText(("HTML: " + this->mc_Lavendel.name().toUpper() +
+                              "\nRGBA: " + QString::number(this->mc_Lavendel.red()) +
+                              "/" + QString::number(this->mc_Lavendel.green()) +
+                              "/" + QString::number(this->mc_Lavendel.blue()) +
+                              "/" + QString::number(this->mc_Lavendel.alpha()))
+                             .toStdString().c_str()));
 
    this->m_SetRecentColorToRecentButton(this->mpc_Ui->pc_PushButtonRecentColorNr1, this->mc_RecentColorNr1);
    this->m_SetRecentColorToRecentButton(this->mpc_Ui->pc_PushButtonRecentColorNr2, this->mc_RecentColorNr2);

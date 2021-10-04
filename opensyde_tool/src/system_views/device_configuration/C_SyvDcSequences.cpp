@@ -56,12 +56,12 @@ using namespace stw_opensyde_core;
 C_SyvDcDeviceInformation::C_SyvDcDeviceInformation(void) :
    c_DeviceName(""),
    q_DeviceNameValid(false),
-   q_SerialNumberValid(false),
    u8_NodeId(0U),
    q_NodeIdValid(false),
-   q_IpAddressValid(false)
+   q_IpAddressValid(false),
+   u8_SubNodeId(0U),
+   q_SubNodeIdValid(false)
 {
-   (void)std::memset(&au8_SerialNumber[0], 0U, sizeof(au8_SerialNumber));
    (void)std::memset(&au8_IpAddress[0], 0U, sizeof(au8_IpAddress));
 }
 
@@ -75,18 +75,6 @@ void C_SyvDcDeviceInformation::SetDeviceName(const C_SCLString & orc_DeviceName)
 {
    this->c_DeviceName = orc_DeviceName;
    this->q_DeviceNameValid = true;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets a serial number and its valid flag
-
-   \param[in]  orau8_SerialNumber   New serial number
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcDeviceInformation::SetSerialNumber(const uint8 (&orau8_SerialNumber)[6])
-{
-   (void)std::memcpy(this->au8_SerialNumber, orau8_SerialNumber, sizeof(this->au8_SerialNumber));
-   this->q_SerialNumberValid = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -114,62 +102,41 @@ void C_SyvDcDeviceInformation::SetIpAddress(const uint8 (&orau8_IpAddress)[4])
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a serial number and its valid flag
+
+   \param[in]  orc_SerialNumber   New serial number
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDcDeviceInformation::SetSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber)
+{
+   this->c_SerialNumber = orc_SerialNumber;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDcDeviceInformation::h_SerialNumberFromStringToArray(const C_SCLString & orc_SerialNumber,
-                                                               uint8 * const opu8_SerialNumer)
+/*! \brief   Sets a sub node id and its valid flag
+
+   \param[in]  ou8_SubNodeId  New sub node id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDcDeviceInformation::SetSubNodeId(const uint8 ou8_SubNodeId)
 {
-   bool q_Return = false;
-   C_SCLString c_CompleteString;
+   this->u8_SubNodeId = ou8_SubNodeId;
+   this->q_SubNodeIdValid = true;
+}
 
-   if (opu8_SerialNumer != NULL)
-   {
-      //format up to and including 2019. E.g: 05.123456.1001
-      if (orc_SerialNumber.Length() == 14)
-      {
-         SCLDynamicArray<C_SCLString> c_Tokens;
-         //Get all numbers
-         orc_SerialNumber.Tokenize(".", c_Tokens);
-         if (c_Tokens.GetLength() == 3)
-         {
-            //Combine all numbers
-            for (uint32 u32_ItCounter = 0U; u32_ItCounter < static_cast<uint32>(c_Tokens.GetLength()); ++u32_ItCounter)
-            {
-               c_CompleteString += c_Tokens[u32_ItCounter];
-            }
-         }
-      }
-      //format from 2020. E.g: 200012345678
-      else if (orc_SerialNumber.Length() == 12)
-      {
-         //no convert needed
-         c_CompleteString = orc_SerialNumber;
-      }
-      else
-      {
-         //invalid format, should never happen
-         C_SCLString c_Error;
-         c_Error.PrintFormatted("Invalid serial number format. String: \"%s\".", c_CompleteString.c_str());
-         osc_write_log_error("Convert serial number string to array", c_Error);
-      }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Comparison of serial number and all relevant members
 
-      //get bytes
-      if (c_CompleteString.Length() == 12)
-      {
-         uint32 u32_ItByte = 0U;
-         q_Return = true;
-         //For each 2 numbers assign one byte
-         for (uint32 u32_ItChar = 1U; u32_ItChar < c_CompleteString.Length(); u32_ItChar += 2)
-         {
-            C_SCLString c_SubString = c_CompleteString[u32_ItChar];
-            c_SubString += c_CompleteString[static_cast<sintn>(u32_ItChar) + 1];
-            c_SubString = "0x" + c_SubString;
-            opu8_SerialNumer[u32_ItByte] = static_cast<uint8>(c_SubString.ToInt());
-            //Next byte
-            ++u32_ItByte;
-         }
-      }
-   }
+   \param[in] orc_Cmp Compared instance
+
+   \return
+   true     Current serial number equals orc_Cmp
+   false    Else
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDcDeviceInformation::IsSerialNumberIdentical(const C_SyvDcDeviceInformation & orc_Cmp) const
+{
+   const bool q_Return = (this->c_SerialNumber == orc_Cmp.c_SerialNumber);
 
    return q_Return;
 }
@@ -179,7 +146,7 @@ bool C_SyvDcDeviceInformation::h_SerialNumberFromStringToArray(const C_SCLString
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcDeviceConfiguation::C_SyvDcDeviceConfiguation(void) :
-   au8_SerialNumber()
+   u8_SubNodeId(0U)
 {
 }
 
@@ -196,11 +163,11 @@ C_SyvDcDeviceConfiguation & C_SyvDcDeviceConfiguation::operator =(const C_SyvDcD
 {
    if (this != &orc_Source)
    {
-      (void)std::memcpy(this->au8_SerialNumber, orc_Source.au8_SerialNumber, sizeof(this->au8_SerialNumber));
+      this->c_SerialNumber = orc_Source.c_SerialNumber;
+      this->u8_SubNodeId = orc_Source.u8_SubNodeId;
       this->c_NodeIds = orc_Source.c_NodeIds;
       this->c_BusIds = orc_Source.c_BusIds;
       this->c_CanBitrates = orc_Source.c_CanBitrates;
-
       this->c_IpAddresses = orc_Source.c_IpAddresses;
    }
 
@@ -306,7 +273,7 @@ sint32 C_SyvDcSequences::InitDcSequences(const uint32 ou32_ViewIndex)
 /*! \brief   Gets all configuration information for a node
 
    Preconditions as input part for orc_Config:
-   - au8_SerialNumber must be set
+   - au8_SerialNumber or c_SerialNumberExt/u8_EcuSerialNumberManufacturerFormat must be set
    - size of c_NodeIds must be one
    - the value in c_NodeIds is the node id for the server to configure on the current used bus
 
@@ -367,7 +334,7 @@ sint32 C_SyvDcSequences::FillDeviceConfig(C_SyvDcDeviceConfiguation & orc_Config
                         pc_Node->c_Properties.c_ComInterfaces[u32_InterfaceCounter];
 
                      if ((rc_ComInterface.e_InterfaceType == C_OSCSystemBus::eETHERNET) &&
-                         (rc_ComInterface.q_IsBusConnected == true) &&
+                         (rc_ComInterface.GetBusConnected() == true) &&
                          (rc_ComInterface.u8_NodeID == c_ServerId.u8_NodeIdentifier) &&
                          (rc_ComInterface.u32_BusIndex == this->mu32_ActiveBusIndex))
                      {
@@ -385,7 +352,7 @@ sint32 C_SyvDcSequences::FillDeviceConfig(C_SyvDcDeviceConfiguation & orc_Config
                   const C_OSCNodeComInterfaceSettings & rc_ComInterface =
                      pc_Node->c_Properties.c_ComInterfaces[u32_InterfaceCounter];
 
-                  if ((rc_ComInterface.q_IsBusConnected == true) &&
+                  if ((rc_ComInterface.GetBusConnected() == true) &&
                       ((rc_ComInterface.u8_NodeID != c_ServerId.u8_NodeIdentifier) ||
                        (rc_ComInterface.u32_BusIndex != this->mu32_ActiveBusIndex)))
                   {
@@ -921,8 +888,9 @@ sint32 C_SyvDcSequences::InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bi
 
    Result of sequence can be get by calling GetDeviceInfosResult
 
-   \param[in]  orc_OpenSydeIds   Ids for openSYDE flashloader to read
-   \param[in]  orc_StwIds        Ids for STW flashloader to read
+   \param[in]  orc_OpenSydeIds           Ids for openSYDE flashloader to read
+   \param[in]  orc_OpenSydeSnrExtFormat  Flags for openSYDE devices if standard or extended format is used
+   \param[in]  orc_StwIds                Ids for STW flashloader to read
 
    \return
    C_NO_ERR   started sequence
@@ -930,6 +898,7 @@ sint32 C_SyvDcSequences::InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bi
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ReadBackCan(const std::vector<C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
+                                     const std::vector<bool> & orc_OpenSydeSnrExtFormat,
                                      const std::vector<C_OSCProtocolDriverOsyNode> & orc_StwIds)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -942,8 +911,10 @@ sint32 C_SyvDcSequences::ReadBackCan(const std::vector<C_OSCProtocolDriverOsyNod
    {
       this->me_Sequence = eREADBACKCAN;
       this->mc_OpenSydeIds.clear();
+      this->mc_OpenSydeSnrExtFormat.clear();
       this->mc_StwIds.clear();
       this->mc_OpenSydeIds = orc_OpenSydeIds;
+      this->mc_OpenSydeSnrExtFormat = orc_OpenSydeSnrExtFormat;
       this->mc_StwIds = orc_StwIds;
 
       this->mpc_Thread->start();
@@ -956,14 +927,16 @@ sint32 C_SyvDcSequences::ReadBackCan(const std::vector<C_OSCProtocolDriverOsyNod
 
    Result of sequence can be get by calling GetDeviceInfosResult
 
-   \param[in]  orc_OpenSydeIds   Ids for openSYDE flashloader to read
+   \param[in]  orc_OpenSydeIds           Ids for openSYDE flashloader to read
+   \param[in]  orc_OpenSydeSnrExtFormat  Flags for openSYDE devices if standard or extended format is used
 
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcSequences::ReadBackEth(const std::vector<C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds)
+sint32 C_SyvDcSequences::ReadBackEth(const std::vector<C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
+                                     const std::vector<bool> & orc_OpenSydeSnrExtFormat)
 {
    sint32 s32_Return = C_NO_ERR;
 
@@ -975,8 +948,10 @@ sint32 C_SyvDcSequences::ReadBackEth(const std::vector<C_OSCProtocolDriverOsyNod
    {
       this->me_Sequence = eREADBACKETH;
       this->mc_OpenSydeIds.clear();
+      this->mc_OpenSydeSnrExtFormat.clear();
       this->mc_StwIds.clear();
       this->mc_OpenSydeIds = orc_OpenSydeIds;
+      this->mc_OpenSydeSnrExtFormat = orc_OpenSydeSnrExtFormat;
       this->mpc_Thread->start();
    }
    return s32_Return;
@@ -1105,8 +1080,8 @@ void C_SyvDcSequences::m_RunConfEthOpenSydeDevicesProgress(const uint32 ou32_Pro
 void C_SyvDcSequences::m_RunConfCanStwFlashloaderDevicesState(const uint32 ou32_Step, const sint32 os32_Result,
                                                               const C_OSCProtocolDriverOsyNode & orc_Server) const
 {
-   Q_EMIT this->SigRunConfCanStwFlashloaderDevicesState(ou32_Step, os32_Result, orc_Server.u8_BusIdentifier,
-                                                        orc_Server.u8_NodeIdentifier);
+   Q_EMIT (this->SigRunConfCanStwFlashloaderDevicesState(ou32_Step, os32_Result, orc_Server.u8_BusIdentifier,
+                                                         orc_Server.u8_NodeIdentifier));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1129,9 +1104,9 @@ void C_SyvDcSequences::m_RunConfOpenSydeDevicesState(const uint32 ou32_Step, con
                                                      const C_OSCSystemBus::E_Type oe_InterfaceType,
                                                      const uint8 ou8_InterfaceNumber) const
 {
-   Q_EMIT this->SigRunConfOpenSydeDevicesState(ou32_Step, os32_Result, orc_Server.u8_BusIdentifier,
-                                               orc_Server.u8_NodeIdentifier,
-                                               static_cast<uint8>(oe_InterfaceType), ou8_InterfaceNumber);
+   Q_EMIT (this->SigRunConfOpenSydeDevicesState(ou32_Step, os32_Result, orc_Server.u8_BusIdentifier,
+                                                orc_Server.u8_NodeIdentifier,
+                                                static_cast<uint8>(oe_InterfaceType), ou8_InterfaceNumber));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1489,10 +1464,14 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromStwFlashloaderDevice(const uint8
          {
             for (uint8 u8_NodeCounter = 0U; u8_NodeCounter < u8_NodesFound; ++u8_NodeCounter)
             {
+               C_OSCProtocolSerialNumber c_SerialNumber;
                uint8 u8_LocalId;
+
+               c_SerialNumber.SetPosSerialNumber(aau8_SNRs[u8_NodeCounter]);
+
                //*** perform "node_wakeup(serial_number)"
                //*** perform "node_companyid(Y*)"
-               s32_Return = this->mpc_ComDriver->SendStwWakeupLocalSerialNumber(aau8_SNRs[u8_NodeCounter], u8_LocalId);
+               s32_Return = this->mpc_ComDriver->SendStwWakeupLocalSerialNumber(c_SerialNumber, u8_LocalId);
 
                if (s32_Return == C_NO_ERR)
                {
@@ -1506,7 +1485,7 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromStwFlashloaderDevice(const uint8
                   {
                      C_SyvDcDeviceInformation c_DeviceInfo;
                      c_DeviceInfo.SetNodeId(c_ServerId.u8_NodeIdentifier);
-                     c_DeviceInfo.SetSerialNumber(aau8_SNRs[u8_NodeCounter]);
+                     c_DeviceInfo.SetSerialNumber(c_SerialNumber);
                      c_DeviceInfo.SetDeviceName(c_DeviceName);
                      this->mc_DeviceInfoResult.push_back(c_DeviceInfo);
                   }
@@ -1585,9 +1564,11 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
    if (this->mpc_ComDriver != NULL)
    {
       std::vector<C_OSCProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberResults> c_ReadSnResult;
+      std::vector<C_OSCProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberExtendedResults> c_ReadSnResultExt;
 
       // * broadcast: "ReadSerialNumber"
-      s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastReadSerialNumber(c_ReadSnResult);
+      s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastReadSerialNumber(c_ReadSnResult,
+                                                                            c_ReadSnResultExt);
 
       if (s32_Return == C_NO_ERR)
       {
@@ -1597,14 +1578,28 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
          uint32 u32_UniqueIdIndicesCounter;
 
          osc_write_log_info("Scan CAN get info from openSYDE devices",
-                            "Sequence finished. Nodes found: " + C_SCLString::IntToStr(c_ReadSnResult.size()));
+                            "Sequence finished. Standard nodes found: " + C_SCLString::IntToStr(c_ReadSnResult.size()));
+         osc_write_log_info("Scan CAN get info from openSYDE devices",
+                            "Sequence finished. Extended nodes found: " +
+                            C_SCLString::IntToStr(c_ReadSnResultExt.size()));
 
-         // Fill the result container
+         // Fill the result container with the standard results
          for (u32_ResultCounter = 0U; u32_ResultCounter < c_ReadSnResult.size(); ++u32_ResultCounter)
          {
             C_SyvDcDeviceInformation c_DeviceInfo;
-            c_DeviceInfo.SetSerialNumber(c_ReadSnResult[u32_ResultCounter].au8_SerialNumber);
+            c_DeviceInfo.SetSerialNumber(c_ReadSnResult[u32_ResultCounter].c_SerialNumber);
             c_DeviceInfo.SetNodeId(c_ReadSnResult[u32_ResultCounter].c_SenderId.u8_NodeIdentifier);
+            this->mc_DeviceInfoResult.push_back(c_DeviceInfo);
+         }
+
+         // Fill the result container with the extended results
+         for (u32_ResultCounter = 0U; u32_ResultCounter < c_ReadSnResultExt.size(); ++u32_ResultCounter)
+         {
+            C_SyvDcDeviceInformation c_DeviceInfo;
+            // Serial number length is not necessary, it was already cross checked with the string
+            c_DeviceInfo.SetSerialNumber(c_ReadSnResultExt[u32_ResultCounter].c_SerialNumber);
+            c_DeviceInfo.SetNodeId(c_ReadSnResultExt[u32_ResultCounter].c_SenderId.u8_NodeIdentifier);
+            c_DeviceInfo.SetSubNodeId(c_ReadSnResultExt[u32_ResultCounter].u8_SubNodeId);
             this->mc_DeviceInfoResult.push_back(c_DeviceInfo);
          }
 
@@ -1632,20 +1627,35 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
             }
          }
 
-         tgl_assert(c_ReadSnResult.size() == mc_DeviceInfoResult.size());
+         tgl_assert((c_ReadSnResult.size() + c_ReadSnResultExt.size()) == mc_DeviceInfoResult.size());
 
          // Get the device names for all devices with unique ids
          for (u32_UniqueIdIndicesCounter = 0U;
               u32_UniqueIdIndicesCounter < c_UniqueIdIndices.size();
               ++u32_UniqueIdIndicesCounter)
          {
+            const uint32 u32_DeviceInfoIndex = c_UniqueIdIndices[u32_UniqueIdIndicesCounter];
+            // Get the correct sender id
+            C_OSCProtocolDriverOsyNode c_CurSenderId;
             // ** directed "readdatabyID(DeviceName)"
             C_SCLString c_Result;
-            this->mpc_ComDriver->SendOsyReadDeviceName(
-               c_ReadSnResult[c_UniqueIdIndices[u32_UniqueIdIndicesCounter]].c_SenderId,
-               c_Result);
 
-            this->mc_DeviceInfoResult[c_UniqueIdIndices[u32_UniqueIdIndicesCounter]].SetDeviceName(c_Result);
+            // The first indexes are always the standard SNR results
+            if (u32_DeviceInfoIndex < c_ReadSnResult.size())
+            {
+               c_CurSenderId = c_ReadSnResult[c_UniqueIdIndices[u32_UniqueIdIndicesCounter]].c_SenderId;
+            }
+            else
+            {
+               const uint32 u32_ReadSnrResultExtIndex = u32_DeviceInfoIndex - c_ReadSnResult.size();
+               // all above must be the extended SNR results
+               tgl_assert(u32_ReadSnrResultExtIndex < c_ReadSnResultExt.size());
+               c_CurSenderId = c_ReadSnResultExt[c_UniqueIdIndices[u32_UniqueIdIndicesCounter]].c_SenderId;
+            }
+
+            this->mpc_ComDriver->SendOsyReadDeviceName(c_CurSenderId, c_Result);
+
+            this->mc_DeviceInfoResult[u32_DeviceInfoIndex].SetDeviceName(c_Result);
          }
       }
       else
@@ -1728,12 +1738,15 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
       if (s32_Return == C_NO_ERR)
       {
          std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults> c_ReadDeviceInfoResults;
+         std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults>
+         c_ReadDeviceInfoExtendedResults;
 
          //wait the minimum wait time (all nodes should now be in the default session of the flashloader)
          stw_tgl::TGL_Sleep(this->GetMinimumFlashloaderResetWaitTime(C_OSCComDriverFlash::eNO_CHANGES_ETHERNET));
 
          //broadcast: "get device info" (returns serial number and device name)
-         s32_Return = this->mpc_ComDriver->SendOsyEthBroadcastGetDeviceInformation(c_ReadDeviceInfoResults);
+         s32_Return = this->mpc_ComDriver->SendOsyEthBroadcastGetDeviceInformation(c_ReadDeviceInfoResults,
+                                                                                   c_ReadDeviceInfoExtendedResults);
          if (s32_Return != C_NO_ERR)
          {
             osc_write_log_error("Scan ETH get info from openSYDE devices",
@@ -1742,16 +1755,35 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
          }
          else
          {
-            osc_write_log_info("Scan ETH get info from openSYDE devices", "Number of responses detected: " +
+            uint32 u32_ResultCounter;
+
+            osc_write_log_info("Scan ETH get info from openSYDE devices", "Number of standard responses detected: " +
                                C_SCLString::IntToStr(c_ReadDeviceInfoResults.size()));
+            osc_write_log_info("Scan ETH get info from openSYDE devices", "Number of extended responses detected: " +
+                               C_SCLString::IntToStr(c_ReadDeviceInfoExtendedResults.size()));
+
             // Fill the result container
-            for (uint32 u32_ResultCounter = 0U; u32_ResultCounter < c_ReadDeviceInfoResults.size(); ++u32_ResultCounter)
+            for (u32_ResultCounter = 0U; u32_ResultCounter < c_ReadDeviceInfoResults.size(); ++u32_ResultCounter)
             {
                C_SyvDcDeviceInformation c_DeviceInfo;
                c_DeviceInfo.SetDeviceName(c_ReadDeviceInfoResults[u32_ResultCounter].c_DeviceName);
                c_DeviceInfo.SetIpAddress(c_ReadDeviceInfoResults[u32_ResultCounter].au8_IpAddress);
                c_DeviceInfo.SetNodeId(c_ReadDeviceInfoResults[u32_ResultCounter].c_NodeId.u8_NodeIdentifier);
-               c_DeviceInfo.SetSerialNumber(c_ReadDeviceInfoResults[u32_ResultCounter].au8_SerialNumber);
+               c_DeviceInfo.SetSerialNumber(c_ReadDeviceInfoResults[u32_ResultCounter].c_SerialNumber);
+               this->mc_DeviceInfoResult.push_back(c_DeviceInfo);
+            }
+
+            // Fill the result container with the extended results
+            for (u32_ResultCounter = 0U; u32_ResultCounter < c_ReadDeviceInfoExtendedResults.size();
+                 ++u32_ResultCounter)
+            {
+               C_SyvDcDeviceInformation c_DeviceInfo;
+               c_DeviceInfo.SetDeviceName(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].c_DeviceName);
+               c_DeviceInfo.SetIpAddress(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].au8_IpAddress);
+               // Serial number length is not necessary, it was already cross checked with the string
+               c_DeviceInfo.SetSerialNumber(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].c_SerialNumber);
+               c_DeviceInfo.SetNodeId(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].c_NodeId.u8_NodeIdentifier);
+               c_DeviceInfo.SetSubNodeId(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].u8_SubNodeId);
                this->mc_DeviceInfoResult.push_back(c_DeviceInfo);
             }
          }
@@ -1853,16 +1885,30 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
                   c_ServerIdOfCurBus.u8_NodeIdentifier = rc_CurConfig.c_NodeIds[u32_InterfaceCounter];
                   c_UsedServerIds.push_back(c_ServerIdOfCurBus);
 
-                  s32_Return =
-                     this->mpc_ComDriver->SendOsyEthBroadcastSetIpAddress(rc_CurConfig.au8_SerialNumber,
-                                                                          rc_CurConfig.c_IpAddresses[
-                                                                             u32_InterfaceCounter].au8_IpAddress,
-                                                                          rc_CurConfig.c_IpAddresses[
-                                                                             u32_InterfaceCounter].au8_NetMask,
-                                                                          rc_CurConfig.c_IpAddresses[
-                                                                             u32_InterfaceCounter].au8_DefaultGateway,
-                                                                          c_ServerIdOfCurBus,
-                                                                          au8_ResponseIp, &u8_CommError);
+                  if (rc_CurConfig.c_SerialNumber.q_ExtFormatUsed == false)
+                  {
+                     s32_Return =
+                        this->mpc_ComDriver->SendOsyEthBroadcastSetIpAddress(
+                           rc_CurConfig.c_SerialNumber,
+                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_IpAddress,
+                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_NetMask,
+                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_DefaultGateway,
+                           c_ServerIdOfCurBus,
+                           au8_ResponseIp, &u8_CommError);
+                  }
+                  else
+                  {
+                     s32_Return =
+                        this->mpc_ComDriver->SendOsyEthBroadcastSetIpAddressExtended(
+                           rc_CurConfig.c_SerialNumber,
+                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_IpAddress,
+                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_NetMask,
+                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_DefaultGateway,
+                           c_ServerIdOfCurBus,
+                           rc_CurConfig.u8_SubNodeId,
+                           au8_ResponseIp, &u8_CommError);
+                  }
+
                   if (s32_Return != C_NO_ERR)
                   {
                      osc_write_log_error("Configure Ethernet openSYDE devices",
@@ -1901,7 +1947,7 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
 
                            if ((pc_Bus != NULL) &&
                                (pc_Bus->u8_BusID == rc_CurConfig.c_BusIds[u32_InterfaceCounter]) &&
-                               (rc_InterfaceSettings.q_IsBusConnected == true))
+                               (rc_InterfaceSettings.GetBusConnected() == true))
                            {
                               this->m_RunConfOpenSydeDevicesState(hu32_SETNODEID, s32_Return, c_ServerIdOfCurBus,
                                                                   rc_InterfaceSettings.e_InterfaceType,
@@ -2254,13 +2300,14 @@ sint32 C_SyvDcSequences::m_RunConfCanStwFlashloaderDevices(void)
          // We can change only the connected bus interface with the STW flashloader
          tgl_assert(rc_CurConfig.c_BusIds.size() == 1);
 
-         if ((rc_CurConfig.c_NodeIds.size() == rc_CurConfig.c_BusIds.size()) &&
+         if ((rc_CurConfig.c_SerialNumber.q_ExtFormatUsed == false) && // STW Flashloader must be standard format
+             (rc_CurConfig.c_NodeIds.size() == rc_CurConfig.c_BusIds.size()) &&
              (rc_CurConfig.c_NodeIds.size() == rc_CurConfig.c_CanBitrates.size()) &&
              (rc_CurConfig.c_BusIds.size() == 1))
          {
             // ** perform "node_wakeup(serial_number)"
             // ** perform "node_companyid(Y*)"
-            s32_Return = this->mpc_ComDriver->SendStwWakeupLocalSerialNumber(rc_CurConfig.au8_SerialNumber, u8_LocalId);
+            s32_Return = this->mpc_ComDriver->SendStwWakeupLocalSerialNumber(rc_CurConfig.c_SerialNumber, u8_LocalId);
 
             if (s32_Return == C_NO_ERR)
             {
@@ -2316,7 +2363,7 @@ sint32 C_SyvDcSequences::m_RunConfCanStwFlashloaderDevices(void)
 
             // ** perform "node_wakeup(serial_number)"
             // ** perform "node_companyid(Y*)"
-            s32_Return = this->mpc_ComDriver->SendStwWakeupLocalSerialNumber(rc_CurConfig.au8_SerialNumber, u8_LocalId);
+            s32_Return = this->mpc_ComDriver->SendStwWakeupLocalSerialNumber(rc_CurConfig.c_SerialNumber, u8_LocalId);
 
             if (s32_Return == C_NO_ERR)
             {
@@ -2464,9 +2511,20 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
                      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
 
                      c_UsedServerIds.push_back(c_ServerIdOfCurBus);
-                     s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastSetNodeIdBySerialNumber(
-                        rc_CurConfig.au8_SerialNumber,
-                        c_ServerIdOfCurBus);
+
+                     if (rc_CurConfig.c_SerialNumber.q_ExtFormatUsed == false)
+                     {
+                        s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastSetNodeIdBySerialNumber(
+                           rc_CurConfig.c_SerialNumber,
+                           c_ServerIdOfCurBus);
+                     }
+                     else
+                     {
+                        s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastSetNodeIdBySerialNumberExtended(
+                           rc_CurConfig.c_SerialNumber,
+                           rc_CurConfig.u8_SubNodeId,
+                           c_ServerIdOfCurBus);
+                     }
 
                      // Get the real interface number of the bus
                      if (pc_Node != NULL)
@@ -2484,7 +2542,7 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
 
                            if ((pc_Bus != NULL) &&
                                (pc_Bus->u8_BusID == rc_CurConfig.c_BusIds[u32_InterfaceCounter]) &&
-                               (rc_ComInterface.q_IsBusConnected == true))
+                               (rc_ComInterface.GetBusConnected() == true))
                            {
                               // Configuration function for CAN, so the interface is type CAN for sure
                               this->m_RunConfOpenSydeDevicesState(hu32_SETNODEID, s32_Return, c_ServerIdOfCurBus,
@@ -2623,7 +2681,7 @@ sint32 C_SyvDcSequences::m_CheckConfOpenSydeDevices(
                      const C_OSCNodeComInterfaceSettings & rc_NodeIntf =
                         pc_Node->c_Properties.c_ComInterfaces[u32_NodeInterfaceCounter];
 
-                     if (rc_NodeIntf.q_IsBusConnected == true)
+                     if (rc_NodeIntf.GetBusConnected() == true)
                      {
                         const C_OSCSystemBus * const pc_OtherBus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
                            rc_NodeIntf.u32_BusIndex);
@@ -2754,7 +2812,7 @@ sint32 C_SyvDcSequences::m_SetCanOpenSydeBitrate(const C_OSCProtocolDriverOsyNod
 
                      if ((pc_Bus != NULL) &&
                          (pc_Bus->u8_BusID == orc_DeviceConfig.c_BusIds[u32_BusCounter]) &&
-                         (rc_InterfaceSettings.q_IsBusConnected == true) &&
+                         (rc_InterfaceSettings.GetBusConnected() == true) &&
                          (rc_InterfaceSettings.e_InterfaceType == C_OSCSystemBus::eCAN))
                      {
                         bool q_SetBitrate = true;
@@ -2868,7 +2926,7 @@ sint32 C_SyvDcSequences::m_SetEthOpenSydeIpAddress(const C_OSCProtocolDriverOsyN
 
                   if ((pc_Bus != NULL) &&
                       (pc_Bus->u8_BusID == orc_DeviceConfig.c_BusIds[u32_BusCounter]) &&
-                      (rc_InterfaceSettings.q_IsBusConnected == true) &&
+                      (rc_InterfaceSettings.GetBusConnected() == true) &&
                       (rc_InterfaceSettings.e_InterfaceType == C_OSCSystemBus::eETHERNET))
                   {
                      const C_OSCProtocolDriverOsyNode c_StateConfiguredInterface(pc_Bus->u8_BusID,
@@ -2966,7 +3024,7 @@ sint32 C_SyvDcSequences::m_SetOpenSydeNodeIds(const C_OSCProtocolDriverOsyNode &
 
                   if ((pc_Bus != NULL) &&
                       (pc_Bus->u8_BusID == orc_DeviceConfig.c_BusIds[u32_BusCounter]) &&
-                      (rc_InterfaceSettings.q_IsBusConnected == true))
+                      (rc_InterfaceSettings.GetBusConnected() == true))
                   {
                      //only if another interface than the one we are connected to ...
                      if ((orc_DeviceConfig.c_BusIds[u32_BusCounter] != orc_ServerId.u8_BusIdentifier) ||
@@ -3211,30 +3269,51 @@ sint32 C_SyvDcSequences::m_ReadBack(void)
    if (this->mpc_ComDriver != NULL)
    {
       uint32 u32_DeviceCounter;
-      uint8 au8_SerialNumber[6];
 
       s32_Return = C_NO_ERR;
+
+      tgl_assert(this->mc_OpenSydeIds.size() == this->mc_OpenSydeSnrExtFormat.size());
 
       // * for all openSYDE nodes:
       for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_OpenSydeIds.size(); ++u32_DeviceCounter)
       {
          C_SyvDcDeviceInformation c_OsyInfo;
          stw_opensyde_core::C_OSCProtocolDriverOsyNode & rc_OsyServerId = this->mc_OpenSydeIds[u32_DeviceCounter];
+         C_OSCProtocolSerialNumber c_SerialNumber;
 
          c_OsyInfo.SetNodeId(rc_OsyServerId.u8_NodeIdentifier);
 
-         // ** perform "readdatabyID(SerialNumber)"
-         s32_Return = this->mpc_ComDriver->SendOsyReadSerialNumber(rc_OsyServerId, au8_SerialNumber);
-
-         if (s32_Return == C_NO_ERR)
+         if (this->mc_OpenSydeSnrExtFormat[u32_DeviceCounter] == false)
          {
-            c_OsyInfo.SetSerialNumber(au8_SerialNumber);
+            // ** perform "readdatabyID(SerialNumber)"
+            s32_Return = this->mpc_ComDriver->SendOsyReadSerialNumber(rc_OsyServerId, c_SerialNumber);
+
+            if (s32_Return == C_NO_ERR)
+            {
+               c_OsyInfo.SetSerialNumber(c_SerialNumber);
+            }
+            else
+            {
+               osc_write_log_error("Read back devices",
+                                   "openSYDE read serial number failed with error: " +
+                                   C_SCLString::IntToStr(s32_Return));
+            }
          }
          else
          {
-            osc_write_log_error("Read back devices",
-                                "openSYDE read serial number failed with error: " +
-                                C_SCLString::IntToStr(s32_Return));
+            // ** perform "readdatabyID(SerialNumberExt)"
+            s32_Return = this->mpc_ComDriver->SendOsyReadSerialNumberExt(rc_OsyServerId, c_SerialNumber);
+
+            if (s32_Return == C_NO_ERR)
+            {
+               c_OsyInfo.SetSerialNumber(c_SerialNumber);
+            }
+            else
+            {
+               osc_write_log_error("Read back devices",
+                                   "openSYDE read serial number failed with error: " +
+                                   C_SCLString::IntToStr(s32_Return));
+            }
          }
 
          if (s32_Return == C_NO_ERR)
@@ -3282,6 +3361,8 @@ sint32 C_SyvDcSequences::m_ReadBack(void)
             if (s32_Return == C_NO_ERR)
             {
                uint8 u8_NodesFound = 0U;
+               uint8 au8_SerialNumber[6];
+               C_OSCProtocolSerialNumber c_SerialNumber;
 
                // ** perform "get_serial_number"
                s32_Return = this->mpc_ComDriver->SendStwGetSerialNumbers(rc_StwServerId, &au8_SerialNumber[0],
@@ -3292,7 +3373,8 @@ sint32 C_SyvDcSequences::m_ReadBack(void)
                {
                   C_SCLString c_StwDeviceName;
 
-                  c_StwInfo.SetSerialNumber(au8_SerialNumber);
+                  c_SerialNumber.SetPosSerialNumber(au8_SerialNumber);
+                  c_StwInfo.SetSerialNumber(c_SerialNumber);
 
                   // ** perform "get_device_id"
                   s32_Return = this->mpc_ComDriver->SendStwGetDeviceId(rc_StwServerId, c_StwDeviceName);

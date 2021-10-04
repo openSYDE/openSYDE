@@ -29,6 +29,7 @@
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSvData.h"
+#include "C_PuiSdUtil.h"
 #include "C_Uti.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
@@ -96,8 +97,8 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_GroupBoxSD->setTitle("");
 
    //Set list types
-   this->mpc_Ui->pc_ListViewNodes->SetTypeNode(true);
-   this->mpc_Ui->pc_ListViewBuses->SetTypeNode(false);
+   this->mpc_Ui->pc_TreeViewNodes->SetTypeNode(true);
+   this->mpc_Ui->pc_TreeViewBuses->SetTypeNode(false);
 
    // configure animation
    this->mc_TimerAnimation.setInterval(msn_TIMER_INTERVAL);
@@ -145,8 +146,8 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
    // Tree for topology and its nodes and busses
    connect(this->mpc_Ui->pc_PushButtonTopology, &C_OgePubNavigation::clicked, this,
            &C_NagNaviBarWidget::m_PbTopologyClick);
-   connect(this->mpc_Ui->pc_ListViewNodes, &C_NagTopList::SigClicked, this, &C_NagNaviBarWidget::m_OnClickNode);
-   connect(this->mpc_Ui->pc_ListViewBuses, &C_NagTopList::SigClicked, this, &C_NagNaviBarWidget::m_OnClickBus);
+   connect(this->mpc_Ui->pc_TreeViewNodes, &C_NagTopTreeView::SigClicked, this, &C_NagNaviBarWidget::m_OnClickNode);
+   connect(this->mpc_Ui->pc_TreeViewBuses, &C_NagTopTreeView::SigClicked, this, &C_NagNaviBarWidget::m_OnClickBus);
 
    connect(this->mpc_Ui->pc_ListViewViews, &C_NagViewList::SigMoveView, this, &C_NagNaviBarWidget::SigMoveView);
    connect(this->mpc_Ui->pc_ListViewViews, &C_NagViewList::SigSelect, this, &C_NagNaviBarWidget::m_SelectView);
@@ -162,6 +163,8 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
    //connect to nodes/bus change signals
    connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigNodesChanged, this,
            &C_NagNaviBarWidget::m_NodesChanged);
+   connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigNodeChanged, this,
+           &C_NagNaviBarWidget::m_NodeChanged);
    connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigBussesChanged,
            this, &C_NagNaviBarWidget::m_BussesChanged);
 
@@ -285,8 +288,8 @@ void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMo
 
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PushButtonTopology, "Active", false);
 
-   this->mpc_Ui->pc_ListViewNodes->SetSelectedIndexAndScroll(-1);
-   this->mpc_Ui->pc_ListViewBuses->SetSelectedIndexAndScroll(-1);
+   this->mpc_Ui->pc_TreeViewNodes->SetSelectedIndexAndScroll(-1);
+   this->mpc_Ui->pc_TreeViewBuses->SetSelectedIndexAndScroll(-1);
 
    this->mpc_Ui->pc_GroupBoxSD->SetSpecialBackground(false);
 
@@ -304,10 +307,10 @@ void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMo
          C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PushButtonTopology, "Active", true);
          break;
       case ms32_SUBMODE_SYSDEF_NODEEDIT:
-         this->mpc_Ui->pc_ListViewNodes->SetSelectedIndexAndScroll(static_cast<sint32>(this->mu32_ActiveIndex));
+         this->mpc_Ui->pc_TreeViewNodes->SetSelectedIndexAndScroll(static_cast<sint32>(this->mu32_ActiveIndex));
          break;
       case ms32_SUBMODE_SYSDEF_BUSEDIT:
-         this->mpc_Ui->pc_ListViewBuses->SetSelectedIndexAndScroll(static_cast<sint32>(this->mu32_ActiveIndex));
+         this->mpc_Ui->pc_TreeViewBuses->SetSelectedIndexAndScroll(static_cast<sint32>(this->mu32_ActiveIndex));
          break;
       default:
          break;
@@ -557,31 +560,88 @@ void C_NagNaviBarWidget::m_StartViewClicked()
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_NodesChanged(void) const
 {
-   uint32 u32_Index;
+   uint32 u32_ItNodes;
+   uint32 u32_ChildNodeCounter = 0;
+   uint32 u32_ParentNodeCounter = 0;
 
    std::vector<QString> c_Nodes;
+   std::vector<std::vector<QString> > c_SubNodes;
+   std::vector<stw_types::sint32> c_NodeListWithSquads;
+   const std::vector<QString> c_EmptySubNodeDummy; // dummy necessary for correspondence of nodes and sub-nodes
+
+   // get node indices
+   C_PuiSdHandler::h_GetInstance()->GetNodeToNodeSquadMapping(c_NodeListWithSquads);
+
+   //add new nodes
+   for (u32_ItNodes = 0U; u32_ItNodes < c_NodeListWithSquads.size(); ++u32_ItNodes)
+   {
+      // skip nodes that got already handled because of their squad siblings
+      if (u32_ChildNodeCounter == u32_ItNodes)
+      {
+         if (c_NodeListWithSquads[u32_ItNodes] < 0)
+         {
+            // standard node
+            c_SubNodes.push_back(c_EmptySubNodeDummy);
+            c_Nodes.push_back(C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNodes)->c_Properties.c_Name.c_str());
+         }
+         else
+         {
+            // node squad
+            const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
+               C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(c_NodeListWithSquads[u32_ItNodes]);
+            if (pc_NodeSquad != NULL)
+            {
+               std::vector<QString> c_SubNodeNames;
+
+               for (uint32 u32_ItSubNodes = 0; u32_ItSubNodes < pc_NodeSquad->c_SubNodeIndexes.size(); u32_ItSubNodes++)
+               {
+                  c_SubNodeNames.push_back(
+                     C_PuiSdUtil::h_GetSubNodeDeviceName(pc_NodeSquad->c_SubNodeIndexes[u32_ItSubNodes]));
+               }
+
+               c_SubNodes.push_back(c_SubNodeNames);
+               c_Nodes.push_back(pc_NodeSquad->c_BaseName.c_str());
+
+               // skip sub nodes in complete list (-1 because one up-count is done anyway in loop)
+               u32_ChildNodeCounter += static_cast<uint32>(pc_NodeSquad->c_SubNodeIndexes.size()) - 1;
+            }
+         }
+
+         // iterate child node index
+         u32_ChildNodeCounter++;
+
+         // count parent nodes
+         u32_ParentNodeCounter++;
+      }
+   }
 
    //Update node count
    this->mpc_Ui->pc_LabelNodes->setText(
-      static_cast<QString>(C_GtGetText::h_GetText("Nodes (%1)")).arg(C_PuiSdHandler::
-                                                                     h_GetInstance()
-                                                                     ->GetOSCNodesSize()));
-
-   c_Nodes.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize());
-   //add new nodes
-   for (u32_Index = 0U; u32_Index < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_Index)
-   {
-      c_Nodes.push_back(C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_Index)->c_Properties.c_Name.c_str());
-   }
+      static_cast<QString>(C_GtGetText::h_GetText("Nodes (%1)")).arg(u32_ParentNodeCounter));
 
    //Update view
-   this->mpc_Ui->pc_ListViewNodes->SetContent(c_Nodes);
+   this->mpc_Ui->pc_TreeViewNodes->SetContent(c_Nodes, c_SubNodes);
+   this->mpc_Ui->pc_TreeViewNodes->expandAll();
    //Trigger error check
    m_UpdateNodeErrors();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for busses change
+/*! \brief  Slot function for single node changed
+
+   \param[in]  ou32_Index  Node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagNaviBarWidget::m_NodeChanged(const uint32 ou32_NodeIndex) const
+{
+   this->mpc_Ui->pc_TreeViewNodes->UpdateItem(ou32_NodeIndex, C_PuiSdUtil::h_GetNodeBaseNameOrName(ou32_NodeIndex));
+
+   //Trigger error check
+   m_UpdateNodeErrors();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for buses change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_BussesChanged(void) const
@@ -591,10 +651,8 @@ void C_NagNaviBarWidget::m_BussesChanged(void) const
    std::vector<QString> c_Buses;
 
    //Update bus count
-   this->mpc_Ui->pc_LabelBuses->setText(
-      static_cast<QString>(C_GtGetText::h_GetText("Buses (%1)")).arg(C_PuiSdHandler::
-                                                                     h_GetInstance()
-                                                                     ->GetOSCBusesSize()));
+   this->mpc_Ui->pc_LabelBuses->setText(static_cast<QString>(C_GtGetText::h_GetText("Buses (%1)")).
+                                        arg(C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize()));
 
    c_Buses.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize());
    //add new nodes
@@ -603,7 +661,7 @@ void C_NagNaviBarWidget::m_BussesChanged(void) const
       c_Buses.push_back(C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_Index)->c_Name.c_str());
    }
    //Update view
-   this->mpc_Ui->pc_ListViewBuses->SetContent(c_Buses);
+   this->mpc_Ui->pc_TreeViewBuses->SetContent(c_Buses);
    //Trigger error check
    m_UpdateBusErrors();
 }
@@ -771,7 +829,7 @@ void C_NagNaviBarWidget::m_UpdateNodeErrors(void)  const
    {
       c_ErrorsNode.push_back(C_PuiSdHandler::h_GetInstance()->CheckNodeConflict(u32_ItNode));
    }
-   this->mpc_Ui->pc_ListViewNodes->SetError(c_ErrorsNode);
+   this->mpc_Ui->pc_TreeViewNodes->SetError(c_ErrorsNode);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -786,7 +844,7 @@ void C_NagNaviBarWidget::m_UpdateBusErrors(void) const
    {
       c_ErrorsBus.push_back(C_PuiSdHandler::h_GetInstance()->CheckBusConflict(u32_ItBus));
    }
-   this->mpc_Ui->pc_ListViewBuses->SetError(c_ErrorsBus);
+   this->mpc_Ui->pc_TreeViewBuses->SetError(c_ErrorsBus);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

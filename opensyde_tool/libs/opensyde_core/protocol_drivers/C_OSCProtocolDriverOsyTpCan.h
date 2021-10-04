@@ -17,6 +17,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "C_OSCProtocolDriverOsyTpBase.h"
+#include "C_OSCProtocolSerialNumber.h"
 #include "CCANDispatcher.h"
 #include "CSCLString.h"
 
@@ -79,6 +80,8 @@ private:
    static const stw_types::uint16 mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1  = 0x0216U;
    static const stw_types::uint16 mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2  = 0x0217U;
    static const stw_types::uint16 mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART3  = 0x0218U;
+   static const stw_types::uint16 mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_START  = 0x0219U;
+   static const stw_types::uint16 mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_LAST  = 0x0224U;
    static const stw_types::uint8 mhu8_BC_OSY_NR_SI = 0x7FU;
 
    ///timeout when waiting for flow control; lower but more realistic than the 1s specified in 15765
@@ -107,6 +110,10 @@ private:
    void m_ComposeSingleFrame(const C_OSCProtocolDriverOsyService & orc_Service, const stw_types::uint32 ou32_Identifier,
                              stw_can::T_STWCAN_Msg_TX & orc_CanMessage) const;
 
+   stw_types::sint32 m_HandleBroadcastSetNodeIdBySerialNumberResponse(const stw_types::uint8 ou8_RoutineIdMsb,
+                                                                      const stw_types::uint8 ou8_RoutineIdLsb,
+                                                                      stw_types::uint8 * const opu8_NrCode = NULL) const;
+
 protected:
    void m_LogWarningWithHeader(const stw_scl::C_SCLString & orc_Information,
                                const stw_types::charn * const opcn_Function) const;
@@ -116,8 +123,15 @@ public:
    class C_BroadcastReadEcuSerialNumberResults
    {
    public:
-      C_OSCProtocolDriverOsyNode c_SenderId; ///< bus ID and node ID of sender
-      stw_types::uint8 au8_SerialNumber[6];  ///< serial number of sender
+      C_OSCProtocolDriverOsyNode c_SenderId;    ///< bus ID and node ID of sender
+      C_OSCProtocolSerialNumber c_SerialNumber; ///< serial number of sender
+   };
+
+   class C_BroadcastReadEcuSerialNumberExtendedResults :
+      public C_BroadcastReadEcuSerialNumberResults
+   {
+   public:
+      stw_types::uint8 u8_SubNodeId; ///< sub node id of sender in case of a multiple CPU device
    };
 
    ///container for results reported by "RequestProgramming" broadcast service
@@ -139,12 +153,17 @@ public:
    stw_types::sint32 SetDispatcher(stw_can::C_CAN_Dispatcher * const opc_Dispatcher);
 
    //Tp-specific broadcast services:
-   stw_types::sint32 BroadcastReadSerialNumber(
-      std::vector<C_BroadcastReadEcuSerialNumberResults> & orc_Responses) const;
+   stw_types::sint32 BroadcastReadSerialNumber(std::vector<C_BroadcastReadEcuSerialNumberResults> & orc_Responses,
+                                               std::vector<C_BroadcastReadEcuSerialNumberExtendedResults> & orc_ExtendedResponses)
+   const;
    stw_types::sint32 BroadcastRequestProgramming(std::vector<C_BroadcastRequestProgrammingResults> & orc_Results) const;
-   stw_types::sint32 BroadcastSetNodeIdBySerialNumber(const stw_types::uint8 (&orau8_SerialNumber)[6],
+   stw_types::sint32 BroadcastSetNodeIdBySerialNumber(const C_OSCProtocolSerialNumber & orc_SerialNumber,
                                                       const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
                                                       stw_types::uint8 * const opu8_NrCode = NULL) const;
+   stw_types::sint32 BroadcastSetNodeIdBySerialNumberExtended(const C_OSCProtocolSerialNumber & orc_SerialNumber,
+                                                              const stw_types::uint8 ou8_SubNodeId,
+                                                              const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
+                                                              stw_types::uint8 * const opu8_NrCode = NULL) const;
    stw_types::sint32 BroadcastEcuReset(const stw_types::uint8 ou8_ResetType) const;
    stw_types::sint32 BroadcastSendEnterPreProgrammingSession(void) const;
    stw_types::sint32 BroadcastSendEnterDefaultSession(void) const;

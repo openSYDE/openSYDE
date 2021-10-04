@@ -345,8 +345,7 @@ bool C_GiSvDaSliderBase::CallProperties(void)
             this->mq_InitialStyleCall = true;
             //Apply
             this->me_WriteMode = pc_Dialog->GetWriteMode();
-            this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
-            this->UpdateTypePe(c_Box.e_Type, c_Box.q_ShowMinMax);
+
             this->ClearDataPoolElements();
             if (c_Tmp.c_ElementId.GetIsValid())
             {
@@ -359,7 +358,12 @@ bool C_GiSvDaSliderBase::CallProperties(void)
                                                                            static_cast<uint32>(this->ms32_Index),
                                                                            &c_Box, this->me_Type) == C_NO_ERR);
 
-            this->m_UpdateStaticValues();
+            //Update style after data update
+            {
+               this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
+               this->mpc_SliderWidget->SetShowMinMax(c_Box.q_ShowMinMax);
+               this->ReInitializeSize();
+            }
          }
          Q_EMIT this->SigTriggerUpdateTransmissionConfiguration();
          if (c_New != NULL)

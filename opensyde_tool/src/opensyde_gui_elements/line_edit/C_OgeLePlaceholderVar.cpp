@@ -16,6 +16,7 @@
 
 #include "C_PuiUtil.h"
 #include "C_OgeLePlaceholderVar.h"
+#include "C_GtGetText.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
@@ -108,5 +109,6 @@ void C_OgeLePlaceholderVar::focusOutEvent(QFocusEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLePlaceholderVar::m_UpdateTooltip(void)
 {
-   this->SetToolTipInformation("", C_PuiUtil::h_ResolvePlaceholderVariables(this->text(), this->mc_DbProjectPath));
+   this->SetToolTipInformation(C_GtGetText::h_GetText("Path"),
+                               C_PuiUtil::h_ResolvePlaceholderVariables(this->text(), this->mc_DbProjectPath));
 }

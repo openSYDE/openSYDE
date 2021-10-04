@@ -26,6 +26,7 @@
 #include "C_OgeWiUtil.h"
 #include "C_OgePopUpDialog.h"
 #include "C_OSCHalcConfigUtil.h"
+#include "C_OSCSystemFilerUtil.h"
 #include "C_OSCHalcConfigStandaloneFiler.h"
 #include "C_SdNdeHalcConfigImportDialog.h"
 #include "C_SdNdeHalcDefUpdateDialog.h"
@@ -365,7 +366,7 @@ void C_SdNdeHalcWidget::m_OnExportConfigClicked(void)
 
    if (pc_Node != NULL)
    {
-      c_DefaultName = pc_Node->c_Properties.c_Name.c_str();
+      c_DefaultName = C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(pc_Node->c_Properties.c_Name.c_str()).c_str();
    }
 
    c_FileName =
@@ -566,8 +567,27 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
       if (this->m_LoadHalcDefinitionFile(c_HalcConfig, c_HalcDefPath) == true)
       {
          bool q_Continue = true;
+
+         // Check change of safety mode
+         // (the impact on Datapools, Data Blocks and update screen would be massive and therefore we do not allow this)
+         if (c_HalcConfig.e_SafetyMode != pc_OldConfig->e_SafetyMode)
+         {
+            C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+            c_Message.SetHeading("Update Hardware Description");
+            c_Message.SetDescription(C_GtGetText::h_GetText(
+                                        "Cannot update hardware description. "
+                                        "The safety mode of the selected hardware description "
+                                        "differs from the safety mode of the current hardware description."));
+            c_Message.SetDetails(C_GtGetText::h_GetText(
+                                    "Hardware description update is only possible if the safety mode does not change. "
+                                    "For using a hardware description file with changed safety mode, try the features "
+                                    "\'Select\' and \'Import\'."));
+            c_Message.Execute();
+            q_Continue = false;
+         }
+
          // Check content version if update makes sense
-         if (pc_OldConfig->u32_ContentVersion == c_HalcConfig.u32_ContentVersion)
+         if ((q_Continue == true) && (pc_OldConfig->u32_ContentVersion == c_HalcConfig.u32_ContentVersion))
          {
             C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
             c_Message.SetHeading("Update Hardware Description");
@@ -604,10 +624,6 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
                {
                   tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHALCConfig(this->mu32_NodeIndex,
                                                                             c_UpdatedHalcConfig) == C_NO_ERR);
-
-                  // make sure all HALC NVM Datapools are assigned if possible
-                  tgl_assert(C_PuiSdHandler::h_GetInstance()->
-                             AssignAllHalcNvmDataPools(this->mu32_NodeIndex) == stw_errors::C_NO_ERR);
 
                   // update GUI
                   this->m_UpdateNodeData();
@@ -650,6 +666,10 @@ void C_SdNdeHalcWidget::m_RunDatapoolMagician(void) const
    const sint32 s32_Result = C_PuiSdHandler::h_GetInstance()->HALCGenerateDatapools(this->mu32_NodeIndex);
 
    tgl_assert((s32_Result == C_NO_ERR) || (s32_Result == C_NOACT));
+
+   // make sure all HALC NVM Datapools are assigned if possible (after magician generation!)
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->
+              AssignAllHalcNvmDataPools(this->mu32_NodeIndex) == stw_errors::C_NO_ERR);
 
    // Inform Datapool overview about changed existence of HAL Datapools
    Q_EMIT (this->SigHalcDataPoolChanged());
@@ -776,7 +796,7 @@ bool C_SdNdeHalcWidget::m_LoadHalcDefinitionFile(C_OSCHalcConfig & orc_HalcConfi
                                                             "of type: %1\n"
                                                             "The current node is of type: %2")).
                                     arg(orc_HalcConfig.c_DeviceName.c_str()).
-                                    arg(pc_Node->c_DeviceType.c_str()));
+                                    arg(pc_Node->pc_DeviceDefinition->c_DeviceName.c_str()));
                c_Message.SetCustomMinHeight(200, 250);
                c_Message.Execute();
             }

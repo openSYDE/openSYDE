@@ -146,6 +146,7 @@ private:
    bool mq_ClearProgressLog;
    bool mq_StartUpdateAfterConnect;
    bool mq_ConnectFailed;
+   bool mq_ErrorDetected;
 
    std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> mc_NodesToFlash;
    std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> mc_NodesWithAllApplications;

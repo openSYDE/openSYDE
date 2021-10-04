@@ -9,7 +9,7 @@
 #define C_OSCHALCDEFCONTENT_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <map>
+#include <vector>
 
 #include "CSCLString.h"
 #include "C_OSCNodeDataPoolContent.h"
@@ -41,7 +41,8 @@ public:
                                  const C_OSCNodeDataPoolContent & orc_Value);
    stw_types::sint32 SetEnumValue(const stw_scl::C_SCLString & orc_DisplayName);
    stw_types::sint32 GetEnumValue(stw_scl::C_SCLString & orc_DisplayName);
-   const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> & GetEnumItems(void) const;
+   const C_OSCNodeDataPoolContent * FindEnumItem(const stw_scl::C_SCLString & orc_DisplayName) const;
+   const std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> > & GetEnumItems(void) const;
 
    void AddBitmaskItem(const C_OSCHalcDefContentBitmaskItem & orc_Value);
    const std::vector<C_OSCHalcDefContentBitmaskItem> & GetBitmaskItems(void) const;
@@ -56,8 +57,8 @@ public:
 
 private:
    E_ComplexType me_ComplexType;
-   std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> mc_EnumItems; ///< All known enum values
-   std::vector<C_OSCHalcDefContentBitmaskItem> mc_BitmaskItems;           ///< All known bitmask values
+   std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> > mc_EnumItems; ///< All known enum values
+   std::vector<C_OSCHalcDefContentBitmaskItem> mc_BitmaskItems;                          ///< All known bitmask values
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

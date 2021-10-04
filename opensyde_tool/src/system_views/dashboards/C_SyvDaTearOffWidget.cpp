@@ -519,15 +519,24 @@ void C_SyvDaTearOffWidget::m_CheckError(void) const
       QString c_ErrorTextHeading;
       QString c_ErrorText;
       QString c_ErrorTextTooltip;
-      const bool q_ViewSetupError = C_SyvUtil::h_CheckViewSetupError(
-         this->mpc_Dashboard->GetViewIndex(), c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip);
+      C_NagToolTip::E_Type e_ToolTipType;
+      QString c_IconPath;
+      sintn sn_ColorID;
+      const bool q_ViewSetupError = C_SyvUtil::h_GetViewSetupLabelInfo(
+         this->mpc_Dashboard->GetViewIndex(), c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip, e_ToolTipType,
+         c_IconPath, sn_ColorID);
 
       if (q_ViewSetupError == true)
       {
-         this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
+         this->mpc_Ui->pc_ErrorLabelIcon->SetSvg(c_IconPath);
+         this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
+                                                                c_ErrorTextTooltip, e_ToolTipType);
+         this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(sn_ColorID);
          this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
-         this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
-         this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip);
+         this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
+                                                                 c_ErrorTextTooltip, e_ToolTipType);
+         this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(sn_ColorID);
+         this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip, e_ToolTipType);
          this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
       }
       else

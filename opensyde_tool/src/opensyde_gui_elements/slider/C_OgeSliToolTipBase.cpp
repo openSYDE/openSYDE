@@ -18,6 +18,7 @@
 #include "C_OgeSliToolTipBase.h"
 #include "C_SdNdeDpContentUtil.h"
 #include "C_OSCNodeDataPoolContentUtil.h"
+#include "C_GtGetText.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -188,7 +189,7 @@ void C_OgeSliToolTipBase::m_OnValueChange(void)
    C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_Tmp, this->mf64_ToolTipFactor, this->mf64_ToolTipOffset,
                                                   c_Content, 0UL);
 
-   this->SetToolTipInformation("", c_Content);
+   this->SetToolTipInformation(C_GtGetText::h_GetText("Value"), c_Content);
    //Update directly
    if (this->m_GetToolTip() != NULL)
    {

@@ -74,7 +74,7 @@ const bool C_SdNdeDpViewWidget::mhaq_AddButtonVisible[static_cast<stw_types::sin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent        Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpViewWidget::C_SdNdeDpViewWidget(QWidget * const opc_Parent) :
@@ -212,7 +212,7 @@ void C_SdNdeDpViewWidget::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Specify associated node
 
-   \param[in] ou32_NodeIndex     Node index
+   \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
@@ -330,7 +330,7 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the conflict state of the active datapool
 
-   \param[in] oq_Active     Flag if conlfict is active or not
+   \param[in]  oq_Active   Flag if conlfict is active or not
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::SetActualDataPoolConflict(const bool oq_Active) const
@@ -366,7 +366,7 @@ void C_SdNdeDpViewWidget::UpdateActualDataPool(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a concrete datapool
 
-   \param[in] ou32_DataPoolIndex      Datapool index
+   \param[in]  ou32_DataPoolIndex   Datapool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::SetActualDataPool(const uint32 ou32_DataPoolIndex)
@@ -449,7 +449,7 @@ void C_SdNdeDpViewWidget::SetNoActualDataPool(void)
 
    Here: Resize usage widget size
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::resizeEvent(QResizeEvent * const opc_Event)
@@ -574,42 +574,51 @@ void C_SdNdeDpViewWidget::m_DpUpdateUsageView(void)
       if (pc_Node != NULL)
       {
          const stw_opensyde_core::C_OSCDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
+         const uint32 u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
          tgl_assert(pc_DevDef != NULL);
          if (pc_DevDef != NULL)
          {
-            uint32 u32_Percentage;
-            uint32 u32_SumNvmSize = 0;
-            std::vector<C_PuiSdHandler::C_PuiSdHandlerNodeLogicNvmArea> c_Areas;
-            QString c_LabelTooltip = static_cast<QString>("%1% ") + C_GtGetText::h_GetText("reserved by Datapools") +
-                                     static_cast<QString>(
-               " (%2 / %3)");
-
-            tgl_assert(C_PuiSdHandler::h_GetInstance()->GetNodeNvmDataPoolAreas(this->mu32_NodeIndex,
-                                                                                c_Areas) == C_NO_ERR);
-
-            this->mpc_UsageBar->SetUsage(this->mu32_NodeIndex, pc_DevDef->u32_UserEepromSizeBytes, c_Areas,
-                                         u32_Percentage, u32_SumNvmSize);
-
-            // show the percentage
-            this->mpc_Ui->pc_LabelUsagePercentage->setText(
-               C_GtGetText::h_GetText("Memory Usage: ") +
-               QString::number(u32_Percentage) + "%");
-            c_LabelTooltip = c_LabelTooltip.arg(QString::number(u32_Percentage),
-                                                C_Uti::h_GetByteCountAsString(u32_SumNvmSize),
-                                                C_Uti::h_GetByteCountAsString(pc_DevDef->u32_UserEepromSizeBytes));
-
-            if (u32_SumNvmSize > pc_DevDef->u32_UserEepromSizeBytes)
+            tgl_assert(u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size());
+            if (u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size())
             {
-               this->mpc_Ui->pc_LabelUsagePercentage->SetForegroundColor(24);
-               this->mpc_Ui->pc_LabelUsagePercentage->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                                               "Memory Statistics"), c_LabelTooltip,
-                                                                            C_NagToolTip::eERROR);
-            }
-            else
-            {
-               this->mpc_Ui->pc_LabelUsagePercentage->SetForegroundColor(7);
-               this->mpc_Ui->pc_LabelUsagePercentage->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                                               "Memory Statistics"), c_LabelTooltip);
+               uint32 u32_Percentage;
+               uint32 u32_SumNvmSize = 0;
+               std::vector<C_PuiSdHandler::C_PuiSdHandlerNodeLogicNvmArea> c_Areas;
+               QString c_LabelTooltip = static_cast<QString>("%1% ") + C_GtGetText::h_GetText("reserved by Datapools") +
+                                        static_cast<QString>(
+                  " (%2 / %3)");
+
+               tgl_assert(C_PuiSdHandler::h_GetInstance()->GetNodeNvmDataPoolAreas(this->mu32_NodeIndex,
+                                                                                   c_Areas) == C_NO_ERR);
+
+               this->mpc_UsageBar->SetUsage(this->mu32_NodeIndex,
+                                            pc_DevDef->c_SubDevices[u32_SubDeviceIndex].u32_UserEepromSizeBytes,
+                                            c_Areas,
+                                            u32_Percentage, u32_SumNvmSize);
+
+               // show the percentage
+               this->mpc_Ui->pc_LabelUsagePercentage->setText(
+                  C_GtGetText::h_GetText("Memory Usage: ") +
+                  QString::number(u32_Percentage) + "%");
+               c_LabelTooltip = c_LabelTooltip.arg(QString::number(u32_Percentage),
+                                                   C_Uti::h_GetByteCountAsString(u32_SumNvmSize),
+                                                   C_Uti::h_GetByteCountAsString(pc_DevDef->c_SubDevices[
+                                                                                    u32_SubDeviceIndex
+                                                                                 ].u32_UserEepromSizeBytes));
+
+               if (u32_SumNvmSize > pc_DevDef->c_SubDevices[u32_SubDeviceIndex].u32_UserEepromSizeBytes)
+               {
+                  this->mpc_Ui->pc_LabelUsagePercentage->SetForegroundColor(24);
+                  this->mpc_Ui->pc_LabelUsagePercentage->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                                  "Memory Statistics"), c_LabelTooltip,
+                                                                               C_NagToolTip::eERROR);
+               }
+               else
+               {
+                  this->mpc_Ui->pc_LabelUsagePercentage->SetForegroundColor(7);
+                  this->mpc_Ui->pc_LabelUsagePercentage->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                                  "Memory Statistics"), c_LabelTooltip);
+               }
             }
          }
       }
@@ -631,7 +640,7 @@ void C_SdNdeDpViewWidget::m_UpdateUsageBarSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot for button auto start address
 
-   \param[in]       oq_Enabled     Flag if auto start address is active
+   \param[in]  oq_Enabled  Flag if auto start address is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::m_AutoStartAddressClicked(const bool oq_Enabled)

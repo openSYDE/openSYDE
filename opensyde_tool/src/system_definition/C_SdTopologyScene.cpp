@@ -21,6 +21,7 @@
 #include <QElapsedTimer>
 
 #include "constants.h"
+#include "stwerrors.h"
 #include "gitypes.h"
 
 #include "C_OSCUtils.h"
@@ -36,15 +37,18 @@
 #include "C_GtGetText.h"
 #include "C_PuiProject.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_SebUtil.h"
 #include "C_SdUtil.h"
 #include "TGLUtils.h"
 #include "C_OgePopUpDialog.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_SdNodeComIfSetupWidget.h"
+#include "C_OSCSystemDefinitionFiler.h"
 #include "C_SdNodeToNodeConnectionSetupWidget.h"
 #include "C_SdManTopologyBusConnectorReconnectManager.h"
 #include "C_OgeWiCustomMessage.h"
+#include "C_Uti.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
@@ -52,6 +56,7 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 using namespace stw_types;
+using namespace stw_errors;
 using namespace stw_tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -159,44 +164,71 @@ C_SdTopologyScene::~C_SdTopologyScene()
 void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & orc_Pos,
                                 const uint64 * const opu64_UniqueID)
 {
-   C_GiNode * pc_Item;
+   uint32 u32_Tmp;
+   const C_OSCDeviceDefinition * const pc_MainDevice = C_OSCSystemDefinition::hc_Devices.LookForDevice(
+      orc_NodeType.toStdString().c_str(), "", u32_Tmp);
 
-   stw_opensyde_core::C_OSCNode c_OSCNode;
-   stw_opensyde_gui_logic::C_PuiSdNode c_UINode;
-   sint32 s32_Index;
-   uint64 u64_UniqueID;
-
-   //Check if a specific unique ID should be used
-   if (opu64_UniqueID != NULL)
+   if (pc_MainDevice != NULL)
    {
-      u64_UniqueID = *opu64_UniqueID;
+      stw_opensyde_gui_logic::C_PuiSdNode c_UINode;
+      C_GiNode * pc_Item;
+      sint32 s32_Index;
+      uint64 u64_UniqueID;
+
+      //Check if a specific unique ID should be used
+      if (opu64_UniqueID != NULL)
+      {
+         u64_UniqueID = *opu64_UniqueID;
+      }
+      else
+      {
+         u64_UniqueID = m_GetNewUniqueID();
+      }
+
+      //Selection
+      this->clearSelection();
+
+      //UI
+      c_UINode.f64_ZOrder = this->GetHighestUsedZValueList(this->items()) + 1.0;
+      if (pc_MainDevice->c_SubDevices.size() == 1UL)
+      {
+         stw_opensyde_core::C_OSCNode c_OSCNode;
+         //Object
+         this->m_InitNodeData(c_OSCNode, orc_NodeType, "");
+         s32_Index = C_PuiSdHandler::h_GetInstance()->AddNodeAndSort(c_OSCNode, c_UINode, orc_NodeType, "");
+      }
+      else
+      {
+         std::vector<stw_opensyde_core::C_OSCNode> c_OSCNodes;
+         std::vector<QString> c_OSCNodeNames;
+         std::vector<stw_opensyde_gui_logic::C_PuiSdNode> c_UINodes;
+         for (uint32 u32_ItSubDevice = 0UL; u32_ItSubDevice < pc_MainDevice->c_SubDevices.size(); ++u32_ItSubDevice)
+         {
+            stw_opensyde_core::C_OSCNode c_OSCNode;
+            //Object
+            this->m_InitNodeData(c_OSCNode,
+                                 pc_MainDevice->c_SubDevices[u32_ItSubDevice].c_SubDeviceName.c_str(), orc_NodeType);
+            c_OSCNodes.push_back(c_OSCNode);
+            c_OSCNodeNames.push_back(pc_MainDevice->c_SubDevices[u32_ItSubDevice].c_SubDeviceName.c_str());
+            c_UINodes.push_back(c_UINode);
+         }
+         s32_Index = C_PuiSdHandler::h_GetInstance()->AddNodeSquadAndSort(c_OSCNodes, c_UINodes, c_OSCNodeNames,
+                                                                          orc_NodeType);
+      }
+      this->m_SyncIndex(C_GiNode::eNODE, s32_Index, C_GiNode::eADD);
+
+      //Graphics
+      pc_Item = new C_GiNode(s32_Index, u64_UniqueID);
+      pc_Item->setPos(orc_Pos);
+      pc_Item->setZValue(c_UINode.f64_ZOrder);
+
+      m_AddNodeToScene(pc_Item);
+
+      //Selection
+      m_UpdateSelection(pc_Item);
+
+      Q_EMIT this->SigNodeChanged(s32_Index);
    }
-   else
-   {
-      u64_UniqueID = m_GetNewUniqueID();
-   }
-
-   //Selection
-   this->clearSelection();
-
-   //Object
-   this->m_InitNodeData(c_OSCNode, orc_NodeType);
-   //UI
-   c_UINode.f64_ZOrder = this->GetHighestUsedZValueList(this->items()) + 1.0;
-   s32_Index = C_PuiSdHandler::h_GetInstance()->AddNodeAndSort(c_OSCNode, c_UINode);
-   this->m_SyncIndex(C_GiNode::eNODE, s32_Index, C_GiNode::eADD);
-
-   //Graphics
-   pc_Item = new C_GiNode(s32_Index, u64_UniqueID);
-   pc_Item->setPos(orc_Pos);
-   pc_Item->setZValue(c_UINode.f64_ZOrder);
-
-   m_AddNodeToScene(pc_Item);
-
-   //Selection
-   m_UpdateSelection(pc_Item);
-
-   Q_EMIT this->SigNodeChanged(s32_Index);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -504,22 +536,18 @@ void C_SdTopologyScene::AddLine(const QPointF & orc_Pos, const stw_types::uint64
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a new bus connector
 
-   \param[in,out]  opc_Node                  Node to connect to
-   \param[in]      opc_Bus                   Bus to connect to
-   \param[in]      oru8_InterfaceNumber      Number of interface to use
-   \param[in]      oru8_NodeId               New node id
-   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
-   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
-   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
-   \param[in]      orc_Pos                   Position to place item at
-   \param[in]      opu64_UniqueID            Optional pointer to unique ID to use for new item
+   \param[in,out]  opc_Node               Node to connect to
+   \param[in]      opc_Bus                Bus to connect to
+   \param[in]      oru8_InterfaceNumber   Number of interface to use
+   \param[in]      orc_NodeIds            Node ids
+   \param[in]      orc_Pos                Position to place item at
+   \param[in]      opu64_UniqueID         Optional pointer to unique ID to use for new item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddBusConnector(C_GiNode * const opc_Node, const C_GiLiBus * const opc_Bus,
                                         const stw_types::uint8 & oru8_InterfaceNumber,
-                                        const stw_types::uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
-                                        const bool oq_ActivateDatapoolECeS, const bool oq_ActivateDatapoolECoS,
-                                        const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID)
+                                        const std::vector<uint8> & orc_NodeIds, const QPointF & orc_Pos,
+                                        const stw_types::uint64 * const opu64_UniqueID)
 {
    if ((opc_Node != NULL) &&
        (opc_Bus != NULL))
@@ -539,16 +567,8 @@ void C_SdTopologyScene::AddBusConnector(C_GiNode * const opc_Node, const C_GiLiB
 
       //Set up connection
       C_PuiSdHandler::h_GetInstance()->AddConnection(
-         static_cast<uint32>(opc_Node->GetIndex()), oru8_InterfaceNumber, oru8_NodeId,
+         static_cast<uint32>(opc_Node->GetIndex()), oru8_InterfaceNumber, orc_NodeIds,
          static_cast<uint32>(opc_Bus->GetIndex()));
-
-      //Configure DP
-      if (opc_Bus->GetType() == C_OSCSystemBus::eCAN)
-      {
-         C_SdUtil::h_ConfigureComDatapools(
-            opc_Node->GetIndex(), oru8_InterfaceNumber, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
-            oq_ActivateDatapoolECoS);
-      }
 
       {
          //Start
@@ -717,64 +737,7 @@ void C_SdTopologyScene::CopyFromSnapshotToScene(const stw_opensyde_gui_logic::C_
       c_MapOldBusIndexToNewBusIndex.insert(u32_ItElem, u32_NewBusIndex);
    }
    //Copy nodes
-   for (u32_ItElem = 0; u32_ItElem < orc_Snapshot.c_OSCNodes.size(); ++u32_ItElem)
-   {
-      C_OSCNode c_OSCInitialNode = orc_Snapshot.c_OSCNodes[u32_ItElem];
-      const uint32 u32_NewNodeIndex = C_PuiSdHandler::h_GetInstance()->AddNodeAndSort(c_OSCInitialNode,
-                                                                                      orc_Snapshot.c_UINodes[u32_ItElem]);
-      const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NewNodeIndex);
-      const C_PuiSdNode * const pc_UINode = C_PuiSdHandler::h_GetInstance()->GetUINode(u32_NewNodeIndex);
-      //Remember new index
-      mh_AddAndUpdateHigher(c_NodeIndices, u32_NewNodeIndex);
-      this->m_SyncIndex(C_PuiSdDataElement::eNODE, u32_NewNodeIndex, C_PuiSdDataElement::eADD);
-      //Replace old connection names to new ones and remove connection if bus was not copied
-      if ((pc_OSCNode != NULL) && (pc_UINode != NULL))
-      {
-         C_OSCNodeProperties c_OSCAdaptedNodeproperties = pc_OSCNode->c_Properties;
-         std::vector<C_PuiSdNodeConnection> c_UIAdaptedNodeConnections = pc_UINode->c_UIBusConnections;
-         for (std::vector<C_PuiSdNodeConnection>::iterator c_ItConn = c_UIAdaptedNodeConnections.begin();
-              c_ItConn != c_UIAdaptedNodeConnections.end();)
-         {
-            uint32 u32_BusIndex = std::numeric_limits<uint32>::max();
-            C_PuiSdNodeConnection & rc_CurConn = *c_ItConn;
-
-            //Get according bus index
-            for (uint32 u32_ItComInterface = 0;
-                 u32_ItComInterface < c_OSCAdaptedNodeproperties.c_ComInterfaces.size();
-                 ++u32_ItComInterface)
-            {
-               C_OSCNodeComInterfaceSettings & rc_ComInt =
-                  c_OSCAdaptedNodeproperties.c_ComInterfaces[u32_ItComInterface];
-               if (rc_ComInt.q_IsBusConnected == true)
-               {
-                  if ((rc_CurConn.c_ConnectionID.e_InterfaceType == rc_ComInt.e_InterfaceType) &&
-                      (rc_CurConn.c_ConnectionID.u8_InterfaceNumber == rc_ComInt.u8_InterfaceNumber))
-                  {
-                     //Replace bus index
-                     u32_BusIndex = rc_ComInt.u32_BusIndex;
-                     u32_BusIndex =
-                        c_MapOldBusIndexToNewBusIndex.value(u32_BusIndex, std::numeric_limits<uint32>::max());
-                     tgl_assert(u32_BusIndex != std::numeric_limits<uint32>::max());
-                     rc_ComInt.u32_BusIndex = u32_BusIndex;
-                  }
-               }
-            }
-            if (u32_BusIndex == std::numeric_limits<uint32>::max())
-            {
-               //Sync core and UI data
-               c_OSCAdaptedNodeproperties.DisconnectComInterface(rc_CurConn.c_ConnectionID.e_InterfaceType,
-                                                                 rc_CurConn.c_ConnectionID.u8_InterfaceNumber);
-               c_ItConn = c_UIAdaptedNodeConnections.erase(c_ItConn);
-            }
-            else
-            {
-               ++c_ItConn;
-            }
-         }
-         C_PuiSdHandler::h_GetInstance()->SetOSCNodeProperties(u32_NewNodeIndex, c_OSCAdaptedNodeproperties);
-         C_PuiSdHandler::h_GetInstance()->SetUINodeConnections(u32_NewNodeIndex, c_UIAdaptedNodeConnections);
-      }
-   }
+   c_NodeIndices = this->m_CopyFromSnapshotToSceneHandleNodes(orc_Snapshot, c_MapOldBusIndexToNewBusIndex);
    //Copy other elements
    c_OtherIndices.push_back(C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.size());
    c_OtherIndices.push_back(C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.size());
@@ -861,7 +824,14 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
                C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(pc_Item);
                if (pc_Node != NULL)
                {
-                  Q_EMIT this->SigNodeDeleted(static_cast<uint32>(pc_Node->GetIndex()));
+                  const std::vector<stw_types::uint32> c_NodeIndices =
+                     C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+                        static_cast<uint32>(pc_Node->GetIndex()));
+                  for (std::vector<stw_types::uint32>::const_reverse_iterator c_ItIndex = c_NodeIndices.rbegin();
+                       c_ItIndex != c_NodeIndices.rend(); ++c_ItIndex)
+                  {
+                     Q_EMIT this->SigNodeDeleted(*c_ItIndex);
+                  }
                   m_RemoveNodeOfScene(pc_Node);
                }
                else
@@ -1520,11 +1490,12 @@ bool C_SdTopologyScene::m_AddOfMime(const QMimeData * const opc_MimeData, const 
       QString c_Text;
       if (opc_MimeData->hasFormat("text/plain") == true)
       {
+         uint32 u32_SubDevice;
          const C_OSCDeviceDefinition * pc_Node;
          c_Text = opc_MimeData->text();
 
          // check if it is a node
-         pc_Node = C_OSCSystemDefinition::hc_Devices.LookForDevice(c_Text.toStdString().c_str());
+         pc_Node = C_OSCSystemDefinition::hc_Devices.LookForDevice(c_Text.toStdString().c_str(), "", u32_SubDevice);
          if (pc_Node != NULL)
          {
             e_Type = C_SdManUnoTopologyAddCommand::E_ElementType::eNODE;
@@ -1903,6 +1874,183 @@ bool C_SdTopologyScene::m_CallSetupStyle(QGraphicsItem * const opc_Item) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy from snapshot to scene, handle nodes
+
+   \param[in]  orc_Snapshot                     Snapshot
+   \param[in]  orc_MapOldBusIndexToNewBusIndex  Map old bus index to new bus index
+
+   \return
+   Node Indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QVector<uint32> C_SdTopologyScene::m_CopyFromSnapshotToSceneHandleNodes(const C_SdTopologyDataSnapshot & orc_Snapshot,
+                                                                        const QMap<uint32,
+                                                                                   uint32> & orc_MapOldBusIndexToNewBusIndex)
+const
+{
+   QVector<uint32> c_NodeIndices;
+   for (uint32 u32_ItElem = 0; u32_ItElem < orc_Snapshot.c_OSCNodes.size(); ++u32_ItElem)
+   {
+      const bool q_IsFirst = C_PuiSdUtil::h_CheckIsFirstInAnyGroupOrNotInAny(u32_ItElem, orc_Snapshot.c_OSCNodeGroups);
+      if (q_IsFirst)
+      {
+         const uint32 u32_NewNodeIndex = C_SdTopologyScene::mh_CopyFromSnapshotToSceneHandleNodesAddNewNodes(
+            orc_Snapshot, u32_ItElem);
+
+         //Remember new index
+         mh_AddAndUpdateHigher(c_NodeIndices, u32_NewNodeIndex);
+         this->m_SyncIndex(C_PuiSdDataElement::eNODE, u32_NewNodeIndex, C_PuiSdDataElement::eADD);
+         C_SdTopologyScene::mh_CopyFromSnapshotToSceneHandleNodesAdaptConnections(u32_NewNodeIndex,
+                                                                                  orc_MapOldBusIndexToNewBusIndex);
+      }
+   }
+   return c_NodeIndices;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy from snapshot to scene, handle nodes, add new nodes
+
+   \param[in]  orc_Snapshot            Snapshot
+   \param[in]  ou32_SnapshotNodeIndex  Snapshot node index
+
+   \return
+   Index of new node in data storage
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SdTopologyScene::mh_CopyFromSnapshotToSceneHandleNodesAddNewNodes(
+   const C_SdTopologyDataSnapshot & orc_Snapshot, const uint32 ou32_SnapshotNodeIndex)
+{
+   uint32 u32_DataIndex;
+   const bool q_IsMulti = C_OSCNodeSquad::h_CheckIsMultiDevice(ou32_SnapshotNodeIndex, orc_Snapshot.c_OSCNodeGroups);
+
+   if (q_IsMulti)
+   {
+      QString c_NameProposal;
+      stw_scl::C_SCLString c_MainDeviceName;
+      stw_scl::C_SCLString c_SubDeviceName;
+      std::vector<QString> c_SubDevices;
+      std::vector<C_OSCNode> c_OSCNodes;
+      std::vector<C_PuiSdNode> c_UINodes;
+      for (uint32 u32_ItGroup = 0UL; u32_ItGroup < orc_Snapshot.c_OSCNodeGroups.size(); ++u32_ItGroup)
+      {
+         const C_OSCNodeSquad & rc_Group = orc_Snapshot.c_OSCNodeGroups[u32_ItGroup];
+         for (uint32 u32_ItSubDevice = 0UL; u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size(); ++u32_ItSubDevice)
+         {
+            if (ou32_SnapshotNodeIndex == rc_Group.c_SubNodeIndexes[u32_ItSubDevice])
+            {
+               c_NameProposal = rc_Group.c_BaseName.c_str();
+               c_SubDevices.reserve(rc_Group.c_SubNodeIndexes.size());
+               c_OSCNodes.reserve(rc_Group.c_SubNodeIndexes.size());
+               c_UINodes.reserve(rc_Group.c_SubNodeIndexes.size());
+               for (uint32 u32_ItCurSubDevice = 0UL; u32_ItCurSubDevice < rc_Group.c_SubNodeIndexes.size();
+                    ++u32_ItCurSubDevice)
+               {
+                  const uint32 u32_CurIndex = rc_Group.c_SubNodeIndexes[u32_ItCurSubDevice];
+                  tgl_assert((u32_CurIndex < orc_Snapshot.c_OSCNodes.size()) &&
+                             (u32_CurIndex < orc_Snapshot.c_UINodes.size()));
+                  if ((u32_CurIndex < orc_Snapshot.c_OSCNodes.size()) &&
+                      (u32_CurIndex < orc_Snapshot.c_UINodes.size()))
+                  {
+                     const C_OSCNode rc_OSCNode =
+                        orc_Snapshot.c_OSCNodes[u32_CurIndex];
+                     C_OSCSystemDefinitionFiler::h_SplitDeviceType(rc_OSCNode.c_DeviceType,
+                                                                   c_MainDeviceName,
+                                                                   c_SubDeviceName);
+                     c_SubDevices.push_back(c_SubDeviceName.c_str());
+                     c_OSCNodes.push_back(rc_OSCNode);
+                     c_UINodes.push_back(orc_Snapshot.c_UINodes[u32_CurIndex]);
+                  }
+               }
+               break;
+            }
+         }
+      }
+      tgl_assert(c_MainDeviceName.IsEmpty() == false);
+      u32_DataIndex = C_PuiSdHandler::h_GetInstance()->AddNodeSquadAndSort(c_OSCNodes, c_UINodes, c_SubDevices,
+                                                                           c_MainDeviceName.c_str(), c_NameProposal);
+   }
+   else
+   {
+      C_OSCNode c_OSCInitialNode = orc_Snapshot.c_OSCNodes[ou32_SnapshotNodeIndex];
+      u32_DataIndex = C_PuiSdHandler::h_GetInstance()->AddNodeAndSort(c_OSCInitialNode,
+                                                                      orc_Snapshot.c_UINodes[
+                                                                         ou32_SnapshotNodeIndex],
+                                                                      c_OSCInitialNode.c_DeviceType.c_str(),
+                                                                      "");
+   }
+   return u32_DataIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy from snapshot to scene, handle nodes, adapt connections
+
+   \param[in]  ou32_DataNodeIndex               Data node index
+   \param[in]  orc_MapOldBusIndexToNewBusIndex  Map old bus index to new bus index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyScene::mh_CopyFromSnapshotToSceneHandleNodesAdaptConnections(const uint32 ou32_DataNodeIndex,
+                                                                              const QMap<uint32,
+                                                                                         uint32> & orc_MapOldBusIndexToNewBusIndex)
+{
+   const std::vector<uint32> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+      ou32_DataNodeIndex);
+
+   for (uint32 u32_It = 0UL; u32_It < c_NodeIndices.size(); ++u32_It)
+   {
+      const uint32 u32_CurIndex = c_NodeIndices[u32_It];
+      //Replace old connection names to new ones and remove connection if bus was not copied
+      const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_CurIndex);
+      const C_PuiSdNode * const pc_UINode = C_PuiSdHandler::h_GetInstance()->GetUINode(u32_CurIndex);
+
+      if ((pc_OSCNode != NULL) && (pc_UINode != NULL))
+      {
+         C_OSCNodeProperties c_OSCAdaptedNodeproperties = pc_OSCNode->c_Properties;
+         std::vector<C_PuiSdNodeConnection> c_UIAdaptedNodeConnections = pc_UINode->c_UIBusConnections;
+         for (std::vector<C_PuiSdNodeConnection>::iterator c_ItConn = c_UIAdaptedNodeConnections.begin();
+              c_ItConn != c_UIAdaptedNodeConnections.end();)
+         {
+            uint32 u32_BusIndex = std::numeric_limits<uint32>::max();
+            C_PuiSdNodeConnection & rc_CurConn = *c_ItConn;
+
+            //Get according bus index
+            for (uint32 u32_ItComInterface = 0;
+                 u32_ItComInterface < c_OSCAdaptedNodeproperties.c_ComInterfaces.size();
+                 ++u32_ItComInterface)
+            {
+               C_OSCNodeComInterfaceSettings & rc_ComInt =
+                  c_OSCAdaptedNodeproperties.c_ComInterfaces[u32_ItComInterface];
+               if (rc_ComInt.GetBusConnectedRawValue() == true)
+               {
+                  if ((rc_CurConn.c_ConnectionID.e_InterfaceType == rc_ComInt.e_InterfaceType) &&
+                      (rc_CurConn.c_ConnectionID.u8_InterfaceNumber == rc_ComInt.u8_InterfaceNumber))
+                  {
+                     //Replace bus index
+                     u32_BusIndex = rc_ComInt.u32_BusIndex;
+                     u32_BusIndex =
+                        orc_MapOldBusIndexToNewBusIndex.value(u32_BusIndex, std::numeric_limits<uint32>::max());
+                     tgl_assert(u32_BusIndex != std::numeric_limits<uint32>::max());
+                     rc_ComInt.u32_BusIndex = u32_BusIndex;
+                  }
+               }
+            }
+            if (u32_BusIndex == std::numeric_limits<uint32>::max())
+            {
+               //Sync core and UI data
+               c_OSCAdaptedNodeproperties.DisconnectComInterface(rc_CurConn.c_ConnectionID.e_InterfaceType,
+                                                                 rc_CurConn.c_ConnectionID.u8_InterfaceNumber);
+               c_ItConn = c_UIAdaptedNodeConnections.erase(c_ItConn);
+            }
+            else
+            {
+               ++c_ItConn;
+            }
+         }
+         C_PuiSdHandler::h_GetInstance()->SetOSCNodeProperties(u32_CurIndex, c_OSCAdaptedNodeproperties);
+         C_PuiSdHandler::h_GetInstance()->SetUINodeConnections(u32_CurIndex, c_UIAdaptedNodeConnections);
+      }
+   }
+}
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_SelectionChanged(void)
 {
    if (this->mq_ProxyWidgetInteractionActive == false)
@@ -2203,24 +2351,19 @@ void C_SdTopologyScene::m_SyncIndex(const stw_opensyde_gui_logic::C_PuiSdDataEle
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new connection
 
-   \param[in]  oru8_InterfaceNumber       Number of interface on bus
-   \param[in]  oru8_NodeId                Node id
-   \param[in]  oq_ActivateDatapoolL2      Activate datapool L2
-   \param[in]  oq_ActivateDatapoolECeS    Activate datapool ECeS
-   \param[in]  oq_ActivateDatapoolECoS    Activate datapool ECoS
+   \param[in]  oru8_InterfaceNumber    Number of interface on bus
+   \param[in]  orc_NodeIds             Node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ConnectNodeToBus(const stw_types::uint8 & oru8_InterfaceNumber,
-                                           const stw_types::uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
-                                           const bool oq_ActivateDatapoolECeS, const bool oq_ActivateDatapoolECoS)
+                                           const std::vector<uint8> & orc_NodeIds)
 {
    if ((this->mpc_NodeConnectItem != NULL) &&
        (this->mpc_BusConnectItem != NULL))
    {
       this->mc_UndoManager.DoAddBusConnector(
          m_GetNewUniqueID(),  this->mc_ConnectEndPoint, this->mpc_NodeConnectItem,
-         this->mpc_BusConnectItem, oru8_InterfaceNumber, oru8_NodeId, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
-         oq_ActivateDatapoolECoS);
+         this->mpc_BusConnectItem, oru8_InterfaceNumber, orc_NodeIds);
 
       //Reset pointers
       this->mpc_NodeConnectItem = NULL;
@@ -2231,17 +2374,13 @@ void C_SdTopologyScene::m_ConnectNodeToBus(const stw_types::uint8 & oru8_Interfa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change existing connection
 
-   \param[in]  oru8_InterfaceNumber       Number of interface on bus
-   \param[in]  oru8_NodeId                New node id
-   \param[in]  oq_ActivateDatapoolL2      Activate datapool L2
-   \param[in]  oq_ActivateDatapoolECeS    Activate datapool ECeS
-   \param[in]  oq_ActivateDatapoolECoS    Activate datapool ECoS
-   \param[in]  opc_Connector              Current bus connector for change of interface
+   \param[in]  oru8_InterfaceNumber    Number of interface on bus
+   \param[in]  orc_NodeIds             Node ids
+   \param[in]  opc_Connector           Current bus connector for change of interface
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_ChangeInterface(const uint8 & oru8_InterfaceNumber, const uint8 & oru8_NodeId,
-                                          const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
-                                          const bool oq_ActivateDatapoolECoS, C_GiLiBusConnector * const opc_Connector)
+void C_SdTopologyScene::m_ChangeInterface(const uint8 & oru8_InterfaceNumber, const std::vector<uint8> & orc_NodeIds,
+                                          C_GiLiBusConnector * const opc_Connector)
 {
    if (opc_Connector != NULL)
    {
@@ -2252,24 +2391,37 @@ void C_SdTopologyScene::m_ChangeInterface(const uint8 & oru8_InterfaceNumber, co
          const C_GiNode * const pc_Node = opc_Connector->GetNodeItem();
          if (pc_Node != NULL)
          {
-            const C_OSCNode * const pc_NodeData = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(pc_Node->GetIndex());
-            if (pc_NodeData != NULL)
+            const std::vector<uint32> c_NodeIndices =
+               C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+                  pc_Node->GetIndex());
+            std::vector<uint8> c_NodeIds;
+            c_NodeIds.reserve(c_NodeIndices.size());
+            for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
             {
-               for (uint32 u32_ItComInterface =
-                       0; u32_ItComInterface < pc_NodeData->c_Properties.c_ComInterfaces.size();
-                    ++u32_ItComInterface)
+               const C_OSCNode * const pc_NodeData =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndices[u32_ItNode]);
+               if (pc_NodeData != NULL)
                {
-                  const C_OSCNodeComInterfaceSettings & rc_ComInterface =
-                     pc_NodeData->c_Properties.c_ComInterfaces[u32_ItComInterface];
-                  if ((rc_ComInterface.u8_InterfaceNumber == pc_Conn->u8_InterfaceNumber) &&
-                      (pc_Conn->e_InterfaceType == rc_ComInterface.e_InterfaceType))
+                  for (uint32 u32_ItComInterface =
+                          0; u32_ItComInterface < pc_NodeData->c_Properties.c_ComInterfaces.size();
+                       ++u32_ItComInterface)
                   {
-                     this->mc_UndoManager.DoChangeInterface(opc_Connector, pc_Conn->u8_InterfaceNumber,
-                                                            oru8_InterfaceNumber, rc_ComInterface.u8_NodeID,
-                                                            oru8_NodeId, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
-                                                            oq_ActivateDatapoolECoS);
+                     const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+                        pc_NodeData->c_Properties.c_ComInterfaces[u32_ItComInterface];
+                     if ((rc_ComInterface.u8_InterfaceNumber == pc_Conn->u8_InterfaceNumber) &&
+                         (pc_Conn->e_InterfaceType == rc_ComInterface.e_InterfaceType))
+                     {
+                        c_NodeIds.push_back(rc_ComInterface.u8_NodeID);
+                     }
                   }
                }
+            }
+            tgl_assert(c_NodeIndices.size() == c_NodeIds.size());
+            if (c_NodeIndices.size() == c_NodeIds.size())
+            {
+               this->mc_UndoManager.DoChangeInterface(opc_Connector, pc_Conn->u8_InterfaceNumber,
+                                                      oru8_InterfaceNumber, c_NodeIds,
+                                                      orc_NodeIds);
             }
          }
       }
@@ -2317,6 +2469,9 @@ void C_SdTopologyScene::m_RemoveNodeOfScene(const C_GiNode * const opc_NodeGraph
 {
    if (opc_NodeGraphicsItem != NULL)
    {
+      const std::vector<stw_types::uint32> c_NodeIndices =
+         C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+            static_cast<uint32>(opc_NodeGraphicsItem->GetIndex()));
       // Context menu button of node
       disconnect(opc_NodeGraphicsItem, &C_GiNode::SigOpenContextMenu, this,
                  &C_SdTopologyScene::m_OpenContextMenu);
@@ -2326,8 +2481,12 @@ void C_SdTopologyScene::m_RemoveNodeOfScene(const C_GiNode * const opc_NodeGraph
       //unregister arrow
       this->mpc_ArrowCursorButton->DetachNode();
       //Update indices
-      this->m_SyncIndex(C_PuiSdDataElement::eNODE, opc_NodeGraphicsItem->GetIndex(),
-                        C_PuiSdDataElement::eDELETE);
+      for (std::vector<stw_types::uint32>::const_reverse_iterator c_ItIndex = c_NodeIndices.rbegin();
+           c_ItIndex != c_NodeIndices.rend(); ++c_ItIndex)
+      {
+         this->m_SyncIndex(C_PuiSdDataElement::eNODE, *c_ItIndex,
+                           C_PuiSdDataElement::eDELETE);
+      }
    }
 }
 
@@ -2820,6 +2979,9 @@ void C_SdTopologyScene::m_ShowNewConnectionPopUp(const C_GiNode * const opc_Node
       sint32 s32_SpecialInterface = -1;
       QGraphicsView * const pc_View = this->views().at(0);
       QPointer<C_OgePopUpDialog> const c_Dialog = new C_OgePopUpDialog(pc_View, pc_View);
+      std::vector<uint32> c_NodeIndices;
+
+      c_NodeIndices.push_back(opc_Node->GetIndex());
 
       //Clean up state
       this->m_HandleHideToolTip();
@@ -2841,36 +3003,39 @@ void C_SdTopologyScene::m_ShowNewConnectionPopUp(const C_GiNode * const opc_Node
                                                                                      opc_Bus->GetIndex(),
                                                                                      s32_SpecialInterface);
       //Resize
-      c_Dialog->SetSize(QSize(800, 450));
+      c_Dialog->SetSize(QSize(800, 280));
       if (pc_ComIfWidget->GetInteractionPossible() == true)
       {
          if (c_Dialog->exec() == static_cast<sintn>(QDialog::Accepted))
          {
-            bool q_DatapoolL2;
-            bool q_DatapoolECeS;
-            bool q_DatapoolECoS;
-            const uint32 u32_SelectedInterface = pc_ComIfWidget->GetSelectedInterface();
+            std::vector<std::vector<uint8> > c_IdContainer;
+            std::vector<uint8> c_NodeIds;
+            std::vector<uint8> c_InterfaceIndices;
+            const uint8 u8_SelectedInterface = pc_ComIfWidget->GetSelectedInterface();
+            const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(opc_Bus->GetIndex());
 
-            pc_ComIfWidget->GetComDataPoolConfiguration(q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
+            c_InterfaceIndices.push_back(u8_SelectedInterface);
 
+            c_IdContainer = this->m_AssignNodeIds(c_NodeIndices, pc_Bus->e_Type,
+                                                  opc_Bus->GetIndex(), c_InterfaceIndices, true);
+
+            c_NodeIds = c_IdContainer[0];
+
+            // do actual connect variations
             if (orq_ChangeInterface == true)
             {
-               m_ChangeInterface(static_cast<uint8>(u32_SelectedInterface),
-                                 pc_ComIfWidget->GetNodeId(), q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS,
-                                 opc_Connector);
+               m_ChangeInterface(u8_SelectedInterface, c_NodeIds, opc_Connector);
             }
             else
             {
                if (orq_Reconnect == true)
                {
                   this->mc_BusConnectorReconnectManager.ContextMenuAccepted(
-                     u32_SelectedInterface, pc_ComIfWidget->GetNodeId(), q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
+                     u8_SelectedInterface, c_NodeIds);
                }
                else
                {
-                  m_ConnectNodeToBus(
-                     static_cast<uint8>(u32_SelectedInterface),
-                     pc_ComIfWidget->GetNodeId(), q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
+                  m_ConnectNodeToBus(u8_SelectedInterface, c_NodeIds);
                }
             }
          }
@@ -2887,8 +3052,8 @@ void C_SdTopologyScene::m_ShowNewConnectionPopUp(const C_GiNode * const opc_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Display custom context menu for connection
 
-   \param[in]  opc_Node1   Node 1 (part of connection)
-   \param[in]  opc_Node2   Node 2 (part of connection)
+   \param[in]  opc_Node1   Node 1 (part of connection). The one which wants to be connected.
+   \param[in]  opc_Node2   Node 2 (part of connection). The one which already is connected.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * const opc_Node1,
@@ -2896,8 +3061,12 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
 {
    if (((opc_Node1 != NULL) && (opc_Node2 != NULL)) && (opc_Node1 != opc_Node2))
    {
+      std::vector<uint32> c_NodeIndices;
       QGraphicsView * const pc_View = this->views().at(0);
       QPointer<C_OgePopUpDialog> const c_Dialog = new C_OgePopUpDialog(pc_View, pc_View);
+
+      c_NodeIndices.push_back(opc_Node1->GetIndex());
+      c_NodeIndices.push_back(opc_Node2->GetIndex());
 
       //Clean up state
       this->m_HandleHideToolTip();
@@ -2913,23 +3082,18 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
          if (c_Dialog->exec() == static_cast<sintn>(QDialog::Accepted))
          {
             std::vector<uint64> c_Ids;
-            bool q_Node1DatapoolL2;
-            bool q_Node1DatapoolECeS;
-            bool q_Node1DatapoolECoS;
-            bool q_Node2DatapoolL2;
-            bool q_Node2DatapoolECeS;
-            bool q_Node2DatapoolECoS;
+            std::vector<uint8> c_InterfaceIndices;
+            std::vector<std::vector<uint8> > c_IdContainer;
 
-            // Adapt the COM datapool configuration for the first node
-            pc_ComIfWidget->GetComDataPoolConfigurationNode1(q_Node1DatapoolL2, q_Node1DatapoolECeS,
-                                                             q_Node1DatapoolECoS);
-
-            // Adapt the COM datapool configuration for the second node
-            pc_ComIfWidget->GetComDataPoolConfigurationNode2(q_Node2DatapoolL2, q_Node2DatapoolECeS,
-                                                             q_Node2DatapoolECoS);
+            // get the selected interfaces
+            c_InterfaceIndices.push_back(static_cast<uint8>(pc_ComIfWidget->GetSelectedInterface1()));
+            c_InterfaceIndices.push_back(static_cast<uint8>(pc_ComIfWidget->GetSelectedInterface2()));
 
             if (pc_ComIfWidget->CheckIfCreateNew() == true)
             {
+               std::vector<uint8> c_Node1Ids;
+               std::vector<uint8> c_Node2Ids;
+
                const QPointF c_Node1Bottom(opc_Node1->sceneBoundingRect().center().x(),
                                            opc_Node1->sceneBoundingRect().bottom());
                const QPointF c_BusPosition = QPointF(c_Node1Bottom.x(), c_Node1Bottom.y() + 100.0);
@@ -2940,6 +3104,13 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
                c_Ids.push_back(this->m_GetNewUniqueID());
                c_Ids.push_back(this->m_GetNewUniqueID());
 
+               c_IdContainer = this->m_AssignNodeIds(c_NodeIndices,
+                                                     pc_ComIfWidget->GetBusType(), pc_ComIfWidget->GetBusIndex(),
+                                                     c_InterfaceIndices, false);
+
+               c_Node1Ids = c_IdContainer[0];
+               c_Node2Ids = c_IdContainer[1];
+
                this->mc_UndoManager.DoAddNodeToNodeConnectionAndCreateNewBus(c_Ids,
                                                                              pc_ComIfWidget->GetBusType(),
                                                                              pc_ComIfWidget->GetBusName(), c_BusPosition,
@@ -2948,18 +3119,15 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
                                                                                 pc_ComIfWidget->GetSelectedInterface1()),
                                                                              static_cast<uint8>(
                                                                                 pc_ComIfWidget->GetSelectedInterface2()),
-                                                                             pc_ComIfWidget->GetNodeId1(),
-                                                                             pc_ComIfWidget->GetNodeId2(),
-                                                                             q_Node1DatapoolL2, q_Node1DatapoolECeS, q_Node1DatapoolECoS,
-                                                                             q_Node2DatapoolL2, q_Node2DatapoolECeS,
-                                                                             q_Node2DatapoolECoS);
+                                                                             c_Node1Ids,
+                                                                             c_Node2Ids);
             }
             else
             {
                const uint32 u32_BusDataIndex = pc_ComIfWidget->GetBusIndex();
                uint64 u64_UniqueBusId = 0;
+               std::vector<uint8> c_NodeIds;
                const QPointF c_Node1Center = opc_Node1->sceneBoundingRect().center();
-               const QPointF c_Node2Center = opc_Node2->sceneBoundingRect().center();
                QList<QGraphicsItem *>::const_iterator c_ItItem;
                const QList<QGraphicsItem *> & rc_Items = this->items();
 
@@ -2984,18 +3152,19 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
                   }
                }
 
-               this->mc_UndoManager.DoAddNodeToNodeConnectionUsingExistingBus(c_Ids, u64_UniqueBusId, c_Node1Center,
-                                                                              c_Node2Center,
-                                                                              opc_Node1->GetID(), opc_Node2->GetID(),
+               c_IdContainer = this->m_AssignNodeIds(c_NodeIndices,
+                                                     pc_ComIfWidget->GetBusType(),
+                                                     pc_ComIfWidget->GetBusIndex(),
+                                                     c_InterfaceIndices, true);
+
+               c_NodeIds = c_IdContainer[0];
+
+               this->mc_UndoManager.DoAddNodeToNodeConnectionUsingExistingBus(c_Ids, u64_UniqueBusId,
+                                                                              c_Node1Center,
+                                                                              opc_Node1->GetID(),
                                                                               static_cast<uint8>(
                                                                                  pc_ComIfWidget->GetSelectedInterface1()),
-                                                                              static_cast<uint8>(
-                                                                                 pc_ComIfWidget->GetSelectedInterface2()),
-                                                                              pc_ComIfWidget->GetNodeId1(),
-                                                                              pc_ComIfWidget->GetNodeId2(),
-                                                                              q_Node1DatapoolL2, q_Node1DatapoolECeS, q_Node1DatapoolECoS,
-                                                                              q_Node2DatapoolL2, q_Node2DatapoolECeS,
-                                                                              q_Node2DatapoolECoS);
+                                                                              c_NodeIds);
             }
          }
       }
@@ -3005,6 +3174,135 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
          c_Dialog->HideOverlay();
       }
    } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generates node ids for given node(s). orc_NodeIndices can hold one or two node indices. Therefore this
+             function can be used when creating a node-to-bus connection or a node-to-node-connection
+
+   \param[in]  orc_NodeIndices         Indices of nodes participating in the new connection.
+   \param[in]  ore_BusType             Type of bus which will be created.
+   \param[in]  oru32_BusIndex          Index of new bus.
+   \param[in]  orc_InterfaceIndices    Selected interfaces.
+   \param[in]  oq_BusExists            Bus exists
+
+   \retval
+   Vector of 2 vectors with node ids. First vector holds Ids for Node 1, second for Node 2. If only one node was given
+   the second vector remains empty and is not used by the calling function
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<std::vector<uint8> > C_SdTopologyScene::m_AssignNodeIds(const std::vector<uint32> & orc_NodeIndices,
+                                                                    const C_OSCSystemBus::E_Type & ore_BusType,
+                                                                    const uint32 & oru32_BusIndex,
+                                                                    const std::vector<uint8> & orc_InterfaceIndices,
+                                                                    const bool oq_BusExists)
+{
+   uint32 u32_NewNodeId;
+   uint32 u32_NodeSquadIndex;
+
+   std::vector<std::vector<uint8> > c_IdContainer;
+   const std::vector<uint8> c_Node1Ids;
+   const std::vector<uint8> c_Node2Ids;
+
+   c_IdContainer.push_back(c_Node1Ids);
+   c_IdContainer.push_back(c_Node2Ids);
+
+   // do stuff for both nodes (for better understanding: At this point "node" means the ones you see on topology)
+   for (uint32 u32_NodeIt = 0; u32_NodeIt < orc_NodeIndices.size(); ++u32_NodeIt)
+   {
+      u32_NodeSquadIndex = 0;
+      // check if current node squad
+      if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(orc_NodeIndices[u32_NodeIt],
+                                                                          u32_NodeSquadIndex) == C_NO_ERR)
+      {
+         const C_OSCNodeSquad * const pc_NodeSquad = C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(
+            u32_NodeSquadIndex);
+         if (pc_NodeSquad != NULL)
+         {
+            // loop over all subnodes
+            for (uint32 u32_SubNodeIt = 0; u32_SubNodeIt < pc_NodeSquad->c_SubNodeIndexes.size(); ++u32_SubNodeIt)
+            {
+               const C_OSCNode * const pc_SubNode =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(pc_NodeSquad->c_SubNodeIndexes[u32_SubNodeIt]);
+               if (pc_SubNode != NULL)
+               {
+                  // check if current sub node is connected to selected interface. Therefore the interfaces are
+                  // packed in a vector to match the node loop
+                  const bool q_Connected =
+                     pc_SubNode->pc_DeviceDefinition->c_SubDevices[pc_SubNode->u32_SubDeviceIndex].IsConnected(
+                        ore_BusType, orc_InterfaceIndices[u32_NodeIt]);
+                  if (q_Connected == false)
+                  {
+                     // dummy id if not connected to selected interface to match the checks in layers above (node id
+                     // count shall be equal to node index count)
+                     c_IdContainer[u32_NodeIt].push_back(0);
+                  }
+                  else
+                  {
+                     // generate ids for current sub node. Keep c_UsedIds up to date.
+                     u32_NewNodeId = m_GenerateNodeIdUsingExistingIds(*pc_SubNode, oru32_BusIndex, c_IdContainer[0],
+                                                                      c_IdContainer[1],
+                                                                      oq_BusExists);
+
+                     c_IdContainer[u32_NodeIt].push_back(static_cast<uint8>(u32_NewNodeId));
+                  }
+               }
+            }
+         }
+      }
+      // old school node
+      else
+      {
+         // generate ids for current sub node. Keep c_UsedIds up to date.
+         const C_OSCNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_NodeIndices[u32_NodeIt]);
+         if (pc_Node != NULL)
+         {
+            u32_NewNodeId = m_GenerateNodeIdUsingExistingIds(*pc_Node, oru32_BusIndex, c_IdContainer[0],
+                                                             c_IdContainer[1],
+                                                             oq_BusExists);
+            c_IdContainer[u32_NodeIt].push_back(static_cast<uint8>(u32_NewNodeId));
+         }
+      }
+   }
+
+   return c_IdContainer;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Generate node id using existing ids
+
+   \param[in]  orc_Node                Node
+   \param[in]  oru32_BusIndex          Bus index
+   \param[in]  orc_ExistingNode1Ids    Existing node1 ids
+   \param[in]  orc_ExistingNode2Ids    Existing node2 ids
+   \param[in]  oq_BusExists            Bus exists
+
+   \return
+   new node ID
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SdTopologyScene::m_GenerateNodeIdUsingExistingIds(const C_OSCNode & orc_Node, const uint32 & oru32_BusIndex,
+                                                           const std::vector<uint8> & orc_ExistingNode1Ids,
+                                                           const std::vector<uint8> & orc_ExistingNode2Ids,
+                                                           const bool oq_BusExists)
+{
+   uint32 u32_Retval;
+
+   std::vector<uint32> c_UsedIds;
+   if (oq_BusExists)
+   {
+      c_UsedIds = C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(oru32_BusIndex,
+                                                                           -1,
+                                                                           -1);
+   }
+
+   c_UsedIds.insert(c_UsedIds.end(), orc_ExistingNode1Ids.begin(), orc_ExistingNode1Ids.end());
+   c_UsedIds.insert(c_UsedIds.end(), orc_ExistingNode2Ids.begin(), orc_ExistingNode2Ids.end());
+   c_UsedIds = C_Uti::h_UniquifyAndSortAscending(c_UsedIds);
+
+   u32_Retval = C_SdUtil::h_GetNextFreeNodeId(orc_Node.c_Properties.c_ComInterfaces, c_UsedIds, -1);
+   return u32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3051,23 +3349,9 @@ void C_SdTopologyScene::m_LoadSnapshot(const QVector<uint32> & orc_NodeIndices, 
                                        const std::vector<C_PuiSdCompleteBusConnectionData> * const opc_AdditionalConnectionData,
                                        const QMap<C_PuiBsTemporaryDataID, uint64> * const opc_IDMap)
 {
-   QVector<uint32> c_SaveNodeIndices;
-   QVector<uint32> c_SaveBusIndices;
    QVector<uint32> c_SaveIndices;
 
    //Fix index if necessary
-
-   //Copy
-   for (sint32 s32_It = 0; s32_It < orc_NodeIndices.size(); ++s32_It)
-   {
-      c_SaveNodeIndices.append(orc_NodeIndices[s32_It]);
-   }
-
-   //Copy
-   for (sint32 s32_It = 0; s32_It < orc_BusIndices.size(); ++s32_It)
-   {
-      c_SaveBusIndices.append(orc_BusIndices[s32_It]);
-   }
 
    //Copy
    for (sint32 s32_It = 0; s32_It < orc_OtherStartIndices.size(); ++s32_It)
@@ -3200,29 +3484,23 @@ void C_SdTopologyScene::m_RevertBusConnectorNode(stw_opensyde_gui::C_GiLiBusConn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Connect bus connector to new node
 
-   \param[in,out]  opc_BusConnector          Current bus connector
-   \param[in,out]  opc_StartingNode          Previously connected node
-   \param[in,out]  opc_LastNode              New node
-   \param[in]      orc_ConnectionPos         Position of connection event
-   \param[in]      ors32_Interface           Newly used interface
-   \param[in]      oru8_NodeId               New node id
-   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
-   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
-   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
+   \param[in,out]  opc_BusConnector    Current bus connector
+   \param[in,out]  opc_StartingNode    Previously connected node
+   \param[in,out]  opc_LastNode        New node
+   \param[in]      orc_ConnectionPos   Position of connection event
+   \param[in]      ors32_Interface     Newly used interface
+   \param[in]      orc_NodeIds         Node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ReconnectBusConnectorNode(const stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                                                     const C_GiNode * const opc_StartingNode,
                                                     const C_GiNode * const opc_LastNode,
                                                     const QPointF & orc_ConnectionPos, const sint32 & ors32_Interface,
-                                                    const uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
-                                                    const bool oq_ActivateDatapoolECeS,
-                                                    const bool oq_ActivateDatapoolECoS)
+                                                    const std::vector<uint8> & orc_NodeIds)
 {
    this->mc_UndoManager.DoReconnectNode(opc_BusConnector, opc_StartingNode, opc_LastNode,
                                         orc_ConnectionPos,
-                                        ors32_Interface, oru8_NodeId, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
-                                        oq_ActivateDatapoolECoS);
+                                        ors32_Interface, orc_NodeIds);
    m_UpdateHints();
 }
 
@@ -3249,29 +3527,23 @@ void C_SdTopologyScene::m_RevertBusConnectorBus(stw_opensyde_gui::C_GiLiBusConne
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Connect bus connector to new bus
 
-   \param[in,out]  opc_BusConnector          Current bus connector
-   \param[in,out]  opc_StartingBus           Previously connected bus
-   \param[in,out]  opc_LastBus               New bus
-   \param[in]      orc_ConnectionPos         Position of connection event
-   \param[in]      ors32_Interface           Newly used interface
-   \param[in]      oru8_NodeId               New node id
-   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
-   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
-   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
+   \param[in,out]  opc_BusConnector    Current bus connector
+   \param[in,out]  opc_StartingBus     Previously connected bus
+   \param[in,out]  opc_LastBus         New bus
+   \param[in]      orc_ConnectionPos   Position of connection event
+   \param[in]      ors32_Interface     Newly used interface
+   \param[in]      orc_NodeIds         Node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ReconnectBusConnectorBus(const stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                                                    const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                                                    const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
                                                    const QPointF & orc_ConnectionPos, const sint32 & ors32_Interface,
-                                                   const uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
-                                                   const bool oq_ActivateDatapoolECeS,
-                                                   const bool oq_ActivateDatapoolECoS)
+                                                   const std::vector<uint8> & orc_NodeIds)
 {
    this->mc_UndoManager.DoReconnectBus(opc_BusConnector, opc_StartingBus, opc_LastBus,
                                        orc_ConnectionPos,
-                                       ors32_Interface, oru8_NodeId, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
-                                       oq_ActivateDatapoolECoS);
+                                       ors32_Interface, orc_NodeIds);
    m_UpdateHints();
 }
 
@@ -3332,30 +3604,52 @@ void C_SdTopologyScene::m_RevertOverrideCursor(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Init node data
 
-   \param[in,out]  orc_OSCNode   newly created node
-   \param[in]      orc_NodeType  Node type
+   \param[in,out]  orc_OSCNode      newly created node
+   \param[in]      orc_NodeType     Node type
+   \param[in]      orc_MainDevice   Main device
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_InitNodeData(C_OSCNode & orc_OSCNode, const QString & orc_NodeType) const
+void C_SdTopologyScene::m_InitNodeData(C_OSCNode & orc_OSCNode, const QString & orc_NodeType,
+                                       const QString & orc_MainDevice) const
 {
+   uint32 u32_SubDeviceIndex = 0UL;
+
    orc_OSCNode.pc_DeviceDefinition =
-      C_OSCSystemDefinition::hc_Devices.LookForDevice(orc_NodeType.toStdString().c_str());
+      C_OSCSystemDefinition::hc_Devices.LookForDevice(
+         orc_NodeType.toStdString().c_str(), orc_MainDevice.toStdString().c_str(), u32_SubDeviceIndex);
+   orc_OSCNode.u32_SubDeviceIndex = u32_SubDeviceIndex;
    tgl_assert(orc_OSCNode.pc_DeviceDefinition != NULL);
-   //default name: same as device type
-   orc_OSCNode.c_Properties.c_Name = C_PuiSdHandler::h_AutomaticCStringAdaptation(
-      orc_OSCNode.pc_DeviceDefinition->GetDisplayName().c_str()).toStdString().c_str();
-   orc_OSCNode.c_DeviceType = orc_NodeType.toStdString().c_str();
-   //---Init COM IF Settings (BEFORE initial datablock)
-   this->m_InitNodeComIfSettings(orc_OSCNode);
-   //Handle initial datablock (if necessary)
-   if ((orc_OSCNode.pc_DeviceDefinition->q_ProgrammingSupport == false) &&
-       (orc_OSCNode.c_Properties.e_FlashLoader != C_OSCNodeProperties::eFL_NONE))
+   if (orc_OSCNode.pc_DeviceDefinition != NULL)
    {
-      C_OSCNodeApplication c_Appl;
-      c_Appl.c_Name = C_GtGetText::h_GetText("Firmware");
-      c_Appl.e_Type = C_OSCNodeApplication::eBINARY;
-      c_Appl.c_Comment = C_GtGetText::h_GetText("Automatically generated Data Block.");
-      orc_OSCNode.c_Applications.push_back(c_Appl);
+      tgl_assert(orc_OSCNode.u32_SubDeviceIndex < orc_OSCNode.pc_DeviceDefinition->c_SubDevices.size());
+      if (orc_OSCNode.u32_SubDeviceIndex < orc_OSCNode.pc_DeviceDefinition->c_SubDevices.size())
+      {
+         //default name: same as device type
+         orc_OSCNode.c_Properties.c_Name = C_PuiSdHandler::h_AutomaticCStringAdaptation(
+            orc_OSCNode.pc_DeviceDefinition->GetDisplayName().c_str()).toStdString().c_str();
+         if (orc_MainDevice.isEmpty())
+         {
+            orc_OSCNode.c_DeviceType = orc_NodeType.toStdString().c_str();
+         }
+         else
+         {
+            orc_OSCNode.c_DeviceType = C_OSCNodeSquad::h_CombineNames(
+               orc_MainDevice.toStdString().c_str(), orc_NodeType.toStdString().c_str());
+         }
+         //---Init COM IF Settings (BEFORE initial datablock)
+         this->m_InitNodeComIfSettings(orc_OSCNode, orc_NodeType, orc_MainDevice);
+         //Handle initial datablock (if necessary)
+         if ((orc_OSCNode.pc_DeviceDefinition->c_SubDevices[orc_OSCNode.u32_SubDeviceIndex].q_ProgrammingSupport ==
+              false) &&
+             (orc_OSCNode.c_Properties.e_FlashLoader != C_OSCNodeProperties::eFL_NONE))
+         {
+            C_OSCNodeApplication c_Appl;
+            c_Appl.c_Name = C_GtGetText::h_GetText("Firmware");
+            c_Appl.e_Type = C_OSCNodeApplication::eBINARY;
+            c_Appl.c_Comment = C_GtGetText::h_GetText("Automatically generated Data Block.");
+            orc_OSCNode.c_Applications.push_back(c_Appl);
+         }
+      }
    }
 }
 
@@ -3365,70 +3659,83 @@ void C_SdTopologyScene::m_InitNodeData(C_OSCNode & orc_OSCNode, const QString & 
    This function is called after node create.
    Default concept: Activate all services if they are supported by the device type
 
-   \param[in,out]  orc_OSCNode   newly created node
+   \param[in,out]  orc_OSCNode      newly created node
+   \param[in]      orc_NodeType     Node type
+   \param[in]      orc_MainDevice   Main device
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_InitNodeComIfSettings(C_OSCNode & orc_OSCNode) const
+void C_SdTopologyScene::m_InitNodeComIfSettings(C_OSCNode & orc_OSCNode, const QString & orc_NodeType,
+                                                const QString & orc_MainDevice) const
 {
+   uint32 u32_SubDeviceIndex = 0UL;
    //get available services of nodes device type
 
    //the node has not been added to the system definition yet, so the "pc_DeviceDefinition" pointer
-   // was not set yet: search list of deviced
+   // was not set yet: search list of device
    const C_OSCDeviceDefinition * const pc_DeviceDefinition =
-      C_OSCSystemDefinition::hc_Devices.LookForDevice(orc_OSCNode.c_DeviceType);
+      C_OSCSystemDefinition::hc_Devices.LookForDevice(orc_NodeType.toStdString().c_str(),
+                                                      orc_MainDevice.toStdString().c_str(),
+                                                      u32_SubDeviceIndex);
 
    tgl_assert(pc_DeviceDefinition != NULL);
 
    //create interfaces
    if (pc_DeviceDefinition != NULL)
    {
-      orc_OSCNode.c_Properties.CreateComInterfaces(*(pc_DeviceDefinition));
+      tgl_assert(u32_SubDeviceIndex < pc_DeviceDefinition->c_SubDevices.size());
+      if (u32_SubDeviceIndex < pc_DeviceDefinition->c_SubDevices.size())
+      {
+         orc_OSCNode.c_Properties.CreateComInterfaces(*(pc_DeviceDefinition), u32_SubDeviceIndex);
 
-      // In case of both protocols are supported, openSYDE is default
-      //server and flashloader: Device Type settings = node settings.
-      if (pc_DeviceDefinition->q_DiagnosticProtocolOpenSydeCan == true)
-      {
-         //openSYDE
-         orc_OSCNode.c_Properties.e_DiagnosticServer = C_OSCNodeProperties::eDS_OPEN_SYDE;
-      }
-      else if (pc_DeviceDefinition->q_DiagnosticProtocolKefex == true)
-      {
-         //KEFEX
-         orc_OSCNode.c_Properties.e_DiagnosticServer = C_OSCNodeProperties::eDS_KEFEX;
-      }
-      else
-      {
-         //not supported
-         orc_OSCNode.c_Properties.e_DiagnosticServer = C_OSCNodeProperties::eDS_NONE;
-      }
+         // In case of both protocols are supported, openSYDE is default
+         //server and flashloader: Device Type settings = node settings.
+         if (pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].q_DiagnosticProtocolOpenSydeCan == true)
+         {
+            //openSYDE
+            orc_OSCNode.c_Properties.e_DiagnosticServer = C_OSCNodeProperties::eDS_OPEN_SYDE;
+         }
+         else if (pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].q_DiagnosticProtocolKefex == true)
+         {
+            //KEFEX
+            orc_OSCNode.c_Properties.e_DiagnosticServer = C_OSCNodeProperties::eDS_KEFEX;
+         }
+         else
+         {
+            //not supported
+            orc_OSCNode.c_Properties.e_DiagnosticServer = C_OSCNodeProperties::eDS_NONE;
+         }
 
-      //flashloader
-      if (pc_DeviceDefinition->q_FlashloaderOpenSydeCan == true)
-      {
-         //open SYDE
-         orc_OSCNode.c_Properties.e_FlashLoader = C_OSCNodeProperties::eFL_OPEN_SYDE;
-      }
-      else if (pc_DeviceDefinition->q_FlashloaderStwCan == true)
-      {
-         //STW
-         orc_OSCNode.c_Properties.e_FlashLoader = C_OSCNodeProperties::eFL_STW;
-      }
-      else
-      {
-         //not supported
-         orc_OSCNode.c_Properties.e_FlashLoader = C_OSCNodeProperties::eFL_NONE;
-      }
+         //flashloader
+         if (pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderOpenSydeCan == true)
+         {
+            //open SYDE
+            orc_OSCNode.c_Properties.e_FlashLoader = C_OSCNodeProperties::eFL_OPEN_SYDE;
+         }
+         else if (pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].q_FlashloaderStwCan == true)
+         {
+            //STW
+            orc_OSCNode.c_Properties.e_FlashLoader = C_OSCNodeProperties::eFL_STW;
+         }
+         else
+         {
+            //not supported
+            orc_OSCNode.c_Properties.e_FlashLoader = C_OSCNodeProperties::eFL_NONE;
+         }
 
-      //init interfaces
-      for (uint32 u32_Index = 0U; u32_Index < orc_OSCNode.c_Properties.c_ComInterfaces.size(); ++u32_Index)
-      {
-         C_OSCNodeComInterfaceSettings & rc_CurInterface = orc_OSCNode.c_Properties.c_ComInterfaces[u32_Index];
-         const bool q_IsUpdateAvailable    = pc_DeviceDefinition->IsUpdateAvailable(rc_CurInterface.e_InterfaceType);
-         const bool q_IsRoutingAvailable   = orc_OSCNode.IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
-         const bool q_IsDiagnosisAvailable = pc_DeviceDefinition->IsDiagnosisAvailable(rc_CurInterface.e_InterfaceType);
-         rc_CurInterface.q_IsUpdateEnabled = q_IsUpdateAvailable;
-         rc_CurInterface.q_IsRoutingEnabled = q_IsRoutingAvailable;
-         rc_CurInterface.q_IsDiagnosisEnabled = q_IsDiagnosisAvailable;
+         //init interfaces
+         for (uint32 u32_Index = 0U; u32_Index < orc_OSCNode.c_Properties.c_ComInterfaces.size(); ++u32_Index)
+         {
+            C_OSCNodeComInterfaceSettings & rc_CurInterface = orc_OSCNode.c_Properties.c_ComInterfaces[u32_Index];
+            const bool q_IsUpdateAvailable    = pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].IsUpdateAvailable(
+               rc_CurInterface.e_InterfaceType);
+            const bool q_IsRoutingAvailable   = orc_OSCNode.IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
+            const bool q_IsDiagnosisAvailable =
+               pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].IsDiagnosisAvailable(
+                  rc_CurInterface.e_InterfaceType);
+            rc_CurInterface.q_IsUpdateEnabled = q_IsUpdateAvailable;
+            rc_CurInterface.q_IsRoutingEnabled = q_IsRoutingAvailable;
+            rc_CurInterface.q_IsDiagnosisEnabled = q_IsDiagnosisAvailable;
+         }
       }
    }
 }

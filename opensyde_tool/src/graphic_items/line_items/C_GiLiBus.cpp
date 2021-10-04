@@ -42,13 +42,13 @@ using namespace stw_types;
 
    Set up GUI with all elements.
 
-   \param[in]     ors32_Index         Index of data element in system definition
-   \param[in]     oru64_ID            Unique ID
-   \param[in]     opc_TextElementName Pointer to text element for showing bus name
-   \param[in]     oq_DoErrorCheck     Optional flag to trigger error check directly in constructor
-   \param[in]     opc_Points          Points for line
-   \param[in]     orq_MiddleLine      Indicator if line(s) should have a different colored central line
-   \param[in,out] opc_Parent          Optional pointer to parent
+   \param[in]      ors32_Index            Index of data element in system definition
+   \param[in]      oru64_ID               Unique ID
+   \param[in]      opc_TextElementName    Pointer to text element for showing bus name
+   \param[in]      oq_DoErrorCheck        Optional flag to trigger error check directly in constructor
+   \param[in]      opc_Points             Points for line
+   \param[in]      orq_MiddleLine         Indicator if line(s) should have a different colored central line
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64_ID,
@@ -160,7 +160,7 @@ QString C_GiLiBus::GetName(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Returns the CAN bitrate in a prepared string
 
-   \param[in] oq_WithComma If true, a comma will be added at the beginning of the string
+   \param[in]  oq_WithComma   If true, a comma will be added at the beginning of the string
 
    \return
    Text with CAN bitrate or empty String in case of an Ethernet bus
@@ -279,7 +279,14 @@ void C_GiLiBus::GenerateHint(void)
          {
             const C_OSCNodeComInterfaceSettings & rc_ComInterface =
                pc_Node->c_Properties.c_ComInterfaces[u32_ItComInterface];
-            if (rc_ComInterface.q_IsBusConnected == true)
+
+            // in case of subnodes from multi nodes we need to know if the interface is internally connected
+            // we don't want to show dummy ids in tooltip
+            const bool q_Connected =
+               pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].IsConnected(pc_Bus->e_Type,
+                                                                                                   rc_ComInterface.u8_InterfaceNumber);
+
+            if ((rc_ComInterface.GetBusConnectedRawValue() == true) && (q_Connected == true))
             {
                if (u32_BusIndex == rc_ComInterface.u32_BusIndex)
                {
@@ -311,7 +318,7 @@ void C_GiLiBus::GenerateHint(void)
 
    Warning: Only expected to work if the provided item is of the same type as this element
 
-   \param[in] opc_GuidelineItem Detailed input parameter description
+   \param[in]  opc_GuidelineItem    Detailed input parameter description
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
@@ -327,7 +334,7 @@ void C_GiLiBus::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in]  of64_ZValue    New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::SetZValueCustom(const float64 of64_ZValue)
@@ -342,7 +349,7 @@ void C_GiLiBus::SetZValueCustom(const float64 of64_ZValue)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set item disabled look flag
 
-   \param[in] oq_Disabled Flag if item is disabled
+   \param[in]  oq_Disabled    Flag if item is disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::SetDisabledLook(const bool oq_Disabled)
@@ -358,8 +365,8 @@ void C_GiLiBus::SetDisabledLook(const bool oq_Disabled)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply style
 
-   \param[in] orc_LineColor line color
-   \param[in] osn_Width     line width
+   \param[in]  orc_LineColor  line color
+   \param[in]  osn_Width      line width
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::ApplyStyle(const QColor & orc_LineColor, const stw_types::sintn osn_Width)
@@ -392,7 +399,7 @@ void C_GiLiBus::CheckBusForChanges(void)
    Deactivate interaction points
    Move complete object
 
-   \param[in] orq_ResizeActive Flag if resize mode active
+   \param[in]  orq_ResizeActive  Flag if resize mode active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::SetResizing(const bool & orq_ResizeActive)
@@ -429,7 +436,7 @@ C_GiTextElementBus * C_GiLiBus::GetTextElementBus(void)
 
    Here: Hide tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
@@ -444,7 +451,7 @@ void C_GiLiBus::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 
    Here: Hide tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
@@ -457,8 +464,8 @@ void C_GiLiBus::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update the position of the text element
 
-   \param[in] ors32_LineIndex        Line index
-   \param[in] orc_PositionDifference Dialog with style result
+   \param[in]  ors32_LineIndex         Line index
+   \param[in]  orc_PositionDifference  Dialog with style result
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::m_BusWasMoved(const stw_types::sint32 & ors32_LineIndex, const QPointF & orc_PositionDifference)

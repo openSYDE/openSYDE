@@ -12,7 +12,7 @@
 #define C_SDMANTOPOLOGYCOPYPASTEMANAGER_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-
+#include "C_GiNode.h"
 #include "C_SebBaseCopyPasteManager.h"
 #include "C_PuiSdNodeConnectionId.h"
 #include "C_PuiBsLineBase.h"
@@ -43,6 +43,16 @@ protected:
 private:
    C_SdTopologyDataSnapshot mc_LastKnownData;
 
+   static void mh_CopyFromSceneToManagerHandleNode(const stw_opensyde_gui::C_GiNode * const opc_UiNodeItem,
+                                                   C_SdTopologyDataSnapshot & orc_Snapshot,
+                                                   const QMap<const QGraphicsItem *,
+                                                              stw_types::float64> & orc_NormalizedZValues,
+                                                   const QGraphicsItem * const opc_NodeItemOrigin);
+   static void mh_CopyFromSceneToManagerHandleMultiNode(const stw_types::uint32 ou32_NodeIndex,
+                                                        C_SdTopologyDataSnapshot & orc_Snapshot,
+                                                        const QMap<const QGraphicsItem *,
+                                                                   stw_types::float64> & orc_NormalizedZValues,
+                                                        const QGraphicsItem * const opc_NodeItemOrigin);
    static void mh_RemoveConnection(C_SdTopologyDataSnapshot & orc_Data, const stw_types::uint32 & oru32_NodeIndex,
                                    const C_PuiSdNodeConnectionId & orc_ConnectionId);
 };
