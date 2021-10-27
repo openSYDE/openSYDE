@@ -1793,7 +1793,7 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
                {
                   if (pc_Node->pc_DeviceDefinition != NULL)
                   {
-                     c_TopologyDeviceType = pc_Node->pc_DeviceDefinition->GetDisplayName().c_str();
+                     c_TopologyDeviceType = pc_Node->pc_DeviceDefinition->c_DeviceName.c_str();
                   }
                   c_TopologyNodeName = pc_Node->c_Properties.c_Name.c_str();
                }

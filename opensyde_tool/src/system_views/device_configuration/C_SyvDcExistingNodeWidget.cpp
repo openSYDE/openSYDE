@@ -473,12 +473,12 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
          this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>(C_GtGetText::h_GetText("Node-ID: <multiple>")));
       }
 
-      this->mc_DeviceName = pc_Node->pc_DeviceDefinition->GetDisplayName().c_str();
+      this->mc_DeviceName = pc_Node->pc_DeviceDefinition->c_DeviceName.c_str();
 
       //Translation: 1: Node type
       this->mpc_Ui->pc_LabelDeviceType->setText(
          static_cast<QString>(C_GtGetText::h_GetText("Type: %1")).
-         arg(pc_Node->pc_DeviceDefinition->GetDisplayName().c_str()));
+         arg(pc_Node->pc_DeviceDefinition->c_DeviceName.c_str()));
    }
    //Resize
    this->resize(this->width(), sn_Height);
