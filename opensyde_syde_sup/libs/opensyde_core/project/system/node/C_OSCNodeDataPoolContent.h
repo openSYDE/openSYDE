@@ -156,15 +156,16 @@ public:
 
    void GetValueAsScaledString(const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset,
                                std::string & orc_Output, const stw_types::uint32 ou32_Index,
-                               const bool oq_AllowRangeAdaptation = true) const;
+                               const bool oq_AllowRangeAdaptation = true,
+                               const bool oq_AllowSpecialHandling = false) const;
    void GetAnyValueAsFloat64(stw_types::float64 & orf64_Output, const stw_types::uint32 ou32_Index) const;
 
 private:
-   E_Type me_Type;                                   ///< Currently active type
-   bool mq_Array;                                    ///< Flag for array (true) or single element type (false)
-   std::vector<stw_types::uint8> mc_Data;            ///< Contained value
-   static const stw_types::sint32 mhs32_TypeError;   ///< Exception value for type mismatch
-   static const stw_types::sint32 mhs32_AccessError; ///< Exception value for out of bounds array access
+   E_Type me_Type;                                    ///< Currently active type
+   bool mq_Array;                                     ///< Flag for array (true) or single element type (false)
+   std::vector<stw_types::uint8> mc_Data;             ///< Contained value
+   static const stw_types::sint32 mhs32_TYPE_ERROR;   ///< Exception value for type mismatch
+   static const stw_types::sint32 mhs32_ACCESS_ERROR; ///< Exception value for out of bounds array access
 
    template <typename T> void m_SetValue(const T & orc_Value, const E_Type oe_Type);
    template <typename T> void m_GetValue(const E_Type oe_Type, T & orc_Value) const;

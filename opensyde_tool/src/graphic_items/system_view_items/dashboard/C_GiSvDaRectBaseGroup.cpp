@@ -1426,8 +1426,9 @@ void C_GiSvDaRectBaseGroup::m_DataPoolElementsChanged(void)
       QString c_Name;
       const bool q_ManualReadElement = m_CheckManualReadRequired();
 
-      q_InvalidElement = (m_CheckHasValidElements(c_Name) == false) || (m_CheckHasAnyRequiredNodesActive() == false) ||
-                         (m_CheckHasAnyRequiredBusesConnected() == false);
+      q_InvalidElement =
+         (m_CheckHasValidElements(c_Name) == false) || (m_CheckHasAnyRequiredNodesActive() == false) ||
+         (m_CheckHasAnyRequiredBusesConnected() == false);
 
       if (((((this->me_WriteMode == C_PuiSvDbWidgetBase::eWM_MANUAL) && (this->mq_ReadItem == false)) ||
             (q_ManualReadElement == true)) &&

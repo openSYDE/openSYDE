@@ -28,6 +28,7 @@
 #include "C_OSCProtocolDriverOsyTpCan.h"
 #include "C_OSCProtocolDriverOsyTpIp.h"
 #include "C_OSCRoutingCalculation.h"
+#include "C_OSCSecurityRsa.h"
 #include "TGLUtils.h"
 #include "TGLTime.h"
 
@@ -65,7 +66,8 @@ C_OSCComDriverProtocol::C_OSCComDriverProtocol(void) :
    mpc_SysDef(NULL),
    mu32_ActiveNodeCount(0),
    mpc_IpDispatcher(NULL),
-   mu32_ActiveBusIndex(0U)
+   mu32_ActiveBusIndex(0U),
+   mpc_SecurityPemDb(NULL)
 {
 }
 
@@ -97,8 +99,9 @@ C_OSCComDriverProtocol::~C_OSCComDriverProtocol(void)
 
    this->mpc_CanTransportProtocolBroadcast = NULL;
    this->mpc_IpTransportProtocolBroadcast = NULL;
-   this->mpc_IpDispatcher = NULL; //do not delete ! not owned by us
-   this->mpc_SysDef = NULL;       //do not delete ! not owned by us
+   this->mpc_IpDispatcher = NULL;  //do not delete ! not owned by us
+   this->mpc_SecurityPemDb = NULL; //do not delete ! not owned by us
+   this->mpc_SysDef = NULL;        //do not delete ! not owned by us
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,6 +112,8 @@ C_OSCComDriverProtocol::~C_OSCComDriverProtocol(void)
    \param[in]  orc_ActiveNodes         Flags for all available nodes in the system
    \param[in]  opc_CanDispatcher       Pointer to concrete CAN dispatcher
    \param[in]  opc_IpDispatcher        Pointer to concrete IP dispatcher
+   \param[in]  opc_SecurityPemDb       Pointer to PEM database (optional)
+                                       Needed if nodes with enabled security are used in the system
 
    \return
    C_NO_ERR      Operation success
@@ -125,7 +130,8 @@ C_OSCComDriverProtocol::~C_OSCComDriverProtocol(void)
 sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefinition,
                                     const uint32 ou32_ActiveBusIndex, const std::vector<uint8> & orc_ActiveNodes,
                                     C_CAN_Dispatcher * const opc_CanDispatcher,
-                                    C_OSCIpDispatcher * const opc_IpDispatcher)
+                                    C_OSCIpDispatcher * const opc_IpDispatcher,
+                                    C_OSCSecurityPemDatabase * const opc_SecurityPemDb)
 {
    sint32 s32_Retval = C_NOACT;
    uint32 u32_Counter;
@@ -158,6 +164,13 @@ sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefi
       this->mc_ActiveNodesSystem = orc_ActiveNodes;
       this->mpc_SysDef = &orc_SystemDefinition;
       this->mpc_IpDispatcher = opc_IpDispatcher;
+      this->mpc_SecurityPemDb = opc_SecurityPemDb;
+
+      if (this->mpc_SecurityPemDb != NULL)
+      {
+         // Initialization of RSA library
+         C_OSCSecurityRsa::h_Init();
+      }
 
       //No check for connected because error check passed
       s32_Retval = m_InitRoutesAndActiveNodes();
@@ -308,6 +321,7 @@ const
    C_RANGE    node index out of range
    C_COM      communication driver reported error
    C_NOACT    At least one node does not support Ethernet to Ethernet routing
+   C_CHECKSUM Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::StartRouting(const uint32 ou32_NodeIndex, uint32 * const opu32_ErrorNodeIndex)
@@ -994,6 +1008,18 @@ C_CAN_Dispatcher * C_OSCComDriverProtocol::m_GetCanDispatcher(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns pointer to IP dispatcher
+
+   \return
+   Pointer to IP dispatcher
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCIpDispatcher * C_OSCComDriverProtocol::m_GetIpDispatcher(void)
+{
+   return this->mpc_IpDispatcher;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the pointer to the openSYDE protocol of specific server id
 
    \param[in]     orc_ServerId             Server id for communication
@@ -1087,12 +1113,39 @@ C_SCLString C_OSCComDriverProtocol::m_GetActiveNodeName(const uint32 ou32_NodeIn
 sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(const uint32 ou32_ActiveNode, const uint8 ou8_SessionId,
                                                   const bool oq_CheckForSession, uint8 * const opu8_NrCode) const
 {
+   C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[ou32_ActiveNode];
+   const sint32 s32_Return = this->m_SetNodeSessionId(pc_ProtocolOsy, ou8_SessionId, oq_CheckForSession, opu8_NrCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a node into a session
+
+   \param[in]     opc_ExistingProtocol  Protocol to use for communication
+   \param[in]     ou8_SessionId         session ID to switch to
+   \param[in]     oq_CheckForSession    checks the current session id on the server. only if it is different, the
+                                        new session id will be set
+   \param[out]    opu8_NrCode           if != NULL: negative response code
+
+   \return
+   C_NO_ERR    All nodes set to session successfully
+   C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
+   C_NOACT     Nodes has no openSYDE protocol
+   C_COM       Communication problem
+   C_WARN      Error response received
+   C_TIMEOUT   Expected response not received within timeout
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(C_OSCProtocolDriverOsy * const opc_ExistingProtocol,
+                                                  const uint8 ou8_SessionId, const bool oq_CheckForSession,
+                                                  uint8 * const opu8_NrCode) const
+{
    sint32 s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
    {
-      C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[ou32_ActiveNode];
-      if (pc_ProtocolOsy != NULL)
+      if (opc_ExistingProtocol != NULL)
       {
          bool q_SetNewSession = true;
 
@@ -1101,7 +1154,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(const uint32 ou32_ActiveNode, 
             uint8 u8_CurrentSession;
 
             // Get the current session
-            s32_Return = pc_ProtocolOsy->OsyReadActiveDiagnosticSession(u8_CurrentSession, opu8_NrCode);
+            s32_Return = opc_ExistingProtocol->OsyReadActiveDiagnosticSession(u8_CurrentSession, opu8_NrCode);
 
             if (s32_Return == C_NO_ERR)
             {
@@ -1131,7 +1184,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(const uint32 ou32_ActiveNode, 
             if (q_SetNewSession == true)
             {
                // Set the session
-               s32_Return = pc_ProtocolOsy->OsyDiagnosticSessionControl(ou8_SessionId, opu8_NrCode);
+               s32_Return = opc_ExistingProtocol->OsyDiagnosticSessionControl(ou8_SessionId, opu8_NrCode);
 
                if ((s32_Return != C_NO_ERR) &&
                    (s32_Return != C_TIMEOUT) &&
@@ -1285,37 +1338,162 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionIdWithExpectation(const uint32 ou
 
    \return
    C_NO_ERR    All nodes set to session successfully
-   C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
+   C_CONFIG    Init function was not called or not successful or protocol was not initialized properly or
+               PEM database was needed but not set.
    C_NOACT     Nodes has no openSYDE protocol
    C_COM       Communication problem
    C_WARN      Error response
    C_TIMEOUT   Expected response not received within timeout
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+               Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(const uint32 ou32_ActiveNode, const uint8 ou8_SecurityLevel,
+                                                       stw_types::uint8 * const opu8_NrCode) const
+{
+   C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[ou32_ActiveNode];
+   const sint32 s32_Return = this->m_SetNodeSecurityAccess(pc_ProtocolOsy, ou8_SecurityLevel, opu8_NrCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a node into a security level
+
+   \param[in]     opc_ExistingProtocol  Protocol to use for communication
+   \param[in]     ou8_SecurityLevel     level of requested security
+   \param[out]    opu8_NrCode           if != NULL: negative response code
+
+   \return
+   C_NO_ERR    All nodes set to session successfully
+   C_CONFIG    Init function was not called or not successful or protocol was not initialized properly or
+               PEM database was needed but not set.
+   C_NOACT     Nodes has no openSYDE protocol
+   C_COM       Communication problem
+   C_WARN      Error response
+   C_TIMEOUT   Expected response not received within timeout
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+               Detailed error codes are logged with opu8_NrCode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(C_OSCProtocolDriverOsy * const opc_ExistingProtocol,
+                                                       const uint8 ou8_SecurityLevel,
                                                        stw_types::uint8 * const opu8_NrCode) const
 {
    sint32 s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
    {
-      C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[ou32_ActiveNode];
-      if (pc_ProtocolOsy != NULL)
+      if (opc_ExistingProtocol != NULL)
       {
          // Set the security level
+         bool q_SecureMode;
+         uint64 u64_Seed;
+         uint8 ou8_SecurityAlgorithm;
 
-         uint32 u32_Seed;
-         s32_Return = pc_ProtocolOsy->OsySecurityAccessRequestSeed(ou8_SecurityLevel, u32_Seed, opu8_NrCode);
+         s32_Return = opc_ExistingProtocol->OsySecurityAccessRequestSeed(ou8_SecurityLevel, q_SecureMode, u64_Seed,
+                                                                         ou8_SecurityAlgorithm, opu8_NrCode);
 
          if (s32_Return == C_NO_ERR)
          {
-            const uint32 u32_Key = 23U; // fixed in UDS stack until seed/key generator available
-            s32_Return = pc_ProtocolOsy->OsySecurityAccessSendKey(ou8_SecurityLevel, u32_Key, opu8_NrCode);
+            if (q_SecureMode == false)
+            {
+               const uint32 u32_KEY = 23U; // fixed in UDS stack for non secure mode
+               if (u64_Seed != 42U)
+               {
+                  C_SCLString c_Tmp;
+                  c_Tmp.PrintFormatted("Received seed in non secure mode does not match the "
+                                       "expected value, expected: 42, got %i", u64_Seed);
+                  // Should be a fixed value too
+                  osc_write_log_warning("Security Access", c_Tmp.c_str());
+               }
+
+               s32_Return = opc_ExistingProtocol->OsySecurityAccessSendKey(ou8_SecurityLevel, u32_KEY, opu8_NrCode);
+            }
+            else
+            {
+               //check pem database on NULL
+               if (mpc_SecurityPemDb != NULL)
+               {
+                  //we need the server's certificate snr to look up the correct key
+                  std::vector<uint8> c_CertSnr;
+                  s32_Return = opc_ExistingProtocol->OsyReadCertificateSerialNumber(c_CertSnr, opu8_NrCode);
+
+                  if (s32_Return == C_NO_ERR)
+                  {
+                     //get PEM file by serial number from database
+                     const C_OSCSecurityPemKeyInfo * const pc_PemKeyInfo =
+                        this->mpc_SecurityPemDb->GetPemFileBySerialNumber(c_CertSnr);
+
+                     if (pc_PemKeyInfo != NULL)
+                     {
+                        std::vector<uint8> c_Signature;
+                        std::vector<uint8> c_RandomValue;
+                        std::vector<uint8> c_PrivKey;
+                        c_Signature.resize(128, 0U);
+                        c_RandomValue.resize(8, 0U);
+
+                        c_RandomValue[0] = static_cast<uint8>(u64_Seed >> 56U);
+                        c_RandomValue[1] = static_cast<uint8>(u64_Seed >> 48U);
+                        c_RandomValue[2] = static_cast<uint8>(u64_Seed >> 40U);
+                        c_RandomValue[3] = static_cast<uint8>(u64_Seed >> 32U);
+                        c_RandomValue[4] = static_cast<uint8>(u64_Seed >> 24U);
+                        c_RandomValue[5] = static_cast<uint8>(u64_Seed >> 16U);
+                        c_RandomValue[6] = static_cast<uint8>(u64_Seed >> 8U);
+                        c_RandomValue[7] = static_cast<uint8>(u64_Seed);
+
+                        //get private key from PEM file
+                        c_PrivKey = pc_PemKeyInfo->GetPrivKeyTextDecoded();
+
+                        //calculate RSA signature with private key and random value from server (u64_Seed)
+                        s32_Return = C_OSCSecurityRsa::h_SignSignature(c_PrivKey, c_RandomValue, c_Signature);
+
+                        if (s32_Return != C_NO_ERR)
+                        {
+                           C_SCLString c_Tmp;
+                           c_Tmp.PrintFormatted("Error on calculating RSA signature: %d", s32_Return);
+                           osc_write_log_error("Security Access", c_Tmp.c_str());
+                           s32_Return = C_CHECKSUM;
+                        }
+                        else
+                        {
+                           //sanity check: calculated rsa signature 128 byte long?
+                           if (c_Signature.size() == 128U)
+                           {
+                              //send signature back to server
+                              s32_Return = opc_ExistingProtocol->OsySecurityAccessSendKey(ou8_SecurityLevel,
+                                                                                          c_Signature,
+                                                                                          opu8_NrCode);
+                              if (s32_Return != C_NO_ERR)
+                              {
+                                 C_SCLString c_Tmp;
+                                 c_Tmp.PrintFormatted("Error on calculating RSA signature: %d", s32_Return);
+                                 osc_write_log_error("Security Access", c_Tmp.c_str());
+                                 s32_Return = C_CHECKSUM;
+                              }
+                           }
+                        }
+                     }
+                     else
+                     {
+                        osc_write_log_error("Security Access", "No PEM file found for received serial number.");
+                        s32_Return = C_CHECKSUM;
+                     }
+                  }
+               }
+               else
+               {
+                  osc_write_log_error("Security Access", "PEM database not initialized.");
+                  s32_Return = C_CONFIG;
+               }
+            }
          }
 
          if ((s32_Return != C_NO_ERR) &&
              (s32_Return != C_TIMEOUT) &&
-             (s32_Return != C_WARN))
+             (s32_Return != C_WARN) &&
+             (s32_Return != C_CONFIG) &&
+             (s32_Return != C_CHECKSUM)) //security related error
          {
             s32_Return = C_COM;
          }
@@ -1340,6 +1518,8 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(const uint32 ou32_ActiveN
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
    C_COM       Error of service
    C_TIMEOUT   Expected response not received within timeout
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+               Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_SecurityLevel,
@@ -1365,8 +1545,9 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_Security
             {
                orc_ErrorActiveNodes.insert(this->mc_ActiveNodesIndexes[u32_Counter]);
             }
-            // Do not change the C_TIMEOUT error
-            if (s32_Return != C_TIMEOUT)
+            // Do not change the C_TIMEOUT and C_CHECKSUM error
+            if ((s32_Return != C_TIMEOUT) &&
+                (s32_Return != C_CHECKSUM))
             {
                s32_Return = C_COM;
             }
@@ -1708,6 +1889,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
    C_RD_WR    malformed protocol response
    C_RANGE    node index out of range
    C_COM      communication driver reported error
+   C_CHECKSUM Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint32 * const opu32_ErrorActiveNodeIndex)
@@ -2159,6 +2341,7 @@ void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
    C_NO_ERR    Routing for point deactivated
    C_NOACT     Routing for point deactivated and no further stopping necessary for this node
    C_COM       communication driver reported error
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_ActiveNode,

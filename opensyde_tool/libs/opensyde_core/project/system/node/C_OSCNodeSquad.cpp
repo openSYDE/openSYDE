@@ -20,7 +20,7 @@ using namespace stw_errors;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_scl::C_SCLString C_OSCNodeSquad::hc_Separator = "::";
+const stw_scl::C_SCLString C_OSCNodeSquad::hc_SEPARATOR = "::";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -72,7 +72,7 @@ stw_scl::C_SCLString C_OSCNodeSquad::h_CombineNames(const stw_scl::C_SCLString &
    }
    else
    {
-      c_Retval = orc_MainDeviceName + C_OSCNodeSquad::hc_Separator + orc_SubDeviceName;
+      c_Retval = orc_MainDeviceName + C_OSCNodeSquad::hc_SEPARATOR + orc_SubDeviceName;
    }
    return c_Retval;
 }

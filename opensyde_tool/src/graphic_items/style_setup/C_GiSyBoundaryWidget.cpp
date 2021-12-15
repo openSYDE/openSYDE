@@ -283,6 +283,7 @@ void C_GiSyBoundaryWidget::m_BorderColorClicked(void)
    if (c_Popup != NULL)
    {
       c_Popup->HideOverlay();
+      c_Popup->deleteLater();
    }
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
@@ -324,6 +325,7 @@ void C_GiSyBoundaryWidget::m_BackgroundColorClicked(void)
    if (c_Popup != NULL)
    {
       c_Popup->HideOverlay();
+      c_Popup->deleteLater();
    }
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 

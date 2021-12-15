@@ -653,7 +653,13 @@ INCLUDEPATH += ../src \
                ../libs/gettext \
                ../libs/dbc_driver_library/src \
                ../libs/dbc_driver_library/src/Vector \
-               ../libs/blf_driver_library
+               ../libs/blf_driver_library \
+               ../libs/openssl/include
+
+#do not issue deprecation warnings (tested code can contain deprecated functions which we do want to provide)
+win32-g++ {
+QMAKE_CXXFLAGS += -Wno-deprecated-declarations
+}
 
 LIBS += -L../libs/gettext -lintl \
         -L../libs/blf_driver_library -lvector_blf \
@@ -661,6 +667,9 @@ LIBS += -L../libs/gettext -lintl \
 
 LIBS += -lws2_32   #WinSock
 LIBS += -lIphlpapi #IP helper API
+
+#openssl
+LIBS += -L../libs/openssl -lcrypto
 
 #add windows API libraries
 LIBS += -lversion

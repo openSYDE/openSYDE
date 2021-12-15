@@ -21,15 +21,15 @@
 #include "stwtypes.h"
 #include "stwerrors.h"
 
-#include "TGLUtils.h"
 #include "CSCLString.h"
-#include "C_SyvUpSequences.h"
-#include "C_SyvComDriverUtil.h"
-#include "C_PuiSdHandler.h"
 #include "TGLUtils.h"
 #include "TGLTime.h"
+#include "C_Uti.h"
 #include "C_GtGetText.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_PuiSdHandler.h"
+#include "C_SyvUpSequences.h"
+#include "C_SyvComDriverUtil.h"
 #include "DLLocalize.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -116,14 +116,14 @@ C_SyvUpSequences::~C_SyvUpSequences(void)
 
    \return
    C_NO_ERR      Operation success
-   C_CONFIG      Invalid system definition for parameters
+   C_NOACT       Parameter ou32_ViewIndex invalid or no active nodes
+   C_CONFIG      Invalid system definition/view configuration
    C_RD_WR       Configured communication DLL does not exist
    C_OVERFLOW    Unknown transport protocol or unknown diagnostic server for at least one node
-   C_NOACT       Parameter ou32_ViewIndex invalid or no active nodes
-   C_COM         CAN initialization failed or no active node
+   C_BUSY        System view error detected
+   C_COM         CAN initialization failed or no route found for at least one node
    C_CHECKSUM    Internal buffer overflow detected
    C_RANGE       Routing configuration failed
-   C_BUSY        System view error detected
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)
@@ -142,9 +142,12 @@ sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)
 
    if (s32_Return == C_NO_ERR)
    {
+      // pem folder is optional -> no error handling
+      mc_PemDatabase.ParseFolder(C_Uti::h_GetPemDbPath().toStdString());
+
       s32_Return = C_OSCComSequencesBase::Init(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinition(),
                                                u32_ActiveBusIndex, c_ActiveNodes, this->mpc_CanDllDispatcher,
-                                               this->mpc_EthernetDispatcher);
+                                               this->mpc_EthernetDispatcher, &this->mc_PemDatabase);
    }
 
    return s32_Return;
@@ -621,9 +624,6 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
    case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
       c_Text = C_GtGetText::h_GetText("Update System: Node NVM write start");
       break;
-   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
-      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write reconnect to server error");
-      break;
    case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
       c_Text = C_GtGetText::h_GetText("Update System: Node NVM write available features error");
       break;
@@ -650,6 +650,57 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED:
       c_Text = C_GtGetText::h_GetText("Update System: Node NVM write of parameter set image files finished");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of PEM file start");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of PEM file available feature error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of PEM file session error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of PEM file open file error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of PEM file extract key error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of PEM file send error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of PEM file finished");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_START:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of security activation state start");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of security activation state available feature error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of security activation state session error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of security activation state send error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_FINISHED:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of security activation state finished");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_START:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of debugger activation state start");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of debugger activation state available feature error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of debugger activation state session error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of debugger activation state send error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_FINISHED:
+      c_Text = C_GtGetText::h_GetText("Update System: Node write of debugger activation state finished");
       break;
    case eUPDATE_SYSTEM_ABORTED:
       c_Text = C_GtGetText::h_GetText("Update System: Aborted");
@@ -1056,12 +1107,22 @@ void C_SyvUpSequences::mh_WriteLog(const C_OSCSuSequences::E_ProgressStep oe_Ste
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
    case C_OSCSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
    case C_OSCSuSequences::eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:

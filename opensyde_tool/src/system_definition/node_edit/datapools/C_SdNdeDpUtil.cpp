@@ -95,6 +95,8 @@ void C_SdNdeDpUtil::h_ConvertToElementGeneric(const stw_opensyde_core::C_OSCNode
                                               QVariant & orc_Generic, const uint32 & oru32_Index,
                                               const sint32 & ors32_DataSetIndex)
 {
+   QString c_Precison;
+
    switch (ore_Type)
    {
    case eELEMENT_NAME:
@@ -133,10 +135,16 @@ void C_SdNdeDpUtil::h_ConvertToElementGeneric(const stw_opensyde_core::C_OSCNode
       orc_Generic = C_SdNdeDpContentUtil::h_ConvertContentToGeneric(orc_OSCElement.c_MaxValue, oru32_Index);
       break;
    case eELEMENT_FACTOR:
-      orc_Generic = orc_OSCElement.f64_Factor;
+      c_Precison = QString::number(orc_OSCElement.f64_Factor, 'g', 17);
+      c_Precison.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(),
+                         Qt::CaseInsensitive);
+      orc_Generic = c_Precison;
       break;
    case eELEMENT_OFFSET:
-      orc_Generic = orc_OSCElement.f64_Offset;
+      c_Precison = QString::number(orc_OSCElement.f64_Offset, 'g', 17);
+      c_Precison.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(),
+                         Qt::CaseInsensitive);
+      orc_Generic = c_Precison;
       break;
    case eELEMENT_UNIT:
       orc_Generic = orc_OSCElement.c_Unit.c_str();

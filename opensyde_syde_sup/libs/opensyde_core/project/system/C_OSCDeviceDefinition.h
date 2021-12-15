@@ -41,7 +41,7 @@ public:
    stw_scl::C_SCLString c_DeviceDescription; ///< text describing device
    stw_scl::C_SCLString c_ImagePath;         ///< path to file with image of device (e.g. JPG)
    stw_scl::C_SCLString c_FilePath;          ///< used for service update package (#24474)
-   stw_types::uint8 u8_NumCanBusses;         ///< number of CAN busses present on device
+   stw_types::uint8 u8_NumCanBusses;         ///< number of CAN buses present on device
    stw_types::uint8 u8_NumEthernetBusses;    ///< number of ethernet interfaces present on device
 
    std::vector<stw_types::uint16> c_SupportedBitrates; ///< supported CAN bitrates in kbit/s
@@ -51,7 +51,7 @@ public:
 
    std::vector<C_OSCSubDeviceDefinition> c_SubDevices;
 
-   static const stw_scl::C_SCLString hc_DefaultCompanyName;
+   static const stw_scl::C_SCLString hc_DEFAULT_COMPANY_NAME;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

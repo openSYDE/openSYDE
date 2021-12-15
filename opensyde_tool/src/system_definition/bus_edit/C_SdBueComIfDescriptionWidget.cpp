@@ -347,10 +347,6 @@ void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeI
       {
          this->LoadUserSettings();
       }
-      else
-      {
-         // TODO BAY: Handle node without CAN
-      }
 
       //lint -e{929} Cast required to avoid ambiguous signal of qt interface
       connect(this->mpc_Ui->pc_CbInterface, static_cast<void (QComboBox::*)(

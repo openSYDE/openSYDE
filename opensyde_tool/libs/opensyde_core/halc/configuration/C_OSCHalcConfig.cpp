@@ -38,7 +38,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfig::C_OSCHalcConfig(void)
+C_OSCHalcConfig::C_OSCHalcConfig(void) :
+   C_OSCHalcDefBase()
 {
 }
 

@@ -57,8 +57,9 @@ C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvUpInformationWidget),
    mu32_ItFile(0),
-   mu32_ItParamFile(0),
-   mu32_ViewIndex(0),
+   mu32_ItParamFile(0U),
+   mu32_ItPemFile(0U),
+   mu32_ViewIndex(0U),
    mu64_NodeStartTimeMs(0ULL),
    mu64_LastKnownDataRateS(0ULL),
    mu64_CurrentFlashedBytes(0ULL),
@@ -168,12 +169,14 @@ void C_SyvUpInformationWidget::SetUpdateNodeSuccess(const uint32 ou32_NodeIndex)
 
    \param[in]  ou32_NodeIndex    Index of node
    \param[in]  oq_IsParam        Flag if "application" was a parameter set file
+   \param[in]  oq_IsPemFile      Flag if "application" was a PEM file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::SetUpdateApplicationStarted(const stw_types::uint32 ou32_NodeIndex,
-                                                           const bool oq_IsParam) const
+                                                           const bool oq_IsParam, const bool oq_IsPemFile) const
 {
    Q_UNUSED(oq_IsParam)
+   Q_UNUSED(oq_IsPemFile)
    this->mpc_Ui->pc_WidgetUpdatePackage->SetUpdateApplicationStarted(ou32_NodeIndex);
 }
 
@@ -182,17 +185,22 @@ void C_SyvUpInformationWidget::SetUpdateApplicationStarted(const stw_types::uint
 
    \param[in]  ou32_NodeIndex    Index of node
    \param[in]  oq_IsParam        Flag if "application" was a parameter set file
+   \param[in]  oq_IsPemFile      Flag if "application" was a PEM file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::SetUpdateApplicationFinished(const stw_types::uint32 ou32_NodeIndex,
-                                                            const bool oq_IsParam)
+                                                            const bool oq_IsParam, const bool oq_IsPemFile)
 {
    this->mpc_Ui->pc_WidgetUpdatePackage->SetUpdateApplicationFinished(ou32_NodeIndex);
 
    // Count file up to assign the progress data to the correct file
-   if (oq_IsParam)
+   if (oq_IsParam == true)
    {
       ++this->mu32_ItParamFile;
+   }
+   else if (oq_IsPemFile == true)
+   {
+      ++this->mu32_ItPemFile;
    }
    else
    {
@@ -346,6 +354,7 @@ void C_SyvUpInformationWidget::InitUpdatePackage(
 {
    this->mu32_ItFile = 0UL;
    this->mu32_ItParamFile = 0UL;
+   this->mu32_ItPemFile = 0UL;
    this->mc_FileSizeInformation.Reset();
    this->mc_FileSizeInformation.ReserveSpace(orc_Order.size());
    //Search for matching value in order
@@ -450,6 +459,7 @@ void C_SyvUpInformationWidget::InitUpdatePackage(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::UpdateProgress(const stw_types::uint16 ou16_Progress100, const bool oq_Finished)
 {
+   // TODO BAY: Handle PEM files
    if (oq_Finished == false)
    {
       uint16 u16_ActualProgress = 0;

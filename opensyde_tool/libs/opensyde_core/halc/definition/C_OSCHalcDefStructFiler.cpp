@@ -31,8 +31,8 @@ using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::uint32 C_OSCHalcDefStructFiler::hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH = 31UL;
-const C_SCLString C_OSCHalcDefStructFiler::mhc_False = "FALSE";
-const C_SCLString C_OSCHalcDefStructFiler::mhc_True = "TRUE";
+const C_SCLString C_OSCHalcDefStructFiler::mhc_FALSE = "FALSE";
+const C_SCLString C_OSCHalcDefStructFiler::mhc_TRUE = "TRUE";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -198,11 +198,11 @@ sint32 C_OSCHalcDefStructFiler::h_ParseSimplestTypeValue(const C_SCLString & orc
          case C_OSCNodeDataPoolContent::eUINT8:
             if (orc_TypeStr == "bool")
             {
-               if (c_ItemStr.LowerCase() == mhc_False.LowerCase())
+               if (c_ItemStr.LowerCase() == mhc_FALSE.LowerCase())
                {
                   orc_Content.SetValueU8(static_cast<uint8>(false));
                }
-               else if (c_ItemStr.LowerCase() == mhc_True.LowerCase())
+               else if (c_ItemStr.LowerCase() == mhc_TRUE.LowerCase())
                {
                   orc_Content.SetValueU8(static_cast<uint8>(true));
                }
@@ -737,11 +737,11 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
                      "initial-apply-value-setting", c_Content);
                   if (s32_Retval == C_NO_ERR)
                   {
-                     if (c_Content.LowerCase() == mhc_False.LowerCase())
+                     if (c_Content.LowerCase() == mhc_FALSE.LowerCase())
                      {
                         c_BitmaskItem.q_ApplyValueSetting = false;
                      }
-                     else if (c_Content.LowerCase() == mhc_True.LowerCase())
+                     else if (c_Content.LowerCase() == mhc_TRUE.LowerCase())
                      {
                         c_BitmaskItem.q_ApplyValueSetting = true;
                      }
@@ -866,11 +866,11 @@ sint32 C_OSCHalcDefStructFiler::h_ParseAttributeIntoContent(C_OSCHalcDefContent 
       else if (orc_Type == "bool")
       {
          const C_SCLString c_ItemStr = orc_XMLParser.GetAttributeString(orc_AttributeName);
-         if (c_ItemStr.LowerCase() == mhc_False.LowerCase())
+         if (c_ItemStr.LowerCase() == mhc_FALSE.LowerCase())
          {
             orc_Content.SetValueU8(static_cast<uint8>(false));
          }
-         else if (c_ItemStr.LowerCase() == mhc_True.LowerCase())
+         else if (c_ItemStr.LowerCase() == mhc_TRUE.LowerCase())
          {
             orc_Content.SetValueU8(static_cast<uint8>(true));
          }

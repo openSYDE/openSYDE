@@ -55,8 +55,6 @@ public:
                                     std::vector<stw_types::uint32> * const opc_InvalidDataPoolIndices,
                                     std::vector<stw_types::uint32> * const opc_InvalidApplicationIndices,
                                     std::vector<stw_types::uint32> * const opc_InvalidDomainIndices) const;
-   bool IsInterfaceConnectedInDevice(const stw_types::uint32 ou32_NodeIndex, const C_OSCSystemBus::E_Type oe_Type,
-                                     const stw_types::uint8 ou8_InterfaceNumber) const;
    stw_types::sint32 CheckErrorBus(const stw_types::uint32 ou32_BusIndex, bool * const opq_NameConflict,
                                    bool * const opq_NameInvalid, bool * const opq_IdInvalid,
                                    bool * const opq_DataPoolsInvalid) const;

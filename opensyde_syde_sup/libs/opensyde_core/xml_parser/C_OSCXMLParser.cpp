@@ -176,6 +176,31 @@ C_SCLString C_OSCXMLParserBase::SelectRoot(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Select root node as active element
+
+   Set the document's root node as active element.
+
+   \param[in,out]  orc_Name   Root node name
+
+   \return
+   Result of root element selection
+
+   \retval   C_NO_ERR   Root found
+   \retval   C_CONFIG   Root not found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCXMLParserBase::SelectRootError(const C_SCLString & orc_Name)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (this->SelectRoot() != orc_Name)
+   {
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Select next node as active element
 
    Select the next node on the same level as the current node as active element.
@@ -365,6 +390,30 @@ bool C_OSCXMLParserBase::AttributeExists(const C_SCLString & orc_Name) const
       }
    }
    return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get current node name
+
+   \return
+   Current node name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCXMLParserBase::GetCurrentNodeName(void) const
+{
+   return (mpc_CurrentNode == NULL) ? "" : mpc_CurrentNode->Name();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get file line for current node
+
+   \return
+   File line for current node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sintn C_OSCXMLParserBase::GetFileLineForCurrentNode(void) const
+{
+   return (mpc_CurrentNode == NULL) ? 0 : mpc_CurrentNode->GetLineNum();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -864,6 +913,86 @@ sint32 C_OSCXMLParserBase::GetAttributeFloat64Error(const C_SCLString & orc_Name
       s32_Retval = C_CONFIG;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Report error for node content, starting with error message
+
+   \param[in]  orc_ErrorMessage  Error message
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in default implementation
+void C_OSCXMLParserBase::ReportErrorForNodeContentAppendXMLContext(const C_SCLString & orc_ErrorMessage)
+const
+{
+   //Does not report in the base implementation as base class does not handle error reporting
+   //Also e.g in ParseFromString case errors in log file might be misleading
+   (void)orc_ErrorMessage;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Report error for attribute content, starting with error message
+
+   \param[in]  orc_Attribute     Attribute
+   \param[in]  orc_ErrorMessage  Error message
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in default implementation
+void C_OSCXMLParserBase::ReportErrorForAttributeContentAppendXMLContext(const C_SCLString & orc_Attribute,
+                                                                        const C_SCLString & orc_ErrorMessage)
+const
+{
+   //Does not report in the base implementation as base class does not handle error reporting
+   //Also e.g in ParseFromString case errors in log file might be misleading
+   (void)orc_Attribute;
+   (void)orc_ErrorMessage;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Report error for node content, finish with error message
+
+   \param[in]  orc_ErrorMessage  Error message
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in default implementation
+void C_OSCXMLParserBase::ReportErrorForNodeContentStartingWithXMLContext(const C_SCLString & orc_ErrorMessage)
+const
+{
+   //Does not report in the base implementation as base class does not handle error reporting
+   //Also e.g in ParseFromString case errors in log file might be misleading
+   (void)orc_ErrorMessage;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Report error for attribute content, finish with error message
+
+   \param[in]  orc_Attribute     Attribute
+   \param[in]  orc_ErrorMessage  Error message
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in default implementation
+void C_OSCXMLParserBase::ReportErrorForAttributeContentStartingWithXMLContext(const C_SCLString & orc_Attribute,
+                                                                              const C_SCLString & orc_ErrorMessage)
+const
+{
+   //Does not report in the base implementation as base class does not handle error reporting
+   //Also e.g in ParseFromString case errors in log file might be misleading
+   (void)orc_Attribute;
+   (void)orc_ErrorMessage;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Report error for node missing
+
+   \param[in]  orc_MissingNodeName  Missing node name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175} intentionally no functionality in default implementation
+void C_OSCXMLParserBase::ReportErrorForNodeMissing(const C_SCLString & orc_MissingNodeName) const
+{
+   //Does not report in the base implementation as base class does not handle error reporting
+   //Also e.g in ParseFromString case errors in log file might be misleading
+   (void)orc_MissingNodeName;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

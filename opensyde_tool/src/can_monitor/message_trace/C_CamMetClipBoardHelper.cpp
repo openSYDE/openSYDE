@@ -335,7 +335,13 @@ void C_CamMetClipBoardHelper::mh_AddCanSignals(const sintn osn_LineWidthInitial,
          if (rc_Signal.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
          {
             //Get value
-            const sintn sn_MultiplexerValue = rc_Signal.c_RawValueDec.ToInt();
+            sintn sn_MultiplexerValue = -1;
+
+            if (rc_Signal.q_DlcError == false)
+            {
+               sn_MultiplexerValue = rc_Signal.c_RawValueDec.ToInt();
+            }
+
             if (c_MultiplexerOrder[u32_Order] == sn_MultiplexerValue)
             {
                bool q_Skip = true;

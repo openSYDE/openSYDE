@@ -329,7 +329,7 @@ std::vector<sint32> C_CamMetTreeDelegate::mh_GetChildColWidths(const bool oq_IsT
    //Signal unit
    c_Retval.push_back(50);
    //Signal value (raw)
-   c_Retval.push_back(50);
+   c_Retval.push_back(110);
    //Special value for last column
    c_Retval.push_back(-1);
    return c_Retval;

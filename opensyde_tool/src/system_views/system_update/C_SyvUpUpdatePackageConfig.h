@@ -15,6 +15,7 @@
 #include <QString>
 #include <vector>
 
+#include "C_PuiSvNodeUpdate.h"
 #include "C_OSCNodeApplication.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -45,6 +46,11 @@ public:
    std::vector<C_SyvUpUpdatePackageConfigNodeApp> c_AppConfigs;
    std::vector<QString> c_ParamSetConfigs;
    std::vector<QString> c_FileConfigs;
+
+   QString c_PemFilePath;
+
+   C_PuiSvNodeUpdate::E_StateSecurity e_StateSecurity;
+   C_PuiSvNodeUpdate::E_StateDebugger e_StateDebugger;
 };
 
 class C_SyvUpUpdatePackageConfig

@@ -488,6 +488,7 @@ void C_SdNdeHalcChannelWidget::m_OnViewDatapoolDetailsClicked(void)
    if (c_New != NULL)
    {
       c_New->HideOverlay();
+      c_New->deleteLater();
    }
 } //lint !e429  //no memory leak because of the Qt memory management
 

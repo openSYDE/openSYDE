@@ -56,10 +56,11 @@ private:
    static const QString mhc_MimeDataManufacturerFormat;
    static const QString mhc_MimeDataDevice;
    static const QString mhc_MimeDataDeviceValid;
+   static const QString mhc_MimeDataSubNodeIdsToOldNodeIds;
 
    void m_Init(void);
-   void m_AppendNode(const stw_opensyde_gui_logic::C_SyvDcDeviceInformation & orc_Info,
-                     const std::set<stw_types::uint8> & orc_SubNodeIds);
+   void m_AppendNode(const stw_opensyde_gui_logic::C_SyvDcDeviceInformation & orc_Info, const std::map<stw_types::uint8,
+                                                                                                       stw_opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds);
 
    void m_ScrollBarRangeChangedVer(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
 };

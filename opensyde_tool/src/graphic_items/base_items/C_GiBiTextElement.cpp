@@ -183,6 +183,7 @@ bool C_GiBiTextElement::OpenStyleDialog(const bool oq_DarkMode)
    if (c_New != NULL)
    {
       c_New->HideOverlay();
+      c_New->deleteLater();
    }
 
    this->mpc_TextItem->AutoAdaptSize();

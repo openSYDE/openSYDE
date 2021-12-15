@@ -530,23 +530,20 @@ const
                }
                if (q_Found == true)
                {
-                  if (this->mc_ECUValuesReadStatus[u32_ItConfig] == true)
+                  const C_OSCNodeDataPoolListElement * const pc_OSCElement =
+                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                        rc_Config.c_ElementId.u32_NodeIndex,
+                        rc_Config.c_ElementId.u32_DataPoolIndex,
+                        rc_Config.c_ElementId.u32_ListIndex,
+                        rc_Config.c_ElementId.u32_ElementIndex);
+                  if (pc_OSCElement != NULL)
                   {
-                     const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
-                           rc_Config.c_ElementId.u32_NodeIndex,
-                           rc_Config.c_ElementId.u32_DataPoolIndex,
-                           rc_Config.c_ElementId.u32_ListIndex,
-                           rc_Config.c_ElementId.u32_ElementIndex);
-                     if (pc_OSCElement != NULL)
-                     {
-                        tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListElementNVMValueChanged(
-                                      rc_Config.c_ElementId.u32_NodeIndex,
-                                      rc_Config.c_ElementId.u32_DataPoolIndex,
-                                      rc_Config.c_ElementId.u32_ListIndex,
-                                      rc_Config.c_ElementId.u32_ElementIndex,
-                                      false) == C_NO_ERR);
-                     }
+                     tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListElementNVMValueChanged(
+                                   rc_Config.c_ElementId.u32_NodeIndex,
+                                   rc_Config.c_ElementId.u32_DataPoolIndex,
+                                   rc_Config.c_ElementId.u32_ListIndex,
+                                   rc_Config.c_ElementId.u32_ElementIndex,
+                                   false) == C_NO_ERR);
                   }
                }
             }

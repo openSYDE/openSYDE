@@ -41,23 +41,24 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out]    opc_Item        Optional pointer to widget item
-   \param[in]        orc_Info        Device information
-   \param[in]        orc_SubNodeIds  Detected sub node ids with same serial number
-                                     - In case of a normal node, exact one sub node id which should be 0
-                                     - In case of a multiple CPU, at least two sub node ids
-   \param[in,out]    opc_Parent      Optional pointer to parent
+   \param[in,out]    opc_Item                    Optional pointer to widget item
+   \param[in]        orc_Info                    Device information
+   \param[in]        orc_SubNodeIdsToOldNodeIds  Detected sub node ids and the associated used node ids
+                                                 with same serial number
+                                                 - In case of a normal node, exact one sub node id which should be 0
+                                                 - In case of a multiple CPU, at least two sub node ids
+   \param[in,out]    opc_Parent                  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcConnectedNodeWidget::C_SyvDcConnectedNodeWidget(QListWidgetItem * const opc_Item,
-                                                       const C_SyvDcDeviceInformation & orc_Info,
-                                                       const std::set<uint8> & orc_SubNodeIds,
+                                                       const C_SyvDcDeviceInformation & orc_Info, const std::map<uint8,
+                                                                                                                 C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
                                                        QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDcConnectedNodeWidget),
    mpc_ListWidgetItem(opc_Item),
    mc_Info(orc_Info),
-   mc_SubNodeIds(orc_SubNodeIds)
+   mc_SubNodeIdsToOldNodeIds(orc_SubNodeIdsToOldNodeIds)
 {
    const QPixmap c_Device =
       static_cast<QPixmap>("://images/system_views/DeviceSmall.svg").scaled(QSize(16, 16), Qt::KeepAspectRatio,
@@ -154,6 +155,17 @@ bool C_SyvDcConnectedNodeWidget::GetDeviceNameValid(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get sub node ids to node ids mapping of node
+
+   \return
+   Sub node ids mapping to node ids
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::map<stw_types::uint8, C_SyvDcDeviceOldComConfig> C_SyvDcConnectedNodeWidget::GetSubNodeIdsToOldNodeIds(void) const
+{
+   return this->mc_SubNodeIdsToOldNodeIds;
+}
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Compare if widget matches to serial number
 
    \param[in] orc_SerialNumber       Serial number
@@ -217,7 +229,7 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
 
    if (this->mc_Info.q_NodeIdValid == true)
    {
-      if (this->mc_SubNodeIds.size() > 1)
+      if (this->mc_SubNodeIdsToOldNodeIds.size() > 1)
       {
          c_Id = C_GtGetText::h_GetText("<multiple>");
       }
@@ -231,7 +243,7 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
       c_Id = C_GtGetText::h_GetText("Unknown");
    }
 
-   if ((this->mc_Info.q_IpAddressValid == true) && (this->mc_SubNodeIds.size() == 1))
+   if ((this->mc_Info.q_IpAddressValid == true) && (this->mc_SubNodeIdsToOldNodeIds.size() == 1))
    {
       // Show IP address if valid. If the IP address is valid, a Ethernet bus is used
       c_Id += " / IP: " + C_Uti::h_IpAddressToString(this->mc_Info.au8_IpAddress);

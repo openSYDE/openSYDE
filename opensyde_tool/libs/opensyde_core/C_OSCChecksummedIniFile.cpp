@@ -111,6 +111,7 @@ bool C_OSCChecksummedIniFile::CheckCheckSum(void)
    uint16 u16_CheckSumINI1;
    uint16 u16_CheckSumINI2;
    uint16 u16_Version;
+   bool q_Match = false;
 
    u16_Version      = this->ReadUint16("INISAFE", "VERSION",     1U);
    u16_CheckSumINI1 = this->ReadUint16("INISAFE", "CHECKSUM",    0U);
@@ -120,7 +121,7 @@ bool C_OSCChecksummedIniFile::CheckCheckSum(void)
       u16_CheckSumCalc = this->m_CalcCheckSum(false);
       if (u16_CheckSumINI1 == u16_CheckSumCalc)
       {
-         return true;
+         q_Match = true;
       }
    }
    else
@@ -128,22 +129,25 @@ bool C_OSCChecksummedIniFile::CheckCheckSum(void)
       u16_CheckSumCalc = this->m_CalcCheckSum(true);
       if (u16_CheckSumINI2 == u16_CheckSumCalc)
       {
-         return true;
+         q_Match = true;
       }
-      //check V1 checksum (maybe file was created by an old version of this class)
-      u16_CheckSumCalc = this->m_CalcCheckSum(false);
-      if (u16_CheckSumINI1 == u16_CheckSumCalc)
+      else
       {
-         return true;
+         //check V1 checksum (maybe file was created by an old version of this class)
+         u16_CheckSumCalc = this->m_CalcCheckSum(false);
+         if (u16_CheckSumINI1 == u16_CheckSumCalc)
+         {
+            q_Match = true;
+         }
       }
    }
-   return false;
+   return q_Match;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Recalculate checksum
 
-   Calculated checksum over INI file constets and stores it within the contents.
+   Calculated checksum over INI file contents and stores it within the contents.
    Note: Does not write to the file immediately; this is only done in the destructor of the base class
 */
 //----------------------------------------------------------------------------------------------------------------------

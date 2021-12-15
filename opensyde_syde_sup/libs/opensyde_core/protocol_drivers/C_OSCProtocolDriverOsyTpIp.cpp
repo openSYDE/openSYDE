@@ -276,9 +276,9 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastGetDeviceInfo(
    std::vector<C_BroadcastGetDeviceInfoExtendedResults> & orc_DeviceExtendedInfos)
 const
 {
-   const uint32 u32_PayloadSizeStd = 37U;
-   const uint32 u32_PayloadSizeExtMin = 36U;
-   const uint32 u32_PayloadSizeExtMax = 64U;
+   const uint32 u32_PAYLOAD_SIZE_STD = 37U;
+   const uint32 u32_PAYLOAD_SIZE_EXT_MIN = 36U;
+   const uint32 u32_PAYLOAD_SIZE_EXT_MAX = 64U;
    sint32 s32_Return;
    C_DoIpHeader c_Header(C_DoIpHeader::hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_REQ, 0U);
 
@@ -313,8 +313,8 @@ const
             sint32 s32_ReturnLocal = mpc_Dispatcher->ReadUdp(c_Response, au8_Ip);
             if (s32_ReturnLocal == C_NO_ERR)
             {
-               if (((c_Response.size() >= (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PayloadSizeExtMin)) &&
-                    (c_Response.size() <= (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PayloadSizeExtMax))))
+               if (((c_Response.size() >= (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PAYLOAD_SIZE_EXT_MIN)) &&
+                    (c_Response.size() <= (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PAYLOAD_SIZE_EXT_MAX))))
                {
                   //header OK ?
                   s32_ReturnLocal = c_Header.DecodeHeader(c_Response);
@@ -326,7 +326,7 @@ const
                          static_cast<uint32>((c_Response.size() - C_DoIpHeader::hu8_DOIP_HEADER_SIZE)))
                      {
                         if ((c_Header.u16_PayloadType == C_DoIpHeader::hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_RES) &&
-                            (c_Response.size() == (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PayloadSizeStd)))
+                            (c_Response.size() == (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PAYLOAD_SIZE_STD)))
                         {
                            //looks legit for the standard response; extract payload ...
                            C_BroadcastGetDeviceInfoResults c_Info;
@@ -336,8 +336,10 @@ const
                         }
                         else if ((c_Header.u16_PayloadType ==
                                   C_DoIpHeader::hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_EXT_RES) &&
-                                 ((c_Response.size() >= (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PayloadSizeExtMin)) &&
-                                  (c_Response.size() <= (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PayloadSizeExtMax))))
+                                 ((c_Response.size() >=
+                                   (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PAYLOAD_SIZE_EXT_MIN)) &&
+                                  (c_Response.size() <=
+                                   (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PAYLOAD_SIZE_EXT_MAX))))
                         {
                            //looks legit for the extended response; extract payload ...
                            C_BroadcastGetDeviceInfoExtendedResults c_Info;
@@ -506,6 +508,16 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const C_OSCProtocolSeri
                            if (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 8U] == 0U)
                            {
                               s32_Return = C_NO_ERR;
+                           }
+                           else if (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 8U] == 3U)
+                           {
+                              m_LogWarningWithHeaderAndIp(
+                                 "SetIpAddress: could not perform action. Node has security activated.",
+                                 TGL_UTIL_FUNC_ID, orau8_ResponseIp);
+                              if (opu8_ErrorResult != NULL)
+                              {
+                                 (*opu8_ErrorResult) = c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 8U];
+                              }
                            }
                            else
                            {
@@ -689,6 +701,16 @@ stw_types::sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddressExtended(
                            if (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2U] == 0U)
                            {
                               s32_Return = C_NO_ERR;
+                           }
+                           else if (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2U] == 3U)
+                           {
+                              m_LogWarningWithHeaderAndIp(
+                                 "SetIpAddress: could not perform action. Node has security activated.",
+                                 TGL_UTIL_FUNC_ID, orau8_ResponseIp);
+                              if (opu8_ErrorResult != NULL)
+                              {
+                                 (*opu8_ErrorResult) = c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2U];
+                              }
                            }
                            else
                            {
@@ -1438,6 +1460,9 @@ void C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults::ParseF
    this->c_NodeId.u8_NodeIdentifier = static_cast<uint8>(u16_SourceAddress & 0x7FU);
    this->c_NodeId.u8_BusIdentifier = static_cast<uint8>((u16_SourceAddress >> 7U) & 0x0FU);
 
+   // Security activated flag (Bit 0 security fla♣g, all other bits are reserved)
+   this->q_SecurityActivated = ((orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 2U] & 0x01U) == 0x01U);
+
    //defensive approach: spec says it's always zero terminated: make sure
    au8_DeviceName[28] = 0U;
    (void)std::memcpy(&au8_DeviceName[0], &orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 3U], 28U);
@@ -1457,9 +1482,5 @@ void C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults::ParseF
                         u8_SerialNumberLength);
 
       this->c_SerialNumber.SetExtSerialNumber(c_SerialNumber, orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 33]);
-   }
-   else
-   {
-      // TODO BAY: Error handling necessary?
    }
 }

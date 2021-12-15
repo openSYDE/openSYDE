@@ -108,6 +108,7 @@ private:
    void m_HideShowOptionalSections(void);
    void m_SkipUpdateOfFile(void);
    void m_ShowInExplorer(void) const;
+   void m_OpenPemFileSettings(void);
 
    void m_AdaptFile(const QString & orc_Path);
    QString m_GetDialogPath(void);
@@ -127,6 +128,7 @@ private:
    QAction * mpc_HideShowOptionalSectionsAction;
    QAction * mpc_SkipUpdateOfFile;
    QAction * mpc_ShowInExplorerAction;
+   QAction * mpc_PemFileSettings;
 
    QString mc_LastPath;
 

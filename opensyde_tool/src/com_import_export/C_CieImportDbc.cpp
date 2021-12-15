@@ -224,7 +224,25 @@ sint32 C_CieImportDbc::mh_ReadFile(const C_SCLString & orc_File, Vector::DBC::Ne
    {
       // load database file
       Vector::DBC::File c_File;
-      if (c_File.load(orc_Network, orc_File.c_str()) != Vector::DBC::Status::Ok)
+      bool q_ReadError = false;
+
+      //try/catch the load function due to the dbc library may throw exceptions when reading files with not supported
+      // content
+      try
+      {
+         if (c_File.load(orc_Network, orc_File.c_str()) != Vector::DBC::Status::Ok)
+         {
+            q_ReadError = true;
+         }
+      }
+      catch (...)
+      {
+         osc_write_log_info("DBC file import", "Reading DBC file \"" + orc_File + "\" failed (mh_ReadFile try/catch).");
+         q_ReadError = true;
+      }
+
+      //read error?
+      if (q_ReadError == true)
       {
          mhc_ErrorMessage = "Can't read DBC file \"" + orc_File + "\".";
          osc_write_log_error("DBC file import", mhc_ErrorMessage);

@@ -69,6 +69,8 @@ public:
    stw_types::sint32 SetNodeUpdateInformationParamInfo(const stw_types::uint32 ou32_NodeIndex,
                                                        const stw_types::uint32 ou32_Index,
                                                        const C_PuiSvNodeUpdateParamInfo & orc_Value);
+   stw_types::sint32 SetNodeUpdateInformationPemFilePath(const stw_types::uint32 ou32_NodeIndex,
+                                                         const QString & orc_Value);
    stw_types::sint32 SetNodeUpdateInformationSkipUpdateOfPath(const stw_types::uint32 ou32_NodeIndex,
                                                               const stw_types::uint32 ou32_Index,
                                                               const bool oq_SkipFile,
@@ -76,6 +78,11 @@ public:
    stw_types::sint32 SetNodeUpdateInformationSkipUpdateOfParamInfo(const stw_types::uint32 ou32_NodeIndex,
                                                                    const stw_types::uint32 ou32_Index,
                                                                    const bool oq_SkipFile);
+   stw_types::sint32 SetNodeUpdateInformationSkipUpdateOfPemFile(const stw_types::uint32 ou32_NodeIndex,
+                                                                 const bool oq_SkipFile);
+   stw_types::sint32 SetNodeUpdateInformationStates(const stw_types::uint32 ou32_NodeIndex,
+                                                    const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                                    const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger);
    stw_types::sint32 SetNodeUpdateInformationParamInfoContent(const stw_types::uint32 ou32_NodeIndex,
                                                               const stw_types::uint32 ou32_Index,
                                                               const QString & orc_FilePath,
@@ -263,6 +270,7 @@ public:
                                                      const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
    stw_types::sint32 RemoveNodeUpdateInformationParamInfo(const stw_types::uint32 ou32_NodeIndex,
                                                           const stw_types::uint32 ou32_Index);
+   stw_types::sint32 RemoveNodeUpdateInformationPemFilePath(const stw_types::uint32 ou32_NodeIndex);
    stw_types::sint32 ClearNodeUpdateInformationAsAppropriate(const stw_types::uint32 ou32_NodeIndex,
                                                              const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
    stw_types::sint32 ClearNodeUpdateInformationParamPaths(const stw_types::uint32 ou32_NodeIndex);

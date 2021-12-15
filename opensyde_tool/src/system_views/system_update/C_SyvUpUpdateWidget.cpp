@@ -759,14 +759,15 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
    if (s32_Result == C_NO_ERR)
    {
       bool q_IsParam;
+      bool q_IsPemFile;
       if (C_SyvUpUpdateWidget::mh_IsConnectionStart(e_Step) == true)
       {
          //Signal progress log
          m_AddProgressLogConnectEntry(u32_NodeIndex);
       }
-      else if (C_SyvUpUpdateWidget::mh_IsUpdateAppStart(e_Step, q_IsParam) == true)
+      else if (C_SyvUpUpdateWidget::mh_IsUpdateAppStart(e_Step, q_IsParam, q_IsPemFile) == true)
       {
-         this->mpc_Ui->pc_WiUpdateInformation->SetUpdateApplicationStarted(u32_NodeIndex, q_IsParam);
+         this->mpc_Ui->pc_WiUpdateInformation->SetUpdateApplicationStarted(u32_NodeIndex, q_IsParam, q_IsPemFile);
       }
       else if (C_SyvUpUpdateWidget::mh_IsUpdateNodeStart(e_Step) == true)
       {
@@ -853,10 +854,10 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
                                                           C_GtGetText::h_GetText("System Update failed!"), true, false);
          this->mpc_Ui->pc_WiUpdateInformation->StopElapsedTimer();
       }
-      else if (C_SyvUpUpdateWidget::mh_IsUpdateAppSuccess(e_Step, q_IsParam) == true)
+      else if (C_SyvUpUpdateWidget::mh_IsUpdateAppSuccess(e_Step, q_IsParam, q_IsPemFile) == true)
       {
          ++this->mu32_ApplicationIndex;
-         this->mpc_Ui->pc_WiUpdateInformation->SetUpdateApplicationFinished(u32_NodeIndex, q_IsParam);
+         this->mpc_Ui->pc_WiUpdateInformation->SetUpdateApplicationFinished(u32_NodeIndex, q_IsParam, q_IsPemFile);
       }
       else if (C_SyvUpUpdateWidget::mh_IsUpdateNodeSuccess(e_Step) == true)
       {
@@ -1033,6 +1034,18 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
             static_cast<QString>(C_GtGetText::h_GetText(" NVM writing available: %1")).arg(
                QString::number(static_cast<uint8>(rc_Info.c_MoreInformation.c_AvailableFeatures.
                                                   q_FlashloaderCanWriteToNvm))));
+         this->m_UpdateReportText(
+            static_cast<QString>(C_GtGetText::h_GetText(" Security supported: %1")).arg(
+               QString::number(static_cast<uint8>(rc_Info.c_MoreInformation.c_AvailableFeatures.
+                                                  q_SupportsSecurity))));
+         this->m_UpdateReportText(
+            static_cast<QString>(C_GtGetText::h_GetText(" Disabling debugger supported: %1")).arg(
+               QString::number(static_cast<uint8>(rc_Info.c_MoreInformation.c_AvailableFeatures.
+                                                  q_SupportsDebuggerOff))));
+         this->m_UpdateReportText(
+            static_cast<QString>(C_GtGetText::h_GetText(" Enabling debugger supported: %1")).arg(
+               QString::number(static_cast<uint8>(rc_Info.c_MoreInformation.c_AvailableFeatures.
+                                                  q_SupportsDebuggerOn))));
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText(
                                     " Ethernet2Ethernet routing supported: %1")).arg(
@@ -1258,6 +1271,37 @@ void C_SyvUpUpdateWidget::m_Connect(void)
       s32_Return = this->mpc_Ui->pc_WiUpdateInformation->GetUpdatePackage(this->mc_NodesToFlash,
                                                                           this->mc_NodesOrder,
                                                                           &this->mc_NodesWithAllApplications);
+
+      if (s32_Return == C_NO_ERR)
+      {
+         if (C_SyvUpUpdateWidget::mh_IsSecurityWarningNecessary(this->mc_NodesToFlash))
+         {
+            C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
+            C_OgeWiCustomMessage::E_Outputs e_Output;
+            c_MessageBox.SetHeading(C_GtGetText::h_GetText("Transferring PEM file"));
+            c_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                           "The Update Package includes PEM file(s). After transferring the public certificate and activating the security flag on the target,\n"
+                                           "access is only possible with a valid private key.\n"
+                                           "\n"
+                                           "Are you sure you want to continue?\n"));
+            c_MessageBox.SetCustomMinHeight(240, 240);
+            c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+            c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+            e_Output = c_MessageBox.Execute();
+            switch (e_Output)
+            {
+            case C_OgeWiCustomMessage::eYES:
+               //Continue
+               break;
+            case C_OgeWiCustomMessage::eCANCEL:
+            case C_OgeWiCustomMessage::eNO:
+            default:
+               //Do not continue
+               s32_Return = C_RANGE;
+               break;
+            }
+         }
+      }
 
       if (s32_Return == C_NO_ERR)
       {
@@ -1896,9 +1940,19 @@ void C_SyvUpUpdateWidget::m_Timer(void)
          case C_BUSY:
             c_Message = C_GtGetText::h_GetText("User aborted the update.");
             break;
+         case C_WARN:
+            c_Message = C_GtGetText::h_GetText("A PEM file could be extracted.");
+            break;
+         case C_DEFAULT:
+            c_Message = C_GtGetText::h_GetText("At least one of the *.syde_psi file has an invalid checksum.");
+            break;
          case C_RANGE:
             c_Message = C_GtGetText::h_GetText(
                "At least one necessary feature of the openSYDE Flashloader is not available for NVM writing.");
+            break;
+         case C_CHECKSUM:
+            c_Message = C_GtGetText::h_GetText(
+               "Authentication between openSYDE Tool and device(s) has failed. Access denied.");
             break;
          default:
             c_Message = C_GtGetText::h_GetText("Unknown error occurred.");
@@ -2001,6 +2055,25 @@ void C_SyvUpUpdateWidget::m_Timer(void)
       case C_SyvUpSequences::eNOT_ACTIVE:
       default:
          break;
+      }
+      // A common handling for all cases could be useful
+      if (s32_SequenceResult == C_CHECKSUM)
+      {
+         C_OgeWiCustomMessage c_MessageAuth(this, C_OgeWiCustomMessage::E_Type::eERROR);
+
+         C_OSCLoggingHandler::h_Flush();
+         c_MessageAuth.SetHeading(C_GtGetText::h_GetText("System Update"));
+         c_MessageAuth.SetDescription(C_GtGetText::h_GetText(
+                                         "Authentication between openSYDE Tool and device(s) has failed. Access denied."));
+         c_MessageAuth.SetDetails(C_GtGetText::h_GetText("Possible reasons:<br/>"
+                                                         "- Associated private key (*.pem) not found in /certificates folder (most common)<br/>"
+                                                         "- Failure during authenfication process<br/>"
+                                                         "For more information see ") +
+                                  C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLESHEET_GUIDE_COLOR_LINK,
+                                                   C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
+                                  C_GtGetText::h_GetText("."));
+         c_MessageAuth.SetCustomMinHeight(200, 300);
+         c_MessageAuth.Execute();
       }
    }
 }
@@ -2108,11 +2181,6 @@ void C_SyvUpUpdateWidget::m_HandleConnectionFailure(void)
          }
       }
 
-      std::cout << "c_RespondedNodes:" << c_RespondedNodes.size() << std::endl;
-      std::cout << "c_ActiveNoneThirdPartyNodeIndices:" << c_ActiveNoneThirdPartyNodeIndices.size() << std::endl;
-      std::cout << "c_ActiveNoResponseNodeIndices:" << c_ActiveNoResponseNodeIndices.size() << std::endl;
-      std::cout << "u32_AddedNodes:" << u32_AddedNodes << std::endl;
-      std::cout << "c_NodeIndicesWhichRequireAResponse:" << c_NodeIndicesWhichRequireAResponse.size() << std::endl;
       //Check existing and added ones then compare with expected number for special case no response
       if ((c_ActiveNoResponseNodeIndices.size() + u32_AddedNodes) == c_NodeIndicesWhichRequireAResponse.size())
       {
@@ -2339,6 +2407,15 @@ void C_SyvUpUpdateWidget::m_ReplaceOriginalWithTempPaths(void)
             }
          }
       }
+
+      // PEM file
+      // Same path, replace the original by the temporary path
+      if (this->mc_NodesToFlash[u32_NodeCounter].c_PemFile ==
+          this->mc_NodesWithAllApplications[u32_NodeCounter].c_PemFile)
+      {
+         this->mc_NodesToFlash[u32_NodeCounter].c_PemFile =
+            this->mc_NodesWithAllApplicationsAndTempPath[u32_NodeCounter].c_PemFile;
+      }
    }
 }
 
@@ -2492,14 +2569,16 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionFailure(const C_OSCSuSequences::E_Progr
 /*! \brief   Check if current step update application start
 
    \param[in]   oe_Step       Current step
-   \param[out]  orq_IsParam   Falg if current step was a parameter file step (only valid if return is true!)
+   \param[out]  orq_IsParam   Flag if current step was a parameter file step (only valid if return is true!)
+   \param[out]  orq_IsPemFile Flag if current step was a PEM file step (only valid if return is true!)
 
    \return
    True  Update application start step
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsUpdateAppStart(const C_OSCSuSequences::E_ProgressStep oe_Step, bool & orq_IsParam)
+bool C_SyvUpUpdateWidget::mh_IsUpdateAppStart(const C_OSCSuSequences::E_ProgressStep oe_Step, bool & orq_IsParam,
+                                              bool & orq_IsPemFile)
 {
    bool q_Retval;
 
@@ -2510,14 +2589,22 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAppStart(const C_OSCSuSequences::E_Progress
    case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_START:  // Application start state
       q_Retval = true;
       orq_IsParam = false;
+      orq_IsPemFile = false;
       break;
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
       q_Retval = true;
       orq_IsParam = true;
+      orq_IsPemFile = false;
+      break;
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START:
+      q_Retval = true;
+      orq_IsParam = false;
+      orq_IsPemFile = true;
       break;
    default:
       q_Retval = false;
       orq_IsParam = false;
+      orq_IsPemFile = false;
       break;
    }
    return q_Retval;
@@ -2527,14 +2614,16 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAppStart(const C_OSCSuSequences::E_Progress
 /*! \brief   Check if current step update application success
 
    \param[in]   oe_Step       Current step
-   \param[out]  orq_IsParam   Falg if current step was a parameter file step (only valid if return is true!)
+   \param[out]  orq_IsParam   Flag if current step was a parameter file step (only valid if return is true!)
+   \param[out]  orq_IsPemFile Flag if current step was a PEM file step (only valid if return is true!)
 
    \return
    True  Update application success step
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsUpdateAppSuccess(const C_OSCSuSequences::E_ProgressStep oe_Step, bool & orq_IsParam)
+bool C_SyvUpUpdateWidget::mh_IsUpdateAppSuccess(const C_OSCSuSequences::E_ProgressStep oe_Step, bool & orq_IsParam,
+                                                bool & orq_IsPemFile)
 {
    bool q_Retval;
 
@@ -2545,14 +2634,22 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAppSuccess(const C_OSCSuSequences::E_Progre
    case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_FINISHED:  // Finished application state
       orq_IsParam = false;
       q_Retval = true;
+      orq_IsPemFile = false;
       break;
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED:
       q_Retval = true;
       orq_IsParam = true;
+      orq_IsPemFile = false;
+      break;
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED:
+      q_Retval = true;
+      orq_IsParam = false;
+      orq_IsPemFile = true;
       break;
    default:
       orq_IsParam = false;
       q_Retval = false;
+      orq_IsPemFile = false;
       break;
    }
    return q_Retval;
@@ -2646,12 +2743,22 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateFailure(const C_OSCSuSequences::E_ProgressS
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
       q_Retval = true;
       break;
@@ -2683,6 +2790,34 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAbort(const C_OSCSuSequences::E_ProgressSte
    else
    {
       q_Retval = false;
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Is security warning necessary
+
+   \param[in]  orc_NodesToFlash  Nodes to flash
+
+   \return
+   Flags
+
+   \retval   True    Is necessary
+   \retval   False   Not necessary
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpUpdateWidget::mh_IsSecurityWarningNecessary(
+   const std::vector<C_OSCSuSequences::C_DoFlash> & orc_NodesToFlash)
+{
+   bool q_Retval = false;
+
+   for (uint32 u32_It = 0UL; u32_It < orc_NodesToFlash.size(); ++u32_It)
+   {
+      const C_OSCSuSequences::C_DoFlash & rc_Flash = orc_NodesToFlash[u32_It];
+      if (!rc_Flash.c_PemFile.IsEmpty())
+      {
+         q_Retval = true;
+      }
    }
    return q_Retval;
 }

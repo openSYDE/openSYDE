@@ -312,6 +312,7 @@ bool C_GiSvDaToggleBase::CallProperties(void)
             if (c_New != NULL)
             {
                c_New->HideOverlay();
+               c_New->deleteLater();
             }
          } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
       }
@@ -527,7 +528,7 @@ void C_GiSvDaToggleBase::UpdateType(const C_PuiSvDbToggle::E_Type oe_Type)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for any invalid elements
 
-   \param[out]   orc_FirstInvalidElementName    Name of first invalid element
+   \param[out]  orc_FirstInvalidElementName  Name of first invalid element
 
    \return
    true  Found

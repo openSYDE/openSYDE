@@ -37,7 +37,8 @@ class C_SyvDcConnectedNodeWidget :
 public:
    explicit C_SyvDcConnectedNodeWidget(QListWidgetItem * const opc_Item,
                                        const stw_opensyde_gui_logic::C_SyvDcDeviceInformation & orc_Info,
-                                       const std::set<stw_types::uint8> & orc_SubNodeIds,
+                                       const std::map<stw_types::uint8,
+                                                      stw_opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
                                        QWidget * const opc_Parent = NULL);
    ~C_SyvDcConnectedNodeWidget(void);
 
@@ -46,6 +47,7 @@ public:
    stw_types::uint8 GetManufacturerFormat(void) const;
    QString GetDeviceName(void) const;
    bool GetDeviceNameValid(void) const;
+   std::map<stw_types::uint8, stw_opensyde_gui_logic::C_SyvDcDeviceOldComConfig> GetSubNodeIdsToOldNodeIds(void) const;
    bool CompareSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
 
 protected:
@@ -55,7 +57,7 @@ private:
    Ui::C_SyvDcConnectedNodeWidget * mpc_Ui;
    QListWidgetItem * mpc_ListWidgetItem;
    const stw_opensyde_gui_logic::C_SyvDcDeviceInformation mc_Info;
-   const std::set<stw_types::uint8> mc_SubNodeIds;
+   const std::map<stw_types::uint8, stw_opensyde_gui_logic::C_SyvDcDeviceOldComConfig> mc_SubNodeIdsToOldNodeIds;
 
    void m_Init(void);
    //Avoid call

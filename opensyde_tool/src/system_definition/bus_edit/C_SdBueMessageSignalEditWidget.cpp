@@ -480,6 +480,7 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaSelector(void)
       Q_EMIT this->SigRecheckError(c_MessageId);
    }
    Q_EMIT this->SigChanged();
+   Q_EMIT (this->SigSignalStartBitChanged(c_MessageId));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -518,7 +519,7 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalNameChanged(const C_OSCCanMessage
 void C_SdBueMessageSignalEditWidget::m_OnSignalStartBitChanged(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
-   Q_EMIT this->SigSignalStartBitChanged(orc_MessageId);
+   Q_EMIT (this->SigSignalStartBitChanged(orc_MessageId));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -270,6 +270,9 @@ void C_OgePopUpDialog::ApplyMaximumSize(const QWidget * const opc_Widget)
 
    if (pc_UsedWidget != NULL)
    {
+      //does not affect other dialogs. This function is only used once for full screen datapool list widget.
+      //popup center was broken since Qt Upgrade. Set top margin is only way to get the widget more towards bottom.
+      this->setContentsMargins(0, 57, 0, 0);
       this->resize(pc_UsedWidget->rect().adjusted(5, 5, -5, -5).size());
    }
 }

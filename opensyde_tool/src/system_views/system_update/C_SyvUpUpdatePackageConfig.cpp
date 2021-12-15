@@ -44,7 +44,10 @@ C_SyvUpUpdatePackageConfigNodeApp::C_SyvUpUpdatePackageConfigNodeApp() :
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpUpdatePackageConfigNode::C_SyvUpUpdatePackageConfigNode() :
    c_Name(""),
-   c_DeviceType("")
+   c_DeviceType(""),
+   c_PemFilePath(""),
+   e_StateSecurity(C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE),
+   e_StateDebugger(C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE)
 {
 }
 

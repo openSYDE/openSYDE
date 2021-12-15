@@ -24,7 +24,9 @@
 #include "ui_C_SyvUpPackageSectionNodeWidget.h"
 #include "C_SyvUpPackageListNodeItemFileWidget.h"
 #include "C_SyvUpPackageListNodeItemParamSetWidget.h"
+#include "C_SyvUpPackageListNodeItemPemFileWidget.h"
 #include "C_PuiSvNodeUpdateParamInfo.h"
+#include "C_SyvUpPemFileOptionsPopUp.h"
 
 #include "C_OgeWiCustomMessage.h"
 #include "C_PuiSdHandler.h"
@@ -56,7 +58,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPackageSectionNodeFilesWidget::C_SyvUpPackageSectionNodeFilesWidget(QWidget * const opc_Parent) :
@@ -70,14 +72,16 @@ C_SyvUpPackageSectionNodeFilesWidget::C_SyvUpPackageSectionNodeFilesWidget(QWidg
 
    Only possible for file based devices
 
-   \param[in]     orc_File      New path
+   \param[in]  orc_File    New path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeFilesWidget::AddFile(const QString & orc_File)
 {
    const bool q_ParamSet = mh_IsFileParamSetFile(orc_File);
+   const bool q_PemFile = mh_IsFilePemFile(orc_File);
 
-   if (q_ParamSet == false)
+   if ((q_ParamSet == false) &&
+       (q_PemFile == false))
    {
       const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -110,6 +114,51 @@ void C_SyvUpPackageSectionNodeFilesWidget::AddFile(const QString & orc_File)
          ++this->mu32_FileCount;
       } //lint !e429  //no memory leak because of the parent of pc_AppWidget and the Qt memory management
    }
+   else if (q_PemFile == true)
+   {
+      tgl_assert(q_ParamSet == false);
+      if (this->mu32_PemFileCount == 0)
+      {
+         C_SyvUpPackageListNodeItemPemFileWidget * const pc_PemWidget =
+            new C_SyvUpPackageListNodeItemPemFileWidget(this->mu32_ViewIndex, this->mu32_NodeIndex,
+                                                        this->mc_DeviceType,
+                                                        this->mq_FileBased, this->mq_StwFlashloader, this);
+         // Set default values
+         const C_PuiSvNodeUpdate::E_StateSecurity e_StateSecurity = C_PuiSvNodeUpdate::eST_SEC_ACTIVATE;
+         const C_PuiSvNodeUpdate::E_StateDebugger e_StateDebugger = C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE;
+
+         pc_PemWidget->SetAppFile(orc_File, false);
+         pc_PemWidget->SetAppNumber(0U);
+         pc_PemWidget->SetOwnerSectionName(this->mc_SectionName);
+         pc_PemWidget->SetPemStates(e_StateSecurity, e_StateDebugger);
+
+         this->mpc_Ui->pc_FileVerticalLayout->insertWidget(this->mu32_PemFileCount,
+                                                           pc_PemWidget);
+
+         // Save the new file as application path
+         tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationPemFilePath(
+                       this->mu32_ViewIndex, this->mu32_NodeIndex, orc_File) == C_NO_ERR);
+         // Set the new default states as well
+         tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationStates(
+                       this->mu32_ViewIndex, this->mu32_NodeIndex,
+                       e_StateSecurity, e_StateDebugger) == C_NO_ERR);
+
+         ++this->mu32_PemFileCount;
+         ++this->mu32_FileCount;
+      } //lint !e429  //no memory leak because of the parent of pc_AppWidget and the Qt memory management
+      else
+      {
+         // Only one PEM file allowed
+         const QString c_Message = static_cast<QString>(
+            C_GtGetText::h_GetText("A PEM file was already added. "
+                                   "Only one PEM file for a node is allowed. The file %1 was not added."))
+                                   .arg(orc_File);
+         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
+         c_MessageBox.SetDescription(c_Message);
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Adding PEM file"));
+         c_MessageBox.Execute();
+      }
+   }
    else
    {
       C_PuiSvNodeUpdateParamInfo c_ParamFileInfo;
@@ -132,7 +181,8 @@ void C_SyvUpPackageSectionNodeFilesWidget::AddFile(const QString & orc_File)
          pc_ParamWidget->SetOwnerSectionName(this->mc_SectionName);
 
          // Inserting psi files before all "other" files
-         this->mpc_Ui->pc_FileVerticalLayout->insertWidget(this->mu32_ParamSetFileCount,
+         this->mpc_Ui->pc_FileVerticalLayout->insertWidget(static_cast<uint32>(this->mu32_PemFileCount +
+                                                                               this->mu32_ParamSetFileCount),
                                                            pc_ParamWidget);
 
          // Save the new file as parameter path
@@ -154,26 +204,38 @@ void C_SyvUpPackageSectionNodeFilesWidget::AddFile(const QString & orc_File)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a new file for the application
 
-   \param[in]     orc_File      New path
-   \param[in]     opc_App       Application widget
+   \param[in]  orc_File    New path
+   \param[in]  opc_App     Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeFilesWidget::AdaptFile(const QString & orc_File,
                                                      C_SyvUpPackageListNodeItemWidget * const opc_App)
 {
    const bool q_NewFileParamSet = mh_IsFileParamSetFile(orc_File);
+   const bool q_NewFilePem = mh_IsFilePemFile(orc_File);
 
    if (opc_App != NULL)
    {
-      if (((opc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE) && (q_NewFileParamSet == false)) ||
-          ((opc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET) && (q_NewFileParamSet == true)))
+      if (((opc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE) &&
+           (q_NewFileParamSet == false) && (q_NewFilePem == false)) ||
+          ((opc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET) &&
+           (q_NewFileParamSet == true) && (q_NewFilePem == false)) ||
+          ((opc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM) &&
+           (q_NewFileParamSet == false) && (q_NewFilePem == true)))
       {
-         if (q_NewFileParamSet == false)
+         if ((q_NewFileParamSet == false) &&
+             (q_NewFilePem == false))
          {
             C_SyvUpPackageSectionNodeWidget::AdaptFile(orc_File, opc_App);
             tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationPath(
                           this->mu32_ViewIndex, this->mu32_NodeIndex, opc_App->GetAppNumber(), orc_File,
                           C_PuiSvNodeUpdate::eFTP_FILE_BASED) == C_NO_ERR);
+         }
+         else if (q_NewFilePem == true)
+         {
+            C_SyvUpPackageSectionNodeWidget::AdaptFile(orc_File, opc_App);
+            tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationPemFilePath(
+                          this->mu32_ViewIndex, this->mu32_NodeIndex, orc_File) == C_NO_ERR);
          }
          else
          {
@@ -183,8 +245,24 @@ void C_SyvUpPackageSectionNodeFilesWidget::AdaptFile(const QString & orc_File,
       else
       {
          // The type of item type is changed, remove the old one and add it as new
-         this->RemoveFile(opc_App);
-         this->AddFile(orc_File);
+         if ((q_NewFilePem == false) ||
+             (this->mu32_PemFileCount == 0U))
+         {
+            // In case of a new PEM file no other PEM may exist already
+            this->RemoveFile(opc_App);
+            this->AddFile(orc_File);
+         }
+         else
+         {
+            // Only one PEM file allowed
+            const QString c_Message = static_cast<QString>(C_GtGetText::h_GetText("A PEM file was already added. "
+                                                                                  "Only one PEM file for a node is allowed. The file %1 was not added."))
+                                      .arg(orc_File);
+            C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
+            c_MessageBox.SetDescription(c_Message);
+            c_MessageBox.SetHeading(C_GtGetText::h_GetText("Adding PEM file"));
+            c_MessageBox.Execute();
+         }
       }
    }
 }
@@ -192,8 +270,8 @@ void C_SyvUpPackageSectionNodeFilesWidget::AdaptFile(const QString & orc_File,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a new file for the application
 
-   \param[in]  oq_Skip     New skip flag
-   \param[in]  opc_App     Application widget
+   \param[in]  oq_Skip  New skip flag
+   \param[in]  opc_App  Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeFilesWidget::SetSkipOfUpdateFile(const bool oq_Skip,
@@ -211,6 +289,13 @@ void C_SyvUpPackageSectionNodeFilesWidget::SetSkipOfUpdateFile(const bool oq_Ski
                        opc_App->GetAppNumber(), oq_Skip,
                        C_PuiSvNodeUpdate::eFTP_FILE_BASED) == C_NO_ERR);
       }
+      else if (opc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM)
+      {
+         tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationSkipUpdateOfPemFile(
+                       this->mu32_ViewIndex,
+                       this->mu32_NodeIndex,
+                       oq_Skip) == C_NO_ERR);
+      }
       else
       {
          tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationSkipUpdateOfParamInfo(
@@ -224,7 +309,7 @@ void C_SyvUpPackageSectionNodeFilesWidget::SetSkipOfUpdateFile(const bool oq_Ski
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Removes the current application
 
-   \param[in]     opc_App       Application widget
+   \param[in]  opc_App  Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeFilesWidget::RemoveFile(C_SyvUpPackageListNodeItemWidget * const opc_App)
@@ -241,6 +326,12 @@ void C_SyvUpPackageSectionNodeFilesWidget::RemoveFile(C_SyvUpPackageListNodeItem
                                                                                      C_PuiSvNodeUpdate::
                                                                                      eFTP_FILE_BASED) == C_NO_ERR);
       }
+      else if (opc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM)
+      {
+         tgl_assert(C_PuiSvHandler::h_GetInstance()->RemoveNodeUpdateInformationPemFilePath(
+                       this->mu32_ViewIndex,
+                       this->mu32_NodeIndex) == C_NO_ERR);
+      }
       else
       {
          tgl_assert(C_PuiSvHandler::h_GetInstance()->RemoveNodeUpdateInformationParamInfo(this->mu32_ViewIndex,
@@ -253,9 +344,58 @@ void C_SyvUpPackageSectionNodeFilesWidget::RemoveFile(C_SyvUpPackageListNodeItem
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Opens the settings for a PEM file
+
+   \param[in]  opc_App  Application widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPackageSectionNodeFilesWidget::OpenPemFileSettings(C_SyvUpPackageListNodeItemWidget * const opc_App)
+{
+   C_SyvUpPackageListNodeItemPemFileWidget * const pc_PemApp =
+      dynamic_cast<C_SyvUpPackageListNodeItemPemFileWidget *>(opc_App);
+
+   if (pc_PemApp != NULL)
+   {
+      C_PuiSvNodeUpdate::E_StateSecurity e_StateSecurity;
+      C_PuiSvNodeUpdate::E_StateDebugger e_StateDebugger;
+      // Get the current PEM states
+      pc_PemApp->GetPemStates(e_StateSecurity, e_StateDebugger);
+
+      // Adapt the states
+      {
+         QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+         C_SyvUpPemFileOptionsPopUp * const pc_InfoDialog = new C_SyvUpPemFileOptionsPopUp(*c_New, e_StateSecurity,
+                                                                                           e_StateDebugger);
+
+         //Resize
+         c_New->SetSize(QSize(500, 400));
+
+         if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+         {
+            //No confirmation
+            e_StateSecurity = pc_InfoDialog->GetComboBoxSecState();
+            e_StateDebugger = pc_InfoDialog->GetComboBoxDebState();
+         }
+
+         if (c_New != NULL)
+         {
+            c_New->HideOverlay();
+            c_New->deleteLater();
+         }
+      } //lint !e429  //no memory leak because of the parent of pc_InfoDialog and the Qt memory management
+
+      pc_PemApp->SetPemStates(e_StateSecurity, e_StateDebugger);
+      tgl_assert(C_PuiSvHandler::h_GetInstance()->SetNodeUpdateInformationStates(this->mu32_ViewIndex,
+                                                                                 this->mu32_NodeIndex,
+                                                                                 e_StateSecurity,
+                                                                                 e_StateDebugger) == C_NO_ERR);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepares the update package node configuration
 
-   \param[out]     orc_NodeConfig         Node configuration
+   \param[out]  orc_NodeConfig   Node configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeFilesWidget::PrepareExportConfig(C_SyvUpUpdatePackageConfigNode & orc_NodeConfig) const
@@ -277,7 +417,18 @@ void C_SyvUpPackageSectionNodeFilesWidget::PrepareExportConfig(C_SyvUpUpdatePack
 
             if (pc_App != NULL)
             {
-               if (pc_App->GetType() != mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET)
+               if (pc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM)
+               {
+                  C_SyvUpPackageListNodeItemPemFileWidget * const pc_PemApp =
+                     dynamic_cast<C_SyvUpPackageListNodeItemPemFileWidget *>(pc_App);
+
+                  if (pc_PemApp != NULL)
+                  {
+                     orc_NodeConfig.c_PemFilePath = pc_App->GetAppFilePath();
+                     pc_PemApp->GetPemStates(orc_NodeConfig.e_StateSecurity, orc_NodeConfig.e_StateDebugger);
+                  }
+               }
+               else if (pc_App->GetType() != mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET)
                {
                   orc_NodeConfig.c_FileConfigs.push_back(pc_App->GetAppFilePath());
                }
@@ -295,7 +446,7 @@ void C_SyvUpPackageSectionNodeFilesWidget::PrepareExportConfig(C_SyvUpUpdatePack
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Loads all matching configurations for this node of the import configuration
 
-   \param[out]     orc_Config         Import configuration
+   \param[out]  orc_Config    Import configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeFilesWidget::LoadImportConfig(const C_SyvUpUpdatePackageConfig & orc_Config)
@@ -339,6 +490,25 @@ void C_SyvUpPackageSectionNodeFilesWidget::LoadImportConfig(const C_SyvUpUpdateP
             }
          }
 
+         if (!orc_Config.c_NodeConfigs[u32_ConfigCounter].c_PemFilePath.isEmpty())
+         {
+            this->AddFile(orc_Config.c_NodeConfigs[u32_ConfigCounter].c_PemFilePath);
+            //Configure PEM states
+            QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(0);
+
+            if (pc_Item != NULL)
+            {
+               C_SyvUpPackageListNodeItemPemFileWidget * const pc_PemApp =
+                  dynamic_cast<C_SyvUpPackageListNodeItemPemFileWidget *>(pc_Item->widget());
+
+               if (pc_PemApp != NULL)
+               {
+                  pc_PemApp->SetPemStates(orc_Config.c_NodeConfigs[u32_ConfigCounter].e_StateSecurity,
+                                          orc_Config.c_NodeConfigs[u32_ConfigCounter].e_StateDebugger);
+               }
+            }
+         }
+
          break;
       }
    }
@@ -349,12 +519,13 @@ void C_SyvUpPackageSectionNodeFilesWidget::LoadImportConfig(const C_SyvUpUpdateP
 
    File based list accept multiple files
 
-   \param[in,out]   orc_PathList                    File paths to analyze, relevant paths in opc_RelevantFilePaths in
-                                                    will be removed here
-   \param[in]       orc_Pos                         Mouse position
-   \param[out]      opc_RelevantFilePaths           File paths which could be used for this list
-   \param[out]      opc_RelevantParamSetImagePaths  Parameter set image paths which could be used for this list
-   \param[out]      oppc_App                        Found application widget
+   \param[in,out]  orc_PathList                    File paths to analyze, relevant paths in opc_RelevantFilePaths in
+                                                   will be removed here
+   \param[in]      orc_Pos                         Mouse position
+   \param[out]     opc_RelevantFilePaths           File paths which could be used for this list
+   \param[out]     opc_RelevantParamSetImagePaths  Parameter set image paths which could be used for this list
+   \param[out]     opc_RelevantPemFilePaths        PEM file paths which could be used for this list
+   \param[out]     oppc_App                        Found application widget
 
    \return
    true  Valid
@@ -364,6 +535,7 @@ void C_SyvUpPackageSectionNodeFilesWidget::LoadImportConfig(const C_SyvUpUpdateP
 bool C_SyvUpPackageSectionNodeFilesWidget::CheckMime(QStringList & orc_PathList, const QPoint & orc_Pos,
                                                      QStringList * const opc_RelevantFilePaths,
                                                      QStringList * const opc_RelevantParamSetImagePaths,
+                                                     QStringList * const opc_RelevantPemFilePaths,
                                                      C_SyvUpPackageListNodeItemWidget ** const oppc_App) const
 {
    bool q_Retval = false;
@@ -373,7 +545,8 @@ bool C_SyvUpPackageSectionNodeFilesWidget::CheckMime(QStringList & orc_PathList,
       C_SyvUpPackageListNodeItemWidget * pc_App = NULL;
 
       q_Retval = C_SyvUpPackageSectionNodeWidget::CheckMime(orc_PathList, orc_Pos, opc_RelevantFilePaths,
-                                                            opc_RelevantParamSetImagePaths, &pc_App);
+                                                            opc_RelevantParamSetImagePaths, opc_RelevantPemFilePaths,
+                                                            &pc_App);
 
       if (q_Retval == true)
       {
@@ -393,6 +566,15 @@ bool C_SyvUpPackageSectionNodeFilesWidget::CheckMime(QStringList & orc_PathList,
                if (opc_RelevantParamSetImagePaths != NULL)
                {
                   opc_RelevantParamSetImagePaths->push_back(rc_CurrentPath);
+               }
+               orc_PathList.erase(orc_PathList.begin() + sn_PathCounter);
+               q_Retval = true;
+            }
+            else if (mh_IsFilePemFile(rc_CurrentPath) == true)
+            {
+               if (opc_RelevantPemFilePaths != NULL)
+               {
+                  opc_RelevantPemFilePaths->push_back(rc_CurrentPath);
                }
                orc_PathList.erase(orc_PathList.begin() + sn_PathCounter);
                q_Retval = true;
@@ -439,8 +621,8 @@ uint32 C_SyvUpPackageSectionNodeFilesWidget::Type(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the number of skipped parameter set image files
 
-   \param[in]       ou32_CountSkippedFiles     Number of parameter set image files which are used by the
-                    datablock sections
+   \param[in]  ou32_CountSkippedFiles  Number of parameter set image files which are used by the
+                                       datablock sections
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeFilesWidget::SetCountSkippedParamSetFiles(const uint32 ou32_CountSkippedFiles)
@@ -451,8 +633,8 @@ void C_SyvUpPackageSectionNodeFilesWidget::SetCountSkippedParamSetFiles(const ui
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialization of the applications in case of datablock configuration
 
-   \param[in]       orc_Node         Current node
-   \param[in]       orc_UpdateInfo   Configured update configuration of view
+   \param[in]  orc_Node          Current node
+   \param[in]  orc_UpdateInfo    Configured update configuration of view
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageSectionNodeFilesWidget::m_InitSpecificItem(const stw_opensyde_core::C_OSCNode & orc_Node,
@@ -460,10 +642,12 @@ void C_SyvUpPackageSectionNodeFilesWidget::m_InitSpecificItem(const stw_opensyde
 {
    const std::vector<QString> c_ViewAppPaths = orc_UpdateInfo.GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED);
    const std::vector<C_PuiSvNodeUpdateParamInfo> c_ViewParamsetPaths = orc_UpdateInfo.GetParamInfos();
+   const QString c_ViewPemPath = orc_UpdateInfo.GetPemFilePath();
 
    std::vector<bool> c_ViewFileSkipFlags = orc_UpdateInfo.GetSkipUpdateOfPathsFlags(
       C_PuiSvNodeUpdate::eFTP_FILE_BASED);
    std::vector<bool> c_ViewParamSetSkipFlags = orc_UpdateInfo.GetSkipUpdateOfParamInfosFlags();
+   const bool q_ViewPemSkipFlag = orc_UpdateInfo.GetSkipUpdateOfPemFile();
    uint32 u32_Counter;
 
    Q_UNUSED(orc_Node)
@@ -477,7 +661,34 @@ void C_SyvUpPackageSectionNodeFilesWidget::m_InitSpecificItem(const stw_opensyde
       c_ViewParamSetSkipFlags.resize(c_ViewParamsetPaths.size(), false);
    }
 
-   // PSI files first
+   // PEM file first
+   if (c_ViewPemPath != "")
+   {
+      C_SyvUpPackageListNodeItemPemFileWidget * const pc_PemWidget =
+         new C_SyvUpPackageListNodeItemPemFileWidget(this->mu32_ViewIndex, this->mu32_NodeIndex,
+                                                     this->mc_DeviceType,
+                                                     this->mq_FileBased, this->mq_StwFlashloader, this);
+      C_PuiSvNodeUpdate::E_StateSecurity e_StateSecurity;
+      C_PuiSvNodeUpdate::E_StateDebugger e_StateDebugger;
+
+      pc_PemWidget->SetAppFile(c_ViewPemPath, false);
+      pc_PemWidget->SetSkipOfUpdateFile(q_ViewPemSkipFlag);
+      pc_PemWidget->SetAppNumber(0U);
+      pc_PemWidget->SetOwnerSectionName(this->mc_SectionName);
+
+      orc_UpdateInfo.GetStates(e_StateSecurity, e_StateDebugger);
+      pc_PemWidget->SetPemStates(e_StateSecurity, e_StateDebugger);
+
+      ++this->mu32_FileCount;
+      this->mu32_PemFileCount = 1U;
+      this->mpc_Ui->pc_FileVerticalLayout->addWidget(pc_PemWidget);
+   } //lint !e429  //no memory leak because of the parent of pc_AppWidget and the Qt memory management
+   else
+   {
+      this->mu32_PemFileCount = 0U;
+   }
+
+   // PSI files second
    for (u32_Counter = this->mu32_CountSkippedParamSetFiles; u32_Counter < c_ViewParamsetPaths.size(); ++u32_Counter)
    {
       C_PuiSvNodeUpdateParamInfo c_ParamInfo;
@@ -547,7 +758,7 @@ void C_SyvUpPackageSectionNodeFilesWidget::m_UpdateTitle(void)
    In case of param set files in the files widget, the skipped count must be used for the real number of
    the param set file
 
-   \param[in]       ou32_Number     Unedited number of param set file
+   \param[in]  ou32_Number    Unedited number of param set file
 
    \return
    Adapted number of param set file

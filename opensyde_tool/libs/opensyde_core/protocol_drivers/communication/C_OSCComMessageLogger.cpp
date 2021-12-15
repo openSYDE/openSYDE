@@ -1237,7 +1237,7 @@ void C_OSCComMessageLogger::mh_InterpretCanSignalValue(C_OSCComMessageLoggerData
       {
          // In case of a float value, the raw value does not make any sense in byte form.
          // Use the value without scaling as raw value.
-         c_OscValue.GetValueAsScaledString(1.0, 0.0, c_StringValue, 0U);
+         c_OscValue.GetValueAsScaledString(1.0, 0.0, c_StringValue, 0U, true, true);
          orc_Signal.c_RawValueDec = c_StringValue.c_str();
          orc_Signal.c_RawValueHex = c_StringValue.c_str();
       }
@@ -1248,7 +1248,7 @@ void C_OSCComMessageLogger::mh_InterpretCanSignalValue(C_OSCComMessageLoggerData
       }
 
       // Interpreted value
-      c_OscValue.GetValueAsScaledString(of64_Factor, of64_Offset, c_StringValue, 0U);
+      c_OscValue.GetValueAsScaledString(of64_Factor, of64_Offset, c_StringValue, 0U, true, true);
       orc_Signal.c_Value = c_StringValue.c_str();
    }
    else

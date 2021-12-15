@@ -85,7 +85,7 @@ private:
    static const stw_types::uint8 mhu8_BC_OSY_NR_SI = 0x7FU;
 
    ///timeout when waiting for flow control; lower but more realistic than the 1s specified in 15765
-   static const stw_types::uint16 mhu16_NBsTimeoutMs = 100U;
+   static const stw_types::uint16 mhu16_NBS_TIMEOUTS_MS = 100U;
 
    stw_can::C_CAN_Dispatcher * mpc_CanDispatcher; ///< CAN dispatcher to use for communication
    stw_types::uint16 mu16_DispatcherClientHandle; ///< our handle for dispatcher interaction
@@ -132,6 +132,7 @@ public:
    {
    public:
       stw_types::uint8 u8_SubNodeId; ///< sub node id of sender in case of a multiple CPU device
+      bool q_SecurityActivated;      ///< flag if node has security feature activated
    };
 
    ///container for results reported by "RequestProgramming" broadcast service
@@ -142,7 +143,7 @@ public:
       bool q_RequestAccepted;                ///< true: no problems; false; flag not set
    };
 
-   C_OSCProtocolDriverOsyTpCan(const stw_types::uint16 ou16_MaxServiceQueueSize = 200U);
+   explicit C_OSCProtocolDriverOsyTpCan(const stw_types::uint16 ou16_MaxServiceQueueSize = 200U);
    virtual ~C_OSCProtocolDriverOsyTpCan(void);
 
    virtual stw_types::sint32 Cycle(void);

@@ -761,7 +761,8 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
             for (u32_NodeCounter = 0; u32_NodeCounter < c_ApplicationsToWrite.size(); ++u32_NodeCounter)
             {
                if ((c_ApplicationsToWrite[u32_NodeCounter].c_FilesToFlash.size() == 0) &&
-                   (c_ApplicationsToWrite[u32_NodeCounter].c_FilesToWriteToNvm.size() == 0))
+                   (c_ApplicationsToWrite[u32_NodeCounter].c_FilesToWriteToNvm.size() == 0) &&
+                   (c_ApplicationsToWrite[u32_NodeCounter].c_PemFile == ""))
                {
                   c_ActiveNodes[u32_NodeCounter] = 0U;
                }
@@ -882,7 +883,7 @@ sint32 C_SyvUpUpdatePackageListWidget::CheckAllPaths(uint32 & oru32_CountFiles,
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpUpdatePackageListWidget::GetUpdatePackage(
    std::vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite, std::vector<uint32> & orc_NodesOrder,
-   std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> * const opc_AllApplications) const
+   std::vector<C_OSCSuSequences::C_DoFlash> * const opc_AllApplications) const
 {
    sint32 s32_Return = C_NOACT;
    sintn sn_Counter;
@@ -1263,6 +1264,9 @@ void C_SyvUpUpdatePackageListWidget::m_OnCustomContextMenuRequested(const QPoint
             this->mpc_RemoveAllNodeFilesAction->setVisible(false);
             this->mpc_ShowInExplorerAction->setEnabled(c_FileInfo.exists());
             this->mpc_ShowInExplorerAction->setVisible(true);
+
+            this->mpc_PemFileSettings->setVisible(
+               this->mpc_SelectedApp->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM);
          }
          else
          {
@@ -1276,6 +1280,7 @@ void C_SyvUpUpdatePackageListWidget::m_OnCustomContextMenuRequested(const QPoint
             // New file or new parameter set image file is possible with all openSYDE devices
             this->mpc_AddFileAction->setVisible(!q_IsStwFlashloader);
             this->mpc_ShowInExplorerAction->setVisible(false);
+            this->mpc_PemFileSettings->setVisible(false);
          }
 
          q_ShowContextMenu = true;
@@ -1310,6 +1315,10 @@ void C_SyvUpUpdatePackageListWidget::m_SetupContextMenu(void)
 
    this->mpc_RevertFileAction = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText("Revert to Default"), this, &C_SyvUpUpdatePackageListWidget::m_RevertFile);
+
+   this->mpc_ContextMenu->addSeparator();
+   this->mpc_PemFileSettings = this->mpc_ContextMenu->addAction(
+      C_GtGetText::h_GetText("PEM File Settings"), this, &C_SyvUpUpdatePackageListWidget::m_OpenPemFileSettings);
 
    this->mpc_ContextMenu->addSeparator();
 
@@ -1361,10 +1370,12 @@ void C_SyvUpUpdatePackageListWidget::m_AddFileAction(void)
    {
       if (this->mpc_SelectedNode->IsFileBased() == false)
       {
-         // No file based and a openSYDE device, only parameter set image files are possible to add
-         this->m_AddNewFile(C_GtGetText::h_GetText("openSYDE parameter set image"),
+         // No file based and a openSYDE device, only parameter set image and PEM files are possible to add
+         this->m_AddNewFile(C_GtGetText::h_GetText("openSYDE parameter set image or PEM file"),
                             static_cast<QString>(C_GtGetText::h_GetText(
-                                                    "openSYDE parameter set image")) + " (*.syde_psi)");
+                                                    "openSYDE parameter set image")) + " (*.syde_psi);;" +
+                            static_cast<QString>(C_GtGetText::h_GetText(
+                                                    "PEM file")) + " (*.pem)");
       }
       else
       {
@@ -1378,7 +1389,7 @@ void C_SyvUpUpdatePackageListWidget::m_AddFileAction(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Adding a new file to the selected node
 
-   Depending on the file extension (.syde_psi), it will be added as parameter set image file or
+   Depending on the file extension (.syde_psi, .pem), it will be added as parameter set image file or
    as file for file based nodes
 
    \param[in]  orc_DialogCaption    Caption for file dialog
@@ -1407,9 +1418,10 @@ void C_SyvUpUpdatePackageListWidget::m_AddNewFile(const QString & orc_DialogCapt
             {
                const QFileInfo c_File(c_Files[s32_Pos]);
                const bool q_ParamsetFile = c_File.completeSuffix().toLower() == "syde_psi";
+               const bool q_PemFile = c_File.completeSuffix().toLower() == "pem";
 
                // add file
-               this->mpc_SelectedNode->AddNewFile(c_Files[s32_Pos], q_ParamsetFile);
+               this->mpc_SelectedNode->AddNewFile(c_Files[s32_Pos], q_ParamsetFile, q_PemFile);
             }
 
             // remember last path
@@ -1454,6 +1466,9 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
             break;
          case mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET:
             c_Filter = static_cast<QString>(C_GtGetText::h_GetText("openSYDE parameter set image")) + " (*.syde_psi)";
+            break;
+         case mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM:
+            c_Filter = static_cast<QString>(C_GtGetText::h_GetText("PEM file")) + " (*.pem)";
             break;
          case mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE:
             c_Filter = static_cast<QString>(C_GtGetText::h_GetText("All files")) + " (*.*)";
@@ -1544,9 +1559,6 @@ void C_SyvUpUpdatePackageListWidget::m_RemoveAllSectionFiles(void)
       {
       case mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK:
          c_Section = C_GtGetText::h_GetText("Data Blocks");
-         break;
-      case mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET:
-         c_Section = C_GtGetText::h_GetText("Parameter Set Images");
          break;
       case mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE:
          c_Section = C_GtGetText::h_GetText("Files");
@@ -1647,6 +1659,19 @@ void C_SyvUpUpdatePackageListWidget::m_SkipUpdateOfFile(void)
    {
       this->mpc_SelectedSection->SetSkipOfUpdateFile(!this->mpc_SelectedApp->GetSkipOfUpdateFile(),
                                                      this->mpc_SelectedApp);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Toggle skipping update of a specific file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpUpdatePackageListWidget::m_OpenPemFileSettings(void)
+{
+   if ((this->mpc_SelectedApp != NULL) &&
+       (this->mpc_SelectedSection != NULL))
+   {
+      this->mpc_SelectedSection->OpenPemFileSettings(this->mpc_SelectedApp);
    }
 }
 

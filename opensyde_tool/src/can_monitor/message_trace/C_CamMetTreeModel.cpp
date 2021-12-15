@@ -1061,10 +1061,13 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                   else
                   {
                      //Special handling necessary
-                     sint32 s32_MuxValue;
+                     sint32 s32_MuxValue = -1;
                      if (rc_Signal.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
                      {
-                        s32_MuxValue = rc_Signal.c_RawValueDec.ToInt();
+                        if (rc_Signal.q_DlcError == false)
+                        {
+                           s32_MuxValue = rc_Signal.c_RawValueDec.ToInt();
+                        }
                      }
                      else
                      {
@@ -1072,7 +1075,10 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                            orc_Index.parent());
                         const C_OSCComMessageLoggerDataSignal & rc_MultiplexerSignal =
                            pc_CurMessage->c_Signals[u32_MultiplexerSignalIndex];
-                        s32_MuxValue = rc_MultiplexerSignal.c_RawValueDec.ToInt();
+                        if (rc_MultiplexerSignal.q_DlcError == false)
+                        {
+                           s32_MuxValue = rc_MultiplexerSignal.c_RawValueDec.ToInt();
+                        }
                      }
                      const std::map<stw_types::sint32,
                                     stw_types::sintn>::const_iterator c_It =
@@ -2167,7 +2173,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
             const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Message.c_Signals[u32_ItSig];
             if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
             {
-               if (rc_SignalData.c_OscSignal.u16_MultiplexValue == c_Order[u32_ItOr])
+               if (static_cast<sintn>(rc_SignalData.c_OscSignal.u16_MultiplexValue) == c_Order[u32_ItOr])
                {
                   ++u32_Counter;
                }
@@ -2902,7 +2908,10 @@ void C_CamMetTreeModel::mh_CopyMessageWhileKeepingUniqueSignals(C_CamMetTreeLogg
             else
             {
                //Multiplexer
-               if (rc_Sig.c_RawValueDec.ToInt() == static_cast<uint16>(os32_MuxValue))
+               // In case of a DLC error the signal will be replaced in any case and avoid getting the invalid value
+               // as integer
+               if ((rc_Sig.q_DlcError == true) ||
+                   (rc_Sig.c_RawValueDec.ToInt() == static_cast<uint16>(os32_MuxValue)))
                {
                   //Will be replaced
                }
@@ -2958,7 +2967,8 @@ uint32 C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(
             if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
             {
                //Multiplexed
-               if (rc_SignalData.c_OscSignal.u16_MultiplexValue == c_Order[static_cast<uint32>(os32_SignalIndex)])
+               if (static_cast<sintn>(rc_SignalData.c_OscSignal.u16_MultiplexValue) ==
+                   c_Order[static_cast<uint32>(os32_SignalIndex)])
                {
                   if (u32_Counter == static_cast<uint32>(os32_SignalIndexL2))
                   {
@@ -2977,6 +2987,7 @@ uint32 C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(
          {
             //Multiplexer
             if ((rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
+                (rc_SignalData.q_DlcError == false) &&
                 (rc_SignalData.c_RawValueDec.ToInt() == c_Order[static_cast<uint32>(os32_SignalIndex)]))
             {
                //Just use first multiplexer

@@ -26,6 +26,9 @@ public:
 
    void SetLogHeading(const stw_scl::C_SCLString & orc_Text);
 
+   // init node system - selects second node, if available; first node is declaration
+   virtual stw_types::sint32 SelectRootError(const stw_scl::C_SCLString & orc_Name);
+
    // select first child node (with name) of current node        (go deeper)
    virtual stw_types::sint32 SelectNodeChildError(const stw_scl::C_SCLString & orc_Name);
 
@@ -46,8 +49,25 @@ public:
    virtual stw_types::sint32 GetAttributeFloat64Error(const stw_scl::C_SCLString & orc_Name,
                                                       stw_types::float64 & orf64_Value) const;
 
+   //Base error reporting functions
+   virtual void ReportErrorForNodeContentAppendXMLContext(const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForAttributeContentAppendXMLContext(const stw_scl::C_SCLString & orc_Attribute,
+                                                               const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForNodeContentStartingWithXMLContext(const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForAttributeContentStartingWithXMLContext(const stw_scl::C_SCLString & orc_Attribute,
+                                                                     const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForNodeMissing(const stw_scl::C_SCLString & orc_MissingNodeName) const;
+
 private:
    stw_scl::C_SCLString mc_LogHeading;
+
+   void m_ReportErrorForRootNodeMissing(const stw_scl::C_SCLString & orc_RootNodeName) const;
+   void m_ReportErrorForAttributeMissing(const stw_scl::C_SCLString & orc_AttributeName) const;
+   stw_scl::C_SCLString m_GetCurrentXMLLineInfoText(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

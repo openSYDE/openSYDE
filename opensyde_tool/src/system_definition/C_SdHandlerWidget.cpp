@@ -753,6 +753,11 @@ void C_SdHandlerWidget::m_GenerateCode(void) const
          pc_CodeGenerationDialog->GetCheckedItems(c_NodeIndices, c_AppIndicesPerNode);
          C_ImpUtil::h_ExportCode(c_NodeIndices, c_AppIndicesPerNode, this->parentWidget());
       }
+      if (c_PopUpDialog != NULL)
+      {
+         c_PopUpDialog->HideOverlay();
+         c_PopUpDialog->deleteLater();
+      }
    } //lint !e429  //no memory leak because of the parent of pc_CodeGenerationDialog and the Qt memory management
 }
 
@@ -1042,6 +1047,7 @@ void C_SdHandlerWidget::m_RtfExport(void)
          if (c_PopUpDialog != NULL)
          {
             c_PopUpDialog->HideOverlay();
+            c_PopUpDialog->deleteLater();
          }
       } //lint !e429  //no memory leak because of the parent of pc_DialogExportReport and the Qt memory management
    }

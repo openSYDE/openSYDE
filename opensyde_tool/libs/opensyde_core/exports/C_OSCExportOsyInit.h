@@ -35,9 +35,9 @@ public:
                                                const stw_scl::C_SCLString & orc_ExportToolInfo = "");
 
    //Minimum buffer size required for DPD-services
-   //greatest size for openSYDE server: routine control DP meta data)
-   //ETH-Header + Service: (8+2+2) + 5 + (1+3) + (1+1+32)
-   static const stw_types::uint8 hu8_MIN_SIZE_DPD_BUF_INSTANCE = 55U;
+   //greatest size for openSYDE server: WriteDataByIdentifier::SetKey
+   //Calculation: (8 + 2 + 2) [ETH-Header] + 3 [WriteDataByIdentifierHeader] + (128 + 4 + 20) [SecurityKeyPayload]
+   static const stw_types::uint8 hu8_MIN_SIZE_DPD_BUF_INSTANCE = 167U;
 
 private:
    static bool mh_IsDpdInitRequired(const C_OSCNodeComInterfaceSettings & orc_Settings);

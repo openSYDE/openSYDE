@@ -33,7 +33,10 @@ public:
 
    stw_types::sint32 SetView(const stw_types::uint32 ou32_Index, const bool oq_ShowAssignment);
    void ConnectSerialNumber(const stw_types::uint32 ou32_NodeIndex,
-                            const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
+                            const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber,
+                            const std::map<stw_types::uint8,
+                                           stw_opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+   const;
    void DisconnectSerialNumber(const stw_types::uint32 ou32_NodeIndex,
                                const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
    stw_types::uint32 GetCommunicatingNodeCount(void) const;
@@ -49,7 +52,9 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigConnect(const stw_types::uint32 ou32_NodeIndex,
-                   const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
+                   const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber,
+                   const std::map<stw_types::uint8,
+                                  stw_opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds);
    void SigDisconnect(const stw_types::uint32 ou32_NodeIndex,
                       const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
 

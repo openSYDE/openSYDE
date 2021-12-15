@@ -485,7 +485,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition 
    if ((oq_UseDeviceDefinitions == true) &&
        (C_OSCSystemDefinition::hc_Devices.WasLoaded() == false))
    {
-      s32_Retval = C_OSCSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions, false);
+      s32_Retval = C_OSCSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions, false, NULL);
       if (s32_Retval != C_NO_ERR)
       {
          osc_write_log_error("Loading System Definition", "Could not load Device definitions.");
@@ -677,13 +677,13 @@ void C_OSCSystemDefinitionFiler::h_SplitDeviceType(const C_SCLString & orc_Compl
                                                    C_SCLString & orc_SubType)
 {
    const std::string c_Tmp = *orc_CompleteType.AsStdString();
-   const uint32 u32_Pos = c_Tmp.find(C_OSCNodeSquad::hc_Separator.c_str());
+   const uint32 u32_Pos = c_Tmp.find(C_OSCNodeSquad::hc_SEPARATOR.c_str());
 
    if (u32_Pos < c_Tmp.size())
    {
       orc_MainType = c_Tmp.substr(0, u32_Pos);
       //lint -e{9114} kept for readability
-      orc_SubType = c_Tmp.substr(u32_Pos + C_OSCNodeSquad::hc_Separator.Length(), c_Tmp.size());
+      orc_SubType = c_Tmp.substr(u32_Pos + C_OSCNodeSquad::hc_SEPARATOR.Length(), c_Tmp.size());
    }
    else
    {

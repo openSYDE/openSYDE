@@ -55,16 +55,12 @@ stw_scl::C_SCLString C_OSCBinaryHash::h_CreateBinaryHash(void)
 {
    const stw_scl::C_SCLString c_ExePath = stw_tgl::TGL_GetExePath();
 
-   if (h_GetHashBool() == true)
-   {
-      return mhc_BinaryHash;
-   }
-   else
+   if (h_GetHashBool() == false)
    {
       mhc_BinaryHash = stw_md5::CMD5Checksum::GetMD5(c_ExePath).UpperCase();
       h_SetHashBool(true);
-      return mhc_BinaryHash;
    }
+   return mhc_BinaryHash;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -22,9 +22,10 @@
 
 #include "stwerrors.h"
 #include "CSCLString.h"
-#include "C_SyvDcSequences.h"
 #include "TGLUtils.h"
 #include "TGLTime.h"
+#include "C_Uti.h"
+#include "C_SyvDcSequences.h"
 #include "C_OSCProtocolDriverOsyTpCan.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_PuiSdHandler.h"
@@ -60,7 +61,8 @@ C_SyvDcDeviceInformation::C_SyvDcDeviceInformation(void) :
    q_NodeIdValid(false),
    q_IpAddressValid(false),
    u8_SubNodeId(0U),
-   q_SubNodeIdValid(false)
+   q_SecuirtyActivated(false),
+   q_ExtendedInfoValid(false)
 {
    (void)std::memset(&au8_IpAddress[0], 0U, sizeof(au8_IpAddress));
 }
@@ -113,15 +115,17 @@ void C_SyvDcDeviceInformation::SetSerialNumber(const stw_opensyde_core::C_OSCPro
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets a sub node id and its valid flag
+/*! \brief   Sets a extended specific information of a node and its valid flag
 
-   \param[in]  ou8_SubNodeId  New sub node id
+   \param[in]  ou8_SubNodeId         New sub node id
+   \param[in]  oq_SecurityActivated  New security activated flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcDeviceInformation::SetSubNodeId(const uint8 ou8_SubNodeId)
+void C_SyvDcDeviceInformation::SetExtendedInfo(const uint8 ou8_SubNodeId, const bool oq_SecurityActivated)
 {
    this->u8_SubNodeId = ou8_SubNodeId;
-   this->q_SubNodeIdValid = true;
+   this->q_SecuirtyActivated = oq_SecurityActivated;
+   this->q_ExtendedInfoValid = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -139,6 +143,66 @@ bool C_SyvDcDeviceInformation::IsSerialNumberIdentical(const C_SyvDcDeviceInform
    const bool q_Return = (this->c_SerialNumber == orc_Cmp.c_SerialNumber);
 
    return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SyvDcDeviceOldComConfig::C_SyvDcDeviceOldComConfig(void) :
+   u8_OldNodeId(0U),
+   q_OldIpAddressValid(false)
+{
+   memset(&au8_OldIpAddress, 0U, 4);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Assignment operator.
+
+   \param[in]  orc_Source  instance to assign
+
+   \return
+   reference to new instance
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SyvDcDeviceOldComConfig & C_SyvDcDeviceOldComConfig::operator =(const C_SyvDcDeviceOldComConfig & orc_Source)
+{
+   if (this != &orc_Source)
+   {
+      this->u8_OldNodeId = orc_Source.u8_OldNodeId;
+      this->q_OldIpAddressValid = orc_Source.q_OldIpAddressValid;
+      memcpy(&this->au8_OldIpAddress, &orc_Source.au8_OldIpAddress, 4);
+   }
+
+   return (*this);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the content
+
+   \param[in]       ou8_OldNodeId        Old node id of node
+   \param[in]       oq_OldIpAddressValid Flag if IP address is valid
+   \param[in]       opu8_OldIpAddress    Optional pointer to old IP address
+                                         If pointer != NULL, q_OldIpAddressValid will be set to oq_OldIpAddressValid
+                                         If pointer == NULL, q_OldIpAddressValid will be set to false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDcDeviceOldComConfig::SetContent(const uint8 ou8_OldNodeId, const bool oq_OldIpAddressValid,
+                                           const uint8 * const opu8_OldIpAddress)
+{
+   this->u8_OldNodeId = ou8_OldNodeId;
+   if (opu8_OldIpAddress != NULL)
+   {
+      this->q_OldIpAddressValid = oq_OldIpAddressValid;
+      if (this->q_OldIpAddressValid == true)
+      {
+         memcpy(&this->au8_OldIpAddress[0], opu8_OldIpAddress, 4);
+      }
+   }
+   else
+   {
+      this->q_OldIpAddressValid = false;
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,6 +229,8 @@ C_SyvDcDeviceConfiguation & C_SyvDcDeviceConfiguation::operator =(const C_SyvDcD
    {
       this->c_SerialNumber = orc_Source.c_SerialNumber;
       this->u8_SubNodeId = orc_Source.u8_SubNodeId;
+      this->c_OldComConfig = orc_Source.c_OldComConfig;
+
       this->c_NodeIds = orc_Source.c_NodeIds;
       this->c_BusIds = orc_Source.c_BusIds;
       this->c_CanBitrates = orc_Source.c_CanBitrates;
@@ -187,6 +253,7 @@ C_SyvDcSequences::C_SyvDcSequences(void) :
    mu32_CanBitrate(0U),
    mq_ConfigureAllInterfaces(false),
    mq_RunScanSendFlashloaderRequestEndless(false),
+   mq_SecurityFeatureUsed(false),
    ms32_Result(C_NOACT)
 {
    mpc_Thread = new C_SyvComDriverThread(&C_SyvDcSequences::mh_ThreadFunc, this);
@@ -237,11 +304,12 @@ C_SyvDcSequences::~C_SyvDcSequences(void)
 
    \return
    C_NO_ERR      Operation success
-   C_CONFIG      Invalid system definition for parameters
+   C_NOACT       Parameter ou32_ViewIndex invalid or no active nodes
+   C_CONFIG      Invalid system definition/view configuration
    C_RD_WR       Configured communication DLL does not exist
    C_OVERFLOW    Unknown transport protocol or unknown diagnostic server for at least one node
-   C_NOACT       Parameter ou32_ActiveBusIndex invalid or no active nodes
-   C_COM         CAN initialization failed or no active node
+   C_BUSY        System view error detected
+   C_COM         CAN initialization failed or no route found for at least one node
    C_CHECKSUM    Internal buffer overflow detected
    C_RANGE       Routing configuration failed
 */
@@ -261,9 +329,12 @@ sint32 C_SyvDcSequences::InitDcSequences(const uint32 ou32_ViewIndex)
 
    if (s32_Return == C_NO_ERR)
    {
+      // pem folder is optional -> no error handling
+      mc_PemDatabase.ParseFolder(C_Uti::h_GetPemDbPath().toStdString());
+
       s32_Return = C_OSCComSequencesBase::Init(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinition(),
                                                u32_ActiveBusIndex, c_ActiveNodes, this->mpc_CanDllDispatcher,
-                                               this->mpc_EthernetDispatcher);
+                                               this->mpc_EthernetDispatcher, &this->mc_PemDatabase);
    }
 
    return s32_Return;
@@ -645,6 +716,7 @@ sint32 C_SyvDcSequences::ConfCanStwFlashloaderDevices(const std::vector<C_SyvDcD
                                           communication interfaces
    \param[in]  oq_ConfigureAllInterfaces  Flag if the settings of all connected interfaces shall be set
                                           or only the settings of the used CAN bus
+   \param[in]  oq_SecurityFeatureUsed     Flag if the security feature is used of at least one node
 
    \return
    C_NO_ERR   started sequence
@@ -652,7 +724,7 @@ sint32 C_SyvDcSequences::ConfCanStwFlashloaderDevices(const std::vector<C_SyvDcD
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ConfCanOpenSydeDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig,
-                                                const bool oq_ConfigureAllInterfaces)
+                                                const bool oq_ConfigureAllInterfaces, const bool oq_SecurityFeatureUsed)
 {
    sint32 s32_Return = C_NO_ERR;
 
@@ -666,6 +738,7 @@ sint32 C_SyvDcSequences::ConfCanOpenSydeDevices(const std::vector<C_SyvDcDeviceC
       this->mc_DeviceConfiguration.clear();
       this->mc_DeviceConfiguration = orc_DeviceConfig;
       this->mq_ConfigureAllInterfaces = oq_ConfigureAllInterfaces;
+      this->mq_SecurityFeatureUsed = oq_SecurityFeatureUsed;
       this->mpc_Thread->start();
    }
    return s32_Return;
@@ -678,6 +751,7 @@ sint32 C_SyvDcSequences::ConfCanOpenSydeDevices(const std::vector<C_SyvDcDeviceC
                                           communication interfaces
    \param[in]  oq_ConfigureAllInterfaces  Flag if the settings of all connected interfaces shall be set
                                           or only the settings of the used Ethernet bus
+   \param[in]  oq_SecurityFeatureUsed     Flag if the security feature is used of at least one node
 
    \return
    C_NO_ERR   started sequence
@@ -685,7 +759,7 @@ sint32 C_SyvDcSequences::ConfCanOpenSydeDevices(const std::vector<C_SyvDcDeviceC
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ConfEthOpenSydeDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig,
-                                                const bool oq_ConfigureAllInterfaces)
+                                                const bool oq_ConfigureAllInterfaces, const bool oq_SecurityFeatureUsed)
 {
    sint32 s32_Return = C_NO_ERR;
 
@@ -699,6 +773,7 @@ sint32 C_SyvDcSequences::ConfEthOpenSydeDevices(const std::vector<C_SyvDcDeviceC
       this->mc_DeviceConfiguration.clear();
       this->mc_DeviceConfiguration = orc_DeviceConfig;
       this->mq_ConfigureAllInterfaces = oq_ConfigureAllInterfaces;
+      this->mq_SecurityFeatureUsed = oq_SecurityFeatureUsed;
       this->mpc_Thread->start();
    }
    return s32_Return;
@@ -1013,6 +1088,32 @@ sint32 C_SyvDcSequences::GetDeviceInfosResult(std::vector<C_SyvDcDeviceInformati
    return s32_Return;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the security usage flag
+
+   \param[out]  orq_SecurityFeatureUsed   Flag if security feature is used
+
+   \return
+   C_NO_ERR       result code read
+   C_BUSY         previously started polled communication still going on
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvDcSequences::GetSecurityFeatureUsageResult(bool & orq_SecurityFeatureUsed) const
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   if (this->mpc_Thread->isRunning() == true)
+   {
+      s32_Return = C_BUSY;
+   }
+   else
+   {
+      // Copy the result vector
+      orq_SecurityFeatureUsed = this->mq_SecurityFeatureUsed;
+   }
+
+   return s32_Return;
+}
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle reports from STW Flashloader driver
 
@@ -1550,6 +1651,7 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromStwFlashloaderDevice(const uint8
    C_CONFIG   no dispatcher installed
               no com driver installed
    C_RANGE    Broadcast protocol not initialized
+   C_CHECKSUM At least one node has security activated and not all node ids are unique
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
@@ -1560,6 +1662,7 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
 
    // Clear old results
    this->mc_DeviceInfoResult.clear();
+   this->mq_SecurityFeatureUsed = false;
 
    if (this->mpc_ComDriver != NULL)
    {
@@ -1599,7 +1702,10 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
             // Serial number length is not necessary, it was already cross checked with the string
             c_DeviceInfo.SetSerialNumber(c_ReadSnResultExt[u32_ResultCounter].c_SerialNumber);
             c_DeviceInfo.SetNodeId(c_ReadSnResultExt[u32_ResultCounter].c_SenderId.u8_NodeIdentifier);
-            c_DeviceInfo.SetSubNodeId(c_ReadSnResultExt[u32_ResultCounter].u8_SubNodeId);
+            c_DeviceInfo.SetExtendedInfo(c_ReadSnResultExt[u32_ResultCounter].u8_SubNodeId,
+                                         c_ReadSnResultExt[u32_ResultCounter].q_SecurityActivated);
+            //lint -e{514}  Using operator with a bool value was intended and is no accident
+            this->mq_SecurityFeatureUsed |= c_ReadSnResultExt[u32_ResultCounter].q_SecurityActivated;
             this->mc_DeviceInfoResult.push_back(c_DeviceInfo);
          }
 
@@ -1617,6 +1723,17 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
                     this->mc_DeviceInfoResult[u32_UniqueIdCheckCounter].u8_NodeId))
                {
                   q_UniqueId = false;
+                  if (this->mq_SecurityFeatureUsed == true)
+                  {
+                     // Special case: In case of at least one node with active security no broadcasts
+                     // can be used by the configuration sequence. Therefore the node ids must be unique for
+                     // using direct communication.
+                     s32_Return = C_CHECKSUM;
+
+                     osc_write_log_error("Scan CAN get info from openSYDE devices",
+                                         "At least one node has the security feature activated and at least"
+                                         " one node id is not unique.");
+                  }
                   break;
                }
             }
@@ -1696,6 +1813,7 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
               no com driver installed
+   C_CHECKSUM At least one node has security activated and not all node ids are unique
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
@@ -1706,6 +1824,7 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
 
    // Clear old results
    this->mc_DeviceInfoResult.clear();
+   this->mq_SecurityFeatureUsed = false;
 
    if (this->mpc_ComDriver != NULL)
    {
@@ -1783,8 +1902,50 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
                // Serial number length is not necessary, it was already cross checked with the string
                c_DeviceInfo.SetSerialNumber(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].c_SerialNumber);
                c_DeviceInfo.SetNodeId(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].c_NodeId.u8_NodeIdentifier);
-               c_DeviceInfo.SetSubNodeId(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].u8_SubNodeId);
+               c_DeviceInfo.SetExtendedInfo(c_ReadDeviceInfoExtendedResults[u32_ResultCounter].u8_SubNodeId,
+                                            c_ReadDeviceInfoExtendedResults[u32_ResultCounter].q_SecurityActivated);
+               //lint -e{514}  Using operator with a bool value was intended and is no accident
+               this->mq_SecurityFeatureUsed |= c_ReadDeviceInfoExtendedResults[u32_ResultCounter].q_SecurityActivated;
                this->mc_DeviceInfoResult.push_back(c_DeviceInfo);
+            }
+
+            // Check for unique ID's and check for unique IPs in case of security
+            if (this->mq_SecurityFeatureUsed == true)
+            {
+               for (u32_ResultCounter = 0U; u32_ResultCounter < mc_DeviceInfoResult.size(); ++u32_ResultCounter)
+               {
+                  bool q_UniqueIdOrIp = true;
+
+                  for (uint32 u32_UniqueIdCheckCounter = 0U;
+                       u32_UniqueIdCheckCounter < mc_DeviceInfoResult.size();
+                       ++u32_UniqueIdCheckCounter)
+                  {
+                     if ((u32_ResultCounter != u32_UniqueIdCheckCounter) &&
+                         ((this->mc_DeviceInfoResult[u32_ResultCounter].u8_NodeId ==
+                           this->mc_DeviceInfoResult[u32_UniqueIdCheckCounter].u8_NodeId) ||
+                          (memcmp(&this->mc_DeviceInfoResult[u32_ResultCounter].au8_IpAddress,
+                                  &this->mc_DeviceInfoResult[u32_UniqueIdCheckCounter].au8_IpAddress, 4) == 0)))
+                     {
+                        q_UniqueIdOrIp = false;
+
+                        // Special case: In case of at least one node with active security no broadcasts
+                        // can be used by the configuration sequence. Therefore the node ids must be unique for
+                        // using direct communication.
+                        s32_Return = C_CHECKSUM;
+
+                        osc_write_log_error("Scan ETH get info from openSYDE devices",
+                                            "At least one node has the security feature activated and at least"
+                                            " one node id or node IP is not unique.");
+
+                        break;
+                     }
+                  }
+
+                  if (q_UniqueIdOrIp == false)
+                  {
+                     break;
+                  }
+               }
             }
          }
       }
@@ -1812,8 +1973,18 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
    * The com driver is initialized and has set up protocol instances for all openSYDE nodes
 
    Sequence:
-   * for all nodes
-   ** broadcast "setIpAddress"
+   * In case of no node with activated security
+   ** for all nodes with standard serial number
+   *** broadcast "setIpAddress"
+   ** for all nodes with extended serial number
+   *** broadcast "setIpAddressExtended"
+   * In case of at least one node with activated security
+   ** for all nodes
+   *** "DiagnosticSessionControl(Preprogramming)"
+   *** for ETH interface which is used for communication and we are connected
+   **** "setNodeIDForChannel"
+   **** "setIPaddressForChannel"
+   * In both cases:
    * broadcast: "enter flashloader"
    * broadcast: "ecu reset"
    * wait a little (all nodes should now be in the default session of the flashloader)
@@ -1840,6 +2011,7 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
                no com driver installed
    C_TIMEOUT   no response within timeout
    C_OVERFLOW  multiple responses received
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
@@ -1849,10 +2021,6 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
    this->m_RunConfEthOpenSydeDevicesProgress(0U);
    if (this->mpc_ComDriver != NULL)
    {
-      uint32 u32_DeviceCounter;
-      // We need the correct bus id for the SyvComDriver.
-      C_OSCProtocolDriverOsyNode c_ServerIdOfCurBus = this->mpc_ComDriver->GetClientId();
-
       // Vector with server ids of all configured nodes and its connected and actual used bus
       std::vector<C_OSCProtocolDriverOsyNode> c_UsedServerIds;
 
@@ -1863,105 +2031,13 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
 
       if (s32_Return == C_NO_ERR)
       {
-         // In the first step, set the IPs of all nodes on the current bus
-         //* for all nodes
-         //** broadcast "setIpAddress"
-         for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_DeviceConfiguration.size(); ++u32_DeviceCounter)
+         if (this->mq_SecurityFeatureUsed == false)
          {
-            const C_SyvDcDeviceConfiguation & rc_CurConfig = this->mc_DeviceConfiguration[u32_DeviceCounter];
-            uint32 u32_InterfaceCounter;
-
-            // Progress calculation for sequence 0% - 30%
-            this->m_RunConfEthOpenSydeDevicesProgress(
-               (u32_DeviceCounter * 30U) / this->mc_DeviceConfiguration.size());
-
-            for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_CurConfig.c_BusIds.size(); ++u32_InterfaceCounter)
-            {
-               if (rc_CurConfig.c_BusIds[u32_InterfaceCounter] == c_ServerIdOfCurBus.u8_BusIdentifier)
-               {
-                  uint8 au8_ResponseIp[4];
-                  uint8 u8_CommError;
-                  uint32 u32_NodeIndex;
-                  c_ServerIdOfCurBus.u8_NodeIdentifier = rc_CurConfig.c_NodeIds[u32_InterfaceCounter];
-                  c_UsedServerIds.push_back(c_ServerIdOfCurBus);
-
-                  if (rc_CurConfig.c_SerialNumber.q_ExtFormatUsed == false)
-                  {
-                     s32_Return =
-                        this->mpc_ComDriver->SendOsyEthBroadcastSetIpAddress(
-                           rc_CurConfig.c_SerialNumber,
-                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_IpAddress,
-                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_NetMask,
-                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_DefaultGateway,
-                           c_ServerIdOfCurBus,
-                           au8_ResponseIp, &u8_CommError);
-                  }
-                  else
-                  {
-                     s32_Return =
-                        this->mpc_ComDriver->SendOsyEthBroadcastSetIpAddressExtended(
-                           rc_CurConfig.c_SerialNumber,
-                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_IpAddress,
-                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_NetMask,
-                           rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_DefaultGateway,
-                           c_ServerIdOfCurBus,
-                           rc_CurConfig.u8_SubNodeId,
-                           au8_ResponseIp, &u8_CommError);
-                  }
-
-                  if (s32_Return != C_NO_ERR)
-                  {
-                     osc_write_log_error("Configure Ethernet openSYDE devices",
-                                         "openSYDE broadcast set IP by serial number failed with error: " +
-                                         C_SCLString::IntToStr(s32_Return));
-                     break;
-                  }
-                  else
-                  {
-                     C_SCLString c_Text;
-                     c_Text.PrintFormatted("openSYDE broadcast set IP by serial number changed the IP address on"
-                                           " node with id %d on bus with id %d.",
-                                           c_ServerIdOfCurBus.u8_NodeIdentifier,
-                                           c_ServerIdOfCurBus.u8_BusIdentifier);
-
-                     osc_write_log_info("Configure Ethernet openSYDE devices", c_Text);
-                  }
-
-                  if (this->mpc_ComDriver->GetNodeIndex(c_ServerIdOfCurBus, u32_NodeIndex) == true)
-                  {
-                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
-                        u32_NodeIndex);
-
-                     if (pc_Node != NULL)
-                     {
-                        uint32 u32_NodeIntfCounter;
-
-                        for (u32_NodeIntfCounter = 0U;
-                             u32_NodeIntfCounter < pc_Node->c_Properties.c_ComInterfaces.size();
-                             ++u32_NodeIntfCounter)
-                        {
-                           const C_OSCNodeComInterfaceSettings & rc_InterfaceSettings =
-                              pc_Node->c_Properties.c_ComInterfaces[u32_NodeIntfCounter];
-                           const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
-                              rc_InterfaceSettings.u32_BusIndex);
-
-                           if ((pc_Bus != NULL) &&
-                               (pc_Bus->u8_BusID == rc_CurConfig.c_BusIds[u32_InterfaceCounter]) &&
-                               (rc_InterfaceSettings.GetBusConnected() == true))
-                           {
-                              this->m_RunConfOpenSydeDevicesState(hu32_SETNODEID, s32_Return, c_ServerIdOfCurBus,
-                                                                  rc_InterfaceSettings.e_InterfaceType,
-                                                                  rc_InterfaceSettings.u8_InterfaceNumber);
-
-                              this->m_RunConfOpenSydeDevicesState(hu32_SETIPADDRESS, s32_Return, c_ServerIdOfCurBus,
-                                                                  rc_InterfaceSettings.e_InterfaceType,
-                                                                  rc_InterfaceSettings.u8_InterfaceNumber);
-                           }
-                        }
-                     }
-                  }
-               }
-            }
+            s32_Return = this->m_RunConfEthOpenSydeDevicesWithBroadcasts(c_UsedServerIds);
+         }
+         else
+         {
+            s32_Return = this->m_RunConfEthOpenSydeDevicesWithoutBroadcasts(c_UsedServerIds);
          }
       }
 
@@ -1969,6 +2045,345 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
       if (s32_Return == C_NO_ERR)
       {
          s32_Return = m_ConfigureNodes(false, c_UsedServerIds);
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Configure openSYDE devices via Ethernet
+
+   \param[in,out]  orc_UsedServerIds    Vector with server ids of all configured nodes and their connected and used bus
+
+   Sequence:
+   * for all nodes with standard serial number
+   ** broadcast "setIpAddress"
+   * for all nodes with extended serial number
+   ** broadcast "setIpAddressExtended"
+
+   \return
+   C_NO_ERR    all devices are configured
+   C_RANGE     device configuration is invalid
+   C_WARN      negative response received
+   C_COM       could not send request
+   C_CONFIG    no dispatcher installed or broadcast protocol not initialized
+               no com driver installed
+   C_TIMEOUT   no response within timeout
+   C_OVERFLOW  multiple responses received
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithBroadcasts(
+   std::vector<C_OSCProtocolDriverOsyNode> & orc_UsedServerIds)
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   uint32 u32_DeviceCounter;
+   // We need the correct bus id for the SyvComDriver.
+   C_OSCProtocolDriverOsyNode c_ServerIdOfCurBus = this->mpc_ComDriver->GetClientId();
+
+   for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_DeviceConfiguration.size(); ++u32_DeviceCounter)
+   {
+      const C_SyvDcDeviceConfiguation & rc_CurConfig = this->mc_DeviceConfiguration[u32_DeviceCounter];
+      uint32 u32_InterfaceCounter;
+
+      // Progress calculation for sequence 0% - 30%
+      this->m_RunConfEthOpenSydeDevicesProgress(
+         (u32_DeviceCounter * 30U) / this->mc_DeviceConfiguration.size());
+
+      for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_CurConfig.c_BusIds.size(); ++u32_InterfaceCounter)
+      {
+         if (rc_CurConfig.c_BusIds[u32_InterfaceCounter] == c_ServerIdOfCurBus.u8_BusIdentifier)
+         {
+            uint8 au8_ResponseIp[4];
+            uint8 u8_CommError;
+            uint32 u32_NodeIndex;
+            c_ServerIdOfCurBus.u8_NodeIdentifier = rc_CurConfig.c_NodeIds[u32_InterfaceCounter];
+            orc_UsedServerIds.push_back(c_ServerIdOfCurBus);
+
+            if (rc_CurConfig.c_SerialNumber.q_ExtFormatUsed == false)
+            {
+               s32_Return =
+                  this->mpc_ComDriver->SendOsyEthBroadcastSetIpAddress(
+                     rc_CurConfig.c_SerialNumber,
+                     rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_IpAddress,
+                     rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_NetMask,
+                     rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_DefaultGateway,
+                     c_ServerIdOfCurBus,
+                     au8_ResponseIp, &u8_CommError);
+            }
+            else
+            {
+               s32_Return =
+                  this->mpc_ComDriver->SendOsyEthBroadcastSetIpAddressExtended(
+                     rc_CurConfig.c_SerialNumber,
+                     rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_IpAddress,
+                     rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_NetMask,
+                     rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_DefaultGateway,
+                     c_ServerIdOfCurBus,
+                     rc_CurConfig.u8_SubNodeId,
+                     au8_ResponseIp, &u8_CommError);
+            }
+
+            if (s32_Return != C_NO_ERR)
+            {
+               osc_write_log_error("Configure Ethernet openSYDE devices",
+                                   "openSYDE broadcast set IP by serial number failed with error: " +
+                                   C_SCLString::IntToStr(s32_Return));
+               break;
+            }
+            else
+            {
+               C_SCLString c_Text;
+               c_Text.PrintFormatted("openSYDE broadcast set IP by serial number changed the IP address on"
+                                     " node with id %d on bus with id %d.",
+                                     c_ServerIdOfCurBus.u8_NodeIdentifier,
+                                     c_ServerIdOfCurBus.u8_BusIdentifier);
+
+               osc_write_log_info("Configure Ethernet openSYDE devices", c_Text);
+            }
+
+            if (this->mpc_ComDriver->GetNodeIndex(c_ServerIdOfCurBus, u32_NodeIndex) == true)
+            {
+               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                  u32_NodeIndex);
+
+               if (pc_Node != NULL)
+               {
+                  uint32 u32_NodeIntfCounter;
+
+                  for (u32_NodeIntfCounter = 0U;
+                       u32_NodeIntfCounter < pc_Node->c_Properties.c_ComInterfaces.size();
+                       ++u32_NodeIntfCounter)
+                  {
+                     const C_OSCNodeComInterfaceSettings & rc_InterfaceSettings =
+                        pc_Node->c_Properties.c_ComInterfaces[u32_NodeIntfCounter];
+                     const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+                        rc_InterfaceSettings.u32_BusIndex);
+
+                     if ((pc_Bus != NULL) &&
+                         (pc_Bus->u8_BusID == rc_CurConfig.c_BusIds[u32_InterfaceCounter]) &&
+                         (rc_InterfaceSettings.GetBusConnected() == true))
+                     {
+                        this->m_RunConfOpenSydeDevicesState(hu32_SETNODEID, s32_Return, c_ServerIdOfCurBus,
+                                                            rc_InterfaceSettings.e_InterfaceType,
+                                                            rc_InterfaceSettings.u8_InterfaceNumber);
+
+                        this->m_RunConfOpenSydeDevicesState(hu32_SETIPADDRESS, s32_Return, c_ServerIdOfCurBus,
+                                                            rc_InterfaceSettings.e_InterfaceType,
+                                                            rc_InterfaceSettings.u8_InterfaceNumber);
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Configure openSYDE devices via Ethernet
+
+   Sequence:
+   * for all nodes
+   ** "DiagnosticSessionControl(Preprogramming)"
+   ** for ETH interface which is used for communication and we are connected
+   *** "setNodeIDForChannel"
+   *** "setIPaddressForChannel"
+
+   \param[in,out]  orc_UsedServerIds    Vector with server ids of all configured nodes and their connected and used bus
+
+   \return
+   C_NO_ERR    all devices are configured
+   C_RANGE     device configuration is invalid
+   C_WARN      negative response received
+   C_COM       could not send request
+   C_CONFIG    no dispatcher installed or broadcast protocol not initialized
+               no com driver installed
+   C_TIMEOUT   no response within timeout
+   C_OVERFLOW  multiple responses received
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithoutBroadcasts(
+   std::vector<C_OSCProtocolDriverOsyNode> & orc_UsedServerIds)
+{
+   sint32 s32_Return = C_NO_ERR;
+   uint32 u32_DeviceCounter;
+   // We need the correct bus id for the SyvComDriver.
+   C_OSCProtocolDriverOsyNode c_ServerIdOfCurBus = this->mpc_ComDriver->GetClientId();
+   C_OSCProtocolDriverOsyNode c_ServerIdOfCurBusWithOldNodeId = c_ServerIdOfCurBus;
+
+   // In the first step, set the IPs of all nodes on the current bus
+   //* for all nodes
+   //** broadcast "setIpAddress"
+   for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_DeviceConfiguration.size(); ++u32_DeviceCounter)
+   {
+      const C_SyvDcDeviceConfiguation & rc_CurConfig = this->mc_DeviceConfiguration[u32_DeviceCounter];
+      uint32 u32_InterfaceCounter;
+
+      // Progress calculation for sequence 0% - 30%
+      this->m_RunConfEthOpenSydeDevicesProgress(
+         (u32_DeviceCounter * 30U) / this->mc_DeviceConfiguration.size());
+
+      for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_CurConfig.c_BusIds.size(); ++u32_InterfaceCounter)
+      {
+         if (rc_CurConfig.c_BusIds[u32_InterfaceCounter] == c_ServerIdOfCurBus.u8_BusIdentifier)
+         {
+            uint32 u32_NodeIndex;
+            c_ServerIdOfCurBus.u8_NodeIdentifier = rc_CurConfig.c_NodeIds[u32_InterfaceCounter];
+            c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier = rc_CurConfig.c_OldComConfig.u8_OldNodeId;
+
+            if (this->mpc_ComDriver->GetNodeIndex(c_ServerIdOfCurBus, u32_NodeIndex) == true)
+            {
+               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                  u32_NodeIndex);
+
+               orc_UsedServerIds.push_back(c_ServerIdOfCurBus);
+
+               if (pc_Node != NULL)
+               {
+                  uint32 u32_NodeIntfCounter;
+
+                  for (u32_NodeIntfCounter = 0U;
+                       u32_NodeIntfCounter < pc_Node->c_Properties.c_ComInterfaces.size();
+                       ++u32_NodeIntfCounter)
+                  {
+                     const C_OSCNodeComInterfaceSettings & rc_InterfaceSettings =
+                        pc_Node->c_Properties.c_ComInterfaces[u32_NodeIntfCounter];
+                     const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+                        rc_InterfaceSettings.u32_BusIndex);
+
+                     if ((pc_Bus != NULL) &&
+                         (pc_Bus->u8_BusID == rc_CurConfig.c_BusIds[u32_InterfaceCounter]) &&
+                         (rc_InterfaceSettings.GetBusConnected() == true))
+                     {
+                        uint8 u8_ErrCode;
+
+                        // Special case: The server id and the IP address can be different in comparison to the
+                        // system definition configuration
+                        // Possible combinations
+                        // 1: Both are identical -> No special handling
+                        // 2: IP address is identical -> Server ID will be adapted and the temporary protocol need the
+                        //    handle of the existing TCP connection
+                        // 3: Server ID is identical  -> The existing protocol can not be used due to a new and other
+                        //    TCP connection
+                        // 4: Bother are different -> New temporary protocol with new TCP connection necessary
+                        // To handle this scenario easy as possible. Use for all services "fresh" protocol and transport
+                        // protocol instances with an own TCP handle and initialization
+                        // The IP address on IP dispatcher layer will have no impact on other connection when it is
+                        // disconnected again
+                        C_OSCProtocolDriverOsy c_TemporaryProtocol;
+                        C_OSCProtocolDriverOsyTpIp c_TpIp;
+
+                        // We need to connect to the old connection
+                        s32_Return = this->mpc_ComDriver->EthConnectNode(c_ServerIdOfCurBusWithOldNodeId,
+                                                                         rc_CurConfig.c_OldComConfig.au8_OldIpAddress,
+                                                                         c_TemporaryProtocol, c_TpIp);
+                        if (s32_Return != C_NO_ERR)
+                        {
+                           C_SCLString c_Text;
+                           c_Text.PrintFormatted(
+                              "Could not reconnect to node with ID %d on bus with id %d. Error code: %d",
+                              c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
+                              c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier, s32_Return);
+                           osc_write_log_error("Configure openSYDE devices", c_Text);
+                        }
+
+                        if (s32_Return == C_NO_ERR)
+                        {
+                           // Set session
+                           s32_Return = this->mpc_ComDriver->SendOsySetPreProgrammingMode(
+                              c_TemporaryProtocol,
+                              false,
+                              &u8_ErrCode);
+
+                           if (s32_Return != C_NO_ERR)
+                           {
+                              C_SCLString c_Text;
+                              c_Text.PrintFormatted("openSYDE setting preprogramming mode failed on node with ID %d on "
+                                                    "bus with ID before setting the new node id %d"
+                                                    " %d with error: %s",
+                                                    c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
+                                                    c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier,
+                                                    c_ServerIdOfCurBus.u8_NodeIdentifier,
+                                                    C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(
+                                                       s32_Return,
+                                                       u8_ErrCode).c_str());
+                              osc_write_log_error("Configure openSYDE devices", c_Text);
+                           }
+                        }
+
+                        if (s32_Return == C_NO_ERR)
+                        {
+                           // Set node id
+                           s32_Return = this->mpc_ComDriver->SendOsySetNodeIdForChannel(
+                              c_TemporaryProtocol, static_cast<uint8>(rc_InterfaceSettings.e_InterfaceType),
+                              rc_InterfaceSettings.u8_InterfaceNumber, c_ServerIdOfCurBus, &u8_ErrCode);
+
+                           // Configuration function for CAN, so the interface is type CAN for sure
+                           this->m_RunConfOpenSydeDevicesState(hu32_SETNODEID, s32_Return, c_ServerIdOfCurBus,
+                                                               rc_InterfaceSettings.e_InterfaceType,
+                                                               rc_InterfaceSettings.u8_InterfaceNumber);
+
+                           if (s32_Return != C_NO_ERR)
+                           {
+                              C_SCLString c_Text;
+                              c_Text.PrintFormatted("openSYDE setting node id for communication channel failed on node "
+                                                    "with ID %d on bus with ID when setting the new node id %d"
+                                                    " %d with error: %s",
+                                                    c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
+                                                    c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier,
+                                                    c_ServerIdOfCurBus.u8_NodeIdentifier,
+                                                    C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(
+                                                       s32_Return,
+                                                       u8_ErrCode).c_str());
+                              osc_write_log_error("Configure openSYDE devices", c_Text);
+                           }
+                        }
+
+                        if (s32_Return == C_NO_ERR)
+                        {
+                           // Set node id
+                           s32_Return = this->mpc_ComDriver->SendOsySetIpAddressForChannel(
+                              c_TemporaryProtocol,
+                              rc_InterfaceSettings.u8_InterfaceNumber,
+                              rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_IpAddress,
+                              rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_NetMask,
+                              rc_CurConfig.c_IpAddresses[u32_InterfaceCounter].au8_DefaultGateway,
+                              &u8_ErrCode);
+
+                           // Configuration function for CAN, so the interface is type CAN for sure
+                           this->m_RunConfOpenSydeDevicesState(hu32_SETIPADDRESS, s32_Return, c_ServerIdOfCurBus,
+                                                               rc_InterfaceSettings.e_InterfaceType,
+                                                               rc_InterfaceSettings.u8_InterfaceNumber);
+
+                           if (s32_Return != C_NO_ERR)
+                           {
+                              C_SCLString c_Text;
+                              c_Text.PrintFormatted("openSYDE setting IP address for communication channel failed on "
+                                                    "node with ID %d on bus with ID after setting the new node id %d"
+                                                    " %d with error: %s",
+                                                    c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
+                                                    c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier,
+                                                    c_ServerIdOfCurBus.u8_NodeIdentifier,
+                                                    C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(
+                                                       s32_Return,
+                                                       u8_ErrCode).c_str());
+                              osc_write_log_error("Configure openSYDE devices", c_Text);
+                           }
+                        }
+
+                        // Configuration of primary interface of node finished. Concrete disconnect necessary
+                        C_OSCComDriverFlash::h_EthDisconnectNode(c_TemporaryProtocol);
+                     }
+                  }
+               }
+            }
+         }
       }
    }
 
@@ -2006,6 +2421,7 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
    C_WARN      negative response received
    C_COM       could not send request
    C_TIMEOUT   no response within timeout (was SetNodeIdentifiersForBroadcasts() called ?)
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
@@ -2094,6 +2510,7 @@ sint32 C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
       // servers because of an error in the process between the servers.
       for (u32_DeviceCounter = 0U; u32_DeviceCounter < orc_UsedServerIds.size(); ++u32_DeviceCounter)
       {
+         uint8 u8_NrCode;
          // Progress calculation for sequence 60% - 70%
          if (oq_ViaCan == true)
          {
@@ -2119,14 +2536,17 @@ sint32 C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
 
          // ** "DiagnosticSessionControl(Preprogramming)"
          // ** activate "SecurityAccess" for Level 1
-         s32_Return = this->mpc_ComDriver->SendOsySetPreProgrammingMode(orc_UsedServerIds[u32_DeviceCounter], false);
+         s32_Return = this->mpc_ComDriver->SendOsySetPreProgrammingMode(orc_UsedServerIds[u32_DeviceCounter], false,
+                                                                        &u8_NrCode);
 
          if (s32_Return != C_NO_ERR)
          {
             C_SCLString c_Text;
             c_Text.PrintFormatted("openSYDE setting preprogramming mode failed on node with ID %d on bus with ID"
-                                  " %d with error: %d", orc_UsedServerIds[u32_DeviceCounter].u8_NodeIdentifier,
-                                  orc_UsedServerIds[u32_DeviceCounter].u8_BusIdentifier, s32_Return);
+                                  " %d with error: %s", orc_UsedServerIds[u32_DeviceCounter].u8_NodeIdentifier,
+                                  orc_UsedServerIds[u32_DeviceCounter].u8_BusIdentifier,
+                                  C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
+                                                                                           u8_NrCode).c_str());
             osc_write_log_error("Configure openSYDE devices", c_Text);
          }
 
@@ -2424,10 +2844,20 @@ sint32 C_SyvDcSequences::m_RunConfCanStwFlashloaderDevices(void)
    * The com driver passed as parameter is initialized and has set up protocol instances for all openSYDE nodes
 
    Sequence:
-   * for all nodes
-   ** broadcast "setNodeIdBySerialNumberPart1"
-   ** broadcast "setNodeIdBySerialNumberPart2"
-   ** broadcast "setNodeIdBySerialNumberPart3"
+   * In case of no node with activated security
+   ** broadcast "DiagnosticSessionControl(Default)"
+   ** for all nodes with standard serial number
+   *** broadcast "setNodeIdBySerialNumberPart1"
+   *** broadcast "setNodeIdBySerialNumberPart2"
+   *** broadcast "setNodeIdBySerialNumberPart3"
+   ** for all nodes with extended serial number
+   *** broadcast "setNodeIdBySerialNumberExtendedPartX"
+   * In case of at least one node with activated security
+   ** for all nodes
+   *** "DiagnosticSessionControl(Preprogramming)"
+   *** for CAN interface which is used for communication and we are connected
+   **** "setNodeIDForChannel"
+   * In both cases:
    * broadcast: "RequestProgramming"
    * broadcast: "ecu reset"
    * wait a little (all nodes should now be in the default session of the flashloader)
@@ -2454,6 +2884,7 @@ sint32 C_SyvDcSequences::m_RunConfCanStwFlashloaderDevices(void)
                no com driver installed
    C_TIMEOUT   no response within timeout (was SetNodeIdentifiersForBroadcasts() called ?)
    C_OVERFLOW  multiple responses received
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
@@ -2464,10 +2895,6 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
 
    if (this->mpc_ComDriver != NULL)
    {
-      uint32 u32_DeviceCounter;
-      // We need the correct bus id for the SyvComDriver.
-      C_OSCProtocolDriverOsyNode c_ServerIdOfCurBus = this->mpc_ComDriver->GetClientId();
-
       // Vector with server ids of all configured nodes and its connected and actual used bus
       std::vector<C_OSCProtocolDriverOsyNode> c_UsedServerIds;
 
@@ -2476,103 +2903,16 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
       // Before we start check all device configurations
       s32_Return = this->m_CheckConfOpenSydeDevices(this->mc_DeviceConfiguration);
 
-      // All openSYDE nodes must be in default session.
-      // The broadcast SetNodeIdBySerialNumber works only in this session.
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastEnterDefaultSession();
-      }
-
-      if (s32_Return == C_NO_ERR)
-      {
-         // In the first step, adapt all node ids on the current used bus
-         // * for all nodes
-         // ** broadcast "setNodeIdBySerialNumberPartx"
-         for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_DeviceConfiguration.size(); ++u32_DeviceCounter)
+         if (this->mq_SecurityFeatureUsed == false)
          {
-            const C_SyvDcDeviceConfiguation & rc_CurConfig = this->mc_DeviceConfiguration[u32_DeviceCounter];
-            uint32 u32_InterfaceCounter;
-
-            // Progress calculation for sequence 0% - 30%
-            this->m_RunConfCanOpenSydeDevicesProgress(
-               (u32_DeviceCounter * 30U) / this->mc_DeviceConfiguration.size());
-
-            for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_CurConfig.c_BusIds.size(); ++u32_InterfaceCounter)
-            {
-               if (rc_CurConfig.c_BusIds[u32_InterfaceCounter] == c_ServerIdOfCurBus.u8_BusIdentifier)
-               {
-                  uint32 u32_NodeIndex;
-                  bool q_InterfaceFound = false;
-
-                  c_ServerIdOfCurBus.u8_NodeIdentifier = rc_CurConfig.c_NodeIds[u32_InterfaceCounter];
-
-                  if (this->GetNodeIndex(c_ServerIdOfCurBus, u32_NodeIndex) == true)
-                  {
-                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
-
-                     c_UsedServerIds.push_back(c_ServerIdOfCurBus);
-
-                     if (rc_CurConfig.c_SerialNumber.q_ExtFormatUsed == false)
-                     {
-                        s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastSetNodeIdBySerialNumber(
-                           rc_CurConfig.c_SerialNumber,
-                           c_ServerIdOfCurBus);
-                     }
-                     else
-                     {
-                        s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastSetNodeIdBySerialNumberExtended(
-                           rc_CurConfig.c_SerialNumber,
-                           rc_CurConfig.u8_SubNodeId,
-                           c_ServerIdOfCurBus);
-                     }
-
-                     // Get the real interface number of the bus
-                     if (pc_Node != NULL)
-                     {
-                        uint32 u32_NodeInterfaceCounter;
-
-                        for (u32_NodeInterfaceCounter = 0U;
-                             u32_NodeInterfaceCounter < pc_Node->c_Properties.c_ComInterfaces.size();
-                             ++u32_NodeInterfaceCounter)
-                        {
-                           const C_OSCNodeComInterfaceSettings & rc_ComInterface =
-                              pc_Node->c_Properties.c_ComInterfaces[u32_NodeInterfaceCounter];
-                           const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
-                              rc_ComInterface.u32_BusIndex);
-
-                           if ((pc_Bus != NULL) &&
-                               (pc_Bus->u8_BusID == rc_CurConfig.c_BusIds[u32_InterfaceCounter]) &&
-                               (rc_ComInterface.GetBusConnected() == true))
-                           {
-                              // Configuration function for CAN, so the interface is type CAN for sure
-                              this->m_RunConfOpenSydeDevicesState(hu32_SETNODEID, s32_Return, c_ServerIdOfCurBus,
-                                                                  C_OSCSystemBus::eCAN,
-                                                                  rc_ComInterface.u8_InterfaceNumber);
-                           }
-                        }
-                     }
-                     q_InterfaceFound = true;
-                  }
-                  else
-                  {
-                     s32_Return = C_RANGE;
-                  }
-
-                  if ((q_InterfaceFound == true) ||
-                      (s32_Return != C_NO_ERR))
-                  {
-                     break;
-                  }
-               }
-            }
-
-            if (s32_Return != C_NO_ERR)
-            {
-               osc_write_log_error("Configure CAN openSYDE devices",
-                                   "openSYDE broadcast set node ID by serial number failed with error: " +
-                                   C_SCLString::IntToStr(s32_Return));
-               break;
-            }
+            s32_Return = m_RunConfCanOpenSydeDevicesWithBroadcasts(c_UsedServerIds);
+         }
+         else
+         {
+            // Security is enabled on at least one node, so no broadcasts can be used
+            s32_Return = m_RunConfCanOpenSydeDevicesWithoutBroadcasts(c_UsedServerIds);
          }
       }
 
@@ -2580,6 +2920,284 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
       if (s32_Return == C_NO_ERR)
       {
          s32_Return = m_ConfigureNodes(true, c_UsedServerIds);
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write new configuration to openSYDE devices via CAN-TP broadcasts.
+
+   \param[in,out]  orc_UsedServerIds    Vector with server ids of all configured nodes and their connected and used bus
+
+   Sequence:
+   * broadcast "DiagnosticSessionControl(Default)"
+   * for all nodes with standard serial number
+   ** broadcast "setNodeIdBySerialNumberPart1"
+   ** broadcast "setNodeIdBySerialNumberPart2"
+   ** broadcast "setNodeIdBySerialNumberPart3"
+   * for all nodes with extended serial number
+   ** broadcast "setNodeIdBySerialNumberExtendedPartX"
+
+   \return
+   C_NO_ERR    all devices are configured
+   C_RANGE     device configuration is invalid
+   C_WARN      negative response received
+   C_COM       could not send requests
+   C_CONFIG    no dispatcher installed or broadcast protocol not initialized
+               no com driver installed
+   C_TIMEOUT   no response within timeout (was SetNodeIdentifiersForBroadcasts() called ?)
+   C_OVERFLOW  multiple responses received
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevicesWithBroadcasts(
+   std::vector<C_OSCProtocolDriverOsyNode> & orc_UsedServerIds)
+{
+   sint32 s32_Return;
+
+   // All openSYDE nodes must be in default session.
+   // The broadcast SetNodeIdBySerialNumber works only in this session.
+   s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastEnterDefaultSession();
+
+   if (s32_Return == C_NO_ERR)
+   {
+      uint32 u32_DeviceCounter;
+
+      // We need the correct bus id for the SyvComDriver.
+      C_OSCProtocolDriverOsyNode c_ServerIdOfCurBus = this->mpc_ComDriver->GetClientId();
+
+      // In the first step, adapt all node ids on the current used bus
+      // * for all nodes
+      // ** broadcast "setNodeIdBySerialNumberPartx"
+      for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_DeviceConfiguration.size(); ++u32_DeviceCounter)
+      {
+         const C_SyvDcDeviceConfiguation & rc_CurConfig = this->mc_DeviceConfiguration[u32_DeviceCounter];
+         uint32 u32_InterfaceCounter;
+
+         // Progress calculation for sequence 0% - 30%
+         this->m_RunConfCanOpenSydeDevicesProgress(
+            (u32_DeviceCounter * 30U) / this->mc_DeviceConfiguration.size());
+
+         for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_CurConfig.c_BusIds.size(); ++u32_InterfaceCounter)
+         {
+            if (rc_CurConfig.c_BusIds[u32_InterfaceCounter] == c_ServerIdOfCurBus.u8_BusIdentifier)
+            {
+               uint32 u32_NodeIndex;
+               bool q_InterfaceFound = false;
+
+               c_ServerIdOfCurBus.u8_NodeIdentifier = rc_CurConfig.c_NodeIds[u32_InterfaceCounter];
+
+               if (this->GetNodeIndex(c_ServerIdOfCurBus, u32_NodeIndex) == true)
+               {
+                  const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+
+                  orc_UsedServerIds.push_back(c_ServerIdOfCurBus);
+
+                  if (rc_CurConfig.c_SerialNumber.q_ExtFormatUsed == false)
+                  {
+                     s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastSetNodeIdBySerialNumber(
+                        rc_CurConfig.c_SerialNumber,
+                        c_ServerIdOfCurBus);
+                  }
+                  else
+                  {
+                     s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastSetNodeIdBySerialNumberExtended(
+                        rc_CurConfig.c_SerialNumber,
+                        rc_CurConfig.u8_SubNodeId,
+                        c_ServerIdOfCurBus);
+                  }
+
+                  // Get the real interface number of the bus
+                  if (pc_Node != NULL)
+                  {
+                     uint32 u32_NodeInterfaceCounter;
+
+                     for (u32_NodeInterfaceCounter = 0U;
+                          u32_NodeInterfaceCounter < pc_Node->c_Properties.c_ComInterfaces.size();
+                          ++u32_NodeInterfaceCounter)
+                     {
+                        const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+                           pc_Node->c_Properties.c_ComInterfaces[u32_NodeInterfaceCounter];
+                        const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+                           rc_ComInterface.u32_BusIndex);
+
+                        if ((pc_Bus != NULL) &&
+                            (pc_Bus->u8_BusID == rc_CurConfig.c_BusIds[u32_InterfaceCounter]) &&
+                            (rc_ComInterface.GetBusConnected() == true))
+                        {
+                           // Configuration function for CAN, so the interface is type CAN for sure
+                           this->m_RunConfOpenSydeDevicesState(hu32_SETNODEID, s32_Return, c_ServerIdOfCurBus,
+                                                               C_OSCSystemBus::eCAN,
+                                                               rc_ComInterface.u8_InterfaceNumber);
+                        }
+                     }
+                  }
+                  q_InterfaceFound = true;
+               }
+               else
+               {
+                  s32_Return = C_RANGE;
+               }
+
+               if ((q_InterfaceFound == true) ||
+                   (s32_Return != C_NO_ERR))
+               {
+                  break;
+               }
+            }
+         }
+
+         if (s32_Return != C_NO_ERR)
+         {
+            osc_write_log_error("Configure CAN openSYDE devices",
+                                "openSYDE broadcast set node ID by serial number failed with error: " +
+                                C_SCLString::IntToStr(s32_Return));
+            break;
+         }
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write new configuration to openSYDE devices via CAN-TP without broadcasts.
+
+   \param[in,out]  orc_UsedServerIds    Vector with server ids of all configured nodes and their connected and used bus
+
+   Sequence:
+   * for all nodes
+   ** "DiagnosticSessionControl(Preprogramming)"
+   ** for CAN interface which is used for communication and we are connected
+   *** "setNodeIDForChannel"
+
+   \return
+   C_NO_ERR    all devices are configured
+   C_RANGE     device configuration is invalid
+   C_WARN      negative response received
+   C_COM       could not send requests
+   C_CONFIG    no dispatcher installed or broadcast protocol not initialized
+               no com driver installed
+   C_TIMEOUT   no response within timeout
+   C_OVERFLOW  multiple responses received
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevicesWithoutBroadcasts(
+   std::vector<C_OSCProtocolDriverOsyNode> & orc_UsedServerIds)
+{
+   sint32 s32_Return = C_NO_ERR;
+   uint32 u32_DeviceCounter;
+
+   // We need the correct bus id for the SyvComDriver.
+   C_OSCProtocolDriverOsyNode c_ServerIdOfCurBus = this->mpc_ComDriver->GetClientId();
+   C_OSCProtocolDriverOsyNode c_ServerIdOfCurBusWithOldNodeId = c_ServerIdOfCurBus;
+
+   for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_DeviceConfiguration.size(); ++u32_DeviceCounter)
+   {
+      const C_SyvDcDeviceConfiguation & rc_CurConfig = this->mc_DeviceConfiguration[u32_DeviceCounter];
+      uint32 u32_InterfaceCounter;
+
+      // Progress calculation for sequence 0% - 30%
+      this->m_RunConfCanOpenSydeDevicesProgress(
+         (u32_DeviceCounter * 30U) / this->mc_DeviceConfiguration.size());
+
+      for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_CurConfig.c_BusIds.size(); ++u32_InterfaceCounter)
+      {
+         if (rc_CurConfig.c_BusIds[u32_InterfaceCounter] == c_ServerIdOfCurBus.u8_BusIdentifier)
+         {
+            uint32 u32_NodeIndex;
+            bool q_InterfaceFound = false;
+
+            c_ServerIdOfCurBus.u8_NodeIdentifier = rc_CurConfig.c_NodeIds[u32_InterfaceCounter];
+            c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier = rc_CurConfig.c_OldComConfig.u8_OldNodeId;
+
+            if (this->GetNodeIndex(c_ServerIdOfCurBus, u32_NodeIndex) == true)
+            {
+               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+
+               orc_UsedServerIds.push_back(c_ServerIdOfCurBus);
+
+               // Get the real interface number of the bus
+               if (pc_Node != NULL)
+               {
+                  uint32 u32_NodeInterfaceCounter;
+
+                  for (u32_NodeInterfaceCounter = 0U;
+                       u32_NodeInterfaceCounter < pc_Node->c_Properties.c_ComInterfaces.size();
+                       ++u32_NodeInterfaceCounter)
+                  {
+                     const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+                        pc_Node->c_Properties.c_ComInterfaces[u32_NodeInterfaceCounter];
+                     const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+                        rc_ComInterface.u32_BusIndex);
+
+                     if ((pc_Bus != NULL) &&
+                         (pc_Bus->u8_BusID == rc_CurConfig.c_BusIds[u32_InterfaceCounter]) &&
+                         (rc_ComInterface.GetBusConnected() == true))
+                     {
+                        uint8 u8_ErrCode;
+                        // Set session
+                        s32_Return = this->mpc_ComDriver->SendOsySetPreProgrammingMode(c_ServerIdOfCurBusWithOldNodeId,
+                                                                                       false,
+                                                                                       &u8_ErrCode);
+                        if (s32_Return != C_NO_ERR)
+                        {
+                           C_SCLString c_Text;
+                           c_Text.PrintFormatted("openSYDE setting preprogramming mode failed on node with ID %d on "
+                                                 "bus with ID before setting the new node id %d"
+                                                 " %d with error: %s",
+                                                 c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
+                                                 c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier,
+                                                 c_ServerIdOfCurBus.u8_NodeIdentifier,
+                                                 C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(
+                                                    s32_Return,
+                                                    u8_ErrCode).c_str());
+                           osc_write_log_error("Configure openSYDE devices", c_Text);
+                        }
+
+                        if (s32_Return == C_NO_ERR)
+                        {
+                           // Set node id
+                           s32_Return = this->mpc_ComDriver->SendOsySetNodeIdForChannel(
+                              c_ServerIdOfCurBusWithOldNodeId, static_cast<uint8>(rc_ComInterface.e_InterfaceType),
+                              rc_ComInterface.u8_InterfaceNumber, c_ServerIdOfCurBus);
+
+                           // Configuration function for CAN, so the interface is type CAN for sure
+                           this->m_RunConfOpenSydeDevicesState(hu32_SETNODEID, s32_Return, c_ServerIdOfCurBus,
+                                                               C_OSCSystemBus::eCAN,
+                                                               rc_ComInterface.u8_InterfaceNumber);
+
+                           if (s32_Return != C_NO_ERR)
+                           {
+                              C_SCLString c_Text;
+                              c_Text.PrintFormatted("openSYDE setting node id for communication channel failed on node "
+                                                    "with ID %d on bus with ID when setting the new node id %d"
+                                                    " %d with error: %s",
+                                                    c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
+                                                    c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier,
+                                                    c_ServerIdOfCurBus.u8_NodeIdentifier,
+                                                    C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(
+                                                       s32_Return,
+                                                       u8_ErrCode).c_str());
+                              osc_write_log_error("Configure openSYDE devices", c_Text);
+                           }
+                        }
+
+                        q_InterfaceFound = true;
+                     }
+                  }
+               }
+            }
+
+            if ((q_InterfaceFound == true) ||
+                (s32_Return != C_NO_ERR))
+            {
+               break;
+            }
+         }
       }
    }
 
@@ -3147,6 +3765,7 @@ sint32 C_SyvDcSequences::m_ReadBackCan(void)
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_ReadBackEth(void)
@@ -3183,7 +3802,8 @@ sint32 C_SyvDcSequences::m_ReadBackEth(void)
          }
          else
          {
-            s32_Return = this->mpc_ComDriver->SendOsySetPreProgrammingMode(rc_OsyServerId, false);
+            uint8 u8_NrCode;
+            s32_Return = this->mpc_ComDriver->SendOsySetPreProgrammingMode(rc_OsyServerId, false, &u8_NrCode);
 
             if (s32_Return == C_NOACT)
             {
@@ -3196,9 +3816,10 @@ sint32 C_SyvDcSequences::m_ReadBackEth(void)
             {
                C_SCLString c_Text;
                c_Text.PrintFormatted("openSYDE setting preprogramming mode failed on node with ID %d on bus with ID"
-                                     " %d with error: %d", rc_OsyServerId.u8_NodeIdentifier,
+                                     " %d with error: %s", rc_OsyServerId.u8_NodeIdentifier,
                                      rc_OsyServerId.u8_BusIdentifier,
-                                     s32_Return);
+                                     C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
+                                                                                              u8_NrCode).c_str());
                osc_write_log_error("Configure openSYDE devices", c_Text);
             }
          }

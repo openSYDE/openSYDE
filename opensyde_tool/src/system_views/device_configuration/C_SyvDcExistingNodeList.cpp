@@ -104,12 +104,19 @@ sint32 C_SyvDcExistingNodeList::SetView(const uint32 ou32_Index, const bool oq_S
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do assignment for specified node and serial number
 
-   \param[in] ou32_NodeIndex         Node index
-   \param[in] orc_SerialNumber       Serial number
+   \param[in] ou32_NodeIndex              Node index
+   \param[in] orc_SerialNumber            Serial number
+   \param[in] orc_SubNodeIdsToOldNodeIds  Detected sub node ids and the associated used node ids
+                                          with same serial number
+                                          - In case of a normal node, exact one sub node id which should be 0
+                                          - In case of a multiple CPU, at least two sub node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeList::ConnectSerialNumber(const uint32 ou32_NodeIndex,
-                                                  const C_OSCProtocolSerialNumber & orc_SerialNumber) const
+                                                  const C_OSCProtocolSerialNumber & orc_SerialNumber,
+                                                  const std::map<uint8,
+                                                                 C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+const
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
    {
@@ -117,7 +124,7 @@ void C_SyvDcExistingNodeList::ConnectSerialNumber(const uint32 ou32_NodeIndex,
          dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
       if ((pc_Widget != NULL) && (pc_Widget->CompareIndex(ou32_NodeIndex) == true))
       {
-         pc_Widget->ConnectSerialNumber(orc_SerialNumber);
+         pc_Widget->ConnectSerialNumber(orc_SerialNumber, orc_SubNodeIdsToOldNodeIds);
       }
    }
 }

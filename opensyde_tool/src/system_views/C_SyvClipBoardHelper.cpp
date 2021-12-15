@@ -17,6 +17,7 @@
 #include "C_OSCXMLParser.h"
 #include "C_SyvClipBoardHelper.h"
 #include "C_PuiSvHandlerFiler.h"
+#include "C_PuiSvDashboardFiler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -58,7 +59,7 @@ void C_SyvClipBoardHelper::h_StoreDashboardToClipboard(const C_PuiSvDashboard & 
    c_StringXml.SelectNodeParent();
    //System definition compatibility
    c_StringXml.CreateAndSelectNodeChild("gui-only");
-   C_PuiSvHandlerFiler::h_SaveDashboard(orc_Data, c_StringXml);
+   C_PuiSvDashboardFiler::h_SaveDashboard(orc_Data, c_StringXml);
    c_StringXml.SaveToString(c_XMLContent);
    mh_SetClipBoard(c_XMLContent.c_str());
 }
@@ -86,7 +87,7 @@ sint32 C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(C_PuiSvDashboard & orc
    {
       if (c_StringXml.SelectNodeChild("gui-only") == "gui-only")
       {
-         s32_Retval = C_PuiSvHandlerFiler::h_LoadDashboard(orc_Data, c_StringXml, true);
+         s32_Retval = C_PuiSvDashboardFiler::h_LoadDashboard(orc_Data, c_StringXml, true);
       }
       else
       {

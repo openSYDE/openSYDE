@@ -61,6 +61,7 @@ public:
 
    bool GetIsValid(void) const;
    QString GetInvalidNamePlaceholder(void) const;
+   QString GetInvalidItemPlaceholderTooltip(void) const;
    stw_opensyde_core::C_OSCNodeDataPool::E_Type GetInvalidTypePlaceholder(void) const;
 
    //Simple getter & setter

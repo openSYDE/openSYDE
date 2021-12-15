@@ -960,15 +960,15 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
       //Check
       if (s32_Retval == C_NO_ERR)
       {
-         const uint32 u32_LongestConstVarNameOffset = 13UL;
+         const uint32 u32_LONGEST_CONST_VAR_NAME_OFFSET = 13UL;
          if (orc_IODataDomain.c_SingularName.Length() > (C_OSCHalcDefStructFiler::
                                                          hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH -
-                                                         u32_LongestConstVarNameOffset))
+                                                         u32_LONGEST_CONST_VAR_NAME_OFFSET))
          {
             orc_XMLParser.ReportErrorForNodeContentStartingWithXMLContext(
                "content of domain \"singular-name\" (or \"name\" if not existing) node is too long, maximum allowed characters: " +
                C_SCLString::IntToStr(C_OSCHalcDefStructFiler::hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH -
-                                     u32_LongestConstVarNameOffset) +
+                                     u32_LONGEST_CONST_VAR_NAME_OFFSET) +
                " (Current: " +
                C_SCLString::IntToStr(orc_IODataDomain.
                                      c_SingularName.Length()) +

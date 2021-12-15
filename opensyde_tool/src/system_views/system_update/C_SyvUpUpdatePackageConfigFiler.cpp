@@ -17,7 +17,9 @@
 #include "TGLFile.h"
 #include "TGLUtils.h"
 #include "CSCLString.h"
+#include "C_OSCXMLParserLog.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_PuiSvHandlerFiler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -41,8 +43,8 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load update package configuration
 
-   \param[in]     orc_FilePath       File path for configuration
-   \param[in]     orc_Config         Update package configuration
+   \param[in]  orc_FilePath   File path for configuration
+   \param[in]  orc_Config     Update package configuration
 
    \return
    C_NO_ERR   File load
@@ -58,7 +60,9 @@ sint32 C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(const QString & orc_FilePat
 
    if (stw_tgl::TGL_FileExists(orc_FilePath.toStdString().c_str()) == true)
    {
-      C_OSCXMLParser c_XMLParser;
+      C_OSCXMLParserLog c_XMLParser;
+
+      c_XMLParser.SetLogHeading("Loading Update Package Configuration");
 
       s32_Return = c_XMLParser.LoadFromFile(orc_FilePath.toStdString().c_str());
 
@@ -125,10 +129,10 @@ sint32 C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(const QString & orc_FilePat
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load update package configuration
+/*! \brief   Save update package configuration
 
-   \param[in]     orc_FilePath       File path for configuration
-   \param[out]    orc_Config         Update package configuration
+   \param[in]   orc_FilePath  File path for configuration
+   \param[out]  orc_Config    Update package configuration
 
    \return
    C_NO_ERR    File save
@@ -292,6 +296,11 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_SaveNode(C_OSCXMLParser & orc_XMLParser
          }
       }
 
+      if (q_Success == true)
+      {
+         mh_SaveNodeUpdateInformationPem(orc_NodeConfig, orc_XMLParser);
+      }
+
       // Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "nodes");
    }
@@ -354,6 +363,29 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_SaveFile(C_OSCXMLParser & orc_XMLParser
    }
 
    return q_Success;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save node update information pem
+
+   \param[in]      orc_NodeConfig   Node config
+   \param[in,out]  orc_XMLParser    XML parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpUpdatePackageConfigFiler::mh_SaveNodeUpdateInformationPem(
+   const C_SyvUpUpdatePackageConfigNode & orc_NodeConfig, C_OSCXMLParserBase & orc_XMLParser)
+{
+   orc_XMLParser.CreateAndSelectNodeChild("pem-file");
+   orc_XMLParser.CreateNodeChild("path", orc_NodeConfig.c_PemFilePath.toStdString());
+   orc_XMLParser.CreateAndSelectNodeChild("states");
+   orc_XMLParser.CreateNodeChild("security", C_PuiSvHandlerFiler::h_PemFileStateSecurityToString(
+                                    orc_NodeConfig.e_StateSecurity).toStdString());
+   orc_XMLParser.CreateNodeChild("debugger", C_PuiSvHandlerFiler::h_PemFileStateDebuggerToString(
+                                    orc_NodeConfig.e_StateDebugger).toStdString());
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "pem-file");
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -430,6 +462,14 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_LoadNodes(C_OSCXMLParser & orc_XMLParse
                {
                   //Return
                   tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+               }
+            }
+
+            if (q_Success == true)
+            {
+               if (mh_LoadNodeUpdateInformationPem(c_NodeConfig, orc_XMLParser) != C_NO_ERR)
+               {
+                  q_Success = false;
                }
             }
 
@@ -638,4 +678,101 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_LoadFiles(C_OSCXMLParser & orc_XMLParse
    }
 
    return q_Success;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load node update information pem
+
+   \param[in,out]  orc_NodeConfig   Node config
+   \param[in,out]  orc_XMLParser    XML parser
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Information loaded
+   \retval   C_CONFIG   Error loading information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvUpUpdatePackageConfigFiler::mh_LoadNodeUpdateInformationPem(C_SyvUpUpdatePackageConfigNode & orc_NodeConfig,
+                                                                        C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_XMLParser.SelectNodeChild("pem-file") == "pem-file")
+   {
+      s32_Retval = orc_XMLParser.SelectNodeChildError("path");
+      if (s32_Retval == C_NO_ERR)
+      {
+         orc_NodeConfig.c_PemFilePath = orc_XMLParser.GetNodeContent().c_str();
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "pem-file");
+         s32_Retval = C_SyvUpUpdatePackageConfigFiler::mh_LoadNodeUpdateInformationPemStates(orc_NodeConfig,
+                                                                                             orc_XMLParser);
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+      }
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load node update information pem states
+
+   \param[in,out]  orc_NodeConfig   Node config
+   \param[in,out]  orc_XMLParser    XML parser
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Information loaded
+   \retval   C_CONFIG   Error loading information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvUpUpdatePackageConfigFiler::mh_LoadNodeUpdateInformationPemStates(
+   C_SyvUpUpdatePackageConfigNode & orc_NodeConfig, C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = orc_XMLParser.SelectNodeChildError("states");
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = orc_XMLParser.SelectNodeChildError("security");
+      if (s32_Retval == C_NO_ERR)
+      {
+         C_PuiSvNodeUpdate::E_StateSecurity e_StateSecurity = C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE;
+         s32_Retval = C_PuiSvHandlerFiler::h_StringToPemFileStateSecurity(
+            orc_XMLParser.GetNodeContent().c_str(), e_StateSecurity);
+         if (s32_Retval == C_NO_ERR)
+         {
+            orc_NodeConfig.e_StateSecurity = e_StateSecurity;
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "states");
+         }
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         C_PuiSvNodeUpdate::E_StateDebugger e_StateDebugger = C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE;
+         s32_Retval = orc_XMLParser.SelectNodeChildError("debugger");
+         if (s32_Retval == C_NO_ERR)
+         {
+            s32_Retval = C_PuiSvHandlerFiler::h_StringToPemFileStateDebugger(
+               orc_XMLParser.GetNodeContent().c_str(), e_StateDebugger);
+            if (s32_Retval == C_NO_ERR)
+            {
+               orc_NodeConfig.e_StateDebugger = e_StateDebugger;
+               //Return
+               tgl_assert(orc_XMLParser.SelectNodeParent() == "states");
+            }
+         }
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "pem-file");
+      }
+   }
+   return s32_Retval;
 }

@@ -459,6 +459,31 @@ sint32 C_PuiSvData::SetNodeUpdateInformationParamInfo(const uint32 ou32_NodeInde
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information PEM file path
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_Value         New path
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::SetNodeUpdateInformationPemFilePath(const uint32 ou32_NodeIndex, const QString & orc_Value)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_UpdateInformation.SetPemFilePath(orc_Value);
+      s32_Return = C_NO_ERR;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information skip flag
 
    \param[in]  ou32_NodeIndex    Node index
@@ -507,6 +532,59 @@ sint32 C_PuiSvData::SetNodeUpdateInformationSkipUpdateOfParamInfo(const uint32 o
    {
       C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
       s32_Return = rc_UpdateInformation.SetSkipUpdateOfParamInfo(ou32_Index, oq_SkipFile);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information PEM file skip flag
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  oq_SkipFile       New skip flag
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32 ou32_NodeIndex, const bool oq_SkipFile)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_UpdateInformation.SetSkipUpdateOfPemFile(oq_SkipFile);
+      s32_Return = C_NO_ERR;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information states
+
+   \param[in]      ou32_NodeIndex    Node index
+   \param[in]      oe_StateSecurity  Security state of node
+   \param[in]      oe_StateDebugger  Debugger state of node
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::SetNodeUpdateInformationStates(const uint32 ou32_NodeIndex,
+                                                   const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                                   const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_UpdateInformation.SetStates(oe_StateSecurity, oe_StateDebugger);
+      s32_Return = C_NO_ERR;
    }
 
    return s32_Return;
@@ -2903,6 +2981,30 @@ sint32 C_PuiSvData::RemoveNodeUpdateInformationParamInfo(const uint32 ou32_NodeI
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove node update information PEM file path
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::RemoveNodeUpdateInformationPemFilePath(const uint32 ou32_NodeIndex)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_UpdateInformation.RemovePemFilePath();
+      s32_Return = C_NO_ERR;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear all node update information paths as appropriate for the type
 
    \param[in]  ou32_NodeIndex    Node index
@@ -3366,7 +3468,7 @@ void C_PuiSvData::InitFromSystemDefinition(void)
                   for (u32_PathCounter = 0; u32_PathCounter < rc_Application.c_ResultPaths.size(); ++u32_PathCounter)
                   {
                      C_PuiSvNodeUpdateParamInfo c_ParamInfo;
-                     // TODO BAY: Adaption necessary if a check of the default PSI File will be added
+                     // Adaption necessary if a check of the default PSI File will be added
                      c_ParamInfo.SetContent(C_PuiUtil::h_MakeIndependentOfDbProjectPath(
                                                rc_Application.c_ProjectPath.c_str(),
                                                rc_Application.c_ResultPaths[u32_PathCounter].c_str()),

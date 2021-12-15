@@ -439,18 +439,19 @@ void C_SyvUpUpdatePackageNodeWidget::UpdatePositionNumber(const uint32 ou32_Posi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds a new file for the file based file list or a parameter set file
+/*! \brief   Adds a new file for the file based file list, a parameter set file or a PEM file
 
    \param[in]  orc_File       New path
    \param[in]  oq_Paramset    Flag if file for update or paramset file
+   \param[in]  oq_PemFile     Flag if file is a PEM file
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdatePackageNodeWidget::AddNewFile(const QString & orc_File, const bool oq_Paramset)
+void C_SyvUpUpdatePackageNodeWidget::AddNewFile(const QString & orc_File, const bool oq_Paramset, const bool oq_PemFile)
 {
    // compare all data block and file based files
    if ((this->mpc_FilesWidget != NULL) &&
        (this->mq_StwFlashloader == false) &&
-       ((this->mq_FileBased == true) || (oq_Paramset == true)) &&
+       ((this->mq_FileBased == true) || (oq_Paramset == true) || (oq_PemFile == true)) &&
        (this->m_CheckFileAlreadyContained(orc_File) == false))
    {
       this->mpc_FilesWidget->AddFile(orc_File);
@@ -1128,12 +1129,15 @@ void C_SyvUpUpdatePackageNodeWidget::dropEvent(QDropEvent * const opc_Event)
       QStringList c_FilePathsDatablocks;
       QStringList c_FilePathsParamsetFiles;
       QStringList c_FilePathsFileBased;
+      QStringList c_FilePathsPemFiles;
       C_SyvUpPackageListNodeItemWidget * pc_App = NULL;
       const QPoint c_AdaptedPos = this->mpc_Ui->pc_ScrollAreaWidget->mapFrom(this, opc_Event->pos());
 
       if (this->m_CheckMime(pc_MimeData, c_AdaptedPos, &c_FilePathsDatablocks,
                             &c_FilePathsParamsetFiles,
-                            &c_FilePathsFileBased, &pc_App) == true)
+                            &c_FilePathsFileBased,
+                            &c_FilePathsPemFiles,
+                            &pc_App) == true)
       {
          const QString c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
 
@@ -1156,34 +1160,54 @@ void C_SyvUpUpdatePackageNodeWidget::dropEvent(QDropEvent * const opc_Event)
             // Param sets and file based entries
 
             // Check if relative paths are possible and appreciated (for all files ask once)
-            QStringList c_PathsParamAndFile;
+            QStringList c_PathsParamAndPemAndFile;
             // Concatenate paths
-            c_PathsParamAndFile.append(c_FilePathsParamsetFiles);
-            c_PathsParamAndFile.append(c_FilePathsFileBased);
-            // Ask
-            c_PathsParamAndFile = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_PathsParamAndFile, c_Folder);
+            c_PathsParamAndPemAndFile.append(c_FilePathsParamsetFiles);
+            c_PathsParamAndPemAndFile.append(c_FilePathsFileBased);
+            c_PathsParamAndPemAndFile.append(c_FilePathsPemFiles);
 
-            if (c_PathsParamAndFile.size() > 0)
+            // Ask
+            c_PathsParamAndPemAndFile =
+               C_ImpUtil::h_AskUserToSaveRelativePath(this, c_PathsParamAndPemAndFile, c_Folder);
+
+            if (c_PathsParamAndPemAndFile.size() > 0)
             {
                // Re-split paths
-               tgl_assert(c_PathsParamAndFile.size() ==
-                          (c_FilePathsParamsetFiles.size() + c_FilePathsFileBased.size()));
-               c_FilePathsParamsetFiles = c_PathsParamAndFile.mid(0, c_FilePathsParamsetFiles.size());
-               c_FilePathsFileBased = c_PathsParamAndFile.mid(c_FilePathsParamsetFiles.size(), -1);
+               tgl_assert(c_PathsParamAndPemAndFile.size() ==
+                          (c_FilePathsParamsetFiles.size() + c_FilePathsFileBased.size() + c_FilePathsPemFiles.size()));
+
+               c_FilePathsParamsetFiles = c_PathsParamAndPemAndFile.mid(0, c_FilePathsParamsetFiles.size());
+
+               c_FilePathsFileBased = c_PathsParamAndPemAndFile.mid(
+                  c_FilePathsParamsetFiles.size(), c_FilePathsFileBased.size());
+
+               c_FilePathsPemFiles = c_PathsParamAndPemAndFile.mid(
+                  c_FilePathsParamsetFiles.size() + c_FilePathsFileBased.size(),
+                  -1);
 
                if ((pc_App != NULL) &&
                    (c_FilePathsFileBased.size() == 1) &&
-                   (c_FilePathsParamsetFiles.size() == 0))
+                   (c_FilePathsParamsetFiles.size() == 0) &&
+                   (c_FilePathsPemFiles.size() == 0))
                {
                   // Replace one file based entry
                   this->AdaptFile(c_FilePathsFileBased[0], pc_App);
                }
                else if ((pc_App != NULL) &&
                         (c_FilePathsFileBased.size() == 0) &&
-                        (c_FilePathsParamsetFiles.size() == 1))
+                        (c_FilePathsParamsetFiles.size() == 1) &&
+                        (c_FilePathsPemFiles.size() == 0))
                {
                   // Replace one parameter set image entry
                   this->AdaptFile(c_FilePathsParamsetFiles[0], pc_App);
+               }
+               else if ((pc_App != NULL) &&
+                        (c_FilePathsFileBased.size() == 0) &&
+                        (c_FilePathsParamsetFiles.size() == 0) &&
+                        (c_FilePathsPemFiles.size() == 1))
+               {
+                  // Replace one PEM file entry
+                  this->AdaptFile(c_FilePathsPemFiles[0], pc_App);
                }
                else
                {
@@ -1192,12 +1216,17 @@ void C_SyvUpUpdatePackageNodeWidget::dropEvent(QDropEvent * const opc_Event)
                   for (sn_FileCounter = 0; sn_FileCounter < c_FilePathsFileBased.size(); ++sn_FileCounter)
                   {
                      // Add new file. If list does not support adding new files, nothing will happen
-                     this->AddNewFile(c_FilePathsFileBased[sn_FileCounter], false);
+                     this->AddNewFile(c_FilePathsFileBased[sn_FileCounter], false, false);
                   }
                   for (sn_FileCounter = 0; sn_FileCounter < c_FilePathsParamsetFiles.size(); ++sn_FileCounter)
                   {
                      // Add new file. If list does not support adding new files, nothing will happen
-                     this->AddNewFile(c_FilePathsParamsetFiles[sn_FileCounter], true);
+                     this->AddNewFile(c_FilePathsParamsetFiles[sn_FileCounter], true, false);
+                  }
+                  for (sn_FileCounter = 0; sn_FileCounter < c_FilePathsPemFiles.size(); ++sn_FileCounter)
+                  {
+                     // Add new file. If list does not support adding new files, nothing will happen
+                     this->AddNewFile(c_FilePathsPemFiles[sn_FileCounter], false, true);
                   }
                }
             }
@@ -1418,11 +1447,11 @@ C_SyvUpPackageSectionNodeWidget * C_SyvUpUpdatePackageNodeWidget::m_GetNextListI
    {
       if (this->mpc_FilesWidget != NULL)
       {
-         if (this->mpc_FilesWidget->GetSectionState() != C_SyvUpPackageListNodeItemWidget::hu32_STATE_FINISHED)
-         {
-            // Current file is in file based section
-            pc_List = this->mpc_FilesWidget;
-         }
+         // Do not check for finished state here. If no list was already found, a state configuration error for a PEM
+         // file was probably detected, so the error belongs to the "other files", but the finished state does not match
+
+         // Current file is in file based section
+         pc_List = this->mpc_FilesWidget;
       }
       else
       {
@@ -1552,6 +1581,7 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckFileAlreadyContained(const QString &
    \param[out]  opc_FilePathsDatablocks   File paths which could be used for datablock list
    \param[out]  opc_FilePathsParamsets    File paths which could be used for parameter set image list
    \param[out]  opc_FilePathsFileBased    File paths which could be used for file based list
+   \param[out]  opc_RelevantPemFilePaths  PEM file paths which could be used for file based list
    \param[out]  oppc_App                  Found application widget
 
    \return
@@ -1563,6 +1593,7 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckMime(const QMimeData * const opc_Mim
                                                  QStringList * const opc_FilePathsDatablocks,
                                                  QStringList * const opc_FilePathsParamsets,
                                                  QStringList * const opc_FilePathsFileBased,
+                                                 QStringList * const opc_RelevantPemFilePaths,
                                                  C_SyvUpPackageListNodeItemWidget ** const oppc_App) const
 {
    bool q_Retval = false;
@@ -1604,6 +1635,7 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckMime(const QMimeData * const opc_Mim
             q_Retval = this->mc_DatablockWidgets[sn_DatablockCounter]->CheckMime(c_PathList, orc_Pos,
                                                                                  opc_FilePathsDatablocks,
                                                                                  opc_FilePathsParamsets,
+                                                                                 NULL,
                                                                                  oppc_App);
 
             if (q_Retval == true)
@@ -1614,12 +1646,14 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckMime(const QMimeData * const opc_Mim
          }
 
          // If a datablock is possible, no other list is possible
-         if (q_Retval == false)
+         if ((q_Retval == false) &&
+             (this->mpc_FilesWidget != NULL))
          {
             // Check if no file/parameter set image operation is possible or the caller wants to know all possibilities
             // In this case both checks are necessary
             q_Retval = this->mpc_FilesWidget->CheckMime(c_PathList, orc_Pos, opc_FilePathsFileBased,
                                                         opc_FilePathsParamsets,
+                                                        opc_RelevantPemFilePaths,
                                                         oppc_App);
          }
       }

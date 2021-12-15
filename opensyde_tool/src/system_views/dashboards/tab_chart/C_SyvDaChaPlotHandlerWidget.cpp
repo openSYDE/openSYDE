@@ -440,7 +440,7 @@ void C_SyvDaChaPlotHandlerWidget::SetData(const C_PuiSvDbTabChart & orc_Data, co
          c_InvalidNamePlaceholder = rc_Config.c_ElementId.GetInvalidNamePlaceholder();
          e_InvalidDataPoolTypePlaceholder = rc_Config.c_ElementId.GetInvalidTypePlaceholder();
          c_ToolTipErrorTextHeading = C_GtGetText::h_GetText("Configuration warning");
-         c_ToolTipErrorText = C_GtGetText::h_GetText("Data element was deleted in SYSTEM DEFINITION");
+         c_ToolTipErrorText = rc_Config.c_ElementId.GetInvalidItemPlaceholderTooltip();
       }
       else
       {

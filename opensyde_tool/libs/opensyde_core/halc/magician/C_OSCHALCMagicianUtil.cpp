@@ -299,7 +299,7 @@ C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetSafetyFlagVariable(
    const stw_scl::C_SCLString & orc_DomainSingularName, const bool oq_IsSafe, const uint32 ou32_NumChannels,
    const bool oq_AddDataset)
 {
-   const uint8 u8_MaxValue = 1U;
+   const uint8 u8_MAX_VALUE = 1U;
    C_OSCNodeDataPoolListElement c_Element;
 
    c_Element.c_Name = C_OSCHALCMagicianUtil::h_GetSafetyFlagVariableName(orc_DomainSingularName);
@@ -319,12 +319,12 @@ C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetSafetyFlagVariable(
    {
       for (uint32 u32_It = 0UL; u32_It < ou32_NumChannels; ++u32_It)
       {
-         c_Element.c_MaxValue.SetValueAU8Element(u8_MaxValue, u32_It);
+         c_Element.c_MaxValue.SetValueAU8Element(u8_MAX_VALUE, u32_It);
       }
    }
    else
    {
-      c_Element.c_MaxValue.SetValueU8(u8_MaxValue);
+      c_Element.c_MaxValue.SetValueU8(u8_MAX_VALUE);
    }
 
    return c_Element;

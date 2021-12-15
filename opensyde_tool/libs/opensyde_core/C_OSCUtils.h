@@ -56,7 +56,7 @@ public:
                                        stw_scl::C_SCLString * const opc_ErrorMessage = NULL);
 
 private:
-   static const stw_types::float64 mhf64_Epsilon;
+   static const stw_types::float64 mhf64_EPSILON;
    static stw_scl::C_SCLResourceStrings mhc_ResourceStrings;
 };
 

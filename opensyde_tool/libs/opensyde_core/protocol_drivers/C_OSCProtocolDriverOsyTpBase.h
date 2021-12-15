@@ -96,7 +96,7 @@ public:
    static const stw_types::uint8 hu8_OSY_RESET_TYPE_RESET_TO_FLASHLOADER = 0x60U;
    static const stw_types::uint16 hu16_OSY_MAXIMUM_SERVICE_SIZE          = 4095U;
 
-   C_OSCProtocolDriverOsyTpBase(const stw_types::uint16 ou16_MaxServiceQueueSize);
+   explicit C_OSCProtocolDriverOsyTpBase(const stw_types::uint16 ou16_MaxServiceQueueSize);
    virtual ~C_OSCProtocolDriverOsyTpBase(void);
 
    virtual stw_types::sint32 IsConnected(void);

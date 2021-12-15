@@ -294,7 +294,7 @@ sint32 C_OSCDeviceDefinitionFiler::mh_Load(C_OSCDeviceDefinition & orc_DeviceDef
          }
          if (orc_DeviceDefinition.u8_ManufacturerId == 0U)
          {
-            orc_DeviceDefinition.c_ManufacturerDisplayValue = C_OSCDeviceDefinition::hc_DefaultCompanyName;
+            orc_DeviceDefinition.c_ManufacturerDisplayValue = C_OSCDeviceDefinition::hc_DEFAULT_COMPANY_NAME;
          }
       }
    }

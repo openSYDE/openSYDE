@@ -347,6 +347,7 @@ void C_SdNdeHalcWidget::m_OnImportConfigClicked(void)
       if (c_PopUpDialog != NULL)
       {
          c_PopUpDialog->HideOverlay();
+         c_PopUpDialog->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
 }
@@ -651,6 +652,7 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
             if (c_PopUpDialog != NULL)
             {
                c_PopUpDialog->HideOverlay();
+               c_PopUpDialog->deleteLater();
             }
          } //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
       }

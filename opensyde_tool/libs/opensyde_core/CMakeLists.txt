@@ -393,6 +393,10 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CXFLFlashWriteParameters.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CXFLHexFile.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CXFLProtocol.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OSCSecurityPem.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OSCSecurityPemKeyInfo.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OSCSecurityPemDatabase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OSCSecurityRsa.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OSCCanDispatcherOsyRouter.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OSCDiagProtocolBase.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OSCDiagProtocolKfx.cpp
@@ -431,6 +435,10 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CXFLFlashWriteParameters.h
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CXFLHexFile.h
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/CXFLProtocol.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OSCSecurityPem.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OSCSecurityPemKeyInfo.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OSCSecurityPemDatabase.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/security/C_OSCSecurityRsa.h
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OSCCanDispatcherOsyRouter.h
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OSCDiagProtocolBase.h
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/C_OSCDiagProtocolKfx.h
@@ -457,12 +465,17 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/can_dispatcher/dispatcher
       ${CMAKE_CURRENT_SOURCE_DIR}/ip_dispatcher/dispatcher
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer
+      ${CMAKE_CURRENT_SOURCE_DIR}/security
+      ${CMAKE_CURRENT_SOURCE_DIR}/libtomcrypt/src/headers
+      ${CMAKE_CURRENT_SOURCE_DIR}/libtomcrypt/libtommath
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib
    )
+
+   add_subdirectory(libtomcrypt)
 endif()
 
 # windows target drivers: CAN and Ethernet dispatchers

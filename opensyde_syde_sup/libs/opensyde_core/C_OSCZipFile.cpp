@@ -206,13 +206,14 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
    vector<mz_zip_archive_file_stat> c_Files; // to store content of zip archive
 
    // open archive
-   memset(&c_ZipArchive, 0, sizeof(c_ZipArchive));
+   (void)memset(&c_ZipArchive, 0, sizeof(c_ZipArchive));
    sn_MzStatus = mz_zip_reader_init_file(&c_ZipArchive, orc_SourcePath.c_str(), 0);
    if (sn_MzStatus == MZ_FALSE)
    {
       if (opc_ErrorText != NULL)
       {
-         (*opc_ErrorText) = "Could not open zip archive \"" + orc_SourcePath + "\".";
+         (*opc_ErrorText) = "Could not open zip archive \"" + orc_SourcePath + "\". Reason: \"" +
+                            mz_zip_get_error_string(c_ZipArchive.m_last_error) + "\".";
       }
       s32_Return = C_RD_WR;
    }
@@ -247,7 +248,7 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
       {
          //lint -e{8080} //using type expected by the library for compatibility
          size_t un_UncompFileSize;
-         void * const pv_Data = mz_zip_reader_extract_file_to_heap(&c_ZipArchive, c_Iter->m_filename,
+         void * const pv_Data = mz_zip_reader_extract_file_to_heap(&c_ZipArchive, &c_Iter->m_filename[0],
                                                                    &un_UncompFileSize, 0);
          if (pv_Data != NULL)
          {
@@ -278,9 +279,9 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
                   if (pc_File != NULL)
                   {
                      //lint -e{8080} //using type expected by the library for compatibility
-                     const size_t un_SizeOfElement = sizeof(charn);
+                     const size_t un_SIZE_OF_ELEMENT = sizeof(charn);
                      //lint -e{8080} //using type expected by the library for compatibility
-                     const size_t un_NumOfBytesWritten = std::fwrite(pv_Data, un_SizeOfElement, un_UncompFileSize,
+                     const size_t un_NumOfBytesWritten = std::fwrite(pv_Data, un_SIZE_OF_ELEMENT, un_UncompFileSize,
                                                                      pc_File);
                      if (un_NumOfBytesWritten != un_UncompFileSize)
                      {
@@ -385,9 +386,9 @@ sint32 C_OSCZipFile::h_IsZipFile(const C_SCLString & orc_FilePath)
             const stw_types::charn acn_ZIP_HEADER[4] = {0x50, 0x4B, 0x03, 0x04};
             stw_types::charn acn_Header[4];
             c_FileStream.seekg(0LL, std::ios::beg);
-            c_FileStream.read(acn_Header, 4);
+            c_FileStream.read(&acn_Header[0], 4);
 
-            if (memcmp(acn_ZIP_HEADER, acn_Header, 4) == 0)
+            if (memcmp(&acn_ZIP_HEADER[0], &acn_Header[0], 4) == 0)
             {
                s32_Return = C_NO_ERR;
             }

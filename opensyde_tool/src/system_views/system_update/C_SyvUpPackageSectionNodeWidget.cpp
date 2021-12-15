@@ -35,6 +35,7 @@
 #include "C_ImpUtil.h"
 #include "C_PuiUtil.h"
 #include "C_SyvUpPackageListNodeItemParamSetWidget.h"
+#include "C_SyvUpPackageListNodeItemPemFileWidget.h"
 #include "C_SyvUpParamSetFileAddPopUp.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -78,6 +79,7 @@ C_SyvUpPackageSectionNodeWidget::C_SyvUpPackageSectionNodeWidget(QWidget * const
    mu32_FileCount(0U),
    mu32_PrimaryFileCount(0U),
    mu32_ParamSetFileCount(0U),
+   mu32_PemFileCount(0U),
    mu32_DataBlockPathNumber(0U),
    mq_ShowAddButton(false),
    mu32_PositionNumber(0U),
@@ -430,6 +432,21 @@ void C_SyvUpPackageSectionNodeWidget::UpdateDeviceInformation(const C_SyvUpDevic
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Opens the settings for a PEM file
+
+   Default implementation does nothing.
+
+   \param[in]  opc_App  Application widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
+//lint -e{9175}  //intentionally no functionality in default implementation
+void C_SyvUpPackageSectionNodeWidget::OpenPemFileSettings(C_SyvUpPackageListNodeItemWidget * const opc_App)
+{
+   Q_UNUSED(opc_App)
+   // Nothing to do here
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks all paths for existence
 
    \param[out]  oru32_CountFiles             Number of files
@@ -685,6 +702,18 @@ uint32 C_SyvUpPackageSectionNodeWidget::GetParamSetFileCount(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the number of parameter image set files
+
+   \return
+   Number of files
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SyvUpPackageSectionNodeWidget::GetPemFileCount(void) const
+{
+   return this->mu32_PemFileCount;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the state of the section
 
    \return
@@ -693,7 +722,15 @@ uint32 C_SyvUpPackageSectionNodeWidget::GetParamSetFileCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvUpPackageSectionNodeWidget::GetSectionState(void) const
 {
-   return this->mu32_State;
+   uint32 u32_State = this->mu32_State;
+
+   if (this->m_AreAllFilesSkipped() == true)
+   {
+      // Special case: Handle file as finished to skip the file
+      u32_State = C_SyvUpPackageListNodeItemWidget::hu32_STATE_FINISHED;
+   }
+
+   return u32_State;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -754,6 +791,7 @@ sint32 C_SyvUpPackageSectionNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoF
          {
             const QString c_Path = pc_App->GetAppAbsoluteFilePath();
             const bool q_ParamSetFile = (pc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET);
+            const bool q_PemFile = (pc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM);
             const QFileInfo c_File(c_Path);
 
             // Check file
@@ -762,44 +800,70 @@ sint32 C_SyvUpPackageSectionNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoF
             {
                QString c_LogEntry;
 
-               if (q_ParamSetFile == false)
+               if ((q_ParamSetFile == false) &&
+                   (q_PemFile == false))
                {
                   c_LogEntry = "Generate Update Package: For node \"%1\" and application \"%2\" used file: %3";
                }
-               else
+               else if (q_ParamSetFile == true)
                {
                   c_LogEntry =
                      "Generate Update Package: For node \"%1\" and application \"%2\" used parameter set image file: %3";
+               }
+               else
+               {
+                  c_LogEntry = "Generate Update Package: For node \"%1\" and application \"%2\" used PEM file: %3";
                }
 
                if ((pc_App->GetSkipOfUpdateFile() == false) &&
                    (pc_App->GetState() != C_SyvUpPackageListNodeItemWidget::hu32_STATE_FINISHED))
                {
-                  if (q_ParamSetFile == false)
+                  if ((q_ParamSetFile == false) &&
+                      (q_PemFile == false))
                   {
                      orc_ApplicationsToWrite.c_FilesToFlash.push_back(c_Path.toStdString().c_str());
                   }
-                  else
+                  else if (q_ParamSetFile == true)
                   {
                      orc_ApplicationsToWrite.c_FilesToWriteToNvm.push_back(c_Path.toStdString().c_str());
+                  }
+                  else
+                  {
+                     orc_ApplicationsToWrite.c_PemFile = c_Path.toStdString().c_str();
+
+                     mh_FillDoFlashWithPemStates(pc_App, orc_ApplicationsToWrite);
                   }
                }
                else
                {
                   // Update of application is not necessary
                   ++oru32_FilesUpdated;
+
+                  if (q_PemFile == true)
+                  {
+                     // Special case, in case of a skipped PEM file, do not transfer the states
+                     orc_ApplicationsToWrite.q_SendSecurityEnabledState = false;
+                     orc_ApplicationsToWrite.q_SendDebuggerEnabledState = false;
+                  }
                }
 
                if (opc_AllApplications != NULL)
                {
                   // Fill vector with all applications independent of the state
-                  if (q_ParamSetFile == false)
+                  if ((q_ParamSetFile == false) &&
+                      (q_PemFile == false))
                   {
                      opc_AllApplications->c_FilesToFlash.push_back(c_Path.toStdString().c_str());
                   }
-                  else
+                  else if (q_ParamSetFile == true)
                   {
                      opc_AllApplications->c_FilesToWriteToNvm.push_back(c_Path.toStdString().c_str());
+                  }
+                  else
+                  {
+                     opc_AllApplications->c_PemFile = c_Path.toStdString().c_str();
+
+                     mh_FillDoFlashWithPemStates(pc_App, *opc_AllApplications);
                   }
                }
 
@@ -812,14 +876,20 @@ sint32 C_SyvUpPackageSectionNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoF
             {
                QString c_LogEntry;
 
-               if (q_ParamSetFile == false)
+               if ((q_ParamSetFile == false) &&
+                   (q_PemFile == false))
                {
                   c_LogEntry = "Generate Update Package: The path of Node \"%1\" and application \"%2\" is invalid: %3";
                }
-               else
+               else if (q_ParamSetFile == true)
                {
                   c_LogEntry = "Generate Update Package: The path of Node \"%1\" and application \"%2\" parameter"
                                " set image file is invalid: %3";
+               }
+               else
+               {
+                  c_LogEntry = "Generate Update Package: The path of Node \"%1\" and application \"%2\" PEM"
+                               " file is invalid: %3";
                }
 
                osc_write_log_info("Generate Update Package",
@@ -839,7 +909,8 @@ sint32 C_SyvUpPackageSectionNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoF
    }
 
    if ((orc_ApplicationsToWrite.c_FilesToFlash.size() == 0) &&
-       (orc_ApplicationsToWrite.c_FilesToWriteToNvm.size() == 0))
+       (orc_ApplicationsToWrite.c_FilesToWriteToNvm.size() == 0) &&
+       (orc_ApplicationsToWrite.c_PemFile == ""))
    {
       // No files added
       s32_Return = C_NOACT;
@@ -856,6 +927,7 @@ sint32 C_SyvUpPackageSectionNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoF
    \param[in]      orc_Pos                         Mouse position
    \param[out]     opc_RelevantFilePaths           File paths which could be used for this list
    \param[out]     opc_RelevantParamSetImagePaths  Parameter set image paths which could be used for this list
+   \param[out]     opc_RelevantPemFilePaths        PEM file paths which could be used for this list
    \param[out]     oppc_App                        Found application widget
 
    \return
@@ -866,6 +938,7 @@ sint32 C_SyvUpPackageSectionNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoF
 bool C_SyvUpPackageSectionNodeWidget::CheckMime(QStringList & orc_PathList, const QPoint & orc_Pos,
                                                 QStringList * const opc_RelevantFilePaths,
                                                 QStringList * const opc_RelevantParamSetImagePaths,
+                                                QStringList * const opc_RelevantPemFilePaths,
                                                 C_SyvUpPackageListNodeItemWidget ** const oppc_App) const
 {
    // One application is only usable in case of one specific path
@@ -879,6 +952,7 @@ bool C_SyvUpPackageSectionNodeWidget::CheckMime(QStringList & orc_PathList, cons
       Q_UNUSED(orc_PathList)
       Q_UNUSED(opc_RelevantFilePaths)
       Q_UNUSED(opc_RelevantParamSetImagePaths)
+      Q_UNUSED(opc_RelevantPemFilePaths)
 
       if (oppc_App != NULL)
       {
@@ -999,6 +1073,53 @@ QString C_SyvUpPackageSectionNodeWidget::m_GetApplicationPath(const uint32 ou32_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if all files of the section are marked with skipped
+
+   \retval   true    All files are marked with skipped
+   \retval   false   At least one file is not marked with skipped or no files exist
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpPackageSectionNodeWidget::m_AreAllFilesSkipped(void) const
+{
+   sintn sn_FileCounter;
+   bool q_Return = false;
+   bool q_AtLeastOneFileNotSkipped = false;
+   bool q_AtLeastOneFileExist = false;
+
+   for (sn_FileCounter = 0; sn_FileCounter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++sn_FileCounter)
+   {
+      QLayoutItem * const pc_CurrentItem = this->mpc_Ui->pc_FileVerticalLayout->itemAt(sn_FileCounter);
+
+      if (pc_CurrentItem != NULL)
+      {
+         C_SyvUpPackageListNodeItemWidget * const pc_App =
+            dynamic_cast<C_SyvUpPackageListNodeItemWidget *>(pc_CurrentItem->widget());
+
+         if (pc_App != NULL)
+         {
+            // One file exist at least
+            q_AtLeastOneFileExist = true;
+            if (pc_App->GetSkipOfUpdateFile() == false)
+            {
+               // Not skipped file
+               q_AtLeastOneFileNotSkipped = true;
+               break;
+            }
+         }
+      }
+   }
+
+   if ((q_AtLeastOneFileExist == true) &&
+       (q_AtLeastOneFileNotSkipped == false))
+   {
+      // All files of section are skipped
+      q_Return = true;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Adapts the widget in case of a change of the file count
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1073,7 +1194,8 @@ void C_SyvUpPackageSectionNodeWidget::m_SetFileState(const uint32 ou32_File, con
       }
       break;
    case C_SyvUpPackageListNodeItemWidget::hu32_STATE_TO_DO:
-      if (this->mu32_FileCount == 0U)
+      if ((this->mu32_FileCount == 0U) ||
+          (this->m_AreAllFilesSkipped() == true)) // Special case: Check if all sub files are skipped
       {
          // In this case nothing to in this section
          this->m_SetState(C_SyvUpPackageListNodeItemWidget::hu32_STATE_FINISHED);
@@ -1256,6 +1378,7 @@ sint32 C_SyvUpPackageSectionNodeWidget::m_GetParamsetFileInfo(const QString & or
       if (c_New != NULL)
       {
          c_New->HideOverlay();
+         c_New->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_InfoDialog and the Qt memory management
    else
@@ -1321,6 +1444,31 @@ bool C_SyvUpPackageSectionNodeWidget::mh_IsFileParamSetFile(const QString & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the file is an PEM file
+
+   The check decides based on the file extension.
+
+   \param[in]  orc_File    File to check
+
+   \retval   true    The file is a PEM file
+   \retval   false   The file is not a PEM file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpPackageSectionNodeWidget::mh_IsFilePemFile(const QString & orc_File)
+{
+   const QFileInfo c_File(orc_File);
+   bool q_PemFile = false;
+   const QString c_FileExtension = "pem";
+
+   if (c_File.completeSuffix().toLower() == c_FileExtension)
+   {
+      q_PemFile = true;
+   }
+
+   return q_PemFile;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of expand signal.
 
    \param[in]  oq_Expand   true: expand; false: collapse
@@ -1379,7 +1527,17 @@ void C_SyvUpPackageSectionNodeWidget::m_InitItems(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPackageSectionNodeWidget::m_GetApplicationState(const uint32 ou32_Application) const
+/*! \brief   Gets the state of an application and optional the type of the application
+
+   \param[in]       ou32_Application    Index of application in node section
+   \param[out]      opu32_Type          Optional: Type of found application
+
+   \return
+   Status of application
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SyvUpPackageSectionNodeWidget::m_GetApplicationState(const uint32 ou32_Application,
+                                                              uint32 * const opu32_Type) const
 {
    QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(ou32_Application);
    // Undefined state in error case
@@ -1394,6 +1552,10 @@ uint32 C_SyvUpPackageSectionNodeWidget::m_GetApplicationState(const uint32 ou32_
       if (pc_App != NULL)
       {
          u32_Return = pc_App->GetState();
+         if (opu32_Type != NULL)
+         {
+            *opu32_Type = pc_App->GetType();
+         }
       }
    }
 
@@ -1423,13 +1585,56 @@ void C_SyvUpPackageSectionNodeWidget::m_SetApplicationConnected(const uint32 ou3
 uint32 C_SyvUpPackageSectionNodeWidget::m_GetFirstNotFinishedApplication(void) const
 {
    sint32 s32_ApplicationCounter;
+   uint32 u32_TypeCounter;
 
-   for (s32_ApplicationCounter = 0U;
-        s32_ApplicationCounter < static_cast<sint32>(this->mpc_Ui->pc_FileVerticalLayout->count());
-        ++s32_ApplicationCounter)
+   // The order of application type is relevant and different to the shown order
+   // Transfer order:
+   // 1: Datablock applications
+   // 2: File based other files
+   // 3: PSI files
+   // 4: PEM file
+
+   for (u32_TypeCounter = 0U; u32_TypeCounter <= mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM; ++u32_TypeCounter)
    {
-      if (this->m_GetApplicationState(s32_ApplicationCounter) !=
-          C_SyvUpPackageListNodeItemWidget::hu32_STATE_FINISHED)
+      uint32 u32_ExpectedType;
+      bool q_Found = false;
+
+      // Order of type numbers does not match the expected types, so a little remap is necessary
+      switch (u32_TypeCounter)
+      {
+      case 0U:
+         u32_ExpectedType = mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK;
+         break;
+      case 1U:
+         u32_ExpectedType = mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE;
+         break;
+      case 2U:
+         u32_ExpectedType = mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET;
+         break;
+      case 3U:
+         u32_ExpectedType = mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM;
+         break;
+      default:
+         break;
+      }
+
+      // Search all applications
+      for (s32_ApplicationCounter = 0U;
+           s32_ApplicationCounter < static_cast<sint32>(this->mpc_Ui->pc_FileVerticalLayout->count());
+           ++s32_ApplicationCounter)
+      {
+         // Check state and type to get the correct order
+         uint32 u32_CurrentType = mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK;
+         const uint32 u32_State = this->m_GetApplicationState(s32_ApplicationCounter, &u32_CurrentType);
+         if ((u32_State != C_SyvUpPackageListNodeItemWidget::hu32_STATE_FINISHED) &&
+             (u32_CurrentType == u32_ExpectedType))
+         {
+            q_Found = true;
+            break;
+         }
+      }
+
+      if (q_Found == true)
       {
          break;
       }
@@ -1446,6 +1651,7 @@ void C_SyvUpPackageSectionNodeWidget::m_UpdateNumbers(void)
    // Recount the different types of files
    this->mu32_PrimaryFileCount = 0U;
    this->mu32_ParamSetFileCount = 0U;
+   this->mu32_PemFileCount = 0U;
 
    for (sn_AppWidgetCounter = 0; sn_AppWidgetCounter < this->mpc_Ui->pc_FileVerticalLayout->count();
         ++sn_AppWidgetCounter)
@@ -1459,10 +1665,16 @@ void C_SyvUpPackageSectionNodeWidget::m_UpdateNumbers(void)
 
          if (pc_App != NULL)
          {
-            if (pc_App->GetType() != mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET)
+            if ((pc_App->GetType() != mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET) &&
+                (pc_App->GetType() != mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM))
             {
                pc_App->SetAppNumber(this->mu32_PrimaryFileCount);
                ++this->mu32_PrimaryFileCount;
+            }
+            else if (pc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM)
+            {
+               pc_App->SetAppNumber(this->mu32_PemFileCount);
+               ++mu32_PemFileCount;
             }
             else
             {
@@ -1482,4 +1694,61 @@ void C_SyvUpPackageSectionNodeWidget::m_UpdateNumbers(void)
 void C_SyvUpPackageSectionNodeWidget::m_RestartMovie(void)
 {
    this->mpc_Movie->start();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fills the PEM states in the DoFlash class
+
+   \param[in]       opc_App       PEM file app
+   \param[in,out]   orc_DoFlash   Detailed output parameter description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPackageSectionNodeWidget::mh_FillDoFlashWithPemStates(
+   const C_SyvUpPackageListNodeItemWidget * const opc_App, C_OSCSuSequences::C_DoFlash & orc_DoFlash)
+{
+   const C_SyvUpPackageListNodeItemPemFileWidget * const pc_PemApp =
+      dynamic_cast<const C_SyvUpPackageListNodeItemPemFileWidget *>(opc_App);
+
+   tgl_assert(pc_PemApp != NULL);
+   if (pc_PemApp != NULL)
+   {
+      C_PuiSvNodeUpdate::E_StateSecurity e_StateSecurity;
+      C_PuiSvNodeUpdate::E_StateDebugger e_StateDebugger;
+
+      pc_PemApp->GetPemStates(e_StateSecurity, e_StateDebugger);
+
+      switch (e_StateSecurity)
+      {
+      case C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE:
+         orc_DoFlash.q_SendSecurityEnabledState = false;
+         break;
+      case C_PuiSvNodeUpdate::eST_SEC_ACTIVATE:
+         orc_DoFlash.q_SendSecurityEnabledState = true;
+         orc_DoFlash.q_SecurityEnabled = true;
+         break;
+      case C_PuiSvNodeUpdate::eST_SEC_DEACTIVATE:
+         orc_DoFlash.q_SendSecurityEnabledState = true;
+         orc_DoFlash.q_SecurityEnabled = false;
+         break;
+      default:
+         break;
+      }
+
+      switch (e_StateDebugger)
+      {
+      case C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE:
+         orc_DoFlash.q_SendDebuggerEnabledState = false;
+         break;
+      case C_PuiSvNodeUpdate::eST_DEB_ACTIVATE:
+         orc_DoFlash.q_SendDebuggerEnabledState = true;
+         orc_DoFlash.q_DebuggerEnabled = true;
+         break;
+      case C_PuiSvNodeUpdate::eST_DEB_DEACTIVATE:
+         orc_DoFlash.q_SendDebuggerEnabledState = true;
+         orc_DoFlash.q_DebuggerEnabled = false;
+         break;
+      default:
+         break;
+      }
+   }
 }

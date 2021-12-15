@@ -86,10 +86,10 @@ const C_OSCDeviceDefinition * C_OSCDeviceManager::LookForDevice(const C_SCLStrin
    \param[in,out]  orc_IniFile               Path of .ini file where user devices will be saved
 
    \return
-   C_NO_ERR   Device added without problems
-   C_RD_WR    Could not add device
-   C_CONFIG   Device already exists, won't be added
-   C_NOACT    specified file is invalid (invalid XML file)
+   C_NO_ERR     Device added without problems
+   C_RD_WR      Could not add device
+   C_OVERFLOW   Device already exists, won't be added
+   C_NOACT      Specified file is invalid (invalid XML file)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDeviceManager::AddDevice(const stw_scl::C_SCLString & orc_DeviceDefinitionFile,
@@ -125,7 +125,9 @@ sint32 C_OSCDeviceManager::AddDevice(const stw_scl::C_SCLString & orc_DeviceDefi
                                                                    c_DeviceDefinition.c_DeviceNameAlias,
                                                                    c_DeviceDefinition.c_FilePath) == true)
          {
-            s32_Return = C_CONFIG;
+            s32_Return = C_OVERFLOW;
+            osc_write_log_error("Adding device definition",
+                                "Device \"" + c_DeviceDefinition.c_FilePath + "\" already exists.");
             break;
          }
       }
@@ -283,15 +285,17 @@ bool C_OSCDeviceManager::WasLoaded(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load all known devices
 
-   \param[in]  orc_File       Ini file path
-   \param[in]  oq_Optional    If optional: Type of log entry when file is missing is set to "INFO". Otherwise: "ERROR".
+   \param[in]     orc_File          Ini file path
+   \param[in]     oq_Optional       If user_devices.ini: Type of log entry when file is missing is set to "INFO". Otherwise: "ERROR".
+   \param[in,out] opsn_DeviceCount  Optional parameter: can be used to keep track of how many devices are listed in an ini file
 
    \return
    C_NO_ERR   all information loaded without problems
    C_RD_WR    could not load information
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDeviceManager::LoadFromFile(const C_SCLString & orc_File, const bool oq_Optional)
+sint32 C_OSCDeviceManager::LoadFromFile(const C_SCLString & orc_File, const bool oq_Optional,
+                                        sintn * const opsn_DeviceCount)
 {
    sint32 s32_Return = C_NO_ERR;
 
@@ -320,9 +324,25 @@ sint32 C_OSCDeviceManager::LoadFromFile(const C_SCLString & orc_File, const bool
       C_OSCDeviceGroup c_Group;
       const C_SCLString c_GroupName = c_Ini.ReadString("DeviceTypes", "TypeName" + C_SCLString::IntToStr(
                                                           sn_ItType + 1), "");
+
+      // special case user_devices.ini. We accept only one format. If an ini-file contains [User Nodes], the
+      // number of types [NumTypes] has to be 1
+      if (c_GroupName == "User Nodes")
+      {
+         if (sn_NumTypes > 1)
+         {
+            osc_write_log_error("Loading from ini file", "File \"" + orc_File + "\" should only contain User Nodes.");
+            break;
+         }
+         // optional parameter (see above): sends number of files listed in ini to GUI layer for user feedback.
+         if (opsn_DeviceCount != NULL)
+         {
+            *opsn_DeviceCount += c_Ini.ReadInteger("User Nodes", "DeviceCount", 0);
+         }
+      }
+
       c_Group.SetGroupName(c_GroupName.c_str());
       s32_Return = c_Group.LoadGroup(c_Ini, TGL_ExtractFilePath(orc_File));
-
       this->mc_DeviceGroups.push_back(c_Group);
 
       if (s32_Return != C_NO_ERR)

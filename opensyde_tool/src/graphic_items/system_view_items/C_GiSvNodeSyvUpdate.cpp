@@ -197,10 +197,11 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
        (this->mc_NodeData.GetUpdateInProgressStatus()  == false))
    {
       QGraphicsView * const pc_View = this->scene()->views().at(0);
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
+      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View->parentWidget(), pc_View->parentWidget());
       this->mpc_InfoDialog =
          new C_SyvUpNodePropertiesDialog(*c_New,  static_cast<uint32>(this->ms32_Index),
                                          this->mc_NodeData);
+
       this->m_RefreshDialog();
       //Resize
       c_New->SetSize(QSize(1000, 820));
@@ -246,6 +247,7 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
       if (c_New != NULL)
       {
          c_New->HideOverlay();
+         c_New->deleteLater();
       }
    }
 }

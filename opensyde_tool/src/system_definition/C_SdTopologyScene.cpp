@@ -3045,6 +3045,7 @@ void C_SdTopologyScene::m_ShowNewConnectionPopUp(const C_GiNode * const opc_Node
       if (c_Dialog != NULL)
       {
          c_Dialog->HideOverlay();
+         c_Dialog->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
@@ -3172,6 +3173,7 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
       if (c_Dialog != NULL)
       {
          c_Dialog->HideOverlay();
+         c_Dialog->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }

@@ -63,7 +63,7 @@ public:
    void SetProgress(const stw_types::uint32 ou32_Percentage) const;
    void UpdatePositionNumber(const stw_types::uint32 ou32_PositionNumber);
 
-   void AddNewFile(const QString & orc_File, const bool oq_Paramset);
+   void AddNewFile(const QString & orc_File, const bool oq_Paramset, const bool oq_PemFile);
    void AdaptFile(const QString & orc_File, C_SyvUpPackageListNodeItemWidget * const opc_App);
    void RevertFile(C_SyvUpPackageListNodeItemWidget * const opc_App) const;
    void RemoveFile(C_SyvUpPackageListNodeItemWidget * const opc_App) const;
@@ -143,6 +143,7 @@ private:
                     QStringList * const opc_FilePathsDatablocks = NULL,
                     QStringList * const opc_FilePathsParamsets = NULL,
                     QStringList * const opc_FilePathsFileBased = NULL,
+                    QStringList * const opc_RelevantPemFilePaths = NULL,
                     C_SyvUpPackageListNodeItemWidget ** const oppc_App = NULL) const;
 
    static const stw_types::sint32 mhs32_LAYOUT_THRESHOLD;

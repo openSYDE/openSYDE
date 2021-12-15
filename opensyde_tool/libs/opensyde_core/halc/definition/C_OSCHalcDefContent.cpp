@@ -41,6 +41,7 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCHalcDefContent::C_OSCHalcDefContent(void) :
+   C_OSCNodeDataPoolContent(),
    me_ComplexType(eCT_PLAIN)
 {
 }

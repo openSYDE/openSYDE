@@ -528,7 +528,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                            pc_OSCElement->c_MinValue,
                            pc_OSCElement->f64_Factor,
                            pc_OSCElement->f64_Offset,
-                           0);
+                           0, true, osn_Role);
                      }
                      else
                      {
@@ -562,7 +562,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                            pc_OSCElement->c_MaxValue,
                            pc_OSCElement->f64_Factor,
                            pc_OSCElement->f64_Offset,
-                           0);
+                           0, true, osn_Role);
                      }
                      else
                      {
@@ -634,7 +634,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                                                                                           u32_DataSet],
                                                                                        pc_OSCElement->f64_Factor,
                                                                                        pc_OSCElement->f64_Offset,
-                                                                                       0);
+                                                                                       0, true, osn_Role);
                            }
                         }
                      }

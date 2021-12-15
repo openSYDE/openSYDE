@@ -45,6 +45,7 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/C_SdTopologyWidget.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.cpp \
     ../src/system_views/C_SyvHandlerWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPemFileOptionsPopUp.cpp \
     ../src/user_settings/C_UsHandler.cpp \
     ../src/user_settings/C_UsFiler.cpp \
     ../src/project_operations/C_PopListItem.cpp \
@@ -380,6 +381,7 @@ SOURCES += ../src/main.cpp \
     ../src/project_gui/system_views/C_PuiSvData.cpp \
     ../src/project_gui/system_views/C_PuiSvDashboard.cpp \
     ../src/project_gui/system_views/C_PuiSvHandlerFiler.cpp \
+    ../src/project_gui/system_views/C_PuiSvDashboardFiler.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabDashboardTab.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiDashboardTab.cpp \
     ../src/graphic_items/C_GiCheckBox.cpp \
@@ -734,9 +736,11 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/system_update/C_SyvUpInformationWidget.cpp \
     ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.cpp \
     ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.cpp \
+    ../src/system_views/system_update/C_SyvUpPemFileInfoPopUp.cpp \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemDatablockWidget.cpp \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemFileWidget.cpp \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemParamSetWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemPemFileWidget.cpp \
     ../src/system_views/system_update/C_SyvUpPackageSectionNodeDatablockWidget.cpp \
     ../src/system_views/system_update/C_SyvUpPackageSectionNodeFilesWidget.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubSystemCommissioningEdit.cpp \
@@ -888,6 +892,7 @@ HEADERS  += \
     ../src/system_definition/C_SdTopologyWidget.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.h \
     ../src/system_views/C_SyvHandlerWidget.h \
+    ../src/system_views/system_update/C_SyvUpPemFileOptionsPopUp.h \
     ../src/user_settings/C_UsHandler.h \
     ../src/constants.h \
     ../src/user_settings/C_UsFiler.h \
@@ -1225,6 +1230,7 @@ HEADERS  += \
     ../src/project_gui/system_views/C_PuiSvData.h \
     ../src/project_gui/system_views/C_PuiSvDashboard.h \
     ../src/project_gui/system_views/C_PuiSvHandlerFiler.h \
+    ../src/project_gui/system_views/C_PuiSvDashboardFiler.h \
     ../src/opensyde_gui_elements/label/C_OgeLabDashboardTab.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiDashboardTab.h \
     ../src/graphic_items/C_GiCheckBox.h \
@@ -1589,9 +1595,11 @@ HEADERS  += \
     ../src/system_views/system_update/C_SyvUpInformationWidget.h \
     ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.h \
     ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.h \
+    ../src/system_views/system_update/C_SyvUpPemFileInfoPopUp.h \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemDatablockWidget.h \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemFileWidget.h \
     ../src/system_views/system_update/C_SyvUpPackageListNodeItemParamSetWidget.h \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemPemFileWidget.h \
     ../src/system_views/system_update/C_SyvUpPackageSectionNodeDatablockWidget.h \
     ../src/system_views/system_update/C_SyvUpPackageSectionNodeFilesWidget.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubSystemCommissioningEdit.h \
@@ -1753,6 +1761,7 @@ FORMS    += \
     ../src/system_definition/C_SdNodeComIfSetupWidget.ui \
     ../src/system_definition/C_SdNodeToNodeConnectionSetupWidget.ui \
     ../src/system_views/system_setup/C_SyvSeSetupWidget.ui \
+    ../src/system_views/system_update/C_SyvUpPemFileOptionsPopUp.ui \
     ../src/system_views/system_update/C_SyvUpUpdateWidget.ui \
     ../src/system_views/system_update/C_SyvUpOverviewWidget.ui \
     ../src/opensyde_gui_elements/widget/C_OgeWiDashboardTab.ui \
@@ -1817,6 +1826,7 @@ FORMS    += \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaImportReport.ui \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorAddWidget.ui \
     ../src/system_views/system_update/C_SyvUpParamSetFileInfoPopUp.ui \
+    ../src/system_views/system_update/C_SyvUpPemFileInfoPopUp.ui \
     ../src/system_views/system_update/C_SyvUpSummaryWidgetSmall.ui \
     ../src/system_views/system_update/C_SyvUpInformationWidget.ui \
     ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.ui \
@@ -1930,7 +1940,8 @@ INCLUDEPATH += ../src \
                ../libs/dbc_driver_library/src/ \
                ../libs/dbc_driver_library/src/Vector \
                ../libs/dbc_driver_library/src/Vector/DBC \
-               ../libs/qcustomplot
+               ../libs/qcustomplot \
+               ../libs/openssl/include
 
 RESOURCES += \
     ../src/application.qrc
@@ -1942,11 +1953,19 @@ LIBS += -L../libs/gettext -lintl \
 LIBS += -lws2_32   #WinSock
 LIBS += -lIphlpapi #IP helper API
 
+#openssl
+LIBS += -L../libs/openssl -lcrypto
+
 #add windows API libraries
 LIBS += -lversion
 
 #do not warn about c++11 - we need it for Qt anyway and would else get issues with warnings in qobjectdefs_impl.h
 QMAKE_CXXFLAGS += -Wno-c++11-compat
+
+#do not issue deprecation warnings (tested code can contain deprecated functions which we do want to provide)
+win32-g++ {
+QMAKE_CXXFLAGS += -Wno-deprecated-declarations
+}
 
 QMAKE_TARGET_COMPANY = STW
 QMAKE_TARGET_PRODUCT = openSYDE

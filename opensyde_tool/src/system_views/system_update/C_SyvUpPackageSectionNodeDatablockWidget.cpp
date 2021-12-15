@@ -589,6 +589,7 @@ void C_SyvUpPackageSectionNodeDatablockWidget::UpdateDeviceInformation(const C_S
    \param[in]   orc_Pos                         Mouse position
    \param[out]  opc_RelevantFilePaths           File paths which could be used for this list
    \param[out]  opc_RelevantParamSetImagePaths  Parameter set image paths which could be used for this list
+   \param[out]  opc_RelevantPemFilePaths        PEM file paths (Not relevant and possible for datablocks)
    \param[out]  oppc_App                        Found application widget
 
    \return
@@ -599,6 +600,7 @@ void C_SyvUpPackageSectionNodeDatablockWidget::UpdateDeviceInformation(const C_S
 bool C_SyvUpPackageSectionNodeDatablockWidget::CheckMime(QStringList & orc_PathList, const QPoint & orc_Pos,
                                                          QStringList * const opc_RelevantFilePaths,
                                                          QStringList * const opc_RelevantParamSetImagePaths,
+                                                         QStringList * const opc_RelevantPemFilePaths,
                                                          C_SyvUpPackageListNodeItemWidget ** const oppc_App) const
 {
    bool q_Retval = false;
@@ -608,7 +610,8 @@ bool C_SyvUpPackageSectionNodeDatablockWidget::CheckMime(QStringList & orc_PathL
       C_SyvUpPackageListNodeItemWidget * pc_App = NULL;
 
       q_Retval = C_SyvUpPackageSectionNodeWidget::CheckMime(orc_PathList, orc_Pos, opc_RelevantFilePaths,
-                                                            opc_RelevantParamSetImagePaths, &pc_App);
+                                                            opc_RelevantParamSetImagePaths,
+                                                            opc_RelevantPemFilePaths, &pc_App);
 
       // Dropping on datablocks must have a specific app as target
       if ((q_Retval == true) &&

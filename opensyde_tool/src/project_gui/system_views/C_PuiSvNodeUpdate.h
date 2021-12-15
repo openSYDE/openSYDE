@@ -35,6 +35,20 @@ public:
       eFTP_FILE_BASED
    };
 
+   enum E_StateSecurity
+   {
+      eST_SEC_NO_CHANGE,
+      eST_SEC_ACTIVATE,
+      eST_SEC_DEACTIVATE
+   };
+
+   enum E_StateDebugger
+   {
+      eST_DEB_NO_CHANGE,
+      eST_DEB_ACTIVATE,
+      eST_DEB_DEACTIVATE
+   };
+
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
    //Vectors
@@ -63,6 +77,17 @@ public:
    stw_types::sint32 RemovePath(const stw_types::uint32 ou32_Index, const E_GenericFileType oe_Type);
    stw_types::sint32 RemoveParamInfo(const stw_types::uint32 ou32_Index);
 
+   // PEM file
+   void SetPemFilePath(const QString & orc_Value);
+   QString GetPemFilePath(void) const;
+   void RemovePemFilePath(void);
+   void SetSkipUpdateOfPemFile(const bool oq_Skip);
+   bool GetSkipUpdateOfPemFile(void) const;
+
+   //State elements
+   void SetStates(const E_StateSecurity oe_StateSecurity, const E_StateDebugger oe_StateDebugger);
+   void GetStates(E_StateSecurity & ore_StateSecurity, E_StateDebugger & ore_StateDebugger) const;
+
    void OnSyncNodeApplicationAdded(const stw_types::uint32 ou32_NodeIndex,
                                    const stw_types::uint32 ou32_ApplicationIndex);
    void OnSyncNodeApplicationMoved(const stw_types::uint32 ou32_NodeIndex,
@@ -90,6 +115,12 @@ private:
    // 1: flags for datablock paths
    // 2: flags for file based paths
    // 3: flags for parameter set paths
+
+   QString mc_PemFilePath;
+   bool mq_SkipUpdateOfPemFile;
+
+   E_StateSecurity me_StateSecurity;
+   E_StateDebugger me_StateDebugger;
 
    static const stw_types::sintn mhsn_PARAMETER_SET_INDEX = 2;
 };

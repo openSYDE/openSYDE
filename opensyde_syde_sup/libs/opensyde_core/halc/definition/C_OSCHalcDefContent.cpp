@@ -41,6 +41,7 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCHalcDefContent::C_OSCHalcDefContent(void) :
+   C_OSCNodeDataPoolContent(),
    me_ComplexType(eCT_PLAIN)
 {
 }
@@ -84,8 +85,9 @@ sint32 C_OSCHalcDefContent::AddEnumItem(const stw_scl::C_SCLString & orc_Display
                                         const C_OSCNodeDataPoolContent & orc_Value)
 {
    sint32 s32_Retval = C_NO_ERR;
+   const C_OSCNodeDataPoolContent * const pc_Content = this->FindEnumItem(orc_DisplayName);
 
-   if (this->mc_EnumItems.find(orc_DisplayName) != this->mc_EnumItems.end())
+   if (pc_Content != NULL)
    {
       s32_Retval = C_RANGE;
    }
@@ -93,7 +95,8 @@ sint32 C_OSCHalcDefContent::AddEnumItem(const stw_scl::C_SCLString & orc_Display
    {
       if ((orc_Value.GetType() == this->GetType()) && (orc_Value.GetArray() == this->GetArray()))
       {
-         this->mc_EnumItems[orc_DisplayName] = orc_Value;
+         this->mc_EnumItems.push_back(std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>(orc_DisplayName,
+                                                                                                orc_Value));
       }
       else
       {
@@ -117,47 +120,45 @@ sint32 C_OSCHalcDefContent::AddEnumItem(const stw_scl::C_SCLString & orc_Display
 sint32 C_OSCHalcDefContent::SetEnumValue(const stw_scl::C_SCLString & orc_DisplayName)
 {
    sint32 s32_Retval = C_NO_ERR;
-   const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = this->mc_EnumItems.find(
-      orc_DisplayName);
+   const C_OSCNodeDataPoolContent * const pc_NewContent = this->FindEnumItem(orc_DisplayName);
 
-   if (c_It != this->mc_EnumItems.end())
+   if (pc_NewContent != NULL)
    {
-      const C_OSCNodeDataPoolContent & rc_NewContent = c_It->second;
-      if ((this->GetArray() == rc_NewContent.GetArray()) && (this->GetType() == rc_NewContent.GetType()))
+      if ((this->GetArray() == pc_NewContent->GetArray()) && (this->GetType() == pc_NewContent->GetType()))
       {
          if (this->GetArray())
          {
             switch (this->GetType())
             {
             case eUINT8:
-               this->SetValueAU8(rc_NewContent.GetValueAU8());
+               this->SetValueAU8(pc_NewContent->GetValueAU8());
                break;
             case eUINT16:
-               this->SetValueAU16(rc_NewContent.GetValueAU16());
+               this->SetValueAU16(pc_NewContent->GetValueAU16());
                break;
             case eUINT32:
-               this->SetValueAU32(rc_NewContent.GetValueAU32());
+               this->SetValueAU32(pc_NewContent->GetValueAU32());
                break;
             case eUINT64:
-               this->SetValueAU64(rc_NewContent.GetValueAU64());
+               this->SetValueAU64(pc_NewContent->GetValueAU64());
                break;
             case eSINT8:
-               this->SetValueAS8(rc_NewContent.GetValueAS8());
+               this->SetValueAS8(pc_NewContent->GetValueAS8());
                break;
             case eSINT16:
-               this->SetValueAS16(rc_NewContent.GetValueAS16());
+               this->SetValueAS16(pc_NewContent->GetValueAS16());
                break;
             case eSINT32:
-               this->SetValueAS32(rc_NewContent.GetValueAS32());
+               this->SetValueAS32(pc_NewContent->GetValueAS32());
                break;
             case eSINT64:
-               this->SetValueAS64(rc_NewContent.GetValueAS64());
+               this->SetValueAS64(pc_NewContent->GetValueAS64());
                break;
             case eFLOAT32:
-               this->SetValueAF32(rc_NewContent.GetValueAF32());
+               this->SetValueAF32(pc_NewContent->GetValueAF32());
                break;
             case eFLOAT64:
-               this->SetValueAF64(rc_NewContent.GetValueAF64());
+               this->SetValueAF64(pc_NewContent->GetValueAF64());
                break;
             default:
                break;
@@ -168,34 +169,34 @@ sint32 C_OSCHalcDefContent::SetEnumValue(const stw_scl::C_SCLString & orc_Displa
             switch (this->GetType())
             {
             case eUINT8:
-               this->SetValueU8(rc_NewContent.GetValueU8());
+               this->SetValueU8(pc_NewContent->GetValueU8());
                break;
             case eUINT16:
-               this->SetValueU16(rc_NewContent.GetValueU16());
+               this->SetValueU16(pc_NewContent->GetValueU16());
                break;
             case eUINT32:
-               this->SetValueU32(rc_NewContent.GetValueU32());
+               this->SetValueU32(pc_NewContent->GetValueU32());
                break;
             case eUINT64:
-               this->SetValueU64(rc_NewContent.GetValueU64());
+               this->SetValueU64(pc_NewContent->GetValueU64());
                break;
             case eSINT8:
-               this->SetValueS8(rc_NewContent.GetValueS8());
+               this->SetValueS8(pc_NewContent->GetValueS8());
                break;
             case eSINT16:
-               this->SetValueS16(rc_NewContent.GetValueS16());
+               this->SetValueS16(pc_NewContent->GetValueS16());
                break;
             case eSINT32:
-               this->SetValueS32(rc_NewContent.GetValueS32());
+               this->SetValueS32(pc_NewContent->GetValueS32());
                break;
             case eSINT64:
-               this->SetValueS64(rc_NewContent.GetValueS64());
+               this->SetValueS64(pc_NewContent->GetValueS64());
                break;
             case eFLOAT32:
-               this->SetValueF32(rc_NewContent.GetValueF32());
+               this->SetValueF32(pc_NewContent->GetValueF32());
                break;
             case eFLOAT64:
-               this->SetValueF64(rc_NewContent.GetValueF64());
+               this->SetValueF64(pc_NewContent->GetValueF64());
                break;
             default:
                break;
@@ -228,7 +229,8 @@ sint32 C_OSCHalcDefContent::GetEnumValue(stw_scl::C_SCLString & orc_DisplayName)
 {
    sint32 s32_Retval = C_RANGE;
 
-   for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = this->mc_EnumItems.begin();
+   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+           this->mc_EnumItems.begin();
         c_It != this->mc_EnumItems.end(); ++c_It)
    {
       if (c_It->second == *this)
@@ -242,13 +244,40 @@ sint32 C_OSCHalcDefContent::GetEnumValue(stw_scl::C_SCLString & orc_DisplayName)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Find enum item
+
+   \param[in]  orc_DisplayName   Display name
+
+   \return
+   Found item, if pointer not NULL
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCNodeDataPoolContent * C_OSCHalcDefContent::FindEnumItem(const stw_scl::C_SCLString & orc_DisplayName) const
+{
+   const C_OSCNodeDataPoolContent * pc_Retval = NULL;
+
+   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+           this->mc_EnumItems.begin();
+        c_It != this->mc_EnumItems.end(); ++c_It)
+   {
+      if (c_It->first == orc_DisplayName)
+      {
+         pc_Retval = &c_It->second;
+         break;
+      }
+   }
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get all enum items
 
    \return
    All enum items
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> & C_OSCHalcDefContent::GetEnumItems(void) const
+const std::vector<std::pair<stw_scl::C_SCLString,
+                            C_OSCNodeDataPoolContent> > & C_OSCHalcDefContent::GetEnumItems(void) const
 {
    return this->mc_EnumItems;
 }
@@ -474,7 +503,8 @@ void C_OSCHalcDefContent::CalcHash(uint32 & oru32_HashValue) const
 
    stw_scl::C_SCLChecksums::CalcCRC32(&this->me_ComplexType, sizeof(this->me_ComplexType), oru32_HashValue);
 
-   for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = this->mc_EnumItems.begin();
+   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+           this->mc_EnumItems.begin();
         c_It != this->mc_EnumItems.end(); ++c_It)
    {
       stw_scl::C_SCLChecksums::CalcCRC32(c_It->first.c_str(), c_It->first.Length(), oru32_HashValue);
@@ -502,7 +532,8 @@ void C_OSCHalcDefContent::CalcHashElement(uint32 & oru32_HashValue, const uint32
 
    stw_scl::C_SCLChecksums::CalcCRC32(&this->me_ComplexType, sizeof(this->me_ComplexType), oru32_HashValue);
 
-   for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = this->mc_EnumItems.begin();
+   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+           this->mc_EnumItems.begin();
         c_It != this->mc_EnumItems.end(); ++c_It)
    {
       stw_scl::C_SCLChecksums::CalcCRC32(c_It->first.c_str(), c_It->first.Length(), oru32_HashValue);
@@ -529,7 +560,8 @@ void C_OSCHalcDefContent::CalcHashStructure(uint32 & oru32_HashValue) const
 
    stw_scl::C_SCLChecksums::CalcCRC32(&this->me_ComplexType, sizeof(this->me_ComplexType), oru32_HashValue);
 
-   for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = this->mc_EnumItems.begin();
+   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+           this->mc_EnumItems.begin();
         c_It != this->mc_EnumItems.end(); ++c_It)
    {
       stw_scl::C_SCLChecksums::CalcCRC32(c_It->first.c_str(), c_It->first.Length(), oru32_HashValue);

@@ -75,7 +75,7 @@ C_PopFileTableView::C_PopFileTableView(QWidget * const opc_Parent) :
    this->horizontalHeader()->setSectionResizeMode(C_PopFileTableModel::h_EnumToColumn(
                                                      C_PopFileTableModel::ePATH), QHeaderView::Stretch);
    this->setColumnWidth(C_PopFileTableModel::h_EnumToColumn(C_PopFileTableModel::eNAME), 315);
-   this->setColumnWidth(C_PopFileTableModel::h_EnumToColumn(C_PopFileTableModel::eVERSION), 80);
+   this->setColumnWidth(C_PopFileTableModel::h_EnumToColumn(C_PopFileTableModel::eVERSION), 100);
    this->setColumnWidth(C_PopFileTableModel::h_EnumToColumn(C_PopFileTableModel::ePATH), 200);
 
    //Row Height

@@ -81,7 +81,8 @@ public:
                                   const stw_types::uint32 ou32_ActiveBusIndex,
                                   const std::vector<stw_types::uint8> & orc_ActiveNodes,
                                   stw_can::C_CAN_Dispatcher * const opc_CanDispatcher,
-                                  C_OSCIpDispatcher * const opc_IpDispatcher);
+                                  C_OSCIpDispatcher * const opc_IpDispatcher,
+                                  C_OSCSecurityPemDatabase * const opc_SecurityPemDb);
 
    stw_types::sint32 InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bitrate);
 
@@ -95,6 +96,13 @@ public:
                                                         const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                         stw_types::uint32 & oru32_TimeValue) const;
 
+   // ETH specific functions for connect when no protocol and/or IP address is initialized
+   stw_types::sint32 EthConnectNode(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                    const stw_types::uint8 (&orau8_IpAddress)[4],
+                                    C_OSCProtocolDriverOsy & orc_TemporaryProtocol,
+                                    C_OSCProtocolDriverOsyTpIp & orc_TpIp);
+   static stw_types::sint32 h_EthDisconnectNode(C_OSCProtocolDriverOsy & orc_TemporaryProtocol);
+
    // openSYDE Services
    stw_types::sint32 SendOsyBroadcastRequestProgramming(bool & orq_NotAccepted) const;
    stw_types::sint32 SendOsyBroadcastEcuReset(const stw_types::uint8 ou8_ResetType) const;
@@ -105,11 +113,11 @@ public:
       std::vector<C_OSCProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberExtendedResults> & orc_ExtendedResponses)
    const;
    stw_types::sint32 SendOsyCanBroadcastSetNodeIdBySerialNumber(const C_OSCProtocolSerialNumber & orc_SerialNumber,
-                                                                const C_OSCProtocolDriverOsyNode & orc_NewNodeId)
-   const;
+                                                                const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
+                                                                stw_types::uint8 * const opu8_NrCode = NULL) const;
    stw_types::sint32 SendOsyCanBroadcastSetNodeIdBySerialNumberExtended(
       const C_OSCProtocolSerialNumber & orc_SerialNumber, const stw_types::uint8 ou8_SubNodeId,
-      const C_OSCProtocolDriverOsyNode & orc_NewNodeId) const;
+      const C_OSCProtocolDriverOsyNode & orc_NewNodeId, stw_types::uint8 * const opu8_NrCode = NULL) const;
    stw_types::sint32 SendOsyEthBroadcastGetDeviceInformation(
       std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults> & orc_ReadDeviceInfoResults,
       std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults> & orc_ReadDeviceInfoExtendedResults)
@@ -185,31 +193,68 @@ public:
    stw_types::sint32 SendOsyRequestProgramming(const C_OSCProtocolDriverOsyNode & orc_ServerId) const;
    stw_types::sint32 SendOsyEcuReset(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                      const stw_types::uint8 ou8_ResetType) const;
+   stw_types::sint32 SendOsySetPreProgrammingMode(C_OSCProtocolDriverOsy & orc_Protocol, const bool oq_SessionOnly,
+                                                  stw_types::uint8 * const opu8_NrCode = NULL) const;
    stw_types::sint32 SendOsySetPreProgrammingMode(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                   const bool oq_SessionOnly,
-                                                  stw_types::uint8 * const opu8_NrCode = NULL)  const;
+                                                  stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 SendOsySetProgrammingMode(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                               const stw_types::uint8 * const opu8_SecurityLevel = NULL,
                                                stw_types::uint8 * const opu8_NrCode = NULL) const;
    stw_types::sint32 SendOsySetSecurityLevel(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                             const stw_types::uint8 ou8_Level) const;
+                                             const stw_types::uint8 ou8_Level,
+                                             stw_types::uint8 * const opu8_NrCode = NULL) const;
    stw_types::sint32 SendOsySetBitrate(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                        const stw_types::uint8 ou8_ChannelIndex, const stw_types::uint32 ou32_Bitrate,
                                        stw_types::uint8 * const opu8_NrCode = NULL) const;
+   stw_types::sint32 SendOsySetIpAddressForChannel(C_OSCProtocolDriverOsy & orc_Protocol,
+                                                   const stw_types::uint8 ou8_ChannelIndex,
+                                                   const stw_types::uint8 (&orau8_IpAddress)[4],
+                                                   const stw_types::uint8 (&orau8_NetMask)[4],
+                                                   const stw_types::uint8 (&orau8_DefaultGateway)[4],
+                                                   stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 SendOsySetIpAddressForChannel(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                    const stw_types::uint8 ou8_ChannelIndex,
                                                    const stw_types::uint8 (&orau8_IpAddress)[4],
                                                    const stw_types::uint8 (&orau8_NetMask)[4],
                                                    const stw_types::uint8 (&orau8_DefaultGateway)[4],
-                                                   stw_types::uint8 * const opu8_NrCode = NULL) const;
+                                                   stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 SendOsySetNodeIdForChannel(C_OSCProtocolDriverOsy & orc_Protocol,
+                                                const stw_types::uint8 ou8_ChannelType,
+                                                const stw_types::uint8 ou8_ChannelIndex,
+                                                const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
+                                                stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 SendOsySetNodeIdForChannel(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                 const stw_types::uint8 ou8_ChannelType,
                                                 const stw_types::uint8 ou8_ChannelIndex,
                                                 const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
-                                                stw_types::uint8 * const opu8_NrCode = NULL) const;
+                                                stw_types::uint8 * const opu8_NrCode = NULL);
 
    stw_types::sint32 SendOsyReadListOfFeatures(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ListOfFeatures,
                                                stw_types::uint8 * const opu8_NrCode = NULL) const;
+
+   stw_types::sint32 SendOsyReadCertificateSerialNumber(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                        std::vector<stw_types::uint8> & orc_SerialNumber,
+                                                        stw_types::uint8 * const opu8_NrCode = NULL) const;
+   stw_types::sint32 SendOsyWriteSecurityKey(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                             const std::vector<stw_types::uint8> & orc_PublicKeyModulus,
+                                             const std::vector<stw_types::uint8> & orc_PublicKeyExponent,
+                                             const std::vector<stw_types::uint8> & orc_CertificateSerialNumber,
+                                             stw_types::uint8 * const opu8_NrCode = NULL) const;
+   stw_types::sint32 SendOsyReadSecurityActivation(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                   bool & orq_SecurityOn, stw_types::uint8 & oru8_SecurityAlgorithm,
+                                                   stw_types::uint8 * const opu8_NrCode = NULL) const;
+   stw_types::sint32 SendOsyWriteSecurityActivation(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                    const bool oq_SecurityOn,
+                                                    const stw_types::uint8 ou8_SecurityAlgorithm,
+                                                    stw_types::uint8 * const opu8_NrCode = NULL) const;
+   stw_types::sint32 SendOsyReadDebuggerEnabled(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                bool & orq_DebuggerEnabled,
+                                                stw_types::uint8 * const opu8_NrCode = NULL) const;
+   stw_types::sint32 SendOsyWriteDebuggerEnabled(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                 const bool oq_DebuggerEnabled,
+                                                 stw_types::uint8 * const opu8_NrCode = NULL) const;
 
    // STW Flashloader services
    stw_types::sint32 SendStwRequestNodeReset(void);

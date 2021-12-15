@@ -1731,7 +1731,9 @@ sint32 C_XFLProtocol::GetSNRExt(uint8 * const opu8_SNR, const uint8 ou8_NumMax, 
       TRG_HandleSystemMessages();
       if (m_CANGetResponse(t_RXMsg) == C_NO_ERR)
       {
-         if ((t_RXMsg.au8_Data[0] == mc_Config.u8_LocalID) && (t_RXMsg.au8_Data[1] == mu8_XFL_CMD_GRP_GET_SNR))
+         if ((t_RXMsg.u8_DLC == 8U) &&
+             (t_RXMsg.au8_Data[0] == mc_Config.u8_LocalID) &&
+             (t_RXMsg.au8_Data[1] == mu8_XFL_CMD_GRP_GET_SNR))
          {
             if (opu8_SNR != NULL)
             {

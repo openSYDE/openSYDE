@@ -524,6 +524,21 @@ QString C_Uti::h_GetExePath(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get PEM database path
+
+   \return
+   PEM database path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_Uti::h_GetPemDbPath()
+{
+   QDir c_Directory(C_Uti::h_GetExePath());
+
+   c_Directory.cd("certificates");
+   return c_Directory.absolutePath();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get resource version number of a file as an QString
 
    Extracts the windows version number of the specified file and returns it

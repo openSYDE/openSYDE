@@ -12,7 +12,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <stddef.h>
+#include <cstddef>
 
 #include "C_OSCNodeDataPoolListId.h"
 

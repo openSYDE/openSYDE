@@ -17,6 +17,7 @@
 #include "C_SUPSuSequences.h"
 #include "CCAN.h"
 #include "C_OSCIpDispatcher.h"
+#include "C_OSCSecurityPemDatabase.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -67,6 +68,8 @@ public:
       eERR_UPDATE_SYSDEF               = 65,
       eERR_UPDATE_CHECKSUM             = 66,
       eERR_UPDATE_NO_NVM               = 67,
+      eERR_UPDATE_CERTIFICATE_PATH     = 68,
+      eERR_UPDATE_AUTHENTICATION       = 69,
 
       eERR_THREAD_UPDATE_IN_PROGRESS   = 70,
       eERR_THREAD_UPDATE_INIT_FAILED   = 71,
@@ -89,6 +92,7 @@ protected:
    stw_scl::C_SCLString mc_LogPath;
    stw_scl::C_SCLString mc_LogFile;
    stw_scl::C_SCLString mc_UnzipPath;
+   stw_scl::C_SCLString mc_CertFolderPath;
 
    C_SYDEsup::E_Result m_InitOptionalParameters(void);
 
@@ -106,6 +110,9 @@ private:
    stw_scl::C_SCLString m_GetLogFileLocation(void) const;
    void m_PrintStringFromError(const C_SYDEsup::E_Result & ore_Result) const;
    void m_Conclude(C_SUPSuSequences & orc_Sequence, const bool & orq_ResetSystem);
+
+   // Security PEM database
+   stw_opensyde_core::C_OSCSecurityPemDatabase mc_PemDatabase;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

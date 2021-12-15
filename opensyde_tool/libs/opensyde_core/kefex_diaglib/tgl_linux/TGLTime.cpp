@@ -43,7 +43,7 @@ using namespace stw_tgl;
 void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
 {
    struct timespec t_TimeSpec;
-   struct tm* pt_LocalTime;
+   struct tm * pt_LocalTime;
    time_t t_UnixTime;
 
    clock_gettime(CLOCK_REALTIME, &t_TimeSpec);
@@ -55,13 +55,18 @@ void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
    t_UnixTime = t_TimeSpec.tv_sec;
    pt_LocalTime = localtime(&t_UnixTime);
 
-   //Convert to readable format
-   orc_DateTime.mu16_Year  = static_cast<uint16>(pt_LocalTime->tm_year);
-   orc_DateTime.mu8_Month  = static_cast<uint8>(pt_LocalTime->tm_mon);
+   //Convert from tm format to TGL format
+   orc_DateTime.mu16_Year  = static_cast<uint16>(pt_LocalTime->tm_year + 1900);
+   orc_DateTime.mu8_Month  = static_cast<uint8>(pt_LocalTime->tm_mon + 1);
    orc_DateTime.mu8_Day    = static_cast<uint8>(pt_LocalTime->tm_mday);
    orc_DateTime.mu8_Hour   = static_cast<uint8>(pt_LocalTime->tm_hour);
    orc_DateTime.mu8_Minute = static_cast<uint8>(pt_LocalTime->tm_min);
    orc_DateTime.mu8_Second = static_cast<uint8>(pt_LocalTime->tm_sec);
+   //Technically tm_sec could be > 59 in some rare cases due to leap seconds
+   if (orc_DateTime.mu8_Second > 59U)
+   {
+      orc_DateTime.mu8_Second = 59U;
+   }
    orc_DateTime.mu16_MilliSeconds = static_cast<uint16>(t_TimeSpec.tv_nsec / 1000000);
 }
 

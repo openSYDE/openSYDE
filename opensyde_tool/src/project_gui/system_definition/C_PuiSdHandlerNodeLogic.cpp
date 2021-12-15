@@ -2728,6 +2728,8 @@ sint32 C_PuiSdHandlerNodeLogic::InsertDataPoolList(const uint32 & oru32_NodeInde
                                                  orc_UIContent);
             rc_OSCDataPool.c_Lists.insert(rc_OSCDataPool.c_Lists.begin() + oru32_DataPoolListIndex, c_NodeDataPoolList);
 
+            rc_OSCNode.RecalculateAddress();
+
             //Synchronization engine
             Q_EMIT (this->SigSyncNodeDataPoolListAdded(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex));
 
@@ -2813,6 +2815,8 @@ sint32 C_PuiSdHandlerNodeLogic::RemoveDataPoolList(const uint32 & oru32_NodeInde
                                                                   oru32_DataPoolListIndex));
             rc_UIDataPool.c_DataPoolLists.erase(rc_UIDataPool.c_DataPoolLists.begin() + oru32_DataPoolListIndex);
             rc_OSCDataPool.c_Lists.erase(rc_OSCDataPool.c_Lists.begin() + oru32_DataPoolListIndex);
+
+            rc_OSCNode.RecalculateAddress();
 
             // Handle shared Datapools
             if (oq_HandleSharedDatapools == true)
@@ -4271,6 +4275,8 @@ sint32 C_PuiSdHandlerNodeLogic::InsertDataPoolListElement(const uint32 & oru32_N
                rc_OSCList.c_Elements.insert(rc_OSCList.c_Elements.begin() + oru32_DataPoolListElementIndex,
                                             c_NodeDataPoolListElement);
 
+               rc_OSCNode.RecalculateAddress();
+
                //Synchronization engine
                Q_EMIT (this->SigSyncNodeDataPoolListElementAdded(oru32_NodeIndex, oru32_DataPoolIndex,
                                                                  oru32_DataPoolListIndex,
@@ -4377,6 +4383,8 @@ sint32 C_PuiSdHandlerNodeLogic::RemoveDataPoolListElement(const uint32 & oru32_N
                rc_UIList.c_DataPoolListElements.erase(rc_UIList.c_DataPoolListElements.begin() +
                                                       oru32_DataPoolListElementIndex);
                rc_OSCList.c_Elements.erase(rc_OSCList.c_Elements.begin() + oru32_DataPoolListElementIndex);
+
+               rc_OSCNode.RecalculateAddress();
 
                // Handle shared Datapools
                if (oq_HandleSharedDatapools == true)

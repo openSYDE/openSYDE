@@ -44,6 +44,8 @@ private:
                           const C_SyvUpUpdatePackageConfigNodeApp & orc_AppConfig);
    static bool mh_SaveParamSet(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser, const QString & orc_Path);
    static bool mh_SaveFile(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser, const QString & orc_Path);
+   static void mh_SaveNodeUpdateInformationPem(const C_SyvUpUpdatePackageConfigNode & orc_NodeConfig,
+                                               stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
 
    static bool mh_LoadNodes(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser, C_SyvUpUpdatePackageConfig & orc_Config);
    static bool mh_LoadApps(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser,
@@ -52,6 +54,10 @@ private:
                                 C_SyvUpUpdatePackageConfigNode & orc_NodeConfig);
    static bool mh_LoadFiles(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser,
                             C_SyvUpUpdatePackageConfigNode & orc_NodeConfig);
+   static stw_types::sint32 mh_LoadNodeUpdateInformationPem(C_SyvUpUpdatePackageConfigNode & orc_NodeConfig,
+                                                            stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadNodeUpdateInformationPemStates(C_SyvUpUpdatePackageConfigNode & orc_NodeConfig,
+                                                                  stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

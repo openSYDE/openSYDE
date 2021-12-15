@@ -6,12 +6,27 @@ project("console_system_updater_sydesup")
 #include script to generate PC-lint configuration files
 include(lint_config.cmake)
 
+if (NOT WIN32)
+   #dynamic link
+   set(OPENSSL_USE_STATIC_LIBS 0) 
+   find_package(OpenSSL REQUIRED)
+endif()
+
 set(PROJECT_ROOT ${PROJECT_SOURCE_DIR}/..)
 
 # --- PROJECT INCLUDE PATHS --------------------------------------------------------------------------------------------
 set(SYDESUP_COMMON_INCLUDE_DIRECTORIES
    ${PROJECT_ROOT}/src
    )
+
+if (WIN32)
+   set(SYDESUP_COMMON_INCLUDE_DIRECTORIES
+      ${SYDESUP_COMMON_INCLUDE_DIRECTORIES}
+      #/libs/openssl/include needen only on windows
+	  ${PROJECT_ROOT}/libs/openssl/include
+      )
+endif()
+
 
 include_directories(${SYDESUP_COMMON_INCLUDE_DIRECTORIES})
 
@@ -85,17 +100,25 @@ set(SYDESUP_LINK_LIBRARIES_WINDOWS
    opensyde_core
    ws2_32   #WinSock
    Iphlpapi #IP helper API
+   crypto
+   libtomcrypt
+   libtommath
 )
 
 set(SYDESUP_LINK_LIBRARIES_LINUX
    pthread
    rt
    opensyde_core
+   OpenSSL::Crypto
+   libtomcrypt
+   libtommath
 )
 
 # COMPILER SWITCHES
 # use same compiler switches that gcc uses when compiling openSYDE core from osc_moduletest.pro file
 add_compile_options(-Wno-deprecated-declarations -Wall -Wextra)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 
 # do not warn about unused parameters in miniz.c; this library is not owned by us
 set_source_files_properties(../libs/opensyde_core/miniz/miniz.c PROPERTIES COMPILE_FLAGS -Wno-unused-parameter)
@@ -115,9 +138,12 @@ endif()
 
 # --- BUILD EXECUTABLE -------------------------------------------------------------------------------------------------
 if(WIN32)
+   link_directories(
+       ../libs/openssl
+   )
    add_executable(SYDEsup ${SYDESUP_COMMON_SOURCES} ${SYDESUP_WINDOWS_SOURCES} ${PROJECT_ROOT}/src/WindowsMain.cpp)
    target_link_libraries(SYDEsup ${SYDESUP_LINK_LIBRARIES_WINDOWS})
-else()
+else()    
    include_directories(${SYDESUP_LINUX_INCLUDE_DIRECTORIES})
    add_executable(SYDEsup ${SYDESUP_COMMON_SOURCES} ${SYDESUP_LINUX_SOURCES} ${SYDESUP_LINUX_LIB_SOURCES}
                           ${PROJECT_ROOT}/src/LinuxMain.cpp)

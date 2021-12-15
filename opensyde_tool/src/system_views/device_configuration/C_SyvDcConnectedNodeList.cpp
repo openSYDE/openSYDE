@@ -35,6 +35,8 @@ const QString C_SyvDcConnectedNodeList::mhc_MimeDataExtFormat = "stw_opensyde_co
 const QString C_SyvDcConnectedNodeList::mhc_MimeDataManufacturerFormat = "stw_opensyde_connected_node_manu_format";
 const QString C_SyvDcConnectedNodeList::mhc_MimeDataDevice = "stw_opensyde_connected_node_device";
 const QString C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid = "stw_opensyde_connected_node_device_valid";
+const QString C_SyvDcConnectedNodeList::mhc_MimeDataSubNodeIdsToOldNodeIds =
+   "stw_opensyde_connected_node_subnodeids_to_nodeids";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -201,6 +203,11 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
             dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(oc_Items[0]));
          if (pc_Widget != NULL)
          {
+            QString c_StringSubNodeIdsToOldNodeIds;
+            const std::map<uint8, C_SyvDcDeviceOldComConfig> c_SubNodeIdsToOldNodeIds =
+               pc_Widget->GetSubNodeIdsToOldNodeIds();
+            std::map<stw_types::uint8, C_SyvDcDeviceOldComConfig>::const_iterator c_ItIds;
+
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeData,
                                pc_Widget->GetPlainSerialNumberString().toStdString().c_str());
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataExtFormat,
@@ -214,6 +221,29 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid,
                                QString::number(static_cast<sintn>(pc_Widget->GetDeviceNameValid())).
                                toStdString().c_str());
+
+            // Build a string to set the sub node id to node id mapping
+            for (c_ItIds = c_SubNodeIdsToOldNodeIds.begin(); c_ItIds != c_SubNodeIdsToOldNodeIds.end(); ++c_ItIds)
+            {
+               // Format: sub node id,node id, ip valid flag(true), ip0:ip1:ip2:ip3;
+               // sub node id, node id, ip valid flag(false);
+               c_StringSubNodeIdsToOldNodeIds +=
+                  QString::number(c_ItIds->first) + "," +
+                  QString::number(c_ItIds->second.u8_OldNodeId) + "," +
+                  QString::number(static_cast<uint8>(c_ItIds->second.q_OldIpAddressValid));
+
+               if (c_ItIds->second.q_OldIpAddressValid == true)
+               {
+                  c_StringSubNodeIdsToOldNodeIds += ",";
+                  c_StringSubNodeIdsToOldNodeIds += QString::number(c_ItIds->second.au8_OldIpAddress[0]) + ":" +
+                                                    QString::number(c_ItIds->second.au8_OldIpAddress[1]) + ":" +
+                                                    QString::number(c_ItIds->second.au8_OldIpAddress[2]) + ":" +
+                                                    QString::number(c_ItIds->second.au8_OldIpAddress[3]);
+               }
+               c_StringSubNodeIdsToOldNodeIds += ";";
+            }
+            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataSubNodeIdsToOldNodeIds,
+                               c_StringSubNodeIdsToOldNodeIds.toStdString().c_str());
          }
       }
    }
@@ -229,13 +259,13 @@ void C_SyvDcConnectedNodeList::m_Init(void)
    uint32 u32_ItData;
 
    std::vector<C_SyvDcDeviceInformation> c_DataUnique;
-   std::vector<std::set<uint8> > c_DataUniqueSubNodeIds;
+   std::vector<std::map<uint8, C_SyvDcDeviceOldComConfig> > c_DataUniqueSubNodeIdsToOldNodeIds;
 
    //Init/Reinit UI
    this->clear();
 
    c_DataUnique.reserve(this->mc_Data.size());
-   c_DataUniqueSubNodeIds.reserve(this->mc_Data.size());
+   c_DataUniqueSubNodeIdsToOldNodeIds.reserve(this->mc_Data.size());
 
    // Check for Multi-CPU nodes
    for (u32_ItData = 0U; u32_ItData < this->mc_Data.size(); ++u32_ItData)
@@ -252,7 +282,10 @@ void C_SyvDcConnectedNodeList::m_Init(void)
          if (rc_DataUnique.IsSerialNumberIdentical(rc_Data) == true)
          {
             // Serial number is identical, add the sub node id
-            c_DataUniqueSubNodeIds[u32_ItDataUnique].insert(rc_Data.u8_SubNodeId);
+            C_SyvDcDeviceOldComConfig c_OldComConfig;
+            c_OldComConfig.SetContent(rc_Data.u8_NodeId, rc_Data.q_IpAddressValid, &rc_Data.au8_IpAddress[0]);
+
+            c_DataUniqueSubNodeIdsToOldNodeIds[u32_ItDataUnique][rc_Data.u8_SubNodeId] = c_OldComConfig;
             q_MatchingSubNodeFound = true;
             break;
          }
@@ -260,42 +293,45 @@ void C_SyvDcConnectedNodeList::m_Init(void)
 
       if (q_MatchingSubNodeFound == false)
       {
-         std::set<uint8> c_SubNodeId;
+         std::map<uint8, C_SyvDcDeviceOldComConfig> c_SubNodeIdToNodeId;
+         C_SyvDcDeviceOldComConfig c_OldComConfig;
+         c_OldComConfig.SetContent(rc_Data.u8_NodeId, rc_Data.q_IpAddressValid, &rc_Data.au8_IpAddress[0]);
 
-         c_SubNodeId.insert(rc_Data.u8_SubNodeId);
+         c_SubNodeIdToNodeId[rc_Data.u8_SubNodeId] = c_OldComConfig;
 
          // New serial number
          c_DataUnique.push_back(rc_Data);
-         c_DataUniqueSubNodeIds.push_back(c_SubNodeId);
+         c_DataUniqueSubNodeIdsToOldNodeIds.push_back(c_SubNodeIdToNodeId);
       }
    }
 
-   tgl_assert(c_DataUnique.size() == c_DataUniqueSubNodeIds.size());
+   tgl_assert(c_DataUnique.size() == c_DataUniqueSubNodeIdsToOldNodeIds.size());
 
    //No point if pc not connected
    for (u32_ItData = 0U; u32_ItData < c_DataUnique.size(); ++u32_ItData)
    {
-      m_AppendNode(c_DataUnique[u32_ItData], c_DataUniqueSubNodeIds[u32_ItData]);
+      m_AppendNode(c_DataUnique[u32_ItData], c_DataUniqueSubNodeIdsToOldNodeIds[u32_ItData]);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append node to list
 
-   \param[in] orc_Info        Read device information
-   \param[in] orc_SubNodeIds  Detected sub node ids with same serial number
-                              - In case of a normal node, exact one sub node id which should be 0
-                              - In case of a multiple CPU, at least two sub node ids
+   \param[in] orc_Info                    Read device information
+   \param[in] orc_SubNodeIdsToOldNodeIds  Detected sub node ids and the associated used node ids with same serial number
+                                          - In case of a normal node, exact one sub node id which should be 0
+                                          - In case of a multiple CPU, at least two sub node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc_Info,
-                                            const std::set<uint8> & orc_SubNodeIds)
+void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc_Info, const std::map<uint8,
+                                                                                                      C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
 {
    C_SyvDcConnectedNodeWidget * pc_Widget;
 
    this->addItem("");
 
-   pc_Widget = new C_SyvDcConnectedNodeWidget(this->item(this->count() - 1), orc_Info, orc_SubNodeIds, this);
+   pc_Widget = new C_SyvDcConnectedNodeWidget(this->item(this->count() - 1), orc_Info,
+                                              orc_SubNodeIdsToOldNodeIds, this);
 
    this->setItemWidget(this->item(this->count() - 1), pc_Widget);
 

@@ -330,6 +330,7 @@ bool C_GiSvDaPieChartBase::CallProperties(void)
             if (c_New != NULL)
             {
                c_New->HideOverlay();
+               c_New->deleteLater();
             }
             ;
          } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management

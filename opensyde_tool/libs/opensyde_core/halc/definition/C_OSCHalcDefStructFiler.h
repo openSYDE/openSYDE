@@ -62,8 +62,8 @@ public:
    static const stw_types::uint32 hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH;
 
 private:
-   static const stw_scl::C_SCLString mhc_False;
-   static const stw_scl::C_SCLString mhc_True;
+   static const stw_scl::C_SCLString mhc_FALSE;
+   static const stw_scl::C_SCLString mhc_TRUE;
 
    C_OSCHalcDefStructFiler(void);
 

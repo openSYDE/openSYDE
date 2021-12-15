@@ -56,12 +56,25 @@ public:
    class C_DoFlash
    {
    public:
+      C_DoFlash(void);
+
       ///list of files to flash (keep size to 0 to not flash any files)
       std::vector<stw_scl::C_SCLString> c_FilesToFlash;
       ///list of parameter files to write to NVM (keep size to 0 to not write any files)
       std::vector<stw_scl::C_SCLString> c_FilesToWriteToNvm;
       ///optional list of names to allow (other than the device name itself)
       std::vector<stw_scl::C_SCLString> c_OtherAcceptedDeviceNames;
+
+      ///optional PEM file (empty string for no PEM file)
+      stw_scl::C_SCLString c_PemFile;
+
+      /// Node configuration flags for security state
+      bool q_SendSecurityEnabledState;
+      bool q_SecurityEnabled;
+
+      /// Node configuration flags for debugger state
+      bool q_SendDebuggerEnabledState;
+      bool q_DebuggerEnabled;
    };
 
    ///set of information used to identify one application
@@ -159,8 +172,8 @@ public:
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_RESULT_STRING,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED,
 
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START, //reported once for each node (if there are > 0 NVM files)
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START,                   //reported once for each node (if there are > 0 NVM
+                                                                 // files)
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of flashloader
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR,   //problem getting maximum block size from device
@@ -170,6 +183,28 @@ public:
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR, //problem writing file data to device
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED,    //reported for each finished file
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED,         //reported once for each node (if there are > 0 NVM files)
+
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START,
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of flashloader
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED,
+
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_START,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of
+                                                                            // flashloader
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_FINISHED,
+
+      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_START,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of
+                                                                            // flashloader
+      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_FINISHED,
 
       eUPDATE_SYSTEM_OSY_NODE_FINISHED,
       eUPDATE_SYSTEM_ABORTED,
@@ -242,7 +277,8 @@ private:
    stw_types::sint32 m_FlashNodeOpenSydeHex(const std::vector<stw_scl::C_SCLString> & orc_FilesToFlash,
                                             const std::vector<stw_scl::C_SCLString> & orc_OtherAcceptedDeviceNames,
                                             const stw_types::uint32 ou32_RequestDownloadTimeout,
-                                            const stw_types::uint32 ou32_TransferDataTimeout);
+                                            const stw_types::uint32 ou32_TransferDataTimeout,
+                                            bool & orq_SetProgrammingMode);
    stw_types::sint32 m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexDataDump & orc_HexDataDump,
                                                const stw_types::uint32 ou32_SignatureAddress,
                                                const stw_types::uint32 ou32_RequestDownloadTimeout,
@@ -250,13 +286,21 @@ private:
    stw_types::sint32 m_FlashNodeOpenSydeFile(const std::vector<stw_scl::C_SCLString> & orc_FilesToFlash,
                                              const stw_types::uint32 ou32_RequestDownloadTimeout,
                                              const stw_types::uint32 ou32_TransferDataTimeout,
-                                             const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures);
+                                             const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                             bool & orq_SetProgrammingMode);
    stw_types::sint32 m_FlashOneFileOpenSydeFile(const stw_scl::C_SCLString & orc_FileToFlash,
                                                 const stw_types::uint32 ou32_RequestDownloadTimeout,
                                                 const stw_types::uint32 ou32_TransferDataTimeout,
                                                 const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures);
    stw_types::sint32 m_WriteNvmOpenSyde(const std::vector<stw_scl::C_SCLString> & orc_FilesToWrite,
-                                        const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures);
+                                        const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                        const bool oq_SetProgrammingMode);
+   stw_types::sint32 m_WritePemOpenSydeFile(const stw_scl::C_SCLString & orc_FileToWrite,
+                                            const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                            bool & orq_SetProgrammingMode);
+   stw_types::sint32 m_WriteOpenSydeNodeStates(const C_OSCSuSequences::C_DoFlash & orc_ApplicationsToWrite,
+                                               const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                               bool & orq_SetProgrammingMode);
 
    stw_types::sint32 m_WriteFingerPrintOsy(void);
 

@@ -37,7 +37,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigDomain::C_OSCHalcConfigDomain(void)
+C_OSCHalcConfigDomain::C_OSCHalcConfigDomain(void) :
+   C_OSCHalcDefDomain()
 {
 }
 
@@ -47,7 +48,8 @@ C_OSCHalcConfigDomain::C_OSCHalcConfigDomain(void)
    \param[in]  orc_Base    Base
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigDomain::C_OSCHalcConfigDomain(const C_OSCHalcDefDomain & orc_Base)
+C_OSCHalcConfigDomain::C_OSCHalcConfigDomain(const C_OSCHalcDefDomain & orc_Base) :
+   C_OSCHalcDefDomain()
 {
    //Copy all
    this->c_Channels = orc_Base.c_Channels;

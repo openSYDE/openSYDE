@@ -15,6 +15,7 @@
 #include <QScrollBar>
 #include <QHeaderView>
 #include <QApplication>
+#include <algorithm> //for std::sort
 
 #include "stwerrors.h"
 #include "constants.h"
@@ -791,6 +792,16 @@ void C_CamMetTreeView::m_CopySelection(void)
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
    c_SelectedItems = this->selectedIndexes();
+
+   //selectedIndexes returns a list of all selected indexes, but the indexes are NOT sorted
+   //we need to sort them due to we want same row order as displyed in the trace
+   std::sort(c_SelectedItems.begin(), c_SelectedItems.end(),
+             [] (const QModelIndex & orc_ItA, const QModelIndex & orc_ItB)
+   {
+      return orc_ItA.row() < orc_ItB.row();
+   }
+             );
+
    if (c_SelectedItems.size() > 0L)
    {
       std::vector<sintn> c_AddedTopLevelRows;

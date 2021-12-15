@@ -834,6 +834,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnAddClicked(void)
    if (c_New != NULL)
    {
       c_New->HideOverlay();
+      c_New->deleteLater();
    }
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
@@ -1479,6 +1480,7 @@ bool C_SyvDaDashboardSelectorTabWidget::m_EditTab(const uint32 & oru32_DataIndex
    if (c_New != NULL)
    {
       c_New->HideOverlay();
+      c_New->deleteLater();
    }
    return q_Return; //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }

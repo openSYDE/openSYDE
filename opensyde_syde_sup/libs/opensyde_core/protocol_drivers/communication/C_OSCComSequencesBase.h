@@ -31,14 +31,15 @@ namespace stw_opensyde_core
 class C_OSCComSequencesBase
 {
 public:
-   C_OSCComSequencesBase(const bool oq_RoutingActive);
+   explicit C_OSCComSequencesBase(const bool oq_RoutingActive);
    virtual ~C_OSCComSequencesBase(void);
 
    virtual stw_types::sint32 Init(C_OSCSystemDefinition & orc_SystemDefinition,
                                   const stw_types::uint32 ou32_ActiveBusIndex,
                                   const std::vector<stw_types::uint8> & orc_ActiveNodes,
                                   stw_can::C_CAN_Dispatcher * const opc_CanDispatcher,
-                                  C_OSCIpDispatcher * const opc_IpDispatcher);
+                                  C_OSCIpDispatcher * const opc_IpDispatcher,
+                                  C_OSCSecurityPemDatabase * const opc_SecurityPemDb);
 
    bool IsInitialized(void) const;
 

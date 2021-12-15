@@ -192,6 +192,7 @@ bool C_GiBiArrow::OpenStyleDialog(const bool oq_DarkMode)
    if (c_New != NULL)
    {
       c_New->HideOverlay();
+      c_New->deleteLater();
    }
    return q_Retval; //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }

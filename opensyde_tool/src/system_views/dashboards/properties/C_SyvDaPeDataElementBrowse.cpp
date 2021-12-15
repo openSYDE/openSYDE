@@ -216,7 +216,7 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_SyvDaPeDataElementBrowse::GetS
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Cleans up the last view configuration as preparation for the entire deletion
 
-   In some constellations it is problematic if the model still has the mpc_InvisibleRootItem set, when it hides with
+   In some situations it is problematic if the model still has the mpc_InvisibleRootItem set, when it hides with
    the dialog in the background waiting to die.
 */
 //----------------------------------------------------------------------------------------------------------------------

@@ -45,8 +45,10 @@ public:
    void SetUpdateStarted(void) const;
    void SetUpdateNodeStarted(const stw_types::uint32 ou32_NodeIndex);
    void SetUpdateNodeSuccess(const stw_types::uint32 ou32_NodeIndex);
-   void SetUpdateApplicationStarted(const stw_types::uint32 ou32_NodeIndex, const bool oq_IsParam) const;
-   void SetUpdateApplicationFinished(const stw_types::uint32 ou32_NodeIndex, const bool oq_IsParam);
+   void SetUpdateApplicationStarted(const stw_types::uint32 ou32_NodeIndex, const bool oq_IsParam,
+                                    const bool oq_IsPemFile) const;
+   void SetUpdateApplicationFinished(const stw_types::uint32 ou32_NodeIndex, const bool oq_IsParam,
+                                     const bool oq_IsPemFile);
    void SetUpdateApplicationError(const stw_types::uint32 ou32_NodeIndex) const;
    void DiscardApplicationStatus(const stw_types::uint32 ou32_NodeIndex) const;
    void SetUpdateFinished(void) const;
@@ -108,6 +110,7 @@ private:
    stw_opensyde_gui_logic::C_SyvUpFileSizeInformation mc_FileSizeInformation;
    stw_types::uint32 mu32_ItFile;
    stw_types::uint32 mu32_ItParamFile;
+   stw_types::uint32 mu32_ItPemFile;
    stw_types::uint32 mu32_ViewIndex;
    stw_types::uint64 mu64_NodeStartTimeMs;
    stw_types::uint64 mu64_LastKnownDataRateS;

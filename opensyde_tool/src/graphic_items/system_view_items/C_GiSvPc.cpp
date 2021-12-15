@@ -511,6 +511,7 @@ bool C_GiSvPc::m_OpenCANDllDialog(void) const
       if (c_DllDialog != NULL)
       {
          c_DllDialog->HideOverlay();
+         c_DllDialog->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_DllWidget and the Qt memory management
    return q_Retval;

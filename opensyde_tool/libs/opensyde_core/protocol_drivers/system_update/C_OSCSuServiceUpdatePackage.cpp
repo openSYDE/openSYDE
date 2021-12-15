@@ -50,18 +50,24 @@ static const uint16 mu16_FILE_VERSION = 1U;
 static const C_SCLString mc_SUP_SYSDEF = "sup_system_definition.syde_sysdef";
 static const C_SCLString mc_INI_DEV = "devices.ini";
 // XML node names of service update package definition
-static const C_SCLString mc_ROOT_NAME = "opensyde-updatepack-definition"; // xml root node
-static const C_SCLString mc_FILE_VERSION = "file-version";                // xml node
-static const C_SCLString mc_NODES = "nodes";                              // xml node
-static const C_SCLString mc_NODE = "node";                                // xml node
-static const C_SCLString mc_NODE_ACTIVE_ATTR = "active";                  // xml node attribute
-static const C_SCLString mc_NODE_POSITION_ATTR = "position";              // xml node attribute
-static const C_SCLString mc_FILES = "files";                              // xml node
-static const C_SCLString mc_FILE = "file";                                // xml node
-static const C_SCLString mc_PARAM_FILES = "param-files";                  // xml node
-static const C_SCLString mc_PARAM_FILE = "param-file";                    // xml node
-static const C_SCLString mc_FILE_NAME_ATTR = "name";                      // xml node attribute
-static const C_SCLString mc_BUS_INDEX = "bus-index-client";               // xml node
+static const C_SCLString mc_ROOT_NAME = "opensyde-updatepack-definition";       // xml root node
+static const C_SCLString mc_FILE_VERSION = "file-version";                      // xml node
+static const C_SCLString mc_NODES = "nodes";                                    // xml node
+static const C_SCLString mc_NODE = "node";                                      // xml node
+static const C_SCLString mc_NODE_ACTIVE_ATTR = "active";                        // xml node attribute
+static const C_SCLString mc_NODE_POSITION_ATTR = "position";                    // xml node attribute
+static const C_SCLString mc_FILES = "files";                                    // xml node
+static const C_SCLString mc_FILE = "file";                                      // xml node
+static const C_SCLString mc_PARAM_FILES = "param-files";                        // xml node
+static const C_SCLString mc_PARAM_FILE = "param-file";                          // xml node
+static const C_SCLString mc_PEM_FILE_CONFIG = "pem-file-config";                // xml node
+static const C_SCLString mc_PEM_FILE = "pem-file";                              // xml node
+static const C_SCLString mc_PEM_FILE_CONFIG_SEC_ENAB_ATTR = "security-enabled"; // xml node attribute
+static const C_SCLString mc_PEM_FILE_CONFIG_SEC_SEND_ATTR = "security-send";    // xml node attribute
+static const C_SCLString mc_PEM_FILE_CONFIG_DEB_ENAB_ATTR = "debugger-enabled"; // xml node attribute
+static const C_SCLString mc_PEM_FILE_CONFIG_DEB_SEND_ATTR = "debugger-send";    // xml node attribute
+static const C_SCLString mc_FILE_NAME_ATTR = "name";                            // xml node attribute
+static const C_SCLString mc_BUS_INDEX = "bus-index-client";                     // xml node
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -204,6 +210,13 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
             C_OSCZipFile::h_AppendFilesRelative(c_SupFiles, c_DoFlash.c_FilesToFlash, c_PackagePathTmp);
             //Parameter set files
             C_OSCZipFile::h_AppendFilesRelative(c_SupFiles, c_DoFlash.c_FilesToWriteToNvm, c_PackagePathTmp);
+            //PEM file
+            if (c_DoFlash.c_PemFile != "")
+            {
+               std::vector<C_SCLString> c_PemFiles;
+               c_PemFiles.push_back(c_DoFlash.c_PemFile);
+               C_OSCZipFile::h_AppendFilesRelative(c_SupFiles, c_PemFiles, c_PackagePathTmp);
+            }
          }
       }
 
@@ -508,6 +521,10 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
                                                              u32_UpdatePosition, c_UpdateOrderByNodes,
                                                              c_TargetUnzipPath,
                                                              c_XMLParser, mc_PARAM_FILES, mc_PARAM_FILE);
+            C_OSCSuServiceUpdatePackage::mh_LoadPemConfigSection(c_DoFlash, u32_NodeCounter,
+                                                                 u32_UpdatePosition, c_UpdateOrderByNodes,
+                                                                 c_TargetUnzipPath,
+                                                                 c_XMLParser);
             if (orc_SystemDefinition.c_Nodes[u32_NodeCounter].pc_DeviceDefinition != NULL)
             {
                const C_OSCNode & rc_CurNode = orc_SystemDefinition.c_Nodes[u32_NodeCounter];
@@ -753,7 +770,9 @@ void C_OSCSuServiceUpdatePackage::mh_CreateUpdatePackageDefFile(const C_SCLStrin
       if (c_CurrentNode.u8_Active == mu8_ACTIVE_NODE)
       {
          // if there are files to update for active node then list files
-         if ((c_CurrentNode.c_ApplicationFileNames.size() > 0) || (c_CurrentNode.c_NVMFileNames.size() > 0))
+         if ((c_CurrentNode.c_ApplicationFileNames.size() > 0) ||
+             (c_CurrentNode.c_NVMFileNames.size() > 0) ||
+             (c_CurrentNode.c_PemFile != ""))
          {
             //Update Position
             c_XMLParser.SetAttributeUint32(mc_NODE_POSITION_ATTR, c_CurrentNode.u32_Position);
@@ -761,6 +780,7 @@ void C_OSCSuServiceUpdatePackage::mh_CreateUpdatePackageDefFile(const C_SCLStrin
 
          mh_SaveFiles(c_CurrentNode.c_ApplicationFileNames, c_XMLParser, mc_FILES, mc_FILE);
          mh_SaveFiles(c_CurrentNode.c_NVMFileNames, c_XMLParser, mc_PARAM_FILES, mc_PARAM_FILE);
+         mh_SavePemConfig(c_CurrentNode, c_XMLParser);
 
          tgl_assert(c_XMLParser.SelectNodeParent() == mc_NODES);
       }
@@ -808,33 +828,33 @@ sint32 C_OSCSuServiceUpdatePackage::mh_CreateDeviceIniFile(const C_SCLString & o
 {
    sint32 s32_Return = C_NO_ERR;
 
-   const C_SCLString c_HeadSection = "DeviceTypes"; //                      -"-
-   const C_SCLString c_FirstKey = "NumTypes";       //                      -"-
-   const sintn sn_FirstValue = 1;                   //                      -"-
-   const C_SCLString c_SecondKey = "TypeName1";     //                      -"-
-   const C_SCLString c_DeviceSection = "UsedDevices";
-   const C_SCLString c_DeviceCount = "DeviceCount";
-   const C_SCLString c_DeviceKey = "Device";
-   uint32 u32_DeviceCounter = 1;
+   const C_SCLString c_HEAD_SECTION = "DeviceTypes"; //                      -"-
+   const C_SCLString c_FIRST_KEY = "NumTypes";       //                      -"-
+   const sintn sn_FIRST_VALUE = 1;                   //                      -"-
+   const C_SCLString c_SECOND_KEY = "TypeName1";     //                      -"-
+   const C_SCLString c_DEVICE_SECTION = "UsedDevices";
+   const C_SCLString c_DEVICE_COUNT = "DeviceCount";
+   const C_SCLString c_DEVICE_KEY = "Device";
    const C_SCLString c_IniDevPath = TGL_FileIncludeTrailingDelimiter(orc_Path) + mc_INI_DEV;
+   uint32 u32_DeviceCounter = 1;
 
    // build up devices.ini --> device definitions are in the same folder
    try
    {
       C_SCLIniFile c_IniFile(c_IniDevPath); // devices.ini
       // write header section
-      c_IniFile.WriteInteger(c_HeadSection, c_FirstKey, sn_FirstValue);
-      c_IniFile.WriteString(c_HeadSection, c_SecondKey, c_DeviceSection);
+      c_IniFile.WriteInteger(c_HEAD_SECTION, c_FIRST_KEY, sn_FIRST_VALUE);
+      c_IniFile.WriteString(c_HEAD_SECTION, c_SECOND_KEY, c_DEVICE_SECTION);
 
       // write content section
-      c_IniFile.WriteInteger(c_DeviceSection, c_DeviceCount, orc_DeviceDefinitionPaths.size());
+      c_IniFile.WriteInteger(c_DEVICE_SECTION, c_DEVICE_COUNT, orc_DeviceDefinitionPaths.size());
       // fill up with device definitions
       set<C_SCLString>::const_iterator c_Iter;
       for (c_Iter = orc_DeviceDefinitionPaths.begin(); c_Iter != orc_DeviceDefinitionPaths.end(); ++c_Iter)
       {
-         const C_SCLString c_Key = c_DeviceKey + C_SCLString::IntToStr(u32_DeviceCounter);
+         const C_SCLString c_Key = c_DEVICE_KEY + C_SCLString::IntToStr(u32_DeviceCounter);
          const C_SCLString c_Value = TGL_ExtractFileName(*c_Iter);
-         c_IniFile.WriteString(c_DeviceSection, c_Key, c_Value);
+         c_IniFile.WriteString(c_DEVICE_SECTION, c_Key, c_Value);
          u32_DeviceCounter++;
       }
       c_IniFile.UpdateFile(); // make data persistent
@@ -887,7 +907,8 @@ sint32 C_OSCSuServiceUpdatePackage::mh_SupDefParamAdapter(const C_OSCSystemDefin
       // in case we have an active node and (!) application(s) for update are available
       if ((c_SupDefNodeContent.u8_Active == mu8_ACTIVE_NODE) &&
           ((orc_ApplicationsToWrite[u32_Pos].c_FilesToFlash.size() > 0) ||
-           (orc_ApplicationsToWrite[u32_Pos].c_FilesToWriteToNvm.size() > 0)))
+           (orc_ApplicationsToWrite[u32_Pos].c_FilesToWriteToNvm.size() > 0) ||
+           (orc_ApplicationsToWrite[u32_Pos].c_PemFile != "")))
       {
          // get update position of node
          // nodes update order only contains active nodes with applications
@@ -926,6 +947,19 @@ sint32 C_OSCSuServiceUpdatePackage::mh_SupDefParamAdapter(const C_OSCSystemDefin
          const C_SCLString c_Tmp = c_Folder + "/" + TGL_ExtractFileName(*c_IterParam);
          c_SupDefNodeContent.c_NVMFileNames.push_back(c_Tmp);
       }
+
+      // get PEM file and its settings of node
+      if (orc_ApplicationsToWrite[u32_Pos].c_PemFile != "")
+      {
+         const C_SCLString c_Tmp = c_Folder + "/" + TGL_ExtractFileName(orc_ApplicationsToWrite[u32_Pos].c_PemFile);
+         c_SupDefNodeContent.c_PemFile = c_Tmp;
+
+         c_SupDefNodeContent.q_SendSecurityEnabledState = orc_ApplicationsToWrite[u32_Pos].q_SendSecurityEnabledState;
+         c_SupDefNodeContent.q_SecurityEnabled = orc_ApplicationsToWrite[u32_Pos].q_SecurityEnabled;
+         c_SupDefNodeContent.q_SendDebuggerEnabledState = orc_ApplicationsToWrite[u32_Pos].q_SendDebuggerEnabledState;
+         c_SupDefNodeContent.q_DebuggerEnabled = orc_ApplicationsToWrite[u32_Pos].q_DebuggerEnabled;
+      }
+
       c_SupDefContent.c_Nodes.push_back(c_SupDefNodeContent);
    }
 
@@ -1013,8 +1047,7 @@ sint32 C_OSCSuServiceUpdatePackage::mh_SetNodesUpdateOrder(const map<uint32, uin
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCSuServiceUpdatePackage::mh_LoadFilesSection(std::vector<C_SCLString> & orc_Files,
                                                       const uint32 ou32_NodeCounter, const uint32 ou32_UpdatePos,
-                                                      std::map<uint32,
-                                                               uint32> & orc_PositionMap,
+                                                      std::map<uint32, uint32> & orc_PositionMap,
                                                       const C_SCLString & orc_TargetUnzipPath,
                                                       C_OSCXMLParserBase & orc_XMLParser,
                                                       const C_SCLString & orc_BaseNodeName,
@@ -1049,6 +1082,62 @@ void C_OSCSuServiceUpdatePackage::mh_LoadFilesSection(std::vector<C_SCLString> &
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load PEM configuration section from service update package definition file
+
+   \param[in,out] orc_DoFlash         Node configuration with PEM configuration
+   \param[in]     ou32_NodeCounter    Current node index
+   \param[in]     ou32_UpdatePos      Current update position
+   \param[in,out] orc_PositionMap     Map for node indices and update positions
+   \param[in]     orc_TargetUnzipPath Path where all the files will be unzipped to
+   \param[in,out] orc_XMLParser       XMLParser for service update package definition file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCSuServiceUpdatePackage::mh_LoadPemConfigSection(C_OSCSuSequences::C_DoFlash & orc_DoFlash,
+                                                          const uint32 ou32_NodeCounter, const uint32 ou32_UpdatePos,
+                                                          std::map<uint32, uint32> & orc_PositionMap,
+                                                          const C_SCLString & orc_TargetUnzipPath,
+                                                          C_OSCXMLParserBase & orc_XMLParser)
+{
+   if (orc_XMLParser.SelectNodeChild(mc_PEM_FILE_CONFIG) == mc_PEM_FILE_CONFIG)
+   {
+      // get PEM file path
+      tgl_assert(orc_XMLParser.SelectNodeChild(mc_PEM_FILE) == mc_PEM_FILE);
+
+      // we have to take care of OS dependent path delimiters for windows '\\'
+      const C_SCLString c_XmlAttr = orc_XMLParser.GetAttributeString(mc_FILE_NAME_ATTR);
+      if (c_XmlAttr != "")
+      {
+         const C_SCLString c_FileName = TGL_ExtractFileName(c_XmlAttr);
+         // subfolder without '/'
+         const C_SCLString c_SubFolder =
+            c_XmlAttr.SubString(1, (c_XmlAttr.Length() - c_FileName.Length()) - 1);
+         const C_SCLString c_FilePath = TGL_FileIncludeTrailingDelimiter(
+            orc_TargetUnzipPath + c_SubFolder) + c_FileName;
+         orc_DoFlash.c_PemFile = c_FilePath;
+
+         // node has applications to update
+         orc_PositionMap.insert(std::pair<uint32, uint32>(ou32_NodeCounter, ou32_UpdatePos));
+      }
+
+      tgl_assert(orc_XMLParser.SelectNodeParent() == mc_PEM_FILE_CONFIG);
+
+      if (orc_DoFlash.c_PemFile != "")
+      {
+         // Only in case of a PEM file, the states are relevant
+         orc_DoFlash.q_SendSecurityEnabledState =
+            orc_XMLParser.GetAttributeBool(mc_PEM_FILE_CONFIG_SEC_SEND_ATTR, false);
+         orc_DoFlash.q_SecurityEnabled = orc_XMLParser.GetAttributeBool(mc_PEM_FILE_CONFIG_SEC_ENAB_ATTR, false);
+
+         orc_DoFlash.q_SendDebuggerEnabledState =
+            orc_XMLParser.GetAttributeBool(mc_PEM_FILE_CONFIG_DEB_SEND_ATTR, false);
+         orc_DoFlash.q_DebuggerEnabled = orc_XMLParser.GetAttributeBool(mc_PEM_FILE_CONFIG_DEB_ENAB_ATTR, false);
+      }
+
+      tgl_assert(orc_XMLParser.SelectNodeParent() == mc_NODE);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Save files in XML
 
    \param[in,out] orc_Files           Files to save
@@ -1073,6 +1162,36 @@ void C_OSCSuServiceUpdatePackage::mh_SaveFiles(const std::vector<C_SCLString> & 
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == orc_BaseNodeName);
       }
+      //Return for next node
+      tgl_assert(orc_XMLParser.SelectNodeParent() == mc_NODE);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save PEM file configuration in XML
+
+   \param[in,out] orc_CurrentNode     Current node configuration with PEM file configuration
+   \param[in,out] orc_XMLParser       XMLParser for service update package definition file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCSuServiceUpdatePackage::mh_SavePemConfig(const C_SupDefNodeContent & orc_CurrentNode,
+                                                   C_OSCXMLParserBase & orc_XMLParser)
+{
+   if (orc_CurrentNode.c_PemFile != "")
+   {
+      //Files
+      tgl_assert(orc_XMLParser.CreateAndSelectNodeChild(mc_PEM_FILE_CONFIG) == mc_PEM_FILE_CONFIG);
+      orc_XMLParser.SetAttributeBool(mc_PEM_FILE_CONFIG_SEC_SEND_ATTR, orc_CurrentNode.q_SendSecurityEnabledState);
+      orc_XMLParser.SetAttributeBool(mc_PEM_FILE_CONFIG_SEC_ENAB_ATTR, orc_CurrentNode.q_SecurityEnabled);
+      orc_XMLParser.SetAttributeBool(mc_PEM_FILE_CONFIG_DEB_SEND_ATTR, orc_CurrentNode.q_SendDebuggerEnabledState);
+      orc_XMLParser.SetAttributeBool(mc_PEM_FILE_CONFIG_DEB_ENAB_ATTR, orc_CurrentNode.q_DebuggerEnabled);
+
+      //File
+      tgl_assert(orc_XMLParser.CreateAndSelectNodeChild(mc_PEM_FILE) == mc_PEM_FILE);
+      orc_XMLParser.SetAttributeString(mc_FILE_NAME_ATTR, orc_CurrentNode.c_PemFile);
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == mc_PEM_FILE_CONFIG);
+
       //Return for next node
       tgl_assert(orc_XMLParser.SelectNodeParent() == mc_NODE);
    }

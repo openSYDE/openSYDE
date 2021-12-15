@@ -20,11 +20,13 @@
 #include "C_PuiSdHandler.h"
 #include "C_PuiSdUtil.h"
 #include "C_SyvComDriverDiagConnect.h"
+#include "C_OSCLoggingHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
+using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
@@ -216,7 +218,7 @@ void C_SyvComDriverDiagConnect::m_RunSetDiagnosticMode(void)
                                                         "- Gateway address of node is not configured properly"))
             .arg(c_ErrorDetails);
          break;
-      case C_CHECKSUM:
+      case C_DEFAULT:
          this->mc_ErrorMessage =
             static_cast<QString>(C_GtGetText::h_GetText(
                                     "The Datapool definition differs between client and node.\n"
@@ -244,6 +246,19 @@ void C_SyvComDriverDiagConnect::m_RunSetDiagnosticMode(void)
          this->mc_ErrorMessageDetails = static_cast<QString>(C_GtGetText::h_GetText("Possible scenario:\n"
                                                                                     "- Node can currently not enter diagnostic session\n"
                                                                                     "- If the node is in Flashloader (Try restarting the node to fix this error)"));
+         break;
+      case C_CHECKSUM:
+         this->mc_ErrorMessage =
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "Authentication between openSYDE Tool and device(s) has failed. Access denied."));
+         C_OSCLoggingHandler::h_Flush();
+         this->mc_ErrorMessageDetails = C_GtGetText::h_GetText("Possible reasons:<br/>"
+                                                               "- Associated private key (*.pem) not found in /certificates folder (most common)<br/>"
+                                                               "- Failure during authenfication process<br/>"
+                                                               "For more information see ") +
+                                        C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
+                                                         C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
+                                        C_GtGetText::h_GetText(".");
          break;
       default:
          this->mc_ErrorMessage =

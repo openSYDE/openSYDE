@@ -491,6 +491,7 @@ void C_GiSyLineWidget::m_ColorClicked(void)
    if (c_Popup != NULL)
    {
       c_Popup->HideOverlay();
+      c_Popup->deleteLater();
    }
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
@@ -532,6 +533,7 @@ void C_GiSyLineWidget::m_ColorInnerClicked(void)
    if (c_Popup != NULL)
    {
       c_Popup->HideOverlay();
+      c_Popup->deleteLater();
    }
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 

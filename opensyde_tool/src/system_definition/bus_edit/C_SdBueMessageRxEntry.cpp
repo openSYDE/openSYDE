@@ -107,7 +107,7 @@ void C_SdBueMessageRxEntry::InitStaticNames(void) const
       C_GtGetText::h_GetText("Timeout"),
       C_GtGetText::h_GetText("This property is relevant for source code file generation. "
                              "\nWithin this interval a valid message should be received. "
-                             "\nOtherwise the Process Data Exchange Stack (implemented on device) will report an "
+                             "\nOtherwise the COMM stack (implemented on device) will report an "
                              "error."));
 }
 
@@ -715,6 +715,7 @@ void C_SdBueMessageRxEntry::m_OnTimeoutConfigLinkClicked(void)
       if (c_New != NULL)
       {
          c_New->HideOverlay();
+         c_New->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }

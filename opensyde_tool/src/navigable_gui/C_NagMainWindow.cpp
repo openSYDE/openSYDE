@@ -193,6 +193,11 @@ C_NagMainWindow::C_NagMainWindow(const uint16 ou16_Timer) :
    //Window icon
    C_OgeWiUtil::h_SetWindowIcon(this);
 
+   if (C_UsHandler::h_GetInstance()->GetAppMaximized() == true)
+   {
+      this->showMaximized();
+   }
+
    //Time measurement log
    osc_write_log_performance_stop(u16_TimerId, "Main");
 }
@@ -323,12 +328,6 @@ void C_NagMainWindow::m_OpenDetail(const sint32 os32_Index, const sint32 os32_Su
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::showEvent(QShowEvent * const opc_Event)
 {
-   if (C_UsHandler::h_GetInstance()->GetAppMaximized() == true)
-   {
-      // Call here maximized to avoid a further show event in the constructor
-      this->showMaximized();
-   }
-
    QMainWindow::showEvent(opc_Event);
 
    if (this->mq_InitialProjectLoaded == false)

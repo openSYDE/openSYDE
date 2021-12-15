@@ -447,5 +447,6 @@ void C_SdNdeDpListPopUp::m_OpenColorPicker(void)
    if (c_Popup != NULL)
    {
       c_Popup->HideOverlay();
+      c_Popup->deleteLater();
    }
 } //lint !e429  //no memory leak because of the parent of pc_ColorWidget and the Qt memory management

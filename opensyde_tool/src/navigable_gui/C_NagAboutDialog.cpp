@@ -106,6 +106,9 @@ void C_NagAboutDialog::InitStaticNames(void) const
    c_Text += C_GtGetText::h_GetText("    - The MinGW Runtime\n");
    c_Text += C_GtGetText::h_GetText("    - Miniz\n");
    c_Text += C_GtGetText::h_GetText("    - AES implementation by SergeyBel\n");
+   c_Text += C_GtGetText::h_GetText("    - OpenSSL\n");
+   c_Text += C_GtGetText::h_GetText("    - LibTomCrypt\n");
+   c_Text += C_GtGetText::h_GetText("    - LibTomMath\n");
 
    if (this->mc_OptionalComponents != "")
    {

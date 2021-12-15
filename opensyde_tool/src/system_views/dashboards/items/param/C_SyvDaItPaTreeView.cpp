@@ -763,6 +763,7 @@ void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
          if (c_Dialog != NULL)
          {
             c_Dialog->HideOverlay();
+            c_Dialog->deleteLater();
          }
       }
    }

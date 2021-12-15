@@ -29,6 +29,7 @@ public:
    virtual void AdaptFile(const QString & orc_File, C_SyvUpPackageListNodeItemWidget * const opc_App) override;
    virtual void SetSkipOfUpdateFile(const bool oq_Skip, C_SyvUpPackageListNodeItemWidget * const opc_App) override;
    virtual void RemoveFile(C_SyvUpPackageListNodeItemWidget * const opc_App) override;
+   virtual void OpenPemFileSettings(C_SyvUpPackageListNodeItemWidget * const opc_App) override;
 
    virtual void PrepareExportConfig(stw_opensyde_gui_logic::C_SyvUpUpdatePackageConfigNode & orc_NodeConfig) const
    override;
@@ -36,6 +37,7 @@ public:
 
    virtual bool CheckMime(QStringList & orc_PathList, const QPoint & orc_Pos, QStringList * const opc_RelevantFilePaths,
                           QStringList * const opc_RelevantParamSetImagePaths,
+                          QStringList * const opc_RelevantPemFilePaths,
                           C_SyvUpPackageListNodeItemWidget ** const oppc_App) const override;
    virtual stw_types::uint32 Type(void) const override;
 

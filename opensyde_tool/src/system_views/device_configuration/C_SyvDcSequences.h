@@ -19,13 +19,14 @@
 #include "stwtypes.h"
 #include "CSCLString.h"
 
-#include "C_OSCProtocolSerialNumber.h"
+#include "CCAN.h"
+#include "TGLTasks.h"
 #include "C_OSCComSequencesBase.h"
+#include "C_OSCProtocolSerialNumber.h"
 #include "C_SyvComDriverThread.h"
 #include "C_OSCNodeComInterfaceSettings.h"
-#include "CCAN.h"
 #include "C_OSCIpDispatcherWinSock.h"
-#include "TGLTasks.h"
+#include "C_OSCSecurityPemDatabase.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -44,7 +45,7 @@ public:
    void SetNodeId(const stw_types::uint8 ou8_NodeId);
    void SetIpAddress(const stw_types::uint8 (&orau8_IpAddress)[4]);
    void SetSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
-   void SetSubNodeId(const stw_types::uint8 ou8_SubNodeId);
+   void SetExtendedInfo(const stw_types::uint8 ou8_SubNodeId, const bool oq_SecurityActivated);
 
    bool IsSerialNumberIdentical(const C_SyvDcDeviceInformation & orc_Cmp) const;
 
@@ -59,8 +60,26 @@ public:
 
    stw_opensyde_core::C_OSCProtocolSerialNumber c_SerialNumber;
 
+   // Extended specific information
    stw_types::uint8 u8_SubNodeId;
-   bool q_SubNodeIdValid;
+   bool q_SecuirtyActivated;
+   bool q_ExtendedInfoValid;
+};
+
+///Old communication configuration of a node
+class C_SyvDcDeviceOldComConfig
+{
+public:
+   C_SyvDcDeviceOldComConfig(void);
+   C_SyvDcDeviceOldComConfig & operator =(const C_SyvDcDeviceOldComConfig & orc_Source);
+
+   void SetContent(const stw_types::uint8 ou8_OldNodeId, const bool oq_OldIpAddressValid,
+                   const stw_types::uint8 * const opu8_OldIpAddress = NULL);
+
+   // Old node id which was used and detected by getting serial number
+   stw_types::uint8 u8_OldNodeId;
+   stw_types::uint8 au8_OldIpAddress[4];
+   bool q_OldIpAddressValid;
 };
 
 ///Target configuration for one device
@@ -73,6 +92,9 @@ public:
    // Identifier of the device
    stw_opensyde_core::C_OSCProtocolSerialNumber c_SerialNumber;
    stw_types::uint8 u8_SubNodeId;
+
+   //Communication configuration of node which was detected by getting serial number
+   C_SyvDcDeviceOldComConfig c_OldComConfig;
 
    // Configuration parameters for all interfaces
    std::vector<stw_types::uint8> c_NodeIds;
@@ -108,9 +130,9 @@ public:
    stw_types::sint32 CheckOpenSydeDevicesConfig(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig) const;
    stw_types::sint32 ConfCanStwFlashloaderDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig);
    stw_types::sint32 ConfCanOpenSydeDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig,
-                                            const bool oq_ConfigureAllInterfaces);
+                                            const bool oq_ConfigureAllInterfaces, const bool oq_SecurityFeatureUsed);
    stw_types::sint32 ConfEthOpenSydeDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig,
-                                            const bool oq_ConfigureAllInterfaces);
+                                            const bool oq_ConfigureAllInterfaces, const bool oq_SecurityFeatureUsed);
 
    stw_types::sint32 SendOsyBroadcastRequestProgramming(bool & orq_NotAccepted) const;
    stw_types::sint32 ResetCanStwFlashloaderDevices(void);
@@ -126,6 +148,7 @@ public:
 
    stw_types::sint32 GetResults(stw_types::sint32 & ors32_Result) const;
    stw_types::sint32 GetDeviceInfosResult(std::vector<C_SyvDcDeviceInformation> & orc_DeviceInfo) const;
+   stw_types::sint32 GetSecurityFeatureUsageResult(bool & orq_SecurityFeatureUsed) const;
 
    static const stw_types::uint32 hu32_SETNODEID = 0U;
    static const stw_types::uint32 hu32_SETCANBITRATE = 1U;
@@ -194,9 +217,17 @@ private:
    stw_types::sint32 m_RunScanCanGetInfoFromOpenSydeDevices(void);
    stw_types::sint32 m_RunConfCanStwFlashloaderDevices(void);
    stw_types::sint32 m_RunConfCanOpenSydeDevices(void);
+   stw_types::sint32 m_RunConfCanOpenSydeDevicesWithBroadcasts(
+      std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_UsedServerIds);
+   stw_types::sint32 m_RunConfCanOpenSydeDevicesWithoutBroadcasts(
+      std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_UsedServerIds);
 
    stw_types::sint32 m_RunScanEthGetInfoFromOpenSydeDevices(void);
    stw_types::sint32 m_RunConfEthOpenSydeDevices(void);
+   stw_types::sint32 m_RunConfEthOpenSydeDevicesWithBroadcasts(
+      std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_UsedServerIds);
+   stw_types::sint32 m_RunConfEthOpenSydeDevicesWithoutBroadcasts(
+      std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_UsedServerIds);
 
    stw_types::sint32 m_ConfigureNodes(const bool oq_ViaCan,
                                       std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_UsedServerIds);
@@ -235,8 +266,14 @@ private:
 
    // Result information of several sequences
    std::vector<C_SyvDcDeviceInformation> mc_DeviceInfoResult;
+   // Result of ScanCanGetInfoFromOpenSydeDevices and ScanEthGetInfoFromOpenSydeDevices
+   // Input of ConfCanOpenSydeDevices and ConfEthOpenSydeDevices
+   bool mq_SecurityFeatureUsed;
    // Service execution result
    stw_types::sint32 ms32_Result;
+
+   // Security PEM database
+   stw_opensyde_core::C_OSCSecurityPemDatabase mc_PemDatabase;
 
    static const stw_types::uint32 mhu32_DEFAULT_SCAN_TIME_MS = 5000U;
 };

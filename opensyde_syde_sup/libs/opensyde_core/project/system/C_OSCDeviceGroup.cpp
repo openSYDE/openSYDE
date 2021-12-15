@@ -203,10 +203,6 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
                s32_Return = C_RD_WR;
             }
          }
-         if (s32_Return != C_NO_ERR)
-         {
-            break;
-         }
       }
    }
    return s32_Return;

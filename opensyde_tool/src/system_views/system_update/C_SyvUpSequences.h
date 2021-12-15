@@ -13,11 +13,12 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>
+#include "CCAN.h"
+#include "TGLTasks.h"
 #include "C_OSCSuSequences.h"
 #include "C_SyvComDriverThread.h"
-#include "CCAN.h"
 #include "C_OSCIpDispatcherWinSock.h"
-#include "TGLTasks.h"
+#include "C_OSCSecurityPemDatabase.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -131,6 +132,9 @@ private:
    //results of STW Flashloader device information scans:
    std::vector<stw_types::uint32> mc_ReportXflDeviceInformationNodeIndex;
    std::vector<C_XflDeviceInformation> mc_ReportXflDeviceInformation;
+
+   // Security PEM database
+   stw_opensyde_core::C_OSCSecurityPemDatabase mc_PemDatabase;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -245,6 +245,7 @@ void C_CieImportReportWidget::m_OkClicked(void)
                if (c_Popup != NULL)
                {
                   c_Popup->HideOverlay();
+                  c_Popup->deleteLater();
                }
             } //lint !e429  //no memory leak because of the parent of pc_DialogImportReport and the Qt memory
          }

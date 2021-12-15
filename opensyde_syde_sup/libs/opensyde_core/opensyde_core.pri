@@ -360,6 +360,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
                   $${PWD}/ip_dispatcher/target_windows_win_sock \
                   $${PWD}/ip_dispatcher/dispatcher \
                   $${PWD}/data_dealer \
+                  $${PWD}/security \
                   $${PWD}/protocol_drivers \
                   $${PWD}/protocol_drivers/routing \
                   $${PWD}/protocol_drivers/communication \
@@ -386,6 +387,10 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/kefex_diaglib/CXFLFlashWriteParameters.cpp \
               $${PWD}/kefex_diaglib/CXFLHexFile.cpp \
               $${PWD}/kefex_diaglib/CXFLProtocol.cpp \
+              $${PWD}/security/C_OSCSecurityPem.cpp \
+              $${PWD}/security/C_OSCSecurityPemKeyInfo.cpp \
+              $${PWD}/security/C_OSCSecurityPemDatabase.cpp \
+              $${PWD}/security/C_OSCSecurityRsa.cpp \
               $${PWD}/protocol_drivers/C_OSCCanDispatcherOsyRouter.cpp \
               $${PWD}/protocol_drivers/C_OSCDiagProtocolBase.cpp \
               $${PWD}/protocol_drivers/C_OSCDiagProtocolKfx.cpp \
@@ -427,6 +432,10 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/kefex_diaglib/CXFLFlashWriteParameters.h \
               $${PWD}/kefex_diaglib/CXFLHexFile.h \
               $${PWD}/kefex_diaglib/CXFLProtocol.h \
+              $${PWD}/security/C_OSCSecurityPem.h \
+              $${PWD}/security/C_OSCSecurityPemKeyInfo.h \
+              $${PWD}/security/C_OSCSecurityPemDatabase.h \
+              $${PWD}/security/C_OSCSecurityRsa.h \
               $${PWD}/protocol_drivers/C_OSCCanDispatcherOsyRouter.h \
               $${PWD}/protocol_drivers/C_OSCDiagProtocolBase.h \
               $${PWD}/protocol_drivers/C_OSCDiagProtocolKfx.h \
@@ -447,6 +456,9 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/system_update/C_OSCSuServiceUpdatePackage.h \
               $${PWD}/protocol_drivers/system_update/C_OsyHexFile.h \
               $${PWD}/protocol_drivers/DiagLib_config.h
+
+
+   include(./libtomcrypt/libtomcrypt.pri)
 }
 
 # optional: protocol logging

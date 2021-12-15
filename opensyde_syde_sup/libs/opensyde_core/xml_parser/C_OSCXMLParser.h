@@ -60,6 +60,7 @@ public:
 
    // init node system - selects second node, if available; first node is declaration
    stw_scl::C_SCLString SelectRoot(void);
+   virtual stw_types::sint32 SelectRootError(const stw_scl::C_SCLString & orc_Name);
 
    // node navigation - returns current node
    // select first/next node (with name) after current node      (go forward)
@@ -85,10 +86,8 @@ public:
    // node attribute operations
    bool AttributeExists(const stw_scl::C_SCLString & orc_Name) const;
 
-   stw_scl::C_SCLString GetCurrentNodeName(void) const
-   {
-      return (mpc_CurrentNode == NULL) ? "" : mpc_CurrentNode->Name();
-   }
+   stw_scl::C_SCLString GetCurrentNodeName(void) const;
+   stw_types::sintn GetFileLineForCurrentNode(void) const;
 
    // set attribute values
    void SetAttributeString(const stw_scl::C_SCLString & orc_Name, const stw_scl::C_SCLString & orc_Value);
@@ -133,6 +132,19 @@ public:
                                                       stw_types::float32 & orf32_Value) const;
    virtual stw_types::sint32 GetAttributeFloat64Error(const stw_scl::C_SCLString & orc_Name,
                                                       stw_types::float64 & orf64_Value) const;
+
+   //Base reporting functions
+   virtual void ReportErrorForNodeContentAppendXMLContext(const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForAttributeContentAppendXMLContext(const stw_scl::C_SCLString & orc_Attribute,
+                                                               const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForNodeContentStartingWithXMLContext(const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForAttributeContentStartingWithXMLContext(const stw_scl::C_SCLString & orc_Attribute,
+                                                                     const stw_scl::C_SCLString & orc_ErrorMessage)
+   const;
+   virtual void ReportErrorForNodeMissing(const stw_scl::C_SCLString & orc_MissingNodeName) const;
 
    // get all attributes
    std::vector<C_OSCXMLAttribute> GetAttributes(void) const;

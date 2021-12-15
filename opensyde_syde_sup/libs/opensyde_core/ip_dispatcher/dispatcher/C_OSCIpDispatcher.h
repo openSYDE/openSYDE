@@ -62,7 +62,7 @@ protected:
    }
 
 public:
-   C_OSCIpDispatcher(const stw_types::uint16 ou16_ConnectionTimeoutSeconds)
+   explicit C_OSCIpDispatcher(const stw_types::uint16 ou16_ConnectionTimeoutSeconds)
    {
       mu32_ConnectionTimeoutSeconds = ou16_ConnectionTimeoutSeconds;
    }

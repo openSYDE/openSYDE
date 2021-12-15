@@ -106,19 +106,26 @@ static const C_TextAndSize mac_TextAndSizeTable[mu8_NUM_DATA_TYPES] =
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::operator <(const C_OSCCanOpenObject & orc_Object) const
 {
+   bool q_IsLess = false;
+
    if (u16_Index != orc_Object.u16_Index)
    {
-      return (u16_Index < orc_Object.u16_Index);
+      q_IsLess = (u16_Index < orc_Object.u16_Index);
    }
-
-   //mu8_NumSubs != 0xFF: main index -> first in sorting !
-   if (u8_NumSubs != 0xFF)
+   else
    {
-      return true;
+      //mu8_NumSubs != 0xFF: main index -> first in sorting !
+      if (u8_NumSubs != 0xFF)
+      {
+         q_IsLess = true;
+      }
+      else
+      {
+         //same index -> check sub-index !
+         q_IsLess = (u8_SubIndex < orc_Object.u8_SubIndex);
+      }
    }
-
-   //same index -> check sub-index !
-   return (u8_SubIndex < orc_Object.u8_SubIndex);
+   return q_IsLess;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -466,11 +473,13 @@ bool C_OSCCanOpenObject::IsWriteable(void) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsIntegerDataType(void) const
 {
-   if ((u8_DataType >= mu8_NUM_DATA_TYPES) || (u8_DataType == hu8_DATA_TYPE_INVALID))
+   bool q_IsType = false;
+
+   if ((u8_DataType < mu8_NUM_DATA_TYPES) && (u8_DataType != hu8_DATA_TYPE_INVALID))
    {
-      return false;
+      q_IsType = mac_TextAndSizeTable[u8_DataType].q_IsInteger;
    }
-   return mac_TextAndSizeTable[u8_DataType].q_IsInteger;
+   return q_IsType;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -483,11 +492,13 @@ bool C_OSCCanOpenObject::IsIntegerDataType(void) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsUnsignedDataType(void) const
 {
-   if ((u8_DataType >= mu8_NUM_DATA_TYPES) || (u8_DataType == hu8_DATA_TYPE_INVALID))
+   bool q_IsType = false;
+
+   if ((u8_DataType < mu8_NUM_DATA_TYPES) && (u8_DataType != hu8_DATA_TYPE_INVALID))
    {
-      return false;
+      q_IsType = mac_TextAndSizeTable[u8_DataType].q_IsUnsigned;
    }
-   return mac_TextAndSizeTable[u8_DataType].q_IsUnsigned;
+   return q_IsType;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -500,11 +511,13 @@ bool C_OSCCanOpenObject::IsUnsignedDataType(void) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsFloatDataType(void) const
 {
-   if ((u8_DataType >= mu8_NUM_DATA_TYPES) || (u8_DataType == hu8_DATA_TYPE_INVALID))
+   bool q_IsType = false;
+
+   if ((u8_DataType < mu8_NUM_DATA_TYPES) && (u8_DataType != hu8_DATA_TYPE_INVALID))
    {
-      return false;
+      q_IsType = mac_TextAndSizeTable[u8_DataType].q_IsFloat;
    }
-   return mac_TextAndSizeTable[u8_DataType].q_IsFloat;
+   return q_IsType;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -517,11 +530,13 @@ bool C_OSCCanOpenObject::IsFloatDataType(void) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsStringDataType(void) const
 {
-   if ((u8_DataType >= mu8_NUM_DATA_TYPES) || (u8_DataType == hu8_DATA_TYPE_INVALID))
+   bool q_IsType = false;
+
+   if ((u8_DataType < mu8_NUM_DATA_TYPES) && (u8_DataType != hu8_DATA_TYPE_INVALID))
    {
-      return false;
+      q_IsType = mac_TextAndSizeTable[u8_DataType].q_IsString;
    }
-   return mac_TextAndSizeTable[u8_DataType].q_IsString;
+   return q_IsType;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -457,7 +457,7 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OSCSystemDefinitio
    if ((oq_UseDeviceDefinitions == true) &&
        (C_OSCSystemDefinition::hc_Devices.WasLoaded() == false))
    {
-      s32_Retval = C_OSCSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions, false);
+      s32_Retval = C_OSCSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions, false, NULL);
       if (s32_Retval != C_NO_ERR)
       {
          osc_write_log_error("Loading System Definition", "Could not load Device definitions.");

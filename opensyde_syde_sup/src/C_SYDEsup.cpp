@@ -60,7 +60,8 @@ C_SYDEsup::C_SYDEsup(void) :
    mc_CanDriver(""),
    mc_LogPath(""),
    mc_LogFile(""),
-   mc_UnzipPath("")
+   mc_UnzipPath(""),
+   mc_CertFolderPath("")
 {
 }
 
@@ -115,28 +116,31 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    {
       /* name, has_arg, flag, val */
       {
-         "help",         no_argument,         NULL,    'h'
+         "help",              no_argument,         NULL,    'h'
       },
       {
-         "man",          no_argument,         NULL,    'm'
+         "man",               no_argument,         NULL,    'm'
       },
       {
-         "version",      no_argument,         NULL,    'v'
+         "version",           no_argument,         NULL,    'v'
       },
       {
-         "quiet",        no_argument,         NULL,    'q'
+         "quiet",             no_argument,         NULL,    'q'
       },
       {
-         "packagefile",  required_argument,   NULL,    'p'
+         "packagefile",       required_argument,   NULL,    'p'
       },
       {
-         "caninterface", required_argument,   NULL,    'i'
+         "caninterface",      required_argument,   NULL,    'i'
       },
       {
-         "unzipdir",     required_argument,   NULL,    'z'
+         "unzipdir",          required_argument,   NULL,    'z'
       },
       {
-         "logdir",       required_argument,   NULL,    'l'
+         "logdir",            required_argument,   NULL,    'l'
+      },
+      {
+         "certificatesdir",   required_argument,   NULL,    'c'
       },
       {
          NULL,           0,                   NULL,    0
@@ -146,7 +150,7 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    do
    {
       sintn sn_Index;
-      sn_Result = getopt_long(osn_Argc, oppcn_Argv, "hmvqp:i:z:l:", &ac_Options[0], &sn_Index);
+      sn_Result = getopt_long(osn_Argc, oppcn_Argv, "hmvqp:i:z:l:c:", &ac_Options[0], &sn_Index);
       if (sn_Result != -1)
       {
          switch (sn_Result)
@@ -175,6 +179,9 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
             break;
          case 'l':
             mc_LogPath = optarg;
+            break;
+         case 'c':
+            mc_CertFolderPath = optarg;
             break;
          case '?': //parser reports error (missing parameter option)
             q_ParseError = true;
@@ -407,14 +414,38 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void)
       }
    }
 
+   // optional step: load pem database if cmd line parameter is not empty
+   if (e_Result == eOK)
+   {
+      if (s32_Return == C_NO_ERR)
+      {
+         //parse pem database if cmd line parameter is not empty
+         if (mc_CertFolderPath != "")
+         {
+            s32_Return = mc_PemDatabase.ParseFolder(mc_CertFolderPath.c_str());
+
+            if (s32_Return != C_NO_ERR)
+            {
+               e_Result = eERR_UPDATE_CERTIFICATE_PATH;
+               s32_Return = C_DEFAULT;
+               h_WriteLog("Load PEM database",
+                          "Could not load certificates (PEM files) at path \"" + this->mc_CertFolderPath + "\"");
+            }
+         }
+      }
+   }
+
    // initialize sequence if previous step (unpacking if Ethernet, CAN initializing if CAN) was successful
    if (e_Result == eOK)
    {
-      // initialize sequence
-      s32_Return = c_Sequence.Init(c_SystemDefinition, u32_ActiveBusIndex, c_ActiveNodes, mpc_CanDispatcher,
-                                   mpc_EthDispatcher);
-      // tell report methods to not print to console
-      c_Sequence.SetQuiet(mq_Quiet);
+      if (s32_Return == C_NO_ERR)
+      {
+         // initialize sequence
+         s32_Return = c_Sequence.Init(c_SystemDefinition, u32_ActiveBusIndex, c_ActiveNodes, mpc_CanDispatcher,
+                                      mpc_EthDispatcher, &this->mc_PemDatabase);
+         // tell report methods to not print to console
+         c_Sequence.SetQuiet(mq_Quiet);
+      }
    }
 
    // activate Flashloader if previous step was successful and return errors else
@@ -491,6 +522,9 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void)
          std::cout << &std::endl;
          q_ResetSystem = true;
          break;
+      case C_DEFAULT:
+         e_Result = eERR_UPDATE_CHECKSUM;
+         break;
       case C_BUSY:
          e_Result = eERR_UPDATE_ABORTED;
          break;
@@ -509,11 +543,11 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void)
       case C_CONFIG:
          e_Result = eERR_UPDATE_SYSDEF;
          break;
-      case C_CHECKSUM:
-         e_Result = eERR_UPDATE_CHECKSUM;
-         break;
       case C_RANGE:
          e_Result = eERR_UPDATE_NO_NVM;
+         break;
+      case C_CHECKSUM:
+         e_Result = eERR_UPDATE_AUTHENTICATION;
          break;
       default:
          e_Result = eERR_UNKNOWN;
@@ -645,6 +679,9 @@ void C_SYDEsup::m_PrintVersion(const C_SCLString & orc_Version, const C_SCLStrin
 //----------------------------------------------------------------------------------------------------------------------
 void C_SYDEsup::m_PrintInformation(const bool oq_Detailed) const
 {
+   const C_SCLString c_PathWithTrailingDelimiter = TGL_FileIncludeTrailingDelimiter("x");
+   const C_SCLString c_PathDelimiter = c_PathWithTrailingDelimiter.SubString(2, c_PathWithTrailingDelimiter.Length());
+
    if (oq_Detailed == true)
    {
       std::cout <<
@@ -657,18 +694,22 @@ void C_SYDEsup::m_PrintInformation(const bool oq_Detailed) const
 
    // show parameter help
    std::cout << "\nCommand line parameters:\n\n"
-      "Flag   Alternative      Description                                   Default         Example\n"
+      "Flag   Alternative         Description                                     Default         Example\n"
       "---------------------------------------------------------------------------------------------------------------\n"
-      "-h     --help           Print help                                                    -h\n"
-      "-m     --manpage        Print manual page                                             -m\n"
-      "-v     --version        Print version                                                 -v\n"
-      "-q     --quiet          Print less console output                                     -q\n"
-      "-p     --packagefile    Path to Service Update Package file           <none>          -p .\\MyPackage.syde_sup\n"
-      "-i     --caninterface   CAN interface                                 <none>          " <<
+      "-h     --help              Print help                                                      -h\n"
+      "-m     --manpage           Print manual page                                               -m\n"
+      "-v     --version           Print version                                                   -v\n"
+      "-q     --quiet             Print less console output                                       -q\n"
+      "-p     --packagefile       Path to Service Update Package file             <none>          -p ." <<
+      c_PathDelimiter.c_str() << "MyPackage.syde_sup\n"
+      "-i     --caninterface      CAN interface                                   <none>          " <<
       this->m_GetCanInterfaceUsageExample().c_str() << "\n"
-      "-z     --unzipdir       Existing directory where files get unzipped   <packagefile>   -z .\\MyUnzipDir\n"
-      "-l     --logdir         Directory for log files                       " <<
-      this->m_GetDefaultLogLocation().c_str() <<      "          -l .\\MyLogDir\n"
+      "-z     --unzipdir          Existing directory where files get unzipped     <packagefile>   -z ." <<
+      c_PathDelimiter.c_str() << "MyUnzipDir\n"
+      "-l     --logdir            Directory for log files                         " <<
+      this->m_GetDefaultLogLocation().c_str() <<      "          -l ." << c_PathDelimiter.c_str() << "MyLogDir\n"
+      "-c     --certificatesdir   Directory for certificates (PEM-files)          <none>          -c ." <<
+      c_PathDelimiter.c_str() << "MyCertificatesDir\n"
       "The package file parameter \"-p\" is mandatory, all others are optional. \n"
       "If the active bus in the given Service Update Package is of CAN type, a CAN interface must be provided." <<
       &std::endl;
@@ -867,6 +908,17 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
    case eERR_UPDATE_NO_NVM: // C_RANGE
       c_Activity = "Update System";
       c_Error = "At least one feature of the openSYDE Flashloader is not available for NVM writing.";
+      break;
+   case eERR_UPDATE_CERTIFICATE_PATH:
+      c_Activity = "Load Certificates";
+      c_Error = "Could not load certificates (PEM files) at path \"" + this->mc_CertFolderPath + "\"";
+      break;
+   case eERR_UPDATE_AUTHENTICATION:
+      c_Activity = "Update System";
+      c_Error = "Authentication between sydesup and device(s) has failed. Access denied."
+                "Possible reasons:\n"
+                "- Associated private key (*.pem) not found in certificates folder (most common)\n"
+                "- Failure during authenfication process";
       break;
 
    // results regarding thread process issues

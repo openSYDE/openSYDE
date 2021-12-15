@@ -195,6 +195,7 @@ const QString mc_PATH_VARIABLE_COMPUTER_NAME = "%{COMPUTER_NAME}";
 const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK = 0U;
 const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET = 1U;
 const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE = 2U;
+const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM = 3U;
 
 // Highest known generated code structure version
 const stw_types::uint16 mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION = 5U;

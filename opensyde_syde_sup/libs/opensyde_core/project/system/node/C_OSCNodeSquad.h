@@ -37,7 +37,7 @@ public:
                                     const std::vector<stw_opensyde_core::C_OSCNodeSquad> & orc_AvailableGroups,
                                     stw_types::uint32 * const opu32_GroupIndex = NULL);
 
-   static const stw_scl::C_SCLString hc_Separator;  ///< Default separator for GUI and device type checks
+   static const stw_scl::C_SCLString hc_SEPARATOR;  ///< Default separator for GUI and device type checks
    stw_scl::C_SCLString c_BaseName;                 ///< Base name for all sub nodes
    std::vector<stw_types::uint32> c_SubNodeIndexes; ///< Indexes of all containing sub nodes in the squad
 };

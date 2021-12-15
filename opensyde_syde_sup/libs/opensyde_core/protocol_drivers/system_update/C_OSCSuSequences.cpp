@@ -27,6 +27,7 @@
 #include "C_OSCUtils.h"
 #include "C_OSCDataDealerNvmSafe.h"
 #include "C_OSCDiagProtocolOsy.h"
+#include "C_OSCSecurityPem.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -47,6 +48,17 @@ using namespace stw_diag_lib;
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCSuSequences::C_DoFlash::C_DoFlash(void) :
+   q_SendSecurityEnabledState(false),
+   q_SecurityEnabled(false),
+   q_SendDebuggerEnabledState(false),
+   q_DebuggerEnabled(false)
+{
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: check whether node is an active node on a specific bus
@@ -262,10 +274,12 @@ sint32 C_OSCSuSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_S
    * Reports progress from 0..100 for the overall process
    * Reports 0..100 for each file being flashed
 
-   \param[in]  orc_FilesToFlash              Files to flash
-   \param[in]  orc_OtherAcceptedDeviceNames  Other accepted device names
-   \param[in]  ou32_RequestDownloadTimeout   Maximum time in ms it can take to erase one continuous area in flash
-   \param[in]  ou32_TransferDataTimeout      Maximum time in ms it can take to write up to 4kB of data to flash
+   \param[in]      orc_FilesToFlash              Files to flash
+   \param[in]      orc_OtherAcceptedDeviceNames  Other accepted device names
+   \param[in]      ou32_RequestDownloadTimeout   Maximum time in ms it can take to erase one continuous area in flash
+   \param[in]      ou32_TransferDataTimeout      Maximum time in ms it can take to write up to 4kB of data to flash
+   \param[in,out]  orq_SetProgrammingMode        In: Flag if programming mode must be set.
+                                                 Out: Flag if programming mode was set.
 
    \return
    C_NO_ERR    flashed all files
@@ -276,12 +290,13 @@ sint32 C_OSCSuSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_S
    C_NOACT     could not extract device name from hex file
    C_OVERFLOW  device name of device does not match name contained in hex file
    C_BUSY      procedure aborted by user (as returned by m_ReportProgress)
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> & orc_FilesToFlash,
                                                 const std::vector<C_SCLString> & orc_OtherAcceptedDeviceNames,
                                                 const uint32 ou32_RequestDownloadTimeout,
-                                                const uint32 ou32_TransferDataTimeout)
+                                                const uint32 ou32_TransferDataTimeout, bool & orq_SetProgrammingMode)
 {
    sint32 s32_Return = C_NO_ERR;
    uint32 u32_Return;
@@ -414,12 +429,21 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
       //we need to enter the programming session for that:
       (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_START, C_NO_ERR, 20U, mc_CurrentNode,
                              "Checking memory availability ...");
-      s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
+      if (orq_SetProgrammingMode == true)
+      {
+         // In the hole update sequence, setting the programming mode only one time
+         s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
+         orq_SetProgrammingMode = false;
+      }
       if (s32_Return != C_NO_ERR)
       {
          (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR, s32_Return, 20U, mc_CurrentNode,
                                 "Could not activate programming session.");
-         s32_Return = C_COM;
+
+         if (s32_Return != C_CHECKSUM)
+         {
+            s32_Return = C_COM;
+         }
       }
       else
       {
@@ -522,10 +546,10 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
 
    Reports progress from 0..100
 
-   \param[in]     orc_HexDataDump               Dump of file to flash
-   \param[in]     ou32_SignatureAddress         address of signature block within hex file
-   \param[in]     ou32_RequestDownloadTimeout   Maximum time in ms it can take to erase one continuous area in flash
-   \param[in]     ou32_TransferDataTimeout      Maximum time in ms it can take to write up to 4kB of data to flash
+   \param[in]      orc_HexDataDump               Dump of file to flash
+   \param[in]      ou32_SignatureAddress         address of signature block within hex file
+   \param[in]      ou32_RequestDownloadTimeout   Maximum time in ms it can take to erase one continuous area in flash
+   \param[in]      ou32_TransferDataTimeout      Maximum time in ms it can take to write up to 4kB of data to flash
 
    \return
    C_NO_ERR   file flashed
@@ -745,11 +769,13 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexData
    * Reports progress from 0..100 for the overall process
    * Reports 0..100 for each file being flashed
 
-   \param[in]     orc_FilesToFlash              Files to write
-   \param[in]     ou32_RequestDownloadTimeout   Maximum time in ms it can take to prepare one file on the target file
-   \param[in]     ou32_TransferDataTimeout      Maximum time in ms it can take to write up to 4kB of data to the target
-                                                 file
-   \param[in]     orc_ProtocolFeatures          available protocol features
+   \param[in]      orc_FilesToFlash              Files to write
+   \param[in]      ou32_RequestDownloadTimeout   Maximum time in ms it can take to prepare one file on the target file
+   \param[in]      ou32_TransferDataTimeout      Maximum time in ms it can take to write up to 4kB of data to the target
+                                                  file
+   \param[in]      orc_ProtocolFeatures          available protocol features
+   \param[in,out]  orq_SetProgrammingMode        In: Flag if programming mode must be set.
+                                                 Out: Flag if programming mode was set.
 
    \return
    C_NO_ERR    flashed all files
@@ -761,25 +787,35 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexData
    C_NOACT     could not extract device name from hex file
    C_OVERFLOW  device name of device does not match name contained in hex file
    C_BUSY      procedure aborted by user (as returned by m_ReportProgress)
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_FlashNodeOpenSydeFile(const std::vector<C_SCLString> & orc_FilesToFlash,
                                                  const uint32 ou32_RequestDownloadTimeout,
                                                  const uint32 ou32_TransferDataTimeout,
-                                                 const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures)
+                                                 const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                                 bool & orq_SetProgrammingMode)
 {
-   sint32 s32_Return;
+   sint32 s32_Return = C_NO_ERR;
 
    //start the actual transfers
    //we need to enter the programming session for that:
    (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_START, C_NO_ERR, 20U, mc_CurrentNode,
                           "Checking memory availability ...");
-   s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
+   if (orq_SetProgrammingMode == true)
+   {
+      // In the hole update sequence, setting the programming mode only one time
+      s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
+      orq_SetProgrammingMode = false;
+   }
    if (s32_Return != C_NO_ERR)
    {
       (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR, s32_Return, 20U, mc_CurrentNode,
                              "Could not activate programming session.");
-      s32_Return = C_COM;
+      if (s32_Return != C_CHECKSUM)
+      {
+         s32_Return = C_COM;
+      }
    }
 
    if (s32_Return == C_NO_ERR)
@@ -1123,21 +1159,24 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
     To set up the DataDealerNvm we need to set up a DiagProtocol; but we only have a ProtocolDriverOsy
     So we create a DiagProtocol and copy over the known settings from the already up-and-running ProtocolDriverOsy.
 
-   \param[in]     orc_FilesToWrite              Files to write to NVM
-   \param[in]     orc_ProtocolFeatures          Information about available protocol features
+   \param[in]      orc_FilesToWrite              Files to write to NVM
+   \param[in]      orc_ProtocolFeatures          Information about available protocol features
+   \param[in]      oq_SetProgrammingMode         In: Flag if programming mode must be set.
 
    \return
    C_NO_ERR    all files were written
    C_RD_WR     one of the files is not a valid .psi_syde file or does not exist
    C_CONFIG    one of the files contains data for zero or more than one device (expected: data for exactly one device)
-   C_CHECKSUM  one of the files is present but checksum is invalid
+   C_DEFAULT   one of the files is present but checksum is invalid
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
    C_COM       communication driver reported problem (details will be written to log file)
    C_BUSY      procedure aborted by user (as returned by m_ReportProgress)
    C_RANGE     At least one feature of the openSYDE Flashloader is not available for NVM writing
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_WriteNvmOpenSyde(const std::vector<C_SCLString> & orc_FilesToWrite,
-                                            const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures)
+                                            const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                            const bool oq_SetProgrammingMode)
 {
    sint32 s32_Return = C_NO_ERR;
    C_OSCNode & rc_Node = this->mpc_SystemDefinition->c_Nodes[mu32_CurrentNode];
@@ -1174,17 +1213,25 @@ sint32 C_OSCSuSequences::m_WriteNvmOpenSyde(const std::vector<C_SCLString> & orc
          // Both features are necessary to write NVM files to flashloader
          (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return, 5U,
                                 mc_CurrentNode,
-                                "Not all necessary openSYDE Flashloader features are available on the node.");
+                                "The node has not the Flashloader feature to write a Parameter Set Image file.");
       }
 
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
+         if (oq_SetProgrammingMode == true)
+         {
+            // In the hole update sequence, setting the programming mode only one time
+            s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
+            // Last step with this security level in this sequence
+         }
          if (s32_Return != C_NO_ERR)
          {
             (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR, s32_Return, 5U, mc_CurrentNode,
                                    "Could not activate programming session.");
-            s32_Return = C_COM;
+            if (s32_Return != C_CHECKSUM)
+            {
+               s32_Return = C_COM;
+            }
          }
       }
 
@@ -1224,6 +1271,11 @@ sint32 C_OSCSuSequences::m_WriteNvmOpenSyde(const std::vector<C_SCLString> & orc
             else
             {
                s32_Return = c_Dealer.NvmSafeReadFileWithCRC(orc_FilesToWrite[u16_File]);
+               if (s32_Return == C_CHECKSUM)
+               {
+                  // Remap to have a unique return value for this case
+                  s32_Return = C_DEFAULT;
+               }
             }
             if (s32_Return != C_NO_ERR)
             {
@@ -1273,6 +1325,295 @@ sint32 C_OSCSuSequences::m_WriteNvmOpenSyde(const std::vector<C_SCLString> & orc
       {
          (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED, s32_Return, 100U, mc_CurrentNode,
                                 "Writing parameter set image file(s) to device finished.");
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write one PEM file to openSYDE node
+
+   File to be written must be in valid .pem file format
+
+   Assumptions/prerequisites (not explicitly checked by this function):
+   * mc_CurrentNode contains ID of node to work with
+   * server node must be in Flashloader mode
+   * orc_FileToWrite must be a valid file path
+   * node is active
+
+   * Reports progress from 0..100 for the overall process
+
+   \param[in]      orc_FileToWrite               PEM file to write
+   \param[in]      orc_ProtocolFeatures          Information about available protocol features
+   \param[in,out]  orq_SetProgrammingMode        In: Flag if programming mode must be set.
+                                                 Out: Flag if programming mode was set.
+
+   \return
+   C_NO_ERR    all files were written
+   C_RD_WR     the file is not a valid .pem file or does not exist
+   C_WARN      the file is present but key details of PEM file could not be extracted
+   C_COM       communication driver reported problem (details will be written to log file)
+   C_RANGE     At least one feature of the openSYDE Flashloader is not available for NVM writing
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCSuSequences::m_WritePemOpenSydeFile(const stw_scl::C_SCLString & orc_FileToWrite,
+                                                const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                                bool & orq_SetProgrammingMode)
+{
+   sint32 s32_Return;
+
+   (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START, C_NO_ERR, 0U, mc_CurrentNode,
+                          "Writing PEM file ...");
+
+   if (orc_ProtocolFeatures.q_SupportsSecurity == false)
+   {
+      s32_Return = C_RANGE;
+      // Security feature is necessary to write PEM file to flashloader
+      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return, 5U,
+                             mc_CurrentNode,
+                             "The node has not the Flashloader features to support security and to write PEM files.");
+   }
+   else
+   {
+      C_OSCSecurityPem c_PemFile;
+      std::string c_ErrorMessage;
+
+      s32_Return = c_PemFile.LoadFromFile(orc_FileToWrite.c_str(), c_ErrorMessage);
+
+      if (s32_Return == C_NO_ERR)
+      {
+         const std::vector<uint8> c_PubKeyDecoded = c_PemFile.GetKeyInfo().GetPubKeyTextDecoded();
+         std::vector<uint8> c_PubKeyModulus;
+         std::vector<uint8> c_PubKeyExponent;
+
+         s32_Return = C_OSCSecurityPem::h_ExtractModulusAndExponent(c_PubKeyDecoded, c_PubKeyModulus, c_PubKeyExponent,
+                                                                    c_ErrorMessage);
+
+         if (s32_Return == C_NO_ERR)
+         {
+            if (orq_SetProgrammingMode == true)
+            {
+               // In the hole update sequence, setting the programming mode only one time
+               const uint8 u8_SECURITY_LEVEL = 1U;
+               s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode, &u8_SECURITY_LEVEL);
+               orq_SetProgrammingMode = false;
+            }
+            if (s32_Return != C_NO_ERR)
+            {
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR, s32_Return, 10U,
+                                      mc_CurrentNode,
+                                      "Could not activate programming session.");
+               if (s32_Return != C_CHECKSUM)
+               {
+                  s32_Return = C_COM;
+               }
+            }
+         }
+
+         if (s32_Return == C_NO_ERR)
+         {
+            const std::vector<uint8> c_KeySerialNumber = c_PemFile.GetKeyInfo().GetPubKeySerialNumber();
+            uint8 u8_NrCode;
+
+            s32_Return = this->mpc_ComDriver->SendOsyWriteSecurityKey(this->mc_CurrentNode, c_PubKeyModulus,
+                                                                      c_PubKeyExponent,
+                                                                      c_KeySerialNumber,
+                                                                      &u8_NrCode);
+
+            if (s32_Return != C_NO_ERR)
+            {
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR, s32_Return,
+                                      75U, mc_CurrentNode,
+                                      "Could not write security key. Details: " +
+                                      C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
+                                                                                               u8_NrCode));
+               s32_Return = C_COM;
+            }
+         }
+         else
+         {
+            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR, s32_Return,
+                                   50U, mc_CurrentNode,
+                                   "Could not load PEM file. Details: " + c_ErrorMessage);
+            s32_Return = C_WARN;
+         }
+      }
+      else
+      {
+         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR, s32_Return,
+                                25U, mc_CurrentNode,
+                                "Could not extract security key from decoded public key. Details: " +
+                                c_ErrorMessage);
+         s32_Return = C_RD_WR;
+      }
+   }
+
+   if (s32_Return == C_NO_ERR)
+   {
+      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED, s32_Return, 100U, mc_CurrentNode,
+                             "Writing PEM file to device finished.");
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write device states to openSYDE node
+
+   Assumptions/prerequisites (not explicitly checked by this function):
+   * mc_CurrentNode contains ID of node to work with
+   * server node must be in Flashloader mode
+   * node is active
+
+   \param[in]      orc_ApplicationsToWrite       Update configuration with all states for sending or not sending
+   \param[in]      orc_ProtocolFeatures          Information about available protocol features
+   \param[in,out]  orq_SetProgrammingMode        In: Flag if programming mode must be set.
+                                                 Out: Flag if programming mode was set.
+
+   \return
+   C_NO_ERR    all states were written or no write process was necessary
+   C_COM       communication driver reported problem (details will be written to log file)
+   C_RANGE     At least one feature of the openSYDE Flashloader is not available for state writing
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCSuSequences::m_WriteOpenSydeNodeStates(const C_OSCSuSequences::C_DoFlash & orc_ApplicationsToWrite,
+                                                   const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                                   bool & orq_SetProgrammingMode)
+{
+   sint32 s32_Return = C_NO_ERR;
+   const uint8 u8_SECURITY_LEVEL = 1U;
+
+   // Security state
+   if (orc_ApplicationsToWrite.q_SendSecurityEnabledState == true)
+   {
+      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_START, C_NO_ERR, 0U, mc_CurrentNode,
+                             "Writing security activation ...");
+
+      if (orc_ProtocolFeatures.q_SupportsSecurity == true)
+      {
+         if (orq_SetProgrammingMode == true)
+         {
+            // In the hole update sequence, setting the programming mode only one time
+            s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode, &u8_SECURITY_LEVEL);
+            orq_SetProgrammingMode = false;
+         }
+         if (s32_Return != C_NO_ERR)
+         {
+            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR, s32_Return, 10U,
+                                   mc_CurrentNode,
+                                   "Could not activate programming session.");
+            if (s32_Return != C_CHECKSUM)
+            {
+               s32_Return = C_COM;
+            }
+         }
+
+         if (s32_Return == C_NO_ERR)
+         {
+            uint8 u8_NrCode;
+            // Only RSA 1024 supported at the moment, so 0 for security algorithm
+            s32_Return = this->mpc_ComDriver->SendOsyWriteSecurityActivation(this->mc_CurrentNode,
+                                                                             orc_ApplicationsToWrite.q_SecurityEnabled,
+                                                                             0U, &u8_NrCode);
+
+            if (s32_Return == C_NO_ERR)
+            {
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_FINISHED, s32_Return, 100U,
+                                      mc_CurrentNode, "Writing security activation to device finished.");
+            }
+            else
+            {
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR, s32_Return,
+                                      50U, mc_CurrentNode,
+                                      "Could not write security activation. Details: " +
+                                      C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
+                                                                                               u8_NrCode));
+               s32_Return = C_COM;
+            }
+         }
+      }
+      else
+      {
+         // Security feature is necessary to write security activation state to flashloader
+         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return, 5U,
+                                mc_CurrentNode,
+                                "The node has not the Flashloader features to support security.");
+
+         s32_Return = C_RANGE;
+      }
+   }
+
+   // Debugger state
+   if ((s32_Return == C_NO_ERR) &&
+       (orc_ApplicationsToWrite.q_SendDebuggerEnabledState == true))
+   {
+      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_START, C_NO_ERR, 0U, mc_CurrentNode,
+                             "Writing debugger state ...");
+
+      if (((orc_ProtocolFeatures.q_SupportsDebuggerOn == true) &&
+           (orc_ApplicationsToWrite.q_DebuggerEnabled == true)) ||
+          ((orc_ProtocolFeatures.q_SupportsDebuggerOff == true) &&
+           (orc_ApplicationsToWrite.q_DebuggerEnabled == false)))
+      {
+         if (orq_SetProgrammingMode == true)
+         {
+            // In the hole update sequence, setting the programming mode only one time
+            s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode, &u8_SECURITY_LEVEL);
+            // Last time setting of ProgrammingMode in this sequence
+         }
+         if (s32_Return != C_NO_ERR)
+         {
+            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR, s32_Return, 10U,
+                                   mc_CurrentNode,
+                                   "Could not activate programming session.");
+            if (s32_Return != C_CHECKSUM)
+            {
+               s32_Return = C_COM;
+            }
+         }
+
+         if (s32_Return == C_NO_ERR)
+         {
+            uint8 u8_NrCode;
+            s32_Return = this->mpc_ComDriver->SendOsyWriteDebuggerEnabled(this->mc_CurrentNode,
+                                                                          orc_ApplicationsToWrite.q_DebuggerEnabled,
+                                                                          &u8_NrCode);
+
+            if (s32_Return == C_NO_ERR)
+            {
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_FINISHED, s32_Return, 100U,
+                                      mc_CurrentNode, "Writing debugger state to device finished.");
+            }
+            else
+            {
+               (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR, s32_Return,
+                                      50U, mc_CurrentNode,
+                                      "Could not write debugger state. Details: " +
+                                      C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return,
+                                                                                               u8_NrCode));
+               s32_Return = C_COM;
+            }
+         }
+      }
+      else
+      {
+         // Debugger state change feature is necessary to write debugger state to flashloader
+         if (orc_ApplicationsToWrite.q_DebuggerEnabled == true)
+         {
+            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return, 5U,
+                                   mc_CurrentNode,
+                                   "The node has not the Flashloader feature to enable the debugger.");
+         }
+         else
+         {
+            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return, 5U,
+                                   mc_CurrentNode,
+                                   "The node has not the Flashloader feature to disable the debugger.");
+         }
+         s32_Return = C_RANGE;
       }
    }
 
@@ -1403,6 +1744,7 @@ sint32 C_OSCSuSequences::m_FlashNodeXfl(const std::vector<C_SCLString> & orc_Fil
 
    \return
    C_COM      communication driver reported problem (details will be written to log file)
+   C_CHECKSUM Security related error (something went wrong while handshaking with the server)
    C_NO_ERR   information read
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1419,7 +1761,10 @@ sint32 C_OSCSuSequences::m_ReadDeviceInformationOpenSyde(const uint8 ou8_Progres
    {
       (void)m_ReportProgress(eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR, s32_Return, ou8_ProgressToReport, mc_CurrentNode,
                              "Could not reconnect to node");
-      s32_Return = C_COM;
+      if (s32_Return != C_CHECKSUM)
+      {
+         s32_Return = C_COM;
+      }
    }
 
    if (s32_Return == C_NO_ERR)
@@ -1436,7 +1781,11 @@ sint32 C_OSCSuSequences::m_ReadDeviceInformationOpenSyde(const uint8 ou8_Progres
                                 mc_CurrentNode,
                                 "Error activating PreProgramming session. Details:" +
                                 C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return, u8_NrCode));
-         s32_Return = C_COM;
+
+         if (s32_Return != C_CHECKSUM)
+         {
+            s32_Return = C_COM;
+         }
       }
    }
 
@@ -1463,13 +1812,17 @@ sint32 C_OSCSuSequences::m_ReadDeviceInformationOpenSyde(const uint8 ou8_Progres
                              "Reading flash block information ...");
 
       //we need security level 1 for that:
-      s32_Return = this->mpc_ComDriver->SendOsySetSecurityLevel(mc_CurrentNode, 1U);
+      s32_Return = this->mpc_ComDriver->SendOsySetSecurityLevel(mc_CurrentNode, 1U, &u8_NrCode);
       if (s32_Return != C_NO_ERR)
       {
          (void)m_ReportProgress(eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR, s32_Return,
                                 ou8_ProgressToReport, mc_CurrentNode,
-                                "Error setting security level for reading flash block information.");
-         s32_Return = C_COM;
+                                "Error setting security level for reading flash block information. Details:" +
+                                C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return, u8_NrCode));
+         if (s32_Return != C_CHECKSUM)
+         {
+            s32_Return = C_COM;
+         }
       }
       else
       {
@@ -1681,7 +2034,8 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
          //node inactive but files defined ?
          if ((orc_ActiveNodes[u16_Node] == 0U) &&
              ((orc_ApplicationsToWrite[u16_Node].c_FilesToFlash.size() != 0) ||
-              (orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm.size() != 0)))
+              (orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm.size() != 0) ||
+              (orc_ApplicationsToWrite[u16_Node].c_PemFile != "")))
          {
             //file(s) defined for inactive node -> cry
             s32_Return = C_NOACT;
@@ -1720,6 +2074,19 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                         *opc_ErrorPath = c_File;
                      }
                      break;
+                  }
+               }
+               // PEM file
+               if (orc_ApplicationsToWrite[u16_Node].c_PemFile != "")
+               {
+                  const C_SCLString c_File = orc_ApplicationsToWrite[u16_Node].c_PemFile;
+                  if (TGL_FileExists(c_File) == false)
+                  {
+                     s32_Return = C_RANGE;
+                     if (opc_ErrorPath != NULL)
+                     {
+                        *opc_ErrorPath = c_File;
+                     }
                   }
                }
             }
@@ -1887,6 +2254,28 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                   break;
                }
             }
+
+            //PEM file
+            if (c_NodesToFlashNewPaths[u16_Node].c_PemFile != "")
+            {
+               //get source file name
+               const C_SCLString c_SourceFileName = orc_ApplicationsToWrite[u16_Node].c_PemFile;
+               //compose target file name
+               const C_SCLString c_TargetFileName =
+                  c_NodeTargetPaths[u16_Node] +
+                  TGL_ExtractFileName(orc_ApplicationsToWrite[u16_Node].c_PemFile);
+
+               //copy file
+               s32_Return = C_OSCUtils::h_CopyFile(c_SourceFileName, c_TargetFileName, opc_ErrorPath);
+               if (s32_Return == C_NO_ERR)
+               {
+                  c_NodesToFlashNewPaths[u16_Node].c_PemFile = c_TargetFileName;
+               }
+               else
+               {
+                  break;
+               }
+            }
          }
       }
    }
@@ -1980,6 +2369,7 @@ void C_OSCSuSequences::h_CheckForChangedApplications(
    C_CONFIG   mpc_SystemDefinition is NULL (Init() not called)
    C_COM      communication driver reported problem (details will be written to log file)
    C_WARN     activation for at least one device failed (see log for details)
+   C_CHECKSUM Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
@@ -2293,7 +2683,10 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
                            // Node is not reachable
                            this->mc_TimeoutNodes[u16_Node] = static_cast<uint8>(s32_Return == C_TIMEOUT);
 
-                           s32_Return = C_COM;
+                           if (s32_Return != C_CHECKSUM)
+                           {
+                              s32_Return = C_COM;
+                           }
                         }
                         else
                         {
@@ -2494,7 +2887,10 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
                                  // Node is not reachable
                                  this->mc_TimeoutNodes[u16_Node] = static_cast<uint8>(s32_Return == C_TIMEOUT);
 
-                                 s32_Return = C_COM;
+                                 if (s32_Return != C_CHECKSUM)
+                                 {
+                                    s32_Return = C_COM;
+                                 }
                               }
 
                               (void)this->m_DisconnectFromTargetServer(false);
@@ -2678,12 +3074,14 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
    C_WARN     reading failed for at least one node
    C_NO_ERR   information read
    C_COM      communication driver reported error (details will be written to log file)
+   C_CHECKSUM Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
 {
    sint32 s32_Return = C_NO_ERR;
    bool q_AtLeastOneError = false;
+   bool q_AtLeastOneAuthentificationError = false;
 
    if (this->mpc_SystemDefinition == NULL)
    {
@@ -2784,6 +3182,11 @@ sint32 C_OSCSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
          }
          if (s32_Return != C_NO_ERR)
          {
+            if (s32_Return == C_CHECKSUM)
+            {
+               q_AtLeastOneAuthentificationError = true;
+            }
+
             q_AtLeastOneError = true;
             if (oq_FailOnFirstError == true)
             {
@@ -2802,7 +3205,14 @@ sint32 C_OSCSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
 
    if (q_AtLeastOneError == true)
    {
-      s32_Return = C_WARN;
+      if (q_AtLeastOneAuthentificationError == true)
+      {
+         s32_Return = C_CHECKSUM;
+      }
+      else
+      {
+         s32_Return = C_WARN;
+      }
    }
 
    return s32_Return;
@@ -2856,7 +3266,9 @@ sint32 C_OSCSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
                for STW Flashloader targets: NVM files are defined (not supported by STW Flashloader)
    C_COM       communication driver reported problem (details will be written to log file)
    C_BUSY      procedure aborted by user (as returned by m_ReportProgress)
-   C_CHECKSUM  parameter writing: one of the files is present but checksum is invalid
+   C_DEFAULT   parameter writing: one of the files is present but checksum is invalid
+   C_WARN      The file is present but key details of PEM file could not be extracted
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
    C_RANGE     At least one feature of the openSYDE Flashloader is not available for NVM writing
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -2884,7 +3296,8 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
       for (uint16 u16_Node = 0U; u16_Node < this->mpc_SystemDefinition->c_Nodes.size(); u16_Node++)
       {
          if ((orc_ApplicationsToWrite[u16_Node].c_FilesToFlash.size() != 0) ||
-             (orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm.size() != 0))
+             (orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm.size() != 0) ||
+             (orc_ApplicationsToWrite[u16_Node].c_PemFile != ""))
          {
             if (this->mc_ActiveNodes[u16_Node] == false)
             {
@@ -2935,6 +3348,16 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
                                             orc_ApplicationsToWrite[u16_Node].c_FilesToWriteToNvm[u32_File] + "\" !");
                         s32_Return = C_RD_WR;
                         break;
+                     }
+                  }
+                  // PEM file
+                  if (orc_ApplicationsToWrite[u16_Node].c_PemFile != "")
+                  {
+                     if (TGL_FileExists(orc_ApplicationsToWrite[u16_Node].c_PemFile) == false)
+                     {
+                        osc_write_log_error("System Update", "Could not find file \"" +
+                                            orc_ApplicationsToWrite[u16_Node].c_PemFile + "\" !");
+                        s32_Return = C_RD_WR;
                      }
                   }
                }
@@ -2994,7 +3417,8 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
 
          //flash openSYDE nodes
          if ((orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash.size() > 0) ||
-             (orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToWriteToNvm.size() > 0))
+             (orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToWriteToNvm.size() > 0) ||
+             (orc_ApplicationsToWrite[u32_NodeIndex].c_PemFile != ""))
          {
             uint32 u32_BusIndex;
             bool q_RoutingActivated = false;
@@ -3037,6 +3461,7 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
                      if (pc_DeviceDefinition != NULL)
                      {
                         C_OSCProtocolDriverOsy::C_ListOfFeatures c_AvailableFeatures;
+                        bool q_SetProgrammingMode = true;
 
                         //if connected via Ethernet we might need to reconnect (in case we ran into the session timeout)
                         s32_Return = this->m_ReconnectToTargetServer();
@@ -3044,7 +3469,10 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
                         {
                            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_RECONNECT_ERROR, s32_Return, 10U, mc_CurrentNode,
                                                   "Could not reconnect to node");
-                           s32_Return = C_COM;
+                           if (s32_Return != C_CHECKSUM)
+                           {
+                              s32_Return = C_COM;
+                           }
                         }
 
                         if (s32_Return == C_NO_ERR)
@@ -3074,7 +3502,8 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
                                  orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash,
                                  orc_ApplicationsToWrite[u32_NodeIndex].c_OtherAcceptedDeviceNames,
                                  pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeRequestDownloadTimeout,
-                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeTransferDataTimeout);
+                                 pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeTransferDataTimeout,
+                                 q_SetProgrammingMode);
                            }
                            else
                            {
@@ -3082,7 +3511,8 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
                                  orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash,
                                  pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeRequestDownloadTimeout,
                                  pc_DeviceDefinition->c_SubDevices[u32_SubDeviceIndex].u32_FlashloaderOpenSydeTransferDataTimeout,
-                                 c_AvailableFeatures);
+                                 c_AvailableFeatures,
+                                 q_SetProgrammingMode);
                            }
                         }
 
@@ -3092,7 +3522,29 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
                         {
                            s32_Return =
                               m_WriteNvmOpenSyde(orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToWriteToNvm,
-                                                 c_AvailableFeatures);
+                                                 c_AvailableFeatures,
+                                                 q_SetProgrammingMode);
+                        }
+
+                        // Special case: An other security level is necessary for the next steps.
+                        // The next step must set the programming mode with the other security level again
+                        q_SetProgrammingMode = true;
+
+                        // PEM file to write?
+                        if ((s32_Return == C_NO_ERR) &&
+                            (orc_ApplicationsToWrite[u32_NodeIndex].c_PemFile != ""))
+                        {
+                           s32_Return = m_WritePemOpenSydeFile(orc_ApplicationsToWrite[u32_NodeIndex].c_PemFile,
+                                                               c_AvailableFeatures,
+                                                               q_SetProgrammingMode);
+                        }
+
+                        // States to write?
+                        if (s32_Return == C_NO_ERR)
+                        {
+                           s32_Return = m_WriteOpenSydeNodeStates(orc_ApplicationsToWrite[u32_NodeIndex],
+                                                                  c_AvailableFeatures,
+                                                                  q_SetProgrammingMode);
                         }
 
                         (void)this->m_DisconnectFromTargetServer();
@@ -3157,6 +3609,7 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
    C_NO_ERR    reset requests were sent out to all nodes
    C_CONFIG    mpc_SystemDefinition is NULL (Init() not called)
    C_COM       communication driver reported problem (details will be written to log file)
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSuSequences::ResetSystem(void)
@@ -3355,6 +3808,15 @@ void C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
    orc_Text.Add("Flash fingerprint username: " + orc_Info.c_MoreInformation.c_FlashFingerprintUserName);
    c_Line.PrintFormatted("NVM writing available: %d",
                          (orc_Info.c_MoreInformation.c_AvailableFeatures.q_FlashloaderCanWriteToNvm == true) ? 1 : 0);
+   orc_Text.Add(c_Line);
+   c_Line.PrintFormatted("Security supported: %d",
+                         (orc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsSecurity == true) ? 1 : 0);
+   orc_Text.Add(c_Line);
+   c_Line.PrintFormatted("Disabling debugger supported: %d",
+                         (orc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOff == true) ? 1 : 0);
+   orc_Text.Add(c_Line);
+   c_Line.PrintFormatted("Enabling debugger supported: %d",
+                         (orc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOn == true) ? 1 : 0);
    orc_Text.Add(c_Line);
    c_Line.PrintFormatted("Maximum block size information available: %d",
                          (orc_Info.c_MoreInformation.c_AvailableFeatures.q_MaxNumberOfBlockLengthAvailable ==
@@ -3716,6 +4178,7 @@ bool C_OSCSuSequences::C_ApplicationProperties::operator ==(const C_ApplicationP
    C_BUSY     could not re-connect to node
    C_RANGE    node not found or no openSYDE protocol installed
    C_COM      communication driver reported error (details will be written to log file)
+   C_CHECKSUM Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_ReconnectToTargetServer(const bool oq_RestartRouting, const uint32 ou32_NodeIndex)

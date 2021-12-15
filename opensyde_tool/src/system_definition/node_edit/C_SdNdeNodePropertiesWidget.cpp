@@ -1479,6 +1479,7 @@ void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32 ou32_Row)
       if (c_New.isNull() == false)
       {
          c_New->HideOverlay();
+         c_New->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
 }
@@ -1573,6 +1574,7 @@ void C_SdNdeNodePropertiesWidget::m_FlashloaderOptions(void) const
       if (c_New.isNull() == false)
       {
          c_New->HideOverlay();
+         c_New->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
 }

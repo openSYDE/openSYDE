@@ -117,13 +117,15 @@ private:
    static bool mh_IsConnectionSuccess(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsConnectionFailure(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsUpdateAppStart(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step,
-                                   bool & orq_IsParam);
+                                   bool & orq_IsParam, bool & orq_IsPemFile);
    static bool mh_IsUpdateAppSuccess(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step,
-                                     bool & orq_IsParam);
+                                     bool & orq_IsParam, bool & orq_IsPemFile);
    static bool mh_IsUpdateNodeStart(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsUpdateNodeSuccess(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsUpdateFailure(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsUpdateAbort(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
+   static bool mh_IsSecurityWarningNecessary(
+      const std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_NodesToFlash);
 
    void m_UpdateUpdatePackageStatus(void);
    void m_WiFixPosMaxBtnClicked(void);

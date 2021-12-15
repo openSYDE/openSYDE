@@ -451,7 +451,16 @@ void C_GiSvSubNodeData::CopyUpdateStatus(C_GiSvSubNodeData & orc_NodeData) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvSubNodeData::CopySTWDeviceInfo(C_GiSvSubNodeData & orc_NodeData) const
 {
-   orc_NodeData.mc_DeviceInfo.pc_STWDevice = this->mc_DeviceInfo.pc_STWDevice;
+   // We need a real copy of the element
+   stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * pc_Copy = NULL;
+
+   if (this->mc_DeviceInfo.pc_STWDevice != NULL)
+   {
+      pc_Copy = new stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation();
+      *pc_Copy = *this->mc_DeviceInfo.pc_STWDevice;
+   }
+
+   orc_NodeData.mc_DeviceInfo.pc_STWDevice = pc_Copy;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -462,7 +471,16 @@ void C_GiSvSubNodeData::CopySTWDeviceInfo(C_GiSvSubNodeData & orc_NodeData) cons
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvSubNodeData::CopyOSYDeviceInfo(C_GiSvSubNodeData & orc_NodeData) const
 {
-   orc_NodeData.mc_DeviceInfo.pc_OSYDevice = this->mc_DeviceInfo.pc_OSYDevice;
+   // We need a real copy of the element
+   stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * pc_Copy = NULL;
+
+   if (this->mc_DeviceInfo.pc_OSYDevice != NULL)
+   {
+      pc_Copy = new stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation();
+      *pc_Copy = *this->mc_DeviceInfo.pc_OSYDevice;
+   }
+
+   orc_NodeData.mc_DeviceInfo.pc_OSYDevice = pc_Copy;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

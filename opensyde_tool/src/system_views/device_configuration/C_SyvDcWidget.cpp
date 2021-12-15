@@ -82,6 +82,7 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
    mu64_BitRate(0U),
    mq_DisconnectNecessary(false),
    me_BusType(C_OSCSystemBus::eCAN),
+   mq_SecurityFeatureUsed(false),
    me_Step(eSCANCANENTERFLASHLOADER),
    mc_ReportText("")
 {
@@ -379,7 +380,6 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_COM:
-      // TODO BAY: Adapt text in case of Ethernet
       c_Message =
          static_cast<QString>(C_GtGetText::h_GetText(
                                  "CAN initialization failed. Check your PC CAN interface configuration "
@@ -781,13 +781,15 @@ void C_SyvDcWidget::m_StartConfigProper(void)
                {
                   s32_Result =
                      this->mpc_DcSequences->ConfCanOpenSydeDevices(this->mc_OpenSydeDeviceConfigurations,
-                                                                   this->m_AreAllInterfacesToConfigure());
+                                                                   this->m_AreAllInterfacesToConfigure(),
+                                                                   this->mq_SecurityFeatureUsed);
                }
                else
                {
                   s32_Result =
                      this->mpc_DcSequences->ConfEthOpenSydeDevices(this->mc_OpenSydeDeviceConfigurations,
-                                                                   this->m_AreAllInterfacesToConfigure());
+                                                                   this->m_AreAllInterfacesToConfigure(),
+                                                                   this->mq_SecurityFeatureUsed);
                }
 
                if (s32_Result != C_NO_ERR)
@@ -2352,12 +2354,20 @@ sint32 C_SyvDcWidget::m_GetBitRateValue(uint32 & oru32_Value) const
 
    \param[in] ou32_NodeIndex         Node index
    \param[in] orc_SerialNumber       Serial number
+   \param[in] orc_SubNodeIdsToOldNodeIds  Detected sub node ids and the associated used node ids
+                                          with same serial number
+                                          - In case of a normal node, exact one sub node id which should be 0
+                                          - In case of a multiple CPU, at least two sub node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_AssignmentConnect(const uint32 ou32_NodeIndex,
-                                        const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const
+                                        const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber,
+                                        const std::map<uint8,
+                                                       C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+const
 {
-   this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->ConnectSerialNumber(ou32_NodeIndex, orc_SerialNumber);
+   this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->ConnectSerialNumber(ou32_NodeIndex, orc_SerialNumber,
+                                                                           orc_SubNodeIdsToOldNodeIds);
    this->mpc_Ui->pc_ListWidgetConnectedNodesAssignment->DisableSerialNumber(orc_SerialNumber);
    m_AssignmentUpdateProgress();
 }
@@ -2407,6 +2417,7 @@ void C_SyvDcWidget::m_Timer(void)
 {
    if (this->mpc_DcSequences != NULL)
    {
+      const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
       sint32 s32_Result;
       sint32 s32_SequenceResult;
       bool q_ShowFinalErrorMessage = false;
@@ -2536,6 +2547,7 @@ void C_SyvDcWidget::m_Timer(void)
             if (s32_SequenceResult == C_NO_ERR)
             {
                this->mpc_DcSequences->GetDeviceInfosResult(c_DeviceInfo);
+               this->mpc_DcSequences->GetSecurityFeatureUsageResult(this->mq_SecurityFeatureUsed);
 
                this->mc_FoundDevices.reserve(this->mc_FoundDevices.size() + c_DeviceInfo.size());
 
@@ -2550,10 +2562,22 @@ void C_SyvDcWidget::m_Timer(void)
             {
                C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
-               c_Message.SetDescription(C_GtGetText::h_GetText("Failed while getting all information"
-                                                               " from openSYDE Devices."));
+               if (s32_SequenceResult == C_CHECKSUM)
+               {
+                  c_Message.SetCustomMinHeight(200, 230);
+                  c_Message.SetDescription(
+                     C_GtGetText::h_GetText("At least one node has security activated "
+                                            "and at least one node id is not unique."));
+                  c_Message.SetDetails(C_GtGetText::h_GetText(
+                                          "This combination is not supported by the device configuration."));
+               }
+               else
+               {
+                  c_Message.SetCustomMinHeight(180, 180);
+                  c_Message.SetDescription(C_GtGetText::h_GetText("Failed while getting all information"
+                                                                  " from openSYDE Devices."));
+               }
                m_CleanUpScan();
-               c_Message.SetCustomMinHeight(180, 180);
                c_Message.Execute();
             }
             break;
@@ -2565,7 +2589,8 @@ void C_SyvDcWidget::m_Timer(void)
                {
                   this->me_Step = eCONFCANOPENSYDEDEVICES;
                   s32_Result = this->mpc_DcSequences->ConfCanOpenSydeDevices(this->mc_OpenSydeDeviceConfigurations,
-                                                                             this->m_AreAllInterfacesToConfigure());
+                                                                             this->m_AreAllInterfacesToConfigure(),
+                                                                             this->mq_SecurityFeatureUsed);
 
                   if (s32_Result == C_NO_ERR)
                   {
@@ -2627,6 +2652,26 @@ void C_SyvDcWidget::m_Timer(void)
                c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/>";
 
                this->m_UpdateReportText(c_Text);
+
+               if (s32_SequenceResult == C_CHECKSUM)
+               {
+                  C_OgeWiCustomMessage c_MessageAuth(this, C_OgeWiCustomMessage::E_Type::eERROR);
+
+                  q_ShowFinalErrorMessage = false;
+                  C_OSCLoggingHandler::h_Flush();
+                  c_MessageAuth.SetHeading(C_GtGetText::h_GetText("Device Configuration"));
+                  c_MessageAuth.SetDescription(C_GtGetText::h_GetText(
+                                                  "Authentication between openSYDE Tool and device(s) has failed. Access denied."));
+                  c_MessageAuth.SetDetails(C_GtGetText::h_GetText("Possible reasons:<br/>"
+                                                                  "- Associated private key (*.pem) not found in /certificates folder (most common)<br/>"
+                                                                  "- Failure during authenfication process<br/>"
+                                                                  "For more information see ") +
+                                           C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"),
+                                                            mc_STYLESHEET_GUIDE_COLOR_LINK,
+                                                            c_Log) + C_GtGetText::h_GetText("."));
+                  c_MessageAuth.SetCustomMinHeight(200, 300);
+                  c_MessageAuth.Execute();
+               }
             }
             break;
          case eREADBACKCAN: // Same implementation for showing the read info
@@ -2672,6 +2717,26 @@ void C_SyvDcWidget::m_Timer(void)
                                           "Errors occurred during device configuration. Check report for details."));
                c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/><br/>";
                this->m_UpdateReportText(c_Text);
+
+               if (s32_SequenceResult == C_CHECKSUM)
+               {
+                  C_OgeWiCustomMessage c_MessageAuth(this, C_OgeWiCustomMessage::E_Type::eERROR);
+
+                  q_ShowFinalErrorMessage = false;
+                  C_OSCLoggingHandler::h_Flush();
+                  c_MessageAuth.SetHeading(C_GtGetText::h_GetText("Device Configuration"));
+                  c_MessageAuth.SetDescription(C_GtGetText::h_GetText(
+                                                  "Authentication between openSYDE Tool and device(s) has failed. Access denied."));
+                  c_MessageAuth.SetDetails(C_GtGetText::h_GetText("Possible reasons:<br/>"
+                                                                  "- Associated private key (*.pem) not found in /certificates folder (most common)<br/>"
+                                                                  "- Failure during authenfication process<br/>"
+                                                                  "For more information see ") +
+                                           C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"),
+                                                            mc_STYLESHEET_GUIDE_COLOR_LINK,
+                                                            c_Log) + C_GtGetText::h_GetText("."));
+                  c_MessageAuth.SetCustomMinHeight(200, 300);
+                  c_MessageAuth.Execute();
+               }
             }
 
             if (this->me_Step == eREADBACKCAN)

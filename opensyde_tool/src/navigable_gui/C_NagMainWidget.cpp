@@ -362,6 +362,7 @@ void C_NagMainWidget::OnSaveProjAs(void)
    {
       pc_Dialog->SaveUserSettings();
       c_New->HideOverlay();
+      c_New->deleteLater();
    }
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
@@ -416,6 +417,7 @@ void C_NagMainWidget::OnCreateServiceProj(void)
    if (c_New != NULL)
    {
       c_New->HideOverlay();
+      c_New->deleteLater();
    }
 } //lint !e593  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
@@ -440,6 +442,7 @@ void C_NagMainWidget::OpenColorPicker(void)
    if (c_Popup != NULL)
    {
       c_Popup->HideOverlay();
+      c_Popup->deleteLater();
    }
 } //lint !e429  //no memory leak because of the parent of pc_ColorWidget and the Qt memory management
 
@@ -622,7 +625,7 @@ void C_NagMainWidget::m_UpdateCurrProjInfo(void)
    }
    //Always use version from current project
    this->mpc_Ui->pc_LabelVersion->setText(c_FontMetrics.elidedText(C_PuiProject::h_GetInstance()->c_Version.c_str(),
-                                                                   Qt::ElideLeft, 120));
+                                                                   Qt::ElideRight, 140));
    this->mpc_Ui->pc_LabelVersion->SetToolTipInformation(C_GtGetText::h_GetText("Project Version"),
                                                         C_PuiProject::h_GetInstance()->c_Version.c_str());
    this->mpc_Ui->pc_LineEditVersion->setText(C_PuiProject::h_GetInstance()->c_Version.c_str());
@@ -687,6 +690,7 @@ void C_NagMainWidget::m_AboutClicked()
    if (c_New != NULL)
    {
       c_New->HideOverlay();
+      c_New->deleteLater();
    }
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 

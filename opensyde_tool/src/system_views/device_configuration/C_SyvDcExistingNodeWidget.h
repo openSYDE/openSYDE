@@ -42,7 +42,10 @@ public:
                               const bool oq_PartOfSquad, QListWidgetItem * const opc_Item,
                               const bool oq_ShowAssignment);
    bool CompareIndex(const stw_types::uint32 ou32_NodeIndex) const;
-   void ConnectSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
+   void ConnectSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber,
+                            const std::map<stw_types::uint8,
+                                           stw_opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+   const;
    void DisconnectSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
    bool IsAssigned(void) const;
    void AppendDeviceConfig(std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> & orc_Configs) const;
@@ -56,7 +59,9 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigConnect(const stw_types::uint32 ou32_NodeIndex,
-                   const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
+                   const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber,
+                   const std::map<stw_types::uint8,
+                                  stw_opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds);
    void SigDisconnect(const stw_types::uint32 ou32_NodeIndex, const stw_opensyde_core::C_OSCProtocolSerialNumber);
 
 protected:
@@ -78,13 +83,15 @@ private:
    static const QString mhc_MimeDataManufacturerFormat;
    static const QString mhc_MimeDataDevice;
    static const QString mhc_MimeDataDeviceValid;
+   static const QString mhc_MimeDataSubNodeIdsToOldNodeIds;
 
    stw_types::sint32 m_Init(void);
    void m_OnDisconnectRequest(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);
    static void mh_AppendDeviceConfigForNode(const stw_types::uint32 ou32_NodeIndex,
                                             const stw_types::uint32 ou32_ConnectedBusIndex,
                                             stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation oc_NodeConfig,
-                                            std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> & orc_Configs);
+                                            const std::map<stw_types::uint8,
+                                                           stw_opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds, std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> & orc_Configs);
 
    //Avoid call
    C_SyvDcExistingNodeWidget(const C_SyvDcExistingNodeWidget &);

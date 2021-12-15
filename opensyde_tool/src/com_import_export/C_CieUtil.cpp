@@ -263,6 +263,7 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
                if (c_PopUpDialogReportDialog != NULL)
                {
                   c_PopUpDialogReportDialog->HideOverlay();
+                  c_PopUpDialogReportDialog->deleteLater();
                }
             } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
          }
@@ -432,11 +433,13 @@ sint32 C_CieUtil::mh_ImportDBCFile(const uint32 ou32_BusIndex, const C_OSCCanPro
             if (c_PopUpDialogReportDialog != NULL)
             {
                c_PopUpDialogReportDialog->HideOverlay();
+               c_PopUpDialogReportDialog->deleteLater();
             }
          } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
          if (c_PopUpDialogNodeAssignment != NULL)
          {
             c_PopUpDialogNodeAssignment->HideOverlay();
+            c_PopUpDialogNodeAssignment->deleteLater();
          }
       } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
    }
@@ -553,6 +556,7 @@ sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCan
                   if (c_New != NULL)
                   {
                      c_New->HideOverlay();
+                     c_New->deleteLater();
                   }
                } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
                else
@@ -612,6 +616,11 @@ sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCan
             }
          }
       }
+   }
+   if (c_PopUpDialog != NULL)
+   {
+      c_PopUpDialog->HideOverlay();
+      c_PopUpDialog->deleteLater();
    }
    return s32_Return;
 } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management

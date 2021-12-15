@@ -20,7 +20,7 @@
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_scl::C_SCLString C_OSCDeviceDefinition::hc_DefaultCompanyName = "Sensor-Technik Wiedemann GmbH";
+const stw_scl::C_SCLString C_OSCDeviceDefinition::hc_DEFAULT_COMPANY_NAME = "Sensor-Technik Wiedemann GmbH";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -63,7 +63,7 @@ void C_OSCDeviceDefinition::Clear(void)
    c_SupportedBitrates.clear();
 
    u8_ManufacturerId = 0;
-   c_ManufacturerDisplayValue = C_OSCDeviceDefinition::hc_DefaultCompanyName;
+   c_ManufacturerDisplayValue = C_OSCDeviceDefinition::hc_DEFAULT_COMPANY_NAME;
 
    c_SubDevices.clear();
 }

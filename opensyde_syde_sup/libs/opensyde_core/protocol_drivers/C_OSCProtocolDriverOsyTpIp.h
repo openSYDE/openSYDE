@@ -117,6 +117,7 @@ public:
    {
    public:
       stw_types::uint8 u8_SubNodeId; ///< ID of sub node in case of multi CPU devices. Default is 0
+      bool q_SecurityActivated;      ///< flag if node has security feature activated
 
       virtual bool operator ==(const C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const;
       virtual bool operator <(const C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const;
@@ -133,7 +134,7 @@ public:
       bool q_RequestAccepted;              ///< true: no problems; false; flag not set
    };
 
-   C_OSCProtocolDriverOsyTpIp(const stw_types::uint16 ou16_MaxServiceQueueSize = 200U);
+   explicit C_OSCProtocolDriverOsyTpIp(const stw_types::uint16 ou16_MaxServiceQueueSize = 200U);
    virtual ~C_OSCProtocolDriverOsyTpIp(void);
 
    virtual stw_types::sint32 Cycle(void);

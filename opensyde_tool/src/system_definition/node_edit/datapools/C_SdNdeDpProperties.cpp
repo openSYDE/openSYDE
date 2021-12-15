@@ -417,7 +417,7 @@ void C_SdNdeDpProperties::InitStaticNames(void)
 
    this->mpc_Ui->pc_LabelComProt->SetToolTipInformation(
       C_GtGetText::h_GetText("Communication Protocol"),
-      C_GtGetText::h_GetText("Type of process data exchange CAN protocol:"
+      C_GtGetText::h_GetText("Type of COMM CAN protocol:"
                              "\n - OSI Layer 2 - Layer 2 CAN data"
                              "\n - ECeS - ESX CAN efficient safety protocol"
                              "\n - ECoS - ESX CANopen safety protocol"));

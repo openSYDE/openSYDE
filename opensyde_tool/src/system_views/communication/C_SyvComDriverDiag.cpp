@@ -134,9 +134,8 @@ C_SyvComDriverDiag::~C_SyvComDriverDiag(void)
    C_RD_WR       Configured communication DLL does not exist
    C_OVERFLOW    Unknown transport protocol or unknown diagnostic server for at least one node
    C_BUSY        System view error detected
-   C_COM         CAN initialization failed
+   C_COM         CAN initialization failed or no route found for at least one node
    C_CHECKSUM    Internal buffer overflow detected
-   C_RD_WR       Active bus index invalid
    C_RANGE       Routing configuration failed
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -158,9 +157,12 @@ sint32 C_SyvComDriverDiag::InitDiag(void)
 
    if (s32_Return == C_NO_ERR)
    {
+      // pem folder is optional -> no error handling
+      mc_PemDatabase.ParseFolder(C_Uti::h_GetPemDbPath().toStdString());
+
       s32_Return = C_OSCComDriverProtocol::Init(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst(),
                                                 u32_ActiveBusIndex, c_ActiveNodes, this->mpc_CanDllDispatcher,
-                                                this->mpc_EthernetDispatcher);
+                                                this->mpc_EthernetDispatcher, &this->mc_PemDatabase);
    }
 
    if (s32_Return == C_NO_ERR)
@@ -202,8 +204,9 @@ sint32 C_SyvComDriverDiag::InitDiag(void)
    C_NO_ERR    All nodes set to session successfully
    C_CONFIG    InitDiag function was not called or not successful or protocol was not initialized properly.
    C_COM       Error of service
-   C_CHECKSUM  Checksum of a datapool does not match
+   C_DEFAULT   Checksum of a datapool does not match
                Datapool with the name orc_DatapoolName does not exist on the server
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
    C_TIMEOUT   Expected response not received within timeout
    C_RD_WR     malformed protocol response
    C_WARN      error response
@@ -1877,6 +1880,7 @@ sint32 C_SyvComDriverDiag::m_InitDataDealer(void)
    C_TIMEOUT   Expected response not received within timeout
    C_RD_WR     Unexpected content in response
    C_NOACT     At least one node does not support Ethernet to Ethernet routing
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::set<uint32> & orc_ErrorActiveNodes)
@@ -1959,7 +1963,7 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
-   C_CHECKSUM checksum of datapool does not match
+   C_DEFAULT  checksum of datapool does not match
               Datapool with the name orc_DatapoolName does not exist on the server
    C_COM      communication driver reported error
 */
@@ -2014,7 +2018,7 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
                                                pc_Node->c_DataPools[u8_DataPoolIndex].c_Name.c_str());
                         osc_write_log_error("Starting diagnostics", c_Error);
                         // Datapool checksum does not match
-                        s32_Retval = C_CHECKSUM;
+                        s32_Retval = C_DEFAULT;
                      }
                      else
                      {
@@ -2178,7 +2182,7 @@ sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveNode
    C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized, node or view invalid
    C_RD_WR    malformed protocol response
-   C_CHECKSUM Checksum or version of Datapool does not match
+   C_DEFAULT  Checksum or version of Datapool does not match
               Datapool with the name orc_DatapoolName does not exist on the server
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -2250,7 +2254,7 @@ sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::
                                   static_cast<QString>(rc_Datapool.c_Name.c_str()) +
                                   ", Server: " + static_cast<QString>(c_ServerMetadata.c_Name.c_str()) + ").";
 
-                  s32_Return = C_CHECKSUM;
+                  s32_Return = C_DEFAULT;
                }
                // Check version
                else if (memcmp(rc_Datapool.au8_Version, c_ServerMetadata.au8_Version,
@@ -2270,7 +2274,7 @@ sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::
                                   " does not match (Client: " + c_VersionClient +
                                   ", Server: " + c_VersionServer + ").";
 
-                  s32_Return = C_CHECKSUM;
+                  s32_Return = C_DEFAULT;
                }
                else
                {
@@ -2293,7 +2297,7 @@ sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::
                         // Checksum does not match
                         c_ErrorReason = "The checksum of Datapool " + static_cast<QString>(rc_Datapool.c_Name.c_str()) +
                                         " does not match.";
-                        s32_Return = C_CHECKSUM;
+                        s32_Return = C_DEFAULT;
                      }
                      else
                      {
@@ -2334,7 +2338,7 @@ sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::
                // Special case: Datapool with this name does not exist
                c_ErrorReason = "The Datapool " + static_cast<QString>(rc_Datapool.c_Name.c_str()) +
                                " does not exist on the server.";
-               s32_Return = C_CHECKSUM;
+               s32_Return = C_DEFAULT;
             }
 
             if (s32_Return != C_NO_ERR)

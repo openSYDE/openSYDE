@@ -248,7 +248,7 @@ sintn C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize
 {
    sintn sn_Retval;
    static QMap<QString, sintn> hc_PreviousResults;
-   //Find some way to uniquely identify the input parameter constellation
+   //Find some way to uniquely identify the input parameter situation
    const QString c_CompleteInput =
       static_cast<QString>("%1,%2,%3,%4,%5").arg(orc_Font.toString()).arg(orc_Size.width()).arg(
          orc_Size.height()).arg(orc_Text).arg(static_cast<float64>(of32_HeightScaling));

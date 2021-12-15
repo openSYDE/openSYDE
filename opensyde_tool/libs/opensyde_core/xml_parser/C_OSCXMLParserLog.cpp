@@ -39,7 +39,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCXMLParserLog::C_OSCXMLParserLog()
+C_OSCXMLParserLog::C_OSCXMLParserLog() :
+   C_OSCXMLParser()
 {
 }
 

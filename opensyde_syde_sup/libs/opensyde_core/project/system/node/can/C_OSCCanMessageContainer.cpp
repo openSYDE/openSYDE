@@ -151,14 +151,7 @@ uint32 C_OSCCanMessageContainer::GetMessageSignalDataStartIndex(const bool & orq
 //----------------------------------------------------------------------------------------------------------------------
 const std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessagesConst(const bool & orq_IsTx) const
 {
-   if (orq_IsTx == true)
-   {
-      return this->c_TxMessages;
-   }
-   else
-   {
-      return this->c_RxMessages;
-   }
+   return (orq_IsTx == true) ? this->c_TxMessages : this->c_RxMessages;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -172,14 +165,7 @@ const std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessagesConst(
 //----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool & orq_IsTx)
 {
-   if (orq_IsTx == true)
-   {
-      return this->c_TxMessages;
-   }
-   else
-   {
-      return this->c_RxMessages;
-   }
+   return (orq_IsTx == true) ? this->c_TxMessages : this->c_RxMessages;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

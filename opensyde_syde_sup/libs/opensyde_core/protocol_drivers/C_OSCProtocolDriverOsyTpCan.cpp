@@ -730,8 +730,17 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleBroadcastSetNodeIdBySerialNumberResp
          {
             //negative response detected
             q_NegativeResponseReceived = true;
-            m_LogWarningWithHeader("Broadcast: Negative response received. Probably a node with an other SN.",
-                                   TGL_UTIL_FUNC_ID);
+            //Node id was not set, node has security activated.
+            if (c_Response.au8_Data[3] == 0x22U)
+            {
+               m_LogWarningWithHeader("Broadcast: Negative response received. Node has security activated.",
+                                      TGL_UTIL_FUNC_ID);
+            }
+            else
+            {
+               m_LogWarningWithHeader("Broadcast: Negative response received. Probably a node with an other SN.",
+                                      TGL_UTIL_FUNC_ID);
+            }
             if (opu8_NrCode != NULL)
             {
                (*opu8_NrCode) = c_Response.au8_Data[3];
@@ -920,7 +929,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
       else if (mc_TxService.e_Status == C_ServiceState::eWAITING_FOR_FLOW_CONTROL)
       {
          //check for Tx timeout:
-         if ((TGL_GetTickCount() - mhu16_NBsTimeoutMs) > mc_TxService.u32_StartTimeMs)
+         if ((TGL_GetTickCount() - mhu16_NBS_TIMEOUTS_MS) > mc_TxService.u32_StartTimeMs)
          {
             //transfer timed out ...
             m_LogWarningWithHeader("N_Bs timeout reached before receiving flow control. Aborting ongoing Tx transfer.",
@@ -1398,7 +1407,8 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
 
                            // The serial number payload in the last two bytes will contain following information
                            // separated in the different block
-                           // - Reserved (1 byte; set all bits to zero)
+                           // - Security Activated (1 bit of first byte)
+                           // - Reserved (Bit 1-7 of first byte; set all bits to zero)
                            // - SerialNumberManufacturerFormat (1 byte)
                            // - SerialNumber Length (1 byte)
                            // - SerialNumber (1 .. 29 bytes)
@@ -1413,11 +1423,14 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                               c_ResultExt.c_SenderId.u8_BusIdentifier = mc_ClientId.u8_BusIdentifier; //same as ours ...
                               c_ResultExt.c_SenderId.u8_NodeIdentifier = static_cast<uint8>(c_Response.u32_ID & 0x7FU);
                               c_ResultExt.u8_SubNodeId = u8_ReceivedSubNodeId;
-                              c_ResultExt.c_SerialNumber.u8_SerialNumberByteLength = 0U; // Will be filled in the next
+                              c_ResultExt.c_SerialNumber.u8_SerialNumberByteLength = 0U; // Will be filled in the
+                                                                                         // next
                                                                                          // block
 
                               // Serial number payload of first block
-                              // First byte reserved
+                              // First byte: Bit 0 security flag, all other bits are reserved
+                              c_ResultExt.q_SecurityActivated = ((c_Response.au8_Data[6] & 0x01U) == 0x01U);
+
                               // Last byte of payload in first block
                               c_ResultExt.c_SerialNumber.u8_SerialNumberManufacturerFormat = c_Response.au8_Data[7];
 

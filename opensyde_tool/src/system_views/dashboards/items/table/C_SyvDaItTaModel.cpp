@@ -57,8 +57,8 @@ const uint32 C_SyvDaItTaModel::hu32_MaxElements = static_cast<uint32>(std::numer
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Data   Data storage
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Data      Data storage
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTaModel::C_SyvDaItTaModel(C_PuiSvDbDataElementHandler * const opc_Data, QObject * const opc_Parent) :
@@ -91,8 +91,8 @@ C_SyvDaItTaModel::C_SyvDaItTaModel(C_PuiSvDbDataElementHandler * const opc_Data,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply style
 
-   \param[in] oe_Style    New style type
-   \param[in] oq_DarkMode Flag if dark mode is active
+   \param[in]  oe_Style       New style type
+   \param[in]  oq_DarkMode    Flag if dark mode is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
@@ -379,9 +379,9 @@ void C_SyvDaItTaModel::UpdateError(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparence value configured by the actual timeout state
- *
-   \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                 Value for transparence (0..255)
+
+   \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
+   \param[in]  osn_Value               Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
@@ -418,8 +418,8 @@ void C_SyvDaItTaModel::UpdateTransparence(const uint32 ou32_DataElementIndex, co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get item indices
 
-   \param[in] orc_Indices     Model indices
-   \param[in] orc_ItemIndices Item indices
+   \param[in]  orc_Indices       Model indices
+   \param[in]  orc_ItemIndices   Item indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::GetUniqueRows(const QModelIndexList & orc_Indices, std::vector<uint32> & orc_ItemIndices) const
@@ -443,9 +443,9 @@ void C_SyvDaItTaModel::GetUniqueRows(const QModelIndexList & orc_Indices, std::v
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in] osn_Section    Section
-   \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in]  osn_Section       Section
+   \param[in]  oe_Orientation    Orientation
+   \param[in]  osn_Role          Role
 
    \return
    Header string
@@ -507,7 +507,7 @@ QVariant C_SyvDaItTaModel::headerData(const sintn osn_Section, const Qt::Orienta
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table row count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -545,7 +545,7 @@ sintn C_SyvDaItTaModel::rowCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -565,8 +565,8 @@ sintn C_SyvDaItTaModel::columnCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -1021,7 +1021,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      c_Retval = pc_DataElementId->GetInvalidNamePlaceholder();
                      break;
                   case C_SyvDaItTaModel::eICON:
-                     c_Retval = C_GtGetText::h_GetText("Data element was deleted in SYSTEM DEFINITION");
+                     c_Retval = pc_DataElementId->GetInvalidItemPlaceholderTooltip();
                      break;
                   case C_SyvDaItTaModel::eVALUE:
                   case C_SyvDaItTaModel::eBAR:
@@ -1132,8 +1132,8 @@ void C_SyvDaItTaModel::MoveItems(const QModelIndexList & orc_Indices, const bool
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new data element
 
-   \param[in] orc_Indices           Item(s) after that the new element should be added (usually only one item)
-   \param[in] orc_DataPoolElementId New data element ID
+   \param[in]  orc_Indices             Item(s) after that the new element should be added (usually only one item)
+   \param[in]  orc_DataPoolElementId   New data element ID
 
    \return
    Index of new item
@@ -1149,8 +1149,8 @@ uint32 C_SyvDaItTaModel::AddItem(const QModelIndexList & orc_Indices,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove items
 
-   \param[in]  orc_Indices             Items to remove
-   \param[out] orc_RemovedDataElements Removed data elements
+   \param[in]   orc_Indices               Items to remove
+   \param[out]  orc_RemovedDataElements   Removed data elements
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::RemoveItems(const QModelIndexList & orc_Indices,
@@ -1166,7 +1166,7 @@ void C_SyvDaItTaModel::RemoveItems(const QModelIndexList & orc_Indices,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Column to enum conversion
 
-   \param[in]  ors32_Column     Column
+   \param[in]  ors32_Column   Column
 
    \return
    Enum value
@@ -1199,7 +1199,7 @@ C_SyvDaItTaModel::E_Columns C_SyvDaItTaModel::h_ColumnToEnum(const sint32 & ors3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Enum to column conversion
 
-   \param[in] ore_Value Enum value
+   \param[in]  ore_Value   Enum value
 
    \return
    Column
@@ -1235,7 +1235,7 @@ sint32 C_SyvDaItTaModel::h_EnumToColumn(const C_SyvDaItTaModel::E_Columns & ore_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get ID for element index
 
-   \param[in]  ou32_Index Element index
+   \param[in]  ou32_Index  Element index
 
    \return
    C_NO_ERR Operation success
@@ -1440,8 +1440,8 @@ void C_SyvDaItTaModel::m_DeleteItem(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Trigger table signal for start of remove action
 
-   \param[in] ou32_FirstIndex Lowest index of this section of removed items
-   \param[in] ou32_LastIndex  Highest index of this section of removed items
+   \param[in]  ou32_FirstIndex   Lowest index of this section of removed items
+   \param[in]  ou32_LastIndex    Highest index of this section of removed items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::m_BeginRemoveRows(const uint32 ou32_FirstIndex, const uint32 ou32_LastIndex)
@@ -1461,8 +1461,8 @@ void C_SyvDaItTaModel::m_BeginRemoveRows(const uint32 ou32_FirstIndex, const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Trigger table signal for end of remove action
 
-   \param[in] ou32_FirstIndex Lowest index of this section of removed items
-   \param[in] ou32_LastIndex  Highest index of this section of removed items
+   \param[in]  ou32_FirstIndex   Lowest index of this section of removed items
+   \param[in]  ou32_LastIndex    Highest index of this section of removed items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::m_EndRemoveRows(const uint32 ou32_FirstIndex, const uint32 ou32_LastIndex)
@@ -1518,7 +1518,7 @@ void C_SyvDaItTaModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get prepare configuration for new item
 
-   \param[in] orc_DataPoolElementId New item ID
+   \param[in]  orc_DataPoolElementId   New item ID
 
    \return
    Prepare configuration for new item
@@ -1548,8 +1548,8 @@ C_PuiSvDbNodeDataElementConfig C_SyvDaItTaModel::mh_GetConfigForNewItem(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Delete item in the provided array and unregister index if not used after this move
 
-   \param[in]     ou32_Index       Index to delete
-   \param[in,out] orc_AdaptedItems Items to change
+   \param[in]      ou32_Index          Index to delete
+   \param[in,out]  orc_AdaptedItems    Items to change
 
    \return
    Deleted index
@@ -1588,7 +1588,10 @@ C_PuiSvDbNodeDataPoolListElementId C_SyvDaItTaModel::m_RemoveItem(const uint32 o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get value in percent
 
-   \param[in] ou32_Index Data element index
+   \param[in]  ou32_Index  Data element index
+
+   \return
+   Value in percent
 */
 //----------------------------------------------------------------------------------------------------------------------
 float32 C_SyvDaItTaModel::m_GetPercentage(const uint32 ou32_Index) const
@@ -1631,7 +1634,10 @@ float32 C_SyvDaItTaModel::m_GetPercentage(const uint32 ou32_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get value encoded into QVariant
 
-   \param[in] ou32_Index Data element index
+   \param[in]  ou32_Index  Data element index
+
+   \return
+   Value encoded into QVariant
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItTaModel::m_GetValue(const uint32 ou32_Index) const
@@ -1706,7 +1712,7 @@ QString C_SyvDaItTaModel::m_GetValue(const uint32 ou32_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get all row indices from the selected indices (unique)
 
-   \param[in] orc_Indices Model indices
+   \param[in]  orc_Indices    Model indices
 
    \return
    Unique row indices

@@ -24,6 +24,7 @@
 #include "C_GtGetText.h"
 #include "CSCLChecksums.h"
 #include "C_OSCXMLParser.h"
+#include "C_OSCXMLParserLog.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiSdUtil.h"
 #include "C_PuiSvHandler.h"
@@ -1136,6 +1137,35 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationParamInfo(const uint32 ou32_ViewI
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information PEM file path
+
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_Value         New path
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::SetNodeUpdateInformationPemFilePath(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
+                                                           const QString & orc_Value)
+{
+   sint32 s32_Retval;
+
+   if (ou32_ViewIndex < this->mc_Views.size())
+   {
+      C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+      s32_Retval = rc_View.SetNodeUpdateInformationPemFilePath(ou32_NodeIndex, orc_Value);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information skip flag
 
    \param[in]  ou32_ViewIndex    View index
@@ -1191,6 +1221,66 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfParamInfo(const uint3
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
       s32_Retval = rc_View.SetNodeUpdateInformationSkipUpdateOfParamInfo(ou32_NodeIndex, ou32_Index, oq_SkipFile);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information PEM file skip flag
+
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  oq_SkipFile       New skip flag
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32 ou32_ViewIndex,
+                                                                   const uint32 ou32_NodeIndex, const bool oq_SkipFile)
+{
+   sint32 s32_Retval;
+
+   if (ou32_ViewIndex < this->mc_Views.size())
+   {
+      C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+      s32_Retval = rc_View.SetNodeUpdateInformationSkipUpdateOfPemFile(ou32_NodeIndex, oq_SkipFile);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information states
+
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  oe_StateSecurity  Security state of node
+   \param[in]  oe_StateDebugger  Debugger state of node
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::SetNodeUpdateInformationStates(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
+                                                      const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                                      const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
+{
+   sint32 s32_Retval;
+
+   if (ou32_ViewIndex < this->mc_Views.size())
+   {
+      C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+      s32_Retval = rc_View.SetNodeUpdateInformationStates(ou32_NodeIndex, oe_StateSecurity, oe_StateDebugger);
    }
    else
    {
@@ -1867,6 +1957,33 @@ sint32 C_PuiSvHandler::RemoveNodeUpdateInformationParamInfo(const uint32 ou32_Vi
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
       s32_Retval = rc_View.RemoveNodeUpdateInformationParamInfo(ou32_NodeIndex, ou32_Index);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove node update information PEM file path
+
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::RemoveNodeUpdateInformationPemFilePath(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex)
+{
+   sint32 s32_Retval;
+
+   if (ou32_ViewIndex < this->mc_Views.size())
+   {
+      C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+      s32_Retval = rc_View.RemoveNodeUpdateInformationPemFilePath(ou32_NodeIndex);
    }
    else
    {
@@ -3136,7 +3253,8 @@ sint32 C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
 
    if (TGL_FileExists(orc_Path.toStdString().c_str()) == true)
    {
-      C_OSCXMLParser c_XMLParser;
+      C_OSCXMLParserLog c_XMLParser;
+      c_XMLParser.SetLogHeading("Loading views");
       s32_Retval = c_XMLParser.LoadFromFile(orc_Path.toStdString().c_str());
       if (s32_Retval == C_NO_ERR)
       {

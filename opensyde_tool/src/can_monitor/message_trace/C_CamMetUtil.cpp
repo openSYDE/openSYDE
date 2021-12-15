@@ -58,7 +58,15 @@ std::vector<sintn> C_CamMetUtil::h_GetMultiplexerOrder(const std::vector<C_OSCCo
       const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Signals[u32_ItSig];
       if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
-         c_Order.push_back(rc_SignalData.c_RawValueDec.ToInt());
+         if (rc_SignalData.q_DlcError == false)
+         {
+            c_Order.push_back(rc_SignalData.c_RawValueDec.ToInt());
+         }
+         else
+         {
+            // Invalid multiplexer but it is still a kind of multiplexer value
+            c_Order.push_back(-1);
+         }
       }
    }
    //lint -e{864} Call as expected by interface
@@ -83,7 +91,8 @@ sint32 C_CamMetUtil::h_GetMultiplexerValue(const std::vector<C_OSCComMessageLogg
    for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Signals.size(); ++u32_ItSig)
    {
       const C_OSCComMessageLoggerDataSignal & rc_Sig = orc_Signals[u32_ItSig];
-      if (rc_Sig.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if ((rc_Sig.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
+          (rc_Sig.q_DlcError == false))
       {
          s32_Value = rc_Sig.c_RawValueDec.ToInt();
          break;

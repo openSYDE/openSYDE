@@ -150,7 +150,10 @@ private:
    stw_types::sint32 m_GetBitRateValue(stw_types::uint32 & oru32_Value) const;
 
    void m_AssignmentConnect(const stw_types::uint32 ou32_NodeIndex,
-                            const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
+                            const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber,
+                            const std::map<stw_types::uint8,
+                                           stw_opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
+   const;
    void m_AssignmentDisconnect(const stw_types::uint32 ou32_NodeIndex,
                                const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const;
    void m_AssignmentUpdateProgress(void) const;
@@ -188,6 +191,7 @@ private:
    bool mq_DisconnectNecessary;
    stw_opensyde_core::C_OSCSystemBus::E_Type me_BusType;
    std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceInformation> mc_FoundDevices;
+   bool mq_SecurityFeatureUsed;
 
    QTimer mc_Timer;
    E_Step me_Step;

@@ -114,6 +114,10 @@ C_SyvUpPackageListNodeItemWidget::C_SyvUpPackageListNodeItemWidget(const uint32 
    this->mpc_Ui->pc_LabelSkip->SetBackgroundColor(24);
    this->mpc_Ui->pc_LabelSkip->setVisible(false);
 
+   // Will be handled in specific derived items
+   this->mpc_Ui->pc_LabelSecurity->setVisible(false);
+   this->mpc_Ui->pc_LabelDebugger->setVisible(false);
+
    this->mpc_Ui->pc_LabelPath->setText(C_GtGetText::h_GetText("<Add File>"));
 }
 
@@ -687,13 +691,32 @@ void C_SyvUpPackageListNodeItemWidget::m_UpateFilePathLabel(void) const
    if ((this->mc_AbsoluteFilePath != "") &&
        (this->mc_AbsoluteFilePath != C_GtGetText::h_GetText("<Add File>")))
    {
-      sintn sn_Width = this->parentWidget()->width() - mhsn_PathOffset;
+      //Use topmost widget (in list) as reference for width
+      sintn sn_Width = this->parentWidget()->parentWidget()->width() - mhsn_PathOffset;
       QString c_AdaptedString;
 
       if (this->mpc_Ui->pc_LabelUserHint->isVisible() == true)
       {
          // In this case the label for the path does not have so much space to use
          sn_Width -= this->mpc_Ui->pc_LabelUserHint->width();
+      }
+
+      if (this->mpc_Ui->pc_LabelSecurity->isVisible() == true)
+      {
+         // In this case the label for the path does not have so much space to use
+         sn_Width -= this->mpc_Ui->pc_LabelSecurity->width();
+      }
+
+      if (this->mpc_Ui->pc_LabelDebugger->isVisible() == true)
+      {
+         // In this case the label for the path does not have so much space to use
+         sn_Width -= this->mpc_Ui->pc_LabelDebugger->width();
+      }
+      if (((this->mpc_Ui->pc_LabelUserHint->isVisible() == true) ||
+           (this->mpc_Ui->pc_LabelDebugger->isVisible() == true)) ||
+          (this->mpc_Ui->pc_LabelSecurity->isVisible() == true))
+      {
+         // In this case the label for the path does not have so much space to use
          sn_Width -= this->mpc_Ui->pc_HorizontalSpacerUserHint->geometry().width();
       }
 

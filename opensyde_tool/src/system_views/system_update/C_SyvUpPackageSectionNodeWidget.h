@@ -63,6 +63,7 @@ public:
    virtual void RemoveFile(C_SyvUpPackageListNodeItemWidget * const opc_App);
    void RemoveAllFiles(void);
    virtual void UpdateDeviceInformation(const stw_opensyde_gui_logic::C_SyvUpDeviceInfo & orc_DeviceInformation);
+   virtual void OpenPemFileSettings(C_SyvUpPackageListNodeItemWidget * const opc_App);
    virtual void PrepareExportConfig(stw_opensyde_gui_logic::C_SyvUpUpdatePackageConfigNode & orc_NodeConfig) const = 0;
    virtual void LoadImportConfig(const stw_opensyde_gui_logic::C_SyvUpUpdatePackageConfig & orc_Config) = 0;
    virtual stw_types::uint32 Type(void) const = 0;
@@ -76,6 +77,7 @@ public:
    stw_types::uint32 GetFileCount(void) const;
    stw_types::uint32 GetPrimaryFileCount(void) const;
    stw_types::uint32 GetParamSetFileCount(void) const;
+   stw_types::uint32 GetPemFileCount(void) const;
    stw_types::uint32 GetSectionState(void) const;
    bool IsUpdateNecessary(void) const;
    stw_types::sint32 GetUpdatePackage(stw_opensyde_core::C_OSCSuSequences::C_DoFlash & orc_ApplicationsToWrite,
@@ -83,6 +85,7 @@ public:
                                       stw_types::uint32 & oru32_FilesUpdated) const;
    virtual bool CheckMime(QStringList & orc_PathList, const QPoint & orc_Pos, QStringList * const opc_RelevantFilePaths,
                           QStringList * const opc_RelevantParamSetImagePaths,
+                          QStringList * const opc_RelevantPemFilePaths,
                           C_SyvUpPackageListNodeItemWidget ** const oppc_App) const;
    void Expand(const bool oq_Expand);
    bool IsExpanded(void) const;
@@ -97,6 +100,7 @@ protected:
    virtual stw_types::uint32 m_AdaptParamSetNumber(const stw_types::uint32 ou32_Number);
 
    QString m_GetApplicationPath(const stw_types::uint32 ou32_Application) const;
+   bool m_AreAllFilesSkipped(void) const;
    void m_FileCountChanged(void);
    void m_SetFileState(const stw_types::uint32 ou32_File, const stw_types::uint32 ou32_State);
    void m_SetState(const stw_types::uint32 ou32_State);
@@ -108,6 +112,7 @@ protected:
    virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
 
    static bool mh_IsFileParamSetFile(const QString & orc_File);
+   static bool mh_IsFilePemFile(const QString & orc_File);
 
    Ui::C_SyvUpPackageSectionNodeWidget * mpc_Ui;
    stw_types::uint32 mu32_ViewIndex;
@@ -119,8 +124,9 @@ protected:
    bool mq_FileBased;
    bool mq_StwFlashloader;
    stw_types::uint32 mu32_FileCount;           // Count of all files
-   stw_types::uint32 mu32_PrimaryFileCount;    // Count of all section specific files without param set files
+   stw_types::uint32 mu32_PrimaryFileCount;    // Count of all section specific files without param set and PEM files
    stw_types::uint32 mu32_ParamSetFileCount;   // Count of all param set files in the section
+   stw_types::uint32 mu32_PemFileCount;        // Count of all PEM files in the section
    stw_types::uint32 mu32_DataBlockPathNumber; // Index of Data Block path
    QString mc_Title;
    bool mq_ShowAddButton;
@@ -130,13 +136,17 @@ private:
 
    void m_InitItems(void);
 
-   stw_types::uint32 m_GetApplicationState(const stw_types::uint32 ou32_Application) const;
+   stw_types::uint32 m_GetApplicationState(const stw_types::uint32 ou32_Application,
+                                           stw_types::uint32 * const opu32_Type = NULL) const;
    void m_SetApplicationConnected(const stw_types::uint32 ou32_Application, const bool oq_Connected) const;
    stw_types::uint32 m_GetFirstNotFinishedApplication(void) const;
 
    void m_UpdateNumbers(void);
    void m_ButtonAddNewFile(void);
    void m_RestartMovie(void);
+
+   static void mh_FillDoFlashWithPemStates(const C_SyvUpPackageListNodeItemWidget * const opc_App,
+                                           stw_opensyde_core::C_OSCSuSequences::C_DoFlash & orc_DoFlash);
 
    stw_types::uint32 mu32_PositionNumber;
    stw_types::uint32 mu32_State;

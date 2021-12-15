@@ -334,6 +334,7 @@ bool C_GiSvDaTableBase::CallProperties(void)
                if (c_New != NULL)
                {
                   c_New->HideOverlay();
+                  c_New->deleteLater();
                }
             } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
          }
@@ -775,6 +776,7 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
          pc_Dialog->SaveUserSettings();
          pc_Dialog->PrepareCleanUp();
          c_New->HideOverlay();
+         c_New->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 }

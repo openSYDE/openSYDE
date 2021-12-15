@@ -262,12 +262,8 @@ bool C_OSCSystemDefinition::CheckInterfaceIsAvailable(const uint32 ou32_NodeInde
       {
          const C_OSCNodeComInterfaceSettings & rc_CurComInterface =
             rc_CurNode.c_Properties.c_ComInterfaces[ou32_ComIndex];
-         //Skip if not connected
-         const bool q_CurInterfaceIsConnectedInternally = this->IsInterfaceConnectedInDevice(ou32_NodeIndex,
-                                                                                             rc_CurComInterface.e_InterfaceType,
-                                                                                             rc_CurComInterface.u8_InterfaceNumber);
          //Check com interface has bus connected
-         if ((rc_CurComInterface.GetBusConnected() == true) && (q_CurInterfaceIsConnectedInternally))
+         if (rc_CurComInterface.GetBusConnected() == true)
          {
             std::vector<uint32> c_NodeIndices;
             std::vector<uint32> c_InterfaceIndices;
@@ -686,39 +682,6 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
    }
 
    return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Is interface connected internally in device
-
-   \param[in]  ou32_NodeIndex       Node index
-   \param[in]  oe_Type              Interface type
-   \param[in]  ou8_InterfaceNumber  Interface number
-
-   \return
-   Flag if interface is connected internally in device
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_OSCSystemDefinition::IsInterfaceConnectedInDevice(const uint32 ou32_NodeIndex,
-                                                         const C_OSCSystemBus::E_Type oe_Type,
-                                                         const uint8 ou8_InterfaceNumber) const
-{
-   bool q_Retval = true;
-
-   if (ou32_NodeIndex < this->c_Nodes.size())
-   {
-      const C_OSCNode rc_CurNode = this->c_Nodes[ou32_NodeIndex];
-      if (rc_CurNode.pc_DeviceDefinition != NULL)
-      {
-         const uint32 u32_SubDev = rc_CurNode.u32_SubDeviceIndex;
-         if (u32_SubDev < rc_CurNode.pc_DeviceDefinition->c_SubDevices.size())
-         {
-            const C_OSCSubDeviceDefinition & rc_CurSubDevice = rc_CurNode.pc_DeviceDefinition->c_SubDevices[u32_SubDev];
-            q_Retval = rc_CurSubDevice.IsConnected(oe_Type, ou8_InterfaceNumber);
-         }
-      }
-   }
-   return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1648,14 +1611,8 @@ void C_OSCSystemDefinition::m_GetNodeAndComDpIndexesOfBus(const uint32 ou32_BusI
       {
          const C_OSCNodeComInterfaceSettings & rc_CurComInterface =
             rc_Node.c_Properties.c_ComInterfaces[u32_ComInterfaces];
-         //Skip if not connected
-         const bool q_IsInterfaceConnectedInternally =
-            this->IsInterfaceConnectedInDevice(
-               u32_NodeIndex,
-               rc_CurComInterface.e_InterfaceType,
-               rc_CurComInterface.u8_InterfaceNumber);
          // is the bus connected
-         if ((rc_CurComInterface.GetBusConnected() == true) && (q_IsInterfaceConnectedInternally))
+         if (rc_CurComInterface.GetBusConnected() == true)
          {
             // check the connections
             if (rc_CurComInterface.u32_BusIndex == ou32_BusIndex)

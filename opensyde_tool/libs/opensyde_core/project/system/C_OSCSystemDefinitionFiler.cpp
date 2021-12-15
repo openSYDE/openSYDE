@@ -677,13 +677,13 @@ void C_OSCSystemDefinitionFiler::h_SplitDeviceType(const C_SCLString & orc_Compl
                                                    C_SCLString & orc_SubType)
 {
    const std::string c_Tmp = *orc_CompleteType.AsStdString();
-   const uint32 u32_Pos = c_Tmp.find(C_OSCNodeSquad::hc_Separator.c_str());
+   const uint32 u32_Pos = c_Tmp.find(C_OSCNodeSquad::hc_SEPARATOR.c_str());
 
    if (u32_Pos < c_Tmp.size())
    {
       orc_MainType = c_Tmp.substr(0, u32_Pos);
       //lint -e{9114} kept for readability
-      orc_SubType = c_Tmp.substr(u32_Pos + C_OSCNodeSquad::hc_Separator.Length(), c_Tmp.size());
+      orc_SubType = c_Tmp.substr(u32_Pos + C_OSCNodeSquad::hc_SEPARATOR.Length(), c_Tmp.size());
    }
    else
    {

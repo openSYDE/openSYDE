@@ -262,8 +262,7 @@ sint32 C_OSCDeviceDefinitionFiler::mh_Load(C_OSCDeviceDefinition & orc_DeviceDef
       }
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = orc_Parser.SelectNodeChildError("manufacturer-string");
-         if (s32_Return == C_NO_ERR)
+         if (orc_Parser.SelectNodeChild("manufacturer-string") == "manufacturer-string")
          {
             s32_Return = orc_Parser.SelectNodeChildError("id");
             if (s32_Return == C_NO_ERR)
@@ -293,14 +292,9 @@ sint32 C_OSCDeviceDefinitionFiler::mh_Load(C_OSCDeviceDefinition & orc_DeviceDef
             c_Text = orc_Parser.SelectNodeParent(); //back to parent of parent ...
             tgl_assert(c_Text == "global");
          }
-         else
-         {
-            //Error allowed
-            s32_Return = C_NO_ERR;
-         }
          if (orc_DeviceDefinition.u8_ManufacturerId == 0U)
          {
-            orc_DeviceDefinition.c_ManufacturerDisplayValue = C_OSCDeviceDefinition::hc_DefaultCompanyName;
+            orc_DeviceDefinition.c_ManufacturerDisplayValue = C_OSCDeviceDefinition::hc_DEFAULT_COMPANY_NAME;
          }
       }
    }
@@ -350,24 +344,19 @@ sint32 C_OSCDeviceDefinitionFiler::mh_LoadSubDevice(C_OSCSubDeviceDefinition & o
                                                     const C_OSCDeviceDefinition & orc_DeviceDefinition,
                                                     const C_SCLString & orc_Path)
 {
-   sint32 s32_Return = orc_Parser.SelectNodeChildError("sub-device-name");
+   sint32 s32_Return = C_NO_ERR;
    uint32 u32_Value;
 
    stw_scl::C_SCLString c_Text;
 
-   if (s32_Return == C_NO_ERR)
+   if (orc_Parser.SelectNodeChild("sub-device-name") == "sub-device-name")
    {
       orc_SubDeviceDefinition.c_SubDeviceName = orc_Parser.GetNodeContent();
       c_Text = orc_Parser.SelectNodeParent(); //back to parent ...
       tgl_assert(c_Text == "sub-device");
    }
-   else
-   {
-      //Error allowed
-   }
    orc_SubDeviceDefinition.c_ConnectedInterfaces.clear();
-   s32_Return = orc_Parser.SelectNodeChildError("connected-interfaces");
-   if (s32_Return == C_NO_ERR)
+   if (orc_Parser.SelectNodeChild("connected-interfaces") == "connected-interfaces")
    {
       s32_Return = orc_Parser.SelectNodeChildError("interface");
       if (s32_Return == C_NO_ERR)
@@ -392,11 +381,6 @@ sint32 C_OSCDeviceDefinitionFiler::mh_LoadSubDevice(C_OSCSubDeviceDefinition & o
       }
       c_Text = orc_Parser.SelectNodeParent(); //back to parent ...
       tgl_assert(c_Text == "sub-device");
-   }
-   else
-   {
-      //Error allowed
-      s32_Return = C_NO_ERR;
    }
 
    if (orc_Parser.SelectNodeChild("other-accepted-names") == "other-accepted-names")

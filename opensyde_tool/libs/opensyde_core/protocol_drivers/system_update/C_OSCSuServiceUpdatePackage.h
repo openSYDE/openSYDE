@@ -67,6 +67,15 @@ protected:
       stw_types::uint32 u32_Position;
       std::vector<stw_scl::C_SCLString> c_ApplicationFileNames; // with relative path
       std::vector<stw_scl::C_SCLString> c_NVMFileNames;         // with relative path
+      stw_scl::C_SCLString c_PemFile;
+
+      /// Node configuration flags for security state
+      bool q_SendSecurityEnabledState;
+      bool q_SecurityEnabled;
+
+      /// Node configuration flags for debugger state
+      bool q_SendDebuggerEnabledState;
+      bool q_DebuggerEnabled;
    };
 
    ///class to create service update package definition file
@@ -116,9 +125,16 @@ protected:
                                    const stw_scl::C_SCLString & orc_TargetUnzipPath, C_OSCXMLParserBase & orc_XMLParser,
                                    const stw_scl::C_SCLString & orc_BaseNodeName,
                                    const stw_scl::C_SCLString & orc_ElementNodeName);
+   static void mh_LoadPemConfigSection(C_OSCSuSequences::C_DoFlash & orc_DoFlash,
+                                       const stw_types::uint32 ou32_NodeCounter, const stw_types::uint32 ou32_UpdatePos,
+                                       std::map<stw_types::uint32,
+                                                stw_types::uint32> & orc_PositionMap,
+                                       const stw_scl::C_SCLString & orc_TargetUnzipPath,
+                                       C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveFiles(const std::vector<stw_scl::C_SCLString> & orc_Files, C_OSCXMLParserBase & orc_XMLParser,
                             const stw_scl::C_SCLString & orc_BaseNodeName,
                             const stw_scl::C_SCLString & orc_ElementNodeName);
+   static void mh_SavePemConfig(const C_SupDefNodeContent & orc_CurrentNode, C_OSCXMLParserBase & orc_XMLParser);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

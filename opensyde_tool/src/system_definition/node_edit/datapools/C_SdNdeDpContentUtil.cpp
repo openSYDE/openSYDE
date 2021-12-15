@@ -2196,13 +2196,14 @@ void C_SdNdeDpContentUtil::h_InitMinForSignal(C_OSCNodeDataPoolContent & orc_Con
 
    \param[in]  orc_Input      Node data pool content type
    \param[in]  oru32_Index    Optional array index
+   \param[in]  osn_Role       Data role
 
    \return
    QVariant content
 */
 //----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeDpContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPoolContent & orc_Input,
-                                                         const uint32 & oru32_Index)
+                                                         const uint32 & oru32_Index, const sintn osn_Role)
 {
    QVariant c_Retval;
 
@@ -2235,10 +2236,29 @@ QVariant C_SdNdeDpContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPool
          c_Retval = orc_Input.GetValueS64();
          break;
       case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
-         c_Retval = static_cast<float64>(orc_Input.GetValueF32());
+         if (osn_Role == static_cast<sintn>(Qt::ItemDataRole::DisplayRole))
+         {
+            QString c_Precison = QString::number(orc_Input.GetValueF32(), 'g', 9);
+            c_Precison.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(), Qt::CaseInsensitive);
+            c_Retval = c_Precison;
+         }
+         else
+         {
+            c_Retval = static_cast<float64>(orc_Input.GetValueF32());
+         }
          break;
       case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
-         c_Retval = orc_Input.GetValueF64();
+         if (osn_Role == static_cast<sintn>(Qt::ItemDataRole::DisplayRole))
+         {
+            QString c_Precison = QString::number(orc_Input.GetValueF64(), 'g', 17);
+            c_Precison.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(),
+                               Qt::CaseInsensitive);
+            c_Retval = c_Precison;
+         }
+         else
+         {
+            c_Retval = orc_Input.GetValueF64();
+         }
          break;
       default:
          break;
@@ -2282,6 +2302,7 @@ QVariant C_SdNdeDpContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPool
          break;
       }
    }
+
    return c_Retval;
 }
 
@@ -2293,6 +2314,7 @@ QVariant C_SdNdeDpContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPool
    \param[in]  of64_Offset                Offset
    \param[in]  oru32_Index                Optional array index
    \param[in]  oq_AllowRangeAdaptation    Allow range adaptation
+   \param[in]  osn_Role                   Data role
 
    \return
    QVariant content
@@ -2301,16 +2323,17 @@ QVariant C_SdNdeDpContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPool
 QVariant C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(const C_OSCNodeDataPoolContent & orc_Input,
                                                                const float64 of64_Factor, const float64 of64_Offset,
                                                                const uint32 & oru32_Index,
-                                                               const bool oq_AllowRangeAdaptation)
+                                                               const bool oq_AllowRangeAdaptation, const sintn osn_Role)
 {
    QVariant c_Retval;
 
    if (C_OSCUtils::h_IsScalingActive(of64_Factor, of64_Offset) == false)
    {
-      c_Retval = C_SdNdeDpContentUtil::h_ConvertContentToGeneric(orc_Input, oru32_Index);
+      c_Retval = C_SdNdeDpContentUtil::h_ConvertContentToGeneric(orc_Input, oru32_Index, osn_Role);
    }
    else
    {
+      QString c_Precison;
       std::vector<float64> c_Values;
       C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_Input, c_Values);
       if (oru32_Index < c_Values.size())
@@ -2319,7 +2342,17 @@ QVariant C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(const C_OSCNodeDa
                                                                       oq_AllowRangeAdaptation);
          if (C_Uti::h_CheckFloatHasNoFractionPart(f64_ScaledValue) == false)
          {
-            c_Retval = f64_ScaledValue;
+            if (osn_Role == static_cast<sintn>(Qt::ItemDataRole::DisplayRole))
+            {
+               c_Precison = QString::number(f64_ScaledValue, 'g', 17);
+               c_Precison.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(),
+                                  Qt::CaseInsensitive);
+               c_Retval = c_Precison;
+            }
+            else
+            {
+               c_Retval = f64_ScaledValue;
+            }
          }
          else
          {
@@ -2337,7 +2370,17 @@ QVariant C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(const C_OSCNodeDa
             }
             else
             {
-               c_Retval = f64_ScaledValue;
+               if (osn_Role == static_cast<sintn>(Qt::ItemDataRole::DisplayRole))
+               {
+                  c_Precison = QString::number(f64_ScaledValue, 'g', 17);
+                  c_Precison.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(),
+                                     Qt::CaseInsensitive);
+                  c_Retval = c_Precison;
+               }
+               else
+               {
+                  c_Retval = f64_ScaledValue;
+               }
             }
          }
       }

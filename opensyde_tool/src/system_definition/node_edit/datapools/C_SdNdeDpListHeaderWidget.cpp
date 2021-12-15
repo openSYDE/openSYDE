@@ -473,6 +473,7 @@ void C_SdNdeDpListHeaderWidget::PopUp(void)
       }
 
       c_Dialog->HideOverlay();
+      c_Dialog->deleteLater();
    } //lint !e429  //no memory leak because of the parent of the dialog and the Qt memory management
 }
 
@@ -662,6 +663,7 @@ void C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked(void)
       if (c_Dialog != NULL)
       {
          c_Dialog->HideOverlay();
+         c_Dialog->deleteLater();
       }
    } //lint !e429  //no memory leak because of the parent of pc_ImportDialog and the Qt memory management
 }
@@ -734,6 +736,7 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
    if (c_Dialog != NULL)
    {
       c_Dialog->HideOverlay();
+      c_Dialog->deleteLater();
    }
 }
 

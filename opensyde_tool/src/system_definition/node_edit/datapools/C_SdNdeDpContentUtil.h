@@ -84,12 +84,14 @@ public:
    static void h_InitMinForSignal(stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
                                   const stw_types::uint16 ou16_BitLength);
    static QVariant h_ConvertContentToGeneric(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input,
-                                             const stw_types::uint32 & oru32_Index);
+                                             const stw_types::uint32 & oru32_Index, const stw_types::sintn osn_Role  =
+                                                static_cast<stw_types::sintn>(Qt::EditRole));
    static QVariant h_ConvertScaledContentToGeneric(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input,
                                                    const stw_types::float64 of64_Factor,
                                                    const stw_types::float64 of64_Offset,
                                                    const stw_types::uint32 & oru32_Index,
-                                                   const bool oq_AllowRangeAdaptation = true);
+                                                   const bool oq_AllowRangeAdaptation = true, const stw_types::sintn osn_Role  =
+                                                      static_cast<stw_types::sintn>(Qt::EditRole));
    static stw_types::sint32 h_SetDataVariableFromGeneric(const QVariant & orc_Value,
                                                          stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Output,
                                                          const stw_types::uint32 & oru32_Index);

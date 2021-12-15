@@ -54,7 +54,7 @@ C_OSCComDriverBaseCanMessage::C_OSCComDriverBaseCanMessage(void) :
    this->c_Msg.u8_RTR = 0U;
    this->c_Msg.u8_XTD = 0U;
    this->c_Msg.u32_ID = 0U;
-   (void)std::memset(this->c_Msg.au8_Data, 0, 8U);
+   (void)std::memset(&this->c_Msg.au8_Data[0], 0, 8U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -402,7 +402,7 @@ sint32 C_OSCComDriverBase::SendCanMessageDirect(const T_STWCAN_Msg_TX & orc_Msg)
          // Inform the logger about the sent message
          T_STWCAN_Msg_RX c_Msg;
 
-         (void)std::memcpy(c_Msg.au8_Data, orc_Msg.au8_Data, 8U);
+         (void)std::memcpy(&c_Msg.au8_Data[0], &orc_Msg.au8_Data[0], 8U);
          c_Msg.u8_Align = orc_Msg.u8_Align;
          c_Msg.u8_DLC = orc_Msg.u8_DLC;
          c_Msg.u8_RTR = orc_Msg.u8_RTR;

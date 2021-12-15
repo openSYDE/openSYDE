@@ -42,7 +42,10 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvNodeUpdate::C_PuiSvNodeUpdate(void) :
-   u32_NodeUpdatePosition(0U)
+   u32_NodeUpdatePosition(0U),
+   mq_SkipUpdateOfPemFile(false),
+   me_StateSecurity(eST_SEC_NO_CHANGE),
+   me_StateDebugger(eST_DEB_NO_CHANGE)
 {
    // For each type of file
    this->mc_SkipUpdateOfFiles.resize(3);
@@ -59,7 +62,11 @@ C_PuiSvNodeUpdate::C_PuiSvNodeUpdate(void) :
 void C_PuiSvNodeUpdate::CalcHash(uint32 & oru32_HashValue) const
 {
    const sintn sn_Size = this->mc_DataBlockPaths.size();
+   const stw_scl::C_SCLString c_PemFile = this->mc_PemFilePath.toStdString().c_str();
 
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_StateDebugger, sizeof(this->me_StateDebugger), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_StateSecurity, sizeof(this->me_StateSecurity), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Size, sizeof(sn_Size), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&sn_Size, sizeof(sn_Size), oru32_HashValue);
    for (uint32 u32_It = 0; u32_It < this->mc_DataBlockPaths.size(); ++u32_It)
    {
@@ -87,6 +94,10 @@ void C_PuiSvNodeUpdate::CalcHash(uint32 & oru32_HashValue) const
       }
    }
    stw_scl::C_SCLChecksums::CalcCRC32(&u32_NodeUpdatePosition, sizeof(u32_NodeUpdatePosition), oru32_HashValue);
+
+   stw_scl::C_SCLChecksums::CalcCRC32(c_PemFile.c_str(), c_PemFile.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_SkipUpdateOfPemFile, sizeof(this->mq_SkipUpdateOfPemFile),
+                                      oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -512,6 +523,99 @@ sint32 C_PuiSvNodeUpdate::RemoveParamInfo(const uint32 ou32_Index)
    }
 
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information PEM file path
+
+   \param[in]  orc_Value   New path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvNodeUpdate::SetPemFilePath(const QString & orc_Value)
+{
+   this->mc_PemFilePath = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns node update information PEM file path
+
+   \return
+   - PEM file path
+   - Empty string if no PEM file set
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSvNodeUpdate::GetPemFilePath(void) const
+{
+   return this->mc_PemFilePath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns node update information PEM file path
+
+   Sets the state to do not change too
+
+   \retval   Path             PEM file path
+   \retval   Empty string     No PEM file is set
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvNodeUpdate::RemovePemFilePath(void)
+{
+   this->mc_PemFilePath = "";
+   this->mq_SkipUpdateOfPemFile = false;
+   this->me_StateSecurity = eST_SEC_NO_CHANGE;
+   this->me_StateDebugger = eST_DEB_NO_CHANGE;
+   this->mq_SkipUpdateOfPemFile = false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information PEM file path skip flag
+
+   \param[in]  oq_Skip   New flag
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvNodeUpdate::SetSkipUpdateOfPemFile(const bool oq_Skip)
+{
+   this->mq_SkipUpdateOfPemFile = oq_Skip;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns node update information PEM file path skip flag
+
+   \retval   true       Flag for skipping the PEM file
+   \retval   false      Flag for not skipping the PEM file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvNodeUpdate::GetSkipUpdateOfPemFile(void) const
+{
+   return this->mq_SkipUpdateOfPemFile;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set node update information states
+
+   \param[in]      oe_StateSecurity   Security state of node
+   \param[in]      oe_StateDebugger   Debugger state of node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvNodeUpdate::SetStates(const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                  const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
+{
+   this->me_StateDebugger = oe_StateDebugger;
+   this->me_StateSecurity = oe_StateSecurity;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the update information states of the node
+
+   \param[out]      ore_StateSecurity   Security state of node
+   \param[out]      ore_StateDebugger   Debugger state of node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvNodeUpdate::GetStates(C_PuiSvNodeUpdate::E_StateSecurity & ore_StateSecurity,
+                                  C_PuiSvNodeUpdate::E_StateDebugger & ore_StateDebugger) const
+{
+   ore_StateDebugger = this->me_StateDebugger;
+   ore_StateSecurity = this->me_StateSecurity;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

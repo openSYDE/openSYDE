@@ -13,6 +13,13 @@ Ubuntu 20.04:
    GCC 9.3.0 (32-bit)
    CMake 3.16.3
 
+Required Library Installation:
+==============================
+Ubuntu 20.04:
+   libssl-dev:i386 (sudo apt-get install libssl-dev:i386; tested with version 1.1.1f)
+   For building with 32bit compiler on a 64bit System: install gcc-multilib and g++-multilib
+   
+   
 Editor:
 =======
 Windows: Qt Creator 4.14.2

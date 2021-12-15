@@ -126,6 +126,10 @@ using namespace stw_can;
 #define DPD_DATAID_FILE_BASED_TRANSFER_EXIT_RESULT          (0xA81DU)
 #define UDC_H_DATAID_ECU_SERIAL_NUMBER_EXT                  (0xA81EU)
 #define UDC_H_DATAID_SUB_NODE_ID                            (0xA81FU)
+#define UDC_H_DATAID_CERTIFICATE_SERIAL_NUMBER              (0xA820U)
+#define UDC_H_DATAID_SECURITY_ACTIVATION                    (0xA821U)
+#define UDC_H_DATAID_DEBUGGER_ACTIVATION                    (0xA822U)
+#define UDC_H_DATAID_SECURITY_KEY                           (0xA823U)
 #define UDC_H_DATAID_BOOTSOFTWARE_IDENTIFICATION            (0xF180U)
 #define FL_H_DATAID_SOFTWARE_FINGERPRINT                    (0xF184U)
 #define UDC_H_DATAID_ACTIVE_DIAGNOSTIC_SESSION              (0xF186U)
@@ -499,7 +503,8 @@ C_SCLString C_CMONProtocolOpenSYDE::m_SessionIdToText(const uint8 ou8_SessionId)
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8_ServiceData,
                                                         const uint8 ou8_ServiceSize,
-                                                        const T_CanAddressInformation & ort_CanAddressInformation) const
+                                                        const T_CanAddressInformation & ort_CanAddressInformation,
+                                                        const bool oq_IsSingleFrame) const
 {
    const bool q_IsResponse = ((opu8_ServiceData[0] & 0x40U) == 0x40U) ? true : false;
    const uint8 u8_Service = (opu8_ServiceData[0] & 0xBFU);
@@ -516,7 +521,8 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
       }
       else
       {
-         c_Text = ":" + m_DataIdentifierAndDataToText(mh_BytesToWordHighLow(&opu8_ServiceData[1]), q_IsResponse,
+         c_Text = ":" + m_DataIdentifierAndDataToText(u8_Service == OSY_UDS_SI_WRITE_DATA_BY_IDENTIFIER,
+                                                      mh_BytesToWordHighLow(&opu8_ServiceData[1]), q_IsResponse,
                                                       ou8_ServiceSize - 3U, &opu8_ServiceData[3]);
       }
       u8_FirstRawByte = ou8_ServiceSize; //complete interpretation is in subfunction; don't do it here ...
@@ -864,13 +870,29 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
       }
       else
       {
-         if (opu8_ServiceData[1] == 0U)
+         if (ou8_ServiceSize > 2U)
          {
-            c_Text = "  TYPE:INVALID";
+            c_Text = "  MODE:";
+            if (oq_IsSingleFrame == false)
+            {
+               c_Text += "secure";
+            }
+            else
+            {
+               c_Text += "non-secure";
+            }
          }
          else
          {
-            c_Text = "  TYPE:";
+            c_Text = "";
+         }
+         if (opu8_ServiceData[1] == 0U)
+         {
+            c_Text += "  TYPE:INVALID";
+         }
+         else
+         {
+            c_Text += "  TYPE:";
             if ((opu8_ServiceData[1] & 0x01U) == 0x01U)
             {
                c_Text += "  REQUEST_SEED  LEVEL:" + m_GetByteAsStringFormat(opu8_ServiceData[1]);
@@ -1097,7 +1119,8 @@ C_SCLString C_CMONProtocolOpenSYDE::mh_ThreeByteVersionToString(const uint8 * co
    Text interpretation of data identifier
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 ou16_DataIdentifier,
+C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const bool oq_IsWrite,
+                                                                  const uint16 ou16_DataIdentifier,
                                                                   const bool oq_IsResponse, const uint8 ou8_PayloadSize,
                                                                   const uint8 * const opu8_Payload) const
 {
@@ -1249,8 +1272,104 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 o
          }
          else
          {
-            c_Text += "  SubNodeId: " + C_SCLString::IntToStr(opu8_Payload[0]);
+            c_Text += "  SubNodeId: " + m_GetByteAsStringFormat(opu8_Payload[0]);
             u8_FirstRawByte = ou8_PayloadSize; //finished here ...
+         }
+      }
+      break;
+   case UDC_H_DATAID_CERTIFICATE_SERIAL_NUMBER:
+      c_Text = "CertificateSerialNumber";
+      if (oq_IsResponse == true)
+      {
+         if (ou8_PayloadSize != 3U)
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+         else
+         {
+            C_SCLString c_Text2;
+            c_Text2.PrintFormatted("  CERTIFICATESNR:%02x:%02x:%02x", opu8_Payload[0], opu8_Payload[1],
+                                   opu8_Payload[2]);
+
+            c_Text += c_Text2;
+            u8_FirstRawByte = 3U; //finished here ...
+         }
+      }
+      break;
+   case UDC_H_DATAID_SECURITY_ACTIVATION:
+      c_Text = "SecurityActivation";
+      if (((oq_IsResponse == true) && (oq_IsWrite == false)) ||
+          ((oq_IsResponse == false) && (oq_IsWrite == true)))
+      {
+         if (ou8_PayloadSize != 2U)
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+         else
+         {
+            if ((opu8_Payload[0] & 0x01) == 0x01)
+            {
+               // security on
+               c_Text += "  ACTIVATION:on";
+            }
+            else
+            {
+               // security off
+               c_Text += "  ACTIVATION:off";
+            }
+
+            if (opu8_Payload[1] == 0)
+            {
+               c_Text += "  ALGO:RSA_1024_WITH_PKCS1_PADDING";
+            }
+            else
+            {
+               c_Text += "  ALGO:" + m_GetByteAsStringFormat(opu8_Payload[1]);
+            }
+            u8_FirstRawByte = 2U; //finished here ...
+         }
+      }
+      break;
+   case UDC_H_DATAID_DEBUGGER_ACTIVATION:
+      c_Text = "DebuggerActivation";
+      if (((oq_IsResponse == true) && (oq_IsWrite == false)) ||
+          ((oq_IsResponse == false) && (oq_IsWrite == true)))
+      {
+         if (ou8_PayloadSize != 1U)
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+         else
+         {
+            if ((opu8_Payload[0] & 0x01) == 0x01)
+            {
+               // security on
+               c_Text += "  DEBUGGER:activated";
+            }
+            else
+            {
+               // security off
+               c_Text += "  DEBUGGER:deactivated";
+            }
+            u8_FirstRawByte = 1U; //finished here ...
+         }
+      }
+      break;
+   case UDC_H_DATAID_SECURITY_KEY:
+      c_Text = "SecurityKey";
+      if (oq_IsResponse == false)
+      {
+         if (ou8_PayloadSize != 3U)
+         {
+            c_Text += " error: incorrect number of data bytes";
+         }
+         else
+         {
+            C_SCLString c_Text2;
+            c_Text2.PrintFormatted("  PUBLICKEY:%02x:%02x:%02x", opu8_Payload[0], opu8_Payload[1], opu8_Payload[2]);
+
+            c_Text += c_Text2;
+            u8_FirstRawByte = 3U; //finished here ...
          }
       }
       break;
@@ -1727,7 +1846,7 @@ C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_
                      {
                         c_Text += m_ServiceIdToText(orc_Msg.au8_Data[1]);
                         c_Text += m_ServiceDataToText(&orc_Msg.au8_Data[1], static_cast<uint8>(u16_NumBytes),
-                                                      t_Address);
+                                                      t_Address, true);
                      }
                   }
                }
@@ -1743,7 +1862,7 @@ C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_
                   u16_NumBytes = ((static_cast<uint16>(orc_Msg.au8_Data[0] & 0x0FU)) << 8U) + orc_Msg.au8_Data[1];
                   c_Text += (" NUM " + m_GetWordAsStringFormat(u16_NumBytes) + " ");
                   c_Text += m_ServiceIdToText(orc_Msg.au8_Data[2]);
-                  c_Text += m_ServiceDataToText(&orc_Msg.au8_Data[2], 6, t_Address);
+                  c_Text += m_ServiceDataToText(&orc_Msg.au8_Data[2], 6, t_Address, false);
                }
                break;
             case ISO15765_N_PCI_CF:
@@ -1893,7 +2012,7 @@ C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_
                   {
                      c_Text += ("NUM " + m_GetByteAsStringFormat(orc_Msg.au8_Data[1]) + " ");
                      c_Text += m_ServiceIdToText(orc_Msg.au8_Data[2]);
-                     c_Text += m_ServiceDataToText(&orc_Msg.au8_Data[2], 6, t_Address);
+                     c_Text += m_ServiceDataToText(&orc_Msg.au8_Data[2], 6, t_Address, false);
                   }
                }
                else
