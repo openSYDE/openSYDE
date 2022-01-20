@@ -309,7 +309,7 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_GetExePath(void)
     C_SCLString c_Path = "";
 
     sprintf(acn_Arg, "/proc/%d/exe", getpid());
-    sn_Return = readlink(acn_Arg, acn_Path, BUFSIZ );
+    sn_Return = readlink(acn_Arg, acn_Path, PATH_MAX );
     if (sn_Return > 0)
     {
        //we got a path ...
