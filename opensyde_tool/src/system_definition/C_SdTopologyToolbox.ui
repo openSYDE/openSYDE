@@ -143,7 +143,7 @@
         <x>0</x>
         <y>0</y>
         <width>400</width>
-        <height>241</height>
+        <height>243</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_6">
@@ -274,8 +274,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>396</width>
-            <height>279</height>
+            <width>394</width>
+            <height>278</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -327,8 +327,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>396</width>
-            <height>279</height>
+            <width>394</width>
+            <height>278</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -384,8 +384,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>396</width>
-            <height>279</height>
+            <width>394</width>
+            <height>278</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -460,6 +460,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui::C_SdTopologyListWidget</class>
    <extends>QListWidget</extends>
    <header>C_SdTopologyListWidget.h</header>
@@ -482,17 +488,19 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
-   <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabToolBarNoSearchResult</class>
    <extends>QLabel</extends>
    <header>C_OgeLabToolBarNoSearchResult.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>pc_ScrollAreaNodes</tabstop>
+  <tabstop>pc_ScrollAreaSearch</tabstop>
+  <tabstop>pc_ListWidgetSearch</tabstop>
+  <tabstop>pc_ScrollAreaBuses</tabstop>
+  <tabstop>pc_ScrollAreaDrawing</tabstop>
+  <tabstop>pc_ListWidgetDrawing</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

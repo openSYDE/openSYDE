@@ -319,8 +319,7 @@ bool C_SCLIniFile::m_SetValue(const C_SCLString & orc_Section, const C_SCLString
    else
    {
       //existing key:
-      pc_Key->c_Value   = orc_Value;
-      pc_Key->c_Comment = "";
+      pc_Key->c_Value = orc_Value;
    }
    return true;
 }
@@ -720,6 +719,7 @@ void C_SCLIniFile::DeleteKey(const C_SCLString & orc_Section, const C_SCLString 
 {
    sint32 s32_Index;
    C_SCLIniSection * const pc_Section = m_GetSection(orc_Section);
+
    if (pc_Section == NULL)
    {
       return;
@@ -737,8 +737,7 @@ void C_SCLIniFile::DeleteKey(const C_SCLString & orc_Section, const C_SCLString 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-///Given a section name, this function first checks to see if the given section
-///already exists in the list or not, if not, it creates the new section and assigns
+///Given a section name, this function creates the new section and assigns
 ///an empty comment.
 C_SCLIniSection * C_SCLIniFile::m_CreateSection(const C_SCLString & orc_Section)
 {
@@ -797,6 +796,7 @@ bool C_SCLIniFile::ValueExists(const C_SCLString & orc_Section, const C_SCLStrin
 C_SCLIniKey * C_SCLIniFile::m_GetKey(const C_SCLString & orc_Key, const C_SCLString & orc_Section)
 {
    C_SCLIniSection * const pt_Section = m_GetSection(orc_Section);
+
    if (pt_Section == NULL)
    {
       return NULL;

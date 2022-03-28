@@ -142,20 +142,20 @@ void C_SyvDaPeUpdateModeTableView::AdjustToItems(const bool & orq_Initial, const
    if (((this->mpc_TreeWidgetItem != NULL) && (this->mpc_TreeWidget != NULL)) && (this->model() != NULL))
    {
       //Configure
-      const sintn sn_ConstOffset = 50;
-      const sintn sn_ItemOffset = 30;
-      const uint32 u32_VisibleItemCount = 7;
+      const sintn sn_CONST_OFFSET = 50;
+      const sintn sn_ITEM_OFFSET = 30;
+      const uint32 u32_VISIBLE_ITEM_COUNT = 7U;
       const uint32 u32_ItemCount = this->model()->rowCount();
-      sintn sn_Height = sn_ConstOffset;
+      sintn sn_Height = sn_CONST_OFFSET;
 
       //Adapt dynamic elements
-      if ((u32_ItemCount <= u32_VisibleItemCount) || (oq_Last == true))
+      if ((u32_ItemCount <= u32_VISIBLE_ITEM_COUNT) || (oq_Last == true))
       {
-         sn_Height += sn_ItemOffset * static_cast<sintn>(u32_ItemCount);
+         sn_Height += sn_ITEM_OFFSET * static_cast<sintn>(u32_ItemCount);
       }
       else
       {
-         sn_Height += sn_ItemOffset * static_cast<sintn>(u32_VisibleItemCount);
+         sn_Height += sn_ITEM_OFFSET * static_cast<sintn>(u32_VISIBLE_ITEM_COUNT);
       }
       //Change size
       this->setMinimumHeight(sn_Height);

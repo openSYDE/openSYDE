@@ -65,8 +65,8 @@ void C_PopListItem::paint(QPainter * const opc_Painter, const QStyleOptionViewIt
       const QFontMetrics c_FontHeadingInfo(c_FontHeading);
       const sintn sn_Height = orc_Option.rect.height();
       QRect c_Rect = orc_Option.rect;
-      const QColor c_ColorPen(42, 42, 91);
-      const QPen c_Pen(c_ColorPen, 1.0, Qt::SolidLine);
+      const QColor c_COLOR_PEN(42, 42, 91);
+      const QPen c_Pen(c_COLOR_PEN, 1.0, Qt::SolidLine);
       //advisory
       opc_Painter->save();
       opc_Painter->setBrush(static_cast<QBrush>(QColor(245, 247, 248)));

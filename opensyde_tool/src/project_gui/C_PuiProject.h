@@ -58,8 +58,8 @@ private:
    stw_types::uint32 mu32_CalculatedProjectHash;
    bool mq_SwitchToLastKnownUseCase;
 
-   static const QString mhc_TempFolder;
-   static const QString mhc_ServiceProjectExtension;
+   static const QString mhc_TEMP_FOLDER;
+   static const QString mhc_SERVICE_PROJECT_EXTENSION;
 
    //Avoid calling
    C_PuiProject(void);

@@ -15,9 +15,11 @@
 
 #include "C_GiNode.h"
 #include "C_PuiSvData.h"
+#include "C_GiSvNodeData.h"
 #include "C_SyvUpDeviceInfo.h"
 #include "C_SyvTopologyBaseScene.h"
 #include "C_SyvRoRouteCalculation.h"
+#include "C_OSCSuSequencesNodeStates.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -35,7 +37,8 @@ public:
    C_SyvUpScene(const stw_types::uint32 ou32_ViewIndex = 0, QObject * const opc_Parent = NULL);
    virtual ~C_SyvUpScene();
 
-   void SetConnected(const bool oq_Active, const bool oq_SignalNodes) const;
+   void SetConnecting(const bool oq_Active) const;
+   void SetConnected(const bool oq_Active) const;
    void SetUpdating(const bool oq_Active) const;
    void UpdateDeviceInformation(const std::vector<stw_types::uint32> & orc_NodeIndexes,
                                 const std::vector<stw_opensyde_gui_logic::C_SyvUpDeviceInfo> & orc_DeviceInformation)
@@ -44,10 +47,13 @@ public:
    void StartProgressAnimation(const stw_types::uint32 ou32_NodeIndex) const;
    void StopProgressAnimation(const bool oq_Abort, const stw_types::uint32 ou32_FailedApplicationIndex,
                               const bool oq_StopUpdateingState) const;
-   void SetNoResponse(const stw_types::uint32 ou32_NodeIndex) const;
-   std::vector<stw_types::uint32> GetActiveNoResponseNodeIndices(void) const;
+   void SetNodeError(const stw_types::uint32 ou32_NodeIndex) const;
    std::vector<stw_types::uint32> GetActiveNoneThirdPartyNodeIndices(void) const;
    void CheckUpdateDisabledState(void) const;
+
+   void SetNodeConnectStates(const std::vector<stw_opensyde_core::C_OSCSuSequencesNodeConnectStates> & orc_NodeStates,
+                             const C_GiSvNodeData::C_GiSvNodeDataPreconditionErrors & orc_NodePreconditionErrors);
+   void SetNodeUpdateStates(const std::vector<stw_opensyde_core::C_OSCSuSequencesNodeUpdateStates> & orc_NodeStates);
 
    virtual bool IsAnyItemAddable(void) const override;
    virtual bool IsItemMovable(const QGraphicsItem * const opc_Item) const override;
@@ -73,7 +79,7 @@ protected:
    virtual void m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem) override;
 
 private:
-   static const stw_types::float64 mhf64_BusAnimationTolerance;
+   static const stw_types::float64 mhf64_BUS_ANIMATION_TOLERANCE;
 
    //Avoid call
    C_SyvUpScene(const C_SyvUpScene &);

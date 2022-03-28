@@ -182,8 +182,8 @@ void C_SyvDaDashboardToolbox::m_FillToolboxStatic(void)
    m_AddWidgetItems();
 
    // configure Headings
-   this->mpc_Ui->pc_LabelFreeElements->setMaximumHeight(C_SebToolboxUtil::hsn_LabelSize);
-   this->mpc_Ui->pc_LabelFreeElements->setMinimumHeight(C_SebToolboxUtil::hsn_LabelSize);
+   this->mpc_Ui->pc_LabelFreeElements->setMaximumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
+   this->mpc_Ui->pc_LabelFreeElements->setMinimumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -24,7 +24,7 @@ using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // Configuration for dynamic transparency color configuration of elements
-const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
+const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_AREA_ELEMENTS(
 {
    "stw_opensyde_gui--C_SdSearchTreeWidget",
    "stw_opensyde_gui_elements--C_OgeTedTable",
@@ -57,8 +57,8 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui_elements--C_OgeTebMessageDetails",
    "stw_opensyde_gui_elements--C_OgeTebReport",
    "stw_opensyde_gui--C_SebGraphicsView",
-   "stw_opensyde_gui--C_SyvUpUpdatePackageListWidget",
-   "stw_opensyde_gui--C_SyvUpPackageSectionNodeWidget",
+   "stw_opensyde_gui--C_SyvUpPacListWidget",
+   "stw_opensyde_gui--C_SyvUpPacSectionNodeWidget",
    "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget",
    "stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView",
    "stw_opensyde_gui_elements--C_OgeSmoothScrollArea",
@@ -75,12 +75,12 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget"
 }
    );
-const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_ScrollAreaProperties(
+const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_AREA_PROPERTIES(
 {
    C_UtiStyleSheets::C_PropertyValueColorConfig("", "background-color", Qt::transparent)
 }
    );
-const std::vector<C_UtiStyleSheets::C_ElementColorConfig> C_UtiStyleSheets::mhc_ElementColorsWithTransparency(
+const std::vector<C_UtiStyleSheets::C_ElementColorConfig> C_UtiStyleSheets::mhc_ELEMENT_COLORS_WITH_TRANSPARENCY(
 {
    C_UtiStyleSheets::C_ElementColorConfig(
       "stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"OPENSYDE_BRIGHT\"]", mc_STYLE_GUIDE_COLOR_32),
@@ -125,7 +125,7 @@ const std::vector<C_UtiStyleSheets::C_ElementColorConfig> C_UtiStyleSheets::mhc_
 }
    );
 
-const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
+const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_BRIGHT(
 {
    "stw_opensyde_gui--C_SyvDaItPaArView QScrollBar",
    "stw_opensyde_gui--C_SyvDaItPaTableView QScrollBar",
@@ -159,7 +159,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui_elements--C_OgeTebReport QScrollBar",
    "stw_opensyde_gui--C_SebGraphicsView QScrollBar[DarkMode=\"false\"]",
    "stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar",
-   "stw_opensyde_gui--C_SyvUpPackageSectionNodeWidget QScrollBar",
+   "stw_opensyde_gui--C_SyvUpPacSectionNodeWidget QScrollBar",
    "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_BRIGHT\"]",
    "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"FLAT_BRIGHT\"]",
    "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_BRIGHT\"]",
@@ -174,7 +174,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget QScrollBar"
 }
    );
-const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_ScrollBarPropertiesBright(
+const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_BRIGHT(
 {
    C_UtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", Qt::transparent),
    C_UtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", Qt::transparent),
@@ -192,7 +192,7 @@ const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets
    C_UtiStyleSheets::C_PropertyValueColorConfig("::sub-page", "border-color", mc_STYLE_GUIDE_COLOR_11)
 }
    );
-const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsDark(
+const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_DARK(
 {
    "stw_opensyde_gui--C_SyvDaItPaTreeView QScrollBar[DarkMode=\"true\"]",
    "stw_opensyde_gui--C_SyvDaItTaView QScrollBar[DarkMode=\"true\"]",
@@ -205,7 +205,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsDark(
    "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_DARK\"]"
 }
    );
-const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_ScrollBarPropertiesDark(
+const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_DARK(
 {
    C_UtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", Qt::transparent),
    C_UtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", Qt::transparent),
@@ -223,13 +223,13 @@ const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets
    C_UtiStyleSheets::C_PropertyValueColorConfig("::sub-page", "border-color", mc_STYLE_GUIDE_COLOR_32)
 }
    );
-const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsMainNavi(
+const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_MAIN_NAVI(
 {
    "stw_opensyde_gui_logic--C_PopFileTableView QScrollBar",
    "stw_opensyde_gui_elements--C_OgeSaNaviBar QScrollBar"
 }
    );
-const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_ScrollBarPropertiesMainNavi(
+const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_MAIN_NAVI(
 {
    C_UtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color", Qt::transparent),
    C_UtiStyleSheets::C_PropertyValueColorConfig(":horizontal", "background-color", Qt::transparent),
@@ -269,7 +269,8 @@ QString C_UtiStyleSheets::h_GetStylesheet(void)
 {
    QString c_Stylesheet;
 
-   mh_AppendScrollBarStyleSheet(C_UtiStyleSheets::mhc_ScrollAreaElements, C_UtiStyleSheets::mhc_ScrollAreaProperties,
+   mh_AppendScrollBarStyleSheet(C_UtiStyleSheets::mhc_SCROLL_AREA_ELEMENTS,
+                                C_UtiStyleSheets::mhc_SCROLL_AREA_PROPERTIES,
                                 c_Stylesheet);
 
    mh_AppendStylesheet("://styles/CheckBox.qss", c_Stylesheet);
@@ -387,10 +388,10 @@ void C_UtiStyleSheets::mh_AppendTransparentColorSteps(QString & orc_Stylesheet)
    const QString c_TransparencyPropertyEnd = "\"] {\n";
    const QString c_End = "\n}\n";
 
-   for (u32_Counter = 0; u32_Counter < mhc_ElementColorsWithTransparency.size(); ++u32_Counter)
+   for (u32_Counter = 0; u32_Counter < mhc_ELEMENT_COLORS_WITH_TRANSPARENCY.size(); ++u32_Counter)
    {
       // Prepare color for start
-      QColor c_Color = mhc_ElementColorsWithTransparency[u32_Counter].c_Color;
+      QColor c_Color = mhc_ELEMENT_COLORS_WITH_TRANSPARENCY[u32_Counter].c_Color;
       sintn sn_AlphaValue = msn_TRANSPARENCY_START;
 
       do
@@ -401,7 +402,7 @@ void C_UtiStyleSheets::mh_AppendTransparentColorSteps(QString & orc_Stylesheet)
          c_Color.setAlpha(sn_AlphaValue);
 
          // Build the stylesheet string
-         c_Line = mhc_ElementColorsWithTransparency[u32_Counter].c_ElementName;
+         c_Line = mhc_ELEMENT_COLORS_WITH_TRANSPARENCY[u32_Counter].c_ElementName;
          c_Line += c_TransparencyPropertyStart;
          // Add the property value -> transparency value
          c_Line += QString::number(sn_AlphaValue);
@@ -429,12 +430,12 @@ void C_UtiStyleSheets::mh_AppendTransparentColorSteps(QString & orc_Stylesheet)
 //----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendScrollBarStyleSheets(QString & orc_Stylesheet)
 {
-   mh_AppendScrollBarStyleSheet(C_UtiStyleSheets::mhc_ScrollBarElementsDark,
-                                C_UtiStyleSheets::mhc_ScrollBarPropertiesDark, orc_Stylesheet);
-   mh_AppendScrollBarStyleSheet(C_UtiStyleSheets::mhc_ScrollBarElementsBright,
-                                C_UtiStyleSheets::mhc_ScrollBarPropertiesBright, orc_Stylesheet);
-   mh_AppendScrollBarStyleSheet(C_UtiStyleSheets::mhc_ScrollBarElementsMainNavi,
-                                C_UtiStyleSheets::mhc_ScrollBarPropertiesMainNavi, orc_Stylesheet);
+   mh_AppendScrollBarStyleSheet(C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_DARK,
+                                C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_DARK, orc_Stylesheet);
+   mh_AppendScrollBarStyleSheet(C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_BRIGHT,
+                                C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_BRIGHT, orc_Stylesheet);
+   mh_AppendScrollBarStyleSheet(C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_MAIN_NAVI,
+                                C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_MAIN_NAVI, orc_Stylesheet);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

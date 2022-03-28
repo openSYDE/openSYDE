@@ -92,6 +92,17 @@ void C_GiWiProxyBase::TriggerMouseReleaseEvent(QGraphicsSceneMouseEvent * const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger mouse double click event
+
+   \param[in,out] opc_Event Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiWiProxyBase::TriggerMouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
+{
+   QGraphicsProxyWidget::mouseDoubleClickEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Trigger key press event
 
    \param[in,out] opc_Event Event identification and information

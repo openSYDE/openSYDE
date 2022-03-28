@@ -67,8 +67,7 @@ public:
    void AddImage(const QString & orc_FilePath, const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID);
    void AddBusConnector(C_GiNode * const opc_Node, const C_GiLiBus * const opc_Bus,
                         const stw_types::uint8 & oru8_InterfaceNumber,
-                        const std::vector<stw_types::uint8> & orc_NodeIds, const QPointF & orc_Pos,
-                        const stw_types::uint64 * const opu64_UniqueID = NULL);
+                        const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties, const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID = NULL);
 
    virtual void UpdateTransform(const QTransform & orc_Transform) override;
    //lint -e{1735} Suppression, because default parameters are identical
@@ -180,9 +179,9 @@ private:
                     const stw_types::sint32 & ors32_Index,
                     const stw_opensyde_gui_logic::C_PuiSdDataElement::E_Action & ore_Action) const;
    void m_ConnectNodeToBus(const stw_types::uint8 &  oru8_InterfaceNumber,
-                           const std::vector<stw_types::uint8> & orc_NodeIds);
+                           const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties);
    void m_ChangeInterface(const stw_types::uint8 & oru8_InterfaceNumber,
-                          const std::vector<stw_types::uint8> & orc_NodeIds, C_GiLiBusConnector * const opc_Connector);
+                          const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties, C_GiLiBusConnector * const opc_Connector);
    void m_RestoreToolTips(void) const;
    void m_RemoveNodeOfScene(const C_GiNode * const opc_NodeGraphicsItem);
    void m_RemoveBusOfScene(const C_GiLiBus * const opc_BusGraphicsItem);
@@ -203,13 +202,17 @@ private:
                                  const stw_types::sint32 & ors32_SpecialInterface,
                                  C_GiLiBusConnector * const opc_Connector);
    void m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * const opc_Node1, const C_GiNode * const opc_Node2);
-   std::vector<std::vector<stw_types::uint8> > m_AssignNodeIds(const std::vector<stw_types::uint32> & orc_NodeIndices,
-                                                               const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_BusType, const stw_types::uint32 & oru32_BusIndex, const std::vector<stw_types::uint8> & orc_InterfaceIndices, const bool oq_BusExists);
-   stw_types::uint32 m_GenerateNodeIdUsingExistingIds(const stw_opensyde_core::C_OSCNode & orc_Node,
-                                                      const stw_types::uint32 & oru32_BusIndex,
-                                                      const std::vector<stw_types::uint8> & orc_ExistingNode1Ids,
-                                                      const std::vector<stw_types::uint8> & orc_ExistingNode2Ids,
-                                                      const bool oq_BusExists);
+   std::vector<std::vector<stw_types::uint8> > m_AssignNodeProperty(
+      const std::vector<stw_types::uint32> & orc_NodeIndices,
+      const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_BusType, const stw_types::uint32 & oru32_BusIndex,
+      const std::vector<stw_types::uint8> & orc_InterfaceIndices, const bool oq_BusExists, const bool oq_GenerateId);
+   stw_types::uint32 m_GeneratePropertyUsingExisting(const stw_opensyde_core::C_OSCNode & orc_Node,
+                                                     const stw_types::uint32 & oru32_BusIndex, const std::vector<
+                                                        stw_types::uint8> & orc_ExistingNode1Properties,
+                                                     const std::vector<stw_types::uint8> & orc_ExistingNode2Properties,
+                                                     const bool oq_BusExists, const bool oq_GenerateId);
+   std::vector<stw_types::uint8> m_BuildCompleteIpAddress(const stw_types::uint8 & oru8_IpLastByte);
+
    void m_ShowInterfaceChangePopUp(QGraphicsItem * const opc_Item);
    void m_LoadSnapshot(const QVector<stw_types::uint32> & orc_NodeIndices,
                        const QVector<stw_types::uint32> & orc_BusIndices,
@@ -234,7 +237,7 @@ private:
    void m_ReconnectBusConnectorNode(const C_GiLiBusConnector * const opc_BusConnector,
                                     const C_GiNode * const opc_StartingNode, const C_GiNode * const opc_LastNode,
                                     const QPointF & orc_ConnectionPos, const stw_types::sint32 & ors32_Interface,
-                                    const std::vector<stw_types::uint8> & orc_NodeIds);
+                                    const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties);
    void m_RevertBusConnectorBus(C_GiLiBusConnector * const opc_BusConnector,
                                 const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                                 const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
@@ -243,7 +246,7 @@ private:
                                    const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                                    const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
                                    const QPointF & orc_ConnectionPos, const stw_types::sint32 & ors32_Interface,
-                                   const std::vector<stw_types::uint8> & orc_NodeIds);
+                                   const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties);
    void m_RemoveConnectorLine(void);
    void m_RemoveBusNameLine(void);
    void m_RemoveTemporaryLine(C_GiLiTemporaryLine ** const opc_TemporaryLine);
@@ -269,7 +272,7 @@ private:
    C_GiLiBusConnector * mpc_SelectedBusConnectorItem;
    bool mq_RestoreMouseCursorWhenPossible;
    stw_types::uint64 mu64_MouseOverrideCounter;
-   static const bool mhq_NewConnectState;
+   static const bool mhq_NEW_CONNECT_STATE;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

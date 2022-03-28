@@ -43,11 +43,15 @@ public:
    virtual void LoadData(void) override;
    virtual void UpdateData(void) override;
    virtual void DeleteData(void) override;
-   virtual bool CallProperties(void) override;
 
    virtual void UpdateShowValue(void) override;
    virtual void ConnectionActiveChanged(const bool oq_Active) override;
    virtual void EditModeActiveChanged(const bool oq_Active) override;
+   virtual bool EnableEditContent(void) override;
+   virtual void DisableEditContent(void) override;
+   virtual void ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,
+                                     const bool oq_Active) override;
+
    virtual void HandleManualOperationFinished(const stw_types::sint32 os32_Result,
                                               const stw_types::uint8 ou8_NRC) override;
 
@@ -73,13 +77,15 @@ Q_SIGNALS:
 
 protected:
    virtual bool m_AllowWarningIcon(void) const override;
+   virtual bool m_HasEditContentMode(void) const override;
    virtual bool m_AllowRefreshButton(void) const override;
    virtual QString m_GetCommonToolTipContent(void) const override;
 
 private:
    bool mq_Connected;
-   bool mq_EditActive;
    C_SyvDaItPaWidgetNew * mpc_ParamWidget;
+
+   QAction * mpc_AddDataElement;
 
    stw_types::sint32 m_MapDataElementIndexToInternalElementIndex(const stw_types::uint32 ou32_DataElementIndex,
                                                                  stw_types::uint32 & oru32_InternalElementIndex) const;

@@ -12,11 +12,13 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "TGLUtils.h"
 #include "stwerrors.h"
-#include "C_PuiSvDbWidgetBase.h"
 #include "CSCLChecksums.h"
+#include "C_PuiSvDbWidgetBase.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
@@ -49,7 +51,7 @@ C_PuiSvDbWidgetBase::C_PuiSvDbWidgetBase(void) :
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbWidgetBase::CalcHash(uint32 & oru32_HashValue) const
@@ -69,8 +71,8 @@ void C_PuiSvDbWidgetBase::CalcHash(uint32 & oru32_HashValue) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current index for specified element ID
 
-   \param[in]  orc_Id      Data element id
-   \param[out] oru32_Index Data element index
+   \param[in]   orc_Id        Data element id
+   \param[out]  oru32_Index   Data element index
 
    \return
    C_NO_ERR Data element id found
@@ -96,7 +98,7 @@ sint32 C_PuiSvDbWidgetBase::GetIndex(const C_PuiSvDbNodeDataPoolListElementId & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Remove element from widget
 
-   \param[in] oru32_Index Internal index
+   \param[in]  oru32_Index    Internal index
 
    \retval   C_NO_ERR   Index found
    \retval   C_RANGE    Index not found
@@ -115,4 +117,26 @@ sint32 C_PuiSvDbWidgetBase::RemoveElement(const uint32 & oru32_Index)
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Remove all references to element id
+
+   \param[in]  orc_DataElementId    Data element id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDbWidgetBase::RemoveAllReferencesToElementId(const C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId)
+{
+   for (uint32 u32_It = 0; u32_It < this->c_DataPoolElementsConfig.size();)
+   {
+      const C_PuiSvDbNodeDataElementConfig & rc_Config = this->c_DataPoolElementsConfig[u32_It];
+      if (rc_Config.c_ElementId == orc_DataElementId)
+      {
+         tgl_assert(this->RemoveElement(u32_It) == C_NO_ERR);
+      }
+      else
+      {
+         ++u32_It;
+      }
+   }
 }

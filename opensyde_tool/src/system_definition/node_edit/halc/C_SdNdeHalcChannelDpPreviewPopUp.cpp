@@ -29,7 +29,7 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing = 50;
+const sintn C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING = 50;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -249,10 +249,10 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
 {
    const QString c_Column1HeadingTagStart =
       static_cast<QString>("<td style=\"padding: 30px %1 6px 0px;font-weight: bold;\">").
-      arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
+      arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING);
    const QString c_ColumnContentHeadingTagStart =
       static_cast<QString>("<td style=\"padding: 30px %1 6px %1;font-weight: bold;\">").
-      arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
+      arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING);
    const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
 
    orc_Text += "<h3>";
@@ -487,9 +487,9 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(const stw_scl::C_SCLStrin
                                                        const stw_scl::C_SCLString & orc_VarComment, QString & orc_Text)
 {
    const QString c_Column1TagStart = static_cast<QString>("<td style=\"padding: 0 %1 0 0px;\">").arg(
-      C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
+      C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING);
    const QString c_ColumnContentTagStart = static_cast<QString>(
-      "<td valign=\"middle\" style=\"padding: 0 %1 0 %1;\">").arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TableSpacing);
+      "<td valign=\"middle\" style=\"padding: 0 %1 0 %1;\">").arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING);
 
    orc_Text += "<tr>";
    orc_Text += c_Column1TagStart;

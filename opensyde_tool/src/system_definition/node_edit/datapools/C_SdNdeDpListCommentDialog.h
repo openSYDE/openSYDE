@@ -54,6 +54,7 @@ private:
 
    void m_OkClicked(void);
    void m_CancelClicked(void);
+   void m_CommentConfirmed(void);
 
    //Avoid call
    C_SdNdeDpListCommentDialog(const C_SdNdeDpListCommentDialog &);

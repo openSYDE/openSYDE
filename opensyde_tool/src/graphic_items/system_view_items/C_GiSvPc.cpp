@@ -34,21 +34,21 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_GiSvPc::mhu32_ScaleCategory0 = 3U; // no scaling -> default
-const uint32 C_GiSvPc::mhu32_ScaleCategory1 = 0U;
-const uint32 C_GiSvPc::mhu32_ScaleCategory2 = 1U;
-const uint32 C_GiSvPc::mhu32_ScaleCategory3 = 2U;
+const uint32 C_GiSvPc::mhu32_SCALE_CATEGORY_0 = 3U; // no scaling -> default
+const uint32 C_GiSvPc::mhu32_SCALE_CATEGORY_1 = 0U;
+const uint32 C_GiSvPc::mhu32_SCALE_CATEGORY_2 = 1U;
+const uint32 C_GiSvPc::mhu32_SCALE_CATEGORY_3 = 2U;
 
-const float64 C_GiSvPc::mhaf64_ScaleMinWidthNode[3] =
+const float64 C_GiSvPc::mhaf64_SCALE_MIN_WIDTH_NODE[3] =
 {
    250.0, 350.0, 450.0
 };
-const float64 C_GiSvPc::mhaf64_ScaleMinHeightNode[3] =
+const float64 C_GiSvPc::mhaf64_SCALE_MIN_HEIGHT_NODE[3] =
 {
    165.0, 230.0, 300.0
 };
 
-const stw_types::float64 C_GiSvPc::mhf64_InitSizeOfPc = 150.0;
+const stw_types::float64 C_GiSvPc::mhf64_INIT_SIZE_OF_PC = 150.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -94,15 +94,17 @@ C_GiSvPc::C_GiSvPc(const uint64 ou64_UniqueID, const uint32 ou32_ViewIndex) :
    this->m_DetectIconSize();
    this->m_InitConflictIcon();
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->m_UpdateItems((std::max(mhf64_MinWidthImage, this->mpc_SvgGraphicsItem->f64_Width) - mhf64_MinWidthImage),
-                       (std::max(mhf64_MinHeightImage, this->mpc_SvgGraphicsItem->f64_Height) - mhf64_MinHeightImage),
+   this->m_UpdateItems((std::max(mhf64_MIN_WIDTH_IMAGE, this->mpc_SvgGraphicsItem->f64_Width) - mhf64_MIN_WIDTH_IMAGE),
+                       (std::max(mhf64_MIN_HEIGHT_IMAGE,
+                                 this->mpc_SvgGraphicsItem->f64_Height) - mhf64_MIN_HEIGHT_IMAGE),
                        true);
 
    // Scale the image to a init size and keep the aspect ratio
    c_SizeImage = this->mpc_SvgGraphicsItem->GetSizeRect();
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->ApplySizeChange(QPointF(20.0, 20.0),
-                         QSizeF(mhf64_InitSizeOfPc, c_SizeImage.height() / (c_SizeImage.width() / mhf64_InitSizeOfPc)));
+                         QSizeF(mhf64_INIT_SIZE_OF_PC,
+                                c_SizeImage.height() / (c_SizeImage.width() / mhf64_INIT_SIZE_OF_PC)));
    //lint -e{1566}  no memory leak because of the parent of mpc_ConflictIcon and the Qt memory management
 }
 
@@ -576,16 +578,16 @@ void C_GiSvPc::m_DetectIconSize(void)
 
    switch (u32_ScaleCategory)
    {
-   case mhu32_ScaleCategory0:
+   case mhu32_SCALE_CATEGORY_0:
       this->ms32_IconSize = 24;
       break;
-   case mhu32_ScaleCategory1:
+   case mhu32_SCALE_CATEGORY_1:
       this->ms32_IconSize = 36;
       break;
-   case mhu32_ScaleCategory2:
+   case mhu32_SCALE_CATEGORY_2:
       this->ms32_IconSize = 48;
       break;
-   case mhu32_ScaleCategory3:
+   case mhu32_SCALE_CATEGORY_3:
       this->ms32_IconSize = 72;
       break;
    default:
@@ -635,30 +637,30 @@ void C_GiSvPc::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
 uint32 C_GiSvPc::m_GetScaleCategory(void) const
 {
    const QSizeF c_ActSize = this->mpc_SvgGraphicsItem->boundingRect().size();
-   uint32 u32_ScaleCategory = mhu32_ScaleCategory0;
+   uint32 u32_ScaleCategory = mhu32_SCALE_CATEGORY_0;
 
    // check first scaling
-   if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory1]) &&
-       (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory1]))
+   if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_1]) &&
+       (c_ActSize.height() >= mhaf64_SCALE_MIN_HEIGHT_NODE[mhu32_SCALE_CATEGORY_1]))
    {
       // check second scaling
-      if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory2]) &&
-          (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory2]))
+      if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_2]) &&
+          (c_ActSize.height() >= mhaf64_SCALE_MIN_HEIGHT_NODE[mhu32_SCALE_CATEGORY_2]))
       {
          // check third scaling
-         if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory3]) &&
-             (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory3]))
+         if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_3]) &&
+             (c_ActSize.height() >= mhaf64_SCALE_MIN_HEIGHT_NODE[mhu32_SCALE_CATEGORY_3]))
          {
-            u32_ScaleCategory = mhu32_ScaleCategory3;
+            u32_ScaleCategory = mhu32_SCALE_CATEGORY_3;
          }
          else
          {
-            u32_ScaleCategory = mhu32_ScaleCategory2;
+            u32_ScaleCategory = mhu32_SCALE_CATEGORY_2;
          }
       }
       else
       {
-         u32_ScaleCategory = mhu32_ScaleCategory1;
+         u32_ScaleCategory = mhu32_SCALE_CATEGORY_1;
       }
    }
 

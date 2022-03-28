@@ -264,6 +264,7 @@ bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep o
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
@@ -320,6 +321,7 @@ bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep o
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_START:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_START:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_START:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_START:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FINISHED:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_START:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_START:
@@ -475,6 +477,12 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
       c_Text = "Read Device Information - Flashloader information error";
+      break;
+   case eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_START:
+      c_Text = "Read Device Information - Flashloader security activation state start";
+      break;
+   case eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
+      c_Text = "Read Device Information - Flashloader security activation state error";
       break;
    case eREAD_DEVICE_INFO_FINISHED:
       c_Text = "Read Device Information - Finished";

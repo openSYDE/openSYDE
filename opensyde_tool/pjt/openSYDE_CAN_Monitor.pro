@@ -19,7 +19,9 @@ DESTDIR = ../result/tool/CAN_Monitor
 RC_FILE = ../src/can_monitor/cam_resources.rc
 
 #include relevant openSYDE core modules
+opensyde_core_skip_modules += opensyde_core_skip_zipping
 opensyde_core_skip_modules += opensyde_core_skip_code_generation
+opensyde_core_skip_modules += opensyde_core_skip_protocol_drivers
 include(../libs/opensyde_core/opensyde_core.pri)
 
 SOURCES += \
@@ -653,8 +655,7 @@ INCLUDEPATH += ../src \
                ../libs/gettext \
                ../libs/dbc_driver_library/src \
                ../libs/dbc_driver_library/src/Vector \
-               ../libs/blf_driver_library \
-               ../libs/openssl/include
+               ../libs/blf_driver_library
 
 #do not issue deprecation warnings (tested code can contain deprecated functions which we do want to provide)
 win32-g++ {
@@ -667,9 +668,6 @@ LIBS += -L../libs/gettext -lintl \
 
 LIBS += -lws2_32   #WinSock
 LIBS += -lIphlpapi #IP helper API
-
-#openssl
-LIBS += -L../libs/openssl -lcrypto
 
 #add windows API libraries
 LIBS += -lversion

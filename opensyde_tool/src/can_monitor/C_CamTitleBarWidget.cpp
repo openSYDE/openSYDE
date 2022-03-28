@@ -549,16 +549,16 @@ void C_CamTitleBarWidget::m_SetButtonsText(const bool oq_IconOnly) const
 
    if (oq_IconOnly == true)
    {
-      const uint32 u32_SmallMaximumSize = 34;
+      const uint32 u32_SMALL_MAXIMUM_SIZE = 34;
       this->mpc_Ui->pc_PushButtonNew->setText(C_GtGetText::h_GetText(""));
       this->mpc_Ui->pc_ToolButtonLoad->setText(C_GtGetText::h_GetText(""));
       this->mpc_Ui->pc_PushButtonSaveAs->setText(C_GtGetText::h_GetText(""));
       this->mpc_Ui->pc_PushButtonSave->setText(C_GtGetText::h_GetText(""));
 
-      this->mpc_Ui->pc_PushButtonNew->setMaximumWidth(u32_SmallMaximumSize);
-      this->mpc_Ui->pc_ToolButtonLoad->setMaximumWidth((2 * u32_SmallMaximumSize) + 6);
-      this->mpc_Ui->pc_PushButtonSaveAs->setMaximumWidth(u32_SmallMaximumSize);
-      this->mpc_Ui->pc_PushButtonSave->setMaximumWidth(u32_SmallMaximumSize);
+      this->mpc_Ui->pc_PushButtonNew->setMaximumWidth(u32_SMALL_MAXIMUM_SIZE);
+      this->mpc_Ui->pc_ToolButtonLoad->setMaximumWidth((2 * u32_SMALL_MAXIMUM_SIZE) + 6);
+      this->mpc_Ui->pc_PushButtonSaveAs->setMaximumWidth(u32_SMALL_MAXIMUM_SIZE);
+      this->mpc_Ui->pc_PushButtonSave->setMaximumWidth(u32_SMALL_MAXIMUM_SIZE);
    }
    else
    {

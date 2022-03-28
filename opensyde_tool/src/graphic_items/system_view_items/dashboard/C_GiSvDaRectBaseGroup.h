@@ -52,6 +52,7 @@ public:
 
    virtual void SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style,
                                 const bool oq_DarkMode);
+   virtual void SetDefaultCursor(const QCursor & orc_Value) override;
    virtual void ReInitializeSize(void) = 0;
 
    void LoadSvBasicData(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase & orc_Data);
@@ -64,11 +65,14 @@ public:
       const stw_types::uint8 ou8_ErrorCode);
 
    virtual void UpdateShowValue(void);
-   virtual void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
+   virtual void UpdateTransparency(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
    virtual void ConnectionActiveChanged(const bool oq_Active);
    virtual void EditModeActiveChanged(const bool oq_Active);
    virtual void SendCurrentValue(void);
    virtual bool CallProperties(void);
+   virtual bool EnableEditContent(void);
+   virtual void DisableEditContent(void);
+   bool IsEditContentEnabled(void) const;
    virtual void HandleManualOperationFinished(const stw_types::sint32 os32_Result, const stw_types::uint8 ou8_NRC);
    virtual void SetErrorForInvalidDlc(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ElementId,
                                       const stw_types::uint8 ou8_DLC);
@@ -112,9 +116,11 @@ protected:
    virtual void m_ResizeUpdateItems(const stw_types::float64 of64_DiffWidth, const stw_types::float64 of64_DiffHeight);
    virtual void m_ForceWidgetResize(const QSizeF & orc_NewSize);
 
+   virtual QVariant itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value) override;
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
+   virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void keyReleaseEvent(QKeyEvent * const opc_Event) override;
    virtual void focusOutEvent(QFocusEvent * const opc_Event) override;
@@ -127,6 +133,7 @@ protected:
    virtual bool m_AllowRefreshButton(void) const;
    virtual void m_UpdateErrorIcon(void);
    virtual bool m_AllowWarningIcon(void) const;
+   virtual bool m_HasEditContentMode(void) const;
    virtual QString m_GetCommonToolTipContent(void) const;
 
    C_SyvDaItDashboardBaseWidget * mpc_Widget;
@@ -137,6 +144,8 @@ protected:
    QMap<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId, QString> mc_CommmunicationErrors;
    QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, stw_types::uint8> mc_InvalidDlcSignals;
    bool mq_InitialStyleCall;
+   bool mq_EditModeActive;         // Edit mode of dashboard
+   bool mq_EditContentModeEnabled; // Edit content mode of specific widget
 
 private:
    C_GiWiProxyBase * mpc_ProxyWidget;
@@ -145,11 +154,11 @@ private:
    C_GiSvgGraphicsItem * mpc_RefreshIcon;
    QGraphicsItemGroup * mpc_ButtonGroup;
    stw_types::sint32 ms32_IconSize;
-   static const stw_types::float64 mhf64_ActionPointOffset;
+   static const stw_types::float64 mhf64_ACTION_POINT_OFFSET;
    QSizeF mc_CurrentSize;
    bool mq_ProxyWidgetInteractionActive;
    std::vector<stw_types::sintn> mc_LastTransparencyValue;
-   static const stw_types::uint8 mhu8_StartGreyTimeoutPercentage;
+   static const stw_types::uint8 mhu8_START_GREY_TIMEOUT_PERCENTAGE;
    bool mq_ConnectionActive;
    bool mq_ShowButton;
    bool mq_AbortTriggered;

@@ -13,8 +13,8 @@
    The following elements are calculated into the CRC:
    - names and values of all nodes
    - names and values of all attributes
-   - absolute index of the node (to prevent a potentially theoretical constellation where moving a node in the hierarchy
-                                 might not be detected)
+   - absolute index of the node (to prevent a potential situation where moving a node in the hierarchy might not be
+                                 detected)
 
    The following elements are not calculated into the CRC:
    - XML header tag

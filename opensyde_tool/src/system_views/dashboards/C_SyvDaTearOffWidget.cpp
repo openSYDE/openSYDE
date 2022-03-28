@@ -13,6 +13,7 @@
 #include <QHBoxLayout>
 
 #include "stwerrors.h"
+#include "constants.h"
 #include "C_SyvUtil.h"
 #include "C_OgeWiUtil.h"
 #include "C_PuiSvHandler.h"
@@ -523,8 +524,9 @@ void C_SyvDaTearOffWidget::m_CheckError(void) const
       C_NagToolTip::E_Type e_ToolTipType;
       QString c_IconPath;
       sintn sn_ColorID;
-      const bool q_ViewSetupError = C_SyvUtil::h_GetViewSetupLabelInfo(
-         this->mpc_Dashboard->GetViewIndex(), c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip, e_ToolTipType,
+      const bool q_ViewSetupError = C_SyvUtil::h_GetViewStatusLabelInfo(
+         this->mpc_Dashboard->GetViewIndex(), ms32_SUBMODE_SYSVIEW_DASHBOARD,
+         c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip, e_ToolTipType,
          c_IconPath, sn_ColorID);
 
       if (q_ViewSetupError == true)

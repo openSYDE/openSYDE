@@ -137,15 +137,16 @@ void C_CamDbDbc::FindAllMessages(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Search for a message with this ID, return the first one found
 
-   \param[in]   ou32_Id       CAN ID to search for
-   \param[out]  orc_Message   Found message name (only valid if C_NO_ERR)
+   \param[in]   ou32_Id          CAN ID to search for
+   \param[in]   oq_IsExtended    Is extended
+   \param[out]  orc_Message      Found message name (only valid if C_NO_ERR)
 
    \return
    C_NO_ERR Found at least one matching message
    C_NOACT  No matching message found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, QString & orc_Message) const
+sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtended, QString & orc_Message) const
 {
    sint32 s32_Retval = C_NOACT;
 
@@ -159,7 +160,7 @@ sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, QString & orc_Message) 
            ++u32_ItMessage)
       {
          const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_RxMessages[u32_ItMessage];
-         if (rc_Message.c_CanMessage.u32_CanId == ou32_Id)
+         if ((rc_Message.c_CanMessage.u32_CanId == ou32_Id) && (rc_Message.c_CanMessage.q_IsExtended == oq_IsExtended))
          {
             //Found match
             orc_Message = rc_Message.c_CanMessage.c_Name.c_str();
@@ -171,7 +172,7 @@ sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, QString & orc_Message) 
            ++u32_ItMessage)
       {
          const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_TxMessages[u32_ItMessage];
-         if (rc_Message.c_CanMessage.u32_CanId == ou32_Id)
+         if ((rc_Message.c_CanMessage.u32_CanId == ou32_Id) && (rc_Message.c_CanMessage.q_IsExtended == oq_IsExtended))
          {
             //Found match
             orc_Message = rc_Message.c_CanMessage.c_Name.c_str();
@@ -183,7 +184,7 @@ sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, QString & orc_Message) 
    for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_Data.c_UnmappedMessages.size(); ++u32_ItMessage)
    {
       const C_CieConverter::C_CIENodeMessage & rc_Message = this->mc_Data.c_UnmappedMessages[u32_ItMessage];
-      if (rc_Message.c_CanMessage.u32_CanId == ou32_Id)
+      if ((rc_Message.c_CanMessage.u32_CanId == ou32_Id) && (rc_Message.c_CanMessage.q_IsExtended == oq_IsExtended))
       {
          //Found match
          orc_Message = rc_Message.c_CanMessage.c_Name.c_str();

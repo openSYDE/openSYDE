@@ -20,6 +20,7 @@
 #include "stwerrors.h"
 
 #include "TGLTime.h"
+#include "TGLFile.h"
 
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCComMessageLogger.h"
@@ -223,7 +224,7 @@ void C_OSCComMessageLogger::SetProtocol(const e_CMONL7Protocols oe_Protocol)
 /*! \brief  Adds an openSYDE system definition for analyzing
 
    \param[in]  orc_PathSystemDefinition Path of system definition file (Must be .syde_sysdef)
-   \param[out] orc_Busses               All CAN buses of system definition
+   \param[out] orc_Buses                All CAN buses of system definition
 
    \return
    C_NO_ERR    data read
@@ -236,9 +237,9 @@ void C_OSCComMessageLogger::SetProtocol(const e_CMONL7Protocols oe_Protocol)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDefinition,
-                                           std::vector<C_OSCSystemBus> & orc_Busses)
+                                           std::vector<C_OSCSystemBus> & orc_Buses)
 {
-   return this->AddOsySysDef(orc_PathSystemDefinition, 0xFFFFFFFFUL, orc_Busses);
+   return this->AddOsySysDef(orc_PathSystemDefinition, 0xFFFFFFFFUL, orc_Buses);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -246,7 +247,7 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
 
    \param[in]  orc_PathSystemDefinition Path of system definition file (Must be .syde_sysdef)
    \param[in]  ou32_BusIndex            Bus index of CAN bus of system definition for monitoring
-   \param[out] orc_Busses               All CAN buses of system definition
+   \param[out] orc_Buses               All CAN buses of system definition
 
    \return
    C_NO_ERR    data read
@@ -260,14 +261,17 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDefinition, const uint32 ou32_BusIndex,
-                                           std::vector<C_OSCSystemBus> & orc_Busses)
+                                           std::vector<C_OSCSystemBus> & orc_Buses)
 {
-   C_OSCSystemDefinition c_SysDef;
+   const C_SCLString c_FileExtension = stw_tgl::TGL_ExtractFileExtension(orc_PathSystemDefinition).LowerCase();
    sint32 s32_Return = C_RANGE;
 
-   if (orc_PathSystemDefinition.SubString(orc_PathSystemDefinition.Length() - 11U, 12U).LowerCase() == ".syde_sysdef")
+   if (c_FileExtension == ".syde_sysdef")
    {
+      C_OSCSystemDefinition c_SysDef;
       // Load without device definitions
+      // Optional parameters to skip contents of h_LoadSystemDefinitionFile are not used,
+      // because we are not in SYDEsup or SYDE Coder C context (#61996) and we want all system definition data here.
       s32_Return =
          C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(c_SysDef, orc_PathSystemDefinition, "", false);
       if (s32_Return == C_NO_ERR)
@@ -281,7 +285,7 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
          for (u32_BusCounter = 0U; u32_BusCounter < c_SysDef.c_Buses.size(); ++u32_BusCounter)
          {
             // Return all busses to make sure the index still works
-            orc_Busses.push_back(c_SysDef.c_Buses[u32_BusCounter]);
+            orc_Buses.push_back(c_SysDef.c_Buses[u32_BusCounter]);
 
             // Only CAN buses are relevant
             if (c_SysDef.c_Buses[u32_BusCounter].e_Type == C_OSCSystemBus::eCAN)
@@ -607,6 +611,7 @@ void C_OSCComMessageLogger::RemoveAllFilter(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Returns the current count of filtered CAN messages
 
+   Filtered messages refers to the number of messages that did not pass active filter(s).
    This function is thread safe
 
    \return

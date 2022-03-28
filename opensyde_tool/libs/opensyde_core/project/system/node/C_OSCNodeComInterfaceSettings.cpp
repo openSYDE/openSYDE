@@ -22,6 +22,10 @@ using namespace stw_types;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const stw_types::uint8 C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_FIRST_BYTE = 192U;
+const stw_types::uint8 C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_SECOND_BYTE = 168U;
+const stw_types::uint8 C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_THIRD_BYTE = 0U;
+const stw_types::uint8 C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_FOURTH_BYTE = 2U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -171,8 +175,18 @@ void C_OSCNodeComInterfaceSettings::SetInterfaceConnectedInDevice(const bool oq_
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeComInterfaceSettings::C_IpAddress::C_IpAddress(void)
 {
-   (void)std::memset(&au8_IpAddress[0], 0, sizeof(au8_IpAddress));
-   (void)std::memset(&au8_NetMask[0], 255, sizeof(au8_NetMask));
-   au8_NetMask[3] = 0;
-   (void)std::memset(&au8_DefaultGateway[0], 0, sizeof(au8_DefaultGateway));
+   au8_IpAddress[0] = hu8_IP_FIRST_BYTE;
+   au8_IpAddress[1] = hu8_IP_SECOND_BYTE;
+   au8_IpAddress[2] = hu8_IP_THIRD_BYTE;
+   au8_IpAddress[3] = hu8_IP_FOURTH_BYTE;
+
+   au8_NetMask[0] = 255U;
+   au8_NetMask[1] = 255U;
+   au8_NetMask[2] = 255U;
+   au8_NetMask[3] = 0U;
+
+   au8_DefaultGateway[0] = 0U;
+   au8_DefaultGateway[1] = 0U;
+   au8_DefaultGateway[2] = 0U;
+   au8_DefaultGateway[3] = 0U;
 }

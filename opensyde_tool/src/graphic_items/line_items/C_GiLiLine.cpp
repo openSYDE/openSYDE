@@ -32,7 +32,7 @@ using namespace stw_opensyde_core;
 using namespace stw_types;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::uint8 C_GiLiLine::mhu8_AnimationStepCount = 60;
+const stw_types::uint8 C_GiLiLine::mhu8_ANIMATION_STEP_COUNT = 60;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -270,7 +270,7 @@ void C_GiLiLine::m_UpdateAnimation(void)
    if (this->mc_Points.size() > 0)
    {
       ++this->mu8_AnimationStep;
-      if (this->mu8_AnimationStep >= C_GiLiLine::mhu8_AnimationStepCount)
+      if (this->mu8_AnimationStep >= C_GiLiLine::mhu8_ANIMATION_STEP_COUNT)
       {
          this->mu8_AnimationStep = 0;
       }
@@ -316,11 +316,11 @@ uint8 C_GiLiLine::m_GetAnimationStepCount(void) const
 
    if (this->mq_SpeedUpAnimation == true)
    {
-      u8_Retval = C_GiLiLine::mhu8_AnimationStepCount * 4U;
+      u8_Retval = C_GiLiLine::mhu8_ANIMATION_STEP_COUNT * 4U;
    }
    else
    {
-      u8_Retval = C_GiLiLine::mhu8_AnimationStepCount;
+      u8_Retval = C_GiLiLine::mhu8_ANIMATION_STEP_COUNT;
    }
    return u8_Retval;
 }
@@ -710,7 +710,7 @@ void C_GiLiLine::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsI
          QVector<qreal> c_Pattern;
          float64 f64_Offset;
          QColor c_AnimatedColor;
-         const uint8 u8_AnimationStepCountOverride = C_GiLiLine::mhu8_AnimationStepCount;
+         const uint8 u8_ANIMATION_STEP_COUNT_OVERRIDE = C_GiLiLine::mhu8_ANIMATION_STEP_COUNT;
          const float64 f64_PenWidth = static_cast<float64>(this->GetWidth());
 
          if (this->mq_MiddleLine == true)
@@ -733,13 +733,13 @@ void C_GiLiLine::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsI
          if (this->mq_InverseAnimation == false)
          {
             f64_Offset = static_cast<float64>(this->mu8_AnimationStep) *
-                         ((48.0 / f64_PenWidth) / static_cast<float64>(u8_AnimationStepCountOverride));
+                         ((48.0 / f64_PenWidth) / static_cast<float64>(u8_ANIMATION_STEP_COUNT_OVERRIDE));
          }
          else
          {
-            const uint8 u8_StepsTillFinished = u8_AnimationStepCountOverride - this->mu8_AnimationStep;
+            const uint8 u8_StepsTillFinished = u8_ANIMATION_STEP_COUNT_OVERRIDE - this->mu8_AnimationStep;
             f64_Offset = static_cast<float64>(u8_StepsTillFinished) *
-                         ((48.0 / f64_PenWidth) / static_cast<float64>(u8_AnimationStepCountOverride));
+                         ((48.0 / f64_PenWidth) / static_cast<float64>(u8_ANIMATION_STEP_COUNT_OVERRIDE));
          }
          c_Pen.setDashOffset(f64_Offset);
          c_Pen.setDashPattern(c_Pattern);

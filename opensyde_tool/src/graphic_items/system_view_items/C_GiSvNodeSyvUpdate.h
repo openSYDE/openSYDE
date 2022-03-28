@@ -40,12 +40,16 @@ public:
    virtual ~C_GiSvNodeSyvUpdate();
 
    virtual void SetViewConnected(const bool oq_Connected) override;
+   void SetConnecting(const bool oq_Active);
    void SetConnected(const bool oq_Active);
    void SetUpdating(const bool oq_Active);
    void SetNodeUpdateInProgress(const bool oq_Active, const bool oq_Aborted,
                                 const stw_types::uint32 ou32_FailedApplicationIndex,
                                 const stw_types::uint32 ou32_NodeIndex);
-   void SetNoResponse(const stw_types::uint32 ou32_NodeIndex);
+   void SetNodeError(const stw_types::uint32 ou32_NodeIndex);
+   void SetNodeConnectStates(const std::vector<stw_opensyde_core::C_OSCSuSequencesNodeConnectStates> & orc_NodeStates,
+                             const C_GiSvNodeData::C_GiSvNodeDataPreconditionErrors & orc_NodePreconditionErrors);
+   void SetNodeUpdateStates(const std::vector<stw_opensyde_core::C_OSCSuSequencesNodeUpdateStates> & orc_NodeStates);
    void ShowInfo(void);
    void UpdateInitialPackageStatus(const stw_opensyde_gui_logic::C_SyvUpDeviceInfo & orc_DeviceApplicationInfos,
                                    const stw_types::uint32 ou32_NodeIndex);
@@ -53,7 +57,7 @@ public:
    std::vector<stw_types::uint32> GetAllNotRespondingAndActiveIndices(void) const;
    std::vector<stw_types::uint32> GetAllActiveSTWDeviceIndices(void) const;
    bool IsActiveInView(void) const;
-   bool IsStwDevice(void) const;
+   bool HasNodeAnAvailableFlashloader(void) const;
    void UpdateIcons(void);
 
    virtual void GenerateHint(void) override;

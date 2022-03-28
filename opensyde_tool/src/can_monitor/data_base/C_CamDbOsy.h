@@ -35,7 +35,8 @@ public:
    void SetData(const stw_opensyde_core::C_OSCComMessageLoggerOsySysDefConfig & orc_Data);
 
    void FindAllMessages(void);
-   stw_types::sint32 FindMessageById(const stw_types::uint32 ou32_Id, QString & orc_Message) const;
+   stw_types::sint32 FindMessageById(const stw_types::uint32 ou32_Id, const bool oq_IsExtended,
+                                     QString & orc_Message) const;
    stw_types::sint32 FindMessage(const QString & orc_Message);
 
    bool GetActive(void) const;

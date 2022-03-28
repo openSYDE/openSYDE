@@ -14,6 +14,7 @@
 
 #include "ui_C_SyvSeSetupWidget.h"
 
+#include "constants.h"
 #include "C_SyvUtil.h"
 #include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
@@ -337,7 +338,7 @@ void C_SyvSeSetupWidget::keyPressEvent(QKeyEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::m_ViewChanged(void)
 {
-   Q_EMIT this->SigChanged();
+   Q_EMIT (this->SigChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -359,32 +360,44 @@ void C_SyvSeSetupWidget::m_CheckViewForError(const bool oq_SendError) const
    C_NagToolTip::E_Type e_ToolTipType;
    QString c_IconPath;
    sintn sn_ColorID;
-   const bool q_ViewSetupError = C_SyvUtil::h_GetViewSetupLabelInfo(
-      this->mu32_ViewIndex, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip, e_ToolTipType,
-      c_IconPath, sn_ColorID);
+   const bool q_ViewSetupError = C_SyvUtil::h_GetViewStatusLabelInfo(
+      this->mu32_ViewIndex, ms32_SUBMODE_SYSVIEW_SETUP, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip,
+      e_ToolTipType, c_IconPath, sn_ColorID);
 
    if (q_ViewSetupError == true)
    {
+      QString c_ToolTipHeading;
+
+      if (e_ToolTipType == C_NagToolTip::eERROR)
+      {
+         c_ToolTipHeading = C_GtGetText::h_GetText("Invalid");
+         Q_EMIT (this->SigEnableConfiguration(false));
+      }
+      else
+      {
+         c_ToolTipHeading = C_GtGetText::h_GetText("Note");
+         Q_EMIT (this->SigEnableConfiguration(true));
+      }
+
       this->mpc_Ui->pc_ErrorLabelIcon->SetSvg(c_IconPath);
-      this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
+      this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation(c_ToolTipHeading,
                                                              c_ErrorTextTooltip, e_ToolTipType);
       this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(sn_ColorID);
       this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
-      this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
+      this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation(c_ToolTipHeading,
                                                               c_ErrorTextTooltip, e_ToolTipType);
       this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(sn_ColorID);
       this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip, e_ToolTipType);
       this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
-      Q_EMIT this->SigEnableConfiguration(false);
    }
    else
    {
       this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(false);
-      Q_EMIT this->SigEnableConfiguration(true);
+      Q_EMIT (this->SigEnableConfiguration(true));
    }
    if (oq_SendError == true)
    {
-      Q_EMIT this->SigCheckViewError(this->mu32_ViewIndex);
+      Q_EMIT (this->SigCheckViewError(this->mu32_ViewIndex));
    }
 }
 

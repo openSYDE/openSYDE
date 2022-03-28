@@ -3,7 +3,7 @@ stw_opensyde_gui--C_NagViewList,
 stw_opensyde_gui--C_SyvDcConnectedNodeList,
 stw_opensyde_gui--C_SyvDcExistingNodeList,
 stw_opensyde_gui--C_SdNdeDpSelectorListWidget,
-stw_opensyde_gui--C_SyvUpUpdatePackageListWidget
+stw_opensyde_gui--C_SyvUpPacListWidget
 {
 outline: none;
 }
@@ -21,9 +21,9 @@ stw_opensyde_gui--C_SdNdeDbListWidget::item:hover,
 stw_opensyde_gui--C_SdNdeDpSelectorListWidget,
 stw_opensyde_gui--C_SdNdeDpSelectorListWidget::item:selected,
 stw_opensyde_gui--C_SdNdeDpSelectorListWidget::item:hover,
-stw_opensyde_gui--C_SyvUpUpdatePackageListWidget,
-stw_opensyde_gui--C_SyvUpUpdatePackageListWidget::item:selected,
-stw_opensyde_gui--C_SyvUpUpdatePackageListWidget::item:hover
+stw_opensyde_gui--C_SyvUpPacListWidget,
+stw_opensyde_gui--C_SyvUpPacListWidget::item:selected,
+stw_opensyde_gui--C_SyvUpPacListWidget::item:hover
 {
 border-style: none;
 }

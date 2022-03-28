@@ -203,6 +203,12 @@ const stw_types::uint16 mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION = 5U;
 // File check interval (for e.g.: Update package file check, CAN Monitor database check, ...)
 const stw_types::uint32 mu32_FILE_CHECK_INTERVAL = 500U;
 
+// HTML styling
+const QString mc_REPORT_HEADLINE_HTML_TAG_START = "<h3>";
+const QString mc_REPORT_HEADLINE_HTML_TAG_END = "</h3>";
+const QString mc_REPORT_HIGHLIGHT_TAG_START = "<span style=\" font-weight: bold;\">";
+const QString mc_REPORT_HIGHLIGHT_TAG_END = "</span>";
+
 //User roles
 //----------------------------------------------------------------------------------------------------------------------
 //Generic string for additional information (type: QString)

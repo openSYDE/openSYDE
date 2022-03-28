@@ -35,6 +35,11 @@ public:
       stw_types::uint8 au8_IpAddress[4];      //IP V4 address
       stw_types::uint8 au8_NetMask[4];        //IP V4 net mask
       stw_types::uint8 au8_DefaultGateway[4]; //IP V4 default gateway
+
+      static const stw_types::uint8 hu8_IP_FIRST_BYTE;
+      static const stw_types::uint8 hu8_IP_SECOND_BYTE;
+      static const stw_types::uint8 hu8_IP_THIRD_BYTE;
+      static const stw_types::uint8 hu8_IP_FOURTH_BYTE;
    };
 
    C_OSCNodeComInterfaceSettings(void);

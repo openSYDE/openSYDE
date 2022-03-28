@@ -36,12 +36,12 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SyvDcExistingNodeWidget::mhc_MimeData = "stw_opensyde_connected_node";
-const QString C_SyvDcExistingNodeWidget::mhc_MimeDataExtFormat = "stw_opensyde_connected_node_ext_format";
-const QString C_SyvDcExistingNodeWidget::mhc_MimeDataManufacturerFormat = "stw_opensyde_connected_node_manu_format";
-const QString C_SyvDcExistingNodeWidget::mhc_MimeDataDevice = "stw_opensyde_connected_node_device";
-const QString C_SyvDcExistingNodeWidget::mhc_MimeDataDeviceValid = "stw_opensyde_connected_node_device_valid";
-const QString C_SyvDcExistingNodeWidget::mhc_MimeDataSubNodeIdsToOldNodeIds =
+const QString C_SyvDcExistingNodeWidget::mhc_MIME_DATA = "stw_opensyde_connected_node";
+const QString C_SyvDcExistingNodeWidget::mhc_MIME_DATA_EXT_FORMAT = "stw_opensyde_connected_node_ext_format";
+const QString C_SyvDcExistingNodeWidget::mhc_MIME_DATA_MANUFACTURER_FORMAT = "stw_opensyde_connected_node_manu_format";
+const QString C_SyvDcExistingNodeWidget::mhc_MIME_DATA_DEVICE = "stw_opensyde_connected_node_device";
+const QString C_SyvDcExistingNodeWidget::mhc_MIME_DATA_DEVICE_VALID = "stw_opensyde_connected_node_device_valid";
+const QString C_SyvDcExistingNodeWidget::mhc_MIME_DATA_SUB_NODE_IDS_TO_OLD_NODE_IDS =
    "stw_opensyde_connected_node_subnodeids_to_nodeids";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -293,10 +293,10 @@ void C_SyvDcExistingNodeWidget::dragEnterEvent(QDragEnterEvent * const opc_Event
 {
    const QMimeData * const pc_Mime = opc_Event->mimeData();
 
-   if ((pc_Mime != NULL) && (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeDataDevice) == true))
+   if ((pc_Mime != NULL) && (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_DEVICE) == true))
    {
-      const QString c_DroppedDevice = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataDevice);
-      const QString c_DroppedDeviceValid = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataDeviceValid);
+      const QString c_DroppedDevice = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_DEVICE);
+      const QString c_DroppedDeviceValid = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_DEVICE_VALID);
 
       // Allow only matching devices or devices with unknown device names because of same node ids
       if ((this->mc_DeviceName.compare(c_DroppedDevice) == 0) ||
@@ -321,7 +321,7 @@ void C_SyvDcExistingNodeWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
 {
    const QMimeData * const pc_Mime = opc_Event->mimeData();
 
-   if ((pc_Mime != NULL) && (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeDataDevice) == true))
+   if ((pc_Mime != NULL) && (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_DEVICE) == true))
    {
       opc_Event->acceptProposedAction();
    }
@@ -354,10 +354,10 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
 {
    const QMimeData * const pc_Mime = opc_Event->mimeData();
 
-   if ((pc_Mime != NULL) && (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeDataDevice) == true))
+   if ((pc_Mime != NULL) && (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_DEVICE) == true))
    {
-      const QString c_DroppedDevice = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataDevice);
-      const QString c_DroppedDeviceValid = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataDeviceValid);
+      const QString c_DroppedDevice = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_DEVICE);
+      const QString c_DroppedDeviceValid = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_DEVICE_VALID);
 
       //Disconnect previous one
       if (this->mpc_Ui->pc_WidgetSerialNumber->IsAssigned() == true)
@@ -382,26 +382,26 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
          std::map<uint8, C_SyvDcDeviceOldComConfig> c_SubNodeIdsToOldNodeIds;
 
          //Connect new one
-         if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeData) == true)
+         if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MIME_DATA) == true)
          {
-            c_SerialNumberString = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeData);
+            c_SerialNumberString = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MIME_DATA);
          }
-         if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeDataExtFormat) == true)
+         if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_EXT_FORMAT) == true)
          {
-            const QString c_ExtFormat = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataExtFormat);
+            const QString c_ExtFormat = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_EXT_FORMAT);
             q_ExtFormat = (c_ExtFormat == "1") ? true : false;
          }
-         if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeDataManufacturerFormat) == true)
+         if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_MANUFACTURER_FORMAT) == true)
          {
-            const QString c_ManuFormat = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataManufacturerFormat);
+            const QString c_ManuFormat = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_MANUFACTURER_FORMAT);
             u8_ManufacturerFormat = static_cast<uint8>(c_ManuFormat.toInt());
          }
 
-         if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeDataSubNodeIdsToOldNodeIds) == true)
+         if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MIME_DATA_SUB_NODE_IDS_TO_OLD_NODE_IDS) == true)
          {
             // Get the mapping of sub node ids to the used old node id and if valid the old IP address of the node
             const QString c_StringAllSubNodeIdsToOldNodeIds = pc_Mime->data(
-               C_SyvDcExistingNodeWidget::mhc_MimeDataSubNodeIdsToOldNodeIds);
+               C_SyvDcExistingNodeWidget::mhc_MIME_DATA_SUB_NODE_IDS_TO_OLD_NODE_IDS);
 
             // Parsing of the string. Building of this string is here: C_SyvDcConnectedNodeList::mimeData
             const QStringList c_ListSubNodeIdsToOldNodeIds = c_StringAllSubNodeIdsToOldNodeIds.split(";",
@@ -592,7 +592,7 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcExistingNodeWidget::m_Init(void)
 {
-   const sintn sn_Height = 72;
+   const sintn sn_HEIGHT = 72;
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
    sint32 s32_Return = C_NO_ERR;
@@ -627,7 +627,7 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
                {
                   if (rc_Interface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
                   {
-                     c_Ids += static_cast<QString>(", Node-ID: %1").arg(rc_Interface.u8_NodeID);
+                     c_Ids += static_cast<QString>(", Node ID: %1").arg(rc_Interface.u8_NodeID);
                      c_Ids += " / IP: ";
                      c_Ids += C_Uti::h_IpAddressToString(rc_Interface.c_Ip.au8_IpAddress);
                   }
@@ -640,12 +640,12 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
             }
          }
          //Translation: 1: Node ID
-         this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>(C_GtGetText::h_GetText("Node-ID: %1")).arg(c_Ids));
+         this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>(C_GtGetText::h_GetText("Node ID: %1")).arg(c_Ids));
       }
       else
       {
          //In case of a node squad, no concrete node id or IP address will be showed
-         this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>(C_GtGetText::h_GetText("Node-ID: <multiple>")));
+         this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>(C_GtGetText::h_GetText("Node ID: <multiple>")));
       }
 
       this->mc_DeviceName = pc_Node->pc_DeviceDefinition->c_DeviceName.c_str();
@@ -656,18 +656,18 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
          arg(pc_Node->pc_DeviceDefinition->c_DeviceName.c_str()));
    }
    //Resize
-   this->resize(this->width(), sn_Height);
-   this->setMinimumHeight(sn_Height);
-   this->setMaximumHeight(sn_Height);
+   this->resize(this->width(), sn_HEIGHT);
+   this->setMinimumHeight(sn_HEIGHT);
+   this->setMaximumHeight(sn_HEIGHT);
    if (this->mpc_ListWidgetItem != NULL)
    {
-      this->mpc_ListWidgetItem->setSizeHint(QSize(this->mpc_ListWidgetItem->sizeHint().width(), sn_Height));
+      this->mpc_ListWidgetItem->setSizeHint(QSize(this->mpc_ListWidgetItem->sizeHint().width(), sn_HEIGHT));
    }
    else
    {
       //Adapted for missing borders
-      this->setMinimumHeight(sn_Height);
-      this->setMaximumHeight(sn_Height);
+      this->setMinimumHeight(sn_HEIGHT);
+      this->setMaximumHeight(sn_HEIGHT);
    }
 
    return s32_Return;

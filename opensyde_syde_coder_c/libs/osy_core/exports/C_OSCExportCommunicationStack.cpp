@@ -93,7 +93,7 @@ C_SCLString C_OSCExportCommunicationStack::h_GetConfigurationName(const uint8 ou
 
    \param[in]  ou16_GenCodeVersion  Overall code format version
 
-   \return version of parametrization code
+   \return version of comm code
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint16 C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(const uint16 ou16_GenCodeVersion)
@@ -138,6 +138,7 @@ uint16 C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(const uint16 o
    C_NOACT     Application is not of type ePROGRAMMABLE_APPLICATION or has unknown code structure version
    C_RD_WR     Operation failure: cannot store files
    C_CONFIG    Protocol or Datapool not available in node for interface or application index out of range
+               Message definition does not contain at least one message with signals
    C_RANGE     Application index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -193,21 +194,57 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
 
       if ((pc_ComProtocol != NULL) && (pc_DataPool != NULL))
       {
-         uint32 u32_HashValue = 0U;
-         //calculate hash value over the current state of the Datapool and protocol definitions
-         pc_ComProtocol->CalcHash(u32_HashValue);
-         pc_DataPool->CalcHash(u32_HashValue);
-         const C_SCLString c_ProjectId = C_SCLString::IntToStr(u32_HashValue);
+         //check whether there is at least one message with signals defined; otherwise fail; KFXTCSWRSCC_474
+         bool q_NoSignals = true;
+         const C_OSCCanMessageContainer & rc_Messages = pc_ComProtocol->c_ComMessages[ou8_InterfaceIndex];
 
-         // create header file
-         s32_Retval = mh_CreateHeaderFile(orc_ExportToolInfo, orc_Path, c_Application, *pc_ComProtocol,
-                                          ou8_InterfaceIndex, c_ProjectId);
-
-         // create implementation file
-         if (s32_Retval == C_NO_ERR)
+         for (uint16 u16_MessageIndex = 0U; u16_MessageIndex < rc_Messages.c_TxMessages.size(); u16_MessageIndex++)
          {
-            s32_Retval = mh_CreateImplementationFile(orc_ExportToolInfo, orc_Path, c_Application, *pc_ComProtocol,
-                                                     *pc_DataPool, ou8_InterfaceIndex, c_ProjectId);
+            if (rc_Messages.c_TxMessages[u16_MessageIndex].c_Signals.size() > 0)
+            {
+               q_NoSignals = false;
+               break;
+            }
+         }
+
+         if (q_NoSignals == true)
+         {
+            for (uint16 u16_MessageIndex = 0U; u16_MessageIndex < rc_Messages.c_RxMessages.size(); u16_MessageIndex++)
+            {
+               if (rc_Messages.c_RxMessages[u16_MessageIndex].c_Signals.size() > 0)
+               {
+                  q_NoSignals = false;
+                  break;
+               }
+            }
+         }
+
+         if (q_NoSignals == false)
+         {
+            uint32 u32_HashValue = 0U;
+            //calculate hash value over the current state of the Datapool and protocol definitions
+            pc_ComProtocol->CalcHash(u32_HashValue);
+            pc_DataPool->CalcHash(u32_HashValue);
+            const C_SCLString c_ProjectId = C_SCLString::IntToStr(u32_HashValue);
+
+            // create header file
+            s32_Retval = mh_CreateHeaderFile(orc_ExportToolInfo, orc_Path, c_Application, *pc_ComProtocol,
+                                             ou8_InterfaceIndex, c_ProjectId);
+
+            // create implementation file
+            if (s32_Retval == C_NO_ERR)
+            {
+               s32_Retval = mh_CreateImplementationFile(orc_ExportToolInfo, orc_Path, c_Application, *pc_ComProtocol,
+                                                        *pc_DataPool, ou8_InterfaceIndex, c_ProjectId);
+            }
+         }
+         else
+         {
+            osc_write_log_error("Creating source code",
+                                "No messages with signals exist for specified communication protocol " +
+                                mh_GetProtocolNameByType(
+                                   ore_Protocol) + " for interface index " + C_SCLString::IntToStr(ou8_InterfaceIndex));
+            s32_Retval = C_CONFIG;
          }
       }
       else
@@ -327,13 +364,37 @@ sint32 C_OSCExportCommunicationStack::mh_CreateImplementationFile(const C_SCLStr
          (orc_ComProtocol.c_ComMessages[ou8_InterfaceIndex].c_TxMessages.size() > 0) ? true : false;
       const bool q_RxMessagesPresent =
          (orc_ComProtocol.c_ComMessages[ou8_InterfaceIndex].c_RxMessages.size() > 0) ? true : false;
+      const C_OSCCanMessageContainer & rc_Messages = orc_ComProtocol.c_ComMessages[ou8_InterfaceIndex];
+      bool q_MessageWithoutSignalsPresent = false;
+
+      for (uint16 u16_Message = 0U; u16_Message < rc_Messages.c_TxMessages.size(); u16_Message++)
+      {
+         if (rc_Messages.c_TxMessages[u16_Message].c_Signals.size() == 0)
+         {
+            q_MessageWithoutSignalsPresent = true;
+            break;
+         }
+      }
+
+      if (q_MessageWithoutSignalsPresent == false)
+      {
+         for (uint16 u16_Message = 0U; u16_Message < rc_Messages.c_RxMessages.size(); u16_Message++)
+         {
+            if (rc_Messages.c_RxMessages[u16_Message].c_Signals.size() == 0)
+            {
+               q_MessageWithoutSignalsPresent = true;
+               break;
+            }
+         }
+      }
 
       // add header
       mh_AddHeader(orc_ExportToolInfo, c_Data, ou8_InterfaceIndex, orc_ComProtocol.e_Type, mhq_IS_IMPLEMENTATION_FILE);
 
       // add includes
       mh_AddCIncludes(c_Data, orc_DataPool, ou8_InterfaceIndex, orc_ComProtocol.e_Type,
-                      ((q_RxMessagesPresent == false) || (q_TxMessagesPresent == false)));
+                      ((q_RxMessagesPresent == false) || (q_TxMessagesPresent == false) ||
+                       (q_MessageWithoutSignalsPresent == true)));
 
       // add defines
       mh_AddDefines(c_Data, orc_ComProtocol.c_ComMessages[ou8_InterfaceIndex], ou8_InterfaceIndex,
@@ -837,61 +898,87 @@ void C_OSCExportCommunicationStack::mh_AddSignalDefinitions(C_SCLStringList & or
 {
    for (uint16 u16_MessageIndex = 0U; u16_MessageIndex < orc_Messages.size(); u16_MessageIndex++)
    {
-      bool q_AddNonMux = false;
       const C_OSCCanMessage & rc_Message = orc_Messages[u16_MessageIndex];
 
-      if (ou16_GenCodeVersion >= 2U)
+      //Only create of signal table(s) for messages with signals.
+      //For multiplexed messages we have at least one signal by definition; otherwise it could not be multiplexed.
+      //So the check will cover both types of messages.
+      if (rc_Message.c_Signals.size() > 0)
       {
-         // check for mux messages
-         uint32 u32_MultiplexerIndex;
-         if (rc_Message.IsMultiplexed(&u32_MultiplexerIndex) == true)
+         bool q_AddNonMux = false;
+         if (ou16_GenCodeVersion >= 2U)
          {
-            std::map< sint32, std::vector<C_OSCCanSignal> > c_SignalsPerValue;
-            std::map< sint32, std::vector<C_OSCCanSignal> >::const_iterator c_ItValue;
-
-            // get signals grouped by mux value
-            mh_GroupSignalsByMuxValue(rc_Message, u32_MultiplexerIndex, c_SignalsPerValue);
-
-            // add signal definitions to data string list
-            for (c_ItValue = c_SignalsPerValue.begin(); c_ItValue != c_SignalsPerValue.end(); ++c_ItValue)
+            // check for mux messages
+            uint32 u32_MultiplexerIndex;
+            if (rc_Message.IsMultiplexed(&u32_MultiplexerIndex) == true)
             {
-               // skip no-mux signals
-               if (c_ItValue->first != -1)
+               std::map< sint32, std::vector<C_OSCCanSignal> > c_MuxedSignalsPerValue;
+               std::vector<C_OSCCanSignal> c_NonMuxedSignals;
+
+               // get signals grouped by mux value
+               mh_GroupSignalsByMuxValue(rc_Message, u32_MultiplexerIndex, c_MuxedSignalsPerValue, c_NonMuxedSignals);
+
+               // Special case: Multiplexed message without any multiplexed signals.
+               if (c_MuxedSignalsPerValue.size() == 0) //no muxed signals ...
                {
-                  orc_Data.Append("static const T_osy_com_signal_definition mat_" + rc_Message.c_Name + "Value" +
-                                  C_SCLString::IntToStr(c_ItValue->first) + "[" +
-                                  C_SCLString::IntToStr(c_ItValue->second.size() +
-                                                        c_SignalsPerValue[-1].size()) + "]=");
+                  const C_OSCCanSignal & rc_MultiplexerSignal = rc_Message.c_Signals[u32_MultiplexerIndex];
+                  std::vector<C_OSCCanSignal> c_Signals;
+                  c_Signals.push_back(rc_MultiplexerSignal);
+                  //add non-muxed signals:
+                  c_Signals.insert(c_Signals.end(), c_NonMuxedSignals.begin(), c_NonMuxedSignals.end());
+
+                  orc_Data.Append("static const T_osy_com_signal_definition mat_" + rc_Message.c_Name + "[" +
+                                  C_SCLString::IntToStr(c_Signals.size()) + "] =");
                   orc_Data.Append("{");
-                  // add multiplexer+multiplexed signals
-                  mh_ConvertSignalsToStrings(orc_Data, c_SignalsPerValue[c_ItValue->first], ou32_SignalListIndex,
-                                             (c_SignalsPerValue[-1].size() == 0));
-                  // add fixed signals
-                  mh_ConvertSignalsToStrings(orc_Data, c_SignalsPerValue[-1], ou32_SignalListIndex, true);
+                  // add signals
+                  mh_ConvertSignalsToStrings(orc_Data, c_Signals, ou32_SignalListIndex, true);
                   orc_Data.Append("};");
                   orc_Data.Append("");
                }
+               else
+               {
+                  std::map< sint32, std::vector<C_OSCCanSignal> >::const_iterator c_ItValue;
+
+                  // add signal definitions to data string list
+                  for (c_ItValue = c_MuxedSignalsPerValue.begin(); c_ItValue != c_MuxedSignalsPerValue.end();
+                       ++c_ItValue)
+                  {
+                     orc_Data.Append("static const T_osy_com_signal_definition mat_" + rc_Message.c_Name + "Value" +
+                                     C_SCLString::IntToStr(c_ItValue->first) + "[" +
+                                     C_SCLString::IntToStr(c_ItValue->second.size() +
+                                                           c_NonMuxedSignals.size()) + "] =");
+                     orc_Data.Append("{");
+                     // add multiplexer+multiplexed signals
+                     mh_ConvertSignalsToStrings(orc_Data, c_MuxedSignalsPerValue[c_ItValue->first],
+                                                ou32_SignalListIndex,
+                                                (c_NonMuxedSignals.size() == 0));
+                     // add non-muxed signals
+                     mh_ConvertSignalsToStrings(orc_Data, c_NonMuxedSignals, ou32_SignalListIndex, true);
+                     orc_Data.Append("};");
+                     orc_Data.Append("");
+                  }
+               }
+            }
+            else
+            {
+               q_AddNonMux = true;
             }
          }
          else
          {
             q_AddNonMux = true;
          }
-      }
-      else
-      {
-         q_AddNonMux = true;
-      }
 
-      // add messages without mux
-      if (q_AddNonMux == true)
-      {
-         orc_Data.Append("static const T_osy_com_signal_definition mat_" + rc_Message.c_Name +
-                         "[" + C_SCLString::IntToStr(rc_Message.c_Signals.size()) + "] =");
-         orc_Data.Append("{");
-         mh_ConvertSignalsToStrings(orc_Data, rc_Message.c_Signals, ou32_SignalListIndex, true);
-         orc_Data.Append("};");
-         orc_Data.Append("");
+         // add messages without mux
+         if (q_AddNonMux == true)
+         {
+            orc_Data.Append("static const T_osy_com_signal_definition mat_" + rc_Message.c_Name +
+                            "[" + C_SCLString::IntToStr(rc_Message.c_Signals.size()) + "] =");
+            orc_Data.Append("{");
+            mh_ConvertSignalsToStrings(orc_Data, rc_Message.c_Signals, ou32_SignalListIndex, true);
+            orc_Data.Append("};");
+            orc_Data.Append("");
+         }
       }
    }
 }
@@ -925,37 +1012,62 @@ void C_OSCExportCommunicationStack::mh_AddMessageMuxDefinitions(C_SCLStringList 
       if (rc_Message.IsMultiplexed(&u32_MultiplexerIndex) == true)
       {
          // mux message: add entry for every mux value
-         std::map< sint32, std::vector<C_OSCCanSignal> > c_SignalsPerValue;
-         std::map< sint32, std::vector<C_OSCCanSignal> >::const_iterator c_ItValue;
-         uint16 u16_MuxCount = 0;
+         std::map< sint32, std::vector<C_OSCCanSignal> > c_MuxedSignalsPerValue;
+         std::vector<C_OSCCanSignal> c_NonMuxedSignals;
 
          // get signals grouped by mux value
-         mh_GroupSignalsByMuxValue(rc_Message, u32_MultiplexerIndex, c_SignalsPerValue);
+         mh_GroupSignalsByMuxValue(rc_Message, u32_MultiplexerIndex, c_MuxedSignalsPerValue, c_NonMuxedSignals);
 
-         // add signal definitions to data string list
-         for (c_ItValue = c_SignalsPerValue.begin(); c_ItValue != c_SignalsPerValue.end(); ++c_ItValue)
+         // Special case: Multiplexed message without any multiplexed signals. Add dummy-mux value "0".
+         if (c_MuxedSignalsPerValue.size() == 0) //no muxed signals ...
          {
-            // skip no-mux signals
-            if (c_ItValue->first != -1)
+            c_Text = "   { 0U, " + C_SCLString::IntToStr(1U + c_NonMuxedSignals.size()) + "U, " +
+                     "&mat_" + rc_Message.c_Name + "[0] }";
+            if (u16_MessageIndex != (u16_MessageCount - 1U))
+            {
+               c_Text += ",";
+            }
+            orc_Data.Append(c_Text);
+         }
+         else
+         {
+            uint16 u16_MuxCount = 0;
+            std::map< sint32, std::vector<C_OSCCanSignal> >::const_iterator c_ItValue;
+
+            // add signal definitions to data string list
+            for (c_ItValue = c_MuxedSignalsPerValue.begin(); c_ItValue != c_MuxedSignalsPerValue.end(); ++c_ItValue)
             {
                c_Text = "   { " + C_SCLString::IntToStr(c_ItValue->first) + "U, " +
-                        C_SCLString::IntToStr(c_ItValue->second.size() + c_SignalsPerValue[-1].size()) + "U, " +
+                        C_SCLString::IntToStr(c_ItValue->second.size() + c_NonMuxedSignals.size()) + "U, " +
                         "&mat_" + rc_Message.c_Name + "Value" + C_SCLString::IntToStr(c_ItValue->first) + "[0] }";
                if ((u16_MessageIndex != (u16_MessageCount - 1U)) ||
-                   (u16_MuxCount != static_cast<uint16>((c_SignalsPerValue.size() - 1))))
+                   (u16_MuxCount != static_cast<uint16>((c_MuxedSignalsPerValue.size() - 1))))
                {
                   c_Text += ",";
                }
                orc_Data.Append(c_Text);
+               u16_MuxCount++;
             }
-            u16_MuxCount++;
          }
       }
       else
       {
+         //if number of signals is zero then add NULL instead of pointer to the signal table
+         //muxed message cannot have zero signals so this only affects non-muxed messages
+         const uint16 u16_NumberOfSignals = static_cast<uint16>(rc_Message.c_Signals.size());
+         C_SCLString c_SignalTable;
+
+         if (u16_NumberOfSignals == 0U)
+         {
+            c_SignalTable = "NULL";
+         }
+         else
+         {
+            c_SignalTable = "&mat_" + rc_Message.c_Name + "[0]";
+         }
+
          // no mux message: add one entry
-         c_Text = "   { 0U, " + C_SCLString::IntToStr(rc_Message.c_Signals.size()) + "U, " + "&mat_" +
-                  rc_Message.c_Name + "[0] }";
+         c_Text = "   { 0U, " + C_SCLString::IntToStr(u16_NumberOfSignals) + "U, " + c_SignalTable + " }";
          if (u16_MessageIndex != (u16_MessageCount - 1U))
          {
             c_Text += ",";
@@ -1089,8 +1201,21 @@ void C_OSCExportCommunicationStack::mh_AddMessageDefinitions(C_SCLStringList & o
       }
       else
       {
+         //if number of signals is zero then add NULL instead of pointer to the signal table
+         const uint16 u16_NumberOfSignals = static_cast<uint16>(rc_Message.c_Signals.size());
+         C_SCLString c_SignalTable;
+
+         if (u16_NumberOfSignals == 0U)
+         {
+            c_SignalTable = "NULL";
+         }
+         else
+         {
+            c_SignalTable = "&mat_" + rc_Message.c_Name + "[0]";
+         }
+
          c_Text += C_SCLString::IntToStr(u32_MessageCounterGap) + "U, " + //message counter gap
-                   "&mat_" + rc_Message.c_Name + "[0] }";                 // pointer to signals
+                   c_SignalTable + " }";                                  // pointer to signals
       }
 
       if (u16_MessageIndex != (u16_MessageCount - 1U))
@@ -1117,6 +1242,7 @@ void C_OSCExportCommunicationStack::mh_AddMessageDefinitions(C_SCLStringList & o
    If a message is not multiplexed, count it as one. If it is multiplexed count number of multiplexed messages
    corresponding to this message, i.e. number of multiplex values. If the message has a multiplexer signal and
    therefore is multiplexed, but has no multiplexed signal at all, also count with one.
+   See KFXTCSWRSCC_380.
 
    \param[in]  orc_Messages   Original messages
 
@@ -1182,6 +1308,7 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetProtocolNameByType(const C_OSCC
       c_Name = "eces";
       break;
    default:
+      tgl_assert(false);
       break;
    }
 
@@ -1211,6 +1338,7 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetByteOrderNameByType(
       c_Name = "OSY_COM_BYTE_ORDER_BIG";
       break;
    default:
+      tgl_assert(false);
       break;
    }
 
@@ -1243,6 +1371,7 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetTransmissionTriggerNameByType(
       c_Name = "OSY_COM_COMM_METHOD_ON_EVENT";
       break;
    default:
+      tgl_assert(false);
       break;
    }
 
@@ -1309,18 +1438,19 @@ void C_OSCExportCommunicationStack::mh_ConvertSignalsToStrings(C_SCLStringList &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Group signals by multiplex value
 
-   Sort all signals of the given message into vectors. There is one vector for each multiplex value and besides
-   one vector to key -1, holding all non-mux signals. The first entry in mux case is always the multiplexer signal
-   itself.
+   Sort all signals of the given message into vectors. There is one vector for each multiplex value and one separate
+    vector holding all non-mux signals. The first entry in mux case is always the multiplexer signal itself.
 
-   \param[in]   orc_Message            CAN message data for signal information
-   \param[in]   ou32_MultiplexerIndex  Index of multiplexer signal in orc_Message
-   \param[out]  orc_SignalsPerValue    Signals sorted by multiplexer values (see description)
+   \param[in]   orc_Message              CAN message data for signal information
+   \param[in]   ou32_MultiplexerIndex    Index of multiplexer signal in orc_Message
+   \param[out]  orc_MuxedSignalsPerValue Signals sorted by multiplexer values (see description)
+   \param[out]  orc_NonMuxedSignals      Non-multiplexed signals in the message
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_GroupSignalsByMuxValue(const C_OSCCanMessage & orc_Message,
                                                               const uint32 ou32_MultiplexerIndex, std::map<sint32,
-                                                                                                           std::vector<C_OSCCanSignal> > & orc_SignalsPerValue)
+                                                                                                           std::vector<C_OSCCanSignal> > & orc_MuxedSignalsPerValue,
+                                                              std::vector<C_OSCCanSignal> & orc_NonMuxedSignals)
 {
    if (ou32_MultiplexerIndex < orc_Message.c_Signals.size())
    {
@@ -1332,7 +1462,7 @@ void C_OSCExportCommunicationStack::mh_GroupSignalsByMuxValue(const C_OSCCanMess
       for (c_ItValue = c_MultiplexValues.begin(); c_ItValue != c_MultiplexValues.end(); ++c_ItValue)
       {
          // add multiplexer signal of every multiplexer-value-group; must be first entry!
-         orc_SignalsPerValue[*c_ItValue].push_back(rc_MultiplexerSignal);
+         orc_MuxedSignalsPerValue[*c_ItValue].push_back(rc_MultiplexerSignal);
       }
 
       for (uint8 u8_SignalIndex = 0U; u8_SignalIndex < static_cast<uint8>(orc_Message.c_Signals.size());
@@ -1342,17 +1472,18 @@ void C_OSCExportCommunicationStack::mh_GroupSignalsByMuxValue(const C_OSCCanMess
          switch (rc_Signal.e_MultiplexerType)
          {
          case C_OSCCanSignal::eMUX_DEFAULT:
-            orc_SignalsPerValue[-1].push_back(rc_Signal);
+            orc_NonMuxedSignals.push_back(rc_Signal);
             break;
          case C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL:
             // signal was already added to every vector
             break;
          case C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL:
             // if key does not already exist something went really wrong
-            tgl_assert(orc_SignalsPerValue.count(rc_Signal.u16_MultiplexValue) == 1);
-            orc_SignalsPerValue[rc_Signal.u16_MultiplexValue].push_back(rc_Signal);
+            tgl_assert(orc_MuxedSignalsPerValue.count(rc_Signal.u16_MultiplexValue) == 1);
+            orc_MuxedSignalsPerValue[rc_Signal.u16_MultiplexValue].push_back(rc_Signal);
             break;
          default:
+            tgl_assert(false);
             break;
          }
       }

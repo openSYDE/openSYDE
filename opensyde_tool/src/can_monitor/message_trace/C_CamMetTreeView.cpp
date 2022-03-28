@@ -588,9 +588,9 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
    // Adapt the color
    QPen c_Pen = opc_Painter->pen();
    const QPoint c_TopLeft = orc_Rect.topLeft();
-   const sintn sn_OffsetL1 = 10;
-   const sintn sn_OffsetL2 = 30;
-   const sintn sn_OffsetL3 = 50;
+   const sintn sn_OFFSET_L1 = 10;
+   const sintn sn_OFFSET_L2 = 30;
+   const sintn sn_OFFSET_L3 = 50;
 
    c_Pen.setColor(mc_STYLE_GUIDE_COLOR_10);
    c_Pen.setWidth(1);
@@ -610,12 +610,12 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
          if (c_MessageIndex.sibling(c_MessageIndex.row() + 1, 0).isValid())
          {
             //Draw +
-            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OffsetL1);
+            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OFFSET_L1);
          }
          else
          {
             //Draw L
-            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OffsetL1);
+            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OFFSET_L1);
          }
       }
    }
@@ -625,7 +625,7 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
       //Draw |
       if (c_MessageIndex.sibling(c_MessageIndex.row() + 1, 0).isValid())
       {
-         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OffsetL1);
+         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OFFSET_L1);
       }
    }
    else
@@ -634,7 +634,7 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
       //Draw |
       if (c_MessageIndex.sibling(c_MessageIndex.row() + 1, 0).isValid())
       {
-         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OffsetL1);
+         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OFFSET_L1);
       }
    }
    //Signal
@@ -644,7 +644,7 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
       //Draw |
       if (c_SignalIndex.sibling(c_SignalIndex.row() + 1, 0).isValid())
       {
-         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OffsetL2);
+         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OFFSET_L2);
       }
    }
    else if (orc_Index.parent().isValid())
@@ -659,12 +659,12 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
          if (c_SignalIndex.sibling(c_SignalIndex.row() + 1, 0).isValid())
          {
             //Draw +
-            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OffsetL2);
+            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OFFSET_L2);
          }
          else
          {
             //Draw L
-            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OffsetL2);
+            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OFFSET_L2);
          }
       }
    }
@@ -685,12 +685,12 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
          if (c_MuxIndex.sibling(c_MuxIndex.row() + 1, 0).isValid())
          {
             //Draw +
-            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OffsetL3);
+            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OFFSET_L3);
          }
          else
          {
             //Draw L
-            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OffsetL3);
+            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OFFSET_L3);
          }
       }
    }
@@ -714,7 +714,7 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
 sintn C_CamMetTreeView::sizeHintForColumn(const sintn osn_Column) const
 {
    sintn sn_Size;
-   static const sintn hasn_Sizes[static_cast<sintn>(C_CamMetTreeModel::eCAN_COUNTER) + 1] =
+   static const sintn hasn_SIZES[static_cast<sintn>(C_CamMetTreeModel::eCAN_COUNTER) + 1] =
    {
       mhsn_COL_WIDTH_TIME_STAMP,
       mhsn_COL_WIDTH_CAN_ID,
@@ -727,7 +727,7 @@ sintn C_CamMetTreeView::sizeHintForColumn(const sintn osn_Column) const
 
    if ((osn_Column <= static_cast<sintn>(C_CamMetTreeModel::eCAN_COUNTER)) && (osn_Column >= 0))
    {
-      sn_Size = hasn_Sizes[osn_Column];
+      sn_Size = hasn_SIZES[osn_Column];
    }
    else
    {
@@ -1000,14 +1000,14 @@ void C_CamMetTreeView::m_SetAllChildren(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_RepositionButtons(void)
 {
-   const QSize c_ButtonSizeUp(17, 46);
-   const QSize c_ButtonSizeDown(17, 17);
+   const QSize c_BUTTON_SIZE_UP(17, 46);
+   const QSize c_BUTTON_SIZE_DOWN(17, 17);
 
    //Position
-   this->mpc_PushButtonScrollTop->setGeometry(QRect(QPoint(0, 0), c_ButtonSizeUp));
+   this->mpc_PushButtonScrollTop->setGeometry(QRect(QPoint(0, 0), c_BUTTON_SIZE_UP));
    this->mpc_PushButtonScrollBottom->setGeometry(QRect(QPoint(0,
                                                               this->verticalScrollBar()->height() -
-                                                              c_ButtonSizeDown.height()), c_ButtonSizeDown));
+                                                              c_BUTTON_SIZE_DOWN.height()), c_BUTTON_SIZE_DOWN));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

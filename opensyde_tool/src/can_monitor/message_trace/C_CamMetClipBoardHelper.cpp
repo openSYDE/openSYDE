@@ -64,19 +64,19 @@ void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, con
                                                  const bool oq_DisplayTimestampAbsoluteTimeOfDay,
                                                  const std::vector<C_CamMetClipBoardHelperCanMessageData> & orc_MessageData)
 {
-   const sintn sn_WidthInitial = 4;
-   const sintn sn_WidthTime = 25;
-   const sintn sn_WidthID = 12;
-   const sintn sn_WidthName = 40;
-   const sintn sn_WidthDir = 12;
-   const sintn sn_WidthDLC = 12;
-   const sintn sn_WidthData = 34;
+   const sintn sn_WIDTH_INITIAL = 4;
+   const sintn sn_WIDTH_TIME = 25;
+   const sintn sn_WIDTH_ID = 12;
+   const sintn sn_WIDTH_NAME = 40;
+   const sintn sn_WIDTH_DIR = 12;
+   const sintn sn_WIDTH_DLC = 12;
+   const sintn sn_WIDTH_DATA = 34;
    QString c_Text;
    uint32 u32_CounterMessage;
 
    //Build header
-   C_CamMetClipBoardHelper::mh_AddHeader(c_Text, sn_WidthInitial, sn_WidthTime, sn_WidthID, sn_WidthName, sn_WidthDir,
-                                         sn_WidthDLC, sn_WidthData);
+   C_CamMetClipBoardHelper::mh_AddHeader(c_Text, sn_WIDTH_INITIAL, sn_WIDTH_TIME, sn_WIDTH_ID, sn_WIDTH_NAME,
+                                         sn_WIDTH_DIR, sn_WIDTH_DLC, sn_WIDTH_DATA);
 
    for (u32_CounterMessage = 0U; u32_CounterMessage < orc_MessageData.size(); ++u32_CounterMessage)
    {
@@ -86,8 +86,8 @@ void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, con
       {
          C_CamMetClipBoardHelper::mh_AddMessage(c_Text, *pc_Data, orc_MessageData[u32_CounterMessage].q_Extended,
                                                 oq_DisplayAsHex, oq_DisplayTimestampRelative,
-                                                oq_DisplayTimestampAbsoluteTimeOfDay, sn_WidthInitial, sn_WidthTime,
-                                                sn_WidthID, sn_WidthName, sn_WidthDir, sn_WidthDLC, sn_WidthData,
+                                                oq_DisplayTimestampAbsoluteTimeOfDay, sn_WIDTH_INITIAL, sn_WIDTH_TIME,
+                                                sn_WIDTH_ID, sn_WIDTH_NAME, sn_WIDTH_DIR, sn_WIDTH_DLC, sn_WIDTH_DATA,
                                                 orc_MessageData[u32_CounterMessage].c_ExpandedIndices);
       }
    }

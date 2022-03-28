@@ -24,17 +24,17 @@ using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // Configuration for dynamic transparency color configuration of elements
-const std::vector<QString> C_CamUtiStyleSheets::mhc_ScrollAreaElements(
+const std::vector<QString> C_CamUtiStyleSheets::mhc_SCROLL_AREA_ELEMENTS(
 {
 }
    );
-const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyleSheets::mhc_ScrollAreaProperties(
+const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyleSheets::mhc_SCROLL_AREA_PROPERTIES(
 {
    C_CamUtiStyleSheets::C_PropertyValueColorConfig("", "background-color", static_cast<QColor>(Qt::transparent))
 }
    );
 
-const std::vector<QString> C_CamUtiStyleSheets::mhc_ScrollBarElementsBright(
+const std::vector<QString> C_CamUtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_BRIGHT(
 {
    "stw_opensyde_gui--C_CamGenTableView QScrollBar",
    "stw_opensyde_gui--C_CamGenSigTableView QScrollBar",
@@ -44,7 +44,7 @@ const std::vector<QString> C_CamUtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar"
 }
    );
-const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyleSheets::mhc_ScrollBarPropertiesBright(
+const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_BRIGHT(
 {
    C_CamUtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color",
                                                    static_cast<QColor>(Qt::transparent)),
@@ -65,12 +65,12 @@ const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyle
    C_CamUtiStyleSheets::C_PropertyValueColorConfig("::sub-page", "border-color", mc_STYLE_GUIDE_COLOR_11)
 }
    );
-const std::vector<QString> C_CamUtiStyleSheets::mhc_ScrollBarElementsDark(
+const std::vector<QString> C_CamUtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_DARK(
 {
    // insert dark scroll bar here
 }
    );
-const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyleSheets::mhc_ScrollBarPropertiesDark(
+const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_DARK(
 {
    C_CamUtiStyleSheets::C_PropertyValueColorConfig(":vertical", "background-color",
                                                    static_cast<QColor>(Qt::transparent)),
@@ -113,8 +113,8 @@ QString C_CamUtiStyleSheets::h_GetStylesheet(void)
 {
    QString c_Stylesheet;
 
-   mh_AppendScrollBarStyleSheet(C_CamUtiStyleSheets::mhc_ScrollAreaElements,
-                                C_CamUtiStyleSheets::mhc_ScrollAreaProperties, c_Stylesheet);
+   mh_AppendScrollBarStyleSheet(C_CamUtiStyleSheets::mhc_SCROLL_AREA_ELEMENTS,
+                                C_CamUtiStyleSheets::mhc_SCROLL_AREA_PROPERTIES, c_Stylesheet);
 
    mh_AppendStylesheet("://styles/Color.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/Font.qss", c_Stylesheet);
@@ -185,10 +185,10 @@ void C_CamUtiStyleSheets::mh_AppendDynamicStylesheet(QString & orc_Stylesheet)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamUtiStyleSheets::mh_AppendScrollBarStyleSheets(QString & orc_Stylesheet)
 {
-   mh_AppendScrollBarStyleSheet(C_CamUtiStyleSheets::mhc_ScrollBarElementsDark,
-                                C_CamUtiStyleSheets::mhc_ScrollBarPropertiesDark, orc_Stylesheet);
-   mh_AppendScrollBarStyleSheet(C_CamUtiStyleSheets::mhc_ScrollBarElementsBright,
-                                C_CamUtiStyleSheets::mhc_ScrollBarPropertiesBright, orc_Stylesheet);
+   mh_AppendScrollBarStyleSheet(C_CamUtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_DARK,
+                                C_CamUtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_DARK, orc_Stylesheet);
+   mh_AppendScrollBarStyleSheet(C_CamUtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_BRIGHT,
+                                C_CamUtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_BRIGHT, orc_Stylesheet);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

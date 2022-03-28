@@ -26,7 +26,6 @@ namespace stw_opensyde_core
 class C_OSCSystemFilerUtil
 {
 public:
-   C_OSCSystemFilerUtil(void);
    static stw_scl::C_SCLString h_BusTypeEnumToString(const C_OSCSystemBus::E_Type oe_Type);
    static stw_types::sint32 h_BusTypeStringToEnum(const stw_scl::C_SCLString & orc_Type,
                                                   C_OSCSystemBus::E_Type & ore_Type);

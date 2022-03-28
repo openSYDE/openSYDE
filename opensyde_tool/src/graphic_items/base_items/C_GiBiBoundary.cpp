@@ -31,10 +31,10 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 mf64_ActionPointOffsetBoundary = 8.0;
+const float64 mf64_ACTION_POINT_OFFSET_BOUNDARY = 8.0;
 
-const float64 C_GiBiBoundary::mhf64_MinWidthBoundary = 50.0;
-const float64 C_GiBiBoundary::mhf64_MinHeightBoundary = 50.0;
+const float64 C_GiBiBoundary::mhf64_MIN_WIDTH_BOUNDARY = 50.0;
+const float64 C_GiBiBoundary::mhf64_MIN_HEIGHT_BOUNDARY = 50.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -61,13 +61,13 @@ C_GiBiBoundary::C_GiBiBoundary(const uint64 & oru64_ID, const float64 of64_Width
                                QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiBiRectBaseGroup(oru64_ID,
-                       mhf64_MinWidthBoundary, mhf64_MinHeightBoundary, mf64_ActionPointOffsetBoundary, false,
+                       mhf64_MIN_WIDTH_BOUNDARY, mhf64_MIN_HEIGHT_BOUNDARY, mf64_ACTION_POINT_OFFSET_BOUNDARY, false,
                        opc_Parent)
 {
    //lint -e{1938}  static const is guaranteed preinitialized before main
    const QRectF c_Rect = QRectF(0.0, 0.0,
-                                std::max(mhf64_MinWidthBoundary, of64_Width),
-                                std::max(mhf64_MinHeightBoundary, of64_Height));
+                                std::max(mhf64_MIN_WIDTH_BOUNDARY, of64_Width),
+                                std::max(mhf64_MIN_HEIGHT_BOUNDARY, of64_Height));
    QPen c_Pen;
    QBrush c_Brush;
 

@@ -141,16 +141,16 @@ sint32 C_OSCExportParamSet::h_CreateParameterSetImage(const C_SCLString & orc_Pa
    {
       if (orc_Node.c_HALCConfig.e_SafetyMode != C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
       {
-         const bool q_IsSafe = true;
+         const bool q_IS_SAFE = true;
          C_OSCParamSetRawNode c_RawNodeSafe;
          C_OSCParamSetInterpretedNode c_IntNodeSafe;
 
-         s32_Retval = mh_FillPsiStructure(orc_Node, q_IsSafe, ou16_ApplicationIndex, c_RawNodeSafe, c_IntNodeSafe);
+         s32_Retval = mh_FillPsiStructure(orc_Node, q_IS_SAFE, ou16_ApplicationIndex, c_RawNodeSafe, c_IntNodeSafe);
 
          if (s32_Retval == C_NO_ERR)
          {
             s32_Retval = C_OSCExportParamSet::mh_WriteParameterSetImage(
-               c_RawNodeSafe, c_IntNodeSafe, q_IsSafe, rc_Application, orc_Path, orc_Files,
+               c_RawNodeSafe, c_IntNodeSafe, q_IS_SAFE, rc_Application, orc_Path, orc_Files,
                orc_ExportToolName, orc_ExportToolVersion);
          }
       }
@@ -161,17 +161,17 @@ sint32 C_OSCExportParamSet::h_CreateParameterSetImage(const C_SCLString & orc_Pa
    {
       if (orc_Node.c_HALCConfig.e_SafetyMode != C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE)
       {
-         const bool q_IsSafe = false;
+         const bool q_IS_SAFE = false;
          C_OSCParamSetRawNode c_RawNodeNonSafe;
          C_OSCParamSetInterpretedNode c_IntNodeNonSafe;
 
          s32_Retval =
-            mh_FillPsiStructure(orc_Node, q_IsSafe, ou16_ApplicationIndex, c_RawNodeNonSafe, c_IntNodeNonSafe);
+            mh_FillPsiStructure(orc_Node, q_IS_SAFE, ou16_ApplicationIndex, c_RawNodeNonSafe, c_IntNodeNonSafe);
 
          if (s32_Retval == C_NO_ERR)
          {
             s32_Retval = C_OSCExportParamSet::mh_WriteParameterSetImage(
-               c_RawNodeNonSafe, c_IntNodeNonSafe, q_IsSafe, rc_Application, orc_Path, orc_Files,
+               c_RawNodeNonSafe, c_IntNodeNonSafe, q_IS_SAFE, rc_Application, orc_Path, orc_Files,
                orc_ExportToolName, orc_ExportToolVersion);
          }
       }
@@ -276,7 +276,7 @@ void C_OSCExportParamSet::mh_FillInterpretedDatapool(const C_OSCNodeDataPool & o
    orc_SdDataPool.CalcDefinitionHash(orc_IntDataPool.c_DataPoolInfo.u32_DataPoolCrc);
    orc_IntDataPool.c_DataPoolInfo.u32_NvMStartAddress = orc_SdDataPool.u32_NvMStartAddress;
    orc_IntDataPool.c_DataPoolInfo.u32_NvMSize = orc_SdDataPool.u32_NvMSize;
-   memcpy(orc_IntDataPool.c_DataPoolInfo.au8_Version, orc_SdDataPool.au8_Version, 3);
+   (void)memcpy(&orc_IntDataPool.c_DataPoolInfo.au8_Version[0], &orc_SdDataPool.au8_Version[0], 3);
 
    // Add all lists
    for (uint16 u16_ListIndex = 0U; u16_ListIndex < orc_SdDataPool.c_Lists.size(); u16_ListIndex++)

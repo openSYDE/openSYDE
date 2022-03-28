@@ -125,8 +125,8 @@ private:
    // drawing background
    bool mq_SubtleSurroundGradient;
    bool mq_DrawBackground;
-   static const QColor mhc_GradientColorLight;
-   static const QColor mhc_GradientColorDark;
+   static const QColor mhc_GRADIENT_COLOR_LIGHT;
+   static const QColor mhc_GRADIENT_COLOR_DARK;
 
    // tool tip
    C_NagToolTip mc_ToolTip;

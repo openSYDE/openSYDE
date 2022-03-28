@@ -124,22 +124,55 @@ C_SyvDaDashboardScene::~C_SyvDaDashboardScene(void)
 bool C_SyvDaDashboardScene::IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc_ScenePos)
 {
    bool q_Return = false;
+   const QList<QGraphicsItem *> & rc_Items = this->items();
 
-   if (this->mq_EditMode == false)
+   // update the items
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
    {
-      const QList<QGraphicsItem *> & rc_Items = this->items();
-
-      // update the items
-      for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
+      C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
+      if (pc_Item != NULL)
       {
-         C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
-         if (pc_Item != NULL)
+         if ((this->mq_EditMode == false) ||
+             (pc_Item->IsEditContentEnabled() == true))
          {
             q_Return = pc_Item->IsMousePosRelevantForProxyWidgetInteraction(orc_ScenePos);
             if (q_Return == true)
             {
                break;
             }
+         }
+      }
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Checks if the current selection is relevant for the proxy widget
+
+   In base is no item relevant. Function returns always false.
+   Derived classes must overwrite the function if needed.
+
+   \return
+   true     Selection is on a relevant position
+   false    Selection is not on a relevant position
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaDashboardScene::IsSelectionRelevantForProxyWidgetInteraction(void) const
+{
+   bool q_Return = false;
+   const QList<QGraphicsItem *> & rc_Items = this->items();
+
+   // update the items
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
+   {
+      C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
+      if (pc_Item != NULL)
+      {
+         q_Return = pc_Item->IsEditContentEnabled();
+         if (q_Return == true)
+         {
+            break;
          }
       }
    }
@@ -600,37 +633,34 @@ void C_SyvDaDashboardScene::CopyFromManagerToScene(const QPointF * const opc_Pos
 
    const C_SyvDaDashboardSnapshot * const pc_SnapShot =
       dynamic_cast<const C_SyvDaDashboardSnapshot * const>(pc_Data);
+   const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
+              C_PuiSvReadDataConfiguration> * const pc_Rails = this->mc_CopyPasteManager.GetRails();
 
-   if (pc_SnapShot != NULL)
+   if ((pc_SnapShot != NULL) && (pc_Rails != NULL))
    {
-      QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_Rails;
-      if (C_SyvClipBoardHelper::h_LoadRailsFromClipboard(c_Rails,
-                                                         C_SyvDaCopyPasteManager::hc_ClipBoardBaseTagName) == C_NO_ERR)
-      {
-         const QPointF c_Offset = QPointF(10.0, 10.0);
-         const uint32 u32_ItemCount = pc_SnapShot->Count();
+      const QPointF c_OFFSET = QPointF(10.0, 10.0);
+      const uint32 u32_ItemCount = pc_SnapShot->Count();
 
-         std::vector<uint64> c_UniqueIDs;
-         QPointF c_TotalOffset;
-         if (opc_Pos == NULL)
-         {
-            //Add point offset
-            this->mc_CopyPasteManager.IncrementPasteCounter();
-            c_TotalOffset = static_cast<float64>(this->mc_CopyPasteManager.GetPasteCounter()) * c_Offset;
-         }
-         else
-         {
-            //Set absolute position
-            c_TotalOffset = this->mc_CopyPasteManager.GetDiff(*opc_Pos);
-         }
-         c_UniqueIDs.resize(u32_ItemCount);
-         for (uint32 u32_ItItem = 0; u32_ItItem < u32_ItemCount; ++u32_ItItem)
-         {
-            c_UniqueIDs[u32_ItItem] = m_GetNewUniqueID();
-         }
-         this->mc_UndoManager.DoAddSnapshot(c_UniqueIDs, *pc_SnapShot, c_Rails, c_TotalOffset, this->GetHighestUsedZValueList(
-                                               this->items()));
+      std::vector<uint64> c_UniqueIDs;
+      QPointF c_TotalOffset;
+      if (opc_Pos == NULL)
+      {
+         //Add point offset
+         this->mc_CopyPasteManager.IncrementPasteCounter();
+         c_TotalOffset = static_cast<float64>(this->mc_CopyPasteManager.GetPasteCounter()) * c_OFFSET;
       }
+      else
+      {
+         //Set absolute position
+         c_TotalOffset = this->mc_CopyPasteManager.GetDiff(*opc_Pos);
+      }
+      c_UniqueIDs.resize(u32_ItemCount);
+      for (uint32 u32_ItItem = 0; u32_ItItem < u32_ItemCount; ++u32_ItItem)
+      {
+         c_UniqueIDs[u32_ItItem] = m_GetNewUniqueID();
+      }
+      this->mc_UndoManager.DoAddSnapshot(c_UniqueIDs, *pc_SnapShot, *pc_Rails, c_TotalOffset, this->GetHighestUsedZValueList(
+                                            this->items()));
    }
 }
 
@@ -681,7 +711,6 @@ bool C_SyvDaDashboardScene::IsItemMovable(const QGraphicsItem * const opc_Item) 
        (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_CHART) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
@@ -725,7 +754,6 @@ bool C_SyvDaDashboardScene::IsItemSelectable(const QGraphicsItem * const opc_Ite
        (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_CHART) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
@@ -769,7 +797,6 @@ bool C_SyvDaDashboardScene::IsItemDeletable(const QGraphicsItem * const opc_Item
        (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_CHART) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
@@ -813,7 +840,6 @@ bool C_SyvDaDashboardScene::IsZOrderChangeable(const QGraphicsItem * const opc_I
        (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_CHART) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
@@ -857,7 +883,6 @@ bool C_SyvDaDashboardScene::IsAlignmentUsable(const QGraphicsItem * const opc_It
        (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_CHART) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
        (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
@@ -1139,7 +1164,7 @@ bool C_SyvDaDashboardScene::m_AddOfMime(const QMimeData * const opc_MimeData, co
       {
          c_Text = opc_MimeData->text();
 
-         if (opc_MimeData->hasFormat(C_SdTopologyListWidget::hc_GroupName) == true)
+         if (opc_MimeData->hasFormat(C_SdTopologyListWidget::hc_GROUP_NAME) == true)
          {
             const QString c_Theme1 = C_GtGetText::h_GetText("openSYDE");
             const QString c_Theme2 = C_GtGetText::h_GetText("Material");
@@ -1147,7 +1172,7 @@ bool C_SyvDaDashboardScene::m_AddOfMime(const QMimeData * const opc_MimeData, co
             const QString c_Theme4 = C_GtGetText::h_GetText("Skeuomorphic");
             if ((((c_Text == c_Theme1) || (c_Text == c_Theme2)) || (c_Text == c_Theme3)) || (c_Text == c_Theme4))
             {
-               const QString c_Group = opc_MimeData->data(C_SdTopologyListWidget::hc_GroupName);
+               const QString c_Group = opc_MimeData->data(C_SdTopologyListWidget::hc_GROUP_NAME);
                if (c_Group == C_GtGetText::h_GetText("Value Label"))
                {
                   e_Type = C_PuiSvDbDataElement::eLABEL;
@@ -1363,6 +1388,55 @@ bool C_SyvDaDashboardScene::m_HandleDeleteUserConfirmation(const QList<QGraphics
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten key press release event slot
+
+   \param[in,out]  opc_KeyEvent  Key event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
+{
+   const QList<QGraphicsItem *> & rc_Items = this->selectedItems();
+   bool q_SkipSceneSpecific = false;
+
+   if (rc_Items.size() == 1)
+   {
+      QGraphicsItem * const pc_Item = rc_Items.at(0);
+      QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(pc_Item);
+      C_GiSvDaRectBaseGroup * const pc_Widget = dynamic_cast<C_GiSvDaRectBaseGroup *>(pc_Parent);
+
+      if (pc_Widget != NULL)
+      {
+         if (pc_Widget->IsEditContentEnabled() == true)
+         {
+            // In case of edit content mode, all key press events will be handled of the "inner" widgets
+            // For achieving this skipping of the scene specific functionality and forward the event
+            // to the original keyPressEvent which will forward the signal to the selected element
+            q_SkipSceneSpecific = true;
+         }
+         else if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F2)) &&
+                  (this->mq_EditMode == true))
+         {
+            pc_Widget->EnableEditContent();
+            opc_KeyEvent->accept();
+         }
+         else
+         {
+            // Nothing to do
+         }
+      }
+   }
+
+   if (q_SkipSceneSpecific == false)
+   {
+      C_SebScene::keyPressEvent(opc_KeyEvent);
+   }
+   else
+   {
+      QGraphicsScene::keyPressEvent(opc_KeyEvent);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten context menu event
 
    \param[in,out]  opc_Event  Event identification and information
@@ -1408,6 +1482,49 @@ void C_SyvDaDashboardScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten mouse press event slot
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardScene::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
+{
+   bool q_CallSebScene = true;
+
+   // Avoid in case of enabled content edit mode changing the selection or other interactions of C_SebScene
+   // with the right mouse click. The event must be handled by the proxy widget of the dashboard widget in this
+   // scenario
+   if ((this->mq_EditMode == true) &&
+       (opc_Event->button() == Qt::RightButton))
+   {
+      const QList<QGraphicsItem *> & rc_Items = this->selectedItems();
+
+      if (rc_Items.size() == 1)
+      {
+         QGraphicsItem * const pc_Item = rc_Items.at(0);
+         QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(pc_Item);
+         C_GiSvDaRectBaseGroup * const pc_Widget = dynamic_cast<C_GiSvDaRectBaseGroup *>(pc_Parent);
+
+         if ((pc_Widget != NULL) &&
+             (pc_Widget->IsEditContentEnabled() == true) &&
+             (pc_Widget->IsMousePosRelevantForProxyWidgetInteraction(opc_Event->scenePos())))
+         {
+            q_CallSebScene = false;
+         }
+      }
+   }
+
+   if (q_CallSebScene == true)
+   {
+      C_SebScene::mousePressEvent(opc_Event);
+   }
+   else
+   {
+      QGraphicsScene::mousePressEvent(opc_Event);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten mouse double click event slot
 
    \param[in,out]  opc_Event  Event identification and information
@@ -1423,9 +1540,23 @@ void C_SyvDaDashboardScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * con
 
       if (pc_RectBase != NULL)
       {
-         if (pc_RectBase->CallProperties() == false)
+         if (pc_RectBase->IsEditContentEnabled() == true)
          {
+            // In case of an already activated edit content mode forward the event
             C_SebScene::mouseDoubleClickEvent(opc_Event);
+         }
+         // Check for supporting properties dialog
+         else if (pc_RectBase->CallProperties() == false)
+         {
+            // Next try for enabling edit content mode
+            if (pc_RectBase->EnableEditContent() == false)
+            {
+               C_SebScene::mouseDoubleClickEvent(opc_Event);
+            }
+         }
+         else
+         {
+            // Nothing to do
          }
       }
       else
@@ -1453,6 +1584,34 @@ void C_SyvDaDashboardScene::m_OnWidgetEditProperties(QGraphicsItem * const opc_I
    {
       pc_RectBase->CallProperties();
       Q_EMIT (this->SigErrorChange());
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle edit content
+
+   \param[in,out]  opc_Item   Item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardScene::m_OnWidgetEditContent(QGraphicsItem * const opc_Item) const
+{
+   C_GiSvDaRectBaseGroup * const pc_RectBase = dynamic_cast<C_GiSvDaRectBaseGroup * const>(opc_Item);
+
+   if (pc_RectBase != NULL)
+   {
+      pc_RectBase->EnableEditContent();
+      Q_EMIT (this->SigErrorChange());
+   }
+   else
+   {
+      // Special case: Text element
+      C_GiSvDaTextElement  * const pc_TextElement = dynamic_cast<C_GiSvDaTextElement * const>(opc_Item);
+
+      if (pc_TextElement != NULL)
+      {
+         pc_TextElement->EnableEditContent();
+         Q_EMIT (this->SigErrorChange());
+      }
    }
 }
 
@@ -1491,6 +1650,8 @@ void C_SyvDaDashboardScene::m_AddWidgetToScene(C_GiSvDaRectBaseGroup * const opc
            &C_SyvDaDashboardScene::SigErrorChange);
    connect(opc_Item, &C_GiSvDaRectBaseGroup::SigHideToolTip, this,
            &C_SyvDaDashboardScene::m_HandleHideToolTip);
+
+   opc_Item->EditModeActiveChanged(this->mq_EditMode);
 
    m_AddRectBaseGroupToScene(opc_Item);
    m_AddAnyItemToScene(opc_Item);
@@ -1999,6 +2160,14 @@ void C_SyvDaDashboardScene::m_SelectionChanged(void)
          if (pc_Item != NULL)
          {
             pc_Item->SetResizing(false);
+
+            C_GiSvDaRectBaseGroup * const pc_DbItem = dynamic_cast<C_GiSvDaRectBaseGroup *>(pc_Item);
+            if ((pc_DbItem != NULL) && (pc_DbItem->IsEditContentEnabled() == true))
+            {
+               // In case of a change of number of selected items from 1 to n and a still active edit content mode
+               // the mode must be disabled
+               pc_DbItem->DisableEditContent();
+            }
          }
          else
          {
@@ -2024,4 +2193,6 @@ void C_SyvDaDashboardScene::m_InitBaseSceneContextMenuManager(void) const
 {
    connect(&this->mc_ContextMenuManager, &C_SyvDaContextMenuManager::SigEditProperties, this,
            &C_SyvDaDashboardScene::m_OnWidgetEditProperties);
+   connect(&this->mc_ContextMenuManager, &C_SyvDaContextMenuManager::SigEditContent, this,
+           &C_SyvDaDashboardScene::m_OnWidgetEditContent);
 }

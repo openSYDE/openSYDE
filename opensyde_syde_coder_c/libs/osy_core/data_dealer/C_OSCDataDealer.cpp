@@ -304,7 +304,7 @@ sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint1
    C_TIMEOUT   expected response not received within timeout
    C_NOACT     could not send request (e.g. Tx buffer full)
    C_RD_WR     protocol driver reported protocol violation
-   C_WARN      error response reveived
+   C_WARN      error response received
    C_COM       expected server response not received because of communication error
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -384,7 +384,7 @@ sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16
    C_TIMEOUT   expected response not received within timeout
    C_NOACT     could not send request (e.g. Tx buffer full)
    C_RD_WR     protocol driver reported protocol violation
-   C_WARN      error response reveived
+   C_WARN      error response received
    C_COM       expected server response not received because of communication error
 */
 //----------------------------------------------------------------------------------------------------------------------

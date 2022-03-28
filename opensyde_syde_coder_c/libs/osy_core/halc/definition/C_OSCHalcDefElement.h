@@ -35,7 +35,7 @@ public:
    C_OSCHalcDefContent::E_ComplexType GetComplexType(void) const;
    C_OSCNodeDataPoolContent::E_Type GetType(void) const;
    bool GetArray(void) const;
-   const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> & GetEnumItems(void) const;
+   const std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> > & GetEnumItems(void) const;
    const std::vector<C_OSCHalcDefContentBitmaskItem> & GetBitmaskItems(void) const;
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;

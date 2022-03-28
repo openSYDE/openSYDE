@@ -26,6 +26,8 @@ class C_OgePubSvgIconWithText :
 {
 public:
    C_OgePubSvgIconWithText(QWidget * const opc_Parent = NULL);
+
+   void HideToolTip(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

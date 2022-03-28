@@ -42,9 +42,9 @@ using namespace stw_tgl;
 using namespace stw_scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const std::string C_CieExportDbc::mhc_SigInitialValue = "GenSigStartValue";
-const std::string C_CieExportDbc::mhc_MsgCycleTime = "GenMsgCycleTime";
-const std::string C_CieExportDbc::mhc_MsgSendType = "GenMsgSendType";
+const std::string C_CieExportDbc::mhc_SIG_INITIAL_VALUE = "GenSigStartValue";
+const std::string C_CieExportDbc::mhc_MSG_CYCLE_TIME = "GenMsgCycleTime";
+const std::string C_CieExportDbc::mhc_MSG_SEND_TYPE = "GenMsgSendType";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -595,7 +595,7 @@ sint32 C_CieExportDbc::mh_SetSignalValues(const C_CieConverter::C_CIEDataPoolEle
 
    // set initial value
    Vector::DBC::Attribute c_Attribute;
-   c_Attribute.name = mhc_SigInitialValue;
+   c_Attribute.name = mhc_SIG_INITIAL_VALUE;
 
    float64 f64_Value;
    C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Element.c_DataSetValues.at(0), f64_Value, 0UL); // raw value
@@ -636,7 +636,7 @@ sint32 C_CieExportDbc::mh_SetTransmission(const C_CieConverter::C_CIENodeMessage
    osc_write_log_info("DBC file export", c_Message);
 
    Vector::DBC::Attribute c_TransmissionMode;
-   c_TransmissionMode.name = mhc_MsgSendType;
+   c_TransmissionMode.name = mhc_MSG_SEND_TYPE;
    if (orc_Message.c_CanMessage.e_TxMethod == C_OSCCanMessage::E_TxMethodType::eTX_METHOD_CYCLIC)
    {
       // cyclic message -> also set cycle time
@@ -657,7 +657,7 @@ sint32 C_CieExportDbc::mh_SetTransmission(const C_CieConverter::C_CIENodeMessage
    if (orc_Message.c_CanMessage.e_TxMethod == C_OSCCanMessage::E_TxMethodType::eTX_METHOD_CYCLIC)
    {
       Vector::DBC::Attribute c_CycleTime;
-      c_CycleTime.name = mhc_MsgCycleTime;
+      c_CycleTime.name = mhc_MSG_CYCLE_TIME;
       sintn sn_CycleTime = static_cast<sintn>(orc_Message.c_CanMessage.u32_CycleTimeMs); // cast is OK,
       // because only expecting low cycle times of max. some seconds
       if (sn_CycleTime < 0)
@@ -1017,7 +1017,7 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
 
    // set global attribute definition for cycle time (default)
    Vector::DBC::AttributeDefinition c_CycleTimeAttributeDef;
-   c_CycleTimeAttributeDef.name = mhc_MsgCycleTime;
+   c_CycleTimeAttributeDef.name = mhc_MSG_CYCLE_TIME;
    c_CycleTimeAttributeDef.objectType = Vector::DBC::AttributeDefinition::ObjectType::Message;
    c_CycleTimeAttributeDef.valueType = Vector::DBC::AttributeValueType::Int;
    orc_AttributeDefinitions.insert(std::pair<std::string, Vector::DBC::AttributeDefinition>(
@@ -1025,7 +1025,7 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
 
    // set global attribute definitions for openSYDE message send types 'Cyclic' and 'OnEvent'
    Vector::DBC::AttributeDefinition c_MsgSendTypeAttributeDef;
-   c_MsgSendTypeAttributeDef.name = mhc_MsgSendType;
+   c_MsgSendTypeAttributeDef.name = mhc_MSG_SEND_TYPE;
    c_MsgSendTypeAttributeDef.objectType = Vector::DBC::AttributeDefinition::ObjectType::Message;
    c_MsgSendTypeAttributeDef.valueType = Vector::DBC::AttributeValueType::Enum;
    c_MsgSendTypeAttributeDef.enumValues.push_back("Cyclic");
@@ -1066,7 +1066,7 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
                                       c_NmStationName, c_NmStationAttributeDef));
 
    // set initial value
-   std::string c_SigInitialValueName = mhc_SigInitialValue.c_str();
+   std::string c_SigInitialValueName = mhc_SIG_INITIAL_VALUE.c_str();
    Vector::DBC::AttributeDefinition c_SigInitialValueAttribute;
    c_SigInitialValueAttribute.name = c_SigInitialValueName;
    c_SigInitialValueAttribute.objectType = Vector::DBC::AttributeDefinition::ObjectType::Signal;

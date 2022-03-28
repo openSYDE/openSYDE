@@ -299,11 +299,11 @@ void C_SyvDaPeProgressBar::m_FillAlignmentComboBox(const sintn osn_Type) const
 void C_SyvDaPeProgressBar::m_UpdatePreview(void)
 {
    C_GiSvDaProgressBarBase * const pc_Item = new C_GiSvDaProgressBarBase(0UL, 0UL, -1L, 0ULL, NULL);
-   const QSizeF c_ItemSize(240.0, 100.0);
+   const QSizeF c_ITEM_SIZE(240.0, 100.0);
    //Do not use view center
-   const QPointF c_ItemPos(6.0, 30.0);
+   const QPointF c_ITEM_POS(6.0, 30.0);
 
-   pc_Item->ApplySizeChange(c_ItemPos, c_ItemSize);
+   pc_Item->ApplySizeChange(c_ITEM_POS, c_ITEM_SIZE);
    pc_Item->SetDisplayStyle(this->mrc_ParentDialog.GetTheme(), this->mq_DarkMode);
    pc_Item->UpdateTypePe(this->GetType(), this->GetAlignment(), this->GetShowMinMax());
    pc_Item->SetValuePe(50);

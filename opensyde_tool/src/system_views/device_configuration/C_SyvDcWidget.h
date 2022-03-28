@@ -91,7 +91,7 @@ private:
    void m_CleanUpScan(void) const;
    void m_ScanFinished(void);
    bool m_CheckSameSerialNumber(void);
-   void m_EnterScanErrorState(const QString & orc_Text) const;
+   void m_EnterScanErrorState(void);
    void m_StartConfigProper(void);
    void m_ShowConfigResult(void);
    void m_BackToScan(void);
@@ -176,6 +176,7 @@ private:
    bool m_CheckQuitPossible(void) const;
    void m_OnCloseIgnored(void);
    void m_InformUserAboutAbortedClose(void) const;
+   void m_InformUserAfterScan(const QString & orc_Text);
 
    Ui::C_SyvDcWidget * mpc_Ui;
 
@@ -183,6 +184,7 @@ private:
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_logic::C_SyvDcSequences * mpc_DcSequences;
    const stw_types::uint32 mu32_ViewIndex;
+   bool mq_InitializationFinished;
    stw_types::uint32 mu32_TempBitrate; // In kbit/s
    bool mq_SameBitrates;
    stw_types::uint32 mu32_BusIndex;
@@ -201,10 +203,6 @@ private:
    std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> mc_StwFlashloaderDeviceConfigurations;
    std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> mc_OpenSydeDeviceConfigurations;
 
-   static const QString mhc_REPORT_HEADLINE_HTML_TAG_START;
-   static const QString mhc_REPORT_HEADLINE_HTML_TAG_END;
-   static const QString mhc_REPORT_HIGHLIGHT_TAG_START;
-   static const QString mhc_REPORT_HIGHLIGHT_TAG_END;
    static const stw_types::sint32 mhs32_INDEX_CONFIGURATION_ALL_CONNECTED_INTERFACES;
    static const stw_types::sint32 mhs32_INDEX_CONFIGURATION_ONLY_USED_INTERFACES;
 };

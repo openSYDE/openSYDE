@@ -44,8 +44,8 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sint32 C_CamMainWindow::mhs32_SettingsSplitterMax = 350;
-const sint32 C_CamMainWindow::mhs32_MessageGenSplitterMax = 120;
+const sint32 C_CamMainWindow::mhs32_SETTINGS_SPLITTER_MAX = 350;
+const sint32 C_CamMainWindow::mhs32_MESSAGE_GEN_SPLITTER_MAX = 120;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -796,7 +796,7 @@ void C_CamMainWindow::m_OnExpandSettings(const bool oq_Expand)
    {
       // expand
       this->mpc_Ui->pc_SplitterSettings->SetSecondSegment(
-         std::max(mhs32_SettingsSplitterMax, C_UsHandler::h_GetInstance()->GetSplitterSettingsX()));
+         std::max(mhs32_SETTINGS_SPLITTER_MAX, C_UsHandler::h_GetInstance()->GetSplitterSettingsX()));
    }
    else
    {
@@ -846,7 +846,7 @@ void C_CamMainWindow::m_OnSettingsSplitterMoved(const sint32 & ors32_Pos, const 
       if (rc_Sizes.size() > 1)
       {
          // is actual size between boundaries?
-         if ((rc_Sizes.at(1) <= C_CamMainWindow::mhs32_SettingsSplitterMax) && (rc_Sizes.at(1) > 35))
+         if ((rc_Sizes.at(1) <= C_CamMainWindow::mhs32_SETTINGS_SPLITTER_MAX) && (rc_Sizes.at(1) > 35))
          {
             if (ors32_Pos > this->ms32_SettingsSplitterPosition)
             {
@@ -882,7 +882,7 @@ void C_CamMainWindow::m_OnSettingsSplitterMoved(const sint32 & ors32_Pos, const 
       else
       {
          this->mpc_Ui->pc_SplitterSettings->SetSecondSegment(
-            std::max(mhs32_SettingsSplitterMax,
+            std::max(mhs32_SETTINGS_SPLITTER_MAX,
                      static_cast<sint32>(this->mpc_Ui->pc_SplitterSettings->width()) - ors32_Pos));
       }
    }
@@ -901,7 +901,8 @@ void C_CamMainWindow::m_OnExpandMessageGen(const bool oq_Expand)
    {
       // expand
       this->mpc_Ui->pc_SplitterMessageGen
-      ->SetSecondSegment(std::max(mhs32_MessageGenSplitterMax, C_UsHandler::h_GetInstance()->GetSplitterMessageGenY()));
+      ->SetSecondSegment(std::max(mhs32_MESSAGE_GEN_SPLITTER_MAX,
+                                  C_UsHandler::h_GetInstance()->GetSplitterMessageGenY()));
    }
    else
    {
@@ -953,7 +954,7 @@ void C_CamMainWindow::m_OnMessageGenSplitterMoved(const sint32 & ors32_Pos, cons
       if (rc_Sizes.size() > 1)
       {
          // is actual size between boundaries?
-         if ((rc_Sizes.at(1) <= mhs32_MessageGenSplitterMax) && (rc_Sizes.at(1) > 18))
+         if ((rc_Sizes.at(1) <= mhs32_MESSAGE_GEN_SPLITTER_MAX) && (rc_Sizes.at(1) > 18))
          {
             if (ors32_Pos > this->ms32_MessageGenSplitterPosition)
             {
@@ -989,7 +990,7 @@ void C_CamMainWindow::m_OnMessageGenSplitterMoved(const sint32 & ors32_Pos, cons
       else
       {
          this->mpc_Ui->pc_SplitterMessageGen->SetSecondSegment(
-            std::max(mhs32_MessageGenSplitterMax,
+            std::max(mhs32_MESSAGE_GEN_SPLITTER_MAX,
                      static_cast<sint32>(this->mpc_Ui->pc_SplitterMessageGen->height()) - ors32_Pos));
       }
    }

@@ -76,8 +76,8 @@ private:
 
    C_SdTopologyScene * mpc_Scene;
 
-   static const stw_types::sintn mhsn_WidgetBorder;
-   static const stw_types::sintn mhsn_ToolboxInitPosY;
+   static const stw_types::sintn mhsn_WIDGET_BORDER;
+   static const stw_types::sintn mhsn_TOOLBOX_INIT_POS_Y;
 
 protected:
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;

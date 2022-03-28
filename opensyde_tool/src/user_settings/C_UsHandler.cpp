@@ -29,9 +29,9 @@ using namespace stw_types;
 using namespace stw_errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint8 C_UsHandler::mhu8_MaxRecentProjects = 42;
-const QPoint C_UsHandler::mhc_DefaultViewPos = QPoint(0, 0);
-const stw_types::sintn C_UsHandler::mhsn_DefaultZoomLevel = 100;
+const uint8 C_UsHandler::mhu8_MAX_RECENT_PROJECTS = 42;
+const QPoint C_UsHandler::mhc_DEFAULT_VIEW_POS = QPoint(0, 0);
+const stw_types::sintn C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL = 100;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -122,8 +122,8 @@ void C_UsHandler::SetDefault(void)
 
    this->ms32_ProjLastKnownMode = 0;
 
-   this->mc_ProjSdTopologyViewPos = C_UsHandler::mhc_DefaultViewPos;
-   this->msn_ProjSdTopologyViewZoom = C_UsHandler::mhsn_DefaultZoomLevel;
+   this->mc_ProjSdTopologyViewPos = C_UsHandler::mhc_DEFAULT_VIEW_POS;
+   this->msn_ProjSdTopologyViewZoom = C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL;
 
    this->ms32_SysDefSubMode = 0;
    this->mu32_SysDefIndex = 0U;
@@ -340,7 +340,7 @@ sint32 C_UsHandler::GetSdBusEditLayoutSplitterX(void) const
 //----------------------------------------------------------------------------------------------------------------------
 stw_types::uint8 C_UsHandler::h_GetMaxRecentProjects(void)
 {
-   return C_UsHandler::mhu8_MaxRecentProjects;
+   return C_UsHandler::mhu8_MAX_RECENT_PROJECTS;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -698,8 +698,8 @@ C_UsCommunication C_UsHandler::GetProjSdBus(const QString & orc_BusName) const
 //----------------------------------------------------------------------------------------------------------------------
 C_UsSystemView C_UsHandler::GetProjSvSetupView(const QString & orc_ViewName) const
 {
-   return this->mc_ProjSvSetupView.value(orc_ViewName, C_UsSystemView(C_UsHandler::mhsn_DefaultZoomLevel,
-                                                                      C_UsHandler::mhc_DefaultViewPos));
+   return this->mc_ProjSvSetupView.value(orc_ViewName, C_UsSystemView(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL,
+                                                                      C_UsHandler::mhc_DEFAULT_VIEW_POS));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1042,7 +1042,7 @@ void C_UsHandler::AddToRecentProjects(const QString & orc_Str)
    RemoveOfRecentProjects(c_Copy);
    //Add
    this->mc_RecentProjects.prepend(c_Copy.toStdString().c_str());
-   if (this->mc_RecentProjects.count() > C_UsHandler::mhu8_MaxRecentProjects)
+   if (this->mc_RecentProjects.count() > C_UsHandler::mhu8_MAX_RECENT_PROJECTS)
    {
       this->mc_RecentProjects.pop_back();
    }
@@ -1690,7 +1690,7 @@ void C_UsHandler::SetProjSvNavigationExpandedStatus(const QString & orc_ViewName
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetNavigationExpandedStatus(oq_NavigationExpandedStatus);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -1712,7 +1712,7 @@ void C_UsHandler::SetProjSvSetupViewZoom(const QString & orc_ViewName, const sin
    }
    else
    {
-      this->mc_ProjSvSetupView.insert(orc_ViewName, C_UsSystemView(osn_New, C_UsHandler::mhc_DefaultViewPos));
+      this->mc_ProjSvSetupView.insert(orc_ViewName, C_UsSystemView(osn_New, C_UsHandler::mhc_DEFAULT_VIEW_POS));
    }
 }
 
@@ -1732,7 +1732,7 @@ void C_UsHandler::SetProjSvSetupViewPos(const QString & orc_ViewName, const QPoi
    }
    else
    {
-      this->mc_ProjSvSetupView.insert(orc_ViewName, C_UsSystemView(C_UsHandler::mhsn_DefaultZoomLevel, orc_New));
+      this->mc_ProjSvSetupView.insert(orc_ViewName, C_UsSystemView(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, orc_New));
    }
 }
 
@@ -1753,7 +1753,7 @@ void C_UsHandler::SetProjSvUpdateViewZoom(const QString & orc_ViewName, const si
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.sn_UpdateViewZoom = osn_New;
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -1776,7 +1776,7 @@ void C_UsHandler::SetProjSvUpdateViewPos(const QString & orc_ViewName, const QPo
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.c_UpdateViewPos = orc_New;
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -1799,7 +1799,7 @@ void C_UsHandler::SetProjSvParamExport(const QString & orc_ViewName, const QStri
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.c_ParamExportPath = orc_Path;
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -1822,7 +1822,7 @@ void C_UsHandler::SetProjSvParamImport(const QString & orc_ViewName, const QStri
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.c_ParamImportPath = orc_Path;
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -1848,7 +1848,7 @@ void C_UsHandler::SetProjSvParamRecord(const QString & orc_ViewName, const QStri
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.c_ParamRecordPath = orc_Path;
       c_View.c_ParamRecordFileName = orc_FileName;
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
@@ -1875,7 +1875,7 @@ void C_UsHandler::AddProjSvNodeUpdateDataRate(const QString & orc_ViewName, cons
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.AddNodeUpdateDataRate(orc_NodeName, ou32_Checksum, of64_DataRateBytesPerMs);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -1898,7 +1898,7 @@ void C_UsHandler::SetProjSvUpdateSplitterX(const QString & orc_ViewName, const s
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetUpdateSplitterX(os32_Value);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -1921,7 +1921,7 @@ void C_UsHandler::SetProjSvUpdateHorizontalSplitterY(const QString & orc_ViewNam
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetUpdateHorizontalSplitterY(os32_Value);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -1949,7 +1949,7 @@ void C_UsHandler::SetProjSvUpdateProgressLog(const QString & orc_ViewName, const
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetUpdateProgressLogPos(orc_Position);
       c_View.SetUpdateProgressLogSize(orc_Size);
       c_View.SetUpdateProgressLogMaximized(orq_Maximized);
@@ -1974,7 +1974,7 @@ void C_UsHandler::SetProjSvUpdateSummaryBig(const QString & orc_ViewName, const 
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetUpdateSummaryBig(oq_BigVisible);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -1997,7 +1997,7 @@ void C_UsHandler::SetProjSvUpdateEmptyOptionalSectionsVisible(const QString & or
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetUpdateEmptyOptionalSectionsVisible(oq_Visible);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2022,7 +2022,7 @@ void C_UsHandler::SetProjSvUpdateSectionsExpandedFlags(const QString & orc_ViewN
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetNodeSectionsExpanded(orc_NodeName, orc_SectionsExpanded);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2050,7 +2050,7 @@ void C_UsHandler::SetProjSvDashboardToolbox(const QString & orc_ViewName, const 
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetDashboardToolboxPos(orc_Position);
       c_View.SetDashboardToolboxSize(orc_Size);
       c_View.SetDashboardToolboxMaximized(orq_Maximized);
@@ -2075,7 +2075,7 @@ void C_UsHandler::SetProjSvDashboardSelectedTabIndex(const QString & orc_ViewNam
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetDashboardSelectedTabIndex(os32_Index);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2098,7 +2098,7 @@ void C_UsHandler::SetProjSvDashboardMainTab(const QString & orc_ViewName, const 
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetDashboardMainTab(orc_DashboardName);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2129,7 +2129,7 @@ void C_UsHandler::SetProjSvDashboardTearOffPosition(const QString & orc_ViewName
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetDashboardTearOffPosition(orc_DashboardName, orc_Position, orc_Size, oq_TornOffWindowMinimized,
                                          oq_TornOffWindowMaximized);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
@@ -2157,7 +2157,7 @@ void C_UsHandler::SetProjSvDashboardScenePositionAndZoom(const QString & orc_Vie
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetProjSvDashboardScenePositionAndZoom(orc_DashboardName, orc_Position, osn_Zoom);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }

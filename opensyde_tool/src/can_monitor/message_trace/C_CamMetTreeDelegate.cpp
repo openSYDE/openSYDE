@@ -32,13 +32,13 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QColor C_CamMetTreeDelegate::mhc_HighlightBackgroundColor = mc_STYLE_GUIDE_COLOR_27;
-const QColor C_CamMetTreeDelegate::mhc_HighlightForegroundColor = mc_STYLE_GUIDE_COLOR_0;
-const QColor C_CamMetTreeDelegate::mhc_HighlightBorderColor = mc_STYLE_GUIDE_COLOR_7;
-const QColor C_CamMetTreeDelegate::mhc_DefaultBorderColor = Qt::transparent;
-const QColor C_CamMetTreeDelegate::mhc_DefaultBackgroundColor = Qt::transparent;
-const QFont C_CamMetTreeDelegate::mhc_HighlightFont = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
-const QFont C_CamMetTreeDelegate::mhc_DefaultFont = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
+const QColor C_CamMetTreeDelegate::mhc_HIGHLIGHT_BACKGROUND_COLOR = mc_STYLE_GUIDE_COLOR_27;
+const QColor C_CamMetTreeDelegate::mhc_HIGHLIGHT_FOREGROUND_COLOR = mc_STYLE_GUIDE_COLOR_0;
+const QColor C_CamMetTreeDelegate::mhc_HIGHLIGHT_BORDER_COLOR = mc_STYLE_GUIDE_COLOR_7;
+const QColor C_CamMetTreeDelegate::mhc_DEFAULT_BORDER_COLOR = Qt::transparent;
+const QColor C_CamMetTreeDelegate::mhc_DEFAULT_BACKGROUND_COLOR = Qt::transparent;
+const QFont C_CamMetTreeDelegate::mhc_HIGHLIGHT_FONT = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
+const QFont C_CamMetTreeDelegate::mhc_DEFAULT_FONT = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -99,13 +99,13 @@ void C_CamMetTreeDelegate::paint(QPainter * const opc_Painter, const QStyleOptio
    //Always draw cell (should only be background if any additional paint operations are done)
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
    if (C_TblDelegateUtil::h_PaintMarkedCell(opc_Painter, c_PaddedCellRect, orc_Index, q_Selected,
-                                            C_CamMetTreeDelegate::mhc_DefaultBackgroundColor,
-                                            C_CamMetTreeDelegate::mhc_DefaultBorderColor,
-                                            C_CamMetTreeDelegate::mhc_DefaultFont,
-                                            C_CamMetTreeDelegate::mhc_HighlightForegroundColor,
-                                            C_CamMetTreeDelegate::mhc_HighlightBackgroundColor,
-                                            C_CamMetTreeDelegate::mhc_HighlightBorderColor,
-                                            C_CamMetTreeDelegate::mhc_HighlightFont, 19, 25) == true)
+                                            C_CamMetTreeDelegate::mhc_DEFAULT_BACKGROUND_COLOR,
+                                            C_CamMetTreeDelegate::mhc_DEFAULT_BORDER_COLOR,
+                                            C_CamMetTreeDelegate::mhc_DEFAULT_FONT,
+                                            C_CamMetTreeDelegate::mhc_HIGHLIGHT_FOREGROUND_COLOR,
+                                            C_CamMetTreeDelegate::mhc_HIGHLIGHT_BACKGROUND_COLOR,
+                                            C_CamMetTreeDelegate::mhc_HIGHLIGHT_BORDER_COLOR,
+                                            C_CamMetTreeDelegate::mhc_HIGHLIGHT_FONT, 19, 25) == true)
    {
       //Don't do anything else
       //Make sure text is not painted twice
@@ -240,7 +240,7 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
 
          if (oq_Selected == true)
          {
-            c_FontColor = C_CamMetTreeDelegate::mhc_HighlightForegroundColor;
+            c_FontColor = C_CamMetTreeDelegate::mhc_HIGHLIGHT_FOREGROUND_COLOR;
          }
          else
          {
@@ -254,10 +254,10 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
 
             //Handle cell content
             if (C_TblDelegateUtil::h_PaintStringWithRestriction(opc_Painter, c_TopLeft, c_CellRectAdapted, *c_It,
-                                                                C_CamMetTreeDelegate::mhc_DefaultBackgroundColor,
-                                                                C_CamMetTreeDelegate::mhc_DefaultBorderColor,
+                                                                C_CamMetTreeDelegate::mhc_DEFAULT_BACKGROUND_COLOR,
+                                                                C_CamMetTreeDelegate::mhc_DEFAULT_BORDER_COLOR,
                                                                 c_FontColor,
-                                                                C_CamMetTreeDelegate::mhc_DefaultFont,
+                                                                C_CamMetTreeDelegate::mhc_DEFAULT_FONT,
                                                                 c_Alignments[u32_It],
                                                                 c_ColSizes[u32_It]) == true)
             {
@@ -268,10 +268,10 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
                //Handle space in between
                if (C_TblDelegateUtil::h_PaintStringWithRestriction(opc_Painter, c_TopLeft, c_CellRectAdapted,
                                                                    c_Spaces[u32_It],
-                                                                   C_CamMetTreeDelegate::mhc_DefaultBackgroundColor,
-                                                                   C_CamMetTreeDelegate::mhc_DefaultBorderColor,
+                                                                   C_CamMetTreeDelegate::mhc_DEFAULT_BACKGROUND_COLOR,
+                                                                   C_CamMetTreeDelegate::mhc_DEFAULT_BORDER_COLOR,
                                                                    c_FontColor,
-                                                                   C_CamMetTreeDelegate::mhc_DefaultFont,
+                                                                   C_CamMetTreeDelegate::mhc_DEFAULT_FONT,
                                                                    Qt::AlignLeft | Qt::AlignVCenter,
                                                                    -1) == true)
                {

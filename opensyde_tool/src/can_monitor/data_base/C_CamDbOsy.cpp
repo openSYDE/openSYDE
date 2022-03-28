@@ -179,15 +179,16 @@ void C_CamDbOsy::FindAllMessages(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Search for a message with this ID, return the first one found
 
-   \param[in]   ou32_Id       CAN ID to search for
-   \param[out]  orc_Message   Found message name (only valid if C_NO_ERR)
+   \param[in]   ou32_Id          CAN ID to search for
+   \param[in]   oq_IsExtended    Is extended
+   \param[out]  orc_Message      Found message name (only valid if C_NO_ERR)
 
    \return
    C_NO_ERR Found at least one matching message
    C_NOACT  No matching message found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, QString & orc_Message) const
+sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtended, QString & orc_Message) const
 {
    sint32 s32_Retval = C_NOACT;
 
@@ -221,7 +222,7 @@ sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, QString & orc_Message) 
                        ++u32_ItMsg)
                   {
                      const C_OSCCanMessage & rc_Message = rc_Container.c_RxMessages[u32_ItMsg];
-                     if (rc_Message.u32_CanId == ou32_Id)
+                     if ((rc_Message.u32_CanId == ou32_Id) && (rc_Message.q_IsExtended == oq_IsExtended))
                      {
                         //Found match
                         orc_Message = rc_Message.c_Name.c_str();
@@ -233,7 +234,7 @@ sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, QString & orc_Message) 
                        (u32_ItMsg < rc_Container.c_TxMessages.size()) && (s32_Retval == C_NOACT); ++u32_ItMsg)
                   {
                      const C_OSCCanMessage & rc_Message = rc_Container.c_TxMessages[u32_ItMsg];
-                     if (rc_Message.u32_CanId == ou32_Id)
+                     if ((rc_Message.u32_CanId == ou32_Id) && (rc_Message.q_IsExtended == oq_IsExtended))
                      {
                         //Found match
                         orc_Message = rc_Message.c_Name.c_str();

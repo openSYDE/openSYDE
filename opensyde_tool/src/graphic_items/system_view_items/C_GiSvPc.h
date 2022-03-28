@@ -64,13 +64,13 @@ private:
    bool mq_Connected;
    C_GiRectPixmap * mpc_ConflictIcon;
    stw_types::sint32 ms32_IconSize;
-   static const stw_types::uint32 mhu32_ScaleCategory0;
-   static const stw_types::uint32 mhu32_ScaleCategory1;
-   static const stw_types::uint32 mhu32_ScaleCategory2;
-   static const stw_types::uint32 mhu32_ScaleCategory3;
-   static const stw_types::float64 mhaf64_ScaleMinWidthNode[3];
-   static const stw_types::float64 mhaf64_ScaleMinHeightNode[3];
-   static const stw_types::float64 mhf64_InitSizeOfPc;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_0;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_1;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_2;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_3;
+   static const stw_types::float64 mhaf64_SCALE_MIN_WIDTH_NODE[3];
+   static const stw_types::float64 mhaf64_SCALE_MIN_HEIGHT_NODE[3];
+   static const stw_types::float64 mhf64_INIT_SIZE_OF_PC;
 
    //Avoid call
    C_GiSvPc(const C_GiSvPc &);

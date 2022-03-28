@@ -37,7 +37,7 @@ public:
    bool GetMinimumSize(void) const;
    void SetMinimumSize(const bool oq_MinimumSize);
 
-   static const QString hc_GroupName;
+   static const QString hc_GROUP_NAME;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

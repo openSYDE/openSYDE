@@ -44,7 +44,6 @@ const stw_types::sintn msn_GRAPHICS_ITEM_DB_SPIN_BOX      = static_cast<stw_type
 const stw_types::sintn msn_GRAPHICS_ITEM_DB_PROGRESS_BAR  = static_cast<stw_types::sintn>(QGraphicsItem::UserType) + 21;
 const stw_types::sintn msn_GRAPHICS_ITEM_DB_SLIDER        = static_cast<stw_types::sintn>(QGraphicsItem::UserType) + 22;
 const stw_types::sintn msn_GRAPHICS_ITEM_DB_TOGGLE        = static_cast<stw_types::sintn>(QGraphicsItem::UserType) + 23;
-const stw_types::sintn msn_GRAPHICS_ITEM_DB_CHART         = static_cast<stw_types::sintn>(QGraphicsItem::UserType) + 24;
 const stw_types::sintn msn_GRAPHICS_ITEM_DB_PIE_CHART     = static_cast<stw_types::sintn>(QGraphicsItem::UserType) + 25;
 const stw_types::sintn msn_GRAPHICS_ITEM_DB_TABLE         = static_cast<stw_types::sintn>(QGraphicsItem::UserType) + 26;
 const stw_types::sintn msn_GRAPHICS_ITEM_DB_PARAM         = static_cast<stw_types::sintn>(QGraphicsItem::UserType) + 27;

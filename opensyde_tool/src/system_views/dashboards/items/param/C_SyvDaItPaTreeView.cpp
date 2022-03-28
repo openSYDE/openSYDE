@@ -244,6 +244,17 @@ void C_SyvDaItPaTreeView::SetConnected(const bool oq_Connected)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set load and save action status
+
+   \param[in]  oq_Active   Load and save action active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeView::SetLoadSaveActive(const bool oq_Active)
+{
+   this->mc_Model.SetLoadSaveActive(oq_Active);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set action status
 
    \param[in]  oq_Active   Action active
@@ -600,6 +611,15 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide tooltip
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeView::HideToolTip(void)
+{
+   this->m_HideToolTip();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten key press event slot
 
    Here: Handle escape manually
@@ -671,6 +691,69 @@ bool C_SyvDaItPaTreeView::event(QEvent * const opc_Event)
    }
 
    return C_OgeTreeViewToolTipBase::event(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten mouse release event slot
+
+   Deactivate right click
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeView::mouseReleaseEvent(QMouseEvent * const opc_Event)
+{
+   if (opc_Event->button() == Qt::RightButton)
+   {
+      //Ignore
+      opc_Event->accept();
+   }
+   else
+   {
+      C_OgeTreeViewToolTipBase::mouseReleaseEvent(opc_Event);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
+
+   Deactivate right click
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeView::mousePressEvent(QMouseEvent * const opc_Event)
+{
+   if (opc_Event->button() == Qt::RightButton)
+   {
+      //Ignore
+      opc_Event->accept();
+   }
+   else
+   {
+      C_OgeTreeViewToolTipBase::mousePressEvent(opc_Event);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
+
+   Deactivate right click
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
+{
+   if (opc_Event->button() == Qt::RightButton)
+   {
+      //Ignore
+      opc_Event->accept();
+   }
+   else
+   {
+      C_OgeTreeViewToolTipBase::mouseDoubleClickEvent(opc_Event);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

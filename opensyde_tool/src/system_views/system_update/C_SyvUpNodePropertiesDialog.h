@@ -60,9 +60,9 @@ private:
 
    C_GiSvNodeData mc_NodeData;
 
-   static const QString mhc_HtmlCellTagStartMain;
-   static const QString mhc_HtmlCellTagStartContent;
-   static const QString mhc_HtmlCellTagStartStatus;
+   static const QString mhc_HTML_CELL_TAG_START_MAIN;
+   static const QString mhc_HTML_CELL_TAG_START_CONTENT;
+   static const QString mhc_HTML_CELL_TAG_START_STATUS;
 
    void m_OkClicked(void);
    void m_InitStatus(void) const;
@@ -113,6 +113,20 @@ private:
                                       const stw_opensyde_core::C_OSCNode & orc_Node, const bool oq_IsMultiDevice);
    void m_OnDiscard(void);
    void m_ReInitStatus(void) const;
+   void m_UpdateProgressLog(void) const;
+   QString m_GetProgressLogConnectStatesString(void) const;
+   static QString mh_GetProgressLogConnectStatesStringForSubNode(const C_GiSvSubNodeData * const opc_SubNodeData);
+   QString m_GetProgressLogUpdateStatesString(void) const;
+   static QString mh_GetProgressLogUpdateStatesStringForSubNode(const C_GiSvSubNodeData * const opc_SubNodeData);
+
+   static QString mh_GetTableLineForBrowser(const QString & orc_FirstRow, const QString & orc_SecondRow,
+                                            const stw_types::uint32 ou32_Layer);
+   static QString mh_GetSuSequenceNodeStateString(const stw_opensyde_core::E_OSCSuSequencesNodeState oe_State);
+   static QString mh_GetSuSequenceNodeFileLoadStateString(
+      const stw_opensyde_core::E_OSCSuSequencesNodeState oe_StateExists,
+      const stw_opensyde_core::E_OSCSuSequencesNodeState oe_StateLoadedd);
+   static QString mh_GetSuSequenceNodePreconditionString(const bool oq_FeatureSupported, const bool oq_FeatureError);
+
    //Avoid call
    C_SyvUpNodePropertiesDialog(const C_SyvUpNodePropertiesDialog &);
    C_SyvUpNodePropertiesDialog & operator =(const C_SyvUpNodePropertiesDialog &);

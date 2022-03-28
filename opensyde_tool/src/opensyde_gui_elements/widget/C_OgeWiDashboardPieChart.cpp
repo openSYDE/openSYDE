@@ -24,8 +24,7 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QColor C_OgeWiDashboardPieChart::mhc_Transparent = static_cast<QColor>(Qt::transparent);
-const float32 C_OgeWiDashboardPieChart::mhf32_Pi = static_cast<float32>(std::acos(-1));
+const QColor C_OgeWiDashboardPieChart::mhc_TRANSPARENT = static_cast<QColor>(Qt::transparent);
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -56,7 +55,7 @@ C_OgeWiDashboardPieChart::C_OgeWiDashboardPieChart(QWidget * const opc_Parent) :
    msn_BorderWidth(5),
    mq_ShowUnit(true),
    mq_ShowValue(true),
-   msn_Transparence(msn_TRANSPARENCY_END),
+   msn_Transparency(msn_TRANSPARENCY_END),
    mq_TransparentBackground(false),
    me_Style(C_PuiSvDbWidgetBase::eOPENSYDE),
    mq_DarkMode(false)
@@ -137,14 +136,14 @@ void C_OgeWiDashboardPieChart::SetUnit(const QString & orc_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets of the color transparence value configured by the actual timeout state
+/*! \brief   Sets of the color transparency value configured by the actual timeout state
 
-   \param[in]     osn_Value                           Value for transparence (0..255)
+   \param[in]     osn_Value                           Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiDashboardPieChart::SetTransparence(const sintn osn_Value)
+void C_OgeWiDashboardPieChart::SetTransparency(const sintn osn_Value)
 {
-   this->msn_Transparence = osn_Value;
+   this->msn_Transparency = osn_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -251,7 +250,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 
          // Text-------------------------------------------------------------------------------
          c_HelpingColor = mc_STYLE_GUIDE_COLOR_0;
-         c_HelpingColor.setAlpha(msn_Transparence);
+         c_HelpingColor.setAlpha(msn_Transparency);
          m_SetPieText(c_Painter, c_HelpingColor, c_InnerCircleRect, c_DisplayString);
 
          QWidget::paintEvent(opc_Event);
@@ -284,7 +283,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 
          // Text-------------------------------------------------------------------------------
          c_HelpingColor = mc_STYLE_GUIDE_COLOR_34;
-         c_HelpingColor.setAlpha(msn_Transparence);
+         c_HelpingColor.setAlpha(msn_Transparency);
          m_SetPieText(c_Painter, c_HelpingColor, c_InnerCircleRect, c_DisplayString);
          //         m_SetPieText(c_Painter, mc_STYLE_GUIDE_COLOR_34, c_InnerCircleRect, c_DisplayString);
 
@@ -317,7 +316,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 
          // Text-------------------------------------------------------------------------------
          c_HelpingColor = mc_STYLE_GUIDE_COLOR_0;
-         c_HelpingColor.setAlpha(msn_Transparence);
+         c_HelpingColor.setAlpha(msn_Transparency);
          m_SetPieText(c_Painter, c_HelpingColor, c_InnerCircleRect, c_DisplayString);
          //         m_SetPieText(c_Painter, mc_STYLE_GUIDE_COLOR_0, c_InnerCircleRect, c_DisplayString);
 
@@ -337,7 +336,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 
          // Text-------------------------------------------------------------------------------
          c_HelpingColor = mc_STYLE_GUIDE_COLOR_0;
-         c_HelpingColor.setAlpha(msn_Transparence);
+         c_HelpingColor.setAlpha(msn_Transparency);
          m_SetPieText(c_Painter, c_HelpingColor, c_InnerCircleRect, c_DisplayString);
          //         m_SetPieText(c_Painter, mc_STYLE_GUIDE_COLOR_0, c_InnerCircleRect, c_DisplayString);
 
@@ -386,7 +385,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 
          // Text-------------------------------------------------------------------------------
          c_HelpingColor = mc_STYLE_GUIDE_COLOR_0;
-         c_HelpingColor.setAlpha(msn_Transparence);
+         c_HelpingColor.setAlpha(msn_Transparency);
          m_SetPieText(c_Painter, c_HelpingColor, c_InnerCircleRect, c_DisplayString);
          //         m_SetPieText(c_Painter, mc_STYLE_GUIDE_COLOR_0, c_InnerCircleRect, c_DisplayString);
 
@@ -421,7 +420,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 
          // Text-------------------------------------------------------------------------------
          c_HelpingColor = mc_STYLE_GUIDE_COLOR_34;
-         c_HelpingColor.setAlpha(msn_Transparence);
+         c_HelpingColor.setAlpha(msn_Transparency);
          m_SetPieText(c_Painter, c_HelpingColor, c_InnerCircleRect, c_DisplayString);
          //         m_SetPieText(c_Painter, mc_STYLE_GUIDE_COLOR_34, c_InnerCircleRect, c_DisplayString);
 
@@ -466,7 +465,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 
          // Text-------------------------------------------------------------------------------
          c_HelpingColor = mc_STYLE_GUIDE_COLOR_0;
-         c_HelpingColor.setAlpha(msn_Transparence);
+         c_HelpingColor.setAlpha(msn_Transparency);
          m_SetPieText(c_Painter, c_HelpingColor, c_InnerCircleRect, c_DisplayString);
          //         m_SetPieText(c_Painter, mc_STYLE_GUIDE_COLOR_0, c_InnerCircleRect, c_DisplayString);
 
@@ -507,7 +506,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 
          // Text-------------------------------------------------------------------------------
          c_HelpingColor = mc_STYLE_GUIDE_COLOR_6;
-         c_HelpingColor.setAlpha(msn_Transparence);
+         c_HelpingColor.setAlpha(msn_Transparency);
          m_SetPieText(c_Painter, c_HelpingColor, c_InnerCircleRect, c_DisplayString);
          //         m_SetPieText(c_Painter, mc_STYLE_GUIDE_COLOR_6, c_InnerCircleRect, c_DisplayString);
 
@@ -537,13 +536,13 @@ void C_OgeWiDashboardPieChart::m_SetPie(QPainter & orc_Painter, const QBrush oc_
 
    c_PieArc.setCapStyle(oe_CapStyle); //Qt::RoundCap causes  overlap & default not possible with Gradient
    orc_Painter.setPen(c_PieArc);
-   const sintn sn_PieStartAngle = 90 * 16; // To start on top in the
+   const sintn sn_PIE_START_ANGLE = 90 * 16; // To start on top in the
    // middle
    const float32 f32_PieSpanAngle = (-1.0F * 360.0F * of32_Progress * 16.0F); // -1: clockwise, 360*16: full
    // turn
 
    // Paints the Arc in the rect form start with the length span
-   orc_Painter.drawArc(orc_PieCircleRect, sn_PieStartAngle, static_cast<sintn>(f32_PieSpanAngle));
+   orc_Painter.drawArc(orc_PieCircleRect, sn_PIE_START_ANGLE, static_cast<sintn>(f32_PieSpanAngle));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

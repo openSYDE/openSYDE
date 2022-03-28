@@ -44,7 +44,7 @@ C_SdManTopologyBusConnectorReconnectManager::C_SdManTopologyBusConnectorReconnec
    mpc_LastBus(NULL),
    me_ConnectState(C_GiLiBusConnector::eTO_BUS),
    ms32_NewInterface(-1),
-   mc_NodeIds(),
+   mc_Properties(),
    mq_ContextMenuActive(false)
 {
 }
@@ -101,14 +101,14 @@ void C_SdManTopologyBusConnectorReconnectManager::ContextMenuAboutToClose(void)
 /*! \brief   Register interface accepted
 
    \param[in]  ors32_Interface   Selected interface number
-   \param[in]  orc_NodeIds       Node ids
+   \param[in]  orc_Properties    Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyBusConnectorReconnectManager::ContextMenuAccepted(const sint32 & ors32_Interface,
-                                                                      const std::vector<uint8> & orc_NodeIds)
+                                                                      const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    this->ms32_NewInterface = ors32_Interface;
-   this->mc_NodeIds = orc_NodeIds;
+   this->mc_Properties = orc_Properties;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -158,12 +158,12 @@ void C_SdManTopologyBusConnectorReconnectManager::m_FinishReconnect(void)
       {
          Q_EMIT this->SigReconnectBus(this->mpc_BusConnector, this->mpc_StartingBus, this->mpc_LastBus,
                                       this->mc_ConnectionPos,
-                                      this->ms32_NewInterface, this->mc_NodeIds);
+                                      this->ms32_NewInterface, this->mc_Properties);
       }
       else
       {
          Q_EMIT this->SigReconnectNode(this->mpc_BusConnector, this->mpc_StartingNode, this->mpc_LastNode,
-                                       this->mc_ConnectionPos, this->ms32_NewInterface, this->mc_NodeIds);
+                                       this->mc_ConnectionPos, this->ms32_NewInterface, this->mc_Properties);
       }
    }
    else

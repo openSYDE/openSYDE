@@ -53,7 +53,7 @@ public:
 private:
    C_OSCNodeDataPoolContentUtil(void);
 
-   static const stw_types::float64 mhf64_Epsilon;
+   static const stw_types::float64 mhf64_EPSILON;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

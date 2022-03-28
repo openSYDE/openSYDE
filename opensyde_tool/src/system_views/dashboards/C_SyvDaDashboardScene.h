@@ -45,6 +45,7 @@ public:
    virtual ~C_SyvDaDashboardScene(void);
 
    virtual bool IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc_ScenePos) override;
+   virtual bool IsSelectionRelevantForProxyWidgetInteraction(void) const override;
 
    void SetEditMode(const bool oq_Active);
    void SetDrawingActive(const bool oq_Active) const;
@@ -113,7 +114,9 @@ protected:
    virtual bool m_IsUndoAvailable(void) const;
    virtual bool m_HandleDeleteUserConfirmation(const QList<QGraphicsItem *> & orc_SelectedItems) const override;
 
+   virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event) override;
+   virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
 
 private:
@@ -123,6 +126,7 @@ private:
 
    //Properties
    void m_OnWidgetEditProperties(QGraphicsItem * const opc_Item) const;
+   void m_OnWidgetEditContent(QGraphicsItem * const opc_Item) const;
 
    //Connects
    void m_AddParamWidgetToScene(C_GiSvDaParam * const opc_Item);

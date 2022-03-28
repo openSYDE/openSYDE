@@ -761,6 +761,53 @@ bool C_PuiSdUtil::h_CheckIsFirstInAnyGroupOrNotInAny(const uint32 ou32_NodeIndex
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get interface data for node
+
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      orc_ConnectionId    Connection id
+   \param[in,out]  orc_Properties      Properties
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdUtil::h_GetInterfaceDataForNode(const uint32 ou32_NodeIndex,
+                                            const C_PuiSdNodeConnectionId & orc_ConnectionId,
+                                            std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
+{
+   const std::vector<uint32> c_NodeIndices =
+      C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
+
+   orc_Properties.clear();
+   orc_Properties.reserve(c_NodeIndices.size());
+   for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
+   {
+      const C_OSCNode * const pc_NodeData =
+         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndices[u32_ItNode]);
+      if (pc_NodeData != NULL)
+      {
+         for (uint32 u32_ItComInterface =
+                 0; u32_ItComInterface < pc_NodeData->c_Properties.c_ComInterfaces.size();
+              ++u32_ItComInterface)
+         {
+            const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+               pc_NodeData->c_Properties.c_ComInterfaces[u32_ItComInterface];
+            if ((rc_ComInterface.u8_InterfaceNumber == orc_ConnectionId.u8_InterfaceNumber) &&
+                (orc_ConnectionId.e_InterfaceType == rc_ComInterface.e_InterfaceType))
+            {
+               C_PuiSdNodeInterfaceAutomaticProperties c_Property;
+               c_Property.c_IP.reserve(4);
+               for (uint32 u32_It = 0UL; u32_It < 4; ++u32_It)
+               {
+                  c_Property.c_IP.push_back(rc_ComInterface.c_Ip.au8_IpAddress[u32_It]);
+               }
+               c_Property.u8_NodeId = rc_ComInterface.u8_NodeID;
+               orc_Properties.push_back(c_Property);
+            }
+         }
+      }
+   }
+   tgl_assert(orc_Properties.size() == c_NodeIndices.size());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------

@@ -45,9 +45,9 @@ public:
                                   const QString & orc_ToolTipContent = "", const QString & orc_ToolTipHeading = "");
    static void h_AddFinalSpacer(QVBoxLayout * const opc_Layout, QListWidget * const opc_ListWidget);
 
-   static const stw_types::sintn hsn_LabelSize;
-   static const stw_types::sintn hsn_HeadingSpacerSizeTop;
-   static const stw_types::sintn hsn_HeadingSpacerSizeBottom;
+   static const stw_types::sintn hsn_LABEL_SIZE;
+   static const stw_types::sintn hsn_HEADING_SPACER_SIZE_TOP;
+   static const stw_types::sintn hsn_HEADING_SPACER_SIZE_BOTTOM;
 
 private:
    C_SebToolboxUtil(void);

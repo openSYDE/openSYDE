@@ -215,18 +215,18 @@ void C_GiSvDaLabelBase::UpdateShowValue(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of the color transparence value configured by the actual timeout state
+/*! \brief   Update of the color transparency value configured by the actual timeout state
 
    Base class implementation does nothing. If the dashboard element has drawing elements which
    can not be adapted by stylesheets the derived class must reimplement this function.
 
    \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                 Value for transparence (0..255)
+   \param[in]     osn_Value                 Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaLabelBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_GiSvDaLabelBase::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
-   C_GiSvDaRectBaseGroup::UpdateTransparence(ou32_DataElementIndex, osn_Value);
+   C_GiSvDaRectBaseGroup::UpdateTransparency(ou32_DataElementIndex, osn_Value);
    if (this->mpc_LabelWidget != NULL)
    {
       this->mpc_LabelWidget->ResetFont();

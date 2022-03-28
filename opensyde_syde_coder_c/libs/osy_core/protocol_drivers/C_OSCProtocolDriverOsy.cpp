@@ -53,6 +53,10 @@ C_OSCProtocolDriverOsy::C_ListOfFeatures::C_ListOfFeatures(void)
    q_MaxNumberOfBlockLengthAvailable = false;
    q_EthernetToEthernetRoutingSupported = false;
    q_FileBasedTransferExitResultAvailable = false;
+   q_ExtendedSerialNumberModeImplemented = false;
+   q_SupportsSecurity = false;
+   q_SupportsDebuggerOff = false;
+   q_SupportsDebuggerOn = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -779,8 +783,8 @@ sint32 C_OSCProtocolDriverOsy::m_ReadStringDataIdentifier(const uint16 ou16_Data
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identifier, std::vector<uint8> & orc_WriteData,
-                                                       uint8 & oru8_NrCode)
+sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identifier,
+                                                       const std::vector<uint8> & orc_WriteData, uint8 & oru8_NrCode)
 {
    sint32 s32_Return;
    C_OSCProtocolDriverOsyService c_Request;
@@ -835,7 +839,7 @@ sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identif
    Send request and wait for response.
    See class description for general handling of "polled" services.
 
-   \param[out] orau8_SerialNumber    read serial number
+   \param[out] orc_SerialNumber      read serial number
    \param[out] opu8_NrCode           if != NULL: negative response code in case of an error response
 
    \return
@@ -848,7 +852,8 @@ sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identif
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(uint8 (&orau8_SerialNumber)[6], uint8 * const opu8_NrCode)
+sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(C_OSCProtocolSerialNumber & orc_SerialNumber,
+                                                      uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
 
@@ -858,7 +863,9 @@ sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(uint8 (&orau8_SerialNumber
    s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_ECU_SERIAL_NUMBER, 6U, true, c_Snr, u8_NrErrorCode);
    if (s32_Return == C_NO_ERR)
    {
-      (void)std::memcpy(&orau8_SerialNumber[0], &c_Snr[0], 6);
+      uint8 au8_SerialNumber[6];
+      (void)std::memcpy(&au8_SerialNumber[0], &c_Snr[0], 6);
+      orc_SerialNumber.SetPosSerialNumber(au8_SerialNumber);
    }
    if (opu8_NrCode != NULL)
    {
@@ -986,6 +993,10 @@ sint32 C_OSCProtocolDriverOsy::OsyReadListOfFeatures(C_ListOfFeatures & orc_List
       orc_ListOfFeatures.q_MaxNumberOfBlockLengthAvailable = ((c_Data[7] & 0x02U) == 0x02U) ? true : false;
       orc_ListOfFeatures.q_EthernetToEthernetRoutingSupported = ((c_Data[7] & 0x04U) == 0x04U) ? true : false;
       orc_ListOfFeatures.q_FileBasedTransferExitResultAvailable = ((c_Data[7] & 0x08U) == 0x08U) ? true : false;
+      orc_ListOfFeatures.q_ExtendedSerialNumberModeImplemented = ((c_Data[7] & 0x10U) == 0x10U) ? true : false;
+      orc_ListOfFeatures.q_SupportsSecurity = ((c_Data[7] & 0x20U) == 0x20U) ? true : false;
+      orc_ListOfFeatures.q_SupportsDebuggerOff = ((c_Data[7] & 0x40U) == 0x40U) ? true : false;
+      orc_ListOfFeatures.q_SupportsDebuggerOn = ((c_Data[7] & 0x80U) == 0x80U) ? true : false;
       //we don't know anything about the meaning of the rest of the bits as we have no crystal ball
    }
    if (opu8_NrCode != NULL)
@@ -1340,6 +1351,119 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFileBasedTransferExitResult(C_SCLString & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadEcuSerialNumberExt service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+   Per specification the maximum length is 29 characters.
+
+   \param[out] orc_SerialNumberExt                 read extended serial number
+   \param[out] opu8_NrCode                         if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+   C_RANGE    length of read string or serial number does not match
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumberExt(C_OSCProtocolSerialNumber & orc_SerialNumberExt,
+                                                         uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+   uint8 u8_NrErrorCode = 0U;
+
+   std::vector<uint8> c_Data;
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_ECU_SERIAL_NUMBER_EXT, 3, false, c_Data, u8_NrErrorCode);
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   if (s32_Return == C_NO_ERR)
+   {
+      // At least 3 bytes are necessary
+      if (c_Data.size() > 2)
+      {
+         // Byte stream
+         const uint8 u8_SnrLength = c_Data[1];
+
+         // Maximum length of an extended serial number must be valid and
+         // length of string must match the expected size of the SNR
+         if ((u8_SnrLength <= 29U) &&
+             ((static_cast<uint32>(u8_SnrLength) + 2U) == c_Data.size()))
+         {
+            const uint8 u8_SerialNumberManufacturerFormat = c_Data[0];
+            // Erase the first two bytes to have the serial number data only
+            c_Data.erase(c_Data.begin(), c_Data.begin() + 2);
+            s32_Return = orc_SerialNumberExt.SetExtSerialNumber(c_Data, u8_SerialNumberManufacturerFormat);
+         }
+         else
+         {
+            s32_Return = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Return = C_RANGE;
+      }
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::ECUSerialNumberDataIdentifierExt", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadSubNodeId service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   Whether this service is available on the target can be checked with OsyReadListOfFeatures().
+
+   \param[out] oru8_SubNodeId                   read sub node id
+   \param[out] opu8_NrCode                      if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyReadSubNodeId(stw_types::uint8 & oru8_SubNodeId, uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+
+   std::vector<uint8> c_Data;
+   uint8 u8_NrErrorCode = 0U;
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_SUB_NODE_ID, 1U, true, c_Data, u8_NrErrorCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      //extract information:
+      oru8_SubNodeId = c_Data[0];
+   }
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::ReadMaxNumberOfBlockLength", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   WriteApplicationSoftwareFingerprint service implementation
 
    Send request and wait for response.
@@ -1389,6 +1513,297 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteApplicationSoftwareFingerprint(const uint
       (*opu8_NrCode) = u8_NrErrorCode;
    }
    m_LogServiceError("WriteDataByIdentifier::ApplicationSoftwareFingerprint", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadCertificateSerialNumber service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+   Serial number is a byte array with maximum length of 20 Bytes.
+
+   \param[out] orc_SerialNumber             read certificate serial number
+   \param[out] opu8_NrCode                  if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+   C_RANGE    count of read bytes does not match the expectation (more than 20 bytes received)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyReadCertificateSerialNumber(std::vector<stw_types::uint8> & orc_SerialNumber,
+                                                              uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+
+   uint8 u8_NrErrorCode = 0U;
+
+   orc_SerialNumber.clear();
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_CERTIFICATE_SERIAL_NUMBER, 1U, false, orc_SerialNumber,
+                                       u8_NrErrorCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      if (orc_SerialNumber.size() > 20)
+      {
+         orc_SerialNumber.clear();
+         s32_Return = C_RANGE;
+      }
+   }
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::CertificateSerialNumber", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   WriteSecurityKey service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+   Public key modulus is a byte array with a length of 128 Bytes.
+   Public key exponent is a byte array with a length of 1 to 4 Bytes containing the exponent (high byte first).
+   Serial number is a byte array with maximum length of 20 Bytes.
+
+   \param[in]  orc_PublicKeyModulus            new public key modulus
+   \param[in]  orc_PublicKeyExponent           new public key exponent
+   \param[in]  orc_CertificateSerialNumber     new certificate serial number
+   \param[out] opu8_NrCode                     if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+   C_RANGE    parameter orc_PublicKeyModulus, orc_PublicKeyExponent, orc_SerialNumber does not match the size expectation
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyWriteSecurityKey(const std::vector<uint8> & orc_PublicKeyModulus,
+                                                   const std::vector<uint8> & orc_PublicKeyExponent,
+                                                   const std::vector<uint8> & orc_CertificateSerialNumber,
+                                                   uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+   uint8 u8_NrErrorCode = 0U;
+
+   if ((orc_PublicKeyModulus.size() != 128) ||
+       (orc_PublicKeyExponent.size() == 0) ||
+       (orc_PublicKeyExponent.size() > 4) ||
+       (orc_CertificateSerialNumber.size() == 0) ||
+       (orc_CertificateSerialNumber.size() > 20))
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      std::vector<uint8> c_Data;
+      c_Data.resize(orc_PublicKeyModulus.size() + 4 + orc_CertificateSerialNumber.size());
+      (void)memcpy(&c_Data[0], &orc_PublicKeyModulus[0], orc_PublicKeyModulus.size());
+      (void)memset(&c_Data[128], 0, 4);
+      //MSB first: move exponent "to the right":
+      (void)memcpy(&c_Data[(128 + 4) - orc_PublicKeyExponent.size()], &orc_PublicKeyExponent[0],
+                   orc_PublicKeyExponent.size());
+
+      (void)memcpy(&c_Data[orc_PublicKeyModulus.size() + 4], &orc_CertificateSerialNumber[0],
+                   orc_CertificateSerialNumber.size());
+
+      s32_Return = m_WriteDataByIdentifier(mhu16_OSY_DI_SECURITY_KEY, c_Data, u8_NrErrorCode);
+      if (opu8_NrCode != NULL)
+      {
+         (*opu8_NrCode) = u8_NrErrorCode;
+      }
+   }
+   m_LogServiceError("WriteDataByIdentifier::SecurityKey", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadSecurityActivation service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   \param[out] orq_SecurityOn               read flag if security is on or off on the node
+   \param[out] oru8_SecurityAlgorithm       read used security algorithm of the node
+   \param[out] opu8_NrCode                  if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyReadSecurityActivation(bool & orq_SecurityOn, uint8 & oru8_SecurityAlgorithm,
+                                                         uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+
+   std::vector<uint8> c_Data;
+   uint8 u8_NrErrorCode = 0U;
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_SECURITY_ACTIVATION, 2U, true, c_Data,
+                                       u8_NrErrorCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      orq_SecurityOn = ((c_Data[0] & 0x01U) == 0x01U) ? true : false;
+      oru8_SecurityAlgorithm = c_Data[1];
+   }
+
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::SecurityActivation", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   WriteSecurityActivation service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   \param[in]  oq_SecurityOn          new flag if security is on or off on the node
+   \param[in]  ou8_SecurityAlgorithm  new used security algorithm of the node
+   \param[out] opu8_NrCode            if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyWriteSecurityActivation(const bool oq_SecurityOn, const uint8 ou8_SecurityAlgorithm,
+                                                          uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+   uint8 u8_NrErrorCode = 0U;
+
+   std::vector<uint8> c_Data;
+
+   c_Data.resize(2);
+   c_Data[0] = (oq_SecurityOn == true) ? 0x01U : 0x00U;
+   c_Data[1] = ou8_SecurityAlgorithm;
+
+   s32_Return = m_WriteDataByIdentifier(mhu16_OSY_DI_SECURITY_ACTIVATION, c_Data, u8_NrErrorCode);
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("WriteDataByIdentifier::SecurityActivation", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadDebuggerEnabled service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   \param[out] orq_DebuggerEnabled          read flag if debugger is on or off on the node
+   \param[out] opu8_NrCode                  if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyReadDebuggerEnabled(bool & orq_DebuggerEnabled, uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+
+   std::vector<uint8> c_Data;
+   uint8 u8_NrErrorCode = 0U;
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_DEBUGGER_ACTIVATION, 1U, true, c_Data,
+                                       u8_NrErrorCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      orq_DebuggerEnabled = ((c_Data[0] & 0x01U) == 0x01U) ? true : false;
+   }
+
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::DebuggerEnabled", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   WriteDebuggerEnabled service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   If the debugger interface of device can be activated or deactivated depends on the device.
+   This information can be read with the function OsyReadListOfFeatures and the resulting flags q_SupportsDebuggerOff
+   and q_SupportsDebuggerOn.
+
+   \param[in]  oq_DebuggerEnabled     new flag if debugger is on or off on the node
+   \param[out] opu8_NrCode            if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyWriteDebuggerEnabled(const bool oq_DebuggerEnabled, uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+   uint8 u8_NrErrorCode = 0U;
+
+   std::vector<uint8> c_Data;
+
+   c_Data.resize(1);
+   c_Data[0] = (oq_DebuggerEnabled == true) ? 0x01U : 0x00U;
+
+   s32_Return = m_WriteDataByIdentifier(mhu16_OSY_DI_DEBUGGER_ACTIVATION, c_Data, u8_NrErrorCode);
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("WriteDataByIdentifier::DebuggerEnabled", s32_Return, u8_NrErrorCode);
 
    return s32_Return;
 }
@@ -3236,11 +3651,24 @@ sint32 C_OSCProtocolDriverOsy::m_RoutineControl(const uint16 ou16_RoutineIdentif
 
    Request the seed for key generation from server.
    The sub-function means the level of security.
-   The seed consist of 4bytes.
+   The seed consist of 8bytes.
 
-   \param[in]  ou8_SecurityLevel     level of requested security (= sub-function)
-   \param[out] oru32_Seed            seed for key generation
-   \param[out] opu8_NrCode           if != NULL: negative response code in case of an error response
+   Two modes are supported:
+   - Non-secure mode:
+      oru8_SecurityAlgorithm is set to 0
+      32 bit value for the seed
+   - Secure mode:
+      8 bit value for the used security algorithm -> oru8_SecurityAlgorithm
+      64 bit value for the seed -> oru64_Seed
+
+   The request is the same for both modes.
+
+   \param[in]  ou8_SecurityLevel      level of requested security (= sub-function)
+   \param[out] orq_SecureMode         true: secure mode was detected
+                                      false: non secure mode detected
+   \param[out] oru64_Seed             seed for key generation
+   \param[out] oru8_SecurityAlgorithm Read security algorithm
+   \param[out] opu8_NrCode            if != NULL: negative response code in case of an error response
 
    \return
    C_NO_ERR   request sent, positive response received
@@ -3248,11 +3676,12 @@ sint32 C_OSCProtocolDriverOsy::m_RoutineControl(const uint16 ou16_RoutineIdentif
    C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
-   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID or unexpected size)
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8 ou8_SecurityLevel, uint32 & oru32_Seed,
+sint32 C_OSCProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8 ou8_SecurityLevel, bool & orq_SecureMode,
+                                                            uint64 & oru64_Seed, uint8 & oru8_SecurityAlgorithm,
                                                             uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -3266,10 +3695,37 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8 ou8_Secu
 
    s32_Return = m_SecurityAccess(ou8_SecurityLevel, c_SendData, 0U, 4U, c_ReceiveData, u8_NrErrorCode);
 
-   oru32_Seed = ((static_cast<uint32>(c_ReceiveData[0])) << 24U) +
-                ((static_cast<uint32>(c_ReceiveData[1])) << 16U) +
-                ((static_cast<uint32>(c_ReceiveData[2])) << 8U) +
-                (static_cast<uint32>(c_ReceiveData[3]));
+   if (c_ReceiveData.size() == 4)
+   {
+      // Non secure mode
+      orq_SecureMode = false;
+      oru8_SecurityAlgorithm = 0U;
+      oru64_Seed = ((static_cast<uint64>(c_ReceiveData[0])) << 24U) +
+                   ((static_cast<uint64>(c_ReceiveData[1])) << 16U) +
+                   ((static_cast<uint64>(c_ReceiveData[2])) << 8U) +
+                   (static_cast<uint64>(c_ReceiveData[3]));
+   }
+   else if (c_ReceiveData.size() == 10)
+   {
+      // Secure mode
+      orq_SecureMode = true;
+      // c_ReceiveData[1] is reserved
+      oru8_SecurityAlgorithm = c_ReceiveData[0];
+      oru64_Seed = ((static_cast<uint64>(c_ReceiveData[2])) << 56U) +
+                   ((static_cast<uint64>(c_ReceiveData[3])) << 48U) +
+                   ((static_cast<uint64>(c_ReceiveData[4])) << 40U) +
+                   ((static_cast<uint64>(c_ReceiveData[5])) << 32U) +
+                   ((static_cast<uint64>(c_ReceiveData[6])) << 24U) +
+                   ((static_cast<uint64>(c_ReceiveData[7])) << 16U) +
+                   ((static_cast<uint64>(c_ReceiveData[8])) << 8U) +
+                   (static_cast<uint64>(c_ReceiveData[9]));
+   }
+   else
+   {
+      // Not expected size
+      s32_Return = C_RD_WR;
+   }
+
    if (opu8_NrCode != NULL)
    {
       (*opu8_NrCode) = u8_NrErrorCode;
@@ -3333,6 +3789,57 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessSendKey(const uint8 ou8_Security
    {
       C_SCLString c_ErrorText;
       c_ErrorText.PrintFormatted("SecurityAccessSendKey(Level:%d, Key:%d)", ou8_SecurityLevel, ou32_Key);
+      m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Security access - Send Key service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   Send the computed key to the server.
+   The sub-function + 1 means the level of security.
+
+   \param[in]  ou8_SecurityLevel     level of requested security (= sub-function)
+   \param[out] orc_Key               key for security access
+   \param[out] opu8_NrCode           if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsySecurityAccessSendKey(const uint8 ou8_SecurityLevel,
+                                                        const std::vector<stw_types::uint8> & orc_Key,
+                                                        uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+
+   std::vector<uint8> c_ReceiveData;
+   uint8 u8_NrErrorCode = 0U;
+
+   c_ReceiveData.resize(0);
+
+   s32_Return = m_SecurityAccess(ou8_SecurityLevel + 1U, orc_Key,
+                                 static_cast<uint16>(orc_Key.size()), 0U, c_ReceiveData, u8_NrErrorCode);
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+   if (s32_Return != C_NO_ERR)
+   {
+      C_SCLString c_ErrorText;
+      c_ErrorText.PrintFormatted("SecurityAccessSendKey(Level:%d)", ou8_SecurityLevel);
       m_LogServiceError(c_ErrorText, s32_Return, u8_NrErrorCode);
    }
 
@@ -3406,7 +3913,7 @@ sint32 C_OSCProtocolDriverOsy::m_SecurityAccess(const uint8 ou8_SubFunction, con
          uint8 u8_NrErrorCode;
          s32_Return = m_PollForSpecificServiceResponse(mhu8_OSY_SI_SECURITY_ACCESS,
                                                        ou16_ExpectedPayloadSize + 2U, c_Response,
-                                                       u8_NrErrorCode, true);
+                                                       u8_NrErrorCode, false);
          switch (s32_Return)
          {
          case C_NO_ERR:
@@ -4301,10 +4808,10 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMemoryByAddress(const uint32 ou32_MemoryAd
       //1 byte FormatIdentifier
       //4 bytes address
       //4 bytes size
-      const uint32 u32_BlockSize = (C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 10U);
+      const uint32 u32_BLOCK_SIZE = (C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 10U);
 
       //split up into smaller blocks:
-      for (uint32 u32_ReadIndex = 0U; u32_ReadIndex < orc_DataRecord.size(); u32_ReadIndex += u32_BlockSize)
+      for (uint32 u32_ReadIndex = 0U; u32_ReadIndex < orc_DataRecord.size(); u32_ReadIndex += u32_BLOCK_SIZE)
       {
          C_OSCProtocolDriverOsyService c_Request;
          std::vector<uint8> c_MemoryAddress;
@@ -4313,9 +4820,9 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMemoryByAddress(const uint32 ou32_MemoryAd
          uint8 u8_MemorySizeByteCount;
          const uint32 u32_MemoryAddress = ou32_MemoryAddress + u32_ReadIndex;
          uint32 u32_Size = static_cast<uint32>(orc_DataRecord.size() - u32_ReadIndex);
-         if (u32_Size > u32_BlockSize)
+         if (u32_Size > u32_BLOCK_SIZE)
          {
-            u32_Size = u32_BlockSize;
+            u32_Size = u32_BLOCK_SIZE;
          }
 
          //Convert to bytes
@@ -4910,7 +5417,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
       orc_BlockInfo.ClearContent();
 
       // parse response message for information
-      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_IdBlockAddresses)
+      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_ID_BLOCK_ADDRESSES)
       {
          orc_BlockInfo.u32_BlockStartAddress = ((static_cast<uint32>(c_ReceiveData[un_Counter + 1U])) << 24U) +
                                                ((static_cast<uint32>(c_ReceiveData[un_Counter + 2U])) << 16U) +
@@ -4922,12 +5429,12 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
                                              (static_cast<uint32>(c_ReceiveData[un_Counter + 8U]));
          un_Counter += 9U;
       }
-      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_IdResultSignature)
+      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_ID_RESULT_SIGNATURE)
       {
          orc_BlockInfo.u8_SignatureValid = c_ReceiveData[un_Counter + 1U];
          un_Counter += 2U;
       }
-      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_IdApplicationVersion)
+      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_ID_APPLICATION_VERSION)
       {
          const uintn un_Length = static_cast<uintn>(c_ReceiveData[un_Counter + 1U]);
          c_Text.resize(un_Length + 1U);     //plus 1 for termination
@@ -4936,7 +5443,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
          orc_BlockInfo.c_ApplicationVersion = &c_Text[0];
          un_Counter += un_Length + 2U;
       }
-      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_IdBuildTimestamp)
+      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_ID_BUILD_TIMESTAMP)
       {
          c_Text.resize(11U + 1U);           //plus 1 for termination
          c_Text[c_Text.size() - 1U] = '\0'; //add termination
@@ -4949,7 +5456,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
          orc_BlockInfo.c_BuildTime = &c_Text[0];
          un_Counter += 8U;
       }
-      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_IdApplicationName)
+      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_ID_APPLICATION_NAME)
       {
          const uintn un_Length = static_cast<uintn>(c_ReceiveData[un_Counter + 1U]);
          c_Text.resize(un_Length + 1U);     //plus 1 for termination
@@ -4958,7 +5465,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
          orc_BlockInfo.c_ApplicationName = &c_Text[0];
          un_Counter += un_Length + 2U;
       }
-      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_IdAdditionalInformation)
+      if (c_ReceiveData[un_Counter] == C_FlashBlockInfo::hu8_ID_ADDITIONAL_INFORMATION)
       {
          const uintn un_Length = static_cast<uintn>(c_ReceiveData[un_Counter + 1U]);
          c_Text.resize(un_Length + 1U);     //plus 1 for termination
@@ -5279,6 +5786,12 @@ C_SCLString C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(const sint3
          break;
       case (C_OSCProtocolDriverOsy::hu8_NR_CODE_INVALID_KEY):
          c_Text += "invalidKey";
+         break;
+      case (C_OSCProtocolDriverOsy::hu8_NR_CODE_EXCEEDED_NUMBER_OF_ATTEMPTS):
+         c_Text += "exceededNumberOfAttempts";
+         break;
+      case (C_OSCProtocolDriverOsy::hu8_NR_CODE_REQUIRED_TIME_DELAY_NOT_EXPIRED):
+         c_Text += "requiredTimeDelayNotExpired";
          break;
       case (C_OSCProtocolDriverOsy::hu8_NR_CODE_UPLOAD_DOWNLOAD_NOT_ACCEPTED):
          c_Text += "uploadDownloadNotAccepted";

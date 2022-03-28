@@ -362,7 +362,7 @@ void C_GiSyLineWidget::SetEndArrow(const stw_opensyde_gui_logic::C_PuiBsLineArro
 void C_GiSyLineWidget::m_UpdatePreview(void)
 {
    const QSize c_ViewSize = C_GiSyBaseWidget::h_GetSceneViewSize();
-   const float64 f64_PlacementOffset = 25.0;
+   const float64 f64_PLACEMENT_OFFSET = 25.0;
 
    std::vector<QPointF> c_Points;
 
@@ -375,8 +375,8 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
       C_GiLiLine * pc_Item;
 
       // Main line
-      c_Points.push_back(QPointF(f64_PlacementOffset, 70.0));
-      c_Points.push_back(QPointF(static_cast<float64>(c_ViewSize.width()) - f64_PlacementOffset, 70.0));
+      c_Points.push_back(QPointF(f64_PLACEMENT_OFFSET, 70.0));
+      c_Points.push_back(QPointF(static_cast<float64>(c_ViewSize.width()) - f64_PLACEMENT_OFFSET, 70.0));
 
       if (me_Mode == eETHERNET_BUS)
       {
@@ -423,13 +423,13 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
          f64_XOffset = static_cast<float64>(this->mpc_Ui->pc_SpinBoxWidth->value()) * 2.0;
       }
 
-      c_Points.push_back(QPointF(f64_PlacementOffset + f64_XOffset, static_cast<float64>(c_ViewSize.height()) / 2.0));
+      c_Points.push_back(QPointF(f64_PLACEMENT_OFFSET + f64_XOffset, static_cast<float64>(c_ViewSize.height()) / 2.0));
       e_ArrowHeadType = this->GetEndArrow();
       if (C_GiBiArrow::h_HasOffsetInteractionPoint(e_ArrowHeadType) == true)
       {
          f64_XOffset = static_cast<float64>(this->mpc_Ui->pc_SpinBoxWidth->value()) * 2.0;
       }
-      c_Points.push_back(QPointF((static_cast<float64>(c_ViewSize.width()) - f64_PlacementOffset) - f64_XOffset,
+      c_Points.push_back(QPointF((static_cast<float64>(c_ViewSize.width()) - f64_PLACEMENT_OFFSET) - f64_XOffset,
                                  static_cast<float64>(c_ViewSize.height()) / 2.0));
 
       pc_Arrow = new C_GiBiArrow(0ULL, &c_Points);

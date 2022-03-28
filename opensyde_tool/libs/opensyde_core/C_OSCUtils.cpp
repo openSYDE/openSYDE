@@ -546,7 +546,7 @@ C_SCLString C_OSCUtils::h_PosSerialNumberToString(const uint8 * const opu8_Seria
    \retval   empty string  if length of orc_RawSerialNumber does not match the expectations
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCUtils::h_FsnSerialNumberToString(const stw_types::uint8 ou8_ManufacturerFormat,
+C_SCLString C_OSCUtils::h_FsnSerialNumberToString(const uint8 ou8_ManufacturerFormat,
                                                   const stw_scl::C_SCLString & orc_RawSerialNumber)
 {
    C_SCLString c_Result;

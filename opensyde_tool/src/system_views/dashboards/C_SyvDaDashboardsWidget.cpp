@@ -39,10 +39,10 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SyvDaDashboardsWidget::mhc_DarkModeEnabledIconPath = "://images/system_views/Darkmode_Disable.svg";
-const QString C_SyvDaDashboardsWidget::mhc_DarkModeDisabledIconPath = "://images/system_views/Darkmode_Enable.svg";
-const sintn C_SyvDaDashboardsWidget::mhsn_WidgetBorder = 11;
-const sintn C_SyvDaDashboardsWidget::mhsn_ToolboxInitPosY = 150;
+const QString C_SyvDaDashboardsWidget::mhc_DARK_MODE_ENABLED_ICON_PATH = "://images/system_views/Darkmode_Disable.svg";
+const QString C_SyvDaDashboardsWidget::mhc_DARK_MODE_DISABLED_ICON_PATH = "://images/system_views/Darkmode_Enable.svg";
+const sintn C_SyvDaDashboardsWidget::mhsn_WIDGET_BORDER = 11;
+const sintn C_SyvDaDashboardsWidget::mhsn_TOOLBOX_INIT_POS_Y = 150;
 stw_types::uint32 C_SyvDaDashboardsWidget::mhu32_DisconnectTime = 0UL;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -197,12 +197,12 @@ void C_SyvDaDashboardsWidget::LoadDarkMode(void)
    {
       if (pc_View->GetDarkModeActive() == true)
       {
-         Q_EMIT (this->SigSetDarkModePushButtonIcon(C_SyvDaDashboardsWidget::mhc_DarkModeEnabledIconPath));
+         Q_EMIT (this->SigSetDarkModePushButtonIcon(C_SyvDaDashboardsWidget::mhc_DARK_MODE_ENABLED_ICON_PATH));
          m_ApplyDarkMode(true);
       }
       else
       {
-         Q_EMIT (this->SigSetDarkModePushButtonIcon(C_SyvDaDashboardsWidget::mhc_DarkModeDisabledIconPath));
+         Q_EMIT (this->SigSetDarkModePushButtonIcon(C_SyvDaDashboardsWidget::mhc_DARK_MODE_DISABLED_ICON_PATH));
          m_ApplyDarkMode(false);
       }
    }
@@ -426,8 +426,9 @@ void C_SyvDaDashboardsWidget::CheckError(void) const
    C_NagToolTip::E_Type e_ToolTipType;
    QString c_IconPath;
    sintn sn_ColorID;
-   const bool q_ViewSetupError = C_SyvUtil::h_GetViewSetupLabelInfo(
-      this->mu32_ViewIndex, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip, e_ToolTipType,
+   const bool q_ViewSetupError = C_SyvUtil::h_GetViewStatusLabelInfo(
+      this->mu32_ViewIndex, ms32_SUBMODE_SYSVIEW_DASHBOARD, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip,
+      e_ToolTipType,
       c_IconPath, sn_ColorID);
 
    if (q_ViewSetupError == true)
@@ -540,32 +541,32 @@ void C_SyvDaDashboardsWidget::resizeEvent(QResizeEvent * const opc_Event)
       }
 
       // would the toolbox be outside of the widget in x direction
-      if ((this->mpc_Toolbox->x() + this->mpc_Toolbox->width() + mhsn_WidgetBorder) > pc_Widget->width())
+      if ((this->mpc_Toolbox->x() + this->mpc_Toolbox->width() + mhsn_WIDGET_BORDER) > pc_Widget->width())
       {
          // is the toolbox to big?
-         if ((this->mpc_Toolbox->width() + (2 * mhsn_WidgetBorder)) > pc_Widget->width())
+         if ((this->mpc_Toolbox->width() + (2 * mhsn_WIDGET_BORDER)) > pc_Widget->width())
          {
-            c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WidgetBorder));
+            c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WIDGET_BORDER));
          }
          else
          {
             // adapt position of toolbox
-            c_Point.setX((pc_Widget->width() - this->mpc_Toolbox->width()) - mhsn_WidgetBorder);
+            c_Point.setX((pc_Widget->width() - this->mpc_Toolbox->width()) - mhsn_WIDGET_BORDER);
          }
       }
 
       // would the toolbox be outside of the widget in y direction
-      if ((this->mpc_Toolbox->y() + this->mpc_Toolbox->height() + mhsn_WidgetBorder) > pc_Widget->height())
+      if ((this->mpc_Toolbox->y() + this->mpc_Toolbox->height() + mhsn_WIDGET_BORDER) > pc_Widget->height())
       {
          // is the toolbox to big?
-         if ((this->mpc_Toolbox->height() + (2 * mhsn_WidgetBorder)) > pc_Widget->height())
+         if ((this->mpc_Toolbox->height() + (2 * mhsn_WIDGET_BORDER)) > pc_Widget->height())
          {
-            c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WidgetBorder));
+            c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WIDGET_BORDER));
          }
          else
          {
             // adapt position of toolbox
-            c_Point.setY((pc_Widget->height() - this->mpc_Toolbox->height()) - mhsn_WidgetBorder);
+            c_Point.setY((pc_Widget->height() - this->mpc_Toolbox->height()) - mhsn_WIDGET_BORDER);
          }
       }
 
@@ -573,7 +574,7 @@ void C_SyvDaDashboardsWidget::resizeEvent(QResizeEvent * const opc_Event)
       // The operator '-' have to follow by the same operator, otherwise the geometry is wrong
       //lint -save -e834
       c_PointFixMiniToolbox.setX((pc_Widget->width() - this->mpc_FixMinimizedToolbox->width()) -
-                                 170 - mhsn_WidgetBorder);
+                                 170 - mhsn_WIDGET_BORDER);
       //lint -restore
 
       this->mpc_Toolbox->setGeometry(QRect(c_Point, c_Size));
@@ -662,15 +663,15 @@ void C_SyvDaDashboardsWidget::m_InitToolBox(void)
          if (this->mpc_ToolboxParent == NULL)
          {
             // default value in this error case
-            this->mpc_Toolbox->move(mhsn_WidgetBorder, mhsn_ToolboxInitPosY);
+            this->mpc_Toolbox->move(mhsn_WIDGET_BORDER, mhsn_TOOLBOX_INIT_POS_Y);
          }
          else
          {
             // default value
             this->mpc_Toolbox->setGeometry(QRect(QPoint((((this->mpc_ToolboxParent->width() -
                                                            this->mpc_Toolbox->width()) -
-                                                          mhsn_WidgetBorder) - static_cast<sintn> (150)),
-                                                        mhsn_ToolboxInitPosY + static_cast<sintn> (50)),
+                                                          mhsn_WIDGET_BORDER) - static_cast<sintn> (150)),
+                                                        mhsn_TOOLBOX_INIT_POS_Y + static_cast<sintn> (50)),
                                                  QSize(449, 429)));
 
             this->mpc_Toolbox->SetMaximizedHeight(429);
@@ -762,7 +763,6 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
    bool q_NameInvalid;
    bool q_PCNotConnected;
    bool q_RoutingInvalid;
-   bool q_UpdateDisabledButDataBlocks;
    bool q_SysDefInvalid;
    bool q_NoNodesActive;
 
@@ -807,11 +807,11 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
    case C_BUSY:
       if (C_PuiSvHandler::h_GetInstance()->CheckViewError(this->mu32_ViewIndex, &q_NameInvalid,
                                                           &q_PCNotConnected, &q_RoutingInvalid,
-                                                          &q_UpdateDisabledButDataBlocks,
+                                                          NULL, NULL,
                                                           &q_SysDefInvalid, &q_NoNodesActive, NULL, NULL) == C_NO_ERR)
       {
-         if ((((((q_NameInvalid == false) && (q_PCNotConnected == false)) && (q_RoutingInvalid == false)) &&
-               (q_SysDefInvalid == false)) && (q_NoNodesActive == false)) && (q_UpdateDisabledButDataBlocks == false))
+         if ((q_NameInvalid == false) && (q_PCNotConnected == false) && (q_RoutingInvalid == false) &&
+             (q_SysDefInvalid == false) && (q_NoNodesActive == false))
          {
             orc_Message =
                static_cast<QString>(C_GtGetText::h_GetText("System View Dashboard configuration error detected. "
@@ -862,7 +862,7 @@ void C_SyvDaDashboardsWidget::m_CloseOsyDriver(void)
       this->mpc_ComDriver->StopCycling();
 
       // Send a last time the tester present to make sure the close function can send all necessary stop messages
-      this->mpc_ComDriver->SendTesterPresentWithoutDefectNodes();
+      this->mpc_ComDriver->SendTesterPresentToActiveNodes();
 
       this->mpc_ComDriver->StopDiagnosisServer();
 

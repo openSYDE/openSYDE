@@ -51,8 +51,8 @@ protected:
 private:
    Ui::C_CamMainWindow * mpc_Ui;
 
-   static const stw_types::sint32 mhs32_SettingsSplitterMax;
-   static const stw_types::sint32 mhs32_MessageGenSplitterMax;
+   static const stw_types::sint32 mhs32_SETTINGS_SPLITTER_MAX;
+   static const stw_types::sint32 mhs32_MESSAGE_GEN_SPLITTER_MAX;
 
    stw_opensyde_gui_logic::C_CamComDriverBase mc_ComDriver;
    stw_can::C_CAN * mpc_CanDllDispatcher;

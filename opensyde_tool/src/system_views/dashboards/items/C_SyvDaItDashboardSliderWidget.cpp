@@ -116,8 +116,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::AdjustFontToSize(void) const
 {
-   const sintn sn_Margins = 2 * 6;
-   const sintn sn_AdaptedWidth = this->width() - sn_Margins;
+   const sintn sn_MARGINS = 2 * 6;
+   const sintn sn_AdaptedWidth = this->width() - sn_MARGINS;
    const float32 f32_WidthLabels = static_cast<float32>(sn_AdaptedWidth) * (2.0F / ((25.0F * 2.0F) / 3.0F));
    const sintn sn_WidthLabels = static_cast<sintn>(f32_WidthLabels);
 

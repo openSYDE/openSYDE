@@ -16,13 +16,14 @@
 #include <QGraphicsDropShadowEffect>
 
 #include "stwtypes.h"
-#include "C_GiRectBaseGroup.h"
 #include "C_GiPort.h"
 #include "C_OSCNode.h"
+#include "C_GiRectPixmap.h"
 #include "C_GiNodeBoundary.h"
+#include "C_GiRectBaseGroup.h"
 #include "C_GiBiCustomToolTip.h"
 #include "C_PuiSdNodeConnectionId.h"
-#include "C_GiRectPixmap.h"
+#include "C_PuiSdNodeInterfaceAutomaticProperties.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -41,8 +42,9 @@ class C_GiNode :
 public:
    //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiNode(const stw_types::sint32 & ors32_Index, const stw_types::uint64 & oru64_ID,
-            const stw_types::float64 & orf64_Width = mhf64_InitialWidthNode,
-            const stw_types::float64 & orf64_Height = mhf64_InitialHeightNode, QGraphicsItem * const opc_Parent = NULL);
+            const stw_types::float64 & orf64_Width = mhf64_INITIAL_WIDTH_NODE,
+            const stw_types::float64 & orf64_Height = mhf64_INITIAL_HEIGHT_NODE,
+            QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiNode();
    virtual void FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const;
    virtual void FindClosestPort(const QPointF &orc_ScenePoint, C_GiPort * (&orpc_Closest)) const;
@@ -53,14 +55,14 @@ public:
    void AddConnection(C_GiLiBusConnector * const opc_Connection);
    void AddConnectionAndData(C_GiLiBusConnector * const opc_Connection,
                              const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId & orc_NodeConnection,
-                             const std::vector<stw_types::uint8> & orc_NodeIds,
-                             const stw_types::uint32 & oru32_BusIndex);
+                             const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties, const stw_types::uint32 & oru32_BusIndex);
    void UpdateConnection(const C_GiLiBusConnector * const opc_Connection,
                          const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId & orc_NodeConnection,
-                         const std::vector<stw_types::uint8> & orc_NodeIds,
+                         const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
                          const stw_types::uint32 & oru32_BusIndex) const;
    void ChangeInterface(const stw_types::uint8 ou8_Interface, const C_GiLiBusConnector * const opc_Connection,
-                        const std::vector<stw_types::uint8> & orc_NodeIds) const;
+                        const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
+   const;
    const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId * GetNodeConnectionId(
       const C_GiLiBusConnector * const opc_Connection) const;
    virtual void LoadData(void) override;
@@ -110,18 +112,18 @@ protected:
    stw_types::sint32 m_GetIconSize(void) const;
    stw_types::uint32 m_GetScaleCategory(void) const;
 
-   static const stw_types::float64 mhf64_MinWidthNode;
-   static const stw_types::float64 mhf64_MinHeightNode;
-   static const stw_types::float64 mhf64_InitialWidthNode;
-   static const stw_types::float64 mhf64_InitialHeightNode;
-   static const stw_types::uint32 mhu32_ScaleCategory0;
-   static const stw_types::uint32 mhu32_ScaleCategory1;
-   static const stw_types::uint32 mhu32_ScaleCategory2;
-   static const stw_types::uint32 mhu32_ScaleCategory3;
-   static const stw_types::uint32 mhu32_ScaleCategory4;
-   static const stw_types::uint32 mhu32_ScaleCategory5;
-   static const stw_types::uint32 mhu32_ScaleCategory6;
-   static const stw_types::uint32 mhu32_ScaleCategory7;
+   static const stw_types::float64 mhf64_MIN_WIDTH_NODE;
+   static const stw_types::float64 mhf64_MIN_HEIGHT_NODE;
+   static const stw_types::float64 mhf64_INITIAL_WIDTH_NODE;
+   static const stw_types::float64 mhf64_INITIAL_HEIGHT_NODE;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_0;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_1;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_2;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_3;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_4;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_5;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_6;
+   static const stw_types::uint32 mhu32_SCALE_CATEGORY_7;
 
    bool mq_ErrorIconHovered;
    QString mc_ErrorText;
@@ -147,8 +149,8 @@ private:
    void m_UpdateItems(const stw_types::float64 of64_DiffWidth, const stw_types::float64 of64_DiffHeight,
                       const bool oq_Initial);
 
-   static const stw_types::float64 mhaf64_ScaleMinWidthNode[7];
-   static const stw_types::float64 mhaf64_ScaleMinHeightNode[7];
+   static const stw_types::float64 mhaf64_SCALE_MIN_WIDTH_NODE[7];
+   static const stw_types::float64 mhaf64_SCALE_MIN_HEIGHT_NODE[7];
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

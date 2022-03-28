@@ -384,7 +384,7 @@
         </font>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="text">
         <string>Cancel</string>
@@ -428,7 +428,7 @@
         </font>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="text">
         <string>OK</string>
@@ -457,30 +457,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabNodeDataPoolSelectedItems</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabNodeDataPoolSelectedItems.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
    <extends>QPushButton</extends>
    <header>C_OgePubDialog.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeGbx</class>
@@ -489,21 +468,42 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDpListDataSetView</class>
-   <extends>QTableView</extends>
-   <header>C_SdNdeDpListDataSetView.h</header>
+   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubCancel.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupItem.h</header>
   </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxTransparent.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubIconOnly.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabNodeDataPoolSelectedItems</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabNodeDataPoolSelectedItems.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_SdNdeDpListDataSetView</class>
+   <extends>QTableView</extends>
+   <header>C_SdNdeDpListDataSetView.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>pc_GroupBoxGeneral</tabstop>
+  <tabstop>pc_SelectionLabel</tabstop>
   <tabstop>pc_TableView</tabstop>
-  <tabstop>pc_BushButtonOk</tabstop>
   <tabstop>pc_BushButtonCancel</tabstop>
+  <tabstop>pc_BushButtonOk</tabstop>
  </tabstops>
  <resources/>
  <connections/>

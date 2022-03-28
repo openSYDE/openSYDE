@@ -47,7 +47,7 @@ using namespace std;
    \param[in]      oru64_LastNodeID       New node ID
    \param[in]      orc_ConnectionPos      Event position
    \param[in]      ors32_Interface        Interface to connect to
-   \param[in]      orc_NodeIds            Node ids
+   \param[in]      orc_Properties         Properties
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,10 +57,11 @@ C_SdManUnoTopologyReconnectNodeCommand::C_SdManUnoTopologyReconnectNodeCommand(Q
                                                                                const uint64 & oru64_LastNodeID,
                                                                                const QPointF & orc_ConnectionPos,
                                                                                const sint32 & ors32_Interface,
-                                                                               const std::vector<uint8> & orc_NodeIds,
+                                                                               const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
                                                                                QUndoCommand * const opc_Parent) :
    C_SdManUnoTopologyReconnectBaseCommand(opc_Scene, orc_IDs, oru64_StartingNodeID, oru64_LastNodeID, orc_ConnectionPos,
-                                          ors32_Interface, orc_NodeIds, "Reconnect bus connector(s) to new node",
+                                          ors32_Interface, orc_Properties,
+                                          "Reconnect bus connector(s) to new node",
                                           opc_Parent)
 {
    C_GiLiBusConnector * const pc_BusConnector = m_GetBusConnector();
@@ -103,12 +104,12 @@ C_SdManUnoTopologyReconnectNodeCommand::~C_SdManUnoTopologyReconnectNodeCommand(
    \param[in]  oru64_StartingID  ID of initial node
    \param[in]  oru64_LastID      ID of new node
    \param[in]  ors32_Interface   Interface number to use
-   \param[in]  orc_NodeIds       Node ids
+   \param[in]  orc_Properties    Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyReconnectNodeCommand::m_Reconnect(const uint64 & oru64_StartingID, const uint64 & oru64_LastID,
                                                          const sint32 & ors32_Interface,
-                                                         const std::vector<uint8> & orc_NodeIds)
+                                                         const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    C_GiNode * const pc_StartingNode = dynamic_cast<C_GiNode *>(m_GetSceneItem(oru64_StartingID));
    C_GiNode * const pc_LastNode = dynamic_cast<C_GiNode *>(m_GetSceneItem(oru64_LastID));
@@ -116,6 +117,6 @@ void C_SdManUnoTopologyReconnectNodeCommand::m_Reconnect(const uint64 & oru64_St
 
    if (pc_BusConnector != NULL)
    {
-      pc_BusConnector->Reconnect(pc_StartingNode, pc_LastNode, this->mc_ConnectionPos, ors32_Interface, orc_NodeIds);
+      pc_BusConnector->Reconnect(pc_StartingNode, pc_LastNode, this->mc_ConnectionPos, ors32_Interface, orc_Properties);
    }
 }

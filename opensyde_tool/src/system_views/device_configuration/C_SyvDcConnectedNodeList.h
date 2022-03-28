@@ -51,12 +51,12 @@ protected:
 private:
    bool mq_GridSizeSet;
    std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceInformation> mc_Data;
-   static const QString mhc_MimeData;
-   static const QString mhc_MimeDataExtFormat;
-   static const QString mhc_MimeDataManufacturerFormat;
-   static const QString mhc_MimeDataDevice;
-   static const QString mhc_MimeDataDeviceValid;
-   static const QString mhc_MimeDataSubNodeIdsToOldNodeIds;
+   static const QString mhc_MIME_DATA;
+   static const QString mhc_MIME_DATA_EXT_FORMAT;
+   static const QString mhc_MIME_DATA_MANUFACTURER_FORMAT;
+   static const QString mhc_MIME_DATA_DEVICE;
+   static const QString mhc_MIME_DATA_DEVICE_VALID;
+   static const QString mhc_MIME_DATA_SUB_NODE_IDS_TO_OLD_NODE_IDS;
 
    void m_Init(void);
    void m_AppendNode(const stw_opensyde_gui_logic::C_SyvDcDeviceInformation & orc_Info, const std::map<stw_types::uint8,

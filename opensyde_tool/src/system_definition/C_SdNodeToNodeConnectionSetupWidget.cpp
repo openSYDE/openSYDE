@@ -67,8 +67,8 @@ C_SdNodeToNodeConnectionSetupWidget::C_SdNodeToNodeConnectionSetupWidget(
    mu32_NodeID1(0),
    mu32_NodeID2(0),
    mq_InteractionPossible(false),
-   mc_BUS_TYPE_CAN(C_GtGetText::h_GetText("CAN")),
-   mc_BUS_TYPE_ETHERNET(C_GtGetText::h_GetText("Ethernet"))
+   mc_BusTypeCan(C_GtGetText::h_GetText("CAN")),
+   mc_BusTypeEthernet(C_GtGetText::h_GetText("Ethernet"))
 {
    // init UI
    this->mpc_Ui->setupUi(this);
@@ -168,7 +168,7 @@ C_OSCSystemBus::E_Type C_SdNodeToNodeConnectionSetupWidget::GetBusType(void) con
 
    if (this->mpc_Ui->pc_RadioButtonCreateNew->isChecked() == true)
    {
-      if (this->mpc_Ui->pc_ComboBoxBusType->currentText() == this->mc_BUS_TYPE_ETHERNET)
+      if (this->mpc_Ui->pc_ComboBoxBusType->currentText() == this->mc_BusTypeEthernet)
       {
          e_Retval = C_OSCSystemBus::eETHERNET;
       }
@@ -368,17 +368,17 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
             {
                if (e_NewBusRestrictedType == C_OSCSystemBus::eCAN)
                {
-                  this->mpc_Ui->pc_ComboBoxBusType->addItem(this->mc_BUS_TYPE_CAN);
+                  this->mpc_Ui->pc_ComboBoxBusType->addItem(this->mc_BusTypeCan);
                }
                else
                {
-                  this->mpc_Ui->pc_ComboBoxBusType->addItem(this->mc_BUS_TYPE_ETHERNET);
+                  this->mpc_Ui->pc_ComboBoxBusType->addItem(this->mc_BusTypeEthernet);
                }
             }
             else
             {
-               this->mpc_Ui->pc_ComboBoxBusType->addItem(this->mc_BUS_TYPE_CAN);
-               this->mpc_Ui->pc_ComboBoxBusType->addItem(this->mc_BUS_TYPE_ETHERNET);
+               this->mpc_Ui->pc_ComboBoxBusType->addItem(this->mc_BusTypeCan);
+               this->mpc_Ui->pc_ComboBoxBusType->addItem(this->mc_BusTypeEthernet);
             }
          }
 

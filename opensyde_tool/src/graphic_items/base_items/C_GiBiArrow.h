@@ -75,7 +75,7 @@ private:
    QGraphicsPathItem * mpc_ArrowHeadEnd;
    stw_types::float64 mf64_ArrowLength;
    stw_types::float64 mf64_ArrowHeight;
-   static const stw_types::float64 mhf64_ShapeOffsetFactor;
+   static const stw_types::float64 mhf64_SHAPE_OFFSET_FACTOR;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

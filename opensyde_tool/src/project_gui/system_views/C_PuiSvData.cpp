@@ -2424,7 +2424,7 @@ sint32 C_PuiSvData::AddReadRailItem(const C_OSCNodeDataPoolListElementId & orc_I
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::AddDashboard(const C_PuiSvDashboard & orc_Dashboard, const bool oq_AutoAdapt)
 {
-   tgl_assert(InsertDashboard(this->mc_Dashboards.size(), orc_Dashboard, oq_AutoAdapt) == C_NO_ERR);
+   tgl_assert(InsertDashboard(this->mc_Dashboards.size(), orc_Dashboard, oq_AutoAdapt, NULL) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2433,6 +2433,7 @@ void C_PuiSvData::AddDashboard(const C_PuiSvDashboard & orc_Dashboard, const boo
    \param[in]  ou32_Index     Dashboard index
    \param[in]  orc_Dashboard  Dashboard data
    \param[in]  oq_AutoAdapt   Auto adapt name flag
+   \param[in]  opc_Rails      Read rail item configuration
 
    \return
    C_NO_ERR Operation success
@@ -2440,7 +2441,8 @@ void C_PuiSvData::AddDashboard(const C_PuiSvDashboard & orc_Dashboard, const boo
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::InsertDashboard(const uint32 ou32_Index, const C_PuiSvDashboard & orc_Dashboard,
-                                    const bool oq_AutoAdapt)
+                                    const bool oq_AutoAdapt, const QMap<C_OSCNodeDataPoolListElementId,
+                                                                        C_PuiSvReadDataConfiguration> * const opc_Rails)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -2473,30 +2475,41 @@ sint32 C_PuiSvData::InsertDashboard(const uint32 ou32_Index, const C_PuiSvDashbo
                         rc_Config.c_ElementId);
                   if (c_ItReadItem == this->mc_ReadRailAssignments.end())
                   {
-                     const C_OSCNodeDataPoolListElement * const pc_Element =
-                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
-                           rc_Config.c_ElementId.u32_NodeIndex,
-                           rc_Config.c_ElementId.u32_DataPoolIndex,
-                           rc_Config.c_ElementId.u32_ListIndex,
-                           rc_Config.c_ElementId.u32_ElementIndex);
-                     if (pc_Element != NULL)
+                     if ((opc_Rails != NULL) && (opc_Rails->contains(rc_Config.c_ElementId)))
                      {
-                        C_PuiSvReadDataConfiguration c_RailConfig;
-                        if ((((pc_Element->GetArray() == true) ||
-                              (pc_Element->GetType() == C_OSCNodeDataPoolContent::eUINT64)) ||
-                             (pc_Element->GetType() == C_OSCNodeDataPoolContent::eSINT64)) ||
-                            (pc_Element->GetType() == C_OSCNodeDataPoolContent::eFLOAT64))
+                        const QMap<C_OSCNodeDataPoolListElementId,
+                                   C_PuiSvReadDataConfiguration>::ConstIterator c_ItMap =
+                           opc_Rails->find(rc_Config.c_ElementId);
+                        tgl_assert(c_ItMap != opc_Rails->cend());
+                        this->AddReadRailItem(rc_Config.c_ElementId, c_ItMap.value());
+                     }
+                     else
+                     {
+                        const C_OSCNodeDataPoolListElement * const pc_Element =
+                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                              rc_Config.c_ElementId.u32_NodeIndex,
+                              rc_Config.c_ElementId.u32_DataPoolIndex,
+                              rc_Config.c_ElementId.u32_ListIndex,
+                              rc_Config.c_ElementId.u32_ElementIndex);
+                        if (pc_Element != NULL)
                         {
-                           c_RailConfig.u8_RailIndex = 0;
-                           c_RailConfig.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER;
+                           C_PuiSvReadDataConfiguration c_RailConfig;
+                           if ((((pc_Element->GetArray() == true) ||
+                                 (pc_Element->GetType() == C_OSCNodeDataPoolContent::eUINT64)) ||
+                                (pc_Element->GetType() == C_OSCNodeDataPoolContent::eSINT64)) ||
+                               (pc_Element->GetType() == C_OSCNodeDataPoolContent::eFLOAT64))
+                           {
+                              c_RailConfig.u8_RailIndex = 0;
+                              c_RailConfig.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER;
+                           }
+                           else
+                           {
+                              c_RailConfig.u8_RailIndex = 1;
+                              c_RailConfig.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_CYCLIC;
+                           }
+                           c_RailConfig.InitDefaultThreshold(pc_Element->c_MinValue, pc_Element->c_MaxValue);
+                           this->AddReadRailItem(rc_Config.c_ElementId, c_RailConfig);
                         }
-                        else
-                        {
-                           c_RailConfig.u8_RailIndex = 1;
-                           c_RailConfig.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_CYCLIC;
-                        }
-                        c_RailConfig.InitDefaultThreshold(pc_Element->c_MinValue, pc_Element->c_MaxValue);
-                        this->AddReadRailItem(rc_Config.c_ElementId, c_RailConfig);
                      }
                   }
                }
@@ -3281,62 +3294,6 @@ void C_PuiSvData::ActivateAllRelevantSubDevices(void)
          }
       }
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Deactivate sub devices based on errors
-
-   \param[in]  orc_Errors  Errors
-
-   \return
-   Deactivate sub devices
-*/
-//----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_PuiSvData::DeactivateSubDevicesBasedOnErrors(const std::map<uint32, QString> & orc_Errors)
-{
-   std::vector<uint32> c_Retval;
-   const std::vector<C_OSCNodeSquad> & rc_Groups =
-      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_NodeSquads;
-
-   for (uint32 u32_ItGroup = 0UL; u32_ItGroup < rc_Groups.size(); ++u32_ItGroup)
-   {
-      const C_OSCNodeSquad & rc_Group = rc_Groups[u32_ItGroup];
-      if (rc_Group.c_SubNodeIndexes.size() > 0UL)
-      {
-         const bool q_IsActive = this->GetNodeStatusDisplayedAsActive(rc_Group.c_SubNodeIndexes[0UL]);
-         if (q_IsActive)
-         {
-            bool q_OneSuccess = false;
-            for (uint32 u32_ItSubDevice = 0UL; (u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size()) && (!q_OneSuccess);
-                 ++u32_ItSubDevice)
-            {
-               const uint32 u32_CurIndex = rc_Group.c_SubNodeIndexes[u32_ItSubDevice];
-               if (orc_Errors.count(u32_CurIndex) == 0UL)
-               {
-                  q_OneSuccess = true;
-               }
-            }
-            if (q_OneSuccess)
-            {
-               for (uint32 u32_ItSubDevice = 0UL;
-                    u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size();
-                    ++u32_ItSubDevice)
-               {
-                  const uint32 u32_CurIndex = rc_Group.c_SubNodeIndexes[u32_ItSubDevice];
-                  if (orc_Errors.count(u32_CurIndex) != 0UL)
-                  {
-                     if (u32_CurIndex < this->mc_NodeActiveFlags.size())
-                     {
-                        c_Retval.push_back(u32_CurIndex);
-                        this->mc_NodeActiveFlags[u32_CurIndex] = 0U;
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -28,9 +28,9 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_NagViewItem::mhsn_SizeTop = 48;
-const stw_types::sintn C_NagViewItem::mhsn_SizeSub = 30;
-const stw_types::sintn C_NagViewItem::mhsn_FixSizeBottom = 18;
+const stw_types::sintn C_NagViewItem::mhsn_SIZE_TOP = 48;
+const stw_types::sintn C_NagViewItem::mhsn_SIZE_SUB = 30;
+const stw_types::sintn C_NagViewItem::mhsn_FIX_SIZE_BOTTOM = 18;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -239,9 +239,11 @@ void C_NagViewItem::UpdateDeco(void) const
    C_NagToolTip::E_Type e_ToolTipType;
    QString c_IconPath;
    sintn sn_ColorID;
-   const bool q_Error = C_SyvUtil::h_GetViewSetupLabelInfo(this->mu32_ViewIndex, c_ErrorTextHeading, c_Error,
-                                                           c_ErrorTextTooltip,
-                                                           e_ToolTipType, c_IconPath, sn_ColorID);
+   // Sub mode of setup is used due to show here only errors on every view sub mode
+   const bool q_Error = C_SyvUtil::h_GetViewStatusLabelInfo(this->mu32_ViewIndex, ms32_SUBMODE_SYSVIEW_SETUP,
+                                                            c_ErrorTextHeading, c_Error,
+                                                            c_ErrorTextTooltip,
+                                                            e_ToolTipType, c_IconPath, sn_ColorID);
 
    if ((q_Error) && (e_ToolTipType == C_NagToolTip::eERROR))
    {
@@ -449,11 +451,11 @@ void C_NagViewItem::HandleServiceMode(void)
 QSize C_NagViewItem::sizeHint(void) const
 {
    QSize c_Retval = QWidget::sizeHint();
-   sintn sn_Height = C_NagViewItem::mhsn_SizeTop;
+   sintn sn_Height = C_NagViewItem::mhsn_SIZE_TOP;
 
    if (this->m_IsExpanded() == true)
    {
-      sn_Height += (3 * C_NagViewItem::mhsn_SizeSub) + C_NagViewItem::mhsn_FixSizeBottom;
+      sn_Height += (3 * C_NagViewItem::mhsn_SIZE_SUB) + C_NagViewItem::mhsn_FIX_SIZE_BOTTOM;
    }
 
    c_Retval.setWidth(this->width());

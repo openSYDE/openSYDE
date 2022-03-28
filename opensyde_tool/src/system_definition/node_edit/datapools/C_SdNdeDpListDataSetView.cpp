@@ -118,6 +118,9 @@ C_SdNdeDpListDataSetView::C_SdNdeDpListDataSetView(QWidget * const opc_Parent) :
          this->horizontalHeader(), &QHeaderView::geometriesChanged, this,
          &C_SdNdeDpListDataSetView::m_UpdateCornerButton);
    }
+
+   connect(&(this->mc_Delegate), &C_SdNdeDpListDataSetDelegate::SigTedConfirmed, this,
+           &C_SdNdeDpListDataSetView::m_CommentConfirmed);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -776,4 +779,13 @@ uint32 C_SdNdeDpListDataSetView::m_GetOneAfterHighestSelected(void)
       }
    }
    return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot to set focus of comment field after user confirms with defined keys of KeyPressEvent in C_OgeTedTable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpListDataSetView::m_CommentConfirmed()
+{
+   this->setFocus();
 }

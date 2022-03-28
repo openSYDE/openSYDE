@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 //Cast to integer on some level so this is the allowed maximum
-const uint32 C_SyvDaItTaModel::hu32_MaxElements = static_cast<uint32>(std::numeric_limits<sintn>::max());
+const uint32 C_SyvDaItTaModel::hu32_MAX_ELEMENTS = static_cast<uint32>(std::numeric_limits<sintn>::max());
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -378,13 +378,13 @@ void C_SyvDaItTaModel::UpdateError(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of the color transparence value configured by the actual timeout state
+/*! \brief   Update of the color transparency value configured by the actual timeout state
 
    \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
-   \param[in]  osn_Value               Value for transparence (0..255)
+   \param[in]  osn_Value               Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItTaModel::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_SyvDaItTaModel::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
@@ -677,7 +677,8 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                            QString c_Error;
                            QStringList c_Icons;
                            c_Icons.push_back(QString::number(16));
-                           if (pc_TableWidget->GetViewActive(*pc_DataElementId) == false)
+                           if ((pc_TableWidget->GetViewActive(*pc_DataElementId) == false) ||
+                               (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false))
                            {
                               switch (pc_DataPool->e_Type)
                               {
@@ -839,7 +840,8 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      {
                      case C_SyvDaItTaModel::eICON:
                         bool q_IsTransmissionError;
-                        if (pc_TableWidget->GetViewActive(*pc_DataElementId) == false)
+                        if ((pc_TableWidget->GetViewActive(*pc_DataElementId) == false) ||
+                            (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false))
                         {
                            c_Retval = C_GtGetText::h_GetText("Configuration warning");
                         }
@@ -893,6 +895,11 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                               c_Retval = C_GtGetText::h_GetText("There is a signal of a not connected bus");
                            }
                         }
+                        else if (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false)
+                        {
+                           c_Retval = C_GtGetText::h_GetText("There is a data element of a node with "
+                                                             "disabled communication interface flags for Dashboard");
+                        }
                         else if (pc_TableWidget->CheckItemError(*pc_DataElementId, c_Error,
                                                                 q_IsTransmissionError) == true)
                         {
@@ -934,7 +941,8 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      {
                      case C_SyvDaItTaModel::eICON:
                         bool q_IsTransmissionError;
-                        if (pc_TableWidget->GetViewActive(*pc_DataElementId) == false)
+                        if ((pc_TableWidget->GetViewActive(*pc_DataElementId) == false) ||
+                            (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false))
                         {
                            c_Retval = static_cast<sintn>(C_NagToolTip::eWARNING);
                         }
@@ -1284,7 +1292,7 @@ uint32 C_SyvDaItTaModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
    if ((pc_TableWidget != NULL) && (this->mc_AddDataPoolElementId.GetIsValid() == true))
    {
       const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
-      if ((pc_Item != NULL) && (pc_Item->c_DataPoolElementsConfig.size() < C_SyvDaItTaModel::hu32_MaxElements))
+      if ((pc_Item != NULL) && (pc_Item->c_DataPoolElementsConfig.size() < C_SyvDaItTaModel::hu32_MAX_ELEMENTS))
       {
          const C_PuiSvDbNodeDataElementConfig c_NewConfig = C_SyvDaItTaModel::mh_GetConfigForNewItem(
             this->mc_AddDataPoolElementId);

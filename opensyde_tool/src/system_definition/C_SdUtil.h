@@ -72,6 +72,12 @@ public:
       const stw_types::uint32 ou32_NodeIndex, const stw_types::sint32 os32_SpecialApplicationIndex);
    static std::vector<stw_types::uint32> h_GetUsedBusIdsUniqueAndSortedAscending(
       const stw_types::sint32 os32_SpecialBusIndex);
+   static std::vector<stw_types::uint32> h_GetUsedIpAddressesForBusUniqueAndSortedAscending(
+      const stw_types::uint32 & oru32_BusIndex, const stw_types::uint32 & oru32_SpecialNodeIndex,
+      const stw_types::sint32 & ors32_SpecialInterface);
+   static std::vector<std::vector<stw_types::uint8> > h_GetAllUsedIpAddressesForBus(
+      const stw_types::uint32 & oru32_BusIndex, const stw_types::uint32 & oru32_SpecialNodeIndex,
+      const stw_types::sint32 & ors32_SpecialInterface);
    static void h_AdaptMessageToProtocolType(stw_opensyde_core::C_OSCCanMessage & orc_Message,
                                             stw_opensyde_gui_logic::C_PuiSdNodeCanMessage * const opc_UiMessage,
                                             const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Type,
@@ -81,9 +87,14 @@ public:
                                            QStringList * const opc_AdaptationInfos);
    static QString h_InitUsedIdsString(const std::vector<stw_types::uint32> & orc_UsedIds, const QString & orc_ItemName,
                                       const QString & orc_ItemType, const bool oq_SkipItem = false);
-   static stw_types::uint32 h_GetNextFreeNodeId(
+   static QString h_InitUsedIpsString(const std::vector<std::vector<stw_types::uint8> > & orc_UsedIps,
+                                      const QString & orc_ItemName, const QString & orc_ItemType,
+                                      const bool oq_SkiptItem = false);
+   static QString h_IpAddressAsString(const std::vector<stw_types::uint8> & orc_Ip);
+   static stw_types::uint32 h_GetNextFreeNodeProperty(
       const std::vector<stw_opensyde_core::C_OSCNodeComInterfaceSettings> & orc_Interfaces,
-      const std::vector<stw_types::uint32> & orc_UsedNodeIds, const stw_types::sint32 & ors32_SpecialInterface);
+      const std::vector<stw_types::uint32> & orc_UsedNodeProperties,
+      const stw_types::sint32 & ors32_SpecialInterface, const bool oq_GenerateId);
    static bool h_HasConnectionType(const stw_opensyde_core::C_OSCNode & orc_Node,
                                    const stw_opensyde_core::C_OSCSystemBus::E_Type oe_Type);
    static bool h_CheckNodeInterfaceAvailable(

@@ -38,7 +38,7 @@ public:
    void UpdateStaticValues(void);
    void UpdateValue(void);
    void UpdateError(void);
-   void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
+   void UpdateTransparency(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
 
    void AddItem(const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId);
    void MoveSelected(const bool oq_Up);
@@ -49,8 +49,24 @@ public:
    void SetCurrentColumnWidths(const std::vector<stw_types::sint32> & orc_ColumnWidths);
    std::vector<stw_types::sint32> GetCurrentColumnWidths(void) const;
 
-   void SetSelectionAvailable(const bool oq_Active);
+   void SetSelectionAvailable(const bool oq_Active, const bool oq_SelectFirst);
    void SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode);
+   void HideToolTip(void);
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
+   //lint -restore
+   void SigTriggerEdit(void);
+   void SigAddDataElement(void);
+   void SigMoveDataElementUp(void);
+   void SigMoveDataElementDown(void);
+   void SigRemoveDataElement(void);
+
+protected:
+   virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
+   virtual void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
 
 private:
    stw_opensyde_gui_logic::C_SyvDaItTaModel mc_Model;

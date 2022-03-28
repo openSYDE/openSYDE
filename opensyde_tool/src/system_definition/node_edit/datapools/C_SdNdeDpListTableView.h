@@ -120,6 +120,7 @@ private:
    stw_types::uint32 m_GetOneAfterHighestSelected(void);
    void m_HandleColumnStateSave(void) const;
    void m_HandleColumnStateRestore(void);
+   void m_CommentConfirmed(void);
    //Avoid call
    C_SdNdeDpListTableView(const C_SdNdeDpListTableView &);
    C_SdNdeDpListTableView & operator =(const C_SdNdeDpListTableView &);

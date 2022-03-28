@@ -129,10 +129,10 @@ private:
    E_ConnectState me_ConnectState;
    stw_types::sintn msn_InitToolboxCounter;
    static stw_types::uint32 mhu32_DisconnectTime;
-   static const QString mhc_DarkModeEnabledIconPath;
-   static const QString mhc_DarkModeDisabledIconPath;
-   static const stw_types::sintn mhsn_WidgetBorder;
-   static const stw_types::sintn mhsn_ToolboxInitPosY;
+   static const QString mhc_DARK_MODE_ENABLED_ICON_PATH;
+   static const QString mhc_DARK_MODE_DISABLED_ICON_PATH;
+   static const stw_types::sintn mhsn_WIDGET_BORDER;
+   static const stw_types::sintn mhsn_TOOLBOX_INIT_POS_Y;
 };
 }
 

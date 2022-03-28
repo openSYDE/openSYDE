@@ -56,8 +56,8 @@ protected:
    C_GiImage * mpc_Image;
    C_GiSvgGraphicsItem * mpc_SvgGraphicsItem;
    bool mq_IsSvgFlag;
-   static const stw_types::float64 mhf64_MinWidthImage;
-   static const stw_types::float64 mhf64_MinHeightImage;
+   static const stw_types::float64 mhf64_MIN_WIDTH_IMAGE;
+   static const stw_types::float64 mhf64_MIN_HEIGHT_IMAGE;
 
 private:
    //Avoid call
@@ -68,7 +68,7 @@ private:
    void m_Init(void);
    void m_InitSvg(void);
 
-   static const stw_types::float64 mhf64_ActionPointOffsetImage;
+   static const stw_types::float64 mhf64_ACTION_POINT_OFFSET_IMAGE;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

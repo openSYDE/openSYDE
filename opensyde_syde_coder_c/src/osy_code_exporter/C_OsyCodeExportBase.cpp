@@ -326,11 +326,23 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void)
 {
    E_ResultCode e_Return = eRESULT_OK;
+   sint32 s32_Return;
+   const C_SCLString * pc_DeviceToLoad = NULL;
 
-   // Load system definition
-   const sint32 s32_Return =
-      C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(mc_SystemDefinition, mc_SystemDefinitionFilePath, "",
-                                                             false);
+   //single device operation ?
+   if (mc_DeviceName != "")
+   {
+      // Only load required device:
+      pc_DeviceToLoad = &mc_DeviceName;
+   }
+   else
+   {
+      // Load whole system definition (keep pointer to NULL)
+   }
+
+   s32_Return = C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(mc_SystemDefinition,
+                                                                       mc_SystemDefinitionFilePath, "",
+                                                                       false, NULL, NULL, false, pc_DeviceToLoad);
 
    if (s32_Return == C_NO_ERR)
    {

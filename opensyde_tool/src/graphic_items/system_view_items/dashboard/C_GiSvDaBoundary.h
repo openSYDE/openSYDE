@@ -30,8 +30,8 @@ public:
    //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiSvDaBoundary(const stw_types::uint32 & oru32_ViewIndex, const stw_types::uint32 & oru32_DashboardIndex,
                     const stw_types::sint32 & ors32_DataIndex, const stw_types::uint64 & oru64_ID,
-                    const stw_types::float64 of64_Width = mhf64_MinWidthBoundary,
-                    const stw_types::float64 of64_Height = mhf64_MinHeightBoundary,
+                    const stw_types::float64 of64_Width = mhf64_MIN_WIDTH_BOUNDARY,
+                    const stw_types::float64 of64_Height = mhf64_MIN_HEIGHT_BOUNDARY,
                     QGraphicsItem * const opc_Parent = NULL);
    virtual void LoadData(void) override;
    virtual void UpdateData(void) override;

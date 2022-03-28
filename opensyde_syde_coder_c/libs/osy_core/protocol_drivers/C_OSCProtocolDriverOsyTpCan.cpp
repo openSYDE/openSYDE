@@ -667,6 +667,117 @@ void C_OSCProtocolDriverOsyTpCan::m_ComposeSingleFrame(const C_OSCProtocolDriver
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handling the response to the services BroadcastSetNodeIdBySerialNumber/-Extended
+
+   Incoming responses to other services will be dumped: we are strictly handshaking here ...
+   (why would someone send other broadcast requests in parallel ?)
+
+   \param[in]    ou8_RoutineIdMsb     MSB part of the last sent routine identifier for matching the correct response
+   \param[in]    ou8_RoutineIdLsb     LSB part of the last sent routine identifier for matching the correct response
+   \param[out]   opu8_NrCode          if not NULL: negative response code (if C_WARN is returned)
+
+   \return
+   C_NO_ERR    no problems; one positive response received
+   C_WARN      negative response received and no positive response received
+   C_TIMEOUT   no response within timeout (was SetNodeIdentifiersForBroadcasts() called ?)
+   C_OVERFLOW  multiple positive responses received
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsyTpCan::m_HandleBroadcastSetNodeIdBySerialNumberResponse(const uint8 ou8_RoutineIdMsb,
+                                                                                     const uint8 ou8_RoutineIdLsb,
+                                                                                     uint8 * const opu8_NrCode) const
+{
+   sint32 s32_Return;
+   //check for responses
+   const uint32 u32_StartTime = TGL_GetTickCount();
+   T_STWCAN_Msg_RX c_Response;
+   sint32 s32_ReturnLocal;
+   bool q_PositiveResponseReceived = false;
+   bool q_MultiplePositiveResponsesReceived = false;
+   bool q_NegativeResponseReceived = false;
+
+   // No further abort condition. Wait always the entire timeout time to get all positive and negative responses
+   while ((TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTime)
+   {
+      //trigger dispatcher
+      //ignore return value: we cannot be sure some other client did not check before us
+      (void)mpc_CanDispatcher->DispatchIncoming();
+
+      s32_ReturnLocal = mpc_CanDispatcher->ReadFromQueue(mu16_DispatcherClientHandle, c_Response);
+      if (s32_ReturnLocal == C_NO_ERR)
+      {
+         //format OK ?
+         if ((c_Response.u8_DLC == 5U) && (c_Response.au8_Data[0] == (mhu8_ISO15765_N_PCI_SF + 4U)) &&
+             (c_Response.au8_Data[1] == (mhu8_OSY_BC_SI_ROUTINE_CONTROL | 0x40U)) &&
+             (c_Response.au8_Data[2] == mhu8_OSY_BC_RC_SUB_FUNCTION_START_ROUTINE) &&
+             (c_Response.au8_Data[3] == ou8_RoutineIdMsb) &&
+             (c_Response.au8_Data[4] == ou8_RoutineIdLsb))
+         {
+            //looks legit ...
+            if (q_PositiveResponseReceived == false)
+            {
+               q_PositiveResponseReceived = true;
+            }
+            else
+            {
+               //multiple responses -> report
+               q_MultiplePositiveResponsesReceived = true;
+            }
+         }
+         else if ((c_Response.u8_DLC == 4U) && (c_Response.au8_Data[0] == (mhu8_ISO15765_N_PCI_SF + 3U)) &&
+                  (c_Response.au8_Data[1] == mhu8_BC_OSY_NR_SI) &&
+                  (c_Response.au8_Data[2] == mhu8_OSY_BC_SI_ROUTINE_CONTROL))
+         {
+            //negative response detected
+            q_NegativeResponseReceived = true;
+            //Node id was not set, node has security activated.
+            if (c_Response.au8_Data[3] == 0x22U)
+            {
+               m_LogWarningWithHeader("Broadcast: Negative response received. Node has security activated.",
+                                      TGL_UTIL_FUNC_ID);
+            }
+            else
+            {
+               m_LogWarningWithHeader("Broadcast: Negative response received. Probably a node with an other SN.",
+                                      TGL_UTIL_FUNC_ID);
+            }
+            if (opu8_NrCode != NULL)
+            {
+               (*opu8_NrCode) = c_Response.au8_Data[3];
+            }
+         }
+         else
+         {
+            m_LogWarningWithHeader("Broadcast: unexpected response received. Ignoring.", TGL_UTIL_FUNC_ID);
+         }
+      }
+   }
+
+   if (q_MultiplePositiveResponsesReceived == true)
+   {
+      // Multiple positive responses received. At least two nodes with same SN. Error case.
+      s32_Return = C_OVERFLOW;
+   }
+   else if (q_PositiveResponseReceived == true)
+   {
+      // One positive response received. All negative responses can be ignored
+      s32_Return = C_NO_ERR;
+   }
+   else if (q_NegativeResponseReceived == true)
+   {
+      // No positive, only negative responses. Error case.
+      s32_Return = C_WARN;
+   }
+   else
+   {
+      // No relevant response received
+      s32_Return = C_TIMEOUT;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Perform cyclic communication tasks for CAN-TP
 
    Perform cyclic communication tasks for CAN-TP.
@@ -818,7 +929,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
       else if (mc_TxService.e_Status == C_ServiceState::eWAITING_FOR_FLOW_CONTROL)
       {
          //check for Tx timeout:
-         if ((TGL_GetTickCount() - mhu16_NBsTimeoutMs) > mc_TxService.u32_StartTimeMs)
+         if ((TGL_GetTickCount() - mhu16_NBS_TIMEOUTS_MS) > mc_TxService.u32_StartTimeMs)
          {
             //transfer timed out ...
             m_LogWarningWithHeader("N_Bs timeout reached before receiving flow control. Aborting ongoing Tx transfer.",
@@ -1029,9 +1140,9 @@ uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxIdentifier(void) const
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxBroadcastIdentifier(void) const
 {
-   return (static_cast<uint32>(0x18DB0000U) +
-           ((static_cast<uint32>(C_OSCProtocolDriverOsyNode::mhu8_NODE_ID_BROADCASTS)) << 8U) +
-           mc_ClientId.u8_NodeIdentifier);
+   return static_cast<uint32>(0x18DB0000U +
+                              ((static_cast<uint32>(C_OSCProtocolDriverOsyNode::mhu8_NODE_ID_BROADCASTS)) << 8U) +
+                              mc_ClientId.u8_NodeIdentifier);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1149,7 +1260,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetDispatcher(C_CAN_Dispatcher * const opc_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read serial number of all devices on local bus
 
-   Send broadcast to read device serial number.
+   Send broadcasts to read device serial number in standard and extended format.
    Report back list of nodes that sent a response (with the sent serial number and node IDs).
    The function will wait for responses for the time configured with SetBroadcastTimeout()
    Only positive responses are reported. Negative responses are ignored.
@@ -1157,7 +1268,8 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetDispatcher(C_CAN_Dispatcher * const opc_D
    Incoming responses to other services will be dumped: we are strictly handshaking here ...
    (why would someone send other broadcast requests in parallel ?)
 
-   \param[out]    orc_Responses   information about all nodes that sent a response
+   \param[out]    orc_Responses           information about all nodes that sent a response
+   \param[out]    orc_ExtendedResponses   information about all nodes that sent an extended response
 
    \return
    C_NO_ERR   no problems; zero or more responses received; data placed in orc_Responses
@@ -1166,11 +1278,13 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetDispatcher(C_CAN_Dispatcher * const opc_D
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
-   std::vector<C_BroadcastReadEcuSerialNumberResults> & orc_Responses) const
+   std::vector<C_BroadcastReadEcuSerialNumberResults> & orc_Responses,
+   std::vector<C_BroadcastReadEcuSerialNumberExtendedResults> & orc_ExtendedResponses) const
 {
    sint32 s32_Return;
 
    orc_Responses.clear();
+   orc_ExtendedResponses.clear();
    if (mpc_CanDispatcher == NULL)
    {
       s32_Return = C_CONFIG;
@@ -1180,6 +1294,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
       //set up request
       C_OSCProtocolDriverOsyService c_Service;
       T_STWCAN_Msg_TX c_Msg;
+      T_STWCAN_Msg_RX c_Response;
+      sint32 s32_ReturnLocal;
+
       c_Service.c_Data.resize(1);
       c_Service.c_Data[0] = mhu8_OSY_BC_SI_READ_SERIAL_NUMBER;
       m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
@@ -1193,11 +1310,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
       else
       {
          //check for responses
-         const uint32 u32_StartTime = TGL_GetTickCount();
-         T_STWCAN_Msg_RX c_Response;
-         sint32 s32_ReturnLocal;
+         const uint32 u32_StartTimeStd = TGL_GetTickCount();
 
-         while ((TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTime)
+         while ((TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTimeStd)
          {
             //trigger dispatcher
             //ignore return value: we cannot be sure some other client did not check before us
@@ -1213,12 +1328,23 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                {
                   //looks legit; extract payload ...
                   C_BroadcastReadEcuSerialNumberResults c_Result;
-                  (void)std::memcpy(&c_Result.au8_SerialNumber[0], &c_Response.au8_Data[2], 6U);
+                  uint8 au8_SerialNumber[6];
+                  (void)std::memcpy(&au8_SerialNumber[0], &c_Response.au8_Data[2], 6U);
+                  c_Result.c_SerialNumber.SetPosSerialNumber(au8_SerialNumber);
+
                   //extract node-id from sender
                   //must be local addressing ...
                   c_Result.c_SenderId.u8_BusIdentifier = mc_ClientId.u8_BusIdentifier; //same as ours ...
                   c_Result.c_SenderId.u8_NodeIdentifier = static_cast<uint8>(c_Response.u32_ID & 0x7FU);
                   orc_Responses.push_back(c_Result);
+               }
+               else if ((c_Response.u8_DLC == 4U) && (c_Response.au8_Data[0] == (mhu8_ISO15765_N_PCI_SF + 3U)) &&
+                        (c_Response.au8_Data[1] == mhu8_BC_OSY_NR_SI) &&
+                        (c_Response.au8_Data[2] == mhu8_OSY_BC_SI_READ_SERIAL_NUMBER))
+               {
+                  //negative response detected
+                  m_LogWarningWithHeader("Broadcast: Negative response received. Probably a node with an extended SN.",
+                                         TGL_UTIL_FUNC_ID);
                }
                else
                {
@@ -1226,7 +1352,304 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                }
             }
          }
-         s32_Return = C_NO_ERR;
+      }
+
+      if (s32_Return == C_NO_ERR)
+      {
+         bool q_Continue = false;
+         std::map<uint32, C_BroadcastReadEcuSerialNumberExtendedResults> c_UniqueIdToResult;
+
+         // Send the extended variant
+         c_Service.c_Data.resize(3);
+         c_Service.c_Data[1] = 0U; // Block number. Start with the first block
+         c_Service.c_Data[2] = 0U; // Reserved byte
+         m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+
+         do
+         {
+            q_Continue = false;
+
+            s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
+            if (s32_Return != C_NO_ERR)
+            {
+               m_LogWarningWithHeader("Could not send single frame broadcast CAN message.", TGL_UTIL_FUNC_ID);
+               s32_Return = C_COM;
+            }
+            else
+            {
+               //check for responses
+               const uint32 u32_StartTimeExt = TGL_GetTickCount();
+
+               while ((TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTimeExt)
+               {
+                  //trigger dispatcher
+                  //ignore return value: we cannot be sure some other client did not check before us
+                  (void)mpc_CanDispatcher->DispatchIncoming();
+
+                  s32_ReturnLocal = mpc_CanDispatcher->ReadFromQueue(mu16_DispatcherClientHandle, c_Response);
+                  if (s32_ReturnLocal == C_NO_ERR)
+                  {
+                     //format OK (frame type; number of bytes; service) ?
+                     if ((c_Response.u8_DLC == 8U) &&
+                         (c_Response.au8_Data[0] == (mhu8_ISO15765_N_PCI_SF + 7U)) &&
+                         (c_Response.au8_Data[1] == (mhu8_OSY_BC_SI_READ_SERIAL_NUMBER | 0x40U)))
+                     {
+                        //looks legit; extract payload ...
+                        // The block information
+                        const uint8 u8_ReceivedBlockNumber = c_Response.au8_Data[2] & 0x0FU;
+                        const uint8 u8_ReceivedSubNodeId = c_Response.au8_Data[2] >> 4U;
+
+                        if (u8_ReceivedBlockNumber == c_Service.c_Data[1])
+                        {
+                           const uint32 u32_UniqueId = (static_cast<uint32>(c_Response.au8_Data[3]) << 16U) +
+                                                       (static_cast<uint32>(c_Response.au8_Data[4]) << 8U) +
+                                                       static_cast<uint32>(c_Response.au8_Data[5]);
+
+                           // The serial number payload in the last two bytes will contain following information
+                           // separated in the different block
+                           // - Security Activated (1 bit of first byte)
+                           // - Reserved (Bit 1-7 of first byte; set all bits to zero)
+                           // - SerialNumberManufacturerFormat (1 byte)
+                           // - SerialNumber Length (1 byte)
+                           // - SerialNumber (1 .. 29 bytes)
+
+                           if (u8_ReceivedBlockNumber == 0U)
+                           {
+                              // First block. Add the initial result instance
+                              C_BroadcastReadEcuSerialNumberExtendedResults c_ResultExt;
+
+                              //extract node-id from sender
+                              //must be local addressing ...
+                              c_ResultExt.c_SenderId.u8_BusIdentifier = mc_ClientId.u8_BusIdentifier; //same as ours ...
+                              c_ResultExt.c_SenderId.u8_NodeIdentifier = static_cast<uint8>(c_Response.u32_ID & 0x7FU);
+                              c_ResultExt.u8_SubNodeId = u8_ReceivedSubNodeId;
+                              c_ResultExt.c_SerialNumber.u8_SerialNumberByteLength = 0U; // Will be filled in the
+                                                                                         // next
+                                                                                         // block
+
+                              // Serial number payload of first block
+                              // First byte: Bit 0 security flag, all other bits are reserved
+                              c_ResultExt.q_SecurityActivated = ((c_Response.au8_Data[6] & 0x01U) == 0x01U);
+
+                              // Last byte of payload in first block
+                              c_ResultExt.c_SerialNumber.u8_SerialNumberManufacturerFormat = c_Response.au8_Data[7];
+
+                              // It is in any case the extended format
+                              c_ResultExt.c_SerialNumber.q_ExtFormatUsed = true;
+
+                              if (c_ResultExt.c_SerialNumber.u8_SerialNumberManufacturerFormat == 0U)
+                              {
+                                 // Special case: POS serial number with extended
+                                 c_ResultExt.c_SerialNumber.q_FsnSerialNumber = false;
+                              }
+                              else
+                              {
+                                 c_ResultExt.c_SerialNumber.q_FsnSerialNumber = true;
+                              }
+
+                              // Add the initial result to the map with its unique id as key
+                              c_UniqueIdToResult[u32_UniqueId] = c_ResultExt;
+
+                              // At least two blocks are always necessary
+                              q_Continue = true;
+                           }
+                           else
+                           {
+                              std::map<uint32, C_BroadcastReadEcuSerialNumberExtendedResults>::iterator c_ItResult;
+                              // Search the matching extended result to complete the result
+                              c_ItResult = c_UniqueIdToResult.find(u32_UniqueId);
+
+                              if (c_ItResult != c_UniqueIdToResult.end())
+                              {
+                                 C_BroadcastReadEcuSerialNumberExtendedResults & rc_CurrentResult = c_ItResult->second;
+                                 if (rc_CurrentResult.u8_SubNodeId == u8_ReceivedSubNodeId)
+                                 {
+                                    if (u8_ReceivedBlockNumber == 1U)
+                                    {
+                                       // Serial number payload of second block
+                                       // First byte Serial number length
+                                       rc_CurrentResult.c_SerialNumber.u8_SerialNumberByteLength =
+                                          c_Response.au8_Data[6];
+
+                                       if ((rc_CurrentResult.c_SerialNumber.u8_SerialNumberByteLength > 0) &&
+                                           (rc_CurrentResult.c_SerialNumber.u8_SerialNumberByteLength <= 29))
+                                       {
+                                          // Second byte of payload is first byte of serial number
+                                          if (rc_CurrentResult.c_SerialNumber.q_FsnSerialNumber == true)
+                                          {
+                                             // FSN format
+                                             rc_CurrentResult.c_SerialNumber.c_SerialNumberExt =
+                                                static_cast<charn>(c_Response.au8_Data[7]);
+                                          }
+                                          else
+                                          {
+                                             // POS format
+                                             rc_CurrentResult.c_SerialNumber.au8_SerialNumber[0] =
+                                                c_Response.au8_Data[7];
+                                          }
+
+                                          if (rc_CurrentResult.c_SerialNumber.u8_SerialNumberByteLength > 1)
+                                          {
+                                             // At least one further block is necessary
+                                             q_Continue = true;
+                                          }
+                                       }
+                                    }
+                                    else
+                                    {
+                                       // Building the serial number
+                                       // The first block has no part of the serial number and the
+                                       // second block had only the first sign.
+                                       const uint8 u8_SnrBlock = u8_ReceivedBlockNumber - 2U;
+                                       uint32 u32_NextSnrSignIndex = (static_cast<uint32>(u8_SnrBlock) * 2U) + 1U;
+
+                                       if (u32_NextSnrSignIndex <
+                                           rc_CurrentResult.c_SerialNumber.u8_SerialNumberByteLength)
+                                       {
+                                          if (rc_CurrentResult.c_SerialNumber.q_FsnSerialNumber == true)
+                                          {
+                                             // FSN format
+                                             rc_CurrentResult.c_SerialNumber.c_SerialNumberExt +=
+                                                static_cast<charn>(c_Response.au8_Data[6]);
+                                          }
+                                          else if (u32_NextSnrSignIndex < 6)
+                                          {
+                                             // POS format
+                                             rc_CurrentResult.c_SerialNumber.au8_SerialNumber[u32_NextSnrSignIndex] =
+                                                c_Response.au8_Data[6];
+                                          }
+                                          else
+                                          {
+                                             // Nothing to do
+                                          }
+                                       }
+
+                                       // Check the next sign
+                                       ++u32_NextSnrSignIndex;
+
+                                       // It is possible that the serial number has a length which does not need the
+                                       // last byte of the last necessary block
+                                       if (u32_NextSnrSignIndex <
+                                           rc_CurrentResult.c_SerialNumber.u8_SerialNumberByteLength)
+                                       {
+                                          if (rc_CurrentResult.c_SerialNumber.q_FsnSerialNumber == true)
+                                          {
+                                             rc_CurrentResult.c_SerialNumber.c_SerialNumberExt +=
+                                                static_cast<charn>(c_Response.au8_Data[7]);
+                                          }
+                                          else if (u32_NextSnrSignIndex < 6U)
+                                          {
+                                             // POS format
+                                             rc_CurrentResult.c_SerialNumber.
+                                             au8_SerialNumber[u32_NextSnrSignIndex] = c_Response.au8_Data[7];
+                                          }
+                                          else
+                                          {
+                                             // Nothing to do
+                                          }
+                                       }
+
+                                       if (rc_CurrentResult.c_SerialNumber.q_FsnSerialNumber == true)
+                                       {
+                                          if (rc_CurrentResult.c_SerialNumber.c_SerialNumberExt.Length() <
+                                              rc_CurrentResult.c_SerialNumber.u8_SerialNumberByteLength)
+                                          {
+                                             // Serial number is not finished yet
+                                             q_Continue = true;
+                                          }
+                                       }
+                                       else
+                                       {
+                                          if (u32_NextSnrSignIndex < 5U)
+                                          {
+                                             // Serial number is not finished yet. Exact 6 are necessary for POS
+                                             q_Continue = true;
+                                          }
+                                       }
+                                    }
+                                 }
+                                 else
+                                 {
+                                    // Should not happen. Same UniqueId but different SubNodeId
+                                    m_LogWarningWithHeader(
+                                       "Broadcast: Different SubNode Id with same UniqueId in response received. Ignoring.",
+                                       TGL_UTIL_FUNC_ID);
+                                 }
+                              }
+                              else
+                              {
+                                 // u32_UniqueId not found. Error on transmitting or calculation of CRC or
+                                 // the device did not responded on the first block
+                                 m_LogWarningWithHeader(
+                                    "Broadcast: unexpected UniqueId in response received. Ignoring.",
+                                    TGL_UTIL_FUNC_ID);
+                              }
+                           }
+                        }
+                        else
+                        {
+                           // Not requested block number
+                           m_LogWarningWithHeader("Broadcast: unexpected block number  in response received. Ignoring.",
+                                                  TGL_UTIL_FUNC_ID);
+                        }
+                     }
+                     else if ((c_Response.u8_DLC == 4U) && (c_Response.au8_Data[0] == (mhu8_ISO15765_N_PCI_SF + 3U)) &&
+                              (c_Response.au8_Data[1] == mhu8_BC_OSY_NR_SI) &&
+                              (c_Response.au8_Data[2] == mhu8_OSY_BC_SI_READ_SERIAL_NUMBER))
+                     {
+                        //negative response detected
+                        m_LogWarningWithHeader(
+                           "Broadcast: Negative response received. Probably a node with a standard SN.",
+                           TGL_UTIL_FUNC_ID);
+                     }
+                     else
+                     {
+                        m_LogWarningWithHeader("Broadcast: unexpected response received. Ignoring.", TGL_UTIL_FUNC_ID);
+                     }
+                  }
+               }
+
+               if (q_Continue == true)
+               {
+                  // Next bock number for next request
+                  c_Service.c_Data[1] = c_Service.c_Data[1] + 1U;
+                  m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+               }
+            }
+         }
+         while ((q_Continue == true) && (s32_Return == C_NO_ERR));
+
+         // Add the extended results to the output
+         if (s32_Return == C_NO_ERR)
+         {
+            std::map<uint32, C_BroadcastReadEcuSerialNumberExtendedResults>::iterator c_ItResult;
+
+            for (c_ItResult = c_UniqueIdToResult.begin(); c_ItResult != c_UniqueIdToResult.end(); ++c_ItResult)
+            {
+               // Check the result for a valid serial number length
+               if ((c_ItResult->second.c_SerialNumber.u8_SerialNumberByteLength > 0U) &&
+                   (c_ItResult->second.c_SerialNumber.u8_SerialNumberByteLength <= 29) &&
+  // Check for FSN serial number ext length
+                   (((c_ItResult->second.c_SerialNumber.q_FsnSerialNumber == true) &&
+                     (c_ItResult->second.c_SerialNumber.c_SerialNumberExt.Length() ==
+                      c_ItResult->second.c_SerialNumber.u8_SerialNumberByteLength)) ||
+  // Check for POS serial number length for exact 6 byte
+                    ((c_ItResult->second.c_SerialNumber.q_FsnSerialNumber == false) &&
+                     (c_ItResult->second.c_SerialNumber.u8_SerialNumberByteLength == 6U))))
+               {
+                  // Valid result
+                  c_ItResult->second.c_SerialNumber.q_IsValid = true;
+
+                  orc_ExtendedResponses.push_back(c_ItResult->second);
+               }
+               else
+               {
+                  // A not finished result
+                  m_LogWarningWithHeader("An extended serial number had not the correct length.",
+                                         TGL_UTIL_FUNC_ID);
+               }
+            }
+         }
       }
    }
    return s32_Return;
@@ -1351,7 +1774,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
    The service consists of three individual single frame services.
    A response is only expected after the third single frame.
 
-   \param[in]    orau8_SerialNumber   serial number of node to address
+   \param[in]    orc_SerialNumber     serial number of node to address
    \param[in]    orc_NewNodeId        node ID to set
    \param[out]   opu8_NrCode          if not NULL: negative response code (if C_WARN is returned)
 
@@ -1359,6 +1782,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
    C_NO_ERR    no problems; one positive response received
    C_RANGE     invalid node ID (bus ID or node-ID out of range); "0x7F" is not permitted as node ID as it's reserved for
                 broadcasts
+               invalid serial number
    C_WARN      negative response received and no positive response received
    C_COM       could not send requests
    C_CONFIG    no dispatcher installed
@@ -1366,7 +1790,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
    C_OVERFLOW  multiple positive responses received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const uint8 (&orau8_SerialNumber)[6],
+sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const C_OSCProtocolSerialNumber & orc_SerialNumber,
                                                                      const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
                                                                      uint8 * const opu8_NrCode) const
 {
@@ -1377,7 +1801,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const uint8
       s32_Return = C_CONFIG;
    }
    else if ((orc_NewNodeId.u8_BusIdentifier > C_OSCProtocolDriverOsyNode::mhu8_MAX_BUS) ||
-            (orc_NewNodeId.u8_NodeIdentifier >= C_OSCProtocolDriverOsyNode::mhu8_MAX_NODE))
+            (orc_NewNodeId.u8_NodeIdentifier >= C_OSCProtocolDriverOsyNode::mhu8_MAX_NODE) ||
+            (orc_SerialNumber.q_IsValid == false) ||
+            (orc_SerialNumber.q_ExtFormatUsed == true))
    {
       s32_Return = C_RANGE;
    }
@@ -1391,9 +1817,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const uint8
       c_Service.c_Data[1] = mhu8_OSY_BC_RC_SUB_FUNCTION_START_ROUTINE;
       c_Service.c_Data[2] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1 >> 8U);
       c_Service.c_Data[3] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1 & 0xFFU);
-      c_Service.c_Data[4] = orau8_SerialNumber[0];
-      c_Service.c_Data[5] = orau8_SerialNumber[1];
-      c_Service.c_Data[6] = orau8_SerialNumber[2];
+      c_Service.c_Data[4] = orc_SerialNumber.au8_SerialNumber[0];
+      c_Service.c_Data[5] = orc_SerialNumber.au8_SerialNumber[1];
+      c_Service.c_Data[6] = orc_SerialNumber.au8_SerialNumber[2];
       m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
       s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
@@ -1406,9 +1832,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const uint8
       {
          c_Service.c_Data[2] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2 >> 8U);
          c_Service.c_Data[3] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2 & 0xFFU);
-         c_Service.c_Data[4] = orau8_SerialNumber[3];
-         c_Service.c_Data[5] = orau8_SerialNumber[4];
-         c_Service.c_Data[6] = orau8_SerialNumber[5];
+         c_Service.c_Data[4] = orc_SerialNumber.au8_SerialNumber[3];
+         c_Service.c_Data[5] = orc_SerialNumber.au8_SerialNumber[4];
+         c_Service.c_Data[6] = orc_SerialNumber.au8_SerialNumber[5];
          m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
          s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
@@ -1439,82 +1865,156 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const uint8
 
       if (s32_Return == C_NO_ERR)
       {
-         //check for responses
-         const uint32 u32_StartTime = TGL_GetTickCount();
-         T_STWCAN_Msg_RX c_Response;
-         sint32 s32_ReturnLocal;
-         bool q_PositiveResponseReceived = false;
-         bool q_MultiplePositiveResponsesReceived = false;
-         bool q_NegativeResponseReceived = false;
+         s32_Return = this->m_HandleBroadcastSetNodeIdBySerialNumberResponse(c_Service.c_Data[2],
+                                                                             c_Service.c_Data[3],
+                                                                             opu8_NrCode);
+      }
+   }
+   return s32_Return;
+}
 
-         // No further abort condition. Wait always the entire timeout time to get all positive and negative responses
-         while ((TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTime)
-         {
-            //trigger dispatcher
-            //ignore return value: we cannot be sure some other client did not check before us
-            (void)mpc_CanDispatcher->DispatchIncoming();
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node-id of node specified by serial number extended
 
-            s32_ReturnLocal = mpc_CanDispatcher->ReadFromQueue(mu16_DispatcherClientHandle, c_Response);
-            if (s32_ReturnLocal == C_NO_ERR)
-            {
-               //format OK ?
-               if ((c_Response.u8_DLC == 5U) && (c_Response.au8_Data[0] == (mhu8_ISO15765_N_PCI_SF + 4U)) &&
-                   (c_Response.au8_Data[1] == (mhu8_OSY_BC_SI_ROUTINE_CONTROL | 0x40U)) &&
-                   (c_Response.au8_Data[2] == mhu8_OSY_BC_RC_SUB_FUNCTION_START_ROUTINE) &&
-                   (c_Response.au8_Data[3] == c_Service.c_Data[2]) &&
-                   (c_Response.au8_Data[4] == c_Service.c_Data[3]))
-               {
-                  //looks legit ...
-                  if (q_PositiveResponseReceived == false)
-                  {
-                     q_PositiveResponseReceived = true;
-                  }
-                  else
-                  {
-                     //multiple responses -> report
-                     q_MultiplePositiveResponsesReceived = true;
-                  }
-               }
-               else if ((c_Response.u8_DLC == 4U) && (c_Response.au8_Data[0] == (mhu8_ISO15765_N_PCI_SF + 3U)) &&
-                        (c_Response.au8_Data[1] == mhu8_BC_OSY_NR_SI) &&
-                        (c_Response.au8_Data[2] == mhu8_OSY_BC_SI_ROUTINE_CONTROL))
-               {
-                  //negative response detected
-                  q_NegativeResponseReceived = true;
-                  m_LogWarningWithHeader("Broadcast: Negative response received. Probably a node with an other SN.",
-                                         TGL_UTIL_FUNC_ID);
-                  if (opu8_NrCode != NULL)
-                  {
-                     (*opu8_NrCode) = c_Response.au8_Data[3];
-                  }
-               }
-               else
-               {
-                  m_LogWarningWithHeader("Broadcast: unexpected response received. Ignoring.", TGL_UTIL_FUNC_ID);
-               }
-            }
-         }
+   Send broadcast to set node-id by serial number extended.
+   The function will wait for responses for the time configured with SetBroadcastTimeout().
 
-         if (q_MultiplePositiveResponsesReceived == true)
+   As specified the serial number is expected to be unique and non-addressed nodes shall keep their gob shut.
+   So
+   * exactly one response is expected and reported
+   * multiple responses are interpreted as error
+
+   Incoming responses to other services will be dumped: we are strictly handshaking here ...
+   (why would someone send other broadcast requests in parallel ?)
+
+   The service consists of at least 3 and maximum 12 individual single frame services.
+   A response is only expected after the last single frame.
+   The number of used single frames depends of the length of the serial number (1 to 29 bytes)
+
+   \param[in]    orc_SerialNumber                     serial number of node to address (1 to 29 bytes allowed)
+   \param[in]    ou8_SubNodeId                        sub node id of sub node to address (in case of a device without sub nodes: 0)
+   \param[in]    orc_NewNodeId                        node ID to set
+   \param[out]   opu8_NrCode                          if not NULL: negative response code (if C_WARN is returned)
+
+   \return
+   C_NO_ERR    no problems; one positive response received
+   C_RANGE     invalid node ID (bus ID or node-ID out of range); "0x7F" is not permitted as node ID as it's reserved for
+                broadcasts
+               Serial number is empty or has more than 29 bytes
+   C_WARN      negative response received and no positive response received
+   C_COM       could not send requests
+   C_CONFIG    no dispatcher installed
+   C_TIMEOUT   no response within timeout (was SetNodeIdentifiersForBroadcasts() called ?)
+   C_OVERFLOW  multiple positive responses received
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumberExtended(
+   const C_OSCProtocolSerialNumber & orc_SerialNumber, const uint8 ou8_SubNodeId,
+   const C_OSCProtocolDriverOsyNode & orc_NewNodeId, uint8 * const opu8_NrCode) const
+{
+   sint32 s32_Return;
+
+   if (mpc_CanDispatcher == NULL)
+   {
+      s32_Return = C_CONFIG;
+   }
+   else if ((orc_NewNodeId.u8_BusIdentifier > C_OSCProtocolDriverOsyNode::mhu8_MAX_BUS) ||
+            (orc_NewNodeId.u8_NodeIdentifier >= C_OSCProtocolDriverOsyNode::mhu8_MAX_NODE) ||
+            (orc_SerialNumber.q_IsValid == false) ||
+            (orc_SerialNumber.q_ExtFormatUsed == false))
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      // The payload will filled by:
+      // - reserved; 1 byte (set to zero)
+      // - parameters to set:
+      // -- bus ID to set; 1 byte (0..15)
+      // -- node ID to set; 1 byte (0..126)
+      // - parameters to identify target device:
+      // -- SubNodeId; 1 byte (0..15); set to zero if the device does not have logical sub-nodes
+      // -- SerialNumberManufacturerFormat (1 byte)
+      // -- SerialNumberLength (1 byte)
+      // -- SerialNumber (1 .. 29 bytes)
+
+      //set up request
+      C_OSCProtocolDriverOsyService c_Service;
+      T_STWCAN_Msg_TX c_Msg;
+      uint16 u16_PartCounter = 0U;
+      uint8 u8_SerialNumberBytesSent = 0U;
+      const std::vector<uint8> c_RawSerialNumber = orc_SerialNumber.GetSerialNumberAsRawData();
+      c_Service.c_Data.resize(7);
+      c_Service.c_Data[0] = mhu8_OSY_BC_SI_ROUTINE_CONTROL;
+      c_Service.c_Data[1] = mhu8_OSY_BC_RC_SUB_FUNCTION_START_ROUTINE;
+      c_Service.c_Data[2] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_START >> 8U);
+
+      do
+      {
+         c_Service.c_Data[3] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_START & 0xFFU) +
+                               static_cast<uint8>(u16_PartCounter);
+
+         if (u16_PartCounter == 0U)
          {
-            // Multiple positive responses received. At least two nodes with same SN. Error case.
-            s32_Return = C_OVERFLOW;
+            c_Service.c_Data[4] = 0U; // reserved
+            c_Service.c_Data[5] = orc_NewNodeId.u8_BusIdentifier;
+            c_Service.c_Data[6] = orc_NewNodeId.u8_NodeIdentifier;
          }
-         else if (q_PositiveResponseReceived == true)
+         else if (u16_PartCounter == 1U)
          {
-            // One positive response received. All negative responses can be ignored
-            s32_Return = C_NO_ERR;
-         }
-         else if (q_NegativeResponseReceived == true)
-         {
-            // No positive, only negative responses. Error case.
-            s32_Return = C_WARN;
+            c_Service.c_Data[4] = ou8_SubNodeId;
+            c_Service.c_Data[5] = orc_SerialNumber.u8_SerialNumberManufacturerFormat;
+            c_Service.c_Data[6] = orc_SerialNumber.u8_SerialNumberByteLength;
          }
          else
          {
-            // No relevant response received
-            s32_Return = C_TIMEOUT;
+            // Now the serial number will be part of the parts
+            const uint8 u8_BytesLeft = orc_SerialNumber.u8_SerialNumberByteLength - u8_SerialNumberBytesSent;
+            const uint8 u8_BytesToCopy = (u8_BytesLeft >= 3U) ? 3U : (u8_BytesLeft % 3U);
+
+            if (u8_BytesToCopy < 3U)
+            {
+               // Set the not needed bytes to 0
+               memset(&c_Service.c_Data[static_cast<uintn>(u8_BytesToCopy) + 4U], 0U,
+                      3U - static_cast<uintn>(u8_BytesToCopy));
+            }
+
+            memcpy(&c_Service.c_Data[4], &c_RawSerialNumber[u8_SerialNumberBytesSent], u8_BytesToCopy);
+            u8_SerialNumberBytesSent += u8_BytesToCopy;
          }
+
+         m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+
+         s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
+         if (s32_Return != C_NO_ERR)
+         {
+            m_LogWarningWithHeader("Could not send single frame broadcast CAN message.", TGL_UTIL_FUNC_ID);
+            s32_Return = C_COM;
+         }
+         else
+         {
+         }
+
+         // Check break conditions
+         if ((u8_SerialNumberBytesSent >= orc_SerialNumber.u8_SerialNumberByteLength) ||
+             ((mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_START + u16_PartCounter) >=
+              mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_LAST))
+         {
+            break;
+         }
+         else
+         {
+            // At least one further part necessary
+            ++u16_PartCounter;
+         }
+      }
+      while (s32_Return == C_NO_ERR);
+
+      if (s32_Return == C_NO_ERR)
+      {
+         s32_Return = this->m_HandleBroadcastSetNodeIdBySerialNumberResponse(c_Service.c_Data[2],
+                                                                             c_Service.c_Data[3],
+                                                                             opu8_NrCode);
       }
    }
    return s32_Return;

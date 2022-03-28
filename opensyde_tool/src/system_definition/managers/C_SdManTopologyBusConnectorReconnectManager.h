@@ -39,7 +39,7 @@ public:
                                      const stw_opensyde_gui::C_GiLiBus * const opc_Bus);
    void ContextMenuAboutToClose(void);
    void ContextMenuAccepted(const stw_types::sint32 & ors32_Interface,
-                            const std::vector<stw_types::uint8> & orc_NodeIds);
+                            const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties);
    void DeactivateReconnection(void);
    bool Active(void) const;
 
@@ -55,14 +55,16 @@ Q_SIGNALS:
    void SigReconnectNode(stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                          stw_opensyde_gui::C_GiNode * const opc_StartingNode,
                          stw_opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
-                         const stw_types::sint32 & ors32_Interface, const std::vector<stw_types::uint8> & orc_NodeIds);
+                         const stw_types::sint32 & ors32_Interface,
+                         const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties);
    void SigRevertBus(stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                      const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                      const stw_opensyde_gui::C_GiLiBus * const opc_LastBus, const QPointF & orc_ScenePos);
    void SigReconnectBus(stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                         const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                         const stw_opensyde_gui::C_GiLiBus * const opc_LastBus, const QPointF & orc_ConnectionPos,
-                        const stw_types::sint32 & ors32_Interface, const std::vector<stw_types::uint8> & orc_NodeIds);
+                        const stw_types::sint32 & ors32_Interface,
+                        const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties);
    void SigCleanUpTemporaryLine(void);
 
 private:
@@ -73,7 +75,7 @@ private:
    const stw_opensyde_gui::C_GiLiBus * mpc_LastBus;
    stw_opensyde_gui::C_GiLiBusConnector::E_ConnectState me_ConnectState;
    stw_types::sint32 ms32_NewInterface;
-   std::vector<stw_types::uint8> mc_NodeIds;
+   std::vector<C_PuiSdNodeInterfaceAutomaticProperties> mc_Properties;
    QPointF mc_ConnectionPos;
    QPointF mc_LastKnownInteractionPointPosition;
    bool mq_ContextMenuActive;

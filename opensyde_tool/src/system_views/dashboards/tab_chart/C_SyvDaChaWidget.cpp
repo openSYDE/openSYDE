@@ -39,7 +39,7 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_SyvDaChaWidget::mhu32_MaximumDataElements = 0xFFFFU;
+const uint32 C_SyvDaChaWidget::mhu32_MAXIMUM_DATA_ELEMENTS = 0xFFFFU;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -65,7 +65,7 @@ C_SyvDaChaWidget::C_SyvDaChaWidget(const uint32 ou32_ViewIndex, const uint32 ou3
                                    QWidget * const opc_Parent) :
    C_SyvDaDashboardContentBaseWidget(opc_Parent),
    C_PuiSvDbDataElementHandler(ou32_ViewIndex, ou32_DashboardIndex, 0, C_PuiSvDbDataElement::eTAB_CHART,
-                               mhu32_MaximumDataElements, true),
+                               mhu32_MAXIMUM_DATA_ELEMENTS, true),
    mpc_Ui(new Ui::C_SyvDaChaWidget),
    mq_InitialStyleCall(true),
    mq_DarkMode(false),
@@ -77,7 +77,7 @@ C_SyvDaChaWidget::C_SyvDaChaWidget(const uint32 ou32_ViewIndex, const uint32 ou3
 {
    this->mpc_Ui->setupUi(this);
 
-   this->mpc_Ui->pc_ChartWidget->Init(mhu32_MaximumDataElements);
+   this->mpc_Ui->pc_ChartWidget->Init(mhu32_MAXIMUM_DATA_ELEMENTS);
    this->m_LoadChartData();
 
    connect(this->mpc_Ui->pc_ChartWidget, &C_SyvDaChaPlotHandlerWidget::SigChartDataChanged,
@@ -439,7 +439,8 @@ void C_SyvDaChaWidget::m_DataPoolElementsChanged(void)
 
       q_InvalidElement = (this->m_CheckHasValidElements(c_Name) == false) ||
                          (this->m_CheckHasAnyRequiredNodesActive() == false) ||
-                         (this->m_CheckHasAnyRequiredBusesConnected() == false);
+                         (this->m_CheckHasAnyRequiredBusesConnected() == false) ||
+                         (this->m_CheckHasAnyRequiredNodesValidDashboardRouting() == false);
 
       if ((q_ManualReadElement == true) &&
           (q_InvalidElement == false))
@@ -1072,7 +1073,8 @@ void C_SyvDaChaWidget::m_ManualRead(void)
          if (this->m_CheckIsOnTrigger(c_ElementId))
          {
             if ((c_ElementId.GetIsValid() == true) &&
-                (this->m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true))
+                (this->m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true) &&
+                (this->m_CheckNodeHasAnyRequiredValidDashboardRouting(c_ElementId.u32_NodeIndex) == true))
             {
                //-1 because we already prepared for the next element!
                if (this->m_CheckElementAlreadyRead(this->mu32_ManualOperationActionIndex - 1UL, c_ElementId) == false)

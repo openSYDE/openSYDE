@@ -382,29 +382,10 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
                const std::vector<uint32> c_NodeIndices =
                   C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
                      u32_NodeIndex);
-               std::vector<uint8> c_NodeIds;
-               c_NodeIds.reserve(c_NodeIndices.size());
-               for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
-               {
-                  const C_OSCNode * const pc_NodeData = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
-                  if (pc_NodeData != NULL)
-                  {
-                     if (c_CompleteBusConnectionData.c_ConnectionId.u8_InterfaceNumber <
-                         pc_NodeData->c_Properties.c_ComInterfaces.size())
-                     {
-                        const C_OSCNodeComInterfaceSettings * const pc_ComInterface =
-                           pc_NodeData->c_Properties.GetComInterface(
-                              pc_BusReferenced->GetType(), c_CompleteBusConnectionData.c_ConnectionId.
-                              u8_InterfaceNumber);
-                        if (pc_ComInterface != NULL)
-                        {
-                           c_NodeIds.push_back(pc_ComInterface->u8_NodeID);
-                        }
-                     }
-                  }
-               }
-               tgl_assert(c_NodeIds.size() == c_NodeIndices.size());
-               if (c_NodeIds.size() == c_NodeIndices.size())
+               std::vector<C_PuiSdNodeInterfaceAutomaticProperties> c_Properties;
+               C_PuiSdUtil::h_GetInterfaceDataForNode(u32_NodeIndex, c_CompleteBusConnectionData.c_ConnectionId,
+                                                      c_Properties);
+               if (c_Properties.size() == c_NodeIndices.size())
                {
                   C_GiLiBusConnector * const pc_GraphicsConnector = new C_GiLiBusConnector(
                      u64_CurUniqueID, c_CompleteBusConnectionData.c_UIData.c_UINodeConnectionInteractionPoints,
@@ -413,7 +394,7 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
                   //Add to system definition data
                   C_PuiSdHandler::h_GetInstance()->AddConnection(
                      u32_NodeIndex, c_CompleteBusConnectionData.c_ConnectionId.u8_InterfaceNumber,
-                     c_NodeIds, static_cast<uint32>(pc_BusReferenced->GetIndex()));
+                     c_Properties, static_cast<uint32>(pc_BusReferenced->GetIndex()));
                   pc_GraphicsConnector->RestoreZOrder();
                   pc_Node->AddConnection(pc_GraphicsConnector);
                   m_AddBusConnectorToScene(pc_GraphicsConnector);

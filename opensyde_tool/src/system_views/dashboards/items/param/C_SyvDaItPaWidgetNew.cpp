@@ -586,19 +586,39 @@ void C_SyvDaItPaWidgetNew::SetAllExpandedTreeItems(const std::vector<C_PuiSvDbEx
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of edit mode
 
-   \param[in]  oq_Active   Flag if edit mode is active or not active now
+   \param[in]  oq_EditMode          Edit mode
+   \param[in]  oq_EditContentMode   Edit content mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::SetEditModeActive(const bool oq_Active)
+void C_SyvDaItPaWidgetNew::SetEditMode(const bool oq_EditMode, const bool oq_EditContentMode)
 {
-   this->mq_Editable = oq_Active;
+   this->mq_Editable = oq_EditContentMode;
+   this->mpc_Ui->pc_TreeView->SetEditMode(oq_EditContentMode);
+   this->mpc_Ui->pc_PushButtonAdd->setEnabled(oq_EditContentMode);
 
-   this->mpc_Ui->pc_TreeView->SetEditMode(oq_Active);
-
-   this->mpc_Ui->pc_PushButtonAdd->setEnabled(oq_Active);
+   if (oq_EditContentMode)
+   {
+      this->mpc_Ui->pc_TreeView->SetLoadSaveActive(true);
+   }
+   else
+   {
+      this->mpc_Ui->pc_TreeView->SetLoadSaveActive(!oq_EditMode);
+   }
    //Update selection
    this->m_UpdateButtons();
    m_UpdateButtonToolTips();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide tooltip
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaWidgetNew::HideToolTip(void)
+{
+   // In case of deactivating the content edit mode when a tooltip is still visible,
+   // no further events can be received here. In this case all tooltips must be hided manually
+   this->mpc_Ui->pc_TreeView->HideToolTip();
+   this->mpc_Ui->pc_PushButtonAdd->HideToolTip();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -614,6 +634,41 @@ void C_SyvDaItPaWidgetNew::paintEvent(QPaintEvent * const opc_Event)
 {
    stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
    QWidget::paintEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
+
+   Here: Handle dashboard param widget specific key functionality
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaWidgetNew::keyPressEvent(QKeyEvent * const opc_Event)
+{
+   // Events can get here only in content edit mode
+   bool q_CallOrig = true;
+
+   switch (opc_Event->key())
+   {
+   case Qt::Key_BracketRight: // Qt::Key_BracketRight matches the "Not-Num-Plus"-Key
+   case Qt::Key_Plus:
+      if (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == true)
+      {
+         q_CallOrig = false;
+         this->ButtonAddClicked();
+         opc_Event->accept();
+      }
+      break;
+   default:
+      //Nothing to do
+      break;
+   }
+
+   if (q_CallOrig == true)
+   {
+      QWidget::keyPressEvent(opc_Event);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -637,15 +692,32 @@ void C_SyvDaItPaWidgetNew::m_ReadElements(void)
          {
             const C_OSCNodeDataPoolListElementId & rc_ID = this->mc_ListIds[u32_ItList];
             const std::vector<uint8> & rc_ActiveFlags = pc_View->GetNodeActiveFlags();
+
             if ((rc_ID.u32_NodeIndex < rc_ActiveFlags.size()) && (rc_ActiveFlags[rc_ID.u32_NodeIndex] == 1U))
             {
                //Valid
+               bool q_Error = false;
+
+               C_PuiSvHandler::h_GetInstance()->CheckViewNodeDashboardRoutingError(this->mu32_ViewIndex,
+                                                                                   rc_ID.u32_NodeIndex,
+                                                                                   q_Error);
+
+               if (q_Error == true)
+               {
+                  s32_Result = C_RANGE;
+               }
             }
             else
             {
                s32_Result = C_RANGE;
             }
+
+            if (s32_Result != C_NO_ERR)
+            {
+               break;
+            }
          }
+
          if (s32_Result == C_NO_ERR)
          {
             this->mc_ListsWithCRCError.clear();
@@ -658,7 +730,7 @@ void C_SyvDaItPaWidgetNew::m_ReadElements(void)
                // Start the poll for the first list
                // All other lists will be handled by HandleManualOperationFinished and get triggered by the
                // finished signal of the poll thread
-               Q_EMIT this->SigNvmReadList(rc_ID);
+               Q_EMIT (this->SigNvmReadList(rc_ID));
                ++this->mu32_ListCounter;
                m_UpdateReadAllowedFlag(false);
                m_UpdateButtonToolTips();
@@ -683,7 +755,8 @@ void C_SyvDaItPaWidgetNew::m_ReadElements(void)
          C_OgeWiCustomMessage c_MessageResult(pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::E_Type::eERROR);
          c_MessageResult.SetHeading(C_GtGetText::h_GetText("System Parametrization"));
          c_MessageResult.SetDescription(C_GtGetText::h_GetText(
-                                           "Parametrization widget contains nodes, which are not active in current view."));
+                                           "Parametrization widget contains nodes, which are not active in current"
+                                           " view or have the Dashboard flags disabled."));
          c_MessageResult.SetCustomMinHeight(180, 180);
          c_MessageResult.Execute();
          this->mq_ReadActive = false;
@@ -913,7 +986,7 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
 
             if (s32_Result == C_NO_ERR)
             {
-               const QSize c_SizeImportReport(1210, 790);
+               const QSize c_SIZE_IMPORT_REPORT(1210, 790);
                const C_OSCParamSetInterpretedData & rc_Data = c_ParamSetHandler.GetInterpretedData();
                std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_FloatRangeCheckInvalidValueIds;
                std::vector<QString> c_FloatRangeCheckInvalidValues;
@@ -929,7 +1002,7 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
                Q_UNUSED(pc_Dialog)
 
                //Resize
-               c_New->SetSize(c_SizeImportReport);
+               c_New->SetSize(c_SIZE_IMPORT_REPORT);
 
                pc_Dialog->GetFloatRangeCheckResults(c_FloatRangeCheckInvalidValueIds, c_FloatRangeCheckInvalidValues,
                                                     c_FloatRangeCheckNewValues);
@@ -1372,7 +1445,8 @@ void C_SyvDaItPaWidgetNew::m_UpdateButtons(void)
 void C_SyvDaItPaWidgetNew::m_UpdateButtonToolTips(void) const
 {
    const QString c_ReasonEditMode =
-      C_GtGetText::h_GetText("Disabled because this action is only allowed in edit mode.");
+      C_GtGetText::h_GetText(
+         "Disabled because this action is only allowed in edit content mode activated by the context menu.");
    QString c_Heading;
    QString c_Description;
 

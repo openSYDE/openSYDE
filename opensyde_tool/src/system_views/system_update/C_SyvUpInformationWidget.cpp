@@ -88,7 +88,7 @@ C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
    this->mc_Timer.setInterval(1000);
    connect(&this->mc_Timer, &QTimer::timeout, this, &C_SyvUpInformationWidget::m_UpdateTime);
    connect(&this->mc_Timer, &QTimer::timeout, this, &C_SyvUpInformationWidget::m_UpdateDataRate);
-   connect(this->mpc_Ui->pc_WidgetUpdatePackage, &C_SyvUpUpdatePackageWidget::SigUpdatePackageState,
+   connect(this->mpc_Ui->pc_WidgetUpdatePackage, &C_SyvUpPacWidget::SigUpdatePackageState,
            this, &C_SyvUpInformationWidget::SigUpdatePackageState);
 
    connect(this->mpc_Ui->pc_WidgetUpdateSummary, &C_SyvUpSummaryWidget::SigHideBigSummaryWidget,

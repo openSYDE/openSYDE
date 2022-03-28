@@ -76,19 +76,19 @@ private:
    static QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState> mhc_ViewSetupsNL;
    static QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState> mhc_ViewSetupsDE;
    static QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState> mhc_ViewSetupsBS;
-   static const QString mhc_IconNode;
-   static const QString mhc_IconDatapool;
-   static const QString mhc_IconList;
-   static const QString mhc_IconVariable;
-   static const QString mhc_IconParameter;
-   static const QString mhc_IconSignal;
-   static const QString mhc_IconEthernet;
-   static const QString mhc_IconCAN;
-   static const QString mhc_IconMessage;
-   static const QString mhc_IconHALCInput;
-   static const QString mhc_IconHALCOutput;
-   static const QString mhc_IconHALCMisc;
-   static const QString mhc_AdditionalDataPoolInfo;
+   static const QString mhc_ICON_NODE;
+   static const QString mhc_ICON_DATAPOOL;
+   static const QString mhc_ICON_LIST;
+   static const QString mhc_ICON_VARIABLE;
+   static const QString mhc_ICON_PARAMETER;
+   static const QString mhc_ICON_SIGNAL;
+   static const QString mhc_ICON_ETHERNET;
+   static const QString mhc_ICON_CAN;
+   static const QString mhc_ICON_MESSAGE;
+   static const QString mhc_ICON_HALC_INPUT;
+   static const QString mhc_ICON_HALC_OUTPUT;
+   static const QString mhc_ICON_HALC_MISC;
+   static const QString mhc_ADDITIONAL_DATA_POOL_INFO;
 
    static C_PuiSvDbNodeDataPoolListElementId mh_Translate(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_Indices,

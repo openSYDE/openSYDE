@@ -20,6 +20,7 @@
 #include "C_OSCNodeApplication.h"
 #include "C_OSCCanProtocol.h"
 #include "C_OSCHalcConfig.h"
+#include "C_OSCCanMessageUniqueId.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -121,16 +122,16 @@ public:
                            bool * const opq_NameInvalid, bool * const opq_IsErrorInListOrMessage,
                            bool * const opq_InvalidNumberOfListsOrElements,
                            std::vector<stw_types::uint32> * const opc_InvalidListIndices) const;
-   void  CheckMessageId(const stw_types::uint32 ou32_InterfaceIndex, const stw_types::uint32 ou32_MessageId,
-                        bool & orq_Valid, const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol = NULL,
-                        const stw_types::uint32 * const opu32_SkipInterfaceIndex = NULL,
-                        const bool * const opq_SkipMessageIsTxFlag = NULL,
-                        const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
-   void  CheckMessageName(const stw_types::uint32 ou32_InterfaceIndex, const stw_scl::C_SCLString & orc_MessageName,
-                          bool & orq_Valid, const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol = NULL,
-                          const stw_types::uint32 * const opu32_SkipInterfaceIndex = NULL,
-                          const bool * const opq_SkipMessageIsTxFlag = NULL,
-                          const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
+   void CheckMessageId(const stw_types::uint32 ou32_InterfaceIndex, const C_OSCCanMessageUniqueId & orc_MessageId,
+                       bool & orq_Valid, const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol = NULL,
+                       const stw_types::uint32 * const opu32_SkipInterfaceIndex = NULL,
+                       const bool * const opq_SkipMessageIsTxFlag = NULL,
+                       const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
+   void CheckMessageName(const stw_types::uint32 ou32_InterfaceIndex, const stw_scl::C_SCLString & orc_MessageName,
+                         bool & orq_Valid, const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol = NULL,
+                         const stw_types::uint32 * const opu32_SkipInterfaceIndex = NULL,
+                         const bool * const opq_SkipMessageIsTxFlag = NULL,
+                         const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
    stw_types::sint32 CheckApplicationProcessIdValid(const stw_types::uint32 ou32_ApplicationIndex,
                                                     bool & orq_Valid) const;
    void CheckHalcConfigValid(bool * const opq_ConfigInvalid,
@@ -145,8 +146,12 @@ public:
                                                          const stw_types::uint32 ou32_ElementIndex);
 
    const C_OSCDeviceDefinition * pc_DeviceDefinition; ///< Pointer to device definition
-   stw_scl::C_SCLString c_DeviceType;                 ///< Node type: reference to name of device type in Device
-   ///< Definition
+   stw_types::uint32 u32_SubDeviceIndex;
+   stw_scl::C_SCLString c_DeviceType; ///< Node type: for non multi-cpu devices (C_OSCDeviceDefinition::c_DeviceName =
+   ///< C_OSCNode::c_DeviceType) for multi-cpu devices (C_OSCSubDeviceDefinition::c_DeviceName =
+   ///< C_OSCNode::c_DeviceType).
+   ///< Simply put: When the device type of multi-cpu device is needed:
+   ///< "C_OSCNode::pc_DeviceDefinition->c_DeviceName" will do the trick.
    C_OSCNodeProperties c_Properties;           ///< General node properties
    std::vector<C_OSCNodeDataPool> c_DataPools; ///< All datapools assigned to this node, expected type order:
    ///< DIAG, NVM then COM

@@ -33,7 +33,7 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::float64 C_SyvUpScene::mhf64_BusAnimationTolerance = 0.001;
+const stw_types::float64 C_SyvUpScene::mhf64_BUS_ANIMATION_TOLERANCE = 0.001;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -68,13 +68,12 @@ C_SyvUpScene::~C_SyvUpScene()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update connected status
+/*! \brief   Signal if connect in progress
 
-   \param[in]  oq_Active         Flag if connected
-   \param[in]  oq_SignalNodes    Optional flag to signal nodes
+   \param[in]  oq_Active   Flag if connect in progress
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpScene::SetConnected(const bool oq_Active, const bool oq_SignalNodes) const
+void C_SyvUpScene::SetConnecting(const bool oq_Active) const
 {
    const QList<QGraphicsItem *> c_Items = this->items();
 
@@ -87,7 +86,34 @@ void C_SyvUpScene::SetConnected(const bool oq_Active, const bool oq_SignalNodes)
          //Nodes
 
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
-         if ((pc_Node != NULL) && (oq_SignalNodes == true))
+         if (pc_Node != NULL)
+         {
+            pc_Node->SetConnecting(oq_Active);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update connected status
+
+   \param[in]  oq_Active         Flag if connected
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpScene::SetConnected(const bool oq_Active) const
+{
+   const QList<QGraphicsItem *> c_Items = this->items();
+
+   //Search for matching bus
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
+   {
+      QGraphicsItem * const pc_CurItemParent = C_SebUtil::h_GetHighestParent(*c_ItItem);
+      if (pc_CurItemParent != NULL)
+      {
+         //Nodes
+
+         C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
+         if (pc_Node != NULL)
          {
             pc_Node->SetConnected(oq_Active);
          }
@@ -144,6 +170,7 @@ void C_SyvUpScene::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeI
    if (orc_NodeIndexes.size() == orc_DeviceInformation.size())
    {
       const QList<QGraphicsItem *> c_Items = this->items();
+      uint32 u32_UpdatedStatuses = 0U;
 
       //Search for matching bus
       for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
@@ -152,9 +179,10 @@ void C_SyvUpScene::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeI
          if (pc_CurItemParent != NULL)
          {
             //Nodes
-
             C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
-            if (pc_Node != NULL)
+
+            if ((pc_Node != NULL) &&
+                (pc_Node->IsActiveInView() == true))
             {
                for (uint32 u32_ItDevice = 0; u32_ItDevice < orc_NodeIndexes.size(); ++u32_ItDevice)
                {
@@ -164,10 +192,16 @@ void C_SyvUpScene::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeI
                   {
                      pc_Node->UpdateInitialPackageStatus(orc_DeviceInformation[u32_ItDevice],
                                                          orc_NodeIndexes[u32_ItDevice]);
-                     break;
+                     ++u32_UpdatedStatuses;
                   }
                }
             }
+         }
+
+         if (u32_UpdatedStatuses == orc_NodeIndexes.size())
+         {
+            // All device information instances handled
+            break;
          }
       }
    }
@@ -296,6 +330,7 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
 
    if (oq_StopUpdateingState == true)
    {
+      this->SetConnecting(false);
       this->SetUpdating(false);
    }
    //Search for matching bus
@@ -351,12 +386,12 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set no response state for node
+/*! \brief   Set error state for node
 
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpScene::SetNoResponse(const uint32 ou32_NodeIndex) const
+void C_SyvUpScene::SetNodeError(const uint32 ou32_NodeIndex) const
 {
    const uint32 u32_TopologyNodeIndex = C_PuiSdUtil::h_GetIndexOfFirstNodeInGroup(ou32_NodeIndex);
 
@@ -373,47 +408,11 @@ void C_SyvUpScene::SetNoResponse(const uint32 ou32_NodeIndex) const
          C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if ((pc_Node != NULL) && (pc_Node->CheckIndexRelevantForThisNode(u32_TopologyNodeIndex)))
          {
-            pc_Node->SetNoResponse(ou32_NodeIndex);
+            pc_Node->SetNodeError(ou32_NodeIndex);
             break;
          }
       }
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all not responding node indices
-
-   \return
-   All not responding node indices
-*/
-//----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_SyvUpScene::GetActiveNoResponseNodeIndices(void) const
-{
-   const QList<QGraphicsItem *> c_Items = this->items();
-
-   std::vector<uint32> c_Retval;
-
-   for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
-   {
-      const QGraphicsItem * const pc_CurItemParent = C_SebUtil::h_GetHighestParent(*c_ItItem);
-      if (pc_CurItemParent != NULL)
-      {
-         //Nodes
-
-         const C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<const C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
-         if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->HasNoResponseAndIsActive() == true))
-         {
-            const std::vector<uint32> c_AllCurrent = pc_Node->GetAllNotRespondingAndActiveIndices();
-            for (std::vector<uint32>::const_iterator c_It = c_AllCurrent.cbegin(); c_It != c_AllCurrent.end(); ++c_It)
-            {
-               c_Retval.push_back(*c_It);
-            }
-         }
-      }
-   }
-   //Nodes may have been added multiple times
-   C_Uti::h_Uniqueify(c_Retval);
-   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -438,7 +437,7 @@ std::vector<uint32> C_SyvUpScene::GetActiveNoneThirdPartyNodeIndices(void) const
 
          const C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<const C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
          if ((((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true)) &&
-             (pc_Node->IsStwDevice() == true))
+             (pc_Node->HasNodeAnAvailableFlashloader() == true))
          {
             const std::vector<uint32> c_AllCurrent = pc_Node->GetAllActiveSTWDeviceIndices();
             for (std::vector<uint32>::const_iterator c_It = c_AllCurrent.cbegin(); c_It != c_AllCurrent.end(); ++c_It)
@@ -472,6 +471,60 @@ void C_SyvUpScene::CheckUpdateDisabledState(void) const
          if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true))
          {
             pc_Node->UpdateIcons();
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the connect state of all nodes
+
+   \param[in]       orc_NodeStates                 Node connect states
+   \param[in]       orc_NodePreconditionErrors     Node precondition error states
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpScene::SetNodeConnectStates(const std::vector<C_OSCSuSequencesNodeConnectStates> & orc_NodeStates,
+                                        const C_GiSvNodeData::C_GiSvNodeDataPreconditionErrors & orc_NodePreconditionErrors)
+{
+   const QList<QGraphicsItem *> c_Items = this->items();
+
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
+   {
+      QGraphicsItem * const pc_CurItemParent = C_SebUtil::h_GetHighestParent(*c_ItItem);
+      if (pc_CurItemParent != NULL)
+      {
+         //Nodes
+
+         C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
+         if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true))
+         {
+            pc_Node->SetNodeConnectStates(orc_NodeStates, orc_NodePreconditionErrors);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the connect state of all nodes
+
+   \param[in]       orc_NodeStates     Node connect states
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpScene::SetNodeUpdateStates(const std::vector<C_OSCSuSequencesNodeUpdateStates> & orc_NodeStates)
+{
+   const QList<QGraphicsItem *> c_Items = this->items();
+
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
+   {
+      QGraphicsItem * const pc_CurItemParent = C_SebUtil::h_GetHighestParent(*c_ItItem);
+      if (pc_CurItemParent != NULL)
+      {
+         //Nodes
+
+         C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
+         if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true))
+         {
+            pc_Node->SetNodeUpdateStates(orc_NodeStates);
          }
       }
    }
@@ -961,9 +1014,9 @@ sint32 C_SyvUpScene::mh_GetAnimationPath(const QPointF & orc_PointStart, const Q
       float64 f64_Dist2;
       C_GiBiConnectableItem::h_DistToLine(rc_LineStart, rc_LineEnd, orc_PointStart, &f64_Dist1);
       C_GiBiConnectableItem::h_DistToLine(rc_LineStart, rc_LineEnd, orc_PointEnd, &f64_Dist2);
-      if (std::abs(f64_Dist1) < C_SyvUpScene::mhf64_BusAnimationTolerance)
+      if (std::abs(f64_Dist1) < C_SyvUpScene::mhf64_BUS_ANIMATION_TOLERANCE)
       {
-         if (std::abs(f64_Dist2) < C_SyvUpScene::mhf64_BusAnimationTolerance)
+         if (std::abs(f64_Dist2) < C_SyvUpScene::mhf64_BUS_ANIMATION_TOLERANCE)
          {
             //Undecided
             C_GiBiConnectableItem::h_DistToPoint(rc_LineStart, orc_PointStart, f64_Dist1);
@@ -1002,7 +1055,7 @@ sint32 C_SyvUpScene::mh_GetAnimationPath(const QPointF & orc_PointStart, const Q
       }
       else
       {
-         if (std::abs(f64_Dist2) < C_SyvUpScene::mhf64_BusAnimationTolerance)
+         if (std::abs(f64_Dist2) < C_SyvUpScene::mhf64_BUS_ANIMATION_TOLERANCE)
          {
             if (q_First == true)
             {

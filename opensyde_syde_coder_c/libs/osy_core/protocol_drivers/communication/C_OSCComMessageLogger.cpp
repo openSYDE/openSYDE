@@ -15,9 +15,12 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <algorithm>
+
 #include "stwerrors.h"
 
 #include "TGLTime.h"
+#include "TGLFile.h"
 
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCComMessageLogger.h"
@@ -112,7 +115,15 @@ C_OSCComMessageLogger::C_OSCComMessageLogger(void) :
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLogger::~C_OSCComMessageLogger(void)
 {
-   this->RemoveAllLogFiles();
+   try
+   {
+      C_OSCComMessageLogger::RemoveAllLogFiles();
+   }
+   catch (...)
+   {
+   }
+   mpc_OsySysDefMessage = NULL;
+   mpc_OsySysDefDataPoolList = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -213,7 +224,7 @@ void C_OSCComMessageLogger::SetProtocol(const e_CMONL7Protocols oe_Protocol)
 /*! \brief  Adds an openSYDE system definition for analyzing
 
    \param[in]  orc_PathSystemDefinition Path of system definition file (Must be .syde_sysdef)
-   \param[out] orc_Busses               All CAN buses of system definition
+   \param[out] orc_Buses                All CAN buses of system definition
 
    \return
    C_NO_ERR    data read
@@ -226,9 +237,9 @@ void C_OSCComMessageLogger::SetProtocol(const e_CMONL7Protocols oe_Protocol)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDefinition,
-                                           std::vector<C_OSCSystemBus> & orc_Busses)
+                                           std::vector<C_OSCSystemBus> & orc_Buses)
 {
-   return this->AddOsySysDef(orc_PathSystemDefinition, 0xFFFFFFFFUL, orc_Busses);
+   return this->AddOsySysDef(orc_PathSystemDefinition, 0xFFFFFFFFUL, orc_Buses);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -236,7 +247,7 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
 
    \param[in]  orc_PathSystemDefinition Path of system definition file (Must be .syde_sysdef)
    \param[in]  ou32_BusIndex            Bus index of CAN bus of system definition for monitoring
-   \param[out] orc_Busses               All CAN buses of system definition
+   \param[out] orc_Buses               All CAN buses of system definition
 
    \return
    C_NO_ERR    data read
@@ -250,14 +261,17 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDefinition, const uint32 ou32_BusIndex,
-                                           std::vector<C_OSCSystemBus> & orc_Busses)
+                                           std::vector<C_OSCSystemBus> & orc_Buses)
 {
-   C_OSCSystemDefinition c_SysDef;
+   const C_SCLString c_FileExtension = stw_tgl::TGL_ExtractFileExtension(orc_PathSystemDefinition).LowerCase();
    sint32 s32_Return = C_RANGE;
 
-   if (orc_PathSystemDefinition.SubString(orc_PathSystemDefinition.Length() - 11U, 12U).LowerCase() == ".syde_sysdef")
+   if (c_FileExtension == ".syde_sysdef")
    {
+      C_OSCSystemDefinition c_SysDef;
       // Load without device definitions
+      // Optional parameters to skip contents of h_LoadSystemDefinitionFile are not used,
+      // because we are not in SYDEsup or SYDE Coder C context (#61996) and we want all system definition data here.
       s32_Return =
          C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(c_SysDef, orc_PathSystemDefinition, "", false);
       if (s32_Return == C_NO_ERR)
@@ -271,7 +285,7 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
          for (u32_BusCounter = 0U; u32_BusCounter < c_SysDef.c_Buses.size(); ++u32_BusCounter)
          {
             // Return all busses to make sure the index still works
-            orc_Busses.push_back(c_SysDef.c_Buses[u32_BusCounter]);
+            orc_Buses.push_back(c_SysDef.c_Buses[u32_BusCounter]);
 
             // Only CAN buses are relevant
             if (c_SysDef.c_Buses[u32_BusCounter].e_Type == C_OSCSystemBus::eCAN)
@@ -597,6 +611,7 @@ void C_OSCComMessageLogger::RemoveAllFilter(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Returns the current count of filtered CAN messages
 
+   Filtered messages refers to the number of messages that did not pass active filter(s).
    This function is thread safe
 
    \return
@@ -943,7 +958,7 @@ bool C_OSCComMessageLogger::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
             // Search an interface which is connected to the bus
             for (u32_IntfCounter = 0U; u32_IntfCounter < rc_Node.c_Properties.c_ComInterfaces.size(); ++u32_IntfCounter)
             {
-               if ((rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter].q_IsBusConnected == true) &&
+               if ((rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter].GetBusConnected() == true) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter].u32_BusIndex ==
                     c_ItSysDef->second.u32_BusIndex))
                {
@@ -1227,7 +1242,7 @@ void C_OSCComMessageLogger::mh_InterpretCanSignalValue(C_OSCComMessageLoggerData
       {
          // In case of a float value, the raw value does not make any sense in byte form.
          // Use the value without scaling as raw value.
-         c_OscValue.GetValueAsScaledString(1.0, 0.0, c_StringValue, 0U);
+         c_OscValue.GetValueAsScaledString(1.0, 0.0, c_StringValue, 0U, true, true);
          orc_Signal.c_RawValueDec = c_StringValue.c_str();
          orc_Signal.c_RawValueHex = c_StringValue.c_str();
       }
@@ -1238,7 +1253,7 @@ void C_OSCComMessageLogger::mh_InterpretCanSignalValue(C_OSCComMessageLoggerData
       }
 
       // Interpreted value
-      c_OscValue.GetValueAsScaledString(of64_Factor, of64_Offset, c_StringValue, 0U);
+      c_OscValue.GetValueAsScaledString(of64_Factor, of64_Offset, c_StringValue, 0U, true, true);
       orc_Signal.c_Value = c_StringValue.c_str();
    }
    else
@@ -1451,6 +1466,7 @@ void C_OSCComMessageLogger::m_InterpretSysDefCanSignal(C_OSCComMessageLoggerData
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::m_ResetCounter(void)
 {
+   //lint -e522 //false positive; call to std::fill has side effects
    std::fill(this->mc_MsgCounterStandardId.begin(), this->mc_MsgCounterStandardId.end(), 0U);
    this->mc_MsgCounterExtendedId.clear();
 }

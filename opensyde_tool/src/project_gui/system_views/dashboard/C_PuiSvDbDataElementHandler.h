@@ -92,8 +92,10 @@ protected:
    virtual bool m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const;
    bool m_CheckManualReadRequired(void) const;
    bool m_CheckHasAnyRequiredNodesActive(void) const;
+   bool m_CheckHasAnyRequiredNodesValidDashboardRouting(void) const;
    bool m_CheckHasAnyRequiredBusesConnected(void) const;
    bool m_CheckNodeActive(const stw_types::uint32 ou32_NodeIndex) const;
+   bool m_CheckNodeHasAnyRequiredValidDashboardRouting(const stw_types::uint32 ou32_NodeIndex) const;
    bool m_CheckIsOnTrigger(const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id) const;
    bool m_CheckElementAlreadyRead(const stw_types::uint32 ou32_ItemIndex,
                                   const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id) const;

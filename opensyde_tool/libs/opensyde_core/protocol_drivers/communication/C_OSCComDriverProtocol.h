@@ -50,6 +50,7 @@ public:
                                   C_OSCIpDispatcher * const opc_IpDispatcher,
                                   C_OSCSecurityPemDatabase * const opc_SecurityPemDb);
    stw_types::sint32 SendTesterPresent(const std::set<stw_types::uint32> * const opc_SkipNodes = NULL);
+   stw_types::sint32 SendTesterPresent(const std::vector<stw_types::uint32> & orc_ActiveNodes) const;
    stw_types::sint32 SendTesterPresent(const C_OSCProtocolDriverOsyNode & orc_ServerId) const;
    stw_types::sint32 StartRouting(const stw_types::uint32 ou32_NodeIndex,
                                   stw_types::uint32 * const opu32_ErrorNodeIndex = NULL);
@@ -124,6 +125,9 @@ protected:
                                         stw_types::uint8 * const opu8_NrCode) const;
    stw_types::sint32 m_SetNodesSessionId(const stw_types::uint8 ou8_SessionId, const bool oq_CheckForSession,
                                          std::set<stw_types::uint32> & orc_DefectNodeIndices) const;
+   stw_types::sint32 m_SetNodesSessionId(const std::vector<stw_types::uint32> & orc_ActiveNodes,
+                                         const stw_types::uint8 ou8_SessionId, const bool oq_CheckForSession,
+                                         std::set<stw_types::uint32> & orc_DefectNodeIndices) const;
    stw_types::sint32 m_SetNodeSessionIdWithExpectation(const stw_types::uint32 ou32_ActiveNode,
                                                        const stw_types::uint8 ou8_ExpectedNeededSession) const;
    stw_types::sint32 m_SetNodeSecurityAccess(const stw_types::uint32 ou32_ActiveNode,
@@ -133,6 +137,9 @@ protected:
                                              const stw_types::uint8 ou8_SecurityLevel,
                                              stw_types::uint8 * const opu8_NrCode) const;
    stw_types::sint32 m_SetNodesSecurityAccess(const stw_types::uint8 ou8_SecurityLevel,
+                                              std::set<stw_types::uint32> & orc_ErrorActiveNodes) const;
+   stw_types::sint32 m_SetNodesSecurityAccess(const std::vector<stw_types::uint32> & orc_ActiveNodes,
+                                              const stw_types::uint8 ou8_SecurityLevel,
                                               std::set<stw_types::uint32> & orc_ErrorActiveNodes) const;
 
    stw_types::sint32 m_StartRoutingIp2Ip(const stw_types::uint32 ou32_ActiveNode,

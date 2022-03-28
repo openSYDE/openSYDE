@@ -35,7 +35,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Default constructor/destructor
+/*! \brief  Default constructor
 
    \param[in]  orc_HalcConfig    Halc config
    \param[in]  oe_Selector       Selector

@@ -135,6 +135,8 @@ void C_PuiSdHandlerNodeLogic::SetOSCNodeEthernetConfiguration(const uint32 ou32_
             rc_CurInterface.c_Ip.au8_DefaultGateway[1] = static_cast<uint8>(orc_DefaultGateway[1]);
             rc_CurInterface.c_Ip.au8_DefaultGateway[2] = static_cast<uint8>(orc_DefaultGateway[2]);
             rc_CurInterface.c_Ip.au8_DefaultGateway[3] = static_cast<uint8>(orc_DefaultGateway[3]);
+
+            Q_EMIT (this->SigNodeChanged(ou32_NodeIndex));
          }
       }
    }
@@ -676,16 +678,19 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
       bool q_NameConflict;
       bool q_NameEmpty;
       bool q_NodeIdInvalid;
+      bool q_IpInvalid;
       bool q_DataPoolsInvalid;
       bool q_ApplicationsInvalid;
       bool q_DomainsInvalid;
 
       if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid,
+                                                 &q_IpInvalid,
                                                  &q_DataPoolsInvalid, &q_ApplicationsInvalid, &q_DomainsInvalid,
                                                  true, NULL, NULL, NULL, NULL) == C_NO_ERR)
       {
          const bool q_NvmSizeConflict = this->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
-         if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
+         if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true)) ||
+                 (q_DataPoolsInvalid == true)) ||
                 (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_NameEmpty == true)) ||
              (q_NvmSizeConflict == true))
          {
@@ -716,11 +721,13 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
       //Only do name and id conflict check, otherwise reuse stored value
       bool q_NameConflict;
       bool q_NodeIdInvalid;
+      bool q_IpInvalid;
 
-      if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, NULL, &q_NodeIdInvalid, NULL, NULL,
+      if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, NULL, &q_NodeIdInvalid, &q_IpInvalid,
+                                                 NULL, NULL,
                                                  NULL, true, NULL, NULL, NULL, NULL) == C_NO_ERR)
       {
-         if ((q_NameConflict == true) || (q_NodeIdInvalid == true))
+         if ((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true))
          {
             q_Retval = true;
          }
@@ -1093,7 +1100,7 @@ sint32 C_PuiSdHandlerNodeLogic::MapNodeIndexToName(const uint32 ou32_NodeIndex, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if STW device
+/*! \brief   Check if device has a flashloader available to communicate with
 
    \param[in]  ou32_NodeIndex    Node index
 
@@ -1102,7 +1109,7 @@ sint32 C_PuiSdHandlerNodeLogic::MapNodeIndexToName(const uint32 ou32_NodeIndex, 
    False Third party
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdHandlerNodeLogic::IsNodeAStwDevice(const uint32 ou32_NodeIndex) const
+bool C_PuiSdHandlerNodeLogic::HasNodeAnAvailableFlashloader(const uint32 ou32_NodeIndex) const
 {
    bool q_Retval = false;
 

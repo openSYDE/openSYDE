@@ -33,15 +33,14 @@ public:
    void ReInitSize(void);
    void SetValue(const QString & orc_Value, const stw_types::sint32 os32_Progress2000000);
    void SetUnit(const QString & orc_Value);
-   void SetTransparence(const stw_types::sintn osn_Value);
+   void SetTransparency(const stw_types::sintn osn_Value);
 
 protected:
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
 
 private:
-   static const QColor mhc_Transparent;
-   static const stw_types::float32 mhf32_Pi;
+   static const QColor mhc_TRANSPARENT;
    QColor mc_ValueStart;
    QColor mc_ValueEnd;
    QColor mc_InnerBorderTop;
@@ -60,7 +59,7 @@ private:
    bool mq_ShowUnit;
    bool mq_ShowValue;
    QFont mc_Font;
-   stw_types::sintn msn_Transparence;
+   stw_types::sintn msn_Transparency;
    bool mq_TransparentBackground;
    stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style me_Style;
    bool mq_DarkMode;

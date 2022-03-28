@@ -41,10 +41,11 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 
    \param[in]  oq_RoutingActive     Flag for activating routing
+   \param[in]  oq_UpdateRoutingMode Flag for update specific routing or generic routing
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComSequencesBase::C_OSCComSequencesBase(const bool oq_RoutingActive) :
-   mpc_ComDriver(new C_OSCComDriverFlash(oq_RoutingActive, &mh_MyXflReportProgress, this)),
+C_OSCComSequencesBase::C_OSCComSequencesBase(const bool oq_RoutingActive, const bool oq_UpdateRoutingMode) :
+   mpc_ComDriver(new C_OSCComDriverFlash(oq_RoutingActive, oq_UpdateRoutingMode, &mh_MyXflReportProgress, this)),
    mpc_SystemDefinition(NULL),
    mu32_ActiveBusIndex(0U),
    mq_OpenSydeDevicesActive(false),
@@ -95,7 +96,7 @@ C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
                  Length of active nodes vector is not identical to number of nodes in system definition
                  No STW flashloader devices and no openSYDE devices are active
                  No STW flashloader devices on active bus and no openSYDE devices are active, but STW flashloader on
-                     other busses are active
+                     other buses are active
    C_OVERFLOW    Unknown transport protocol or unknown diagnostic server for at least one node
    C_NOACT       No active nodes
    C_COM         CAN initialization failed or no route found for at least one node

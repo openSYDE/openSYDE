@@ -65,7 +65,8 @@ public:
    //implemented functions from C_OSCDiagProtocolBase:
    virtual stw_types::uint8 GetEndianness(void) const;
 
-   virtual stw_types::sint32 Cycle(void);
+   //this is intended to implement the pure virtual function from C_OSCDiagProtocolBase
+   virtual stw_types::sint32 Cycle(void); //lint !e1511
 
    virtual stw_types::sint32 DataPoolReadNumeric(const stw_types::uint8 ou8_DataPoolIndex,
                                                  const stw_types::uint16 ou16_ListIndex,

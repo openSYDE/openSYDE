@@ -43,7 +43,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterTableModel::C_CamMosFilterTableModel(QObject * const opc_Parent) :
@@ -54,9 +54,9 @@ C_CamMosFilterTableModel::C_CamMosFilterTableModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in] osn_Section    Section
-   \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in]  osn_Section       Section
+   \param[in]  oe_Orientation    Orientation
+   \param[in]  osn_Role          Role
 
    \return
    Header string
@@ -131,7 +131,7 @@ QVariant C_CamMosFilterTableModel::headerData(const sintn osn_Section, const Qt:
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -151,8 +151,8 @@ sintn C_CamMosFilterTableModel::columnCount(const QModelIndex & orc_Parent) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -312,7 +312,7 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle copy items action
 
-   \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
+   \param[in]  orc_SelectedIndices  Selected row indices (Expected: unique)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  nothing needs to be done here
@@ -325,9 +325,9 @@ void C_CamMosFilterTableModel::CopySelectedItems(const std::vector<uint32> & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data at index
 
-   \param[in] orc_Index Index
-   \param[in] orc_Value New data
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  orc_Value   New data
+   \param[in]  osn_Role    Data role
 
    \return
    true  success
@@ -423,7 +423,7 @@ bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVar
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get flags for item
 
-   \param[in] orc_Index Item
+   \param[in]  orc_Index   Item
 
    \return
    Flags for item
@@ -458,7 +458,7 @@ Qt::ItemFlags C_CamMosFilterTableModel::flags(const QModelIndex & orc_Index) con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Column to enum conversion
 
-   \param[in] os32_Column Column
+   \param[in]  os32_Column    Column
 
    \return
    Enum value
@@ -494,7 +494,7 @@ C_CamMosFilterTableModel::E_Columns C_CamMosFilterTableModel::h_ColumnToEnum(con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Enum to column conversion
 
-   \param[in] oe_Value Enum value
+   \param[in]  oe_Value    Enum value
 
    \return
    Column
@@ -531,19 +531,20 @@ sint32 C_CamMosFilterTableModel::h_EnumToColumn(const C_CamMosFilterTableModel::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Search in all loaded databases for messages with given CAN ID.
 
-   \param[in]     ou32_CanId        message CAN ID
+   \param[in]  ou32_CanId     message CAN ID
+   \param[in]  oq_IsExtended  Is extended
 
    \return
    string <Database>::<MessageName> (empty string if not found)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_CamMosFilterTableModel::h_SearchMessageInDatabases(const uint32 ou32_CanId)
+QString C_CamMosFilterTableModel::h_SearchMessageInDatabases(const uint32 ou32_CanId, const bool oq_IsExtended)
 {
    QString c_Return = "";
    QString c_Database = "";
    QString c_Message = "";
 
-   C_CamDbHandler::h_GetInstance()->FindMessageById(ou32_CanId, c_Database, c_Message);
+   C_CamDbHandler::h_GetInstance()->FindMessageById(ou32_CanId, oq_IsExtended, c_Database, c_Message);
 
    if ((c_Database != "") && (c_Message != ""))
    {
@@ -570,7 +571,7 @@ QList<C_CamProFilterItemData> C_CamMosFilterTableModel::GetFilterItemsData() con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data of filter items
 
-   \param[in]     orc_FilterItemsData   list of filter items
+   \param[in]  orc_FilterItemsData  list of filter items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableModel::SetFilterItemsData(const QList<C_CamProFilterItemData> & orc_FilterItemsData)
@@ -581,13 +582,14 @@ void C_CamMosFilterTableModel::SetFilterItemsData(const QList<C_CamProFilterItem
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief Set IDs of specific filter item.
 
-   \param[in]     ou32_Index        index of selected filter item
-   \param[in]     ou32_NewStartId   new start ID
-   \param[in]     ou32_NewEndId     new end ID
+   \param[in]  ou32_Index        index of selected filter item
+   \param[in]  ou32_NewStartId   new start ID
+   \param[in]  ou32_NewEndId     new end ID
+   \param[in]  oq_IsExtended     Is extended
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableModel::SetFilterItemIDs(const uint32 ou32_Index, const uint32 ou32_NewStartId,
-                                                const uint32 ou32_NewEndId)
+                                                const uint32 ou32_NewEndId, const bool oq_IsExtended)
 {
    QVector<sintn> c_Roles;
    const sint32 s32_Column = C_CamMosFilterTableModel::h_EnumToColumn(C_CamMosFilterTableModel::eDETAILS);
@@ -597,12 +599,14 @@ void C_CamMosFilterTableModel::SetFilterItemIDs(const uint32 ou32_Index, const u
       C_CamProFilterItemData & rc_FilterItemData = this->mc_FilterItemsData[ou32_Index];
 
       rc_FilterItemData.u32_StartId = ou32_NewStartId;
+      rc_FilterItemData.u8_ExtendedId = static_cast<uint8>(oq_IsExtended);
 
       // force equality of start and end ID if type is "ID"
       if (rc_FilterItemData.e_Type == C_CamProFilterItemData::E_Type::eID_SINGLE)
       {
          rc_FilterItemData.u32_EndId = ou32_NewStartId;
-         rc_FilterItemData.c_DatabaseMatch = C_CamMosFilterTableModel::h_SearchMessageInDatabases(ou32_NewStartId);
+         rc_FilterItemData.c_DatabaseMatch = C_CamMosFilterTableModel::h_SearchMessageInDatabases(ou32_NewStartId,
+                                                                                                  oq_IsExtended);
       }
       else
       {
@@ -618,29 +622,23 @@ void C_CamMosFilterTableModel::SetFilterItemIDs(const uint32 ou32_Index, const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set extended ID flag of specific filter item.
 
-   \param[in]     ou32_Index        index of selected filter item
-   \param[in]     oq_Extended       extended ID flag
+   \param[in]  ou32_Index     index of selected filter item
+   \param[in]  oq_Extended    extended ID flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableModel::SetFilterItemExtended(const uint32 ou32_Index, const bool oq_Extended)
 {
-   QVector<sintn> c_Roles;
-   const sint32 s32_Column = C_CamMosFilterTableModel::h_EnumToColumn(C_CamMosFilterTableModel::eDETAILS);
-
    if (ou32_Index < static_cast<uint32>(this->mc_FilterItemsData.size()))
    {
-      this->mc_FilterItemsData[ou32_Index].u8_ExtendedId = static_cast<uint8>(oq_Extended);
+      const C_CamProFilterItemData & rc_FilterItemData = this->mc_FilterItemsData[ou32_Index];
+      this->SetFilterItemIDs(ou32_Index, rc_FilterItemData.u32_StartId, rc_FilterItemData.u32_EndId, oq_Extended);
    }
-
-   // update column "Details" of selected role (only display role necessary)
-   c_Roles.push_back(static_cast<sintn>(Qt::DisplayRole));
-   Q_EMIT (this->dataChanged(this->index(ou32_Index, s32_Column), this->index(ou32_Index, s32_Column), c_Roles));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle add new item action
 
-   \param[in] ou32_SelectedIndex Index to insert item at
+   \param[in]  ou32_SelectedIndex   Index to insert item at
 
    \return
    Index of new item
@@ -676,7 +674,7 @@ uint32 C_CamMosFilterTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle paste items action
 
-   \param[in] ou32_SelectedIndex Index to insert item at
+   \param[in]  ou32_SelectedIndex   Index to insert item at
 
    \return
    Indices of new items
@@ -708,7 +706,7 @@ uint32 C_CamMosFilterTableModel::m_GetSizeItems() const
 
    Warning: not expected to fail
 
-   \param[in] ou32_Index Index to delete
+   \param[in]  ou32_Index  Index to delete
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableModel::m_DeleteItem(const uint32 ou32_Index)
@@ -722,8 +720,8 @@ void C_CamMosFilterTableModel::m_DeleteItem(const uint32 ou32_Index)
    For implementation: First delete ou32_SourceIndex then insert ou32_TargetIndex
    Warning: not expected to fail
 
-   \param[in] ou32_SourceIndex Source index
-   \param[in] ou32_TargetIndex Target index
+   \param[in]  ou32_SourceIndex  Source index
+   \param[in]  ou32_TargetIndex  Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  nothing needs to be done here

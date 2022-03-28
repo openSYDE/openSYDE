@@ -25,6 +25,7 @@
 #include <limits>
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "CSCLString.h"
 #include "C_OSCNodeDataPoolContent.h"
 #include "CSCLChecksums.h"
 #include "C_OSCUtils.h"
@@ -34,11 +35,12 @@
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_tgl;
+using namespace stw_scl;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sint32 C_OSCNodeDataPoolContent::mhs32_TypeError = C_CONFIG;
-const sint32 C_OSCNodeDataPoolContent::mhs32_AccessError = C_RANGE;
+const sint32 C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR = C_CONFIG;
+const sint32 C_OSCNodeDataPoolContent::mhs32_ACCESS_ERROR = C_RANGE;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -56,7 +58,8 @@ const sint32 C_OSCNodeDataPoolContent::mhs32_AccessError = C_RANGE;
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent::C_OSCNodeDataPoolContent(void) :
    me_Type(eUINT8),
-   mq_Array(false)
+   mq_Array(false),
+   mc_CriticalSection()
 {
    mc_Data.resize(1, 0U); //matching uint8 type
 }
@@ -230,12 +233,12 @@ template <typename T> void C_OSCNodeDataPoolContent::m_SetValue(const T & orc_Va
       }
       else
       {
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
       }
    }
    else
    {
-      throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+      throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
    }
 }
 
@@ -262,12 +265,12 @@ template <typename T> void C_OSCNodeDataPoolContent::m_GetValue(const E_Type oe_
       }
       else
       {
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
       }
    }
    else
    {
-      throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+      throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
    }
 }
 
@@ -677,12 +680,12 @@ template <typename T> void C_OSCNodeDataPoolContent::m_SetValueArray(const T & o
       }
       else
       {
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
       }
    }
    else
    {
-      throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+      throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
    }
 }
 
@@ -717,17 +720,17 @@ template <typename T> void C_OSCNodeDataPoolContent::m_SetValueArrayElement(cons
          }
          else
          {
-            throw C_OSCNodeDataPoolContent::mhs32_AccessError;
+            throw C_OSCNodeDataPoolContent::mhs32_ACCESS_ERROR;
          }
       }
       else
       {
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
       }
    }
    else
    {
-      throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+      throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
    }
 }
 
@@ -755,12 +758,12 @@ template <typename T> void C_OSCNodeDataPoolContent::m_GetValueArray(const E_Typ
       }
       else
       {
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
       }
    }
    else
    {
-      throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+      throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
    }
 }
 
@@ -795,17 +798,17 @@ template <typename T> void C_OSCNodeDataPoolContent::m_GetValueArrayElement(cons
          }
          else
          {
-            throw C_OSCNodeDataPoolContent::mhs32_AccessError;
+            throw C_OSCNodeDataPoolContent::mhs32_ACCESS_ERROR;
          }
       }
       else
       {
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
       }
    }
    else
    {
-      throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+      throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
    }
 }
 
@@ -1288,13 +1291,13 @@ void C_OSCNodeDataPoolContent::SetArraySize(const uint32 & oru32_Size)
          this->mc_Data.resize(static_cast<size_t>(oru32_Size * 8), 0U);
          break;
       default:
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
          break;
       }
    }
    else
    {
-      throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+      throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
    }
 }
 
@@ -1333,7 +1336,7 @@ uint32 C_OSCNodeDataPoolContent::GetArraySize(void) const
          u32_Retval = static_cast<uint32>(this->mc_Data.size() / 8);
          break;
       default:
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
          break;
       }
    }
@@ -1394,7 +1397,7 @@ void C_OSCNodeDataPoolContent::SetType(const E_Type & ore_Value)
          this->mc_Data.resize(8);
          break;
       default:
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
          break;
       }
 
@@ -1498,7 +1501,7 @@ void C_OSCNodeDataPoolContent::SetType(const E_Type & ore_Value)
          this->SetValueF64(f64_NewValue);
          break;
       default:
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
          break;
       }
    }
@@ -1533,7 +1536,7 @@ void C_OSCNodeDataPoolContent::SetType(const E_Type & ore_Value)
          this->mc_Data.resize(static_cast<size_t>(u32_Size * 8));
          break;
       default:
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
          break;
       }
       //Copy data (if any)
@@ -1656,7 +1659,7 @@ void C_OSCNodeDataPoolContent::SetType(const E_Type & ore_Value)
             this->SetValueAF64Element(f64_NewValue, u32_ItArray);
             break;
          default:
-            throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+            throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
             break;
          }
       }
@@ -1723,7 +1726,7 @@ void C_OSCNodeDataPoolContent::SetArray(const bool oq_Value)
          this->mc_Data.resize(8);
          break;
       default:
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
          break;
       }
    }
@@ -2756,11 +2759,13 @@ bool C_OSCNodeDataPoolContent::CompareArrayGreater(const C_OSCNodeDataPoolConten
    \param[out]  orc_Output                Scaled string
    \param[in]   ou32_Index                Index to use in case of array
    \param[in]   oq_AllowRangeAdaptation   Allow range adaptation
+   \param[in]   oq_AllowSpecialHandling   Allow special handling
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::GetValueAsScaledString(const float64 of64_Factor, const float64 of64_Offset,
                                                       std::string & orc_Output, const uint32 ou32_Index,
-                                                      const bool oq_AllowRangeAdaptation) const
+                                                      const bool oq_AllowRangeAdaptation,
+                                                      const bool oq_AllowSpecialHandling) const
 {
    std::stringstream c_Stream;
    if (C_OSCUtils::h_IsScalingActive(of64_Factor, of64_Offset) == true)
@@ -2801,10 +2806,28 @@ void C_OSCNodeDataPoolContent::GetValueAsScaledString(const float64 of64_Factor,
             c_Stream << this->GetValueS64();
             break;
          case C_OSCNodeDataPoolContent::eFLOAT32:
-            c_Stream << this->GetValueF32();
+            if (oq_AllowSpecialHandling == true)
+            {
+               C_SCLString c_Precison;
+               c_Precison.PrintFormatted("%.9g", this->GetValueF32());
+               c_Stream << c_Precison.c_str();
+            }
+            else
+            {
+               c_Stream << this->GetValueF32();
+            }
             break;
          case C_OSCNodeDataPoolContent::eFLOAT64:
-            c_Stream << this->GetValueF64();
+            if (oq_AllowSpecialHandling == true)
+            {
+               C_SCLString c_Precison;
+               c_Precison.PrintFormatted("%.17g", this->GetValueF64());
+               c_Stream << c_Precison.c_str();
+            }
+            else
+            {
+               c_Stream << this->GetValueF64();
+            }
             break;
          default:
             break;
@@ -3091,7 +3114,7 @@ void C_OSCNodeDataPoolContent::m_GetBaseType(bool & orq_IsUintBase, bool & orq_I
          orq_IsFloatBase = true;
          break;
       default:
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
          break;
       }
    }
@@ -3167,7 +3190,7 @@ void C_OSCNodeDataPoolContent::m_GetBaseTypeArray(const uint32 & oru32_Index, bo
          orq_IsFloatBase = true;
          break;
       default:
-         throw C_OSCNodeDataPoolContent::mhs32_TypeError;
+         throw C_OSCNodeDataPoolContent::mhs32_TYPE_ERROR;
          break;
       }
    }

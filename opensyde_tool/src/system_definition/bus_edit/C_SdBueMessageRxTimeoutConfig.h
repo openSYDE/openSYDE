@@ -54,9 +54,9 @@ private:
 
    const stw_types::uint32 mu32_AutoReceiveTimeoutValue;
 
-   static const stw_types::sint32 mhs32_IndexAuto;
-   static const stw_types::sint32 mhs32_IndexCustom;
-   static const stw_types::sint32 mhs32_IndexDisabled;
+   static const stw_types::sint32 mhs32_INDEX_AUTO;
+   static const stw_types::sint32 mhs32_INDEX_CUSTOM;
+   static const stw_types::sint32 mhs32_INDEX_DISABLED;
 
    //Avoid call
    C_SdBueMessageRxTimeoutConfig(const C_SdBueMessageRxTimeoutConfig &);

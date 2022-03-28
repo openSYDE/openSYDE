@@ -27,7 +27,7 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_SyvDaPeUpdateModeNodeHeader::mhu32_HeaderHeight = 40;
+const uint32 C_SyvDaPeUpdateModeNodeHeader::mhu32_HEADER_HEIGHT = 40;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -69,9 +69,9 @@ C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const stw_types::ui
 
    //Resize
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->setMinimumHeight(C_SyvDaPeUpdateModeNodeHeader::mhu32_HeaderHeight);
+   this->setMinimumHeight(C_SyvDaPeUpdateModeNodeHeader::mhu32_HEADER_HEIGHT);
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->setMaximumHeight(C_SyvDaPeUpdateModeNodeHeader::mhu32_HeaderHeight);
+   this->setMaximumHeight(C_SyvDaPeUpdateModeNodeHeader::mhu32_HEADER_HEIGHT);
 
    //init
    this->InitStaticNames();

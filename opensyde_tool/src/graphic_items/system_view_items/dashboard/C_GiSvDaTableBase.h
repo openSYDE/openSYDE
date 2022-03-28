@@ -40,11 +40,13 @@ public:
    virtual void UpdateData(void) override;
 
    virtual void UpdateShowValue(void) override;
-   virtual void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex,
+   virtual void UpdateTransparency(const stw_types::uint32 ou32_DataElementIndex,
                                    const stw_types::sintn osn_Value) override;
    virtual void ConnectionActiveChanged(const bool oq_Active) override;
+   void EditElementProperties(void);
    virtual void EditModeActiveChanged(const bool oq_Active) override;
-   virtual bool CallProperties(void) override;
+   virtual bool EnableEditContent(void) override;
+   virtual void DisableEditContent(void) override;
 
    virtual void ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,
                                      const bool oq_Active) override;
@@ -55,6 +57,8 @@ public:
    const stw_opensyde_gui_logic::C_PuiSvDbTable * GetTableItem(void) const;
    stw_types::sint32 SetTableItem(const stw_opensyde_gui_logic::C_PuiSvDbTable & orc_Content) const;
    bool GetViewActive(const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const;
+   bool GetViewDashboardRouteValid(
+      const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const;
    stw_types::uint32 GetViewIndex(void) const;
    bool CheckItemError(const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
                        QString & orc_Content, bool & orq_IsTransmissionError) const;
@@ -62,6 +66,7 @@ public:
 protected:
    virtual void m_UpdateErrorIcon(void) override;
    virtual bool m_AllowWarningIcon(void) const override;
+   virtual bool m_HasEditContentMode(void) const;
    virtual QString m_GetCommonToolTipContent(void) const override;
 
 private:
@@ -70,6 +75,7 @@ private:
    QAction * mpc_AddDataElement;
    QAction * mpc_AddSeperator;
    QAction * mpc_ConfigDataElement;
+   QAction * mpc_ConfigSeperator;
    QAction * mpc_RemoveDataElement;
    QAction * mpc_MoveUpDataElement;
    QAction * mpc_MoveDownDataElement;

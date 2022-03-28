@@ -32,7 +32,7 @@ public:
                                                            stw_types::uint32 & oru32_ActiveBusIndex,
                                                            std::vector<stw_types::uint8> & orc_ActiveNodes,
                                                            stw_can::C_CAN ** const oppc_CanDispatcher,
-                                                           stw_opensyde_core::C_OSCIpDispatcherWinSock ** const oppc_IpDispatcher, const bool oq_InitCan = true);
+                                                           stw_opensyde_core::C_OSCIpDispatcherWinSock ** const oppc_IpDispatcher, const bool oq_InitCan, const bool oq_IgnoreUpdateRoutingErrors, bool * const opq_DashboardRoutingErrors);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -235,62 +235,63 @@ private:
    C_UsHandler(const C_UsHandler &);
    C_UsHandler & operator =(const C_UsHandler &);
 
-   const QString mc_IniPathAndName;                      ///< Fix location of user settings
-   QString mc_ActualProject;                             ///< Project specific settings for this concrete project
-   static const stw_types::uint8 mhu8_MaxRecentProjects; ///< Maximum number of entries in unique history of recent
-                                                         // projects
-   static const QPoint mhc_DefaultViewPos;               ///< Default view position
-   static const stw_types::sintn mhsn_DefaultZoomLevel;  ///< Default zoom level
-   const QString mc_DefaultProjectsFolder;               ///< Default openSYDE projects location if no recent projects
-                                                         // are available
-   QString mc_Lang;                                      ///< Current language
-   bool mq_PerformanceMeasurementActive;                 ///< Flag if performance measurement is active (log entries)
-   QString mc_CurrentSaveAsPath;                         ///< Current save as base path
-   QVector<QColor> mc_RecentColors;                      ///< Recent colors from color picker
-   stw_types::sintn msn_NextRecentColorButtonNumber;     ///< Next recent color button for color from color picker
-   QStringList mc_RecentProjects;                        ///< Unique history of recent projects
-   QPoint mc_ScreenPos;                                  ///< History of last known screen position
-   QSize mc_AppSize;                                     ///< History of last known openSyde window size
-   bool mq_AppMaximized;                                 ///< History of openSyde window state
-   QPoint mc_SdTopologyToolboxPos;                       ///< History of last known sys def toolbox position
-   QSize mc_SdTopologyToolboxSize;                       ///< History of last known sys def toolbox size
-   stw_types::sint32 ms32_NaviBarSize;                   ///< Last known navi bar size
-   stw_types::sint32 ms32_NaviBarNodeSectionSize;        ///< Last known navi bar node section size
-   stw_types::sint32 ms32_SdNodeEditSplitterX;           ///< History of last known node edit splitter position x value
-   stw_types::sint32 ms32_SdNodEditHalcSplitterX;        ///< History of last known halc splitter position x value
-   stw_types::sint32 ms32_SdBusEditTreeSplitterX;        ///< History of last known bus edit tree splitter
-                                                         // position x value
-   stw_types::sint32 ms32_SdBusEditTreeSplitterX2;       ///< History of last known sys def bus edit tree splitter
-                                                         // position 2 x value
-   stw_types::sint32 ms32_SdBusEditLayoutSplitterX;      ///< History of last known sys def bus edit layout splitter
-                                                         // position x value
-   bool mq_SdTopologyToolboxMaximized;                   ///< History of sys def toolbox state
-   stw_types::sint32 ms32_ProjLastKnownMode;             ///< History of last known project mode (SD/SC/Main)
-   stw_types::sintn msn_ProjSdTopologyViewZoom;          ///< History of last known zoom value for specific project
-   QPoint mc_ProjSdTopologyViewPos;                      ///< History of last known viewport pos for specific project
-   QString mc_ProjSdTopologyLastKnownTSPPath;            ///< History of last known TSP path
-   QString mc_ProjSdTopologyLastKnownCodeExportPath;     ///< History of last known code export path
-   QString mc_ProjSdTopologyLastKnownExportPath;         ///< History of last known export path
-   QString mc_ProjSdTopologyLastKnownImportPath;         ///< History of last known import path
-   QString mc_ProjSdTopologyLastKnownDeviceDefPath;      ///< History of last known import path for a syde_devdef-file
-   QString mc_ProjSdTopologyLastKnownRtfPath;            ///< History of last known rtf file export path
-   QString mc_ProjSdTopologyLastKnownRtfCompanyName;     ///< History of last known rtf file export company name
-   QString mc_ProjSdTopologyLastKnownRtfCompanyLogoPath; ///< History of last known rtf file export company logo path
-   QString mc_LastKnownHalcDefPath;                      ///< History of last known HALC definition file path
-   QString mc_LastKnownHalcImportPath;                   ///< History of last known HALC import file path
-   QString mc_LastKnownHalcExportPath;                   ///< History of last known HALC export file path
-   QString mc_LastKnownServiceProjectPath;               ///< History of last known service project path
-   QMap<QString, C_UsSystemView> mc_ProjSvSetupView;     ///< History of last known view user settings
-   QMap<QString, C_UsNode> mc_ProjSdNode;                ///< History of last known node user settings
-   QMap<QString, C_UsCommunication> mc_ProjSdBus;        ///< History of last known bus user settings
-   stw_types::sint32 ms32_SysDefSubMode;                 ///< History of last known system definition sub mode
-   stw_types::uint32 mu32_SysDefIndex;                   ///< History of last known system definition index
-   stw_types::uint32 mu32_SysDefFlag;                    ///< History of last known system definition flag
-   stw_types::sint32 ms32_SysViewSubMode;                ///< History of last known system view sub mode
-   stw_types::uint32 mu32_SysViewIndex;                  ///< History of last known system view index
-   stw_types::uint32 mu32_SysViewFlag;                   ///< History of last known system view flag
-   stw_types::sintn msn_SysDefNodeEditTabIndex;          ///< History of last known tab index in node edit
-   stw_types::sintn msn_SysDefBusEditTabIndex;           ///< History of last known tab index in bus edit
+   const QString mc_IniPathAndName;                        ///< Fix location of user settings
+   QString mc_ActualProject;                               ///< Project specific settings for this concrete project
+   static const stw_types::uint8 mhu8_MAX_RECENT_PROJECTS; ///< Maximum number of entries in unique history of recent
+                                                           // projects
+   static const QPoint mhc_DEFAULT_VIEW_POS;               ///< Default view position
+   static const stw_types::sintn mhsn_DEFAULT_ZOOM_LEVEL;  ///< Default zoom level
+   const QString mc_DefaultProjectsFolder;                 ///< Default openSYDE projects location if no recent projects
+                                                           // are available
+   QString mc_Lang;                                        ///< Current language
+   bool mq_PerformanceMeasurementActive;                   ///< Flag if performance measurement is active (log entries)
+   QString mc_CurrentSaveAsPath;                           ///< Current save as base path
+   QVector<QColor> mc_RecentColors;                        ///< Recent colors from color picker
+   stw_types::sintn msn_NextRecentColorButtonNumber;       ///< Next recent color button for color from color picker
+   QStringList mc_RecentProjects;                          ///< Unique history of recent projects
+   QPoint mc_ScreenPos;                                    ///< History of last known screen position
+   QSize mc_AppSize;                                       ///< History of last known openSyde window size
+   bool mq_AppMaximized;                                   ///< History of openSyde window state
+   QPoint mc_SdTopologyToolboxPos;                         ///< History of last known sys def toolbox position
+   QSize mc_SdTopologyToolboxSize;                         ///< History of last known sys def toolbox size
+   stw_types::sint32 ms32_NaviBarSize;                     ///< Last known navi bar size
+   stw_types::sint32 ms32_NaviBarNodeSectionSize;          ///< Last known navi bar node section size
+   stw_types::sint32 ms32_SdNodeEditSplitterX;             ///< History of last known node edit splitter position x
+                                                           // value
+   stw_types::sint32 ms32_SdNodEditHalcSplitterX;          ///< History of last known halc splitter position x value
+   stw_types::sint32 ms32_SdBusEditTreeSplitterX;          ///< History of last known bus edit tree splitter
+                                                           // position x value
+   stw_types::sint32 ms32_SdBusEditTreeSplitterX2;         ///< History of last known sys def bus edit tree splitter
+                                                           // position 2 x value
+   stw_types::sint32 ms32_SdBusEditLayoutSplitterX;        ///< History of last known sys def bus edit layout splitter
+                                                           // position x value
+   bool mq_SdTopologyToolboxMaximized;                     ///< History of sys def toolbox state
+   stw_types::sint32 ms32_ProjLastKnownMode;               ///< History of last known project mode (SD/SC/Main)
+   stw_types::sintn msn_ProjSdTopologyViewZoom;            ///< History of last known zoom value for specific project
+   QPoint mc_ProjSdTopologyViewPos;                        ///< History of last known viewport pos for specific project
+   QString mc_ProjSdTopologyLastKnownTSPPath;              ///< History of last known TSP path
+   QString mc_ProjSdTopologyLastKnownCodeExportPath;       ///< History of last known code export path
+   QString mc_ProjSdTopologyLastKnownExportPath;           ///< History of last known export path
+   QString mc_ProjSdTopologyLastKnownImportPath;           ///< History of last known import path
+   QString mc_ProjSdTopologyLastKnownDeviceDefPath;        ///< History of last known import path for a syde_devdef-file
+   QString mc_ProjSdTopologyLastKnownRtfPath;              ///< History of last known rtf file export path
+   QString mc_ProjSdTopologyLastKnownRtfCompanyName;       ///< History of last known rtf file export company name
+   QString mc_ProjSdTopologyLastKnownRtfCompanyLogoPath;   ///< History of last known rtf file export company logo path
+   QString mc_LastKnownHalcDefPath;                        ///< History of last known HALC definition file path
+   QString mc_LastKnownHalcImportPath;                     ///< History of last known HALC import file path
+   QString mc_LastKnownHalcExportPath;                     ///< History of last known HALC export file path
+   QString mc_LastKnownServiceProjectPath;                 ///< History of last known service project path
+   QMap<QString, C_UsSystemView> mc_ProjSvSetupView;       ///< History of last known view user settings
+   QMap<QString, C_UsNode> mc_ProjSdNode;                  ///< History of last known node user settings
+   QMap<QString, C_UsCommunication> mc_ProjSdBus;          ///< History of last known bus user settings
+   stw_types::sint32 ms32_SysDefSubMode;                   ///< History of last known system definition sub mode
+   stw_types::uint32 mu32_SysDefIndex;                     ///< History of last known system definition index
+   stw_types::uint32 mu32_SysDefFlag;                      ///< History of last known system definition flag
+   stw_types::sint32 ms32_SysViewSubMode;                  ///< History of last known system view sub mode
+   stw_types::uint32 mu32_SysViewIndex;                    ///< History of last known system view index
+   stw_types::uint32 mu32_SysViewFlag;                     ///< History of last known system view flag
+   stw_types::sintn msn_SysDefNodeEditTabIndex;            ///< History of last known tab index in node edit
+   stw_types::sintn msn_SysDefBusEditTabIndex;             ///< History of last known tab index in bus edit
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

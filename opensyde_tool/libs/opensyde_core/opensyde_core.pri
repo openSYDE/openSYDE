@@ -208,6 +208,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.cpp \
        $${PWD}/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.cpp \
        $${PWD}/project/system/node/can/C_OSCCanMessage.cpp \
+       $${PWD}/project/system/node/can/C_OSCCanMessageUniqueId.cpp \
        $${PWD}/project/system/node/can/C_OSCCanMessageContainer.cpp \
        $${PWD}/project/system/node/can/C_OSCCanMessageIdentificationIndices.cpp \
        $${PWD}/project/system/node/can/C_OSCCanProtocol.cpp \
@@ -304,6 +305,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/C_OSCNodeProperties.h \
        $${PWD}/project/system/node/C_OSCNodeStwFlashloaderSettings.h \
        $${PWD}/project/system/node/can/C_OSCCanMessage.h \
+       $${PWD}/project/system/node/can/C_OSCCanMessageUniqueId.h \
        $${PWD}/project/system/node/can/C_OSCCanMessageContainer.h \
        $${PWD}/project/system/node/can/C_OSCCanMessageIdentificationIndices.h \
        $${PWD}/project/system/node/can/C_OSCCanProtocol.h \
@@ -348,18 +350,41 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_param_set) {
               $${PWD}/data_dealer/paramset/C_OSCParamSetRawNodeFiler.h
 }
 
-# optional: protocol drivers (openSYDE, STW Flashloader, KEFEX, Windows CAN and Ethernet Dispatchers, Data Dealer)
+# optional: CAN and Ethernet dispatcher interface and Windows implementation
+contains(opensyde_core_skip_modules, opensyde_core_skip_com_dispatchers) {
+   message("opensyde_core_skip_com_dispatchers detected ... skipping package")
+} else {
+   message("opensyde_core_skip_com_dispatchers not detected ... dragging in package")
+
+   INCLUDEPATH += $${PWD}/can_dispatcher/dispatcher \
+                  $${PWD}/can_dispatcher/target_windows_stw_dlls \
+                  $${PWD}/ip_dispatcher/dispatcher \
+                  $${PWD}/ip_dispatcher/target_windows_win_sock
+
+   SOURCES += $${PWD}/can_dispatcher/dispatcher/CCANBase.cpp \
+            $${PWD}/can_dispatcher/dispatcher/CCANDispatcher.cpp \
+            $${PWD}/can_dispatcher/target_windows_stw_dlls/CCAN.cpp \
+            $${PWD}/can_dispatcher/target_windows_stw_dlls/CCANDLL.cpp \
+            $${PWD}/ip_dispatcher/target_windows_win_sock/C_OSCIpDispatcherWinSock.cpp
+
+   HEADERS += $${PWD}/can_dispatcher/dispatcher/stw_can.h \
+              $${PWD}/can_dispatcher/dispatcher/CCANBase.h \
+              $${PWD}/can_dispatcher/dispatcher/CCANDispatcher.h \
+              $${PWD}/can_dispatcher/target_windows_stw_dlls/CCAN.h \
+              $${PWD}/can_dispatcher/target_windows_stw_dlls/CCANDLL.h \
+              $${PWD}/ip_dispatcher/dispatcher/C_OSCIpDispatcher.h \
+              $${PWD}/ip_dispatcher/target_windows_win_sock/C_OSCIpDispatcherWinSock.h
+}
+
+
+# optional: protocol drivers (openSYDE, STW Flashloader, KEFEX, Data Dealer)
+# Also requires CAN and Ethernet dispatchers
 contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
    message("opensyde_core_skip_protocol_drivers detected ... skipping package")
 } else {
    message("opensyde_core_skip_protocol_drivers not detected ... dragging in package")
 
-   INCLUDEPATH += $${PWD}/can_dispatcher \
-                  $${PWD}/can_dispatcher/target_windows_stw_dlls \
-                  $${PWD}/can_dispatcher/dispatcher \
-                  $${PWD}/ip_dispatcher/target_windows_win_sock \
-                  $${PWD}/ip_dispatcher/dispatcher \
-                  $${PWD}/data_dealer \
+   INCLUDEPATH += $${PWD}/data_dealer \
                   $${PWD}/security \
                   $${PWD}/protocol_drivers \
                   $${PWD}/protocol_drivers/routing \
@@ -367,14 +392,9 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
                   $${PWD}/protocol_drivers/system_update \
                   $${PWD}/kefex_diaglib
 
-   SOURCES += $${PWD}/can_dispatcher/dispatcher/CCANBase.cpp \
-              $${PWD}/can_dispatcher/dispatcher/CCANDispatcher.cpp \
-              $${PWD}/can_dispatcher/target_windows_stw_dlls/CCAN.cpp \
-              $${PWD}/can_dispatcher/target_windows_stw_dlls/CCANDLL.cpp \
-              $${PWD}/data_dealer/C_OSCDataDealer.cpp \
+   SOURCES += $${PWD}/data_dealer/C_OSCDataDealer.cpp \
               $${PWD}/data_dealer/C_OSCDataDealerNvm.cpp \
               $${PWD}/data_dealer/C_OSCDataDealerNvmSafe.cpp \
-              $${PWD}/ip_dispatcher/target_windows_win_sock/C_OSCIpDispatcherWinSock.cpp \
               $${PWD}/kefex_diaglib/CDLReportEvents.cpp \
               $${PWD}/kefex_diaglib/CHexFile.cpp \
               $${PWD}/kefex_diaglib/CKFXComm.cpp \
@@ -408,18 +428,13 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/routing/C_OSCRoutingCalculation.cpp \
               $${PWD}/protocol_drivers/routing/C_OSCRoutingRoute.cpp \
               $${PWD}/protocol_drivers/system_update/C_OSCSuSequences.cpp \
+              $${PWD}/protocol_drivers/system_update/C_OSCSuSequencesNodeStates.cpp \
               $${PWD}/protocol_drivers/system_update/C_OSCSuServiceUpdatePackage.cpp \
               $${PWD}/protocol_drivers/system_update/C_OsyHexFile.cpp
 
-   HEADERS += $${PWD}/can_dispatcher/dispatcher/CCANBase.h \
-              $${PWD}/can_dispatcher/dispatcher/CCANDispatcher.h \
-              $${PWD}/can_dispatcher/target_windows_stw_dlls/CCAN.h \
-              $${PWD}/can_dispatcher/target_windows_stw_dlls/CCANDLL.h \
-              $${PWD}/data_dealer/C_OSCDataDealer.h \
+   HEADERS += $${PWD}/data_dealer/C_OSCDataDealer.h \
               $${PWD}/data_dealer/C_OSCDataDealerNvm.h \
               $${PWD}/data_dealer/C_OSCDataDealerNvmSafe.h \
-              $${PWD}/ip_dispatcher/dispatcher/C_OSCIpDispatcher.h \
-              $${PWD}/ip_dispatcher/target_windows_win_sock/C_OSCIpDispatcherWinSock.h \
               $${PWD}/kefex_diaglib/CDLReportEvents.h \
               $${PWD}/kefex_diaglib/CHexFile.h \
               $${PWD}/kefex_diaglib/CKFXComm.h \
@@ -453,21 +468,24 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/routing/C_OSCRoutingCalculation.h \
               $${PWD}/protocol_drivers/routing/C_OSCRoutingRoute.h \
               $${PWD}/protocol_drivers/system_update/C_OSCSuSequences.h \
+              $${PWD}/protocol_drivers/system_update/C_OSCSuSequencesNodeStates.h \
               $${PWD}/protocol_drivers/system_update/C_OSCSuServiceUpdatePackage.h \
               $${PWD}/protocol_drivers/system_update/C_OsyHexFile.h \
               $${PWD}/protocol_drivers/DiagLib_config.h
-
 
    include(./libtomcrypt/libtomcrypt.pri)
 }
 
 # optional: protocol logging
+# Also requires CAN and Ethernet dispatchers
+# Note that C_OSCComDriverBase.cpp is part of this package and of the protocol drivers as it's needed in both cases
 contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_logging) {
    message("opensyde_core_skip_protocol_logging detected ... skipping package")
 } else {
    message("opensyde_core_skip_protocol_logging not detected ... dragging in package")
 
-   INCLUDEPATH += $${PWD}/kefex_diaglib
+   INCLUDEPATH += $${PWD}/kefex_diaglib \
+                  $${PWD}/protocol_drivers/communication
 
    SOURCES += $${PWD}/kefex_diaglib/CCMONProtocol.cpp \
               $${PWD}/kefex_diaglib/CCMONProtocolBase.cpp \
@@ -509,4 +527,10 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_logging) {
               $${PWD}/protocol_drivers/communication/C_OSCComMessageLoggerFileAsc.h \
               $${PWD}/protocol_drivers/communication/C_OSCComMessageLoggerFileBase.h \
               $${PWD}/protocol_drivers/communication/C_OSCComMessageLoggerOsySysDefConfig.h
+
+   ! contains(SOURCES, $${PWD}/protocol_drivers/communication/C_OSCComDriverBase.cpp) {
+      SOURCES += $${PWD}/protocol_drivers/communication/C_OSCComDriverBase.cpp
+      HEADERS += $${PWD}/protocol_drivers/communication/C_OSCComDriverBase.h
+   }
+
 }

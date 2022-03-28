@@ -265,7 +265,7 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
 {
-   const bool q_Retval = false;
+   bool q_Retval = false;
 
    if (data(orc_Index, osn_Role) != orc_Value)
    {
@@ -292,6 +292,7 @@ bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant &
                                                                                    pc_OSCElement->f64_Offset,
                                                                                    u32_Index);
                      tgl_assert(pc_ParamWidget->SetParamItem(c_Copy) == C_NO_ERR);
+                     q_Retval = true;
                   }
                }
             }

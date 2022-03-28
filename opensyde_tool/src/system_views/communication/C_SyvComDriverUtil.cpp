@@ -39,13 +39,17 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Fills all parameter for C_OSCComDriverProtocol based on specific view and prepares the CAN dispatcher
 
-   \param[in]      ou32_ViewIndex         Index of current used view
-   \param[out]     oru32_ActiveBusIndex   Bus index of bus in system definition where we are connected to
-   \param[out]     orc_ActiveNodes        Flags for all available nodes in the system
-   \param[in,out]  oppc_CanDispatcher     Pointer to concrete CAN dispatcher
-   \param[in,out]  oppc_IpDispatcher      Pointer to concrete IP dispatcher
-   \param[in]      oq_InitCan             Optional flag to initialize the CAN bus. Default is true.
-                                          DLL will be opened although.
+   \param[in]      ou32_ViewIndex                              Index of current used view
+   \param[out]     oru32_ActiveBusIndex                        Bus index of bus in system definition where we are
+                                                               connected to
+   \param[out]     orc_ActiveNodes                             Flags for all available nodes in the system
+   \param[in,out]  oppc_CanDispatcher                          Pointer to concrete CAN dispatcher
+   \param[in,out]  oppc_IpDispatcher                           Pointer to concrete IP dispatcher
+   \param[in]      oq_InitCan                                  Optional flag to initialize the CAN bus. Default is true.
+                                                               DLL will be opened although.
+   \param[in]      oq_IgnoreUpdateRoutingErrors                Ignoring an update routing invalid error of view check
+   \param[out]     opq_DashboardRoutingErrors                  Optional: Flag for a detected dashboard routing error
+                                                               of at least one node
 
    \return
    C_NO_ERR    Parameter filled
@@ -59,24 +63,27 @@ sint32 C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(const uint32 ou32_View
                                                           std::vector<uint8> & orc_ActiveNodes,
                                                           stw_can::C_CAN ** const oppc_CanDispatcher,
                                                           C_OSCIpDispatcherWinSock ** const oppc_IpDispatcher,
-                                                          const bool oq_InitCan)
+                                                          const bool oq_InitCan,
+                                                          const bool oq_IgnoreUpdateRoutingErrors,
+                                                          bool * const opq_DashboardRoutingErrors)
 {
    bool q_NameInvalid;
    bool q_PCNotConnected;
    bool q_RoutingInvalid;
-   bool q_UpdateDisabledButDataBlocks;
+   bool q_UpdateRoutingInvalid;
    bool q_SysDefInvalid;
    bool q_NoNodesActive;
 
    sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->CheckViewError(ou32_ViewIndex, &q_NameInvalid,
                                                                        &q_PCNotConnected, &q_RoutingInvalid,
-                                                                       &q_UpdateDisabledButDataBlocks,
+                                                                       &q_UpdateRoutingInvalid,
+                                                                       opq_DashboardRoutingErrors,
                                                                        &q_SysDefInvalid, &q_NoNodesActive,
                                                                        NULL, NULL);
 
-   if ((((((((s32_Retval == C_NO_ERR) && (q_NameInvalid == false)) && (q_PCNotConnected == false)) &&
-           (q_RoutingInvalid == false)) && (q_SysDefInvalid == false)) && (q_NoNodesActive == false))) &&
-       (q_UpdateDisabledButDataBlocks == false))
+   if ((s32_Retval == C_NO_ERR) && (q_NameInvalid == false) && (q_PCNotConnected == false) &&
+       (q_RoutingInvalid == false) && (q_SysDefInvalid == false) && (q_NoNodesActive == false) &&
+       ((q_UpdateRoutingInvalid == false) || (oq_IgnoreUpdateRoutingErrors == true)))
    {
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
 

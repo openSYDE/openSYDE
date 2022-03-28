@@ -34,12 +34,12 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SyvDaItPaTreeModel::mhc_IconAllNode = "";
-const QString C_SyvDaItPaTreeModel::mhc_IconNode = ":/images/system_definition/IconNode.svg";
-const QString C_SyvDaItPaTreeModel::mhc_IconDatapool = ":/images/system_definition/IconDataPoolSmall.svg";
-const QString C_SyvDaItPaTreeModel::mhc_IconList = ":/images/system_definition/IconDatapoolList.svg";
-const QString C_SyvDaItPaTreeModel::mhc_IconParameter = ":/images/system_definition/IconParameter.svg";
-const QString C_SyvDaItPaTreeModel::mhc_ECUValueInitString = "N/A";
+const QString C_SyvDaItPaTreeModel::mhc_ICON_ALL_NODE = "";
+const QString C_SyvDaItPaTreeModel::mhc_ICON_NODE = ":/images/system_definition/IconNode.svg";
+const QString C_SyvDaItPaTreeModel::mhc_ICON_DATAPOOL = ":/images/system_definition/IconDataPoolSmall.svg";
+const QString C_SyvDaItPaTreeModel::mhc_ICON_LIST = ":/images/system_definition/IconDatapoolList.svg";
+const QString C_SyvDaItPaTreeModel::mhc_ICON_PARAMETER = ":/images/system_definition/IconParameter.svg";
+const QString C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING = "N/A";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -65,6 +65,7 @@ C_SyvDaItPaTreeModel::C_SyvDaItPaTreeModel(QObject * const opc_Parent) :
    mq_DarkMode(false),
    mq_EditMode(false),
    mq_Connected(false),
+   mq_SaveLoadActive(true),
    mq_ActionActive(false)
 {
 }
@@ -156,6 +157,17 @@ void C_SyvDaItPaTreeModel::SetConnected(const bool oq_Connected)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set load and save action status
+
+   \param[in]  oq_Active   Load and save action active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeModel::SetLoadSaveActive(const bool oq_Active)
+{
+   this->mq_SaveLoadActive = oq_Active;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set action status
 
    \param[in]  oq_Active   Action active
@@ -210,7 +222,7 @@ void C_SyvDaItPaTreeModel::ClearECUValues(void)
          for (uint32 u32_ItValue = 0UL; u32_ItValue < this->mc_ECUValuesString[u32_ItElement].size(); ++u32_ItValue)
          {
             //Overwrite all previous values
-            this->mc_ECUValuesString[u32_ItElement][u32_ItValue] = C_SyvDaItPaTreeModel::mhc_ECUValueInitString;
+            this->mc_ECUValuesString[u32_ItElement][u32_ItValue] = C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING;
          }
       }
    }
@@ -1175,7 +1187,7 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
                   std::vector<QString> c_Entry;
                   if (pc_UiElement->q_InterpretAsString == true)
                   {
-                     c_Entry.push_back(C_SyvDaItPaTreeModel::mhc_ECUValueInitString);
+                     c_Entry.push_back(C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING);
                   }
                   else
                   {
@@ -1184,14 +1196,14 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
                         const C_OSCNodeDataPoolContent & rc_Content = pc_Param->c_ListValues[u32_It1];
                         if (rc_Content.GetArray() == false)
                         {
-                           c_Entry.push_back(C_SyvDaItPaTreeModel::mhc_ECUValueInitString);
+                           c_Entry.push_back(C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING);
                         }
                         else
                         {
                            c_Entry.reserve(rc_Content.GetArraySize());
                            for (uint32 u32_ItArr = 0UL; u32_ItArr < rc_Content.GetArraySize(); ++u32_ItArr)
                            {
-                              c_Entry.push_back(C_SyvDaItPaTreeModel::mhc_ECUValueInitString);
+                              c_Entry.push_back(C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING);
                            }
                         }
                      }
@@ -1505,7 +1517,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                               else
                               {
                                  c_Retval = static_cast<QString>(C_GtGetText::h_GetText("CRC: %1")).arg(
-                                    C_SyvDaItPaTreeModel::mhc_ECUValueInitString);
+                                    C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING);
                               }
                            }
                         }
@@ -1596,7 +1608,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                      {
                         if (this->mc_ECUValuesReadStatus[u32_Index] == false)
                         {
-                           c_Retval = C_SyvDaItPaTreeModel::mhc_ECUValueInitString;
+                           c_Retval = C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING;
                         }
                         else
                         {
@@ -1921,8 +1933,12 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          uint32 u32_ValidLayers;
          C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-         if (((e_Col == C_SyvDaItPaTreeModel::eDEVICE_VALUE) || (e_Col == C_SyvDaItPaTreeModel::eSET)) &&
-             (u32_ValidLayers == 4UL))
+         if (e_Col == C_SyvDaItPaTreeModel::eCOMMENT)
+         {
+            c_Retval = this->data(orc_Index, static_cast<sintn>(Qt::DisplayRole));
+         }
+         else if (((e_Col == C_SyvDaItPaTreeModel::eDEVICE_VALUE) || (e_Col == C_SyvDaItPaTreeModel::eSET)) &&
+                  (u32_ValidLayers == 4UL))
          {
             const C_GiSvDaParam * const pc_ParamWidget =
                dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
@@ -2002,7 +2018,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
    {
       QColor c_DefaultNonInteractive;
       QColor c_Default;
-      const QColor c_Error = mc_STYLE_GUIDE_COLOR_24;
+      const QColor c_ERROR = mc_STYLE_GUIDE_COLOR_24;
       const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
       if (this->mq_DarkMode == true)
       {
@@ -2056,7 +2072,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                         else
                         {
                            //Error
-                           c_Retval = c_Error;
+                           c_Retval = c_ERROR;
                         }
                      }
                   }
@@ -2225,7 +2241,14 @@ Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
       }
       else if ((e_Col == eACTION_LOAD) || (e_Col == eACTION_SAVE))
       {
-         c_Retval = c_Retval | Qt::ItemIsEditable;
+         if (this->mq_SaveLoadActive == true)
+         {
+            c_Retval = c_Retval | Qt::ItemIsEditable;
+         }
+         else
+         {
+            c_Retval = Qt::NoItemFlags;
+         }
       }
       else if (e_Col == eACTION_REMOVE)
       {
@@ -2259,7 +2282,14 @@ Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
       }
       else if ((e_Col == eACTION_LOAD) || (e_Col == eACTION_SAVE))
       {
-         c_Retval = c_Retval | Qt::ItemIsEditable;
+         if (this->mq_SaveLoadActive == true)
+         {
+            c_Retval = c_Retval | Qt::ItemIsEditable;
+         }
+         else
+         {
+            c_Retval = Qt::NoItemFlags;
+         }
       }
       else if (e_Col == eACTION_REMOVE)
       {
@@ -2292,7 +2322,14 @@ Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
       }
       else if ((e_Col == eACTION_LOAD) || (e_Col == eACTION_SAVE))
       {
-         c_Retval = c_Retval | Qt::ItemIsEditable;
+         if (this->mq_SaveLoadActive == true)
+         {
+            c_Retval = c_Retval | Qt::ItemIsEditable;
+         }
+         else
+         {
+            c_Retval = Qt::NoItemFlags;
+         }
       }
       else if (e_Col == eACTION_REMOVE)
       {
@@ -3020,7 +3057,7 @@ void C_SyvDaItPaTreeModel::mh_InitAllNode(C_TblTreItem * const opc_TreeNode, con
                pc_View->GetName());
       }
       //Icon
-      opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_IconAllNode);
+      opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_ICON_ALL_NODE);
       //State
       opc_TreeNode->q_Enabled = true;
       opc_TreeNode->q_Selectable = false;
@@ -3051,16 +3088,33 @@ void C_SyvDaItPaTreeModel::mh_InitNode(C_TblTreItem * const opc_TreeNode, const 
          //Name
          opc_TreeNode->c_Name = pc_NodeData->c_Properties.c_Name.c_str();
          //Icon
-         opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_IconNode);
+         opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_ICON_NODE);
          //State
          if (pc_View != NULL)
          {
             opc_TreeNode->q_Enabled = static_cast<bool>(pc_View->GetNodeActiveFlags()[ou32_NodeIndex]);
             opc_TreeNode->q_Selectable = false;
-         }
-         if (opc_TreeNode->q_Enabled == false)
-         {
-            opc_TreeNode->c_Name += C_GtGetText::h_GetText(" (Inactive in view)");
+
+            if (opc_TreeNode->q_Enabled == false)
+            {
+               opc_TreeNode->c_Name += C_GtGetText::h_GetText(" (Inactive in view)");
+            }
+            else
+            {
+               // Check a further reason for deactivation
+               bool q_Error;
+               tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckViewNodeDashboardRoutingError(
+                             ou32_ViewIndex,
+                             ou32_NodeIndex,
+                             q_Error) == C_NO_ERR);
+
+               if (q_Error == true)
+               {
+                  opc_TreeNode->q_Enabled = false;
+                  opc_TreeNode->c_Name += C_GtGetText::h_GetText(
+                     " (Disabled flags)");
+               }
+            }
          }
       }
    }
@@ -3092,7 +3146,7 @@ void C_SyvDaItPaTreeModel::mh_InitDataPool(C_TblTreItem * const opc_TreeNode, co
          //Name
          opc_TreeNode->c_Name = pc_NodeDataPoolData->c_Name.c_str();
          //Icon
-         opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_IconDatapool);
+         opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_ICON_DATAPOOL);
          //State
          opc_TreeNode->q_Enabled = oq_Enabled;
          opc_TreeNode->q_Selectable = false;
@@ -3130,7 +3184,7 @@ void C_SyvDaItPaTreeModel::mh_InitList(C_TblTreItem * const opc_TreeNode, const 
          opc_TreeNode->c_Name = static_cast<QString>("%1 (%2)").arg(pc_ListData->c_Name.c_str()).arg(
             pc_ListData->c_Elements.size());
          //Icon
-         opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_IconList);
+         opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_ICON_LIST);
          //State
          opc_TreeNode->q_Enabled = oq_Enabled;
          opc_TreeNode->q_Selectable = false;
@@ -3170,7 +3224,7 @@ void C_SyvDaItPaTreeModel::mh_InitElement(C_TblTreItem * const opc_TreeNode, con
          opc_TreeNode->c_Name = static_cast<QString>("%1 - %2").arg(ou32_ElementIndex + 1).arg(
             pc_ElementData->c_Name.c_str());
          //Icon
-         opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_IconParameter);
+         opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_ICON_PARAMETER);
          //State
          opc_TreeNode->q_Enabled = oq_Enabled;
          opc_TreeNode->q_Selectable = false;

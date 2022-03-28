@@ -288,16 +288,17 @@ const C_PuiSdNodeConnectionId * C_GiLiBusConnector::GetConnectionData(void) cons
 /*! \brief  Helper function to change bus connector interface number
 
    \param[in]  oru8_NewInterface    New interface number
-   \param[in]  orc_NodeIds          Node ids
+   \param[in]  orc_Properties       Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnector::ChangeInterface(const uint8 & oru8_NewInterface, const std::vector<uint8> & orc_NodeIds)
+void C_GiLiBusConnector::ChangeInterface(const uint8 & oru8_NewInterface,
+                                         const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem);
 
    if (pc_Node != NULL)
    {
-      pc_Node->ChangeInterface(oru8_NewInterface, this, orc_NodeIds);
+      pc_Node->ChangeInterface(oru8_NewInterface, this, orc_Properties);
    }
 }
 
@@ -325,12 +326,13 @@ void C_GiLiBusConnector::Revert(stw_opensyde_gui::C_GiNode * const opc_StartingN
    \param[in,out]  opc_LastNode        New node to connect this bus connection to
    \param[in]      orc_ConnectionPos   New connection position
    \param[in]      ors32_Interface     Interface number to use
-   \param[in]      orc_NodeIds         Node ids
+   \param[in]      orc_Properties      Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_StartingNode,
                                    stw_opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
-                                   const stw_types::sint32 & ors32_Interface, const std::vector<uint8> & orc_NodeIds)
+                                   const stw_types::sint32 & ors32_Interface,
+                                   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    this->mpc_GenericSignalItem = opc_LastNode;
    if (opc_LastNode != NULL)
@@ -349,7 +351,7 @@ void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_Starti
             opc_StartingNode->RemoveConnector(this);
          }
          //Add connection to new node
-         opc_LastNode->AddConnectionAndData(this, c_NodeConn, orc_NodeIds,
+         opc_LastNode->AddConnectionAndData(this, c_NodeConn, orc_Properties,
                                             static_cast<uint32>(this->GetBusItem()->GetIndex()));
          //Update tool tip
          Q_EMIT this->SigHintUpdate();
@@ -366,13 +368,13 @@ void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_Starti
    \param[in,out]  opc_LastBus         New bus to connect this bus connection to
    \param[in]      orc_ConnectionPos   New connection position
    \param[in]      ors32_Interface     Interface number to use
-   \param[in]      orc_NodeIds         Node ids
+   \param[in]      orc_Properties      Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::Reconnect(const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                                    const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
                                    const QPointF & orc_ConnectionPos, const stw_types::sint32 & ors32_Interface,
-                                   const std::vector<uint8> & orc_NodeIds)
+                                   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    Q_UNUSED(opc_StartingBus)
    this->m_SetBus(opc_LastBus);
@@ -386,7 +388,8 @@ void C_GiLiBusConnector::Reconnect(const stw_opensyde_gui::C_GiLiBus * const opc
       //Bus
       if (pc_Node != NULL)
       {
-         pc_Node->UpdateConnection(this, c_NodeConn, orc_NodeIds, static_cast<uint32>(this->GetBusItem()->GetIndex()));
+         pc_Node->UpdateConnection(this, c_NodeConn, orc_Properties,
+                                   static_cast<uint32>(this->GetBusItem()->GetIndex()));
       }
       //Update tool tip
       Q_EMIT this->SigHintUpdate();

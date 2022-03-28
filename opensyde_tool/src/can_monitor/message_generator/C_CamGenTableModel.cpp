@@ -1175,11 +1175,11 @@ void C_CamGenTableModel::m_SpecialXtdFlagSetHandling(const sintn osn_Row, const 
 
    if (u64_MessageId > 0x7FFULL)
    {
-      constexpr C_CamProMessageData::E_GenericUint32DataSelector e_SelectorID =
+      constexpr C_CamProMessageData::E_GenericUint32DataSelector e_SELECTOR_ID =
          C_CamProMessageData::eGUIDS_ID;
-      constexpr uint32 u32_NewVal = 0x0UL;
-      tgl_assert(C_CamProHandler::h_GetInstance()->SetMessageUint32Value(ou32_Index, e_SelectorID,
-                                                                         u32_NewVal) == C_NO_ERR);
+      constexpr uint32 u32_NEW_VAL = 0x0UL;
+      tgl_assert(C_CamProHandler::h_GetInstance()->SetMessageUint32Value(ou32_Index, e_SELECTOR_ID,
+                                                                         u32_NEW_VAL) == C_NO_ERR);
       //Message
       Q_EMIT (this->SigReport(stw_opensyde_gui_elements::C_OgeWiCustomMessage::eWARNING,
                               C_GtGetText::h_GetText("Check Message ID"),

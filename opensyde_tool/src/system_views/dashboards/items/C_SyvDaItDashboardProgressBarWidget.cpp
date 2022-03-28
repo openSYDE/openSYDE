@@ -61,7 +61,7 @@ C_SyvDaItDashboardProgressBarWidget::C_SyvDaItDashboardProgressBarWidget(QWidget
    mf32_BarMarginBottom(0.0F),
    mf32_BarMarginLeft(0.0F),
    mf32_BarMarginRight(0.0F),
-   msn_Transparence(255)
+   msn_Transparency(255)
 {
    mpc_Ui->setupUi(this);
 
@@ -142,8 +142,8 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
    QPen c_MinMaxPen;
    QPen c_ValuePen;
 
-   const float32 f32_ArrowSizeH = 3.0F; // Factor for sizing the arrow horizontal
-   const float32 f32_ArrowSizeV = 5.0F; // Factor for sizing the arrow vertical
+   const float32 f32_ARROW_SIZE_H = 3.0F; // Factor for sizing the arrow horizontal
+   const float32 f32_ARROW_SIZE_V = 5.0F; // Factor for sizing the arrow vertical
    float32 f32_Value;
    sintn sn_ActualPixelSize;
    float32 f32_TemporaryHelpingVariable1;
@@ -301,11 +301,11 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
          // TopLeft
          f32_TemporaryHelpingVariable1 =
             (static_cast<float32>(c_ValueRect.left()) -
-             (static_cast<float32>(c_TextFontMetric.horizontalAdvance("8")) / f32_ArrowSizeH)) +
+             (static_cast<float32>(c_TextFontMetric.horizontalAdvance("8")) / f32_ARROW_SIZE_H)) +
             static_cast<float32>(this->rect().width());
          f32_TemporaryHelpingVariable2 = ((static_cast<float32>(this->rect().top()) + mf32_BarMarginTop) -
                                           (static_cast<float32>(c_TextFontMetric.horizontalAdvance("8")) /
-                                           f32_ArrowSizeH)) -
+                                           f32_ARROW_SIZE_H)) -
                                          (static_cast<float32>(this->rect().height()) * 0.05F);
          ac_ArrowPoints[0] =
             QPointF(static_cast<float64>(f32_TemporaryHelpingVariable1),
@@ -313,11 +313,11 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
          // TopRight
          f32_TemporaryHelpingVariable1 =
             (static_cast<float32>(c_ValueRect.left()) +
-             (static_cast<float32>(c_TextFontMetric.horizontalAdvance("8")) / f32_ArrowSizeH)) +
+             (static_cast<float32>(c_TextFontMetric.horizontalAdvance("8")) / f32_ARROW_SIZE_H)) +
             static_cast<float32>(this->rect().width());
          f32_TemporaryHelpingVariable2 = ((static_cast<float32>(this->rect().top()) + mf32_BarMarginTop) -
                                           (static_cast<float32>(c_TextFontMetric.horizontalAdvance("8")) /
-                                           f32_ArrowSizeH)) -
+                                           f32_ARROW_SIZE_H)) -
                                          (static_cast<float32>(this->rect().height()) * 0.05F);
          ac_ArrowPoints[1] =
             QPointF(static_cast<float64>(f32_TemporaryHelpingVariable1),
@@ -340,13 +340,13 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
          //x position
          f32_TemporaryHelpingVariable1 = (static_cast<float32>(c_ValueRect.left()) -
                                           (static_cast<float32>(c_TextFontMetric.horizontalAdvance("8")) /
-                                           f32_ArrowSizeH)) +
+                                           f32_ARROW_SIZE_H)) +
                                          static_cast<float32>(this->rect().width());
          //y position
          f32_TemporaryHelpingVariable2 = ((static_cast<float32>(this->rect().bottom()) - mf32_BarMarginBottom) +
                                           (static_cast<float32>(this->rect().height()) * 0.05F)) +
                                          (static_cast<float32>(c_TextFontMetric.horizontalAdvance("8")) /
-                                          f32_ArrowSizeH);
+                                          f32_ARROW_SIZE_H);
          ac_ArrowPoints[0] =
             QPointF(static_cast<float64>(f32_TemporaryHelpingVariable1),
                     static_cast<float64>(f32_TemporaryHelpingVariable2));
@@ -354,13 +354,13 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
          //x position
          f32_TemporaryHelpingVariable1 = (static_cast<float32>(c_ValueRect.left()) +
                                           (static_cast<float32>(c_TextFontMetric.horizontalAdvance("8")) /
-                                           f32_ArrowSizeH)) +
+                                           f32_ARROW_SIZE_H)) +
                                          static_cast<float32>(this->rect().width());
          //y position
          f32_TemporaryHelpingVariable2 = ((static_cast<float32>(this->rect().bottom()) - mf32_BarMarginBottom) +
                                           (static_cast<float32>(this->rect().height()) * 0.05F)) +
                                          (static_cast<float32>(c_TextFontMetric.horizontalAdvance("8")) /
-                                          f32_ArrowSizeH);
+                                          f32_ARROW_SIZE_H);
          ac_ArrowPoints[1] =
             QPointF(static_cast<float64>(f32_TemporaryHelpingVariable1),
                     static_cast<float64>(f32_TemporaryHelpingVariable2));
@@ -539,14 +539,14 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
             c_TextFont.setPixelSize(static_cast<sintn>(f32_TemporaryHelpingVariable1));
          }
          f32_TemporaryHelpingVariable1 = (((static_cast<float32>(this->rect().left()) + mf32_BarMarginLeft) -
-                                           (static_cast<float32>(c_TextFont.pixelSize()) / f32_ArrowSizeV)) -
+                                           (static_cast<float32>(c_TextFont.pixelSize()) / f32_ARROW_SIZE_V)) -
                                           (static_cast<float32>(this->rect().width()) * 0.005F)) - 5.0F;
          c_ValueRect.setRight(static_cast<sintn>(f32_TemporaryHelpingVariable1));
          c_Painter.setFont(c_TextFont);
          c_Painter.drawText(c_ValueRect, Qt::AlignVCenter | Qt::AlignRight, mc_Value + this->mc_Unit);
          // TopLeft
          f32_TemporaryHelpingVariable1 = ((static_cast<float32>(this->rect().left()) + mf32_BarMarginLeft) -
-                                          (static_cast<float32>(c_TextFont.pixelSize()) / f32_ArrowSizeV)) -
+                                          (static_cast<float32>(c_TextFont.pixelSize()) / f32_ARROW_SIZE_V)) -
                                          (static_cast<float32>(this->rect().width()) * 0.005F);
          f32_TemporaryHelpingVariable2 = ((static_cast<float32>(this->rect().bottom()) - mf32_BarMarginBottom) -
                                           ((((static_cast<float32>(this->rect().height()) - mf32_BarMarginTop) -
@@ -555,7 +555,7 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
                                            (static_cast<float32>(this->mpc_Ui->pc_ProgressBar->maximum()) -
                                             static_cast<float32>(this->mpc_Ui->pc_ProgressBar->minimum())))) -
                                          (static_cast<float32>(c_TextFont.pixelSize()) /
-                                          f32_ArrowSizeV);
+                                          f32_ARROW_SIZE_V);
          ac_ArrowPoints[0] =
             QPointF(static_cast<float64>(f32_TemporaryHelpingVariable1),
                     static_cast<float64>(f32_TemporaryHelpingVariable2));
@@ -568,7 +568,7 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
                                            (static_cast<float32>(this->mpc_Ui->pc_ProgressBar->maximum()) -
                                             static_cast<float32>(this->mpc_Ui->pc_ProgressBar->minimum())))) +
                                          (static_cast<float32>(c_TextFont.pixelSize()) /
-                                          f32_ArrowSizeV);
+                                          f32_ARROW_SIZE_V);
          ac_ArrowPoints[1] =
             QPointF(static_cast<float64>(f32_TemporaryHelpingVariable1),
                     static_cast<float64>(f32_TemporaryHelpingVariable2));
@@ -602,14 +602,14 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
             c_TextFont.setPixelSize(static_cast<sintn>(f32_TemporaryHelpingVariable1));
          }
          f32_TemporaryHelpingVariable1 = (static_cast<float32>(this->rect().right()) - mf32_BarMarginRight) +
-                                         (static_cast<float32>(c_TextFont.pixelSize()) / f32_ArrowSizeV) +
+                                         (static_cast<float32>(c_TextFont.pixelSize()) / f32_ARROW_SIZE_V) +
                                          (static_cast<float32>(this->rect().width()) * 0.01F) + 1.5F;
          c_ValueRect.setLeft(static_cast<sintn>(f32_TemporaryHelpingVariable1));
          c_Painter.setFont(c_TextFont);
          c_Painter.drawText(c_ValueRect, Qt::AlignVCenter | Qt::AlignLeft, mc_Value + this->mc_Unit);
          // TopRight
          f32_TemporaryHelpingVariable1 = (static_cast<float32>(this->rect().right()) - mf32_BarMarginRight) +
-                                         (static_cast<float32>(c_TextFont.pixelSize()) / f32_ArrowSizeV) +
+                                         (static_cast<float32>(c_TextFont.pixelSize()) / f32_ARROW_SIZE_V) +
                                          (static_cast<float32>(this->rect().width()) * 0.01F);
          f32_TemporaryHelpingVariable2 = ((static_cast<float32>(this->rect().bottom()) - mf32_BarMarginBottom) -
                                           ((((static_cast<float32>(this->rect().height()) - mf32_BarMarginTop) -
@@ -617,13 +617,13 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
                                            (static_cast<float32>(this->mpc_Ui->pc_ProgressBar->maximum()) -
                                             static_cast<float32>(this->mpc_Ui->pc_ProgressBar->minimum())))) -
                                          (static_cast<float32>(c_TextFont.pixelSize()) /
-                                          f32_ArrowSizeV);
+                                          f32_ARROW_SIZE_V);
          ac_ArrowPoints[0] =
             QPointF(static_cast<float64>(f32_TemporaryHelpingVariable1),
                     static_cast<float64>(f32_TemporaryHelpingVariable2));
          // BottomRight
          f32_TemporaryHelpingVariable1 = (static_cast<float32>(this->rect().right()) - mf32_BarMarginRight) +
-                                         (static_cast<float32>(c_TextFont.pixelSize()) / f32_ArrowSizeV) +
+                                         (static_cast<float32>(c_TextFont.pixelSize()) / f32_ARROW_SIZE_V) +
                                          (static_cast<float32>(this->rect().width()) * 0.01F);
          f32_TemporaryHelpingVariable2 = ((static_cast<float32>(this->rect().bottom()) - mf32_BarMarginBottom) -
                                           (((static_cast<float32>(this->rect().height()) - mf32_BarMarginTop) -
@@ -635,7 +635,7 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
                                                                         static_cast
                                                                         <float32>(this->mpc_Ui->pc_ProgressBar->minimum())))))
                                          +
-                                         (static_cast<float32>(c_TextFont.pixelSize()) / f32_ArrowSizeV);
+                                         (static_cast<float32>(c_TextFont.pixelSize()) / f32_ARROW_SIZE_V);
          ac_ArrowPoints[1] =
             QPointF(static_cast<float64>(f32_TemporaryHelpingVariable1),
                     static_cast<float64>(f32_TemporaryHelpingVariable2));
@@ -1105,7 +1105,7 @@ void C_SyvDaItDashboardProgressBarWidget::mh_SetArc(QPainterPath & orc_Path, con
                                                     const QPointF & orc_P2, const QPointF & orc_P3,
                                                     const float64 of64_Radius)
 {
-   const float64 f64_Full360 = 2.0 * M_PI;
+   const float64 f64_FULL_360 = 2.0 * M_PI;
    QPointF c_P1;
    QPointF c_P2;
 
@@ -1161,11 +1161,11 @@ void C_SyvDaItDashboardProgressBarWidget::mh_SetArc(QPainterPath & orc_Path, con
       */
       const float64 f64_Beta = mh_GetArc(orc_PCenter - c_P1, QPointF(1.0, 0.0));
       const float64 f64_Alpha = mh_GetArc(orc_PCenter - c_P2, QPointF(1.0, 0.0));
-      const float64 f64_Start = f64_Beta - (f64_Full360 / 4.0);
-      const float64 f64_Sweep =  ((f64_Full360 / 2.0) + f64_Alpha) - f64_Beta;
+      const float64 f64_Start = f64_Beta - (f64_FULL_360 / 4.0);
+      const float64 f64_Sweep =  ((f64_FULL_360 / 2.0) + f64_Alpha) - f64_Beta;
 
       orc_Path.arcTo(mh_GetCircle(orc_PCenter,
-                                  of64_Radius), f64_Start * (360.0 / f64_Full360), f64_Sweep * (360.0 / f64_Full360));
+                                  of64_Radius), f64_Start * (360.0 / f64_FULL_360), f64_Sweep * (360.0 / f64_FULL_360));
    }
 }
 
@@ -1199,7 +1199,7 @@ void C_SyvDaItDashboardProgressBarWidget::m_SetLabelColor(QPainter & orc_Painter
    if (mq_DarkMode)
    {
       c_HelpingColorVariable = mc_STYLE_GUIDE_COLOR_0;
-      c_HelpingColorVariable.setAlpha(msn_Transparence); // Color for Value hast to get more transparent some times
+      c_HelpingColorVariable.setAlpha(msn_Transparency); // Color for Value hast to get more transparent some times
       orc_MinMaxPen.setColor(mc_STYLE_GUIDE_COLOR_0);
       orc_ValuePen.setColor(c_HelpingColorVariable);
       orc_Painter.setBrush(static_cast<QBrush>(c_HelpingColorVariable)); // Arrow inside
@@ -1210,7 +1210,7 @@ void C_SyvDaItDashboardProgressBarWidget::m_SetLabelColor(QPainter & orc_Painter
       if (me_Style == stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::eOPENSYDE_2)
       {
          c_HelpingColorVariable = mc_STYLE_GUIDE_COLOR_6;
-         c_HelpingColorVariable.setAlpha(msn_Transparence);
+         c_HelpingColorVariable.setAlpha(msn_Transparency);
          orc_MinMaxPen.setColor(mc_STYLE_GUIDE_COLOR_6);
          orc_ValuePen.setColor(c_HelpingColorVariable);
          orc_Painter.setBrush(static_cast<QBrush>(c_HelpingColorVariable));
@@ -1219,7 +1219,7 @@ void C_SyvDaItDashboardProgressBarWidget::m_SetLabelColor(QPainter & orc_Painter
       else
       {
          c_HelpingColorVariable = mc_STYLE_GUIDE_COLOR_34;
-         c_HelpingColorVariable.setAlpha(msn_Transparence);
+         c_HelpingColorVariable.setAlpha(msn_Transparency);
          orc_MinMaxPen.setColor(mc_STYLE_GUIDE_COLOR_34);
          orc_ValuePen.setColor(c_HelpingColorVariable);
          orc_Painter.setBrush(static_cast<QBrush>(c_HelpingColorVariable));
@@ -1497,14 +1497,14 @@ void C_SyvDaItDashboardProgressBarWidget::m_SetBarMargins()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets of the color transparence value configured by the actual timeout state
+/*! \brief   Sets of the color transparency value configured by the actual timeout state
 
-   \param[in]  osn_Value   Value for transparence (0..255)
+   \param[in]  osn_Value   Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardProgressBarWidget::SetTransparence(const sintn osn_Value)
+void C_SyvDaItDashboardProgressBarWidget::SetTransparency(const sintn osn_Value)
 {
-   this->msn_Transparence = osn_Value;
+   this->msn_Transparency = osn_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

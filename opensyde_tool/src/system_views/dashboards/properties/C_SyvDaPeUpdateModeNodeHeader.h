@@ -57,7 +57,7 @@ private:
    const stw_types::uint32 mu32_ViewIndex;
    const stw_types::uint32 mu32_NodeIndex;
    //View restrictions
-   static const stw_types::uint32 mhu32_HeaderHeight;
+   static const stw_types::uint32 mhu32_HEADER_HEIGHT;
 
    void m_OnPushButtonExpandClicked(const bool oq_Checked);
 

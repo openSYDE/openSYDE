@@ -34,7 +34,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigParameterStruct::C_OSCHalcConfigParameterStruct(void)
+C_OSCHalcConfigParameterStruct::C_OSCHalcConfigParameterStruct(void) :
+   C_OSCHalcConfigParameter()
 {
 }
 

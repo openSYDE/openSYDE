@@ -12,6 +12,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <QTextCursor>
+
 #include "stwtypes.h"
 #include "C_GiSvDaTextElement.h"
 #include "C_PuiSvHandler.h"
@@ -155,4 +157,18 @@ void C_GiSvDaTextElement::SetZValueCustom(const float64 of64_ZValue)
    C_GiBiTextElement::SetZValueCustom(of64_ZValue);
    //Apply to data
    this->UpdateData();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enable edit content mode by enabling the text interaction
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaTextElement::EnableEditContent(void)
+{
+   QTextCursor c_Cursor = this->mpc_TextItem->textCursor();
+
+   this->mpc_TextItem->SetTextInteraction(true);
+
+   c_Cursor.movePosition(QTextCursor::Start);
+   this->mpc_TextItem->setTextCursor(c_Cursor);
 }

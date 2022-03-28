@@ -47,25 +47,25 @@ C_SyvDaChaPlotTriangleItem::C_SyvDaChaPlotTriangleItem(const bool oq_RightTriang
    pc_Position(createPosition(QLatin1String("position")))
 {
    this->pc_Position->setCoords(0.0, 0.0);
-   const float64 f64_Width = 8.0;
+   const float64 f64_WIDTH = 8.0;
    const float64 f64_Y = 0.0;
    const float64 f64_X = 0.0;
    // Factor for adjusting the "length" of the triangle
-   const float64 f64_FactorMidPoint = 0.6;
+   const float64 f64_FACTOR_MID_POINT = 0.6;
 
    if (oq_RightTriangle == true)
    {
       // Lines to form the right orientated triangle
-      this->mac_LineArray[0] = QPointF(f64_X, f64_Y - f64_Width);
-      this->mac_LineArray[1] = QPointF(f64_X, f64_Y + f64_Width);
-      this->mac_LineArray[2] = QPointF(f64_X + (f64_FactorMidPoint * f64_Width), f64_Y);
+      this->mac_LineArray[0] = QPointF(f64_X, f64_Y - f64_WIDTH);
+      this->mac_LineArray[1] = QPointF(f64_X, f64_Y + f64_WIDTH);
+      this->mac_LineArray[2] = QPointF(f64_X + (f64_FACTOR_MID_POINT * f64_WIDTH), f64_Y);
    }
    else
    {
       // Lines to form the left orientated triangle
-      this->mac_LineArray[0] = QPointF(f64_X, f64_Y - f64_Width);
-      this->mac_LineArray[1] = QPointF(f64_X, f64_Y + f64_Width);
-      this->mac_LineArray[2] = QPointF(f64_X - (f64_FactorMidPoint * f64_Width), f64_Y);
+      this->mac_LineArray[0] = QPointF(f64_X, f64_Y - f64_WIDTH);
+      this->mac_LineArray[1] = QPointF(f64_X, f64_Y + f64_WIDTH);
+      this->mac_LineArray[2] = QPointF(f64_X - (f64_FACTOR_MID_POINT * f64_WIDTH), f64_Y);
    }
 }
 

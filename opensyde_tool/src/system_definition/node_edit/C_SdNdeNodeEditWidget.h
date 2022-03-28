@@ -15,7 +15,10 @@
 
 #include "stwtypes.h"
 
+#include "C_SdNdeHalcWidget.h"
+#include "C_SdNdeDpEditWidget.h"
 #include "C_SdBueComIfDescriptionWidget.h"
+#include "C_SdNdeNodePropertiesTabContentWidget.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -45,14 +48,14 @@ public:
    void Save(void) const;
    void SetFlag(const stw_types::uint32 ou32_Flag) const;
    void OpenDetail(const stw_types::sint32 os32_MainIndex, const stw_types::sint32 os32_ListIndex,
-                   const stw_types::sint32 os32_ElementIndex, const stw_types::sint32 os32_Flag) const;
+                   const stw_types::sint32 os32_ElementIndex, const stw_types::sint32 os32_Flag);
    void AddFromTSP(void);
    stw_types::sintn GetTabIndex(void) const;
 
-   static const stw_types::sintn hsn_TabIndexProperties;
-   static const stw_types::sintn hsn_TabIndexDataPool;
-   static const stw_types::sintn hsn_TabIndexComm;
-   static const stw_types::sintn hsn_TabIndexHalc;
+   static const stw_types::sintn hsn_TAB_INDEX_PROPERTIES;
+   static const stw_types::sintn hsn_TAB_INDEX_DATA_POOL;
+   static const stw_types::sintn hsn_TAB_INDEX_COMM;
+   static const stw_types::sintn hsn_TAB_INDEX_HALC;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -82,17 +85,29 @@ private:
    void m_SaveUserSettings(void) const;
    void m_DataChanged(void);
    void m_OnSwitchToBus(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
-   void m_OnSwitchToHalc(void) const;
-   void m_OnSwitchToCommMessages(const stw_types::uint32 ou32_DataPoolIndex) const;
-   void m_CurrentTabChanged(const stw_types::sintn osn_Index) const;
+   void m_OnSwitchToHalc(void);
+   void m_OnSwitchToCommMessages(const stw_types::uint32 ou32_DataPoolIndex);
+   void m_CurrentTabChanged(const stw_types::sintn osn_Index);
    void m_TabClicked(const stw_types::sintn osn_Index) const;
+   void m_CreateTabWidgetsAlways(const stw_types::sintn osn_Index, const bool oq_AdaptCursor);
    void m_ReloadDataPools(void) const;
    void m_ReloadCommMessages(void) const;
    void m_HalcLoadedFromTSP(void) const;
+   void m_CreatePropertiesTab(const bool oq_AdaptCursor);
+   void m_CreateDpTab(const bool oq_AdaptCursor);
+   void m_CreateCommTab(const bool oq_AdaptCursor);
+   void m_CreateHalTab(const bool oq_AdaptCursor);
+   static void mh_StartWaitingCursor(void);
+   static void mh_EndWaitingCursor(void);
 
    Ui::C_SdNdeNodeEditWidget * mpc_Ui;
    const stw_types::uint32 mu32_NodeIndex;
    bool mq_DataChanged;
+   bool mq_SkipLoadUserSettings;
+   C_SdNdeNodePropertiesTabContentWidget * mpc_PropertiesWidget;
+   C_SdNdeDpEditWidget * mpc_DataPoolEditWidget;
+   C_SdBueComIfDescriptionWidget * mpc_ComIfDescriptionWidget;
+   C_SdNdeHalcWidget * mpc_HalWidget;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

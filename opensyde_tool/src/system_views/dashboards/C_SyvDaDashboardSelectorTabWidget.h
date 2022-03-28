@@ -24,6 +24,7 @@
 #include "C_SyvDaTearOffWidget.h"
 #include "C_OgeWiDashboardTab.h"
 #include "C_SyvComDriverDiag.h"
+#include "C_PuiSvReadDataConfiguration.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -112,7 +113,9 @@ private:
                         C_SyvDaDashboardWidget * const opc_Widget = NULL, const QSize & orc_Size = QSize(1000, 800),
                         const bool oq_TornOffWindowMinimized = false, const bool oq_TornOffWindowMaximized = false,
                         const bool oq_Load = false);
-   void m_AddTab(const stw_opensyde_gui_logic::C_PuiSvDashboard & orc_Data);
+   void m_AddTab(const stw_opensyde_gui_logic::C_PuiSvDashboard & orc_Data,
+                 const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
+                            stw_opensyde_gui_logic::C_PuiSvReadDataConfiguration> * const opc_Rails);
    void m_DeleteTab(const stw_types::sint32 os32_TabIndex);
    void m_CopyTab(const stw_types::uint32 ou32_DataIndex) const;
    bool m_EditTab(const stw_types::uint32 & oru32_DataIndex, QString & orc_Name, QString & orc_Comment);
@@ -127,9 +130,9 @@ private:
    bool mq_EditMode;
    bool mq_Connected;
    stw_types::uint32 mu32_ViewIndex;
-   static const QTabBar::ButtonPosition mhe_TabContentPosition;
-   static const QString mhc_AddIconDark;
-   static const QString mhc_AddIconLight;
+   static const QTabBar::ButtonPosition mhe_TAB_CONTENT_POSITION;
+   static const QString mhc_ADD_ICON_DARK;
+   static const QString mhc_ADD_ICON_LIGHT;
    stw_opensyde_gui_logic::C_PuiSvDashboard::E_TabType me_DashboardTabType;
 };
 

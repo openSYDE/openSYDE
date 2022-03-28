@@ -59,7 +59,7 @@ public:
    void UpdateError(const stw_types::uint32 ou32_DataElementIndex, const QString & orc_ErrorText,
                     const bool oq_IsTransmissionError, const bool oq_ErrorActive) const;
    void ResetError(void) const;
-   void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
+   void UpdateTransparency(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
    QString GetDataElementName(const stw_types::uint32 ou32_DataPoolElementConfigIndex) const;
    QString GetDataElementUnit(const stw_types::uint32 ou32_DataPoolElementConfigIndex) const;
    bool GetDataElementToggledState(const stw_types::uint32 ou32_DataPoolElementConfigIndex) const;

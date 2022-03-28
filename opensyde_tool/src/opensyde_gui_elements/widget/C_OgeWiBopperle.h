@@ -49,8 +49,8 @@ private:
    QColor mc_ColorActive;
    QColor mc_ColorInactive;
 
-   static const stw_types::sintn mhsn_PointSize;
-   static const stw_types::sintn mhsn_PointDistance;
+   static const stw_types::sintn mhsn_POINT_SIZE;
+   static const stw_types::sintn mhsn_POINT_DISTANCE;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

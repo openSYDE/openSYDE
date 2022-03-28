@@ -27,10 +27,10 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 C_GiImageGroupWithoutData::mhf64_ActionPointOffsetImage = 8.0;
+const float64 C_GiImageGroupWithoutData::mhf64_ACTION_POINT_OFFSET_IMAGE = 8.0;
 
-const float64 C_GiImageGroupWithoutData::mhf64_MinWidthImage = 10.0;
-const float64 C_GiImageGroupWithoutData::mhf64_MinHeightImage = 10.0;
+const float64 C_GiImageGroupWithoutData::mhf64_MIN_WIDTH_IMAGE = 10.0;
+const float64 C_GiImageGroupWithoutData::mhf64_MIN_HEIGHT_IMAGE = 10.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -58,8 +58,8 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, co
                                                      const bool oq_RequestLateImageInit,
                                                      QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID, mhf64_MinWidthImage,
-                       mhf64_MinHeightImage, mhf64_ActionPointOffsetImage, true, opc_Parent),
+   C_GiBiRectBaseGroup(oru64_ID, mhf64_MIN_WIDTH_IMAGE,
+                       mhf64_MIN_HEIGHT_IMAGE, mhf64_ACTION_POINT_OFFSET_IMAGE, true, opc_Parent),
    mpc_Image(NULL),
    mpc_SvgGraphicsItem(NULL),
    mq_IsSvgFlag(oq_RequestLateImageInit)
@@ -88,8 +88,8 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, co
                                                      const float64 of64_Height, const QPixmap & orc_Image,
                                                      QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID, mhf64_MinWidthImage,
-                       mhf64_MinHeightImage, mhf64_ActionPointOffsetImage, true, opc_Parent),
+   C_GiBiRectBaseGroup(oru64_ID, mhf64_MIN_WIDTH_IMAGE,
+                       mhf64_MIN_HEIGHT_IMAGE, mhf64_ACTION_POINT_OFFSET_IMAGE, true, opc_Parent),
    mpc_SvgGraphicsItem(NULL),
    mq_IsSvgFlag(false)
 {

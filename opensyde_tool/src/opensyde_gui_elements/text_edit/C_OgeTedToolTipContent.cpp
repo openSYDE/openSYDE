@@ -74,8 +74,8 @@ void C_OgeTedToolTipContent::m_AdjustMinimumSize()
    sint32 s32_Width = 630;
    sint32 s32_Height;
 
-   const sint32 s32_MaxWidth = 630;
-   const sint32 s32_MaxHeight = 700;
+   const sint32 s32_MAX_WIDTH = 630;
+   const sint32 s32_MAX_HEIGHT = 700;
 
    QFont c_Font = mc_STYLE_GUIDE_FONT_SEMIBOLD_13;
 
@@ -101,7 +101,7 @@ void C_OgeTedToolTipContent::m_AdjustMinimumSize()
    }
 
    // make sure the text edit gets not wider than maximum
-   s32_Width = std::min(s32_Width, s32_MaxWidth);
+   s32_Width = std::min(s32_Width, s32_MAX_WIDTH);
 
    s32_Height =
       static_cast<sint32>(c_FontMetric.boundingRect(0, 0, s32_Width, 0,
@@ -109,7 +109,7 @@ void C_OgeTedToolTipContent::m_AdjustMinimumSize()
       static_cast<sint32>(2 * this->frameWidth()) + 2;
 
    // make sure the text edit gets not higher than maximum
-   s32_Height = std::min(s32_Height, s32_MaxHeight);
+   s32_Height = std::min(s32_Height, s32_MAX_HEIGHT);
 
    this->setMinimumWidth(s32_Width);
    this->setMaximumWidth(s32_Width);

@@ -302,6 +302,74 @@ bool C_OSCSystemDefinition::CheckInterfaceIsAvailable(const uint32 ou32_NodeInde
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if com interface of node allows specified IP address
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_ComIndex     Communication interface
+   \param[in]  orc_Ip            IP Address
+
+   \return
+   false Conflict
+   true  Default
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCSystemDefinition::CheckIpAddressIsValid(const uint32 ou32_NodeIndex, const uint32 ou32_ComIndex,
+                                                  const std::vector<sint32> & orc_Ip) const
+{
+   bool q_Retval = true;
+
+   //Check node exists
+   if (ou32_NodeIndex < this->c_Nodes.size())
+   {
+      const C_OSCNode & rc_CurNode = this->c_Nodes[ou32_NodeIndex];
+      //Check com interface exists
+      if (ou32_ComIndex < rc_CurNode.c_Properties.c_ComInterfaces.size())
+      {
+         const C_OSCNodeComInterfaceSettings & rc_CurComInterface =
+            rc_CurNode.c_Properties.c_ComInterfaces[ou32_ComIndex];
+         //Check com interface has bus connected
+         if (rc_CurComInterface.GetBusConnected() == true)
+         {
+            std::vector<uint32> c_NodeIndices;
+            std::vector<uint32> c_InterfaceIndices;
+            this->GetNodeIndexesOfBus(rc_CurComInterface.u32_BusIndex, c_NodeIndices, c_InterfaceIndices);
+            if (c_NodeIndices.size() == c_InterfaceIndices.size())
+            {
+               for (uint32 u32_ItFound = 0; u32_ItFound < c_NodeIndices.size(); ++u32_ItFound)
+               {
+                  //Skip selected com interface
+                  if (((ou32_NodeIndex == c_NodeIndices[u32_ItFound]) &&
+                       (c_InterfaceIndices[u32_ItFound] == ou32_ComIndex)) == false)
+                  {
+                     if (c_NodeIndices[u32_ItFound] < this->c_Nodes.size())
+                     {
+                        const C_OSCNode & rc_Node = this->c_Nodes[c_NodeIndices[u32_ItFound]];
+                        //Check all com interfaces
+                        if (c_InterfaceIndices[u32_ItFound] < rc_Node.c_Properties.c_ComInterfaces.size())
+                        {
+                           //Check if connected bus matches
+                           const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+                              rc_Node.c_Properties.c_ComInterfaces[c_InterfaceIndices[u32_ItFound]];
+
+                           if ((static_cast<uint8>(orc_Ip[0]) == rc_ComInterface.c_Ip.au8_IpAddress[0]) &&
+                               (static_cast<uint8>(orc_Ip[1]) == rc_ComInterface.c_Ip.au8_IpAddress[1]) &&
+                               (static_cast<uint8>(orc_Ip[2]) == rc_ComInterface.c_Ip.au8_IpAddress[2]) &&
+                               (static_cast<uint8>(orc_Ip[3]) == rc_ComInterface.c_Ip.au8_IpAddress[3]))
+                           {
+                              q_Retval = false;
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if any bus uses the provided bus id
 
    \param[in]  ou8_BusId               Bus id to check for
@@ -382,6 +450,7 @@ sint32 C_OSCSystemDefinition::GetNextFreeBusId(uint8 & oru8_BusId) const
    \param[out]     opq_NameConflict                Name conflict
    \param[out]     opq_NameInvalid                 Name not usable as variable
    \param[out]     opq_NodeIdInvalid               true: Node index is not usable
+   \param[out]     opq_IpInvalid                   true: IP address is not usable
    \param[out]     opq_DataPoolsInvalid            true: error in data pool was detected
    \param[out]     opq_ApplicationsInvalid         true: error in application was detected
    \param[out]     opq_DomainsInvalid              true: error in HALC configuration was detected
@@ -398,8 +467,8 @@ sint32 C_OSCSystemDefinition::GetNextFreeBusId(uint8 & oru8_BusId) const
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool * const opq_NameConflict,
                                              bool * const opq_NameInvalid, bool * const opq_NodeIdInvalid,
-                                             bool * const opq_DataPoolsInvalid, bool * const opq_ApplicationsInvalid,
-                                             bool * const opq_DomainsInvalid,
+                                             bool * const opq_IpInvalid, bool * const opq_DataPoolsInvalid,
+                                             bool * const opq_ApplicationsInvalid, bool * const opq_DomainsInvalid,
                                              const bool & orq_AllowComDataPoolException,
                                              std::vector<uint32> * const opc_InvalidInterfaceIndices,
                                              std::vector<uint32> * const opc_InvalidDataPoolIndices,
@@ -481,7 +550,7 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                *opq_NodeIdInvalid = true;
                if (opc_InvalidInterfaceIndices == NULL)
                {
-                  //not interested in details, we are finished here as we know there was at least one conflics
+                  //not interested in details, we are finished here as we know there was at least one conflict
                   break;
                }
                else
@@ -491,6 +560,48 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
             }
          }
       }
+      if (opq_IpInvalid != NULL)
+      {
+         *opq_IpInvalid = false;
+
+         for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_CheckedNode.c_Properties.c_ComInterfaces.size();
+              ++u32_ItComInterface)
+         {
+            //only consider ethernet interfaces for this check
+            if (rc_CheckedNode.c_Properties.c_ComInterfaces[u32_ItComInterface].e_InterfaceType ==
+                C_OSCSystemBus::eETHERNET)
+            {
+               std::vector<sint32> c_Ip;
+               c_Ip.reserve(4U);
+               c_Ip.push_back(static_cast<sint32>(rc_CheckedNode.c_Properties.c_ComInterfaces[u32_ItComInterface].c_Ip.
+                                                  au8_IpAddress[0]));
+               c_Ip.push_back(static_cast<sint32>(rc_CheckedNode.c_Properties.c_ComInterfaces[u32_ItComInterface].c_Ip.
+                                                  au8_IpAddress[1]));
+               c_Ip.push_back(static_cast<sint32>(rc_CheckedNode.c_Properties.c_ComInterfaces[u32_ItComInterface].c_Ip.
+                                                  au8_IpAddress[2]));
+               c_Ip.push_back(static_cast<sint32>(rc_CheckedNode.c_Properties.c_ComInterfaces[u32_ItComInterface].c_Ip.
+                                                  au8_IpAddress[3]));
+               //check for same IP used twice on same bus
+               const bool q_ComIpValid = this->CheckIpAddressIsValid(ou32_NodeIndex, u32_ItComInterface, c_Ip);
+
+               //if conflict found abort check
+               if (q_ComIpValid == false)
+               {
+                  *opq_IpInvalid = true;
+                  if (opc_InvalidInterfaceIndices == NULL)
+                  {
+                     //not interested in details, we are finished here as we know there was at least one conflics
+                     break;
+                  }
+                  else
+                  {
+                     opc_InvalidInterfaceIndices->push_back(u32_ItComInterface);
+                  }
+               }
+            }
+         }
+      }
+
       if (opq_DataPoolsInvalid != NULL)
       {
          // check all datapools for errors
@@ -844,7 +955,10 @@ sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * c
                                           if ((s32_Retval == C_NO_ERR) && (q_MessageValid == true))
                                           {
                                              s32_Retval = this->CheckMessageIdBus(ou32_BusIndex,
-                                                                                  rc_Message.u32_CanId,
+                                                                                  C_OSCCanMessageUniqueId(rc_Message.
+                                                                                                          u32_CanId,
+                                                                                                          rc_Message.
+                                                                                                          q_IsExtended),
                                                                                   q_MessageValid, &c_MessageId);
                                           }
                                        }
@@ -865,7 +979,10 @@ sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * c
                                           if ((s32_Retval == C_NO_ERR) && (q_MessageValid == true))
                                           {
                                              s32_Retval = this->CheckMessageIdBus(ou32_BusIndex,
-                                                                                  rc_Message.u32_CanId,
+                                                                                  C_OSCCanMessageUniqueId(rc_Message.
+                                                                                                          u32_CanId,
+                                                                                                          rc_Message.
+                                                                                                          q_IsExtended),
                                                                                   q_MessageValid, &c_MessageId);
                                           }
                                        }
@@ -892,7 +1009,7 @@ sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * c
 /*! \brief   Check if message id valid
 
    \param[in]   ou32_BusIndex    Bus index
-   \param[in]   ou32_MessageId   Message id
+   \param[in]   orc_MessageId    Message id
    \param[out]  orq_Valid        Flag if valid
    \param[in]   opc_SkipMessage  Optional parameter to skip one message
                                  (Use-case: skip current message to avoid conflict with itself)
@@ -902,8 +1019,8 @@ sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * c
    C_RANGE  Bus does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemDefinition::CheckMessageIdBus(const uint32 ou32_BusIndex, const uint32 ou32_MessageId,
-                                                bool & orq_Valid,
+sint32 C_OSCSystemDefinition::CheckMessageIdBus(const uint32 ou32_BusIndex,
+                                                const C_OSCCanMessageUniqueId & orc_MessageId, bool & orq_Valid,
                                                 const C_OSCCanMessageIdentificationIndices * const opc_SkipMessage)
 const
 {
@@ -929,7 +1046,7 @@ const
                //Check if skip possible
                if ((opc_SkipMessage != NULL) && (opc_SkipMessage->u32_NodeIndex == c_NodeIndices[u32_ItNode]))
                {
-                  rc_Node.CheckMessageId(c_InterfaceIndices[u32_ItNode], ou32_MessageId, q_Valid,
+                  rc_Node.CheckMessageId(c_InterfaceIndices[u32_ItNode], orc_MessageId, q_Valid,
                                          &opc_SkipMessage->e_ComProtocol,
                                          &opc_SkipMessage->u32_InterfaceIndex,
                                          &opc_SkipMessage->q_MessageIsTx,
@@ -938,7 +1055,7 @@ const
                else
                {
                   //Check message id for one node
-                  rc_Node.CheckMessageId(c_InterfaceIndices[u32_ItNode], ou32_MessageId, q_Valid);
+                  rc_Node.CheckMessageId(c_InterfaceIndices[u32_ItNode], orc_MessageId, q_Valid);
                }
                //Set invalid if necessary
                if (q_Valid == false)

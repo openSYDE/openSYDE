@@ -55,7 +55,7 @@ public:
    stw_types::sint32 StartCycling(void);
    void StopCycling(void);
 
-   stw_types::sint32 SendTesterPresentWithoutDefectNodes(void);
+   stw_types::sint32 SendTesterPresentToActiveNodes(void);
 
    stw_types::sint32 PollDataPoolRead(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_DataPoolIndex,
                                       const stw_types::uint16 ou16_ListIndex,
@@ -155,8 +155,13 @@ private:
                                                      // as many entries as we
                                                      // have nodes.
 
-   std::set<stw_types::uint32> mc_DiagNodes;         ///< Nodes which has used datapool elements
-   std::set<stw_types::uint32> mc_DefectNodeIndices; ///< Nodes which could not be reached on start
+   std::vector<stw_types::uint32> mc_ActiveDiagNodes;          ///< Nodes which has diagnostic active. The other active
+                                                               // nodes are active for routing but not for diagnostic.
+                                                               // It has the indexes of the mc_ActiveNodesIndexes
+   std::vector<stw_types::uint32> mc_ActiveCommunicatingNodes; ///< All nodes which are communicating for dashboard or
+                                                               // part of at least one route
+   std::set<stw_types::uint32> mc_DiagNodesWithElements;       ///< Nodes which has used datapool elements
+   std::set<stw_types::uint32> mc_DefectNodeIndices;           ///< Nodes which could not be reached on start
    // Read metadata of all active nodes and its Datapools. First layer are the active
    // nodes, second layer are the Datapools
    std::vector<std::list<stw_opensyde_core::C_OSCProtocolDriverOsy::C_DataPoolMetaData> > mc_ReadDatapoolMetadata;
@@ -166,7 +171,7 @@ private:
    stw_opensyde_core::C_OSCIpDispatcherWinSock * mpc_EthernetDispatcher;
 
    // Mapping from CAN-ID to registered widget and its used CAN message signal
-   QMap<stw_types::uint32, QList<C_SyvComDriverDiagWidgetRegistration> > mc_AllWidgets;
+   QMap<stw_opensyde_core::C_OSCCanMessageUniqueId, QList<C_SyvComDriverDiagWidgetRegistration> > mc_AllWidgets;
 
    // Security PEM database
    stw_opensyde_core::C_OSCSecurityPemDatabase mc_PemDatabase;
@@ -177,14 +182,16 @@ private:
    stw_types::sint32 m_InitDataDealer(void);
    stw_types::sint32 m_StartRoutingDiag(QString & orc_ErrorDetails, std::set<stw_types::uint32> & orc_ErrorActiveNodes);
    stw_types::sint32 m_StartDiagServers(QString & orc_ErrorDetails);
-   stw_types::sint32 m_GetAllDatapoolMetadata(const stw_types::uint32 ou32_ActiveNodeIndex, QString & orc_ErrorDetails);
-   stw_types::sint32 m_CheckOsyDatapoolsAndCreateMapping(const stw_types::uint32 ou32_ActiveNodeIndex,
+   stw_types::sint32 m_GetAllDatapoolMetadata(const stw_types::uint32 ou32_ActiveDiagNodeIndex,
+                                              QString & orc_ErrorDetails);
+   stw_types::sint32 m_CheckOsyDatapoolsAndCreateMapping(const stw_types::uint32 ou32_ActiveDiagNodeIndex,
                                                          QString & orc_ErrorDetails);
-   stw_types::sint32 m_GetReadDatapoolMetadata(const stw_types::uint32 ou32_ActiveNodeIndex,
+   stw_types::sint32 m_GetReadDatapoolMetadata(const stw_types::uint32 ou32_ActiveDiagNodeIndex,
                                                const stw_scl::C_SCLString & orc_DatapoolName,
                                                stw_types::uint32 & oru32_ServerDatapoolIndex,
                                                stw_opensyde_core::C_OSCProtocolDriverOsy::C_DataPoolMetaData & orc_Metadata)
    const;
+   stw_types::uint32 m_GetActiveDiagIndex(const stw_types::uint32 ou32_NodeIndex, bool * const opq_Found = NULL) const;
 
    stw_types::sint32 m_Cycle(void);
    static void mh_ThreadFunc(void * const opv_Instance);

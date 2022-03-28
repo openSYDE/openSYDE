@@ -785,10 +785,10 @@ void C_CamGenTableView::m_SelectAndScrollToRow(const uint32 ou32_Row)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_RepositionButtons(void)
 {
-   const QSize c_ButtonSizeUp(25, 27);
+   const QSize c_BUTTON_SIZE_UP(25, 27);
 
    //Position
-   this->mpc_PushButtonScrollTop->setGeometry(QRect(QPoint(0, 0), c_ButtonSizeUp));
+   this->mpc_PushButtonScrollTop->setGeometry(QRect(QPoint(0, 0), c_BUTTON_SIZE_UP));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

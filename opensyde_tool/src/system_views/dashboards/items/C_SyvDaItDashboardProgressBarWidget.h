@@ -49,7 +49,7 @@ public:
    void SetMax(const stw_types::sintn osn_Value, const QString & orc_Value);
    void SetShowMinMax(const bool oq_Value);
    void SetUnit(const QString & orc_Value);
-   void SetTransparence(const stw_types::sintn osn_Value);
+   void SetTransparency(const stw_types::sintn osn_Value);
    stw_opensyde_gui_logic::C_PuiSvDbProgressBar::E_Type GetType() const;
 
 protected:
@@ -88,7 +88,7 @@ private:
    stw_types::float32 mf32_BarMarginBottom; // To Size the Progress Bar dependent on this->rect()
    stw_types::float32 mf32_BarMarginLeft;   // To Size the Progress Bar dependent on this->rect()
    stw_types::float32 mf32_BarMarginRight;  // To Size the Progress Bar dependent on this->rect()
-   stw_types::sintn msn_Transparence;
+   stw_types::sintn msn_Transparency;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

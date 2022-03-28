@@ -19,6 +19,7 @@
 #include "CSCLString.h"
 #include "C_OSCSystemDefinition.h"
 #include "C_OSCComSequencesBase.h"
+#include "C_OSCSuSequencesNodeStates.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -56,12 +57,25 @@ public:
    class C_DoFlash
    {
    public:
+      C_DoFlash(void);
+
       ///list of files to flash (keep size to 0 to not flash any files)
       std::vector<stw_scl::C_SCLString> c_FilesToFlash;
       ///list of parameter files to write to NVM (keep size to 0 to not write any files)
       std::vector<stw_scl::C_SCLString> c_FilesToWriteToNvm;
       ///optional list of names to allow (other than the device name itself)
       std::vector<stw_scl::C_SCLString> c_OtherAcceptedDeviceNames;
+
+      ///optional PEM file (empty string for no PEM file)
+      stw_scl::C_SCLString c_PemFile;
+
+      /// Node configuration flags for security state
+      bool q_SendSecurityEnabledState;
+      bool q_SecurityEnabled;
+
+      /// Node configuration flags for debugger state
+      bool q_SendDebuggerEnabledState;
+      bool q_DebuggerEnabled;
    };
 
    ///set of information used to identify one application
@@ -112,6 +126,8 @@ public:
       eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR,
       eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_START,
       eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR,
+      eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_START,
+      eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR,
       eREAD_DEVICE_INFO_OSY_FINISHED,
       eREAD_DEVICE_INFO_XFL_START,
       eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR,
@@ -159,8 +175,8 @@ public:
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_RESULT_STRING,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED,
 
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START, //reported once for each node (if there are > 0 NVM files)
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START,                   //reported once for each node (if there are > 0 NVM
+                                                                 // files)
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of flashloader
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR,   //problem getting maximum block size from device
@@ -170,6 +186,28 @@ public:
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR, //problem writing file data to device
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED,    //reported for each finished file
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED,         //reported once for each node (if there are > 0 NVM files)
+
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START,
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of flashloader
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED,
+
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_START,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of
+                                                                            // flashloader
+      eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_FINISHED,
+
+      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_START,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of
+                                                                            // flashloader
+      eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_FINISHED,
 
       eUPDATE_SYSTEM_OSY_NODE_FINISHED,
       eUPDATE_SYSTEM_ABORTED,
@@ -206,6 +244,11 @@ public:
                                   const std::vector<stw_types::uint32> & orc_NodesOrder);
    stw_types::sint32 ResetSystem(void);
 
+   virtual stw_types::sint32 GetConnectStates(std::vector<C_OSCSuSequencesNodeConnectStates> & orc_ConnectStatesNodes)
+   const;
+   virtual stw_types::sint32 GetUpdateStates(std::vector<C_OSCSuSequencesNodeUpdateStates> & orc_UpdateStatesNodes)
+   const;
+
    static void h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceInformation & orc_Info,
                                                       stw_scl::C_SCLStringList & orc_Text);
    static void h_StwFlashloaderInformationToText(const C_XflDeviceInformation & orc_Info,
@@ -239,33 +282,55 @@ private:
 
    C_OSCProtocolDriverOsyNode mc_CurrentNode; //node we currently deal with
 
+   std::vector<C_OSCSuSequencesNodeConnectStates> mc_ConnectStatesNodes;
+   std::vector<C_OSCSuSequencesNodeUpdateStates> mc_UpdateStatesNodes;
+
    stw_types::sint32 m_FlashNodeOpenSydeHex(const std::vector<stw_scl::C_SCLString> & orc_FilesToFlash,
                                             const std::vector<stw_scl::C_SCLString> & orc_OtherAcceptedDeviceNames,
                                             const stw_types::uint32 ou32_RequestDownloadTimeout,
-                                            const stw_types::uint32 ou32_TransferDataTimeout);
+                                            const stw_types::uint32 ou32_TransferDataTimeout,
+                                            bool & orq_SetProgrammingMode,
+                                            std::vector<C_OSCSuSequencesNodeHexFileStates> & orc_StateHexFiles);
    stw_types::sint32 m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexDataDump & orc_HexDataDump,
                                                const stw_types::uint32 ou32_SignatureAddress,
                                                const stw_types::uint32 ou32_RequestDownloadTimeout,
-                                               const stw_types::uint32 ou32_TransferDataTimeout);
+                                               const stw_types::uint32 ou32_TransferDataTimeout,
+                                               C_OSCSuSequencesNodeHexFileStates & orc_StateHexFile);
    stw_types::sint32 m_FlashNodeOpenSydeFile(const std::vector<stw_scl::C_SCLString> & orc_FilesToFlash,
                                              const stw_types::uint32 ou32_RequestDownloadTimeout,
                                              const stw_types::uint32 ou32_TransferDataTimeout,
-                                             const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures);
+                                             const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                             bool & orq_SetProgrammingMode,
+                                             std::vector<C_OSCSuSequencesNodeOtherFileStates> & orc_StateOtherFiles);
    stw_types::sint32 m_FlashOneFileOpenSydeFile(const stw_scl::C_SCLString & orc_FileToFlash,
                                                 const stw_types::uint32 ou32_RequestDownloadTimeout,
                                                 const stw_types::uint32 ou32_TransferDataTimeout,
-                                                const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures);
+                                                const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                                C_OSCSuSequencesNodeOtherFileStates & orc_StateOtherFile);
    stw_types::sint32 m_WriteNvmOpenSyde(const std::vector<stw_scl::C_SCLString> & orc_FilesToWrite,
-                                        const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures);
+                                        const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                        const bool oq_SetProgrammingMode,
+                                        std::vector<C_OSCSuSequencesNodePsiFileStates> & orc_StatePsiFiles);
+   stw_types::sint32 m_WritePemOpenSydeFile(const stw_scl::C_SCLString & orc_FileToWrite,
+                                            const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                            bool & orq_SetProgrammingMode,
+                                            C_OSCSuSequencesNodePemFileStates & orc_StatePemFile);
+   stw_types::sint32 m_WriteOpenSydeNodeStates(const C_OSCSuSequences::C_DoFlash & orc_ApplicationsToWrite,
+                                               const C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ProtocolFeatures,
+                                               bool & orq_SetProgrammingMode,
+                                               C_OSCSuSequencesNodePemFileStates & orc_StatePemFile);
 
    stw_types::sint32 m_WriteFingerPrintOsy(void);
 
-   stw_types::sint32 m_FlashNodeXfl(const std::vector<stw_scl::C_SCLString> & orc_FilesToFlash);
+   stw_types::sint32 m_FlashNodeXfl(const std::vector<stw_scl::C_SCLString> & orc_FilesToFlash,
+                                    std::vector<C_OSCSuSequencesNodeStwFlHexFileStates> & orc_StateHexFiles);
 
    stw_types::sint32 m_ReadDeviceInformationOpenSyde(const stw_types::uint8 ou8_ProgressToReport,
-                                                     const stw_types::uint32 ou32_NodeIndex);
+                                                     const stw_types::uint32 ou32_NodeIndex,
+                                                     C_OSCSuSequencesNodeConnectStates & orc_NodeState);
    stw_types::sint32 m_ReadDeviceInformationStwFlashloader(const stw_types::uint8 ou8_ProgressToReport,
-                                                           const stw_types::uint32 ou32_NodeIndex);
+                                                           const stw_types::uint32 ou32_NodeIndex,
+                                                           C_OSCSuSequencesNodeConnectStates & orc_NodeState);
 
    bool m_IsNodeActive(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_BusIndex,
                        C_OSCNodeProperties::E_FlashLoaderProtocol & ore_ProtocolType,

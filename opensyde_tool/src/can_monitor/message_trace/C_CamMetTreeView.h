@@ -77,7 +77,7 @@ protected:
    virtual stw_types::sintn sizeHintForColumn(const stw_types::sintn osn_Column) const override;
 
 private:
-   static const QString mhc_Stylesheet;
+   static const QString mhc_STYLESHEET;
    std::mutex mc_MutexUpdate;
    QThread mc_ThreadGUIBuffer;
    QTimer mc_TimerHandleMessages;

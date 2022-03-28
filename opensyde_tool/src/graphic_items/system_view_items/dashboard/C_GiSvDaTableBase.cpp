@@ -66,11 +66,12 @@ C_GiSvDaTableBase::C_GiSvDaTableBase(const uint32 & oru32_ViewIndex, const uint3
                                      QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiSvDaRectBaseGroup(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eTABLE,
-                         C_SyvDaItTaModel::hu32_MaxElements, oru64_ID, 50.0, 25.0, 100.0, 50.0, false, true,
+                         C_SyvDaItTaModel::hu32_MAX_ELEMENTS, oru64_ID, 50.0, 25.0, 100.0, 50.0, false, true,
                          opc_Parent),
    mpc_AddDataElement(NULL),
    mpc_AddSeperator(NULL),
    mpc_ConfigDataElement(NULL),
+   mpc_ConfigSeperator(NULL),
    mpc_RemoveDataElement(NULL),
    mpc_MoveUpDataElement(NULL),
    mpc_MoveDownDataElement(NULL),
@@ -78,6 +79,16 @@ C_GiSvDaTableBase::C_GiSvDaTableBase(const uint32 & oru32_ViewIndex, const uint3
 {
    this->mpc_TableWidget = new C_SyvDaItTaView(this);
    this->mpc_Widget->SetWidget(this->mpc_TableWidget);
+
+   connect(this->mpc_TableWidget, &C_SyvDaItTaView::SigTriggerEdit, this, &C_GiSvDaTableBase::EditElementProperties);
+   connect(this->mpc_TableWidget, &C_SyvDaItTaView::SigMoveDataElementDown, this,
+           &C_GiSvDaTableBase::m_MoveDataElementDown);
+   connect(this->mpc_TableWidget, &C_SyvDaItTaView::SigMoveDataElementUp, this,
+           &C_GiSvDaTableBase::m_MoveDataElementUp);
+   connect(this->mpc_TableWidget, &C_SyvDaItTaView::SigRemoveDataElement, this,
+           &C_GiSvDaTableBase::m_RemoveDataElement);
+   connect(this->mpc_TableWidget, &C_SyvDaItTaView::SigAddDataElement, this,
+           &C_GiSvDaTableBase::m_AddNewDataElement);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -218,18 +229,18 @@ void C_GiSvDaTableBase::UpdateShowValue(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of the color transparence value configured by the actual timeout state
+/*! \brief   Update of the color transparency value configured by the actual timeout state
 
    \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
-   \param[in]  osn_Value               Value for transparence (0..255)
+   \param[in]  osn_Value               Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaTableBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_GiSvDaTableBase::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    tgl_assert(this->mpc_TableWidget != NULL);
    if (this->mpc_TableWidget != NULL)
    {
-      this->mpc_TableWidget->UpdateTransparence(ou32_DataElementIndex, osn_Value);
+      this->mpc_TableWidget->UpdateTransparency(ou32_DataElementIndex, osn_Value);
    }
 }
 
@@ -254,31 +265,14 @@ void C_GiSvDaTableBase::ConnectionActiveChanged(const bool oq_Active)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Information about the start or stop of edit mode
-
-   \param[in]  oq_Active   Flag if edit mode is active or not active now
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaTableBase::EditModeActiveChanged(const bool oq_Active)
-{
-   C_GiSvDaRectBaseGroup::EditModeActiveChanged(oq_Active);
-   tgl_assert(this->mpc_TableWidget != NULL);
-   if (this->mpc_TableWidget != NULL)
-   {
-      this->mpc_TableWidget->SetSelectionAvailable(oq_Active);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Call properties for widgets
-
-   \return true (configurable properties called)
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvDaTableBase::CallProperties(void)
+void C_GiSvDaTableBase::EditElementProperties(void)
 {
    tgl_assert(this->mpc_TableWidget != NULL);
-   if (this->mpc_TableWidget != NULL)
+   if ((this->mpc_TableWidget != NULL) &&
+       (this->mq_EditContentModeEnabled == true))
    {
       const std::vector<uint32> c_Indices = this->mpc_TableWidget->GetUniqueAndValidSelectedRows();
 
@@ -340,7 +334,74 @@ bool C_GiSvDaTableBase::CallProperties(void)
          }
       }
    }
-   return true;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of edit mode
+
+   \param[in]  oq_Active   Flag if edit mode is active or not active now
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaTableBase::EditModeActiveChanged(const bool oq_Active)
+{
+   C_GiSvDaRectBaseGroup::EditModeActiveChanged(oq_Active);
+
+   tgl_assert(this->mpc_TableWidget != NULL);
+   if (this->mpc_TableWidget != NULL)
+   {
+      if (oq_Active == false)
+      {
+         this->mpc_TableWidget->SetSelectionAvailable(true, false);
+      }
+      else if (this->mq_EditContentModeEnabled == false)
+      {
+         this->mpc_TableWidget->SetSelectionAvailable(false, false);
+      }
+      else
+      {
+         // Nothing to do
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enable edit content mode for widgets
+
+   \retval false  nothing done
+   \retval true   edit content mode enabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaTableBase::EnableEditContent(void)
+{
+   const bool q_Return = C_GiSvDaRectBaseGroup::EnableEditContent();
+
+   if (q_Return == true)
+   {
+      tgl_assert(this->mpc_TableWidget != NULL);
+      if (this->mpc_TableWidget != NULL)
+      {
+         this->mpc_TableWidget->SetSelectionAvailable(true, true);
+      }
+   }
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disable edit content mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaTableBase::DisableEditContent(void)
+{
+   C_GiSvDaRectBaseGroup::DisableEditContent();
+
+   tgl_assert(this->mpc_TableWidget != NULL);
+   if (this->mpc_TableWidget != NULL)
+   {
+      this->mpc_TableWidget->SetSelectionAvailable(false, false);
+      // In case of a still visible tool tip, it will no disappear due to the not forwarded events and an own scene
+      // independent handling, it must be hided manually
+      this->mpc_TableWidget->HideToolTip();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -357,123 +418,129 @@ bool C_GiSvDaTableBase::CallProperties(void)
 void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,
                                              const bool oq_Active)
 {
-   tgl_assert(this->mpc_TableWidget != NULL);
-   if ((oq_Active == true) && (this->mpc_TableWidget != NULL))
+   if (this->mq_EditContentModeEnabled == false)
    {
-      const std::vector<uint32> c_SelectedRows = this->mpc_TableWidget->GetUniqueSelectedRows();
-      // Initial registration of the context menu
-      if (mpc_AddDataElement == NULL)
-      {
-         mpc_AddDataElement = opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Add data element(s)"));
-         // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
-         this->mpc_AddDataElement->setVisible(false);
-      }
-      if (mpc_AddSeperator == NULL)
-      {
-         mpc_AddSeperator = opc_ContextMenuManager->RegisterSeperator();
-         // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
-         this->mpc_AddSeperator->setVisible(false);
-      }
-      if (mpc_ConfigDataElement == NULL)
-      {
-         mpc_ConfigDataElement = opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText(
-                                                                           "Selected data element properties"));
-         // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
-         this->mpc_ConfigDataElement->setVisible(false);
-      }
-      if (mpc_RemoveDataElement == NULL)
-      {
-         mpc_RemoveDataElement =
-            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Remove selected data element(s)"));
-         // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
-         this->mpc_RemoveDataElement->setVisible(false);
-      }
-      if (mpc_MoveUpDataElement == NULL)
-      {
-         mpc_MoveUpDataElement =
-            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Move selected data element(s) up"));
-         // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
-         this->mpc_MoveUpDataElement->setVisible(false);
-      }
-      if (mpc_MoveDownDataElement == NULL)
-      {
-         mpc_MoveDownDataElement =
-            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Move selected data element(s) down"));
-         // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
-         this->mpc_MoveDownDataElement->setVisible(false);
-      }
-      if (mpc_MiscSeperator == NULL)
-      {
-         mpc_MiscSeperator = opc_ContextMenuManager->RegisterSeperator();
-         // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
-         this->mpc_MiscSeperator->setVisible(false);
-      }
-
-      // Connect the signals
-      if ((mpc_AddDataElement != NULL) &&
-          (this->GetWidgetDataPoolElementCount() < C_SyvDaItTaModel::hu32_MaxElements))
-      {
-         opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_AddDataElement);
-         opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_AddSeperator);
-         connect(mpc_AddDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_AddNewDataElement);
-      }
-      if (c_SelectedRows.size() > 0UL)
-      {
-         if (mpc_ConfigDataElement != NULL)
-         {
-            opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_ConfigDataElement);
-            connect(mpc_ConfigDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::CallProperties);
-            if (this->mpc_TableWidget->GetUniqueAndValidSelectedRows().size() == 1)
-            {
-               this->mpc_ConfigDataElement->setEnabled(true);
-            }
-            else
-            {
-               this->mpc_ConfigDataElement->setEnabled(false);
-            }
-         }
-         if (this->mpc_MoveDownDataElement != NULL)
-         {
-            opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_MoveDownDataElement);
-            connect(mpc_MoveDownDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementDown);
-         }
-         if (this->mpc_MoveUpDataElement != NULL)
-         {
-            opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_MoveUpDataElement);
-            connect(mpc_MoveUpDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementUp);
-         }
-         if (this->mpc_RemoveDataElement != NULL)
-         {
-            opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_RemoveDataElement);
-            connect(mpc_RemoveDataElement, &QAction::triggered,
-                    this, &C_GiSvDaTableBase::m_RemoveDataElement);
-         }
-         opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_MiscSeperator);
-      }
+      // Normal edit mode, use default dashboard context menu
+      C_GiSvDaRectBaseGroup::ConfigureContextMenu(opc_ContextMenuManager, oq_Active);
    }
    else
    {
-      // Disconnect the signals
-      if (mpc_AddDataElement != NULL)
+      // Deactivate the default dashboard scene actions.
+      // In content edit mode only widget specific functions are relevant
+      opc_ContextMenuManager->SetSpecificActionsAvailable(false, true);
+
+      tgl_assert(this->mpc_TableWidget != NULL);
+      if ((oq_Active == true) && (this->mpc_TableWidget != NULL))
       {
-         disconnect(mpc_AddDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_AddNewDataElement);
-      }
-      if (mpc_ConfigDataElement != NULL)
-      {
-         disconnect(mpc_ConfigDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::CallProperties);
-      }
-      if (this->mpc_MoveDownDataElement != NULL)
-      {
-         disconnect(mpc_MoveDownDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementDown);
-      }
-      if (this->mpc_MoveUpDataElement != NULL)
-      {
-         disconnect(mpc_MoveUpDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementUp);
-      }
-      if (mpc_RemoveDataElement != NULL)
-      {
-         disconnect(mpc_RemoveDataElement, &QAction::triggered,
+         const std::vector<uint32> c_SelectedRows = this->mpc_TableWidget->GetUniqueSelectedRows();
+         // Initial registration of the context menu
+         if (mpc_AddDataElement == NULL)
+         {
+            mpc_AddDataElement =
+               opc_ContextMenuManager->RegisterActionWithKeyboardShortcut(C_GtGetText::h_GetText(
+                                                                             "Add data element(s)"),
+                                                                          static_cast<sintn>(Qt::CTRL) +
+                                                                          static_cast<sintn>(Qt::Key_Plus));
+            // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+            this->mpc_AddDataElement->setVisible(false);
+            connect(mpc_AddDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_AddNewDataElement);
+         }
+         if (mpc_AddSeperator == NULL)
+         {
+            mpc_AddSeperator = opc_ContextMenuManager->RegisterSeperator();
+            // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+            this->mpc_AddSeperator->setVisible(false);
+         }
+         if (mpc_ConfigDataElement == NULL)
+         {
+            mpc_ConfigDataElement = opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText(
+                                                                              "Edit properties"));
+            // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+            this->mpc_ConfigDataElement->setVisible(false);
+            connect(mpc_ConfigDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::EditElementProperties);
+         }
+         if (mpc_ConfigSeperator == NULL)
+         {
+            mpc_ConfigSeperator = opc_ContextMenuManager->RegisterSeperator();
+            // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+            this->mpc_ConfigSeperator->setVisible(false);
+         }
+         if (mpc_MoveUpDataElement == NULL)
+         {
+            mpc_MoveUpDataElement =
+               opc_ContextMenuManager->RegisterActionWithKeyboardShortcut(C_GtGetText::h_GetText(
+                                                                             "Move up"),
+                                                                          static_cast<sintn>(Qt::CTRL) +
+                                                                          static_cast<sintn>(Qt::Key_Up));
+            // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+            this->mpc_MoveUpDataElement->setVisible(false);
+            connect(mpc_MoveUpDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementUp);
+         }
+         if (mpc_MoveDownDataElement == NULL)
+         {
+            mpc_MoveDownDataElement =
+               opc_ContextMenuManager->RegisterActionWithKeyboardShortcut(C_GtGetText::h_GetText(
+                                                                             "Move down"),
+                                                                          static_cast<sintn>(Qt::CTRL) +
+                                                                          static_cast<sintn>(Qt::Key_Down));
+            // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+            this->mpc_MoveDownDataElement->setVisible(false);
+            connect(mpc_MoveDownDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementDown);
+         }
+         if (mpc_MiscSeperator == NULL)
+         {
+            mpc_MiscSeperator = opc_ContextMenuManager->RegisterSeperator();
+            // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+            this->mpc_MiscSeperator->setVisible(false);
+         }
+         if (mpc_RemoveDataElement == NULL)
+         {
+            mpc_RemoveDataElement =
+               opc_ContextMenuManager->RegisterActionWithKeyboardShortcut(C_GtGetText::h_GetText(
+                                                                             "Delete"),
+                                                                          static_cast<sintn>(Qt::Key_Delete));
+            // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+            this->mpc_RemoveDataElement->setVisible(false);
+            connect(mpc_RemoveDataElement, &QAction::triggered,
                     this, &C_GiSvDaTableBase::m_RemoveDataElement);
+         }
+
+         // Connect the signals
+         if ((mpc_AddDataElement != NULL) &&
+             (this->GetWidgetDataPoolElementCount() < C_SyvDaItTaModel::hu32_MAX_ELEMENTS))
+         {
+            opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_AddDataElement);
+            opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_AddSeperator);
+         }
+         if (c_SelectedRows.size() > 0UL)
+         {
+            if (mpc_ConfigDataElement != NULL)
+            {
+               opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_ConfigDataElement);
+               if (this->mpc_TableWidget->GetUniqueAndValidSelectedRows().size() == 1)
+               {
+                  this->mpc_ConfigDataElement->setEnabled(true);
+               }
+               else
+               {
+                  this->mpc_ConfigDataElement->setEnabled(false);
+               }
+               opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_ConfigSeperator);
+            }
+            if (this->mpc_MoveDownDataElement != NULL)
+            {
+               opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_MoveDownDataElement);
+            }
+            if (this->mpc_MoveUpDataElement != NULL)
+            {
+               opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_MoveUpDataElement);
+            }
+            opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_MiscSeperator);
+            if (this->mpc_RemoveDataElement != NULL)
+            {
+               opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_RemoveDataElement);
+            }
+         }
       }
    }
 }
@@ -629,6 +696,39 @@ bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId &
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check node dashboard route is valid without errors
+
+   \param[in]  orc_DataPoolElementId   Datapool element ID
+
+   \return
+   True  Node dashboard route is valid
+   False Node dashboard route is not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaTableBase::GetViewDashboardRouteValid(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
+const
+{
+   // In case of bus element irrelevant
+   bool q_Return = true;
+
+   if (orc_DataPoolElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
+   {
+      bool q_Error;
+      if (C_PuiSvHandler::h_GetInstance()->CheckViewNodeDashboardRoutingError(this->mu32_ViewIndex,
+                                                                              orc_DataPoolElementId.u32_NodeIndex,
+                                                                              q_Error) == C_NO_ERR)
+      {
+         q_Return = !q_Error;
+      }
+      else
+      {
+         q_Return = false;
+      }
+   }
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current view index
 
    \return
@@ -714,6 +814,19 @@ bool C_GiSvDaTableBase::m_AllowWarningIcon(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if element supports the edit content mode
+
+   \return
+   True  Element does have and support a widget specific edit content mode
+   False Element does not have and support a widget specific edit content mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaTableBase::m_HasEditContentMode(void) const
+{
+   return true;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get common tool tip content if no other item takes precedence over the tool tip
 
    \return
@@ -732,6 +845,8 @@ QString C_GiSvDaTableBase::m_GetCommonToolTipContent(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::m_AddNewDataElement(void)
 {
+   //Trigger refresh of data because of fix for 73815
+   this->UpdateData();
    tgl_assert(this->mpc_TableWidget != NULL);
    if (this->mpc_TableWidget != NULL)
    {
@@ -754,7 +869,7 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
 
             for (u32_Counter = 0U;
                  (u32_Counter < c_DataElements.size()) &&
-                 (this->GetWidgetDataPoolElementCount() < C_SyvDaItTaModel::hu32_MaxElements); ++u32_Counter)
+                 (this->GetWidgetDataPoolElementCount() < C_SyvDaItTaModel::hu32_MAX_ELEMENTS); ++u32_Counter)
             {
                const C_PuiSvDbNodeDataPoolListElementId & rc_DataElement = c_DataElements[u32_Counter];
                if (rc_DataElement.GetIsValid() == true)
@@ -767,6 +882,8 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
          }
          //Signal for error change
          Q_EMIT (this->SigDataElementsChanged());
+         //Trigger reload of data because of 73815
+         this->LoadData();
          //Cursor
          QApplication::restoreOverrideCursor();
       }
@@ -787,9 +904,12 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::m_MoveDataElementUp(void)
 {
-   if (this->mpc_TableWidget != NULL)
+   if (this->mq_EditContentModeEnabled)
    {
-      this->mpc_TableWidget->MoveSelected(true);
+      if (this->mpc_TableWidget != NULL)
+      {
+         this->mpc_TableWidget->MoveSelected(true);
+      }
    }
 }
 
@@ -799,9 +919,12 @@ void C_GiSvDaTableBase::m_MoveDataElementUp(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::m_MoveDataElementDown(void)
 {
-   if (this->mpc_TableWidget != NULL)
+   if (this->mq_EditContentModeEnabled)
    {
-      this->mpc_TableWidget->MoveSelected(false);
+      if (this->mpc_TableWidget != NULL)
+      {
+         this->mpc_TableWidget->MoveSelected(false);
+      }
    }
 }
 
@@ -811,44 +934,47 @@ void C_GiSvDaTableBase::m_MoveDataElementDown(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::m_RemoveDataElement(void)
 {
-   tgl_assert(this->mpc_TableWidget != NULL);
-   if (this->mpc_TableWidget != NULL)
+   if (this->mq_EditContentModeEnabled)
    {
-      const C_PuiSvData * pc_View;
+      tgl_assert(this->mpc_TableWidget != NULL);
+      if (this->mpc_TableWidget != NULL)
+      {
+         const C_PuiSvData * pc_View;
 
-      std::vector<C_PuiSvDbNodeDataPoolListElementId> c_RemovedDataElements;
-      //Remove data element(s)
-      this->mpc_TableWidget->RemoveSelectedItems(c_RemovedDataElements);
-      //Necessary before view is checked
-      for (uint32 u32_ItDataElement = 0; u32_ItDataElement < c_RemovedDataElements.size(); ++u32_ItDataElement)
-      {
-         const C_PuiSvDbNodeDataPoolListElementId & rc_RemovedItem = c_RemovedDataElements[u32_ItDataElement];
-         if (rc_RemovedItem.GetIsValid() == true)
-         {
-            this->RemoveDataPoolElement(rc_RemovedItem);
-         }
-      }
-      //Remove read rail assignments as necessary
-      pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-      if (pc_View != NULL)
-      {
+         std::vector<C_PuiSvDbNodeDataPoolListElementId> c_RemovedDataElements;
+         //Remove data element(s)
+         this->mpc_TableWidget->RemoveSelectedItems(c_RemovedDataElements);
+         //Necessary before view is checked
          for (uint32 u32_ItDataElement = 0; u32_ItDataElement < c_RemovedDataElements.size(); ++u32_ItDataElement)
          {
             const C_PuiSvDbNodeDataPoolListElementId & rc_RemovedItem = c_RemovedDataElements[u32_ItDataElement];
             if (rc_RemovedItem.GetIsValid() == true)
             {
-               if (pc_View->CheckReadUsage(rc_RemovedItem) == false)
+               this->RemoveDataPoolElement(rc_RemovedItem);
+            }
+         }
+         //Remove read rail assignments as necessary
+         pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+         if (pc_View != NULL)
+         {
+            for (uint32 u32_ItDataElement = 0; u32_ItDataElement < c_RemovedDataElements.size(); ++u32_ItDataElement)
+            {
+               const C_PuiSvDbNodeDataPoolListElementId & rc_RemovedItem = c_RemovedDataElements[u32_ItDataElement];
+               if (rc_RemovedItem.GetIsValid() == true)
                {
-                  //Allow error as the returned vector might not be unique (same id can occur multiple times)
-                  C_PuiSvHandler::h_GetInstance()->RemoveViewReadRailItem(this->mu32_ViewIndex,
-                                                                          rc_RemovedItem);
+                  if (pc_View->CheckReadUsage(rc_RemovedItem) == false)
+                  {
+                     //Allow error as the returned vector might not be unique (same id can occur multiple times)
+                     C_PuiSvHandler::h_GetInstance()->RemoveViewReadRailItem(this->mu32_ViewIndex,
+                                                                             rc_RemovedItem);
+                  }
                }
             }
          }
-      }
 
-      //Signal for error change
-      Q_EMIT (this->SigDataElementsChanged());
+         //Signal for error change
+         Q_EMIT (this->SigDataElementsChanged());
+      }
    }
 }
 

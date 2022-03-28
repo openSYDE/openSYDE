@@ -329,10 +329,10 @@ void C_TblDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewIt
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
    if (c_IconPaths.count() == 2)
    {
-      const QSize c_IconSize(16, 16);
-      const QRect c_Rect(orc_Option.rect.topLeft() + QPoint((orc_Option.rect.width() - c_IconSize.width()) / 2,
-                                                            (orc_Option.rect.height() - c_IconSize.height()) / 2),
-                         c_IconSize);
+      const QSize c_ICON_SIZE(16, 16);
+      const QRect c_Rect(orc_Option.rect.topLeft() + QPoint((orc_Option.rect.width() - c_ICON_SIZE.width()) / 2,
+                                                            (orc_Option.rect.height() - c_ICON_SIZE.height()) / 2),
+                         c_ICON_SIZE);
       if (orc_Option.state.testFlag(QStyle::State_Selected) == true)
       {
          QSvgRenderer c_Renderer(c_IconPaths.at(1));

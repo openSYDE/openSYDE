@@ -49,7 +49,7 @@ private:
                                                 const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
                                                 const stw_types::uint32 ou32_ItDomain,
                                                 const stw_types::uint32 ou32_RelevantIndex,
-                                                const stw_types::uint32 ou32_UseCase) const;
+                                                const stw_types::uint8 ou8_UseCaseValue) const;
    stw_types::sint32 m_FillHALCDatapoolsChannel(C_OSCNodeDataPoolList & orc_List,
                                                 const C_OSCHalcConfigChannel & orc_Channel,
                                                 const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,

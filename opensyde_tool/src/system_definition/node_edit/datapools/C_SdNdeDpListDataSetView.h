@@ -93,6 +93,7 @@ private:
    void m_UpdateModelView(void);
    void m_UpdateCornerButton(void);
    stw_types::uint32 m_GetOneAfterHighestSelected(void);
+   void m_CommentConfirmed(void);
    //Avoid call
    C_SdNdeDpListDataSetView(const C_SdNdeDpListDataSetView &);
    C_SdNdeDpListDataSetView & operator =(const C_SdNdeDpListDataSetView &);

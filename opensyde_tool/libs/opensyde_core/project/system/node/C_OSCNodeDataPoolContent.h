@@ -32,6 +32,8 @@ class C_OSCNodeDataPoolContent
 public:
    C_OSCNodeDataPoolContent(void);
    C_OSCNodeDataPoolContent(const C_OSCNodeDataPoolContent & orc_Source);
+   //lint -esym(1539,stw_opensyde_core::C_OSCNodeDataPoolContent::mc_CriticalSection)
+   //The lock of the copy is intended to remain unchanged.
    C_OSCNodeDataPoolContent & operator = (const C_OSCNodeDataPoolContent & orc_Source);
    virtual ~C_OSCNodeDataPoolContent(void);
 

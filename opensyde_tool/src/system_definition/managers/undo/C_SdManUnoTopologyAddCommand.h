@@ -48,7 +48,7 @@ public:
                                 const stw_types::uint64 ou64_BusConnectorNodeID = 0,
                                 const stw_types::uint64 ou64_BusConnectorBusID = 0,
                                 const stw_types::uint8 ou8_InterfaceNumber = 0,
-                                const std::vector<stw_types::uint8> & orc_NodeIds = std::vector<stw_types::uint8>(),
+                                const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties = std::vector<C_PuiSdNodeInterfaceAutomaticProperties>(),
                                 QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SdManUnoTopologyAddCommand(void);
 
@@ -62,7 +62,7 @@ private:
    const stw_types::uint64 mu64_BusConnectorNodeID;
    const stw_types::uint64 mu64_BusConnectorBusID;
    const stw_types::uint8 mu8_InterfaceNumber;
-   const std::vector<stw_types::uint8> mc_NodeIds;
+   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> mc_Properties;
    const bool mq_ForceUseAdditionalInformation;
 };
 

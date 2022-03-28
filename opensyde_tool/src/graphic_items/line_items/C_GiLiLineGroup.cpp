@@ -27,7 +27,7 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 C_GiLiLineGroup::mhf64_MaxDistToAlign = 10.0;
+const float64 C_GiLiLineGroup::mhf64_MAX_DIST_TO_ALIGN = 10.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -198,8 +198,8 @@ bool C_GiLiLineGroup::mh_Near(const float64 of64_Exact, const float64 of64_Eval)
 {
    bool q_Retval;
 
-   if ((of64_Exact >= (of64_Eval - C_GiLiLineGroup::mhf64_MaxDistToAlign)) &&
-       (of64_Exact <= (of64_Eval + C_GiLiLineGroup::mhf64_MaxDistToAlign)))
+   if ((of64_Exact >= (of64_Eval - C_GiLiLineGroup::mhf64_MAX_DIST_TO_ALIGN)) &&
+       (of64_Exact <= (of64_Eval + C_GiLiLineGroup::mhf64_MAX_DIST_TO_ALIGN)))
    {
       q_Retval = true;
    }

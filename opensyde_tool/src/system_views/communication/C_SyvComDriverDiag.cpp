@@ -143,12 +143,15 @@ sint32 C_SyvComDriverDiag::InitDiag(void)
 {
    sint32 s32_Return;
    uint32 u32_ActiveBusIndex;
+   uint32 u32_ActiveNodeCounter;
+   bool q_NodeDiagRoutingError = false;
 
    std::vector<uint8> c_ActiveNodes;
 
    s32_Return = C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(this->mu32_ViewIndex, u32_ActiveBusIndex,
                                                                    c_ActiveNodes, &this->mpc_CanDllDispatcher,
-                                                                   &this->mpc_EthernetDispatcher);
+                                                                   &this->mpc_EthernetDispatcher, true, true,
+                                                                   &q_NodeDiagRoutingError);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -163,6 +166,58 @@ sint32 C_SyvComDriverDiag::InitDiag(void)
       s32_Return = C_OSCComDriverProtocol::Init(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst(),
                                                 u32_ActiveBusIndex, c_ActiveNodes, this->mpc_CanDllDispatcher,
                                                 this->mpc_EthernetDispatcher, &this->mc_PemDatabase);
+   }
+
+   // Get active diag nodes
+   if (q_NodeDiagRoutingError == true)
+   {
+      std::set<stw_types::uint32> c_NodeDashboardErrors;
+      std::set<stw_types::uint32> c_RelevantNodes;
+      // Special case: Dashboard specific routing error detected and this nodes must be deactivated
+      C_PuiSvHandler::h_GetInstance()->GetViewNodeDashboardRoutingErrors(this->mu32_ViewIndex,
+                                                                         c_NodeDashboardErrors);
+      C_PuiSvHandler::h_GetInstance()->GetViewRelevantNodesForDashboardRouting(this->mu32_ViewIndex,
+                                                                               c_RelevantNodes);
+
+      // In this case errors are nodes which has deactivated diagnostic functions, but can be used for
+      // routing for example
+      for (u32_ActiveNodeCounter = 0U; u32_ActiveNodeCounter < this->mc_ActiveNodesIndexes.size();
+           ++u32_ActiveNodeCounter)
+      {
+         bool q_IsDiagNode = true;
+         if (c_NodeDashboardErrors.find(this->mc_ActiveNodesIndexes[u32_ActiveNodeCounter]) !=
+             c_NodeDashboardErrors.end())
+         {
+            // Deactivate the node for diagnostic
+            q_IsDiagNode = false;
+         }
+
+         if (q_IsDiagNode == true)
+         {
+            this->mc_ActiveDiagNodes.push_back(u32_ActiveNodeCounter);
+         }
+
+         // Register all nodes which are relevant for communication (dashboard itself or routing)
+         if (c_RelevantNodes.find(this->mc_ActiveNodesIndexes[u32_ActiveNodeCounter]) !=
+             c_RelevantNodes.end())
+         {
+            // Deactivate the node for diagnostic
+            this->mc_ActiveCommunicatingNodes.push_back(u32_ActiveNodeCounter);
+         }
+      }
+   }
+   else
+   {
+      // All active nodes are capable for diagnostic
+      // Assign all indexes for mc_ActiveNodesIndexes of the active nodes to mc_ActiveDiagNodes and
+      // mc_ActiveCommunicatingNodes
+      this->mc_ActiveDiagNodes.resize(this->mc_ActiveNodesIndexes.size());
+      for (u32_ActiveNodeCounter = 0U; u32_ActiveNodeCounter < mc_ActiveNodesIndexes.size(); ++u32_ActiveNodeCounter)
+      {
+         this->mc_ActiveDiagNodes[u32_ActiveNodeCounter] = u32_ActiveNodeCounter;
+      }
+
+      this->mc_ActiveCommunicatingNodes = this->mc_ActiveDiagNodes;
    }
 
    if (s32_Return == C_NO_ERR)
@@ -231,11 +286,12 @@ sint32 C_SyvComDriverDiag::SetDiagnosticMode(QString & orc_ErrorDetails)
       // Bring all nodes to the same session and security level
       // But check if the server is already in the correct session. The routing init has set some servers
       // to the session already
-      s32_Return = this->m_SetNodesSessionId(C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_EXTENDED_DIAGNOSIS, true,
+      s32_Return = this->m_SetNodesSessionId(this->mc_ActiveDiagNodes,
+                                             C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_EXTENDED_DIAGNOSIS, true,
                                              this->mc_DefectNodeIndices);
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = this->m_SetNodesSecurityAccess(1U, this->mc_DefectNodeIndices);
+         s32_Return = this->m_SetNodesSecurityAccess(this->mc_ActiveDiagNodes, 1U, this->mc_DefectNodeIndices);
          if (s32_Return != C_NO_ERR)
          {
             osc_write_log_error("Initializing diagnostic protocol", "Could not get security access");
@@ -298,7 +354,7 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                                                                                                               uint32> & orc_FailedNodesElementNumber, std::map<uint32,
                                                                                                                                                                uint32> & orc_NodesElementNumber)
 {
-   uint16 u16_Node;
+   uint32 u32_DiagNodeCounter;
    sint32 s32_Return = C_NO_ERR;
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
@@ -313,20 +369,22 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
    {
       uint16 u16_RateMs;
       //set up rails:
-      for (u16_Node = 0U; u16_Node < this->mc_ActiveNodesIndexes.size(); u16_Node++)
+      for (u32_DiagNodeCounter = 0U; u32_DiagNodeCounter < this->mc_ActiveDiagNodes.size(); u32_DiagNodeCounter++)
       {
+         // Get the original active node index
+         const uint32 u32_ActiveNode = this->mc_ActiveDiagNodes[u32_DiagNodeCounter];
          u16_RateMs = pc_View->GetUpdateRateFast();
-         s32_Return = this->mc_DiagProtocols[u16_Node]->DataPoolSetEventDataRate(0, u16_RateMs);
+         s32_Return = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolSetEventDataRate(0, u16_RateMs);
          if (s32_Return == C_NO_ERR)
          {
             u16_RateMs = pc_View->GetUpdateRateMedium();
-            s32_Return = this->mc_DiagProtocols[u16_Node]->DataPoolSetEventDataRate(1, u16_RateMs);
+            s32_Return = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolSetEventDataRate(1, u16_RateMs);
          }
 
          if (s32_Return == C_NO_ERR)
          {
             u16_RateMs = pc_View->GetUpdateRateSlow();
-            s32_Return = this->mc_DiagProtocols[u16_Node]->DataPoolSetEventDataRate(2, u16_RateMs);
+            s32_Return = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolSetEventDataRate(2, u16_RateMs);
          }
 
          if (s32_Return != C_NO_ERR)
@@ -341,11 +399,11 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                                     "C_WARN     error response\n"
                                     "C_RD_WR    malformed protocol response\n").arg(static_cast<QString>(
                                                                                        m_GetActiveNodeName(
-                                                                                          u16_Node)
+                                                                                          u32_ActiveNode)
                                                                                        .c_str())).arg(
                   C_Uti::h_StwError(s32_Return)).toStdString().c_str());
             s32_Return = C_COM;
-            orc_ErrorDetails += m_GetActiveNodeName(u16_Node).c_str();
+            orc_ErrorDetails += m_GetActiveNodeName(u32_ActiveNode).c_str();
             break;
          }
       }
@@ -363,10 +421,11 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
       {
          bool q_Found;
          //we need the node index within the list of active nodes:
-         const uint32 u32_ActiveNodeIndex = this->m_GetActiveIndex(c_It.key().u32_NodeIndex, &q_Found);
+         const uint32 u32_ActiveDiagNodeIndex = this->m_GetActiveDiagIndex(c_It.key().u32_NodeIndex, &q_Found);
          //Skip inactive nodes
          if (q_Found == true)
          {
+            const uint32 u32_ActiveNodeIndex = this->mc_ActiveDiagNodes[u32_ActiveDiagNodeIndex];
             uint8 u8_NegResponseCode = 0;
             //check for valid value ranges (node index is checked in "GetActiveIndex" function)
             tgl_assert(c_It.key().u32_DataPoolIndex <= 0xFFU);
@@ -524,7 +583,7 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::StopCyclicTransmissions(void)
 {
-   uint16 u16_Node;
+   uint32 u32_DiagNode;
    sint32 s32_Return = C_NO_ERR;
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
@@ -535,14 +594,16 @@ sint32 C_SyvComDriverDiag::StopCyclicTransmissions(void)
    else
    {
       //stop all transmissions
-      for (u16_Node = 0U; u16_Node < this->mc_ActiveNodesIndexes.size(); u16_Node++)
+      for (u32_DiagNode = 0U; u32_DiagNode < this->mc_ActiveDiagNodes.size(); u32_DiagNode++)
       {
-         const sint32 s32_Return2 = this->mc_DiagProtocols[u16_Node]->DataPoolStopEventDriven();
+         // Get the original active node index
+         const uint32 u32_ActiveNode = this->mc_ActiveDiagNodes[u32_DiagNode];
+         const sint32 s32_Return2 = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolStopEventDriven();
          if (s32_Return2 != C_NO_ERR)
          {
             osc_write_log_warning("Asynchronous communication",
                                   static_cast<QString>("Node \"%1\" - DataPoolStopEventDriven - warning: %2\n").
-                                  arg(static_cast<QString>(m_GetActiveNodeName(u16_Node).c_str())).
+                                  arg(static_cast<QString>(m_GetActiveNodeName(u32_ActiveNode).c_str())).
                                   arg(C_Uti::h_StwError(s32_Return2)).toStdString().c_str());
             s32_Return = C_COM;
          }
@@ -653,9 +714,9 @@ void C_SyvComDriverDiag::StopCycling(void)
    C_COM       Error of service
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComDriverDiag::SendTesterPresentWithoutDefectNodes(void)
+sint32 C_SyvComDriverDiag::SendTesterPresentToActiveNodes(void)
 {
-   return this->SendTesterPresent(&this->mc_DefectNodeIndices);
+   return this->SendTesterPresent(this->mc_ActiveCommunicatingNodes);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -675,7 +736,7 @@ sint32 C_SyvComDriverDiag::PollDataPoolRead(const uint32 ou32_NodeIndex, const u
                                             const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -706,7 +767,7 @@ sint32 C_SyvComDriverDiag::PollDataPoolWrite(const uint32 ou32_NodeIndex, const 
                                              const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -737,7 +798,7 @@ sint32 C_SyvComDriverDiag::PollNvmRead(const uint32 ou32_NodeIndex, const uint8 
                                        const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -768,7 +829,7 @@ sint32 C_SyvComDriverDiag::PollNvmWrite(const uint32 ou32_NodeIndex, const uint8
                                         const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -799,7 +860,7 @@ sint32 C_SyvComDriverDiag::PollNvmReadList(const uint32 ou32_NodeIndex, const ui
 {
    sint32 s32_Return;
    bool q_Found;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex, &q_Found);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex, &q_Found);
 
    if ((u32_ActiveIndex >= mc_DataDealers.size()) || (q_Found == false))
    {
@@ -828,7 +889,7 @@ sint32 C_SyvComDriverDiag::PollSafeNvmWriteChangedElements(const uint32 ou32_Nod
                                                            const std::vector<C_OSCNodeDataPoolListId> & orc_ListIds)
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -871,7 +932,7 @@ sint32 C_SyvComDriverDiag::GetPollSafeNvmWriteChangedElementsOutput(
 sint32 C_SyvComDriverDiag::PollSafeNvmReadValues(const uint32 ou32_NodeIndex)
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -916,7 +977,7 @@ sint32 C_SyvComDriverDiag::GetPollNvmSafeReadValuesOutput(const C_OSCNode * (&or
 sint32 C_SyvComDriverDiag::PollSafeNvmSafeWriteCrcs(const uint32 ou32_NodeIndex)
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -947,7 +1008,7 @@ sint32 C_SyvComDriverDiag::PollNvmNotifyOfChanges(const uint32 ou32_NodeIndex, c
                                                   const uint16 ou16_ListIndex)
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -1025,7 +1086,7 @@ sint32 C_SyvComDriverDiag::GetPollResultNRC(uint8 & oru8_NRC) const
 sint32 C_SyvComDriverDiag::NvmSafeClearInternalContent(const uint32 ou32_NodeIndex) const
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -1063,7 +1124,7 @@ sint32 C_SyvComDriverDiag::PollNvmSafeReadParameterValues(const uint32 ou32_Node
                                                           const std::vector<C_OSCNodeDataPoolListId> & orc_ListIds)
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -1099,7 +1160,7 @@ sint32 C_SyvComDriverDiag::NvmSafeCreateCleanFileWithoutCRC(const uint32 ou32_No
 const
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -1141,7 +1202,7 @@ const
 sint32 C_SyvComDriverDiag::NvmSafeReadFileWithoutCRC(const uint32 ou32_NodeIndex, const QString & orc_Path) const
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -1183,7 +1244,7 @@ sint32 C_SyvComDriverDiag::NvmSafeCheckParameterFileContents(const uint32 ou32_N
                                                              std::vector<C_OSCNodeDataPoolListId> & orc_DataPoolLists)
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -1216,7 +1277,7 @@ sint32 C_SyvComDriverDiag::NvmSafeCheckParameterFileContents(const uint32 ou32_N
 sint32 C_SyvComDriverDiag::NvmSafeUpdateCRCForFile(const uint32 ou32_NodeIndex, const QString & orc_Path) const
 {
    sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   const uint32 u32_ActiveIndex = this->m_GetActiveDiagIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= mc_DataDealers.size())
    {
@@ -1287,9 +1348,9 @@ void C_SyvComDriverDiag::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
                    (pc_Signal != NULL) &&
                    (pc_Element != NULL))
                {
-                  const uint32 u32_MsgCanId = pc_CanMsg->u32_CanId;
+                  const C_OSCCanMessageUniqueId c_MsgCanId(pc_CanMsg->u32_CanId, pc_CanMsg->q_IsExtended);
                   C_SyvComDriverDiagWidgetRegistration c_WidgetRegistration;
-                  QMap<stw_types::uint32, QList<C_SyvComDriverDiagWidgetRegistration> >::iterator c_ItElement;
+                  QMap<C_OSCCanMessageUniqueId, QList<C_SyvComDriverDiagWidgetRegistration> >::iterator c_ItElement;
 
                   c_WidgetRegistration.c_Signal = *pc_Signal;
 
@@ -1323,7 +1384,7 @@ void C_SyvComDriverDiag::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
                   // the new values
                   c_WidgetRegistration.c_ElementContent = pc_Element->c_Value;
 
-                  c_ItElement = this->mc_AllWidgets.find(u32_MsgCanId);
+                  c_ItElement = this->mc_AllWidgets.find(c_MsgCanId);
 
                   // Add the widget to the map
                   if (c_ItElement != this->mc_AllWidgets.end())
@@ -1340,7 +1401,7 @@ void C_SyvComDriverDiag::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
                      // The map has no entry for this datapool element. Add a new list with this widget
                      QList<C_SyvComDriverDiagWidgetRegistration> c_List;
                      c_List.push_back(c_WidgetRegistration);
-                     this->mc_AllWidgets.insert(u32_MsgCanId, c_List);
+                     this->mc_AllWidgets.insert(c_MsgCanId, c_List);
                   }
                }
                else
@@ -1365,7 +1426,7 @@ void C_SyvComDriverDiag::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvComDriverDiag::m_GetRoutingMode(C_OSCRoutingCalculation::E_Mode & ore_Mode) const
 {
-   ore_Mode = C_OSCRoutingCalculation::eDIAGNOSTIC;
+   ore_Mode = C_OSCRoutingCalculation::eROUTING_CHECK;
 
    return true;
 }
@@ -1515,11 +1576,13 @@ bool C_SyvComDriverDiag::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfac
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::m_HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx)
 {
+   const bool q_IsExtended = orc_Msg.u8_XTD == 1;
+
    C_OSCComDriverBase::m_HandleCanMessage(orc_Msg, oq_IsTx);
-   QMap<stw_types::uint32, QList<C_SyvComDriverDiagWidgetRegistration> >::const_iterator c_ItElement;
+   QMap<C_OSCCanMessageUniqueId, QList<C_SyvComDriverDiagWidgetRegistration> >::const_iterator c_ItElement;
 
    // Check if this CAN message id is relevant
-   c_ItElement = this->mc_AllWidgets.find(orc_Msg.u32_ID);
+   c_ItElement = this->mc_AllWidgets.find(C_OSCCanMessageUniqueId(orc_Msg.u32_ID, q_IsExtended));
 
    if (c_ItElement != this->mc_AllWidgets.end())
    {
@@ -1684,12 +1747,12 @@ sint32 C_SyvComDriverDiag::m_InitDiagNodes(void)
       for (QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration>::const_iterator c_ItElement =
               rc_Transmissions.begin(); c_ItElement != rc_Transmissions.end(); ++c_ItElement)
       {
-         this->mc_DiagNodes.insert(c_ItElement.key().u32_NodeIndex);
+         this->mc_DiagNodesWithElements.insert(c_ItElement.key().u32_NodeIndex);
       }
       for (std::set<C_OSCNodeDataPoolListElementId>::const_iterator c_ItWriteElement =
               c_WriteElements.begin(); c_ItWriteElement != c_WriteElements.end(); ++c_ItWriteElement)
       {
-         this->mc_DiagNodes.insert((*c_ItWriteElement).u32_NodeIndex);
+         this->mc_DiagNodesWithElements.insert((*c_ItWriteElement).u32_NodeIndex);
       }
    }
 
@@ -1826,17 +1889,20 @@ sint32 C_SyvComDriverDiag::m_InitDataDealer(void)
 
       if (pc_View != NULL)
       {
-         this->mc_DataDealers.resize(this->m_GetActiveNodeCount());
-         for (uint32 u32_ItActiveFlag = 0; u32_ItActiveFlag < this->mc_ActiveNodesIndexes.size(); ++u32_ItActiveFlag)
+         this->mc_DataDealers.resize(this->mc_ActiveDiagNodes.size());
+         for (uint32 u32_DiagNodeCounter = 0U; u32_DiagNodeCounter  < this->mc_ActiveDiagNodes.size();
+              ++u32_DiagNodeCounter)
          {
+            // Get the original active node index
+            const uint32 u32_ActiveNode = this->mc_ActiveDiagNodes[u32_DiagNodeCounter];
             C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mc_ActiveNodesIndexes[u32_ItActiveFlag]);
+               C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mc_ActiveNodesIndexes[u32_ActiveNode]);
             if (pc_Node != NULL)
             {
                //Data dealer init
-               this->mc_DataDealers[u32_ItActiveFlag] =
-                  new C_SyvComDataDealer(pc_Node, this->mc_ActiveNodesIndexes[u32_ItActiveFlag],
-                                         this->mc_DiagProtocols[u32_ItActiveFlag]);
+               this->mc_DataDealers[u32_DiagNodeCounter] =
+                  new C_SyvComDataDealer(pc_Node, this->mc_ActiveNodesIndexes[u32_ActiveNode],
+                                         this->mc_DiagProtocols[u32_ActiveNode]);
             }
             else
             {
@@ -1886,20 +1952,22 @@ sint32 C_SyvComDriverDiag::m_InitDataDealer(void)
 sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::set<uint32> & orc_ErrorActiveNodes)
 {
    sint32 s32_Return = C_NO_ERR;
-   uint32 u32_ActiveNodeCounter;
+   uint32 u32_DiagNodeCounter;
    uint32 u32_ErrorActiveNodeIndex;
 
    // Start IP to IP routing for all nodes which need it
-   for (u32_ActiveNodeCounter = 0U; u32_ActiveNodeCounter < this->mc_ActiveNodesIndexes.size(); ++u32_ActiveNodeCounter)
+   for (u32_DiagNodeCounter = 0U; u32_DiagNodeCounter < this->mc_ActiveDiagNodes.size(); ++u32_DiagNodeCounter)
    {
-      s32_Return = this->m_StartRoutingIp2Ip(u32_ActiveNodeCounter, &u32_ErrorActiveNodeIndex);
+      // Get the original active node index
+      const uint32 u32_ActiveNode = this->mc_ActiveDiagNodes[u32_DiagNodeCounter];
+      s32_Return = this->m_StartRoutingIp2Ip(u32_ActiveNode, &u32_ErrorActiveNodeIndex);
 
       if (s32_Return != C_NO_ERR)
       {
          const C_OSCNode * const pc_Node =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_ActiveNodesIndexes[u32_ActiveNodeCounter]);
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_ActiveNodesIndexes[u32_ActiveNode]);
 
-         orc_ErrorActiveNodes.insert(u32_ActiveNodeCounter);
+         orc_ErrorActiveNodes.insert(u32_ActiveNode);
          orc_ErrorActiveNodes.insert(u32_ErrorActiveNodeIndex);
 
          tgl_assert(pc_Node != NULL);
@@ -1914,29 +1982,31 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
    if (s32_Return == C_NO_ERR)
    {
       // Search nodes which needs routing
-      for (u32_ActiveNodeCounter = 0U; u32_ActiveNodeCounter < this->mc_ActiveNodesIndexes.size();
-           ++u32_ActiveNodeCounter)
+      for (u32_DiagNodeCounter = 0U; u32_DiagNodeCounter < this->mc_ActiveDiagNodes.size();
+           ++u32_DiagNodeCounter)
       {
+         // Get the original active node index
+         const uint32 u32_ActiveNode = this->mc_ActiveDiagNodes[u32_DiagNodeCounter];
          const C_OSCNode * const pc_Node =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_ActiveNodesIndexes[u32_ActiveNodeCounter]);
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_ActiveNodesIndexes[u32_ActiveNode]);
 
          tgl_assert(pc_Node != NULL);
          if (pc_Node != NULL)
          {
-            s32_Return = this->m_StartRouting(u32_ActiveNodeCounter, &u32_ErrorActiveNodeIndex);
+            s32_Return = this->m_StartRouting(u32_ActiveNode, &u32_ErrorActiveNodeIndex);
 
             tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
             // Reconnect is only supported by openSYDE nodes
             if ((pc_Node->c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_OPEN_SYDE) &&
                 (s32_Return == C_NO_ERR) &&
-                (this->GetClientId().u8_BusIdentifier == this->mc_ServerIDs[u32_ActiveNodeCounter].u8_BusIdentifier))
+                (this->GetClientId().u8_BusIdentifier == this->mc_ServerIDs[u32_ActiveNode].u8_BusIdentifier))
             {
-               s32_Return = this->ReConnectNode(this->mc_ServerIDs[u32_ActiveNodeCounter]);
+               s32_Return = this->ReConnectNode(this->mc_ServerIDs[u32_ActiveNode]);
             }
 
             if (s32_Return != C_NO_ERR)
             {
-               orc_ErrorActiveNodes.insert(u32_ActiveNodeCounter);
+               orc_ErrorActiveNodes.insert(u32_ActiveNode);
                orc_ErrorActiveNodes.insert(u32_ErrorActiveNodeIndex);
 
                orc_ErrorDetails += static_cast<QString>("\"") + pc_Node->c_Properties.c_Name.c_str() + "\"\n";
@@ -1976,17 +2046,20 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
 
    if ((this->mq_Initialized == true) && (this->mc_DiagProtocols.size() > 0UL))
    {
-      uint32 u32_Counter;
+      uint32 u32_DiagNodeCounter;
 
-      this->mc_ReadDatapoolMetadata.resize(this->mc_ActiveNodesIndexes.size());
+      this->mc_ReadDatapoolMetadata.resize(this->mc_ActiveDiagNodes.size());
 
-      for (u32_Counter = 0U; u32_Counter < this->mc_DiagProtocols.size(); ++u32_Counter)
+      for (u32_DiagNodeCounter = 0U; u32_DiagNodeCounter < this->mc_ActiveDiagNodes.size(); ++u32_DiagNodeCounter)
       {
+         // Get the original active node index
+         const uint32 u32_ActiveNode = this->mc_ActiveDiagNodes[u32_DiagNodeCounter];
          // Check only if Datapool of node is really used
-         if (this->mc_DiagNodes.find(this->mc_ActiveNodesIndexes[u32_Counter]) != this->mc_DiagNodes.end())
+         if (this->mc_DiagNodesWithElements.find(this->mc_ActiveNodesIndexes[u32_ActiveNode]) !=
+             this->mc_DiagNodesWithElements.end())
          {
             const C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_ActiveNodesIndexes[u32_Counter]);
+               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_ActiveNodesIndexes[u32_ActiveNode]);
 
             if (pc_Node != NULL)
             {
@@ -2038,12 +2111,12 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
                   sint32 s32_Return;
 
                   // Get all Datapool names on node to create the mapping
-                  s32_Return = this->m_GetAllDatapoolMetadata(u32_Counter, orc_ErrorDetails);
+                  s32_Return = this->m_GetAllDatapoolMetadata(u32_DiagNodeCounter, orc_ErrorDetails);
 
                   if (s32_Return == C_NO_ERR)
                   {
                      // Verify all used Datapools for checksum and version
-                     s32_Return = this->m_CheckOsyDatapoolsAndCreateMapping(u32_Counter, orc_ErrorDetails);
+                     s32_Return = this->m_CheckOsyDatapoolsAndCreateMapping(u32_DiagNodeCounter, orc_ErrorDetails);
                   }
 
                   if (s32_Return != C_NO_ERR)
@@ -2062,7 +2135,7 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
    }
    else if ((this->mq_Initialized == true) &&
             (this->mc_DiagProtocols.size() == 0U) &&
-            (this->mc_ActiveNodesIndexes.size() == 0U))
+            (this->mc_ActiveDiagNodes.size() == 0U))
    {
       // Special case: No error. No connectable nodes, but nodes third party nodes could be active
       s32_Retval = C_NO_ERR;
@@ -2080,8 +2153,8 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
 
    All Datapool names will be read from the node and tried
 
-   \param[in]      ou32_ActiveNodeIndex   Active node index (mc_ActiveNodesIndexes)
-   \param[in,out]  orc_ErrorDetails       Details for current error
+   \param[in]      ou32_ActiveDiagNodeIndex   Active diag node index (mc_ActiveDiagNodes)
+   \param[in,out]  orc_ErrorDetails           Details for current error
 
    \return
    C_NO_ERR   Datapool metadata were read successfully
@@ -2092,10 +2165,12 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveNodeIndex, QString & orc_ErrorDetails)
+sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveDiagNodeIndex, QString & orc_ErrorDetails)
 {
    uint32 u32_ItDataPool;
    sint32 s32_Return = C_NO_ERR;
+   // Get the original active node index
+   const uint32 u32_ActiveNode = this->mc_ActiveDiagNodes[ou32_ActiveDiagNodeIndex];
 
    for (u32_ItDataPool = 0U; u32_ItDataPool < C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE; ++u32_ItDataPool)
    {
@@ -2103,14 +2178,14 @@ sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveNode
       C_OSCProtocolDriverOsy::C_DataPoolMetaData c_Metadata;
 
       // Get meta data
-      s32_Return = this->mc_DiagProtocols[ou32_ActiveNodeIndex]->DataPoolReadMetaData(
+      s32_Return = this->mc_DiagProtocols[u32_ActiveNode]->DataPoolReadMetaData(
          static_cast<uint8>(u32_ItDataPool),
          c_Metadata.au8_Version, c_Metadata.c_Name, &u8_ErrorCode);
 
       if (s32_Return == C_NO_ERR)
       {
          // Datapool exists and metadata are available
-         this->mc_ReadDatapoolMetadata[ou32_ActiveNodeIndex].push_back(c_Metadata);
+         this->mc_ReadDatapoolMetadata[ou32_ActiveDiagNodeIndex].push_back(c_Metadata);
       }
       else
       {
@@ -2141,7 +2216,7 @@ sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveNode
 
          if (c_ErrorReason != "")
          {
-            const uint32 u32_NodeIndex = this->mc_ActiveNodesIndexes[ou32_ActiveNodeIndex];
+            const uint32 u32_NodeIndex = this->mc_ActiveNodesIndexes[u32_ActiveNode];
             const C_OSCNode * const pc_Node =
                C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
             if (pc_Node != NULL)
@@ -2173,8 +2248,8 @@ sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveNode
 
    m_GetAllDatapoolMetadata must be called before calling m_CheckDatapoolsAndCreateMapping
 
-   \param[in]      ou32_ActiveNodeIndex   Active node index (mc_ActiveNodesIndexes)
-   \param[in,out]  orc_ErrorDetails       Details for current error
+   \param[in]      ou32_ActiveDiagNodeIndex   Active diag node index (mc_ActiveDiagNodes)
+   \param[in,out]  orc_ErrorDetails           Details for current error
 
    \return
    C_NO_ERR   Datapools are as expected
@@ -2186,15 +2261,17 @@ sint32 C_SyvComDriverDiag::m_GetAllDatapoolMetadata(const uint32 ou32_ActiveNode
               Datapool with the name orc_DatapoolName does not exist on the server
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::uint32 ou32_ActiveNodeIndex,
+sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::uint32 ou32_ActiveDiagNodeIndex,
                                                                QString & orc_ErrorDetails)
 {
    sint32 s32_Retval = C_CONFIG;
    QString c_DataPoolErrorString = "";
+   // Get the original active node index
+   const uint32 u32_ActiveNode = this->mc_ActiveDiagNodes[ou32_ActiveDiagNodeIndex];
 
    stw_opensyde_core::C_OSCDiagProtocolOsy * const pc_Protocol =
-      dynamic_cast<C_OSCDiagProtocolOsy *>(this->mc_DiagProtocols[ou32_ActiveNodeIndex]);
-   const uint32 u32_NodeIndex = this->mc_ActiveNodesIndexes[ou32_ActiveNodeIndex];
+      dynamic_cast<C_OSCDiagProtocolOsy *>(this->mc_DiagProtocols[u32_ActiveNode]);
+   const uint32 u32_NodeIndex = this->mc_ActiveNodesIndexes[u32_ActiveNode];
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
    const C_OSCNode * const pc_Node =
       C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
@@ -2237,7 +2314,7 @@ sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::
             C_OSCProtocolDriverOsy::C_DataPoolMetaData c_ServerMetadata;
 
             // Get metadata
-            s32_Return = this->m_GetReadDatapoolMetadata(ou32_ActiveNodeIndex,
+            s32_Return = this->m_GetReadDatapoolMetadata(ou32_ActiveDiagNodeIndex,
                                                          rc_Datapool.c_Name,
                                                          u32_ServerDatapoolIndex,
                                                          c_ServerMetadata);
@@ -2389,7 +2466,7 @@ sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the Datapool metadata and its index on the server with a specific Datapool name
 
-   \param[in]   ou32_ActiveNodeIndex         Active node index (mc_ActiveNodesIndexes)
+   \param[in]   ou32_ActiveDiagNodeIndex     Active diag node index (mc_ActiveDiagNodes)
    \param[in]   orc_DatapoolName             Searched Datapool name
    \param[out]  oru32_ServerDatapoolIndex    Index of Datapool on server (only valid when return value is C_NO_ERR)
    \param[out]  orc_Metadata                 Metadata of Datapool on server (only valid when return value is C_NO_ERR)
@@ -2398,14 +2475,14 @@ sint32 C_SyvComDriverDiag::m_CheckOsyDatapoolsAndCreateMapping(const stw_types::
    \retval   C_RANGE    Datapool with the name orc_DatapoolName does not exist on the server
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComDriverDiag::m_GetReadDatapoolMetadata(const uint32 ou32_ActiveNodeIndex,
+sint32 C_SyvComDriverDiag::m_GetReadDatapoolMetadata(const uint32 ou32_ActiveDiagNodeIndex,
                                                      const C_SCLString & orc_DatapoolName,
                                                      uint32 & oru32_ServerDatapoolIndex,
                                                      C_OSCProtocolDriverOsy::C_DataPoolMetaData & orc_Metadata) const
 {
    sint32 s32_Return = C_RANGE;
    const std::list<C_OSCProtocolDriverOsy::C_DataPoolMetaData> & rc_NodeDatapoolsMetadata =
-      this->mc_ReadDatapoolMetadata[ou32_ActiveNodeIndex];
+      this->mc_ReadDatapoolMetadata[ou32_ActiveDiagNodeIndex];
 
    std::list<C_OSCProtocolDriverOsy::C_DataPoolMetaData>::const_iterator c_ItMetadata;
 
@@ -2429,6 +2506,50 @@ sint32 C_SyvComDriverDiag::m_GetReadDatapoolMetadata(const uint32 ou32_ActiveNod
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get index of node in list of diag active nodes
+
+   If no active diag node is found that matches the passed absolute index the function will fail with an assertion.
+
+   \param[in]     ou32_NodeIndex    absolute index of node within system description
+   \param[out]    opq_Found         Optional flag if server id was found
+
+   \return   index of node within list of active diag nodes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SyvComDriverDiag::m_GetActiveDiagIndex(const uint32 ou32_NodeIndex, bool * const opq_Found) const
+{
+   uint32 u32_DiagNodeIndex = 0U;
+   bool q_Found = false;
+   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex, &q_Found);
+
+   if (q_Found == true)
+   {
+      // Original node active index found, now searching the active diag node index
+      q_Found = false;
+
+      for (u32_DiagNodeIndex = 0U; u32_DiagNodeIndex < this->mc_ActiveDiagNodes.size(); ++u32_DiagNodeIndex)
+      {
+         if (this->mc_ActiveDiagNodes[u32_DiagNodeIndex] == u32_ActiveIndex)
+         {
+            q_Found = true;
+            break;
+         }
+      }
+   }
+
+   if (opq_Found != NULL)
+   {
+      *opq_Found = q_Found;
+   }
+   else
+   {
+      tgl_assert(q_Found == true);
+   }
+
+   return u32_DiagNodeIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2491,7 +2612,7 @@ void C_SyvComDriverDiag::m_ThreadFunc(void)
    if (u32_CurrentTime > (hu32_LastSentTesterPresent + 1000U))
    {
       hu32_LastSentTesterPresent = u32_CurrentTime;
-      this->SendTesterPresent();
+      this->SendTesterPresent(this->mc_ActiveCommunicatingNodes);
    }
    else if (u32_CurrentTime > (hu32_LastSentDebugTest + 200U))
    {

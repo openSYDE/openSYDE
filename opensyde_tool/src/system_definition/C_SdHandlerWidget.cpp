@@ -85,27 +85,27 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    ms32_SubMode(-1),
    mu32_Index(0U),
    mq_DataChanged(false),
-   mc_TOOLTIP_GENERAT_CODE_HEADING(C_GtGetText::h_GetText("Generate Files")),
-   mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF(C_GtGetText::h_GetText(
-                                             "Generate files for all nodes with file generation support based on defined SYSTEM DEFINITION."
-                                             "\n - openSYDE server initialization wrapper"
-                                             "\n   Create source code providing initialization structures for the OSS DPD and DPH init functions."
-                                             "\n - COMM stack definition"
-                                             "\n   Create source code providing entire communication stack configuration."
-                                             "\n - Datapools"
-                                             "\n   Create source code for Datapool settings of an openSYDE node."
-                                             "\n - NVM-based Hardware Configuration"
-                                             "\n   Generate parameter set image file(s) for hardware configuration of an openSYDE node.")),
-   mc_TOOLTIP_GENERAT_CODE_CONTENT_NODE(C_GtGetText::h_GetText(
-                                           "Generate files for current node based on defined SYSTEM DEFINITION."
-                                           "\n - openSYDE server initialization wrapper"
-                                           "\n   Create source code providing initialization structures for the OSS DPD and DPH init functions."
-                                           "\n - COMM stack definition"
-                                           "\n   Create source code providing entire communication stack configuration."
-                                           "\n - Datapools"
-                                           "\n   Create source code for Datapool settings of current openSYDE node."
-                                           "\n - NVM-based Hardware Configuration"
-                                           "\n   Generate parameter set image file(s) for hardware configuration of current openSYDE node."))
+   mc_TooltipGenerateCodeHeading(C_GtGetText::h_GetText("Generate Files")),
+   mc_TooltipGenerateCodeContentSysdef(C_GtGetText::h_GetText(
+                                          "Generate files for all nodes with file generation support based on defined SYSTEM DEFINITION."
+                                          "\n - openSYDE server initialization wrapper"
+                                          "\n   Create source code providing initialization structures for the OSS DPD and DPH init functions."
+                                          "\n - COMM stack definition"
+                                          "\n   Create source code providing entire communication stack configuration."
+                                          "\n - Datapools"
+                                          "\n   Create source code for Datapool settings of an openSYDE node."
+                                          "\n - NVM-based Hardware Configuration"
+                                          "\n   Generate parameter set image file(s) for hardware configuration of an openSYDE node.")),
+   mc_TooltipGenerateCodeContentNode(C_GtGetText::h_GetText(
+                                        "Generate files for current node based on defined SYSTEM DEFINITION."
+                                        "\n - openSYDE server initialization wrapper"
+                                        "\n   Create source code providing initialization structures for the OSS DPD and DPH init functions."
+                                        "\n - COMM stack definition"
+                                        "\n   Create source code providing entire communication stack configuration."
+                                        "\n - Datapools"
+                                        "\n   Create source code for Datapool settings of current openSYDE node."
+                                        "\n - NVM-based Hardware Configuration"
+                                        "\n   Generate parameter set image file(s) for hardware configuration of current openSYDE node."))
 {
    sintn sn_Index;
 
@@ -140,8 +140,8 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
 
    // Function index 1: mhu32_USER_INPUT_FUNC_GENERATE_CODE
    c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Generate Files");
-   c_ButtonProperties.c_ToolTipHeading = mc_TOOLTIP_GENERAT_CODE_HEADING;
-   c_ButtonProperties.c_ToolTipContent = mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF;
+   c_ButtonProperties.c_ToolTipHeading = mc_TooltipGenerateCodeHeading;
+   c_ButtonProperties.c_ToolTipContent = mc_TooltipGenerateCodeContentSysdef;
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 
    // Function index 2: mhu32_USER_INPUT_FUNC_IMPORT
@@ -486,8 +486,8 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, true));
 
          Q_EMIT (this->SigSetToolTipForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE,
-                                                     this->mc_TOOLTIP_GENERAT_CODE_HEADING,
-                                                     this->mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF));
+                                                     this->mc_TooltipGenerateCodeHeading,
+                                                     this->mc_TooltipGenerateCodeContentSysdef));
       }
       else if (os32_SubMode == ms32_SUBMODE_SYSDEF_NODEEDIT)
       {
@@ -515,8 +515,8 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
          //Buttons
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, true));
          Q_EMIT (this->SigSetToolTipForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE,
-                                                     this->mc_TOOLTIP_GENERAT_CODE_HEADING,
-                                                     this->mc_TOOLTIP_GENERAT_CODE_CONTENT_NODE));
+                                                     this->mc_TooltipGenerateCodeHeading,
+                                                     this->mc_TooltipGenerateCodeContentNode));
          // show tsp import button
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_TSP_IMPORT, true));
 
@@ -545,8 +545,8 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
          //Buttons
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, true));
          Q_EMIT (this->SigSetToolTipForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE,
-                                                     this->mc_TOOLTIP_GENERAT_CODE_HEADING,
-                                                     this->mc_TOOLTIP_GENERAT_CODE_CONTENT_NODE));
+                                                     this->mc_TooltipGenerateCodeHeading,
+                                                     this->mc_TooltipGenerateCodeContentNode));
 
          // show button for DBC file export and messages import
          if (pc_Bus->e_Type == C_OSCSystemBus::E_Type::eCAN) // Ethernet is not supported yet
@@ -768,6 +768,7 @@ void C_SdHandlerWidget::m_GenerateCode(void) const
 void C_SdHandlerWidget::m_Export(void)
 {
    std::set<uint32> c_CanMessageIds; // to count CAN messages
+   std::set<C_OSCCanMessageUniqueId> c_CanMessageIdsWithExtended;
    uint32 u32_NumOfInputSignals = 0;
 
    tgl_assert(this->mpc_ActBusEdit != NULL);
@@ -863,9 +864,28 @@ void C_SdHandlerWidget::m_Export(void)
                      const std::set<uint32>::const_iterator c_Iter = c_CanMessageIds.find(c_TxIter->u32_CanId);
                      if (c_Iter == c_CanMessageIds.end())
                      {
+                        c_CanMessageIdsWithExtended.insert(C_OSCCanMessageUniqueId(c_TxIter->u32_CanId,
+                                                                                   c_TxIter->q_IsExtended));
                         c_CanMessageIds.insert(c_TxIter->u32_CanId);
                         // count signals
                         u32_NumOfInputSignals += c_TxIter->c_Signals.size();
+                     }
+                     else
+                     {
+                        const std::set<C_OSCCanMessageUniqueId>::const_iterator c_IterWithExtended =
+                           c_CanMessageIdsWithExtended.find(C_OSCCanMessageUniqueId(c_TxIter->u32_CanId,
+                                                                                    c_TxIter
+                                                                                    ->q_IsExtended));
+                        if (c_IterWithExtended == c_CanMessageIdsWithExtended.end())
+                        {
+                           const stw_scl::C_SCLString c_Message = "Can't export message \"" +
+                                                                  c_TxIter->c_Name + "\" in bus \"" +
+                                                                  stw_scl::C_SCLString::IntToStr(this->mu32_Index) +
+                                                                  "\" because message ID is not unique.";
+                           c_Warnings.Append(c_Message);
+                           osc_write_log_warning("DBC Export", c_Message);
+                           s32_Error += C_WARN;
+                        }
                      }
                   }
 
@@ -883,9 +903,28 @@ void C_SdHandlerWidget::m_Export(void)
                      const std::set<uint32>::const_iterator c_Iter = c_CanMessageIds.find(c_RxIter->u32_CanId);
                      if (c_Iter == c_CanMessageIds.end())
                      {
+                        c_CanMessageIdsWithExtended.insert(C_OSCCanMessageUniqueId(c_RxIter->u32_CanId,
+                                                                                   c_RxIter->q_IsExtended));
                         c_CanMessageIds.insert(c_RxIter->u32_CanId);
                         // count signals
                         u32_NumOfInputSignals += c_RxIter->c_Signals.size();
+                     }
+                     else
+                     {
+                        const std::set<C_OSCCanMessageUniqueId>::const_iterator c_IterWithExtended =
+                           c_CanMessageIdsWithExtended.find(C_OSCCanMessageUniqueId(c_RxIter->u32_CanId,
+                                                                                    c_RxIter
+                                                                                    ->q_IsExtended));
+                        if (c_IterWithExtended == c_CanMessageIdsWithExtended.end())
+                        {
+                           const stw_scl::C_SCLString c_Message = "Can't export message \"" +
+                                                                  c_RxIter->c_Name + "\" in bus \"" +
+                                                                  stw_scl::C_SCLString::IntToStr(this->mu32_Index) +
+                                                                  "\" because message ID is not unique. Message is ignored.";
+                           c_Warnings.Append(c_Message);
+                           osc_write_log_warning("DBC Export", c_Message);
+                           s32_Error += C_WARN;
+                        }
                      }
                   }
                   // save current node
@@ -957,9 +996,9 @@ void C_SdHandlerWidget::m_RtfExport(void)
          C_RtfExportWidget * const pc_DialogExportReport = new C_RtfExportWidget(*c_PopUpDialog);
 
          // resize
-         const QSize c_SizeImportReport(890, 410);
+         const QSize c_SIZE_IMPORT_REPORT(890, 410);
 
-         c_PopUpDialog->SetSize(c_SizeImportReport);
+         c_PopUpDialog->SetSize(c_SIZE_IMPORT_REPORT);
 
          stw_scl::C_SCLString c_RtfPath = static_cast<stw_scl::C_SCLString>(
             C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownRtfPath().toStdString().c_str());
@@ -1113,19 +1152,19 @@ void C_SdHandlerWidget::CallHelp(void)
    if (this->mpc_ActNodeEdit != NULL)
    {
       const sintn sn_TabIndex = this->mpc_ActNodeEdit->GetTabIndex();
-      if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TabIndexDataPool)
+      if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TAB_INDEX_DATA_POOL)
       {
          //TabIndex == Datapools
          stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdNdeDbViewWidget");
       }
-      else if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TabIndexComm)
+      else if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TAB_INDEX_COMM)
       {
          //TabIndex == COMM
          stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdBueComIfDescriptionWidget");
       }
-      else if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TabIndexHalc)
+      else if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TAB_INDEX_HALC)
       {
          // TabIndex == HALC
          stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(

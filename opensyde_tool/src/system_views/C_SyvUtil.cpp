@@ -46,6 +46,7 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief   Get system view label info
 
    \param[in]      ou32_ViewIndex               View index
+   \param[in]      os32_ViewSubMode             View sub mode (setup, update or dashboard)
    \param[out]     orc_ErrorLabelHeadingText    Error heading information
    \param[out]     orc_ErrorLabelText           Detailed error information
    \param[out]     orc_ErrorTooltipText         Error tooltip information
@@ -58,33 +59,35 @@ using namespace stw_opensyde_gui_logic;
    False Hide label
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUtil::h_GetViewSetupLabelInfo(const uint32 ou32_ViewIndex, QString & orc_ErrorLabelHeadingText,
-                                        QString & orc_ErrorLabelText, QString & orc_ErrorTooltipText,
-                                        C_NagToolTip::E_Type & ore_TooltipType, QString & orc_IconPath,
-                                        sintn & orsn_ColorID)
+bool C_SyvUtil::h_GetViewStatusLabelInfo(const uint32 ou32_ViewIndex, const sint32 os32_ViewSubMode,
+                                         QString & orc_ErrorLabelHeadingText, QString & orc_ErrorLabelText,
+                                         QString & orc_ErrorTooltipText, C_NagToolTip::E_Type & ore_TooltipType,
+                                         QString & orc_IconPath, sintn & orsn_ColorID)
 {
-   bool q_Retval;
+   bool q_Retval = false;
    bool q_NameInvalid;
    bool q_PcNotConnected;
    bool q_RoutingInvalid;
-   bool q_UpdateDisabledButDataBlocks;
+   bool q_UpdateRoutingInvalid;
+   bool q_DashboardRoutingInvalid;
    bool q_SysDefInvalid;
    bool q_NoActiveNodes;
-   QString c_RoutingErrorText;
-   QString c_AutomaticallyDeactivatedNodes;
+
+   std::vector<QString> c_RoutingErrorText;
+   QString c_SetupRoutingWarningText;
    sint32 s32_Return;
 
    s32_Return = C_PuiSvHandler::h_GetInstance()->CheckViewError(ou32_ViewIndex,
                                                                 &q_NameInvalid,
                                                                 &q_PcNotConnected,
-                                                                &q_RoutingInvalid, &q_UpdateDisabledButDataBlocks,
+                                                                &q_RoutingInvalid, &q_UpdateRoutingInvalid,
+                                                                &q_DashboardRoutingInvalid,
                                                                 &q_SysDefInvalid, &q_NoActiveNodes,
-                                                                &c_RoutingErrorText, &c_AutomaticallyDeactivatedNodes);
+                                                                &c_RoutingErrorText, &c_SetupRoutingWarningText);
 
-   if ((q_UpdateDisabledButDataBlocks == true) ||
-       ((((((q_NameInvalid == true) || (q_PcNotConnected == true)) || ((q_RoutingInvalid == true)) ||
-           (q_SysDefInvalid == true)) || (q_NoActiveNodes == true)) ||
-         (s32_Return != C_NO_ERR))))
+   if ((q_NameInvalid == true) || (q_PcNotConnected == true) || (q_RoutingInvalid == true) ||
+       (q_SysDefInvalid == true) || (q_NoActiveNodes == true) ||
+       (s32_Return != C_NO_ERR))
    {
       if (s32_Return == C_RANGE)
       {
@@ -107,26 +110,11 @@ bool C_SyvUtil::h_GetViewSetupLabelInfo(const uint32 ou32_ViewIndex, QString & o
          orc_ErrorLabelText = C_GtGetText::h_GetText(
             "There are no active buses. PC connection could not be established.");
       }
-      else if (q_UpdateDisabledButDataBlocks == true)
-      {
-         bool q_UpdateError;
-         QString c_ErrorText;
-         C_PuiSvHandler::h_GetInstance()->CheckUpdateEnabledForDataBlocks(ou32_ViewIndex, q_UpdateError,
-                                                                          c_ErrorText);
-         if (q_UpdateError == true)
-         {
-            orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid View:");
-            orc_ErrorLabelText =
-               static_cast<QString>(C_GtGetText::h_GetText(
-                                       "There are Data Blocks defined for %1"
-                                       " but there are no interfaces which support update for these nodes."))
-               .arg(c_ErrorText);
-         }
-      }
       else if (q_RoutingInvalid == true)
       {
+         // Setup error is relevant for all sub modes
          orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid View:");
-         orc_ErrorLabelText = c_RoutingErrorText;
+         orc_ErrorLabelText = c_RoutingErrorText[ms32_SUBMODE_SYSVIEW_SETUP];
       }
       else if (q_SysDefInvalid == true)
       {
@@ -141,32 +129,50 @@ bool C_SyvUtil::h_GetViewSetupLabelInfo(const uint32 ou32_ViewIndex, QString & o
 
       q_Retval = true;
    }
+   // Special cases: Error depends of sub mode
+   else if ((os32_ViewSubMode == ms32_SUBMODE_SYSVIEW_UPDATE) && (q_UpdateRoutingInvalid == true))
+   {
+      // Handle the invalid update routing as error
+      orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid Update View:");
+      orc_ErrorLabelText = c_RoutingErrorText[ms32_SUBMODE_SYSVIEW_UPDATE];
+      q_Retval = true;
+   }
+   else if ((os32_ViewSubMode == ms32_SUBMODE_SYSVIEW_DASHBOARD) && (q_DashboardRoutingInvalid == true))
+   {
+      // Show the error as warning to inform the user why specific nodes are not available in the dashboard
+      orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Note:");
+      orc_ErrorLabelText = c_RoutingErrorText[ms32_SUBMODE_SYSVIEW_DASHBOARD];
+   }
+   else if ((os32_ViewSubMode == ms32_SUBMODE_SYSVIEW_SETUP) &&
+            (c_SetupRoutingWarningText != ""))
+   {
+      // Show the warning if a warning exists as information
+      orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Note:");
+      orc_ErrorLabelText = c_SetupRoutingWarningText;
+   }
    else
    {
+      orc_ErrorLabelHeadingText = "";
       orc_ErrorLabelText = "";
-      q_Retval = false;
    }
-   if (q_Retval)
+
+   if (q_Retval == true)
    {
+      // Error message
       ore_TooltipType = C_NagToolTip::eERROR;
       orc_IconPath = "://images/Error_iconV2.svg";
       orsn_ColorID = 24;
    }
    else
    {
+      // Info message
       ore_TooltipType = C_NagToolTip::eDEFAULT;
       orc_IconPath = "://images/Info_Icon_MessageBox.svg";
       orsn_ColorID = 3;
-      if (!c_AutomaticallyDeactivatedNodes.isEmpty())
+
+      if (orc_ErrorLabelHeadingText != "")
       {
          q_Retval = true;
-         orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Note:");
-         //lint -e{1946} Qt interface
-         orc_ErrorLabelText = QString(C_GtGetText::h_GetText(
-                                         "There are sub-nodes which can not be reached by the PC"
-                                         " and are not available in the Device Configuration,"
-                                         " Update and Dashboard screens. Affected sub-nodes: %1"))
-                              .arg(c_AutomaticallyDeactivatedNodes);
       }
    }
    //Combine strings for tooltip

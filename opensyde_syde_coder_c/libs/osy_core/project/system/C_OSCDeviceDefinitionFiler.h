@@ -37,6 +37,25 @@ private:
                                                     bool & orq_IsFileBased);
    static void mh_ParseSTWFlashloaderAvailability(const C_OSCXMLParser & orc_Parser, bool & orq_ProtocolSupportedCan);
 
+   static stw_types::sint32 mh_Load(C_OSCDeviceDefinition & orc_DeviceDefinition, C_OSCXMLParser & orc_Parser,
+                                    const stw_scl::C_SCLString & orc_Path);
+   static stw_types::sint32 mh_LoadSubDevice(C_OSCSubDeviceDefinition & orc_SubDeviceDefinition,
+                                             C_OSCXMLParser & orc_Parser,
+                                             const C_OSCDeviceDefinition & orc_DeviceDefinition,
+                                             const stw_scl::C_SCLString & orc_Path);
+   static void mh_SaveSubDevice(const C_OSCSubDeviceDefinition & orc_SubDeviceDefinition, C_OSCXMLParser & orc_Parser);
+   static stw_types::sint32 mh_HandleConnectedInterfaces(C_OSCDeviceDefinition & orc_DeviceDefinition);
+   static stw_types::sint32 mh_CheckContentErrors(const C_OSCDeviceDefinition & orc_DeviceDefinition);
+   static stw_types::sint32 mh_CheckNotConnectedInterface(const C_OSCDeviceDefinition & orc_DeviceDefinition);
+   static stw_types::sint32 mh_CheckNotConnectedInterfaceByType(const C_OSCDeviceDefinition & orc_DeviceDefinition,
+                                                                const C_OSCSystemBus::E_Type oe_Type,
+                                                                const stw_types::uint8 ou8_NumAvailableInterfaces);
+   static stw_types::sint32 mh_CheckNotConnectedDevice(const C_OSCDeviceDefinition & orc_DeviceDefinition);
+   static bool mh_CheckNotConnectedDeviceByType(const C_OSCSubDeviceDefinition & orc_SubDeviceDefinition,
+                                                const C_OSCSystemBus::E_Type oe_Type,
+                                                const stw_types::uint8 ou8_NumAvailableInterfaces);
+   static stw_types::sint32 mh_CheckDeviceName(const C_OSCDeviceDefinition & orc_DeviceDefinition);
+
 public:
    static stw_types::sint32 h_Load(C_OSCDeviceDefinition & orc_DeviceDefinition, const stw_scl::C_SCLString & orc_Path);
    static stw_types::sint32 h_Save(const C_OSCDeviceDefinition & orc_DeviceDefinition,

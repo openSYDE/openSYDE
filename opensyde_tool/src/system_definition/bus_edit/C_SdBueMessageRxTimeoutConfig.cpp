@@ -24,9 +24,9 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_IndexAuto = 0;
-const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_IndexCustom = 1;
-const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_IndexDisabled = 2;
+const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_AUTO = 0;
+const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_CUSTOM = 1;
+const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_DISABLED = 2;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -83,7 +83,7 @@ C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & 
    {
       // In case of a not on event message, the timeout time can not be disabled
       //lint -e{1938}  static const is guaranteed preinitialized before main
-      this->mpc_Ui->pc_ComboBoxTimeoutActive->SetItemState(mhs32_IndexDisabled, false);
+      this->mpc_Ui->pc_ComboBoxTimeoutActive->SetItemState(mhs32_INDEX_DISABLED, false);
 
       this->mpc_Ui->pc_SpinBoxTimeout->SetMinimumCustom(ou32_LastKnownCycleTimeValue);
 
@@ -110,19 +110,19 @@ C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & 
        (oq_TxMethodOnEvent == true))
    {
       //lint -e{1938}  static const is guaranteed preinitialized before main
-      this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_IndexDisabled);
+      this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_DISABLED);
       this->mpc_Ui->pc_SpinBoxTimeout->setValue(ou32_AutoReceiveTimeoutValue);
    }
    else if (oe_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM)
    {
       //lint -e{1938}  static const is guaranteed preinitialized before main
-      this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_IndexCustom);
+      this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_CUSTOM);
       this->mpc_Ui->pc_SpinBoxTimeout->setValue(ou32_ReceiveTimeoutValue);
    }
    else
    {
       //lint -e{1938}  static const is guaranteed preinitialized before main
-      this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_IndexAuto);
+      this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_AUTO);
       this->mpc_Ui->pc_SpinBoxTimeout->setValue(ou32_AutoReceiveTimeoutValue);
    }
 
@@ -191,11 +191,11 @@ C_PuiSdNodeCanMessage::E_RxTimeoutMode C_SdBueMessageRxTimeoutConfig::GetReceive
 {
    C_PuiSdNodeCanMessage::E_RxTimeoutMode e_Value;
 
-   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_IndexAuto)
+   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_AUTO)
    {
       e_Value = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
    }
-   else if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_IndexCustom)
+   else if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_CUSTOM)
    {
       e_Value = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM;
    }
@@ -218,7 +218,7 @@ stw_types::uint32 C_SdBueMessageRxTimeoutConfig::GetReceiveTimeoutValue(void) co
 {
    uint32 u32_Return;
 
-   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() != C_SdBueMessageRxTimeoutConfig::mhs32_IndexDisabled)
+   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() != C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_DISABLED)
    {
       u32_Return = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxTimeout->value());
    }
@@ -290,7 +290,7 @@ void C_SdBueMessageRxTimeoutConfig::m_HandleInactiveStates(void) const
 {
    // Concrete timeout value only available in custom mode
    this->mpc_Ui->pc_SpinBoxTimeout->setEnabled((this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() ==
-                                                C_SdBueMessageRxTimeoutConfig::mhs32_IndexCustom));
+                                                C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_CUSTOM));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -301,7 +301,7 @@ void C_SdBueMessageRxTimeoutConfig::m_OnReceiveTimeoutModeChanged(void) const
 {
    this->m_HandleInactiveStates();
 
-   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_IndexAuto)
+   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_AUTO)
    {
       this->m_UpdateAutoReceiveTimeoutValue();
    }
@@ -313,7 +313,7 @@ void C_SdBueMessageRxTimeoutConfig::m_OnReceiveTimeoutModeChanged(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxTimeoutConfig::m_UpdateAutoReceiveTimeoutValue(void) const
 {
-   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_IndexAuto)
+   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_AUTO)
    {
       this->mpc_Ui->pc_SpinBoxTimeout->setValue(static_cast<sintn>(this->mu32_AutoReceiveTimeoutValue));
    }

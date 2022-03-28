@@ -335,7 +335,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
                      "                       OSY_INIT_DPD_NUMBER_OF_PARALLEL_CONNECTIONS, OSY_INIT_DPD_NUMBER_OF_PARALLEL_CONNECTIONS,");
                   c_Lines.Add("                       OSY_INIT_DPD_BUF_SIZE_INSTANCE,");
                   c_Lines.Add(
-                     "                       OSY_INIT_DPD_CAN_FIFO_SIZE_TX, OSY_INIT_DPD_CAN_ROUTING_FIFO_SIZE_RX)");
+                     "                       OSY_INIT_DPD_CAN_ROUTING_FIFO_SIZE_RX, OSY_INIT_DPD_CAN_FIFO_SIZE_TX)");
                   u8_NumCanChannels++;
                }
                else

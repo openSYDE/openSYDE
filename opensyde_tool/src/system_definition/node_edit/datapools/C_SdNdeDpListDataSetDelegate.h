@@ -46,6 +46,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigStore(const QModelIndex & orc_Index) const;
+   void SigTedConfirmed(void) const;
 
 private:
    const C_SdNdeDpListDataSetModel * mpc_Model;

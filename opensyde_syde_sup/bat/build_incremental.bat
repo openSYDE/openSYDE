@@ -14,9 +14,15 @@ SET PATH=%PATH%;%CWD%\
 
 rem run cmake
 cmake.exe ..\pjt -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../pjt/toolchain_windows.cmake
+if ERRORLEVEL 1 goto done
 
 rem perform actual build
 cmake.exe --build . --target all -- -j4
+if ERRORLEVEL 1 goto done
+
 rem copy resulting binary to result:
 cmake.exe --build . --target install
+if ERRORLEVEL 1 goto done
+
 cd ..\bat
+:done

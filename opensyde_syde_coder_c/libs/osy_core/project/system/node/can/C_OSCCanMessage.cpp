@@ -267,7 +267,12 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
                         {
                            //Conflict
                            *opq_LayoutConflict = true;
+                           break;
                         }
+                     }
+                     if ((*opq_LayoutConflict) == true)
+                     {
+                        break;
                      }
                   }
                }
@@ -285,12 +290,12 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
             for (std::set<uint16>::const_iterator c_ItPosition = c_SetPositions.begin();
                  c_ItPosition != c_SetPositions.end(); ++c_ItPosition)
             {
-               if (static_cast<sint16>(*c_ItPosition) >
-                   (static_cast<sint16>((this->u16_Dlc - static_cast<uint16>(ou32_CANMessageValidSignalsDLCOffset)) *
-                                        8U) -
-                    1))
+               const uint16 u16_MaxPosition = static_cast<uint16>
+                                              (((this->u16_Dlc - ou32_CANMessageValidSignalsDLCOffset) * 8U) - 1U);
+               if ((*c_ItPosition) > u16_MaxPosition)
                {
                   *opq_BorderConflict = true;
+                  break;
                }
             }
          }
@@ -329,6 +334,7 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
                         if (rc_CurrentElement.c_Name.LowerCase() == rc_ListElement.c_Name.LowerCase())
                         {
                            *opq_NameConflict = true;
+                           break;
                         }
                      }
                   }
@@ -358,16 +364,17 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
             //Find multiplexer
             for (uint32 u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
             {
-               const C_OSCCanSignal & rc_SignalData = c_Signals[u32_ItSignal];
                //Skip current signal
                if (u32_ItSignal != oru32_SignalIndex)
                {
+                  const C_OSCCanSignal & rc_SignalData = c_Signals[u32_ItSignal];
                   if (rc_SignalData.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
                   {
                      //Check range
                      const uint64 u64_MaxValue =
-                        (rc_SignalData.u16_ComBitLength >=
-                         64) ? std::numeric_limits<uint64>::max() : ((1ULL << rc_SignalData.u16_ComBitLength) - 1ULL);
+                        (rc_SignalData.u16_ComBitLength >= 64U) ?
+                        std::numeric_limits<uint64>::max() :
+                        ((static_cast<uint64>(1ULL) << rc_SignalData.u16_ComBitLength) - 1ULL);
                      if (rc_CheckedSignal.u16_MultiplexValue > u64_MaxValue)
                      {
                         *opq_MultiplexedValueOutOfRange = true;

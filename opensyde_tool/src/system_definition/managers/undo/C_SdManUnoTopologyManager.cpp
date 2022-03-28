@@ -187,14 +187,14 @@ void C_SdManUnoTopologyManager::DoAddBus(const C_SdManUnoTopologyAddCommand::E_E
    \param[in]  opc_Node                Node for bus connector creation
    \param[in]  opc_Bus                 Bus for bus connector creation
    \param[in]  oru8_InterfaceNumber    Interface number for bus connector creation
-   \param[in]  orc_NodeIds             Node ids
+   \param[in]  orc_Properties          Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID, const QPointF & orc_NewPos,
                                                   const QGraphicsItem * const opc_Node,
                                                   const QGraphicsItem * const opc_Bus,
                                                   const stw_types::uint8 & oru8_InterfaceNumber,
-                                                  const std::vector<uint8> & orc_NodeIds)
+                                                  const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    vector<uint64> c_IDs;
    uint64 u64_NodeID;
@@ -207,7 +207,7 @@ void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID,
    pc_AddCommand = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
                                                     C_SdManUnoTopologyAddCommand::E_ElementType::eBUS_CONNECTOR,
                                                     orc_NewPos,
-                                                    u64_NodeID, u64_BusID, oru8_InterfaceNumber, orc_NodeIds);
+                                                    u64_NodeID, u64_BusID, oru8_InterfaceNumber, orc_Properties);
    connect(pc_AddCommand,
            &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this, &C_SdManUnoTopologyManager::m_OnErrorChange);
    this->m_DoPushAndSignalError(pc_AddCommand);
@@ -224,8 +224,8 @@ void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID,
    \param[in]  oru64_Node2UniqueID        Node 2 unique ID
    \param[in]  oru8_Node1InterfaceNumber  Node 1 interface number
    \param[in]  oru8_Node2InterfaceNumber  Node 2 interface number
-   \param[in]  orc_Node1NodeIDs           Node1 node I ds
-   \param[in]  orc_Node2NodeIDs           Node2 node I ds
+   \param[in]  orc_Node1Properties        Node 1 properties
+   \param[in]  orc_Node2Properties        Node 2 properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const std::vector<uint64> & orc_FourUniqueIds, const stw_opensyde_core::C_OSCSystemBus::E_Type
@@ -235,8 +235,8 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
                                                                          const uint64 & oru64_Node2UniqueID,
                                                                          const uint8 & oru8_Node1InterfaceNumber,
                                                                          const uint8 & oru8_Node2InterfaceNumber,
-                                                                         const std::vector<uint8> & orc_Node1NodeIDs,
-                                                                         const std::vector<uint8> & orc_Node2NodeIDs)
+                                                                         const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Node1Properties,
+                                                                         const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Node2Properties)
 {
    if (orc_FourUniqueIds.size() >= 4)
    {
@@ -269,7 +269,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
                                                       orc_BusPosition,
                                                       oru64_Node1UniqueID, orc_FourUniqueIds[0],
                                                       oru8_Node1InterfaceNumber,
-                                                      orc_Node1NodeIDs,
+                                                      orc_Node1Properties,
                                                       pc_UndoCommand);
       connect(pc_TmpAddCmd,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
@@ -282,7 +282,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
                                                       orc_BusPosition,
                                                       oru64_Node2UniqueID, orc_FourUniqueIds[0],
                                                       oru8_Node2InterfaceNumber,
-                                                      orc_Node2NodeIDs,
+                                                      orc_Node2Properties,
                                                       pc_UndoCommand);
       connect(pc_TmpAddCmd,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
@@ -299,7 +299,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
    \param[in]  orc_Node1Position          Node 1 position
    \param[in]  oru64_Node1UniqueID        Node 1 unique ID
    \param[in]  oru8_Node1InterfaceNumber  Node 1 interface number
-   \param[in]  orc_Node1IDs               Node1 node Ids
+   \param[in]  orc_Node1Properties        Node 1 properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const std::vector<uint64> & orc_TwoUniqueIds,
@@ -307,7 +307,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const 
                                                                           const QPointF & orc_Node1Position,
                                                                           const uint64 & oru64_Node1UniqueID,
                                                                           const uint8 & oru8_Node1InterfaceNumber,
-                                                                          const std::vector<uint8> & orc_Node1IDs)
+                                                                          const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Node1Properties)
 {
    if (orc_TwoUniqueIds.size() >= 2)
    {
@@ -320,7 +320,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const 
       pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
                                                       C_SdManUnoTopologyAddCommand::eBUS_CONNECTOR,
                                                       orc_Node1Position, oru64_Node1UniqueID, oru64_BusUniqueID,
-                                                      oru8_Node1InterfaceNumber, orc_Node1IDs,
+                                                      oru8_Node1InterfaceNumber, orc_Node1Properties,
                                                       pc_UndoCommand);
       connect(pc_TmpAddCmd,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
@@ -359,13 +359,14 @@ void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64> & oru64_
    \param[in]  opc_LastNode         New node
    \param[in]  orc_ConnectionPos    Event position
    \param[in]  ors32_Interface      Interface to connect to
-   \param[in]  orc_NodeIds          Node ids
+   \param[in]  orc_Properties       Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const opc_BusConnector,
                                                 const C_GiNode * const opc_StartingNode,
                                                 const C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
-                                                const sint32 & ors32_Interface, const std::vector<uint8> & orc_NodeIds)
+                                                const sint32 & ors32_Interface,
+                                                const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    if ((opc_StartingNode != NULL) && (opc_LastNode != NULL))
    {
@@ -378,7 +379,7 @@ void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const
       pc_ReconnectCommand = new C_SdManUnoTopologyReconnectNodeCommand(this->mpc_Scene, c_IDs,
                                                                        opc_StartingNode->GetID(),
                                                                        opc_LastNode->GetID(), orc_ConnectionPos,
-                                                                       ors32_Interface, orc_NodeIds);
+                                                                       ors32_Interface, orc_Properties);
       m_MergeWithPrev(pc_ReconnectCommand);
       //Deactivate due to data change
       this->m_PrepareAction();
@@ -398,13 +399,14 @@ void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const
    \param[in]  opc_LastBus          Last bus
    \param[in]  orc_ConnectionPos    Event position
    \param[in]  ors32_Interface      Interface to connect to
-   \param[in]  orc_NodeIds          Node ids
+   \param[in]  orc_Properties       Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const opc_BusConnector,
                                                const C_GiLiBus * const opc_StartingBus,
                                                const C_GiLiBus * const opc_LastBus, const QPointF & orc_ConnectionPos,
-                                               const sint32 & ors32_Interface, const std::vector<uint8> & orc_NodeIds)
+                                               const sint32 & ors32_Interface,
+                                               const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    if ((opc_StartingBus != NULL) && (opc_LastBus != NULL))
    {
@@ -417,7 +419,7 @@ void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const 
       pc_ReconnectCommand = new C_SdManUnoTopologyReconnectBusCommand(this->mpc_Scene, c_IDs,
                                                                       opc_StartingBus->GetID(),
                                                                       opc_LastBus->GetID(), orc_ConnectionPos,
-                                                                      ors32_Interface, orc_NodeIds);
+                                                                      ors32_Interface, orc_Properties);
       m_MergeWithPrev(pc_ReconnectCommand);
       //Deactivate due to data change
       this->m_PrepareAction();
@@ -435,15 +437,15 @@ void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const 
    \param[in]  opc_BusConnector              Bus connector to change interface of
    \param[in]  oru8_PreviousInterfaceNumber  Last used interface number
    \param[in]  oru8_NewInterfaceNumber       New interface number to use
-   \param[in]  orc_PreviousNodeIds           Previous node ids
-   \param[in]  orc_NewNodeIds                New node ids
+   \param[in]  orc_PreviousProperties        Previous properties
+   \param[in]  orc_NewProperties             New properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoChangeInterface(const C_GiLiBusConnector * const opc_BusConnector,
                                                   const uint8 & oru8_PreviousInterfaceNumber,
                                                   const uint8 & oru8_NewInterfaceNumber,
-                                                  const std::vector<uint8> & orc_PreviousNodeIds,
-                                                  const std::vector<uint8> & orc_NewNodeIds)
+                                                  const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_PreviousProperties,
+                                                  const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_NewProperties)
 {
    if (opc_BusConnector != NULL)
    {
@@ -455,8 +457,8 @@ void C_SdManUnoTopologyManager::DoChangeInterface(const C_GiLiBusConnector * con
       c_IDs.push_back(u64_ID);
       pc_ReconnectCommand = new C_SdManUnoTopologyChangeInterfaceCommand(this->mpc_Scene, c_IDs,
                                                                          oru8_PreviousInterfaceNumber,
-                                                                         oru8_NewInterfaceNumber, orc_PreviousNodeIds,
-                                                                         orc_NewNodeIds);
+                                                                         oru8_NewInterfaceNumber,
+                                                                         orc_PreviousProperties, orc_NewProperties);
       //Deactivate due to data change
       this->m_PrepareAction();
       //this->push(pc_ReconnectCommand);

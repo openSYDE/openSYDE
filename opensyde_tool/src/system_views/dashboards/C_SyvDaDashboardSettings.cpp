@@ -26,9 +26,9 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_SyvDaDashboardSettings::mhsn_Min = 10;
-const stw_types::sintn C_SyvDaDashboardSettings::mhsn_Max = 65000;
-const stw_types::sintn C_SyvDaDashboardSettings::mhsn_MinDistanceBetween = 10;
+const stw_types::sintn C_SyvDaDashboardSettings::mhsn_MIN = 10;
+const stw_types::sintn C_SyvDaDashboardSettings::mhsn_MAX = 65000;
+const stw_types::sintn C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN = 10;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -62,29 +62,29 @@ C_SyvDaDashboardSettings::C_SyvDaDashboardSettings(C_OgePopUpDialog & orc_Parent
 
    //Min
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_SpinBoxFast->SetMinimumCustom(C_SyvDaDashboardSettings::mhsn_Min);
+   this->mpc_Ui->pc_SpinBoxFast->SetMinimumCustom(C_SyvDaDashboardSettings::mhsn_MIN);
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_SpinBoxMedium->SetMinimumCustom(
-      C_SyvDaDashboardSettings::mhsn_Min + C_SyvDaDashboardSettings::mhsn_MinDistanceBetween);
+      C_SyvDaDashboardSettings::mhsn_MIN + C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_SpinBoxSlow->SetMinimumCustom(
-      C_SyvDaDashboardSettings::mhsn_Min + (2 * C_SyvDaDashboardSettings::mhsn_MinDistanceBetween));
+      C_SyvDaDashboardSettings::mhsn_MIN + (2 * C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN));
    //Max
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_SpinBoxFast->SetMaximumCustom(
-      C_SyvDaDashboardSettings::mhsn_Max - (2 * C_SyvDaDashboardSettings::mhsn_MinDistanceBetween));
+      C_SyvDaDashboardSettings::mhsn_MAX - (2 * C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN));
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_SpinBoxMedium->SetMaximumCustom(
-      C_SyvDaDashboardSettings::mhsn_Max - C_SyvDaDashboardSettings::mhsn_MinDistanceBetween);
+      C_SyvDaDashboardSettings::mhsn_MAX - C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_SpinBoxSlow->SetMaximumCustom(C_SyvDaDashboardSettings::mhsn_Max);
+   this->mpc_Ui->pc_SpinBoxSlow->SetMaximumCustom(C_SyvDaDashboardSettings::mhsn_MAX);
    //Step size
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_SpinBoxFast->setSingleStep(C_SyvDaDashboardSettings::mhsn_MinDistanceBetween);
+   this->mpc_Ui->pc_SpinBoxFast->setSingleStep(C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_SpinBoxMedium->setSingleStep(C_SyvDaDashboardSettings::mhsn_MinDistanceBetween);
+   this->mpc_Ui->pc_SpinBoxMedium->setSingleStep(C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_SpinBoxSlow->setSingleStep(C_SyvDaDashboardSettings::mhsn_MinDistanceBetween);
+   this->mpc_Ui->pc_SpinBoxSlow->setSingleStep(C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
 
    this->m_Load();
 
@@ -251,9 +251,9 @@ void C_SyvDaDashboardSettings::m_OnFastChanged(const stw_types::sintn osn_Value)
    const sintn sn_FastValue = osn_Value;
    const sintn sn_MediumValue = this->mpc_Ui->pc_SpinBoxMedium->value();
 
-   if (sn_FastValue >= (sn_MediumValue - C_SyvDaDashboardSettings::mhsn_MinDistanceBetween))
+   if (sn_FastValue >= (sn_MediumValue - C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN))
    {
-      this->mpc_Ui->pc_SpinBoxMedium->setValue(sn_FastValue + C_SyvDaDashboardSettings::mhsn_MinDistanceBetween);
+      this->mpc_Ui->pc_SpinBoxMedium->setValue(sn_FastValue + C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
    }
 }
 
@@ -269,14 +269,14 @@ void C_SyvDaDashboardSettings::m_OnMediumChanged(const stw_types::sintn osn_Valu
    const sintn sn_MediumValue = osn_Value;
    const sintn sn_SlowValue = this->mpc_Ui->pc_SpinBoxSlow->value();
 
-   if (sn_FastValue >= (sn_MediumValue - C_SyvDaDashboardSettings::mhsn_MinDistanceBetween))
+   if (sn_FastValue >= (sn_MediumValue - C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN))
    {
-      this->mpc_Ui->pc_SpinBoxFast->setValue(sn_MediumValue - C_SyvDaDashboardSettings::mhsn_MinDistanceBetween);
+      this->mpc_Ui->pc_SpinBoxFast->setValue(sn_MediumValue - C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
    }
 
-   if (sn_SlowValue <= (sn_MediumValue + C_SyvDaDashboardSettings::mhsn_MinDistanceBetween))
+   if (sn_SlowValue <= (sn_MediumValue + C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN))
    {
-      this->mpc_Ui->pc_SpinBoxSlow->setValue(sn_MediumValue + C_SyvDaDashboardSettings::mhsn_MinDistanceBetween);
+      this->mpc_Ui->pc_SpinBoxSlow->setValue(sn_MediumValue + C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
    }
 }
 
@@ -291,8 +291,8 @@ void C_SyvDaDashboardSettings::m_OnSlowChanged(const stw_types::sintn osn_Value)
    const sintn sn_MediumValue = this->mpc_Ui->pc_SpinBoxMedium->value();
    const sintn sn_SlowValue = osn_Value;
 
-   if (sn_SlowValue <= (sn_MediumValue + C_SyvDaDashboardSettings::mhsn_MinDistanceBetween))
+   if (sn_SlowValue <= (sn_MediumValue + C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN))
    {
-      this->mpc_Ui->pc_SpinBoxMedium->setValue(sn_SlowValue - C_SyvDaDashboardSettings::mhsn_MinDistanceBetween);
+      this->mpc_Ui->pc_SpinBoxMedium->setValue(sn_SlowValue - C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
    }
 }

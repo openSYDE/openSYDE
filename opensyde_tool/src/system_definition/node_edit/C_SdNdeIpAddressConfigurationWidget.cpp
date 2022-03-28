@@ -16,6 +16,12 @@
 #include "TGLUtils.h"
 #include "ui_C_SdNdeIpAddressConfigurationWidget.h"
 #include "C_OgeWiCustomMessage.h"
+#include "C_OgeWiUtil.h"
+// QLineEdit is multiple times included with the following include, but cannot do anything else then suppress lint
+// warning
+//lint -save -e451
+#include "C_OgeLeIpAddress.h"
+//lint -restore
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -72,6 +78,31 @@ C_SdNdeIpAddressConfigurationWidget::C_SdNdeIpAddressConfigurationWidget(
            &C_SdNdeIpAddressConfigurationWidget::m_OkClicked);
    connect(this->mpc_Ui->pc_BushButtonCancel, &QPushButton::clicked, this,
            &C_SdNdeIpAddressConfigurationWidget::m_CancelClicked);
+
+   std::vector<QLineEdit *> c_LeIpAddress =  this->mpc_Ui->pc_WidgetIpAddress->GetLineEdits();
+   for (std::vector<QLineEdit *>::iterator c_Iter = c_LeIpAddress.begin(); c_Iter != c_LeIpAddress.end(); ++c_Iter)
+   {
+      connect(dynamic_cast<C_OgeLeIpAddress *>(*c_Iter),
+              &C_OgeLeIpAddress::SignalTabKey,
+              this, &C_SdNdeIpAddressConfigurationWidget::SlotTabKey);
+   }
+
+   std::vector<QLineEdit *> c_LeSubNetMask =  this->mpc_Ui->pc_WidgetSubNetMask->GetLineEdits();
+   for (std::vector<QLineEdit *>::iterator c_Iter = c_LeSubNetMask.begin(); c_Iter != c_LeSubNetMask.end(); ++c_Iter)
+   {
+      connect(dynamic_cast<C_OgeLeIpAddress *>(*c_Iter),
+              &C_OgeLeIpAddress::SignalTabKey,
+              this, &C_SdNdeIpAddressConfigurationWidget::SlotTabKey);
+   }
+
+   std::vector<QLineEdit *> c_LeDefaultGateway =  this->mpc_Ui->pc_WidgetDefaultGateway->GetLineEdits();
+   for (std::vector<QLineEdit *>::iterator c_Iter = c_LeDefaultGateway.begin(); c_Iter != c_LeDefaultGateway.end();
+        ++c_Iter)
+   {
+      connect(dynamic_cast<C_OgeLeIpAddress *>(*c_Iter),
+              &C_OgeLeIpAddress::SignalTabKey,
+              this, &C_SdNdeIpAddressConfigurationWidget::SlotTabKey);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -99,6 +130,32 @@ void C_SdNdeIpAddressConfigurationWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelDefaultGateway->setText(C_GtGetText::h_GetText("Default Gateway"));
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot to provide 'Tab' key behaviour for the three IP address fields.
+
+   When user presses 'Tab' the next IP address line or button should be focused.
+
+   \param[in]       opc_LineEdit     One line edit part of one IP address line where 'Tab' key was pressed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeIpAddressConfigurationWidget::SlotTabKey(const QLineEdit * const opc_LineEdit)
+{
+   if (this->mpc_Ui->pc_WidgetIpAddress->IsLineEditPartOfWidget(opc_LineEdit) == true)
+   {
+      this->mpc_Ui->pc_WidgetSubNetMask->SetCursorPosition(0);
+   }
+   else if (this->mpc_Ui->pc_WidgetSubNetMask->IsLineEditPartOfWidget(opc_LineEdit) == true)
+   {
+      this->mpc_Ui->pc_WidgetDefaultGateway->SetCursorPosition(0);
+   }
+   else
+   {
+      if (this->mpc_Ui->pc_WidgetDefaultGateway->IsLineEditPartOfWidget(opc_LineEdit) == true)
+      {
+         this->mpc_Ui->pc_BushButtonCancel->setFocus();
+      }
+   }
+}
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten key press event slot
 
@@ -144,33 +201,61 @@ void C_SdNdeIpAddressConfigurationWidget::m_LoadData(void) const
    {
       const C_OSCNodeComInterfaceSettings & rc_CurInterface = pc_Node->c_Properties.c_ComInterfaces[this->mu32_ComIf];
 
-      this->mpc_Ui->pc_LineEditIpAddress->SetIPAddress(rc_CurInterface.c_Ip.au8_IpAddress);
-      this->mpc_Ui->pc_LineEditSubNetMask->SetIPAddress(rc_CurInterface.c_Ip.au8_NetMask);
-      this->mpc_Ui->pc_LineEditDefaultGateway->SetIPAddress(rc_CurInterface.c_Ip.au8_DefaultGateway);
+      this->mpc_Ui->pc_WidgetIpAddress->SetIPAddress(rc_CurInterface.c_Ip.au8_IpAddress);
+      this->mpc_Ui->pc_WidgetSubNetMask->SetIPAddress(rc_CurInterface.c_Ip.au8_NetMask);
+      this->mpc_Ui->pc_WidgetDefaultGateway->SetIPAddress(rc_CurInterface.c_Ip.au8_DefaultGateway);
 
       // directly start typing without cursor move
-      this->mpc_Ui->pc_LineEditIpAddress->setCursorPosition(0);
+      this->mpc_Ui->pc_WidgetIpAddress->SetCursorPosition(0);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of Ok button click
 
-   - write current settings to data
+   - write current settings to data. If IP Address is conflicting user may confirm the conflict (error engine will
+     show conflict anyways).
    - exit with accept state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeIpAddressConfigurationWidget::m_OkClicked(void)
 {
-   //write current settings to data
-   C_PuiSdHandler::h_GetInstance()->SetOSCNodeEthernetConfiguration(
+   const bool q_IpValid = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckIpAddressIsValid(
       this->mu32_NodeIndex, this->mu32_ComIf,
-      this->mpc_Ui->pc_LineEditIpAddress->GetIPAddress(),
-      this->mpc_Ui->pc_LineEditSubNetMask->GetIPAddress(),
-      this->mpc_Ui->pc_LineEditDefaultGateway->GetIPAddress());
+      this->mpc_Ui->pc_WidgetIpAddress->GetIPAddress());
+   bool q_WriteToData = true;
 
-   //close dialog after data write
-   this->mrc_ParentDialog.accept();
+   //set invalid text property
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetIpAddress, "Valid", q_IpValid);
+
+   if (q_IpValid == false)
+   {
+      C_OgeWiCustomMessage c_Error(this, C_OgeWiCustomMessage::E_Type::eERROR);
+      c_Error.SetHeading(C_GtGetText::h_GetText("IP Address Settings"));
+      c_Error.SetDescription(C_GtGetText::h_GetText(
+                                "IP Address does conflict with another node on the same Ethernet. Are you sure you want to assign this IP Address?"));
+      c_Error.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+      c_Error.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
+      c_Error.SetCustomMinHeight(180, 250);
+
+      if (c_Error.Execute() == C_OgeWiCustomMessage::eCANCEL)
+      {
+         q_WriteToData = false;
+         this->mpc_Ui->pc_WidgetIpAddress->setFocus();
+      }
+   }
+
+   if (q_WriteToData)
+   {
+      //write current settings to data
+      C_PuiSdHandler::h_GetInstance()->SetOSCNodeEthernetConfiguration(
+         this->mu32_NodeIndex, this->mu32_ComIf,
+         this->mpc_Ui->pc_WidgetIpAddress->GetIPAddress(),
+         this->mpc_Ui->pc_WidgetSubNetMask->GetIPAddress(),
+         this->mpc_Ui->pc_WidgetDefaultGateway->GetIPAddress());
+      //close dialog after data write
+      this->mrc_ParentDialog.accept();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

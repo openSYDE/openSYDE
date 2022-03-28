@@ -116,7 +116,7 @@ sint32 C_OSCNode::InsertDataPool(const uint32 ou32_DataPoolIndex, const C_OSCNod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Delete data pool at specified position
 
-   \param[in]  ou32_DataPoolIndex  Data pool index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 
    \return
    C_NO_ERR Operation success
@@ -195,13 +195,13 @@ sint32 C_OSCNode::MoveDataPool(const uint32 ou32_Start, const uint32 ou32_Target
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Insert message at specified position
 
-   \param[in]  oe_ComProtocol          Com protocol
-   \param[in]  ou32_InterfaceIndex     Interface index
-   \param[in]  ou32_DatapoolIndex      Datapool index
-   \param[in]  oq_MessageIsTx          Flag if message is tx
-   \param[in]  ou32_MessageIndex       Message index
-   \param[in]  orc_Message             Message data
-   \param[in]  orc_SignalData          Signal data
+   \param[in]  oe_ComProtocol       Com protocol
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou32_DatapoolIndex   Datapool index
+   \param[in]  oq_MessageIsTx       Flag if message is tx
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  orc_Message          Message data
+   \param[in]  orc_SignalData       Signal data
 
    \return
    C_NO_ERR Operation success
@@ -279,15 +279,15 @@ sint32 C_OSCNode::InsertMessage(const C_OSCCanProtocol::E_Type oe_ComProtocol, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set message at specified position
 
-   \param[in]  oe_ComProtocol          Com protocol
-   \param[in]  ou32_InterfaceIndex     Interface index
-   \param[in]  ou32_DatapoolIndex      Datapool index
-   \param[in]  oq_MessageIsTx          Flag if message is tx
-   \param[in]  ou32_MessageIndex       Message index
-   \param[in]  orc_Message             Message data
-   \param[in]  oq_NewMessageIsTx       true: the message is a Tx message
-                                       false: the message is an Rx message
-   \param[in]  orc_SignalData          Signal data
+   \param[in]  oe_ComProtocol       Com protocol
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou32_DatapoolIndex   Datapool index
+   \param[in]  oq_MessageIsTx       Flag if message is tx
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  orc_Message          Message data
+   \param[in]  oq_NewMessageIsTx    true: the message is a Tx message
+                                    false: the message is an Rx message
+   \param[in]  orc_SignalData       Signal data
 
    \return
    C_NO_ERR Operation success
@@ -371,11 +371,11 @@ sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type oe_ComProtocol, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Delete message at specified position
 
-   \param[in]  oe_ComProtocol          Com protocol
-   \param[in]  ou32_InterfaceIndex     Interface index
-   \param[in]  ou32_DatapoolIndex      Datapool index
-   \param[in]  oq_MessageIsTx          Flag if message is tx
-   \param[in]  ou32_MessageIndex       Message index
+   \param[in]  oe_ComProtocol       Com protocol
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou32_DatapoolIndex   Datapool index
+   \param[in]  oq_MessageIsTx       Flag if message is tx
+   \param[in]  ou32_MessageIndex    Message index
 
    \return
    C_NO_ERR Operation success
@@ -446,14 +446,14 @@ sint32 C_OSCNode::DeleteMessage(const C_OSCCanProtocol::E_Type oe_ComProtocol, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Insert signal at specified position
 
-   \param[in]  oe_ComProtocol          Com protocol
-   \param[in]  ou32_InterfaceIndex     Interface index
-   \param[in]  ou32_DatapoolIndex      Datapool index
-   \param[in]  oq_MessageIsTx          Flag if message is tx
-   \param[in]  ou32_MessageIndex       Message index
-   \param[in]  ou32_SignalIndex        Signal index
-   \param[in]  orc_Signal              Signal data for message positioning
-   \param[in]  orc_SignalData          Signal data for data pool
+   \param[in]  oe_ComProtocol       Com protocol
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou32_DatapoolIndex   Datapool index
+   \param[in]  oq_MessageIsTx       Flag if message is tx
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  ou32_SignalIndex     Signal index
+   \param[in]  orc_Signal           Signal data for message positioning
+   \param[in]  orc_SignalData       Signal data for data pool
 
    \return
    C_NO_ERR Operation success
@@ -536,14 +536,14 @@ sint32 C_OSCNode::InsertSignal(const C_OSCCanProtocol::E_Type oe_ComProtocol, co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set signal at specified position
 
-   \param[in]  oe_ComProtocol          Com protocol
-   \param[in]  ou32_InterfaceIndex     Interface index
-   \param[in]  ou32_DatapoolIndex      Datapool index
-   \param[in]  oq_MessageIsTx          Flag if message is tx
-   \param[in]  ou32_MessageIndex       Message index
-   \param[in]  ou32_SignalIndex        Signal index
-   \param[in]  orc_Signal              Signal data for message positioning
-   \param[in]  orc_SignalData          Signal data for data pool
+   \param[in]  oe_ComProtocol       Com protocol
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou32_DatapoolIndex   Datapool index
+   \param[in]  oq_MessageIsTx       Flag if message is tx
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  ou32_SignalIndex     Signal index
+   \param[in]  orc_Signal           Signal data for message positioning
+   \param[in]  orc_SignalData       Signal data for data pool
 
    \return
    C_NO_ERR Operation success
@@ -610,13 +610,13 @@ sint32 C_OSCNode::SetSignal(const C_OSCCanProtocol::E_Type oe_ComProtocol, const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set signal at specified position
 
-   \param[in]  oe_ComProtocol          Com protocol
-   \param[in]  ou32_InterfaceIndex     Interface index
-   \param[in]  ou32_DatapoolIndex      Datapool index
-   \param[in]  oq_MessageIsTx          Flag if message is tx
-   \param[in]  ou32_MessageIndex       Message index
-   \param[in]  ou32_SignalIndex        Signal index
-   \param[in]  orc_Signal              Signal data for message positioning
+   \param[in]  oe_ComProtocol       Com protocol
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou32_DatapoolIndex   Datapool index
+   \param[in]  oq_MessageIsTx       Flag if message is tx
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  ou32_SignalIndex     Signal index
+   \param[in]  orc_Signal           Signal data for message positioning
 
    \return
    C_NO_ERR Operation success
@@ -676,13 +676,13 @@ sint32 C_OSCNode::SetSignalPosition(const C_OSCCanProtocol::E_Type oe_ComProtoco
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set signal at specified position
 
-   \param[in]  oe_ComProtocol          Com protocol
-   \param[in]  ou32_InterfaceIndex     Interface index
-   \param[in]  ou32_DatapoolIndex      Datapool index
-   \param[in]  oq_MessageIsTx          Flag if message is tx
-   \param[in]  ou32_MessageIndex       Message index
-   \param[in]  ou32_SignalIndex        Signal index
-   \param[in]  ou16_MultiplexValue     New multiplex value
+   \param[in]  oe_ComProtocol       Com protocol
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou32_DatapoolIndex   Datapool index
+   \param[in]  oq_MessageIsTx       Flag if message is tx
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  ou32_SignalIndex     Signal index
+   \param[in]  ou16_MultiplexValue  New multiplex value
 
    \return
    C_NO_ERR Operation success
@@ -739,12 +739,12 @@ sint32 C_OSCNode::SetSignalMUXValue(const C_OSCCanProtocol::E_Type oe_ComProtoco
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Delete signal at specified position
 
-   \param[in]  oe_ComProtocol         Com protocol
-   \param[in]  ou32_InterfaceIndex    Interface index
-   \param[in]  ou32_DatapoolIndex     Datapool index
-   \param[in]  oq_MessageIsTx         Flag if message is tx
-   \param[in]  ou32_MessageIndex      Message index
-   \param[in]  ou32_SignalIndex       Signal index
+   \param[in]  oe_ComProtocol       Com protocol
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou32_DatapoolIndex   Datapool index
+   \param[in]  oq_MessageIsTx       Flag if message is tx
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  ou32_SignalIndex     Signal index
 
    \return
    C_NO_ERR Operation success
@@ -1140,7 +1140,7 @@ const C_OSCNodeDataPool * C_OSCNode::GetHalDataPoolConst(const bool oq_SafeDatap
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get communication data pool for specified protocol
 
-   \param[in]  oe_ComProtocol        Communication protocol
+   \param[in]  oe_ComProtocol       Communication protocol
    \param[in]  ou32_DataPoolIndex   Datapool index
 
    \return
@@ -1206,7 +1206,7 @@ C_OSCNodeDataPool * C_OSCNode::GetComDataPool(const C_OSCCanProtocol::E_Type oe_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get all communication data pools for specified protocol
 
-   \param[in]  oe_ComProtocol   Communication protocol type
+   \param[in]  oe_ComProtocol    Communication protocol type
 
    \return
    Empty vector            No matching data found for communication protocol
@@ -1236,7 +1236,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get all communication data pools for specified protocol
 
-   \param[in]  oe_ComProtocol   Communication protocol type
+   \param[in]  oe_ComProtocol    Communication protocol type
 
    \return
    Empty vector            No matching data found for communication protocol
@@ -1318,7 +1318,7 @@ C_OSCCanProtocol * C_OSCNode::GetCANProtocol(const C_OSCCanProtocol::E_Type oe_C
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get all protocols for specified communication protocol
 
-   \param[in]  oe_ComProtocol   Communication protocol
+   \param[in]  oe_ComProtocol    Communication protocol
 
    \return
    Empty vector            No matching data found for communication protocol
@@ -1345,7 +1345,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get all protocols for specified communication protocol
 
-   \param[in]  oe_ComProtocol   Communication protocol
+   \param[in]  oe_ComProtocol    Communication protocol
 
    \return
    Empty vector            No matching data found for communication protocol
@@ -1428,8 +1428,8 @@ C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocol(const uint32 ou32_DataPoolIn
    Goes through the data pool lists and element and check whether the number are within the supported range.
    The valid range is limited by the openSYDE communication protocol.
 
-   \param[in]   ou32_DataPoolIndex                  Data pool index
-   \param[out]  orq_InvalidNumberOfListsOrElements  true: number of lists or elements of at least one list out of range
+   \param[in]   ou32_DataPoolIndex                    Data pool index
+   \param[out]  orq_InvalidNumberOfListsOrElements    true: number of lists or elements of at least one list out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::CheckErrorDataPoolNumListsAndElements(const uint32 ou32_DataPoolIndex,
@@ -1474,15 +1474,15 @@ void C_OSCNode::CheckErrorDataPoolNumListsAndElements(const uint32 ou32_DataPool
    * naming conflict: multiple lists have the same name
    * naming conflict: mulsiple elements within one list have the same name
 
-   \param[in]   ou32_DataPoolIndex           Data pool index
-   \param[out]  opq_NameConflict             Name conflict
-   \param[out]  opq_NameInvalid              Name not usable as variable
-   \param[out]  opq_IsErrorInListOrMessage   true: conflict in any list or message was detected
-   \param[out]  opq_InvalidNumberOfListsOrElements  true: invalid number of lists or elements
-   \param[out]  opc_InvalidListIndices       Optional storage for list of invalid list indices
-                                              (see opq_IsErrorInListOrMessage)
-                                             If COMM: interface index
-                                             Else: list index
+   \param[in]   ou32_DataPoolIndex                    Data pool index
+   \param[out]  opq_NameConflict                      Name conflict
+   \param[out]  opq_NameInvalid                       Name not usable as variable
+   \param[out]  opq_IsErrorInListOrMessage            true: conflict in any list or message was detected
+   \param[out]  opq_InvalidNumberOfListsOrElements    true: invalid number of lists or elements
+   \param[out]  opc_InvalidListIndices                Optional storage for list of invalid list indices
+                                                      (see opq_IsErrorInListOrMessage)
+                                                      If COMM: interface index
+                                                      Else: list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::CheckErrorDataPool(const uint32 ou32_DataPoolIndex, bool * const opq_NameConflict,
@@ -1731,7 +1731,7 @@ void C_OSCNode::CheckErrorDataPool(const uint32 ou32_DataPoolIndex, bool * const
 /*! \brief  Check if message id valid
 
    \param[in]   ou32_InterfaceIndex       Interface index
-   \param[in]   ou32_MessageId            Message id
+   \param[in]   orc_MessageId             Message id
    \param[out]  orq_Valid                 Flag if valid
    \param[in]   ope_SkipComProtocol       Optional parameter to skip one index
                                           (Only used if all other optional skip parameters are used as well)
@@ -1747,8 +1747,8 @@ void C_OSCNode::CheckErrorDataPool(const uint32 ou32_DataPoolIndex, bool * const
                                           (Use-case: skip current message to avoid conflict with itself)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNode::CheckMessageId(const uint32 ou32_InterfaceIndex, const uint32 ou32_MessageId, bool & orq_Valid,
-                               const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol,
+void C_OSCNode::CheckMessageId(const uint32 ou32_InterfaceIndex, const C_OSCCanMessageUniqueId & orc_MessageId,
+                               bool & orq_Valid, const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol,
                                const uint32 * const opu32_SkipInterfaceIndex,
                                const bool * const opq_SkipMessageIsTxFlag,
                                const uint32 * const opu32_SkipMessageIndex) const
@@ -1763,9 +1763,11 @@ void C_OSCNode::CheckMessageId(const uint32 ou32_InterfaceIndex, const uint32 ou
       if (pc_CurMessage != NULL)
       {
          //No skip necessary as they should be already filtered
-         if (pc_CurMessage->u32_CanId == ou32_MessageId)
+         if ((pc_CurMessage->u32_CanId == orc_MessageId.u32_CanId) &&
+             (pc_CurMessage->q_IsExtended == orc_MessageId.q_IsExtended))
          {
             orq_Valid = false;
+            break;
          }
       }
    }

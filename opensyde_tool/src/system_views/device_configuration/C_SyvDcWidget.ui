@@ -528,7 +528,7 @@
    </item>
    <item>
     <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxReport">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
       <property name="leftMargin">
        <number>30</number>
       </property>
@@ -569,7 +569,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Style</string>
+             <string>_Report</string>
             </property>
            </widget>
           </item>
@@ -644,54 +644,12 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_12">
-        <item>
-         <spacer name="horizontalSpacer_8">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>35</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PbBackToScan">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Back to &quot;Scan&quot;</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxScan">
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,1,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,1,0">
       <property name="leftMargin">
        <number>30</number>
       </property>
@@ -735,7 +693,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Style</string>
+             <string>_Settings</string>
             </property>
            </widget>
           </item>
@@ -799,7 +757,7 @@
         <item>
          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelBitRate">
           <property name="text">
-           <string>TextLabel</string>
+           <string>_Bitratel</string>
           </property>
          </widget>
         </item>
@@ -829,7 +787,7 @@
         <item>
          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelConfigurationMode">
           <property name="text">
-           <string>TextLabel</string>
+           <string>_Model</string>
           </property>
          </widget>
         </item>
@@ -908,7 +866,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Style</string>
+                 <string>_Topology Nodes</string>
                 </property>
                </widget>
               </item>
@@ -971,6 +929,9 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_21">
              <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
               <number>0</number>
              </property>
              <item>
@@ -1053,7 +1014,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Style</string>
+                 <string>_Connected Devices</string>
                 </property>
                </widget>
               </item>
@@ -1118,6 +1079,9 @@
              <property name="leftMargin">
               <number>0</number>
              </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
              <item>
               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelStartScan">
                <property name="text">
@@ -1161,61 +1125,12 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,0,0">
-        <property name="rightMargin">
-         <number>10</number>
-        </property>
-        <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelScanFoundDevicesWarning">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>97</width>
-            <height>35</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonScan">
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>PushButton</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxAssignment">
-     <layout class="QVBoxLayout" name="verticalLayout_18" stretch="0,0,0,1,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout_18" stretch="0,0,0,1,0">
       <property name="leftMargin">
        <number>30</number>
       </property>
@@ -1259,7 +1174,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Style</string>
+             <string>_Assignment</string>
             </property>
            </widget>
           </item>
@@ -1320,7 +1235,7 @@
         <item>
          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelAssignment">
           <property name="text">
-           <string>TextLabel</string>
+           <string>InfoTextLabel</string>
           </property>
          </widget>
         </item>
@@ -1371,7 +1286,7 @@
              <number>10</number>
             </property>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_35" stretch="0,1">
+             <layout class="QHBoxLayout" name="horizontalLayout_35" stretch="0,1,0">
               <property name="spacing">
                <number>6</number>
               </property>
@@ -1396,7 +1311,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Style</string>
+                 <string>_Topology Nodes</string>
                 </property>
                </widget>
               </item>
@@ -1412,6 +1327,13 @@
                  </size>
                 </property>
                </spacer>
+              </item>
+              <item>
+               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelAssignmentProgress">
+                <property name="text">
+                 <string>_AssignmentProgressTextLabel</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -1496,7 +1418,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Style</string>
+                 <string>_Connected Devices</string>
                 </property>
                </widget>
               </item>
@@ -1572,52 +1494,6 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_19">
-        <property name="rightMargin">
-         <number>10</number>
-        </property>
-        <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelAssignmentProgress">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_22">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>35</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonConfigure">
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>PushButton</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
      </layout>
     </widget>
    </item>
@@ -1639,6 +1515,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <property name="spacing">
+      <number>26</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
@@ -1656,13 +1535,13 @@
       <widget class="stw_opensyde_gui_elements::C_OgePubCancel" name="pc_BushButtonCancel">
        <property name="minimumSize">
         <size>
-         <width>120</width>
+         <width>150</width>
          <height>35</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>120</width>
+         <width>150</width>
          <height>35</height>
         </size>
        </property>
@@ -1673,7 +1552,70 @@
         </font>
        </property>
        <property name="text">
-        <string>Cancel</string>
+        <string>_Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonConfigure">
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>_Configure Devices</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonScan">
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>_Scan for Devices</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="stw_opensyde_gui_elements::C_OgePubCancel" name="pc_PbBackToScan">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>_Back to &quot;Scan&quot;</string>
        </property>
       </widget>
      </item>
@@ -1681,13 +1623,13 @@
       <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_BushButtonOk">
        <property name="minimumSize">
         <size>
-         <width>120</width>
+         <width>150</width>
          <height>35</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>120</width>
+         <width>150</width>
          <height>35</height>
         </size>
        </property>
@@ -1698,7 +1640,7 @@
         </font>
        </property>
        <property name="text">
-        <string>OK</string>
+        <string>_OK</string>
        </property>
       </widget>
      </item>
@@ -1728,11 +1670,6 @@
    <extends>QGroupBox</extends>
    <header>C_OgeGbx.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubConfigure</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubConfigure.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>

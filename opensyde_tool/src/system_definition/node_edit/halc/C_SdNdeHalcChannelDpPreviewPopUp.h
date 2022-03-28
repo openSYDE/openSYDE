@@ -77,7 +77,7 @@ private:
    C_SdNdeHalcChannelDpPreviewPopUp(const C_SdNdeHalcChannelDpPreviewPopUp &);
    C_SdNdeHalcChannelDpPreviewPopUp & operator =(const C_SdNdeHalcChannelDpPreviewPopUp &);
 
-   static const stw_types::sintn mhsn_TableSpacing;
+   static const stw_types::sintn mhsn_TABLE_SPACING;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

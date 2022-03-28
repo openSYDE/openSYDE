@@ -20,9 +20,11 @@
 
 #include "C_OgeWiHover.h"
 #include "C_SyvUpScene.h"
+#include "C_GiSvNodeData.h"
 #include "C_SyvUpSequences.h"
 #include "C_SyvUpProgressLog.h"
 #include "C_OgeWiFixPosition.h"
+#include "C_OSCSuSequencesNodeStates.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -59,6 +61,9 @@ Q_SIGNALS:
    //lint -restore
    void SigChanged(void);
    void SigBlockDragAndDrop(const bool oq_Block);
+   void SigNodeConnectStates(const std::vector<stw_opensyde_core::C_OSCSuSequencesNodeConnectStates> & orc_NodeStates,
+                             const C_GiSvNodeData::C_GiSvNodeDataPreconditionErrors & orc_NodePreconditionErrors);
+   void SigNodeUpdateStates(const std::vector<stw_opensyde_core::C_OSCSuSequencesNodeUpdateStates> & orc_NodeStates);
 
 protected:
    virtual void showEvent(QShowEvent * const opc_Event) override;
@@ -94,14 +99,17 @@ private:
    void m_Update(void);
 
    void m_Disconnect(void);
-   void m_DisconnectAction(const bool oq_ClearLogAndResetScene = true);
+   void m_DisconnectAction(void);
    void m_Cancel(void);
 
    void m_Timer(void);
 
+   void m_HandlePreconditionErrorType(const std::vector<stw_types::uint32> & orc_ErrorNodeIndexes,
+                                      const QString & orc_Description, const QString & orc_DetailsStart);
+   void m_HandleNodePreconditionError(QString & orc_ErrorText, const stw_types::uint32 ou32_ErrorNodeIndex);
    void m_UpdateReportText(const QString & orc_NewTextPart) const;
 
-   void m_HandleConnectionFailure(void);
+   void m_HandleConnectionFailure(const bool oq_SuppressMessageBox = false);
    void m_HandleUpdateFailure(void);
 
    void m_InitToolBox(void);
@@ -155,16 +163,15 @@ private:
    std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> mc_NodesWithAllApplicationsAndTempPath;
    std::vector<stw_types::uint32> mc_NodesOrder;
    bool mq_NodesPreconditionError;
-   std::vector<stw_types::uint32> mc_NodesPreconditionNvmWriteError;
-   std::vector<stw_types::uint32> mc_NodesPreconditionEthToEthError;
+   C_GiSvNodeData::C_GiSvNodeDataPreconditionErrors mc_NodePreconditionErrors;
 
    stw_types::uint32 mu32_DisconnectTime;
    stw_types::uint32 mu32_UpdateTime;
 
-   static const QString mhc_TempFolder;
-   static const stw_types::sintn mhsn_WidgetBorder;
-   static const stw_types::sintn mhsn_ToolboxInitPosY;
-   static const stw_types::uint32 mhu32_WaitTime;
+   static const QString mhc_TEMP_FOLDER;
+   static const stw_types::sintn mhsn_WIDGET_BORDER;
+   static const stw_types::sintn mhsn_TOOLBOX_INIT_POS_Y;
+   static const stw_types::uint32 mhu32_WAIT_TIME;
 };
 }
 

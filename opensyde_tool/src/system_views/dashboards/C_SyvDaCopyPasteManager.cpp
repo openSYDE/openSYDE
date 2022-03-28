@@ -42,11 +42,12 @@ using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
+using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SyvDaCopyPasteManager::hc_ClipBoardBaseTagName = "opensyde-system-definition";
+const QString C_SyvDaCopyPasteManager::hc_CLIP_BOARD_BASE_TAG_NAME = "opensyde-system-definition";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -89,9 +90,25 @@ C_SyvDaCopyPasteManager::~C_SyvDaCopyPasteManager(void)
 //----------------------------------------------------------------------------------------------------------------------
 const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc_Parent)
 {
-   C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(this->mc_LastKnownData, this->mu32_ViewIndex, opc_Parent);
+   C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(this->mc_LastKnownData, this->mc_LastKnownRails,
+                                                    this->mc_LastKnownElementIDGroups, this->mu32_ViewIndex,
+                                                    opc_Parent);
 
    return &this->mc_LastKnownData;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get rails
+
+   \return
+   NULL No valid rails found
+   Else Valid rails
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
+           C_PuiSvReadDataConfiguration> * C_SyvDaCopyPasteManager::GetRails() const
+{
+   return &this->mc_LastKnownRails;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -346,7 +363,7 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
 
          //Copy to clip board
          C_SyvClipBoardHelper::h_StoreDashboardToClipboard(c_Snapshot, c_Rails,
-                                                           C_SyvDaCopyPasteManager::hc_ClipBoardBaseTagName);
+                                                           C_SyvDaCopyPasteManager::hc_CLIP_BOARD_BASE_TAG_NAME);
       }
    }
 }
@@ -361,21 +378,31 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaCopyPasteManager::CheckValidContentAndPrepareData(void)
 {
+   this->mc_LastKnownRails.clear();
    this->mc_LastKnownData.Clear();
-   return (C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(this->mc_LastKnownData,
-                                                              C_SyvDaCopyPasteManager::hc_ClipBoardBaseTagName) ==
+   this->mc_LastKnownElementIDGroups.clear();
+   return (C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(this->mc_LastKnownData, this->mc_LastKnownRails,
+                                                              this->mc_LastKnownElementIDGroups,
+                                                              C_SyvDaCopyPasteManager::hc_CLIP_BOARD_BASE_TAG_NAME) ==
            C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Adapt copy content for paste
 
-   \param[in,out]  orc_CopyData     Copy data
-   \param[in]      ou32_ViewIndex   View index
-   \param[in,out]  opc_Parent       Parent for dialog
+   \param[in,out]  orc_CopyData           Copy data
+   \param[in,out]  orc_Rails              System view dashboard rails
+   \param[in]      orc_ElementIDGroups    Element ID groups
+   \param[in]      ou32_ViewIndex         View index
+   \param[in,out]  opc_Parent             Parent for dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(C_PuiSvDashboard & orc_CopyData, const uint32 ou32_ViewIndex,
+void C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(C_PuiSvDashboard & orc_CopyData,
+                                                      QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
+                                                           C_PuiSvReadDataConfiguration> & orc_Rails,
+                                                      const QMap<C_PuiSvDbNodeDataPoolListElementId,
+                                                                 C_PuiSvDbElementIdCRCGroup> & orc_ElementIDGroups,
+                                                      const uint32 ou32_ViewIndex,
                                                       QWidget * const opc_Parent)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
@@ -504,16 +531,20 @@ void C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(C_PuiSvDashboard & orc_Cop
          }
       }
       //Check ID validity
-      if (orc_CopyData.DiscardInvalidIndices())
       {
-         C_OgeWiCustomMessage c_Message(opc_Parent);
-         c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
-         c_Message.SetDescription(C_GtGetText::h_GetText(
-                                     "Some data elements were not found in your SYSTEM DEFINITION.\n"
-                                     "These were automatically removed from the pasted widgets."));
-         c_Message.SetCustomMinHeight(180, 180);
-         c_Message.Execute();
+         const bool q_Changed1 = orc_CopyData.DiscardInvalidIndices();
+         const bool q_Changed2 = C_SyvDaCopyPasteManager::mh_ValidateCrcs(orc_CopyData, orc_Rails, orc_ElementIDGroups);
+         if (q_Changed1 || q_Changed2)
+         {
+            C_OgeWiCustomMessage c_Message(opc_Parent);
+            c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
+            c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
+            c_Message.SetDescription(C_GtGetText::h_GetText(
+                                        "Some data elements were not found in your SYSTEM DEFINITION.\n"
+                                        "These were automatically removed from the pasted widgets."));
+            c_Message.SetCustomMinHeight(180, 180);
+            c_Message.Execute();
+         }
       }
    }
 }
@@ -583,4 +614,38 @@ void C_SyvDaCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * con
          m_MinToOrgPos(rc_Widget.c_UIPosition);
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Validate CRCs
+
+   \param[in,out]  orc_Data               System view dashboard
+   \param[in,out]  orc_Rails              System view dashboard rails
+   \param[in]      orc_ElementIDGroups    Element ID groups
+
+   \return
+   Flags
+
+   \retval   True    Changes happened
+   \retval   False   Nothing changed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaCopyPasteManager::mh_ValidateCrcs(C_PuiSvDashboard & orc_Data, QMap<C_OSCNodeDataPoolListElementId,
+                                                                                C_PuiSvReadDataConfiguration> & orc_Rails, const QMap<C_PuiSvDbNodeDataPoolListElementId,
+                                                                                                                                      C_PuiSvDbElementIdCRCGroup> & orc_ElementIDGroups)
+{
+   bool q_Retval = false;
+
+   for (QMap<C_PuiSvDbNodeDataPoolListElementId,
+             C_PuiSvDbElementIdCRCGroup>::ConstIterator c_It = orc_ElementIDGroups.cbegin();
+        c_It != orc_ElementIDGroups.cend(); ++c_It)
+   {
+      if (c_It.value().CheckCRC() != C_NO_ERR)
+      {
+         orc_Rails.remove(c_It.key());
+         orc_Data.RemoveAllReferencesToElementId(c_It.key());
+         q_Retval = true;
+      }
+   }
+   return q_Retval;
 }

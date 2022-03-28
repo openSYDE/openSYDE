@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
-const stw_types::float64 C_GiBiArrow::mhf64_ShapeOffsetFactor = 4.0;
+const stw_types::float64 C_GiBiArrow::mhf64_SHAPE_OFFSET_FACTOR = 4.0;
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
@@ -62,9 +62,9 @@ C_GiBiArrow::C_GiBiArrow(const uint64 & oru64_ID, const std::vector<QPointF> * c
    mpc_ArrowHeadStart(NULL),
    mpc_ArrowHeadEnd(NULL),
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   mf64_ArrowLength(mhf64_ShapeOffsetFactor),
+   mf64_ArrowLength(mhf64_SHAPE_OFFSET_FACTOR),
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   mf64_ArrowHeight(mhf64_ShapeOffsetFactor)
+   mf64_ArrowHeight(mhf64_SHAPE_OFFSET_FACTOR)
 {
    this->setFlag(ItemIsSelectable);
    this->setFlag(ItemIsMovable);
@@ -110,7 +110,7 @@ C_GiBiArrow::~C_GiBiArrow(void)
 //----------------------------------------------------------------------------------------------------------------------
 QPainterPath C_GiBiArrow::shape() const
 {
-   const float64 f64_AdaptedWidth = static_cast<stw_types::float64>(this->GetWidth()) * mhf64_ShapeOffsetFactor;
+   const float64 f64_AdaptedWidth = static_cast<stw_types::float64>(this->GetWidth()) * mhf64_SHAPE_OFFSET_FACTOR;
    float64 f64_InteractioWidth = 0.0;
 
    //Copy points for interface
@@ -136,8 +136,8 @@ QPainterPath C_GiBiArrow::shape() const
 void C_GiBiArrow::SetWidth(const sint32 & ors32_Width)
 {
    C_GiLiLineGroup::SetWidth(ors32_Width);
-   mf64_ArrowLength = mhf64_ShapeOffsetFactor * static_cast<float64>(ors32_Width);
-   mf64_ArrowHeight = mhf64_ShapeOffsetFactor * static_cast<float64>(ors32_Width);
+   mf64_ArrowLength = mhf64_SHAPE_OFFSET_FACTOR * static_cast<float64>(ors32_Width);
+   mf64_ArrowHeight = mhf64_SHAPE_OFFSET_FACTOR * static_cast<float64>(ors32_Width);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -26,9 +26,10 @@ namespace stw_opensyde_core
 class C_OSCNodeFiler
 {
 public:
-   static stw_types::sint32 h_LoadNodeFile(C_OSCNode & orc_Node, const stw_scl::C_SCLString & orc_FilePath);
+   static stw_types::sint32 h_LoadNodeFile(C_OSCNode & orc_Node, const stw_scl::C_SCLString & orc_FilePath,
+                                           const bool oq_SkipContent = false);
    static stw_types::sint32 h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,
-                                       const stw_scl::C_SCLString & orc_BasePath);
+                                       const stw_scl::C_SCLString & orc_BasePath, const bool oq_SkipContent = false);
    static stw_types::sint32 h_SaveNodeFile(const C_OSCNode & orc_Node, const stw_scl::C_SCLString & orc_FilePath,
                                            std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles);
    static stw_types::sint32 h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,

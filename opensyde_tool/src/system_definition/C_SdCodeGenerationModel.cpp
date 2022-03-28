@@ -72,7 +72,7 @@ C_SdCodeGenerationModel::~C_SdCodeGenerationModel(void)
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_ElementIndices)
 {
-   const sint32 s32_Return = C_NO_ERR;
+   const sint32 s32_RETURN = C_NO_ERR;
    C_TblTreeModelCheckableItem * const pc_VisibleRootItem = new C_TblTreeModelCheckableItem();
 
    const std::vector<C_OSCNode> & rc_Nodes = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_Nodes;
@@ -190,7 +190,7 @@ sint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_ElementIndi
    this->mpc_InvisibleRootItem->AddChild(pc_VisibleRootItem);
    this->endResetModel();
 
-   return s32_Return;
+   return s32_RETURN;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

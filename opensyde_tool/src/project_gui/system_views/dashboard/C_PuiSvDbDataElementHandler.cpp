@@ -1022,8 +1022,8 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(voi
                    (c_ItItem.value() < this->mc_DataPoolElementTimeoutsMs.size()))
                {
                   //Ten steps with 0.5 seconds each
-                  const uint32 u32_TimeoutMs = 5000;
-                  this->mc_DataPoolElementTimeoutsMs[c_ItItem.value()] = u32_TimeoutMs;
+                  const uint32 u32_TIMEOUT_MS = 5000U;
+                  this->mc_DataPoolElementTimeoutsMs[c_ItItem.value()] = u32_TIMEOUT_MS;
                }
             }
             else
@@ -1214,6 +1214,43 @@ bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredNodesActive(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for any required nodes with valid dashboard routing
+
+   \return
+   true  Found
+   false Not found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredNodesValidDashboardRouting(void) const
+{
+   bool q_AtLeastOneValidElement = false;
+
+   const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
+
+   for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
+        c_ItElement != rc_Elements.end(); ++c_ItElement)
+   {
+      const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
+      if (c_ElementId.GetIsValid() == true)
+      {
+         bool q_Error = false;
+         tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckViewNodeDashboardRoutingError(this->mu32_ViewIndex,
+                                                                                        c_ElementId.u32_NodeIndex,
+                                                                                        q_Error) ==
+                    C_NO_ERR);
+
+         if (q_Error == false)
+         {
+            q_AtLeastOneValidElement = true;
+            break;
+         }
+      }
+   }
+
+   return q_AtLeastOneValidElement;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for any required buses not connected in view
 
    \return
@@ -1328,6 +1365,31 @@ bool C_PuiSvDbDataElementHandler::m_CheckNodeActive(const uint32 ou32_NodeIndex)
    }
 
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for node valid dashboard routing
+
+   \param[in]  ou32_NodeIndex    Node index to check
+
+   \return
+   true  Dashboard routing valid
+   false Dashboard routing not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbDataElementHandler::m_CheckNodeHasAnyRequiredValidDashboardRouting(const uint32 ou32_NodeIndex) const
+{
+   bool q_Valid;
+   bool q_Error = false;
+
+   tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckViewNodeDashboardRoutingError(this->mu32_ViewIndex,
+                                                                                  ou32_NodeIndex,
+                                                                                  q_Error) ==
+              C_NO_ERR);
+
+   q_Valid  = !q_Error;
+
+   return q_Valid;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

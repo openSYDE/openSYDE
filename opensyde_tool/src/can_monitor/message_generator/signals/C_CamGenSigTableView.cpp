@@ -284,10 +284,10 @@ void C_CamGenSigTableView::resizeEvent(QResizeEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::m_RepositionButtons(void)
 {
-   const QSize c_ButtonSizeUp(25, 27);
+   const QSize c_BUTTON_SIZE_UP(25, 27);
 
    //Position
-   this->mpc_PushButtonScrollTop->setGeometry(QRect(QPoint(0, 0), c_ButtonSizeUp));
+   this->mpc_PushButtonScrollTop->setGeometry(QRect(QPoint(0, 0), c_BUTTON_SIZE_UP));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

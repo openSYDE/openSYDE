@@ -12,8 +12,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <winsock.h> //Windows WinSock
 #include <winsock2.h>
+#include <winsock.h> //Windows WinSock
 #include <cstring>
 #include <iphlpapi.h> //Windows IP helper utilities
 #include "stwtypes.h"
@@ -238,7 +238,7 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
 
    u32_RetVal = GetAdaptersAddresses(AF_INET, 0U, NULL, pt_Addresses, &u32_AddressesBufLen);
 
-   if (u32_RetVal == NO_ERROR) //lint !e620 //constant defined by API; no problem
+   if (u32_RetVal == NO_ERROR) //lint !e620 !e9106 //constant defined by API; no problem
    {
       PIP_ADAPTER_ADDRESSES pt_Adapter = pt_Addresses;
       while (pt_Adapter != NULL)
@@ -463,9 +463,9 @@ sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, 
    if ((q_Error == false) && (oq_ServerPort == false))
    {
       //set broadcast permission for UDP client socket
-      const charn cn_Broadcast = 'a';
+      const charn cn_BROADCAST = 'a';
       sn_Return =
-         setsockopt(orun_Socket, SOL_SOCKET, SO_BROADCAST, &cn_Broadcast, sizeof(cn_Broadcast));
+         setsockopt(orun_Socket, SOL_SOCKET, SO_BROADCAST, &cn_BROADCAST, sizeof(cn_BROADCAST));
       if (sn_Return == SOCKET_ERROR)
       {
          osc_write_log_error("openSYDE IP-TP",
@@ -627,7 +627,7 @@ sint32 C_OSCIpDispatcherWinSock::IsTcpConnected(const uint32 ou32_Handle)
 
    if (ou32_Handle >= this->mc_SocketsTcp.size())
    {
-      osc_write_log_error("openSYDE IP-TP", "ReConnectTcp called with invalid handle.");
+      osc_write_log_error("openSYDE IP-TP", "IsTcpConnected called with invalid handle.");
       s32_Return = C_RANGE;
    }
    else if (this->mc_SocketsTcp[ou32_Handle].un_Socket == m_WsInvalidSocket())

@@ -33,10 +33,10 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TabIndexProperties = 0;
-const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TabIndexDataPool = 1;
-const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TabIndexComm = 2;
-const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TabIndexHalc = 3;
+const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TAB_INDEX_PROPERTIES = 0;
+const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TAB_INDEX_DATA_POOL = 1;
+const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TAB_INDEX_COMM = 2;
+const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TAB_INDEX_HALC = 3;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -63,73 +63,26 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeNodeEditWidget),
    mu32_NodeIndex(ou32_NodeIndex),
-   mq_DataChanged(false)
+   mq_DataChanged(false),
+   mq_SkipLoadUserSettings(true),
+   mpc_PropertiesWidget(NULL),
+   mpc_DataPoolEditWidget(NULL),
+   mpc_ComIfDescriptionWidget(NULL),
+   mpc_HalWidget(NULL)
 {
    mpc_Ui->setupUi(this);
 
-   this->mpc_Ui->pc_WidgetApplications->SetNodeIndex(this->mu32_NodeIndex);
-
    InitStaticNames();
 
-   // Splitter stretch: if there is more space stretch left widget (i.e. index 0)
-   this->mpc_Ui->pc_Splitter->setStretchFactor(0, 10);
-   this->mpc_Ui->pc_Splitter->setStretchFactor(1, 0);
-
-   this->mpc_Ui->pc_NodePropWidget->SetNodeId(this->mu32_NodeIndex);
-   this->mpc_Ui->pc_DataPoolEditWidget->SetNode(this->mu32_NodeIndex);
-   this->mpc_Ui->pc_TabHalc->SetNode(this->mu32_NodeIndex);
-   this->mpc_Ui->pc_ComIfDescriptionWidget->SetNodeId(this->mu32_NodeIndex, C_OSCCanProtocol::eLAYER2);
-
    // connecting to signals
-   connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigChanged,
-           this, &C_SdNdeNodeEditWidget::m_DataChanged);
-   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigChanged,
-           this, &C_SdNdeNodeEditWidget::m_DataChanged);
-   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigDataPoolsChanged,
-           this, &C_SdNdeNodeEditWidget::m_ReloadCommMessages);
-   connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigChanged,
-           this, &C_SdNdeNodeEditWidget::m_DataChanged);
-   connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange,
-           this, &C_SdNdeNodeEditWidget::SigErrorChange);
-   connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigSwitchToBus,
-           this, &C_SdNdeNodeEditWidget::m_OnSwitchToBus);
-   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToHalc,
-           this, &C_SdNdeNodeEditWidget::m_OnSwitchToHalc);
-   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToCommMessages,
-           this, &C_SdNdeNodeEditWidget::m_OnSwitchToCommMessages);
-   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSave,
-           this, &C_SdNdeNodeEditWidget::SigSave);
-   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSaveAs,
-           this, &C_SdNdeNodeEditWidget::SigSaveAs);
    connect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw_opensyde_gui_elements::C_OgeTawPageNavi::currentChanged,
            this, &C_SdNdeNodeEditWidget::m_CurrentTabChanged);
    connect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw_opensyde_gui_elements::C_OgeTawPageNavi::tabBarClicked,
            this, &C_SdNdeNodeEditWidget::m_TabClicked);
-   connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigNameChanged,
-           this, &C_SdNdeNodeEditWidget::SigNameChanged);
-   connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigBusBitrateClicked,
-           this, &C_SdNdeNodeEditWidget::SigSwitchToBusProperties);
 
    // show the initial tab
    this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(osn_TabIndex);
-
-   //Other connects
-   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigErrorChange,
-           this, &C_SdNdeNodeEditWidget::SigErrorChange);
-   connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigErrorChange, this,
-           &C_SdNdeNodeEditWidget::SigErrorChange);
-   connect(this->mpc_Ui->pc_TabHalc, &C_SdNdeHalcWidget::SigErrorChange, this,
-           &C_SdNdeNodeEditWidget::SigErrorChange);
-   connect(this->mpc_Ui->pc_TabHalc, &C_SdNdeHalcWidget::SigHalcDataPoolChanged, this,
-           &C_SdNdeNodeEditWidget::m_ReloadDataPools);
-   connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigCommDataPoolAdded, this,
-           &C_SdNdeNodeEditWidget::m_ReloadDataPools);
-   connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange, this,
-           &C_SdNdeNodeEditWidget::m_ReloadDataPools);
-   connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigOwnedDataPoolsChanged, this,
-           &C_SdNdeNodeEditWidget::m_ReloadDataPools);
-   connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigHalcLoadedFromTSP, this,
-           &C_SdNdeNodeEditWidget::m_HalcLoadedFromTSP);
+   m_CurrentTabChanged(osn_TabIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -152,10 +105,10 @@ C_SdNdeNodeEditWidget::~C_SdNdeNodeEditWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::InitStaticNames(void) const
 {
-   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TabIndexProperties, C_GtGetText::h_GetText("Properties"));
-   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TabIndexDataPool, C_GtGetText::h_GetText("Datapools"));
-   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TabIndexComm, C_GtGetText::h_GetText("COMM Messages"));
-   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TabIndexHalc, C_GtGetText::h_GetText("Hardware Configurator"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TAB_INDEX_PROPERTIES, C_GtGetText::h_GetText("Properties"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TAB_INDEX_DATA_POOL, C_GtGetText::h_GetText("Datapools"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TAB_INDEX_COMM, C_GtGetText::h_GetText("COMM Messages"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TAB_INDEX_HALC, C_GtGetText::h_GetText("Hardware Configurator"));
 
    //Tool tips
 }
@@ -179,7 +132,10 @@ bool C_SdNdeNodeEditWidget::WasChanged(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::Save(void) const
 {
-   this->mpc_Ui->pc_NodePropWidget->SaveToData();
+   if (this->mpc_PropertiesWidget != NULL)
+   {
+      this->mpc_PropertiesWidget->SaveToData();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -197,11 +153,15 @@ void C_SdNdeNodeEditWidget::SetFlag(const uint32 ou32_Flag) const
        (ou32_Flag == mu32_FLAG_OPEN_PROPERTIES))
    {
       // open the properties
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexProperties);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_PROPERTIES);
 
       if (ou32_Flag == mu32_FLAG_EDIT_NAME)
       {
-         this->mpc_Ui->pc_NodePropWidget->SelectName();
+         tgl_assert(this->mpc_PropertiesWidget != NULL);
+         if (this->mpc_PropertiesWidget != NULL)
+         {
+            this->mpc_PropertiesWidget->SelectName();
+         }
       }
    }
 }
@@ -225,50 +185,65 @@ void C_SdNdeNodeEditWidget::SetFlag(const uint32 ou32_Flag) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::OpenDetail(const sint32 os32_MainIndex, const sint32 os32_ListIndex,
-                                       const sint32 os32_ElementIndex, const sint32 os32_Flag) const
+                                       const sint32 os32_ElementIndex, const sint32 os32_Flag)
 {
    if (os32_Flag == 0)
    {
       // open the datapool
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexDataPool);
-      this->mpc_Ui->pc_DataPoolEditWidget->OpenDetail(os32_MainIndex, os32_ListIndex, os32_ElementIndex);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_DATA_POOL);
+      tgl_assert(this->mpc_DataPoolEditWidget != NULL);
+      if (this->mpc_DataPoolEditWidget != NULL)
+      {
+         this->mpc_DataPoolEditWidget->OpenDetail(os32_MainIndex, os32_ListIndex, os32_ElementIndex);
+      }
    }
    else if ((os32_Flag == 1) ||
             (os32_Flag == 2))
    {
       // open the interface description widget
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexComm);
-
-      if (os32_Flag == 1)
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_COMM);
+      tgl_assert(this->mpc_ComIfDescriptionWidget != NULL);
+      if (this->mpc_ComIfDescriptionWidget != NULL)
       {
-         this->mpc_Ui->pc_ComIfDescriptionWidget->SelectSignalSearch(this->mu32_NodeIndex,
-                                                                     static_cast<uint32>(os32_MainIndex),
-                                                                     static_cast<uint32>(os32_ListIndex),
-                                                                     static_cast<uint32>(os32_ElementIndex));
-      }
-      else if (os32_Flag == 2)
-      {
-         this->mpc_Ui->pc_ComIfDescriptionWidget->SelectMessageSearch(this->mu32_NodeIndex,
-                                                                      static_cast<uint32>(os32_MainIndex),
-                                                                      static_cast<uint32>(os32_ListIndex),
-                                                                      static_cast<uint32>(os32_ElementIndex));
-      }
-      else
-      {
-         // nothing to do
+         if (os32_Flag == 1)
+         {
+            this->mpc_ComIfDescriptionWidget->SelectSignalSearch(this->mu32_NodeIndex,
+                                                                 static_cast<uint32>(os32_MainIndex),
+                                                                 static_cast<uint32>(os32_ListIndex),
+                                                                 static_cast<uint32>(os32_ElementIndex));
+         }
+         else if (os32_Flag == 2)
+         {
+            this->mpc_ComIfDescriptionWidget->SelectMessageSearch(this->mu32_NodeIndex,
+                                                                  static_cast<uint32>(os32_MainIndex),
+                                                                  static_cast<uint32>(os32_ListIndex),
+                                                                  static_cast<uint32>(os32_ElementIndex));
+         }
+         else
+         {
+            // nothing to do
+         }
       }
    }
    else if (os32_Flag == 3)
    {
       // show the application / data block
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexProperties);
-      this->mpc_Ui->pc_WidgetApplications->ShowApplication(os32_MainIndex);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_PROPERTIES);
+      tgl_assert(this->mpc_PropertiesWidget != NULL);
+      if (this->mpc_PropertiesWidget != NULL)
+      {
+         this->mpc_PropertiesWidget->ShowApplication(os32_MainIndex);
+      }
    }
    else if (os32_Flag == 4)
    {
       // show HALC
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexHalc);
-      this->mpc_Ui->pc_TabHalc->ShowChannel(os32_MainIndex, os32_ListIndex);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_HALC);
+      tgl_assert(this->mpc_HalWidget != NULL);
+      if (this->mpc_HalWidget != NULL)
+      {
+         this->mpc_HalWidget->ShowChannel(os32_MainIndex, os32_ListIndex);
+      }
    }
    else
    {
@@ -282,9 +257,12 @@ void C_SdNdeNodeEditWidget::OpenDetail(const sint32 os32_MainIndex, const sint32
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::AddFromTSP(void)
 {
-   if (this->mpc_Ui->pc_WidgetApplications != NULL)
+   //Widget necessary
+   m_CreatePropertiesTab(true);
+   tgl_assert(this->mpc_PropertiesWidget != NULL);
+   if (this->mpc_PropertiesWidget != NULL)
    {
-      this->mpc_Ui->pc_WidgetApplications->AddFromTSP();
+      this->mpc_PropertiesWidget->AddFromTSP();
    }
 }
 
@@ -310,6 +288,7 @@ sintn C_SdNdeNodeEditWidget::GetTabIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::showEvent(QShowEvent * const opc_Event)
 {
+   this->mq_SkipLoadUserSettings = true;
    this->m_LoadUserSettings();
    QWidget::showEvent(opc_Event);
 }
@@ -334,12 +313,19 @@ void C_SdNdeNodeEditWidget::hideEvent(QHideEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_LoadUserSettings() const
 {
-   const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdNodeEditSplitterX();
-
-   this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
+   if (this->mpc_PropertiesWidget != NULL)
+   {
+      this->mpc_PropertiesWidget->LoadUserSettings();
+   }
    this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex());
-   this->mpc_Ui->pc_TabHalc->LoadUserSettings();
-   this->mpc_Ui->pc_ComIfDescriptionWidget->LoadUserSettings();
+   if (this->mpc_HalWidget != NULL)
+   {
+      this->mpc_HalWidget->LoadUserSettings();
+   }
+   if (this->mpc_ComIfDescriptionWidget != NULL)
+   {
+      this->mpc_ComIfDescriptionWidget->LoadUserSettings();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -348,15 +334,19 @@ void C_SdNdeNodeEditWidget::m_LoadUserSettings() const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_SaveUserSettings() const
 {
-   const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
-
-   if (c_Sizes.size() > 0)
+   if (this->mpc_PropertiesWidget != NULL)
    {
-      C_UsHandler::h_GetInstance()->SetSdNodeEditSplitterX(c_Sizes.at(0));
+      this->mpc_PropertiesWidget->SaveUserSettings();
    }
    C_UsHandler::h_GetInstance()->SetProjLastSysDefNodeTabIndex(this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex());
-   this->mpc_Ui->pc_TabHalc->SaveUserSettings();
-   this->mpc_Ui->pc_ComIfDescriptionWidget->SaveUserSettings();
+   if (this->mpc_HalWidget != NULL)
+   {
+      this->mpc_HalWidget->SaveUserSettings();
+   }
+   if (this->mpc_ComIfDescriptionWidget != NULL)
+   {
+      this->mpc_ComIfDescriptionWidget->SaveUserSettings();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -382,9 +372,9 @@ void C_SdNdeNodeEditWidget::m_OnSwitchToBus(const uint32 & oru32_BusIndex, const
 /*! \brief   Open the HALC tab
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodeEditWidget::m_OnSwitchToHalc(void) const
+void C_SdNdeNodeEditWidget::m_OnSwitchToHalc(void)
 {
-   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexHalc);
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_HALC);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -393,10 +383,14 @@ void C_SdNdeNodeEditWidget::m_OnSwitchToHalc(void) const
    \param[in]  ou32_DataPoolIndex   Index of COMM Datapool
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodeEditWidget::m_OnSwitchToCommMessages(const uint32 ou32_DataPoolIndex) const
+void C_SdNdeNodeEditWidget::m_OnSwitchToCommMessages(const uint32 ou32_DataPoolIndex)
 {
-   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexComm);
-   this->mpc_Ui->pc_ComIfDescriptionWidget->SetProtocolByDataPool(ou32_DataPoolIndex);
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_COMM);
+   tgl_assert(this->mpc_ComIfDescriptionWidget != NULL);
+   if (this->mpc_ComIfDescriptionWidget != NULL)
+   {
+      this->mpc_ComIfDescriptionWidget->SetProtocolByDataPool(ou32_DataPoolIndex);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -412,12 +406,17 @@ void C_SdNdeNodeEditWidget::m_OnSwitchToCommMessages(const uint32 ou32_DataPoolI
    \param[in]  osn_Index   Index of selected tab
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
+void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index)
 {
    sintn sn_Counter;
 
+   m_CreateTabWidgetsAlways(osn_Index, true);
+
    //Simple trigger update
-   this->mpc_Ui->pc_WidgetApplications->UpdateApplications();
+   if (this->mpc_PropertiesWidget != NULL)
+   {
+      this->mpc_PropertiesWidget->UpdateApplications();
+   }
 
    // Adjust the size of the hided but visible widgets of the other tabs
    for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_TabWidgetPageNavi->count(); ++sn_Counter)
@@ -435,11 +434,18 @@ void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
    // The previous call of adjustSize causes some times to a second size change of pc_DataPoolEditWidget
    // This can cause a wrong size of the widget. A further call of adjustSize seems to repair the problem
    // The origin reason why the widget is resized two times with different sizes is unknown
-   this->mpc_Ui->pc_DataPoolEditWidget->adjustSize();
-
-   if (osn_Index == hsn_TabIndexComm)
+   if (this->mpc_DataPoolEditWidget != NULL)
    {
-      this->mpc_Ui->pc_ComIfDescriptionWidget->SetInitialFocus();
+      this->mpc_DataPoolEditWidget->adjustSize();
+   }
+
+   if (osn_Index == hsn_TAB_INDEX_COMM)
+   {
+      tgl_assert(this->mpc_ComIfDescriptionWidget != NULL);
+      if (this->mpc_ComIfDescriptionWidget != NULL)
+      {
+         this->mpc_ComIfDescriptionWidget->SetInitialFocus();
+      }
    }
 }
 
@@ -453,11 +459,48 @@ void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_TabClicked(const sintn osn_Index) const
 {
-   if ((this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex() == hsn_TabIndexDataPool) &&
-       (osn_Index == hsn_TabIndexDataPool))
+   if ((this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex() == hsn_TAB_INDEX_DATA_POOL) &&
+       (osn_Index == hsn_TAB_INDEX_DATA_POOL))
    {
       // Only relevant if no other tab than the Datapool tab was clicked and no other tab was selected before
-      this->mpc_Ui->pc_DataPoolEditWidget->OpenOverview();
+      tgl_assert(this->mpc_DataPoolEditWidget != NULL);
+      if (this->mpc_DataPoolEditWidget != NULL)
+      {
+         this->mpc_DataPoolEditWidget->OpenOverview();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for tab change of pc_TabWidgetPageNavi (including inital call)
+
+   Create widgets, if necessary
+
+   \param[in]  osn_Index         Index of selected tab
+   \param[in]  oq_AdaptCursor    Adapt cursor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_CreateTabWidgetsAlways(const sintn osn_Index, const bool oq_AdaptCursor)
+{
+   if (osn_Index == hsn_TAB_INDEX_PROPERTIES)
+   {
+      m_CreatePropertiesTab(oq_AdaptCursor);
+   }
+   else if (osn_Index == hsn_TAB_INDEX_DATA_POOL)
+   {
+      m_CreateDpTab(oq_AdaptCursor);
+   }
+   else if (osn_Index == hsn_TAB_INDEX_COMM)
+   {
+      m_CreateCommTab(oq_AdaptCursor);
+   }
+   else if (osn_Index == hsn_TAB_INDEX_HALC)
+   {
+      m_CreateHalTab(oq_AdaptCursor);
+   }
+   else
+   {
+      //Nothing to do
    }
 }
 
@@ -467,8 +510,14 @@ void C_SdNdeNodeEditWidget::m_TabClicked(const sintn osn_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_ReloadDataPools(void) const
 {
-   this->mpc_Ui->pc_DataPoolEditWidget->SetNode(this->mu32_NodeIndex);
-   this->mpc_Ui->pc_WidgetApplications->UpdateApplications();
+   if (this->mpc_DataPoolEditWidget != NULL)
+   {
+      this->mpc_DataPoolEditWidget->SetNode(this->mu32_NodeIndex);
+   }
+   if (this->mpc_PropertiesWidget != NULL)
+   {
+      this->mpc_PropertiesWidget->UpdateApplications();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -479,8 +528,11 @@ void C_SdNdeNodeEditWidget::m_ReloadDataPools(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_ReloadCommMessages(void) const
 {
-   this->mpc_Ui->pc_ComIfDescriptionWidget->SetNodeId(this->mu32_NodeIndex,
-                                                      this->mpc_Ui->pc_ComIfDescriptionWidget->GetActProtocol());
+   if (this->mpc_ComIfDescriptionWidget != NULL)
+   {
+      this->mpc_ComIfDescriptionWidget->SetNodeId(this->mu32_NodeIndex,
+                                                  this->mpc_ComIfDescriptionWidget->GetActProtocol());
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -499,6 +551,186 @@ void C_SdNdeNodeEditWidget::m_HalcLoadedFromTSP(void) const
 
    // reload tabs to update GUI
    this->m_ReloadDataPools();
-   this->mpc_Ui->pc_TabHalc->SetNode(this->mu32_NodeIndex);
-   this->mpc_Ui->pc_WidgetApplications->UpdateApplications();
+   if (this->mpc_HalWidget != NULL)
+   {
+      this->mpc_HalWidget->SetNode(this->mu32_NodeIndex);
+   }
+   if (this->mpc_PropertiesWidget != NULL)
+   {
+      this->mpc_PropertiesWidget->UpdateApplications();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create properties tab content
+
+   \param[in]  oq_AdaptCursor    Adapt cursor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_CreatePropertiesTab(const bool oq_AdaptCursor)
+{
+   if (this->mpc_PropertiesWidget == NULL)
+   {
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_StartWaitingCursor();
+      }
+      this->mpc_PropertiesWidget = new C_SdNdeNodePropertiesTabContentWidget();
+
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigChanged,
+              this, &C_SdNdeNodeEditWidget::m_DataChanged);
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigNameChanged,
+              this, &C_SdNdeNodeEditWidget::SigNameChanged);
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigBusBitrateClicked,
+              this, &C_SdNdeNodeEditWidget::SigSwitchToBusProperties);
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigErrorChange, this,
+              &C_SdNdeNodeEditWidget::SigErrorChange);
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigOwnedDataPoolsChanged, this,
+              &C_SdNdeNodeEditWidget::m_ReloadDataPools);
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigHalcLoadedFromTSP, this,
+              &C_SdNdeNodeEditWidget::m_HalcLoadedFromTSP);
+
+      this->mpc_PropertiesWidget->SetNodeIndex(this->mu32_NodeIndex);
+      this->mpc_Ui->pc_TabPropertiesLayout->addWidget(this->mpc_PropertiesWidget);
+      if (this->mq_SkipLoadUserSettings == false)
+      {
+         this->mpc_PropertiesWidget->LoadUserSettings();
+      }
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_EndWaitingCursor();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create dp tab content
+
+   \param[in]  oq_AdaptCursor    Adapt cursor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_CreateDpTab(const bool oq_AdaptCursor)
+{
+   if (this->mpc_DataPoolEditWidget == NULL)
+   {
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_StartWaitingCursor();
+      }
+      this->mpc_DataPoolEditWidget = new C_SdNdeDpEditWidget();
+      this->mpc_DataPoolEditWidget->SetNode(this->mu32_NodeIndex);
+
+      connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigChanged,
+              this, &C_SdNdeNodeEditWidget::m_DataChanged);
+      connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigDataPoolsChanged,
+              this, &C_SdNdeNodeEditWidget::m_ReloadCommMessages);
+      connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToHalc,
+              this, &C_SdNdeNodeEditWidget::m_OnSwitchToHalc);
+      connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToCommMessages,
+              this, &C_SdNdeNodeEditWidget::m_OnSwitchToCommMessages);
+      connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSave,
+              this, &C_SdNdeNodeEditWidget::SigSave);
+      connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSaveAs,
+              this, &C_SdNdeNodeEditWidget::SigSaveAs);
+      connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigErrorChange,
+              this, &C_SdNdeNodeEditWidget::SigErrorChange);
+
+      this->mpc_Ui->pc_TabDatapoolsLayout->addWidget(this->mpc_DataPoolEditWidget);
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_EndWaitingCursor();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create comm tab content
+
+   \param[in]  oq_AdaptCursor    Adapt cursor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_CreateCommTab(const bool oq_AdaptCursor)
+{
+   if (this->mpc_ComIfDescriptionWidget == NULL)
+   {
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_StartWaitingCursor();
+      }
+      this->mpc_ComIfDescriptionWidget = new C_SdBueComIfDescriptionWidget();
+      this->mpc_ComIfDescriptionWidget->SetNodeId(this->mu32_NodeIndex, C_OSCCanProtocol::eLAYER2);
+
+      connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigChanged,
+              this, &C_SdNdeNodeEditWidget::m_DataChanged);
+      connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange,
+              this, &C_SdNdeNodeEditWidget::SigErrorChange);
+      connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigSwitchToBus,
+              this, &C_SdNdeNodeEditWidget::m_OnSwitchToBus);
+      connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigCommDataPoolAdded, this,
+              &C_SdNdeNodeEditWidget::m_ReloadDataPools);
+      connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange, this,
+              &C_SdNdeNodeEditWidget::m_ReloadDataPools);
+
+      this->mpc_Ui->pc_TabCommMessagesLayout->addWidget(this->mpc_ComIfDescriptionWidget);
+      if (this->mq_SkipLoadUserSettings == false)
+      {
+         this->mpc_ComIfDescriptionWidget->LoadUserSettings();
+      }
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_EndWaitingCursor();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create hal tab content
+
+   \param[in]  oq_AdaptCursor    Adapt cursor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_CreateHalTab(const bool oq_AdaptCursor)
+{
+   if (this->mpc_HalWidget == NULL)
+   {
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_StartWaitingCursor();
+      }
+      this->mpc_HalWidget = new C_SdNdeHalcWidget();
+      this->mpc_HalWidget->SetNode(this->mu32_NodeIndex);
+
+      connect(mpc_HalWidget, &C_SdNdeHalcWidget::SigErrorChange, this,
+              &C_SdNdeNodeEditWidget::SigErrorChange);
+      connect(mpc_HalWidget, &C_SdNdeHalcWidget::SigHalcDataPoolChanged, this,
+              &C_SdNdeNodeEditWidget::m_ReloadDataPools);
+
+      this->mpc_Ui->pc_TabHalcLayout->addWidget(this->mpc_HalWidget);
+      if (this->mq_SkipLoadUserSettings == false)
+      {
+         this->mpc_HalWidget->LoadUserSettings();
+      }
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_EndWaitingCursor();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Start waiting cursor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::mh_StartWaitingCursor()
+{
+   QApplication::setOverrideCursor(Qt::WaitCursor);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  End waiting cursor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::mh_EndWaitingCursor()
+{
+   QApplication::restoreOverrideCursor();
 }

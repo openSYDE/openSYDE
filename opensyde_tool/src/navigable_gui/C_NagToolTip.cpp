@@ -172,7 +172,7 @@ void C_NagToolTip::DoMove(const QPoint & orc_GlobalPos)
 
       stw_types::sintn sn_NewY = orc_GlobalPos.y();
       stw_types::sintn sn_NewX = orc_GlobalPos.x();
-      const sintn sn_DistanceToBorder = 20; //space between tooltip and boarder
+      const sintn sn_DISTANCE_TO_BORDER = 20; //space between tooltip and boarder
 
       this->updateGeometry();
 
@@ -181,9 +181,9 @@ void C_NagToolTip::DoMove(const QPoint & orc_GlobalPos)
           (c_RectMonitor.x() + c_RectMonitor.width()))
       {
          // max of left border of monitor and right border of monitor minus tool-tip-width
-         sn_NewX = std::max(c_RectMonitor.x() + sn_DistanceToBorder,
+         sn_NewX = std::max(c_RectMonitor.x() + sn_DISTANCE_TO_BORDER,
                             (c_RectMonitor.x() + c_RectMonitor.width()) -
-                            (this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width() + sn_DistanceToBorder));
+                            (this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width() + sn_DISTANCE_TO_BORDER));
       }
 
       // y coordinate out of monitor
@@ -194,7 +194,7 @@ void C_NagToolTip::DoMove(const QPoint & orc_GlobalPos)
          // which usally means the mouse is inside the tooltip which then will trigger the tooltip to instantly hide
          // Also include the distance to the border so the mouse does not even touch the tooltip
          sn_NewY = (orc_GlobalPos.y() - this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) -
-                   sn_DistanceToBorder;
+                   sn_DISTANCE_TO_BORDER;
       }
 
       this->move(QPoint(sn_NewX, sn_NewY));

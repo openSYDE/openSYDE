@@ -350,7 +350,7 @@ void C_SyvDaChaDataItemWidget::UpdateMeasurementValue(const E_MeasurementValueSt
    \param[in]  osn_Value   Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataItemWidget::UpdateTransparence(const sintn osn_Value) const
+void C_SyvDaChaDataItemWidget::UpdateTransparency(const sintn osn_Value) const
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelValue, "Transparency",
                                           QString::number(osn_Value));

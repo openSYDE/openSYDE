@@ -181,19 +181,19 @@ private:
    stw_types::sint32 ms32_LastGridIndex;
    bool mq_SignalChanged;
 
-   static const stw_types::float64 mhf64_Space;
-   static const stw_types::float64 mhf64_ZOrderBelowAllItems;
-   static const stw_types::float64 mhf64_ZOrderDefault;
-   static const stw_types::float64 mhf64_ZOrderInteraction;
-   static const stw_types::float64 mhf64_ZOrderEmptyItem;
-   static const stw_types::float64 mhf64_ZOrderHintItem;
+   static const stw_types::float64 mhf64_SPACE;
+   static const stw_types::float64 mhf64_Z_ORDER_BELOW_ALL_ITEMS;
+   static const stw_types::float64 mhf64_Z_ORDER_DEFAULT;
+   static const stw_types::float64 mhf64_Z_ORDER_INTERACTION;
+   static const stw_types::float64 mhf64_Z_ORDER_EMPTY_ITEM;
+   static const stw_types::float64 mhf64_Z_ORDER_HINT_ITEM;
    static const stw_types::uint8 mhu8_NUM_COLORS;
 
    // Array for grid states. It saves the pointer to the signals on each bit
    std::set<C_SdBueMlvSignalManager *> mac_SetGridState[64];
 
    // Color configuration for the signals
-   static const C_SdBueMlvSignalManager::C_SignalItemColors mhac_SignalsColors[64];
+   static const C_SdBueMlvSignalManager::C_SignalItemColors mhac_SIGNALS_COLORS[64];
    std::vector<std::array<bool, 64> > mc_SignalsColorsUsed;
 
    // ECeS hint

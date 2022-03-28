@@ -89,7 +89,8 @@ C_CamMosFilterPopup::C_CamMosFilterPopup(const stw_opensyde_gui_logic::C_CamProF
 
          // search for messages in databases
          c_FilterData.c_FilterItems[s32_Pos].c_DatabaseMatch = C_CamMosFilterTableModel::h_SearchMessageInDatabases(
-            c_FilterData.c_FilterItems[s32_Pos].u32_StartId);
+            c_FilterData.c_FilterItems[s32_Pos].u32_StartId,
+            c_FilterData.c_FilterItems[s32_Pos].u8_ExtendedId == 1U);
       }
    }
 
@@ -715,6 +716,7 @@ void C_CamMosFilterPopup::m_OnStartIdEdited(void)
          tgl_assert(s32_CurrentRowIndex < rc_FilterItems.size());
          if (s32_CurrentRowIndex < rc_FilterItems.size())
          {
+            const bool q_IsExtended = rc_FilterItems[s32_CurrentRowIndex].u8_ExtendedId == 1U;
             uint32 u32_EndId = rc_FilterItems[s32_CurrentRowIndex].u32_EndId;
             if (static_cast<uint32>(c_Value.toULongLong()) > u32_EndId)
             {
@@ -724,7 +726,7 @@ void C_CamMosFilterPopup::m_OnStartIdEdited(void)
 
             // set new ID(s)
             this->mpc_TableModel->SetFilterItemIDs(s32_CurrentRowIndex,
-                                                   static_cast<uint32>(c_Value.toULongLong()), u32_EndId);
+                                                   static_cast<uint32>(c_Value.toULongLong()), u32_EndId, q_IsExtended);
          }
       }
       else
@@ -766,6 +768,7 @@ void C_CamMosFilterPopup::m_OnEndIdEdited(void)
          tgl_assert(s32_CurrentRowIndex < rc_FilterItems.size());
          if (s32_CurrentRowIndex < rc_FilterItems.size())
          {
+            const bool q_IsExtended = rc_FilterItems[s32_CurrentRowIndex].u8_ExtendedId == 1U;
             uint32 u32_StartId = rc_FilterItems[s32_CurrentRowIndex].u32_StartId;
             if (static_cast<uint32>(c_Value.toULongLong()) < u32_StartId)
             {
@@ -775,7 +778,7 @@ void C_CamMosFilterPopup::m_OnEndIdEdited(void)
 
             // set new ID(s)
             this->mpc_TableModel->SetFilterItemIDs(s32_CurrentRowIndex, u32_StartId,
-                                                   static_cast<uint32>(c_Value.toULongLong()));
+                                                   static_cast<uint32>(c_Value.toULongLong()), q_IsExtended);
          }
       }
       else
@@ -942,26 +945,10 @@ void C_CamMosFilterPopup::m_UpdateTitleFilterItemCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_SetMessageDataFromDatabase(const uint32 ou32_CanId, const bool oq_IsExtended)
 {
-   QVariant c_CanIdBefore;
-   QVariant c_CanIdAfter;
-   QString c_Errors = "";
-
-   // remember previous values
-   const bool q_WasExtended = this->mpc_Ui->pc_CheckBoxExtended->isChecked();
-
-   tgl_assert(this->mpc_Ui->pc_LeCanIdStart->GetValueAsVariant(c_CanIdBefore, c_Errors) == C_NO_ERR);
-
    // set information in line edit and check box to use line edits min/max handling
    this->mpc_Ui->pc_CheckBoxExtended->setChecked(oq_IsExtended);
    this->mpc_Ui->pc_LeCanIdStart->setText(C_Uti::h_GetValueAsHex(ou32_CanId));
 
    // trigger change
    this->m_OnStartIdEdited();
-
-   // reset extended flag if ID did not change
-   tgl_assert(this->mpc_Ui->pc_LeCanIdStart->GetValueAsVariant(c_CanIdAfter, c_Errors) == C_NO_ERR);
-   if ((c_CanIdBefore == c_CanIdAfter) && (this->mpc_Ui->pc_CheckBoxExtended->isChecked() != q_WasExtended))
-   {
-      this->mpc_Ui->pc_CheckBoxExtended->setChecked(q_WasExtended);
-   }
 }

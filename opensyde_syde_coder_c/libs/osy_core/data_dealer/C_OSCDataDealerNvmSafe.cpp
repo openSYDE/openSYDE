@@ -1430,7 +1430,7 @@ void C_OSCDataDealerNvmSafe::mh_CreateInterpretedList(const C_OSCNodeDataPoolLis
    C_RD_WR    Data pool version mismatch
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRawNode & orc_Node)
+sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRawNode & orc_Node) const
 {
    sint32 s32_Retval = C_NO_ERR;
 

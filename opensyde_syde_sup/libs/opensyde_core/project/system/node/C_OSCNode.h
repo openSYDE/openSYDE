@@ -20,6 +20,7 @@
 #include "C_OSCNodeApplication.h"
 #include "C_OSCCanProtocol.h"
 #include "C_OSCHalcConfig.h"
+#include "C_OSCCanMessageUniqueId.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -121,16 +122,16 @@ public:
                            bool * const opq_NameInvalid, bool * const opq_IsErrorInListOrMessage,
                            bool * const opq_InvalidNumberOfListsOrElements,
                            std::vector<stw_types::uint32> * const opc_InvalidListIndices) const;
-   void  CheckMessageId(const stw_types::uint32 ou32_InterfaceIndex, const stw_types::uint32 ou32_MessageId,
-                        bool & orq_Valid, const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol = NULL,
-                        const stw_types::uint32 * const opu32_SkipInterfaceIndex = NULL,
-                        const bool * const opq_SkipMessageIsTxFlag = NULL,
-                        const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
-   void  CheckMessageName(const stw_types::uint32 ou32_InterfaceIndex, const stw_scl::C_SCLString & orc_MessageName,
-                          bool & orq_Valid, const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol = NULL,
-                          const stw_types::uint32 * const opu32_SkipInterfaceIndex = NULL,
-                          const bool * const opq_SkipMessageIsTxFlag = NULL,
-                          const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
+   void CheckMessageId(const stw_types::uint32 ou32_InterfaceIndex, const C_OSCCanMessageUniqueId & orc_MessageId,
+                       bool & orq_Valid, const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol = NULL,
+                       const stw_types::uint32 * const opu32_SkipInterfaceIndex = NULL,
+                       const bool * const opq_SkipMessageIsTxFlag = NULL,
+                       const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
+   void CheckMessageName(const stw_types::uint32 ou32_InterfaceIndex, const stw_scl::C_SCLString & orc_MessageName,
+                         bool & orq_Valid, const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol = NULL,
+                         const stw_types::uint32 * const opu32_SkipInterfaceIndex = NULL,
+                         const bool * const opq_SkipMessageIsTxFlag = NULL,
+                         const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
    stw_types::sint32 CheckApplicationProcessIdValid(const stw_types::uint32 ou32_ApplicationIndex,
                                                     bool & orq_Valid) const;
    void CheckHalcConfigValid(bool * const opq_ConfigInvalid,

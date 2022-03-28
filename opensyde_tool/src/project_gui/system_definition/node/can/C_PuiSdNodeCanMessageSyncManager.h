@@ -21,6 +21,7 @@
 #include "C_PuiSdNodeDataPoolListElement.h"
 #include "C_PuiSdNodeCanMessage.h"
 #include "C_PuiSdNodeCanSignal.h"
+#include "C_OSCCanMessageUniqueId.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -128,7 +129,7 @@ public:
                       bool * const opq_MessagesHaveNoTx, bool * const opq_DelayTimeInvalid,
                       bool * const opq_MessageSignalInvalid,
                       const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset) const;
-   void CheckMessageIdBus(const stw_types::uint32 & oru32_MessageId, bool & orq_Valid, const stw_opensyde_core::C_OSCCanMessageIdentificationIndices * const opc_SkipMessage =
+   void CheckMessageIdBus(const stw_opensyde_core::C_OSCCanMessageUniqueId & orc_MessageId, bool & orq_Valid, const stw_opensyde_core::C_OSCCanMessageIdentificationIndices * const opc_SkipMessage =
                              NULL, bool * const opq_EcosRangeError = NULL, bool * const opq_EcosEvenError = NULL,
                           bool * const opq_DuplicateDetected = NULL) const;
    void CheckMessageNameBus(const stw_scl::C_SCLString & orc_MessageName, bool & orq_Valid, const stw_opensyde_core::C_OSCCanMessageIdentificationIndices * const opc_SkipMessage =

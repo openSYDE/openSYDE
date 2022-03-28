@@ -13,6 +13,10 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
+// QLineEdit is multiple times included, but cannot do anything else then suppress lint warning
+//lint -save -e451
+#include <QLineEdit>
+//lint -restore
 #include <QRegExpValidator>
 #include "stwtypes.h"
 #include "C_OgePopUpDialog.h"
@@ -41,6 +45,8 @@ public:
    ~C_SdNdeIpAddressConfigurationWidget(void);
 
    void InitStaticNames(void) const;
+
+   void SlotTabKey(const QLineEdit * const opc_LineEdit);
 
 protected:
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;

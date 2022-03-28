@@ -202,7 +202,7 @@ void C_SdBueMlvEmptyItem::paint(QPainter * const opc_Painter, const QStyleOption
    QPen c_Pen;
    QBrush c_Brush;
    QRectF c_Rect;
-   const uint32 u32_Alignment = static_cast<uint32>(Qt::AlignRight) | static_cast<uint32>(Qt::AlignTop);
+   const uint32 u32_ALIGNMENT = static_cast<uint32>(Qt::AlignRight) | static_cast<uint32>(Qt::AlignTop);
 
    C_SdBueMlvBaseItem::paint(opc_Painter, opc_Option, opc_Widget);
 
@@ -221,7 +221,7 @@ void C_SdBueMlvEmptyItem::paint(QPainter * const opc_Painter, const QStyleOption
    c_Rect = this->boundingRect();
    // adapt the region
    c_Rect.setWidth(c_Rect.width() - 5.0);
-   opc_Painter->drawText(c_Rect, static_cast<sintn>(u32_Alignment), this->mc_Text);
+   opc_Painter->drawText(c_Rect, static_cast<sintn>(u32_ALIGNMENT), this->mc_Text);
 
    // draw the error icon if an error was set
    if (this->mq_ErrorActive == true)

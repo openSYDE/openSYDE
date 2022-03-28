@@ -103,7 +103,7 @@ private:
    bool mq_SpeedUpAnimation;
    QTimer mc_Timer;
    stw_types::uint8 mu8_AnimationStep;
-   static const stw_types::uint8 mhu8_AnimationStepCount;
+   static const stw_types::uint8 mhu8_ANIMATION_STEP_COUNT;
    QColor mc_AnimationPackageColor;
    QPolygonF mc_AnimationPolygon;
 };

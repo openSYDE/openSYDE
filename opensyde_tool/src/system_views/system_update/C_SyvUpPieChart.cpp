@@ -23,7 +23,7 @@ using namespace stw_types;
 using namespace stw_opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SyvUpPieChart::mhc_FilePath = "../../src/images/custom.gif";
+const QString C_SyvUpPieChart::mhc_FILE_PATH = "../../src/images/custom.gif";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -50,12 +50,12 @@ C_SyvUpPieChart::C_SyvUpPieChart(QWidget * const opc_Parent) :
    mq_FinishedAnimation(false)
 {
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   const QFileInfo c_FileInfo(C_SyvUpPieChart::mhc_FilePath);
+   const QFileInfo c_FileInfo(C_SyvUpPieChart::mhc_FILE_PATH);
 
    if (c_FileInfo.exists() == true)
    {
       //lint -e{1938}  static const is guaranteed preinitialized before main
-      this->mpc_Movie = new QMovie(C_SyvUpPieChart::mhc_FilePath);
+      this->mpc_Movie = new QMovie(C_SyvUpPieChart::mhc_FILE_PATH);
    }
    else
    {

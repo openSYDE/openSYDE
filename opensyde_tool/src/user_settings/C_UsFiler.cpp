@@ -1827,8 +1827,8 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    q_Flag = orc_Ini.ReadBool("SdTopologyToolbox", "Size_maximized", true);
    orc_UserSettings.SetSdTopologyToolboxMaximized(q_Flag);
 
-   // Sys def node edit splitter
-   s32_Value = orc_Ini.ReadInteger("SdNodeEdit", "SplitterX", 1000);
+   // Sys def node edit splitter (Default: 1242; Fits perfect when using full hd resolution)
+   s32_Value = orc_Ini.ReadInteger("SdNodeEdit", "SplitterX", 1242);
    orc_UserSettings.SetSdNodeEditSplitterX(s32_Value);
 
    // Sys def node edit HALC splitter

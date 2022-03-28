@@ -510,13 +510,13 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
             }
             else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
             {
-               const QColor c_Inactive1 = mc_STYLE_GUIDE_COLOR_8;
-               const QColor c_Inactive2 = mc_STYLE_GUIDE_COLOR_10;
-               const QColor c_Active = mc_STYLE_GUIDE_COLOR_6;
+               const QColor c_INACTIVE_1 = mc_STYLE_GUIDE_COLOR_8;
+               const QColor c_INACTIVE_2 = mc_STYLE_GUIDE_COLOR_10;
+               const QColor c_ACTIVE = mc_STYLE_GUIDE_COLOR_6;
                //Stylesheets do not allow access of specific columns so we need to set it manually
                if (this->flags(orc_Index).testFlag(Qt::ItemIsEditable) == true)
                {
-                  c_Retval = c_Active;
+                  c_Retval = c_ACTIVE;
                }
                else
                {
@@ -528,13 +528,13 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   case eARRAY_SIZE:
                   case eDATA_POOL:
                   case eUSAGE:
-                     c_Retval = c_Inactive1;
+                     c_Retval = c_INACTIVE_1;
                      break;
                   case eICON:
                   case eTRANSMISSION_MODE:
                   case eCYCLIC_INTERVAL:
                   case eTHRESHOLD:
-                     c_Retval = c_Inactive2;
+                     c_Retval = c_INACTIVE_2;
                      break;
                   default:
                      tgl_assert(false);

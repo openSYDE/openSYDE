@@ -59,8 +59,8 @@ private:
    stw_opensyde_core::C_OSCTargetSupportPackage mc_Package;
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
-   static const QString mhc_StartTD;
-   static const QString mhc_ContinueTD;
+   static const QString mhc_START_TD;
+   static const QString mhc_CONTINUE_TD;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);

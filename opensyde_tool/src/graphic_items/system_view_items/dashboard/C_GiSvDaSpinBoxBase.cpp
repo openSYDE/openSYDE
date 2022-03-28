@@ -230,6 +230,22 @@ void C_GiSvDaSpinBoxBase::ConnectionActiveChanged(const bool oq_Active)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of edit mode
+
+   \param[in]  oq_Active   Flag if edit mode is active or not active now
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaSpinBoxBase::EditModeActiveChanged(const bool oq_Active)
+{
+   C_GiSvDaRectBaseGroup::EditModeActiveChanged(oq_Active);
+
+   if (this->mpc_SpinBoxWidget != NULL)
+   {
+      this->mpc_SpinBoxWidget->setEnabled(!oq_Active);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sends the current set value of the element
 */
 //----------------------------------------------------------------------------------------------------------------------

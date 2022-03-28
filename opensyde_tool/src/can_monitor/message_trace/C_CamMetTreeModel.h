@@ -121,10 +121,10 @@ private:
    stw_types::sintn msn_LastSearchedSignalRowMultiplexed;
    bool mq_IsLastSearchedSignalLastOfMessage;
    QString mc_LastSearchedString;
-   static const QString mhc_IconMessage;
-   static const QString mhc_IconMessageSelected;
-   static const QString mhc_IconSignal;
-   static const QString mhc_IconSignalSelected;
+   static const QString mhc_ICON_MESSAGE;
+   static const QString mhc_ICON_MESSAGE_SELECTED;
+   static const QString mhc_ICON_SIGNAL;
+   static const QString mhc_ICON_SIGNAL_SELECTED;
 
    //Avoid call
    C_CamMetTreeModel(const C_CamMetTreeModel &);

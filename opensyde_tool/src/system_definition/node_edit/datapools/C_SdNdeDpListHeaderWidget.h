@@ -83,9 +83,6 @@ private:
    stw_types::uint32 mu32_NodeIndex;
    stw_types::uint32 mu32_DataPoolIndex;
    stw_types::uint32 mu32_ListIndex;
-   static const stw_types::uint32 mhu32_HeaderHeight;
-   static const stw_types::uint32 mhu32_HeaderExpandedHeight;
-   static const stw_types::sintn mhsn_GroupSize;
    bool mq_InitActive;
    bool mq_DataSetError;
    QTimer mc_DoubleClickTimer;

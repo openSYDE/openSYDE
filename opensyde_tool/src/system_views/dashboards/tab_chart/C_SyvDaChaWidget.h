@@ -97,7 +97,7 @@ private:
    QAction * mpc_ActionRemoveAll;
    QAction * mpc_ActionConfigDataElement;
 
-   static const stw_types::uint32 mhu32_MaximumDataElements;
+   static const stw_types::uint32 mhu32_MAXIMUM_DATA_ELEMENTS;
 
    QMap<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId, QString> mc_CommmunicationErrors;
    QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, stw_types::uint8> mc_InvalidDlcSignals;

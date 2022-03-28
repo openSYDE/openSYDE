@@ -195,19 +195,19 @@ void C_GiSvDaPieChartBase::UpdateShowValue(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of the color transparence value configured by the actual timeout state
+/*! \brief   Update of the color transparency value configured by the actual timeout state
 
    \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                 Value for transparence (0..255)
+   \param[in]     osn_Value                 Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaPieChartBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_GiSvDaPieChartBase::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    if ((ou32_DataElementIndex == 0) &&
        (this->mpc_PieChartWidget != NULL))
    {
       // Only one item is supported by this item
-      this->mpc_PieChartWidget->SetTransparence(osn_Value);
+      this->mpc_PieChartWidget->SetTransparency(osn_Value);
    }
 }
 

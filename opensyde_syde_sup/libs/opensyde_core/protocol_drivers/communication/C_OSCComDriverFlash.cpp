@@ -86,17 +86,19 @@ C_SCLString C_OSCComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumberFor
 /*! \brief   Default constructor
 
    \param[in]  oq_RoutingActive              Flag for activating routing
+   \param[in]  oq_UpdateRoutingMode          Flag for update specific routing or generic routing (m_GetRoutingMode)
    \param[in]  opr_XflReportProgress         function to call if STW Flashloader driver has something to report
    \param[in]  opv_XflReportProgressInstance Instance pointer to pass when invoking opv_XflReportProgressInstance
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComDriverFlash::C_OSCComDriverFlash(const bool oq_RoutingActive,
+C_OSCComDriverFlash::C_OSCComDriverFlash(const bool oq_RoutingActive, const bool oq_UpdateRoutingMode,
                                          const C_OSCFlashProtocolStwFlashloader::PR_ReportProgress opr_XflReportProgress,
                                          void * const opv_XflReportProgressInstance) :
    C_OSCComDriverProtocol(),
    pr_XflReportProgress(opr_XflReportProgress),
    pv_XflReportProgressInstance(opv_XflReportProgressInstance),
-   mq_RoutingActive(oq_RoutingActive)
+   mq_RoutingActive(oq_RoutingActive),
+   mq_UpdateRoutingMode(oq_UpdateRoutingMode)
 {
    mc_CompanyId.u8_NumBytes = 2U;
    mc_CompanyId.au8_Data[0] = static_cast<uint8>('Y');
@@ -987,11 +989,15 @@ sint32 C_OSCComDriverFlash::SendOsyReadActiveDiagnosticSession(const C_OSCProtoc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send the ReadFlashBlockData service to read information about all flash blocks
 
-   Executes the service in a loop starting from 0 (flashloader).
-   Block 0 is expected to be present. Other blocks are optional.
+   Executes the service in a loop starting from 0.
+   A "requestOutOfRange" NRC is interpreted as "this is the first block not available" and will terminate the loop.
+
+   Technically block 0 (Flashloader) should always be present. As a defensive measure we will not fail in this case.
+   Instead we will return an empty list of identified blocks. So the application can decide how to deal with this
+    situation.
 
    \param[in]     orc_ServerId      Server id for communication
-   \param[out]    orc_BlockInfo     read server information
+   \param[out]    orc_BlockInfo     read flash block information
    \param[out]    opu8_NrCode       if != NULL and error response: negative response code
 
    \return
@@ -999,7 +1005,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadActiveDiagnosticSession(const C_OSCProtoc
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
    C_NOACT     Could not put request in Tx queue
-   C_WARN      Error response received (except for requestOutOfRange for block > 0)
+   C_WARN      Error response received (except for requestOutOfRange)
    C_TIMEOUT   Expected response not received within timeout
    C_COM      communication driver reported error
 */
@@ -1033,10 +1039,9 @@ const
                (*opu8_NrCode) = u8_NrCode;
             }
 
-            if ((s32_Return == C_WARN) &&
-                ((u16_Block > 0U) && (u8_NrCode == C_OSCProtocolDriverOsy::hu8_NR_CODE_REQUEST_OUT_OF_RANGE)))
+            if ((s32_Return == C_WARN) && (u8_NrCode == C_OSCProtocolDriverOsy::hu8_NR_CODE_REQUEST_OUT_OF_RANGE))
             {
-               //no more blocks ?
+               //no more blocks
                //done here ... not a real problem
                s32_Return = C_NO_ERR;
             }
@@ -2687,7 +2692,14 @@ void C_OSCComDriverFlash::PrepareForDestructionFlash(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComDriverFlash::m_GetRoutingMode(C_OSCRoutingCalculation::E_Mode & ore_Mode) const
 {
-   ore_Mode = C_OSCRoutingCalculation::eUPDATE;
+   if (this->mq_UpdateRoutingMode == true)
+   {
+      ore_Mode = C_OSCRoutingCalculation::eUPDATE;
+   }
+   else
+   {
+      ore_Mode = C_OSCRoutingCalculation::eROUTING_CHECK;
+   }
 
    return this->mq_RoutingActive;
 }
@@ -2806,7 +2818,7 @@ void C_OSCComDriverFlash::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the interface has relevant functions activated
 
-   In this case routing and update functionality
+   In this case routing and in case of update specific routing the update functionality
 
    \param[in]     orc_ComItfSettings         Interface configuration
 
@@ -2821,7 +2833,7 @@ bool C_OSCComDriverFlash::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfa
 
    if ((orc_ComItfSettings.GetBusConnected() == true) &&
        ((orc_ComItfSettings.q_IsRoutingEnabled == true) ||
-        (orc_ComItfSettings.q_IsUpdateEnabled == true)))
+        ((orc_ComItfSettings.q_IsUpdateEnabled == true) || (this->mq_UpdateRoutingMode == false))))
    {
       q_Return = true;
    }

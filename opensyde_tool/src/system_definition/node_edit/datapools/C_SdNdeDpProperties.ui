@@ -1114,7 +1114,7 @@ p, li { white-space: pre-wrap; }
              </size>
             </property>
             <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
+             <enum>Qt::StrongFocus</enum>
             </property>
             <property name="layoutDirection">
              <enum>Qt::RightToLeft</enum>
@@ -1279,26 +1279,6 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
-   <extends>QComboBox</extends>
-   <header>C_OgeCbxText.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
-   <extends>QSpinBox</extends>
-   <header>C_OgeSpxNumber.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
    <header>C_OgeLabHeadingGroupBold.h</header>
@@ -1308,37 +1288,6 @@ p, li { white-space: pre-wrap; }
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
-   <extends>QTextEdit</extends>
-   <header>C_OgeTedPropertiesComment.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLePropertiesName.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxGrayed</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxGrayed.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabBusType</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabBusType.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
@@ -1352,6 +1301,62 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
+   <extends>QTextEdit</extends>
+   <header>C_OgeTedPropertiesComment.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubCancel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLeProperties.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
+   <extends>QComboBox</extends>
+   <header>C_OgeCbxText.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLePropertiesName.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
+   <extends>QSpinBox</extends>
+   <header>C_OgeSpxNumber.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_SdNdeDpSelectorAddListWidget</class>
+   <extends>QListWidget</extends>
+   <header>C_SdNdeDpSelectorAddListWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabSvgOnly.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxGrayed</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxGrayed.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabBusType</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabBusType.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeChxTristateTransparentToggle</class>
    <extends>QCheckBox</extends>
    <header>C_OgeChxTristateTransparentToggle.h</header>
@@ -1360,11 +1365,6 @@ p, li { white-space: pre-wrap; }
    <class>stw_opensyde_gui_elements::C_OgeLabGroupSubItem</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupSubItem.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDpSelectorAddListWidget</class>
-   <extends>QListWidget</extends>
-   <header>C_SdNdeDpSelectorAddListWidget.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubConfigure</class>
@@ -1376,6 +1376,14 @@ p, li { white-space: pre-wrap; }
   <tabstop>pc_LineEditDatapoolName</tabstop>
   <tabstop>pc_CommentText</tabstop>
   <tabstop>pc_LineEditVersion_2</tabstop>
+  <tabstop>pc_ComboBoxProtocol</tabstop>
+  <tabstop>pc_ComboBoxScope</tabstop>
+  <tabstop>pc_CheckBoxSafety</tabstop>
+  <tabstop>pc_ComboBoxApplication</tabstop>
+  <tabstop>pc_SpinBoxDatapoolStartAddress</tabstop>
+  <tabstop>pc_SpinBoxSize</tabstop>
+  <tabstop>pc_BushButtonBreakRelation</tabstop>
+  <tabstop>pc_ListWidgetSharedDatapoolInfo</tabstop>
   <tabstop>pc_BushButtonCancel</tabstop>
   <tabstop>pc_BushButtonOk</tabstop>
  </tabstops>

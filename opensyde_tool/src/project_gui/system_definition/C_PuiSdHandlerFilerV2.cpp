@@ -252,13 +252,12 @@ sint32 C_PuiSdHandlerFilerV2::h_LoadDataPoolList(C_PuiSdNodeDataPoolList & orc_D
 
    \return
    C_NO_ERR    information loaded
-   C_CONFIG    error loading information
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerFilerV2::h_LoadDataPoolListElements(
    std::vector<C_PuiSdNodeDataPoolListElement> & orc_DataPoolListElements, C_OSCXMLParserBase & orc_XMLParser)
 {
-   const sint32 s32_Retval = C_NO_ERR;
+   const sint32 s32_RETVAL = C_NO_ERR;
 
    C_SCLString c_CurrentDataPoolListElementNode;
    uint32 u32_ExpectedSize = 0UL;
@@ -306,7 +305,7 @@ sint32 C_PuiSdHandlerFilerV2::h_LoadDataPoolListElements(
          osc_write_log_warning("Load file", c_Tmp.c_str());
       }
    }
-   return s32_Retval;
+   return s32_RETVAL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

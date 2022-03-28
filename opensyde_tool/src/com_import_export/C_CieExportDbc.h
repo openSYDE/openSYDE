@@ -68,9 +68,9 @@ private:
    static stw_scl::C_SCLString mh_NiceifyStringForDbcSymbol(const stw_scl::C_SCLString & orc_String);
    static stw_scl::C_SCLString mh_EscapeCriticalSymbols(const stw_scl::C_SCLString & orc_String);
 
-   static const std::string mhc_SigInitialValue;
-   static const std::string mhc_MsgCycleTime;
-   static const std::string mhc_MsgSendType;
+   static const std::string mhc_SIG_INITIAL_VALUE;
+   static const std::string mhc_MSG_CYCLE_TIME;
+   static const std::string mhc_MSG_SEND_TYPE;
    static std::map<stw_scl::C_SCLString, stw_scl::C_SCLString> mhc_NodeMapping;
    static bool mhq_ValidDbcExport;
    static C_ExportStatistic mhc_ExportStatistic;

@@ -51,6 +51,7 @@ public:
    void SetDark(const bool oq_Value);
    void SetEditMode(const bool oq_EditMode);
    void SetConnected(const bool oq_Connected);
+   void SetLoadSaveActive(const bool oq_Active);
    void SetActionActive(const bool oq_Active);
    void DeleteSpecified(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds);
    void ClearECUValues(void);
@@ -113,18 +114,19 @@ private:
    bool mq_DarkMode;
    bool mq_EditMode;
    bool mq_Connected;
+   bool mq_SaveLoadActive;
    bool mq_ActionActive;
    std::vector<std::vector<QString> > mc_ECUValuesString;
    std::vector<bool> mc_ECUValuesReadStatus;
    std::vector<bool> mc_ECUCRCValidStatus;
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> mc_ECUValues;
 
-   static const QString mhc_IconAllNode;
-   static const QString mhc_IconNode;
-   static const QString mhc_IconDatapool;
-   static const QString mhc_IconList;
-   static const QString mhc_IconParameter;
-   static const QString mhc_ECUValueInitString;
+   static const QString mhc_ICON_ALL_NODE;
+   static const QString mhc_ICON_NODE;
+   static const QString mhc_ICON_DATAPOOL;
+   static const QString mhc_ICON_LIST;
+   static const QString mhc_ICON_PARAMETER;
+   static const QString mhc_ECU_VALUE_INIT_STRING;
 
    static void mh_InitAllNode(C_TblTreItem * const opc_TreeNode, const stw_types::uint32 ou32_ViewIndex);
    static void mh_InitNode(C_TblTreItem * const opc_TreeNode, const stw_types::uint32 ou32_NodeIndex,

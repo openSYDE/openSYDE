@@ -78,12 +78,12 @@ private:
    stw_types::uint32 mu32_NodeIndex;
    bool mq_PartOfSquad;
    QString mc_DeviceName;
-   static const QString mhc_MimeData;
-   static const QString mhc_MimeDataExtFormat;
-   static const QString mhc_MimeDataManufacturerFormat;
-   static const QString mhc_MimeDataDevice;
-   static const QString mhc_MimeDataDeviceValid;
-   static const QString mhc_MimeDataSubNodeIdsToOldNodeIds;
+   static const QString mhc_MIME_DATA;
+   static const QString mhc_MIME_DATA_EXT_FORMAT;
+   static const QString mhc_MIME_DATA_MANUFACTURER_FORMAT;
+   static const QString mhc_MIME_DATA_DEVICE;
+   static const QString mhc_MIME_DATA_DEVICE_VALID;
+   static const QString mhc_MIME_DATA_SUB_NODE_IDS_TO_OLD_NODE_IDS;
 
    stw_types::sint32 m_Init(void);
    void m_OnDisconnectRequest(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber);

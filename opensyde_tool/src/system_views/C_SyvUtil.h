@@ -32,7 +32,7 @@ public:
    {
       eI_APPLICATION_MATCH,
       eI_TO_BE_UPDATED,
-      eI_NO_RESPONSE,
+      eI_ERROR,
       eI_UPDATE_DISABLED,
       eI_UNKNOWN
    };
@@ -47,10 +47,11 @@ public:
       eU_UNKNOWN
    };
 
-   static bool h_GetViewSetupLabelInfo(const stw_types::uint32 ou32_ViewIndex, QString & orc_ErrorLabelHeadingText,
-                                       QString & orc_ErrorLabelText, QString & orc_ErrorTooltipText,
-                                       stw_opensyde_gui::C_NagToolTip::E_Type & ore_TooltipType, QString & orc_IconPath,
-                                       stw_types::sintn & orsn_ColorID);
+   static bool h_GetViewStatusLabelInfo(const stw_types::uint32 ou32_ViewIndex,
+                                        const stw_types::sint32 os32_ViewSubMode, QString & orc_ErrorLabelHeadingText,
+                                        QString & orc_ErrorLabelText, QString & orc_ErrorTooltipText,
+                                        stw_opensyde_gui::C_NagToolTip::E_Type & ore_TooltipType,
+                                        QString & orc_IconPath, stw_types::sintn & orsn_ColorID);
    static stw_types::sint32 h_GetIndicesFromBusId(const stw_types::uint8 ou8_BusIdentifier,
                                                   const stw_types::uint8 ou8_NodeIdentifier,
                                                   stw_types::uint32 & oru32_NodeIndex,

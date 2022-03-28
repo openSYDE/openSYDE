@@ -137,6 +137,8 @@ C_SdNdeDpListTableView::C_SdNdeDpListTableView(QWidget * const opc_Parent) :
            &C_SdNdeDpListTableView::m_HandleLinkClicked);
    connect(this->horizontalHeader(), &QHeaderView::sectionResized, this,
            &C_SdNdeDpListTableView::m_OnColumnResize);
+   connect(&mc_Delegate, &C_SdNdeDpListTableDelegate::SigTedConfirmed, this,
+           &C_SdNdeDpListTableView::m_CommentConfirmed);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1438,4 +1440,13 @@ void C_SdNdeDpListTableView::m_HandleColumnStateRestore(void)
          }
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot to set focus of comment field after user confirms with defined keys of KeyPressEvent in C_OgeTedTable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpListTableView::m_CommentConfirmed(void)
+{
+   this->setFocus();
 }

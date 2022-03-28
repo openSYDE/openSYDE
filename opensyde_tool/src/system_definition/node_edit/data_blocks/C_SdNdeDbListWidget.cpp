@@ -18,11 +18,13 @@
 #include "C_SdNdeDbWidget.h"
 #include "C_PuiSdHandler.h"
 #include "C_OgeWiUtil.h"
+#include "C_OgeHorizontalListWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
+using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,7 +41,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent        Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbListWidget::C_SdNdeDbListWidget(QWidget * const opc_Parent) :
@@ -86,7 +88,7 @@ C_SdNdeDbListWidget::~C_SdNdeDbListWidget()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node index
 
-   \param[in] ou32_NodeIndex Node index
+   \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::SetIndex(const stw_types::uint32 ou32_NodeIndex)
@@ -97,8 +99,8 @@ void C_SdNdeDbListWidget::SetIndex(const stw_types::uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a new node application to the list
 
-   \param[in] ou32_NodeIndex        Node index
-   \param[in] ou32_ApplicationIndex Application index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
@@ -153,7 +155,7 @@ void C_SdNdeDbListWidget::UpdateApplications(void) const
 
    Here: Synchronizing application data with widgets
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::dropEvent(QDropEvent * const opc_Event)
@@ -200,12 +202,15 @@ void C_SdNdeDbListWidget::dropEvent(QDropEvent * const opc_Event)
             s32_TargetRow = this->count();
          }
 
-         // move only if changed
-         QListWidget::dropEvent(opc_Event);
+         if (C_OgeHorizontalListWidget::h_CheckValidMoveAction(this->msn_DragItemIndex, s32_TargetRow, *this))
+         {
+            // move only if changed
+            QListWidget::dropEvent(opc_Event);
 
-         this->m_MoveApplication(this->msn_DragItemIndex, s32_TargetRow);
-         // the number must be updated
-         this->m_UpdateApplicationIndexes();
+            this->m_MoveApplication(this->msn_DragItemIndex, s32_TargetRow);
+            // the number must be updated
+            this->m_UpdateApplicationIndexes();
+         }
       }
 
       // reset the counter;
@@ -222,7 +227,7 @@ void C_SdNdeDbListWidget::dropEvent(QDropEvent * const opc_Event)
 
    Here: start custom paint
 
-   \param[in] oc_SupportedActions Supported actions
+   \param[in]  oc_SupportedActions  Supported actions
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::startDrag(const Qt::DropActions oc_SupportedActions)

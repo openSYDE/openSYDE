@@ -195,6 +195,11 @@ bool C_OSCRoutingCalculation::CheckItfNumberForRouting(const stw_types::uint32 o
             // At least one com interface is relevant
             q_Return = true;
          }
+         else if (this->me_Mode == C_OSCRoutingCalculation::eROUTING_CHECK)
+         {
+            // Independent of any update or diagnostic functionality of the interface
+            q_Return = true;
+         }
          else
          {
             // Nothing to do
@@ -203,19 +208,9 @@ bool C_OSCRoutingCalculation::CheckItfNumberForRouting(const stw_types::uint32 o
       else
       {
          // Node is for routing
-         if ((this->me_Mode == C_OSCRoutingCalculation::eDIAGNOSTIC) &&
-             (orc_ComItfSettings.q_IsRoutingEnabled == true))
+         if (orc_ComItfSettings.q_IsRoutingEnabled == true)
          {
             q_Return = true;
-         }
-         else if ((this->me_Mode == C_OSCRoutingCalculation::eUPDATE) &&
-                  (orc_ComItfSettings.q_IsRoutingEnabled == true))
-         {
-            q_Return = true;
-         }
-         else
-         {
-            // Nothing to do
          }
       }
    }
@@ -230,7 +225,7 @@ bool C_OSCRoutingCalculation::CheckItfNumberForRouting(const stw_types::uint32 o
 void C_OSCRoutingCalculation::m_SearchRoute(void)
 {
    // maximum number of buses
-   this->mc_CheckedBusses.reserve(16);
+   this->mc_CheckedBuses.reserve(16);
 
    // reset the search
    this->mq_PcBus = true;
@@ -297,7 +292,7 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
    // Check if the target node must be routable
    sint32 s32_Return;
    bool q_UsableBusFound = false;
-   bool q_MinimumOneFunctionActive = false;
+   bool q_AtLeastOneFunctionActive = false;
    const C_OSCNode * const pc_Node = &this->mrc_AllNodes[this->mu32_TargetNodeIndex];
    uint32 u32_Counter;
 
@@ -307,7 +302,7 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
       if ((this->me_Mode == C_OSCRoutingCalculation::eDIAGNOSTIC) &&
           (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].q_IsDiagnosisEnabled == true))
       {
-         q_MinimumOneFunctionActive = true;
+         q_AtLeastOneFunctionActive = true;
 
          if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
          {
@@ -318,7 +313,19 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
       else if ((this->me_Mode == C_OSCRoutingCalculation::eUPDATE) &&
                (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].q_IsUpdateEnabled == true))
       {
-         q_MinimumOneFunctionActive = true;
+         q_AtLeastOneFunctionActive = true;
+
+         if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
+         {
+            // Minimum one com interface is relevant
+            q_UsableBusFound = true;
+         }
+      }
+      else if (this->me_Mode == eROUTING_CHECK)
+      {
+         // Independent of any update or diagnostic functionality of the interface, but the error must be detected,
+         // so handle it as interface with active functionality
+         q_AtLeastOneFunctionActive = true;
 
          if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
          {
@@ -342,7 +349,7 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
       // Function (diagnosis or update) is active and minimum one bus is connected to the matching interface
       s32_Return = C_NO_ERR;
    }
-   else if (q_MinimumOneFunctionActive == true)
+   else if (q_AtLeastOneFunctionActive == true)
    {
       // Minimum one function (diagnosis or update) is active but no bus is connected to a matching interface
       // No routing possible
@@ -352,7 +359,7 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
    }
    else
    {
-      // Target node must not be routed, because the relevant function is deactivated on all busses
+      // Target node must not be routed, because the relevant function is deactivated on all buses
       osc_write_log_info("Routing calculation", "No usable bus found (target node index: " +
                          C_SCLString::IntToStr(this->mu32_TargetNodeIndex) + ")");
       s32_Return = C_NOACT;
@@ -375,7 +382,7 @@ void C_OSCRoutingCalculation::m_SearchRoutePointsOnBus(const uint32 ou32_BusInde
 {
    uint32 u32_NodeCounter;
 
-   set<uint32> c_SetBussesToSearch;
+   set<uint32> c_SetBusesToSearch;
    set<uint32>::const_iterator c_ItBusToSearch;
 
    // search all nodes connected to the bus
@@ -395,8 +402,8 @@ void C_OSCRoutingCalculation::m_SearchRoutePointsOnBus(const uint32 ou32_BusInde
                                                 pc_ActNode->c_Properties.c_ComInterfaces[u32_InItfCounter]) == true))
             {
                C_OSCRoutingRoutePoint c_PointIn;
-               vector<uint32> c_VecBussesToSearchOfNode;
-               uint32 u32_NodeBusses;
+               vector<uint32> c_VecBusesToSearchOfNode;
+               uint32 u32_NodeBuses;
 
                // Configure the input and common parameter of the route point
                c_PointIn.u32_NodeIndex = u32_NodeCounter;
@@ -407,22 +414,22 @@ void C_OSCRoutingCalculation::m_SearchRoutePointsOnBus(const uint32 ou32_BusInde
                c_PointIn.u8_InInterfaceNumber =
                   pc_ActNode->c_Properties.c_ComInterfaces[u32_InItfCounter].u8_InterfaceNumber;
 
-               c_VecBussesToSearchOfNode = this->m_GetAllRoutePointsOfNodeOnOneInput(c_PointIn, u32_InItfCounter);
+               c_VecBusesToSearchOfNode = this->m_GetAllRoutePointsOfNodeOnOneInput(c_PointIn, u32_InItfCounter);
 
                // add all new buses of this node for the next search
-               for (u32_NodeBusses = 0U; u32_NodeBusses < c_VecBussesToSearchOfNode.size(); ++u32_NodeBusses)
+               for (u32_NodeBuses = 0U; u32_NodeBuses < c_VecBusesToSearchOfNode.size(); ++u32_NodeBuses)
                {
-                  c_SetBussesToSearch.insert(c_VecBussesToSearchOfNode[u32_NodeBusses]);
+                  c_SetBusesToSearch.insert(c_VecBusesToSearchOfNode[u32_NodeBuses]);
                }
             }
          }
       }
    }
 
-   this->mc_CheckedBusses.push_back(ou32_BusIndex);
+   this->mc_CheckedBuses.push_back(ou32_BusIndex);
 
    // search the other buses recursively
-   for (c_ItBusToSearch = c_SetBussesToSearch.begin(); c_ItBusToSearch != c_SetBussesToSearch.end(); ++c_ItBusToSearch)
+   for (c_ItBusToSearch = c_SetBusesToSearch.begin(); c_ItBusToSearch != c_SetBusesToSearch.end(); ++c_ItBusToSearch)
    {
       this->m_SearchRoutePointsOnBus(*c_ItBusToSearch);
    }
@@ -476,11 +483,11 @@ vector<uint32> C_OSCRoutingCalculation::m_GetAllRoutePointsOfNodeOnOneInput(cons
 
             // check if it is a new bus
             for (u32_PreviousBusCounter = 0U;
-                 u32_PreviousBusCounter < this->mc_CheckedBusses.size();
+                 u32_PreviousBusCounter < this->mc_CheckedBuses.size();
                  ++u32_PreviousBusCounter)
             {
                if (pc_ActNode->c_Properties.c_ComInterfaces[u32_OutItfCounter].u32_BusIndex ==
-                   this->mc_CheckedBusses[u32_PreviousBusCounter])
+                   this->mc_CheckedBuses[u32_PreviousBusCounter])
                {
                   // this bus was already used
                   q_NewBus = false;

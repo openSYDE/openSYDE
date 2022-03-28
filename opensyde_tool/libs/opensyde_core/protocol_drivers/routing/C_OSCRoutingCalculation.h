@@ -30,8 +30,9 @@ class C_OSCRoutingCalculation
 public:
    enum E_Mode ///< mode of routing
    {
-      eUPDATE,    ///< routing for update communication
-      eDIAGNOSTIC ///< routing for diagnostic communication
+      eUPDATE,       ///< routing for update communication
+      eDIAGNOSTIC,   ///< routing for diagnostic communication
+      eROUTING_CHECK ///< routing calculation only for validation of an existing route independent of the use case
    };
 
    C_OSCRoutingCalculation(const std::vector<C_OSCNode> & orc_AllNodes,
@@ -73,7 +74,7 @@ private:
    std::list<C_OSCRoutingRoute> mc_AllOpenRoutes;
    stw_types::sint32 ms32_ResultState;
 
-   std::vector<stw_types::uint32> mc_CheckedBusses;
+   std::vector<stw_types::uint32> mc_CheckedBuses;
    bool mq_PcBus;
 
    //lint -e{1725} reference used for performance reasons

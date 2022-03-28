@@ -33,10 +33,10 @@ using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 mf64_ActionPointOffsetBoundary = 10.0;
+const float64 mf64_ACTION_POINT_OFFSET_BOUNDARY = 10.0;
 
-const float64 C_GiBiTextElement::mhf64_MinWidthTextElement = 70.0;
-const float64 C_GiBiTextElement::mhf64_MinHeightTextElement = 20.0;
+const float64 C_GiBiTextElement::mhf64_MIN_WIDTH_TEXT_ELEMENT = 70.0;
+const float64 C_GiBiTextElement::mhf64_MIN_HEIGHT_TEXT_ELEMENT = 20.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -61,7 +61,8 @@ const float64 C_GiBiTextElement::mhf64_MinHeightTextElement = 20.0;
 C_GiBiTextElement::C_GiBiTextElement(const stw_types::uint64 & oru64_ID, const bool oq_Editable,
                                      QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID, mhf64_MinWidthTextElement, mhf64_MinHeightTextElement, mf64_ActionPointOffsetBoundary,
+   C_GiBiRectBaseGroup(oru64_ID, mhf64_MIN_WIDTH_TEXT_ELEMENT, mhf64_MIN_HEIGHT_TEXT_ELEMENT,
+                       mf64_ACTION_POINT_OFFSET_BOUNDARY,
                        false, opc_Parent),
    mpc_TextItem(NULL),
    mq_Editable(oq_Editable)
@@ -81,7 +82,8 @@ C_GiBiTextElement::C_GiBiTextElement(const stw_types::uint64 & oru64_ID, const b
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiTextElement::C_GiBiTextElement(const uint64 & oru64_ID, QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID, mhf64_MinWidthTextElement, mhf64_MinHeightTextElement, mf64_ActionPointOffsetBoundary,
+   C_GiBiRectBaseGroup(oru64_ID, mhf64_MIN_WIDTH_TEXT_ELEMENT, mhf64_MIN_HEIGHT_TEXT_ELEMENT,
+                       mf64_ACTION_POINT_OFFSET_BOUNDARY,
                        false, opc_Parent),
    mpc_TextItem(NULL),
    mq_Editable(true)
@@ -95,11 +97,11 @@ void C_GiBiTextElement::m_Init()
 {
    QFont c_Font;
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   const QRectF c_Rect = QRectF(0.0, 0.0,
-                                std::max(mhf64_MinWidthTextElement, 1.0),
-                                std::max(mhf64_MinHeightTextElement, 1.0));
+   const QRectF c_RECT = QRectF(0.0, 0.0,
+                                std::max(mhf64_MIN_WIDTH_TEXT_ELEMENT, 1.0),
+                                std::max(mhf64_MIN_HEIGHT_TEXT_ELEMENT, 1.0));
 
-   this->mpc_TextItem = new C_GiText(c_Rect, this->mq_Editable);
+   this->mpc_TextItem = new C_GiText(c_RECT, this->mq_Editable);
 
    // Notify the base class about the boundary as biggest item as orientation. Very important!
    this->m_SetBiggestItem(*this->mpc_TextItem);

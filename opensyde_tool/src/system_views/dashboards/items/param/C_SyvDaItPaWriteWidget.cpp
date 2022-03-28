@@ -141,7 +141,6 @@ void C_SyvDaItPaWriteWidget::InitText(void)
       C_GtGetText::h_GetText("The following parameter values will be written to NVM memory. "
                              "Click \"Write\" to start this process."));
 
-   this->mpc_Ui->pc_LabelHeadingConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Parameters")));
    this->mpc_Ui->pc_LabelHeadingNotification->setText(static_cast<QString>(C_GtGetText::h_GetText(
                                                                               "Application Notification")));
    this->mpc_Ui->pc_PbConfirm->setText(static_cast<QString>(C_GtGetText::h_GetText("Write")));
@@ -1014,6 +1013,7 @@ void C_SyvDaItPaWriteWidget::m_OnCancel(void)
 void C_SyvDaItPaWriteWidget::m_ConfirmCheckBoxChanged(void) const
 {
    this->mpc_Ui->pc_PbConfirm->setEnabled(this->mpc_Ui->pc_CbConfirm->isChecked());
+   this->mpc_Ui->pc_PbConfirm->setFocus();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

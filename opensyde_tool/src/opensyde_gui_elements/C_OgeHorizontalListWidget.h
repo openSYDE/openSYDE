@@ -38,6 +38,9 @@ public:
    void SetActualLine(const stw_types::sintn osn_Line);
    void ScrollToItem(const stw_types::sintn osn_Index);
 
+   static bool h_CheckValidMoveAction(const stw_types::sintn osn_StartIndex, const stw_types::sint32 os32_EndIndex,
+                                      const QListWidget & orc_Widget);
+
    virtual void dropEvent(QDropEvent * const opc_Event) override;
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -71,9 +74,9 @@ private:
    bool mq_DragTimeoutActiveLeft;
    bool mq_DragTimeoutActiveRight;
 
-   static const stw_types::sintn mhsn_ScrollArea;
-   static const stw_types::sintn mhsn_DragScrollTimerIntervalStart;
-   static const stw_types::sintn mhsn_DragScrollTimerInterval;
+   static const stw_types::sintn mhsn_SCROLL_AREA;
+   static const stw_types::sintn mhsn_DRAG_SCROLL_TIMER_INTERVAL_START;
+   static const stw_types::sintn mhsn_DRAG_SCROLL_TIMER_INTERVAL;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

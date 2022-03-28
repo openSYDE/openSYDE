@@ -1272,7 +1272,8 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
             if (opq_MessageIdInvalid != NULL)
             {
                bool q_MessageIdValid;
-               this->CheckMessageIdBus(pc_Message->u32_CanId, q_MessageIdValid,
+               this->CheckMessageIdBus(C_OSCCanMessageUniqueId(pc_Message->u32_CanId,
+                                                               pc_Message->q_IsExtended), q_MessageIdValid,
                                        &c_UniqueMessageIds[u32_ItUniqueMessageId]);
                if (q_MessageIdValid == false)
                {
@@ -1349,7 +1350,7 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message id valid
 
-   \param[in]      oru32_MessageId        Message id
+   \param[in]      orc_MessageId          Message id
    \param[out]     orq_Valid              Flag if valid
    \param[in]      opc_SkipMessage        Optional parameter to skip one message
                                           (Use-case: skip current message to avoid conflict with itself)
@@ -1358,7 +1359,8 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
    \param[in,out]  opq_DuplicateDetected  Optional output for duplicate check result
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdNodeCanMessageSyncManager::CheckMessageIdBus(const uint32 & oru32_MessageId, bool & orq_Valid,
+void C_PuiSdNodeCanMessageSyncManager::CheckMessageIdBus(const C_OSCCanMessageUniqueId & orc_MessageId,
+                                                         bool & orq_Valid,
                                                          const C_OSCCanMessageIdentificationIndices * const opc_SkipMessage, bool * const opq_EcosRangeError, bool * const opq_EcosEvenError,
                                                          bool * const opq_DuplicateDetected)
 const
@@ -1385,8 +1387,8 @@ const
       //Check ECoS
       if (opc_SkipMessage->e_ComProtocol == C_OSCCanProtocol::eCAN_OPEN_SAFETY)
       {
-         if ((oru32_MessageId < mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN) ||
-             (oru32_MessageId > mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX))
+         if ((orc_MessageId.u32_CanId < mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN) ||
+             (orc_MessageId.u32_CanId > mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX))
          {
             orq_Valid = false;
             if (opq_EcosRangeError != NULL)
@@ -1394,7 +1396,7 @@ const
                *opq_EcosRangeError = true;
             }
          }
-         if ((oru32_MessageId % 2) == 0)
+         if ((orc_MessageId.u32_CanId % 2) == 0)
          {
             orq_Valid = false;
             if (opq_EcosEvenError != NULL)
@@ -1423,7 +1425,8 @@ const
             C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_UniqueMessageIds[u32_ItUniqueMessageId]);
          if (pc_CurrentMessage != NULL)
          {
-            if (pc_CurrentMessage->u32_CanId == oru32_MessageId)
+            if ((pc_CurrentMessage->u32_CanId == orc_MessageId.u32_CanId) &&
+                (pc_CurrentMessage->q_IsExtended == orc_MessageId.q_IsExtended))
             {
                q_Found = true;
                break;

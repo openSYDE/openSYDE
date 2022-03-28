@@ -138,22 +138,6 @@
           <property name="horizontalSpacing">
            <number>20</number>
           </property>
-          <item row="0" column="1">
-           <widget class="stw_opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditIpAddress">
-            <property name="minimumSize">
-             <size>
-              <width>150</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>150</width>
-              <height>30</height>
-             </size>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSubNetMask">
             <property name="text">
@@ -181,8 +165,31 @@
             </property>
            </spacer>
           </item>
+          <item row="2" column="0">
+           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDefaultGateway">
+            <property name="text">
+             <string>GateWay</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="stw_opensyde_gui::C_SdNdeLeIpAddressWidget" name="pc_WidgetIpAddress" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>30</height>
+             </size>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="1">
-           <widget class="stw_opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditSubNetMask">
+           <widget class="stw_opensyde_gui::C_SdNdeLeIpAddressWidget" name="pc_WidgetSubNetMask" native="true">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -198,7 +205,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="stw_opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditDefaultGateway">
+           <widget class="stw_opensyde_gui::C_SdNdeLeIpAddressWidget" name="pc_WidgetDefaultGateway" native="true">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -210,13 +217,6 @@
               <width>150</width>
               <height>30</height>
              </size>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDefaultGateway">
-            <property name="text">
-             <string>GateWay</string>
             </property>
            </widget>
           </item>
@@ -391,11 +391,19 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeIpAddress</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeIpAddress.h</header>
+   <class>stw_opensyde_gui::C_SdNdeLeIpAddressWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeLeIpAddressWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>pc_WidgetIpAddress</tabstop>
+  <tabstop>pc_WidgetSubNetMask</tabstop>
+  <tabstop>pc_WidgetDefaultGateway</tabstop>
+  <tabstop>pc_BushButtonCancel</tabstop>
+  <tabstop>pc_BushButtonOk</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

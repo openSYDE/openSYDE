@@ -81,8 +81,8 @@ private:
                                 bool & orq_ExistingBusExists, bool & orq_ExistingBusRestricted,
                                 stw_opensyde_core::C_OSCSystemBus::E_Type & ore_ExistingBusType) const;
 
-   const QString mc_BUS_TYPE_CAN;
-   const QString mc_BUS_TYPE_ETHERNET;
+   const QString mc_BusTypeCan;
+   const QString mc_BusTypeEthernet;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

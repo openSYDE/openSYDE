@@ -58,7 +58,7 @@ public:
    void UpdateMeasurementValue(const E_MeasurementValueState oe_MeasurementValueVariant, const QString & orc_Value);
    void UpdateError(const QString & orc_ErrorText, const bool oq_IsTransmissionError, const bool oq_ErrorActive);
    void ResetError(void);
-   void UpdateTransparence(const stw_types::sintn osn_Value) const;
+   void UpdateTransparency(const stw_types::sintn osn_Value) const;
 
    QString GetDataElementName(void) const;
    QString GetDataElementUnit(void) const;

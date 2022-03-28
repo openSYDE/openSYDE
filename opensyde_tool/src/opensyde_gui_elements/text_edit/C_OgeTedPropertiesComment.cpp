@@ -19,6 +19,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
+using namespace stw_types;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -64,9 +65,28 @@ void C_OgeTedPropertiesComment::focusOutEvent(QFocusEvent * const opc_Event)
 
       c_TempTextCursor.clearSelection();
       this->setTextCursor(c_TempTextCursor);
-
       Q_EMIT (this->SigEditingFinished());
    }
 
    QTextEdit::focusOutEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten key press event to emulate key 'Tab', 'Return' and 'Enter' behaviour as user confirmation.
+
+   \param[in]       opc_KeyEvent     Qt key event to catch
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeTedPropertiesComment::keyPressEvent(QKeyEvent * const opc_KeyEvent)
+{
+   if (opc_KeyEvent != NULL)
+   {
+      C_OgeTedContextMenuBase::keyPressEvent(opc_KeyEvent);
+      if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Tab)) ||
+          (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)) ||
+          (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)))
+      {
+         Q_EMIT (this->SigCommentConfirmed());
+      }
+   }
 }

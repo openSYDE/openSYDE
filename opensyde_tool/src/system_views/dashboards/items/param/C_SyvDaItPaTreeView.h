@@ -47,6 +47,7 @@ public:
    void SetDark(const bool oq_Value);
    void SetEditMode(const bool oq_EditMode);
    void SetConnected(const bool oq_Connected);
+   void SetLoadSaveActive(const bool oq_Active);
    void SetActionActive(const bool oq_Active);
    QString GetSelectedItemTypeTemplate(void) const;
    stw_types::uint32 GetSelectedItemCount(void) const;
@@ -66,6 +67,7 @@ public:
    void SetCRCStatus(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_ListId, const bool oq_Status);
    void GetListSetValues(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ListId,
                          std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> & orc_ListValues) const;
+   void HideToolTip(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -89,6 +91,9 @@ Q_SIGNALS:
 protected:
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual bool event(QEvent * const opc_Event) override;
+   virtual void mouseReleaseEvent(QMouseEvent * const opc_Event) override;
+   virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
+   virtual void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
 
 private:
    stw_opensyde_gui_logic::C_SyvDaItPaTreeDelegate mc_Delegate;

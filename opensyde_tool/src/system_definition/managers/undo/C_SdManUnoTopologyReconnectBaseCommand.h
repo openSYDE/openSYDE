@@ -32,8 +32,9 @@ public:
                                           const stw_types::uint64 & oru64_StartingItemID,
                                           const stw_types::uint64 & oru64_LastItemID, const QPointF & orc_ConnectionPos,
                                           const stw_types::sint32 & ors32_Interface,
-                                          const std::vector<stw_types::uint8> & orc_NodeIds,
-                                          const QString & orc_Description, QUndoCommand * const opc_Parent = NULL);
+                                          const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
+                                          const QString & orc_Description,
+                                          QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SdManUnoTopologyReconnectBaseCommand(void);
    virtual void undo(void) override;
    virtual void redo(void) override;
@@ -45,13 +46,13 @@ protected:
    //TODO: Save initial position (If this command ever needs to be undone) -> also add to m_Reconnect interface
    const stw_types::sint32 ms32_Interface;
    stw_types::uint8 mu8_InitialInterface;
-   const std::vector<stw_types::uint8> mc_NodeIds;
-   std::vector<stw_types::uint8> mc_InitialNodeIds;
+   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> mc_Properties;
+   std::vector<C_PuiSdNodeInterfaceAutomaticProperties> mc_InitialProperties;
 
    stw_opensyde_gui::C_GiLiBusConnector * m_GetBusConnector(void) const;
    virtual void m_Reconnect(const stw_types::uint64 & oru64_StartingID, const stw_types::uint64 & oru64_LastID,
                             const stw_types::sint32 & ors32_Interface,
-                            const std::vector<stw_types::uint8> & orc_NodeIds) = 0;
+                            const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties) = 0;
 
 private:
    bool mq_Merged;

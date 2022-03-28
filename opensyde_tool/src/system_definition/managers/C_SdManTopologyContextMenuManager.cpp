@@ -81,6 +81,13 @@ void C_SdManTopologyContextMenuManager::m_SetActionsInvisible(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Activate single item specific actions
+
+   \return
+   true     Specific action found
+   false    No specific action found
+*/
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
 {
    // specific functionality

@@ -33,7 +33,7 @@ static const sintn msn_GRID_HEIGHT = 70;
 static const sintn msn_GRID_WIDTH = 90;
 static const sintn msn_ICON_HEIGHT = 48;
 static const sintn msn_ICON_WIDTH = 48;
-const QString C_SdTopologyListWidget::hc_GroupName = "application/stw/opensyde/system/element";
+const QString C_SdTopologyListWidget::hc_GROUP_NAME = "application/stw/opensyde/system/element";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -228,7 +228,7 @@ void C_SdTopologyListWidget::startDrag(const Qt::DropActions oc_SupportedActions
          QMimeData * const pc_MimeData = new QMimeData();
 
          pc_MimeData->setText(pc_Item->data(msn_USER_ROLE_ADDITIONAL_INFORMATION).toString());
-         pc_MimeData->setData(C_SdTopologyListWidget::hc_GroupName, this->mc_Name.toStdString().c_str());
+         pc_MimeData->setData(C_SdTopologyListWidget::hc_GROUP_NAME, this->mc_Name.toStdString().c_str());
          c_Pix = c_SelectedItems[0]->icon().pixmap(msn_ICON_WIDTH, msn_ICON_HEIGHT);
          pc_Drag->setPixmap(c_Pix);
          pc_Drag->setHotSpot(c_Pix.rect().center());

@@ -61,7 +61,8 @@ public:
    void SetAllExpandedTreeItems(
       const std::vector<stw_opensyde_gui_logic::C_PuiSvDbExpandedTreeIndex> & orc_Items) const;
 
-   void SetEditModeActive(const bool oq_Active);
+   void SetEditMode(const bool oq_EditMode, const bool oq_EditContentMode);
+   void HideToolTip(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -73,6 +74,7 @@ Q_SIGNALS:
 
 protected:
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
+   virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
 
 private:
    //Avoid call

@@ -60,6 +60,7 @@ public:
    void DisplaySpecificItemToolTip(const QPointF & orc_ScenePos);
 
    virtual bool IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc_ScenePos);
+   virtual bool IsSelectionRelevantForProxyWidgetInteraction(void) const;
 
    virtual void UpdateTransform(const QTransform & orc_Transform);
 
@@ -235,7 +236,7 @@ private:
 
    QTimer mc_ToolTipTimer;
 
-   static const stw_types::float64 mhf64_MovingRange;
+   static const stw_types::float64 mhf64_MOVING_RANGE;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

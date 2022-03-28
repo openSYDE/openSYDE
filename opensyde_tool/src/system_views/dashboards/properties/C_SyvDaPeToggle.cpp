@@ -166,16 +166,16 @@ void C_SyvDaPeToggle::m_UpdatePreview(void)
    const float64 f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
    const QSize c_ViewSize = C_SyvDaPeBase::h_GetSceneViewSize();
    C_GiSvDaToggleBase * const pc_Item = new C_GiSvDaToggleBase(0UL, 0UL, -1L, 0ULL, NULL);
-   const QSizeF c_ItemSize(150.0, 100.0);
+   const QSizeF c_ITEM_SIZE(150.0, 100.0);
    // 20 =  Vertical center adjustment
    const QPointF c_ItemPos(
-      ((static_cast<float64>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0) + (f64_IconOffset / 2.0),
-      ((static_cast<float64>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0) + 20.0);
+      ((static_cast<float64>(c_ViewSize.width()) - c_ITEM_SIZE.width()) / 2.0) + (f64_IconOffset / 2.0),
+      ((static_cast<float64>(c_ViewSize.height()) - c_ITEM_SIZE.height()) / 2.0) + 20.0);
 
    pc_Item->SetDisplayStyle(this->mrc_ParentDialog.GetTheme(), this->mq_DarkMode);
    pc_Item->UpdateType(this->GetType());
 
-   pc_Item->ApplySizeChange(c_ItemPos, c_ItemSize);
+   pc_Item->ApplySizeChange(c_ItemPos, c_ITEM_SIZE);
 
    // clear old scene
    this->mrc_ParentDialog.GetPreviewScene()->clear();

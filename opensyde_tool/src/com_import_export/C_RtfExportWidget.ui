@@ -548,11 +548,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
    <header>C_OgeLabHeadingGroupBold.h</header>
@@ -562,11 +557,6 @@
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
@@ -580,29 +570,39 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubCancel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLeFilePath</class>
    <extends>QLineEdit</extends>
    <header>C_OgeLeFilePath.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubOpen</class>
    <extends>QPushButton</extends>
    <header>C_OgePubOpen.h</header>
   </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLeProperties.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>pc_PushButtonOk</tabstop>
   <tabstop>pc_EditRtfPath</tabstop>
   <tabstop>pc_PushButtonRtfPath</tabstop>
   <tabstop>pc_EditCompany</tabstop>
   <tabstop>pc_EditLogoPath</tabstop>
   <tabstop>pc_PushButtonLogoPath</tabstop>
   <tabstop>pc_PushButtonCancel</tabstop>
+  <tabstop>pc_PushButtonOk</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -19,6 +19,7 @@
 #include "stwerrors.h"
 #include "TGLTime.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_OSCProtocolSerialNumber.h"
 #include "C_OSCProtocolDriverOsyTpIp.h"
 #include "C_OSCIpDispatcher.h"
 
@@ -261,7 +262,8 @@ sint32 C_OSCProtocolDriverOsyTpIp::Disconnect(void)
 
    Incoming UDP responses to other services will be dumped: we are strictly handshaking here ...
 
-   \param[out]    orc_DeviceInfos   information about all nodes that sent a response
+   \param[out]    orc_DeviceInfos           information about all nodes that sent a response
+   \param[out]    orc_DeviceExtendedInfos   information about all nodes that sent an extended response
 
    \return
    C_NO_ERR   no problems; zero or more responses received; data placed in orc_DeviceInfos
@@ -269,14 +271,20 @@ sint32 C_OSCProtocolDriverOsyTpIp::Disconnect(void)
    C_CONFIG   no dispatcher installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpIp::BroadcastGetDeviceInfo(std::vector<C_BroadcastGetDeviceInfoResults> & orc_DeviceInfos)
+sint32 C_OSCProtocolDriverOsyTpIp::BroadcastGetDeviceInfo(
+   std::vector<C_BroadcastGetDeviceInfoResults> & orc_DeviceInfos,
+   std::vector<C_BroadcastGetDeviceInfoExtendedResults> & orc_DeviceExtendedInfos)
 const
 {
+   const uint32 u32_PAYLOAD_SIZE_STD = 37U;
+   const uint32 u32_PAYLOAD_SIZE_EXT_MIN = 36U;
+   const uint32 u32_PAYLOAD_SIZE_EXT_MAX = 64U;
    sint32 s32_Return;
    C_DoIpHeader c_Header(C_DoIpHeader::hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_REQ, 0U);
 
    std::vector<uint8> c_Request;
    orc_DeviceInfos.clear();
+   orc_DeviceExtendedInfos.clear();
    if (mpc_Dispatcher == NULL)
    {
       s32_Return = C_CONFIG;
@@ -298,13 +306,15 @@ const
          uint8 au8_Ip[4];
          std::vector<uint8> c_Response;
          std::vector<C_BroadcastGetDeviceInfoResults>::iterator c_ItDeviceInfo;
+         std::vector<C_BroadcastGetDeviceInfoExtendedResults>::iterator c_ItDeviceExtInfo;
 
          while ((stw_tgl::TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTime)
          {
             sint32 s32_ReturnLocal = mpc_Dispatcher->ReadUdp(c_Response, au8_Ip);
             if (s32_ReturnLocal == C_NO_ERR)
             {
-               if (c_Response.size() == (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 37))
+               if (((c_Response.size() >= (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PAYLOAD_SIZE_EXT_MIN)) &&
+                    (c_Response.size() <= (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PAYLOAD_SIZE_EXT_MAX))))
                {
                   //header OK ?
                   s32_ReturnLocal = c_Header.DecodeHeader(c_Response);
@@ -312,15 +322,37 @@ const
                   {
                   case C_NO_ERR:
                      //sanity check: does payload size match response size ?
-                     if ((c_Header.u32_PayloadSize ==
-                          static_cast<uint32>((c_Response.size() - C_DoIpHeader::hu8_DOIP_HEADER_SIZE))) &&
-                         (c_Header.u16_PayloadType == C_DoIpHeader::hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_RES))
+                     if (c_Header.u32_PayloadSize ==
+                         static_cast<uint32>((c_Response.size() - C_DoIpHeader::hu8_DOIP_HEADER_SIZE)))
                      {
-                        //looks legit; extract payload ...
-                        C_BroadcastGetDeviceInfoResults c_Info;
-                        c_Info.ParseFromArray(c_Response, C_DoIpHeader::hu8_DOIP_HEADER_SIZE);
-                        (void)std::memcpy(&c_Info.au8_IpAddress[0], &au8_Ip[0], 4U);
-                        orc_DeviceInfos.push_back(c_Info);
+                        if ((c_Header.u16_PayloadType == C_DoIpHeader::hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_RES) &&
+                            (c_Response.size() == (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PAYLOAD_SIZE_STD)))
+                        {
+                           //looks legit for the standard response; extract payload ...
+                           C_BroadcastGetDeviceInfoResults c_Info;
+                           c_Info.ParseFromArray(c_Response, C_DoIpHeader::hu8_DOIP_HEADER_SIZE);
+                           (void)std::memcpy(&c_Info.au8_IpAddress[0], &au8_Ip[0], 4U);
+                           orc_DeviceInfos.push_back(c_Info);
+                        }
+                        else if ((c_Header.u16_PayloadType ==
+                                  C_DoIpHeader::hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_EXT_RES) &&
+                                 ((c_Response.size() >=
+                                   (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PAYLOAD_SIZE_EXT_MIN)) &&
+                                  (c_Response.size() <=
+                                   (C_DoIpHeader::hu8_DOIP_HEADER_SIZE + u32_PAYLOAD_SIZE_EXT_MAX))))
+                        {
+                           //looks legit for the extended response; extract payload ...
+                           C_BroadcastGetDeviceInfoExtendedResults c_Info;
+                           c_Info.ParseFromArray(c_Response, C_DoIpHeader::hu8_DOIP_HEADER_SIZE);
+                           (void)std::memcpy(&c_Info.au8_IpAddress[0], &au8_Ip[0], 4U);
+                           orc_DeviceExtendedInfos.push_back(c_Info);
+                        }
+                        else
+                        {
+                           m_LogWarningWithHeaderAndIp(
+                              "UDP response with not matching payload type value received. Ignoring.",
+                              TGL_UTIL_FUNC_ID, au8_Ip);
+                        }
                      }
                      else
                      {
@@ -352,14 +384,21 @@ const
          // are connected to at least two same subnets.
          std::sort(orc_DeviceInfos.begin(), orc_DeviceInfos.end());
          c_ItDeviceInfo = std::unique(orc_DeviceInfos.begin(), orc_DeviceInfos.end());
-
          if (c_ItDeviceInfo != orc_DeviceInfos.end())
          {
             osc_write_log_info("openSYDE IP-TP",
                                "At least one server sent multiple device information responses");
          }
-
          orc_DeviceInfos.erase(c_ItDeviceInfo, orc_DeviceInfos.end());
+
+         std::sort(orc_DeviceExtendedInfos.begin(), orc_DeviceExtendedInfos.end());
+         c_ItDeviceExtInfo = std::unique(orc_DeviceExtendedInfos.begin(), orc_DeviceExtendedInfos.end());
+         if (c_ItDeviceExtInfo != orc_DeviceExtendedInfos.end())
+         {
+            osc_write_log_info("openSYDE IP-TP",
+                               "At least one server sent multiple device information extended responses");
+         }
+         orc_DeviceExtendedInfos.erase(c_ItDeviceExtInfo, orc_DeviceExtendedInfos.end());
       }
    }
    return s32_Return;
@@ -374,7 +413,7 @@ const
 
    Incoming UDP responses to other services will be dumped: we are strictly handshaking here ...
 
-   \param[in]    orau8_SerialNumber    serial number of server to change IP on
+   \param[in]    orc_SerialNumber      serial number of server to change IP on
    \param[in]    orau8_NewIpAddress    IP address to set
    \param[in]    orau8_NetMask         Net mask to set
    \param[in]    orau8_DefaultGateway  Default gateway to set
@@ -387,10 +426,11 @@ const
    C_WARN     error response
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
+   C_RANGE    serial number is invalid or wrong format of serial number is configured
    C_TIMEOUT  no response within timeout
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_SerialNumber)[6],
+sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const C_OSCProtocolSerialNumber & orc_SerialNumber,
                                                          const uint8 (&orau8_NewIpAddress)[4],
                                                          const uint8 (&orau8_NetMask)[4],
                                                          const uint8 (&orau8_DefaultGateway)[4],
@@ -399,18 +439,23 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_Ser
                                                          uint8 * const opu8_ErrorResult) const
 {
    sint32 s32_Return = C_TIMEOUT;
-   C_DoIpHeader c_Header(C_DoIpHeader::hu16_PAYLOAD_TYPE_SET_IP_ADDRESS_MESSAGE_REQ, 21U);
 
    std::vector<uint8> c_Request;
    if (mpc_Dispatcher == NULL)
    {
       s32_Return = C_CONFIG;
    }
+   else if ((orc_SerialNumber.q_IsValid == false) ||
+            (orc_SerialNumber.q_ExtFormatUsed == true))
+   {
+      s32_Return = C_RANGE;
+   }
    else
    {
+      C_DoIpHeader c_Header(C_DoIpHeader::hu16_PAYLOAD_TYPE_SET_IP_ADDRESS_MESSAGE_REQ, 21U);
       sint32 s32_ReturnLocal;
       c_Header.ComposeHeader(c_Request);
-      (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE], &orau8_SerialNumber[0], 6);
+      (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE], &orc_SerialNumber.au8_SerialNumber[0], 6);
       // Mode flag. Bit 1 is IP address, bit 2 is node identifier
       c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 6] = 0x03;
       (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 7], &orau8_NewIpAddress[0], 4);
@@ -450,7 +495,7 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_Ser
                          (c_Header.u16_PayloadType == C_DoIpHeader::hu16_PAYLOAD_TYPE_SET_IP_ADDRESS_MESSAGE_RES))
                      {
                         //looks legit; check payload ...
-                        const sintn sn_SnrOk = std::memcmp(&orau8_SerialNumber[0],
+                        const sintn sn_SnrOk = std::memcmp(&orc_SerialNumber.au8_SerialNumber[0],
                                                            &c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2], 6U);
                         if (sn_SnrOk != 0)
                         {
@@ -463,6 +508,16 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_Ser
                            if (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 8U] == 0U)
                            {
                               s32_Return = C_NO_ERR;
+                           }
+                           else if (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 8U] == 3U)
+                           {
+                              m_LogWarningWithHeaderAndIp(
+                                 "SetIpAddress: could not perform action. Node has security activated.",
+                                 TGL_UTIL_FUNC_ID, orau8_ResponseIp);
+                              if (opu8_ErrorResult != NULL)
+                              {
+                                 (*opu8_ErrorResult) = c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 8U];
+                              }
                            }
                            else
                            {
@@ -503,6 +558,200 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_Ser
          }
       }
    }
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set IP address extended of one node
+
+   Send broadcast to change the IP address of one specific node.
+   Only the node with a specified serial number is expected to send a response and change its IP address.
+   The function will return as soon as it has received one response.
+
+   Incoming UDP responses to other services will be dumped: we are strictly handshaking here ...
+
+   \param[in]    orc_SerialNumber                   serial number of server to change IP on
+   \param[in]    orau8_NewIpAddress                 IP address to set
+   \param[in]    orau8_NetMask                      Net mask to set
+   \param[in]    orau8_DefaultGateway               Default gateway to set
+   \param[in]    orc_NewNodeId                      New bus id and node id for the interface
+   \param[in]    ou8_SubNodeId                      Sub node id of node for identification in case of a multi CPU node
+   \param[out]   orau8_ResponseIp                   IP address the response was received from
+   \param[out]   opu8_ErrorResult                   if not NULL: code of error response (if C_WARN is returned)
+
+   \return
+   C_NO_ERR   no problems
+   C_WARN     error response
+   C_COM      could not send request
+   C_CONFIG   no dispatcher installed
+   C_TIMEOUT  no response within timeout
+   C_RANGE    serial number (orc_SerialNumber) is to long (maximum is 29 byte) or empty
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddressExtended(
+   const C_OSCProtocolSerialNumber & orc_SerialNumber, const stw_types::uint8(&orau8_NewIpAddress)[4],
+   const stw_types::uint8(&orau8_NetMask)[4], const stw_types::uint8(&orau8_DefaultGateway)[4],
+   const C_OSCProtocolDriverOsyNode & orc_NewNodeId, const uint8 ou8_SubNodeId, stw_types::uint8(&orau8_ResponseIp)[4],
+   uint8 * const opu8_ErrorResult) const
+{
+   sint32 s32_Return = C_TIMEOUT;
+
+   std::vector<uint8> c_Request;
+   if (mpc_Dispatcher == NULL)
+   {
+      s32_Return = C_CONFIG;
+   }
+   else if ((orc_SerialNumber.q_IsValid == false) ||
+            (orc_SerialNumber.q_ExtFormatUsed == false))
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      const uint8 u8_SerialNumberLength = orc_SerialNumber.u8_SerialNumberByteLength;
+      const std::vector<uint8> c_SerialNumberRaw = orc_SerialNumber.GetSerialNumberAsRawData();
+      C_DoIpHeader c_Header(C_DoIpHeader::hu16_PAYLOAD_TYPE_SET_IP_ADDRESS_MESSAGE_EXT_REQ,
+                            (18U + u8_SerialNumberLength));
+      sint32 s32_ReturnLocal;
+
+      c_Header.ComposeHeader(c_Request);
+      // Mode flag. Bit 1 is IP address, bit 2 is node identifier
+      c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE] = 0x03;
+      (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 1], &orau8_NewIpAddress[0], 4);
+      (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 5], &orau8_NetMask[0], 4);
+      (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 9], &orau8_DefaultGateway[0], 4);
+      c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 13] = orc_NewNodeId.u8_BusIdentifier;
+      c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 14] = orc_NewNodeId.u8_NodeIdentifier;
+
+      // Extended part
+      c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 15] = ou8_SubNodeId;
+      c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 16] = orc_SerialNumber.u8_SerialNumberManufacturerFormat;
+      c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 17] = u8_SerialNumberLength;
+      (void)std::memcpy(&c_Request[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 18],
+                        &c_SerialNumberRaw[0], u8_SerialNumberLength);
+
+      s32_ReturnLocal = mpc_Dispatcher->SendUdp(c_Request);
+      if (s32_ReturnLocal != C_NO_ERR)
+      {
+         m_LogWarningWithHeader("Could not send UDP broadcast request.", TGL_UTIL_FUNC_ID);
+         s32_Return = C_COM;
+      }
+      else
+      {
+         const uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+         std::vector<uint8> c_Response;
+         bool q_Done = false;
+
+         while (((stw_tgl::TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTime) && (q_Done == false))
+         {
+            //check for response
+            s32_ReturnLocal = mpc_Dispatcher->ReadUdp(c_Response, orau8_ResponseIp);
+            if (s32_ReturnLocal == C_NO_ERR)
+            {
+               if (c_Response.size() ==
+                   (static_cast<uintn>(C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 6U) + u8_SerialNumberLength))
+               {
+                  //header OK ?
+                  s32_ReturnLocal = c_Header.DecodeHeader(c_Response);
+                  switch (s32_ReturnLocal)
+                  {
+                  case C_NO_ERR:
+                     //sanity check: does payload size match response size ?
+                     if ((c_Header.u32_PayloadSize ==
+                          static_cast<uint32>((c_Response.size() - C_DoIpHeader::hu8_DOIP_HEADER_SIZE))) &&
+                         (c_Header.u16_PayloadType == C_DoIpHeader::hu16_PAYLOAD_TYPE_SET_IP_ADDRESS_MESSAGE_EXT_RES))
+                     {
+                        //looks legit; check payload ...
+                        const bool q_SubNodeIdOk = (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 3] ==
+                                                    ou8_SubNodeId);
+                        const bool q_SnManufacturerFormatOk = (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 4] ==
+                                                               orc_SerialNumber.u8_SerialNumberManufacturerFormat);
+                        const bool q_SnLengthOk = (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 5] ==
+                                                   u8_SerialNumberLength);
+                        const sintn sn_SnrOk = std::memcmp(&c_SerialNumberRaw[0],
+                                                           &c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 6U],
+                                                           u8_SerialNumberLength);
+
+                        if (q_SubNodeIdOk == false)
+                        {
+                           m_LogWarningWithHeaderAndIp(
+                              "SetIpAddress: response with unexpected sub node id. Ignoring.",
+                              TGL_UTIL_FUNC_ID, orau8_ResponseIp);
+                        }
+                        else if (q_SnManufacturerFormatOk == false)
+                        {
+                           m_LogWarningWithHeaderAndIp(
+                              "SetIpAddress: response with unexpected manufacturer format. Ignoring.",
+                              TGL_UTIL_FUNC_ID, orau8_ResponseIp);
+                        }
+                        else if (q_SnLengthOk == false)
+                        {
+                           m_LogWarningWithHeaderAndIp(
+                              "SetIpAddress: response with unexpected serial number length. Ignoring.",
+                              TGL_UTIL_FUNC_ID, orau8_ResponseIp);
+                        }
+                        else if (sn_SnrOk != 0)
+                        {
+                           m_LogWarningWithHeaderAndIp(
+                              "SetIpAddress: response with unexpected serial number. Ignoring.",
+                              TGL_UTIL_FUNC_ID, orau8_ResponseIp);
+                        }
+                        else
+                        {
+                           if (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2U] == 0U)
+                           {
+                              s32_Return = C_NO_ERR;
+                           }
+                           else if (c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2U] == 3U)
+                           {
+                              m_LogWarningWithHeaderAndIp(
+                                 "SetIpAddress: could not perform action. Node has security activated.",
+                                 TGL_UTIL_FUNC_ID, orau8_ResponseIp);
+                              if (opu8_ErrorResult != NULL)
+                              {
+                                 (*opu8_ErrorResult) = c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2U];
+                              }
+                           }
+                           else
+                           {
+                              s32_Return = C_WARN;
+                              if (opu8_ErrorResult != NULL)
+                              {
+                                 (*opu8_ErrorResult) = c_Response[C_DoIpHeader::hu8_DOIP_HEADER_SIZE + 2U];
+                              }
+                           }
+                           q_Done = true;
+                        }
+                     }
+                     else
+                     {
+                        m_LogWarningWithHeaderAndIp(
+                           "UDP response with unexpected payload size or type received. Ignoring.", TGL_UTIL_FUNC_ID,
+                           orau8_ResponseIp);
+                     }
+                     break;
+                  case C_CONFIG:
+                     m_LogWarningWithHeaderAndIp("UDP response with unexpected version received. Ignoring.",
+                                                 TGL_UTIL_FUNC_ID, orau8_ResponseIp);
+                     break;
+                  default:
+                     //unexpected ...
+                     m_LogWarningWithHeaderAndIp("Internal error parsing DoIp header.", TGL_UTIL_FUNC_ID,
+                                                 orau8_ResponseIp);
+                     break;
+                  }
+               }
+               else
+               {
+                  m_LogWarningWithHeaderAndIp("UDP response with incorrect payload size (" +
+                                              C_SCLString::IntToStr(c_Response.size()) + ") received. Ignoring.",
+                                              TGL_UTIL_FUNC_ID, orau8_ResponseIp);
+               }
+            }
+         }
+      }
+   }
+
    return s32_Return;
 }
 
@@ -985,6 +1234,14 @@ void C_OSCProtocolDriverOsyTpIp::m_LogWarningWithHeaderAndIp(const C_SCLString &
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::~C_BroadcastGetDeviceInfoResults(void)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current equal to orc_Cmp
 
    IP Address will not be checked. It is not an unique identifier for a device.
@@ -1001,16 +1258,11 @@ bool C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::operator ==(
 {
    bool q_Return = false;
 
-   const sintn sn_Return =
-      std::memcmp(&this->au8_SerialNumber[0], &orc_Cmp.au8_SerialNumber[0], sizeof(this->au8_SerialNumber));
-
-   if (sn_Return == 0)
+   if ((this->c_SerialNumber == orc_Cmp.c_SerialNumber)      &&
+       (this->c_DeviceName == orc_Cmp.c_DeviceName) &&
+       (this->c_NodeId == orc_Cmp.c_NodeId))
    {
-      if ((this->c_DeviceName == orc_Cmp.c_DeviceName) &&
-          (this->c_NodeId == orc_Cmp.c_NodeId))
-      {
-         q_Return = true;
-      }
+      q_Return = true;
    }
 
    return q_Return;
@@ -1033,14 +1285,11 @@ bool C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::operator <(
 {
    bool q_Return = false;
 
-   const sintn sn_Return =
-      std::memcmp(&this->au8_SerialNumber[0], &orc_Cmp.au8_SerialNumber[0], sizeof(this->au8_SerialNumber));
-
-   if (sn_Return < 0)
+   if (this->c_SerialNumber < orc_Cmp.c_SerialNumber)
    {
       q_Return = true;
    }
-   else if (sn_Return == 0)
+   else if (this->c_SerialNumber == orc_Cmp.c_SerialNumber)
    {
       if (this->c_DeviceName < orc_Cmp.c_DeviceName)
       {
@@ -1081,6 +1330,7 @@ void C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::ParseFromArray
                                                                                  const uint8 ou8_DataStartIndex)
 {
    uint8 au8_DeviceName[29];
+   uint8 au8_SerialNumber[6];
 
    const uint16 u16_SourceAddress =
       (static_cast<uint16>(static_cast<uint16>(orc_Data[ou8_DataStartIndex]) << 8U) +
@@ -1089,7 +1339,8 @@ void C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::ParseFromArray
    this->c_NodeId.u8_NodeIdentifier = static_cast<uint8>(u16_SourceAddress & 0x7FU);
    this->c_NodeId.u8_BusIdentifier = static_cast<uint8>((u16_SourceAddress >> 7U) & 0x0FU);
 
-   (void)std::memcpy(&this->au8_SerialNumber[0], &orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 2U], 6U);
+   (void)std::memcpy(&au8_SerialNumber, &orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 2U], 6U);
+   this->c_SerialNumber.SetPosSerialNumber(au8_SerialNumber);
 
    //defensive approach: spec says it's always zero terminated: make sure
    au8_DeviceName[28] = 0U;
@@ -1097,4 +1348,139 @@ void C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::ParseFromArray
 
    //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?& anyway
    this->c_DeviceName = reinterpret_cast<const charn *>(&au8_DeviceName[0]);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current equal to orc_Cmp
+
+   IP Address will not be checked. It is not an unique identifier for a device.
+
+   \param[in] orc_Cmp Compared instance
+
+   \return
+   Current equal to orc_Cmp
+   Else false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults::operator ==(
+   const C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const
+{
+   bool q_Return = false;
+
+   if ((this->c_DeviceName == orc_Cmp.c_DeviceName) &&
+       (this->c_NodeId == orc_Cmp.c_NodeId) &&
+       (this->c_SerialNumber == orc_Cmp.c_SerialNumber) &&
+       (this->u8_SubNodeId == orc_Cmp.u8_SubNodeId))
+   {
+      q_Return = true;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current smaller than orc_Cmp
+
+   IP Address will not be checked. It is not an unique identifier for a device.
+
+   \param[in] orc_Cmp Compared instance
+
+   \return
+   Current smaller than orc_Cmp
+   Else false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults::operator <(
+   const C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const
+{
+   bool q_Return = false;
+
+   if (this->c_SerialNumber < orc_Cmp.c_SerialNumber)
+   {
+      q_Return = true;
+   }
+   else if (this->c_SerialNumber == orc_Cmp.c_SerialNumber)
+   {
+      if (this->u8_SubNodeId < orc_Cmp.u8_SubNodeId)
+      {
+         q_Return = true;
+      }
+      else if (this->u8_SubNodeId == orc_Cmp.u8_SubNodeId)
+      {
+         if (this->c_DeviceName < orc_Cmp.c_DeviceName)
+         {
+            q_Return = true;
+         }
+         else if (this->c_DeviceName == orc_Cmp.c_DeviceName)
+         {
+            if (this->c_NodeId < orc_Cmp.c_NodeId)
+            {
+               q_Return = true;
+            }
+         }
+         else
+         {
+            // Nothing to do
+         }
+      }
+      else
+      {
+         // Nothing to do
+      }
+   }
+   else
+   {
+      // Nothing to do
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Extract device information extended from binary data
+
+   Extract device information extended from binary data stream.
+   Caller is responsible to provide data with the correct size.
+   Extracts serial number and device name.
+
+   \param[in]  orc_Data            binary data
+   \param[in]  ou8_DataStartIndex  offset index within orc_Data where data to parse starts
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults::ParseFromArray(
+   const std::vector<uint8> & orc_Data, const uint8 ou8_DataStartIndex)
+{
+   uint8 au8_DeviceName[29];
+   uint8 u8_SerialNumberLength;
+
+   const uint16 u16_SourceAddress =
+      (static_cast<uint16>(static_cast<uint16>(orc_Data[ou8_DataStartIndex]) << 8U) +
+       orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 1U]) - 1U;
+
+   this->c_NodeId.u8_NodeIdentifier = static_cast<uint8>(u16_SourceAddress & 0x7FU);
+   this->c_NodeId.u8_BusIdentifier = static_cast<uint8>((u16_SourceAddress >> 7U) & 0x0FU);
+
+   // Security activated flag (Bit 0 security fla♣g, all other bits are reserved)
+   this->q_SecurityActivated = ((orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 2U] & 0x01U) == 0x01U);
+
+   //defensive approach: spec says it's always zero terminated: make sure
+   au8_DeviceName[28] = 0U;
+   (void)std::memcpy(&au8_DeviceName[0], &orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 3U], 28U);
+
+   //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?& anyway
+   this->c_DeviceName = reinterpret_cast<const charn *>(&au8_DeviceName[0]);
+
+   this->u8_SubNodeId = orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 32];
+
+   u8_SerialNumberLength = orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 34];
+   if (u8_SerialNumberLength <= 29)
+   {
+      std::vector<uint8> c_SerialNumber;
+      //defensive approach: variable length, so set all to 0 first
+      c_SerialNumber.resize(u8_SerialNumberLength);
+      (void)std::memcpy(&c_SerialNumber[0], &orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 35U],
+                        u8_SerialNumberLength);
+
+      this->c_SerialNumber.SetExtSerialNumber(c_SerialNumber, orc_Data[static_cast<uintn>(ou8_DataStartIndex) + 33]);
+   }
 }

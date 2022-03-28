@@ -64,15 +64,15 @@ private:
       const QColor c_Color;
    };
 
-   static const std::vector<QString> mhc_ScrollAreaElements;
-   static const std::vector<C_PropertyValueColorConfig> mhc_ScrollAreaProperties;
-   static const std::vector<C_ElementColorConfig> mhc_ElementColorsWithTransparency;
-   static const std::vector<QString> mhc_ScrollBarElementsBright;
-   static const std::vector<C_PropertyValueColorConfig> mhc_ScrollBarPropertiesBright;
-   static const std::vector<QString> mhc_ScrollBarElementsDark;
-   static const std::vector<C_PropertyValueColorConfig> mhc_ScrollBarPropertiesDark;
-   static const std::vector<QString> mhc_ScrollBarElementsMainNavi;
-   static const std::vector<C_PropertyValueColorConfig> mhc_ScrollBarPropertiesMainNavi;
+   static const std::vector<QString> mhc_SCROLL_AREA_ELEMENTS;
+   static const std::vector<C_PropertyValueColorConfig> mhc_SCROLL_AREA_PROPERTIES;
+   static const std::vector<C_ElementColorConfig> mhc_ELEMENT_COLORS_WITH_TRANSPARENCY;
+   static const std::vector<QString> mhc_SCROLL_BAR_ELEMENTS_BRIGHT;
+   static const std::vector<C_PropertyValueColorConfig> mhc_SCROLL_BAR_PROPERTIES_BRIGHT;
+   static const std::vector<QString> mhc_SCROLL_BAR_ELEMENTS_DARK;
+   static const std::vector<C_PropertyValueColorConfig> mhc_SCROLL_BAR_PROPERTIES_DARK;
+   static const std::vector<QString> mhc_SCROLL_BAR_ELEMENTS_MAIN_NAVI;
+   static const std::vector<C_PropertyValueColorConfig> mhc_SCROLL_BAR_PROPERTIES_MAIN_NAVI;
 
    static void mh_AppendStylesheet(const QString & orc_File, QString & orc_Stylesheet);
    static void mh_AppendDynamicStylesheet(QString & orc_Stylesheet);

@@ -60,15 +60,15 @@ void C_OgePubUseCaseNav::paintEvent(QPaintEvent * const opc_Event)
    QBrush c_Brush;
    const QPixmap c_Pixmap = this->icon().pixmap(44, 45);
 
-   const QColor c_ColBackground(71, 71, 99, 255);
-   const QColor c_ColBackgroundDark(19, 19, 45, 255);
+   const QColor c_COL_BACKGROUND(71, 71, 99, 255);
+   const QColor c_COL_BACKGROUND_DARK(19, 19, 45, 255);
 
    Q_UNUSED(opc_Event)
 
    // paint the main rectangle
-   c_Brush.setColor(c_ColBackground);
+   c_Brush.setColor(c_COL_BACKGROUND);
    c_Brush.setStyle(Qt::SolidPattern);
-   c_Painter.setPen(c_ColBackground);
+   c_Painter.setPen(c_COL_BACKGROUND);
    c_Painter.setBrush(c_Brush);
    c_Painter.drawRect(0, 0, this->width() - 1, this->height() - 1);
 
@@ -81,7 +81,7 @@ void C_OgePubUseCaseNav::paintEvent(QPaintEvent * const opc_Event)
    }
 
    //draw line
-   c_Painter.setPen(c_ColBackgroundDark);
+   c_Painter.setPen(c_COL_BACKGROUND_DARK);
    c_Painter.drawLine(0, 0, this->width() - 1, 0);
 
    //buttom line

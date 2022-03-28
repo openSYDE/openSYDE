@@ -163,11 +163,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
    <extends>QPushButton</extends>
    <header>C_OgePubDialog.h</header>
@@ -179,6 +174,11 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubCancel.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui::C_SdNdeDpListArrayEditView</class>
    <extends>QTableView</extends>
    <header>C_SdNdeDpListArrayEditView.h</header>
@@ -186,8 +186,8 @@
  </customwidgets>
  <tabstops>
   <tabstop>pc_TableView</tabstop>
-  <tabstop>pc_BushButtonOk</tabstop>
   <tabstop>pc_BushButtonCancel</tabstop>
+  <tabstop>pc_BushButtonOk</tabstop>
  </tabstops>
  <resources/>
  <connections/>

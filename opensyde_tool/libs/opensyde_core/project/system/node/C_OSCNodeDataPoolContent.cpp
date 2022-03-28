@@ -58,7 +58,8 @@ const sint32 C_OSCNodeDataPoolContent::mhs32_ACCESS_ERROR = C_RANGE;
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent::C_OSCNodeDataPoolContent(void) :
    me_Type(eUINT8),
-   mq_Array(false)
+   mq_Array(false),
+   mc_CriticalSection()
 {
    mc_Data.resize(1, 0U); //matching uint8 type
 }

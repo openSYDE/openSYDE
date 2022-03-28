@@ -63,9 +63,14 @@ sint32 C_OSCZipData::h_Zip(uint8 * const opu8_Destination, uint32 & oru32_Destin
    if (s32_Return == MZ_OK)
    {
       oru32_DestinationLength = u32_DestinationLength;
-      return C_NO_ERR;
+      s32_Return = C_NO_ERR;
    }
-   return C_NOACT;
+   else
+   {
+      s32_Return = C_NOACT;
+   }
+
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -98,9 +103,14 @@ sint32 C_OSCZipData::h_Unzip(uint8 * const opu8_Destination, uint32 & oru32_Dest
    if (s32_Return == MZ_OK)
    {
       oru32_DestinationLength = u32_DestinationLength;
-      return C_NO_ERR;
+      s32_Return = C_NO_ERR;
    }
-   return C_NOACT;
+   else
+   {
+      s32_Return = C_NOACT;
+   }
+
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

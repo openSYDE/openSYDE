@@ -527,11 +527,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
    <header>C_OgeLabHeadingGroupBold.h</header>
@@ -541,11 +536,6 @@
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
@@ -559,9 +549,14 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubConfigure</class>
+   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubConfigure.h</header>
+   <header>C_OgePubCancel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLeFilePath</class>
@@ -588,9 +583,13 @@
    <extends>QLabel</extends>
    <header>C_OgeLabGroupSubItem.h</header>
   </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubConfigure</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubConfigure.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>pc_BushButtonOk</tabstop>
   <tabstop>pc_RadioButtonPeak</tabstop>
   <tabstop>pc_RadioButtonVector</tabstop>
   <tabstop>pc_RadioButtonOther</tabstop>
@@ -600,6 +599,7 @@
   <tabstop>pc_BushButtonConfigureDll</tabstop>
   <tabstop>pc_BushButtonTestConnection</tabstop>
   <tabstop>pc_BushButtonCancel</tabstop>
+  <tabstop>pc_BushButtonOk</tabstop>
  </tabstops>
  <resources/>
  <connections/>

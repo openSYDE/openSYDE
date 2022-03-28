@@ -30,12 +30,12 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SyvDcConnectedNodeList::mhc_MimeData = "stw_opensyde_connected_node";
-const QString C_SyvDcConnectedNodeList::mhc_MimeDataExtFormat = "stw_opensyde_connected_node_ext_format";
-const QString C_SyvDcConnectedNodeList::mhc_MimeDataManufacturerFormat = "stw_opensyde_connected_node_manu_format";
-const QString C_SyvDcConnectedNodeList::mhc_MimeDataDevice = "stw_opensyde_connected_node_device";
-const QString C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid = "stw_opensyde_connected_node_device_valid";
-const QString C_SyvDcConnectedNodeList::mhc_MimeDataSubNodeIdsToOldNodeIds =
+const QString C_SyvDcConnectedNodeList::mhc_MIME_DATA = "stw_opensyde_connected_node";
+const QString C_SyvDcConnectedNodeList::mhc_MIME_DATA_EXT_FORMAT = "stw_opensyde_connected_node_ext_format";
+const QString C_SyvDcConnectedNodeList::mhc_MIME_DATA_MANUFACTURER_FORMAT = "stw_opensyde_connected_node_manu_format";
+const QString C_SyvDcConnectedNodeList::mhc_MIME_DATA_DEVICE = "stw_opensyde_connected_node_device";
+const QString C_SyvDcConnectedNodeList::mhc_MIME_DATA_DEVICE_VALID = "stw_opensyde_connected_node_device_valid";
+const QString C_SyvDcConnectedNodeList::mhc_MIME_DATA_SUB_NODE_IDS_TO_OLD_NODE_IDS =
    "stw_opensyde_connected_node_subnodeids_to_nodeids";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -208,17 +208,17 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
                pc_Widget->GetSubNodeIdsToOldNodeIds();
             std::map<stw_types::uint8, C_SyvDcDeviceOldComConfig>::const_iterator c_ItIds;
 
-            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeData,
+            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA,
                                pc_Widget->GetPlainSerialNumberString().toStdString().c_str());
-            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataExtFormat,
+            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA_EXT_FORMAT,
                                QString::number(static_cast<sintn>(pc_Widget->GetExtFormat())).
                                toStdString().c_str());
-            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataManufacturerFormat,
+            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA_MANUFACTURER_FORMAT,
                                QString::number(static_cast<sintn>(pc_Widget->GetManufacturerFormat())).
                                toStdString().c_str());
-            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataDevice,
+            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA_DEVICE,
                                pc_Widget->GetDeviceName().toStdString().c_str());
-            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid,
+            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA_DEVICE_VALID,
                                QString::number(static_cast<sintn>(pc_Widget->GetDeviceNameValid())).
                                toStdString().c_str());
 
@@ -242,7 +242,7 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
                }
                c_StringSubNodeIdsToOldNodeIds += ";";
             }
-            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataSubNodeIdsToOldNodeIds,
+            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA_SUB_NODE_IDS_TO_OLD_NODE_IDS,
                                c_StringSubNodeIdsToOldNodeIds.toStdString().c_str());
          }
       }

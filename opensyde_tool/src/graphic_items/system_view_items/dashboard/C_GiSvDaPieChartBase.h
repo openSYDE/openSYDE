@@ -40,7 +40,7 @@ public:
    virtual void UpdateData(void) override;
 
    virtual void UpdateShowValue(void) override;
-   virtual void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex,
+   virtual void UpdateTransparency(const stw_types::uint32 ou32_DataElementIndex,
                                    const stw_types::sintn osn_Value) override;
    virtual void ConnectionActiveChanged(const bool oq_Active) override;
    virtual bool CallProperties(void) override;

@@ -12,12 +12,14 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "stwtypes.h"
 #include "gitypes.h"
 #include "C_GtGetText.h"
 #include "C_GiLiLineGroup.h"
 #include "C_SyvDaContextMenuManager.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
@@ -37,16 +39,23 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaContextMenuManager::C_SyvDaContextMenuManager()
+C_SyvDaContextMenuManager::C_SyvDaContextMenuManager() :
+   mq_SpecificActionsAvailable(true),
+   mq_FurtherActionsWillBeAdded(false)
 {
    // add all actions
-   this->mpc_ActionEdit = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
-                                                            "Edit Properties"), this,
-                                                         &C_SyvDaContextMenuManager::m_Edit);
+   this->mpc_ActionEditProperties = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
+                                                                      "Edit Properties"), this,
+                                                                   &C_SyvDaContextMenuManager::m_EditProperties);
+   this->mpc_ActionEditContent = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
+                                                                   "Edit Content"), this,
+                                                                &C_SyvDaContextMenuManager::m_EditContent,
+                                                                static_cast<sintn>(Qt::Key_F2));
    this->mpc_ActionEditSeparator = this->mc_ContextMenu.addSeparator();
 
    //move to right place
-   this->mc_ContextMenu.insertAction(this->mpc_ActionCut, this->mpc_ActionEdit);
+   this->mc_ContextMenu.insertAction(this->mpc_ActionCut, this->mpc_ActionEditProperties);
+   this->mc_ContextMenu.insertAction(this->mpc_ActionCut, this->mpc_ActionEditContent);
    this->mc_ContextMenu.insertAction(this->mpc_ActionCut, this->mpc_ActionEditSeparator);
 
    connect(this, &C_SyvDaContextMenuManager::SigContextMenuClosed, this,
@@ -82,6 +91,25 @@ QAction * C_SyvDaContextMenuManager::RegisterAction(const QString & orc_Text)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adds an action to the context menu, adds keyboard shortcut and returns its pointer (at front)
+
+   \param[in]  orc_Text       Shown text of action
+   \param[in]  orc_Sequence   Sequence
+
+   \return
+   Pointer to action
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QAction * C_SyvDaContextMenuManager::RegisterActionWithKeyboardShortcut(const QString & orc_Text,
+                                                                        const QKeySequence & orc_Sequence)
+{
+   QAction * const pc_Retval = this->RegisterAction(orc_Text);
+
+   pc_Retval->setShortcut(orc_Sequence);
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a separator to the context menu and returns its pointer (at front)
 
    \return
@@ -112,98 +140,119 @@ void C_SyvDaContextMenuManager::SetVisibleWithAutoHide(QAction * const opc_Actio
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the flag if the default actions shall be visible or not
+
+   \param[in]       oq_Available                     Flag if the "normal specific" entries shall be visible or not
+   \param[in]       oq_FurtherActionsWillBeAdded     Flag if a specific dashboard element will add further context menu
+                                                     entries and the context menu must be showed
+                                                     Only relevant if oq_Available is false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaContextMenuManager::SetSpecificActionsAvailable(const bool oq_Available,
+                                                            const bool oq_FurtherActionsWillBeAdded)
+{
+   this->mq_SpecificActionsAvailable = oq_Available;
+   this->mq_FurtherActionsWillBeAdded = oq_FurtherActionsWillBeAdded;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Hide all actions
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaContextMenuManager::m_SetActionsInvisible(void)
 {
    C_SebBaseContextMenuManager::m_SetActionsInvisible();
-   this->mpc_ActionEdit->setVisible(false);
+   this->mpc_ActionEditProperties->setVisible(false);
+   this->mpc_ActionEditContent->setVisible(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Activate single item specific actions
+
+   \return
+   true     Specific action found
+   false    No specific action found
+*/
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
 {
-   const C_GiLiLineGroup * const pc_LineGroup = dynamic_cast<C_GiLiLineGroup *>(this->mpc_ActiveItem);
    bool q_Return = false;
 
-   // specific functionality
-   switch (this->mpc_ActiveItem->type())
+   if (this->mq_SpecificActionsAvailable == true)
    {
-   case msn_GRAPHICS_ITEM_LINE_ARROW:
-      this->mpc_ActionSetupStyle->setVisible(true);
-      this->mpc_ActionCut->setVisible(true);
-      this->mpc_ActionCopy->setVisible(true);
-      this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionBringToFront->setVisible(true);
-      this->mpc_ActionSendToBack->setVisible(true);
-      this->mpc_ActionBendLine->setVisible(true);
-      q_Return = true;
-      break;
-   case msn_GRAPHICS_ITEM_IMAGE:
-      this->mpc_ActionCut->setVisible(true);
-      this->mpc_ActionCopy->setVisible(true);
-      this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionBringToFront->setVisible(true);
-      this->mpc_ActionSendToBack->setVisible(true);
-      q_Return = true;
-      break;
-   case msn_GRAPHICS_ITEM_BOUNDARY:    // boundary and text element have the same functionality
-   case msn_GRAPHICS_ITEM_TEXTELEMENT: // boundary and text element have the same functionality
-      this->mpc_ActionSetupStyle->setVisible(true);
-      this->mpc_ActionCut->setVisible(true);
-      this->mpc_ActionCopy->setVisible(true);
-      this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionBringToFront->setVisible(true);
-      this->mpc_ActionSendToBack->setVisible(true);
-      q_Return = true;
-      break;
-   case msn_GRAPHICS_ITEM_DB_LABEL:        // Basic functions of dashboard elements are the same
-   case msn_GRAPHICS_ITEM_DB_SPIN_BOX:     // Basic functions of dashboard elements are the same
-   case msn_GRAPHICS_ITEM_DB_PROGRESS_BAR: // Basic functions of dashboard elements are the same
-   case msn_GRAPHICS_ITEM_DB_SLIDER:       // Basic functions of dashboard elements are the same
-   case msn_GRAPHICS_ITEM_DB_TOGGLE:       // Basic functions of dashboard elements are the same
-   case msn_GRAPHICS_ITEM_DB_PIE_CHART:    // Basic functions of dashboard elements are the same
-      // Specific functions will be registered by the items with the function RegisterAction if needed
-      this->mpc_ActionCut->setVisible(true);
-      this->mpc_ActionCopy->setVisible(true);
-      this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionBringToFront->setVisible(true);
-      this->mpc_ActionSendToBack->setVisible(true);
-      this->mpc_ActionEdit->setVisible(true);
-      q_Return = true;
-      break;
-   case msn_GRAPHICS_ITEM_DB_CHART: // Basic functions of dashboard elements are the same
-   case msn_GRAPHICS_ITEM_DB_TABLE: // Basic functions of dashboard elements are the same
-   case msn_GRAPHICS_ITEM_DB_PARAM: // Basic functions of dashboard elements are the same
-      // Specific functions will be registered by the items with the function RegisterAction if needed
-      this->mpc_ActionCut->setVisible(true);
-      this->mpc_ActionCopy->setVisible(true);
-      this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionBringToFront->setVisible(true);
-      this->mpc_ActionSendToBack->setVisible(true);
-      q_Return = true;
-      break;
-   default:
-      break;
-   }
+      const C_GiLiLineGroup * const pc_LineGroup = dynamic_cast<C_GiLiLineGroup *>(this->mpc_ActiveItem);
 
-   //Setup style
-   if (m_ItemTypeHasSetupStyle(this->mpc_ActiveItem->type()))
-   {
-      this->mpc_ActionSetupStyle->setVisible(true);
-   }
-
-   if (pc_LineGroup != NULL)
-   {
-      // Special case: Points can be removed if there are more than 2 points
-      if (pc_LineGroup->GetNumberPoints() > 2)
+      // specific functionality
+      switch (this->mpc_ActiveItem->type())
       {
-         //Check bend point
-         if (pc_LineGroup->CheckBendPointAt(this->mc_ScenePos) == true)
+      case msn_GRAPHICS_ITEM_LINE_ARROW:
+         this->mpc_ActionSetupStyle->setVisible(true);
+         this->mpc_ActionBendLine->setVisible(true);
+         q_Return = true;
+         break;
+      case msn_GRAPHICS_ITEM_IMAGE:
+         q_Return = true;
+         break;
+      case msn_GRAPHICS_ITEM_BOUNDARY:
+         this->mpc_ActionSetupStyle->setVisible(true);
+         q_Return = true;
+         break;
+      case msn_GRAPHICS_ITEM_TEXTELEMENT:
+         this->mpc_ActionSetupStyle->setVisible(true);
+         this->mpc_ActionEditContent->setVisible(true);
+         q_Return = true;
+         break;
+      case msn_GRAPHICS_ITEM_DB_LABEL:        // Basic functions of dashboard elements are the same
+      case msn_GRAPHICS_ITEM_DB_SPIN_BOX:     // Basic functions of dashboard elements are the same
+      case msn_GRAPHICS_ITEM_DB_PROGRESS_BAR: // Basic functions of dashboard elements are the same
+      case msn_GRAPHICS_ITEM_DB_SLIDER:       // Basic functions of dashboard elements are the same
+      case msn_GRAPHICS_ITEM_DB_TOGGLE:       // Basic functions of dashboard elements are the same
+      case msn_GRAPHICS_ITEM_DB_PIE_CHART:    // Basic functions of dashboard elements are the same
+         // Specific functions will be registered by the items with the function RegisterAction if needed
+         this->mpc_ActionEditProperties->setVisible(true);
+         q_Return = true;
+         break;
+      case msn_GRAPHICS_ITEM_DB_TABLE: // Basic functions of dashboard elements are the same
+      case msn_GRAPHICS_ITEM_DB_PARAM: // Basic functions of dashboard elements are the same
+         // Specific functions will be registered by the items with the function RegisterAction if needed
+         this->mpc_ActionEditContent->setVisible(true);
+         q_Return = true;
+         break;
+      default:
+         break;
+      }
+
+      if (q_Return == true)
+      {
+         // Same actions for all
+         this->mpc_ActionCut->setVisible(true);
+         this->mpc_ActionCopy->setVisible(true);
+         this->mpc_ActionDelete->setVisible(true);
+         this->mpc_ActionBringToFront->setVisible(true);
+         this->mpc_ActionSendToBack->setVisible(true);
+      }
+
+      //Setup style
+      if (m_ItemTypeHasSetupStyle(this->mpc_ActiveItem->type()))
+      {
+         this->mpc_ActionSetupStyle->setVisible(true);
+      }
+
+      if (pc_LineGroup != NULL)
+      {
+         // Special case: Points can be removed if there are more than 2 points
+         if (pc_LineGroup->GetNumberPoints() > 2)
          {
-            this->mpc_ActionRemoveBendLine->setVisible(true);
-            q_Return = true;
+            //Check bend point
+            if (pc_LineGroup->CheckBendPointAt(this->mc_ScenePos) == true)
+            {
+               this->mpc_ActionRemoveBendLine->setVisible(true);
+               q_Return = true;
+            }
+            else
+            {
+               this->mpc_ActionRemoveBendLine->setVisible(false);
+            }
          }
          else
          {
@@ -217,7 +266,7 @@ bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
    }
    else
    {
-      this->mpc_ActionRemoveBendLine->setVisible(false);
+      q_Return = this->mq_FurtherActionsWillBeAdded;
    }
 
    return q_Return;
@@ -251,12 +300,21 @@ bool C_SyvDaContextMenuManager::m_ItemTypeHasSetupStyle(const stw_types::sintn o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Emit edit signal
+/*! \brief   Emit edit properties signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaContextMenuManager::m_Edit(void)
+void C_SyvDaContextMenuManager::m_EditProperties(void)
 {
-   Q_EMIT this->SigEditProperties(this->mpc_ActiveItem);
+   Q_EMIT (this->SigEditProperties(this->mpc_ActiveItem));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Emit edit content signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaContextMenuManager::m_EditContent(void)
+{
+   Q_EMIT (this->SigEditContent(this->mpc_ActiveItem));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

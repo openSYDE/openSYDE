@@ -31,7 +31,7 @@ namespace stw_opensyde_core
 class C_OSCComSequencesBase
 {
 public:
-   explicit C_OSCComSequencesBase(const bool oq_RoutingActive);
+   explicit C_OSCComSequencesBase(const bool oq_RoutingActive, const bool oq_UpdateRoutingMode);
    virtual ~C_OSCComSequencesBase(void);
 
    virtual stw_types::sint32 Init(C_OSCSystemDefinition & orc_SystemDefinition,

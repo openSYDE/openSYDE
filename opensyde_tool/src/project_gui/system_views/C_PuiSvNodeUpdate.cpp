@@ -638,10 +638,10 @@ void C_PuiSvNodeUpdate::OnSyncNodeApplicationAdded(const uint32 ou32_NodeIndex, 
       {
          if (ou32_ApplicationIndex <= this->mc_DataBlockPaths.size())
          {
-            const sintn sn_Type = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            const sintn sn_TYPE = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
             this->mc_DataBlockPaths.insert(this->mc_DataBlockPaths.begin() + ou32_ApplicationIndex, QString());
-            this->mc_SkipUpdateOfFiles[sn_Type].insert(
-               this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationIndex, false);
+            this->mc_SkipUpdateOfFiles[sn_TYPE].insert(
+               this->mc_SkipUpdateOfFiles[sn_TYPE].begin() + ou32_ApplicationIndex, false);
          }
       }
       else
@@ -688,22 +688,22 @@ void C_PuiSvNodeUpdate::OnSyncNodeApplicationMoved(const uint32 ou32_NodeIndex,
       QString c_Entry;
 
       bool q_Entry = false;
-      const sintn sn_Type = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+      const sintn sn_TYPE = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
 
       if (ou32_ApplicationSourceIndex < this->mc_DataBlockPaths.size())
       {
          c_Entry = this->mc_DataBlockPaths[ou32_ApplicationSourceIndex];
          this->mc_DataBlockPaths.erase(this->mc_DataBlockPaths.begin() + ou32_ApplicationSourceIndex);
 
-         q_Entry = this->mc_SkipUpdateOfFiles[sn_Type][ou32_ApplicationSourceIndex];
-         this->mc_SkipUpdateOfFiles[sn_Type].erase(
-            this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationSourceIndex);
+         q_Entry = this->mc_SkipUpdateOfFiles[sn_TYPE][ou32_ApplicationSourceIndex];
+         this->mc_SkipUpdateOfFiles[sn_TYPE].erase(
+            this->mc_SkipUpdateOfFiles[sn_TYPE].begin() + ou32_ApplicationSourceIndex);
       }
       if (ou32_ApplicationTargetIndex <= this->mc_DataBlockPaths.size())
       {
          this->mc_DataBlockPaths.insert(this->mc_DataBlockPaths.begin() + ou32_ApplicationTargetIndex, c_Entry);
-         this->mc_SkipUpdateOfFiles[sn_Type].insert(
-            this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationTargetIndex, q_Entry);
+         this->mc_SkipUpdateOfFiles[sn_TYPE].insert(
+            this->mc_SkipUpdateOfFiles[sn_TYPE].begin() + ou32_ApplicationTargetIndex, q_Entry);
       }
    }
 }
@@ -730,10 +730,10 @@ void C_PuiSvNodeUpdate::OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_
       {
          if (ou32_ApplicationIndex < this->mc_DataBlockPaths.size())
          {
-            const sintn sn_Type = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            const sintn sn_TYPE = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
             this->mc_DataBlockPaths.erase(this->mc_DataBlockPaths.begin() + ou32_ApplicationIndex);
-            this->mc_SkipUpdateOfFiles[sn_Type].erase(
-               this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationIndex);
+            this->mc_SkipUpdateOfFiles[sn_TYPE].erase(
+               this->mc_SkipUpdateOfFiles[sn_TYPE].begin() + ou32_ApplicationIndex);
          }
       }
       else
@@ -780,10 +780,10 @@ void C_PuiSvNodeUpdate::OnSyncNodeApplicationAboutToBeChangedFromParamSetHALC(co
          // Add as "normal" datablock
          if (ou32_ApplicationIndex <= this->mc_DataBlockPaths.size())
          {
-            const sintn sn_Type = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            const sintn sn_TYPE = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
             this->mc_DataBlockPaths.insert(this->mc_DataBlockPaths.begin() + ou32_ApplicationIndex, QString());
-            this->mc_SkipUpdateOfFiles[sn_Type].insert(
-               this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationIndex, false);
+            this->mc_SkipUpdateOfFiles[sn_TYPE].insert(
+               this->mc_SkipUpdateOfFiles[sn_TYPE].begin() + ou32_ApplicationIndex, false);
          }
       }
    }
@@ -813,10 +813,10 @@ void C_PuiSvNodeUpdate::OnSyncNodeApplicationChangedToParamSetHALC(const uint32 
          // Delete the "normal" datablock configuration
          if (ou32_ApplicationIndex < this->mc_DataBlockPaths.size())
          {
-            const sintn sn_Type = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            const sintn sn_TYPE = static_cast<sintn>(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
             this->mc_DataBlockPaths.erase(this->mc_DataBlockPaths.begin() + ou32_ApplicationIndex);
-            this->mc_SkipUpdateOfFiles[sn_Type].erase(
-               this->mc_SkipUpdateOfFiles[sn_Type].begin() + ou32_ApplicationIndex);
+            this->mc_SkipUpdateOfFiles[sn_TYPE].erase(
+               this->mc_SkipUpdateOfFiles[sn_TYPE].begin() + ou32_ApplicationIndex);
          }
 
          // Add as param set datablock

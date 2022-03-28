@@ -72,6 +72,8 @@ C_SdNdeDpListCommentDialog::C_SdNdeDpListCommentDialog(stw_opensyde_gui_elements
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_SdNdeDpListCommentDialog::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked,
            this, &C_SdNdeDpListCommentDialog::m_CancelClicked);
+   connect(this->mpc_Ui->pc_TextEditComment, &C_OgeTedPropertiesComment::SigCommentConfirmed, this,
+           &C_SdNdeDpListCommentDialog::m_CommentConfirmed);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,4 +167,14 @@ void C_SdNdeDpListCommentDialog::m_OkClicked(void)
 void C_SdNdeDpListCommentDialog::m_CancelClicked(void)
 {
    this->mrc_ParentDialog.reject();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot to set focus of comment field after user confirms with defined keys of KeyPressEvent in
+ *  C_OgeTedPropertiesComment
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpListCommentDialog::m_CommentConfirmed(void)
+{
+   this->mpc_Ui->pc_PushButtonCancel->setFocus();
 }

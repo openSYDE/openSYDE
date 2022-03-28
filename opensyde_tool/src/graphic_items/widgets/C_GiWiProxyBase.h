@@ -34,6 +34,7 @@ public:
    void TriggerMousePressEvent(QGraphicsSceneMouseEvent * const opc_Event);
    void TriggerMouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event);
    void TriggerMouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event);
+   void TriggerMouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event);
    void TriggerKeyPressEvent(QKeyEvent * const opc_Event);
    void TriggerKeyReleaseEvent(QKeyEvent * const opc_Event);
    void TriggerFocusOutEvent(QFocusEvent * const opc_Event);

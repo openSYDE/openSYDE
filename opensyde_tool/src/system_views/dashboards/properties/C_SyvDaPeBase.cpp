@@ -757,7 +757,7 @@ void C_SyvDaPeBase::m_Configuration(void) const
    C_SyvDaPeUpdateModeConfiguration * pc_Dialog;
 
    stw_types::uint32 u32_LabelIndex = 0;
-   const C_PuiSvDbDataElement::E_Type e_Type = C_PuiSvDbDataElement::eLABEL;
+   const C_PuiSvDbDataElement::E_Type e_TYPE = C_PuiSvDbDataElement::eLABEL;
 
    //Before opening the dialog we may need to add the new data element manually so the configuration sees a usage
    // and shows the element, later we have to revert to the original state
@@ -768,7 +768,7 @@ void C_SyvDaPeBase::m_Configuration(void) const
       c_Config.c_ElementId = this->mc_DataElement;
       c_Label.c_DataPoolElementsConfig.push_back(c_Config);
       if (C_PuiSvHandler::h_GetInstance()->AddDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                              &c_Label, e_Type) == C_NO_ERR)
+                                                              &c_Label, e_TYPE) == C_NO_ERR)
       {
          const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
          if (pc_View != NULL)
@@ -811,7 +811,7 @@ void C_SyvDaPeBase::m_Configuration(void) const
    if (this->mq_NewConfigAdded == true)
    {
       tgl_assert(C_PuiSvHandler::h_GetInstance()->DeleteDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                        u32_LabelIndex, e_Type) == C_NO_ERR);
+                                                                        u32_LabelIndex, e_TYPE) == C_NO_ERR);
    }
 
    //Hide overlay after dialog is not relevant anymore

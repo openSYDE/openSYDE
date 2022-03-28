@@ -37,9 +37,9 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const C_SCLString C_CieImportDbc::mhc_SendType = "GenMsgSendType";
-const C_SCLString C_CieImportDbc::mhc_CycleTime = "GenMsgCycleTime";
-const C_SCLString C_CieImportDbc::mhc_InitialValue = "GenSigStartValue";
+const C_SCLString C_CieImportDbc::mhc_SEND_TYPE = "GenMsgSendType";
+const C_SCLString C_CieImportDbc::mhc_CYCLE_TIME = "GenMsgCycleTime";
+const C_SCLString C_CieImportDbc::mhc_INITIAL_VALUE = "GenSigStartValue";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -1132,7 +1132,7 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
    for (const auto c_DbcAttributeDefinition : orc_DbcNetwork.attributeDefinitions)
    {
       // global enum message send type, exists only one time
-      if (mhc_SendType.AnsiCompare(c_DbcAttributeDefinition.first.c_str()) == 0)
+      if (mhc_SEND_TYPE.AnsiCompare(c_DbcAttributeDefinition.first.c_str()) == 0)
       {
          mhc_AttributeSendType = c_DbcAttributeDefinition.second;
          q_ValueFound = true;
@@ -1143,8 +1143,8 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
    if (q_ValueFound == false)
    {
       s32_Return = C_WARN;
-      mhc_WarningMessages.Append("Missing attribute definition for send type \"" + mhc_SendType + "\".");
-      osc_write_log_warning("DBC file import", "Missing attribute definition for send type \"" + mhc_SendType + "\".");
+      mhc_WarningMessages.Append("Missing attribute definition for send type \"" + mhc_SEND_TYPE + "\".");
+      osc_write_log_warning("DBC file import", "Missing attribute definition for send type \"" + mhc_SEND_TYPE + "\".");
    }
 
    // search default send type
@@ -1152,7 +1152,7 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
    for (const auto c_DbcAttributeDefaults : orc_DbcNetwork.attributeDefaults)
    {
       // global enum message send type, exists only one time
-      if (mhc_SendType.AnsiCompare(c_DbcAttributeDefaults.first.c_str()) == 0)
+      if (mhc_SEND_TYPE.AnsiCompare(c_DbcAttributeDefaults.first.c_str()) == 0)
       {
          mhc_DefaultSendTypeValue = (c_DbcAttributeDefaults.second).stringValue.c_str();
          q_ValueFound = true;
@@ -1164,10 +1164,10 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
    {
       s32_Return = C_WARN;
       mhc_DefaultSendTypeValue = "OnEvent";
-      mhc_WarningMessages.Append("Missing default attribute definition for send type \"" + mhc_SendType + "\"."
+      mhc_WarningMessages.Append("Missing default attribute definition for send type \"" + mhc_SEND_TYPE + "\"."
                                  " Set to \"" + mhc_DefaultSendTypeValue + "\".");
       osc_write_log_warning("DBC file import",
-                            "Missing default attribute definition for send type \"" + mhc_SendType + "\".");
+                            "Missing default attribute definition for send type \"" + mhc_SEND_TYPE + "\".");
    }
 
    // search default initial value
@@ -1175,7 +1175,7 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
    for (const auto c_DbcAttributeDefaults : orc_DbcNetwork.attributeDefaults)
    {
       // global enum message send type, exists only one time
-      if (mhc_InitialValue.AnsiCompare(c_DbcAttributeDefaults.first.c_str()) == 0)
+      if (mhc_INITIAL_VALUE.AnsiCompare(c_DbcAttributeDefaults.first.c_str()) == 0)
       {
          const C_SCLString c_DefaultInitialValue = (c_DbcAttributeDefaults.second).stringValue.c_str();
          // try to convert to DBC standard raw float value
@@ -1241,7 +1241,7 @@ void C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMess
    // search for attribute cycle time (cycle time also means cyclic transmission method)
    for (const auto c_DbcAttributeValue : orc_DbcMessage.attributeValues)
    {
-      if (mhc_CycleTime.AnsiCompare(c_DbcAttributeValue.first.c_str()) == 0)
+      if (mhc_CYCLE_TIME.AnsiCompare(c_DbcAttributeValue.first.c_str()) == 0)
       {
          if (c_DbcAttributeValue.second.valueType == Vector::DBC::AttributeValueType::Int)
          {
@@ -1268,7 +1268,7 @@ void C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMess
    for (const auto c_DbcAttributeValue : orc_DbcMessage.attributeValues)
    {
       // check for message send type
-      if (mhc_SendType.AnsiCompare(c_DbcAttributeValue.first.c_str()) == 0)
+      if (mhc_SEND_TYPE.AnsiCompare(c_DbcAttributeValue.first.c_str()) == 0)
       {
          // attribute send type found -> overwrite default value
          // there must be an enum! if not, then take default value

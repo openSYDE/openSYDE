@@ -71,6 +71,11 @@ public:
       eRESET_SYSTEM
    };
 
+   virtual stw_types::sint32 GetConnectStates(
+      std::vector<stw_opensyde_core::C_OSCSuSequencesNodeConnectStates> & orc_ConnectStatesNodes) const override;
+   virtual stw_types::sint32 GetUpdateStates(
+      std::vector<stw_opensyde_core::C_OSCSuSequencesNodeUpdateStates> & orc_UpdateStatesNodes) const override;
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 

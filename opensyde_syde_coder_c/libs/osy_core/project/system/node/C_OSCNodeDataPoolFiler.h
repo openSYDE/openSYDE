@@ -97,10 +97,6 @@ private:
       const C_OSCNodeDataPoolListElement::E_Access & ore_NodeDataPoolElementAccess);
    static stw_types::sint32 mh_StringToNodeDataPoolElementAccess(const stw_scl::C_SCLString & orc_String,
                                                                  C_OSCNodeDataPoolListElement::E_Access & ore_Type);
-   static void mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XMLParser, const stw_scl::C_SCLString & orc_String,
-                                     const stw_types::uint64 ou64_Input);
-   static stw_types::uint64 mh_GetAttributeUint64(const C_OSCXMLParserBase & orc_XMLParser,
-                                                  const stw_scl::C_SCLString & orc_String);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

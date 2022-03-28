@@ -13,23 +13,23 @@
 #include "ui_C_SyvUpUpdateWidget.h"
 
 #include "stwerrors.h"
-#include "C_SyvUtil.h"
+#include "constants.h"
+#include "CSCLString.h"
 #include "TGLTime.h"
+#include "TGLFile.h"
+#include "C_Uti.h"
+#include "C_GtGetText.h"
+#include "C_OSCLoggingHandler.h"
+#include "C_OSCUtils.h"
+#include "C_SyvUtil.h"
+#include "C_OgeWiUtil.h"
 #include "C_UsHandler.h"
 #include "C_SyvUpDeviceInfo.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "CSCLString.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSvData.h"
-#include "C_OSCLoggingHandler.h"
 #include "C_PuiSdHandler.h"
-#include "TGLFile.h"
-#include "C_OgeWiUtil.h"
 #include "DLLocalize.h"
 #include "C_OgeWiCustomMessage.h"
-#include "C_OSCUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -42,10 +42,10 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SyvUpUpdateWidget::mhc_TempFolder = "system_update_temp";
-const sintn C_SyvUpUpdateWidget::mhsn_WidgetBorder = 12;
-const sintn C_SyvUpUpdateWidget::mhsn_ToolboxInitPosY = 150;
-const stw_types::uint32 C_SyvUpUpdateWidget::mhu32_WaitTime = 5100U;
+const QString C_SyvUpUpdateWidget::mhc_TEMP_FOLDER = "system_update_temp";
+const sintn C_SyvUpUpdateWidget::mhsn_WIDGET_BORDER = 12;
+const sintn C_SyvUpUpdateWidget::mhsn_TOOLBOX_INIT_POS_Y = 150;
+const stw_types::uint32 C_SyvUpUpdateWidget::mhu32_WAIT_TIME = 5100U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -158,6 +158,8 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * 
    connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubUpdate::clicked, this,
            &C_SyvUpUpdateWidget::m_Cancel);
    connect(this->mpc_Scene, &C_SyvUpScene::SigDiscardInfo, this, &C_SyvUpUpdateWidget::m_DiscardInfo);
+   connect(this, &C_SyvUpUpdateWidget::SigNodeConnectStates, this->mpc_Scene, &C_SyvUpScene::SetNodeConnectStates);
+   connect(this, &C_SyvUpUpdateWidget::SigNodeUpdateStates, this->mpc_Scene, &C_SyvUpScene::SetNodeUpdateStates);
 
    connect(&this->mc_Timer, &QTimer::timeout, this, &C_SyvUpUpdateWidget::m_Timer);
 
@@ -422,38 +424,38 @@ void C_SyvUpUpdateWidget::resizeEvent(QResizeEvent * const opc_Event)
       }
 
       // would the toolbox be outside of the widget in x direction
-      if ((this->mpc_ProgressLog->x() + this->mpc_ProgressLog->width() + mhsn_WidgetBorder) > pc_Widget->width())
+      if ((this->mpc_ProgressLog->x() + this->mpc_ProgressLog->width() + mhsn_WIDGET_BORDER) > pc_Widget->width())
       {
          // is the toolbox to big?
-         if ((this->mpc_ProgressLog->width() + (2 * mhsn_WidgetBorder)) > pc_Widget->width())
+         if ((this->mpc_ProgressLog->width() + (2 * mhsn_WIDGET_BORDER)) > pc_Widget->width())
          {
-            c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WidgetBorder));
+            c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WIDGET_BORDER));
          }
          else
          {
             // adapt position of toolbox
-            c_Point.setX((pc_Widget->width() - this->mpc_ProgressLog->width()) - mhsn_WidgetBorder);
+            c_Point.setX((pc_Widget->width() - this->mpc_ProgressLog->width()) - mhsn_WIDGET_BORDER);
          }
       }
 
       // would the toolbox be outside of the widget in y direction
-      if ((this->mpc_ProgressLog->y() + this->mpc_ProgressLog->height() + mhsn_WidgetBorder) > pc_Widget->height())
+      if ((this->mpc_ProgressLog->y() + this->mpc_ProgressLog->height() + mhsn_WIDGET_BORDER) > pc_Widget->height())
       {
          // is the toolbox to big?
-         if ((this->mpc_ProgressLog->height() + (2 * mhsn_WidgetBorder)) > pc_Widget->height())
+         if ((this->mpc_ProgressLog->height() + (2 * mhsn_WIDGET_BORDER)) > pc_Widget->height())
          {
-            c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WidgetBorder));
+            c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WIDGET_BORDER));
          }
          else
          {
             // adapt position of toolbox
-            c_Point.setY((pc_Widget->height() - this->mpc_ProgressLog->height()) - mhsn_WidgetBorder);
+            c_Point.setY((pc_Widget->height() - this->mpc_ProgressLog->height()) - mhsn_WIDGET_BORDER);
          }
       }
 
       // adapt position of fix minimized toolbox
       c_PointFixMiniProgressLog.setX((pc_Widget->width() - this->mpc_FixMinimizedProgressLog->width()) -
-                                     mhsn_WidgetBorder);
+                                     mhsn_WIDGET_BORDER);
 
       this->mpc_ProgressLog->setGeometry(QRect(c_Point, c_Size));
       this->mpc_FixMinimizedProgressLog->setGeometry(QRect(c_PointFixMiniProgressLog,
@@ -475,9 +477,9 @@ void C_SyvUpUpdateWidget::m_CheckError(void)
    C_NagToolTip::E_Type e_ToolTipType;
    QString c_IconPath;
    sintn sn_ColorID;
-   this->mq_ErrorDetected = C_SyvUtil::h_GetViewSetupLabelInfo(
-      this->mu32_ViewIndex, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip, e_ToolTipType,
-      c_IconPath, sn_ColorID);
+   this->mq_ErrorDetected = C_SyvUtil::h_GetViewStatusLabelInfo(
+      this->mu32_ViewIndex, ms32_SUBMODE_SYSVIEW_UPDATE, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip,
+      e_ToolTipType, c_IconPath, sn_ColorID);
 
    if (this->mq_ErrorDetected == true)
    {
@@ -810,7 +812,7 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
          //Signal scene
          if (this->mpc_Scene != NULL)
          {
-            this->mpc_Scene->SetNoResponse(u32_NodeIndex);
+            this->mpc_Scene->SetNodeError(u32_NodeIndex);
          }
       }
       else if (C_SyvUpUpdateWidget::mh_IsConnectionSuccess(e_Step) == true)
@@ -823,7 +825,7 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
       }
       else if (C_SyvUpUpdateWidget::mh_IsUpdateFailure(e_Step) == true)
       {
-         m_HandleUpdateFailure();
+         //Signal other widgets (signals might be missing)
          this->mpc_Ui->pc_WiUpdateInformation->SetUpdateApplicationError(u32_NodeIndex);
          //Signal progress log
          if (this->mpc_ProgressLogContent != NULL)
@@ -833,6 +835,7 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
          //Signal scene
          if (this->mpc_Scene != NULL)
          {
+            this->mpc_Scene->SetNodeError(u32_NodeIndex);
             this->mpc_Scene->StopProgressAnimation(true, this->mu32_ApplicationIndex, true);
          }
       }
@@ -1158,6 +1161,14 @@ void C_SyvUpUpdateWidget::m_CheckOpenSydeFlashloaderInformation(const std::vecto
             // Same node index
             const C_OSCSuSequences::C_OsyDeviceInformation & rc_Info =
                orc_OsyDeviceInformation[u32_NodesInformationCounter];
+            const C_OSCNode * const pc_Node =
+               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodesPackageCounter);
+            stw_scl::C_SCLString c_NodeName;
+
+            if (pc_Node != NULL)
+            {
+               c_NodeName = pc_Node->c_Properties.c_Name;
+            }
 
             if (this->mc_NodesToFlash[u32_NodesPackageCounter].c_FilesToWriteToNvm.size() > 0)
             {
@@ -1165,18 +1176,57 @@ void C_SyvUpUpdateWidget::m_CheckOpenSydeFlashloaderInformation(const std::vecto
                if ((rc_Info.c_MoreInformation.c_AvailableFeatures.q_FlashloaderCanWriteToNvm == false) ||
                    (rc_Info.c_MoreInformation.c_AvailableFeatures.q_MaxNumberOfBlockLengthAvailable == false))
                {
-                  const C_OSCNode * const pc_Node =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodesPackageCounter);
-
                   // Node does not have the ability
                   this->mq_NodesPreconditionError = true;
-                  this->mc_NodesPreconditionNvmWriteError.push_back(u32_NodesPackageCounter);
+                  this->mc_NodePreconditionErrors.c_NvmWriteError.push_back(u32_NodesPackageCounter);
 
-                  if (pc_Node != NULL)
+                  osc_write_log_error("Update Node",
+                                      "Node " + c_NodeName +
+                                      " has not the Flashloader features to write a Parameter Set Image file.");
+               }
+            }
+
+            if (this->mc_NodesToFlash[u32_NodesPackageCounter].c_PemFile != "")
+            {
+               // Node must have features for PEM writing in Flashloader
+               if (rc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsSecurity == false)
+               {
+                  // Node does not have the ability
+                  this->mq_NodesPreconditionError = true;
+                  this->mc_NodePreconditionErrors.c_PemWriteError.push_back(u32_NodesPackageCounter);
+
+                  osc_write_log_error(
+                     "Update Node",
+                     "Node " + c_NodeName +
+                     " has not the Flashloader features to support security and to write PEM files.");
+               }
+
+               if (this->mc_NodesToFlash[u32_NodesPackageCounter].q_SendDebuggerEnabledState == true)
+               {
+                  if ((rc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOn == false) &&
+                      (this->mc_NodesToFlash[u32_NodesPackageCounter].q_DebuggerEnabled == true))
                   {
-                     osc_write_log_error("Update Node",
-                                         "Node " + pc_Node->c_Properties.c_Name +
-                                         " has not the Flashloader features to write a Parameter Set Image file.");
+                     // Node does not have the ability
+                     this->mq_NodesPreconditionError = true;
+                     this->mc_NodePreconditionErrors.c_DebuggerEnableError.push_back(u32_NodesPackageCounter);
+
+                     osc_write_log_error(
+                        "Update Node",
+                        "Node " + c_NodeName +
+                        " has not the Flashloader features to support enabling the debugger.");
+                  }
+
+                  if ((rc_Info.c_MoreInformation.c_AvailableFeatures.q_SupportsDebuggerOff == false) &&
+                      (this->mc_NodesToFlash[u32_NodesPackageCounter].q_DebuggerEnabled == false))
+                  {
+                     // Node does not have the ability
+                     this->mq_NodesPreconditionError = true;
+                     this->mc_NodePreconditionErrors.c_DebuggerDisableError.push_back(u32_NodesPackageCounter);
+
+                     osc_write_log_error(
+                        "Update Node",
+                        "Node " + c_NodeName +
+                        " has not the Flashloader features to support disabling the debugger.");
                   }
                }
             }
@@ -1184,19 +1234,13 @@ void C_SyvUpUpdateWidget::m_CheckOpenSydeFlashloaderInformation(const std::vecto
             if ((rc_Info.c_MoreInformation.c_AvailableFeatures.q_EthernetToEthernetRoutingSupported == false) &&
                 (this->mpc_UpSequences->IsEthToEthRoutingNecessary(u32_NodesPackageCounter) == true))
             {
-               const C_OSCNode * const pc_Node =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodesPackageCounter);
-
                // Node does not support Ethernet to Ethernet routing but it is necessary for at least one route
                this->mq_NodesPreconditionError = true;
-               this->mc_NodesPreconditionEthToEthError.push_back(u32_NodesPackageCounter);
+               this->mc_NodePreconditionErrors.c_EthToEthError.push_back(u32_NodesPackageCounter);
 
-               if (pc_Node != NULL)
-               {
-                  osc_write_log_error("Update Node",
-                                      "Node " + pc_Node->c_Properties.c_Name +
-                                      " has not the Flashloader features for Ethernet to Ethernet routing.");
-               }
+               osc_write_log_error("Update Node",
+                                   "Node " + c_NodeName +
+                                   " has not the Flashloader features for Ethernet to Ethernet routing.");
             }
 
             break;
@@ -1215,8 +1259,27 @@ void C_SyvUpUpdateWidget::m_Connect(void)
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
+   //Buttons
+   this->mpc_Ui->pc_PbConnect->setEnabled(false);
+   this->mpc_Ui->pc_PbUpdate->setEnabled(false);
+
+   if (this->mpc_ProgressLogContent != NULL)
+   {
+      this->mpc_ProgressLogContent->Clear();
+
+      if (this->mq_StartUpdateAfterConnect == false)
+      {
+         this->mpc_ProgressLogContent->SetHeading(C_GtGetText::h_GetText("Enter Update Mode"));
+      }
+      // Let the user know, when the tool is occupied with itself before communicating with the bus
+      this->mpc_ProgressLogContent->AddSubHeading(C_GtGetText::h_GetText("Initializing communication interface..."));
+      this->mpc_ProgressLogContent->update();
+      // For updating the progress log
+      QApplication::processEvents();
+   }
+
    // Is a new connect already possible
-   while ((this->mu32_DisconnectTime + mhu32_WaitTime) > TGL_GetTickCount())
+   while ((this->mu32_DisconnectTime + mhu32_WAIT_TIME) > TGL_GetTickCount())
    {
       // Wait till it is possible
    }
@@ -1226,34 +1289,18 @@ void C_SyvUpUpdateWidget::m_Connect(void)
    //Always reset flag
    this->mq_ConnectFailed = false;
    this->mq_NodesPreconditionError = false;
-   this->mc_NodesPreconditionNvmWriteError.clear();
-   this->mc_NodesPreconditionEthToEthError.clear();
+   this->mc_NodePreconditionErrors.Clear();
 
    if (s32_Return == C_NO_ERR)
    {
-      //Buttons
-      this->mpc_Ui->pc_PbConnect->setEnabled(false);
-      this->mpc_Ui->pc_PbUpdate->setEnabled(false);
-
-      //Signal progress log
-      if (this->mpc_ProgressLogContent != NULL)
-      {
-         this->mpc_ProgressLogContent->Clear();
-         if (this->mq_StartUpdateAfterConnect == false)
-         {
-            this->mpc_ProgressLogContent->SetHeading(C_GtGetText::h_GetText("Enter Update Mode"));
-         }
-         this->mpc_ProgressLogContent->AddSubHeading(C_GtGetText::h_GetText("Entering update mode..."));
-      }
-
       //Signal summary
       this->mpc_Ui->pc_WiUpdateInformation->SetHeading("", C_GtGetText::h_GetText("Entering update mode..."));
       //Signal scene
       if (this->mpc_Scene != NULL)
       {
          //Reset connected status (required if in system disconnected state due to no node response)
-         this->mpc_Scene->SetConnected(false, true);
-         this->mpc_Scene->SetConnected(true, true);
+         this->mpc_Scene->SetConnected(false);
+         this->mpc_Scene->SetConnected(true);
          this->mpc_Scene->StartConnectionAnimation();
       }
 
@@ -1307,7 +1354,7 @@ void C_SyvUpUpdateWidget::m_Connect(void)
       {
          QString c_ErrorPath;
          const C_SCLString c_ExePath = C_Uti::h_GetExePath().toStdString().c_str();
-         const C_SCLString c_TemporaryPath = c_ExePath + "/" + mhc_TempFolder.toStdString().c_str() + "/";
+         const C_SCLString c_TemporaryPath = c_ExePath + "/" + mhc_TEMP_FOLDER.toStdString().c_str() + "/";
 
          // Copy the application paths
          // Saving both, the original and temporary, paths will help to map changed relevant applications
@@ -1392,14 +1439,27 @@ void C_SyvUpUpdateWidget::m_Connect(void)
       {
          // Start the connect sequence
          this->m_UpdateReportText(C_GtGetText::h_GetText("Activate Flashloader: Started"));
+
          s32_Return = this->mpc_UpSequences->StartActivateFlashloader();
 
          if (s32_Return == C_NO_ERR)
          {
+            //Signal progress log
+            if (this->mpc_ProgressLogContent != NULL)
+            {
+               // The thread was started, the communication is running...
+               this->mpc_ProgressLogContent->AddSubHeading(C_GtGetText::h_GetText("Entering update mode..."));
+            }
+
             //Don't set step if timer still active
             this->me_Step = C_SyvUpSequences::eACTIVATE_FLASHLOADER;
             //Timer
             this->mc_Timer.start();
+            //Signal scene
+            if (this->mpc_Scene != NULL)
+            {
+               this->mpc_Scene->SetConnecting(true);
+            }
          }
          else
          {
@@ -1416,18 +1476,10 @@ void C_SyvUpUpdateWidget::m_Connect(void)
          // Handle failure
          this->mq_StartUpdateAfterConnect = false;
 
-         this->mpc_Ui->pc_PbUpdate->setEnabled(true);
-         this->mpc_Ui->pc_PbConnect->setEnabled(true);
-
          //Signal summary
          this->mpc_Ui->pc_WiUpdateInformation->SetHeading("", C_GtGetText::h_GetText("Disconnected!"));
          this->mpc_Ui->pc_WiUpdateInformation->SetDisconnected();
-         //Signal progress log
-         if (this->mpc_ProgressLogContent != NULL)
-         {
-            this->mpc_ProgressLogContent->AddSubHeading(C_GtGetText::h_GetText("Enter Update Mode failed!"));
-            this->mpc_ProgressLogContent->AddLogHyperlink();
-         }
+
          //Signal scene
          if (this->mpc_Scene != NULL)
          {
@@ -1442,6 +1494,19 @@ void C_SyvUpUpdateWidget::m_Connect(void)
                                   C_GtGetText::h_GetText(
                                      "Activate Flashloader: Cannot start. Error on initialization: %1")).
                                arg(C_Uti::h_StwError(s32_Return)));
+   }
+
+   if (s32_Return != C_NO_ERR)
+   {
+      //Signal progress log
+      if (this->mpc_ProgressLogContent != NULL)
+      {
+         this->mpc_ProgressLogContent->AddSubHeading(C_GtGetText::h_GetText("Enter Update Mode failed!"));
+         this->mpc_ProgressLogContent->AddLogHyperlink();
+      }
+
+      this->mpc_Ui->pc_PbUpdate->setEnabled(true);
+      this->mpc_Ui->pc_PbConnect->setEnabled(true);
    }
 
    QApplication::restoreOverrideCursor();
@@ -1486,7 +1551,7 @@ void C_SyvUpUpdateWidget::m_Update(void)
                this->m_UpdateReportText(C_GtGetText::h_GetText("Update System started"));
 
                // Is a new update already possible
-               while ((this->mu32_UpdateTime + mhu32_WaitTime) > TGL_GetTickCount())
+               while ((this->mu32_UpdateTime + mhu32_WAIT_TIME) > TGL_GetTickCount())
                {
                   // Wait till it is possible
                }
@@ -1578,21 +1643,21 @@ void C_SyvUpUpdateWidget::m_Update(void)
                   }
                   else
                   {
-                     m_HandleUpdateFailure();
-
                      this->m_UpdateReportText(static_cast<QString>(
                                                  C_GtGetText::h_GetText(
                                                     "Update System: Cannot start. Thread is still busy.")).
                                               arg(C_Uti::h_StwError(s32_Return)));
+
+                     m_HandleUpdateFailure();
                   }
                }
             }
             else
             {
-               m_HandleUpdateFailure();
-
                this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(
                                                                 "Update System: Cannot start. Error on System View.")));
+
+               m_HandleUpdateFailure();
             }
 
             QApplication::restoreOverrideCursor();
@@ -1622,17 +1687,14 @@ void C_SyvUpUpdateWidget::m_Disconnect(void)
    //Always reset flag
    this->mq_ConnectFailed = false;
    this->mq_NodesPreconditionError = false;
-   this->mc_NodesPreconditionNvmWriteError.clear();
-   this->mc_NodesPreconditionEthToEthError.clear();
+   this->mc_NodePreconditionErrors.Clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Resets the system
-
-   \param[in]  oq_ClearLogAndResetScene   Clear log and reset scene
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_DisconnectAction(const bool oq_ClearLogAndResetScene)
+void C_SyvUpUpdateWidget::m_DisconnectAction(void)
 {
    if (this->mpc_UpSequences != NULL)
    {
@@ -1653,27 +1715,17 @@ void C_SyvUpUpdateWidget::m_DisconnectAction(const bool oq_ClearLogAndResetScene
 
          this->m_UpdateReportText(C_GtGetText::h_GetText("Disconnect: Start"));
 
-         if (oq_ClearLogAndResetScene == true)
+         //Signal scene
+         if (this->mpc_Scene != NULL)
          {
-            //Signal scene
-            if (this->mpc_Scene != NULL)
-            {
-               this->mpc_Scene->SetConnected(false, true);
-            }
-            //Signal log
-            if (this->mpc_ProgressLogContent != NULL)
-            {
-               this->mpc_ProgressLogContent->Clear();
-            }
+            this->mpc_Scene->SetConnected(false);
          }
-         else
+         //Signal log
+         if (this->mpc_ProgressLogContent != NULL)
          {
-            //Signal scene (partially)
-            if (this->mpc_Scene != NULL)
-            {
-               this->mpc_Scene->SetConnected(false, false);
-            }
+            this->mpc_ProgressLogContent->Clear();
          }
+
          //Signal summary
          this->mpc_Ui->pc_WiUpdateInformation->ResetSummary();
          this->mpc_Ui->pc_WiUpdateInformation->SetHeading("", C_GtGetText::h_GetText("Exiting Update Mode..."));
@@ -1760,6 +1812,8 @@ void C_SyvUpUpdateWidget::m_Timer(void)
          }
          else
          {
+            std::vector<stw_opensyde_core::C_OSCSuSequencesNodeConnectStates> c_NodeStates;
+
             // Sequence failed
             this->me_Step = C_SyvUpSequences::eNOT_ACTIVE;
             this->mq_StartUpdateAfterConnect = false;
@@ -1767,12 +1821,24 @@ void C_SyvUpUpdateWidget::m_Timer(void)
             this->mpc_Ui->pc_PbUpdate->setVisible(true);
             this->mpc_Ui->pc_PbUpdate->setEnabled(true);
             this->mpc_Ui->pc_PbConnect->setEnabled(true);
+
+            // Get the connect status of the nodes
+            tgl_assert(this->mpc_UpSequences->GetConnectStates(c_NodeStates) == C_NO_ERR);
+            Q_EMIT (this->SigNodeConnectStates(c_NodeStates, this->mc_NodePreconditionErrors));
+
             m_HandleConnectionFailure();
          }
          break;
       case C_SyvUpSequences::eREAD_DEVICE_INFORMATION:
          // Sequence finished
          this->me_Step = C_SyvUpSequences::eNOT_ACTIVE;
+         {
+            // Get the connect status of the nodes and inform the UI
+            std::vector<stw_opensyde_core::C_OSCSuSequencesNodeConnectStates> c_NodeStates;
+
+            tgl_assert(this->mpc_UpSequences->GetConnectStates(c_NodeStates) == C_NO_ERR);
+            Q_EMIT (this->SigNodeConnectStates(c_NodeStates, this->mc_NodePreconditionErrors));
+         }
 
          this->mpc_Ui->pc_PbUpdate->setVisible(true);
          this->mpc_Ui->pc_PbDisconnnect->setEnabled(true);
@@ -1828,78 +1894,76 @@ void C_SyvUpUpdateWidget::m_Timer(void)
             this->mq_ConnectFailed = true;
             this->mpc_Ui->pc_PbUpdate->setEnabled(false);
 
-            m_HandleConnectionFailure();
+            // Show the original message box only in the case of a sequence error
+            m_HandleConnectionFailure((s32_SequenceResult == C_NO_ERR) ? this->mq_NodesPreconditionError : false);
 
-            // Show a message box in case of no pause between connect and update and in the special case
-            // with a not capable node for NVM writing or Ethernet routing
-            if ((this->mq_StartUpdateAfterConnect == true) ||
-                (this->mq_NodesPreconditionError == true))
+            // Show a message box in the special case
+            // with a not capable node for NVM/PEM writing or Ethernet routing
+            if (this->mq_NodesPreconditionError == true)
             {
-               if (this->mq_NodesPreconditionError == true)
+               // Error for NVM writing
+               if (this->mc_NodePreconditionErrors.c_NvmWriteError.size() > 0)
                {
-                  // Error for NVM writing
-                  if (this->mc_NodesPreconditionNvmWriteError.size() > 0)
-                  {
-                     C_OgeWiCustomMessage c_MessageNoWriPa(this, C_OgeWiCustomMessage::E_Type::eERROR);
-                     c_MessageNoWriPa.SetHeading(C_GtGetText::h_GetText("System Update"));
-                     QString c_Details = C_GtGetText::h_GetText(
-                        "Following node(s) do not support writing parameter set image files:\n");
-                     uint32 u32_NodeCounter;
+                  this->m_HandlePreconditionErrorType(
+                     this->mc_NodePreconditionErrors.c_NvmWriteError,
+                     C_GtGetText::h_GetText(
+                        "Enter update mode failed.\n"
+                        "There are nodes, which do not support writing"
+                        " parameter set image files."),
+                     C_GtGetText::h_GetText(
+                        "Following node(s) do not support writing parameter set image files:\n"));
+               }
 
-                     for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_NodesPreconditionNvmWriteError.size();
-                          ++u32_NodeCounter)
-                     {
-                        const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
-                           this->mc_NodesPreconditionNvmWriteError[u32_NodeCounter]);
+               // Error for PEM writing
+               if (this->mc_NodePreconditionErrors.c_PemWriteError.size() > 0)
+               {
+                  this->m_HandlePreconditionErrorType(
+                     this->mc_NodePreconditionErrors.c_PemWriteError,
+                     C_GtGetText::h_GetText(
+                        "Enter update mode failed.\n"
+                        "There are nodes, which do not support security"
+                        " and writing PEM files."),
+                     C_GtGetText::h_GetText(
+                        "Following node(s) do not support security and writing PEM files:\n"));
+               }
 
-                        if (pc_Node != NULL)
-                        {
-                           c_Details += "- ";
-                           c_Details += pc_Node->c_Properties.c_Name.c_str();
-                           c_Details += "\n";
-                        }
-                     }
+               // Error for debugger enabling
+               if (this->mc_NodePreconditionErrors.c_DebuggerEnableError.size() > 0)
+               {
+                  this->m_HandlePreconditionErrorType(
+                     this->mc_NodePreconditionErrors.c_DebuggerEnableError,
+                     C_GtGetText::h_GetText(
+                        "Enter update mode failed.\n"
+                        "There are nodes, which do not support"
+                        " enabling the debugger."),
+                     C_GtGetText::h_GetText(
+                        "Following node(s) do not support enabling the debugger:\n"));
+               }
 
-                     // Nodes precondition error
-                     c_MessageNoWriPa.SetDescription(C_GtGetText::h_GetText(
-                                                        "There are nodes, which do not support writing"
-                                                        " parameter set image files."));
-                     c_MessageNoWriPa.SetDetails(c_Details);
-                     c_MessageNoWriPa.SetCustomMinHeight(230, 300);
-                     c_MessageNoWriPa.Execute();
-                  }
+               // Error for debugger disabling
+               if (this->mc_NodePreconditionErrors.c_DebuggerDisableError.size() > 0)
+               {
+                  this->m_HandlePreconditionErrorType(
+                     this->mc_NodePreconditionErrors.c_DebuggerDisableError,
+                     C_GtGetText::h_GetText(
+                        "Enter update mode failed.\n"
+                        "There are nodes, which do not support"
+                        " disabling the debugger."),
+                     C_GtGetText::h_GetText(
+                        "Following node(s) do not support disabling the debugger:\n"));
+               }
 
-                  // Error for Ethernet to Ethernet routing
-                  if (this->mc_NodesPreconditionEthToEthError.size() > 0)
-                  {
-                     C_OgeWiCustomMessage c_MessageNoEthernet(this, C_OgeWiCustomMessage::E_Type::eERROR);
-                     c_MessageNoEthernet.SetHeading(C_GtGetText::h_GetText("System Update"));
-                     QString c_Details = C_GtGetText::h_GetText(
-                        "Following node(s) do not support Ethernet to Ethernet routing:\n");
-                     uint32 u32_NodeCounter;
-
-                     for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_NodesPreconditionEthToEthError.size();
-                          ++u32_NodeCounter)
-                     {
-                        const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
-                           this->mc_NodesPreconditionEthToEthError[u32_NodeCounter]);
-
-                        if (pc_Node != NULL)
-                        {
-                           c_Details += "- ";
-                           c_Details += pc_Node->c_Properties.c_Name.c_str();
-                           c_Details += "\n";
-                        }
-                     }
-
-                     // Nodes precondition error
-                     c_MessageNoEthernet.SetDescription(C_GtGetText::h_GetText(
-                                                           "There are nodes, which do not support Ethernet"
-                                                           " to Ethernet routing."));
-                     c_MessageNoEthernet.SetDetails(c_Details);
-                     c_MessageNoEthernet.SetCustomMinHeight(230, 300);
-                     c_MessageNoEthernet.Execute();
-                  }
+               // Error for Ethernet to Ethernet routing
+               if (this->mc_NodePreconditionErrors.c_EthToEthError.size() > 0)
+               {
+                  this->m_HandlePreconditionErrorType(
+                     this->mc_NodePreconditionErrors.c_EthToEthError,
+                     C_GtGetText::h_GetText(
+                        "Enter update mode failed.\n"
+                        "There are nodes, which do not support Ethernet"
+                        " to Ethernet routing."),
+                     C_GtGetText::h_GetText(
+                        "Following node(s) do not support Ethernet to Ethernet routing:\n"));
                }
             }
          }
@@ -1909,6 +1973,14 @@ void C_SyvUpUpdateWidget::m_Timer(void)
       case C_SyvUpSequences::eUPDATE_SYSTEM:
          // Sequence finished
          this->me_Step = C_SyvUpSequences::eNOT_ACTIVE;
+
+         {
+            // Get the connect status of the nodes and inform the UI
+            std::vector<stw_opensyde_core::C_OSCSuSequencesNodeUpdateStates> c_NodeStates;
+
+            tgl_assert(this->mpc_UpSequences->GetUpdateStates(c_NodeStates) == C_NO_ERR);
+            Q_EMIT (this->SigNodeUpdateStates(c_NodeStates));
+         }
 
          this->mpc_Ui->pc_PbDisconnnect->setEnabled(true);
          this->mpc_Ui->pc_PbUpdate->setVisible(true);
@@ -2014,13 +2086,20 @@ void C_SyvUpUpdateWidget::m_Timer(void)
             //Signal scene
             if (this->mpc_Scene != NULL)
             {
+               this->mpc_Scene->SetNodeError(u32_ErrorNodeIndex);
                this->mpc_Scene->StopProgressAnimation(true, this->mu32_ApplicationIndex, true);
             }
+            // Need to be written before m_HandleUpdateFailure due to the link in the message box
+            this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Update System: %1")).arg(c_Message));
+
             m_HandleUpdateFailure();
+         }
+         else
+         {
+            this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Update System: %1")).arg(c_Message));
          }
 
          this->mpc_Ui->pc_WiUpdateInformation->SetUpdateFinished();
-         this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Update System: %1")).arg(c_Message));
          //Update estimated time
          this->m_UpdateUpdatePackageStatus();
 
@@ -2079,6 +2158,70 @@ void C_SyvUpUpdateWidget::m_Timer(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handles a precondition error type
+
+   \param[in]       orc_ErrorNodeIndexes     Node indexes in system definition of all nodes with error of the same type
+   \param[out]      orc_Description          Description text for the message box
+   \param[in,out]   orc_DetailsStart         Beginning of the details text of the message box
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpUpdateWidget::m_HandlePreconditionErrorType(const std::vector<uint32> & orc_ErrorNodeIndexes,
+                                                        const QString & orc_Description,
+                                                        const QString & orc_DetailsStart)
+{
+   C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+
+   c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
+   QString c_Details = orc_DetailsStart;
+   uint32 u32_NodeCounter;
+
+   for (u32_NodeCounter = 0U; u32_NodeCounter < orc_ErrorNodeIndexes.size(); ++u32_NodeCounter)
+   {
+      this->m_HandleNodePreconditionError(
+         c_Details,
+         orc_ErrorNodeIndexes[u32_NodeCounter]);
+   }
+
+   // Nodes precondition error
+   c_Message.SetDescription(orc_Description);
+   c_Message.SetDetails(c_Details);
+   c_Message.SetCustomMinHeight(200, 300);
+   c_Message.Execute();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Extends the error text with the node name and informs the progress log and scene about the specific node
+
+   \param[in,out]   orc_ErrorText           Error text for extending by node name
+   \param[in]       ou32_ErrorNodeIndex     Node index in system definition of node with error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpUpdateWidget::m_HandleNodePreconditionError(QString & orc_ErrorText, const uint32 ou32_ErrorNodeIndex)
+{
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+      ou32_ErrorNodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      orc_ErrorText += "- ";
+      orc_ErrorText += pc_Node->c_Properties.c_Name.c_str();
+      orc_ErrorText += "\n";
+   }
+
+   //Signal progress log
+   if (this->mpc_ProgressLogContent != NULL)
+   {
+      this->mpc_ProgressLogContent->UpdateStatus(ou32_ErrorNodeIndex, C_GtGetText::h_GetText(
+                                                    "FAIL"), false);
+   }
+   //Signal scene
+   if (this->mpc_Scene != NULL)
+   {
+      this->mpc_Scene->SetNodeError(ou32_ErrorNodeIndex);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_UpdateReportText(const QString & orc_NewTextPart) const
 {
    osc_write_log_info("Update Node", orc_NewTextPart.toStdString().c_str());
@@ -2086,15 +2229,17 @@ void C_SyvUpUpdateWidget::m_UpdateReportText(const QString & orc_NewTextPart) co
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle connection failure
+
+   \param[in]  oq_SuppressMessageBox   Flag if message box shall be suppressed and not be showed
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_HandleConnectionFailure(void)
+void C_SyvUpUpdateWidget::m_HandleConnectionFailure(const bool oq_SuppressMessageBox)
 {
    //Signal summary
    if (this->mq_NodesPreconditionError == false)
    {
       this->mpc_Ui->pc_WiUpdateInformation->SetHeading("",
-                                                       C_GtGetText::h_GetText("Update mode active. Nodes missing!"));
+                                                       C_GtGetText::h_GetText("Update mode active. Errors detected!"));
    }
    else
    {
@@ -2118,8 +2263,6 @@ void C_SyvUpUpdateWidget::m_HandleConnectionFailure(void)
       uint32 u32_AddedNodes = 0;
       //All nodes with any response
       const std::vector<uint32> c_RespondedNodes = this->mpc_ProgressLogContent->GetConnectNodeEntryIndices();
-      //All nodes with no response
-      const std::vector<uint32> c_ActiveNoResponseNodeIndices = this->mpc_Scene->GetActiveNoResponseNodeIndices();
       //All nodes which require an update
       const std::vector<uint32> c_ActiveNoneThirdPartyNodeIndices =
          this->mpc_Scene->GetActiveNoneThirdPartyNodeIndices();
@@ -2175,27 +2318,27 @@ void C_SyvUpUpdateWidget::m_HandleConnectionFailure(void)
                                                        false);
 
             //Signal scene
-            this->mpc_Scene->SetNoResponse(ru32_CurActiveNodeIndex);
+            this->mpc_Scene->SetNodeError(ru32_CurActiveNodeIndex);
             //Always remember
             ++u32_AddedNodes;
          }
       }
 
-      //Check existing and added ones then compare with expected number for special case no response
-      if ((c_ActiveNoResponseNodeIndices.size() + u32_AddedNodes) == c_NodeIndicesWhichRequireAResponse.size())
+      //Display message
+      if (oq_SuppressMessageBox == false)
       {
-         //Handle no nodes case
-         m_DisconnectAction(false);
-
-         //Display message
-         {
-            C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-            c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
-            c_Message.SetDescription(C_GtGetText::h_GetText(
-                                        "None of the active nodes are responding. Check the nodes connection and try again."));
-            c_Message.SetCustomMinHeight(180, 180);
-            c_Message.Execute();
-         }
+         const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+         c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
+         c_Message.SetDescription(C_GtGetText::h_GetText(
+                                     "Enter update mode failed."
+                                     " Details see node progress log and log file."));
+         c_Message.SetDetails(C_GtGetText::h_GetText("For more information see ") +
+                              C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"),
+                                               mc_STYLESHEET_GUIDE_COLOR_LINK,
+                                               c_Log) + C_GtGetText::h_GetText("."));
+         c_Message.SetCustomMinHeight(180, 230);
+         c_Message.Execute();
       }
    }
 }
@@ -2214,6 +2357,22 @@ void C_SyvUpUpdateWidget::m_HandleUpdateFailure(void)
    if (this->mpc_ProgressLogContent != NULL)
    {
       this->mpc_ProgressLogContent->AddLogHyperlink();
+   }
+
+   //Display message
+   {
+      const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+      c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
+      c_Message.SetDescription(C_GtGetText::h_GetText(
+                                  "Update failed."
+                                  " Details see node progress log and log file."));
+      c_Message.SetDetails(C_GtGetText::h_GetText("For more information see ") +
+                           C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"),
+                                            mc_STYLESHEET_GUIDE_COLOR_LINK,
+                                            c_Log) + C_GtGetText::h_GetText("."));
+      c_Message.SetCustomMinHeight(180, 230);
+      c_Message.Execute();
    }
 }
 
@@ -2257,15 +2416,15 @@ void C_SyvUpUpdateWidget::m_InitToolBox(void)
       if (this->mpc_ProgressLogParent == NULL)
       {
          // default value in this error case
-         this->mpc_ProgressLog->move(mhsn_WidgetBorder, mhsn_ToolboxInitPosY);
+         this->mpc_ProgressLog->move(mhsn_WIDGET_BORDER, mhsn_TOOLBOX_INIT_POS_Y);
       }
       else
       {
          // default value
          this->mpc_ProgressLog->setGeometry(QRect(QPoint((((this->mpc_ProgressLogParent->width() -
                                                             this->mpc_ProgressLog->width()) -
-                                                           mhsn_WidgetBorder) -  static_cast<sintn> (100)),
-                                                         mhsn_ToolboxInitPosY),
+                                                           mhsn_WIDGET_BORDER) -  static_cast<sintn> (100)),
+                                                         mhsn_TOOLBOX_INIT_POS_Y),
                                                   QSize(400, 319)));
 
          this->mpc_ProgressLog->SetMaximizedHeight(319);
@@ -2554,6 +2713,7 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionFailure(const C_OSCSuSequences::E_Progr
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
       q_Retval = true;

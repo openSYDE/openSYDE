@@ -24,13 +24,13 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QColor C_CamGenTableDelegate::mhc_DefaultBorderColor = Qt::transparent;
-const QColor C_CamGenTableDelegate::mhc_DefaultBackgroundColor = Qt::transparent;
-const QFont C_CamGenTableDelegate::mhc_DefaultFont = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
-const QColor C_CamGenTableDelegate::mhc_HighlightBackgroundColor = Qt::transparent;
-const QColor C_CamGenTableDelegate::mhc_HighlightForegroundColor = mc_STYLE_GUIDE_COLOR_0;
-const QColor C_CamGenTableDelegate::mhc_HighlightBorderColor = Qt::transparent;
-const QFont C_CamGenTableDelegate::mhc_HighlightFont = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
+const QColor C_CamGenTableDelegate::mhc_DEFAULT_BORDER_COLOR = Qt::transparent;
+const QColor C_CamGenTableDelegate::mhc_DEFAULT_BACKGROUND_COLOR = Qt::transparent;
+const QFont C_CamGenTableDelegate::mhc_DEFAULT_FONT = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
+const QColor C_CamGenTableDelegate::mhc_HIGHLIGHT_BACKGROUND_COLOR = Qt::transparent;
+const QColor C_CamGenTableDelegate::mhc_HIGHLIGHT_FOREGROUND_COLOR = mc_STYLE_GUIDE_COLOR_0;
+const QColor C_CamGenTableDelegate::mhc_HIGHLIGHT_BORDER_COLOR = Qt::transparent;
+const QFont C_CamGenTableDelegate::mhc_HIGHLIGHT_FONT = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -72,13 +72,13 @@ void C_CamGenTableDelegate::paint(QPainter * const opc_Painter, const QStyleOpti
    //Always draw cell (should only be background if any additional paint operations are done)
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
    if (C_TblDelegateUtil::h_PaintMarkedCell(opc_Painter, c_PaddedCellRect, orc_Index, q_Selected,
-                                            C_CamGenTableDelegate::mhc_DefaultBackgroundColor,
-                                            C_CamGenTableDelegate::mhc_DefaultBorderColor,
-                                            C_CamGenTableDelegate::mhc_DefaultFont,
-                                            C_CamGenTableDelegate::mhc_HighlightForegroundColor,
-                                            C_CamGenTableDelegate::mhc_HighlightBackgroundColor,
-                                            C_CamGenTableDelegate::mhc_HighlightBorderColor,
-                                            C_CamGenTableDelegate::mhc_HighlightFont, 19, 25) == true)
+                                            C_CamGenTableDelegate::mhc_DEFAULT_BACKGROUND_COLOR,
+                                            C_CamGenTableDelegate::mhc_DEFAULT_BORDER_COLOR,
+                                            C_CamGenTableDelegate::mhc_DEFAULT_FONT,
+                                            C_CamGenTableDelegate::mhc_HIGHLIGHT_FOREGROUND_COLOR,
+                                            C_CamGenTableDelegate::mhc_HIGHLIGHT_BACKGROUND_COLOR,
+                                            C_CamGenTableDelegate::mhc_HIGHLIGHT_BORDER_COLOR,
+                                            C_CamGenTableDelegate::mhc_HIGHLIGHT_FONT, 19, 25) == true)
    {
       // to make sure text is not painted twice
       tgl_assert(orc_Index.data(static_cast<sintn>(Qt::DisplayRole)).toString().isEmpty());

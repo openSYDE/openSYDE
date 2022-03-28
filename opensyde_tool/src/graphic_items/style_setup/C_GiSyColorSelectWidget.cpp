@@ -452,7 +452,7 @@ void C_GiSyColorSelectWidget::m_InitStandardColorButtons(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set a background if the color has a transparence
+/*! \brief   Set a background if the color has a transparency
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorSelectWidget::m_SetTransparentBackground(void)

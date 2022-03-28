@@ -132,13 +132,13 @@ QVariant C_SdNdeSfoResetMessageTableModel::headerData(const sintn osn_Section, c
       }
       else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
       {
-         const QColor c_Active = mc_STYLE_GUIDE_COLOR_3;
-         const QColor c_Disabled = mc_STYLE_GUIDE_COLOR_10;
+         const QColor c_ACTIVE = mc_STYLE_GUIDE_COLOR_3;
+         const QColor c_DISABLED = mc_STYLE_GUIDE_COLOR_10;
          const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         c_Retval = c_Active;
+         c_Retval = c_ACTIVE;
          if ((pc_OSCNode != NULL) && (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.q_ResetMessageActive == false))
          {
-            c_Retval = c_Disabled;
+            c_Retval = c_DISABLED;
          }
       }
       else
@@ -160,13 +160,13 @@ QVariant C_SdNdeSfoResetMessageTableModel::headerData(const sintn osn_Section, c
 //----------------------------------------------------------------------------------------------------------------------
 sintn C_SdNdeSfoResetMessageTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   const sintn sn_Retval = 0;
+   const sintn sn_RETVAL = 0;
 
    if (orc_Parent.isValid() == false)
    {
       return 1;
    }
-   return sn_Retval;
+   return sn_RETVAL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -180,7 +180,8 @@ sintn C_SdNdeSfoResetMessageTableModel::rowCount(const QModelIndex & orc_Parent)
 //----------------------------------------------------------------------------------------------------------------------
 sintn C_SdNdeSfoResetMessageTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   sintn sn_Retval = 0;
+
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
@@ -495,14 +496,14 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
       }
       else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
       {
-         const QColor c_Active = mc_STYLE_GUIDE_COLOR_6;
-         const QColor c_Disabled = mc_STYLE_GUIDE_COLOR_10;
+         const QColor c_ACTIVE = mc_STYLE_GUIDE_COLOR_6;
+         const QColor c_DISABLED = mc_STYLE_GUIDE_COLOR_10;
          const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
          if (pc_OSCNode != NULL)
          {
             if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.q_ResetMessageActive == false)
             {
-               c_Retval = c_Disabled;
+               c_Retval = c_DISABLED;
             }
             else
             {
@@ -512,86 +513,86 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                case eID:
                case eDLC:
                case eEXTENDED_FORMAT:
-                  c_Retval = c_Active;
+                  c_Retval = c_ACTIVE;
                   break;
                case eBYTE1:
                   if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 0)
                   {
-                     c_Retval = c_Active;
+                     c_Retval = c_ACTIVE;
                   }
                   else
                   {
-                     c_Retval = c_Disabled;
+                     c_Retval = c_DISABLED;
                   }
                   break;
                case eBYTE2:
                   if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 1)
                   {
-                     c_Retval = c_Active;
+                     c_Retval = c_ACTIVE;
                   }
                   else
                   {
-                     c_Retval = c_Disabled;
+                     c_Retval = c_DISABLED;
                   }
                   break;
                case eBYTE3:
                   if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 2)
                   {
-                     c_Retval = c_Active;
+                     c_Retval = c_ACTIVE;
                   }
                   else
                   {
-                     c_Retval = c_Disabled;
+                     c_Retval = c_DISABLED;
                   }
                   break;
                case eBYTE4:
                   if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 3)
                   {
-                     c_Retval = c_Active;
+                     c_Retval = c_ACTIVE;
                   }
                   else
                   {
-                     c_Retval = c_Disabled;
+                     c_Retval = c_DISABLED;
                   }
                   break;
                case eBYTE5:
                   if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 4)
                   {
-                     c_Retval = c_Active;
+                     c_Retval = c_ACTIVE;
                   }
                   else
                   {
-                     c_Retval = c_Disabled;
+                     c_Retval = c_DISABLED;
                   }
                   break;
                case eBYTE6:
                   if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 5)
                   {
-                     c_Retval = c_Active;
+                     c_Retval = c_ACTIVE;
                   }
                   else
                   {
-                     c_Retval = c_Disabled;
+                     c_Retval = c_DISABLED;
                   }
                   break;
                case eBYTE7:
                   if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 6)
                   {
-                     c_Retval = c_Active;
+                     c_Retval = c_ACTIVE;
                   }
                   else
                   {
-                     c_Retval = c_Disabled;
+                     c_Retval = c_DISABLED;
                   }
                   break;
                case eBYTE8:
                   if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 7)
                   {
-                     c_Retval = c_Active;
+                     c_Retval = c_ACTIVE;
                   }
                   else
                   {
-                     c_Retval = c_Disabled;
+                     c_Retval = c_DISABLED;
                   }
                   break;
                default:
@@ -650,7 +651,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
 bool C_SdNdeSfoResetMessageTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                                                const sintn osn_Role)
 {
-   const bool q_Retval = false;
+   bool q_Retval = false;
 
    if (data(orc_Index, osn_Role) != orc_Value)
    {
@@ -743,6 +744,7 @@ bool C_SdNdeSfoResetMessageTableModel::setData(const QModelIndex & orc_Index, co
             C_PuiSdHandler::h_GetInstance()->SetStwFlashloaderSettings(this->mu32_NodeIndex, c_Settings);
 
             Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
+            q_Retval = true;
          }
       }
    }

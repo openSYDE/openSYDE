@@ -41,15 +41,15 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Space = 2.0;
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderBelowAllItems = -1.0;
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderDefault = 0.0;
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderInteraction = 1.0;
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderEmptyItem = 10000.0;
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderHintItem = 10001.0;
+const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_SPACE = 2.0;
+const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_BELOW_ALL_ITEMS = -1.0;
+const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_DEFAULT = 0.0;
+const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_INTERACTION = 1.0;
+const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_EMPTY_ITEM = 10000.0;
+const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_HINT_ITEM = 10001.0;
 const stw_types::uint8 C_SdBueMlvGraphicsScene::mhu8_NUM_COLORS = 64U;
 
-const C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::mhac_SignalsColors[64] =
+const C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[64] =
 {
    // First the background color and as second the font color
    {1U, QColor(172, 255, 250), mc_STYLE_GUIDE_COLOR_6, mc_STYLE_GUIDE_COLOR_8},
@@ -722,7 +722,7 @@ void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
    {
       C_SdBueMlvEmptyItem * const pc_Item = new C_SdBueMlvEmptyItem(u8_Counter);
       this->mc_VecEmptyItems.push_back(pc_Item);
-      pc_Item->setZValue(C_SdBueMlvGraphicsScene::mhf64_ZOrderEmptyItem);
+      pc_Item->setZValue(C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_EMPTY_ITEM);
       this->addItem(pc_Item);
    } //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
 
@@ -741,8 +741,8 @@ void C_SdBueMlvGraphicsScene::m_InitProtocolItems(void)
                                                     stw_opensyde_gui_logic::C_GtGetText::h_GetText(
                                                        "Reserved by Checksum"), true);
 
-   this->mapc_ECeSHints[0]->setZValue(mhf64_ZOrderHintItem);
-   this->mapc_ECeSHints[1]->setZValue(mhf64_ZOrderHintItem);
+   this->mapc_ECeSHints[0]->setZValue(mhf64_Z_ORDER_HINT_ITEM);
+   this->mapc_ECeSHints[1]->setZValue(mhf64_Z_ORDER_HINT_ITEM);
 
    this->mapc_ECeSHints[0]->setVisible(false);
    this->mapc_ECeSHints[1]->setVisible(false);
@@ -788,10 +788,10 @@ void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32 ou32_SignalIndex)
    }
 
    pc_Item = new C_SdBueMlvSignalManager(this->mpc_MessageSyncManager, this->mc_MessageId, this->mu16_MaximumCountBits,
-                                         C_SdBueMlvGraphicsScene::mhf64_Space, this);
+                                         C_SdBueMlvGraphicsScene::mhf64_SPACE, this);
 
    this->mc_VecSignals.push_back(pc_Item);
-   pc_Item->SetZOrder(C_SdBueMlvGraphicsScene::mhf64_ZOrderDefault);
+   pc_Item->SetZOrder(C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_DEFAULT);
 
    connect(pc_Item, &C_SdBueMlvSignalManager::SigAddItem, this, &C_SdBueMlvGraphicsScene::m_AddItemSlot);
    connect(pc_Item, &C_SdBueMlvSignalManager::SigRemoveItem, this, &C_SdBueMlvGraphicsScene::m_RemoveItemSlot);
@@ -885,7 +885,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateBorderItems(void)
       (*pc_ItItem)->SetSize(QSizeF(this->mf64_SingleItemWidth, this->mf64_SingleItemHeight));
       // the first item is at the right side of the scene (Bit 7 - Bit 0)
       (*pc_ItItem)->setPos(static_cast<float64>(s32_Pos) *
-                           (this->mf64_SingleItemWidth + C_SdBueMlvGraphicsScene::mhf64_Space), 0.0);
+                           (this->mf64_SingleItemWidth + C_SdBueMlvGraphicsScene::mhf64_SPACE), 0.0);
 
       --s32_Pos;
    }
@@ -900,7 +900,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateBorderItems(void)
    {
       (*pc_ItItem)->SetSize(QSizeF(this->mf64_SingleItemWidth, this->mf64_SingleItemHeight));
       (*pc_ItItem)->setPos(0.0, static_cast<float64>(s32_Pos) *
-                           (this->mf64_SingleItemHeight + C_SdBueMlvGraphicsScene::mhf64_Space));
+                           (this->mf64_SingleItemHeight + C_SdBueMlvGraphicsScene::mhf64_SPACE));
 
       ++s32_Pos;
    }
@@ -926,9 +926,9 @@ void C_SdBueMlvGraphicsScene::m_UpdateEmptyItems(void)
       s32_PosVertical = (s32_BitPosition / 8) + 1;
 
       f64_PosX = static_cast<float64>(s32_PosHorizontal) *
-                 (this->mf64_SingleItemWidth + C_SdBueMlvGraphicsScene::mhf64_Space);
+                 (this->mf64_SingleItemWidth + C_SdBueMlvGraphicsScene::mhf64_SPACE);
       f64_PosY = (static_cast<float64>(s32_PosVertical) *
-                  (this->mf64_SingleItemHeight + C_SdBueMlvGraphicsScene::mhf64_Space));
+                  (this->mf64_SingleItemHeight + C_SdBueMlvGraphicsScene::mhf64_SPACE));
 
       this->mc_VecEmptyItems[s32_BitPosition]->setPos(f64_PosX, f64_PosY);
    }
@@ -965,7 +965,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateProtocolItems(void)
    QSizeF c_Size;
 
    c_Size.setHeight(this->mf64_SingleItemHeight);
-   c_Size.setWidth((8.0 * this->mf64_SingleItemWidth) + (7.0 * mhf64_Space));
+   c_Size.setWidth((8.0 * this->mf64_SingleItemWidth) + (7.0 * mhf64_SPACE));
 
    // set the size
    if (this->mapc_ECeSHints[0] != NULL)
@@ -1178,7 +1178,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNo
 
       if (this->mc_SignalsColorsUsed[u32_SectionNumber][sn_ColorCounter] == false)
       {
-         c_ColorConfig = C_SdBueMlvGraphicsScene::mhac_SignalsColors[sn_ColorCounter];
+         c_ColorConfig = C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[sn_ColorCounter];
          // set the color variant as used
          this->mc_SignalsColorsUsed[u32_SectionNumber][sn_ColorCounter] = true;
          q_RandomColorFound = true;
@@ -1210,12 +1210,12 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcre
    // search the color to set the flag
    for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_NUM_COLORS; ++u32_ColorCounter)
    {
-      if (ou8_Index == C_SdBueMlvGraphicsScene::mhac_SignalsColors[u32_ColorCounter].u8_Index)
+      if (ou8_Index == C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[u32_ColorCounter].u8_Index)
       {
          uint32 u32_SectionCounter;
          bool q_FreeSectionFound = false;
 
-         c_ColorConfig = C_SdBueMlvGraphicsScene::mhac_SignalsColors[u32_ColorCounter];
+         c_ColorConfig = C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[u32_ColorCounter];
 
          // Search for a free entry in all sections
          for (u32_SectionCounter = 0U; u32_SectionCounter < this->mc_SignalsColorsUsed.size(); ++u32_SectionCounter)
@@ -1271,7 +1271,7 @@ void C_SdBueMlvGraphicsScene::m_SetColorsUnused(const C_SdBueMlvSignalManager::C
 
       for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_NUM_COLORS; ++u32_ColorCounter)
       {
-         if ((C_SdBueMlvGraphicsScene::mhac_SignalsColors[u32_ColorCounter].u8_Index == orc_Colors.u8_Index) &&
+         if ((C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[u32_ColorCounter].u8_Index == orc_Colors.u8_Index) &&
              ((*c_ItSection)[u32_ColorCounter] == true))
          {
             // Set the used color to unused
@@ -1322,8 +1322,8 @@ void C_SdBueMlvGraphicsScene::m_PrepareNextColorSection(void)
 void C_SdBueMlvGraphicsScene::m_SceneRectChanged(void)
 {
    // update the size values of a single item
-   this->mf64_SingleItemWidth = (this->sceneRect().width() - (8.0 * C_SdBueMlvGraphicsScene::mhf64_Space)) / 9.0;
-   this->mf64_SingleItemHeight = (this->sceneRect().height() - (8.0 * C_SdBueMlvGraphicsScene::mhf64_Space)) / 9.0;
+   this->mf64_SingleItemWidth = (this->sceneRect().width() - (8.0 * C_SdBueMlvGraphicsScene::mhf64_SPACE)) / 9.0;
+   this->mf64_SingleItemHeight = (this->sceneRect().height() - (8.0 * C_SdBueMlvGraphicsScene::mhf64_SPACE)) / 9.0;
 
    // update all items
    this->m_UpdateAll();
@@ -1343,7 +1343,7 @@ void C_SdBueMlvGraphicsScene::m_SearchClickedItem(const QPointF & orc_Pos)
       {
          std::set<C_SdBueMlvSignalManager *>::iterator c_ItSetGridPosition;
          float64 f64_ZOrderActual;
-         float64 f64_ZOrderHighest = mhf64_ZOrderBelowAllItems;
+         float64 f64_ZOrderHighest = mhf64_Z_ORDER_BELOW_ALL_ITEMS;
 
          // search the item with the highest ZOrder
          for (c_ItSetGridPosition = this->mac_SetGridState[s32_Counter].begin();
@@ -1376,13 +1376,13 @@ void C_SdBueMlvGraphicsScene::m_BringActualSignalToTop(void)
    // reset all items in the first step
    for (s32_Counter = 0; s32_Counter < this->mc_VecSignals.size(); ++s32_Counter)
    {
-      this->mc_VecSignals[s32_Counter]->SetZOrder(mhf64_ZOrderDefault);
+      this->mc_VecSignals[s32_Counter]->SetZOrder(mhf64_Z_ORDER_DEFAULT);
    }
 
    // set the actual item on top
    if (this->mpc_ActualSignal != NULL)
    {
-      this->mpc_ActualSignal->SetZOrder(mhf64_ZOrderInteraction);
+      this->mpc_ActualSignal->SetZOrder(mhf64_Z_ORDER_INTERACTION);
    }
 }
 

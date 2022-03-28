@@ -43,8 +43,8 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SdNdeDbAddNewProject::mhc_StartTD = "<td style=\"padding: 0 9px 0 0;\">";
-const QString C_SdNdeDbAddNewProject::mhc_ContinueTD = "<td style=\"padding: 0 9px 0 9px;\">";
+const QString C_SdNdeDbAddNewProject::mhc_START_TD = "<td style=\"padding: 0 9px 0 0;\">";
+const QString C_SdNdeDbAddNewProject::mhc_CONTINUE_TD = "<td style=\"padding: 0 9px 0 9px;\">";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -662,18 +662,18 @@ void C_SdNdeDbAddNewProject::m_AddTopSection(QString & orc_Content) const
    orc_Content += "<h3>" + static_cast<QString>(C_GtGetText::h_GetText("openSYDE Target Support Package")) + "</h3>";
    orc_Content += "<table>";
    orc_Content += "<tr>";
-   orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;
+   orc_Content += C_SdNdeDbAddNewProject::mhc_START_TD;
    orc_Content += C_GtGetText::h_GetText("Description:");
    orc_Content += "</td>";
-   orc_Content += C_SdNdeDbAddNewProject::mhc_ContinueTD;
+   orc_Content += C_SdNdeDbAddNewProject::mhc_CONTINUE_TD;
    orc_Content += this->mc_Package.c_Comment.c_str();
    orc_Content += "</td>";
    orc_Content += "</tr>";
    orc_Content += "<tr>";
-   orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;
+   orc_Content += C_SdNdeDbAddNewProject::mhc_START_TD;
    orc_Content += C_GtGetText::h_GetText("Number of Data Blocks:");
    orc_Content += "</td>";
-   orc_Content += C_SdNdeDbAddNewProject::mhc_ContinueTD;
+   orc_Content += C_SdNdeDbAddNewProject::mhc_CONTINUE_TD;
    orc_Content += QString::number(this->mc_Package.c_Applications.size());
    orc_Content += "</td>";
    orc_Content += "</tr>";
@@ -695,18 +695,18 @@ void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
                      "</h4>";
       orc_Content += "<table>";
       orc_Content += "<tr>";
-      orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;
+      orc_Content += C_SdNdeDbAddNewProject::mhc_START_TD;
       orc_Content += C_GtGetText::h_GetText("Name:");
       orc_Content += "</td>";
-      orc_Content += C_SdNdeDbAddNewProject::mhc_ContinueTD;
+      orc_Content += C_SdNdeDbAddNewProject::mhc_CONTINUE_TD;
       orc_Content += rc_Template.c_Name.c_str();
       orc_Content += "</td>";
       orc_Content += "</tr>";
       orc_Content += "<tr>";
-      orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;
+      orc_Content += C_SdNdeDbAddNewProject::mhc_START_TD;
       orc_Content += C_GtGetText::h_GetText("Comment:");
       orc_Content += "</td>";
-      orc_Content += C_SdNdeDbAddNewProject::mhc_ContinueTD;
+      orc_Content += C_SdNdeDbAddNewProject::mhc_CONTINUE_TD;
       orc_Content += rc_Template.c_Comment.c_str();
       orc_Content += "</td>";
       orc_Content += "</tr>";
@@ -720,18 +720,18 @@ void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
                      "</h4>";
       orc_Content += "<table>";
       orc_Content += "<tr>";
-      orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;
+      orc_Content += C_SdNdeDbAddNewProject::mhc_START_TD;
       orc_Content += C_GtGetText::h_GetText("HALC definition file:");
       orc_Content += "</td>";
-      orc_Content += C_SdNdeDbAddNewProject::mhc_ContinueTD;
+      orc_Content += C_SdNdeDbAddNewProject::mhc_CONTINUE_TD;
       orc_Content += this->mc_Package.c_HalcDefPath.c_str();
       orc_Content += "</td>";
       orc_Content += "</tr>";
       orc_Content += "<tr>";
-      orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;
+      orc_Content += C_SdNdeDbAddNewProject::mhc_START_TD;
       orc_Content += C_GtGetText::h_GetText("Comment: ");
       orc_Content += "</td>";
-      orc_Content += C_SdNdeDbAddNewProject::mhc_ContinueTD;
+      orc_Content += C_SdNdeDbAddNewProject::mhc_CONTINUE_TD;
       orc_Content += this->mc_Package.c_HalcComment.c_str();
       orc_Content += "</td>";
       orc_Content += "</tr>";

@@ -41,8 +41,8 @@ const stw_types::sintn msn_MIN_ZOOM_IN_PERCENT = 10;
 const stw_types::sintn msn_MAX_ZOOM_IN_PERCENT = 1000;
 const stw_types::sintn msn_ZOOM_STEP_IN_PERCENT = 5;
 //Background
-const QColor C_SebGraphicsView::mhc_GradientColorLight = mc_STYLE_GUIDE_COLOR_0;
-const QColor C_SebGraphicsView::mhc_GradientColorDark = mc_STYLE_GUIDE_COLOR_52;
+const QColor C_SebGraphicsView::mhc_GRADIENT_COLOR_LIGHT = mc_STYLE_GUIDE_COLOR_0;
+const QColor C_SebGraphicsView::mhc_GRADIENT_COLOR_DARK = mc_STYLE_GUIDE_COLOR_52;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -338,13 +338,13 @@ void C_SebGraphicsView::drawBackground(QPainter * const opc_Painter, const QRect
 
       if (this->mq_DarkMode == false)
       {
-         c_GradientColorStart = C_SebGraphicsView::mhc_GradientColorLight;
-         c_GradientColorEnd = C_SebGraphicsView::mhc_GradientColorLight;
+         c_GradientColorStart = C_SebGraphicsView::mhc_GRADIENT_COLOR_LIGHT;
+         c_GradientColorEnd = C_SebGraphicsView::mhc_GRADIENT_COLOR_LIGHT;
       }
       else
       {
-         c_GradientColorStart = C_SebGraphicsView::mhc_GradientColorDark;
-         c_GradientColorEnd = C_SebGraphicsView::mhc_GradientColorDark;
+         c_GradientColorStart = C_SebGraphicsView::mhc_GRADIENT_COLOR_DARK;
+         c_GradientColorEnd = C_SebGraphicsView::mhc_GRADIENT_COLOR_DARK;
       }
 
       // configure the colors
@@ -564,7 +564,16 @@ void C_SebGraphicsView::mouseReleaseEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::keyPressEvent(QKeyEvent * const opc_Event)
 {
+   C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
+   bool q_BlockPressHandling = false;
+
+   if (pc_Scene != NULL)
+   {
+      q_BlockPressHandling = pc_Scene->IsSelectionRelevantForProxyWidgetInteraction();
+   }
+
    if ((this->mq_ProxyWidgetInteractionActive == false) &&
+       (q_BlockPressHandling == false) &&
        (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == true))
    {
       switch (opc_Event->key())

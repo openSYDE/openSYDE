@@ -466,16 +466,6 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
       }
    }
 
-   // load system definition (has constant name)
-   if (s32_Return == C_NO_ERR)
-   {
-      const C_SCLString c_SysDefPath = c_TargetUnzipPath + mc_SUP_SYSDEF;
-      const C_SCLString c_DevIniPath = c_TargetUnzipPath + mc_INI_DEV;
-
-      s32_Return = C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(orc_SystemDefinition, c_SysDefPath,
-                                                                          c_DevIniPath);
-   }
-
    // load service update package definition
    if (s32_Return == C_NO_ERR)
    {
@@ -525,13 +515,6 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
                                                                  u32_UpdatePosition, c_UpdateOrderByNodes,
                                                                  c_TargetUnzipPath,
                                                                  c_XMLParser);
-            if (orc_SystemDefinition.c_Nodes[u32_NodeCounter].pc_DeviceDefinition != NULL)
-            {
-               const C_OSCNode & rc_CurNode = orc_SystemDefinition.c_Nodes[u32_NodeCounter];
-               tgl_assert(rc_CurNode.u32_SubDeviceIndex < rc_CurNode.pc_DeviceDefinition->c_SubDevices.size());
-               c_DoFlash.c_OtherAcceptedDeviceNames =
-                  rc_CurNode.pc_DeviceDefinition->c_SubDevices[rc_CurNode.u32_SubDeviceIndex].c_OtherAcceptedNames;
-            }
          }
          u32_NodeCounter++;                            // next active node
          orc_ApplicationsToWrite.push_back(c_DoFlash); // push back in any case even if we have no applications
@@ -542,6 +525,31 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
       while (c_SelectedNode == mc_NODE);
 
       mh_SetNodesUpdateOrder(c_UpdateOrderByNodes, orc_NodesUpdateOrder);
+
+      // load system definition (has constant name) for active nodes
+      const C_SCLString c_SysDefPath = c_TargetUnzipPath + mc_SUP_SYSDEF;
+      const C_SCLString c_DevIniPath = c_TargetUnzipPath + mc_INI_DEV;
+
+      s32_Return = C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(orc_SystemDefinition, c_SysDefPath,
+                                                                          c_DevIniPath, true, NULL, &orc_ActiveNodes,
+                                                                          true); // skip content
+   }
+
+   // get "other accepted names" for active nodes
+   if (s32_Return == C_NO_ERR)
+   {
+      for (uint8 u8_Node = 0U; u8_Node < orc_SystemDefinition.c_Nodes.size(); u8_Node++)
+      {
+         if ((orc_ActiveNodes[u8_Node] == 1U) &&
+             (orc_SystemDefinition.c_Nodes[u8_Node].pc_DeviceDefinition != NULL))
+         {
+            const C_OSCNode & rc_CurNode = orc_SystemDefinition.c_Nodes[u8_Node];
+            tgl_assert(rc_CurNode.u32_SubDeviceIndex < rc_CurNode.pc_DeviceDefinition->c_SubDevices.size());
+
+            orc_ApplicationsToWrite[u8_Node].c_OtherAcceptedDeviceNames =
+               rc_CurNode.pc_DeviceDefinition->c_SubDevices[rc_CurNode.u32_SubDeviceIndex].c_OtherAcceptedNames;
+         }
+      }
    }
 
    orc_WarningMessages = mhc_WarningMessages; // set warning messages for caller

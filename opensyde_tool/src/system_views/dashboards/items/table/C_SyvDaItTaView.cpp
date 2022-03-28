@@ -15,6 +15,8 @@
 #include <QScrollBar>
 #include <QHeaderView>
 #include <QMouseEvent>
+
+#include "C_Uti.h"
 #include "stwtypes.h"
 #include "TGLUtils.h"
 #include "C_OgeWiUtil.h"
@@ -45,8 +47,8 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Data   Data storage
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Data      Data storage
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTaView::C_SyvDaItTaView(C_PuiSvDbDataElementHandler * const opc_Data, QWidget * const opc_Parent) :
@@ -65,7 +67,7 @@ C_SyvDaItTaView::C_SyvDaItTaView(C_PuiSvDbDataElementHandler * const opc_Data, Q
    this->setGridStyle(Qt::NoPen);
    this->setShowGrid(false);
    this->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
-   this->SetSelectionAvailable(true);
+   this->SetSelectionAvailable(true, false);
    this->setAlternatingRowColors(true);
    this->setDragDropMode(QAbstractItemView::DragDropMode::NoDragDrop);
    this->setDefaultDropAction(Qt::DropAction::MoveAction);
@@ -130,21 +132,21 @@ void C_SyvDaItTaView::UpdateError(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of the color transparence value configured by the actual timeout state
+/*! \brief   Update of the color transparency value configured by the actual timeout state
 
-   \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                 Value for transparence (0..255)
+   \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
+   \param[in]  osn_Value               Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItTaView::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_SyvDaItTaView::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
-   this->mc_Model.UpdateTransparence(ou32_DataElementIndex, osn_Value);
+   this->mc_Model.UpdateTransparency(ou32_DataElementIndex, osn_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new data element
 
-   \param[in] orc_DataPoolElementId New data element ID
+   \param[in]  orc_DataPoolElementId   New data element ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::AddItem(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
@@ -159,7 +161,7 @@ void C_SyvDaItTaView::AddItem(const C_PuiSvDbNodeDataPoolListElementId & orc_Dat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Move selected items
 
-   \param[in] oq_Up Flag to switch to move one step up or down
+   \param[in]  oq_Up    Flag to switch to move one step up or down
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::MoveSelected(const bool oq_Up)
@@ -223,7 +225,7 @@ std::vector<uint32> C_SyvDaItTaView::GetUniqueAndValidSelectedRows(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Restore column widths
 
-   \param[in] orc_ColumnWidths Stored column widths (Restores default values if empty)
+   \param[in]  orc_ColumnWidths  Stored column widths (Restores default values if empty)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::SetCurrentColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
@@ -266,14 +268,19 @@ std::vector<sint32> C_SyvDaItTaView::GetCurrentColumnWidths(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set selection available if necessary
 
-   \param[in] oq_Active Selection active flag
+   \param[in]  oq_Active         Selection active flag
+   \param[in]  oq_SelectFirst    Select first element
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItTaView::SetSelectionAvailable(const bool oq_Active)
+void C_SyvDaItTaView::SetSelectionAvailable(const bool oq_Active, const bool oq_SelectFirst)
 {
    if (oq_Active == true)
    {
       this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+      if (oq_SelectFirst)
+      {
+         this->setCurrentIndex(this->indexAt(QPoint(0, 0)));
+      }
    }
    else
    {
@@ -285,8 +292,8 @@ void C_SyvDaItTaView::SetSelectionAvailable(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply style
 
-   \param[in] oe_Style    New style type
-   \param[in] oq_DarkMode Flag if dark mode is active
+   \param[in]  oe_Style       New style type
+   \param[in]  oq_DarkMode    Flag if dark mode is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
@@ -320,4 +327,84 @@ void C_SyvDaItTaView::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Styl
       tgl_assert(false);
       break;
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide tooltip
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaView::HideToolTip(void)
+{
+   this->m_HideToolTip();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
+
+   Here: Handle dashboard table specific key functionality
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaView::keyPressEvent(QKeyEvent * const opc_Event)
+{
+   // Events can get here only in content edit mode
+   bool q_CallOrig = true;
+
+   switch (opc_Event->key())
+   {
+   case Qt::Key_Delete:
+      q_CallOrig = false;
+      Q_EMIT (this->SigRemoveDataElement());
+      opc_Event->accept();
+      break;
+   case Qt::Key_BracketRight: // Qt::Key_BracketRight matches the "Not-Num-Plus"-Key
+   case Qt::Key_Plus:
+      if (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == true)
+      {
+         q_CallOrig = false;
+         Q_EMIT (this->SigAddDataElement());
+         opc_Event->accept();
+      }
+      break;
+   case Qt::Key_Up:
+      if (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == true)
+      {
+         q_CallOrig = false;
+         Q_EMIT (this->SigMoveDataElementUp());
+         opc_Event->accept();
+      }
+      break;
+   case Qt::Key_Down:
+      if (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == true)
+      {
+         q_CallOrig = false;
+         Q_EMIT (this->SigMoveDataElementDown());
+         opc_Event->accept();
+      }
+      break;
+   default:
+      //Nothing to do
+      break;
+   }
+
+   if (q_CallOrig == true)
+   {
+      C_TblViewScroll::keyPressEvent(opc_Event);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
+
+   Here: Handle dashboard table specific double click functionality
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
+{
+   C_TblViewScroll::mouseDoubleClickEvent(opc_Event);
+
+   Q_EMIT (this->SigTriggerEdit());
 }

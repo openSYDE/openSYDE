@@ -39,11 +39,25 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes all precondition errors
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvNodeData::C_GiSvNodeDataPreconditionErrors::Clear(void)
+{
+   this->c_NvmWriteError.clear();
+   this->c_PemWriteError.clear();
+   this->c_DebuggerEnableError.clear();
+   this->c_DebuggerDisableError.clear();
+   this->c_EthToEthError.clear();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvNodeData::C_GiSvNodeData() :
-   mq_UpdateConnected(false),
+   mq_ConnectInProgress(false),
+   mq_IsConnected(false),
    mq_UpdateInProgress(false)
 {
 }
@@ -86,6 +100,17 @@ void C_GiSvNodeData::Init(const uint32 ou32_ViewIndex, const uint32 ou32_NodeInd
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal if connect in progress
+
+   \param[in]  oq_Active   Flag if connect in progress
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvNodeData::SetConnecting(const bool oq_Active)
+{
+   this->mq_ConnectInProgress = oq_Active;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set connection change
 
    \param[in]  oq_Active   Flag if connected
@@ -93,7 +118,7 @@ void C_GiSvNodeData::Init(const uint32 ou32_ViewIndex, const uint32 ou32_NodeInd
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeData::SetConnected(const bool oq_Active)
 {
-   this->mq_UpdateConnected = oq_Active;
+   this->mq_IsConnected = oq_Active;
    for (uint32 u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size(); u32_ItSubNodes++)
    {
       this->mc_SubNodes[u32_ItSubNodes].SetConnected(oq_Active);
@@ -171,16 +196,72 @@ void C_GiSvNodeData::SetNodeUpdateInProgress(const bool oq_Active, const bool oq
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Apply no response state
+/*! \brief   Apply error state
 
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeData::SetNoResponse(const uint32 ou32_NodeIndex)
+void C_GiSvNodeData::SetErrorState(const uint32 ou32_NodeIndex)
 {
    const uint32 u32_SubNodeIndex = m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
 
-   this->mc_SubNodes[u32_SubNodeIndex].SetNoResponse();
+   this->mc_SubNodes[u32_SubNodeIndex].SetErrorState();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the connect state of all sub nodes
+
+   \param[in]       orc_NodeStates                 Node connect states
+   \param[in]       orc_NodePreconditionErrors     Node precondition error states
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvNodeData::SetNodeConnectStates(const std::vector<C_OSCSuSequencesNodeConnectStates> & orc_NodeStates,
+                                          const C_GiSvNodeDataPreconditionErrors & orc_NodePreconditionErrors)
+{
+   uint32 u32_Counter;
+
+   for (u32_Counter = 0U; u32_Counter < this->mc_SubNodes.size(); ++u32_Counter)
+   {
+      const uint32 u32_NodeIndex = this->mc_SubNodes[u32_Counter].GetNodeIndex();
+      if (u32_NodeIndex < orc_NodeStates.size())
+      {
+         C_GiSvSubNodeData::C_GiSvSubNodeDataPreconditionErrors c_PreconditionErrors;
+         c_PreconditionErrors.q_NvmWriteError = mh_IsPreconditionErrorSet(orc_NodePreconditionErrors.c_NvmWriteError,
+                                                                          u32_NodeIndex);
+         c_PreconditionErrors.q_PemWriteError = mh_IsPreconditionErrorSet(orc_NodePreconditionErrors.c_PemWriteError,
+                                                                          u32_NodeIndex);
+         c_PreconditionErrors.q_DebuggerEnableError = mh_IsPreconditionErrorSet(
+            orc_NodePreconditionErrors.c_DebuggerEnableError,
+            u32_NodeIndex);
+         c_PreconditionErrors.q_DebuggerDisableError = mh_IsPreconditionErrorSet(
+            orc_NodePreconditionErrors.c_DebuggerDisableError,
+            u32_NodeIndex);
+         c_PreconditionErrors.q_EthToEthError = mh_IsPreconditionErrorSet(orc_NodePreconditionErrors.c_EthToEthError,
+                                                                          u32_NodeIndex);
+
+         this->mc_SubNodes[u32_Counter].SetNodeConnectStates(orc_NodeStates[u32_NodeIndex], c_PreconditionErrors);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the connect state of all sub nodes
+
+   \param[in]       orc_NodeStates     Node connect states
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvNodeData::SetNodeUpdateStates(const std::vector<C_OSCSuSequencesNodeUpdateStates> & orc_NodeStates)
+{
+   uint32 u32_Counter;
+
+   for (u32_Counter = 0U; u32_Counter < this->mc_SubNodes.size(); ++u32_Counter)
+   {
+      const uint32 u32_NodeIndex = this->mc_SubNodes[u32_Counter].GetNodeIndex();
+      if (u32_NodeIndex < orc_NodeStates.size())
+      {
+         this->mc_SubNodes[u32_Counter].SetNodeUpdateStates(orc_NodeStates[u32_NodeIndex]);
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -289,20 +370,20 @@ void C_GiSvNodeData::CopyDiscardedStatus(C_GiSvNodeData & orc_NodeData) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if STW device and active
+/*! \brief   Check if device has a flashloader available to communicate with
 
    \return
    True  STW device
    False Third party
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvNodeData::IsStwDevice() const
+bool C_GiSvNodeData::HasNodeAnAvailableFlashloader(void) const
 {
    bool q_Retval = false;
 
    for (uint32 u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size(); u32_ItSubNodes++)
    {
-      if (this->mc_SubNodes[u32_ItSubNodes].IsStwDevice() == true)
+      if (this->mc_SubNodes[u32_ItSubNodes].HasNodeAnAvailableFlashloader() == true)
       {
          q_Retval = true;
       }
@@ -441,15 +522,27 @@ bool C_GiSvNodeData::CheckUpdateDisabledState(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get update in progress status
+
+   \return
+   Update in progress status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvNodeData::GetConnectInProgressStatus(void) const
+{
+   return this->mq_ConnectInProgress;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get update connected status
 
    \return
    Update connected status
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvNodeData::GetUpdateConnectedStatus() const
+bool C_GiSvNodeData::GetUpdateConnectedStatus(void) const
 {
-   return this->mq_UpdateConnected;
+   return this->mq_IsConnected;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -459,7 +552,7 @@ bool C_GiSvNodeData::GetUpdateConnectedStatus() const
    Update in progress status
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvNodeData::GetUpdateInProgressStatus() const
+bool C_GiSvNodeData::GetUpdateInProgressStatus(void) const
 {
    return this->mq_UpdateInProgress;
 }
@@ -578,8 +671,8 @@ C_SyvUtil::E_NodeUpdateInitialStatus C_GiSvNodeData::GetOverallInitialState(void
    {
       switch (this->mc_SubNodes[u32_ItSubNodes].GetInitialStatus())
       {
-      case C_SyvUtil::eI_NO_RESPONSE:
-         e_InitialState = C_SyvUtil::eI_NO_RESPONSE;
+      case C_SyvUtil::eI_ERROR:
+         e_InitialState = C_SyvUtil::eI_ERROR;
          q_StopChecking = true;
          break;
       case C_SyvUtil::eI_TO_BE_UPDATED:
@@ -656,7 +749,7 @@ bool C_GiSvNodeData::GetSTWDeviceInfoByNodeIndex(const uint32 ou32_NodeIndex) co
 
    if (u32_SubDeviceIndex < this->mc_SubNodes.size())
    {
-      q_Retval = this->mc_SubNodes[u32_SubDeviceIndex].IsStwDevice();
+      q_Retval = this->mc_SubNodes[u32_SubDeviceIndex].HasNodeAnAvailableFlashloader();
    }
    return q_Retval;
 }
@@ -680,6 +773,66 @@ const C_GiSvSubNodeData * C_GiSvNodeData::GetSubNodeByNodeIndex(const uint32 ou3
       pc_Retval = &this->mc_SubNodes[u32_SubDeviceIndex];
    }
    return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get sub node by sub node index
+
+   \param[in]  ou32_SubNodeIndex    Sub node index
+
+   \return
+   Corresponding sub node by sub node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_GiSvSubNodeData * C_GiSvNodeData::GetSubNodeBySubNodeIndex(const uint32 ou32_SubNodeIndex) const
+{
+   const C_GiSvSubNodeData * pc_Retval = NULL;
+
+   if (ou32_SubNodeIndex < this->mc_SubNodes.size())
+   {
+      pc_Retval = &this->mc_SubNodes[ou32_SubNodeIndex];
+   }
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the flag if connect state of all sub nodes was already set for the current process
+
+   \retval   true   node update states are set and usable
+   \retval   false  node update states are not set and usable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvNodeData::IsNodeConnectStatesSet(void) const
+{
+   bool q_Return = false;
+
+   // Assuming all sub nodes did get their states
+   if (this->mc_SubNodes.size() > 0)
+   {
+      q_Return = this->mc_SubNodes[0].IsNodeConnectStatesSet();
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the flag if update state of all sub nodes was already set for the current process
+
+   \retval   true   node update states are set and usable
+   \retval   false  node update states are not set and usable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvNodeData::IsNodeUpdateStatesSet(void) const
+{
+   bool q_Return = false;
+
+   // Assuming all sub nodes did get their states
+   if (this->mc_SubNodes.size() > 0)
+   {
+      q_Return = this->mc_SubNodes[0].IsNodeUpdateStatesSet();
+   }
+
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -710,4 +863,33 @@ uint32 C_GiSvNodeData::m_GetCorrespondingSubNodeIndex(const uint32 ou32_NodeInde
    }
 
    return u32_SubNodeIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the current node index has a specific error set
+
+   \param[in]       orc_ErrorIndexes      All detected error node indexes
+   \param[in]       ou32_CurrentNodeIndex Current node index for check
+
+   \retval   true    Current node has precondition error
+   \retval   false   Current node has no precondition error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvNodeData::mh_IsPreconditionErrorSet(const std::vector<uint32> & orc_ErrorIndexes,
+                                               const uint32 ou32_CurrentNodeIndex)
+{
+   bool q_Return = false;
+   uint32 u32_Counter;
+
+   for (u32_Counter = 0U; u32_Counter < orc_ErrorIndexes.size(); ++u32_Counter)
+   {
+      if (orc_ErrorIndexes[u32_Counter] == ou32_CurrentNodeIndex)
+      {
+         // Error for this node is set
+         q_Return = true;
+         break;
+      }
+   }
+
+   return q_Return;
 }

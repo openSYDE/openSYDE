@@ -50,6 +50,7 @@ public:
    virtual bool IsReadElement(void) const = 0;
    stw_types::sint32 GetIndex(const C_PuiSvDbNodeDataPoolListElementId & orc_Id, stw_types::uint32 & oru32_Index) const;
    virtual stw_types::sint32 RemoveElement(const stw_types::uint32 & oru32_Index);
+   void RemoveAllReferencesToElementId(const C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId);
 
    std::vector<C_PuiSvDbNodeDataElementConfig> c_DataPoolElementsConfig;
    E_WriteMode e_ElementWriteMode;

@@ -422,7 +422,7 @@ sintn C_OSCXMLParserBase::GetFileLineForCurrentNode(void) const
    Return one attribute value of selected node as string.
 
    \param[in]  orc_Name       name of attribute
-   \param[in]  orc_Default    Default
+   \param[in]  orc_Default    Default if attribute is not found
 
    \return
    Content of selected attribute ("" on error)
@@ -450,7 +450,7 @@ C_SCLString C_OSCXMLParserBase::GetAttributeString(const C_SCLString & orc_Name,
    Can handle "0x" notation to interpret hex values.
 
    \param[in]  orc_Name       name of attribute
-   \param[in]  os32_Default   Default
+   \param[in]  os32_Default   Default if attribute is not found or conversion of node content from string fails
 
    \return
    value (zero on error)
@@ -483,7 +483,7 @@ sint32 C_OSCXMLParserBase::GetAttributeSint32(const C_SCLString & orc_Name, cons
    Can handle "0x" notation to interpret hex values.
 
    \param[in]  orc_Name       name of attribute
-   \param[in]  ou32_Default   Default
+   \param[in]  ou32_Default   Default if attribute is not found or conversion of node content from string fails
 
    \return
    value (zero on error)
@@ -516,7 +516,7 @@ uint32 C_OSCXMLParserBase::GetAttributeUint32(const C_SCLString & orc_Name, cons
    Can handle "0x" notation to interpret hex values.
 
    \param[in]  orc_Name       name of attribute
-   \param[in]  os64_Default   Default
+   \param[in]  os64_Default   Default if attribute is not found or conversion of node content from string fails
 
    \return
    value (zero on error)
@@ -549,7 +549,7 @@ sint64 C_OSCXMLParserBase::GetAttributeSint64(const C_SCLString & orc_Name, cons
    Can handle "0x" notation to interpret hex values.
 
    \param[in]  orc_Name       name of attribute
-   \param[in]  ou64_Default   Default
+   \param[in]  ou64_Default   Default if attribute is not found or conversion of node content from string fails
 
    \return
    value (zero on error)
@@ -568,11 +568,19 @@ uint64 C_OSCXMLParserBase::GetAttributeUint64(const C_SCLString & orc_Name, cons
       {
          std::istringstream c_Stream(c_Text.SubString(3UL, c_Text.Length() - 2UL).c_str());
          c_Stream >> std::hex >> u64_Value;
+         if (c_Stream.fail() == true)
+         {
+            u64_Value = ou64_Default;
+         }
       }
       else
       {
          std::istringstream c_Stream(c_Text.c_str());
          c_Stream >> u64_Value;
+         if (c_Stream.fail() == true)
+         {
+            u64_Value = ou64_Default;
+         }
       }
    }
    return u64_Value;
@@ -585,7 +593,7 @@ uint64 C_OSCXMLParserBase::GetAttributeUint64(const C_SCLString & orc_Name, cons
    "0" resp. "1" and "false" resp. "true" are accepted as valid values.
 
    \param[in]  orc_Name    name of attribute
-   \param[in]  oq_Default  Default
+   \param[in]  oq_Default  Default if attribute is not found or conversion of node content from string fails
 
    \return
    true   attribute value is true
@@ -601,7 +609,7 @@ bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name, const bo
       const tinyxml2::XMLError e_Error = mpc_CurrentNode->QueryBoolAttribute(orc_Name.c_str(), &q_Value);
       if (e_Error != tinyxml2::XML_SUCCESS)
       {
-         q_Value = false;
+         q_Value = oq_Default;
       }
    }
    return q_Value;
@@ -613,7 +621,7 @@ bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name, const bo
    Return one attribute value of selected node as float32 value.
 
    \param[in]  orc_Name       name of attribute
-   \param[in]  of32_Default   Default
+   \param[in]  of32_Default   Default if attribute is not found or conversion of node content from string fails
 
    \return
    value (0.0F on error)
@@ -640,7 +648,7 @@ float32 C_OSCXMLParserBase::GetAttributeFloat32(const C_SCLString & orc_Name, co
    Return one attribute value of selected node as float64 value.
 
    \param[in]  orc_Name       name of attribute
-   \param[in]  of64_Default   Default
+   \param[in]  of64_Default   Default if attribute is not found or conversion of node content from string fails
 
    \return
    value (0.0 on error)

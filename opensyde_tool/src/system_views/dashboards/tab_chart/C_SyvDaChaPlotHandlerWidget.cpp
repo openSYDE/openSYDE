@@ -40,8 +40,8 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint8 C_SyvDaChaPlotHandlerWidget::mhu8_CountColors = 47U;
-const QColor C_SyvDaChaPlotHandlerWidget::mhac_DataColors[mhu8_CountColors] =
+const uint8 C_SyvDaChaPlotHandlerWidget::mhu8_COUNT_COLORS = 47U;
+const QColor C_SyvDaChaPlotHandlerWidget::mhac_DATA_COLORS[mhu8_COUNT_COLORS] =
 {
    QColor(192, 0, 0),
    QColor(0, 112, 192),
@@ -92,9 +92,9 @@ const QColor C_SyvDaChaPlotHandlerWidget::mhac_DataColors[mhu8_CountColors] =
    QColor(0, 169, 157)
 };
 
-const stw_types::sintn C_SyvDaChaPlotHandlerWidget::mhsn_WidthLineSelected = 2;
-const stw_types::sintn C_SyvDaChaPlotHandlerWidget::mhsn_WidthLineDefault = 1;
-const stw_types::sintn C_SyvDaChaPlotHandlerWidget::mhsn_IntervalMs = 10;
+const stw_types::sintn C_SyvDaChaPlotHandlerWidget::mhsn_WIDTH_LINE_SELECTED = 2;
+const stw_types::sintn C_SyvDaChaPlotHandlerWidget::mhsn_WIDTH_LINE_DEFAULT = 1;
+const stw_types::sintn C_SyvDaChaPlotHandlerWidget::mhsn_INTERVAL_MS = 10;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -206,7 +206,7 @@ C_SyvDaChaPlotHandlerWidget::C_SyvDaChaPlotHandlerWidget(QWidget * const opc_Par
    this->mpc_Ui->pc_PushButtonOptions->setMenu(this->mpc_MenuOptions);
 
    //Configure timer
-   this->mc_CyclicChartUpdateTrigger.setInterval(C_SyvDaChaPlotHandlerWidget::mhsn_IntervalMs);
+   this->mc_CyclicChartUpdateTrigger.setInterval(C_SyvDaChaPlotHandlerWidget::mhsn_INTERVAL_MS);
 
    this->InitStaticNames();
 
@@ -458,6 +458,22 @@ void C_SyvDaChaPlotHandlerWidget::SetData(const C_PuiSvDbTabChart & orc_Data, co
                   c_ToolTipErrorTextHeading = C_GtGetText::h_GetText("Configuration warning");
                   c_ToolTipErrorText = C_GtGetText::h_GetText("There is a data element of an inactive node");
                }
+               else
+               {
+                  // Check for further warning reason
+                  tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckViewNodeDashboardRoutingError(
+                                ou32_ViewIndex,
+                                rc_Config.c_ElementId.u32_NodeIndex,
+                                q_Warning) == C_NO_ERR);
+
+                  if (q_Warning == true)
+                  {
+                     c_ToolTipErrorTextHeading = C_GtGetText::h_GetText("Configuration warning");
+                     c_ToolTipErrorText = C_GtGetText::h_GetText(
+                        "There is a data element of a node with "
+                        "disabled communication interface flags for Dashboard");
+                  }
+               }
             }
          }
       }
@@ -465,7 +481,7 @@ void C_SyvDaChaPlotHandlerWidget::SetData(const C_PuiSvDbTabChart & orc_Data, co
       // Mark the color as used
       // Adapt the color index in case of a to high index due to possible compatibility mechanisms
       this->mc_Data.c_DataPoolElementsColorIndex[u32_It] = this->mc_Data.c_DataPoolElementsColorIndex[u32_It] %
-                                                           mhu8_CountColors;
+                                                           mhu8_COUNT_COLORS;
       this->m_SetConcreteColorAsUsed(this->mc_Data.c_DataPoolElementsColorIndex[u32_It]);
 
       // Add the concrete graph to the chart
@@ -1015,10 +1031,10 @@ void C_SyvDaChaPlotHandlerWidget::AddGraphContent(const C_PuiSvDbNodeDataPoolLis
                   if (pc_Graph->visible() == true)
                   {
                      // Add a little free space to the values
-                     const float64 f64_FacHigh = 1.1;
-                     const float64 f64_FacLow = 0.9;
-                     const float64 f64_ValueFactorHigh = f64_Value * f64_FacHigh;
-                     const float64 f64_ValueFactorLow = f64_Value * f64_FacLow;
+                     const float64 f64_FAC_HIGH = 1.1;
+                     const float64 f64_FAC_LOW = 0.9;
+                     const float64 f64_ValueFactorHigh = f64_Value * f64_FAC_HIGH;
+                     const float64 f64_ValueFactorLow = f64_Value * f64_FAC_LOW;
 
                      // Adapt range for value
                      if (f64_Value >= 0.0)
@@ -1202,7 +1218,7 @@ void C_SyvDaChaPlotHandlerWidget::RefreshColors(void)
       QColor c_Color;
 
       this->mc_Data.c_DataPoolElementsColorIndex[un_Counter] = this->m_GetNextNotUsedColor();
-      c_Color = mhac_DataColors[this->mc_Data.c_DataPoolElementsColorIndex[un_Counter]];
+      c_Color = mhac_DATA_COLORS[this->mc_Data.c_DataPoolElementsColorIndex[un_Counter]];
 
       this->mpc_Ui->pc_ChartSelectorWidget->UpdateDataSerieColor(static_cast<uint32>(un_Counter), c_Color);
       if (un_Counter < static_cast<uintn>(this->mpc_Ui->pc_Plot->graphCount()))
@@ -1296,7 +1312,7 @@ void C_SyvDaChaPlotHandlerWidget::m_AddGraph(const stw_types::uint32 ou32_DataPo
                                              const QString & orc_ToolTipErrorText)
 {
    // Color selection
-   const QColor c_Color = mhac_DataColors[this->mc_Data.c_DataPoolElementsColorIndex[ou32_DataPoolElementConfigIndex]];
+   const QColor c_Color = mhac_DATA_COLORS[this->mc_Data.c_DataPoolElementsColorIndex[ou32_DataPoolElementConfigIndex]];
    const sintn sn_GraphNumber = this->mpc_Ui->pc_Plot->graphCount();
    QCPAxisRect * const pc_AxisRect = this->mpc_Ui->pc_Plot->axisRect();
    QCPAxis * pc_YAxis = NULL;
@@ -1365,7 +1381,7 @@ void C_SyvDaChaPlotHandlerWidget::m_AddGraph(const stw_types::uint32 ou32_DataPo
    // Configuration of line style
    c_Pen = pc_Graph->pen();
    c_Pen.setColor(c_Color);
-   c_Pen.setWidth(mhsn_WidthLineDefault);
+   c_Pen.setWidth(mhsn_WIDTH_LINE_DEFAULT);
    pc_Graph->setPen(c_Pen);
    pc_Graph->setScatterStyle(QCPScatterStyle::ssDisc);
 
@@ -1497,10 +1513,11 @@ void C_SyvDaChaPlotHandlerWidget::m_UpdateElementCounter(void)
 void C_SyvDaChaPlotHandlerWidget::m_ResizeSelectorWidget(void)
 {
    // those values are also set in corresponding .ui file
-   const sintn sn_ElementHeight = 25L;
-   const sintn sn_MarginAboveElements = 7L;
+   const sintn sn_ELEMENT_HEIGHT = 25;
+   const sintn sn_MARGIN_ABOVE_ELEMENTS = 7;
    const sintn sn_ElementVertSpace =
-      sn_MarginAboveElements + (static_cast<sintn>(this->mc_Data.c_DataPoolElementsConfig.size()) * sn_ElementHeight);
+      sn_MARGIN_ABOVE_ELEMENTS +
+      (static_cast<sintn>(this->mc_Data.c_DataPoolElementsConfig.size()) * sn_ELEMENT_HEIGHT);
    const sintn sn_AvailableSpace =
       this->mpc_Ui->pc_FrameLeft->height() -
       (this->mpc_Ui->pc_WidgetTitle->height() + this->mpc_Ui->pc_MeasurementInfoWidget->height() +
@@ -1515,7 +1532,7 @@ void C_SyvDaChaPlotHandlerWidget::m_ResizeSelectorWidget(void)
    else
    {
       // show at least 4 data elements but make enough space for button
-      const sintn sn_Height = std::max((4 * sn_ElementHeight), sn_AvailableSpace);
+      const sintn sn_Height = std::max((4 * sn_ELEMENT_HEIGHT), sn_AvailableSpace);
 
       // too much data elements, lets use the scroll area
       this->mpc_Ui->pc_ChartSelectorWidget->setMinimumHeight(sn_Height);
@@ -1767,7 +1784,7 @@ uint8 C_SyvDaChaPlotHandlerWidget::m_GetNextNotUsedColor(void)
    // Use the oldest section, if a free color is available
    for (u32_SectionNumber = 0U; u32_SectionNumber < this->mc_DataColorsUsed.size(); ++u32_SectionNumber)
    {
-      for (u32_ItFree = 0UL; u32_ItFree < mhu8_CountColors; ++u32_ItFree)
+      for (u32_ItFree = 0UL; u32_ItFree < mhu8_COUNT_COLORS; ++u32_ItFree)
       {
          if (this->mc_DataColorsUsed[u32_SectionNumber][u32_ItFree] == false)
          {
@@ -1794,7 +1811,7 @@ uint8 C_SyvDaChaPlotHandlerWidget::m_GetNextNotUsedColor(void)
    // search a not used color with a random number in a section with at least one free entry
    do
    {
-      u8_ColorCounter = static_cast<uint8>(rand()) % mhu8_CountColors;
+      u8_ColorCounter = static_cast<uint8>(rand()) % mhu8_COUNT_COLORS;
 
       if (this->mc_DataColorsUsed[u32_SectionNumber][u8_ColorCounter] == false)
       {
@@ -1821,7 +1838,7 @@ uint8 C_SyvDaChaPlotHandlerWidget::m_GetNextNotUsedColor(void)
 void C_SyvDaChaPlotHandlerWidget::m_SetConcreteColorAsUsed(const uint8 ou8_Index)
 {
    // search the color to set the flag
-   if (ou8_Index < mhu8_CountColors)
+   if (ou8_Index < mhu8_COUNT_COLORS)
    {
       uint32 u32_SectionCounter;
       bool q_FreeSectionFound = false;
@@ -1867,7 +1884,7 @@ void C_SyvDaChaPlotHandlerWidget::m_SetColorUnused(const uint8 ou8_Index)
 {
    uint32 u32_ColorCounter;
 
-   std::vector<std::array<bool, mhu8_CountColors> >::reverse_iterator c_ItSection;
+   std::vector<std::array<bool, mhu8_COUNT_COLORS> >::reverse_iterator c_ItSection;
 
    // Search the color to reset the flag
    // Search the sections from behind to reduce the number of sections if possible
@@ -1877,9 +1894,9 @@ void C_SyvDaChaPlotHandlerWidget::m_SetColorUnused(const uint8 ou8_Index)
       bool q_ColorFound = false;
       bool q_OtherColorUsed = false;
 
-      if (ou8_Index < mhu8_CountColors)
+      if (ou8_Index < mhu8_COUNT_COLORS)
       {
-         for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_CountColors; ++u32_ColorCounter)
+         for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_COUNT_COLORS; ++u32_ColorCounter)
          {
             if ((u32_ColorCounter == ou8_Index) &&
                 ((*c_ItSection)[u32_ColorCounter] == true))
@@ -1924,7 +1941,7 @@ void C_SyvDaChaPlotHandlerWidget::m_SetColorUnused(const uint8 ou8_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaPlotHandlerWidget::m_PrepareNextColorSection(void)
 {
-   std::array<bool, mhu8_CountColors> c_SingalsColorsUsed;
+   std::array<bool, mhu8_COUNT_COLORS> c_SingalsColorsUsed;
    c_SingalsColorsUsed.fill(false);
    this->mc_DataColorsUsed.push_back(c_SingalsColorsUsed);
 }
@@ -1997,12 +2014,12 @@ void C_SyvDaChaPlotHandlerWidget::mh_AdaptYAxisStyle(QCPAxis * const opc_Axis, c
    if (oq_Selected == true)
    {
       q_Bold = true;
-      sn_Width = mhsn_WidthLineSelected;
+      sn_Width = mhsn_WIDTH_LINE_SELECTED;
    }
    else
    {
       q_Bold = false;
-      sn_Width = mhsn_WidthLineDefault;
+      sn_Width = mhsn_WIDTH_LINE_DEFAULT;
    }
 
    // Change line thickness
@@ -2116,9 +2133,9 @@ void C_SyvDaChaPlotHandlerWidget::mh_AdaptAxisGridColor(const QCPAxis * const op
 void C_SyvDaChaPlotHandlerWidget::m_AdaptYAxisWithSpace(QCPAxis * const opc_Axis)
 {
    // Offset of free space above and below the measurement points summed
-   const float64 f64_PixelOffset = 10.0;
+   const float64 f64_PIXEL_OFFSET = 10.0;
    const float64 f64_Height = static_cast<float64>(this->mpc_Ui->pc_Plot->axisRect()->height());
-   const float64 f64_ScaleFactor = (f64_Height + f64_PixelOffset) / f64_Height;
+   const float64 f64_ScaleFactor = (f64_Height + f64_PIXEL_OFFSET) / f64_Height;
 
    if (opc_Axis != NULL)
    {

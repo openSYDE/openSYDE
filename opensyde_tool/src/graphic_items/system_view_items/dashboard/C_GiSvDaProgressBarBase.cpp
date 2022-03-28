@@ -402,19 +402,19 @@ void C_GiSvDaProgressBarBase::SetValuePe(const sintn osn_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of the color transparence value configured by the actual timeout state
+/*! \brief   Update of the color transparency value configured by the actual timeout state
 
    \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                 Value for transparence (0..255)
+   \param[in]     osn_Value                 Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaProgressBarBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_GiSvDaProgressBarBase::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    if ((ou32_DataElementIndex == 0) &&
        (this->mpc_ProgressBarWidget != NULL))
    {
       // Only one item is supported by this item
-      this->mpc_ProgressBarWidget->SetTransparence(osn_Value);
+      this->mpc_ProgressBarWidget->SetTransparency(osn_Value);
    }
 }
 

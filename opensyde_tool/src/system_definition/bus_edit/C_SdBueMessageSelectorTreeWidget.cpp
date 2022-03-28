@@ -747,7 +747,7 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
 void C_SdBueMessageSelectorTreeWidget::CopySignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                   const uint32 ou32_SignalIndex) const
 {
-   const uint32 u32_ItVec = 0;
+   const uint32 u32_IT_VEC = 0U;
 
    std::vector<C_OSCCanSignal> c_Signals;
    std::vector<C_OSCNodeDataPoolListElement> c_OSCSignalCommons;
@@ -762,10 +762,10 @@ void C_SdBueMessageSelectorTreeWidget::CopySignal(const C_OSCCanMessageIdentific
 
    tgl_assert(C_PuiSdHandler::h_GetInstance()->GetCanSignalComplete(orc_MessageId,
                                                                     ou32_SignalIndex,
-                                                                    c_Signals[u32_ItVec],
-                                                                    c_OSCSignalCommons[u32_ItVec],
-                                                                    c_UISignalCommons[u32_ItVec],
-                                                                    c_UISignals[u32_ItVec]) ==
+                                                                    c_Signals[u32_IT_VEC],
+                                                                    c_OSCSignalCommons[u32_IT_VEC],
+                                                                    c_UISignalCommons[u32_IT_VEC],
+                                                                    c_UISignals[u32_IT_VEC]) ==
               C_NO_ERR);
 
    C_SdClipBoardHelper::h_StoreSignalsToClipboard(c_Signals, c_OSCSignalCommons, c_UISignalCommons, c_UISignals);
@@ -1368,7 +1368,9 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentif
             bool q_HasTx = true;
             bool q_DelayInvalid;
             bool q_SignalsValid = true;
-            this->mpc_MessageSyncManager->CheckMessageIdBus(pc_Message->u32_CanId, q_IdValid, &orc_MessageId);
+            this->mpc_MessageSyncManager->CheckMessageIdBus(C_OSCCanMessageUniqueId(pc_Message->u32_CanId,
+                                                                                    pc_Message->q_IsExtended), q_IdValid,
+                                                            &orc_MessageId);
             this->mpc_MessageSyncManager->CheckMessageNameBus(pc_Message->c_Name, q_NameValid, &orc_MessageId);
             this->mpc_MessageSyncManager->CheckMessageHasTx(q_HasTx, orc_MessageId);
             pc_MessageContainer->CheckMessageLocalError(NULL, orc_MessageId.u32_MessageIndex,

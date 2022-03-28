@@ -627,7 +627,7 @@ sint32 C_OSCIpDispatcherWinSock::IsTcpConnected(const uint32 ou32_Handle)
 
    if (ou32_Handle >= this->mc_SocketsTcp.size())
    {
-      osc_write_log_error("openSYDE IP-TP", "ReConnectTcp called with invalid handle.");
+      osc_write_log_error("openSYDE IP-TP", "IsTcpConnected called with invalid handle.");
       s32_Return = C_RANGE;
    }
    else if (this->mc_SocketsTcp[ou32_Handle].un_Socket == m_WsInvalidSocket())

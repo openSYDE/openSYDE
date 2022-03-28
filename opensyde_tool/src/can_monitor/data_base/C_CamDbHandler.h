@@ -41,7 +41,8 @@ public:
    bool GetContainsDbc(const QString & orc_File) const;
    bool GetContainsOsy(const QString & orc_File) const;
    void FindAllMessages(void);
-   stw_types::sint32 FindMessageById(const stw_types::uint32 ou32_Id, QString & orc_File, QString & orc_Message) const;
+   stw_types::sint32 FindMessageById(const stw_types::uint32 ou32_Id, const bool oq_IsExtended, QString & orc_File,
+                                     QString & orc_Message) const;
    stw_types::sint32 FindOsyMessage(const QString & orc_File, const QString & orc_Message);
    stw_types::sint32 FindDbcMessage(const QString & orc_File, const QString & orc_Message);
 

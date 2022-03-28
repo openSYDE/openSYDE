@@ -211,6 +211,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanMessage.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanMessageUniqueId.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanMessageContainer.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanMessageIdentificationIndices.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanProtocol.cpp
@@ -306,6 +307,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OSCNodeProperties.h
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OSCNodeStwFlashloaderSettings.h
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanMessage.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanMessageUniqueId.h
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanMessageContainer.h
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanMessageIdentificationIndices.h
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanProtocol.h
@@ -414,6 +416,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing/C_OSCRoutingCalculation.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing/C_OSCRoutingRoute.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OSCSuSequences.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OSCSuSequencesNodeStates.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OSCSuServiceUpdatePackage.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OsyHexFile.cpp
 
@@ -456,6 +459,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing/C_OSCRoutingCalculation.h
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing/C_OSCRoutingRoute.h
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OSCSuSequences.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OSCSuSequencesNodeStates.h
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OSCSuServiceUpdatePackage.h
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/system_update/C_OsyHexFile.h
    )

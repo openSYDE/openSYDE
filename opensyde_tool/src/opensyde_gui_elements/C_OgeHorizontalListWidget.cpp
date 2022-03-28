@@ -20,9 +20,9 @@ using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_OgeHorizontalListWidget::mhsn_ScrollArea = 70;
-const stw_types::sintn C_OgeHorizontalListWidget::mhsn_DragScrollTimerIntervalStart = 1000;
-const stw_types::sintn C_OgeHorizontalListWidget::mhsn_DragScrollTimerInterval = 500;
+const stw_types::sintn C_OgeHorizontalListWidget::mhsn_SCROLL_AREA = 70;
+const stw_types::sintn C_OgeHorizontalListWidget::mhsn_DRAG_SCROLL_TIMER_INTERVAL_START = 1000;
+const stw_types::sintn C_OgeHorizontalListWidget::mhsn_DRAG_SCROLL_TIMER_INTERVAL = 500;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -64,7 +64,7 @@ C_OgeHorizontalListWidget::C_OgeHorizontalListWidget(QWidget * const opc_Parent)
    this->setDefaultDropAction(Qt::MoveAction);
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mc_TimerDragMove.setInterval(mhsn_DragScrollTimerIntervalStart);
+   this->mc_TimerDragMove.setInterval(mhsn_DRAG_SCROLL_TIMER_INTERVAL_START);
    this->mc_TimerDragMove.setSingleShot(false);
    //connect timer
    connect(&this->mc_TimerDragMove, &QTimer::timeout,
@@ -145,6 +145,30 @@ void C_OgeHorizontalListWidget::ScrollToItem(const sintn osn_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check valid move action
+
+   \param[in]  osn_StartIndex    Start index
+   \param[in]  os32_EndIndex     End index
+   \param[in]  orc_Widget        Widget
+
+   \return
+   Flags
+
+   \retval   True    Valid move action
+   \retval   False   Invalid move action
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OgeHorizontalListWidget::h_CheckValidMoveAction(const sintn osn_StartIndex, const sint32 os32_EndIndex,
+                                                       const QListWidget & orc_Widget)
+{
+   const bool q_IndexChanged = (osn_StartIndex != os32_EndIndex);
+   const bool q_MovingLastItemAfterEnd =
+      ((osn_StartIndex >= (orc_Widget.count() - 1)) && (static_cast<sintn>(os32_EndIndex) >= (orc_Widget.count() - 1)));
+
+   return q_IndexChanged && (q_MovingLastItemAfterEnd == false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten drop event
 
    Here: Synchronizing datapool data with widgets
@@ -197,14 +221,16 @@ void C_OgeHorizontalListWidget::dropEvent(QDropEvent * const opc_Event)
             // special case: drop behind the last item in the free space
             s32_TargetRow = this->count();
          }
+         if (C_OgeHorizontalListWidget::h_CheckValidMoveAction(this->msn_DragItemIndex, s32_TargetRow, *this))
+         {
+            // move only if changed
+            QListWidget::dropEvent(opc_Event);
 
-         // move only if changed
-         QListWidget::dropEvent(opc_Event);
+            // the number must be updated
+            this->m_UpdateNumbers();
 
-         // the number must be updated
-         this->m_UpdateNumbers();
-
-         this->m_MoveItem(this->msn_DragItemIndex, s32_TargetRow);
+            this->m_MoveItem(this->msn_DragItemIndex, s32_TargetRow);
+         }
       }
 
       // reset the counter;
@@ -250,29 +276,29 @@ void C_OgeHorizontalListWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
    QRect c_Rect;
 
    // adapt rectangle
-   c_Rect.setTopLeft(QPoint(0, mhsn_ScrollArea));
-   c_Rect.setBottomRight(QPoint(this->width() - mhsn_ScrollArea, this->height()));
+   c_Rect.setTopLeft(QPoint(0, mhsn_SCROLL_AREA));
+   c_Rect.setBottomRight(QPoint(this->width() - mhsn_SCROLL_AREA, this->height()));
 
-   if ((opc_Event->pos().x() < mhsn_ScrollArea) &&
+   if ((opc_Event->pos().x() < mhsn_SCROLL_AREA) &&
        (this->GetActualLine() > 0))
    {
       // start the timer if it is not already started
       if (this->mc_TimerDragMove.isActive() == false)
       {
          // reset interval
-         this->mc_TimerDragMove.setInterval(mhsn_DragScrollTimerIntervalStart);
+         this->mc_TimerDragMove.setInterval(mhsn_DRAG_SCROLL_TIMER_INTERVAL_START);
          this->mc_TimerDragMove.start();
          this->mq_DragTimeoutActiveLeft = true;
       }
    }
-   else if ((opc_Event->pos().x() > (this->width() - mhsn_ScrollArea)) &&
+   else if ((opc_Event->pos().x() > (this->width() - mhsn_SCROLL_AREA)) &&
             (this->GetActualLine() < (this->GetCountLines() - 1)))
    {
       // start the timer if it is not already started
       if (this->mc_TimerDragMove.isActive() == false)
       {
          // reset interval
-         this->mc_TimerDragMove.setInterval(mhsn_DragScrollTimerIntervalStart);
+         this->mc_TimerDragMove.setInterval(mhsn_DRAG_SCROLL_TIMER_INTERVAL_START);
          this->mc_TimerDragMove.start();
          this->mq_DragTimeoutActiveRight = true;
       }
@@ -333,7 +359,7 @@ void C_OgeHorizontalListWidget::wheelEvent(QWheelEvent * const opc_Event)
 void C_OgeHorizontalListWidget::m_DragTimeout(void)
 {
    // next call must be earlier
-   this->mc_TimerDragMove.setInterval(mhsn_DragScrollTimerInterval);
+   this->mc_TimerDragMove.setInterval(mhsn_DRAG_SCROLL_TIMER_INTERVAL);
 
    if (this->mq_DragTimeoutActiveLeft == true)
    {

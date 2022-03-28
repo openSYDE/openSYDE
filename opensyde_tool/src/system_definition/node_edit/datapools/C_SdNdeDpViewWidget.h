@@ -90,10 +90,10 @@ private:
    stw_types::sintn msn_ActiveDataPoolWidget;
    bool mq_HalcNvmBased;
 
-   static const bool mhaq_StorageIndicatorActive[static_cast<stw_types::sintn>(stw_opensyde_core::C_OSCNodeDataPool::
-                                                                               eHALC_NVM) + 1];
-   static const bool mhaq_AddButtonVisible[static_cast<stw_types::sintn>(stw_opensyde_core::C_OSCNodeDataPool::
-                                                                         eHALC_NVM) + 1];
+   static const bool mhaq_STORAGE_INDICATOR_ACTIVE[static_cast<stw_types::sintn>(stw_opensyde_core::C_OSCNodeDataPool::
+                                                                                 eHALC_NVM) + 1];
+   static const bool mhaq_ADD_BUTTON_INVISIBLE[static_cast<stw_types::sintn>(stw_opensyde_core::C_OSCNodeDataPool::
+                                                                             eHALC_NVM) + 1];
 };
 }
 

@@ -217,7 +217,7 @@ void C_GiSyTextElementWidget::m_UpdatePreview(void)
                       (static_cast<float64>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0);
       //Check item size valid
       if ((static_cast<float64>(pc_Item->boundingRect().width()) +
-           (2.0 * C_GiCustomFunctions::hf64_SceneMinBorderSize)) > static_cast<float64>(c_ViewSize.width()))
+           (2.0 * C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE)) > static_cast<float64>(c_ViewSize.width()))
       {
          q_SizeInvalid = true;
       }

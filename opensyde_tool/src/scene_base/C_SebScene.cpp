@@ -45,7 +45,7 @@ const QString C_SebScene::mhc_BOUNDARY = "Boundary";
 const QString C_SebScene::mhc_TEXT_ELEMENT = "Text element";
 const QString C_SebScene::mhc_LINE = "Line/Arrow";
 const QString C_SebScene::mhc_IMAGE = "Image";
-const float64 C_SebScene::mhf64_MovingRange = 10.0;
+const float64 C_SebScene::mhf64_MOVING_RANGE = 10.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -261,6 +261,22 @@ bool C_SebScene::IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc
 {
    Q_UNUSED(orc_ScenePos)
 
+   return false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Checks if the current selection is relevant for the proxy widget
+
+   In base is no item relevant. Function returns always false.
+   Derived classes must overwrite the function if needed.
+
+   \return
+   true     Cursor is on a relevant position
+   false    Cursor is not on a relevant position
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SebScene::IsSelectionRelevantForProxyWidgetInteraction(void) const
+{
    return false;
 }
 
@@ -589,7 +605,7 @@ void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
             //Only block key event if useful
             if (this->selectedItems().size() > 0)
             {
-               this->m_MoveSelectedItems(QPointF(-mhf64_MovingRange, 0.0));
+               this->m_MoveSelectedItems(QPointF(-mhf64_MOVING_RANGE, 0.0));
                if (this->m_GetUndoManager() != NULL)
                {
                   this->m_GetUndoManager()->RegisterMove();
@@ -601,7 +617,7 @@ void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
             //Only block key event if useful
             if (this->selectedItems().size() > 0)
             {
-               this->m_MoveSelectedItems(QPointF(mhf64_MovingRange, 0.0));
+               this->m_MoveSelectedItems(QPointF(mhf64_MOVING_RANGE, 0.0));
                if (this->m_GetUndoManager() != NULL)
                {
                   this->m_GetUndoManager()->RegisterMove();
@@ -613,7 +629,7 @@ void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
             //Only block key event if useful
             if (this->selectedItems().size() > 0)
             {
-               this->m_MoveSelectedItems(QPointF(0.0, -mhf64_MovingRange));
+               this->m_MoveSelectedItems(QPointF(0.0, -mhf64_MOVING_RANGE));
                if (this->m_GetUndoManager() != NULL)
                {
                   this->m_GetUndoManager()->RegisterMove();
@@ -625,7 +641,7 @@ void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
             //Only block key event if useful
             if (this->selectedItems().size() > 0)
             {
-               this->m_MoveSelectedItems(QPointF(0.0, mhf64_MovingRange));
+               this->m_MoveSelectedItems(QPointF(0.0, mhf64_MOVING_RANGE));
                if (this->m_GetUndoManager() != NULL)
                {
                   this->m_GetUndoManager()->RegisterMove();
@@ -655,7 +671,8 @@ void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::focusOutEvent(QFocusEvent * const opc_Event)
 {
-   if (opc_Event->reason() != Qt::PopupFocusReason)
+   if ((opc_Event->reason() != Qt::PopupFocusReason) &&
+       (opc_Event->reason() != Qt::ActiveWindowFocusReason))
    {
       this->clearSelection();
    }
@@ -1745,16 +1762,16 @@ void C_SebScene::m_MoveSelectedItems(const QPointF & orc_Delta)
       {
          float64 f64_NewValue = (*c_ItItem)->mapToScene((*c_ItItem)->boundingRect().topLeft()).x() + c_AdaptedDelta.x();
 
-         if (f64_NewValue < C_GiCustomFunctions::hf64_SceneMinBorderSize)
+         if (f64_NewValue < C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE)
          {
-            c_AdaptedDelta.setX(c_AdaptedDelta.x() + (C_GiCustomFunctions::hf64_SceneMinBorderSize - f64_NewValue));
+            c_AdaptedDelta.setX(c_AdaptedDelta.x() + (C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE - f64_NewValue));
          }
 
          f64_NewValue = (*c_ItItem)->mapToScene((*c_ItItem)->boundingRect().topLeft()).y() + c_AdaptedDelta.y();
 
-         if (f64_NewValue < C_GiCustomFunctions::hf64_SceneMinBorderSize)
+         if (f64_NewValue < C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE)
          {
-            c_AdaptedDelta.setY(c_AdaptedDelta.y() + (C_GiCustomFunctions::hf64_SceneMinBorderSize - f64_NewValue));
+            c_AdaptedDelta.setY(c_AdaptedDelta.y() + (C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE - f64_NewValue));
          }
          c_MovingItems.push_back(*c_ItItem);
       }

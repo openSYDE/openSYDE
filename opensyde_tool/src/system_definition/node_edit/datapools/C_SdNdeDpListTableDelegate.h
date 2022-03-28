@@ -55,6 +55,7 @@ Q_SIGNALS:
    void SigCreateEditor(const QModelIndex & orc_Index) const;
    void SigChangeAutoMinMax(const bool & orq_Checked) const;
    void SigSetModelData(void) const;
+   void SigTedConfirmed(void) const;
 
 private:
    C_SdNdeDpListTableModel * mpc_Model;

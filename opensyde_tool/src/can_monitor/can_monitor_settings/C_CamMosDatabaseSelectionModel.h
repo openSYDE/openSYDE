@@ -44,8 +44,8 @@ public:
    std::vector<stw_types::uint32> GetGenericRepresentationForIndex(const QModelIndex & orc_ItemIndex) const;
 
 private:
-   static const QString mhc_IconDatabase;
-   static const QString mhc_IconMessage;
+   static const QString mhc_ICON_DATABASE;
+   static const QString mhc_ICON_MESSAGE;
    QMap<QString, QString> mc_DatabaseMap;
    QMap<QString, QString> mc_MessageMap;
 

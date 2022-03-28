@@ -30,11 +30,11 @@ namespace stw_opensyde_gui_logic
 class C_CieImportDbc
 {
 private:
-   static const stw_scl::C_SCLString mhc_SendType;
-   static const stw_scl::C_SCLString mhc_CycleTime;
+   static const stw_scl::C_SCLString mhc_SEND_TYPE;
+   static const stw_scl::C_SCLString mhc_CYCLE_TIME;
    static Vector::DBC::AttributeDefinition mhc_AttributeSendType;
    static stw_scl::C_SCLString mhc_DefaultSendTypeValue;
-   static const stw_scl::C_SCLString mhc_InitialValue;
+   static const stw_scl::C_SCLString mhc_INITIAL_VALUE;
    static stw_types::float32 mhf32_DefaultInitialValue;
    static bool mhq_DefaultValueDefined;
    static stw_scl::C_SCLStringList mhc_WarningMessages; // global warnings e.g. why some messages could not be imported

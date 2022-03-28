@@ -31,7 +31,7 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_types;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_NagUseCaseViewWidget::mhc_SVGIconPath = "://images/IconNavigationArrow.svg";
+const QString C_NagUseCaseViewWidget::mhc_SVG_ICON_PATH = "://images/IconNavigationArrow.svg";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -66,9 +66,9 @@ C_NagUseCaseViewWidget::C_NagUseCaseViewWidget(QWidget * const opc_Parent) :
 
    //Set icons
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_LabelSpace->SetSvg(C_NagUseCaseViewWidget::mhc_SVGIconPath);
+   this->mpc_Ui->pc_LabelSpace->SetSvg(C_NagUseCaseViewWidget::mhc_SVG_ICON_PATH);
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_LabelSpace_2->SetSvg(C_NagUseCaseViewWidget::mhc_SVGIconPath);
+   this->mpc_Ui->pc_LabelSpace_2->SetSvg(C_NagUseCaseViewWidget::mhc_SVG_ICON_PATH);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

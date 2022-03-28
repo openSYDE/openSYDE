@@ -33,8 +33,8 @@ class C_GiSvNodeSyvSetup :
 public:
    //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    C_GiSvNodeSyvSetup(const stw_types::uint32 ou32_ViewIndex, const stw_types::sint32 & ors32_NodeIndex,
-                      const stw_types::uint64 & oru64_ID, const stw_types::float64 & orf64_Width = mhf64_MinWidthNode,
-                      const stw_types::float64 & orf64_Height = mhf64_MinHeightNode,
+                      const stw_types::uint64 & oru64_ID, const stw_types::float64 & orf64_Width = mhf64_MIN_WIDTH_NODE,
+                      const stw_types::float64 & orf64_Height = mhf64_MIN_HEIGHT_NODE,
                       QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiSvNodeSyvSetup();
 

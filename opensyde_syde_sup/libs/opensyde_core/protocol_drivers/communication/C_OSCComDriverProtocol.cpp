@@ -298,6 +298,58 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends the tester present message to specific nodes
+
+   \param[in]     orc_ActiveNodes   Active nodes to send the tester present
+
+   \return
+   C_NO_ERR    All tester present messages sent successfully
+   C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
+   C_COM       Error of service
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::vector<stw_types::uint32> & orc_ActiveNodes)
+const
+{
+   sint32 s32_Return = C_CONFIG;
+
+   if (this->mq_Initialized == true)
+   {
+      uint32 u32_Counter;
+
+      for (u32_Counter = 0U; u32_Counter < orc_ActiveNodes.size(); ++u32_Counter)
+      {
+         const uint32 u32_ActiveNode = orc_ActiveNodes[u32_Counter];
+         if (u32_ActiveNode < this->mc_OsyProtocols.size())
+         {
+            C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNode];
+            if (pc_ProtocolOsy != NULL)
+            {
+               // Send tester present message without expecting a response
+               s32_Return = pc_ProtocolOsy->OsyTesterPresent(1U);
+
+               if (s32_Return != C_NO_ERR)
+               {
+                  // No response expected. All errors caused by client. We can break here.
+                  s32_Return = C_COM;
+               }
+            }
+            else
+            {
+               s32_Return = C_CONFIG;
+            }
+         }
+         else
+         {
+            s32_Return = C_CONFIG;
+         }
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize the necessary routing configuration to start the routing for one specific server
 
    Prepares all active nodes with its routing configurations if necessary
@@ -309,7 +361,7 @@ const
    \param[in]   ou32_NodeIndex         node index to read from
    \param[out]  opu32_ErrorNodeIndex   optional pointer for node index which caused the error on starting routing if
                                        an error occurred
-                                       is set when return value is not C_NO_ERR and C_CONFIG
+                                       is set when return value is not C_NO_ERR, C_RANGE and C_CONFIG
 
    \return
    C_NO_ERR   request sent, positive response received
@@ -1113,8 +1165,18 @@ C_SCLString C_OSCComDriverProtocol::m_GetActiveNodeName(const uint32 ou32_NodeIn
 sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(const uint32 ou32_ActiveNode, const uint8 ou8_SessionId,
                                                   const bool oq_CheckForSession, uint8 * const opu8_NrCode) const
 {
-   C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[ou32_ActiveNode];
-   const sint32 s32_Return = this->m_SetNodeSessionId(pc_ProtocolOsy, ou8_SessionId, oq_CheckForSession, opu8_NrCode);
+   C_OSCProtocolDriverOsy * pc_ProtocolOsy = NULL;
+   sint32 s32_Return;
+
+   if (ou32_ActiveNode < this->mc_OsyProtocols.size())
+   {
+      pc_ProtocolOsy = this->mc_OsyProtocols[ou32_ActiveNode];
+      s32_Return = this->m_SetNodeSessionId(pc_ProtocolOsy, ou8_SessionId, oq_CheckForSession, opu8_NrCode);
+   }
+   else
+   {
+      s32_Return = C_CONFIG;
+   }
 
    return s32_Return;
 }
@@ -1231,19 +1293,56 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(C_OSCProtocolDriverOsy * const
 sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const uint8 ou8_SessionId, const bool oq_CheckForSession,
                                                    std::set<uint32> & orc_DefectNodeIndices) const
 {
+   std::vector<uint32> c_AllActiveNodes;
+   uint32 u32_Counter;
+
+   c_AllActiveNodes.resize(this->mc_ActiveNodesIndexes.size());
+   for (u32_Counter = 0U; u32_Counter < c_AllActiveNodes.size(); ++u32_Counter)
+   {
+      c_AllActiveNodes[u32_Counter] = u32_Counter;
+   }
+
+   return this->m_SetNodesSessionId(c_AllActiveNodes, ou8_SessionId, oq_CheckForSession, orc_DefectNodeIndices);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a node into a session
+
+   \param[in]        orc_ActiveNodes       All indexes of active nodes to set the
+                                           session (indexes of mc_ActiveNodesIndexes)
+   \param[in]        ou8_SessionId         session ID to switch to
+   \param[in]        oq_CheckForSession    checks the current session id on the server. only if it is different, the
+                                           new session id will be set
+   \param[in,out]    orc_DefectNodeIndices List of active node indices which encountered an error
+
+   Nodes with previous errors registered in orc_DefectNodeIndices will be skipped
+
+   \return
+   C_NO_ERR    All nodes set to session successfully
+   C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
+   C_COM       Error of service
+   C_TIMEOUT   Expected response not received within timeout
+               or at least one node was registered in orc_DefectNodeIndices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const std::vector<stw_types::uint32> & orc_ActiveNodes,
+                                                   const uint8 ou8_SessionId, const bool oq_CheckForSession,
+                                                   std::set<uint32> & orc_DefectNodeIndices) const
+{
    sint32 s32_Retval = C_NO_ERR;
 
    if (this->mq_Initialized == true)
    {
       uint32 u32_Counter;
 
-      for (u32_Counter = 0U; u32_Counter < this->mc_OsyProtocols.size(); ++u32_Counter)
+      for (u32_Counter = 0U; u32_Counter < orc_ActiveNodes.size(); ++u32_Counter)
       {
+         const uint32 u32_ActiveNode = orc_ActiveNodes[u32_Counter];
          // Search the input values for a previous problem with the node
          // Further communication is only necessary if the node was ok in the first place
-         if (orc_DefectNodeIndices.find(u32_Counter) == orc_DefectNodeIndices.end())
+         if (orc_DefectNodeIndices.find(u32_ActiveNode) == orc_DefectNodeIndices.end())
          {
-            const sint32 s32_Return = this->m_SetNodeSessionId(u32_Counter, ou8_SessionId, oq_CheckForSession, NULL);
+            const sint32 s32_Return = this->m_SetNodeSessionId(u32_ActiveNode, ou8_SessionId, oq_CheckForSession, NULL);
 
             if ((s32_Return != C_NO_ERR) && (s32_Return != C_NOACT))
             {
@@ -1256,7 +1355,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const uint8 ou8_SessionId, co
                {
                   s32_Retval = s32_Return;
                }
-               orc_DefectNodeIndices.insert(u32_Counter);
+               orc_DefectNodeIndices.insert(u32_ActiveNode);
             }
          }
          else
@@ -1511,7 +1610,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(C_OSCProtocolDriverOsy * 
 /*! \brief   Sets all nodes into a specific security level
 
    \param[in]     ou8_SecurityLevel     level of requested security
-   \param[out] orc_ErrorActiveNodes    All active node indexes of nodes which can not be reached
+   \param[out]    orc_ErrorActiveNodes  All active node indexes of nodes which can not be reached
 
    \return
    C_NO_ERR    All nodes set to session successfully
@@ -1525,6 +1624,39 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(C_OSCProtocolDriverOsy * 
 sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_SecurityLevel,
                                                         std::set<uint32> & orc_ErrorActiveNodes) const
 {
+   std::vector<uint32> c_AllActiveNodes;
+   uint32 u32_Counter;
+
+   c_AllActiveNodes.resize(this->mc_ActiveNodesIndexes.size());
+   for (u32_Counter = 0U; u32_Counter < c_AllActiveNodes.size(); ++u32_Counter)
+   {
+      c_AllActiveNodes[u32_Counter] = u32_Counter;
+   }
+
+   return this->m_SetNodesSecurityAccess(c_AllActiveNodes, ou8_SecurityLevel, orc_ErrorActiveNodes);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets all nodes into a specific security level
+
+   \param[in]     orc_ActiveNodes       All indexes of active nodes to set the
+                                        security access (indexes of mc_ActiveNodesIndexes)
+   \param[in]     ou8_SecurityLevel     level of requested security
+   \param[out] orc_ErrorActiveNodes     All active node indexes of nodes which can not be reached
+
+   \return
+   C_NO_ERR    All nodes set to session successfully
+   C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
+   C_COM       Error of service
+   C_TIMEOUT   Expected response not received within timeout
+   C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
+               Detailed error codes are logged with opu8_NrCode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const std::vector<stw_types::uint32> & orc_ActiveNodes,
+                                                        const uint8 ou8_SecurityLevel,
+                                                        std::set<uint32> & orc_ErrorActiveNodes) const
+{
    sint32 s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
@@ -1533,17 +1665,18 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_Security
 
       s32_Return = C_NOACT;
 
-      for (u32_Counter = 0U; u32_Counter < this->mc_OsyProtocols.size(); ++u32_Counter)
+      for (u32_Counter = 0U; u32_Counter < orc_ActiveNodes.size(); ++u32_Counter)
       {
-         s32_Return = this->m_SetNodeSecurityAccess(u32_Counter, ou8_SecurityLevel, NULL);
+         const uint32 u32_ActiveNode = orc_ActiveNodes[u32_Counter];
+         s32_Return = this->m_SetNodeSecurityAccess(u32_ActiveNode, ou8_SecurityLevel, NULL);
 
          if ((s32_Return != C_NO_ERR) &&
              (s32_Return != C_NOACT))
          {
             //Store invalid node
-            if (u32_Counter < this->mc_ActiveNodesIndexes.size())
+            if (u32_ActiveNode < this->mc_ActiveNodesIndexes.size())
             {
-               orc_ErrorActiveNodes.insert(this->mc_ActiveNodesIndexes[u32_Counter]);
+               orc_ErrorActiveNodes.insert(this->mc_ActiveNodesIndexes[u32_ActiveNode]);
             }
             // Do not change the C_TIMEOUT and C_CHECKSUM error
             if ((s32_Return != C_TIMEOUT) &&

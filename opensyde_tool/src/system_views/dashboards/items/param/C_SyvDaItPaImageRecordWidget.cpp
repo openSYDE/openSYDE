@@ -360,7 +360,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
                   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
                   c_MessageBox.SetCustomMinHeight(180, 300);
-                  c_MessageBox.SetCustomMinWidth(800);
+                  c_MessageBox.SetCustomMinWidth(700);
                   e_ReturnMessageBox = c_MessageBox.Execute();
 
                   switch (e_ReturnMessageBox)
@@ -965,6 +965,7 @@ void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
    {
       this->mpc_Ui->pc_LabelFinished->setEnabled(true);
       this->mpc_Ui->pc_BushButtonOk->setVisible(true);
+      this->mpc_Ui->pc_BushButtonOk->setFocus();
       this->mpc_Ui->pc_BushButtonCancel->setVisible(false);
       this->mpc_Ui->pc_ProgressValidateFile->SetProgress(100);
       this->mpc_Ui->pc_BopperleFinished->SetMainBopperleColor(mc_STYLE_GUIDE_COLOR_21, mc_STYLE_GUIDE_COLOR_13);
@@ -1068,6 +1069,7 @@ void C_SyvDaItPaImageRecordWidget::m_OnCancel(void)
 void C_SyvDaItPaImageRecordWidget::m_ConfirmCheckBoxChanged(void) const
 {
    this->mpc_Ui->pc_PbConfirm->setEnabled(this->mpc_Ui->pc_CbConfirm->isChecked());
+   this->mpc_Ui->pc_PbConfirm->setFocus();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

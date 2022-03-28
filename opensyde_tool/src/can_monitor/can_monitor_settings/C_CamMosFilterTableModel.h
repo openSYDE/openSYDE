@@ -53,13 +53,13 @@ public:
    static stw_types::sint32 h_EnumToColumn(const E_Columns oe_Value);
 
    // Utility for database
-   static QString h_SearchMessageInDatabases(const stw_types::uint32 ou32_CanId);
+   static QString h_SearchMessageInDatabases(const stw_types::uint32 ou32_CanId, const bool oq_IsExtended);
 
    // Get and set data
    QList<stw_opensyde_gui_logic::C_CamProFilterItemData> GetFilterItemsData(void) const;
    void SetFilterItemsData(const QList<C_CamProFilterItemData> & orc_FilterItemsData);
    void SetFilterItemIDs(const stw_types::uint32 ou32_Index, const stw_types::uint32 ou32_NewStartId,
-                         const stw_types::uint32 ou32_NewEndId);
+                         const stw_types::uint32 ou32_NewEndId, const bool oq_IsExtended);
    void SetFilterItemExtended(const stw_types::uint32 ou32_Index, const bool oq_Extended);
 
 protected:

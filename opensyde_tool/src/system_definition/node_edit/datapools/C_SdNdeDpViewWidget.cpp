@@ -39,9 +39,9 @@ using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // configuration for the showing of storage usage indicators
-const bool C_SdNdeDpViewWidget::mhaq_StorageIndicatorActive[static_cast<stw_types::sintn>(stw_opensyde_core::
-                                                                                          C_OSCNodeDataPool::
-                                                                                          eHALC_NVM) + 1] =
+const bool C_SdNdeDpViewWidget::mhaq_STORAGE_INDICATOR_ACTIVE[static_cast<stw_types::sintn>(stw_opensyde_core::
+                                                                                            C_OSCNodeDataPool::
+                                                                                            eHALC_NVM) + 1] =
 {
    false, // DIAG
    true,  // NVM
@@ -50,9 +50,9 @@ const bool C_SdNdeDpViewWidget::mhaq_StorageIndicatorActive[static_cast<stw_type
    true   // HALC_NVM
 };
 
-const bool C_SdNdeDpViewWidget::mhaq_AddButtonVisible[static_cast<stw_types::sintn>(stw_opensyde_core::
-                                                                                    C_OSCNodeDataPool::
-                                                                                    eHALC_NVM) + 1] =
+const bool C_SdNdeDpViewWidget::mhaq_ADD_BUTTON_INVISIBLE[static_cast<stw_types::sintn>(stw_opensyde_core::
+                                                                                        C_OSCNodeDataPool::
+                                                                                        eHALC_NVM) + 1] =
 {
    true,  // DIAG
    true,  // NVM
@@ -295,8 +295,8 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
    {
       const bool q_Return = this->mapc_Selectors[s32_Counter]->SetTypeAndNode(
          static_cast<stw_opensyde_core::C_OSCNodeDataPool::E_Type>(s32_Counter), ou32_NodeIndex,
-         mhaq_StorageIndicatorActive[s32_Counter],
-         mhaq_AddButtonVisible[s32_Counter]);
+         mhaq_STORAGE_INDICATOR_ACTIVE[s32_Counter],
+         mhaq_ADD_BUTTON_INVISIBLE[s32_Counter]);
 
       if ((q_Return == true) && (q_RestoreDataPoolSelection == true))
       {

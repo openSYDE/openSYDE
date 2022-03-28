@@ -41,7 +41,7 @@ protected:
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
 
 private:
-   static const QString mhc_FilePath;
+   static const QString mhc_FILE_PATH;
    stw_types::uint16 mu16_ValueInPercent;
    QColor mc_ActiveColor;
    bool mq_FinishedAnimation;

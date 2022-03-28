@@ -107,7 +107,8 @@ void C_OSCParamSetInterpretedNodeFiler::h_SaveInterpretedNode(const C_OSCParamSe
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCParamSetInterpretedNodeFiler::C_OSCParamSetInterpretedNodeFiler(void)
+C_OSCParamSetInterpretedNodeFiler::C_OSCParamSetInterpretedNodeFiler(void) :
+   C_OSCParamSetFilerBase()
 {
 }
 

@@ -27,8 +27,8 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_SebToolboxUtil::hsn_LabelSize = 33;
-const stw_types::sintn C_SebToolboxUtil::hsn_HeadingSpacerSizeTop = 47;
+const stw_types::sintn C_SebToolboxUtil::hsn_LABEL_SIZE = 33;
+const stw_types::sintn C_SebToolboxUtil::hsn_HEADING_SPACER_SIZE_TOP = 47;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -74,8 +74,8 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
 
          // Heading
          opc_Layout->addWidget(pc_Heading);
-         pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LabelSize);
-         pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LabelSize);
+         pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
+         pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
          sn_Index = opc_Layout->indexOf(pc_Heading);
          opc_Layout->setStretch(sn_Index, 0);
       } //lint !e429  //no memory leak because of the parent of pc_Heading and the Qt memory management
@@ -124,7 +124,7 @@ C_OgeFraSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, 
       // Optional top spacer
       if (oq_AddSpacerBefore == true)
       {
-         QSpacerItem * const pc_SpacerTop = new QSpacerItem(0, C_SebToolboxUtil::hsn_HeadingSpacerSizeTop);
+         QSpacerItem * const pc_SpacerTop = new QSpacerItem(0, C_SebToolboxUtil::hsn_HEADING_SPACER_SIZE_TOP);
          opc_Layout->addSpacerItem(pc_SpacerTop);
       } //lint !e429  //no memory leak because of the parent of pc_Heading,the call of addWidget and the Qt memory
       //management
@@ -133,8 +133,8 @@ C_OgeFraSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, 
 
       // Heading
       opc_Layout->addWidget(pc_Heading);
-      pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LabelSize);
-      pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LabelSize);
+      pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
+      pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
       sn_Index = opc_Layout->indexOf(pc_Heading);
       opc_Layout->setStretch(sn_Index, 0);
 
@@ -187,8 +187,8 @@ std::vector<C_OgePubIconOnly *> C_SebToolboxUtil::h_AddNewUserHeading(const QStr
 
       // Heading
       pc_HorizontalLayout->addWidget(pc_Heading);
-      pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LabelSize);
-      pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LabelSize);
+      pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
+      pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
       sn_Index = pc_HorizontalLayout->indexOf(pc_Heading);
       pc_HorizontalLayout->setStretch(sn_Index, 0);
 

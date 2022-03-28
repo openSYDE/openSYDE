@@ -947,9 +947,19 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
+   <extends>QTextEdit</extends>
+   <header>C_OgeTedPropertiesComment.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupItem.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLeProperties.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
@@ -957,19 +967,9 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeCbxText.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
-   <extends>QTextEdit</extends>
-   <header>C_OgeTedPropertiesComment.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
    <extends>QLineEdit</extends>
    <header>C_OgeLePropertiesName.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxProperties</class>
-   <extends>QCheckBox</extends>
-   <header>C_OgeChxProperties.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
@@ -977,9 +977,9 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeSpxNumber.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.h</header>
+   <class>stw_opensyde_gui_elements::C_OgeChxProperties</class>
+   <extends>QCheckBox</extends>
+   <header>C_OgeChxProperties.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeSpxDoubleProperties</class>
@@ -998,6 +998,20 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>pc_LineEditName</tabstop>
+  <tabstop>pc_TextEditComment</tabstop>
+  <tabstop>pc_CheckBoxAutoMinMax</tabstop>
+  <tabstop>pc_DoubleSpinBoxFactor</tabstop>
+  <tabstop>pc_DoubleSpinBoxOffset</tabstop>
+  <tabstop>pc_LineEditUnit</tabstop>
+  <tabstop>pc_ComboBoxByteOrder</tabstop>
+  <tabstop>pc_SpinBoxStartBit</tabstop>
+  <tabstop>pc_ComboBoxType</tabstop>
+  <tabstop>pc_ComboBoxMuxType</tabstop>
+  <tabstop>pc_SpinBoxLength</tabstop>
+  <tabstop>pc_SpinBoxMuxValue</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

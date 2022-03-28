@@ -58,7 +58,15 @@ private:
    void m_TrimNodeName(void) const;
    void m_RegisterChange(void);
    void m_RegisterNameChange(void);
-   void m_CheckComIfId(const stw_types::uint32 ou32_Row, const stw_types::uint32 ou32_Column) const;
+   void m_CheckComInterface(const stw_types::uint32 ou32_Row, const stw_types::uint32 ou32_Column) const;
+   void m_GetInterfaceStatus(const stw_types::uint32 ou32_NodeIndex, const stw_types::sintn osn_InterfaceIndex,
+                             const stw_types::uint8 ou8_NodeId, const std::vector<stw_types::sint32> & orc_Ip,
+                             bool & orq_IdValid, bool & orq_IpValid) const;
+   void m_HandlePropertyConflict(const stw_types::sintn osn_Row, const stw_types::sintn osn_ColumnId,
+                                 const stw_types::sintn osn_ColumnIp, const bool oq_IdValid,
+                                 const bool oq_IpValid) const;
+   void m_HandleErrorFeedback(const stw_types::sintn osn_InterfaceIndex, const bool oq_IdValid,
+                              const bool oq_IpValid) const;
    void m_HandleCellClick(const stw_types::uint32 ou32_Row, const stw_types::uint32 ou32_Column);
    void m_IpAddressClick(const stw_types::uint32 ou32_Row);
    void m_BusBitrateClick(const stw_types::uint32 ou32_Row, const stw_types::uint32 ou32_Column);

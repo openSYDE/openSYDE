@@ -68,8 +68,19 @@ void C_OgeLabFrameError::SetForegroundColor(const stw_types::sintn osn_Value)
 void C_OgeLabFrameError::SetCompleteText(const QString & orc_Text, const QString & orc_Tooltip,
                                          const stw_opensyde_gui::C_NagToolTip::E_Type oe_TooltipType)
 {
+   QString c_ToolTipHeading;
+
+   if (oe_TooltipType == stw_opensyde_gui::C_NagToolTip::eERROR)
+   {
+      c_ToolTipHeading = C_GtGetText::h_GetText("Invalid");
+   }
+   else
+   {
+      c_ToolTipHeading = C_GtGetText::h_GetText("Note");
+   }
+
    this->mc_Text = orc_Text;
-   this->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"), orc_Tooltip, oe_TooltipType);
+   this->SetToolTipInformation(c_ToolTipHeading, orc_Tooltip, oe_TooltipType);
    m_OnSizeChange();
 }
 

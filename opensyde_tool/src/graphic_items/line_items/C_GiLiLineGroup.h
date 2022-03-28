@@ -125,7 +125,7 @@ protected:
    E_MoveMode me_ActiveResizeMode;       ///< Currently active resize mode
    stw_types::sintn msn_ActiveItemIndex; ///< Currently active item index (Mainly for resize mode)
 
-   static const stw_types::float64 mhf64_MaxDistToAlign;
+   static const stw_types::float64 mhf64_MAX_DIST_TO_ALIGN;
 
 private:
    //Avoid call

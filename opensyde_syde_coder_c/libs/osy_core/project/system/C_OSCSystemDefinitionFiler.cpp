@@ -15,11 +15,13 @@
 #include <cstdio>
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "C_OSCXMLParserLog.h"
 #include "C_OSCSystemFilerUtil.h"
 #include "C_OSCSystemDefinitionFilerV2.h"
 #include "C_OSCSystemDefinitionFiler.h"
 #include "TGLFile.h"
 #include "TGLUtils.h"
+#include "C_OSCNodeSquadFiler.h"
 #include "C_OSCLoggingHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -49,15 +51,24 @@ using namespace stw_scl;
    * Load system definition
    * for each node set a pointer to the used device definition
 
-   \param[out]    orc_SystemDefinition       Pointer to storage
-   \param[in]     orc_PathSystemDefinition   Path to system definition
-   \param[in]     orc_PathDeviceDefinitions  Path to device definition description file
-   \param[in]     oq_UseDeviceDefinitions    Flag for using device definitions, if the flag is false
-                                             orc_PathDeviceDefinitions can be an empty string.
-                                             It is highly recommended to use the device definitions.
-                                             Purpose for not using the device definition is when only read
-                                             access to a part of the system definition is necessary.
-   \param[in,out] opu16_ReadFileVersion      Optional storage for read file version (only use in C_NO_ERR case)
+   For system definition version V3 the optional parameters to load only active nodes (opc_NodesToLoad),
+   skip unnecessary content (oq_SkipContent) and to load only given node (opc_ExpectedNodeName),
+   as alternative to list of active nodes, are supported.
+
+   \param[out]     orc_SystemDefinition         Pointer to storage
+   \param[in]      orc_PathSystemDefinition     Path to system definition
+   \param[in]      orc_PathDeviceDefinitions    Path to device definition description file
+   \param[in]      oq_UseDeviceDefinitions      Flag for using device definitions, if the flag is false
+                                                orc_PathDeviceDefinitions can be an empty string.
+                                                It is highly recommended to use the device definitions.
+                                                Purpose for not using the device definition is when only read
+                                                access to a part of the system definition is necessary.
+   \param[in,out]  opu16_ReadFileVersion        Optional storage for read file version (only use in C_NO_ERR case)
+   \param[in]      opc_NodesToLoad              (Optional parameter) only load content of nodes which are active in sysdef
+   \param[in]      oq_SkipContent               (Optional parameter) skip content when not needed (datapools, halc etc.)
+                                                (default = false)
+   \param[in]      opc_ExpectedNodeName         (Optional parameter) only load node content of given node. Parameter is
+                                                used if no node index is available to fill opc_NodesToLoad parameter.
 
    \return
    C_NO_ERR    data read
@@ -72,18 +83,24 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(C_OSCSystemDefinit
                                                               const stw_scl::C_SCLString & orc_PathSystemDefinition,
                                                               const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
                                                               const bool oq_UseDeviceDefinitions,
-                                                              uint16 * const opu16_ReadFileVersion)
+                                                              uint16 * const opu16_ReadFileVersion,
+                                                              const std::vector<uint8> * const opc_NodesToLoad,
+                                                              const bool oq_SkipContent,
+                                                              const stw_scl::C_SCLString * const opc_ExpectedNodeName)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (TGL_FileExists(orc_PathSystemDefinition) == true)
    {
-      C_OSCXMLParser c_XMLParser;
+      C_OSCXMLParserLog c_XMLParser;
+      c_XMLParser.SetLogHeading("Loading System Definition");
       s32_Retval = c_XMLParser.LoadFromFile(orc_PathSystemDefinition);
       if (s32_Retval == C_NO_ERR)
       {
          s32_Retval = h_LoadSystemDefinition(orc_SystemDefinition, c_XMLParser, orc_PathDeviceDefinitions,
-                                             orc_PathSystemDefinition, oq_UseDeviceDefinitions, opu16_ReadFileVersion);
+                                             orc_PathSystemDefinition, oq_UseDeviceDefinitions,
+                                             opu16_ReadFileVersion, opc_NodesToLoad, oq_SkipContent,
+                                             opc_ExpectedNodeName);
       }
       else
       {
@@ -107,9 +124,9 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(C_OSCSystemDefinit
    Will overwrite the file if it already exists.
    Does NOT write the device definition file(s)
 
-   \param[in]     orc_SystemDefinition Pointer to storage
-   \param[in]     orc_Path             Path of system definition
-   \param[in,out] opc_CreatedFiles     Optional storage for history of all created files (and without sysdef)
+   \param[in]      orc_SystemDefinition   Pointer to storage
+   \param[in]      orc_Path               Path of system definition
+   \param[in,out]  opc_CreatedFiles       Optional storage for history of all created files (and without sysdef)
 
    \return
    C_NO_ERR   data saved
@@ -177,14 +194,19 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(const C_OSCSystemD
     The caller is responsible to provide a static life-time of orc_DeviceDefinitions.
     Otherwise the "device definition" pointers in C_OSCNode will point to invalid data.
 
-   \param[out]    orc_Nodes                 data storage
-   \param[in,out] orc_XMLParser             XML with "nodes" active
-   \param[in]     orc_DeviceDefinitions     List of known devices (must contain all device types used by nodes)
-   \param[in]     orc_BasePath              Base path
-   \param[in]     oq_UseDeviceDefinitions   Flag for using device definitions
-   \param[in]     oq_UseFileInterface       Flag for switching between multiple file and single file interface
-                                            True: Assume content is split over multiple files
-                                            False: Assume all relevant content is in this file
+   \param[out]     orc_Nodes                 data storage
+   \param[in,out]  orc_XMLParser             XML with "nodes" active
+   \param[in]      orc_DeviceDefinitions     List of known devices (must contain all device types used by nodes)
+   \param[in]      orc_BasePath              Base path
+   \param[in]      oq_UseDeviceDefinitions   Flag for using device definitions
+   \param[in]      oq_UseFileInterface       Flag for switching between multiple file and single file interface
+                                             True: Assume content is split over multiple files
+                                             False: Assume all relevant content is in this file
+   \param[in]      opc_NodesToLoad           (Optional parameter) only load content of nodes which are active in sysdef
+   \param[in]      oq_SkipContent            (Optional parameter) skip content when not needed (datapools, halc etc.)
+                                             (default = false)
+   \param[in]      opc_ExpectedNodeName      (Optional parameter) only load node content of given node. Parameter is
+                                             used if no node index is available to fill opc_NodesToLoad parameter.
 
    \return
    C_NO_ERR    no error
@@ -195,13 +217,17 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(const C_OSCSystemD
 sint32 C_OSCSystemDefinitionFiler::h_LoadNodes(std::vector<C_OSCNode> & orc_Nodes, C_OSCXMLParserBase & orc_XMLParser,
                                                const C_OSCDeviceManager & orc_DeviceDefinitions,
                                                const stw_scl::C_SCLString & orc_BasePath,
-                                               const bool oq_UseDeviceDefinitions, const bool oq_UseFileInterface)
+                                               const bool oq_UseDeviceDefinitions, const bool oq_UseFileInterface,
+                                               const std::vector<stw_types::uint8> * const opc_NodesToLoad,
+                                               const bool oq_SkipContent,
+                                               const stw_scl::C_SCLString * const opc_ExpectedNodeName)
 
 {
    sint32 s32_Retval = C_NO_ERR;
    C_SCLString c_SelectedNode;
    uint32 u32_ExpectedSize = 0UL;
    const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+   const C_SCLString c_UnloadedNode = "UnloadedNodeWithNodeIndex";
 
    //Check optional length
    if (q_ExpectedSizeHere == true)
@@ -217,24 +243,73 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadNodes(std::vector<C_OSCNode> & orc_Node
 
    if (c_SelectedNode == "node")
    {
+      uint8 u8_NodeIndex = 0U;
       do
       {
          C_OSCNode c_Item;
-         if (oq_UseFileInterface)
+         bool q_SkipNode = false;
+
+         if ((opc_NodesToLoad == NULL) || (opc_NodesToLoad->size() == 0) || ((*opc_NodesToLoad)[u8_NodeIndex] == 1U))
          {
-            const C_SCLString c_FileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
-                                                                                orc_XMLParser.GetNodeContent());
-            s32_Retval = C_OSCNodeFiler::h_LoadNodeFile(c_Item, c_FileName);
+            if (oq_UseFileInterface)
+            {
+               const C_SCLString c_FileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                   orc_XMLParser.GetNodeContent());
+               if ((opc_ExpectedNodeName != NULL) && ((*opc_ExpectedNodeName) != ""))
+               {
+                  // get current node and compare with expected node name
+                  const uint32 u32_BasePathLength = TGL_ExtractFilePath(orc_BasePath).Length();
+                  C_SCLString c_LastFolderName = TGL_ExtractFilePath(c_FileName);
+                  c_LastFolderName = c_LastFolderName.Delete(1, u32_BasePathLength);
+                  c_LastFolderName = c_LastFolderName.Delete(c_LastFolderName.Length(), 1); // remove trailing delim
+                  C_SCLString c_ExpectedFolder = "node_" + (*opc_ExpectedNodeName);
+                  // special handling for squad nodes necessary since the separator can't be used for folder names
+                  const uint32 u32_Pos = c_ExpectedFolder.Pos(C_OSCNodeSquad::hc_SEPARATOR);
+                  if (u32_Pos > 0)
+                  {
+                     // Squad nodes have '5858' in folder name for '::'
+                     const uint32 u32_SubstituteLength = (C_OSCNodeSquad::hc_SEPARATOR).Length();
+                     c_ExpectedFolder = c_ExpectedFolder.Delete(u32_Pos, u32_SubstituteLength);
+                     C_SCLString c_Substitute = "";
+                     for (uint32 u32_Iter = 1; u32_Iter <= u32_SubstituteLength; u32_Iter++)
+                     {
+                        c_Substitute += static_cast<uint8>((C_OSCNodeSquad::hc_SEPARATOR)[u32_Iter]);
+                     }
+                     c_ExpectedFolder = c_ExpectedFolder.Insert(c_Substitute, u32_Pos);
+                  }
+
+                  if (c_LastFolderName.AnsiCompareIC(c_ExpectedFolder) != 0)
+                  {
+                     q_SkipNode = true;
+                  }
+               }
+               if (q_SkipNode == false)
+               {
+                  s32_Retval = C_OSCNodeFiler::h_LoadNodeFile(c_Item, c_FileName, oq_SkipContent);
+               }
+            }
+            else
+            {
+               s32_Retval = C_OSCNodeFiler::h_LoadNode(c_Item, orc_XMLParser, "", oq_SkipContent);
+            }
+            if (s32_Retval != C_NO_ERR)
+            {
+               break;
+            }
          }
          else
          {
-            s32_Retval = C_OSCNodeFiler::h_LoadNode(c_Item, orc_XMLParser, "");
+            q_SkipNode = true;
          }
-         if (s32_Retval != C_NO_ERR)
+
+         if (q_SkipNode == true)
          {
-            break;
+            //don't load; node will have default values
+            c_Item.c_Properties.c_Name = c_UnloadedNode + C_SCLString::IntToStr(u8_NodeIndex);
          }
+
          orc_Nodes.push_back(c_Item);
+         u8_NodeIndex++;
          //Next
          c_SelectedNode = orc_XMLParser.SelectNodeNext("node");
       }
@@ -263,20 +338,31 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadNodes(std::vector<C_OSCNode> & orc_Node
       //set pointers to device definitions
       for (uint32 u32_NodeIndex = 0U; u32_NodeIndex < orc_Nodes.size(); u32_NodeIndex++)
       {
-         const C_OSCDeviceDefinition * const pc_Device =
-            orc_DeviceDefinitions.LookForDevice(orc_Nodes[u32_NodeIndex].c_DeviceType);
-         if (pc_Device == NULL)
+         // check if we have an active node
+         if (orc_Nodes[u32_NodeIndex].c_Properties.c_Name.Pos(c_UnloadedNode) == 0)
          {
-            s32_Retval = C_OVERFLOW;
-            osc_write_log_error("Loading System Definition",
-                                "System Definition contains node \"" + orc_Nodes[u32_NodeIndex].c_Properties.c_Name +
-                                "\" of device type \"" +
-                                orc_Nodes[u32_NodeIndex].c_DeviceType + "\" which is not a known device.");
-            break;
-         }
-         else
-         {
-            orc_Nodes[u32_NodeIndex].pc_DeviceDefinition = pc_Device;
+            stw_scl::C_SCLString c_SubDeviceName = "";
+            stw_scl::C_SCLString c_MainDeviceName = "";
+            C_OSCSystemDefinitionFiler::h_SplitDeviceType(orc_Nodes[u32_NodeIndex].c_DeviceType, c_MainDeviceName,
+                                                          c_SubDeviceName);
+            {
+               const C_OSCDeviceDefinition * const pc_Device =
+                  orc_DeviceDefinitions.LookForDevice(c_SubDeviceName, c_MainDeviceName,
+                                                      orc_Nodes[u32_NodeIndex].u32_SubDeviceIndex);
+               if (pc_Device == NULL)
+               {
+                  s32_Retval = C_OVERFLOW;
+                  osc_write_log_error("Loading System Definition",
+                                      "System Definition contains node \"" + orc_Nodes[u32_NodeIndex].c_Properties.c_Name +
+                                      "\" of device type \"" +
+                                      orc_Nodes[u32_NodeIndex].c_DeviceType + "\" which is not a known device.");
+                  break;
+               }
+               else
+               {
+                  orc_Nodes[u32_NodeIndex].pc_DeviceDefinition = pc_Device;
+               }
+            }
          }
       }
    }
@@ -290,8 +376,8 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadNodes(std::vector<C_OSCNode> & orc_Node
    Load buses data.
    The bus data will be loaded and the bus will be added.
 
-   \param[in,out] orc_Buses     data storage
-   \param[in,out] orc_XMLParser XML with "buses" active
+   \param[in,out]  orc_Buses        data storage
+   \param[in,out]  orc_XMLParser    XML with "buses" active
 
    \return
    C_NO_ERR   no error
@@ -354,10 +440,10 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadBuses(std::vector<C_OSCSystemBus> & orc
    Save nodes data.
    The node data will be saved and the node will be added.
 
-   \param[in]     orc_Nodes        data storage
-   \param[in,out] orc_XMLParser    XML with "nodes" active
-   \param[in]     orc_BasePath     Base path
-   \param[in,out] opc_CreatedFiles Optional storage for history of all created files
+   \param[in]      orc_Nodes           data storage
+   \param[in,out]  orc_XMLParser       XML with "nodes" active
+   \param[in]      orc_BasePath        Base path
+   \param[in,out]  opc_CreatedFiles    Optional storage for history of all created files
 
    \return
    C_NO_ERR   no error
@@ -422,12 +508,8 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveNodes(const std::vector<C_OSCNode> & or
    Save buses data.
    The bus data will be saved and the bus will be added to the system definition (sorted).
 
-   \param[in]     orc_Buses     data storage
-   \param[in,out] orc_XMLParser XML with "buses" active
-
-   \return
-   C_NO_ERR   no error
-   C_CONFIG   content is invalid or incomplete
+   \param[in]      orc_Buses        data storage
+   \param[in,out]  orc_XMLParser    XML with "buses" active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinitionFiler::h_SaveBuses(const std::vector<C_OSCSystemBus> & orc_Buses,
@@ -451,12 +533,17 @@ void C_OSCSystemDefinitionFiler::h_SaveBuses(const std::vector<C_OSCSystemBus> &
    * Load system definition
    * for each node set a pointer to the used device definition
 
-   \param[out]    orc_SystemDefinition      Pointer to storage
-   \param[in,out] orc_XMLParser             XML with default state
-   \param[in]     orc_PathDeviceDefinitions Path to device definition description file
-   \param[in]     orc_BasePath              Base path
-   \param[in]     oq_UseDeviceDefinitions   Flag for using device definitions
-   \param[in,out] opu16_ReadFileVersion     Optional storage for read file version (only use in C_NO_ERR case)
+   \param[out]     orc_SystemDefinition         Pointer to storage
+   \param[in,out]  orc_XMLParser                XML with default state
+   \param[in]      orc_PathDeviceDefinitions    Path to device definition description file
+   \param[in]      orc_BasePath                 Base path
+   \param[in]      oq_UseDeviceDefinitions      Flag for using device definitions
+   \param[in,out]  opu16_ReadFileVersion        Optional storage for read file version (only use in C_NO_ERR case)
+   \param[in]      opc_NodesToLoad              (Optional parameter) only load content of nodes which are active in sysdef
+   \param[in]      oq_SkipContent               (Optional parameter) skip content when not needed (datapools, halc etc.)
+                                                (default = false)
+   \param[in]      opc_ExpectedNodeName         (Optional parameter) only load node content of given node. Parameter is
+                                                used if no node index is available to fill opc_NodesToLoad parameter.
 
    \return
    C_NO_ERR    data read
@@ -470,7 +557,10 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition 
                                                           const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
                                                           const stw_scl::C_SCLString & orc_BasePath,
                                                           const bool oq_UseDeviceDefinitions,
-                                                          uint16 * const opu16_ReadFileVersion)
+                                                          uint16 * const opu16_ReadFileVersion,
+                                                          const std::vector<uint8> * const opc_NodesToLoad,
+                                                          const bool oq_SkipContent,
+                                                          const stw_scl::C_SCLString * const opc_ExpectedNodeName)
 {
    sint32 s32_Retval = C_NO_ERR;
    uint16 u16_FileVersion = 0U;
@@ -479,7 +569,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition 
    if ((oq_UseDeviceDefinitions == true) &&
        (C_OSCSystemDefinition::hc_Devices.WasLoaded() == false))
    {
-      s32_Retval = C_OSCSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions, false);
+      s32_Retval = C_OSCSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions, false, NULL);
       if (s32_Retval != C_NO_ERR)
       {
          osc_write_log_error("Loading System Definition", "Could not load Device definitions.");
@@ -553,6 +643,13 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition 
          if (q_UseV3Filer)
          {
             //Completely rely on V3 loader
+            //Groups
+            orc_SystemDefinition.c_NodeSquads.clear();
+            if (s32_Retval == C_NO_ERR)
+            {
+               s32_Retval = C_OSCNodeSquadFiler::h_LoadNodeGroups(orc_SystemDefinition.c_NodeSquads, orc_XMLParser);
+            }
+
             //Node
             orc_SystemDefinition.c_Nodes.clear();
             if (s32_Retval == C_NO_ERR)
@@ -560,7 +657,8 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition 
                if (orc_XMLParser.SelectNodeChild("nodes") == "nodes")
                {
                   s32_Retval = h_LoadNodes(orc_SystemDefinition.c_Nodes, orc_XMLParser,
-                                           C_OSCSystemDefinition::hc_Devices, orc_BasePath, oq_UseDeviceDefinitions);
+                                           C_OSCSystemDefinition::hc_Devices, orc_BasePath, oq_UseDeviceDefinitions,
+                                           true, opc_NodesToLoad, oq_SkipContent, opc_ExpectedNodeName);
                   if (s32_Retval == C_NO_ERR)
                   {
                      //Return
@@ -610,10 +708,10 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition 
    Save system definition
    Does NOT write the device definition file(s)
 
-   \param[in]     orc_SystemDefinition Pointer to storage
-   \param[in,out] orc_XMLParser        XML with default state
-   \param[in]     orc_BasePath         Base path
-   \param[in,out] opc_CreatedFiles     Optional storage for history of all created files
+   \param[in]      orc_SystemDefinition   Pointer to storage
+   \param[in,out]  orc_XMLParser          XML with default state
+   \param[in]      orc_BasePath           Base path
+   \param[in,out]  opc_CreatedFiles       Optional storage for history of all created files
 
    \return
    C_NO_ERR   no error
@@ -634,6 +732,7 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinition(const C_OSCSystemDefin
    orc_XMLParser.SetNodeContent(C_SCLString::IntToStr(hu16_FILE_VERSION_LATEST));
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-definition");
+   C_OSCNodeSquadFiler::h_SaveNodeGroups(orc_SystemDefinition.c_NodeSquads, orc_XMLParser);
    //Node
    tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("nodes") == "nodes");
    s32_Return = h_SaveNodes(orc_SystemDefinition.c_Nodes, orc_XMLParser, orc_BasePath, opc_CreatedFiles);
@@ -649,4 +748,31 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinition(const C_OSCSystemDefin
       tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-definition");
    }
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Split device type
+
+   \param[in]      orc_CompleteType    Complete type
+   \param[in,out]  orc_MainType        Main type (empty if none)
+   \param[in,out]  orc_SubType         Sub type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCSystemDefinitionFiler::h_SplitDeviceType(const C_SCLString & orc_CompleteType, C_SCLString & orc_MainType,
+                                                   C_SCLString & orc_SubType)
+{
+   const std::string c_Tmp = *orc_CompleteType.AsStdString();
+   const uint32 u32_Pos = c_Tmp.find(C_OSCNodeSquad::hc_SEPARATOR.c_str());
+
+   if (u32_Pos < c_Tmp.size())
+   {
+      orc_MainType = c_Tmp.substr(0, u32_Pos);
+      //lint -e{9114} kept for readability
+      orc_SubType = c_Tmp.substr(u32_Pos + C_OSCNodeSquad::hc_SEPARATOR.Length(), c_Tmp.size());
+   }
+   else
+   {
+      orc_MainType = "";
+      orc_SubType = orc_CompleteType;
+   }
 }

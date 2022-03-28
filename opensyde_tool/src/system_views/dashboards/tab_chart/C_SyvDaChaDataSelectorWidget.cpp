@@ -296,17 +296,17 @@ void C_SyvDaChaDataSelectorWidget::ResetError(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of the color transparence value configured by the actual timeout state
+/*! \brief   Update of the color transparency value configured by the actual timeout state
 
    \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
-   \param[in]  osn_Value               Value for transparence (0..255)
+   \param[in]  osn_Value               Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_SyvDaChaDataSelectorWidget::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    if (ou32_DataElementIndex < this->mc_DataPoolElementsDataItemWidgets.size())
    {
-      this->mc_DataPoolElementsDataItemWidgets[ou32_DataElementIndex]->UpdateTransparence(osn_Value);
+      this->mc_DataPoolElementsDataItemWidgets[ou32_DataElementIndex]->UpdateTransparency(osn_Value);
    }
 }
 

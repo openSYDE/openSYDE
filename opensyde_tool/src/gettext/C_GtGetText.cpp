@@ -163,12 +163,12 @@ sint32 C_GtGetText::h_SetLanguage(const C_SCLString & orc_Language)
 //----------------------------------------------------------------------------------------------------------------------
 const charn * C_GtGetText::h_GetText(const charn * const opcn_MessageID)
 {
-   static const charn hacn_Error[] = "C_GtGetText not initialized";
+   static const charn hacn_ERROR[] = "C_GtGetText not initialized";
    const charn * pcn_String;
 
    if (mhq_Initialized == false)
    {
-      pcn_String = hacn_Error;
+      pcn_String = hacn_ERROR;
    }
    else
    {

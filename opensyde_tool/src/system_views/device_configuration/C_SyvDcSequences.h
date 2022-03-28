@@ -147,6 +147,7 @@ public:
                                  const std::vector<bool> & orc_OpenSydeSnrExtFormat);
 
    stw_types::sint32 GetResults(stw_types::sint32 & ors32_Result) const;
+   bool GetCanInitializationResult(void) const;
    stw_types::sint32 GetDeviceInfosResult(std::vector<C_SyvDcDeviceInformation> & orc_DeviceInfo) const;
    stw_types::sint32 GetSecurityFeatureUsageResult(bool & orq_SecurityFeatureUsed) const;
 
@@ -246,7 +247,7 @@ private:
    stw_types::sint32 m_ReadBack(void);
 
    C_SyvComDriverThread * mpc_Thread;
-   stw_tgl::C_TGLCriticalSection mc_CriticalSection;
+   stw_tgl::C_TGLCriticalSection mc_CriticalSectionRequestEndless;
    stw_can::C_CAN * mpc_CanDllDispatcher;
    stw_opensyde_core::C_OSCIpDispatcherWinSock * mpc_EthernetDispatcher;
    // Sequence execution parameter
@@ -263,6 +264,13 @@ private:
    // Scan flashloader request variables
    stw_types::uint32 mu32_ScanTime;
    bool mq_RunScanSendFlashloaderRequestEndless;
+
+   // CAN Scan flashloader output
+   bool mq_CanInitialized;
+
+   // It is mutable because of the constness of the getter functions. Without the keyword mutable the getter functions
+   // must be non const and that is not wanted.
+   mutable stw_tgl::C_TGLCriticalSection mc_CriticalSectionCanInitialization;
 
    // Result information of several sequences
    std::vector<C_SyvDcDeviceInformation> mc_DeviceInfoResult;

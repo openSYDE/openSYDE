@@ -31,13 +31,14 @@ using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
+using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QTabBar::ButtonPosition C_SyvDaDashboardSelectorTabWidget::mhe_TabContentPosition = QTabBar::LeftSide;
-const QString C_SyvDaDashboardSelectorTabWidget::mhc_AddIconDark = "://images/IconAddDisabled.svg";
-const QString C_SyvDaDashboardSelectorTabWidget::mhc_AddIconLight = "://images/IconAddEnabled.svg";
+const QTabBar::ButtonPosition C_SyvDaDashboardSelectorTabWidget::mhe_TAB_CONTENT_POSITION = QTabBar::LeftSide;
+const QString C_SyvDaDashboardSelectorTabWidget::mhc_ADD_ICON_DARK = "://images/IconAddDisabled.svg";
+const QString C_SyvDaDashboardSelectorTabWidget::mhc_ADD_ICON_LIGHT = "://images/IconAddEnabled.svg";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -69,7 +70,7 @@ C_SyvDaDashboardSelectorTabWidget::C_SyvDaDashboardSelectorTabWidget(QWidget * c
    mpc_PushButton = new C_OgePubIconText(this);
    this->mpc_PushButton->SetIconSize(24);
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_PushButton->setIcon(QIcon(C_SyvDaDashboardSelectorTabWidget::mhc_AddIconLight));
+   this->mpc_PushButton->setIcon(QIcon(C_SyvDaDashboardSelectorTabWidget::mhc_ADD_ICON_LIGHT));
    this->mpc_PushButton->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
                                                C_GtGetText::h_GetText("Add new Dashboard tab."));
    connect(this->mpc_PushButton, &QPushButton::clicked, this, &C_SyvDaDashboardSelectorTabWidget::m_OnAddClicked);
@@ -188,7 +189,7 @@ void C_SyvDaDashboardSelectorTabWidget::SetEditMode(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the confirm button in tear off widget enabled or disabled
 
-   \param[in] oq_Enabled   Flag for enabled
+   \param[in]  oq_Enabled  Flag for enabled
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::SetEnabled(const bool oq_Enabled)
@@ -360,7 +361,7 @@ void C_SyvDaDashboardSelectorTabWidget::ApplyDarkMode(const bool oq_Active)
       C_OgeWiDashboardTab * const pc_DrawingWidget =
          dynamic_cast<C_OgeWiDashboardTab * const>(this->tabBar()->tabButton(s32_Counter,
                                                                              C_SyvDaDashboardSelectorTabWidget::
-                                                                             mhe_TabContentPosition));
+                                                                             mhe_TAB_CONTENT_POSITION));
       if (pc_DrawingWidget != NULL)
       {
          pc_DrawingWidget->SetDarkMode(oq_Active);
@@ -381,11 +382,11 @@ void C_SyvDaDashboardSelectorTabWidget::ApplyDarkMode(const bool oq_Active)
    {
       if (oq_Active == true)
       {
-         this->mpc_PushButton->setIcon(QIcon(C_SyvDaDashboardSelectorTabWidget::mhc_AddIconDark));
+         this->mpc_PushButton->setIcon(QIcon(C_SyvDaDashboardSelectorTabWidget::mhc_ADD_ICON_DARK));
       }
       else
       {
-         this->mpc_PushButton->setIcon(QIcon(C_SyvDaDashboardSelectorTabWidget::mhc_AddIconLight));
+         this->mpc_PushButton->setIcon(QIcon(C_SyvDaDashboardSelectorTabWidget::mhc_ADD_ICON_LIGHT));
       }
    }
 }
@@ -452,7 +453,7 @@ void C_SyvDaDashboardSelectorTabWidget::ConnectionActiveChanged(const bool oq_Ac
       C_OgeWiDashboardTab * const pc_DrawingWidget =
          dynamic_cast<C_OgeWiDashboardTab * const>(this->tabBar()->tabButton(s32_Counter,
                                                                              C_SyvDaDashboardSelectorTabWidget::
-                                                                             mhe_TabContentPosition));
+                                                                             mhe_TAB_CONTENT_POSITION));
       if (pc_DrawingWidget != NULL)
       {
          pc_DrawingWidget->SetInteractive(!oq_Active);
@@ -607,12 +608,12 @@ void C_SyvDaDashboardSelectorTabWidget::paintEvent(QPaintEvent * const opc_Event
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
-   const sintn sn_ButtonWidth = 40;
+   const sintn sn_BUTTON_WIDTH = 40;
 
    QTabWidget::resizeEvent(opc_Event);
 
    //Restrict size
-   this->tabBar()->setMaximumWidth(std::max((this->width() - sn_ButtonWidth) - 50, 0));
+   this->tabBar()->setMaximumWidth(std::max((this->width() - sn_BUTTON_WIDTH) - 50, 0));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -757,7 +758,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_InitTabStyle(const uint32 ou32_Index, 
 
    pc_DrawingWidget->SetDarkMode(oq_Dark);
    this->tabBar()->setTabButton(static_cast<sintn>(ou32_Index),
-                                C_SyvDaDashboardSelectorTabWidget::mhe_TabContentPosition, pc_DrawingWidget);
+                                C_SyvDaDashboardSelectorTabWidget::mhe_TAB_CONTENT_POSITION, pc_DrawingWidget);
    //After add (AND display!)
    pc_DrawingWidget->SetText(orc_Name);
    pc_DrawingWidget->SetToolTip(orc_Name, orc_Comment);
@@ -780,7 +781,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_CurrentChanged(const sintn osn_Current
       C_OgeWiDashboardTab * const pc_DrawingWidget =
          dynamic_cast<C_OgeWiDashboardTab * const>(this->tabBar()->tabButton(s32_ItTab,
                                                                              C_SyvDaDashboardSelectorTabWidget::
-                                                                             mhe_TabContentPosition));
+                                                                             mhe_TAB_CONTENT_POSITION));
       if (pc_DrawingWidget != NULL)
       {
          if (s32_ItTab == osn_CurrentIndex)
@@ -828,7 +829,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnAddClicked(void)
 
       this->me_DashboardTabType = pc_Dialog->GetDashboardTabType();
 
-      m_AddTab(c_NewDashboard);
+      m_AddTab(c_NewDashboard, NULL);
    }
 
    if (c_New != NULL)
@@ -1094,26 +1095,18 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnPasteAction(void)
 {
    C_PuiSvDashboard c_Dashboard;
 
-   if (C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(c_Dashboard, "Tab") == C_NO_ERR)
+   QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_Rails;
+   QMap<C_PuiSvDbNodeDataPoolListElementId,
+        C_PuiSvDbElementIdCRCGroup> c_ElementIDGroups;
+
+   if (C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(c_Dashboard, c_Rails, c_ElementIDGroups, "Tab") == C_NO_ERR)
    {
-      QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_Rails;
-      if (C_SyvClipBoardHelper::h_LoadRailsFromClipboard(c_Rails, "Tab") == C_NO_ERR)
-      {
-         // handle invalid data element indices and param widget duplicates
-         C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(c_Dashboard, this->mu32_ViewIndex, this);
+      // handle invalid data element indices and param widget duplicates
+      C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(c_Dashboard, c_Rails, c_ElementIDGroups, this->mu32_ViewIndex,
+                                                       this);
 
-         // add tab
-         this->m_AddTab(c_Dashboard);
-
-         // add rails
-         for (QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
-                   C_PuiSvReadDataConfiguration>::const_iterator c_It = c_Rails.begin();
-              c_It != c_Rails.end(); ++c_It)
-         {
-            //Accept any return value, keys will most likely exist already
-            C_PuiSvHandler::h_GetInstance()->AddViewReadRailItem(this->mu32_ViewIndex, c_It.key(), c_It.value());
-         }
-      }
+      // add tab
+      this->m_AddTab(c_Dashboard, &c_Rails);
    }
 }
 
@@ -1171,7 +1164,7 @@ sint32 C_SyvDaDashboardSelectorTabWidget::m_GetTabIndex(const C_OgeWiDashboardTa
       const C_OgeWiDashboardTab * const pc_DrawingWidget =
          dynamic_cast<const C_OgeWiDashboardTab * const>(this->tabBar()->tabButton(sn_ItTab,
                                                                                    C_SyvDaDashboardSelectorTabWidget::
-                                                                                   mhe_TabContentPosition));
+                                                                                   mhe_TAB_CONTENT_POSITION));
       if ((pc_DrawingWidget != NULL) && (pc_DrawingWidget == opc_DrawingWidget))
       {
          s32_Retval = sn_ItTab;
@@ -1315,16 +1308,20 @@ void C_SyvDaDashboardSelectorTabWidget::m_TearOffWidget(const uint32 ou32_DataIn
 /*! \brief   Add tab and dashboard data
 
    \param[in]  orc_Data    New dashboard data
+   \param[in]  opc_Rails   Read rail item configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardSelectorTabWidget::m_AddTab(const C_PuiSvDashboard & orc_Data)
+void C_SyvDaDashboardSelectorTabWidget::m_AddTab(const C_PuiSvDashboard & orc_Data,
+                                                 const QMap<C_OSCNodeDataPoolListElementId,
+                                                            C_PuiSvReadDataConfiguration> * const opc_Rails)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    if (pc_View != NULL)
    {
       const uint32 u32_Index = pc_View->GetDashboards().size();
-      if (C_PuiSvHandler::h_GetInstance()->InsertDashboard(this->mu32_ViewIndex, u32_Index, orc_Data, true) == C_NO_ERR)
+      if (C_PuiSvHandler::h_GetInstance()->InsertDashboard(this->mu32_ViewIndex, u32_Index, orc_Data, true,
+                                                           opc_Rails) == C_NO_ERR)
       {
          m_AddSpecificTab(u32_Index);
          Q_EMIT this->SigChanged();
@@ -1385,7 +1382,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_DeleteTab(const sint32 os32_TabIndex)
                   c_DefaultDashboard.SetName(C_GtGetText::h_GetText("Dashboard"));
                   if (C_PuiSvHandler::h_GetInstance()->InsertDashboard(this->mu32_ViewIndex, u32_FreeIndex,
                                                                        c_DefaultDashboard,
-                                                                       true) == C_NO_ERR)
+                                                                       true, NULL) == C_NO_ERR)
                   {
                      m_AddSpecificTab(u32_FreeIndex);
                   }

@@ -44,11 +44,11 @@ private:
    const bool mq_IsString;
    const C_PuiSvDbNodeDataPoolListElementId mc_Id;
 
-   static const QString mhc_Additional64BitInfo;
-   static const QString mhc_AdditionalArrayInfo;
-   static const QString mhc_AdditionalWriteOnlyInfo;
-   static const QString mhc_AdditionalArrayIndexInfo;
-   static const QString mhc_AdditionalArrayStringInfo;
+   static const QString mhc_ADDITIONAL_64BIT_INFO;
+   static const QString mhc_ADDITIONAL_ARRAY_INFO;
+   static const QString mhc_ADDITIONAL_WRITE_ONLY_INFO;
+   static const QString mhc_ADDITIONAL_ARRAY_INDEX_INFO;
+   static const QString mhc_ADDITIONAL_ARRAY_STRING_INFO;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

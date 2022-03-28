@@ -37,15 +37,41 @@ SOURCES += ../src/main.cpp \
     ../src/navigable_gui/C_NagTopTreeDelegate.cpp \
     ../src/navigable_gui/C_NagTopTreeModel.cpp \
     ../src/navigable_gui/C_NagTopTreeView.cpp \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.cpp \
+    ../src/project_gui/system_definition/node/C_PuiSdNodeInterfaceAutomaticProperties.cpp \
     ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.cpp \
+    ../src/project_gui/system_views/dashboard/C_PuiSvDbElementIdCRCGroup.cpp \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.cpp \
     ../src/project_operations/C_PopPasswordDialogWidget.cpp \
     ../src/project_operations/C_PopServiceProjSettingsModel.cpp \
     ../src/system_definition/C_SdTopologyWidget.cpp \
+    ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.cpp \
+    ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.cpp \
     ../src/system_views/C_SyvHandlerWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPemFileOptionsPopUp.cpp \
+    ../src/system_views/system_update/C_SyvUpUpdateWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacConfig.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacConfigFiler.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacHexFileView.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListDelegate.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemDatablockWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemFileWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemParamSetWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemPemFileWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacNodeWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileAddPopUp.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfo.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoComparisonDescription.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoPopUp.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeDatablockWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.cpp \
+    ../src/system_views/system_update/update_package/C_SyvUpPacWidget.cpp \
     ../src/user_settings/C_UsHandler.cpp \
     ../src/user_settings/C_UsFiler.cpp \
     ../src/project_operations/C_PopListItem.cpp \
@@ -367,7 +393,6 @@ SOURCES += ../src/main.cpp \
     ../src/scene_base/C_SebTopologyBaseScene.cpp \
     ../src/system_views/C_SyvTopologyBaseScene.cpp \
     ../src/system_views/system_setup/C_SyvSeSetupWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpUpdateWidget.cpp \
     ../src/system_views/system_setup/C_SyvSeScene.cpp \
     ../src/system_views/system_update/C_SyvUpScene.cpp \
     ../src/system_views/system_update/C_SyvUpOverviewWidget.cpp \
@@ -568,16 +593,11 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/C_SyvUtil.cpp \
     ../src/table_base/C_TblViewScroll.cpp \
     ../src/graphic_items/system_view_items/C_GiSvNodeSyvBase.cpp \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageSectionNodeWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemWidget.cpp \
     ../src/system_views/system_update/C_SyvUpSummaryWidget.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabStateInfo.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubUpdate.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabUpdateNodeTitle.cpp \
     ../src/system_definition/node_edit/C_SdNdeIpAddressConfigurationWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListDelegate.cpp \
     ../src/opensyde_gui_elements/C_OgeHorizontalListWidget.cpp \
     ../src/graphic_items/C_GiInfo.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiOnlyBackground.cpp \
@@ -588,8 +608,6 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/system_update/C_SyvUpProgressLogEntry.cpp \
     ../src/system_views/system_update/C_SyvUpNodePropertiesDialog.cpp \
     ../src/system_views/system_update/C_SyvUpDeviceInfo.cpp \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageConfigFiler.cpp \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageConfig.cpp \
     ../src/opensyde_gui_elements/C_OgeTabBar.cpp \
     ../src/system_views/system_update/C_SyvUpPieChart.cpp \
     ../src/graphic_items/C_GiSvgGraphicsItem.cpp \
@@ -635,7 +653,6 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/C_SyvManager.cpp \
     ../src/com_import_export/C_CieExportReportWidget.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxAllBase.cpp \
-    ../src/system_views/system_update/C_SyvUpHexFileView.cpp \
     ../src/com_import_export/C_RtfExportWidget.cpp \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaTreeView.cpp \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaTreeModel.cpp \
@@ -729,20 +746,8 @@ SOURCES += ../src/main.cpp \
     ../src/project_gui/system_definition/C_PuiSdSharedDatapools.cpp \
     ../src/project_gui/system_views/C_PuiSvHandlerFilerV1.cpp \
     ../src/project_gui/system_views/C_PuiSvNodeUpdateParamInfo.cpp \
-    ../src/system_views/system_update/C_SyvUpParamSetFileInfoPopUp.cpp \
-    ../src/system_views/system_update/C_SyvUpParamSetFileInfo.cpp \
-    ../src/system_views/system_update/C_SyvUpParamSetFileInfoComparisonDescription.cpp \
     ../src/system_views/system_update/C_SyvUpSummaryWidgetSmall.cpp \
     ../src/system_views/system_update/C_SyvUpInformationWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.cpp \
-    ../src/system_views/system_update/C_SyvUpPemFileInfoPopUp.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemDatablockWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemFileWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemParamSetWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemPemFileWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageSectionNodeDatablockWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpPackageSectionNodeFilesWidget.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubSystemCommissioningEdit.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconWithTextBase.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxSystemCommisioningEdit.cpp \
@@ -752,7 +757,6 @@ SOURCES += ../src/main.cpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerNodeLogic.cpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerData.cpp \
     ../src/system_views/dashboards/C_SyvDaDashboardSnapshot.cpp \
-    ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.cpp \
     ../src/system_views/system_update/C_SyvUpFileSizeInformation.cpp \
     ../src/table_base/tree_base/C_TblTreDelegateUtil.cpp \
     ../src/user_settings/C_UsSystemViewNode.cpp \
@@ -884,15 +888,41 @@ HEADERS  += \
     ../src/navigable_gui/C_NagTopTreeDelegate.h \
     ../src/navigable_gui/C_NagTopTreeModel.h \
     ../src/navigable_gui/C_NagTopTreeView.h \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.h \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.h \
+    ../src/project_gui/system_definition/node/C_PuiSdNodeInterfaceAutomaticProperties.h \
     ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.h \
+    ../src/project_gui/system_views/dashboard/C_PuiSvDbElementIdCRCGroup.h \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.h \
     ../src/project_operations/C_PopPasswordDialogWidget.h \
     ../src/project_operations/C_PopServiceProjSettingsModel.h \
     ../src/system_definition/C_SdTopologyWidget.h \
+    ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.h \
+    ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.h \
     ../src/system_views/C_SyvHandlerWidget.h \
-    ../src/system_views/system_update/C_SyvUpPemFileOptionsPopUp.h \
+    ../src/system_views/system_update/C_SyvUpUpdateWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacConfig.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacConfigFiler.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacHexFileView.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListDelegate.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemDatablockWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemFileWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemParamSetWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemPemFileWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacNodeWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileAddPopUp.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfo.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoComparisonDescription.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoPopUp.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeDatablockWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.h \
+    ../src/system_views/system_update/update_package/C_SyvUpPacWidget.h \
     ../src/user_settings/C_UsHandler.h \
     ../src/constants.h \
     ../src/user_settings/C_UsFiler.h \
@@ -1216,7 +1246,6 @@ HEADERS  += \
     ../src/scene_base/C_SebTopologyBaseScene.h \
     ../src/system_views/C_SyvTopologyBaseScene.h \
     ../src/system_views/system_setup/C_SyvSeSetupWidget.h \
-    ../src/system_views/system_update/C_SyvUpUpdateWidget.h \
     ../src/system_views/system_setup/C_SyvSeScene.h \
     ../src/system_views/system_update/C_SyvUpScene.h \
     ../src/system_views/system_update/C_SyvUpOverviewWidget.h \
@@ -1417,16 +1446,11 @@ HEADERS  += \
     ../src/system_views/C_SyvUtil.h \
     ../src/table_base/C_TblViewScroll.h \
     ../src/graphic_items/system_view_items/C_GiSvNodeSyvBase.h \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageWidget.h \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListWidget.h \
-    ../src/system_views/system_update/C_SyvUpPackageSectionNodeWidget.h \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemWidget.h \
     ../src/system_views/system_update/C_SyvUpSummaryWidget.h \
     ../src/opensyde_gui_elements/label/C_OgeLabStateInfo.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubUpdate.h \
     ../src/opensyde_gui_elements/label/C_OgeLabUpdateNodeTitle.h \
     ../src/system_definition/node_edit/C_SdNdeIpAddressConfigurationWidget.h \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListDelegate.h \
     ../src/opensyde_gui_elements/C_OgeHorizontalListWidget.h \
     ../src/graphic_items/C_GiInfo.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiOnlyBackground.h \
@@ -1437,8 +1461,6 @@ HEADERS  += \
     ../src/system_views/system_update/C_SyvUpProgressLogEntry.h \
     ../src/system_views/system_update/C_SyvUpNodePropertiesDialog.h \
     ../src/system_views/system_update/C_SyvUpDeviceInfo.h \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageConfigFiler.h \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageConfig.h \
     ../src/opensyde_gui_elements/C_OgeTabBar.h \
     ../src/system_views/system_update/C_SyvUpPieChart.h \
     ../src/graphic_items/C_GiSvgGraphicsItem.h \
@@ -1510,7 +1532,6 @@ HEADERS  += \
     ../src/system_views/C_SyvManager.h \
     ../src/com_import_export/C_CieExportReportWidget.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxAllBase.h \
-    ../src/system_views/system_update/C_SyvUpHexFileView.h \
     ../src/com_import_export/C_RtfExportWidget.h \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaTreeView.h \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaTreeModel.h \
@@ -1588,20 +1609,8 @@ HEADERS  += \
     ../src/project_gui/system_definition/C_PuiSdSharedDatapools.h \
     ../src/project_gui/system_views/C_PuiSvHandlerFilerV1.h \
     ../src/project_gui/system_views/C_PuiSvNodeUpdateParamInfo.h \
-    ../src/system_views/system_update/C_SyvUpParamSetFileInfoPopUp.h \
-    ../src/system_views/system_update/C_SyvUpParamSetFileInfo.h \
-    ../src/system_views/system_update/C_SyvUpParamSetFileInfoComparisonDescription.h \
     ../src/system_views/system_update/C_SyvUpSummaryWidgetSmall.h \
     ../src/system_views/system_update/C_SyvUpInformationWidget.h \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.h \
-    ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.h \
-    ../src/system_views/system_update/C_SyvUpPemFileInfoPopUp.h \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemDatablockWidget.h \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemFileWidget.h \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemParamSetWidget.h \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemPemFileWidget.h \
-    ../src/system_views/system_update/C_SyvUpPackageSectionNodeDatablockWidget.h \
-    ../src/system_views/system_update/C_SyvUpPackageSectionNodeFilesWidget.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubSystemCommissioningEdit.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconWithTextBase.h \
     ../src/opensyde_gui_elements/check_box/C_OgeChxSystemCommisioningEdit.h \
@@ -1611,7 +1620,6 @@ HEADERS  += \
     ../src/project_gui/system_definition/C_PuiSdHandlerNodeLogic.h \
     ../src/project_gui/system_definition/C_PuiSdHandlerData.h \
     ../src/system_views/dashboards/C_SyvDaDashboardSnapshot.h \
-    ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.h \
     ../src/system_views/system_update/C_SyvUpFileSizeInformation.h \
     ../src/table_base/tree_base/C_TblTreDelegateUtil.h \
     ../src/user_settings/C_UsSystemViewNode.h \
@@ -1711,6 +1719,8 @@ FORMS    += \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.ui \
     ../src/project_operations/C_PopPasswordDialogWidget.ui \
     ../src/system_definition/C_SdTopologyWidget.ui \
+    ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.ui \
+    ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.ui \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.ui \
     ../src/system_views/C_SyvHandlerWidget.ui \
     ../src/opensyde_gui_elements/C_OgePopUpDialog.ui \
@@ -1761,8 +1771,6 @@ FORMS    += \
     ../src/system_definition/C_SdNodeComIfSetupWidget.ui \
     ../src/system_definition/C_SdNodeToNodeConnectionSetupWidget.ui \
     ../src/system_views/system_setup/C_SyvSeSetupWidget.ui \
-    ../src/system_views/system_update/C_SyvUpPemFileOptionsPopUp.ui \
-    ../src/system_views/system_update/C_SyvUpUpdateWidget.ui \
     ../src/system_views/system_update/C_SyvUpOverviewWidget.ui \
     ../src/opensyde_gui_elements/widget/C_OgeWiDashboardTab.ui \
     ../src/system_views/dashboards/C_SyvDaTearOffWidget.ui \
@@ -1792,9 +1800,6 @@ FORMS    += \
     ../src/system_definition/node_edit/stw_flashloader_options/C_SdNdeStwFlashloaderOptions.ui \
     ../src/system_views/device_configuration/C_SyvDcExistingNodeDropAreaWidget.ui \
     ../src/system_views/device_configuration/C_SyvDcConnectedNodeWidget.ui \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageWidget.ui \
-    ../src/system_views/system_update/C_SyvUpPackageSectionNodeWidget.ui \
-    ../src/system_views/system_update/C_SyvUpPackageListNodeItemWidget.ui \
     ../src/system_views/system_update/C_SyvUpSummaryWidget.ui \
     ../src/system_definition/node_edit/C_SdNdeIpAddressConfigurationWidget.ui \
     ../src/system_views/system_update/C_SyvUpProgressLog.ui \
@@ -1808,7 +1813,6 @@ FORMS    += \
     ../src/com_import_export/C_CieDcfEdsImportNodeSelectWidget.ui \
     ../src/com_import_export/C_CieImportReportWidget.ui \
     ../src/com_import_export/C_CieExportReportWidget.ui \
-    ../src/system_views/system_update/C_SyvUpHexFileView.ui \
     ../src/com_import_export/C_RtfExportWidget.ui \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaWidgetNew.ui \
     ../src/system_views/dashboards/C_SyvDaDashboardTabProperties.ui \
@@ -1825,12 +1829,8 @@ FORMS    += \
     ../src/implementation/C_ImpCodeGenerationReportWidget.ui \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaImportReport.ui \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorAddWidget.ui \
-    ../src/system_views/system_update/C_SyvUpParamSetFileInfoPopUp.ui \
-    ../src/system_views/system_update/C_SyvUpPemFileInfoPopUp.ui \
     ../src/system_views/system_update/C_SyvUpSummaryWidgetSmall.ui \
     ../src/system_views/system_update/C_SyvUpInformationWidget.ui \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.ui \
-    ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.ui \
     ../src/system_views/dashboards/C_SyvDaDashboardInteraction.ui \
     ../src/system_definition/bus_edit/C_SdBueMessageRxDatapoolEntry.ui \
     ../src/system_definition/bus_edit/C_SdBueMessageRxTimeoutConfig.ui \
@@ -1852,7 +1852,17 @@ FORMS    += \
     ../src/system_views/dashboards/tab_chart/C_SyvDaChaWidget.ui \
     ../src/system_views/dashboards/tab_chart/C_SyvDaChaDataItemWidget.ui \
     ../src/system_views/dashboards/tab_chart/C_SyvDaChaDataSelectorWidget.ui \
-    ../src/system_views/dashboards/tab_chart/C_SyvDaChaPlotHandlerWidget.ui
+    ../src/system_views/dashboards/tab_chart/C_SyvDaChaPlotHandlerWidget.ui \
+    ../src/system_views/system_update/C_SyvUpUpdateWidget.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacHexFileView.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacListNodeItemWidget.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacNodeWidget.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileAddPopUp.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacParamSetFileInfoPopUp.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFileInfoPopUp.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacPemFileOptionsPopUp.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.ui \
+    ../src/system_views/system_update/update_package/C_SyvUpPacWidget.ui
 
 INCLUDEPATH += ../src \
                ../src/com_import_export \
@@ -1907,6 +1917,7 @@ INCLUDEPATH += ../src \
                ../src/system_views/dashboards/tab_chart \
                ../src/system_views/system_setup \
                ../src/system_views/system_update \
+               ../src/system_views/system_update/update_package \
                ../src/system_views/dashboards/undo \
                ../src/system_views/routing \
                ../src/system_views/device_configuration \

@@ -23,11 +23,11 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_TblTreDataElementItem::mhc_Additional64BitInfo = " (Not supported, 64 bit value)";
-const QString C_TblTreDataElementItem::mhc_AdditionalArrayInfo = " (Not supported, array or string type)";
-const QString C_TblTreDataElementItem::mhc_AdditionalWriteOnlyInfo = " (Not supported, read only)";
-const QString C_TblTreDataElementItem::mhc_AdditionalArrayIndexInfo = " (Not supported, array index)";
-const QString C_TblTreDataElementItem::mhc_AdditionalArrayStringInfo = " (Not supported, string type)";
+const QString C_TblTreDataElementItem::mhc_ADDITIONAL_64BIT_INFO = " (Not supported, 64 bit value)";
+const QString C_TblTreDataElementItem::mhc_ADDITIONAL_ARRAY_INFO = " (Not supported, array or string type)";
+const QString C_TblTreDataElementItem::mhc_ADDITIONAL_WRITE_ONLY_INFO = " (Not supported, read only)";
+const QString C_TblTreDataElementItem::mhc_ADDITIONAL_ARRAY_INDEX_INFO = " (Not supported, array index)";
+const QString C_TblTreDataElementItem::mhc_ADDITIONAL_ARRAY_STRING_INFO = " (Not supported, string type)";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -105,7 +105,7 @@ void C_TblTreDataElementItem::ConfigureDynamicName(const bool oq_ShowOnlyWriteEl
             this->q_Enabled = false;
             this->q_Selectable = false;
             //Explanation
-            this->c_Name += C_TblTreDataElementItem::mhc_AdditionalWriteOnlyInfo;
+            this->c_Name += C_TblTreDataElementItem::mhc_ADDITIONAL_WRITE_ONLY_INFO;
          }
       }
       else
@@ -113,7 +113,7 @@ void C_TblTreDataElementItem::ConfigureDynamicName(const bool oq_ShowOnlyWriteEl
          this->q_Enabled = false;
          this->q_Selectable = false;
          //Explanation
-         this->c_Name += C_TblTreDataElementItem::mhc_Additional64BitInfo;
+         this->c_Name += C_TblTreDataElementItem::mhc_ADDITIONAL_64BIT_INFO;
       }
    }
    else
@@ -123,7 +123,7 @@ void C_TblTreDataElementItem::ConfigureDynamicName(const bool oq_ShowOnlyWriteEl
          this->q_Enabled = false;
          this->q_Selectable = false;
          //Explanation
-         this->c_Name += C_TblTreDataElementItem::mhc_AdditionalArrayIndexInfo;
+         this->c_Name += C_TblTreDataElementItem::mhc_ADDITIONAL_ARRAY_INDEX_INFO;
       }
       else
       {
@@ -132,7 +132,7 @@ void C_TblTreDataElementItem::ConfigureDynamicName(const bool oq_ShowOnlyWriteEl
             this->q_Enabled = false;
             this->q_Selectable = false;
             //Explanation
-            this->c_Name += C_TblTreDataElementItem::mhc_AdditionalArrayStringInfo;
+            this->c_Name += C_TblTreDataElementItem::mhc_ADDITIONAL_ARRAY_STRING_INFO;
          }
          else
          {
@@ -150,7 +150,7 @@ void C_TblTreDataElementItem::ConfigureDynamicName(const bool oq_ShowOnlyWriteEl
             if (oq_ShowArrayIndexElements == false)
             {
                //Explanation
-               this->c_Name += C_TblTreDataElementItem::mhc_AdditionalArrayInfo;
+               this->c_Name += C_TblTreDataElementItem::mhc_ADDITIONAL_ARRAY_INFO;
             }
          }
       }

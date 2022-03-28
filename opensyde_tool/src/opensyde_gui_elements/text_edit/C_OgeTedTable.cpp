@@ -18,6 +18,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
+using namespace stw_types;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -59,4 +60,25 @@ void C_OgeTedTable::focusInEvent(QFocusEvent * const opc_Event)
 {
    QTextEdit::focusInEvent(opc_Event);
    this->selectAll();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten key press event to emulate key 'Tab', 'Return' and 'Enter' behaviour as user confirmation.
+
+   \param[in]       opc_KeyEvent     Qt key event to catch
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeTedTable::keyPressEvent(QKeyEvent * const opc_KeyEvent)
+{
+   if (opc_KeyEvent != NULL)
+   {
+      C_OgeTedContextMenuBase::keyPressEvent(opc_KeyEvent);
+      if ((opc_KeyEvent->matches(QKeySequence::InsertLineSeparator) == false) &&
+          ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Tab)) ||
+           (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)) ||
+           (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter))))
+      {
+         Q_EMIT (this->SigConfirmed()); // make known to delegate and afterwards to table view
+      }
+   }
 }

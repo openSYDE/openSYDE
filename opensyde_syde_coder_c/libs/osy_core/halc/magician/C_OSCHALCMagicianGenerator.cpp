@@ -371,10 +371,11 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
             if (orc_Domain.GetRelevantIndicesForSelectedUseCase(0UL, false, &c_RelevantParameters, NULL,
                                                                 NULL, NULL) == C_NO_ERR)
             {
-               s32_Retval = this->m_FillHALCDatapoolsChannel(orc_List, orc_Domain.c_DomainConfig, orc_Handler,
-                                                             ou32_ItDomain,
-                                                             0UL, c_RelevantParameters,
-                                                             orc_Domain.c_DomainValues.c_Parameters);
+               s32_Retval = this->m_FillHALCDatapoolsChannel(
+                  orc_List, orc_Domain.c_DomainConfig, orc_Handler,
+                  ou32_ItDomain,
+                  0UL, c_RelevantParameters,
+                  orc_Domain.c_DomainValues.c_Parameters);
             }
             else
             {
@@ -387,10 +388,9 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
                if (orc_Handler.CheckSafetyFlagVariableNecessary())
                {
                   //Fill Use-case
-                  s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsSafetyFlag(orc_List, orc_Handler,
-                                                                                         ou32_ItDomain,
-                                                                                         u32_ItRelevantChannel,
-                                                                                         orc_Domain.c_DomainConfig.q_SafetyRelevant);
+                  s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsSafetyFlag(
+                     orc_List, orc_Handler, ou32_ItDomain, u32_ItRelevantChannel,
+                     orc_Domain.c_DomainConfig.q_SafetyRelevant);
                }
             }
             //Check assumptions, assert if not filled but required/generated
@@ -409,9 +409,8 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
             //Fill channel
             if (orc_Handler.CheckChanNumVariableNecessary(orc_Domain))
             {
-               s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsChanNum(orc_List, orc_Handler, ou32_ItDomain,
-                                                                                   u32_ItRelevantChannel,
-                                                                                   u32_ItChannel);
+               s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsChanNum(
+                  orc_List, orc_Handler, ou32_ItDomain, u32_ItRelevantChannel, u32_ItChannel);
             }
 
             if (s32_Retval == C_NO_ERR)
@@ -419,10 +418,8 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
                if (orc_Handler.CheckSafetyFlagVariableNecessary())
                {
                   //Fill Use-case
-                  s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsSafetyFlag(orc_List, orc_Handler,
-                                                                                         ou32_ItDomain,
-                                                                                         u32_ItRelevantChannel,
-                                                                                         rc_Channel.q_SafetyRelevant);
+                  s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsSafetyFlag(
+                     orc_List, orc_Handler, ou32_ItDomain, u32_ItRelevantChannel, rc_Channel.q_SafetyRelevant);
                }
             }
 
@@ -430,11 +427,20 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
             {
                if (orc_Handler.CheckUseCaseVariableNecessary(orc_Domain))
                {
+                  //Get use-case value from index:
+                  //use case index out of range of known use cases would mean we'd have a configuration error
+                  tgl_assert(rc_Channel.u32_UseCaseIndex < orc_Domain.c_ChannelUseCases.size());
+
+                  const C_OSCNodeDataPoolContent & rc_UseCaseContent =
+                     orc_Domain.c_ChannelUseCases[rc_Channel.u32_UseCaseIndex].c_Value;
+
+                  //definition: only uint8 supported for use case
+                  tgl_assert(rc_UseCaseContent.GetType() == C_OSCNodeDataPoolContent::eUINT8);
+
                   //Fill Use-case
-                  s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsUseCase(orc_List, orc_Handler,
-                                                                                      ou32_ItDomain,
-                                                                                      u32_ItRelevantChannel,
-                                                                                      rc_Channel.u32_UseCaseIndex);
+                  s32_Retval = C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsUseCase(
+                     orc_List, orc_Handler, ou32_ItDomain, u32_ItRelevantChannel,
+                     rc_UseCaseContent.GetValueU8());
                }
             }
 
@@ -443,9 +449,10 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolLi
                if (orc_Domain.GetRelevantIndicesForSelectedUseCase(u32_ItChannel, true, &c_RelevantParameters, NULL,
                                                                    NULL, NULL) == C_NO_ERR)
                {
-                  s32_Retval = this->m_FillHALCDatapoolsChannel(orc_List, rc_Channel, orc_Handler, ou32_ItDomain,
-                                                                u32_ItRelevantChannel, c_RelevantParameters,
-                                                                orc_Domain.c_ChannelValues.c_Parameters);
+                  s32_Retval = this->m_FillHALCDatapoolsChannel(
+                     orc_List, rc_Channel, orc_Handler, ou32_ItDomain,
+                     u32_ItRelevantChannel, c_RelevantParameters,
+                     orc_Domain.c_ChannelValues.c_Parameters);
                }
                else
                {
@@ -577,7 +584,7 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsSafetyFlag(C_OSCNodeDataPo
    \param[in]      orc_Handler         Handler
    \param[in]      ou32_ItDomain       Iterator domain
    \param[in]      ou32_RelevantIndex  Relevant index
-   \param[in]      ou32_UseCase        Use case
+   \param[in]      ou8_UseCaseValue    Use case value to fill into data set
 
    \return
    C_NO_ERR Datapool definition generated
@@ -588,12 +595,10 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsUseCase(C_OSCNodeDataPoolL
                                                               const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
                                                               const uint32 ou32_ItDomain,
                                                               const uint32 ou32_RelevantIndex,
-                                                              const uint32 ou32_UseCase) const
+                                                              const uint8 ou8_UseCaseValue) const
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_OSCNodeDataPoolListElement * const pc_UseCaseElement = orc_Handler.GetUseCaseListElement(
-      ou32_ItDomain,
-      orc_List);
+   C_OSCNodeDataPoolListElement * const pc_UseCaseElement = orc_Handler.GetUseCaseListElement(ou32_ItDomain, orc_List);
 
    if (pc_UseCaseElement != NULL)
    {
@@ -601,14 +606,14 @@ sint32 C_OSCHALCMagicianGenerator::m_FillHALCDatapoolsUseCase(C_OSCNodeDataPoolL
       {
          C_OSCNodeDataPoolContent & rc_Content = pc_UseCaseElement->c_DataSetValues[0UL];
          tgl_assert(rc_Content.GetType() == C_OSCNodeDataPoolContent::eUINT8);
+
          if (pc_UseCaseElement->GetArray())
          {
-            rc_Content.SetValueAU8Element(static_cast<uint8>(ou32_UseCase),
-                                          ou32_RelevantIndex);
+            rc_Content.SetValueAU8Element(ou8_UseCaseValue, ou32_RelevantIndex);
          }
          else
          {
-            rc_Content.SetValueU8(static_cast<uint8>(ou32_UseCase));
+            rc_Content.SetValueU8(ou8_UseCaseValue);
          }
       }
       else

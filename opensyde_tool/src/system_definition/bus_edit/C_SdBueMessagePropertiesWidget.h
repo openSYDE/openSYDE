@@ -95,12 +95,13 @@ private:
    void m_TrimmMessageName(void) const;
    void m_RegisterChange(void);
    void m_LoadFromData(void);
-   void m_OnExtendedChange(const bool & orq_Extended) const;
+   void m_OnExtendedChangeWithoutDataAccess(const bool & orq_Extended) const;
    void m_OnTxMethodChange(const stw_types::sint32 & ors32_State) const;
    static stw_types::sint32 mh_TxMethodToIndex(const stw_opensyde_core::C_OSCCanMessage::E_TxMethodType & ore_TxMethod);
    static stw_opensyde_core::C_OSCCanMessage::E_TxMethodType mh_IndexToTxMethod(const stw_types::sint32 & ors32_Index);
    void m_OnNameChanged(void);
    void m_OnIdChanged(void);
+   void m_OnExtendedChanged(void);
    void m_OnDlcChanged(void);
    void m_OnCycleTimeChanged(void);
    void m_OnTxMethodChanged(void);

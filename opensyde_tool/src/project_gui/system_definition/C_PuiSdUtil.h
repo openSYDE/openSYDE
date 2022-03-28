@@ -21,9 +21,11 @@
 #include "C_OSCSystemBus.h"
 #include "C_OSCCanProtocol.h"
 #include "C_OSCNodeDataPool.h"
+#include "C_PuiSdNodeConnectionId.h"
 #include "C_OSCNodeDataPoolListElementId.h"
-#include "C_OSCCanMessageIdentificationIndices.h"
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
+#include "C_OSCCanMessageIdentificationIndices.h"
+#include "C_PuiSdNodeInterfaceAutomaticProperties.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -61,6 +63,9 @@ public:
    static stw_types::uint32 h_GetIndexOfFirstNodeInGroup(const stw_types::uint32 ou32_NodeIndex);
    static bool h_CheckIsFirstInAnyGroupOrNotInAny(const stw_types::uint32 ou32_NodeIndex,
                                                   const std::vector<stw_opensyde_core::C_OSCNodeSquad> & orc_AvailableGroups);
+   static void h_GetInterfaceDataForNode(const stw_types::uint32 ou32_NodeIndex,
+                                         const C_PuiSdNodeConnectionId & orc_ConnectionId,
+                                         std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties);
 
 private:
    C_PuiSdUtil(void);

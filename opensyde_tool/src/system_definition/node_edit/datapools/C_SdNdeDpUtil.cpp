@@ -822,32 +822,32 @@ sint32 C_SdNdeDpUtil::h_GetTableSize(const uint32 ou32_NodeIndex, const uint32 o
    const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(ou32_NodeIndex,
                                                                                                      ou32_DataPoolIndex,
                                                                                                      ou32_ListIndex);
-   const sintn sn_HeaderOffset = 40;
+   const sintn sn_HEADER_OFFSET = 40;
 
    if ((pc_List != NULL) && (pc_Datapool != NULL))
    {
-      const sintn sn_ConstOffset = 65;
-      const sintn sn_ConstChecksumOffset = 33;
-      const sintn sn_ItemOffset = 30;
-      const uint32 u32_VisibleItemCount = 7;
-      const uint32 u32_ItemCount = pc_List->c_Elements.size();
-      sintn sn_Height = sn_ConstOffset;
+      const sintn sn_CONST_OFFSET = 65;
+      const sintn sn_CONST_CHECKSUM_OFFSET = 33;
+      const sintn sn_ITEM_OFFSET = 30;
+      const uint32 u32_VISIBLE_ITEM_COUNT = 7U;
+      const uint32 u32_ITEM_COUNT = pc_List->c_Elements.size();
+      sintn sn_Height = sn_CONST_OFFSET;
 
       //Add checksum checkbox offset for NVM Datapool lists
       if (pc_Datapool->e_Type == C_OSCNodeDataPool::eNVM)
       {
-         sn_Height += sn_ConstChecksumOffset;
+         sn_Height += sn_CONST_CHECKSUM_OFFSET;
       }
 
-      if (u32_ItemCount <= u32_VisibleItemCount)
+      if (u32_ITEM_COUNT <= u32_VISIBLE_ITEM_COUNT)
       {
          // case: number of rows smaller than limit -> show all rows
-         sn_Height += sn_ItemOffset * static_cast<sintn>(u32_ItemCount);
+         sn_Height += sn_ITEM_OFFSET * static_cast<sintn>(u32_ITEM_COUNT);
       }
       else
       {
          // case: more rows than limit -> show limited number of rows
-         sn_Height += sn_ItemOffset * static_cast<sintn>(u32_VisibleItemCount);
+         sn_Height += sn_ITEM_OFFSET * static_cast<sintn>(u32_VISIBLE_ITEM_COUNT);
       }
 
       // special case: last list -> if enough space exists, show as much rows as possible
@@ -863,17 +863,17 @@ sint32 C_SdNdeDpUtil::h_GetTableSize(const uint32 ou32_NodeIndex, const uint32 o
          {
             sn_HeightOtherLists +=
                static_cast<sintn>(C_SdNdeDpUtil::h_GetTableSize(ou32_NodeIndex, ou32_DataPoolIndex, u32_ListCounter)) +
-               sn_HeaderOffset; // no infinite recursion because of list index check above
+               sn_HEADER_OFFSET; // no infinite recursion because of list index check above
          }
 
          // calculate remaining space for last table
          sn_RemainingSpace = osn_MaximumHeight - sn_HeightOtherLists;
 
          // check if more remaining space than the current proposed height
-         if ((sn_Height + sn_HeaderOffset) < sn_RemainingSpace)
+         if ((sn_Height + sn_HEADER_OFFSET) < sn_RemainingSpace)
          {
             // list can use the remaining space
-            sn_Height = sn_RemainingSpace - sn_HeaderOffset;
+            sn_Height = sn_RemainingSpace - sn_HEADER_OFFSET;
          }
       }
 
@@ -882,7 +882,7 @@ sint32 C_SdNdeDpUtil::h_GetTableSize(const uint32 ou32_NodeIndex, const uint32 o
    else
    {
       //Fallback, should not happen
-      s32_Retval = sn_HeaderOffset;
+      s32_Retval = sn_HEADER_OFFSET;
    }
    return s32_Retval;
 }

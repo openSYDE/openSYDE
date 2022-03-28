@@ -49,7 +49,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageTableModel::C_SdBueMessageTableModel(QObject * const opc_Parent) :
@@ -61,7 +61,7 @@ C_SdBueMessageTableModel::C_SdBueMessageTableModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set message sync manager
 
-   \param[in,out] opc_Value Message sync manager
+   \param[in,out]  opc_Value  Message sync manager
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableModel::SetMessageSyncManager(C_PuiSdNodeCanMessageSyncManager * const opc_Value)
@@ -86,9 +86,9 @@ void C_SdBueMessageTableModel::UpdateData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in] osn_Section    Section
-   \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in]  osn_Section       Section
+   \param[in]  oe_Orientation    Orientation
+   \param[in]  osn_Role          Role
 
    \return
    Header string
@@ -164,7 +164,7 @@ QVariant C_SdBueMessageTableModel::headerData(const sintn osn_Section, const Qt:
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table row count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -183,7 +183,7 @@ sintn C_SdBueMessageTableModel::rowCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -204,8 +204,8 @@ sintn C_SdBueMessageTableModel::columnCount(const QModelIndex & orc_Parent) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -406,7 +406,9 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                         QStringList c_Tmp;
 
                         this->mpc_SyncManager->CheckMessageNameBus(pc_Message->c_Name, q_NameValid, &rc_MessageId);
-                        this->mpc_SyncManager->CheckMessageIdBus(pc_Message->u32_CanId, q_IdValid, &rc_MessageId);
+                        this->mpc_SyncManager->CheckMessageIdBus(C_OSCCanMessageUniqueId(pc_Message->u32_CanId,
+                                                                                         pc_Message->q_IsExtended), q_IdValid,
+                                                                 &rc_MessageId);
                         this->mpc_SyncManager->CheckMessageHasTx(q_HasTx, rc_MessageId);
                         //Check signals
                         if (pc_Message->c_Signals.size() > 0)
@@ -512,7 +514,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get flags for item
 
-   \param[in] orc_Index Item
+   \param[in]  orc_Index   Item
 
    \return
    Flags for item
@@ -547,7 +549,7 @@ Qt::ItemFlags C_SdBueMessageTableModel::flags(const QModelIndex & orc_Index) con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Column to enum conversion
 
-   \param[in]  ors32_Column Column
+   \param[in]  ors32_Column   Column
 
    \return
    Enum value
@@ -608,7 +610,7 @@ C_SdBueMessageTableModel::E_Columns C_SdBueMessageTableModel::h_ColumnToEnum(con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Enum to column conversion
 
-   \param[in] ore_Value Enum value
+   \param[in]  ore_Value   Enum value
 
    \return
    Column
@@ -671,8 +673,8 @@ sint32 C_SdBueMessageTableModel::h_EnumToColumn(const C_SdBueMessageTableModel::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert row to message
 
-   \param[in]  ors32_Row     Model row
-   \param[out] orc_MessageId Message identification indices
+   \param[in]   ors32_Row        Model row
+   \param[out]  orc_MessageId    Message identification indices
 
    \return
    C_NO_ERR Operation success
@@ -711,8 +713,8 @@ sint32 C_SdBueMessageTableModel::ConvertRowToMessage(const sint32 & ors32_Row,
 
    Examples: Node / Node (CAN1) / Node (Datapool, CAN1)
 
-   \param[in]       orc_CurMatchingId      ID of the message where the name is created for
-   \param[in]       orc_AllMatchingIds     All matching Ids (needed to find out if CAN interface is ambiguous)
+   \param[in]  orc_CurMatchingId    ID of the message where the name is created for
+   \param[in]  orc_AllMatchingIds   All matching Ids (needed to find out if CAN interface is ambiguous)
 
    \return
    Name string       Examples: MyNode / MyNode (CAN1) / MyNode (MyDatapool, CAN1)

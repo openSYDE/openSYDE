@@ -49,7 +49,7 @@ public:
                      const stw_opensyde_gui_logic::C_PuiSvDbProgressBar::E_Alignment oe_Alignment,
                      const bool oq_ShowMinMax);
    void SetValuePe(const stw_types::sintn osn_Value);
-   virtual void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex,
+   virtual void UpdateTransparency(const stw_types::uint32 ou32_DataElementIndex,
                                    const stw_types::sintn osn_Value) override;
 
 private:

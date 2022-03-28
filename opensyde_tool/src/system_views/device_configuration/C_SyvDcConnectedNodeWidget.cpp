@@ -213,8 +213,8 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
    QString c_Name;
    QString c_Id;
    QString c_Device;
-   const sintn sn_Height = 72;
-   const sintn sn_Width = 294;
+   const sintn sn_HEIGHT = 72;
+   const sintn sn_WIDTH = 294;
 
    if (this->mc_Info.c_SerialNumber.q_IsValid == true)
    {
@@ -249,7 +249,7 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
       c_Id += " / IP: " + C_Uti::h_IpAddressToString(this->mc_Info.au8_IpAddress);
    }
 
-   this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>("Node-ID: %1").arg(c_Id));
+   this->mpc_Ui->pc_LabelNodeId->setText(static_cast<QString>("Node ID: %1").arg(c_Id));
 
    if (this->mc_Info.q_DeviceNameValid == true)
    {
@@ -261,21 +261,21 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
    }
    this->mpc_Ui->pc_LabelDeviceType->setText(static_cast<QString>("Type: %1").arg(c_Device));
    //Resize
-   this->resize(sn_Width, sn_Height);
-   this->setMinimumHeight(sn_Height);
-   this->setMaximumHeight(sn_Height);
-   this->setMinimumWidth(sn_Width);
-   this->setMaximumWidth(sn_Width);
+   this->resize(sn_WIDTH, sn_HEIGHT);
+   this->setMinimumHeight(sn_HEIGHT);
+   this->setMaximumHeight(sn_HEIGHT);
+   this->setMinimumWidth(sn_WIDTH);
+   this->setMaximumWidth(sn_WIDTH);
    if (this->mpc_ListWidgetItem != NULL)
    {
-      this->mpc_ListWidgetItem->setSizeHint(QSize(sn_Width, sn_Height));
+      this->mpc_ListWidgetItem->setSizeHint(QSize(sn_WIDTH, sn_HEIGHT));
    }
    else
    {
       //Adapted for missing borders
-      this->setMinimumWidth(sn_Width);
-      this->setMaximumWidth(sn_Width);
-      this->setMinimumHeight(sn_Height);
-      this->setMaximumHeight(sn_Height);
+      this->setMinimumWidth(sn_WIDTH);
+      this->setMaximumWidth(sn_WIDTH);
+      this->setMinimumHeight(sn_HEIGHT);
+      this->setMaximumHeight(sn_HEIGHT);
    }
 }

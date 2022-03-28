@@ -121,6 +121,8 @@ QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent, c
          break;
       case C_SdNdeDpListTableModel::eCOMMENT:
          pc_Retval = new C_OgeTedTable(opc_Parent);
+         connect(dynamic_cast<C_OgeTedTable *>(pc_Retval), &C_OgeTedTable::SigConfirmed, this,
+                 &C_SdNdeDpListTableDelegate::SigTedConfirmed);
          break;
       case C_SdNdeDpListTableModel::eVALUE_TYPE:
          pc_ComboBox = new C_OgeCbxTable(opc_Parent);

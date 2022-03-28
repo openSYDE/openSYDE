@@ -26,7 +26,7 @@ using namespace stw_types;
 using namespace stw_errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint8 C_UsHandler::mhu8_MaxRecentProjects = 42;
+const uint8 C_UsHandler::mhu8_NAX_RECENT_PROJECTS = 42;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -236,7 +236,7 @@ sint32 C_UsHandler::GetSelectedProtocolIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 stw_types::uint8 C_UsHandler::h_GetMaxRecentProjects(void)
 {
-   return C_UsHandler::mhu8_MaxRecentProjects;
+   return C_UsHandler::mhu8_NAX_RECENT_PROJECTS;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -828,7 +828,7 @@ void C_UsHandler::AddToRecentProjects(const QString & orc_Str)
    RemoveOfRecentProjects(c_Copy);
    //Add
    this->mc_RecentProjects.prepend(c_Copy.toStdString().c_str());
-   if (this->mc_RecentProjects.count() > C_UsHandler::mhu8_MaxRecentProjects)
+   if (this->mc_RecentProjects.count() > C_UsHandler::mhu8_NAX_RECENT_PROJECTS)
    {
       this->mc_RecentProjects.pop_back();
    }

@@ -533,7 +533,7 @@ QIcon C_SdNdeHalcChannelTreeModel::mh_InitIcon(const C_OSCHalcDefDomain::E_Categ
    QIcon c_Icon;
 
    QString c_IconPath = "://images/system_definition/NodeEdit/halc/";
-   const QSize c_IconSize = QSize(16, 16);
+   const QSize c_ICON_SIZE = QSize(16, 16);
 
    switch (oe_Category)
    {
@@ -558,14 +558,14 @@ QIcon C_SdNdeHalcChannelTreeModel::mh_InitIcon(const C_OSCHalcDefDomain::E_Categ
       c_IconPath += "Error";
 
       // use same icon for all modes & states
-      c_Icon = C_SdUtil::h_InitStaticIconSvg(c_IconPath + ".svg", c_IconSize);
+      c_Icon = C_SdUtil::h_InitStaticIconSvg(c_IconPath + ".svg", c_ICON_SIZE);
    }
    else
    {
-      c_Icon = C_SdUtil::h_InitStaticIconSvg(c_IconPath + "Inactive.svg", c_IconSize);
+      c_Icon = C_SdUtil::h_InitStaticIconSvg(c_IconPath + "Inactive.svg", c_ICON_SIZE);
       // use different colored icon for active state
-      c_Icon.addPixmap(QIcon(c_IconPath + "Active.svg").pixmap(c_IconSize), QIcon::Selected, QIcon::On);
-      c_Icon.addPixmap(QIcon(c_IconPath + "Active.svg").pixmap(c_IconSize), QIcon::Selected, QIcon::Off);
+      c_Icon.addPixmap(QIcon(c_IconPath + "Active.svg").pixmap(c_ICON_SIZE), QIcon::Selected, QIcon::On);
+      c_Icon.addPixmap(QIcon(c_IconPath + "Active.svg").pixmap(c_ICON_SIZE), QIcon::Selected, QIcon::Off);
       // "off" icon is used in branch-closed state
    }
 

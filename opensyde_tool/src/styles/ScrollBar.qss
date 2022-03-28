@@ -171,7 +171,7 @@ padding-bottom: 0px;
 }
 
 stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget QScrollBar:vertical,
-stw_opensyde_gui--C_SyvUpUpdatePackageNodeWidget QScrollBar:vertical
+stw_opensyde_gui--C_SyvUpPacNodeWidget QScrollBar:vertical
 {
 width: 15px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
 padding-left: 5px;
@@ -353,7 +353,7 @@ padding-top: 3px;
 padding-bottom: 3px;
 }
 
-stw_opensyde_gui--C_SyvUpPackageSectionNodeWidget QScrollBar:vertical
+stw_opensyde_gui--C_SyvUpPacSectionNodeWidget QScrollBar:vertical
 {
 width: 9px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
 padding-right: 2px;
@@ -392,7 +392,7 @@ stw_opensyde_gui--C_SdNdeHalcConfigImportView QScrollBar:horizontal,
 stw_opensyde_gui_elements--C_OgeTreeViewCheckable QScrollBar:horizontal,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget QScrollBar:horizontal,
 stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar:horizontal,
-stw_opensyde_gui--C_SyvUpPackageSectionNodeWidget QScrollBar:horizontal,
+stw_opensyde_gui--C_SyvUpPacSectionNodeWidget QScrollBar:horizontal,
 stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar:horizontal,
 stw_opensyde_gui--C_SdNdeHalcChannelTreeView QScrollBar:horizontal,
 stw_opensyde_gui--C_SdNdeHalcConfigTreeView QScrollBar:horizontal

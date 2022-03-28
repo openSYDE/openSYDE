@@ -72,7 +72,7 @@ public:
    C_OSCFlashProtocolStwFlashloader::PR_ReportProgress pr_XflReportProgress;
    void * pv_XflReportProgressInstance;
 
-   C_OSCComDriverFlash(const bool oq_RoutingActive,
+   C_OSCComDriverFlash(const bool oq_RoutingActive, const bool oq_UpdateRoutingMode,
                        const C_OSCFlashProtocolStwFlashloader::PR_ReportProgress opr_XflReportProgress,
                        void * const opv_XflReportProgressInstance);
    virtual ~C_OSCComDriverFlash(void);
@@ -333,6 +333,7 @@ private:
    stw_diag_lib::C_XFLCompanyID mc_CompanyId;
 
    const bool mq_RoutingActive;
+   const bool mq_UpdateRoutingMode;
    static const stw_types::uint16 mhu16_STW_FLASHLOADER_PROTOCOL_VERSION_3_00 = 0x3000U;
 };
 

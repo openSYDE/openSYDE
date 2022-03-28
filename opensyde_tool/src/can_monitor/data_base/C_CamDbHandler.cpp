@@ -148,23 +148,25 @@ void C_CamDbHandler::FindAllMessages(void)
 
    First searching all OSY files, then all DBC files
 
-   \param[in]   ou32_Id       CAN ID to search for
-   \param[out]  orc_File      Found file path (only valid if C_NO_ERR)
-   \param[out]  orc_Message   Found message name (only valid if C_NO_ERR)
+   \param[in]   ou32_Id          CAN ID to search for
+   \param[in]   oq_IsExtended    Is extended
+   \param[out]  orc_File         Found file path (only valid if C_NO_ERR)
+   \param[out]  orc_Message      Found message name (only valid if C_NO_ERR)
 
    \return
    C_NO_ERR Found at least one matching message
    C_NOACT  No matching message found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbHandler::FindMessageById(const uint32 ou32_Id, QString & orc_File, QString & orc_Message) const
+sint32 C_CamDbHandler::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtended, QString & orc_File,
+                                       QString & orc_Message) const
 {
    sint32 s32_Retval = C_NOACT;
 
    for (QMap<QString, C_CamDbOsy>::const_iterator c_It = this->mc_OSYFiles.begin();
         (c_It != this->mc_OSYFiles.end()) && (s32_Retval == C_NOACT); ++c_It)
    {
-      s32_Retval = c_It->FindMessageById(ou32_Id, orc_Message);
+      s32_Retval = c_It->FindMessageById(ou32_Id, oq_IsExtended, orc_Message);
       if (s32_Retval == C_NO_ERR)
       {
          //Found match
@@ -174,7 +176,7 @@ sint32 C_CamDbHandler::FindMessageById(const uint32 ou32_Id, QString & orc_File,
    for (QMap<QString, C_CamDbDbc>::const_iterator c_It = this->mc_DBCFiles.begin();
         (c_It != this->mc_DBCFiles.end()) && (s32_Retval == C_NOACT); ++c_It)
    {
-      s32_Retval = c_It->FindMessageById(ou32_Id, orc_Message);
+      s32_Retval = c_It->FindMessageById(ou32_Id, oq_IsExtended, orc_Message);
       if (s32_Retval == C_NO_ERR)
       {
          //Found match

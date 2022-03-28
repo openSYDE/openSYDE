@@ -416,8 +416,8 @@ void C_SdTopologyToolbox::m_FillToolboxStatic(void)
    C_SebToolboxUtil::h_InitFreeElements(this->mpc_Ui->pc_ListWidgetDrawing);
 
    // configure Headings
-   this->mpc_Ui->pc_LabelFreeElements->setMaximumHeight(C_SebToolboxUtil::hsn_LabelSize);
-   this->mpc_Ui->pc_LabelFreeElements->setMinimumHeight(C_SebToolboxUtil::hsn_LabelSize);
+   this->mpc_Ui->pc_LabelFreeElements->setMaximumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
+   this->mpc_Ui->pc_LabelFreeElements->setMinimumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

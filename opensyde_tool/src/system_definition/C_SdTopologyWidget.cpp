@@ -37,8 +37,8 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SdTopologyWidget::mhsn_WidgetBorder = 12;
-const sintn C_SdTopologyWidget::mhsn_ToolboxInitPosY = 150;
+const sintn C_SdTopologyWidget::mhsn_WIDGET_BORDER = 12;
+const sintn C_SdTopologyWidget::mhsn_TOOLBOX_INIT_POS_Y = 150;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -152,10 +152,10 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
       if (C_UsHandler::h_GetInstance()->GetSdTopologyToolboxPos().x() < 0)
       {
          // default value
-         const sintn sn_ToolboxWidth = 355;
-         const sintn sn_ToolboxHeight = 328;
+         const sintn sn_TOOLBOX_WIDTH = 355;
+         const sintn sn_TOOLBOX_HEIGHT = 328;
          // needed to make the toolbox stay inside graphics view (maybe depends on size of navibar)
-         const sintn sn_ToolboxOffset = 308;
+         const sintn sn_TOOLBOX_OFFSET = 308;
          // use available desktop space to have real information about screen (widget sizes are not reliable here)
          {
             sintn sn_MaxWidth = 0;
@@ -164,11 +164,11 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
             {
                sn_MaxWidth = std::max(sn_MaxWidth, pc_It->availableGeometry().width());
             }
-            this->mpc_Toolbox->setGeometry(((sn_MaxWidth - sn_ToolboxWidth) -
-                                            mhsn_WidgetBorder) - sn_ToolboxOffset,
-                                           mhsn_ToolboxInitPosY, sn_ToolboxWidth, sn_ToolboxHeight);
+            this->mpc_Toolbox->setGeometry(((sn_MaxWidth - sn_TOOLBOX_WIDTH) -
+                                            mhsn_WIDGET_BORDER) - sn_TOOLBOX_OFFSET,
+                                           mhsn_TOOLBOX_INIT_POS_Y, sn_TOOLBOX_WIDTH, sn_TOOLBOX_HEIGHT);
          }
-         this->mpc_Toolbox->SetMaximizedHeight(sn_ToolboxHeight);
+         this->mpc_Toolbox->SetMaximizedHeight(sn_TOOLBOX_HEIGHT);
       }
       else
       {
@@ -290,38 +290,38 @@ void C_SdTopologyWidget::resizeEvent(QResizeEvent * const opc_Event)
    }
 
    // would the toolbox be outside of the widget in x direction
-   if ((this->mpc_Toolbox->x() + this->mpc_Toolbox->width() + mhsn_WidgetBorder) > pc_Widget->width())
+   if ((this->mpc_Toolbox->x() + this->mpc_Toolbox->width() + mhsn_WIDGET_BORDER) > pc_Widget->width())
    {
       // is the toolbox to big?
-      if ((this->mpc_Toolbox->width() + (2 * mhsn_WidgetBorder)) > pc_Widget->width())
+      if ((this->mpc_Toolbox->width() + (2 * mhsn_WIDGET_BORDER)) > pc_Widget->width())
       {
-         c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WidgetBorder));
+         c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WIDGET_BORDER));
       }
       else
       {
          // adapt position of toolbox
-         c_Point.setX((pc_Widget->width() - this->mpc_Toolbox->width()) - mhsn_WidgetBorder);
+         c_Point.setX((pc_Widget->width() - this->mpc_Toolbox->width()) - mhsn_WIDGET_BORDER);
       }
    }
 
    // would the toolbox be outside of the widget in y direction
-   if ((this->mpc_Toolbox->y() + this->mpc_Toolbox->height() + mhsn_WidgetBorder) > pc_Widget->height())
+   if ((this->mpc_Toolbox->y() + this->mpc_Toolbox->height() + mhsn_WIDGET_BORDER) > pc_Widget->height())
    {
       // is the toolbox to big?
-      if ((this->mpc_Toolbox->height() + (2 * mhsn_WidgetBorder)) > pc_Widget->height())
+      if ((this->mpc_Toolbox->height() + (2 * mhsn_WIDGET_BORDER)) > pc_Widget->height())
       {
-         c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WidgetBorder));
+         c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WIDGET_BORDER));
       }
       else
       {
          // adapt position of toolbox
-         c_Point.setY((pc_Widget->height() - this->mpc_Toolbox->height()) - mhsn_WidgetBorder);
+         c_Point.setY((pc_Widget->height() - this->mpc_Toolbox->height()) - mhsn_WIDGET_BORDER);
       }
    }
 
    // adapt position of fix minimized toolbox
    c_PointFixMiniToolbox.setX((pc_Widget->width() - this->mpc_FixMinimizedToolbox->width()) -
-                              mhsn_WidgetBorder);
+                              mhsn_WIDGET_BORDER);
 
    this->mpc_Toolbox->setGeometry(QRect(c_Point, c_Size));
    this->mpc_FixMinimizedToolbox->setGeometry(QRect(c_PointFixMiniToolbox, this->mpc_FixMinimizedToolbox->size()));

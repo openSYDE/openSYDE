@@ -92,6 +92,8 @@ QWidget * C_SdNdeDpListDataSetDelegate::createEditor(QWidget * const opc_Parent,
          break;
       case C_SdNdeDpListDataSetModel::E_Rows::eCOMMENT:
          pc_Retval = new C_OgeTedTable(opc_Parent);
+         connect(dynamic_cast<C_OgeTedTable *>(pc_Retval), &C_OgeTedTable::SigConfirmed, this,
+                 &C_SdNdeDpListDataSetDelegate::SigTedConfirmed);
          break;
       default:
          break;

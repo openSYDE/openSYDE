@@ -246,13 +246,13 @@ void C_TblTreDataElementView::SaveExpandedIndices(void)
 {
    if (this->mq_UseInternalExpandedItems == true)
    {
-      const sintn sn_Column = 0;
+      const sintn sn_COLUMN = 0;
 
       std::vector<std::vector<stw_types::uint32> > c_FoundItems;
       //THIS ONE HAS TO BE INVALID
-      const QModelIndex c_Index;
+      const QModelIndex c_INDEX;
       //Handle children
-      m_AppendExpandedIndices(c_FoundItems, c_Index, sn_Column);
+      m_AppendExpandedIndices(c_FoundItems, c_INDEX, sn_COLUMN);
 
       C_TblTreDataElementView::mhc_LastKnownExpandedIndices.remove(this->me_Mode);
       C_TblTreDataElementView::mhc_LastKnownExpandedIndices.insert(this->me_Mode, c_FoundItems);

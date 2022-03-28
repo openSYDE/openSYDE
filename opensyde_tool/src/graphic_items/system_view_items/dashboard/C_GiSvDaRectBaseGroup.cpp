@@ -47,8 +47,8 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 C_GiSvDaRectBaseGroup::mhf64_ActionPointOffset = 10.0;
-const uint8 C_GiSvDaRectBaseGroup::mhu8_StartGreyTimeoutPercentage = 20U;
+const float64 C_GiSvDaRectBaseGroup::mhf64_ACTION_POINT_OFFSET = 10.0;
+const uint8 C_GiSvDaRectBaseGroup::mhu8_START_GREY_TIMEOUT_PERCENTAGE = 20U;
 const QString C_GiSvDaRectBaseGroup::mhc_ICON_READ = "://images/system_views/dashboards/icons/IconUpdateValueRead.svg";
 const QString C_GiSvDaRectBaseGroup::mhc_ICON_READ_ABORT =
    "://images/system_views/dashboards/icons/IconUpdateValueReadCancel.svg";
@@ -102,7 +102,7 @@ C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32 & oru32_ViewIndex, con
                                              const bool oq_KeepAspectRatio, const bool oq_ReadItem,
                                              QGraphicsItem * const opc_Parent, const QPointF & orc_PosOffset) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID, of64_MinWidth, of64_MinHeight, mhf64_ActionPointOffset, oq_KeepAspectRatio,
+   C_GiBiRectBaseGroup(oru64_ID, of64_MinWidth, of64_MinHeight, mhf64_ACTION_POINT_OFFSET, oq_KeepAspectRatio,
                        opc_Parent, orc_PosOffset),
    C_PuiSvDbDataElementHandler(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, ore_Type,
                                ou32_MaximumDataElements, oq_ReadItem),
@@ -111,6 +111,8 @@ C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32 & oru32_ViewIndex, con
    mq_DarkMode(false),
    mf64_WriteValue(0.0),
    mq_InitialStyleCall(true),
+   mq_EditModeActive(false),
+   mq_EditContentModeEnabled(false),
    ms32_IconSize(24),
    mc_CurrentSize(of64_InitWidth, of64_InitHeight),
    mq_ProxyWidgetInteractionActive(false),
@@ -240,6 +242,20 @@ void C_GiSvDaRectBaseGroup::SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiS
       }
    }
 }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set default mouse cursor
+
+   \param[in] orc_Value New default mouse cursor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaRectBaseGroup::SetDefaultCursor(const QCursor & orc_Value)
+{
+   C_GiBiRectBaseGroup::SetDefaultCursor(orc_Value);
+   // Dashboard specific: In case of changing into edit mode or from edit content mode to normal edit mode
+   // all visible proxy widgets would not update the new set cursor. By setting explicit the cursor to the proxy widget
+   // this problem is fixed
+   this->mpc_ProxyWidget->setCursor(orc_Value);
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load basic widget data
@@ -365,7 +381,7 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
          uint8 u8_Percentage;
          sintn sn_Transparency;
          //lint -e{778}  Kept in case the transparency engine is reactivated in the future
-         const sintn sn_Diff = msn_TRANSPARENCY_END - msn_TRANSPARENCY_START;
+         const sintn sn_DIFF = msn_TRANSPARENCY_END - msn_TRANSPARENCY_START;
          if (this->GetWidgetDataPoolElementCount() == 1)
          {
             if (this->m_GetTimoutPercentage100(0, u8_Percentage) != C_NO_ERR)
@@ -383,15 +399,15 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
             // 100 Percentage equals timeout reached equals half transparency -> 127
             sn_Transparency = msn_TRANSPARENCY_END;
             //lint -e{845}  Kept in case the transparency engine is reactivated in the future
-            sn_Transparency -= ((static_cast<sintn>(u8_Percentage) * sn_Diff) / 100);
+            sn_Transparency -= ((static_cast<sintn>(u8_Percentage) * sn_DIFF) / 100);
 
             if (sn_Transparency != this->mc_LastTransparencyValue[0])
             {
                C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Transparency",
                                                                             QString::number(sn_Transparency));
 
-               // Update the transparence of not stylesheet items
-               this->UpdateTransparence(0, sn_Transparency);
+               // Update the transparency of not stylesheet items
+               this->UpdateTransparency(0, sn_Transparency);
 
                // Font changed, trigger update
                this->mpc_ProxyWidget->update();
@@ -418,12 +434,12 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
                // 100 Percentage equals timeout reached equals half transparency -> 127
                sn_Transparency = msn_TRANSPARENCY_END;
                //lint -e{845}  Kept in case the transparency engine is reactivated in the future
-               sn_Transparency -= ((static_cast<sintn>(u8_Percentage) * sn_Diff) / 100);
+               sn_Transparency -= ((static_cast<sintn>(u8_Percentage) * sn_DIFF) / 100);
 
                if (sn_Transparency != this->mc_LastTransparencyValue[u32_It])
                {
-                  // Update the transparence of not stylesheet items
-                  this->UpdateTransparence(u32_It, sn_Transparency);
+                  // Update the transparency of not stylesheet items
+                  this->UpdateTransparency(u32_It, sn_Transparency);
 
                   this->mc_LastTransparencyValue[u32_It] = sn_Transparency;
                }
@@ -434,17 +450,17 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of the color transparence value configured by the actual timeout state
+/*! \brief   Update of the color transparency value configured by the actual timeout state
 
    Base class implementation does nothing. If the dashboard element has drawing elements which
    can not be adapted by stylesheets the derived class must reimplement this function.
 
    \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                 Value for transparence (0..255)
+   \param[in]     osn_Value                 Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  //intentionally no functionality in default implementation
-void C_GiSvDaRectBaseGroup::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_GiSvDaRectBaseGroup::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    // Nothing to do in the base class implementation
    Q_UNUSED(ou32_DataElementIndex)
@@ -473,10 +489,10 @@ void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active)
          C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Transparency",
                                                                       QString::number(msn_TRANSPARENCY_START));
 
-         // Update the transparence of not stylesheet items
+         // Update the transparency of not stylesheet items
          for (uint32 u32_It = 0; u32_It < this->GetWidgetDataPoolElementCount(); ++u32_It)
          {
-            this->UpdateTransparence(u32_It, msn_TRANSPARENCY_START);
+            this->UpdateTransparency(u32_It, msn_TRANSPARENCY_START);
          }
 
          // Font changed, trigger update
@@ -526,17 +542,30 @@ void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of edit mode
 
-   Base class implementation does nothing. If the dashboard element has edit mode specific functionality,
+   If the dashboard element has edit mode specific functionality,
    the derived class must reimplement this function.
 
    \param[in]  oq_Active  Flag if edit mode is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
-//lint -e{9175}  //intentionally no functionality in default implementation
 void C_GiSvDaRectBaseGroup::EditModeActiveChanged(const bool oq_Active)
 {
-   // Nothing to do in the base class implementation
-   Q_UNUSED(oq_Active)
+   this->mq_EditModeActive = oq_Active;
+
+   if (oq_Active == false)
+   {
+      if (this->mq_EditContentModeEnabled == true)
+      {
+         // In case of a still active content edit mode and the deactivation of the edit mode, deactivate it
+         this->DisableEditContent();
+      }
+      // Switching the cursor back to ArrowCursor, DisableEditContent would change it to SizeAllCursor
+      this->SetDefaultCursor(Qt::ArrowCursor);
+   }
+   else
+   {
+      this->SetDefaultCursor(Qt::SizeAllCursor);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -566,7 +595,9 @@ void C_GiSvDaRectBaseGroup::SendCurrentValue(void)
       s32_Return = this->GetDataPoolElementScaling(this->mu32_NextManualActionIndex, c_Scaling);
       tgl_assert(s32_Return == C_NO_ERR);
 
-      if ((c_ElementId.GetIsValid() == true) && (this->m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true))
+      if ((c_ElementId.GetIsValid() == true) &&
+          (this->m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true) &&
+          (this->m_CheckNodeHasAnyRequiredValidDashboardRouting(c_ElementId.u32_NodeIndex) == true))
       {
          // Update the datapool
          C_OSCNodeDataPoolListElement c_OscElement;
@@ -639,6 +670,71 @@ bool C_GiSvDaRectBaseGroup::CallProperties(void)
 {
    // Nothing to do in the base class implementation
    return false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enable edit content mode for widgets
+
+   If the element supports edit content mode, the mode will be enabled
+
+   \retval false  nothing done
+   \retval true   edit content mode enabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::EnableEditContent(void)
+{
+   bool q_Return = false;
+
+   // Only available in the dashboard edit mode
+   if (this->mq_EditModeActive == true)
+   {
+      q_Return = this->m_HasEditContentMode();
+
+      if (q_Return == true)
+      {
+         this->mq_EditContentModeEnabled = true;
+         // Deactivate moving functionality in this mode
+         this->setFlag(QGraphicsItem::ItemIsMovable, false);
+         this->SetDefaultCursor(Qt::ArrowCursor);
+
+         this->update();
+      }
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disable edit content mode for widgets
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaRectBaseGroup::DisableEditContent(void)
+{
+   if (this->mq_EditContentModeEnabled == true)
+   {
+      // Activate moving only here again due to no handling of moving functionality in the selection handling
+      // unlike SetResizing
+      this->setFlag(QGraphicsItem::ItemIsMovable, true);
+      // In case of an override cursor (for example column resize of the table), restore any override cursor due to
+      // missing event handling of the proxy widget when the edit content mode is disabled
+      QApplication::restoreOverrideCursor();
+      this->SetDefaultCursor(Qt::SizeAllCursor);
+
+      this->mq_EditContentModeEnabled = false;
+      this->update();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the state of the edit content mode
+
+   \retval   true    Mode is enabled
+   \retval   false   Mode is disabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::IsEditContentEnabled(void) const
+{
+   return this->mq_EditContentModeEnabled;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -762,37 +858,19 @@ void C_GiSvDaRectBaseGroup::paint(QPainter * const opc_Painter, const QStyleOpti
    if (this->isSelected() == true)
    {
       //Increase selection rectangle size for system view items
-      //Out of bounding rect state reached with factors over 1.3
-      const float64 f64_PenWidth = this->m_GetInteractionPointSceneWidth() * 1.3;
-      const QRectF c_Inner = this->GetVisibleBoundingRect().adjusted(f64_PenWidth / 2.0, f64_PenWidth / 2.0,
-                                                                     -f64_PenWidth / 2.0, -f64_PenWidth / 2.0);
-      const QRectF c_Outer = this->GetVisibleBoundingRect().adjusted(-f64_PenWidth / 2.0, -f64_PenWidth / 2.0,
-                                                                     f64_PenWidth / 2.0, f64_PenWidth / 2.0);
-      QPolygonF c_Poly;
-      QPainterPath c_Path;
-      QBrush c_Brush(mc_STYLE_GUIDE_COLOR_21, Qt::BDiagPattern);
-      const QTransform c_Transform = opc_Painter->worldTransform().inverted();
+      const QRectF c_Rect = this->GetVisibleBoundingRect();
+      QPen c_Pen(static_cast<QBrush>(mc_STYLE_GUIDE_COLOR_21), 1.0);
 
-      //Apply inverse transformation to get improved pattern
-      c_Brush.setTransform(c_Transform);
-
-      c_Poly.append(c_Inner.bottomRight());
-      c_Poly.append(c_Inner.bottomLeft());
-      c_Poly.append(c_Inner.topLeft());
-      c_Poly.append(c_Inner.topRight());
-      c_Poly.append(c_Inner.bottomRight());
-      c_Poly.append(c_Outer.bottomRight());
-      c_Poly.append(c_Outer.bottomLeft());
-      c_Poly.append(c_Outer.topLeft());
-      c_Poly.append(c_Outer.topRight());
-      c_Poly.append(c_Outer.bottomRight());
+      if (this->mq_EditContentModeEnabled == true)
+      {
+         c_Pen.setStyle(Qt::DashLine);
+      }
 
       opc_Painter->setRenderHint(QPainter::HighQualityAntialiasing);
       opc_Painter->setClipRect(opc_Option->exposedRect);
-      opc_Painter->setBrush(c_Brush);
-      opc_Painter->setPen(Qt::NoPen);
-      c_Path.addPolygon(c_Poly);
-      opc_Painter->drawPath(c_Path);
+      opc_Painter->setBrush(Qt::NoBrush);
+      opc_Painter->setPen(c_Pen);
+      opc_Painter->drawRect(c_Rect);
    }
 }
 
@@ -810,10 +888,11 @@ void C_GiSvDaRectBaseGroup::paint(QPainter * const opc_Painter, const QStyleOpti
 void C_GiSvDaRectBaseGroup::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,
                                                  const bool oq_Active)
 {
-   Q_UNUSED(opc_ContextMenuManager)
    Q_UNUSED(oq_Active)
 
-   // Nothing to do in the base class implementation
+   // Activate the "default specific" actions again.
+   // Can be deactivated by derived classes which do not want any of the default functions
+   opc_ContextMenuManager->SetSpecificActionsAvailable(true, false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1036,6 +1115,30 @@ void C_GiSvDaRectBaseGroup::m_ForceWidgetResize(const QSizeF & orc_NewSize)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten itemChange event slot
+
+   Here: Deactivating the edit content mode when deselecting the element
+
+   \param[in] oe_Change Indicator what changed
+   \param[in] orc_Value Value corresponding to change
+
+   \return
+   new value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QVariant C_GiSvDaRectBaseGroup::itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value)
+{
+   if ((oe_Change == ItemSelectedHasChanged) &&
+       (orc_Value == false))
+   {
+      // In case of deselecting the element, deactivate the edit content mode in all cases
+      this->DisableEditContent();
+   }
+
+   return C_GiBiRectBaseGroup::itemChange(oe_Change, orc_Value);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten mouse press event slot
 
    Here: Send event to proxy widget
@@ -1065,12 +1168,18 @@ void C_GiSvDaRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc
 
    if (q_GenericButtonClicked == false)
    {
-      if (this->IsMousePosRelevantForProxyWidgetInteraction(opc_Event->scenePos()) == true)
+      // Interactions with the inner widget only in deactivated edit mode or the activated specific edit content mode
+      if (((this->mq_EditContentModeEnabled == true) || (this->mq_EditModeActive == false)) &&
+          (this->IsMousePosRelevantForProxyWidgetInteraction(opc_Event->scenePos()) == true))
       {
          //Start proxy widget interaction
          this->mq_ProxyWidgetInteractionActive = true;
-         Q_EMIT this->SigWidgetHandling(true);
-         Q_EMIT this->SigSelected(this, true);
+         Q_EMIT (this->SigWidgetHandling(true));
+         if (this->isSelected() == false)
+         {
+            // Select if only not already selected
+            Q_EMIT (this->SigSelected(this, true));
+         }
 
          this->mpc_ProxyWidget->TriggerMousePressEvent(opc_Event);
          opc_Event->accept();
@@ -1115,7 +1224,7 @@ void C_GiSvDaRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_
 void C_GiSvDaRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    //Always handle the mouse release event the same way as the mouse press event was handled
-   if (this->mq_ProxyWidgetInteractionActive)
+   if (this->mq_ProxyWidgetInteractionActive == true)
    {
       this->mpc_ProxyWidget->TriggerMouseReleaseEvent(opc_Event);
       opc_Event->accept();
@@ -1125,8 +1234,26 @@ void C_GiSvDaRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const o
       C_GiBiRectBaseGroup::mouseReleaseEvent(opc_Event);
    }
    //End proxy widget interaction
-   Q_EMIT this->SigWidgetHandling(false);
+   Q_EMIT (this->SigWidgetHandling(false));
    this->mq_ProxyWidgetInteractionActive = false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
+
+   Here: Send event to proxy widget in content edit mode
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaRectBaseGroup::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
+{
+   if ((this->mq_EditModeActive == false) ||
+       (this->mq_EditContentModeEnabled == true))
+   {
+      this->mpc_ProxyWidget->TriggerMouseDoubleClickEvent(opc_Event);
+      opc_Event->accept();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1139,8 +1266,23 @@ void C_GiSvDaRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const o
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   this->mpc_ProxyWidget->TriggerKeyPressEvent(opc_Event);
-   opc_Event->accept();
+   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_Escape)) &&
+       (this->mq_EditContentModeEnabled == true))
+   {
+      this->DisableEditContent();
+      opc_Event->accept();
+   }
+   // Interactions with the inner widget only in deactivated edit mode or the activated specific edit content mode
+   else if ((this->mq_EditModeActive == false) ||
+            (this->mq_EditContentModeEnabled == true))
+   {
+      this->mpc_ProxyWidget->TriggerKeyPressEvent(opc_Event);
+      opc_Event->accept();
+   }
+   else
+   {
+      // Nothing to do
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1153,8 +1295,13 @@ void C_GiSvDaRectBaseGroup::keyPressEvent(QKeyEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::keyReleaseEvent(QKeyEvent * const opc_Event)
 {
-   this->mpc_ProxyWidget->TriggerKeyReleaseEvent(opc_Event);
-   opc_Event->accept();
+   // Interactions with the inner widget only in deactivated edit mode or the activated specific edit content mode
+   if ((this->mq_EditModeActive == false) ||
+       (this->mq_EditContentModeEnabled == true))
+   {
+      this->mpc_ProxyWidget->TriggerKeyReleaseEvent(opc_Event);
+      opc_Event->accept();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1181,7 +1328,10 @@ void C_GiSvDaRectBaseGroup::focusOutEvent(QFocusEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::wheelEvent(QGraphicsSceneWheelEvent * const opc_Event)
 {
-   if (this->mpc_ProxyWidget->hasFocus() == true)
+   // Interactions with the inner widget only in deactivated edit mode or the activated specific edit content mode
+   if (((this->mq_EditModeActive == false) ||
+        (this->mq_EditContentModeEnabled == true)) &&
+       (this->mpc_ProxyWidget->hasFocus() == true))
    {
       this->mpc_ProxyWidget->TriggerWheelEvent(opc_Event);
       //If widget does not handle scroll event, forward the signal
@@ -1204,8 +1354,12 @@ void C_GiSvDaRectBaseGroup::wheelEvent(QGraphicsSceneWheelEvent * const opc_Even
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::hoverEnterEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
-   this->mpc_ProxyWidget->TriggerHoverEnterEvent(opc_Event);
-   C_GiBiRectBaseGroup::hoverEnterEvent(opc_Event);
+   if ((this->mq_EditModeActive == false) ||
+       (this->mq_EditContentModeEnabled == true))
+   {
+      this->mpc_ProxyWidget->TriggerHoverEnterEvent(opc_Event);
+      C_GiBiRectBaseGroup::hoverEnterEvent(opc_Event);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1216,185 +1370,200 @@ void C_GiSvDaRectBaseGroup::hoverEnterEvent(QGraphicsSceneHoverEvent * const opc
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
-   this->mpc_ProxyWidget->TriggerHoverMoveEvent(opc_Event);
-   C_GiBiRectBaseGroup::hoverMoveEvent(opc_Event);
-   //Handle tool tips
-   if ((this->mpc_RefreshIcon->isVisible() == true) &&
-       (this->mpc_RefreshIcon->contains(this->mpc_RefreshIcon->mapFromScene(opc_Event->scenePos())) == true))
+   if ((this->mq_EditModeActive == false) ||
+       (this->mq_EditContentModeEnabled == true))
    {
-      QString c_ManualItems;
-      QString c_Text;
-      if (this->mq_ReadItem == true)
+      this->mpc_ProxyWidget->TriggerHoverMoveEvent(opc_Event);
+      C_GiBiRectBaseGroup::hoverMoveEvent(opc_Event);
+
+      //Handle tool tips
+      if ((this->mpc_RefreshIcon->isVisible() == true) &&
+          (this->mpc_RefreshIcon->contains(this->mpc_RefreshIcon->mapFromScene(opc_Event->scenePos())) == true))
       {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-         if (pc_View != NULL)
+         QString c_ManualItems;
+         QString c_Text;
+         if (this->mq_ReadItem == true)
          {
-            for (uint32 u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
+            const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+            if (pc_View != NULL)
             {
-               C_PuiSvDbNodeDataPoolListElementId c_Id;
-               if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
+               for (uint32 u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
                {
-                  C_PuiSvReadDataConfiguration c_Config;
-                  if (pc_View->GetReadRailAssignment(c_Id, c_Config) == C_NO_ERR)
+                  C_PuiSvDbNodeDataPoolListElementId c_Id;
+                  if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
                   {
-                     if (c_Config.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
+                     C_PuiSvReadDataConfiguration c_Config;
+                     if (pc_View->GetReadRailAssignment(c_Id, c_Config) == C_NO_ERR)
                      {
-                        const C_OSCNodeDataPoolListElement * const pc_Element =
-                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
-                        if (pc_Element != NULL)
+                        if (c_Config.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
                         {
-                           //Add name
-                           if (c_Id.GetUseArrayElementIndex())
+                           const C_OSCNodeDataPoolListElement * const pc_Element =
+                              C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
+                           if (pc_Element != NULL)
                            {
-                              c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
-                                 c_Id.GetArrayElementIndex());
+                              //Add name
+                              if (c_Id.GetUseArrayElementIndex())
+                              {
+                                 c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                                    c_Id.GetArrayElementIndex());
+                              }
+                              else
+                              {
+                                 c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
+                              }
+                              c_ManualItems += "\n";
                            }
-                           else
-                           {
-                              c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
-                           }
-                           c_ManualItems += "\n";
                         }
                      }
                   }
                }
             }
+            c_Text = C_GtGetText::h_GetText("Trigger manual read for:\n");
          }
-         c_Text = C_GtGetText::h_GetText("Trigger manual read for:\n");
+         else
+         {
+            const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+            if (pc_View != NULL)
+            {
+               for (uint32 u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
+               {
+                  C_PuiSvDbNodeDataPoolListElementId c_Id;
+                  if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
+                  {
+                     const C_OSCNodeDataPoolListElement * const pc_Element =
+                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
+                     if (pc_Element != NULL)
+                     {
+                        //Add name
+                        if (c_Id.GetUseArrayElementIndex())
+                        {
+                           c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                              c_Id.GetArrayElementIndex());
+                        }
+                        else
+                        {
+                           c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
+                        }
+                        c_ManualItems += "\n";
+                     }
+                  }
+               }
+            }
+            c_Text = C_GtGetText::h_GetText("Trigger manual write for:\n");
+         }
+         c_Text += c_ManualItems;
+         if (this->mq_ConnectionActive == false)
+         {
+            c_Text += C_GtGetText::h_GetText("\nOnly available while connected.");
+         }
+         //Check if redisplay necessary
+         if (c_Text.compare(this->GetCurrentToolTipContent()) != 0)
+         {
+            Q_EMIT this->SigHideToolTip();
+         }
+         this->SetDefaultToolTipHeading("");
+         this->SetDefaultToolTipContent(c_Text);
+         this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+      }
+      else if (((this->mpc_WarningIcon != NULL) && (this->mpc_WarningIcon->isVisible() == true)) &&
+               (this->mpc_WarningIcon->contains(this->mpc_WarningIcon->mapFromScene(opc_Event->scenePos())) == true))
+      {
+         const QString c_Heading = C_GtGetText::h_GetText("Configuration Warning");
+         QString c_Content;
+         QString c_Name;
+         //if there are no data elements use this tooltip
+         if (this->GetWidgetDataPoolElementCount() == 0U)
+         {
+            c_Content += C_GtGetText::h_GetText("- No data element selected");
+         }
+         else
+         {
+            if (m_CheckHasValidElements(c_Name) == false)
+            {
+               c_Content +=
+                  static_cast<QString>(C_GtGetText::h_GetText(
+                                          "- This widget and this data element (\"%1\") does not match, "
+                                          "possible reasons:\n"
+                                          "   Data element was deleted\n"
+                                          "   Data element has become an array\n"
+                                          "   Data element has different value range")).arg(c_Name);
+            }
+            if (m_CheckHasAnyRequiredNodesActive() == false)
+            {
+               if (c_Content.isEmpty() == false)
+               {
+                  c_Content += "\n";
+               }
+               c_Content += C_GtGetText::h_GetText("- There is a data element of an inactive node");
+            }
+            if (m_CheckHasAnyRequiredBusesConnected() == false)
+            {
+               if (c_Content.isEmpty() == false)
+               {
+                  c_Content += "\n";
+               }
+               c_Content += C_GtGetText::h_GetText("- There is a signal of an inactive bus");
+            }
+            if (m_CheckHasAnyRequiredNodesValidDashboardRouting() == false)
+            {
+               if (c_Content.isEmpty() == false)
+               {
+                  c_Content += "\n";
+               }
+               c_Content += C_GtGetText::h_GetText("- There is a data element of a node with "
+                                                   "disabled communication interface flags for Dashboard");
+            }
+         }
+         //Check if redisplay necessary
+         if (c_Content.compare(this->GetCurrentToolTipContent()) != 0)
+         {
+            Q_EMIT (this->SigHideToolTip());
+         }
+         this->SetDefaultToolTipHeading(c_Heading);
+         this->SetDefaultToolTipContent(c_Content);
+         this->SetDefaultToolTipType(C_NagToolTip::eWARNING);
+      }
+      else if (((this->mpc_ConflictIcon != NULL) && (this->mpc_ConflictIcon->isVisible() == true)) &&
+               (this->mpc_ConflictIcon->contains(this->mpc_ConflictIcon->mapFromScene(opc_Event->scenePos())) == true))
+      {
+         m_UpdateErrorIconToolTip();
       }
       else
       {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-         if (pc_View != NULL)
+         C_PuiSvDbNodeDataPoolListElementId c_Id;
+         QString c_Heading = "";
+         const QString c_NewContent = m_GetCommonToolTipContent();
+         //Check if redisplay necessary
+         if (c_NewContent.compare(this->GetCurrentToolTipContent()) != 0)
          {
-            for (uint32 u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
+            Q_EMIT this->SigHideToolTip();
+         }
+
+         //get element name as heading
+         if (c_NewContent.isEmpty() == false)
+         {
+            if (this->GetDataPoolElementIndex(0, c_Id) == C_NO_ERR)
             {
-               C_PuiSvDbNodeDataPoolListElementId c_Id;
-               if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
+               if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id) != NULL)
                {
-                  const C_OSCNodeDataPoolListElement * const pc_Element =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
-                  if (pc_Element != NULL)
+                  const QString c_ElementName =
+                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id)->c_Name.c_str();
+                  if (c_Id.GetUseArrayElementIndex())
                   {
-                     //Add name
-                     if (c_Id.GetUseArrayElementIndex())
-                     {
-                        c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
-                           c_Id.GetArrayElementIndex());
-                     }
-                     else
-                     {
-                        c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
-                     }
-                     c_ManualItems += "\n";
+                     c_Heading = static_cast<QString>("%1[%2]").arg(c_ElementName).arg(c_Id.GetArrayElementIndex());
+                  }
+                  else
+                  {
+                     c_Heading = c_ElementName;
                   }
                }
             }
          }
-         c_Text = C_GtGetText::h_GetText("Trigger manual write for:\n");
-      }
-      c_Text += c_ManualItems;
-      if (this->mq_ConnectionActive == false)
-      {
-         c_Text += C_GtGetText::h_GetText("\nOnly available while connected.");
-      }
-      //Check if redisplay necessary
-      if (c_Text.compare(this->GetCurrentToolTipContent()) != 0)
-      {
-         Q_EMIT this->SigHideToolTip();
-      }
-      this->SetDefaultToolTipHeading("");
-      this->SetDefaultToolTipContent(c_Text);
-      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
-   }
-   else if (((this->mpc_WarningIcon != NULL) && (this->mpc_WarningIcon->isVisible() == true)) &&
-            (this->mpc_WarningIcon->contains(this->mpc_WarningIcon->mapFromScene(opc_Event->scenePos())) == true))
-   {
-      const QString c_Heading = C_GtGetText::h_GetText("Configuration Warning");
-      QString c_Content;
-      QString c_Name;
-      //if there are no data elements use this tooltip
-      if (this->GetWidgetDataPoolElementCount() == 0U)
-      {
-         c_Content += C_GtGetText::h_GetText("- No data element selected");
-      }
-      else
-      {
-         if (m_CheckHasValidElements(c_Name) == false)
-         {
-            c_Content +=
-               static_cast<QString>(C_GtGetText::h_GetText(
-                                       "- This widget and this data element (\"%1\") does not match, possible reasons:\n"
-                                       "   Data element was deleted\n"
-                                       "   Data element has become an array\n"
-                                       "   Data element has different value range")).arg(c_Name);
-         }
-         if (m_CheckHasAnyRequiredNodesActive() == false)
-         {
-            if (c_Content.isEmpty() == false)
-            {
-               c_Content += "\n";
-            }
-            c_Content += C_GtGetText::h_GetText("- There is a data element of an inactive node");
-         }
-         if (m_CheckHasAnyRequiredBusesConnected() == false)
-         {
-            if (c_Content.isEmpty() == false)
-            {
-               c_Content += "\n";
-            }
-            c_Content += C_GtGetText::h_GetText("- There is a signal of an inactive bus");
-         }
-      }
-      //Check if redisplay necessary
-      if (c_Content.compare(this->GetCurrentToolTipContent()) != 0)
-      {
-         Q_EMIT this->SigHideToolTip();
-      }
-      this->SetDefaultToolTipHeading(c_Heading);
-      this->SetDefaultToolTipContent(c_Content);
-      this->SetDefaultToolTipType(C_NagToolTip::eWARNING);
-   }
-   else if (((this->mpc_ConflictIcon != NULL) && (this->mpc_ConflictIcon->isVisible() == true)) &&
-            (this->mpc_ConflictIcon->contains(this->mpc_ConflictIcon->mapFromScene(opc_Event->scenePos())) == true))
-   {
-      m_UpdateErrorIconToolTip();
-   }
-   else
-   {
-      C_PuiSvDbNodeDataPoolListElementId c_Id;
-      QString c_Heading = "";
-      const QString c_NewContent = m_GetCommonToolTipContent();
-      //Check if redisplay necessary
-      if (c_NewContent.compare(this->GetCurrentToolTipContent()) != 0)
-      {
-         Q_EMIT this->SigHideToolTip();
-      }
 
-      //get element name as heading
-      if (c_NewContent.isEmpty() == false)
-      {
-         if (this->GetDataPoolElementIndex(0, c_Id) == C_NO_ERR)
-         {
-            if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id) != NULL)
-            {
-               const QString c_ElementName =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id)->c_Name.c_str();
-               if (c_Id.GetUseArrayElementIndex())
-               {
-                  c_Heading = static_cast<QString>("%1[%2]").arg(c_ElementName).arg(c_Id.GetArrayElementIndex());
-               }
-               else
-               {
-                  c_Heading = c_ElementName;
-               }
-            }
-         }
+         this->SetDefaultToolTipHeading(c_Heading);
+         this->SetDefaultToolTipContent(c_NewContent);
+         this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
       }
-
-      this->SetDefaultToolTipHeading(c_Heading);
-      this->SetDefaultToolTipContent(c_NewContent);
-      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
    }
 }
 
@@ -1406,10 +1575,11 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
+   // Handle the leave event always to prevent problems with tooltips
    this->mpc_ProxyWidget->TriggerHoverLeaveEvent(opc_Event);
    C_GiBiRectBaseGroup::hoverLeaveEvent(opc_Event);
 
-   Q_EMIT this->SigHideToolTip();
+   Q_EMIT (this->SigHideToolTip());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1426,9 +1596,10 @@ void C_GiSvDaRectBaseGroup::m_DataPoolElementsChanged(void)
       QString c_Name;
       const bool q_ManualReadElement = m_CheckManualReadRequired();
 
-      q_InvalidElement =
-         (m_CheckHasValidElements(c_Name) == false) || (m_CheckHasAnyRequiredNodesActive() == false) ||
-         (m_CheckHasAnyRequiredBusesConnected() == false);
+      q_InvalidElement = (m_CheckHasValidElements(c_Name) == false) ||
+                         (m_CheckHasAnyRequiredNodesActive() == false) ||
+                         (m_CheckHasAnyRequiredBusesConnected() == false) ||
+                         (m_CheckHasAnyRequiredNodesValidDashboardRouting() == false);
 
       if (((((this->me_WriteMode == C_PuiSvDbWidgetBase::eWM_MANUAL) && (this->mq_ReadItem == false)) ||
             (q_ManualReadElement == true)) &&
@@ -1520,6 +1691,22 @@ bool C_GiSvDaRectBaseGroup::m_AllowWarningIcon(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if element supports the edit content mode
+
+   Default elements does not have the widget specific edit content mode.
+   If an element support this mode, the derived class must reimplement this function.
+
+   \return
+   True  Element does have and support a widget specific edit content mode
+   False Element does not have and support a widget specific edit content mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::m_HasEditContentMode(void) const
+{
+   return false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get common tool tip content if no other item takes precedence over the tool tip
 
    \return
@@ -1545,7 +1732,7 @@ void C_GiSvDaRectBaseGroup::m_InitConflictIcon(void)
    //Offset to have icon inside widget
    const float64 f64_PosX =
       (this->GetVisibleBoundingRect().width() - (static_cast<float64>(this->ms32_IconSize) * 1.8125));
-   const float64 f64_PosY = 0.0;
+   const float64 f64_POS_Y = 0.0;
 
    // create the conflict icon
    mpc_ConflictIcon =
@@ -1553,7 +1740,7 @@ void C_GiSvDaRectBaseGroup::m_InitConflictIcon(void)
                               static_cast<float64>(this->ms32_IconSize));
 
    this->mpc_ConflictIcon->moveBy(f64_PosX - this->mpc_ConflictIcon->pos().x(),
-                                  f64_PosY - this->mpc_ConflictIcon->pos().y());
+                                  f64_POS_Y - this->mpc_ConflictIcon->pos().y());
 
    // set the position of the icon
    this->mpc_ConflictIcon->setParentItem(this);
@@ -1568,7 +1755,7 @@ void C_GiSvDaRectBaseGroup::m_InitConflictIcon(void)
                               static_cast<float64>(this->ms32_IconSize));
 
    this->mpc_WarningIcon->moveBy(f64_PosX - this->mpc_WarningIcon->pos().x(),
-                                 f64_PosY - this->mpc_WarningIcon->pos().y());
+                                 f64_POS_Y - this->mpc_WarningIcon->pos().y());
 
    // set the position of the icon
    this->mpc_WarningIcon->setParentItem(this);
@@ -1586,7 +1773,7 @@ void C_GiSvDaRectBaseGroup::m_InitButton(void)
    //Offset to have icon inside widget
    const float64 f64_PosX =
       (this->GetVisibleBoundingRect().width() - (static_cast<float64>(this->ms32_IconSize) * 1.8125));
-   const float64 f64_PosY = 0.0;
+   const float64 f64_POS_Y = 0.0;
 
    // create 'button' with points
    mpc_ButtonGroup = new QGraphicsItemGroup();
@@ -1605,14 +1792,14 @@ void C_GiSvDaRectBaseGroup::m_InitButton(void)
                                              static_cast<float64>(this->ms32_IconSize));
 
    this->mpc_RefreshIcon->moveBy(f64_PosX - this->mpc_RefreshIcon->pos().x(),
-                                 f64_PosY - this->mpc_RefreshIcon->pos().y());
+                                 f64_POS_Y - this->mpc_RefreshIcon->pos().y());
 
    this->mpc_ButtonGroup->addToGroup(this->mpc_RefreshIcon);
 
    //Increase bounding rect
    c_Rect = this->mpc_ButtonGroup->boundingRect();
    c_Rect.setX(f64_PosX);
-   c_Rect.setY(f64_PosY);
+   c_Rect.setY(f64_POS_Y);
    c_Rect.setWidth(static_cast<float64>(this->ms32_IconSize));
    c_Rect.setHeight(static_cast<float64>(this->ms32_IconSize));
    pc_RectItem = new QGraphicsRectItem(c_Rect);
@@ -1646,7 +1833,9 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
          ++this->mu32_NextManualActionIndex;
          if (this->m_CheckIsOnTrigger(c_ElementId))
          {
-            if ((c_ElementId.GetIsValid() == true) && (m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true))
+            if ((c_ElementId.GetIsValid() == true) &&
+                (this->m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true) &&
+                (this->m_CheckNodeHasAnyRequiredValidDashboardRouting(c_ElementId.u32_NodeIndex) == true))
             {
                //-1 because we already prepared for the next element!
                if (this->m_CheckElementAlreadyRead(this->mu32_NextManualActionIndex - 1UL, c_ElementId) == false)

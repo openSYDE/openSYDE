@@ -245,7 +245,7 @@ C_SyvDcDeviceConfiguation & C_SyvDcDeviceConfiguation::operator =(const C_SyvDcD
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcSequences::C_SyvDcSequences(void) :
-   C_OSCComSequencesBase(false),
+   C_OSCComSequencesBase(false, false),
    mpc_CanDllDispatcher(NULL),
    mpc_EthernetDispatcher(NULL),
    // No routing for device configuration
@@ -253,6 +253,7 @@ C_SyvDcSequences::C_SyvDcSequences(void) :
    mu32_CanBitrate(0U),
    mq_ConfigureAllInterfaces(false),
    mq_RunScanSendFlashloaderRequestEndless(false),
+   mq_CanInitialized(false),
    mq_SecurityFeatureUsed(false),
    ms32_Result(C_NOACT)
 {
@@ -321,11 +322,11 @@ sint32 C_SyvDcSequences::InitDcSequences(const uint32 ou32_ViewIndex)
 
    std::vector<uint8> c_ActiveNodes;
 
-   // No CAN initialization due to initialization in the sequences itself
+   // No CAN initialization due to initialization in the sequences itself and ignore update routing errors
    s32_Return = C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(ou32_ViewIndex, u32_ActiveBusIndex, c_ActiveNodes,
                                                                    &this->mpc_CanDllDispatcher,
                                                                    &this->mpc_EthernetDispatcher,
-                                                                   false);
+                                                                   false, true, NULL);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -502,6 +503,9 @@ sint32 C_SyvDcSequences::ScanCanEnterFlashloader(const uint32 ou32_UsedBitrate)
    {
       this->me_Sequence = eSCANCANENTERFLASHLOADER;
       this->mu32_CanBitrate = ou32_UsedBitrate;
+      // Reset output variable
+      this->mq_CanInitialized = false;
+
       this->mpc_Thread->start();
    }
    return s32_Return;
@@ -553,9 +557,9 @@ sint32 C_SyvDcSequences::ScanCanSendFlashloaderRequest(const uint32 ou32_ScanTim
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::StopScanCanSendFlashloaderRequest(void)
 {
-   this->mc_CriticalSection.Acquire();
+   this->mc_CriticalSectionRequestEndless.Acquire();
    this->mq_RunScanSendFlashloaderRequestEndless = false;
-   this->mc_CriticalSection.Release();
+   this->mc_CriticalSectionRequestEndless.Release();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1062,6 +1066,29 @@ sint32 C_SyvDcSequences::GetResults(sint32 & ors32_Result) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get CAN initialization result of ScanCanEnterFlashloader
+
+   The flag will be set early in the sequence.
+
+   This function is thread safe.
+
+   \return
+   true       CAN was initialized successfully
+   false      CAN was not initialized yet or had an error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDcSequences::GetCanInitializationResult(void) const
+{
+   bool q_Return;
+
+   this->mc_CriticalSectionCanInitialization.Acquire();
+   q_Return = this->mq_CanInitialized;
+   this->mc_CriticalSectionCanInitialization.Release();
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the device information result
 
    \param[out]  orc_DeviceInfo   Vector for sequence results
@@ -1319,6 +1346,10 @@ sint32 C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32 ou32_CanBitra
       {
          bool q_RequestNotAccepted = false;
 
+         this->mc_CriticalSectionCanInitialization.Acquire();
+         this->mq_CanInitialized = true;
+         this->mc_CriticalSectionCanInitialization.Release();
+
          if (this->mq_OpenSydeDevicesActive == true)
          {
             // send openSYDE CAN-TP broadcast "RequestProgramming"
@@ -1444,10 +1475,10 @@ sint32 C_SyvDcSequences::m_RunScanCanSendFlashloaderRequest(const uint32 ou32_Sc
          break;
       }
 
-      this->mc_CriticalSection.Acquire();
+      this->mc_CriticalSectionRequestEndless.Acquire();
       // Check flag, which can be set by other thread at any time
       q_RunEndless = this->mq_RunScanSendFlashloaderRequestEndless;
-      this->mc_CriticalSection.Release();
+      this->mc_CriticalSectionRequestEndless.Release();
    }
    while ((q_RunEndless == true) ||
           (u32_CurTime < (ou32_ScanTime + u32_StartTime)));
@@ -1726,13 +1757,14 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
                   if (this->mq_SecurityFeatureUsed == true)
                   {
                      // Special case: In case of at least one node with active security no broadcasts
-                     // can be used by the configuration sequence. Therefore the node ids must be unique for
+                     // can be used by the configuration sequence. Therefore the node IDs must be unique for
                      // using direct communication.
                      s32_Return = C_CHECKSUM;
 
                      osc_write_log_error("Scan CAN get info from openSYDE devices",
                                          "At least one node has the security feature activated and at least"
-                                         " one node id is not unique.");
+                                         " one node ID is not unique. Node ID: "  +
+                                         C_SCLString::IntToStr(this->mc_DeviceInfoResult[u32_ResultCounter].u8_NodeId));
                   }
                   break;
                }
@@ -1760,14 +1792,14 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
             // The first indexes are always the standard SNR results
             if (u32_DeviceInfoIndex < c_ReadSnResult.size())
             {
-               c_CurSenderId = c_ReadSnResult[c_UniqueIdIndices[u32_UniqueIdIndicesCounter]].c_SenderId;
+               c_CurSenderId = c_ReadSnResult[u32_DeviceInfoIndex].c_SenderId;
             }
             else
             {
                const uint32 u32_ReadSnrResultExtIndex = u32_DeviceInfoIndex - c_ReadSnResult.size();
                // all above must be the extended SNR results
                tgl_assert(u32_ReadSnrResultExtIndex < c_ReadSnResultExt.size());
-               c_CurSenderId = c_ReadSnResultExt[c_UniqueIdIndices[u32_UniqueIdIndicesCounter]].c_SenderId;
+               c_CurSenderId = c_ReadSnResultExt[u32_ReadSnrResultExtIndex].c_SenderId;
             }
 
             this->mpc_ComDriver->SendOsyReadDeviceName(c_CurSenderId, c_Result);
@@ -1935,7 +1967,7 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
 
                         osc_write_log_error("Scan ETH get info from openSYDE devices",
                                             "At least one node has the security feature activated and at least"
-                                            " one node id or node IP is not unique.");
+                                            " one node ID or node IP is not unique.");
 
                         break;
                      }
@@ -2305,7 +2337,7 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithoutBroadcasts(
                            {
                               C_SCLString c_Text;
                               c_Text.PrintFormatted("openSYDE setting preprogramming mode failed on node with ID %d on "
-                                                    "bus with ID before setting the new node id %d"
+                                                    "bus with ID before setting the new node ID %d"
                                                     " %d with error: %s",
                                                     c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
                                                     c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier,
@@ -2332,8 +2364,8 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithoutBroadcasts(
                            if (s32_Return != C_NO_ERR)
                            {
                               C_SCLString c_Text;
-                              c_Text.PrintFormatted("openSYDE setting node id for communication channel failed on node "
-                                                    "with ID %d on bus with ID when setting the new node id %d"
+                              c_Text.PrintFormatted("openSYDE setting node ID for communication channel failed on node "
+                                                    "with ID %d on bus with ID when setting the new node ID %d"
                                                     " %d with error: %s",
                                                     c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
                                                     c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier,
@@ -2365,7 +2397,7 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevicesWithoutBroadcasts(
                            {
                               C_SCLString c_Text;
                               c_Text.PrintFormatted("openSYDE setting IP address for communication channel failed on "
-                                                    "node with ID %d on bus with ID after setting the new node id %d"
+                                                    "node with ID %d on bus with ID after setting the new node ID %d"
                                                     " %d with error: %s",
                                                     c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
                                                     c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier,
@@ -3147,7 +3179,7 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevicesWithoutBroadcasts(
                         {
                            C_SCLString c_Text;
                            c_Text.PrintFormatted("openSYDE setting preprogramming mode failed on node with ID %d on "
-                                                 "bus with ID before setting the new node id %d"
+                                                 "bus with ID before setting the new node ID %d"
                                                  " %d with error: %s",
                                                  c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
                                                  c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier,
@@ -3173,8 +3205,8 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevicesWithoutBroadcasts(
                            if (s32_Return != C_NO_ERR)
                            {
                               C_SCLString c_Text;
-                              c_Text.PrintFormatted("openSYDE setting node id for communication channel failed on node "
-                                                    "with ID %d on bus with ID when setting the new node id %d"
+                              c_Text.PrintFormatted("openSYDE setting node ID for communication channel failed on node "
+                                                    "with ID %d on bus with ID when setting the new node ID %d"
                                                     " %d with error: %s",
                                                     c_ServerIdOfCurBusWithOldNodeId.u8_NodeIdentifier,
                                                     c_ServerIdOfCurBusWithOldNodeId.u8_BusIdentifier,
@@ -3671,7 +3703,7 @@ sint32 C_SyvDcSequences::m_SetOpenSydeNodeIds(const C_OSCProtocolDriverOsyNode &
                if (s32_Return != C_NO_ERR)
                {
                   osc_write_log_error("Configure openSYDE devices",
-                                      "openSYDE set node id by channel failed with error: " +
+                                      "openSYDE set node ID by channel failed with error: " +
                                       C_SCLString::IntToStr(s32_Return));
                   break;
                }

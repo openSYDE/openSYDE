@@ -1158,6 +1158,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
                             "_DataPoolValues,  ///< Pointer to pointer to struct containing all Datapool values");
             break;
          default:
+            tgl_assert(false);
             break;
          }
          orc_Data.Append("   0x" + C_SCLString::IntToHex(static_cast<sint64>(u32_HashValue), 4U) +
@@ -1206,6 +1207,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
          c_String += "NULL)";
          break;
       default:
+         tgl_assert(false);
          break;
       }
    }
@@ -1257,6 +1259,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
       orc_Data.Append("   &mt_RemoteDataPoolInfo,  ///< info about remote Datapool");
       break;
    default:
+      tgl_assert(false);
       break;
    }
 
@@ -1333,6 +1336,7 @@ C_SCLString C_OSCExportDataPool::mh_GetType(const C_OSCNodeDataPoolContent::E_Ty
       c_Type += "float64";
       break;
    default:
+      tgl_assert(false);
       break;
    }
 
@@ -1411,6 +1415,7 @@ C_SCLString C_OSCExportDataPool::mh_GetElementValueString(const C_OSCNodeDataPoo
          c_String += C_OSCExportUti::h_FloatToStrG(orc_Value.GetValueF64());
          break;
       default:
+         tgl_assert(false);
          break;
       }
    }
@@ -1471,6 +1476,7 @@ C_SCLString C_OSCExportDataPool::mh_GetElementValueString(const C_OSCNodeDataPoo
             c_String += C_OSCExportUti::h_FloatToStrG(orc_Value.GetValueAF64Element(u32_ArrayIndex));
             break;
          default:
+            tgl_assert(false);
             break;
          }
 
@@ -1538,6 +1544,7 @@ C_SCLString C_OSCExportDataPool::mh_GetElementSize(const C_OSCNodeDataPoolConten
       u32_Size = 8U;
       break;
    default:
+      tgl_assert(false);
       break;
    }
 
@@ -1576,6 +1583,7 @@ C_SCLString C_OSCExportDataPool::mh_ConvertLinkageToString(const C_OSCExportData
       c_Return = "REMOTE_PUBLIC";
       break;
    default:
+      tgl_assert(false);
       break;
    }
 

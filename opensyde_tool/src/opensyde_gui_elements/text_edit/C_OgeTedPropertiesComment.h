@@ -34,10 +34,13 @@ public:
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void SigEditingFinished(void) const; ///< emitted on focus out (return/enter key press mean "new line" in text edits)
+   void SigEditingFinished(void) const;  ///< emitted on focus out (return/enter key press mean "new line" in text
+                                         // edits)
+   void SigCommentConfirmed(void) const; ///< emitted on return/enter key press
 
 protected:
    virtual void focusOutEvent(QFocusEvent * const opc_Event) override;
+   virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

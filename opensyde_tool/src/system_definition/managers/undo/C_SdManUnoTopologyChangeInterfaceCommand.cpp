@@ -43,8 +43,8 @@ using namespace std;
    \param[in]      orc_IDs                   Affected unique IDs
    \param[in]      oru8_PreviousInterface    Previous interface number
    \param[in]      oru8_NewInterface         New interface number to use
-   \param[in]      orc_PreviousNodeIds       Previous node ids
-   \param[in]      orc_NewNodeIds            New node ids
+   \param[in]      orc_PreviousProperties    Previous properties
+   \param[in]      orc_NewProperties         New properties
    \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,14 +52,14 @@ C_SdManUnoTopologyChangeInterfaceCommand::C_SdManUnoTopologyChangeInterfaceComma
                                                                                    const std::vector<uint64> & orc_IDs,
                                                                                    const uint8 & oru8_PreviousInterface,
                                                                                    const uint8 & oru8_NewInterface,
-                                                                                   const std::vector<uint8> & orc_PreviousNodeIds,
-                                                                                   const std::vector<uint8> & orc_NewNodeIds,
+                                                                                   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_PreviousProperties,
+                                                                                   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_NewProperties,
                                                                                    QUndoCommand * const opc_Parent) :
    C_SebUnoBaseCommand(opc_Scene, orc_IDs, "Change interface of bus connection(s)", opc_Parent),
    mu8_PreviousInterface(oru8_PreviousInterface),
    mu8_NewInterface(oru8_NewInterface),
-   mc_PreviousNodeIds(orc_PreviousNodeIds),
-   mc_NewNodeIds(orc_NewNodeIds)
+   mc_PreviousProperties(orc_PreviousProperties),
+   mc_NewProperties(orc_NewProperties)
 {
 }
 
@@ -77,7 +77,7 @@ C_SdManUnoTopologyChangeInterfaceCommand::~C_SdManUnoTopologyChangeInterfaceComm
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyChangeInterfaceCommand::undo(void)
 {
-   m_ChangeInterface(this->mu8_PreviousInterface, this->mc_PreviousNodeIds);
+   m_ChangeInterface(this->mu8_PreviousInterface, this->mc_PreviousProperties);
    QUndoCommand::undo();
 }
 
@@ -87,7 +87,7 @@ void C_SdManUnoTopologyChangeInterfaceCommand::undo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyChangeInterfaceCommand::redo(void)
 {
-   m_ChangeInterface(this->mu8_NewInterface, this->mc_NewNodeIds);
+   m_ChangeInterface(this->mu8_NewInterface, this->mc_NewProperties);
    QUndoCommand::redo();
 }
 
@@ -95,11 +95,12 @@ void C_SdManUnoTopologyChangeInterfaceCommand::redo(void)
 /*! \brief   Change interface of all bus connectors to specified one
 
    \param[in]  oru8_NewInterface    New interface to change to
-   \param[in]  orc_NodeIds          Node ids
+   \param[in]  orc_Properties       Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyChangeInterfaceCommand::m_ChangeInterface(const uint8 & oru8_NewInterface,
-                                                                 const std::vector<uint8> & orc_NodeIds) const
+                                                                 const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
+const
 {
    const vector<QGraphicsItem *> c_Items = m_GetSceneItems();
 
@@ -108,7 +109,7 @@ void C_SdManUnoTopologyChangeInterfaceCommand::m_ChangeInterface(const uint8 & o
       C_GiLiBusConnector * const pc_CurConn = dynamic_cast<C_GiLiBusConnector *>(*c_ItItem);
       if (pc_CurConn != NULL)
       {
-         pc_CurConn->ChangeInterface(oru8_NewInterface, orc_NodeIds);
+         pc_CurConn->ChangeInterface(oru8_NewInterface, orc_Properties);
       }
    }
 }

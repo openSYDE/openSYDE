@@ -47,7 +47,7 @@ C_OSCCanMessageContainer::C_OSCCanMessageContainer(void) :
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessageContainer::CalcHash(uint32 & oru32_HashValue) const
@@ -112,8 +112,8 @@ void C_OSCCanMessageContainer::ReCalcDataElementIndices(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get start of message in data pool list element vector
 
-   \param[in] orq_IsTx           Flag if message is tx (else rx)
-   \param[in] oru32_MessageIndex Message index
+   \param[in]  orq_IsTx             Flag if message is tx (else rx)
+   \param[in]  oru32_MessageIndex   Message index
 
    \return
    Data pool list element index of message start
@@ -143,7 +143,7 @@ uint32 C_OSCCanMessageContainer::GetMessageSignalDataStartIndex(const bool & orq
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Request reference to either list
 
-   \param[in] orq_IsTx Flag if tx message vector was requested (else rx message vector is output)
+   \param[in]  orq_IsTx    Flag if tx message vector was requested (else rx message vector is output)
 
    \return
    Either tx or rx list (as requested)
@@ -151,20 +151,13 @@ uint32 C_OSCCanMessageContainer::GetMessageSignalDataStartIndex(const bool & orq
 //----------------------------------------------------------------------------------------------------------------------
 const std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessagesConst(const bool & orq_IsTx) const
 {
-   if (orq_IsTx == true)
-   {
-      return this->c_TxMessages;
-   }
-   else
-   {
-      return this->c_RxMessages;
-   }
+   return (orq_IsTx == true) ? this->c_TxMessages : this->c_RxMessages;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Request reference to either list
 
-   \param[in] orq_IsTx Flag if tx message vector was requested (else rx message vector is output)
+   \param[in]  orq_IsTx    Flag if tx message vector was requested (else rx message vector is output)
 
    \return
    Either tx or rx list (as requested)
@@ -172,14 +165,7 @@ const std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessagesConst(
 //----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool & orq_IsTx)
 {
-   if (orq_IsTx == true)
-   {
-      return this->c_TxMessages;
-   }
-   else
-   {
-      return this->c_RxMessages;
-   }
+   return (orq_IsTx == true) ? this->c_TxMessages : this->c_RxMessages;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -187,17 +173,17 @@ std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool 
 
    IMPORTANT: some error types (e.g. name & id conflict) can only be checked via system definition
 
-   \param[in]  opc_List                             Node data pool list containing signal data
-                                                    (Optional as it is only required by some checks)
-   \param[in]  oru32_MessageIndex                   Message index
-   \param[in]  orq_IsTx                             Flag if message is tx (else rx)
-   \param[out] opq_NameConflict                     Name conflict
-   \param[out] opq_NameInvalid                      Name not usable as variable
-   \param[out] opq_DelayTimeInvalid                 Delay time is invalid
-   \param[out] opq_IdConflict                       Id conflict
-   \param[out] opq_IdInvalid                        Id out of 11 bit / 29 bit range
-   \param[out] opq_SignalInvalid                    An error found for a signal
-   \param[in]  ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
+   \param[in]   opc_List                              Node data pool list containing signal data
+                                                      (Optional as it is only required by some checks)
+   \param[in]   oru32_MessageIndex                    Message index
+   \param[in]   orq_IsTx                              Flag if message is tx (else rx)
+   \param[out]  opq_NameConflict                      Name conflict
+   \param[out]  opq_NameInvalid                       Name not usable as variable
+   \param[out]  opq_DelayTimeInvalid                  Delay time is invalid
+   \param[out]  opq_IdConflict                        Id conflict
+   \param[out]  opq_IdInvalid                         Id out of 11 bit / 29 bit range
+   \param[out]  opq_SignalInvalid                     An error found for a signal
+   \param[in]   ou32_CANMessageValidSignalsDLCOffset  CAN message DLC offset for valid signal range check
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolList * const opc_List,
@@ -322,7 +308,8 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
             if (q_Skip == false)
             {
                const C_OSCCanMessage & rc_CurrentMessage = this->c_TxMessages[u32_ItMessage];
-               if (rc_Message.u32_CanId == rc_CurrentMessage.u32_CanId)
+               if ((rc_Message.u32_CanId == rc_CurrentMessage.u32_CanId) &&
+                   (rc_Message.q_IsExtended == rc_CurrentMessage.q_IsExtended))
                {
                   *opq_IdConflict = true;
                }
@@ -344,7 +331,8 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
             if (q_Skip == false)
             {
                const C_OSCCanMessage & rc_CurrentMessage = this->c_RxMessages[u32_ItMessage];
-               if (rc_Message.u32_CanId == rc_CurrentMessage.u32_CanId)
+               if ((rc_Message.u32_CanId == rc_CurrentMessage.u32_CanId) &&
+                   (rc_Message.q_IsExtended == rc_CurrentMessage.q_IsExtended))
                {
                   *opq_IdConflict = true;
                }
@@ -385,11 +373,11 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
 
    IMPORTANT: some error types (e.g. name & id conflict) can only be checked via system definition
 
-   \param[in]     orc_ListTx                           Node data pool list containing tx signal data
-   \param[in]     orc_ListRx                           Node data pool list containing rx signal data
-   \param[in]     ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
-   \param[in,out] opc_InvalidTxMessages                Optional vector of invalid Tx CAN message names
-   \param[in,out] opc_InvalidRxMessages                Optional vector of invalid Rx CAN message names
+   \param[in]      orc_ListTx                            Node data pool list containing tx signal data
+   \param[in]      orc_ListRx                            Node data pool list containing rx signal data
+   \param[in]      ou32_CANMessageValidSignalsDLCOffset  CAN message DLC offset for valid signal range check
+   \param[in,out]  opc_InvalidTxMessages                 Optional vector of invalid Tx CAN message names
+   \param[in,out]  opc_InvalidRxMessages                 Optional vector of invalid Rx CAN message names
 
    \return
    true  Error

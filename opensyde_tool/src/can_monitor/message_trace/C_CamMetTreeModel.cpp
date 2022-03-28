@@ -35,10 +35,10 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_CamMetTreeModel::mhc_IconMessage = ":images/IconMessageInactive.svg";
-const QString C_CamMetTreeModel::mhc_IconMessageSelected = "://images/IconMessageSelected.svg";
-const QString C_CamMetTreeModel::mhc_IconSignal = ":images/IconSignalInactive.svg";
-const QString C_CamMetTreeModel::mhc_IconSignalSelected = "://images/IconSignalSelected.svg";
+const QString C_CamMetTreeModel::mhc_ICON_MESSAGE = ":images/IconMessageInactive.svg";
+const QString C_CamMetTreeModel::mhc_ICON_MESSAGE_SELECTED = "://images/IconMessageSelected.svg";
+const QString C_CamMetTreeModel::mhc_ICON_SIGNAL = ":images/IconSignalInactive.svg";
+const QString C_CamMetTreeModel::mhc_ICON_SIGNAL_SELECTED = "://images/IconSignalSelected.svg";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -1110,12 +1110,12 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
             if (orc_Index.parent().isValid() == false)
             {
                // Message
-               c_Retval = C_CamMetTreeModel::mhc_IconMessage;
+               c_Retval = C_CamMetTreeModel::mhc_ICON_MESSAGE;
             }
             else
             {
                // Signal
-               c_Retval = C_CamMetTreeModel::mhc_IconSignal;
+               c_Retval = C_CamMetTreeModel::mhc_ICON_SIGNAL;
             }
          }
       }
@@ -1128,14 +1128,14 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
             if (orc_Index.parent().isValid() == false)
             {
                // Message
-               c_Tmp.append(C_CamMetTreeModel::mhc_IconMessage);
-               c_Tmp.append(C_CamMetTreeModel::mhc_IconMessageSelected);
+               c_Tmp.append(C_CamMetTreeModel::mhc_ICON_MESSAGE);
+               c_Tmp.append(C_CamMetTreeModel::mhc_ICON_MESSAGE_SELECTED);
             }
             else
             {
                // Signal
-               c_Tmp.append(C_CamMetTreeModel::mhc_IconSignal);
-               c_Tmp.append(C_CamMetTreeModel::mhc_IconSignalSelected);
+               c_Tmp.append(C_CamMetTreeModel::mhc_ICON_SIGNAL);
+               c_Tmp.append(C_CamMetTreeModel::mhc_ICON_SIGNAL_SELECTED);
             }
             c_Retval = c_Tmp;
          }

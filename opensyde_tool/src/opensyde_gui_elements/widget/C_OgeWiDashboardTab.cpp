@@ -112,11 +112,11 @@ C_OgeWiDashboardTab::~C_OgeWiDashboardTab(void)
 void C_OgeWiDashboardTab::SetText(const QString & orc_Text)
 {
    // 30 = Icon, 10 = Icon <-> Text, 13 = X, 30 = space so everything fits
-   const sintn sn_Offset = 30 + 10 + 13 + 30;
+   const sintn sn_OFFSET = 30 + 10 + 13 + 30;
    const QFontMetrics c_FontMetrics(this->mpc_Ui->pc_LabelName->font());
 
    this->mpc_Ui->pc_LabelName->setText(orc_Text);
-   this->resize(c_FontMetrics.horizontalAdvance(orc_Text) + sn_Offset, this->height());
+   this->resize(c_FontMetrics.horizontalAdvance(orc_Text) + sn_OFFSET, this->height());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

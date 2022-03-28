@@ -13,7 +13,6 @@
 #include "precomp_headers.h"
 
 #include <cctype>
-#include <fstream>
 #include <iterator>
 #include <cmath>
 #include <limits>
@@ -36,7 +35,7 @@ using namespace stw_scl;
 using namespace stw_tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::float64 C_OSCUtils::mhf64_Epsilon = 1e-5;
+const stw_types::float64 C_OSCUtils::mhf64_EPSILON = 1e-5;
 stw_scl::C_SCLResourceStrings C_OSCUtils::mhc_ResourceStrings;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -70,29 +69,36 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
 {
    uint32 u32_Index;
    charn cn_Char;
+   bool q_IsValid = true;
 
    if (orc_Name.Length() == 0)
    {
-      return false;
+      q_IsValid = false;
    }
-
-   // -> only alphanumeric characters + "_"
-   for (u32_Index = 0; u32_Index < orc_Name.Length(); u32_Index++)
+   else
    {
-      cn_Char = orc_Name.c_str()[u32_Index];
-      if ((std::isalnum(cn_Char) == 0) && (cn_Char != '_')) //ANSI compliant check
+      // -> only alphanumeric characters + "_"
+      for (u32_Index = 0; u32_Index < orc_Name.Length(); u32_Index++)
       {
-         return false;
+         cn_Char = orc_Name.c_str()[u32_Index];
+         if ((std::isalnum(cn_Char) == 0) && (cn_Char != '_')) //ANSI compliant check
+         {
+            q_IsValid = false;
+            break;
+         }
+      }
+
+      if (q_IsValid == true)
+      {
+         // -> should not be longer than ou16_MaxLength characters
+         if (orc_Name.Length() > static_cast<uint32>(ou16_MaxLength))
+         {
+            q_IsValid = false;
+         }
       }
    }
 
-   // -> should not be longer than ou16_MaxLength characters
-   if (orc_Name.Length() > static_cast<uint32>(ou16_MaxLength))
-   {
-      return false;
-   }
-
-   return true;
+   return q_IsValid;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,7 +115,7 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
 bool C_OSCUtils::h_IsFloat64NearlyEqual(const float64 & orf64_Float1, const float64 & orf64_Float2)
 {
    //From Marshall Cline's C++ FAQ Lite document
-   return std::abs(orf64_Float1 - orf64_Float2) <= (C_OSCUtils::mhf64_Epsilon * std::abs(orf64_Float1));
+   return std::abs(orf64_Float1 - orf64_Float2) <= (C_OSCUtils::mhf64_EPSILON * std::abs(orf64_Float1));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -127,7 +133,7 @@ bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const floa
 {
    //From Marshall Cline's C++ FAQ Lite document
    return std::abs(orf32_Float1 - orf32_Float2) <=
-          (static_cast<float32>(C_OSCUtils::mhf64_Epsilon) * std::abs(orf32_Float1));
+          (static_cast<float32>(C_OSCUtils::mhf64_EPSILON) * std::abs(orf32_Float1));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -486,9 +492,11 @@ float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Convert serial number array to string
+/*! \brief  Convert POS serial number array to string
 
-   Support of two serial number formats:
+   Converting the POS (Plain Old Serial) STW format in form of 6 BCD coded bytes to a string.
+
+   Support of two serial number variants of the formats:
       1: format up to and including 2019. E.g: 05.123456.1001
       2: format from 2020. E.g: 200012345678
 
@@ -498,7 +506,7 @@ float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 o
    serial number string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCUtils::h_SerialNumberToString(const uint8 * const opu8_SerialNumber)
+C_SCLString C_OSCUtils::h_PosSerialNumberToString(const uint8 * const opu8_SerialNumber)
 {
    C_SCLString c_Result;
 
@@ -517,6 +525,51 @@ C_SCLString C_OSCUtils::h_SerialNumberToString(const uint8 * const opu8_SerialNu
          c_Result.PrintFormatted("%02X%02X%02X%02X%02X%02X",
                                  opu8_SerialNumber[0], opu8_SerialNumber[1], opu8_SerialNumber[2], opu8_SerialNumber[3],
                                  opu8_SerialNumber[4], opu8_SerialNumber[5]);
+      }
+   }
+
+   return c_Result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert FSN serial number raw string to a formatted string
+
+   Converting the FSN (Flexible Serial Number) format in form of the defined ou8_ManufacturerFormat
+   orc_RawSerialNumber must have at least one byte and the maximum length is 29 byte
+
+   \param[in]  ou8_ManufacturerFormat    Manufacturer format which defines the type of serial number:
+                                         0:      STW POS format
+                                         1..255: reserved
+   \param[in]  orc_RawSerialNumber       Unedited raw serial number
+
+   \retval   string        formatted serial number string
+   \retval   empty string  if length of orc_RawSerialNumber does not match the expectations
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCUtils::h_FsnSerialNumberToString(const uint8 ou8_ManufacturerFormat,
+                                                  const stw_scl::C_SCLString & orc_RawSerialNumber)
+{
+   C_SCLString c_Result;
+
+   if ((orc_RawSerialNumber.Length() > 0) &&
+       (orc_RawSerialNumber.Length() <= 29))
+   {
+      if (ou8_ManufacturerFormat == 0U)
+      {
+         // Must match exactly
+         if (orc_RawSerialNumber.Length() == 6)
+         {
+            // STW POS format
+            //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?&
+            // anyway
+            c_Result = C_OSCUtils::h_PosSerialNumberToString(
+               reinterpret_cast<const uint8 *>(orc_RawSerialNumber.c_str()));
+         }
+      }
+      else
+      {
+         // No concrete formats defined yet
+         c_Result = orc_RawSerialNumber;
       }
    }
 
@@ -587,7 +640,7 @@ C_SCLString C_OSCUtils::h_LoadString(const uint16 ou16_StringIndex)
 
    if (hq_Initialized == false)
    {
-      mhc_ResourceStrings.SetStringTable(gac_DIAG_LIB_RESOURCE_STRINGS, gu16_DIAGLIB_NR_RES_STRNGS);
+      mhc_ResourceStrings.SetStringTable(&gac_DIAG_LIB_RESOURCE_STRINGS[0], gu16_DIAGLIB_NR_RES_STRNGS);
       hq_Initialized = true;
    }
 
@@ -635,7 +688,7 @@ sint32 C_OSCUtils::h_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLStr
       c_Input << &std::noskipws;
 
       const std::istream_iterator<uint8> c_Begin(c_Input);
-      const std::istream_iterator<uint8> c_End;
+      const std::istream_iterator<uint8> c_END;
 
       std::fstream c_Output(orc_TargetFile.c_str(), std::fstream::out | std::fstream::trunc | std::fstream::binary);
       if (c_Output.fail() == true)
@@ -653,7 +706,7 @@ sint32 C_OSCUtils::h_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLStr
          const std::ostream_iterator<uint8> c_Begin2(c_Output);
          try
          {
-            std::copy(c_Begin, c_End, c_Begin2);
+            std::copy(c_Begin, c_END, c_Begin2);
          }
          catch (...)
          {

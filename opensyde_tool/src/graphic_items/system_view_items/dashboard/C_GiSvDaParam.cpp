@@ -19,6 +19,7 @@
 #include "stwtypes.h"
 #include "TGLUtils.h"
 #include "stwerrors.h"
+#include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
 #include "C_GiSvDaParam.h"
 #include "C_PuiSvHandler.h"
@@ -62,11 +63,12 @@ C_GiSvDaParam::C_GiSvDaParam(const uint32 & oru32_ViewIndex, const uint32 & oru3
                          static_cast<uint32>(std::numeric_limits<sintn>::max()),
                          oru64_ID, 90.0, 50.0, 180.0, 100.0, false, true, opc_Parent),
    mq_Connected(false),
-   mq_EditActive(false)
+   mpc_AddDataElement(NULL)
 {
    this->mpc_ParamWidget = new C_SyvDaItPaWidgetNew(oru32_ViewIndex, this);
    this->mpc_Widget->SetWidget(this->mpc_ParamWidget);
    //Activate child handles its own events for combo box pop up
+   // No edit and no edit content mode: The child must handle its own events
    this->setHandlesChildEvents(false);
    //Handle initial edit mode
    this->C_GiSvDaParam::EditModeActiveChanged(true);
@@ -206,17 +208,6 @@ void C_GiSvDaParam::DeleteData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Call properties for widgets
-
-   \return false (no configurable properties)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvDaParam::CallProperties(void)
-{
-   return false;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the shown value of the element
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -255,11 +246,113 @@ void C_GiSvDaParam::ConnectionActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::EditModeActiveChanged(const bool oq_Active)
 {
-   this->mq_EditActive = oq_Active;
+   C_GiSvDaRectBaseGroup::EditModeActiveChanged(oq_Active);
+
+   //Adapt child handles its own events for combo box pop up depending of the edit mode
+   // No edit and no edit content mode: The child must handle its own events
+   // Edit mode and no edit content mode: The child shall not handle its own events due to moving functionality
+   // Edit mode and edit content mode: The child must handle its own events
+   this->setHandlesChildEvents(oq_Active);
+
    tgl_assert(this->mpc_ParamWidget != NULL);
    if (this->mpc_ParamWidget != NULL)
    {
-      this->mpc_ParamWidget->SetEditModeActive(oq_Active);
+      this->mpc_ParamWidget->SetEditMode(this->mq_EditModeActive, this->mq_EditContentModeEnabled);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enable edit content mode for widgets
+
+   \retval false  nothing done
+   \retval true   edit content mode enabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaParam::EnableEditContent(void)
+{
+   const bool q_Return = C_GiSvDaRectBaseGroup::EnableEditContent();
+
+   //Adapt child handles its own events for combo box pop up depending of the edit mode
+   // Edit mode and edit content mode: The child must handle its own events
+   this->setHandlesChildEvents(false);
+
+   if (q_Return == true)
+   {
+      tgl_assert(this->mpc_ParamWidget != NULL);
+      if (this->mpc_ParamWidget != NULL)
+      {
+         this->mpc_ParamWidget->SetEditMode(this->mq_EditModeActive, true);
+      }
+   }
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disable edit content mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaParam::DisableEditContent(void)
+{
+   C_GiSvDaRectBaseGroup::DisableEditContent();
+
+   //Adapt child handles its own events for combo box pop up depending of the edit mode
+   // Edit mode and no edit content mode: The child shall not handle its own events due to moving functionality
+   this->setHandlesChildEvents(true);
+
+   tgl_assert(this->mpc_ParamWidget != NULL);
+   if (this->mpc_ParamWidget != NULL)
+   {
+      this->mpc_ParamWidget->SetEditMode(this->mq_EditModeActive, false);
+      // In case of a still visible tool tip, it will no disappear due to the not forwarded events and an own scene
+      // independent handling, it must be hided manually
+      this->mpc_ParamWidget->HideToolTip();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates or deactivates all relevant context menu entries for this item
+
+   Context menu functions:
+   - Add
+
+   \param[in]  opc_ContextMenuManager  Pointer to context menu manager for registration of actions
+   \param[in]  oq_Active               Flag if context menu entries have to be shown or not
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaParam::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager, const bool oq_Active)
+{
+   if (this->mq_EditContentModeEnabled == false)
+   {
+      // Normal edit mode, use default dashboard context menu
+      C_GiSvDaRectBaseGroup::ConfigureContextMenu(opc_ContextMenuManager, oq_Active);
+   }
+   else
+   {
+      // Deactivate the default dashboard scene actions.
+      // In content edit mode only widget specific functions are relevant
+      opc_ContextMenuManager->SetSpecificActionsAvailable(false, true);
+
+      tgl_assert(this->mpc_ParamWidget != NULL);
+      if ((oq_Active == true) && (this->mpc_ParamWidget != NULL))
+      {
+         // Initial registration of the context menu
+         if (mpc_AddDataElement == NULL)
+         {
+            mpc_AddDataElement =
+               opc_ContextMenuManager->RegisterActionWithKeyboardShortcut(C_GtGetText::h_GetText(
+                                                                             "Add list(s)"),
+                                                                          static_cast<sintn>(Qt::CTRL) +
+                                                                          static_cast<sintn>(Qt::Key_Plus));
+            // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+            this->mpc_AddDataElement->setVisible(false);
+            connect(mpc_AddDataElement, &QAction::triggered, this->mpc_ParamWidget,
+                    &C_SyvDaItPaWidgetNew::ButtonAddClicked);
+         }
+         if (mpc_AddDataElement != NULL)
+         {
+            opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_AddDataElement);
+         }
+      }
    }
 }
 
@@ -577,6 +670,19 @@ QWidget * C_GiSvDaParam::GetPopUpParent(void) const
 bool C_GiSvDaParam::m_AllowWarningIcon(void) const
 {
    return false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if element supports the edit content mode
+
+   \return
+   True  Element does have and support a widget specific edit content mode
+   False Element does not have and support a widget specific edit content mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaParam::m_HasEditContentMode(void) const
+{
+   return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

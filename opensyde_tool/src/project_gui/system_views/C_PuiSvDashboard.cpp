@@ -793,12 +793,38 @@ void C_PuiSvDashboard::GetAllWidgetItems(std::vector<const C_PuiSvDbWidgetBase *
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Gets all registered dashboard elements of all dashboard tabs
+/*! \brief   Gets all registered dashboard elements of all dashboard tabs (excluding GUI part)
 
    \param[in,out]  orc_Ids    Set with all registered elements. Will not be cleared when called
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::GetAllRegisteredDashboardElements(std::set<C_OSCNodeDataPoolListElementId> & orc_Ids) const
+{
+   std::vector<const C_PuiSvDbWidgetBase *> c_Widgets;
+   uint32 u32_WidgetCounter;
+
+   this->GetAllWidgetItems(c_Widgets);
+
+   for (u32_WidgetCounter = 0U; u32_WidgetCounter < c_Widgets.size(); ++u32_WidgetCounter)
+   {
+      const C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_WidgetCounter];
+      uint32 u32_ConfigCounter;
+
+      for (u32_ConfigCounter = 0U; u32_ConfigCounter < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ConfigCounter)
+      {
+         orc_Ids.insert(pc_Widget->c_DataPoolElementsConfig[u32_ConfigCounter].c_ElementId);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets all registered dashboard elements of all dashboard tabs (including GUI part)
+
+   \param[in,out]  orc_Ids    Set with all registered elements. Will not be cleared when called
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::GetAllRegisteredDashboardElementsGuiId(std::set<C_PuiSvDbNodeDataPoolListElementId> & orc_Ids)
+const
 {
    std::vector<const C_PuiSvDbWidgetBase *> c_Widgets;
    uint32 u32_WidgetCounter;
@@ -2737,6 +2763,26 @@ sint32 C_PuiSvDashboard::AddParamNewDataPoolElement(const uint32 ou32_ParamWidge
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Remove all references to element id
+
+   \param[in]  orc_DataElementId    Data element id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::RemoveAllReferencesToElementId(const C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_AllWidgets;
+   m_GetAllWidgetItems(c_AllWidgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_AllWidgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_AllWidgets[u32_ItWidget];
+      if (pc_Widget != NULL)
+      {
+         pc_Widget->RemoveAllReferencesToElementId(orc_DataElementId);
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

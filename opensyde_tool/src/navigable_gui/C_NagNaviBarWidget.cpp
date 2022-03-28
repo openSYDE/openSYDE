@@ -751,15 +751,15 @@ void C_NagNaviBarWidget::m_SysViewSizeChanged(void) const
 {
    if (this->mpc_Ui->pc_ListViewViews->isVisible() == true)
    {
-      const sint32 s32_OtherItemSizes = 444;
-      const sint32 s32_MinSize = 52;
+      const sint32 s32_OTHER_ITEM_SIZES = 444;
+      const sint32 s32_MIN_SIZE = 52;
       //Check if there is any available space to work with
-      if (this->height() > (s32_OtherItemSizes + s32_MinSize))
+      if (this->height() > (s32_OTHER_ITEM_SIZES + s32_MIN_SIZE))
       {
-         const sint32 s32_AvailableSpace = static_cast<sint32>(this->height()) - s32_OtherItemSizes;
+         const sint32 s32_AvailableSpace = static_cast<sint32>(this->height()) - s32_OTHER_ITEM_SIZES;
          //Get desired size taking into account that the minimum is still there
          const sint32 s32_DesiredSize =
-            std::max(this->mpc_Ui->pc_ListViewViews->GetMaximumRequiredHeight(), s32_MinSize);
+            std::max(this->mpc_Ui->pc_ListViewViews->GetMaximumRequiredHeight(), s32_MIN_SIZE);
          sint32 s32_FinalSize;
          //Check if the desired size is in the available space (so in this case the add button can be moved)
          if (s32_DesiredSize < s32_AvailableSpace)
@@ -776,8 +776,8 @@ void C_NagNaviBarWidget::m_SysViewSizeChanged(void) const
       else
       {
          //Default if size calculation returns trash
-         this->mpc_Ui->pc_ScrollArea->setMinimumHeight(s32_MinSize);
-         this->mpc_Ui->pc_ScrollArea->setMaximumHeight(s32_MinSize);
+         this->mpc_Ui->pc_ScrollArea->setMinimumHeight(s32_MIN_SIZE);
+         this->mpc_Ui->pc_ScrollArea->setMaximumHeight(s32_MIN_SIZE);
       }
    }
    else
@@ -1017,7 +1017,7 @@ void C_NagNaviBarWidget::m_AnimationTimerEvent()
 void C_NagNaviBarWidget::m_PbTopologyClick(void)
 {
    const QString c_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
-   const sint32 s32_SubMode = ms32_SUBMODE_SYSDEF_TOPOLOGY;
+   const sint32 s32_SUB_MODE = ms32_SUBMODE_SYSDEF_TOPOLOGY;
 
-   Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, s32_SubMode, 0, c_Name);
+   Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, s32_SUB_MODE, 0, c_Name);
 }

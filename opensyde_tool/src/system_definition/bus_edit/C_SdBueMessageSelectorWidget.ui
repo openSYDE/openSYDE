@@ -272,16 +272,21 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <extends>QFrame</extends>
+   <header>C_OgeFraSeparator.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
    <header>C_OgeGbxTransparent.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
-   <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
-   <container>1</container>
+   <class>stw_opensyde_gui_elements::C_OgePubOptions</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubOptions.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget</class>
@@ -293,12 +298,12 @@
    <extends>QPushButton</extends>
    <header>C_OgePubTreeWidgetRoot.h</header>
   </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubOptions</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubOptions.h</header>
-  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>pc_PbTreeWidgetRoot</tabstop>
+  <tabstop>pc_PbAddMessage</tabstop>
+  <tabstop>pc_MessageTreeWidget</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

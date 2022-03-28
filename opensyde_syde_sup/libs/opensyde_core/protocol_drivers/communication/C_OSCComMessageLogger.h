@@ -60,9 +60,9 @@ public:
    // openSYDE system definition handling
    virtual void SetProtocol(const stw_cmon_protocol::e_CMONL7Protocols oe_Protocol);
    stw_types::sint32 AddOsySysDef(const stw_scl::C_SCLString & orc_PathSystemDefinition,
-                                  std::vector<C_OSCSystemBus> & orc_Busses);
+                                  std::vector<C_OSCSystemBus> & orc_Buses);
    stw_types::sint32 AddOsySysDef(const stw_scl::C_SCLString & orc_PathSystemDefinition,
-                                  const stw_types::uint32 ou32_BusIndex, std::vector<C_OSCSystemBus> & orc_Busses);
+                                  const stw_types::uint32 ou32_BusIndex, std::vector<C_OSCSystemBus> & orc_Buses);
    virtual stw_types::sint32 SetOsySysDefBus(const stw_scl::C_SCLString & orc_PathSystemDefinition,
                                              const stw_types::uint32 ou32_BusIndex);
    virtual stw_types::sint32 GetOsySysDef(const stw_scl::C_SCLString & orc_PathSystemDefinition,
@@ -160,7 +160,7 @@ private:
 
    // Filtering
    std::vector<C_OSCComMessageLoggerFilter> mc_CanFilterConfig;
-   stw_types::uint32 mu32_FilteredMessages;
+   stw_types::uint32 mu32_FilteredMessages; //number of messages that did not pass the filter
 
    // Message counting
    std::vector<stw_types::uint32> mc_MsgCounterStandardId;

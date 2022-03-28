@@ -31,14 +31,14 @@ public:
                                          const stw_types::uint64 & oru64_StartingNodeID,
                                          const stw_types::uint64 & oru64_LastNodeID, const QPointF & orc_ConnectionPos,
                                          const stw_types::sint32 & ors32_Interface,
-                                         const std::vector<stw_types::uint8> & orc_NodeIds,
+                                         const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
                                          QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SdManUnoTopologyReconnectBusCommand(void);
 
 protected:
    virtual void m_Reconnect(const stw_types::uint64 & oru64_StartingID, const stw_types::uint64 & oru64_LastID,
                             const stw_types::sint32 & ors32_Interface,
-                            const std::vector<stw_types::uint8> & orc_NodeIds) override;
+                            const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

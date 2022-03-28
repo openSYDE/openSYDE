@@ -740,6 +740,144 @@ std::vector<uint32> C_SdUtil::h_GetUsedBusIdsUniqueAndSortedAscending(const sint
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the last bytes of all IP Addresses used on the given bus.
+             Only STW default IP addresses (starting with 192.168.0.X) are considered.
+
+   \param[in]  oru32_BusIndex            Bus index of bus to look at
+   \param[in]  oru32_SpecialNodeIndex    Special node index to skip
+   \param[in]  ors32_SpecialInterface    Special interface to skip
+
+   \return
+   Vector of last bytes of IP addresses
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<uint32> C_SdUtil::h_GetUsedIpAddressesForBusUniqueAndSortedAscending(const uint32 & oru32_BusIndex,
+                                                                                 const uint32 & oru32_SpecialNodeIndex,
+                                                                                 const sint32 & ors32_SpecialInterface)
+{
+   std::vector<uint32> c_Retval;
+
+   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(oru32_BusIndex);
+
+   if (pc_Bus != NULL)
+   {
+      std::vector<uint32> c_NodeIndexes;
+      std::vector<uint32> c_InterfaceIndexes;
+
+      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(oru32_BusIndex,
+                                                                                         c_NodeIndexes,
+                                                                                         c_InterfaceIndexes);
+      c_Retval.reserve(c_NodeIndexes.size());
+      if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
+      {
+         for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
+         {
+            const C_OSCNode * const pc_CurNode =
+               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndexes[u32_ItNode]);
+            if (pc_CurNode != NULL)
+            {
+               if (c_InterfaceIndexes[u32_ItNode] < pc_CurNode->c_Properties.c_ComInterfaces.size())
+               {
+                  const C_OSCNodeComInterfaceSettings & rc_CurComInterface =
+                     pc_CurNode->c_Properties.c_ComInterfaces[c_InterfaceIndexes[u32_ItNode]];
+                  //Check special handling, skip own interface
+                  if (((static_cast<uint8>(ors32_SpecialInterface) != rc_CurComInterface.u8_InterfaceNumber) ||
+                       (oru32_SpecialNodeIndex != c_NodeIndexes[u32_ItNode])) ||
+                      (pc_Bus->e_Type != rc_CurComInterface.e_InterfaceType))
+                  {
+                     if ((rc_CurComInterface.GetBusConnected() == true) &&
+                         (rc_CurComInterface.u32_BusIndex == oru32_BusIndex))
+                     {
+                        //only consider addresses which match the STW default in their first 3 bytes
+                        if ((rc_CurComInterface.c_Ip.au8_IpAddress[0] ==
+                             C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_FIRST_BYTE) &&
+                            (rc_CurComInterface.c_Ip.au8_IpAddress[1] ==
+                             C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_SECOND_BYTE) &&
+                            (rc_CurComInterface.c_Ip.au8_IpAddress[2] ==
+                             C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_THIRD_BYTE))
+                        {
+                           c_Retval.push_back(rc_CurComInterface.c_Ip.au8_IpAddress[3]);
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   //0 and 1 are reserved, therefore used. Always!
+   c_Retval.push_back(0U);
+   c_Retval.push_back(1U);
+
+   return C_Uti::h_UniquifyAndSortAscending(c_Retval);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Gets all IP Addresses used on the given bus. (Complete addresses, not just last bytes)
+
+   \param[in]  oru32_BusIndex            Bus index of bus to look at
+   \param[in]  oru32_SpecialNodeIndex    Special node index to skip
+   \param[in]  ors32_SpecialInterface    Special interface to skip
+
+   \return
+   Vector of IP addresses (each stored in a separate vector)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<std::vector<uint8> > C_SdUtil::h_GetAllUsedIpAddressesForBus(const uint32 & oru32_BusIndex,
+                                                                         const uint32 & oru32_SpecialNodeIndex,
+                                                                         const sint32 & ors32_SpecialInterface)
+{
+   std::vector<std::vector<uint8> > c_Retval;
+
+   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(oru32_BusIndex);
+
+   if (pc_Bus != NULL)
+   {
+      std::vector<uint32> c_NodeIndexes;
+      std::vector<uint32> c_InterfaceIndexes;
+
+      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(oru32_BusIndex,
+                                                                                         c_NodeIndexes,
+                                                                                         c_InterfaceIndexes);
+      c_Retval.reserve(c_NodeIndexes.size());
+      if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
+      {
+         for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
+         {
+            const C_OSCNode * const pc_CurNode =
+               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndexes[u32_ItNode]);
+            if (pc_CurNode != NULL)
+            {
+               if (c_InterfaceIndexes[u32_ItNode] < pc_CurNode->c_Properties.c_ComInterfaces.size())
+               {
+                  const C_OSCNodeComInterfaceSettings & rc_CurComInterface =
+                     pc_CurNode->c_Properties.c_ComInterfaces[c_InterfaceIndexes[u32_ItNode]];
+                  //Check special handling, skip own interface
+                  if (((static_cast<uint8>(ors32_SpecialInterface) != rc_CurComInterface.u8_InterfaceNumber) ||
+                       (oru32_SpecialNodeIndex != c_NodeIndexes[u32_ItNode])) ||
+                      (pc_Bus->e_Type != rc_CurComInterface.e_InterfaceType))
+                  {
+                     if ((rc_CurComInterface.GetBusConnected() == true) &&
+                         (rc_CurComInterface.u32_BusIndex == oru32_BusIndex))
+                     {
+                        std::vector<uint8> c_Tmp;
+                        c_Tmp.push_back(rc_CurComInterface.c_Ip.au8_IpAddress[0]);
+                        c_Tmp.push_back(rc_CurComInterface.c_Ip.au8_IpAddress[1]);
+                        c_Tmp.push_back(rc_CurComInterface.c_Ip.au8_IpAddress[2]);
+                        c_Tmp.push_back(rc_CurComInterface.c_Ip.au8_IpAddress[3]);
+                        c_Retval.push_back(c_Tmp);
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt message to protocol restrictions
 
    \param[in,out]  orc_Message            Message to adapt
@@ -922,18 +1060,91 @@ QString C_SdUtil::h_InitUsedIdsString(const std::vector<uint32> & orc_UsedIds, c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get next free node id
+/*! \brief  Builds a string which contains all used IP addresses separated with new line.
 
-   \param[in]  orc_Interfaces          Node interfaces
-   \param[in]  orc_UsedNodeIds         Unused node ids (unique and sorted ascending)
-   \param[in]  ors32_SpecialInterface  Special interface to use as default
+   \param[in]      orc_UsedIps    Used IP addresses
+   \param[in]      orc_ItemName   Item name (e.g. bus name)
+   \param[in]      orc_ItemType   Item type (e.g. "bus" or "node")
+   \param[in]      oq_SkiptItem   Flag to skip item (default = false)
 
    \return
-   Node ID proposal (Always in range but may be invalid)
+   String with already used IP addresses
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdUtil::h_GetNextFreeNodeId(const std::vector<C_OSCNodeComInterfaceSettings> & orc_Interfaces,
-                                     const std::vector<uint32> & orc_UsedNodeIds, const sint32 & ors32_SpecialInterface)
+QString C_SdUtil::h_InitUsedIpsString(const std::vector<std::vector<uint8> > & orc_UsedIps,
+                                      const QString & orc_ItemName, const QString & orc_ItemType,
+                                      const bool oq_SkiptItem)
+{
+   QString c_Retval;
+
+   if (orc_UsedIps.size() > 0UL)
+   {
+      QString c_BusIps;
+      for (uint16 u16_ItIp = 0; u16_ItIp < (orc_UsedIps.size() - 1UL); ++u16_ItIp)
+      {
+         c_BusIps += static_cast<QString>("%1,\n").arg(C_SdUtil::h_IpAddressAsString(orc_UsedIps[u16_ItIp]));
+      }
+      //append last one without comma & new line
+      c_BusIps += C_SdUtil::h_IpAddressAsString(orc_UsedIps[orc_UsedIps.size() - 1]);
+
+      if (oq_SkiptItem == true)
+      {
+         c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Already used IPs: %1")).arg(c_BusIps);
+      }
+      else
+      {
+         c_Retval =
+            static_cast<QString>(C_GtGetText::h_GetText("Already used IPs on %3 %1:\n%2")).arg(orc_ItemName).arg(
+               c_BusIps).arg(orc_ItemType);
+      }
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Converts an IP address represented as a byte-vector to a string
+
+   \param[in]       orc_Ip     Vector with 4 bytes of an IP address
+
+   \return
+   IP as string with point separators
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdUtil::h_IpAddressAsString(const std::vector<uint8> & orc_Ip)
+{
+   QString c_Retval;
+
+   tgl_assert(orc_Ip.size() == 4);
+   if (orc_Ip.size() == 4)
+   {
+      for (uint8 u8_It = 0; u8_It < (orc_Ip.size() - 1UL); ++u8_It)
+      {
+         c_Retval += static_cast<QString>("%1.").arg(static_cast<uint32>(orc_Ip[u8_It]));
+      }
+      //append last one without point
+      c_Retval += QString::number(static_cast<uint32>(orc_Ip[orc_Ip.size() - 1]));
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function generates node id or last byte for IP address depending on oq_GenerateId
+
+   \param[in]  orc_Interfaces                 Node interfaces
+   \param[in]  orc_UsedNodeProperties         Already used node properties (id/ip: unique and sorted ascending)
+   \param[in]  ors32_SpecialInterface         Special interface to use as default
+   \param[in]  oq_GenerateId                  True: generate ID
+                                              False: generate last byte of IP
+
+   \return
+   Node ID or IP proposal (Always in range but may be invalid)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SdUtil::h_GetNextFreeNodeProperty(const std::vector<C_OSCNodeComInterfaceSettings> & orc_Interfaces,
+                                           const std::vector<uint32> & orc_UsedNodeProperties,
+                                           const sint32 & ors32_SpecialInterface, const bool oq_GenerateId)
 {
    uint32 u32_Retval = 0;
 
@@ -944,20 +1155,28 @@ uint32 C_SdUtil::h_GetNextFreeNodeId(const std::vector<C_OSCNodeComInterfaceSett
          const C_OSCNodeComInterfaceSettings & rc_CurComIf = orc_Interfaces[u32_ItInterface];
          if (rc_CurComIf.u8_InterfaceNumber == static_cast<uint8>(ors32_SpecialInterface))
          {
-            u32_Retval = rc_CurComIf.u8_NodeID;
+            if (oq_GenerateId)
+            {
+               u32_Retval = rc_CurComIf.u8_NodeID;
+            }
+            else
+            {
+               u32_Retval = rc_CurComIf.c_Ip.au8_IpAddress[3];
+            }
          }
       }
    }
    else
    {
-      for (uint32 u32_ItBusId = 0; u32_ItBusId < orc_UsedNodeIds.size(); ++u32_ItBusId)
+      for (uint32 u32_It = 0; u32_It < orc_UsedNodeProperties.size(); ++u32_It)
       {
-         if (u32_Retval == orc_UsedNodeIds[u32_ItBusId])
+         if (u32_Retval == orc_UsedNodeProperties[u32_It])
          {
             ++u32_Retval;
          }
       }
    }
+
    return u32_Retval;
 }
 
@@ -1142,6 +1361,7 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
       bool q_NameConflict;
       bool q_NameEmpty;
       bool q_NodeIdInvalid;
+      bool q_IpInvalid;
 
       bool q_DatapoolNvmSizeConflict;
       bool q_DatapoolNvmOverlapConflict;
@@ -1158,13 +1378,14 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
       std::vector<uint32> c_InvalidApplicationIndices;
       std::vector<uint32> c_InvalidDomainIndices;
       s32_Retval = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckErrorNode(
-         c_NodeIndices[u32_ItNode], &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid, &q_DataPoolsInvalid,
+         c_NodeIndices[u32_ItNode], &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid, &q_IpInvalid, &q_DataPoolsInvalid,
          &q_ApplicationsInvalid,
          &q_DomainsInvalid, true, &c_InvalidInterfaceIndices, &c_InvalidDataPoolIndices, &c_InvalidApplicationIndices,
          &c_InvalidDomainIndices);
       if (s32_Retval == C_NO_ERR)
       {
-         if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
+         if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true)) ||
+                 (q_DataPoolsInvalid == true)) ||
                 (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_DataPoolNvmConflict == true)) ||
              (q_NameEmpty == true))
          {
@@ -1179,7 +1400,8 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
                orc_Text += "\n";
             }
             orq_ErrorDetected = true;
-            if (((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_NameEmpty == true))
+            if (((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true)) ||
+                (q_NameEmpty == true))
             {
                orc_Text += C_GtGetText::h_GetText("Invalid properties:\n");
                if (q_NameEmpty == true)
@@ -1200,6 +1422,19 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
                   {
                      orc_Text += static_cast<QString>(C_GtGetText::h_GetText("%1 duplicate node IDs detected.\n")).arg(
                         c_InvalidInterfaceIndices.size());
+                  }
+               }
+               if (q_IpInvalid == true)
+               {
+                  if (c_InvalidInterfaceIndices.size() == 1UL)
+                  {
+                     orc_Text += C_GtGetText::h_GetText("Duplicate IP address detected.\n");
+                  }
+                  else
+                  {
+                     orc_Text +=
+                        static_cast<QString>(C_GtGetText::h_GetText("%1 duplicate IP addresses detected.\n")).arg(
+                           c_InvalidInterfaceIndices.size());
                   }
                }
                orc_Text += "\n";

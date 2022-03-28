@@ -791,7 +791,8 @@ sint32 C_CieImportReportWidget::m_GetMessageOverrideInfo(C_OSCCanMessage & orc_I
                for (uint32 u32_MessageIt = 0; u32_MessageIt < rc_Messages.size(); u32_MessageIt++)
                {
                   const C_OSCCanMessage & rc_ExistingMessage = rc_Messages[u32_MessageIt];
-                  if ((rc_ExistingMessage.u32_CanId == orc_ImportMessageToFind.u32_CanId) &&
+                  if (((rc_ExistingMessage.u32_CanId == orc_ImportMessageToFind.u32_CanId) &&
+                       (rc_ExistingMessage.q_IsExtended == orc_ImportMessageToFind.q_IsExtended)) &&
                       (rc_ExistingMessage.c_Name == orc_ImportMessageToFind.c_Name))
                   {
                      orc_MessageOverrideInfo =

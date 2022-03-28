@@ -10,6 +10,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSdHandlerHALC.h"
+#include "C_PuiSdNodeInterfaceAutomaticProperties.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -44,13 +45,15 @@ public:
 
    //Connections
    void AddConnection(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_InterfaceNumber,
-                      const std::vector<stw_types::uint8> & orc_NodeIds, const stw_types::uint32 ou32_BusIndex);
+                      const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
+                      const stw_types::uint32 ou32_BusIndex);
    void RemoveConnection(const stw_types::uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ID);
    void ChangeConnection(const stw_types::uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ID,
-                         const stw_types::uint8 ou8_NewInterface, const std::vector<stw_types::uint8> & orc_NodeIds);
+                         const stw_types::uint8 ou8_NewInterface,
+                         const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties);
    void ChangeCompleteConnection(const stw_types::uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_PrevID,
                                  const C_PuiSdNodeConnectionId & orc_NewID,
-                                 const std::vector<stw_types::uint8> & orc_NodeIds,
+                                 const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
                                  const stw_types::uint32 & oru32_BusIndex = 0xFFFFFFFFUL);
    void SetUINodeConnections(const stw_types::uint32 ou32_NodeIndex,
                              const std::vector<C_PuiSdNodeConnection> & orc_Connections);

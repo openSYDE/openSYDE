@@ -233,7 +233,9 @@ public:
                                      const C_PuiSvReadDataConfiguration & orc_Config);
    void AddDashboard(const C_PuiSvDashboard & orc_Dashboard, const bool oq_AutoAdapt);
    stw_types::sint32 InsertDashboard(const stw_types::uint32 ou32_Index, const C_PuiSvDashboard & orc_Dashboard,
-                                     const bool oq_AutoAdapt);
+                                     const bool oq_AutoAdapt,
+                                     const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
+                                                C_PuiSvReadDataConfiguration> * const opc_Rails);
    stw_types::sint32 AddDashboardWidget(const stw_types::uint32 ou32_DashboardIndex,
                                         const C_PuiSvDbWidgetBase * const opc_Box,
                                         const C_PuiSvDbDataElement::E_Type oe_Type);
@@ -292,8 +294,6 @@ public:
 
    //Other
    void ActivateAllRelevantSubDevices(void);
-   std::vector<stw_types::uint32> DeactivateSubDevicesBasedOnErrors(const std::map<stw_types::uint32,
-                                                                                   QString> & orc_Errors);
    void FixInvalidRailConfig(const bool oq_PrintLog = true);
    void HandleCompatibilityChart(void);
    void InitFromSystemDefinition(void);

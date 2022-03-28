@@ -46,9 +46,9 @@ using namespace stw_opensyde_core;
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[in]     ou16_XmlFormatVersion  version of XML format
-   \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with node active
+   \param[in]      ou16_XmlFormatVersion  version of XML format
+   \param[out]     orc_Node               data storage
+   \param[in,out]  orc_XMLParser          XML with node active
 
    \return
    C_NO_ERR   data read
@@ -118,8 +118,8 @@ sint32 C_OSCNodeFilerV2::h_LoadNode(const uint16 ou16_XmlFormatVersion, C_OSCNod
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with node active
+   \param[in]      orc_Node         data storage
+   \param[in,out]  orc_XMLParser    XML with node active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser)
@@ -146,8 +146,8 @@ void C_OSCNodeFilerV2::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase
    pre-condition: the passed XML parser has the active node set to "com-protocols"
    post-condition: the passed XML parser has the active node set to the same "com-protocols"
 
-   \param[out]    orc_NodeComProtocols data storage
-   \param[in,out] orc_XMLParser        XML with list active
+   \param[out]     orc_NodeComProtocols   data storage
+   \param[in,out]  orc_XMLParser          XML with list active
 
    \return
    C_NO_ERR   data read
@@ -215,8 +215,8 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & 
    pre-condition: the passed XML parser has the active node set to "com-protocols"
    post-condition: the passed XML parser has the active node set to the same "com-protocols"
 
-   \param[in]     orc_NodeComProtocols data storage
-   \param[in,out] orc_XMLParser        XML with list active
+   \param[in]      orc_NodeComProtocols   data storage
+   \param[in,out]  orc_XMLParser          XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol> & orc_NodeComProtocols,
@@ -239,8 +239,8 @@ void C_OSCNodeFilerV2::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol
    pre-condition: the passed XML parser has the active node set to "com-protocol"
    post-condition: the passed XML parser has the active node set to the same "com-protocol"
 
-   \param[out]    orc_NodeComProtocol data storage
-   \param[in,out] orc_XMLParser       XML with list active
+   \param[out]     orc_NodeComProtocol    data storage
+   \param[in,out]  orc_XMLParser          XML with list active
 
    \return
    C_NO_ERR   data read
@@ -288,8 +288,8 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComProtocol(C_OSCCanProtocol & orc_NodeComPro
    pre-condition: the passed XML parser has the active node set to "com-protocol"
    post-condition: the passed XML parser has the active node set to the same "com-protocol"
 
-   \param[in]     orc_NodeComProtocol data storage
-   \param[in,out] orc_XMLParser       XML with list active
+   \param[in]      orc_NodeComProtocol    data storage
+   \param[in,out]  orc_XMLParser          XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::h_SaveNodeComProtocol(const C_OSCCanProtocol & orc_NodeComProtocol,
@@ -312,8 +312,8 @@ void C_OSCNodeFilerV2::h_SaveNodeComProtocol(const C_OSCCanProtocol & orc_NodeCo
    pre-condition: the passed XML parser has the active node set to "com-message-containers"
    post-condition: the passed XML parser has the active node set to the same "com-message-containers"
 
-   \param[out]    orc_NodeComMessageContainers data storage
-   \param[in,out] orc_XMLParser                XML with list active
+   \param[out]     orc_NodeComMessageContainers    data storage
+   \param[in,out]  orc_XMLParser                   XML with list active
 
    \return
    C_NO_ERR   data read
@@ -381,8 +381,8 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessageContainers(
    pre-condition: the passed XML parser has the active node set to "com-message-containers"
    post-condition: the passed XML parser has the active node set to the same "com-message-containers"
 
-   \param[in]     orc_NodeComMessageContainers data storage
-   \param[in,out] orc_XMLParser                XML with list active
+   \param[in]      orc_NodeComMessageContainers    data storage
+   \param[in,out]  orc_XMLParser                   XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::h_SaveNodeComMessageContainers(
@@ -406,8 +406,8 @@ void C_OSCNodeFilerV2::h_SaveNodeComMessageContainers(
    pre-condition: the passed XML parser has the active node set to "com-message-container"
    post-condition: the passed XML parser has the active node set to the same "com-message-container"
 
-   \param[out]    orc_NodeComMessageContainer data storage
-   \param[in,out] orc_XMLParser               XML with list active
+   \param[out]     orc_NodeComMessageContainer  data storage
+   \param[in,out]  orc_XMLParser                XML with list active
 
    \return
    C_NO_ERR   data read
@@ -461,8 +461,8 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessageContainer(C_OSCCanMessageContainer 
    pre-condition: the passed XML parser has the active node set to "com-message-container"
    post-condition: the passed XML parser has the active node set to the same "com-message-container"
 
-   \param[in]     orc_NodeComMessageContainer data storage
-   \param[in,out] orc_XMLParser               XML with list active
+   \param[in]      orc_NodeComMessageContainer  data storage
+   \param[in,out]  orc_XMLParser                XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::h_SaveNodeComMessageContainer(const C_OSCCanMessageContainer & orc_NodeComMessageContainer,
@@ -489,8 +489,8 @@ void C_OSCNodeFilerV2::h_SaveNodeComMessageContainer(const C_OSCCanMessageContai
    pre-condition: the passed XML parser has the active node set to unknown
    post-condition: the passed XML parser has the active node set to the same unknown
 
-   \param[out]    orc_NodeComMessages data storage
-   \param[in,out] orc_XMLParser       XML with list active
+   \param[out]     orc_NodeComMessages    data storage
+   \param[in,out]  orc_XMLParser          XML with list active
 
    \return
    C_NO_ERR   data read
@@ -559,8 +559,8 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessages(std::vector<C_OSCCanMessage> & or
    pre-condition: the passed XML parser has the active node set to unknown
    post-condition: the passed XML parser has the active node set to the same unknown
 
-   \param[in]     orc_NodeComMessages data storage
-   \param[in,out] orc_XMLParser       XML with list active
+   \param[in]      orc_NodeComMessages    data storage
+   \param[in,out]  orc_XMLParser          XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::h_SaveNodeComMessages(const std::vector<C_OSCCanMessage> & orc_NodeComMessages,
@@ -583,8 +583,8 @@ void C_OSCNodeFilerV2::h_SaveNodeComMessages(const std::vector<C_OSCCanMessage> 
    pre-condition: the passed XML parser has the active node set to "com-message"
    post-condition: the passed XML parser has the active node set to the same "com-message"
 
-   \param[out]    orc_NodeComMessage data storage
-   \param[in,out] orc_XMLParser      XML with list active
+   \param[out]     orc_NodeComMessage  data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 
    \return
    C_NO_ERR   data read
@@ -666,8 +666,8 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessage(C_OSCCanMessage & orc_NodeComMessa
    pre-condition: the passed XML parser has the active node set to "com-message"
    post-condition: the passed XML parser has the active node set to the same "com-message"
 
-   \param[in]     orc_NodeComMessage data storage
-   \param[in,out] orc_XMLParser      XML with list active
+   \param[in]      orc_NodeComMessage  data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::h_SaveNodeComMessage(const C_OSCCanMessage & orc_NodeComMessage,
@@ -695,8 +695,8 @@ void C_OSCNodeFilerV2::h_SaveNodeComMessage(const C_OSCCanMessage & orc_NodeComM
    pre-condition: the passed XML parser has the active node set to "com-signals"
    post-condition: the passed XML parser has the active node set to the same "com-signals"
 
-   \param[out]    orc_NodeComSignals data storage
-   \param[in,out] orc_XMLParser      XML with list active
+   \param[out]     orc_NodeComSignals  data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 
    \return
    C_NO_ERR   data read
@@ -765,8 +765,8 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComSignals(std::vector<C_OSCCanSignal> & orc_
    pre-condition: the passed XML parser has the active node set to "com-signals"
    post-condition: the passed XML parser has the active node set to the same "com-signals"
 
-   \param[in]     orc_NodeComSignals data storage
-   \param[in,out] orc_XMLParser      XML with list active
+   \param[in]      orc_NodeComSignals  data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::h_SaveNodeComSignals(const std::vector<C_OSCCanSignal> & orc_NodeComSignals,
@@ -789,8 +789,8 @@ void C_OSCNodeFilerV2::h_SaveNodeComSignals(const std::vector<C_OSCCanSignal> & 
    pre-condition: the passed XML parser has the active node set to "com-signal"
    post-condition: the passed XML parser has the active node set to the same "com-signal"
 
-   \param[out]    orc_NodeComSignal data storage
-   \param[in,out] orc_XMLParser     XML with list active
+   \param[out]     orc_NodeComSignal   data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 
    \return
    C_NO_ERR   data read
@@ -827,8 +827,8 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComSignal(C_OSCCanSignal & orc_NodeComSignal,
    pre-condition: the passed XML parser has the active node set to "com-signal"
    post-condition: the passed XML parser has the active node set to the same "com-signal"
 
-   \param[in]     orc_NodeComSignal data storage
-   \param[in,out] orc_XMLParser     XML with list active
+   \param[in]      orc_NodeComSignal   data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::h_SaveNodeComSignal(const C_OSCCanSignal & orc_NodeComSignal, C_OSCXMLParserBase & orc_XMLParser)
@@ -842,7 +842,7 @@ void C_OSCNodeFilerV2::h_SaveNodeComSignal(const C_OSCCanSignal & orc_NodeComSig
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform communication protocol type to string
 
-   \param[in] ore_CommunicationProtocol Communication protocol type
+   \param[in]  ore_CommunicationProtocol  Communication protocol type
 
    \return
    Stringified communication protocol type
@@ -873,8 +873,8 @@ C_SCLString C_OSCNodeFilerV2::h_CommunicationProtocolToString(const C_OSCCanProt
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to communication protocol type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Communication protocol type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Communication protocol type
 
    \return
    C_NO_ERR   no error
@@ -914,8 +914,8 @@ sint32 C_OSCNodeFilerV2::h_StringToCommunicationProtocol(const C_SCLString & orc
    pre-condition: the passed XML parser has the active node set to "core"
    post-condition: the passed XML parser has the active node set to the same "core"
 
-   \param[out]    orc_NodeProperties data storage
-   \param[in,out] orc_XMLParser      XML with core active
+   \param[out]     orc_NodeProperties  data storage
+   \param[in,out]  orc_XMLParser       XML with core active
 
    \return
    C_NO_ERR   data read
@@ -1064,7 +1064,7 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
                //Bus
                if (orc_XMLParser.SelectNodeChild("bus") == "bus")
                {
-                  c_ComInterface.q_IsBusConnected = orc_XMLParser.GetAttributeBool("connected");
+                  c_ComInterface.SetBusConnected(orc_XMLParser.GetAttributeBool("connected"));
                   c_ComInterface.u32_BusIndex = orc_XMLParser.GetAttributeUint32("bus-index");
                   //Return
                   tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
@@ -1165,8 +1165,8 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
    pre-condition: the passed XML parser has the active node set to "core"
    post-condition: the passed XML parser has the active node set to the same "core"
 
-   \param[in]     orc_NodeProperties data storage
-   \param[in,out] orc_XMLParser      XML with core active
+   \param[in]      orc_NodeProperties  data storage
+   \param[in,out]  orc_XMLParser       XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::mh_SaveProperties(const C_OSCNodeProperties & orc_NodeProperties,
@@ -1222,7 +1222,7 @@ void C_OSCNodeFilerV2::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePro
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
       orc_XMLParser.CreateAndSelectNodeChild("bus");
-      orc_XMLParser.SetAttributeBool("connected", rc_CurComInterface.q_IsBusConnected);
+      orc_XMLParser.SetAttributeBool("connected", rc_CurComInterface.GetBusConnectedRawValue());
       orc_XMLParser.SetAttributeUint32("bus-index", rc_CurComInterface.u32_BusIndex);
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
@@ -1259,8 +1259,8 @@ void C_OSCNodeFilerV2::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePro
    pre-condition: the passed XML parser has the active node set to "properties"
    post-condition: the passed XML parser has the active node set to the same "properties"
 
-   \param[out]    orc_StwFlashloaderSettings data storage
-   \param[in,out] orc_XMLParser              XML with core active
+   \param[out]     orc_StwFlashloaderSettings   data storage
+   \param[in,out]  orc_XMLParser                XML with core active
 
    \return
    C_NO_ERR   data read
@@ -1364,8 +1364,8 @@ sint32 C_OSCNodeFilerV2::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSet
    pre-condition: the passed XML parser has the active node set to "properties"
    post-condition: the passed XML parser has the active node set to the same "properties"
 
-   \param[in]     orc_StwFlashloaderSettings data storage
-   \param[in,out] orc_XMLParser              XML with core active
+   \param[in]      orc_StwFlashloaderSettings   data storage
+   \param[in,out]  orc_XMLParser                XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderSettings & orc_StwFlashloaderSettings,
@@ -1400,8 +1400,8 @@ void C_OSCNodeFilerV2::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloade
    pre-condition: the passed XML parser has the active node set to "core"
    post-condition: the passed XML parser has the active node set to the same "core"
 
-   \param[out]    orc_NodeApplications data storage
-   \param[in,out] orc_XMLParser        XML with core active
+   \param[out]     orc_NodeApplications   data storage
+   \param[in,out]  orc_XMLParser          XML with core active
 
    \return
    C_NO_ERR   data read
@@ -1588,8 +1588,8 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
    pre-condition: the passed XML parser has the active node set to "core"
    post-condition: the passed XML parser has the active node set to the same "core"
 
-   \param[in]     orc_NodeApplications data storage
-   \param[in,out] orc_XMLParser        XML with core active
+   \param[in]      orc_NodeApplications   data storage
+   \param[in,out]  orc_XMLParser          XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::mh_SaveApplications(const std::vector<C_OSCNodeApplication> & orc_NodeApplications,
@@ -1625,9 +1625,9 @@ void C_OSCNodeFilerV2::mh_SaveApplications(const std::vector<C_OSCNodeApplicatio
    pre-condition: the passed XML parser has the active node set to "core"
    post-condition: the passed XML parser has the active node set to the same "core"
 
-   \param[in]     ou16_XmlFormatVersion  version of XML format
-   \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with core active
+   \param[in]      ou16_XmlFormatVersion  version of XML format
+   \param[out]     orc_Node               data storage
+   \param[in,out]  orc_XMLParser          XML with core active
 
    \return
    C_NO_ERR   data read
@@ -1710,8 +1710,8 @@ sint32 C_OSCNodeFilerV2::mh_LoadDataPools(const uint16 ou16_XmlFormatVersion, C_
    pre-condition: the passed XML parser has the active node set to "core"
    post-condition: the passed XML parser has the active node set to the same "core"
 
-   \param[in]     orc_NodeDataPools data storage
-   \param[in,out] orc_XMLParser     XML with core active
+   \param[in]      orc_NodeDataPools   data storage
+   \param[in,out]  orc_XMLParser       XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & orc_NodeDataPools,
@@ -1733,7 +1733,7 @@ void C_OSCNodeFilerV2::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform diagnostic server type to string
 
-   \param[in] ore_DiagnosticProtocol Diagnostic protocol type
+   \param[in]  ore_DiagnosticProtocol  Diagnostic protocol type
 
    \return
    Stringified diagnostic server type
@@ -1765,8 +1765,8 @@ C_SCLString C_OSCNodeFilerV2::mh_DiagnosticServerToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to diagnostic server type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Diagnostic server type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Diagnostic server type
 
    \return
    C_NO_ERR   no error
@@ -1803,7 +1803,7 @@ sint32 C_OSCNodeFilerV2::mh_StringToDiagnosticServer(const C_SCLString & orc_Str
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform flash loader type to string
 
-   \param[in] ore_FlashLoader Flash loader type
+   \param[in]  ore_FlashLoader   Flash loader type
 
    \return
    Stringified flash loader type
@@ -1834,8 +1834,8 @@ C_SCLString C_OSCNodeFilerV2::mh_FlashLoaderToString(const C_OSCNodeProperties::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to flash loader type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Flash loader type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Flash loader type
 
    \return
    C_NO_ERR   no error
@@ -1872,7 +1872,7 @@ sint32 C_OSCNodeFilerV2::mh_StringToFlashLoader(const C_SCLString & orc_String,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform node data pool communication byte order type to string
 
-   \param[in] ore_CommunicationByteOrder Node data pool communication byte order type
+   \param[in]  ore_CommunicationByteOrder    Node data pool communication byte order type
 
    \return
    Stringified node data pool communication byte order type
@@ -1901,8 +1901,8 @@ C_SCLString C_OSCNodeFilerV2::mh_CommunicationByteOrderToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to node data pool communication byte order type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Node data pool communication byte order type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Node data pool communication byte order type
 
    \return
    C_NO_ERR   no error
@@ -1935,7 +1935,7 @@ sint32 C_OSCNodeFilerV2::mh_StringToCommunicationByteOrder(const C_SCLString & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform node data pool communication message transmission method type to string
 
-   \param[in] ore_NodeComMessageTxMethod Node data pool communication message transmission method type
+   \param[in]  ore_NodeComMessageTxMethod    Node data pool communication message transmission method type
 
    \return
    Stringified node data pool communication message transmission method type
@@ -1967,8 +1967,8 @@ C_SCLString C_OSCNodeFilerV2::mh_NodeComMessageTxMethodToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to node data pool communication message transmission method type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Node data pool communication message transmission method type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Node data pool communication message transmission method type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFilerV2::mh_StringToNodeComMessageTxMethod(const C_SCLString & orc_String,

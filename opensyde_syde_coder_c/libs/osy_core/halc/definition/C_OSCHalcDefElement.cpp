@@ -173,7 +173,8 @@ bool C_OSCHalcDefElement::GetArray() const
    Enum items
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> & C_OSCHalcDefElement::GetEnumItems() const
+const std::vector<std::pair<stw_scl::C_SCLString,
+                            C_OSCNodeDataPoolContent> > & C_OSCHalcDefElement::GetEnumItems() const
 {
    return this->c_InitialValue.GetEnumItems();
 }

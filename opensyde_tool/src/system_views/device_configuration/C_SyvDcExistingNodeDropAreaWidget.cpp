@@ -89,7 +89,7 @@ C_SyvDcExistingNodeDropAreaWidget::~C_SyvDcExistingNodeDropAreaWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeDropAreaWidget::InitStaticNames(void) const
 {
-   this->mpc_Ui->pc_LabelContent->setText(C_GtGetText::h_GetText("Drop Device here"));
+   this->mpc_Ui->pc_LabelContent->setText(C_GtGetText::h_GetText("Drop device here"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

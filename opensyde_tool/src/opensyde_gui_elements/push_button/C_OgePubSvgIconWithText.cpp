@@ -56,3 +56,12 @@ C_OgePubSvgIconWithText::C_OgePubSvgIconWithText(QWidget * const opc_Parent) :
    this->mc_BackgroundColorEnabledHover = mc_STYLE_GUIDE_COLOR_11;
    this->mc_BackgroundColorEnabledPressed = mc_STYLE_GUIDE_COLOR_10;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide tooltip
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgePubSvgIconWithText::HideToolTip(void)
+{
+   this->m_HideToolTip();
+}

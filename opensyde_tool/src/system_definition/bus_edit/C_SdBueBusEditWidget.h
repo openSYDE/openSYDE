@@ -16,6 +16,8 @@
 #include "stwtypes.h"
 
 #include "C_OSCSystemBus.h"
+#include "C_SdBueComIfDescriptionWidget.h"
+#include "C_SdBueBusEditPropertiesWidget.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -49,10 +51,10 @@ public:
                    const stw_types::sint32 os32_Flag) const;
    stw_types::sintn GetTabIndex(void) const;
 
-   void ImportMessages(void) const;
+   void ImportMessages(void);
 
-   static const stw_types::sintn hsn_TabIndexProperties;
-   static const stw_types::sintn hsn_TabIndexComm;
+   static const stw_types::sintn hsn_TAB_INDEX_PROPERTIES;
+   static const stw_types::sintn hsn_TAB_INDEX_COMM;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -73,12 +75,20 @@ private:
    C_SdBueBusEditWidget & operator =(const C_SdBueBusEditWidget &);
 
    void m_DataChanged(void);
-   void m_TabChanged(const stw_types::sintn osn_Index) const;
+   void m_TabChanged(const stw_types::sintn osn_Index);
+   void m_CreateTabWidgetsAlways(const stw_types::sintn osn_Index, const bool oq_AdaptCursor);
+   void m_CreatePropertiesTab(const bool oq_AdaptCursor);
+   void m_CreateCommTab(const bool oq_AdaptCursor);
+   static void mh_StartWaitingCursor(void);
+   static void mh_EndWaitingCursor(void);
 
    Ui::C_SdBueBusEditWidget * mpc_Ui;
    const stw_types::uint32 mu32_BusIndex;
    bool mq_DataChanged;
    stw_opensyde_core::C_OSCSystemBus::E_Type me_BusType;
+   bool mq_SkipLoadUserSettings;
+   C_SdBueBusEditPropertiesWidget * mpc_BusPropertiesWidget;
+   C_SdBueComIfDescriptionWidget * mpc_WidgetComIfDescr;
 };
 }
 

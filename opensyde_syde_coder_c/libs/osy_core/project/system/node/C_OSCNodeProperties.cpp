@@ -73,7 +73,7 @@ void C_OSCNodeProperties::Initialize(void)
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeProperties::CalcHash(uint32 & oru32_HashValue) const
@@ -98,8 +98,8 @@ void C_OSCNodeProperties::CalcHash(uint32 & oru32_HashValue) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get interface matching the specification
 
-   \param[in] oe_InterfaceType    Interface type
-   \param[in] ou8_InterfaceNumber Interface number
+   \param[in]  oe_InterfaceType     Interface type
+   \param[in]  ou8_InterfaceNumber  Interface number
 
    \return
    Match for requested interface
@@ -127,7 +127,7 @@ const C_OSCNodeComInterfaceSettings * C_OSCNodeProperties::GetComInterface(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set com interface
 
-   \param[in] orc_ComInterface  Com interface replacement
+   \param[in]  orc_ComInterface  Com interface replacement
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeProperties::SetComInterface(const C_OSCNodeComInterfaceSettings & orc_ComInterface)
@@ -147,8 +147,8 @@ void C_OSCNodeProperties::SetComInterface(const C_OSCNodeComInterfaceSettings & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Disconnect bus of specified interface
 
-   \param[in] oe_InterfaceType    Interface type
-   \param[in] ou8_InterfaceNumber Interface number
+   \param[in]  oe_InterfaceType     Interface type
+   \param[in]  ou8_InterfaceNumber  Interface number
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeProperties::DisconnectComInterface(const C_OSCSystemBus::E_Type oe_InterfaceType,
@@ -159,8 +159,7 @@ void C_OSCNodeProperties::DisconnectComInterface(const C_OSCSystemBus::E_Type oe
    if (pc_Interface != NULL)
    {
       C_OSCNodeComInterfaceSettings c_Tmp = *pc_Interface;
-      c_Tmp.q_IsBusConnected = false;
-      c_Tmp.u32_BusIndex = 0;
+      c_Tmp.RemoveConnection();
       this->SetComInterface(c_Tmp);
    }
 }
@@ -168,10 +167,12 @@ void C_OSCNodeProperties::DisconnectComInterface(const C_OSCSystemBus::E_Type oe
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize com interfaces using the specified device definition
 
-   \param[in] orc_Device Device definition to use as base for com interfaces
+   \param[in]  orc_Device           Device definition to use as base for com interfaces
+   \param[in]  ou32_SubDeviceIndex  Sub device index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_Device)
+void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_Device,
+                                              const uint32 ou32_SubDeviceIndex)
 {
    bool q_Found;
 
@@ -196,6 +197,12 @@ void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_
             {
                //First
                q_Found = true;
+               if (ou32_SubDeviceIndex < orc_Device.c_SubDevices.size())
+               {
+                  rc_CurInterface.SetInterfaceConnectedInDevice(orc_Device.c_SubDevices[ou32_SubDeviceIndex].IsConnected(
+                                                                   C_OSCSystemBus::eCAN,
+                                                                   u8_ItCan));
+               }
             }
          }
       }
@@ -204,6 +211,12 @@ void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_
          C_OSCNodeComInterfaceSettings c_NewInterface;
          c_NewInterface.e_InterfaceType    = C_OSCSystemBus::eCAN;
          c_NewInterface.u8_InterfaceNumber = u8_ItCan;
+         if (ou32_SubDeviceIndex < orc_Device.c_SubDevices.size())
+         {
+            c_NewInterface.SetInterfaceConnectedInDevice(orc_Device.c_SubDevices[ou32_SubDeviceIndex].IsConnected(
+                                                            C_OSCSystemBus::eCAN,
+                                                            u8_ItCan));
+         }
          this->c_ComInterfaces.push_back(c_NewInterface);
       }
    }
@@ -229,6 +242,12 @@ void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_
             {
                //First
                q_Found = true;
+               if (ou32_SubDeviceIndex < orc_Device.c_SubDevices.size())
+               {
+                  rc_CurInterface.SetInterfaceConnectedInDevice(orc_Device.c_SubDevices[ou32_SubDeviceIndex].IsConnected(
+                                                                   C_OSCSystemBus::eETHERNET,
+                                                                   u8_ItEth));
+               }
             }
          }
       }
@@ -237,6 +256,12 @@ void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_
          C_OSCNodeComInterfaceSettings c_NewInterface;
          c_NewInterface.e_InterfaceType    = C_OSCSystemBus::eETHERNET;
          c_NewInterface.u8_InterfaceNumber = u8_ItEth;
+         if (ou32_SubDeviceIndex < orc_Device.c_SubDevices.size())
+         {
+            c_NewInterface.SetInterfaceConnectedInDevice(orc_Device.c_SubDevices[ou32_SubDeviceIndex].IsConnected(
+                                                            C_OSCSystemBus::eETHERNET,
+                                                            u8_ItEth));
+         }
          this->c_ComInterfaces.push_back(c_NewInterface);
       }
    }

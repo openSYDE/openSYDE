@@ -54,23 +54,47 @@ C_OSCDeviceGroup::C_OSCDeviceGroup(void)
    So the caller has to consider the lifetime of the used instance of this class when using
     the returned pointer.
 
-   \param[in]     orc_Name     Searched device name
+   \param[in]   orc_Name               Searched device name
+   \param[in]   orc_MainDeviceName     Main device name (empty if none exists)
+   \param[out]  oru32_SubDeviceIndex   Sub device index
 
    \return
    != NULL:   pointer to found device
    NULL:      define not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCDeviceDefinition * C_OSCDeviceGroup::LookForDevice(const C_SCLString & orc_Name) const
+const C_OSCDeviceDefinition * C_OSCDeviceGroup::LookForDevice(const C_SCLString & orc_Name,
+                                                              const C_SCLString & orc_MainDeviceName,
+                                                              uint32 & oru32_SubDeviceIndex) const
 {
    const C_OSCDeviceDefinition * pc_Device = NULL;
 
-   for (uint32 u32_ItDevice = 0U; u32_ItDevice < this->mc_Devices.size(); ++u32_ItDevice)
+   for (uint32 u32_ItDevice = 0U; (u32_ItDevice < this->mc_Devices.size()) && (pc_Device == NULL); ++u32_ItDevice)
    {
-      if (this->mc_Devices[u32_ItDevice].c_DeviceName == orc_Name)
+      if (orc_MainDeviceName.IsEmpty())
       {
-         pc_Device = &(this->mc_Devices[u32_ItDevice]);
-         break;
+         oru32_SubDeviceIndex = 0UL;
+         if (this->mc_Devices[u32_ItDevice].c_DeviceName == orc_Name)
+         {
+            pc_Device = &(this->mc_Devices[u32_ItDevice]);
+         }
+      }
+      else
+      {
+         if (this->mc_Devices[u32_ItDevice].c_DeviceName == orc_MainDeviceName)
+         {
+            for (uint32 u32_ItSubDevice = 0U; u32_ItSubDevice < this->mc_Devices[u32_ItDevice].c_SubDevices.size();
+                 ++u32_ItSubDevice)
+            {
+               const C_OSCSubDeviceDefinition & rc_SubDeviceDefinition =
+                  this->mc_Devices[u32_ItDevice].c_SubDevices[u32_ItSubDevice];
+               if (rc_SubDeviceDefinition.c_SubDeviceName == orc_Name)
+               {
+                  pc_Device = &(this->mc_Devices[u32_ItDevice]);
+                  oru32_SubDeviceIndex = u32_ItSubDevice;
+               }
+            }
+         }
       }
    }
    return pc_Device;
@@ -88,9 +112,9 @@ const C_OSCDeviceDefinition * C_OSCDeviceGroup::LookForDevice(const C_SCLString 
    it's compared with the device name again. So the comparison of whether the alias
    name is the same as the device name could be executed twice.
 
-   \param[in]     orc_DeviceName         Name of the device definition
-   \param[in]     orc_DeviceNameAlias    Alias name of the device definition
-   \param[in]     orc_DevicePath         File path of the device definition
+   \param[in]  orc_DeviceName       Name of the device definition
+   \param[in]  orc_DeviceNameAlias  Alias name of the device definition
+   \param[in]  orc_DevicePath       File path of the device definition
 
    \return
    false    Device isn't existing
@@ -126,8 +150,8 @@ bool C_OSCDeviceGroup::PreCheckDevice(const C_SCLString & orc_DeviceName, const 
    Valid base path
    Valid group name
 
-   \param[in,out]   orc_Ini          Ini to parse for device
-   \param[in]       orc_BasePath     base path the relative device paths are relative to (with final "/" or "\")
+   \param[in,out]  orc_Ini       Ini to parse for device
+   \param[in]      orc_BasePath  base path the relative device paths are relative to (with final "/" or "\")
 
    \return
    C_NO_ERR   group loaded
@@ -179,10 +203,6 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
                s32_Return = C_RD_WR;
             }
          }
-         if (s32_Return != C_NO_ERR)
-         {
-            break;
-         }
       }
    }
    return s32_Return;
@@ -191,7 +211,7 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set group name
 
-   \param[in]   orc_GroupName   New value
+   \param[in]  orc_GroupName  New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCDeviceGroup::SetGroupName(const C_SCLString & orc_GroupName)

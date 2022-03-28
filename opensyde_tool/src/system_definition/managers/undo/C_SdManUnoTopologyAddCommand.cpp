@@ -57,7 +57,7 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
    mu64_BusConnectorNodeID(0),
    mu64_BusConnectorBusID(0),
    mu8_InterfaceNumber(0),
-   mc_NodeIds(),
+   mc_Properties(),
    mq_ForceUseAdditionalInformation(orq_ForceUseAdditionalInformation)
 {
 }
@@ -72,7 +72,7 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
    \param[in]      ou64_BusConnectorNodeID   Bus connector node ID
    \param[in]      ou64_BusConnectorBusID    Bus connector bus ID
    \param[in]      ou8_InterfaceNumber       Interface number
-   \param[in]      orc_NodeIds               Node ids
+   \param[in]      orc_Properties            Properties
    \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
                                                            const stw_types::uint64 ou64_BusConnectorNodeID,
                                                            const stw_types::uint64 ou64_BusConnectorBusID,
                                                            const stw_types::uint8 ou8_InterfaceNumber,
-                                                           const std::vector<uint8> & orc_NodeIds,
+                                                           const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
                                                            QUndoCommand * const opc_Parent) :
    C_SdManUnoTopologyAddBaseCommand(opc_Scene, orc_IDs, "Add drawing element(s)",
                                     opc_Parent),
@@ -91,7 +91,7 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
    mu64_BusConnectorNodeID(ou64_BusConnectorNodeID),
    mu64_BusConnectorBusID(ou64_BusConnectorBusID),
    mu8_InterfaceNumber(ou8_InterfaceNumber),
-   mc_NodeIds(orc_NodeIds),
+   mc_Properties(orc_Properties),
    mq_ForceUseAdditionalInformation(false)
 {
 }
@@ -172,7 +172,7 @@ void C_SdManUnoTopologyAddCommand::m_AddNew(void)
             {
                if (pc_Node->CheckInterfaceAvailable(pc_Bus->GetType(), this->mu8_InterfaceNumber) == true)
                {
-                  pc_Scene->AddBusConnector(pc_Node, pc_Bus, this->mu8_InterfaceNumber, this->mc_NodeIds,
+                  pc_Scene->AddBusConnector(pc_Node, pc_Bus, this->mu8_InterfaceNumber, this->mc_Properties,
                                             this->mc_NewPos, &(c_IDs[0]));
                }
             }

@@ -46,7 +46,7 @@ public:
    void InitMinMaxAndName(void);
    void UpdateValue(void);
    void UpdateError(void);
-   void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
+   void UpdateTransparency(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
    void GetUniqueRows(const QModelIndexList & orc_Indices, std::vector<stw_types::uint32> & orc_ItemIndices) const;
 
    virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation, const stw_types::sintn osn_Role =
@@ -71,7 +71,7 @@ public:
 
    const C_PuiSvDbNodeDataPoolListElementId * GetDataPoolElementIndex(const stw_types::uint32 ou32_Index) const;
 
-   static const stw_types::uint32 hu32_MaxElements;
+   static const stw_types::uint32 hu32_MAX_ELEMENTS;
 
 protected:
    virtual stw_types::uint32 m_AddNewItem(const stw_types::uint32 ou32_SelectedIndex) override;

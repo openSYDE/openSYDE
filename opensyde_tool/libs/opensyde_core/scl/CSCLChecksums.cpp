@@ -128,12 +128,12 @@ static const uint32 mau32_CRC_TABLE[] =
 //----------------------------------------------------------------------------------------------------------------------
 void C_SCLChecksums::CalcCRC16STW(const void * const opv_Start, const uint32 ou32_NumBytes, uint16 & oru16_CRC)
 {
-   uint32 u32_Index;
    const uint8 * const pu8_Data = reinterpret_cast<const uint8 *>(opv_Start); //lint !e925 we need to parse byte-by-byte
 
-   for (u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
+   for (uint32 u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
    {
-      oru16_CRC = static_cast<uint16>(mau16_CRC_TABLE[oru16_CRC >> 8U] ^ (static_cast<uint16>(oru16_CRC << 8U)) ^
+      const uint8 u8_Index = static_cast<uint8>(oru16_CRC >> 8U);
+      oru16_CRC = static_cast<uint16>((static_cast<uint16>(oru16_CRC << 8U)) ^ mau16_CRC_TABLE[u8_Index] ^
                                       pu8_Data[u32_Index]);
    }
 }
@@ -153,13 +153,11 @@ void C_SCLChecksums::CalcCRC16STW(const void * const opv_Start, const uint32 ou3
 //----------------------------------------------------------------------------------------------------------------------
 void C_SCLChecksums::CalcCRC16(const void * const opv_Start, const uint32 ou32_NumBytes, uint16 & oru16_CRC)
 {
-   uint32 u32_Index;
-   uint8 u8_Index;
    const uint8 * const pu8_Data = reinterpret_cast<const uint8 *>(opv_Start); //lint !e925 we need to parse byte-by-byte
 
-   for (u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
+   for (uint32 u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
    {
-      u8_Index = static_cast<uint8>(oru16_CRC >> 8U) ^ pu8_Data[u32_Index];
+      const uint8 u8_Index = static_cast<uint8>(oru16_CRC >> 8U) ^ pu8_Data[u32_Index];
       oru16_CRC = static_cast<uint16>((static_cast<uint16>(oru16_CRC << 8U)) ^ mau16_CRC_TABLE[u8_Index]);
    }
 }
@@ -178,9 +176,8 @@ void C_SCLChecksums::CalcCRC16(const void * const opv_Start, const uint32 ou32_N
 void C_SCLChecksums::CalcCRC32(const void * const opv_Start, const uint32 ou32_NumBytes, uint32 & oru32_CRC)
 {
    const uint8 * const pu8_Data = reinterpret_cast<const uint8 *>(opv_Start); //lint !e925 we need to parse byte-by-byte
-   uint32 u32_Index;
 
-   for (u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
+   for (uint32 u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
    {
       oru32_CRC = (mau32_CRC_TABLE[((oru32_CRC) ^ (pu8_Data[u32_Index])) & 0xFFU] ^ ((oru32_CRC) >> 8U));
    }
@@ -218,21 +215,18 @@ sint32 C_SCLChecksums::CalcCRC32TriCore(const void * const opv_Start, const uint
    }
    else
    {
-      uint32 u32_Tmp1;
-      uint32 u32_Tmp2;
-      uint32 u32_IndexBit;
-      uint32 u32_IndexWord;
-      uint32 u32_Value;
-      const uint8 * const pu8_Data = reinterpret_cast<const uint8 *>(opv_Start); //lint !e925 we need to parse
-                                                                                 // byte-by-byte
-      const uint32 u32_Poly = 0xEDB88320UL;
-
-      for (u32_IndexWord = 0U; u32_IndexWord < (ou32_NumBytes / 4U); u32_IndexWord++)
+      for (uint32 u32_IndexWord = 0U; u32_IndexWord < (ou32_NumBytes / 4U); u32_IndexWord++)
       {
-         u32_Tmp1 = 0U;
+         uint32 u32_Tmp1 = 0U;
+         uint32 u32_Tmp2;
+         uint32 u32_Value;
+         const uint32 u32_Poly = 0xEDB88320UL;
+         const uint8 * const pu8_Data = reinterpret_cast<const uint8 *>(opv_Start); //lint !e925 we need to parse
+                                                                                    // byte-by-byte
+
          u32_Tmp2 = oru32_CRC & u32_Poly;
 
-         for (u32_IndexBit = 0U; u32_IndexBit <= 31U; u32_IndexBit++)
+         for (uint32 u32_IndexBit = 0U; u32_IndexBit <= 31U; u32_IndexBit++)
          {
             u32_Tmp1 ^= ((u32_Tmp2 >> u32_IndexBit) & 1U);
          }

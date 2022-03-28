@@ -134,8 +134,8 @@ private:
    bool mq_DarkMode;
 
    stw_types::uint32 mu32_MaximumDataElements;
-   static const stw_types::sintn mhsn_WidthLineSelected;
-   static const stw_types::sintn mhsn_WidthLineDefault;
+   static const stw_types::sintn mhsn_WIDTH_LINE_SELECTED;
+   static const stw_types::sintn mhsn_WIDTH_LINE_DEFAULT;
 
    stw_types::float64 mf64_MaxValue;
    stw_types::float64 mf64_MinValue;
@@ -145,8 +145,8 @@ private:
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> mc_DataPoolElementContentMin;
 
    // Color configuration for the data series
-   static const stw_types::uint8 mhu8_CountColors;
-   static const QColor mhac_DataColors[47];
+   static const stw_types::uint8 mhu8_COUNT_COLORS;
+   static const QColor mhac_DATA_COLORS[47];
    std::vector<std::array<bool, 47> > mc_DataColorsUsed;
 
    std::map<stw_types::uint32, stw_types::uint32> mc_ElementHandlerRegIndexToDataElementIndex;
@@ -159,7 +159,7 @@ private:
    bool mq_ManualOperationPossible;
    bool mq_PauseState;
    bool mq_ShowSamplePointState;
-   static const stw_types::sintn mhsn_IntervalMs;
+   static const stw_types::sintn mhsn_INTERVAL_MS;
    QTimer mc_CyclicChartUpdateTrigger;
 
    // Cursors

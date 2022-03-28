@@ -15,6 +15,7 @@
 #include "stwtypes.h"
 #include "stwerrors.h"
 
+#include "constants.h"
 #include "C_Uti.h"
 #include "C_SyvDcWidget.h"
 #include "ui_C_SyvDcWidget.h"
@@ -42,10 +43,6 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SyvDcWidget::mhc_REPORT_HEADLINE_HTML_TAG_START = "<h3>";
-const QString C_SyvDcWidget::mhc_REPORT_HEADLINE_HTML_TAG_END = "</h3>";
-const QString C_SyvDcWidget::mhc_REPORT_HIGHLIGHT_TAG_START = "<span style=\" font-weight: bold;\">";
-const QString C_SyvDcWidget::mhc_REPORT_HIGHLIGHT_TAG_END = "</span>";
 const sint32 C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ALL_CONNECTED_INTERFACES = 1;
 const sint32 C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ONLY_USED_INTERFACES = 0;
 
@@ -75,6 +72,7 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
    mpc_ParentDialog(&orc_Parent),
    mpc_DcSequences(NULL),
    mu32_ViewIndex(ou32_ViewIndex),
+   mq_InitializationFinished(false),
    mu32_TempBitrate(0U),
    mq_SameBitrates(false),
    mu32_BusIndex(0U),
@@ -133,8 +131,13 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
 
    //Deactivate working screens
    this->mpc_Ui->pc_GroupBoxScan->setVisible(true);
+   this->mpc_Ui->pc_PushButtonScan->setVisible(true);
+
    this->mpc_Ui->pc_GroupBoxAssignment->setVisible(false);
+   this->mpc_Ui->pc_PushButtonConfigure->setVisible(false);
+
    this->mpc_Ui->pc_GroupBoxReport->setVisible(false);
+   this->mpc_Ui->pc_PbBackToScan->setVisible(false);
 
    // connects
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_SyvDcWidget::m_OkClicked);
@@ -152,11 +155,11 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
            &C_SyvDcWidget::m_AssignmentConnect);
    connect(this->mpc_Ui->pc_ListWidgetExistingNodesAssignment, &C_SyvDcExistingNodeList::SigDisconnect, this,
            &C_SyvDcWidget::m_AssignmentDisconnect);
-   connect(this->mpc_Ui->pc_PushButtonScan, &stw_opensyde_gui_elements::C_OgePubConfigure::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonScan, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SyvDcWidget::m_StartSearchProper);
-   connect(this->mpc_Ui->pc_PushButtonConfigure, &stw_opensyde_gui_elements::C_OgePubConfigure::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonConfigure, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SyvDcWidget::m_StartConfigProper);
-   connect(this->mpc_Ui->pc_PbBackToScan, &stw_opensyde_gui_elements::C_OgePubConfigure::clicked, this,
+   connect(this->mpc_Ui->pc_PbBackToScan, &stw_opensyde_gui_elements::C_OgePubCancel::clicked, this,
            &C_SyvDcWidget::m_BackToScan);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxBitRate, static_cast<void (QComboBox::*)(
@@ -245,6 +248,9 @@ void C_SyvDcWidget::InitText(void)
    this->mpc_Ui->pc_LabelProgressConfiguration->setText(static_cast<QString>(C_GtGetText::h_GetText("Configuration")));
    this->mpc_Ui->pc_LabelProgressFinished->setText(static_cast<QString>(C_GtGetText::h_GetText("Finished")));
    this->mpc_Ui->pc_ComboBoxConfigurationMode->clear();
+
+   this->mpc_Ui->pc_BushButtonCancel->setText(static_cast<QString>(C_GtGetText::h_GetText("Cancel")));
+   this->mpc_Ui->pc_BushButtonOk->setText(static_cast<QString>(C_GtGetText::h_GetText("OK")));
 
    // Order is important!
    // Index 0 = all connected interfaces in the system.
@@ -394,6 +400,10 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
       c_Message = static_cast<QString>(C_GtGetText::h_GetText("Routing configuration failed."));
       c_MessageBox.SetCustomMinHeight(180, 180);
       break;
+   case C_BUSY:
+      c_Message = static_cast<QString>(C_GtGetText::h_GetText("System view error detected."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
+      break;
    case C_UNKNOWN_ERR:
       c_Message = static_cast<QString>(C_GtGetText::h_GetText("Wrapped error of internal function call."));
       c_MessageBox.SetCustomMinHeight(180, 180);
@@ -439,9 +449,11 @@ void C_SyvDcWidget::m_StartSearchProper(void)
    this->mpc_Ui->pc_PushButtonScan->setEnabled(false);
    this->mpc_Ui->pc_GroupBoxStartScan->setVisible(true);
    this->mpc_Ui->pc_ListWidgetConnectedNodesScan->setVisible(false);
-   this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setVisible(false);
-   this->mpc_Ui->pc_LabelStartScan->setText(C_GtGetText::h_GetText("Scanning for Devices..."));
+   // Let the user know, when the tool is occupied with itself before communicating with the bus
+   this->mpc_Ui->pc_LabelStartScan->setText(C_GtGetText::h_GetText("Initializing communication interface..."));
    this->mpc_Ui->pc_LabelHeadingFoundDevices->setText(static_cast<QString>(C_GtGetText::h_GetText("Connected Devices")));
+
+   this->mq_InitializationFinished = false;
 
    s32_Return = m_InitSequence();
 
@@ -473,6 +485,14 @@ void C_SyvDcWidget::m_StartSearchProper(void)
                // No concrete enter flashloader function for Ethernet
                this->me_Step = eSCANETHGETINFOFROMOPENSYDEDEVICES;
                s32_Return = this->mpc_DcSequences->ScanEthGetInfoFromOpenSydeDevices();
+
+               if (s32_Return == C_NO_ERR)
+               {
+                  // The thread was started, Ethernet sequence has no further initialization,
+                  // the communication is running...
+                  this->mpc_Ui->pc_LabelStartScan->setText(C_GtGetText::h_GetText("Scanning for devices..."));
+                  this->mq_InitializationFinished = true;
+               }
             }
 
             if (s32_Return == C_NO_ERR)
@@ -515,8 +535,7 @@ void C_SyvDcWidget::m_CleanUpScan(void) const
    this->mpc_Ui->pc_ComboBoxBitRate->setEnabled(this->me_BusType == C_OSCSystemBus::eCAN);
    this->mpc_Ui->pc_ComboBoxConfigurationMode->setEnabled(true);
    this->mpc_Ui->pc_PushButtonScan->setEnabled(true);
-
-   this->mpc_Ui->pc_PushButtonScan->setEnabled(true);
+   this->mpc_Ui->pc_PushButtonScan->setFocus();
    //Latest possible cursor restoration
    QApplication::restoreOverrideCursor();
 }
@@ -535,22 +554,23 @@ void C_SyvDcWidget::m_ScanFinished(void)
    {
       //Zero
       this->mpc_Ui->pc_ProgressScan->SetProgress(0, false);
-      this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setVisible(true);
-      this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setText(C_GtGetText::h_GetText("Error: No devices found!"));
       this->mpc_Ui->pc_LabelStartScan->setText(C_GtGetText::h_GetText("No devices found."));
+      m_InformUserAfterScan(C_GtGetText::h_GetText("No devices found! Check connection of connected devices and retry."));
    }
    else if (this->mc_FoundDevices.size() <
             static_cast<uint32>(this->mpc_Ui->pc_ListWidgetExistingNodes->GetCommunicatingNodeCount()))
    {
       //Less
-      m_EnterScanErrorState(C_GtGetText::h_GetText("Error: Fewer devices found than defined by the System View!"
+      m_EnterScanErrorState();
+      m_InformUserAfterScan(C_GtGetText::h_GetText("Fewer devices found than defined by the System View!"
                                                    " Check connection of connected devices and retry."));
    }
    else if (this->mc_FoundDevices.size() >
             static_cast<uint32>(this->mpc_Ui->pc_ListWidgetExistingNodes->GetCommunicatingNodeCount()))
    {
       //More
-      m_EnterScanErrorState(C_GtGetText::h_GetText("Error: More devices found than defined by the System View! "
+      m_EnterScanErrorState();
+      m_InformUserAfterScan(C_GtGetText::h_GetText("More devices found than defined by the System View! "
                                                    "Connect only devices which are defined in the System View and retry."));
    }
    else
@@ -560,15 +580,21 @@ void C_SyvDcWidget::m_ScanFinished(void)
       if (q_SameSerialNumber == true)
       {
          //Same serial number error
-         m_EnterScanErrorState(
-            C_GtGetText::h_GetText("Error: Devices with duplicate serial numbers found! Make sure that each device "
-                                   "is connected only through one interface to the device configuration and try again."));
+         m_InformUserAfterScan(C_GtGetText::h_GetText(
+                                  "Devices with duplicate serial numbers found! Make sure that each device "
+                                  "is connected only through one interface to the device configuration and try again."));
+
+         m_EnterScanErrorState();
       }
       else
       {
          //Switch screens
          this->mpc_Ui->pc_GroupBoxScan->setVisible(false);
+         this->mpc_Ui->pc_PushButtonScan->setVisible(false);
+
          this->mpc_Ui->pc_GroupBoxAssignment->setVisible(true);
+         this->mpc_Ui->pc_PushButtonConfigure->setVisible(true);
+
          m_InitAssignmentScreen();
          this->mpc_Ui->pc_LabelStartScan->setText(static_cast<QString>(C_GtGetText::h_GetText(
                                                                           "Click on \"Scan for Devices\" ...")));
@@ -686,11 +712,10 @@ bool C_SyvDcWidget::m_CheckSameSerialNumber(void)
    \param[in]  orc_Text    Scan error text
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_EnterScanErrorState(const QString & orc_Text) const
+void C_SyvDcWidget::m_EnterScanErrorState(void)
 {
    this->mpc_Ui->pc_ProgressScan->SetProgress(0, false);
-   this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setVisible(true);
-   this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setText(orc_Text);
+
    this->mpc_Ui->pc_ListWidgetConnectedNodesScan->setVisible(true);
    this->mpc_Ui->pc_ListWidgetConnectedNodesScan->SetData(this->mc_FoundDevices);
    //No drag
@@ -805,7 +830,10 @@ void C_SyvDcWidget::m_StartConfigProper(void)
             {
                //Switch screens
                this->mpc_Ui->pc_GroupBoxAssignment->setVisible(false);
+               this->mpc_Ui->pc_PushButtonConfigure->setVisible(false);
+
                this->mpc_Ui->pc_GroupBoxReport->setVisible(true);
+
                //Clear report
                this->m_ClearReportText();
                m_HandleConfigurationStarted();
@@ -951,9 +979,15 @@ void C_SyvDcWidget::m_BackToScan(void)
    this->mpc_Ui->pc_PbBackToScan->setEnabled(false);
    this->mpc_Ui->pc_BushButtonCancel->setVisible(true);
    this->mpc_Ui->pc_BushButtonOk->setVisible(false);
+
    this->mpc_Ui->pc_GroupBoxScan->setVisible(true);
+   this->mpc_Ui->pc_PushButtonScan->setVisible(true);
+
    this->mpc_Ui->pc_GroupBoxAssignment->setVisible(false);
+   this->mpc_Ui->pc_PushButtonConfigure->setVisible(false);
+
    this->mpc_Ui->pc_GroupBoxReport->setVisible(false);
+   this->mpc_Ui->pc_PbBackToScan->setVisible(false);
 
    this->mc_ServerStates.clear();
 
@@ -2092,6 +2126,8 @@ void C_SyvDcWidget::m_InitScanScreen(void)
    QString c_Heading;
    sint32 s32_Return;
 
+   this->mpc_Ui->pc_PushButtonScan->setFocus();
+
    m_InitBitRateComboBox();
    m_InitModeComboBox();
    s32_Return = this->mpc_Ui->pc_ListWidgetExistingNodes->SetView(this->mu32_ViewIndex, false);
@@ -2122,16 +2158,10 @@ void C_SyvDcWidget::m_InitScanScreen(void)
 
    if (s32_Return != C_NO_ERR)
    {
-      this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setVisible(true);
-      this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setText(
-         C_GtGetText::h_GetText("Warning: At least one node is connected to the bus with more than one interface!"
-                                " Check interface configuration of the devices and retry."));
-
+      m_InformUserAfterScan(C_GtGetText::h_GetText(
+                               "At least one node is connected to the bus with more than one interface."
+                               " Check interface configuration of the devices and retry."));
       this->mpc_Ui->pc_PushButtonScan->setEnabled(false);
-   }
-   else
-   {
-      this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setVisible(false);
    }
 }
 
@@ -2397,18 +2427,19 @@ void C_SyvDcWidget::m_AssignmentUpdateProgress(void) const
    const uint32 u32_OverallItemCount = static_cast<uint32>(this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->count());
    QString c_Text;
 
+   c_Text = static_cast<QString>(C_GtGetText::h_GetText("Assigned: %1 of %2")).arg(u32_AssignedItemCount).arg(
+      u32_OverallItemCount);
+
    if (u32_AssignedItemCount == u32_OverallItemCount)
    {
-      c_Text = static_cast<QString>(C_GtGetText::h_GetText("All devices are assigned."));
       this->mpc_Ui->pc_PushButtonConfigure->setEnabled(true);
+      this->mpc_Ui->pc_PushButtonConfigure->setFocus();
    }
    else
    {
-      c_Text =
-         static_cast<QString>(C_GtGetText::h_GetText("Assigned Devices %1 of %2.")).arg(u32_AssignedItemCount).arg(
-            u32_OverallItemCount);
       this->mpc_Ui->pc_PushButtonConfigure->setEnabled(false);
    }
+
    this->mpc_Ui->pc_LabelAssignmentProgress->setText(c_Text);
 }
 
@@ -2424,6 +2455,18 @@ void C_SyvDcWidget::m_Timer(void)
       QString c_ErrorDescription = "";
 
       std::vector<C_SyvDcDeviceInformation> c_DeviceInfo;
+
+      if ((this->mq_InitializationFinished == false) &&
+          (this->me_Step == eSCANCANENTERFLASHLOADER))
+      {
+         // Special case: The first step with CAN communication has in the sequence the initialization
+         this->mq_InitializationFinished = this->mpc_DcSequences->GetCanInitializationResult();
+         if (this->mq_InitializationFinished == true)
+         {
+            // The thread is running, CAN is now initialized, therefore the communication is running...
+            this->mpc_Ui->pc_LabelStartScan->setText(C_GtGetText::h_GetText("Scanning for devices..."));
+         }
+      }
 
       s32_Result = this->mpc_DcSequences->GetResults(s32_SequenceResult);
 
@@ -2567,7 +2610,7 @@ void C_SyvDcWidget::m_Timer(void)
                   c_Message.SetCustomMinHeight(200, 230);
                   c_Message.SetDescription(
                      C_GtGetText::h_GetText("At least one node has security activated "
-                                            "and at least one node id is not unique."));
+                                            "and at least one node ID is not unique."));
                   c_Message.SetDetails(C_GtGetText::h_GetText(
                                           "This combination is not supported by the device configuration."));
                }
@@ -2645,11 +2688,11 @@ void C_SyvDcWidget::m_Timer(void)
                          arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                          arg(C_GtGetText::h_GetText("log file"));
                c_Text += "<br/>";
-               c_Text += "<br/><br/><br/>" + mhc_REPORT_HIGHLIGHT_TAG_START;
+               c_Text += "<br/><br/><br/>" + mc_REPORT_HIGHLIGHT_TAG_START;
                c_Text += static_cast<QString>(C_GtGetText::h_GetText(
                                                  "Errors occurred during device configuration. Check report for details."));
 
-               c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/>";
+               c_Text += mc_REPORT_HIGHLIGHT_TAG_END + "<br/>";
 
                this->m_UpdateReportText(c_Text);
 
@@ -2677,6 +2720,8 @@ void C_SyvDcWidget::m_Timer(void)
          case eREADBACKCAN: // Same implementation for showing the read info
          case eREADBACKETH: // Same implementation for showing the read info
             this->mpc_Ui->pc_PbBackToScan->setEnabled(true);
+            this->mpc_Ui->pc_PbBackToScan->setVisible(true);
+            this->mpc_Ui->pc_BushButtonOk->setFocus();
             this->m_ShowReadInfo(s32_SequenceResult);
             this->mpc_Ui->pc_BushButtonOk->setVisible(true);
             this->mpc_Ui->pc_BushButtonCancel->setVisible(false);
@@ -2691,7 +2736,7 @@ void C_SyvDcWidget::m_Timer(void)
             this->m_ResetNetwork(false);
 
             //Notify user last?
-            c_Text = "<br/><br/><br/>" + mhc_REPORT_HIGHLIGHT_TAG_START;
+            c_Text = "<br/><br/><br/>" + mc_REPORT_HIGHLIGHT_TAG_START;
 
             if ((s32_SequenceResult == C_NO_ERR) ||
                 (s32_SequenceResult == C_NOACT)) // No openSYDE devices to configure
@@ -2699,7 +2744,7 @@ void C_SyvDcWidget::m_Timer(void)
                C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eINFORMATION);
 
                c_Text +=  static_cast<QString>(C_GtGetText::h_GetText("Device Configuration successfully finished!"));
-               c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/><br/>";
+               c_Text += mc_REPORT_HIGHLIGHT_TAG_END + "<br/><br/>";
                this->m_UpdateReportText(c_Text);
 
                c_Message.SetHeading("Device Configuration");
@@ -2715,7 +2760,7 @@ void C_SyvDcWidget::m_Timer(void)
                c_Text +=
                   static_cast<QString>(C_GtGetText::h_GetText(
                                           "Errors occurred during device configuration. Check report for details."));
-               c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/><br/>";
+               c_Text += mc_REPORT_HIGHLIGHT_TAG_END + "<br/><br/>";
                this->m_UpdateReportText(c_Text);
 
                if (s32_SequenceResult == C_CHECKSUM)
@@ -2807,9 +2852,9 @@ void C_SyvDcWidget::m_HandleConfigurationStarted(void)
    QString c_Text;
    QString c_Temporary;
 
-   c_Text = mhc_REPORT_HEADLINE_HTML_TAG_START;
+   c_Text = mc_REPORT_HEADLINE_HTML_TAG_START;
    c_Text += static_cast<QString>(C_GtGetText::h_GetText("Device Configuration"));
-   c_Text += mhc_REPORT_HEADLINE_HTML_TAG_END;
+   c_Text += mc_REPORT_HEADLINE_HTML_TAG_END;
    c_Temporary = "<p>" + static_cast<QString>(C_GtGetText::h_GetText("Waiting for results ...")) + "</p>";
 
    this->m_UpdateReportText(c_Text, c_Temporary);
@@ -2824,9 +2869,9 @@ void C_SyvDcWidget::m_HandleDeviceVerificationStart(void)
    QString c_Text;
    QString c_Temporary;
 
-   c_Text = mhc_REPORT_HEADLINE_HTML_TAG_START;
+   c_Text = mc_REPORT_HEADLINE_HTML_TAG_START;
    c_Text += static_cast<QString>(C_GtGetText::h_GetText("Device Type Verification"));
-   c_Text += mhc_REPORT_HEADLINE_HTML_TAG_END;
+   c_Text += mc_REPORT_HEADLINE_HTML_TAG_END;
    c_Temporary = "<p>" + static_cast<QString>(C_GtGetText::h_GetText("Waiting for results ...")) + "</p>";
 
    this->m_UpdateReportText(c_Text, c_Temporary);
@@ -3066,6 +3111,20 @@ void C_SyvDcWidget::m_InformUserAboutAbortedClose(void) const
    c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
    c_Message.SetDescription(C_GtGetText::h_GetText(
                                "While the communication is running, an abort can lead to an inconsistent status of the system."));
+   c_Message.SetCustomMinHeight(180, 180);
+   c_Message.Execute();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Inform user after failed scan
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDcWidget::m_InformUserAfterScan(const QString & orc_Text)
+{
+   C_OgeWiCustomMessage c_Message(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eERROR);
+
+   c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
+   c_Message.SetDescription(orc_Text);
    c_Message.SetCustomMinHeight(180, 180);
    c_Message.Execute();
 }

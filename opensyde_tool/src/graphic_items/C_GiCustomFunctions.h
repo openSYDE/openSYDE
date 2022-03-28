@@ -42,7 +42,7 @@ public:
                                              const E_AspectRatioMovement oe_AspectRatioMovement,
                                              const QPointF & orc_Delta);
 
-   static const stw_types::float64 hf64_SceneMinBorderSize;
+   static const stw_types::float64 hf64_SCENE_MIN_BORDER_SIZE;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

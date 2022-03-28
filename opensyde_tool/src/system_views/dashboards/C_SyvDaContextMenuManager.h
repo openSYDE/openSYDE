@@ -34,8 +34,10 @@ public:
    virtual ~C_SyvDaContextMenuManager();
 
    QAction * RegisterAction(const QString & orc_Text);
+   QAction * RegisterActionWithKeyboardShortcut(const QString & orc_Text, const QKeySequence & orc_Sequence);
    QAction * RegisterSeperator(void);
    void SetVisibleWithAutoHide(QAction * const opc_Action);
+   void SetSpecificActionsAvailable(const bool oq_Available, const bool oq_FurtherActionsWillBeAdded);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -43,6 +45,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigEditProperties(QGraphicsItem * const opc_Item);
+   void SigEditContent(QGraphicsItem * const opc_Item);
 
 protected:
    virtual void m_SetActionsInvisible(void) override;
@@ -56,10 +59,15 @@ private:
                                                                               // func.
 
    QList<QAction *> mc_ListVisibleRegisterdActions;
-   QAction * mpc_ActionEdit;
+   QAction * mpc_ActionEditProperties;
+   QAction * mpc_ActionEditContent;
    QAction * mpc_ActionEditSeparator;
 
-   void m_Edit(void);
+   bool mq_SpecificActionsAvailable;
+   bool mq_FurtherActionsWillBeAdded;
+
+   void m_EditProperties(void);
+   void m_EditContent(void);
    void m_HideRegisteredActions(void);
 };
 

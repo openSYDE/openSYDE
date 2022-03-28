@@ -291,6 +291,7 @@ C_SCLString C_OSCExportUti::h_GetTypePrefix(const C_OSCNodeDataPoolContent::E_Ty
       c_Prefix += "f64";
       break;
    default:
+      tgl_assert(false);
       break;
    }
 

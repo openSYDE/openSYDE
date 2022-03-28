@@ -316,7 +316,17 @@ void C_OSCComDriverBase::DistributeMessages(void)
 
          if (s32_Return == C_NO_ERR)
          {
-            this->m_HandleCanMessage(t_Msg, false);
+            if (t_Msg.u8_DLC <= 8)
+            {
+               this->m_HandleCanMessage(t_Msg, false);
+            }
+            else
+            {
+               //ignore invalid can message
+               osc_write_log_error("Reading CAN message",
+                                   "Ignored CAN message (ID: " + C_SCLString::IntToStr(
+                                      t_Msg.u32_ID) + ") due to invalid DLC (" + C_SCLString::IntToStr(t_Msg.u8_DLC));
+            }
          }
       }
       while (s32_Return == C_NO_ERR);
@@ -342,7 +352,7 @@ void C_OSCComDriverBase::DistributeMessages(void)
                u32_Load = 100U;
             }
 
-            // Inform all logger about the bus load
+            // Inform all loggers about the bus load
             for (un_LoggerCounter = 0U; un_LoggerCounter < this->mc_Logger.size(); ++un_LoggerCounter)
             {
                this->mc_Logger[un_LoggerCounter]->UpdateBusLoad(static_cast<uint8>(u32_Load));
@@ -353,7 +363,7 @@ void C_OSCComDriverBase::DistributeMessages(void)
          }
       }
 
-      // Inform about Tx errros and counter
+      // Inform about Tx errors and counter
       for (un_LoggerCounter = 0U; un_LoggerCounter < this->mc_Logger.size(); ++un_LoggerCounter)
       {
          this->mc_Logger[un_LoggerCounter]->UpdateTxErrors(this->mu32_CanTxErrors);

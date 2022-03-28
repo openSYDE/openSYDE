@@ -33,16 +33,16 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn msn_IndexTopLeft = 0;
-const sintn msn_IndexTopRight = 1;
-const sintn msn_IndexBottomLeft = 2;
-const sintn msn_IndexBottomRight = 3;
-const sintn msn_IndexElementKeepRatioMax = 4;
-const sintn msn_IndexTop = 4;
-const sintn msn_IndexBottom = 5;
-const sintn msn_IndexLeft = 6;
-const sintn msn_IndexRight = 7;
-const sintn msn_IndexElementMax = 8;
+const sintn msn_INDEX_TOP_LEFT = 0;
+const sintn msn_INDEX_TOP_RIGHT = 1;
+const sintn msn_INDEX_BOTTOM_LEFT = 2;
+const sintn msn_INDEX_BOTTOM_RIGHT = 3;
+const sintn msn_INDEX_ELEMENT_KEEP_RATIO_MAX = 4;
+const sintn msn_INDEX_TOP = 4;
+const sintn msn_INDEX_BOTTOM = 5;
+const sintn msn_INDEX_LEFT = 6;
+const sintn msn_INDEX_RIGHT = 7;
+const sintn msn_INDEX_ELEMENT_MAX = 8;
 
 const float64 mf64_BOUNDINGRECT_BORDER = 10.0;
 
@@ -79,7 +79,7 @@ C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64 & oru64_ID, const float64 
    C_GiUnique(oru64_ID),
    QGraphicsItemGroup(opc_Parent),
    mq_ResizingActive(false),
-   msn_ActiveResizeMode(msn_IndexElementMax),
+   msn_ActiveResizeMode(msn_INDEX_ELEMENT_MAX),
    mpc_BiggestSubItem(NULL),
    mc_LastKnownPosition(),
    mc_LastKnownSize(),
@@ -100,12 +100,12 @@ C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64 & oru64_ID, const float64 
 
    if (this->mq_KeepAspectRatio == false)
    {
-      s32_Limit = msn_IndexElementMax;
+      s32_Limit = msn_INDEX_ELEMENT_MAX;
    }
    else
    {
       // only four elements necessary
-      s32_Limit = msn_IndexElementKeepRatioMax;
+      s32_Limit = msn_INDEX_ELEMENT_KEEP_RATIO_MAX;
    }
 
    for (s32_Counter = 0; s32_Counter < s32_Limit; ++s32_Counter)
@@ -182,18 +182,18 @@ void C_GiBiRectBaseGroup::m_InitActionPoints()
    this->m_UpdateActionPoints();
 
    // set the cursor of all interaction points
-   this->mc_ActionPoints[msn_IndexTopLeft]->setCursor(static_cast<QCursor>(Qt::SizeFDiagCursor));
-   this->mc_ActionPoints[msn_IndexTopRight]->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
+   this->mc_ActionPoints[msn_INDEX_TOP_LEFT]->setCursor(static_cast<QCursor>(Qt::SizeFDiagCursor));
+   this->mc_ActionPoints[msn_INDEX_TOP_RIGHT]->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
 
-   this->mc_ActionPoints[msn_IndexBottomLeft]->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
-   this->mc_ActionPoints[msn_IndexBottomRight]->setCursor(static_cast<QCursor>(Qt::SizeFDiagCursor));
+   this->mc_ActionPoints[msn_INDEX_BOTTOM_LEFT]->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
+   this->mc_ActionPoints[msn_INDEX_BOTTOM_RIGHT]->setCursor(static_cast<QCursor>(Qt::SizeFDiagCursor));
 
    if (this->mq_KeepAspectRatio == false)
    {
-      this->mc_ActionPoints[msn_IndexTop]->setCursor(static_cast<QCursor>(Qt::SizeVerCursor));
-      this->mc_ActionPoints[msn_IndexBottom]->setCursor(static_cast<QCursor>(Qt::SizeVerCursor));
-      this->mc_ActionPoints[msn_IndexLeft]->setCursor(static_cast<QCursor>(Qt::SizeHorCursor));
-      this->mc_ActionPoints[msn_IndexRight]->setCursor(static_cast<QCursor>(Qt::SizeHorCursor));
+      this->mc_ActionPoints[msn_INDEX_TOP]->setCursor(static_cast<QCursor>(Qt::SizeVerCursor));
+      this->mc_ActionPoints[msn_INDEX_BOTTOM]->setCursor(static_cast<QCursor>(Qt::SizeVerCursor));
+      this->mc_ActionPoints[msn_INDEX_LEFT]->setCursor(static_cast<QCursor>(Qt::SizeHorCursor));
+      this->mc_ActionPoints[msn_INDEX_RIGHT]->setCursor(static_cast<QCursor>(Qt::SizeHorCursor));
    }
 
    // configure the points
@@ -216,33 +216,33 @@ void C_GiBiRectBaseGroup::m_UpdateActionPoints(void)
    this->mc_ShowBoundingRect.setWidth(this->mc_ShowBoundingRect.width() + mf64_ActionPointOffset);
    this->mc_ShowBoundingRect.setHeight(this->mc_ShowBoundingRect.height() + mf64_ActionPointOffset);
 
-   this->mc_ActionPoints[msn_IndexTopLeft]->setPos(this->mc_ShowBoundingRect.x(),
-                                                   this->mc_ShowBoundingRect.y());
-   this->mc_ActionPoints[msn_IndexTopRight]->setPos((this->mc_ShowBoundingRect.width() +
-                                                     this->mc_ShowBoundingRect.x()),
-                                                    this->mc_ShowBoundingRect.y());
+   this->mc_ActionPoints[msn_INDEX_TOP_LEFT]->setPos(this->mc_ShowBoundingRect.x(),
+                                                     this->mc_ShowBoundingRect.y());
+   this->mc_ActionPoints[msn_INDEX_TOP_RIGHT]->setPos((this->mc_ShowBoundingRect.width() +
+                                                       this->mc_ShowBoundingRect.x()),
+                                                      this->mc_ShowBoundingRect.y());
 
-   this->mc_ActionPoints[msn_IndexBottomLeft]->setPos(this->mc_ShowBoundingRect.x(),
-                                                      (this->mc_ShowBoundingRect.height() +
-                                                       this->mc_ShowBoundingRect.y()));
-   this->mc_ActionPoints[msn_IndexBottomRight]->setPos((this->mc_ShowBoundingRect.width() +
-                                                        this->mc_ShowBoundingRect.x()),
-                                                       (this->mc_ShowBoundingRect.height() +
-                                                        this->mc_ShowBoundingRect.y()));
+   this->mc_ActionPoints[msn_INDEX_BOTTOM_LEFT]->setPos(this->mc_ShowBoundingRect.x(),
+                                                        (this->mc_ShowBoundingRect.height() +
+                                                         this->mc_ShowBoundingRect.y()));
+   this->mc_ActionPoints[msn_INDEX_BOTTOM_RIGHT]->setPos((this->mc_ShowBoundingRect.width() +
+                                                          this->mc_ShowBoundingRect.x()),
+                                                         (this->mc_ShowBoundingRect.height() +
+                                                          this->mc_ShowBoundingRect.y()));
 
    if (this->mq_KeepAspectRatio == false)
    {
-      this->mc_ActionPoints[msn_IndexTop]->setPos(this->mc_ShowBoundingRect.center().x(),
-                                                  this->mc_ShowBoundingRect.y());
-      this->mc_ActionPoints[msn_IndexBottom]->setPos(this->mc_ShowBoundingRect.center().x(),
-                                                     (this->mc_ShowBoundingRect.height() +
-                                                      this->mc_ShowBoundingRect.y()));
+      this->mc_ActionPoints[msn_INDEX_TOP]->setPos(this->mc_ShowBoundingRect.center().x(),
+                                                   this->mc_ShowBoundingRect.y());
+      this->mc_ActionPoints[msn_INDEX_BOTTOM]->setPos(this->mc_ShowBoundingRect.center().x(),
+                                                      (this->mc_ShowBoundingRect.height() +
+                                                       this->mc_ShowBoundingRect.y()));
 
-      this->mc_ActionPoints[msn_IndexLeft]->setPos(this->mc_ShowBoundingRect.x(),
-                                                   this->mc_ShowBoundingRect.center().y());
-      this->mc_ActionPoints[msn_IndexRight]->setPos((this->mc_ShowBoundingRect.width() +
-                                                     this->mc_ShowBoundingRect.x()),
+      this->mc_ActionPoints[msn_INDEX_LEFT]->setPos(this->mc_ShowBoundingRect.x(),
                                                     this->mc_ShowBoundingRect.center().y());
+      this->mc_ActionPoints[msn_INDEX_RIGHT]->setPos((this->mc_ShowBoundingRect.width() +
+                                                      this->mc_ShowBoundingRect.x()),
+                                                     this->mc_ShowBoundingRect.center().y());
    }
 }
 
@@ -527,9 +527,9 @@ void C_GiBiRectBaseGroup::ApplySizeChange(const QPointF & orc_NewPos, const QSiz
    this->prepareGeometryChange();
 
    // check new geometry
-   if (c_Pos.x() < (C_GiCustomFunctions::hf64_SceneMinBorderSize + mf64_BOUNDINGRECT_BORDER))
+   if (c_Pos.x() < (C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE + mf64_BOUNDINGRECT_BORDER))
    {
-      c_Pos.setX(C_GiCustomFunctions::hf64_SceneMinBorderSize + mf64_BOUNDINGRECT_BORDER);
+      c_Pos.setX(C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE + mf64_BOUNDINGRECT_BORDER);
 
       if (this->mq_KeepAspectRatio == false)
       {
@@ -540,9 +540,9 @@ void C_GiBiRectBaseGroup::ApplySizeChange(const QPointF & orc_NewPos, const QSiz
          //Don't change size to keep aspect ratio
       }
    }
-   if (c_Pos.y() < (C_GiCustomFunctions::hf64_SceneMinBorderSize + mf64_BOUNDINGRECT_BORDER))
+   if (c_Pos.y() < (C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE + mf64_BOUNDINGRECT_BORDER))
    {
-      c_Pos.setY(C_GiCustomFunctions::hf64_SceneMinBorderSize + mf64_BOUNDINGRECT_BORDER);
+      c_Pos.setY(C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE + mf64_BOUNDINGRECT_BORDER);
 
       if (this->mq_KeepAspectRatio == false)
       {
@@ -652,7 +652,7 @@ QVariant C_GiBiRectBaseGroup::itemChange(const GraphicsItemChange oe_Change, con
          // activation of resizing must be set by external call
          this->SetResizing(false);
       }
-      Q_EMIT this->SigSelectionChange(this->isSelected());
+      Q_EMIT (this->SigSelectionChange(this->isSelected()));
       break;
    case ItemSceneHasChanged:
       if (this->scene() != NULL)
@@ -710,44 +710,44 @@ void C_GiBiRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_E
    {
       const QPointF c_Pos = opc_Event->scenePos();
 
-      if (this->mc_ActionPoints[msn_IndexBottomRight]->IsPointInside(c_Pos) == true)
+      if (this->mc_ActionPoints[msn_INDEX_BOTTOM_RIGHT]->IsPointInside(c_Pos) == true)
       {
-         this->msn_ActiveResizeMode = msn_IndexBottomRight;
+         this->msn_ActiveResizeMode = msn_INDEX_BOTTOM_RIGHT;
       }
-      else if (this->mc_ActionPoints[msn_IndexBottomLeft]->IsPointInside(c_Pos) == true)
+      else if (this->mc_ActionPoints[msn_INDEX_BOTTOM_LEFT]->IsPointInside(c_Pos) == true)
       {
-         this->msn_ActiveResizeMode = msn_IndexBottomLeft;
+         this->msn_ActiveResizeMode = msn_INDEX_BOTTOM_LEFT;
       }
-      else if (this->mc_ActionPoints[msn_IndexTopLeft]->IsPointInside(c_Pos) == true)
+      else if (this->mc_ActionPoints[msn_INDEX_TOP_LEFT]->IsPointInside(c_Pos) == true)
       {
-         this->msn_ActiveResizeMode = msn_IndexTopLeft;
+         this->msn_ActiveResizeMode = msn_INDEX_TOP_LEFT;
       }
-      else if (this->mc_ActionPoints[msn_IndexTopRight]->IsPointInside(c_Pos) == true)
+      else if (this->mc_ActionPoints[msn_INDEX_TOP_RIGHT]->IsPointInside(c_Pos) == true)
       {
-         this->msn_ActiveResizeMode = msn_IndexTopRight;
+         this->msn_ActiveResizeMode = msn_INDEX_TOP_RIGHT;
       }
       else if (this->mq_KeepAspectRatio == false)
       {
-         if (this->mc_ActionPoints[msn_IndexTop]->IsPointInside(c_Pos) == true)
+         if (this->mc_ActionPoints[msn_INDEX_TOP]->IsPointInside(c_Pos) == true)
          {
-            this->msn_ActiveResizeMode = msn_IndexTop;
+            this->msn_ActiveResizeMode = msn_INDEX_TOP;
          }
-         else if (this->mc_ActionPoints[msn_IndexBottom]->IsPointInside(c_Pos) == true)
+         else if (this->mc_ActionPoints[msn_INDEX_BOTTOM]->IsPointInside(c_Pos) == true)
          {
-            this->msn_ActiveResizeMode = msn_IndexBottom;
+            this->msn_ActiveResizeMode = msn_INDEX_BOTTOM;
          }
-         else if (this->mc_ActionPoints[msn_IndexLeft]->IsPointInside(c_Pos) == true)
+         else if (this->mc_ActionPoints[msn_INDEX_LEFT]->IsPointInside(c_Pos) == true)
          {
-            this->msn_ActiveResizeMode = msn_IndexLeft;
+            this->msn_ActiveResizeMode = msn_INDEX_LEFT;
          }
-         else if (this->mc_ActionPoints[msn_IndexRight]->IsPointInside(c_Pos) == true)
+         else if (this->mc_ActionPoints[msn_INDEX_RIGHT]->IsPointInside(c_Pos) == true)
          {
-            this->msn_ActiveResizeMode = msn_IndexRight;
+            this->msn_ActiveResizeMode = msn_INDEX_RIGHT;
          }
          else
          {
             // No interaction point clicked
-            this->msn_ActiveResizeMode = msn_IndexElementMax;
+            this->msn_ActiveResizeMode = msn_INDEX_ELEMENT_MAX;
 
             QGraphicsItemGroup::mousePressEvent(opc_Event);
          }
@@ -755,7 +755,7 @@ void C_GiBiRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_E
       else
       {
          // No interaction point clicked
-         this->msn_ActiveResizeMode = msn_IndexElementMax;
+         this->msn_ActiveResizeMode = msn_INDEX_ELEMENT_MAX;
 
          QGraphicsItemGroup::mousePressEvent(opc_Event);
       }
@@ -774,7 +774,7 @@ void C_GiBiRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_E
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
-   if ((this->msn_ActiveResizeMode != msn_IndexElementMax) &&
+   if ((this->msn_ActiveResizeMode != msn_INDEX_ELEMENT_MAX) &&
        (this->mq_BlockMoveAndResize == false))
    {
       QPointF c_MousePos = opc_Event->scenePos();
@@ -790,15 +790,15 @@ void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Ev
       if (this->mq_KeepAspectRatio == true)
       {
          C_GiCustomFunctions::E_AspectRatioMovement e_AspectRatioMovement;
-         if (this->msn_ActiveResizeMode == msn_IndexBottomLeft)
+         if (this->msn_ActiveResizeMode == msn_INDEX_BOTTOM_LEFT)
          {
             e_AspectRatioMovement = C_GiCustomFunctions::eARM_BOTTOM_LEFT;
          }
-         else if (this->msn_ActiveResizeMode == msn_IndexTopRight)
+         else if (this->msn_ActiveResizeMode == msn_INDEX_TOP_RIGHT)
          {
             e_AspectRatioMovement = C_GiCustomFunctions::eARM_TOP_RIGHT;
          }
-         else if (this->msn_ActiveResizeMode == msn_IndexTopLeft)
+         else if (this->msn_ActiveResizeMode == msn_INDEX_TOP_LEFT)
          {
             e_AspectRatioMovement = C_GiCustomFunctions::eARM_TOP_LEFT;
          }
@@ -813,7 +813,7 @@ void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Ev
       // adapt size and position
       switch (this->msn_ActiveResizeMode)
       {
-      case msn_IndexTopLeft:
+      case msn_INDEX_TOP_LEFT:
          c_Size.setWidth(c_Size.width() - c_Delta.x());
          c_Pos.setX(c_Pos.x() + c_Delta.x());
 
@@ -821,40 +821,40 @@ void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Ev
          c_Pos.setY(c_Pos.y() + c_Delta.y());
          break;
 
-      case msn_IndexTopRight:
+      case msn_INDEX_TOP_RIGHT:
          c_Size.setWidth(c_Size.width() + c_Delta.x());
 
          c_Size.setHeight(c_Size.height() - c_Delta.y());
          c_Pos.setY(c_Pos.y() + c_Delta.y());
          break;
 
-      case msn_IndexBottomLeft:
+      case msn_INDEX_BOTTOM_LEFT:
          c_Size.setWidth(c_Size.width() - c_Delta.x());
          c_Pos.setX(c_Pos.x() + c_Delta.x());
 
          c_Size.setHeight(c_Size.height() + c_Delta.y());
          break;
 
-      case msn_IndexBottomRight:
+      case msn_INDEX_BOTTOM_RIGHT:
          c_Size.setHeight(c_Size.height() + c_Delta.y());
 
          c_Size.setWidth(c_Size.width() + c_Delta.x());
          break;
 
-      case msn_IndexRight:
+      case msn_INDEX_RIGHT:
          c_Size.setWidth(c_Size.width() + c_Delta.x());
          break;
 
-      case msn_IndexLeft:
+      case msn_INDEX_LEFT:
          c_Size.setWidth(c_Size.width() - c_Delta.x());
          c_Pos.setX(c_Pos.x() + c_Delta.x());
          break;
 
-      case msn_IndexBottom:
+      case msn_INDEX_BOTTOM:
          c_Size.setHeight(c_Size.height() + c_Delta.y());
          break;
 
-      case msn_IndexTop:
+      case msn_INDEX_TOP:
          c_Size.setHeight(c_Size.height() - c_Delta.y());
          c_Pos.setY(c_Pos.y() + c_Delta.y());
          break;
@@ -886,7 +886,7 @@ void C_GiBiRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc
       //Signal complete move step
       if (opc_Event->button() == Qt::LeftButton)
       {
-         if (this->msn_ActiveResizeMode != msn_IndexElementMax)
+         if (this->msn_ActiveResizeMode != msn_INDEX_ELEMENT_MAX)
          {
             Q_EMIT this->SigItemWasResized(this->mc_LastKnownPosition, this->mc_LastKnownSize,
                                            this->pos(), this->GetSize());
@@ -900,7 +900,7 @@ void C_GiBiRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc
          }
       }
       // deactivate resizing
-      this->msn_ActiveResizeMode = msn_IndexElementMax;
+      this->msn_ActiveResizeMode = msn_INDEX_ELEMENT_MAX;
    }
    else
    {

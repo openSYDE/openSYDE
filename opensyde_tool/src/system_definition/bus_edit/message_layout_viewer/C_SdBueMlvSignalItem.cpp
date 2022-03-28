@@ -26,8 +26,8 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::float64 C_SdBueMlvSignalItem::mhf64_ResizeItemHeight = 20.0;
-const stw_types::float64 C_SdBueMlvSignalItem::mhf64_ResizeItemClickOffset = 8.0;
+const stw_types::float64 C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_HEIGHT = 20.0;
+const stw_types::float64 C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_CLICK_OFFSET = 8.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -115,30 +115,31 @@ void C_SdBueMlvSignalItem::Update(const float64 of64_SingleItemWidth, const floa
    if (this->mq_ShowLeftResizeItem == true)
    {
       this->mc_LeftResizeItemRectDraw.setRect(0.0, (of64_SingleItemHeight / 2.0) -
-                                              (C_SdBueMlvSignalItem::mhf64_ResizeItemHeight / 2.0),
-                                              5.0, C_SdBueMlvSignalItem::mhf64_ResizeItemHeight);
+                                              (C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_HEIGHT / 2.0),
+                                              5.0, C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_HEIGHT);
 
       this->mc_LeftResizeItemRectClick = this->mc_LeftResizeItemRectDraw;
 
       // increase the size of the clickable area
-      this->mc_LeftResizeItemRectClick.setWidth(mc_LeftResizeItemRectClick.width() + mhf64_ResizeItemClickOffset);
-      this->mc_LeftResizeItemRectClick.setY(mc_LeftResizeItemRectClick.y() - mhf64_ResizeItemClickOffset);
-      this->mc_LeftResizeItemRectClick.setHeight(mc_LeftResizeItemRectClick.height() + mhf64_ResizeItemClickOffset);
+      this->mc_LeftResizeItemRectClick.setWidth(mc_LeftResizeItemRectClick.width() + mhf64_RESIZE_ITEM_CLICK_OFFSET);
+      this->mc_LeftResizeItemRectClick.setY(mc_LeftResizeItemRectClick.y() - mhf64_RESIZE_ITEM_CLICK_OFFSET);
+      this->mc_LeftResizeItemRectClick.setHeight(mc_LeftResizeItemRectClick.height() + mhf64_RESIZE_ITEM_CLICK_OFFSET);
    }
 
    // rectangle for the right resize item
    if (this->mq_ShowRightResizeItem == true)
    {
       this->mc_RightResizeItemRectDraw.setRect((f64_Width - 5.0), (of64_SingleItemHeight / 2.0) -
-                                               (C_SdBueMlvSignalItem::mhf64_ResizeItemHeight / 2.0),
-                                               5.0, C_SdBueMlvSignalItem::mhf64_ResizeItemHeight);
+                                               (C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_HEIGHT / 2.0),
+                                               5.0, C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_HEIGHT);
 
       this->mc_RightResizeItemRectClick = this->mc_RightResizeItemRectDraw;
 
       // increase the size of the clickable area
-      this->mc_RightResizeItemRectClick.setX(mc_RightResizeItemRectClick.x() - mhf64_ResizeItemClickOffset);
-      this->mc_RightResizeItemRectClick.setY(mc_RightResizeItemRectClick.y() - mhf64_ResizeItemClickOffset);
-      this->mc_RightResizeItemRectClick.setHeight(mc_RightResizeItemRectClick.height() + mhf64_ResizeItemClickOffset);
+      this->mc_RightResizeItemRectClick.setX(mc_RightResizeItemRectClick.x() - mhf64_RESIZE_ITEM_CLICK_OFFSET);
+      this->mc_RightResizeItemRectClick.setY(mc_RightResizeItemRectClick.y() - mhf64_RESIZE_ITEM_CLICK_OFFSET);
+      this->mc_RightResizeItemRectClick.setHeight(mc_RightResizeItemRectClick.height() +
+                                                  mhf64_RESIZE_ITEM_CLICK_OFFSET);
    }
 }
 

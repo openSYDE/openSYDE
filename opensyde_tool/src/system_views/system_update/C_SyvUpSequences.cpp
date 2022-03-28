@@ -138,7 +138,7 @@ sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)
    s32_Return = C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(ou32_ViewIndex, u32_ActiveBusIndex,
                                                                    c_ActiveNodes,
                                                                    &this->mpc_CanDllDispatcher,
-                                                                   &this->mpc_EthernetDispatcher);
+                                                                   &this->mpc_EthernetDispatcher, true, false, NULL);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -484,6 +484,12 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
       c_Text = C_GtGetText::h_GetText("Read Device Information: Flashloader information error");
+      break;
+   case eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_START:
+      c_Text = C_GtGetText::h_GetText("Read Device Information: Flashloader security activation state start");
+      break;
+   case eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
+      c_Text = C_GtGetText::h_GetText("Read Device Information: Flashloader security activation state error");
       break;
    case eREAD_DEVICE_INFO_FINISHED:
       c_Text = C_GtGetText::h_GetText("Read Device Information: Finished");
@@ -875,6 +881,64 @@ void C_SyvUpSequences::AbortCurrentProgress(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the node states of the connect process
+
+   The connect process involves the both steps:
+   * ActivateFlashloader
+   * ReadDeviceInformation
+
+   \param[out]      orc_ConnectStatesNodes   Detailed output parameter description
+
+   \retval   C_NO_ERR   States returned
+   \retval   C_BUSY     previously started sequence still going on
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvUpSequences::GetConnectStates(std::vector<C_OSCSuSequencesNodeConnectStates> & orc_ConnectStatesNodes) const
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   if (this->mpc_Thread->isRunning() == true)
+   {
+      s32_Return = C_BUSY;
+   }
+   else
+   {
+      s32_Return = C_OSCSuSequences::GetConnectStates(orc_ConnectStatesNodes);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the node states of the connect process
+
+   The connect process involves the both steps:
+   * ActivateFlashloader
+   * ReadDeviceInformation
+
+   \param[out]      orc_UpdateStatesNodes   Detailed output parameter description
+
+   \retval   C_NO_ERR   States returned
+   \retval   C_BUSY     previously started sequence still going on
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvUpSequences::GetUpdateStates(std::vector<C_OSCSuSequencesNodeUpdateStates> & orc_UpdateStatesNodes) const
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   if (this->mpc_Thread->isRunning() == true)
+   {
+      s32_Return = C_BUSY;
+   }
+   else
+   {
+      s32_Return = C_OSCSuSequences::GetUpdateStates(orc_UpdateStatesNodes);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reports some information about the current sequence
 
    Give textual information to logging engine
@@ -940,8 +1004,8 @@ bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint
       c_Text =  ("Step: " + this->GetStepName(oe_Step)).toStdString().c_str();
       c_Text += " Progress: " + C_SCLString::IntToStr(ou8_Progress);
       c_Text += " Result: " + C_SCLString::IntToStr(os32_Result);
-      c_Text += " Bus-Id: " + C_SCLString::IntToStr(orc_Server.u8_BusIdentifier);
-      c_Text += " Node-Id: " + C_SCLString::IntToStr(orc_Server.u8_NodeIdentifier);
+      c_Text += " Bus ID: " + C_SCLString::IntToStr(orc_Server.u8_BusIdentifier);
+      c_Text += " Node ID: " + C_SCLString::IntToStr(orc_Server.u8_NodeIdentifier);
       c_Text += " Info: " + orc_Information;
 
       mh_WriteLog(oe_Step, c_Text);
@@ -1087,6 +1151,7 @@ void C_SyvUpSequences::mh_WriteLog(const C_OSCSuSequences::E_ProgressStep oe_Ste
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
    case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:

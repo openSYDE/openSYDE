@@ -22,7 +22,7 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 C_GiCustomFunctions::hf64_SceneMinBorderSize = 6.0;
+const float64 C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE = 6.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -63,8 +63,8 @@ QVariant C_GiCustomFunctions::h_ItemChange(const QGraphicsItem::GraphicsItemChan
    //Return value for ItemPositionHasChanged has no effect
    if (oe_Change == QGraphicsItem::ItemPositionChange)
    {
-      const float64 f64_MinX = orc_Offset.x() + C_GiCustomFunctions::hf64_SceneMinBorderSize;
-      const float64 f64_MinY = orc_Offset.y() + C_GiCustomFunctions::hf64_SceneMinBorderSize;
+      const float64 f64_MinX = orc_Offset.x() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
+      const float64 f64_MinY = orc_Offset.y() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
       //Scene boundaries check only makes sense in scene coordinates
       QPointF c_NewPos = opc_GraphicsItem->mapToScene(orc_Value.toPointF());
       const QPointF c_SceneTopLeftOld = opc_GraphicsItem->mapToScene(opc_GraphicsItem->boundingRect().topLeft());
@@ -105,8 +105,8 @@ QVariant C_GiCustomFunctions::h_ItemChange(const QGraphicsItem::GraphicsItemChan
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiCustomFunctions::h_AdaptMouseRangePos(QPointF & orc_Pos, const QPointF & orc_Offset, bool * const opq_Changed)
 {
-   const float64 f64_MinX = orc_Offset.x() + C_GiCustomFunctions::hf64_SceneMinBorderSize;
-   const float64 f64_MinY = orc_Offset.y() + C_GiCustomFunctions::hf64_SceneMinBorderSize;
+   const float64 f64_MinX = orc_Offset.x() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
+   const float64 f64_MinY = orc_Offset.y() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
 
    if (opq_Changed != NULL)
    {

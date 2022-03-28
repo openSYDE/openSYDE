@@ -305,15 +305,47 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_GetExePath(void)
 {
     sintn sn_Return;
     charn acn_Arg[20];
-    charn acn_Path[PATH_MAX + 1] = {0};
+    std::vector<charn> c_VecPath;
     C_SCLString c_Path = "";
+    bool q_Success = false;
+    sintn sn_BuffSize;
+
+    c_VecPath.resize(1, 0);
 
     sprintf(acn_Arg, "/proc/%d/exe", getpid());
-    sn_Return = readlink(acn_Arg, acn_Path, BUFSIZ );
-    if (sn_Return > 0)
+    do
+    {
+      c_VecPath.resize(c_VecPath.size() + PATH_MAX, 0);
+      // Reserving one byte for null termination
+      sn_BuffSize = c_VecPath.size() - 1;
+
+      sn_Return = readlink(acn_Arg, &c_VecPath[0], sn_BuffSize);
+
+      if ((sn_Return >= 0) &&
+          (sn_Return < sn_BuffSize))
+      {
+         // Success: Buffer was big enoug and no error occured
+         q_Success = true;
+      }
+      else if (sn_Return < 0)
+      {
+         // A not buffer size specific error which can not be fixed by trying again with a bigger buffer size
+         // Special case: The error "errno == ENAMETOOLONG" seems no to be fixable by
+         // increasing the buffer size in all cases. Risking an endless loop
+         break;
+      }
+      else
+      {
+         // The buffer was probably to small, try a further iteration with an increased buffer size:
+         // sn_Return is bigger or equal to sn_BuffSize. This is an indicator for a truncated part of the path
+      }
+    }
+    while (q_Success == false);
+
+    if (q_Success == true)
     {
        //we got a path ...
-       c_Path = acn_Path;
+       c_Path = &c_VecPath[0];
     }
 
     return c_Path;

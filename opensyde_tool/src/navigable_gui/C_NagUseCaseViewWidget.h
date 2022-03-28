@@ -66,7 +66,7 @@ private:
    QString mc_ItemName;
    QString mc_ItemSubSubName;
    bool mq_CombineItemAndSubSubName;
-   static const QString mhc_SVGIconPath;
+   static const QString mhc_SVG_ICON_PATH;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

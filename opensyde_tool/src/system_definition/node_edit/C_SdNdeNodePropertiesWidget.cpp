@@ -127,9 +127,24 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(static_cast<sintn> (
                                                                       C_SdNdeComIfSettingsTableDelegate::eCONNECTION))->
    setTextAlignment(static_cast<sintn> (Qt::AlignLeft));
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(static_cast<sintn> (
+                                                                      C_SdNdeComIfSettingsTableDelegate::eNODEID))->
+   setTextAlignment(static_cast<sintn> (Qt::AlignHCenter));
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(static_cast<sintn> (
+                                                                      C_SdNdeComIfSettingsTableDelegate::eIPADDRESS))->
+   setTextAlignment(static_cast<sintn> (Qt::AlignHCenter));
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(static_cast<sintn> (
+                                                                      C_SdNdeComIfSettingsTableDelegate::eUPDATE))->
+   setTextAlignment(static_cast<sintn> (Qt::AlignHCenter));
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(static_cast<sintn> (
+                                                                      C_SdNdeComIfSettingsTableDelegate::eROUTING))->
+   setTextAlignment(static_cast<sintn> (Qt::AlignHCenter));
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(static_cast<sintn> (
+                                                                      C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC))->
+   setTextAlignment(static_cast<sintn> (Qt::AlignHCenter));
 
    //set min column width (necessary for "Linked to..." strech column
-   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->setMinimumSectionSize(75);
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->setMinimumSectionSize(150);
 
    //setup column size mode and size
    this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->setSectionResizeMode(static_cast<sintn> (
@@ -138,7 +153,7 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
                                                                                        QHeaderView::Fixed);
 
    this->mpc_Ui->pc_TableWidgetComIfSettings->setColumnWidth(static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::
-                                                                                 eINTERFACE), 130);
+                                                                                 eINTERFACE), 150);
 
    this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->setSectionResizeMode(static_cast<sintn> (
                                                                                           C_SdNdeComIfSettingsTableDelegate
@@ -150,35 +165,35 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
                                                                                           ::eNODEID),
                                                                                        QHeaderView::Fixed);
    this->mpc_Ui->pc_TableWidgetComIfSettings->setColumnWidth(static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::
-                                                                                 eNODEID), 130);
+                                                                                 eNODEID), 150);
 
    this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->setSectionResizeMode(static_cast<sintn> (
                                                                                           C_SdNdeComIfSettingsTableDelegate
                                                                                           ::eIPADDRESS),
                                                                                        QHeaderView::Fixed);
    this->mpc_Ui->pc_TableWidgetComIfSettings->setColumnWidth(static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::
-                                                                                 eIPADDRESS), 130);
+                                                                                 eIPADDRESS), 150);
 
    this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->setSectionResizeMode(static_cast<sintn> (
                                                                                           C_SdNdeComIfSettingsTableDelegate
                                                                                           ::eUPDATE),
                                                                                        QHeaderView::Fixed);
    this->mpc_Ui->pc_TableWidgetComIfSettings->setColumnWidth(static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::
-                                                                                 eUPDATE), 130);
+                                                                                 eUPDATE), 150);
 
    this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->setSectionResizeMode(static_cast<sintn> (
                                                                                           C_SdNdeComIfSettingsTableDelegate
                                                                                           ::eROUTING),
                                                                                        QHeaderView::Fixed);
    this->mpc_Ui->pc_TableWidgetComIfSettings->setColumnWidth(static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::
-                                                                                 eROUTING), 130);
+                                                                                 eROUTING), 150);
 
    this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->setSectionResizeMode(static_cast<sintn> (
                                                                                           C_SdNdeComIfSettingsTableDelegate
                                                                                           ::eDIAGNOSTIC),
                                                                                        QHeaderView::Fixed);
    this->mpc_Ui->pc_TableWidgetComIfSettings->setColumnWidth(static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::
-                                                                                 eDIAGNOSTIC), 130);
+                                                                                 eDIAGNOSTIC), 150);
 
    //Name restriction
    this->mpc_Ui->pc_LineEditNodeName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
@@ -189,7 +204,8 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    connect(this->mpc_Ui->pc_LineEditNodeName, &QLineEdit::editingFinished, this,
            &C_SdNdeNodePropertiesWidget::m_TrimNodeName);
    connect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellChanged, this,
-           &C_SdNdeNodePropertiesWidget::m_CheckComIfId);
+           &C_SdNdeNodePropertiesWidget::m_CheckComInterface);
+
    connect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellClicked, this,
            &C_SdNdeNodePropertiesWidget::m_HandleCellClick);
    connect(this->mpc_Ui->pc_PushButtonFlashloaderOptions, &C_OgePubOptions::clicked, this,
@@ -225,13 +241,13 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    QString c_InterfaceString;
    QString c_ConnectString;
 
-   const sintn sn_ColInterface = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eINTERFACE);
-   const sintn sn_ColConnection = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eCONNECTION);
-   const sintn sn_ColNodeId = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID);
-   const sintn sn_ColIpAddress = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
-   const sintn sn_ColUpdate = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eUPDATE);
-   const sintn sn_ColRouting = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eROUTING);
-   const sintn sn_ColDiagnostic = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
+   const sintn sn_COL_INTERFACE = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eINTERFACE);
+   const sintn sn_COL_CONNECTION = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eCONNECTION);
+   const sintn sn_COL_NODE_ID = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eNODEID);
+   const sintn sn_COL_IP_ADDRESS = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
+   const sintn sn_COL_UPDATE = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eUPDATE);
+   const sintn sn_COL_ROUTING = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eROUTING);
+   const sintn sn_COL_DIAGNOSTIC = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
 
    this->mpc_Ui->pc_LabSubNodeTitle->setText(C_GtGetText::h_GetText("Sub-Node"));
    this->mpc_Ui->pc_LabelName->setText(C_GtGetText::h_GetText("Name"));
@@ -256,22 +272,22 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    //fake padding with Spaces. No other solution known so far
    c_InterfaceString = "          ";
    c_InterfaceString.append(C_GtGetText::h_GetText("Interface"));
-   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_ColInterface)->setText(c_InterfaceString);
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_COL_INTERFACE)->setText(c_InterfaceString);
 
    //fake padding with Spaces. No other solution known so far
    c_ConnectString = "  ";
    c_ConnectString.append(C_GtGetText::h_GetText("Linked to..."));
-   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_ColConnection)->setText(c_ConnectString);
-   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_ColNodeId)->setText(C_GtGetText::h_GetText(
-                                                                                             "Node ID"));
-   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_ColIpAddress)->setText(C_GtGetText::h_GetText(
-                                                                                                "IP Address"));
-   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_ColUpdate)->setText(C_GtGetText::h_GetText(
-                                                                                             "Update"));
-   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_ColRouting)->setText(C_GtGetText::h_GetText(
-                                                                                              "Routing"));
-   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_ColDiagnostic)->setText(C_GtGetText::h_GetText(
-                                                                                                 "Diagnostic"));
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_COL_CONNECTION)->setText(c_ConnectString);
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_COL_NODE_ID)->setText(C_GtGetText::h_GetText(
+                                                                                               "Node ID"));
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_COL_IP_ADDRESS)->setText(C_GtGetText::h_GetText(
+                                                                                                  "IP Address"));
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_COL_UPDATE)->setText(C_GtGetText::h_GetText(
+                                                                                              "Usable for Update"));
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_COL_ROUTING)->setText(C_GtGetText::h_GetText(
+                                                                                               "Usable for Routing"));
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(sn_COL_DIAGNOSTIC)->setText(C_GtGetText::h_GetText(
+                                                                                                  "Usable for Dashboard"));
 
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
 
@@ -307,17 +323,17 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                             "\nSupported protocols defined in read only "
                                                             "*.syde_devdef file."));
 
-   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColInterface, Qt::Horizontal,
+   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_COL_INTERFACE, Qt::Horizontal,
                                                                   C_GtGetText::h_GetText("Interface"),
                                                                   C_GtGetText::h_GetText(
                                                                      "Name of communication interface (CAN/ETHERNET)."));
 
-   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColConnection, Qt::Horizontal,
+   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_COL_CONNECTION, Qt::Horizontal,
                                                                   C_GtGetText::h_GetText("Linked to..."),
                                                                   C_GtGetText::h_GetText(
                                                                      "Name of bus to which the interface is linked to."));
 
-   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColNodeId, Qt::Horizontal,
+   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_COL_NODE_ID, Qt::Horizontal,
                                                                   C_GtGetText::h_GetText("Node ID"),
                                                                   C_GtGetText::h_GetText(
                                                                      "Node ID is unique on connected bus. The ID is "
@@ -326,7 +342,7 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                                      "connected interfaces on device while \"Device "
                                                                      "configuration\" (SYSTEM COMMISSIONING/Setup)."));
 
-   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColIpAddress, Qt::Horizontal,
+   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_COL_IP_ADDRESS, Qt::Horizontal,
                                                                   C_GtGetText::h_GetText("IP Address"),
                                                                   C_GtGetText::h_GetText(
                                                                      "IP address settings: IP address and subnet mask"
@@ -334,36 +350,32 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                                      "connected interfaces on device while \"Device "
                                                                      "configuration\" (SYSTEM COMMISSIONING/Setup)"));
 
-   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColUpdate, Qt::Horizontal,
-                                                                  C_GtGetText::h_GetText("Update"),
+   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_COL_UPDATE, Qt::Horizontal,
+                                                                  C_GtGetText::h_GetText("Usable for Update"),
                                                                   C_GtGetText::h_GetText(
-                                                                     "Here the interface is authorized via which the "
-                                                                     "openSYDE PC tool may update the system. "
-                                                                     "\nUse case: SYSTEM COMMISSIONING - System Update. "
+                                                                     "If enabled, the interface is usable for System Update. "
+                                                                     "(SYSTEM COMMISSIONING - Update)"
                                                                      "\n\nThis property is just "
                                                                      "a configuration for openSYDE PC tool, "
                                                                      "it is NOT configured on device."));
 
-   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColDiagnostic, Qt::Horizontal,
-                                                                  C_GtGetText::h_GetText("Diagnostic"),
+   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_COL_DIAGNOSTIC, Qt::Horizontal,
+                                                                  C_GtGetText::h_GetText("Usable for Dashboard"),
                                                                   C_GtGetText::h_GetText(
-                                                                     "Here the interface is authorized, which the "
-                                                                     "openSYDE PC tool can use for diagnostic requests. "
-                                                                     "\nUse case: SYSTEM COMMISSIONING - Dashboards. "
-                                                                     "\n\nThis property is just a "
-                                                                     "configuration for openSYDE PC tool, "
+                                                                     "If enabled, the interface is usable for Dashboard. "
+                                                                     "(SYSTEM COMMISSIONING - Dashboards)"
+                                                                     "\n\nThis property is just "
+                                                                     "a configuration for openSYDE PC tool, "
                                                                      "it is NOT configured on device."));
 
-   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColRouting, Qt::Horizontal,
-                                                                  C_GtGetText::h_GetText("Routing"),
+   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_COL_ROUTING, Qt::Horizontal,
+                                                                  C_GtGetText::h_GetText("Usable for Routing"),
                                                                   C_GtGetText::h_GetText(
-                                                                     "Here the interface is authorized, which the "
-                                                                     "openSYDE PC tool can use for diagnostic protocol "
-                                                                     "routing."
+                                                                     "If enabled, the interface is usable for Routing. "
                                                                      "\nAttention: This property is intended as additive "
-                                                                     "feature in addition to \"Update\" and \"Diagnostic\" "
-                                                                     "\nUse cases: SYSTEM COMMISSIONING - System Update "
-                                                                     "and Dashboards.\n\nThis "
+                                                                     "feature in addition to \"System Update\" and \"Dashboards\" "
+                                                                     "\nUse cases: SYSTEM COMMISSIONING - Update "
+                                                                     "SYSTEM COMMISSIONING - Dashboards.\n\nThis "
                                                                      "property is just a configuration for openSYDE tool, "
                                                                      "it is NOT configured on device."));
 }
@@ -412,7 +424,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
    disconnect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellChanged, this,
               &C_SdNdeNodePropertiesWidget::m_RegisterChange);
    disconnect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellChanged, this,
-              &C_SdNdeNodePropertiesWidget::m_CheckComIfId);
+              &C_SdNdeNodePropertiesWidget::m_CheckComInterface);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_ComboBoxProtocol,
               static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged), this,
@@ -581,13 +593,13 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             {
                bool q_InterfaceIsConnected = false;
 
-               const sintn sn_ColInterface = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eINTERFACE);
-               const sintn sn_ColConnection = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eCONNECTION);
-               const sintn sn_ColNodeId = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID);
-               const sintn sn_ColIpAddress = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
-               const sintn sn_ColUpdate = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eUPDATE);
-               const sintn sn_ColRouting = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eROUTING);
-               const sintn sn_ColDiagnostic = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
+               const sintn sn_COL_INTERFACE = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eINTERFACE);
+               const sintn sn_COL_CONNECTION = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eCONNECTION);
+               const sintn sn_COL_NODE_ID = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eNODEID);
+               const sintn sn_COL_IP_ADDRESS = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
+               const sintn sn_COL_UPDATE = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eUPDATE);
+               const sintn sn_COL_ROUTING = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eROUTING);
+               const sintn sn_COL_DIAGNOSTIC = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
                bool q_IsUpdateAvailable;
                bool q_IsRoutingAvailable;
                bool q_IsDiagnosisAvailable;
@@ -613,10 +625,10 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                /**********************************************************************************************************/
                //INTERFACE
                this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(
-                  u8_ComIfCnt, sn_ColInterface, new C_OgeChxTristateTransparentError(this));
+                  u8_ComIfCnt, sn_COL_INTERFACE, new C_OgeChxTristateTransparentError(this));
                //disable
                this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
-                                                                     sn_ColInterface)->setEnabled(false);
+                                                                     sn_COL_INTERFACE)->setEnabled(false);
 
                //set name
                if (u8_ComIfCnt < pc_DevDef->u8_NumCanBusses)
@@ -638,11 +650,11 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                dynamic_cast<C_OgeChxTristateTransparentError *> (this->mpc_Ui->pc_TableWidgetComIfSettings->
                                                                  cellWidget(
                                                                     u8_ComIfCnt,
-                                                                    sn_ColInterface))->setText(c_ComIfName);
+                                                                    sn_COL_INTERFACE))->setText(c_ComIfName);
 
                /**********************************************************************************************************/
                //CONNECTED TO
-               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColConnection,
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_COL_CONNECTION,
                                                                         new C_OgeLabNodePropComIfTable(this));
 
                //set bus name
@@ -668,40 +680,40 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                }
 
                dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
-                                          u8_ComIfCnt, sn_ColConnection))->setText(c_BusName);
+                                          u8_ComIfCnt, sn_COL_CONNECTION))->setText(c_BusName);
 
                if (c_BusName != "-")
                {
-                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColConnection)->setEnabled(
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_COL_CONNECTION)->setEnabled(
                      true);
                   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                         ->cellWidget(u8_ComIfCnt, sn_ColConnection),
+                                                         ->cellWidget(u8_ComIfCnt, sn_COL_CONNECTION),
                                                          "COMIF_TableCell_Hyperlink", true);
                }
                //if the node isn't connected to a bus, the link to bus definition shall not work
                else
                {
-                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColConnection)->setEnabled(
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_COL_CONNECTION)->setEnabled(
                      false);
                }
 
                /**********************************************************************************************************/
                //NODE ID
-               this->mpc_Ui->pc_TableWidgetComIfSettings->setItem(u8_ComIfCnt, sn_ColNodeId,
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setItem(u8_ComIfCnt, sn_COL_NODE_ID,
                                                                   new QTableWidgetItem(""));
                //align center
-               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_ColNodeId)
+               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_COL_NODE_ID)
                ->setTextAlignment(static_cast<sintn> (Qt::AlignCenter));
                //set node value
-               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_ColNodeId)->
+               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_COL_NODE_ID)->
                setText(QString::number(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].u8_NodeID));
 
-               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_ColNodeId)->setFlags(
+               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u8_ComIfCnt, sn_COL_NODE_ID)->setFlags(
                   Qt::ItemIsEnabled | Qt::ItemIsEditable);
 
                /**********************************************************************************************************/
                //IP Address
-               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColIpAddress,
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_COL_IP_ADDRESS,
                                                                         new C_OgeLabNodePropComIfTable(this));
 
                //set IP Address
@@ -725,26 +737,26 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                }
 
                dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
-                                          u8_ComIfCnt, sn_ColIpAddress))->setText(c_IpAddressString);
+                                          u8_ComIfCnt, sn_COL_IP_ADDRESS))->setText(c_IpAddressString);
 
                dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
-                                          u8_ComIfCnt, sn_ColIpAddress))->setAlignment(Qt::AlignCenter);
+                                          u8_ComIfCnt, sn_COL_IP_ADDRESS))->setAlignment(Qt::AlignCenter);
 
                //apply enabled/disabled style
                //if CAN, disable per default
                if (u8_ComIfCnt < pc_DevDef->u8_NumCanBusses)
                {
                   this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
-                                                                        sn_ColIpAddress)->setEnabled(false);
+                                                                        sn_COL_IP_ADDRESS)->setEnabled(false);
                }
                else
                {
                   this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
-                                                                        sn_ColIpAddress)->setEnabled(true);
+                                                                        sn_COL_IP_ADDRESS)->setEnabled(true);
                   //apply special style
                   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TableWidgetComIfSettings
                                                          ->cellWidget(u8_ComIfCnt,
-                                                                      sn_ColIpAddress), "COMIF_TableCell_Hyperlink",
+                                                                      sn_COL_IP_ADDRESS), "COMIF_TableCell_Hyperlink",
                                                          true);
                }
 
@@ -758,7 +770,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
 
                /**********************************************************************************************************/
                // UPDATE
-               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColUpdate, new C_OgeChxTristate(
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_COL_UPDATE, new C_OgeChxTristate(
                                                                            this));
                //set node value
                if (q_IsUpdateAvailable == true)
@@ -770,16 +782,16 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                      if ((q_StwFlashloaderActive == true) && (u8_ComIfCnt >= (pc_DevDef->u8_NumCanBusses)))
                      {
                         this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
-                                                                              sn_ColUpdate)->setEnabled(false);
+                                                                              sn_COL_UPDATE)->setEnabled(false);
 
                         dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                          ->cellWidget(u8_ComIfCnt, sn_ColUpdate))
+                                                          ->cellWidget(u8_ComIfCnt, sn_COL_UPDATE))
                         ->setChecked(false);
                      }
                      else
                      {
                         dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                          ->cellWidget(u8_ComIfCnt, sn_ColUpdate))
+                                                          ->cellWidget(u8_ComIfCnt, sn_COL_UPDATE))
                         ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsUpdateEnabled);
                      }
                   }
@@ -792,63 +804,63 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                {
                   //disable
                   this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt,
-                                                                        sn_ColUpdate)->setEnabled(false);
+                                                                        sn_COL_UPDATE)->setEnabled(false);
                }
                //connect to RegisterChange
                connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                          ->cellWidget(u8_ComIfCnt,
-                                                                      sn_ColUpdate)), &QCheckBox::stateChanged, this,
+                                                                      sn_COL_UPDATE)), &QCheckBox::stateChanged, this,
                        &C_SdNdeNodePropertiesWidget::m_RegisterChange);
 
                /**********************************************************************************************************/
                // ROUTING
                this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(
-                  u8_ComIfCnt, sn_ColRouting, new C_OgeChxTristate(
+                  u8_ComIfCnt, sn_COL_ROUTING, new C_OgeChxTristate(
                      this));
 
                if (q_IsRoutingAvailable == true)
                {
                   //set node value
                   dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                    ->cellWidget(u8_ComIfCnt, sn_ColRouting))
+                                                    ->cellWidget(u8_ComIfCnt, sn_COL_ROUTING))
                   ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsRoutingEnabled);
                }
                else
                {
                   //disable
-                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColRouting)->
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_COL_ROUTING)->
                   setEnabled(false);
                }
 
                //connect to RegisterChange
                connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                          ->cellWidget(u8_ComIfCnt,
-                                                                      sn_ColRouting)), &QCheckBox::stateChanged, this,
+                                                                      sn_COL_ROUTING)), &QCheckBox::stateChanged, this,
                        &C_SdNdeNodePropertiesWidget::m_RegisterChange);
 
                /**********************************************************************************************************/
                // DIAGNOSTIC
-               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_ColDiagnostic, new C_OgeChxTristate(
+               this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u8_ComIfCnt, sn_COL_DIAGNOSTIC, new C_OgeChxTristate(
                                                                            this));
 
                if (q_IsDiagnosisAvailable == true)
                {
                   //set node value
                   dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                    ->cellWidget(u8_ComIfCnt, sn_ColDiagnostic))
+                                                    ->cellWidget(u8_ComIfCnt, sn_COL_DIAGNOSTIC))
                   ->setChecked(pc_Node->c_Properties.c_ComInterfaces[u8_ComIfCnt].q_IsDiagnosisEnabled);
                }
                else
                {
                   //disable
-                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_ColDiagnostic)->
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u8_ComIfCnt, sn_COL_DIAGNOSTIC)->
                   setEnabled(false);
                }
 
                //connect to RegisterChange
                connect(dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
                                                          ->cellWidget(u8_ComIfCnt,
-                                                                      sn_ColDiagnostic)), &QCheckBox::stateChanged, this,
+                                                                      sn_COL_DIAGNOSTIC)), &QCheckBox::stateChanged, this,
                        &C_SdNdeNodePropertiesWidget::m_RegisterChange);
 
                //hide rows if they are not connected (necessary for sub nodes)
@@ -885,7 +897,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
    }
 
    // Initial check of the data. Row is irrelevant because all rows will be checked of the column.
-   this->m_CheckComIfId(0U, static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID));
+   this->m_CheckComInterface(0U, static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID));
 
    //connects for RegisterChange
    connect(this->mpc_Ui->pc_LineEditNodeName, &QLineEdit::editingFinished, this,
@@ -895,7 +907,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
    connect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellChanged, this,
            &C_SdNdeNodePropertiesWidget::m_RegisterChange);
    connect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellChanged, this,
-           &C_SdNdeNodePropertiesWidget::m_CheckComIfId);
+           &C_SdNdeNodePropertiesWidget::m_CheckComInterface);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxProtocol,
            static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged), this,
@@ -933,10 +945,10 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
             std::vector<bool> c_UpdateFlags;
             std::vector<bool> c_RoutingFlags;
             std::vector<bool> c_DiagnosisFlags;
-            const sintn sn_ColNodeId = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID);
-            const sintn sn_ColUpdate = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eUPDATE);
-            const sintn sn_ColRouting = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eROUTING);
-            const sintn sn_ColDiagnostic = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
+            const sintn sn_COL_NODE_ID = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eNODEID);
+            const sintn sn_COL_UPDATE = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eUPDATE);
+            const sintn sn_COL_ROUTING = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eROUTING);
+            const sintn sn_COL_DIAGNOSTIC = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eDIAGNOSTIC);
 
             //save data
 
@@ -1007,7 +1019,8 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
                   rc_CurInterface.e_InterfaceType);
                //node id
                c_NodeIds.push_back(static_cast<uint8> ((this->mpc_Ui->pc_TableWidgetComIfSettings->item(u16_ComIfCnt,
-                                                                                                        sn_ColNodeId)->
+                                                                                                        sn_COL_NODE_ID)
+                                                        ->
                                                         text()
                                                         .toInt())));
 
@@ -1016,11 +1029,11 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
                {
                   //set state only if the cell is enabled (connected + available)
                   if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
-                                                                            sn_ColUpdate)->isEnabled() == true)
+                                                                            sn_COL_UPDATE)->isEnabled() == true)
                   {
                      q_NewValue =
                         dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                          ->cellWidget(u16_ComIfCnt, sn_ColUpdate))->isChecked();
+                                                          ->cellWidget(u16_ComIfCnt, sn_COL_UPDATE))->isChecked();
                   }
                   else
                   {
@@ -1038,11 +1051,11 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
                {
                   //set state only if the cell is enabled (connected + available)
                   if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
-                                                                            sn_ColRouting)->isEnabled() == true)
+                                                                            sn_COL_ROUTING)->isEnabled() == true)
                   {
                      q_NewValue =
                         dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                          ->cellWidget(u16_ComIfCnt, sn_ColRouting))->isChecked();
+                                                          ->cellWidget(u16_ComIfCnt, sn_COL_ROUTING))->isChecked();
                   }
                   else
                   {
@@ -1060,11 +1073,11 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
                {
                   //set state only if the cell is enabled (connected + available)
                   if (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
-                                                                            sn_ColDiagnostic)->isEnabled() == true)
+                                                                            sn_COL_DIAGNOSTIC)->isEnabled() == true)
                   {
                      q_NewValue =
                         dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                          ->cellWidget(u16_ComIfCnt, sn_ColDiagnostic))->isChecked();
+                                                          ->cellWidget(u16_ComIfCnt, sn_COL_DIAGNOSTIC))->isChecked();
                   }
                   else
                   {
@@ -1122,34 +1135,34 @@ void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
               ++u16_ComIfCnt)
          {
             const C_OSCNodeComInterfaceSettings & rc_CurInterface = pc_Node->c_Properties.c_ComInterfaces[u16_ComIfCnt];
-            const sintn sn_ColRouting = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eROUTING);
-            const sintn sn_ColUpdate = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eUPDATE);
+            const sintn sn_COL_ROUTING = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eROUTING);
+            const sintn sn_COL_UPDATE = static_cast<sintn>(C_SdNdeComIfSettingsTableDelegate::eUPDATE);
             const bool q_IsRoutingAvailable = pc_Node->IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
 
             C_OgeChxTristate * const pc_Tristate =
                dynamic_cast<C_OgeChxTristate *>(this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
-                                                                                                      sn_ColRouting));
+                                                                                                      sn_COL_ROUTING));
             C_OgeChxTristate * const pc_TristateUpdate =
                dynamic_cast<C_OgeChxTristate *>(this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
-                                                                                                      sn_ColUpdate));
+                                                                                                      sn_COL_UPDATE));
 
             if (pc_Tristate != NULL)
             {
-               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, sn_ColRouting)->setEnabled(
+               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, sn_COL_ROUTING)->setEnabled(
                   q_IsRoutingAvailable);
 
                // if KEFEX is set update shall be disabled for eth interfaces
                if ((rc_CurInterface.e_InterfaceType == C_OSCSystemBus::eETHERNET) &&
                    (c_NodeProp.e_FlashLoader == C_OSCNodeProperties::eFL_STW))
                {
-                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, sn_ColUpdate)->setEnabled(false);
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, sn_COL_UPDATE)->setEnabled(false);
                   pc_Tristate->setChecked(false);
                   pc_TristateUpdate->setChecked(false);
                }
                // if protocol switches to opensyde enable and check update for eth interfaces again
                else
                {
-                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, sn_ColUpdate)->setEnabled(true);
+                  this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, sn_COL_UPDATE)->setEnabled(true);
                   pc_TristateUpdate->setChecked(true);
                }
 
@@ -1323,94 +1336,240 @@ void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
    \param[in]  ou32_Column    Column
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const uint32 ou32_Column) const
+void C_SdNdeNodePropertiesWidget::m_CheckComInterface(const uint32 ou32_Row, const uint32 ou32_Column) const
 {
-   const sintn sn_ColNodeId = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID);
+   const sintn sn_COL_NODE_ID = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID);
+   const sintn sn_COL_IP = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
 
    Q_UNUSED(ou32_Row)
 
-   //node id change?
-   if (ou32_Column == sn_ColNodeId)
+   //node id or ip change?
+   if ((ou32_Column == sn_COL_NODE_ID) || (ou32_Column == sn_COL_IP))
    {
       sintn sn_RowCounter; // Equals com interface number.
-      // Check all node ids. It could be possible that a node is connected at least two times with the same bus
-      // so the node ids of the same node shall not be identical
+
+      bool q_IdValid;
+      bool q_IpValid;
 
       for (sn_RowCounter = 0U; sn_RowCounter < this->mpc_Ui->pc_TableWidgetComIfSettings->model()->rowCount();
            ++sn_RowCounter)
       {
+         //get node id from cell
          const uint8 u8_NodeId =
             static_cast<uint8> (this->mpc_Ui->pc_TableWidgetComIfSettings->item(sn_RowCounter,
-                                                                                sn_ColNodeId)->text().toInt());
+                                                                                sn_COL_NODE_ID)->text().toInt());
 
-         //check if node id is valid
-         const bool q_IdIsValid =
-            C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckInterfaceIsAvailable(
-               this->mu32_NodeIndex,
-               sn_RowCounter,
-               u8_NodeId);
-
-         if (q_IdIsValid == false)
+         //get ip address from cell
+         const QString c_Ip =
+            dynamic_cast<QLabel *>(this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(sn_RowCounter,
+                                                                                         sn_COL_IP))
+            ->text();
+         //convert string into vector for core logic
+         const QStringList c_IpBytesTmp = c_Ip.split('.');
+         std::vector<sint32> c_IpBytes;
+         for (sintn sn_It = 0; sn_It < c_IpBytesTmp.size(); ++sn_It)
          {
-            //invalid
-            this->mpc_Ui->pc_TableWidgetComIfSettings->model()->setData(
-               this->mpc_Ui->pc_TableWidgetComIfSettings->model()->index(sn_RowCounter, sn_ColNodeId),
-               mc_STYLE_GUIDE_COLOR_24, static_cast<sintn> (Qt::ForegroundRole));
-         }
-         else
-         {
-            //valid
-            this->mpc_Ui->pc_TableWidgetComIfSettings->model()->setData(
-               this->mpc_Ui->pc_TableWidgetComIfSettings->model()->index(sn_RowCounter, sn_ColNodeId),
-               mc_STYLE_GUIDE_COLOR_6, static_cast<sintn> (Qt::ForegroundRole));
+            c_IpBytes.push_back(static_cast<sint32>(c_IpBytesTmp[sn_It].toInt()));
          }
 
-         //handle invalid icon
-         dynamic_cast<QCheckBox *> (this->mpc_Ui->pc_TableWidgetComIfSettings
-                                    ->cellWidget(sn_RowCounter,
-                                                 static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eINTERFACE)))
-         ->setChecked(!q_IdIsValid);
-         if (q_IdIsValid == true)
+         //check node id and ip address of current row for conflicts
+         this->m_GetInterfaceStatus(this->mu32_NodeIndex, sn_RowCounter, u8_NodeId, c_IpBytes, q_IdValid, q_IpValid);
+
+         //handle coloring of cell, when properties are conflicting
+         this->m_HandlePropertyConflict(sn_RowCounter, sn_COL_NODE_ID, sn_COL_IP, q_IdValid, q_IpValid);
+
+         //handle error icon and tool-tips with already used properties
+         this->m_HandleErrorFeedback(sn_RowCounter, q_IdValid, q_IpValid);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Wrapper for core logic. Checks for id and ip collision on given interface.
+
+   \param[in]    ou32_NodeIndex        Node index
+   \param[in]    osn_InterfaceIndex    Interface index
+   \param[in]    ou8_NodeId            Node id to investigate
+   \param[in]    orc_Ip                Ip address to investigate
+   \param[out]   orq_IdValid           Storage for result of node id check
+   \param[out]   orq_IpValid           Storage for result of ip address check
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodePropertiesWidget::m_GetInterfaceStatus(const uint32 ou32_NodeIndex, const sintn osn_InterfaceIndex,
+                                                       const uint8 ou8_NodeId, const std::vector<sint32> & orc_Ip,
+                                                       bool & orq_IdValid, bool & orq_IpValid) const
+{
+   //check if node id is valid
+   orq_IdValid =
+      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckInterfaceIsAvailable(
+         ou32_NodeIndex,
+         osn_InterfaceIndex,
+         ou8_NodeId);
+
+   //check if ip is valid
+   orq_IpValid =
+      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckIpAddressIsValid(
+         ou32_NodeIndex,
+         osn_InterfaceIndex, orc_Ip);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function marks specified cell content red if a property is invalid (id/ip collision)
+
+   \param[in]       sn_Row       Table row
+   \param[in]      sn_ColumnId   Table column for node id
+   \param[in]      sn_ColumnIp   Table column for ip address
+   \param[in]      oq_IdValid    Status of node id. (false: conflict!)
+   \param[in]      oq_IpValid    Status of ip address. (false: conflict!)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodePropertiesWidget::m_HandlePropertyConflict(const sintn osn_Row, const sintn osn_ColumnId,
+                                                           const sintn osn_ColumnIp, const bool oq_IdValid,
+                                                           const bool oq_IpValid) const
+{
+   if (oq_IdValid == false)
+   {
+      //invalid
+      this->mpc_Ui->pc_TableWidgetComIfSettings->model()->setData(
+         this->mpc_Ui->pc_TableWidgetComIfSettings->model()->index(osn_Row, osn_ColumnId),
+         mc_STYLE_GUIDE_COLOR_24, static_cast<sintn> (Qt::ForegroundRole));
+   }
+   else
+   {
+      //valid
+      this->mpc_Ui->pc_TableWidgetComIfSettings->model()->setData(
+         this->mpc_Ui->pc_TableWidgetComIfSettings->model()->index(osn_Row, osn_ColumnId),
+         mc_STYLE_GUIDE_COLOR_6, static_cast<sintn> (Qt::ForegroundRole));
+   }
+
+   if (oq_IpValid == false)
+   {
+      //invalid
+      this->mpc_Ui->pc_TableWidgetComIfSettings->model()->setData(
+         this->mpc_Ui->pc_TableWidgetComIfSettings->model()->index(osn_Row, osn_ColumnIp),
+         mc_STYLE_GUIDE_COLOR_24, static_cast<sintn> (Qt::ForegroundRole));
+   }
+   else
+   {
+      //valid
+      this->mpc_Ui->pc_TableWidgetComIfSettings->model()->setData(
+         this->mpc_Ui->pc_TableWidgetComIfSettings->model()->index(osn_Row, osn_ColumnIp),
+         mc_STYLE_GUIDE_COLOR_6, static_cast<sintn> (Qt::ForegroundRole));
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handles different error cases, sets tool-tip and error icon and prepares content for tool-tip
+
+   \param[in]   osn_InterfaceIndex     Interface index
+   \param[in]   oq_IdValid             True: Conflicting ID
+   \param[in]   oq_IpValid             True: Conflicting IP
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodePropertiesWidget::m_HandleErrorFeedback(const sintn osn_InterfaceIndex, const bool oq_IdValid,
+                                                        const bool oq_IpValid) const
+{
+   bool q_ShowIcon = false;
+
+   if ((oq_IdValid == true) && (oq_IpValid == true))
+   {
+      this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipAt(osn_InterfaceIndex,
+                                                              static_cast<uint32> (
+                                                                 C_SdNdeComIfSettingsTableDelegate
+                                                                 ::eINTERFACE), "", "",
+                                                              C_NagToolTip::eDEFAULT);
+   }
+   else
+   {
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+      if (pc_Node != NULL)
+      {
+         if (osn_InterfaceIndex < static_cast<sintn>(pc_Node->c_Properties.c_ComInterfaces.size()))
          {
-            this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipAt(sn_RowCounter,
-                                                                    static_cast<uint32> (
-                                                                       C_SdNdeComIfSettingsTableDelegate
-                                                                       ::eINTERFACE), "", "",
-                                                                    C_NagToolTip::eDEFAULT);
-         }
-         else
-         {
-            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-            if (pc_Node != NULL)
+            const C_OSCNodeComInterfaceSettings & rc_Interface =
+               pc_Node->c_Properties.c_ComInterfaces[osn_InterfaceIndex];
+            if (rc_Interface.GetBusConnected() == true)
             {
-               if (sn_RowCounter < static_cast<sintn>(pc_Node->c_Properties.c_ComInterfaces.size()))
+               const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+                  rc_Interface.u32_BusIndex);
+               if (pc_Bus != NULL)
                {
-                  const C_OSCNodeComInterfaceSettings & rc_Interface =
-                     pc_Node->c_Properties.c_ComInterfaces[sn_RowCounter];
-                  if (rc_Interface.GetBusConnected() == true)
+                  QString c_TooltipContent;
+
+                  //only ids are conflicting
+                  if ((oq_IdValid == false) && (oq_IpValid == true))
                   {
-                     const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
-                        rc_Interface.u32_BusIndex);
-                     if (pc_Bus != NULL)
-                     {
-                        const std::vector<uint32> c_UsedIds = C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(
-                           rc_Interface.u32_BusIndex, this->mu32_NodeIndex, static_cast<sint32>(sn_RowCounter));
-                        const QString c_Heading = C_GtGetText::h_GetText("Interface: Node ID invalid");
-                        const QString c_Content = C_SdUtil::h_InitUsedIdsString(c_UsedIds,
-                                                                                pc_Bus->c_Name.c_str(),
-                                                                                C_GtGetText::h_GetText("bus"));
-                        this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipAt(sn_RowCounter,
-                                                                                static_cast<uint32> (
-                                                                                   C_SdNdeComIfSettingsTableDelegate
-                                                                                   ::eINTERFACE), c_Heading,
-                                                                                c_Content, C_NagToolTip::eERROR);
-                     }
+                     q_ShowIcon = true;
+                     const std::vector<uint32> c_UsedIds = C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(
+                        rc_Interface.u32_BusIndex, this->mu32_NodeIndex, static_cast<sint32>(osn_InterfaceIndex));
+                     const QString c_Heading = C_GtGetText::h_GetText("Interface: Node ID invalid");
+                     c_TooltipContent = C_SdUtil::h_InitUsedIdsString(c_UsedIds,
+                                                                      pc_Bus->c_Name.c_str(),
+                                                                      C_GtGetText::h_GetText("bus"));
+                     this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipAt(osn_InterfaceIndex,
+                                                                             static_cast<uint32> (
+                                                                                C_SdNdeComIfSettingsTableDelegate
+                                                                                ::eINTERFACE), c_Heading,
+                                                                             c_TooltipContent, C_NagToolTip::eERROR);
+                  }
+                  //only ips are conflicting
+                  else if ((oq_IpValid == false) && (oq_IdValid == true))
+                  {
+                     q_ShowIcon = true;
+                     const std::vector<std::vector<uint8> > c_Ips = C_SdUtil::h_GetAllUsedIpAddressesForBus(
+                        rc_Interface.u32_BusIndex, this->mu32_NodeIndex,
+                        static_cast<sint32>(osn_InterfaceIndex));
+                     const QString c_Heading = C_GtGetText::h_GetText("Interface: IP Address invalid");
+                     c_TooltipContent = C_SdUtil::h_InitUsedIpsString(c_Ips,
+                                                                      pc_Bus->c_Name.c_str(),
+                                                                      C_GtGetText::h_GetText("bus"));
+
+                     this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipAt(osn_InterfaceIndex,
+                                                                             static_cast<uint32> (
+                                                                                C_SdNdeComIfSettingsTableDelegate
+                                                                                ::eINTERFACE), c_Heading,
+                                                                             c_TooltipContent, C_NagToolTip::eERROR);
+                  }
+                  //both id and ip are conflicting
+                  else if ((oq_IdValid == false) && (oq_IpValid == false))
+                  {
+                     q_ShowIcon = true;
+                     const std::vector<uint32> c_UsedIds = C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(
+                        rc_Interface.u32_BusIndex, this->mu32_NodeIndex, static_cast<sint32>(osn_InterfaceIndex));
+                     const std::vector<std::vector<uint8> > c_Ips = C_SdUtil::h_GetAllUsedIpAddressesForBus(
+                        rc_Interface.u32_BusIndex, this->mu32_NodeIndex, static_cast<sint32>(osn_InterfaceIndex));
+                     const QString c_Heading = C_GtGetText::h_GetText("Interface: Property invalid");
+                     c_TooltipContent = C_SdUtil::h_InitUsedIdsString(c_UsedIds,
+                                                                      pc_Bus->c_Name.c_str(),
+                                                                      C_GtGetText::h_GetText("bus"));
+                     c_TooltipContent += "\n";
+                     c_TooltipContent += C_SdUtil::h_InitUsedIpsString(c_Ips,
+                                                                       pc_Bus->c_Name.c_str(),
+                                                                       C_GtGetText::h_GetText("bus"));
+
+                     this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipAt(osn_InterfaceIndex,
+                                                                             static_cast<uint32> (
+                                                                                C_SdNdeComIfSettingsTableDelegate
+                                                                                ::eINTERFACE), c_Heading,
+                                                                             c_TooltipContent, C_NagToolTip::eERROR);
+                  }
+                  else
+                  {
+                     //nothing to do here
                   }
                }
             }
          }
       }
    }
+   //handle invalid icon
+   dynamic_cast<QCheckBox *> (this->mpc_Ui->pc_TableWidgetComIfSettings
+                              ->cellWidget(osn_InterfaceIndex,
+                                           static_cast<sintn>
+                                           (C_SdNdeComIfSettingsTableDelegate::
+                                            eINTERFACE)))
+   ->setChecked(q_ShowIcon);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1426,18 +1585,18 @@ void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const ui
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_HandleCellClick(const uint32 ou32_Row, const uint32 ou32_Column)
 {
-   const sintn sn_ColIpAddress = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
-   const sintn sn_ColBusBitrate = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eCONNECTION);
+   const sintn sn_COL_IP_ADDRESS = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
+   const sintn sn_COL_BUS_BITRATE = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eCONNECTION);
    const bool q_EnabledCellIp = this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(ou32_Row,
-                                                                                      sn_ColIpAddress)->isEnabled();
+                                                                                      sn_COL_IP_ADDRESS)->isEnabled();
    const bool q_EnabledCellBus = this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(ou32_Row,
-                                                                                       sn_ColBusBitrate)->isEnabled();
+                                                                                       sn_COL_BUS_BITRATE)->isEnabled();
 
-   if ((ou32_Column == sn_ColIpAddress) && (q_EnabledCellIp == true))
+   if ((ou32_Column == sn_COL_IP_ADDRESS) && (q_EnabledCellIp == true))
    {
       this->m_IpAddressClick(ou32_Row);
    }
-   else if ((ou32_Column == sn_ColBusBitrate) && (q_EnabledCellBus == true))
+   else if ((ou32_Column == sn_COL_BUS_BITRATE) && (q_EnabledCellBus == true))
    {
       this->m_BusBitrateClick(ou32_Row, ou32_Column);
    }

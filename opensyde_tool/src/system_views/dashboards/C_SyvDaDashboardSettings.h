@@ -45,9 +45,9 @@ private:
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_Parent;
    const stw_types::uint32 mu32_ViewIndex;
-   static const stw_types::sintn mhsn_Min;
-   static const stw_types::sintn mhsn_Max;
-   static const stw_types::sintn mhsn_MinDistanceBetween;
+   static const stw_types::sintn mhsn_MIN;
+   static const stw_types::sintn mhsn_MAX;
+   static const stw_types::sintn mhsn_MIN_DISTANCE_BETWEEN;
 
    void m_Load(void) const;
    void m_OkClicked(void);

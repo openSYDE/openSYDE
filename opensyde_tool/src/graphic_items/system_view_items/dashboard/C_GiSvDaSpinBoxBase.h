@@ -41,6 +41,7 @@ public:
    virtual void DeleteData(void) override;
 
    virtual void ConnectionActiveChanged(const bool oq_Active) override;
+   virtual void EditModeActiveChanged(const bool oq_Active) override;
    virtual void SendCurrentValue(void) override;
    virtual bool CallProperties(void) override;
 

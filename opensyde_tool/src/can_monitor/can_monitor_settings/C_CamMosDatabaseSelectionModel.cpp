@@ -27,8 +27,8 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_CamMosDatabaseSelectionModel::mhc_IconDatabase = "://images/IconDatabaseBlue.svg";
-const QString C_CamMosDatabaseSelectionModel::mhc_IconMessage = "://images/IconMessage.svg";
+const QString C_CamMosDatabaseSelectionModel::mhc_ICON_DATABASE = "://images/IconDatabaseBlue.svg";
+const QString C_CamMosDatabaseSelectionModel::mhc_ICON_MESSAGE = "://images/IconMessage.svg";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -313,7 +313,7 @@ C_TblTreItem * C_CamMosDatabaseSelectionModel::m_CreateAndFillDatabaseNode(const
    const QFileInfo c_FileInfo(orc_File);
 
    //Static
-   pc_Retval->c_Icon = QIcon(C_CamMosDatabaseSelectionModel::mhc_IconDatabase);
+   pc_Retval->c_Icon = QIcon(C_CamMosDatabaseSelectionModel::mhc_ICON_DATABASE);
    pc_Retval->c_Name = c_FileInfo.completeBaseName();
    pc_Retval->c_ToolTipHeading = C_GtGetText::h_GetText("Database");
    pc_Retval->c_ToolTipContent = orc_File;
@@ -345,7 +345,7 @@ void C_CamMosDatabaseSelectionModel::m_CreateAndFillMessageNode(const C_OSCCanMe
    this->mc_MessageMap.insert(pc_MessageItem->c_Name, orc_Message.c_Name.c_str());
    pc_MessageItem->c_ToolTipHeading = orc_Message.c_Name.c_str();
    pc_MessageItem->c_ToolTipContent = C_SdTooltipUtil::h_GetToolTipContentMessage(orc_Message);
-   pc_MessageItem->c_Icon = QIcon(C_CamMosDatabaseSelectionModel::mhc_IconMessage);
+   pc_MessageItem->c_Icon = QIcon(C_CamMosDatabaseSelectionModel::mhc_ICON_MESSAGE);
    opc_ParentItem->AddChild(pc_MessageItem);
 }
 

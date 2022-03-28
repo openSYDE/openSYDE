@@ -282,14 +282,14 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
       //draw "multi node indicator"
       if (this->mu32_SubNodesCount > 0)
       {
-         const float64 f64_LeftMargin = 15.0;
-         const float64 f64_RightMargin = 20.0;
+         const float64 f64_LEFT_MARGIN = 15.0;
+         const float64 f64_RIGHT_MARGIN = 20.0;
          const float64 f64_TopMargin = static_cast<float64>(c_InsideRect.top() + (c_InsideRect.height() * 0.85));
          const float64 f64_ButtomMargin = static_cast<float64>(c_InsideRect.height() - (c_InsideRect.height() * 0.94));
-         const float64 f64_FreeSpaceBetween = 5.0;
+         const float64 f64_FREE_SPACE_BETWEEN = 5.0;
          const float64 f64_SpaceEachNode =
-            static_cast<float64>(((c_InsideRect.width() - (f64_RightMargin - c_InsideRect.left())) -
-                                  (static_cast<float64>(this->mu32_SubNodesCount) * f64_FreeSpaceBetween)) /
+            static_cast<float64>(((c_InsideRect.width() - (f64_RIGHT_MARGIN - c_InsideRect.left())) -
+                                  (static_cast<float64>(this->mu32_SubNodesCount) * f64_FREE_SPACE_BETWEEN)) /
                                  static_cast<float64>(this->mu32_SubNodesCount));
 
          opc_Painter->setPen(Qt::NoPen);
@@ -297,15 +297,15 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
 
          for (uint8 u8_Counter = 0; u8_Counter < this->mu32_SubNodesCount; ++u8_Counter)
          {
-            const float64 f64_X_Left =
-               static_cast<float64>(f64_LeftMargin + (static_cast<float64>(u8_Counter) * f64_FreeSpaceBetween) +
+            const float64 f64_ExLeft =
+               static_cast<float64>(f64_LEFT_MARGIN + (static_cast<float64>(u8_Counter) * f64_FREE_SPACE_BETWEEN) +
                                     (static_cast<float64>(u8_Counter) * f64_SpaceEachNode));
 
-            const float64 f64_X_Right = f64_SpaceEachNode;
+            const float64 f64_ExRight = f64_SpaceEachNode;
 
-            c_MultiNodeIndicatorRect.setRect(f64_X_Left,
+            c_MultiNodeIndicatorRect.setRect(f64_ExLeft,
                                              f64_TopMargin, //const
-                                             f64_X_Right,
+                                             f64_ExRight,
                                              f64_ButtomMargin); //const
 
             opc_Painter->drawRoundedRect(c_MultiNodeIndicatorRect,

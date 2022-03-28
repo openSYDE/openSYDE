@@ -73,9 +73,9 @@ private:
    bool mq_Active;
    bool mq_IgnoreActiveOnExpand;
    stw_types::uint32 mu32_ViewIndex;
-   static const stw_types::sintn mhsn_SizeTop;
-   static const stw_types::sintn mhsn_SizeSub;
-   static const stw_types::sintn mhsn_FixSizeBottom;
+   static const stw_types::sintn mhsn_SIZE_TOP;
+   static const stw_types::sintn mhsn_SIZE_SUB;
+   static const stw_types::sintn mhsn_FIX_SIZE_BOTTOM;
    bool mq_ButtonPressed;
    QMetaObject::Connection mc_Conn;
    const QIcon mc_IconBulletList;

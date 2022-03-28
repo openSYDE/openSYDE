@@ -18,6 +18,7 @@
 #include <vector>
 #include "stwtypes.h"
 #include "C_OSCProtocolDriverOsyTpBase.h"
+#include "C_OSCProtocolSerialNumber.h"
 #include "C_OSCIpDispatcher.h"
 #include "CSCLString.h"
 
@@ -41,8 +42,11 @@ private:
       static const stw_types::uint16 hu16_PAYLOAD_TYPE_DIAGNOSTIC_MESSAGE  = 0x8001U;
       static const stw_types::uint16 hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_REQ = 0xF000U;
       static const stw_types::uint16 hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_RES = 0xF001U;
+      static const stw_types::uint16 hu16_PAYLOAD_TYPE_OSY_GET_DEVICE_INFO_EXT_RES = 0xF009U;
       static const stw_types::uint16 hu16_PAYLOAD_TYPE_SET_IP_ADDRESS_MESSAGE_REQ = 0xF002U;
       static const stw_types::uint16 hu16_PAYLOAD_TYPE_SET_IP_ADDRESS_MESSAGE_RES = 0xF003U;
+      static const stw_types::uint16 hu16_PAYLOAD_TYPE_SET_IP_ADDRESS_MESSAGE_EXT_REQ = 0xF00BU;
+      static const stw_types::uint16 hu16_PAYLOAD_TYPE_SET_IP_ADDRESS_MESSAGE_EXT_RES = 0xF00CU;
       static const stw_types::uint16 hu16_PAYLOAD_TYPE_NET_RESET_MESSAGE_REQ = 0xF004U;
       static const stw_types::uint16 hu16_PAYLOAD_TYPE_REQUEST_PROGRAMMING_REQ = 0xF006U;
       static const stw_types::uint16 hu16_PAYLOAD_TYPE_REQUEST_PROGRAMMING_RES = 0xF007U;
@@ -95,14 +99,30 @@ public:
    class C_BroadcastGetDeviceInfoResults
    {
    public:
-      stw_types::uint8 au8_IpAddress[4];    ///< IP address of device
-      C_OSCProtocolDriverOsyNode c_NodeId;  ///< node ID of device
-      stw_types::uint8 au8_SerialNumber[6]; ///< serial number of device
-      stw_scl::C_SCLString c_DeviceName;    ///< name of device
+      virtual ~C_BroadcastGetDeviceInfoResults(void);
 
-      bool operator ==(const C_BroadcastGetDeviceInfoResults & orc_Cmp) const;
-      bool operator <(const C_BroadcastGetDeviceInfoResults & orc_Cmp) const;
-      void ParseFromArray(const std::vector<stw_types::uint8> & orc_Data, const stw_types::uint8 ou8_DataStartIndex);
+      stw_types::uint8 au8_IpAddress[4];        ///< IP address of device
+      C_OSCProtocolDriverOsyNode c_NodeId;      ///< node ID of device
+      C_OSCProtocolSerialNumber c_SerialNumber; ///< serial number of device
+      stw_scl::C_SCLString c_DeviceName;        ///< name of device
+
+      virtual bool operator ==(const C_BroadcastGetDeviceInfoResults & orc_Cmp) const;
+      virtual bool operator <(const C_BroadcastGetDeviceInfoResults & orc_Cmp) const;
+      virtual void ParseFromArray(const std::vector<stw_types::uint8> & orc_Data,
+                                  const stw_types::uint8 ou8_DataStartIndex);
+   };
+
+   class C_BroadcastGetDeviceInfoExtendedResults :
+      public C_BroadcastGetDeviceInfoResults
+   {
+   public:
+      stw_types::uint8 u8_SubNodeId; ///< ID of sub node in case of multi CPU devices. Default is 0
+      bool q_SecurityActivated;      ///< flag if node has security feature activated
+
+      virtual bool operator ==(const C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const;
+      virtual bool operator <(const C_BroadcastGetDeviceInfoExtendedResults & orc_Cmp) const;
+      virtual void ParseFromArray(const std::vector<stw_types::uint8> & orc_Data,
+                                  const stw_types::uint8 ou8_DataStartIndex);
    };
 
    ///container for results reported by "RequestProgramming" UDP service
@@ -114,7 +134,7 @@ public:
       bool q_RequestAccepted;              ///< true: no problems; false; flag not set
    };
 
-   C_OSCProtocolDriverOsyTpIp(const stw_types::uint16 ou16_MaxServiceQueueSize = 200U);
+   explicit C_OSCProtocolDriverOsyTpIp(const stw_types::uint16 ou16_MaxServiceQueueSize = 200U);
    virtual ~C_OSCProtocolDriverOsyTpIp(void);
 
    virtual stw_types::sint32 Cycle(void);
@@ -128,14 +148,25 @@ public:
    virtual stw_types::sint32 Disconnect(void);
 
    //Tp-specific broadcast services:
-   stw_types::sint32 BroadcastGetDeviceInfo(std::vector<C_BroadcastGetDeviceInfoResults> & orc_DeviceInfos) const;
-   stw_types::sint32 BroadcastSetIpAddress(const stw_types::uint8(&orau8_SerialNumber)[6],
+   stw_types::sint32 BroadcastGetDeviceInfo(std::vector<C_BroadcastGetDeviceInfoResults> & orc_DeviceInfos,
+                                            std::vector<C_BroadcastGetDeviceInfoExtendedResults> & orc_DeviceExtendedInfos)
+   const;
+   stw_types::sint32 BroadcastSetIpAddress(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber,
                                            const stw_types::uint8(&orau8_NewIpAddress)[4],
                                            const stw_types::uint8(&orau8_NetMask)[4],
                                            const stw_types::uint8(&orau8_DefaultGateway)[4],
                                            const C_OSCProtocolDriverOsyNode &orc_NewNodeId,
                                            stw_types::uint8(&orau8_ResponseIp)[4],
                                            stw_types::uint8 * const opu8_ErrorResult = NULL) const;
+   stw_types::sint32 BroadcastSetIpAddressExtended(
+      const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber,
+      const stw_types::uint8(&orau8_NewIpAddress)[4],
+      const stw_types::uint8(&orau8_NetMask)[4],
+      const stw_types::uint8(&orau8_DefaultGateway)[4],
+      const C_OSCProtocolDriverOsyNode &orc_NewNodeId,
+      const stw_types::uint8 ou8_SubNodeId,
+      stw_types::uint8(&orau8_ResponseIp)[4],
+      stw_types::uint8 * const opu8_ErrorResult = NULL) const;
    stw_types::sint32 BroadcastRequestProgramming(std::vector<C_BroadcastRequestProgrammingResults> & orc_Results) const;
    stw_types::sint32 BroadcastNetReset(const stw_types::uint8 ou8_ResetType,
                                        const bool oq_SpecificSerialNumberOnly = false,

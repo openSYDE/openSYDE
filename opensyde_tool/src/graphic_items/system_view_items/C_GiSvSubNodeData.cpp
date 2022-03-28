@@ -48,6 +48,7 @@ using namespace stw_opensyde_gui_logic;
 C_GiSvSubNodeData::C_GiSvSubNodeData(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex) :
    mu32_ViewIndex(ou32_ViewIndex),
    mu32_NodeIndex(ou32_NodeIndex),
+   mq_UpdateInProgress(false),
    mq_UpdateFailed(false),
    mq_UpdateSuccess(false),
    mq_ValidStatus(false),
@@ -55,7 +56,9 @@ C_GiSvSubNodeData::C_GiSvSubNodeData(const uint32 ou32_ViewIndex, const uint32 o
    me_InitialStatus(C_SyvUtil::eI_UNKNOWN),
    me_UpdateStatus(C_SyvUtil::eU_UNKNOWN),
    mu32_FailedApplicationIndex(0),
-   mq_AnyDatablockFound(false)
+   mq_AnyDatablockFound(false),
+   mq_ConnectStatesSet(false),
+   mq_UpdateStatesSet(false)
 {
    this->m_CheckThirdParty();
 }
@@ -101,6 +104,7 @@ void C_GiSvSubNodeData::SetConnected(const bool oq_Active)
       this->mc_HexAppInfoAmbiguous.clear();
       this->mc_ParamFileInfos.clear();
       this->mc_FileInfos.clear();
+      this->mc_PemFileInfo = "";
       if (this->mc_DeviceInfo.pc_STWDevice != NULL)
       {
          delete (mc_DeviceInfo.pc_STWDevice);
@@ -111,6 +115,9 @@ void C_GiSvSubNodeData::SetConnected(const bool oq_Active)
          delete (mc_DeviceInfo.pc_OSYDevice);
          this->mc_DeviceInfo.pc_OSYDevice = NULL;
       }
+
+      this->mq_ConnectStatesSet = false;
+      this->mq_UpdateStatesSet = false;
    }
 
    //Always reset known status information flag
@@ -127,7 +134,9 @@ void C_GiSvSubNodeData::SetConnected(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvSubNodeData::SetUpdating(const bool oq_Active)
 {
-   if ((this->CheckUpdateDisabledState() == true) && (this->me_InitialStatus != C_SyvUtil::eI_NO_RESPONSE))
+   this->mq_UpdateInProgress = oq_Active;
+
+   if ((this->CheckUpdateDisabledState() == true) && (this->me_InitialStatus != C_SyvUtil::eI_ERROR))
    {
       //Update status
       if ((this->me_UpdateStatus == C_SyvUtil::eU_UPDATE_SUCCESS) && (this->CheckAlwaysUpdate() == false))
@@ -208,14 +217,19 @@ void C_GiSvSubNodeData::SetNodeUpdateInProgress(const bool oq_Active, const bool
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Apply no response state
+/*! \brief   Apply error state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvSubNodeData::SetNoResponse(void)
+void C_GiSvSubNodeData::SetErrorState(void)
 {
    //Validate current status
    this->mq_ValidStatus = true;
-   this->me_InitialStatus = C_SyvUtil::eI_NO_RESPONSE;
+   this->me_InitialStatus = C_SyvUtil::eI_ERROR;
+
+   if (this->mq_UpdateInProgress == true)
+   {
+      this->mq_UpdateFailed = true;
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -229,41 +243,43 @@ void C_GiSvSubNodeData::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & orc
    //Validate current status
    this->mq_Discarded = false;
    this->mq_ValidStatus = true;
+
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+   //Clean up current info
+   this->mc_HexFileInfos.clear();
+   this->mc_HexAppInfoAmbiguous.clear();
+   this->mc_ParamFileInfos.clear();
+   this->mc_FileInfos.clear();
+   this->mc_PemFileInfo = "";
+   if (this->mc_DeviceInfo.pc_STWDevice != NULL)
+   {
+      delete (mc_DeviceInfo.pc_STWDevice);
+      this->mc_DeviceInfo.pc_STWDevice = NULL;
+   }
+   if (this->mc_DeviceInfo.pc_OSYDevice != NULL)
+   {
+      delete (mc_DeviceInfo.pc_OSYDevice);
+      this->mc_DeviceInfo.pc_OSYDevice = NULL;
+   }
+
+   //COPY current info
+   if (orc_DeviceApplicationInfos.pc_OSYDevice != NULL)
+   {
+      this->mc_DeviceInfo.pc_OSYDevice =
+         new C_OSCSuSequences::C_OsyDeviceInformation(*orc_DeviceApplicationInfos.pc_OSYDevice);
+   }
+   else if (orc_DeviceApplicationInfos.pc_STWDevice != NULL)
+   {
+      this->mc_DeviceInfo.pc_STWDevice =
+         new C_OSCSuSequences::C_XflDeviceInformation(*orc_DeviceApplicationInfos.pc_STWDevice);
+   }
+   else
+   {
+      //Unexpected
+   }
+
    if (this->CheckUpdateDisabledState() == false)
    {
-      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-      //Clean up current info
-      this->mc_HexFileInfos.clear();
-      this->mc_HexAppInfoAmbiguous.clear();
-      this->mc_ParamFileInfos.clear();
-      this->mc_FileInfos.clear();
-      if (this->mc_DeviceInfo.pc_STWDevice != NULL)
-      {
-         delete (mc_DeviceInfo.pc_STWDevice);
-         this->mc_DeviceInfo.pc_STWDevice = NULL;
-      }
-      if (this->mc_DeviceInfo.pc_OSYDevice != NULL)
-      {
-         delete (mc_DeviceInfo.pc_OSYDevice);
-         this->mc_DeviceInfo.pc_OSYDevice = NULL;
-      }
-
-      //COPY current info
-      if (orc_DeviceApplicationInfos.pc_OSYDevice != NULL)
-      {
-         this->mc_DeviceInfo.pc_OSYDevice =
-            new C_OSCSuSequences::C_OsyDeviceInformation(*orc_DeviceApplicationInfos.pc_OSYDevice);
-      }
-      else if (orc_DeviceApplicationInfos.pc_STWDevice != NULL)
-      {
-         this->mc_DeviceInfo.pc_STWDevice =
-            new C_OSCSuSequences::C_XflDeviceInformation(*orc_DeviceApplicationInfos.pc_STWDevice);
-      }
-      else
-      {
-         //Unexpected
-      }
-
       this->me_InitialStatus = C_SyvUtil::eI_UNKNOWN;
       if (pc_View != NULL)
       {
@@ -291,7 +307,7 @@ void C_GiSvSubNodeData::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & orc
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvSubNodeData::CheckUpdateDisabledState(void) const
 {
-   bool q_Retval = this->IsStwDevice();
+   bool q_Retval = this->HasNodeAnAvailableFlashloader();
 
    if (q_Retval == true)
    {
@@ -361,23 +377,23 @@ bool C_GiSvSubNodeData::CheckUpdateDisabledState(void) const
    }
    else
    {
-      //Not STW device
+      //Not flashloader to communicate with
       q_Retval = true;
    }
    return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if STW device and active
+/*! \brief   Check if device has a flashloader available to communicate with
 
    \return
    True  STW device
    False Third party
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvSubNodeData::IsStwDevice(void) const
+bool C_GiSvSubNodeData::HasNodeAnAvailableFlashloader(void) const
 {
-   const bool q_Retval = C_PuiSdHandler::h_GetInstance()->IsNodeAStwDevice(this->mu32_NodeIndex);
+   const bool q_Retval = C_PuiSdHandler::h_GetInstance()->HasNodeAnAvailableFlashloader(this->mu32_NodeIndex);
 
    return q_Retval;
 }
@@ -422,6 +438,35 @@ bool C_GiSvSubNodeData::CheckAlwaysUpdate(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the connect state of all nodes
+
+   \param[in]       orc_NodeStates             Node connect states
+   \param[in]       orc_PreconditionErrors     All node precondition error flags
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvSubNodeData::SetNodeConnectStates(const C_OSCSuSequencesNodeConnectStates & orc_NodeStates,
+                                             const C_GiSvSubNodeDataPreconditionErrors & orc_PreconditionErrors)
+{
+   this->mc_ConnectStates = orc_NodeStates;
+   this->mc_PreconditionErrors = orc_PreconditionErrors;
+   this->mq_ConnectStatesSet = true;
+   // When setting the connect state, the update states can not be actual anymore
+   this->mq_UpdateStatesSet = false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the connect state of all nodes
+
+   \param[in]       orc_NodeStates     Node connect states
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvSubNodeData::SetNodeUpdateStates(const C_OSCSuSequencesNodeUpdateStates & orc_NodeStates)
+{
+   this->mc_UpdateStates = orc_NodeStates;
+   this->mq_UpdateStatesSet = true;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Copy initial status
 
    \param[in,out]  orc_NodeData  Node data
@@ -433,7 +478,7 @@ void C_GiSvSubNodeData::CopyInitialStatus(C_GiSvSubNodeData & orc_NodeData) cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Copy update status
+/*! \brief  Copy update and connect status and states
 
    \param[in,out]  orc_NodeData  Node data
 */
@@ -441,6 +486,9 @@ void C_GiSvSubNodeData::CopyInitialStatus(C_GiSvSubNodeData & orc_NodeData) cons
 void C_GiSvSubNodeData::CopyUpdateStatus(C_GiSvSubNodeData & orc_NodeData) const
 {
    orc_NodeData.me_UpdateStatus = this->me_UpdateStatus;
+   orc_NodeData.mc_ConnectStates = this->mc_ConnectStates;
+   orc_NodeData.mc_UpdateStates = this->mc_UpdateStates;
+   orc_NodeData.mc_PreconditionErrors = this->mc_PreconditionErrors;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -534,13 +582,25 @@ void C_GiSvSubNodeData::DiscardInfo()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the node index
+
+   \return
+   Node index of node or sub node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_GiSvSubNodeData::GetNodeIndex(void) const
+{
+   return this->mu32_NodeIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data block found status
 
    \return
    Data block found status
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvSubNodeData::GetDataBlockFoundStatus() const
+bool C_GiSvSubNodeData::GetDataBlockFoundStatus(void) const
 {
    return this->mq_AnyDatablockFound;
 }
@@ -674,6 +734,18 @@ uint32 C_GiSvSubNodeData::GetFileInfosCount() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the flag if a PEM file is set
+
+   \retval   true   A PEM file is set
+   \retval   false  No PEM file is set
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvSubNodeData::IsPemFileInfoSet(void) const
+{
+   return (this->mc_PemFileInfo == "") ? false : true;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get hex app info ambiguous array size
 
    \return
@@ -715,6 +787,70 @@ bool C_GiSvSubNodeData::GetHexAppInfoAmbiguous(const uint32 ou32_ApplicationInde
 C_SyvUpDeviceInfo C_GiSvSubNodeData::GetDeviceInfo() const
 {
    return this->mc_DeviceInfo;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the connect state of the sub node
+
+   \return
+   Node connect states reference
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCSuSequencesNodeConnectStates & C_GiSvSubNodeData::GetNodeConnectStates(void) const
+{
+   return this->mc_ConnectStates;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the connect precondition error states of the sub node
+
+   \return
+   Node connect states reference
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_GiSvSubNodeData::C_GiSvSubNodeDataPreconditionErrors & C_GiSvSubNodeData::GetNodeConnectPreconditionErrors(void)
+const
+{
+   return this->mc_PreconditionErrors;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the connect state of the sub node
+
+   Update states are set when the update process is finished. Check with IsNodeUpdateStatesSet first, if states
+   are already usable
+
+   \return
+   Node update states reference
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCSuSequencesNodeUpdateStates & C_GiSvSubNodeData::GetNodeUpdateStates(void) const
+{
+   return this->mc_UpdateStates;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the flag if connect state of all sub nodes was already set for the current process
+
+   \retval   true   node update states are set and usable
+   \retval   false  node update states are not set and usable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvSubNodeData::IsNodeConnectStatesSet(void) const
+{
+   return this->mq_ConnectStatesSet;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the flag if update state of all sub nodes was already set for the current process
+
+   \retval   true   node update states are set and usable
+   \retval   false  node update states are not set and usable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvSubNodeData::IsNodeUpdateStatesSet(void) const
+{
+   return this->mq_UpdateStatesSet;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -886,6 +1022,9 @@ void C_GiSvSubNodeData::m_InitPackageDataForOtherFiles(const C_PuiSvNodeUpdate &
    {
       this->mc_FileInfos.push_back(rc_Files[u32_ItFile]);
    }
+
+   // Handle PEM file
+   this->mc_PemFileInfo = orc_UpdateInformation.GetPemFilePath();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

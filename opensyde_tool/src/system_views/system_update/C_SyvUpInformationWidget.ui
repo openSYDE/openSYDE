@@ -59,7 +59,7 @@
         <number>1</number>
        </property>
        <item>
-        <widget class="stw_opensyde_gui::C_SyvUpUpdatePackageWidget" name="pc_WidgetUpdatePackage" native="true">
+        <widget class="stw_opensyde_gui::C_SyvUpPacWidget" name="pc_WidgetUpdatePackage" native="true">
          <property name="minimumSize">
           <size>
            <width>500</width>
@@ -165,9 +165,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SyvUpUpdatePackageWidget</class>
+   <class>stw_opensyde_gui::C_SyvUpPacWidget</class>
    <extends>QWidget</extends>
-   <header>C_SyvUpUpdatePackageWidget.h</header>
+   <header>C_SyvUpPacWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

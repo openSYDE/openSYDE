@@ -41,10 +41,11 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 
    \param[in]  oq_RoutingActive     Flag for activating routing
+   \param[in]  oq_UpdateRoutingMode Flag for update specific routing or generic routing
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComSequencesBase::C_OSCComSequencesBase(const bool oq_RoutingActive) :
-   mpc_ComDriver(new C_OSCComDriverFlash(oq_RoutingActive, &mh_MyXflReportProgress, this)),
+C_OSCComSequencesBase::C_OSCComSequencesBase(const bool oq_RoutingActive, const bool oq_UpdateRoutingMode) :
+   mpc_ComDriver(new C_OSCComDriverFlash(oq_RoutingActive, oq_UpdateRoutingMode, &mh_MyXflReportProgress, this)),
    mpc_SystemDefinition(NULL),
    mu32_ActiveBusIndex(0U),
    mq_OpenSydeDevicesActive(false),
@@ -85,6 +86,8 @@ C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
                                            - set the entry to false if the device is not expected to be present
    \param[in]  opc_CanDispatcher        Pointer to concrete CAN dispatcher
    \param[in]  opc_IpDispatcher         Pointer to concrete IP dispatcher
+   \param[in]  opc_SecurityPemDb        Pointer to PEM database (optional)
+                                        Needed if nodes with enabled security are used in the system
 
    \return
    C_NO_ERR      Configuration set
@@ -93,7 +96,7 @@ C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
                  Length of active nodes vector is not identical to number of nodes in system definition
                  No STW flashloader devices and no openSYDE devices are active
                  No STW flashloader devices on active bus and no openSYDE devices are active, but STW flashloader on
-                     other busses are active
+                     other buses are active
    C_OVERFLOW    Unknown transport protocol or unknown diagnostic server for at least one node
    C_NOACT       No active nodes
    C_COM         CAN initialization failed or no route found for at least one node
@@ -105,7 +108,8 @@ C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
 sint32 C_OSCComSequencesBase::Init(C_OSCSystemDefinition & orc_SystemDefinition, const uint32 ou32_ActiveBusIndex,
                                    const std::vector<uint8> & orc_ActiveNodes,
                                    stw_can::C_CAN_Dispatcher * const opc_CanDispatcher,
-                                   C_OSCIpDispatcher * const opc_IpDispatcher)
+                                   C_OSCIpDispatcher * const opc_IpDispatcher,
+                                   C_OSCSecurityPemDatabase * const opc_SecurityPemDb)
 {
    sint32 s32_Return = C_CONFIG;
 
@@ -118,7 +122,7 @@ sint32 C_OSCComSequencesBase::Init(C_OSCSystemDefinition & orc_SystemDefinition,
       this->mc_TimeoutNodes.resize(this->mc_ActiveNodes.size(), 0);
 
       s32_Return = this->mpc_ComDriver->Init(orc_SystemDefinition, ou32_ActiveBusIndex,
-                                             orc_ActiveNodes, opc_CanDispatcher, opc_IpDispatcher);
+                                             orc_ActiveNodes, opc_CanDispatcher, opc_IpDispatcher, opc_SecurityPemDb);
 
       if (s32_Return == C_NO_ERR)
       {
@@ -450,7 +454,7 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeOnLocalBusActive(
                      rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter];
 
                   if ((rc_ComIntf.u32_BusIndex == this->mu32_ActiveBusIndex) &&
-                      (rc_ComIntf.q_IsBusConnected == true))
+                      (rc_ComIntf.GetBusConnected() == true))
                   {
                      tgl_assert(this->mu32_ActiveBusIndex < this->mpc_SystemDefinition->c_Buses.size());
 

@@ -44,15 +44,17 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load node file
 
-   \param[out]  orc_Node      Data storage
-   \param[in]   orc_FilePath  File path
+   \param[out]  orc_Node         Data storage
+   \param[in]   orc_FilePath     File path
+   \param[in]   oq_SkipContent   (Optional parameter) skip content when not needed (datapools, halc etc.)
+                                 (default = false)
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & orc_FilePath)
+sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & orc_FilePath, const bool oq_SkipContent)
 {
    C_OSCXMLParser c_XMLParser;
    sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser, orc_FilePath,
@@ -98,7 +100,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & 
    {
       if (c_XMLParser.SelectNodeChild("node") == "node")
       {
-         s32_Retval = C_OSCNodeFiler::h_LoadNode(orc_Node, c_XMLParser, orc_FilePath);
+         s32_Retval = C_OSCNodeFiler::h_LoadNode(orc_Node, c_XMLParser, orc_FilePath, oq_SkipContent);
       }
       else
       {
@@ -121,9 +123,11 @@ sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & 
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[out]     orc_Node         data storage
-   \param[in,out]  orc_XMLParser    XML with node active
-   \param[in]      orc_BasePath     Base path
+   \param[out]     orc_Node            data storage
+   \param[in,out]  orc_XMLParser       XML with node active
+   \param[in]      orc_BasePath        Base path
+   \param[in]      oq_SkipContent      (Optional parameter) skip content when not needed (datapools, halc etc.)
+                                       (default = false)
 
    \return
    C_NO_ERR   data read
@@ -131,7 +135,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & 
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,
-                                  const stw_scl::C_SCLString & orc_BasePath)
+                                  const stw_scl::C_SCLString & orc_BasePath, const bool oq_SkipContent)
 {
    sint32 s32_Retval;
    bool q_AutoNvmStartAddressHere;
@@ -159,26 +163,29 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
       s32_Retval = mh_LoadApplications(orc_Node.c_Applications, orc_XMLParser);
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = mh_LoadDataPools(orc_Node, orc_XMLParser, orc_BasePath);
-
-         if (s32_Retval == C_NO_ERR)
+         if (oq_SkipContent == false)
          {
-            s32_Retval = mh_LoadHALC(orc_Node.c_HALCConfig, orc_XMLParser, orc_BasePath);
-            //AFTER loading the datapools
-            if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("com-protocols") == "com-protocols"))
+            s32_Retval = mh_LoadDataPools(orc_Node, orc_XMLParser, orc_BasePath);
+
+            if (s32_Retval == C_NO_ERR)
             {
-               s32_Retval = h_LoadNodeComProtocols(orc_Node.c_ComProtocols, orc_Node.c_DataPools, orc_XMLParser,
-                                                   orc_BasePath);
-               if (s32_Retval == C_NO_ERR)
+               s32_Retval = mh_LoadHALC(orc_Node.c_HALCConfig, orc_XMLParser, orc_BasePath);
+               //AFTER loading the datapools
+               if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("com-protocols") == "com-protocols"))
                {
-                  //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "node"); //back up to node
+                  s32_Retval = h_LoadNodeComProtocols(orc_Node.c_ComProtocols, orc_Node.c_DataPools, orc_XMLParser,
+                                                      orc_BasePath);
+                  if (s32_Retval == C_NO_ERR)
+                  {
+                     //Return
+                     tgl_assert(orc_XMLParser.SelectNodeParent() == "node"); //back up to node
+                  }
                }
-            }
-            else
-            {
-               osc_write_log_error("Loading node definition", "Could not find \"com-protocols\" node.");
-               s32_Retval = C_CONFIG;
+               else
+               {
+                  osc_write_log_error("Loading node definition", "Could not find \"com-protocols\" node.");
+                  s32_Retval = C_CONFIG;
+               }
             }
          }
       }

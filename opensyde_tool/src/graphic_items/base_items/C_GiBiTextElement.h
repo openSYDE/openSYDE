@@ -89,8 +89,8 @@ private:
 
    bool mq_Editable;
 
-   static const stw_types::float64 mhf64_MinWidthTextElement;
-   static const stw_types::float64 mhf64_MinHeightTextElement;
+   static const stw_types::float64 mhf64_MIN_WIDTH_TEXT_ELEMENT;
+   static const stw_types::float64 mhf64_MIN_HEIGHT_TEXT_ELEMENT;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

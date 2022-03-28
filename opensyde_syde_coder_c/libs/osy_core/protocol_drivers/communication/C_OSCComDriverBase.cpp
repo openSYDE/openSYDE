@@ -54,7 +54,7 @@ C_OSCComDriverBaseCanMessage::C_OSCComDriverBaseCanMessage(void) :
    this->c_Msg.u8_RTR = 0U;
    this->c_Msg.u8_XTD = 0U;
    this->c_Msg.u32_ID = 0U;
-   (void)std::memset(this->c_Msg.au8_Data, 0, 8U);
+   (void)std::memset(&this->c_Msg.au8_Data[0], 0, 8U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -316,7 +316,17 @@ void C_OSCComDriverBase::DistributeMessages(void)
 
          if (s32_Return == C_NO_ERR)
          {
-            this->m_HandleCanMessage(t_Msg, false);
+            if (t_Msg.u8_DLC <= 8)
+            {
+               this->m_HandleCanMessage(t_Msg, false);
+            }
+            else
+            {
+               //ignore invalid can message
+               osc_write_log_error("Reading CAN message",
+                                   "Ignored CAN message (ID: " + C_SCLString::IntToStr(
+                                      t_Msg.u32_ID) + ") due to invalid DLC (" + C_SCLString::IntToStr(t_Msg.u8_DLC));
+            }
          }
       }
       while (s32_Return == C_NO_ERR);
@@ -342,7 +352,7 @@ void C_OSCComDriverBase::DistributeMessages(void)
                u32_Load = 100U;
             }
 
-            // Inform all logger about the bus load
+            // Inform all loggers about the bus load
             for (un_LoggerCounter = 0U; un_LoggerCounter < this->mc_Logger.size(); ++un_LoggerCounter)
             {
                this->mc_Logger[un_LoggerCounter]->UpdateBusLoad(static_cast<uint8>(u32_Load));
@@ -353,7 +363,7 @@ void C_OSCComDriverBase::DistributeMessages(void)
          }
       }
 
-      // Inform about Tx errros and counter
+      // Inform about Tx errors and counter
       for (un_LoggerCounter = 0U; un_LoggerCounter < this->mc_Logger.size(); ++un_LoggerCounter)
       {
          this->mc_Logger[un_LoggerCounter]->UpdateTxErrors(this->mu32_CanTxErrors);
@@ -402,7 +412,7 @@ sint32 C_OSCComDriverBase::SendCanMessageDirect(const T_STWCAN_Msg_TX & orc_Msg)
          // Inform the logger about the sent message
          T_STWCAN_Msg_RX c_Msg;
 
-         (void)std::memcpy(c_Msg.au8_Data, orc_Msg.au8_Data, 8U);
+         (void)std::memcpy(&c_Msg.au8_Data[0], &orc_Msg.au8_Data[0], 8U);
          c_Msg.u8_Align = orc_Msg.u8_Align;
          c_Msg.u8_DLC = orc_Msg.u8_DLC;
          c_Msg.u8_RTR = orc_Msg.u8_RTR;

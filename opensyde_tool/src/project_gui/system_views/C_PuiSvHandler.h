@@ -157,7 +157,9 @@ public:
                                   const bool oq_AutoAdapt);
    stw_types::sint32 InsertDashboard(const stw_types::uint32 ou32_ViewIndex,
                                      const stw_types::uint32 ou32_DashboardIndex,
-                                     const C_PuiSvDashboard & orc_Dashboard, const bool oq_AutoAdapt);
+                                     const C_PuiSvDashboard & orc_Dashboard, const bool oq_AutoAdapt,
+                                     const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
+                                                C_PuiSvReadDataConfiguration> * const opc_Rails);
    stw_types::sint32 AddDashboardWidget(const stw_types::uint32 ou32_ViewIndex,
                                         const stw_types::uint32 ou32_DashboardIndex,
                                         const C_PuiSvDbWidgetBase * const opc_Box,
@@ -243,14 +245,18 @@ public:
    bool GetErrorBus(const stw_types::uint32 ou32_Index) const;
    stw_types::sint32 CheckViewError(const stw_types::uint32 ou32_Index, bool * const opq_NameInvalid,
                                     bool * const opq_PCNotConnected, bool * const opq_RoutingInvalid,
-                                    bool * const opq_UpdateDisabledButDataBlocks, bool * const opq_SysDefInvalid,
-                                    bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails,
-                                    QString * const opc_AutomaticallyDisabledSubDevices);
-   void CheckUpdateEnabledForDataBlocks(const stw_types::uint32 ou32_ViewIndex, bool & orq_UpdateDisabledButDataBlocks,
-                                        QString & orc_ErrorMessage) const;
-   stw_types::sint32 CheckRouting(const stw_types::uint32 ou32_ViewIndex, std::map<stw_types::uint32,
-                                                                                   QString> & orc_ErrorDetails) const;
+                                    bool * const opq_RoutingUpdateInvalid, bool * const opq_RoutingDashboardInvalid,
+                                    bool * const opq_SysDefInvalid, bool * const opq_NoNodesActive,
+                                    std::vector<QString> * const opc_RoutingErrorDetails,
+                                    QString * const opc_SetupRoutingWarningDetails);
    stw_types::sint32 CheckViewReconnectNecessary(const stw_types::uint32 ou32_ViewIndex, bool & orq_ReconnectNecessary);
+   stw_types::sint32 CheckViewNodeDashboardRoutingError(const stw_types::uint32 ou32_ViewIndex,
+                                                        const stw_types::uint32 ou32_NodeIndex,
+                                                        bool & orq_RoutingDashboardError);
+   stw_types::sint32 GetViewNodeDashboardRoutingErrors(const stw_types::uint32 ou32_ViewIndex,
+                                                       std::set<stw_types::uint32> & orc_NodesWithErrors);
+   stw_types::sint32 GetViewRelevantNodesForDashboardRouting(const stw_types::uint32 ou32_ViewIndex,
+                                                             std::set<stw_types::uint32> & orc_RelevantNodes);
 
    //Misc
    stw_types::sint32 CheckAndHandleNewElement(const C_PuiSvDbNodeDataPoolListElementId & orc_NewId);
@@ -372,11 +378,19 @@ private:
    stw_types::uint32 m_CalcHashSystemViews(void) const;
    void m_FixInvalidRailConfig(void);
    void m_HandleCompatibilityChart(void);
-   stw_types::sint32 m_CheckRouting(const stw_types::uint32 ou32_ViewIndex, bool & orq_RoutingError,
-                                    QString & orc_ErrorMessage) const;
-   stw_types::sint32 m_CheckRoutingAndUpdateNodes(const stw_types::uint32 ou32_ViewIndex, bool & orq_RoutingError,
-                                                  QString & orc_ErrorMessage,
-                                                  std::vector<stw_types::uint32> & orc_AutomaticallyDisabledSubDevices);
+   stw_types::sint32 m_CheckRoutingDetails(const stw_types::uint32 ou32_ViewIndex, std::map<stw_types::uint32,
+                                                                                            QString> & orc_SetupWarningRoutingDetails, std::vector< std::map<stw_types::uint32,
+                                                                                                                                                             QString> > & orc_ErrorRoutingDetails, std::set<stw_types::uint32> & orc_NodesWithDashboardRoutingError, std::set<stw_types::uint32> & orc_NodesRelevantForDashboardRouting)
+   const;
+   stw_types::sint32 m_CheckRouting(const stw_types::uint32 ou32_ViewIndex, QString & orc_SetupWarningMessage,
+                                    std::vector<QString> & orc_ErrorMessages,
+                                    std::set<stw_types::uint32> & orc_NodesWithDashboardRoutingError,
+                                    std::set<stw_types::uint32> & orc_NodesRelevantForDashboardRouting) const;
+   stw_types::sint32 m_CheckRoutingAndUpdateNodes(const stw_types::uint32 ou32_ViewIndex,
+                                                  QString & orc_SetupWarningMessage,
+                                                  std::vector<QString> & orc_ErrorMessages,
+                                                  std::set<stw_types::uint32> & orc_NodesWithDashboardRoutingError,
+                                                  std::set<stw_types::uint32> & orc_NodesRelevantForDashboardRouting);
    std::map<stw_scl::C_SCLString, bool> m_GetExistingViewNames(void) const;
 
    static C_PuiSvHandler * mhpc_Singleton;
@@ -394,18 +408,20 @@ private:
       bool q_NameInvalid;
       bool q_PCNotConnected;
       bool q_RoutingInvalid;
-      bool q_UpdateDisabledButDataBlocks;
+      bool q_UpdateRoutingError;
       bool q_SysDefInvalid;
       bool q_NoNodesActive;
-      QString c_RoutingErrorDetails;
-      QString c_AutomaticallyDisabledSubDevices;
+      QString c_RoutingSetupWarningMessage;
+      std::vector<QString> c_RoutingErrorMessages;
       std::vector<stw_types::uint8> c_ResultingNodeActiveStatus;
+      std::set<stw_types::uint32> c_ResultNodesWithDashboardRoutingError;
+      std::set<stw_types::uint32> c_ResultNodesRelevantForDashboardRouting;
 
       void GetResults(bool * const opq_NameInvalid, bool * const opq_PCNotConnected, bool * const opq_RoutingInvalid,
-                      bool * const opq_UpdateDisabledButDataBlocks, bool * const opq_SysDefInvalid,
-                      bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails,
-                      QString * const opc_AutomaticallyDisabledSubDevices) const;
-      void ConstructAutomaticallyDisabledSubDevicesString(const std::vector<stw_types::uint32> & orc_Indices);
+                      bool * const opq_RoutingUpdateInvalid, bool * const opq_RoutingDashboardInvalid,
+                      bool * const opq_SysDefInvalid, bool * const opq_NoNodesActive,
+                      std::vector<QString> * const opc_RoutingErrorDetails,
+                      QString * const opc_SetupRoutingWarningDetails) const;
    };
 
    QMap<stw_types::uint32, C_PuiSvViewErrorDetails> mc_PreviousErrorCheckResults;

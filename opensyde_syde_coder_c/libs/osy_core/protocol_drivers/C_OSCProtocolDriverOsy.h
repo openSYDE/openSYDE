@@ -25,6 +25,7 @@
 #include <map>
 
 #include "stwtypes.h"
+#include "C_OSCProtocolSerialNumber.h"
 #include "C_OSCProtocolDriverOsyTpBase.h"
 #include "stw_can.h" //for CAN message type
 
@@ -85,7 +86,7 @@ private:
    stw_types::sint32 m_ReadStringDataIdentifier(const stw_types::uint16 ou16_DataIdentifier,
                                                 stw_scl::C_SCLString & orc_String, stw_types::uint8 & oru8_NrCode);
    stw_types::sint32 m_WriteDataByIdentifier(const stw_types::uint16 ou16_Identifier,
-                                             std::vector<stw_types::uint8> & orc_WriteData,
+                                             const std::vector<stw_types::uint8> & orc_WriteData,
                                              stw_types::uint8 & oru8_NrCode);
    stw_types::sint32 m_PackDataPoolIdentifier(const stw_types::uint8 ou8_DataPoolIndex,
                                               const stw_types::uint16 ou16_ListIndex,
@@ -141,26 +142,32 @@ private:
    static const stw_types::uint8 mhu8_OSY_NR_SI = 0x7FU;
 
    //data identifiers:
-   static const stw_types::uint16 mhu16_OSY_DI_BOOT_SOFTWARE_IDENTIFICATION = 0xF180U;
+   static const stw_types::uint16 mhu16_OSY_DI_BOOT_SOFTWARE_IDENTIFICATION     = 0xF180U;
    static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_SOFTWARE_FINGERPRINT = 0xF184U;
-   static const stw_types::uint16 mhu16_OSY_DI_ACTIVE_DIAGNOSTIC_SESSION   = 0xF186U;
-   static const stw_types::uint16 mhu16_OSY_DI_ECU_SERIAL_NUMBER           = 0xF18CU;
-   static const stw_types::uint16 mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_NUMBER  = 0xF192U;
-   static const stw_types::uint16 mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_VERSION = 0xF193U;
-   static const stw_types::uint16 mhu16_OSY_DI_LIST_OF_FEATURES            = 0xA800U;
-   static const stw_types::uint16 mhu16_OSY_DI_MAX_NUMBER_OF_BLOCK_LENGTH  = 0xA801U;
-   static const stw_types::uint16 mhu16_OSY_DI_DATARATE_1                  = 0xA810U;
-   static const stw_types::uint16 mhu16_OSY_DI_DATARATE_2                  = 0xA811U;
-   static const stw_types::uint16 mhu16_OSY_DI_DATARATE_3                  = 0xA812U;
-   static const stw_types::uint16 mhu16_OSY_DI_PROTOCOL_VERSION            = 0xA813U;
+   static const stw_types::uint16 mhu16_OSY_DI_ACTIVE_DIAGNOSTIC_SESSION        = 0xF186U;
+   static const stw_types::uint16 mhu16_OSY_DI_ECU_SERIAL_NUMBER                = 0xF18CU;
+   static const stw_types::uint16 mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_NUMBER       = 0xF192U;
+   static const stw_types::uint16 mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_VERSION      = 0xF193U;
+   static const stw_types::uint16 mhu16_OSY_DI_LIST_OF_FEATURES                 = 0xA800U;
+   static const stw_types::uint16 mhu16_OSY_DI_MAX_NUMBER_OF_BLOCK_LENGTH       = 0xA801U;
+   static const stw_types::uint16 mhu16_OSY_DI_DATARATE_1                       = 0xA810U;
+   static const stw_types::uint16 mhu16_OSY_DI_DATARATE_2                       = 0xA811U;
+   static const stw_types::uint16 mhu16_OSY_DI_DATARATE_3                       = 0xA812U;
+   static const stw_types::uint16 mhu16_OSY_DI_PROTOCOL_VERSION                 = 0xA813U;
    static const stw_types::uint16 mhu16_OSY_DI_PROTOCOL_DRIVER_IMPLEMENTATION_VERSION = 0xA814U;
-   static const stw_types::uint16 mhu16_OSY_DI_FLASHLOADER_PROTOCOL_VERSION = 0xA815U;
-   static const stw_types::uint16 mhu16_OSY_DI_MAX_NUM_ASYNC               = 0xA817U;
-   static const stw_types::uint16 mhu16_OSY_DI_FLASH_COUNT                 = 0xA819U;
-   static const stw_types::uint16 mhu16_OSY_DI_DEVICE_NAME                 = 0xA81AU;
-   static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_NAME            = 0xA81BU;
-   static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_VERSION         = 0xA81CU;
-   static const stw_types::uint16 mhu16_OSY_DI_FILE_BASED_TRANSFER_EXIT_RESULT = 0xA81DU;
+   static const stw_types::uint16 mhu16_OSY_DI_FLASHLOADER_PROTOCOL_VERSION     = 0xA815U;
+   static const stw_types::uint16 mhu16_OSY_DI_MAX_NUM_ASYNC                    = 0xA817U;
+   static const stw_types::uint16 mhu16_OSY_DI_FLASH_COUNT                      = 0xA819U;
+   static const stw_types::uint16 mhu16_OSY_DI_DEVICE_NAME                      = 0xA81AU;
+   static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_NAME                 = 0xA81BU;
+   static const stw_types::uint16 mhu16_OSY_DI_APPLICATION_VERSION              = 0xA81CU;
+   static const stw_types::uint16 mhu16_OSY_DI_FILE_BASED_TRANSFER_EXIT_RESULT  = 0xA81DU;
+   static const stw_types::uint16 mhu16_OSY_DI_ECU_SERIAL_NUMBER_EXT            = 0xA81EU;
+   static const stw_types::uint16 mhu16_OSY_DI_SUB_NODE_ID                      = 0xA81FU;
+   static const stw_types::uint16 mhu16_OSY_DI_CERTIFICATE_SERIAL_NUMBER        = 0xA820U;
+   static const stw_types::uint16 mhu16_OSY_DI_SECURITY_ACTIVATION              = 0xA821U;
+   static const stw_types::uint16 mhu16_OSY_DI_DEBUGGER_ACTIVATION              = 0xA822U;
+   static const stw_types::uint16 mhu16_OSY_DI_SECURITY_KEY                     = 0xA823U;
    //routine identifiers
    static const stw_types::uint16 mhu16_OSY_RC_SID_ROUTE_DIAGNOSIS_COMMUNICATION     = 0x0202U;
    static const stw_types::uint16 mhu16_OSY_RC_SID_SEND_CAN_MESSAGE                  = 0x0203U;
@@ -224,12 +231,12 @@ public:
       stw_types::uint8 u8_SignatureValid;      ///< 0 = valid; 1 = invalid
       stw_scl::C_SCLString c_AdditionalInformation;
 
-      static const stw_types::uint8 hu8_IdBlockAddresses        = 1U;
-      static const stw_types::uint8 hu8_IdResultSignature       = 2U;
-      static const stw_types::uint8 hu8_IdApplicationVersion    = 3U;
-      static const stw_types::uint8 hu8_IdBuildTimestamp        = 4U;
-      static const stw_types::uint8 hu8_IdApplicationName       = 5U;
-      static const stw_types::uint8 hu8_IdAdditionalInformation = 6U;
+      static const stw_types::uint8 hu8_ID_BLOCK_ADDRESSES        = 1U;
+      static const stw_types::uint8 hu8_ID_RESULT_SIGNATURE       = 2U;
+      static const stw_types::uint8 hu8_ID_APPLICATION_VERSION    = 3U;
+      static const stw_types::uint8 hu8_ID_BUILD_TIMESTAMP        = 4U;
+      static const stw_types::uint8 hu8_ID_APPLICATION_NAME       = 5U;
+      static const stw_types::uint8 hu8_ID_ADDITIONAL_INFORMATION = 6U;
    };
 
    ///meta information for a data pool
@@ -253,6 +260,10 @@ public:
       bool q_MaxNumberOfBlockLengthAvailable;      ///< true: MaxNumberOfBlockLength can be read
       bool q_EthernetToEthernetRoutingSupported;   ///< true: E2E routing supported
       bool q_FileBasedTransferExitResultAvailable; ///< true: FileBasedTransferExitResult can be read
+      bool q_ExtendedSerialNumberModeImplemented;  ///< true: The device has the extended serial number format
+      bool q_SupportsSecurity;                     ///< true: The device supports the security feature
+      bool q_SupportsDebuggerOff;                  ///< true: The debugger interface of the device can be deactivated
+      bool q_SupportsDebuggerOn;                   ///< true: The debugger interface of the device can be activated
    };
 
    C_OSCProtocolDriverOsy(void);
@@ -291,7 +302,7 @@ public:
                                                  stw_types::uint8 * const opu8_NrCode = NULL);
 
    //Device information services:
-   stw_types::sint32 OsyReadEcuSerialNumber(stw_types::uint8(&orau8_SerialNumber)[6],
+   stw_types::sint32 OsyReadEcuSerialNumber(C_OSCProtocolSerialNumber & orc_SerialNumber,
                                             stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadHardwareNumber(stw_types::uint32 & oru32_HardwareNumber,
                                            stw_types::uint8 * const opu8_NrCode = NULL);
@@ -327,6 +338,9 @@ public:
                                                            stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadFileBasedTransferExitResult(stw_scl::C_SCLString & orc_TransferExitResult,
                                                         stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadEcuSerialNumberExt(C_OSCProtocolSerialNumber & orc_SerialNumberExt,
+                                               stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadSubNodeId(stw_types::uint8 & oru8_SubNodeId, stw_types::uint8 * const opu8_NrCode = NULL);
 
    //Device configuration
    stw_types::sint32 OsySetNodeIdForChannel(const stw_types::uint8 ou8_ChannelType,
@@ -422,11 +436,15 @@ public:
                                                   stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadFlashBlockData(const stw_types::uint8 ou8_FlashBlock, C_FlashBlockInfo & orc_BlockInfo,
                                            stw_types::uint8 * const opu8_NrCode = NULL);
-   stw_types::sint32 OsySecurityAccessRequestSeed(const stw_types::uint8 ou8_SecurityLevel,
-                                                  stw_types::uint32 & oru32_Seed,
+   stw_types::sint32 OsySecurityAccessRequestSeed(const stw_types::uint8 ou8_SecurityLevel, bool & orq_SecureMode,
+                                                  stw_types::uint64 & oru64_Seed,
+                                                  stw_types::uint8 & oru8_SecurityAlgorithm,
                                                   stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsySecurityAccessSendKey(const stw_types::uint8 ou8_SecurityLevel,
                                               const stw_types::uint32 ou32_Key,
+                                              stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsySecurityAccessSendKey(const stw_types::uint8 ou8_SecurityLevel,
+                                              const std::vector<stw_types::uint8> & orc_Key,
                                               stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyRequestDownload(const stw_types::uint32 ou32_StartAddress, const stw_types::uint32 ou32_Size,
                                         stw_types::uint32 & oru32_MaxBlockLength,
@@ -448,6 +466,21 @@ public:
                                                             const stw_scl::C_SCLString & orc_UserName,
                                                             stw_types::uint8 * const opu8_NrCode = NULL);
 
+   //Security
+   stw_types::sint32 OsyReadCertificateSerialNumber(std::vector<stw_types::uint8> & orc_SerialNumber,
+                                                    stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyWriteSecurityKey(const std::vector<stw_types::uint8> & orc_PublicKeyModulus,
+                                         const std::vector<stw_types::uint8> & orc_PublicKeyExponent,
+                                         const std::vector<stw_types::uint8> & orc_CertificateSerialNumber,
+                                         stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadSecurityActivation(bool & orq_SecurityOn, stw_types::uint8 & oru8_SecurityAlgorithm,
+                                               stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyWriteSecurityActivation(const bool oq_SecurityOn, const stw_types::uint8 ou8_SecurityAlgorithm,
+                                                stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadDebuggerEnabled(bool & orq_DebuggerEnabled, stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyWriteDebuggerEnabled(const bool oq_DebuggerEnabled,
+                                             stw_types::uint8 * const opu8_NrCode = NULL);
+
    //Common
    stw_types::sint32 OsyTesterPresent(const stw_types::uint8 ou8_SuppressResponseMsg,
                                       stw_types::uint8 * const opu8_NrCode = NULL);
@@ -465,18 +498,20 @@ public:
    static const stw_types::uint8 hu8_DIAGNOSTIC_SESSION_PROGRAMMING        = 0x02U;
 
    //negative response codes:
-   static const stw_types::uint8 hu8_NR_CODE_SERVICE_NOT_SUPPORTED       = 0x11U;
-   static const stw_types::uint8 hu8_NR_CODE_SUB_FUNCTION_NOT_SUPPORTED  = 0x12U;
+   static const stw_types::uint8 hu8_NR_CODE_SERVICE_NOT_SUPPORTED              = 0x11U;
+   static const stw_types::uint8 hu8_NR_CODE_SUB_FUNCTION_NOT_SUPPORTED         = 0x12U;
    static const stw_types::uint8 hu8_NR_CODE_INCORRECT_MESSAGE_LENGTH_OR_FORMAT = 0x13U;
-   static const stw_types::uint8 hu8_NR_CODE_RESPONSE_TOO_LONG           = 0x14U;
-   static const stw_types::uint8 hu8_NR_CODE_CONDITIONS_NOT_CORRECT      = 0x22U;
-   static const stw_types::uint8 hu8_NR_CODE_REQUEST_SEQUENCE_ERROR      = 0x24U;
-   static const stw_types::uint8 hu8_NR_CODE_REQUEST_OUT_OF_RANGE        = 0x31U;
-   static const stw_types::uint8 hu8_NR_CODE_SECURITY_ACCESS_DENIED      = 0x33U;
-   static const stw_types::uint8 hu8_NR_CODE_INVALID_KEY                 = 0x35U;
-   static const stw_types::uint8 hu8_NR_CODE_UPLOAD_DOWNLOAD_NOT_ACCEPTED = 0x70U;
-   static const stw_types::uint8 hu8_NR_CODE_GENERAL_PROGRAMMING_FAILURE = 0x72U;
-   static const stw_types::uint8 hu8_NR_CODE_RESPONSE_PENDING            = 0x78U;
+   static const stw_types::uint8 hu8_NR_CODE_RESPONSE_TOO_LONG                  = 0x14U;
+   static const stw_types::uint8 hu8_NR_CODE_CONDITIONS_NOT_CORRECT             = 0x22U;
+   static const stw_types::uint8 hu8_NR_CODE_REQUEST_SEQUENCE_ERROR             = 0x24U;
+   static const stw_types::uint8 hu8_NR_CODE_REQUEST_OUT_OF_RANGE               = 0x31U;
+   static const stw_types::uint8 hu8_NR_CODE_SECURITY_ACCESS_DENIED             = 0x33U;
+   static const stw_types::uint8 hu8_NR_CODE_INVALID_KEY                        = 0x35U;
+   static const stw_types::uint8 hu8_NR_CODE_EXCEEDED_NUMBER_OF_ATTEMPTS        = 0x36U;
+   static const stw_types::uint8 hu8_NR_CODE_REQUIRED_TIME_DELAY_NOT_EXPIRED    = 0x37U;
+   static const stw_types::uint8 hu8_NR_CODE_UPLOAD_DOWNLOAD_NOT_ACCEPTED       = 0x70U;
+   static const stw_types::uint8 hu8_NR_CODE_GENERAL_PROGRAMMING_FAILURE        = 0x72U;
+   static const stw_types::uint8 hu8_NR_CODE_RESPONSE_PENDING                   = 0x78U;
    static const stw_types::uint8 hu8_NR_CODE_SERVICE_NOT_SUPPORTED_IN_ACTIVE_SESSION = 0x7FU;
 
    //result status of routine OSY_RC_SID_ROUTE_IP_2_IP_COMMUNICATION

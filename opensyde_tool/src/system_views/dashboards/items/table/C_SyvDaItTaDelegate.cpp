@@ -164,12 +164,12 @@ void C_SyvDaItTaDelegate::paint(QPainter * const opc_Painter, const QStyleOption
    if (orc_Index.column() == C_SyvDaItTaModel::h_EnumToColumn(C_SyvDaItTaModel::eBAR))
    {
       //Padding
-      const sintn sn_OffsetX = 7;
-      const sintn sn_OffsetY = 1;
+      const sintn sn_OFFSET_X = 7;
+      const sintn sn_OFFSET_Y = 1;
       //Expected progress [0;1]
       const float32 f32_Progress = orc_Index.data(static_cast<sintn>(Qt::EditRole)).toFloat();
       //Complete rectangle with padding
-      const QRect c_RectBarBase = orc_Option.rect.adjusted(sn_OffsetX, sn_OffsetY, -sn_OffsetX, -sn_OffsetY);
+      const QRect c_RectBarBase = orc_Option.rect.adjusted(sn_OFFSET_X, sn_OFFSET_Y, -sn_OFFSET_X, -sn_OFFSET_Y);
       const float32 f32_RectBarBaseWidth = static_cast<float32>(c_RectBarBase.width());
       const float32 f32_RectBarWidth = f32_Progress * f32_RectBarBaseWidth;
       //Progress rectangle

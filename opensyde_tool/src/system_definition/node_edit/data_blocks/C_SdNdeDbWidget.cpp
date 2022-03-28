@@ -104,17 +104,17 @@ C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_
    this->mpc_Ui->pc_LabOutputIcon->setText("");
 
    //Icons
-   const QSize c_IconSize(16, 16);
+   const QSize c_ICON_SIZE(16, 16);
    this->mpc_Ui->pc_LabErrorIcon->setPixmap(c_IconError.pixmap(mc_ICON_SIZE_24));
-   this->mpc_Ui->pc_PubEdit->setIconSize(c_IconSize);
+   this->mpc_Ui->pc_PubEdit->setIconSize(c_ICON_SIZE);
    this->mpc_Ui->pc_PubEdit->SetCustomIcons("://images/IconEditSmallActive.svg", "://images/IconEditSmallActive.svg",
                                             "://images/IconEditSmallActive.svg", "://images/IconEditSmallActive.svg");
-   this->mpc_Ui->pc_PubDelete->setIconSize(c_IconSize);
+   this->mpc_Ui->pc_PubDelete->setIconSize(c_ICON_SIZE);
    this->mpc_Ui->pc_PubDelete->SetCustomIcons("://images/system_views/IconTabClose.svg",
                                               "://images/system_views/IconTabCloseHover.svg",
                                               "://images/IconCloseClicked.svg",
                                               "://images/IconCloseDisabled.svg");
-   this->mpc_Ui->pc_PubOpenIde->setIconSize(c_IconSize);
+   this->mpc_Ui->pc_PubOpenIde->setIconSize(c_ICON_SIZE);
    this->mpc_Ui->pc_PubOpenIde->SetCustomIcons("://images/system_definition/IconOpenExternalTool.svg",
                                                "://images/system_definition/IconOpenExternalTool.svg",
                                                "://images/system_definition/IconOpenExternalTool.svg",
@@ -187,6 +187,7 @@ void C_SdNdeDbWidget::UpdateApplication(void)
 void C_SdNdeDbWidget::UpdateApplicationIndex(const uint32 ou32_ApplicationIndex)
 {
    this->mu32_ApplicationIndex = ou32_ApplicationIndex;
+   this->m_LoadData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

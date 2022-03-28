@@ -114,6 +114,22 @@ void C_GiSvNodeSyvUpdate::SetViewConnected(const bool oq_Connected)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal if connect in progress
+
+   \param[in]  oq_Active   Flag if connect in progress
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvNodeSyvUpdate::SetConnecting(const bool oq_Active)
+{
+   if (this->mq_ViewConnected == true)
+   {
+      this->mc_NodeData.SetConnecting(oq_Active);
+      this->m_RefreshDialog();
+      this->UpdateIcons();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set connection change
 
    \param[in]  oq_Active   Flag if connected
@@ -170,17 +186,43 @@ void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Apply no response state
+/*! \brief   Apply error state
 
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeSyvUpdate::SetNoResponse(const uint32 ou32_NodeIndex)
+void C_GiSvNodeSyvUpdate::SetNodeError(const uint32 ou32_NodeIndex)
 {
-   this->mc_NodeData.SetNoResponse(ou32_NodeIndex);
+   this->mc_NodeData.SetErrorState(ou32_NodeIndex);
 
    this->m_RefreshDialog();
    this->UpdateIcons();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the connect state of all sub nodes
+
+   \param[in]       orc_NodeStates                 Node connect states
+   \param[in]       orc_NodePreconditionErrors     Node precondition error states
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvNodeSyvUpdate::SetNodeConnectStates(const std::vector<C_OSCSuSequencesNodeConnectStates> & orc_NodeStates,
+                                               const C_GiSvNodeData::C_GiSvNodeDataPreconditionErrors & orc_NodePreconditionErrors)
+{
+   this->mc_NodeData.SetNodeConnectStates(orc_NodeStates, orc_NodePreconditionErrors);
+   this->m_RefreshDialog();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the connect state of all sub nodes
+
+   \param[in]       orc_NodeStates     Node connect states
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvNodeSyvUpdate::SetNodeUpdateStates(const std::vector<C_OSCSuSequencesNodeUpdateStates> & orc_NodeStates)
+{
+   this->mc_NodeData.SetNodeUpdateStates(orc_NodeStates);
+   this->m_RefreshDialog();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -189,12 +231,10 @@ void C_GiSvNodeSyvUpdate::SetNoResponse(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::ShowInfo(void)
 {
-   //Open if active in view, valid node index, updateable, connected in update screen, and not while updating
-   if ((((((this->mq_ViewConnected == true) && (this->ms32_Index >= 0)) &&
-          (this->mc_NodeData.CheckUpdateDisabledState() == false)) &&
-         (this->IsStwDevice())) &&
-        (this->mc_NodeData.GetUpdateConnectedStatus() == true)) &&
-       (this->mc_NodeData.GetUpdateInProgressStatus()  == false))
+   //Open if active in view and valid node index
+   if ((this->ms32_Index >= 0) &&
+       (this->IsActiveInView() == true) &&
+       (this->HasNodeAnAvailableFlashloader() == true))
    {
       QGraphicsView * const pc_View = this->scene()->views().at(0);
       QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View->parentWidget(), pc_View->parentWidget());
@@ -279,7 +319,7 @@ bool C_GiSvNodeSyvUpdate::HasNoResponseAndIsActive(void) const
 {
    bool q_Retval;
 
-   if ((this->mq_ViewConnected == true) && (this->mc_NodeData.GetOverallInitialState() == C_SyvUtil::eI_NO_RESPONSE))
+   if ((this->mq_ViewConnected == true) && (this->mc_NodeData.GetOverallInitialState() == C_SyvUtil::eI_ERROR))
    {
       q_Retval = true;
    }
@@ -312,7 +352,7 @@ std::vector<uint32> C_GiSvNodeSyvUpdate::GetAllNotRespondingAndActiveIndices() c
          {
             if (pc_View->GetNodeActive(c_NodeIndices[u32_ItNode]))
             {
-               if (this->mc_NodeData.GetInitialStateByNodeIndex(c_NodeIndices[u32_ItNode]) == C_SyvUtil::eI_NO_RESPONSE)
+               if (this->mc_NodeData.GetInitialStateByNodeIndex(c_NodeIndices[u32_ItNode]) == C_SyvUtil::eI_ERROR)
                {
                   c_Retval.push_back(c_NodeIndices[u32_ItNode]);
                }
@@ -387,16 +427,16 @@ bool C_GiSvNodeSyvUpdate::IsActiveInView(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if STW device and active
+/*! \brief   Check if device has a flashloader available to communicate with
 
    \return
    True  STW device
    False Third party
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvNodeSyvUpdate::IsStwDevice(void) const
+bool C_GiSvNodeSyvUpdate::HasNodeAnAvailableFlashloader(void) const
 {
-   const bool q_Retval = this->mc_NodeData.IsStwDevice();
+   const bool q_Retval = this->mc_NodeData.HasNodeAnAvailableFlashloader();
 
    return q_Retval;
 }
@@ -412,7 +452,7 @@ void C_GiSvNodeSyvUpdate::UpdateIcons(void)
    if (this->mq_ViewConnected)
    {
       //Should not happen while connected
-      if (this->mc_NodeData.GetOverallInitialState() != C_SyvUtil::eI_NO_RESPONSE)
+      if (this->mc_NodeData.GetOverallInitialState() != C_SyvUtil::eI_ERROR)
       {
          if (this->mc_NodeData.CheckAlwaysUpdate())
          {
@@ -464,7 +504,7 @@ void C_GiSvNodeSyvUpdate::UpdateIcons(void)
       }
       else
       {
-         this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("No response"));
+         this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("FAIL"));
          this->mpc_IconBottom->SetSvg("://images/system_views/UpdateNoResponse.svg");
          this->mpc_IconTopLeft->SetSvg("");
 
@@ -515,7 +555,7 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
          const C_SyvUtil::E_NodeUpdateInitialStatus e_OverAllInitialState =
             this->mc_NodeData.GetOverallInitialState();
          if ((this->mc_NodeData.CheckUpdateDisabledState() == true) &&
-             (e_OverAllInitialState != C_SyvUtil::eI_NO_RESPONSE))
+             (e_OverAllInitialState != C_SyvUtil::eI_ERROR))
          {
             this->SetDefaultToolTipContent(
                C_GtGetText::h_GetText(
@@ -548,8 +588,8 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
                         c_Text = C_GtGetText::h_GetText("Requesting info ...");
                      }
                      break;
-                  case C_SyvUtil::eI_NO_RESPONSE:
-                     c_Text = C_GtGetText::h_GetText("Node not found. Check connection!");
+                  case C_SyvUtil::eI_ERROR:
+                     c_Text = C_GtGetText::h_GetText("Error occurred. Check node progress log for details!");
                      break;
                   case C_SyvUtil::eI_UPDATE_DISABLED:
                   case C_SyvUtil::eI_UNKNOWN:
@@ -567,8 +607,8 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
                   case C_SyvUtil::eI_TO_BE_UPDATED:
                      c_Text = C_GtGetText::h_GetText("Update required.");
                      break;
-                  case C_SyvUtil::eI_NO_RESPONSE:
-                     c_Text = C_GtGetText::h_GetText("Node not found. Check connection!");
+                  case C_SyvUtil::eI_ERROR:
+                     c_Text = C_GtGetText::h_GetText("Error occurred. Check node progress log for details!");
                      break;
                   case C_SyvUtil::eI_UPDATE_DISABLED:
                   case C_SyvUtil::eI_UNKNOWN:
@@ -595,7 +635,7 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
             }
             else
             {
-               this->SetDefaultToolTipContent(C_GtGetText::h_GetText("Connect to System to get the node status."));
+               this->SetDefaultToolTipContent(C_GtGetText::h_GetText("Enter update mode to get the node status."));
             }
          }
       }
@@ -630,8 +670,8 @@ void C_GiSvNodeSyvUpdate::m_InitIcons(void)
    const uint32 u32_ScaleCategory = m_GetScaleCategory();
    const sint32 s32_IconSize = this->m_GetIconSize();
    const QRectF c_Rect = this->m_GetBoundary()->boundingRect();
-   const sint32 s32_BorderSize = 9;
-   const sint32 s32_BorderSize_IconBottom = 15;
+   const sint32 s32_BORDER_SIZE = 9;
+   const sint32 s32_BORDER_SIZE_ICON_BOTTOM = 15;
    const sint32 s32_IconOffset = std::max(1L, s32_IconSize / 4L);
    sint32 s32_PosX;
    sint32 s32_PosY;
@@ -641,12 +681,12 @@ void C_GiSvNodeSyvUpdate::m_InitIcons(void)
    //Create + placement
 
    //handling of this->mpc_IconTopLeft
-   s32_PosX = (static_cast<sint32>(c_Rect.width()) - s32_IconSize) - s32_BorderSize;
-   s32_PosY = s32_BorderSize;
+   s32_PosX = (static_cast<sint32>(c_Rect.width()) - s32_IconSize) - s32_BORDER_SIZE;
+   s32_PosY = s32_BORDER_SIZE;
    this->mpc_IconTopLeft = new C_GiInfo(QRect(s32_PosX, s32_PosY, s32_IconSize, s32_IconSize));
 
    //handling of this->mpc_IconBottom
-   s32_PosX = s32_BorderSize_IconBottom;
+   s32_PosX = s32_BORDER_SIZE_ICON_BOTTOM;
 
    //Note:
    //   0.77: vertical position factor
@@ -658,7 +698,7 @@ void C_GiSvNodeSyvUpdate::m_InitIcons(void)
    f64_HelpVar = static_cast<float64>(s32_IconSize) * 0.75;
    this->mpc_IconBottom =
       new C_GiInfo(QRect(static_cast<sintn>(s32_PosX), static_cast<sintn>(s32_PosY),
-                         static_cast<sintn>(static_cast<sint32>(c_Rect.width()) - (2L * s32_BorderSize_IconBottom)),
+                         static_cast<sintn>(static_cast<sint32>(c_Rect.width()) - (2L * s32_BORDER_SIZE_ICON_BOTTOM)),
                          static_cast<sintn>(static_cast<sint32>(f64_HelpVar) + s32_IconOffset)));
 
    //Colors
@@ -667,31 +707,31 @@ void C_GiSvNodeSyvUpdate::m_InitIcons(void)
    this->mpc_IconBottom->SetText("Unexpected");
 
    //Font
-   if (u32_ScaleCategory == mhu32_ScaleCategory1)
+   if (u32_ScaleCategory == mhu32_SCALE_CATEGORY_1)
    {
       this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_10);
    }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory2)
+   else if (u32_ScaleCategory == mhu32_SCALE_CATEGORY_2)
    {
       this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_15);
    }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory3)
+   else if (u32_ScaleCategory == mhu32_SCALE_CATEGORY_3)
    {
       this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_20);
    }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory4)
+   else if (u32_ScaleCategory == mhu32_SCALE_CATEGORY_4)
    {
       this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_25);
    }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory5)
+   else if (u32_ScaleCategory == mhu32_SCALE_CATEGORY_5)
    {
       this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_30);
    }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory6)
+   else if (u32_ScaleCategory == mhu32_SCALE_CATEGORY_6)
    {
       this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_35);
    }
-   else if (u32_ScaleCategory == mhu32_ScaleCategory7)
+   else if (u32_ScaleCategory == mhu32_SCALE_CATEGORY_7)
    {
       this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_40);
    }

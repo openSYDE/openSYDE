@@ -165,9 +165,9 @@ void C_OgeSpiVerticalNaviHandle::paintEvent(QPaintEvent * const opc_Event)
 
    if (orientation() == Qt::Horizontal)
    {
-      const stw_types::sintn sn_HandleHeight = 20;
-      const QPoint c_PTopCenter = this->rect().center() + QPoint(0, sn_HandleHeight / 2);
-      const QPoint c_PBottomCenter = this->rect().center() - QPoint(0, sn_HandleHeight / 2);
+      const stw_types::sintn sn_HANDLE_HEIGHT = 20;
+      const QPoint c_PTopCenter = this->rect().center() + QPoint(0, sn_HANDLE_HEIGHT / 2);
+      const QPoint c_PBottomCenter = this->rect().center() - QPoint(0, sn_HANDLE_HEIGHT / 2);
       QPainter c_Painter(this);
       //Background
       c_Painter.setPen(QPen(mc_STYLE_GUIDE_COLOR_1353, 1.0));

@@ -33,7 +33,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigStandaloneDomain::C_OSCHalcConfigStandaloneDomain(void)
+C_OSCHalcConfigStandaloneDomain::C_OSCHalcConfigStandaloneDomain(void) :
+   C_OSCHalcConfigDomain()
 {
 }
 

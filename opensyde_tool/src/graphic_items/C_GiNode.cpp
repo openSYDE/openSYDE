@@ -37,32 +37,32 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sint32 ms32_IndexAbove = 0;
-const sint32 ms32_IndexRight = 1;
-const sint32 ms32_IndexLeft = 2;
-const sint32 ms32_IndexBottom = 3;
+const sint32 ms32_INDEX_ABOVE = 0;
+const sint32 ms32_INDEX_RIGHT = 1;
+const sint32 ms32_INDEX_LEFT = 2;
+const sint32 ms32_INDEX_BOTTOM = 3;
 
-const float64 mf64_ActionPointOffsetNode = 15.0;
+const float64 mf64_ACTION_POINT_OFFSET_NODE = 15.0;
 
-const float64 C_GiNode::mhf64_MinWidthNode = 107.0;
-const float64 C_GiNode::mhf64_MinHeightNode = 71.0;
-const float64 C_GiNode::mhf64_InitialWidthNode = 165.0;
-const float64 C_GiNode::mhf64_InitialHeightNode = 110.0;
+const float64 C_GiNode::mhf64_MIN_WIDTH_NODE = 107.0;
+const float64 C_GiNode::mhf64_MIN_HEIGHT_NODE = 71.0;
+const float64 C_GiNode::mhf64_INITIAL_WIDTH_NODE = 165.0;
+const float64 C_GiNode::mhf64_INITIAL_HEIGHT_NODE = 110.0;
 
-const uint32 C_GiNode::mhu32_ScaleCategory0 = 7U;
-const uint32 C_GiNode::mhu32_ScaleCategory1 = 0U; // no scaling -> default
-const uint32 C_GiNode::mhu32_ScaleCategory2 = 1U;
-const uint32 C_GiNode::mhu32_ScaleCategory3 = 2U;
-const uint32 C_GiNode::mhu32_ScaleCategory4 = 3U;
-const uint32 C_GiNode::mhu32_ScaleCategory5 = 4U;
-const uint32 C_GiNode::mhu32_ScaleCategory6 = 5U;
-const uint32 C_GiNode::mhu32_ScaleCategory7 = 6U;
+const uint32 C_GiNode::mhu32_SCALE_CATEGORY_0 = 7U;
+const uint32 C_GiNode::mhu32_SCALE_CATEGORY_1 = 0U; // no scaling -> default
+const uint32 C_GiNode::mhu32_SCALE_CATEGORY_2 = 1U;
+const uint32 C_GiNode::mhu32_SCALE_CATEGORY_3 = 2U;
+const uint32 C_GiNode::mhu32_SCALE_CATEGORY_4 = 3U;
+const uint32 C_GiNode::mhu32_SCALE_CATEGORY_5 = 4U;
+const uint32 C_GiNode::mhu32_SCALE_CATEGORY_6 = 5U;
+const uint32 C_GiNode::mhu32_SCALE_CATEGORY_7 = 6U;
 
-const float64 C_GiNode::mhaf64_ScaleMinWidthNode[7] =
+const float64 C_GiNode::mhaf64_SCALE_MIN_WIDTH_NODE[7] =
 {
    150.0, 200.0, 250.0, 300.0, 350.0, 400.0, 450.0
 };
-const float64 C_GiNode::mhaf64_ScaleMinHeightNode[7] =
+const float64 C_GiNode::mhaf64_SCALE_MIN_HEIGHT_NODE[7] =
 {
    100.0, 130.0, 165.0, 200.0, 230.0, 265.0, 300.0
 };
@@ -92,8 +92,8 @@ const float64 C_GiNode::mhaf64_ScaleMinHeightNode[7] =
 C_GiNode::C_GiNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const float64 & orf64_Width,
                    const float64 & orf64_Height, QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiRectBaseGroup(ors32_Index, C_PuiSdDataElement::eNODE, oru64_ID, mhf64_MinWidthNode,
-                     mhf64_MinHeightNode, mf64_ActionPointOffsetNode, false, opc_Parent),
+   C_GiRectBaseGroup(ors32_Index, C_PuiSdDataElement::eNODE, oru64_ID, mhf64_MIN_WIDTH_NODE,
+                     mhf64_MIN_HEIGHT_NODE, mf64_ACTION_POINT_OFFSET_NODE, false, opc_Parent),
    mq_ErrorIconHovered(false),
    mq_Valid(true),
    mq_DrawWhiteFilter(false),
@@ -130,8 +130,8 @@ C_GiNode::C_GiNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const fl
    //create boundary
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Boundary = new C_GiNodeBoundary(c_Name, std::max(mhf64_MinWidthNode, orf64_Width),
-                                             std::max(mhf64_MinHeightNode, orf64_Height), u32_SubNodesCount);
+   this->mpc_Boundary = new C_GiNodeBoundary(c_Name, std::max(mhf64_MIN_WIDTH_NODE, orf64_Width),
+                                             std::max(mhf64_MIN_HEIGHT_NODE, orf64_Height), u32_SubNodesCount);
    this->m_DetectIconSize();
 
    // Notify the base class about the boundary as biggest item as orientation. Very important!
@@ -144,8 +144,8 @@ C_GiNode::C_GiNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const fl
    this->addToGroup(this->mpc_Boundary);
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->m_UpdateItems((std::max(mhf64_MinWidthNode, orf64_Width) - mhf64_MinWidthNode),
-                       (std::max(mhf64_MinHeightNode, orf64_Height) - mhf64_MinHeightNode),
+   this->m_UpdateItems((std::max(mhf64_MIN_WIDTH_NODE, orf64_Width) - mhf64_MIN_WIDTH_NODE),
+                       (std::max(mhf64_MIN_HEIGHT_NODE, orf64_Height) - mhf64_MIN_HEIGHT_NODE),
                        true);
 
    // Init z order
@@ -169,54 +169,54 @@ void C_GiNode::m_InitPorts()
 
    {
       //configure port above
-      this->mc_Ports[ms32_IndexAbove]->setParentItem(this->mpc_Boundary);
-      this->mc_Ports[ms32_IndexAbove]->setX(
-         this->mc_Ports[ms32_IndexAbove]->x() +
+      this->mc_Ports[ms32_INDEX_ABOVE]->setParentItem(this->mpc_Boundary);
+      this->mc_Ports[ms32_INDEX_ABOVE]->setX(
+         this->mc_Ports[ms32_INDEX_ABOVE]->x() +
          ((this->mpc_Boundary->boundingRect().width() / 2.0) -
-          (this->mc_Ports[ms32_IndexAbove]->boundingRect().width() / 2.0)));
-      this->mc_Ports[ms32_IndexAbove]->setY((
-                                               this->mc_Ports[ms32_IndexAbove]->y() -
-                                               this->mc_Ports[ms32_IndexAbove]->boundingRect().height()) + 2.0);
+          (this->mc_Ports[ms32_INDEX_ABOVE]->boundingRect().width() / 2.0)));
+      this->mc_Ports[ms32_INDEX_ABOVE]->setY((
+                                                this->mc_Ports[ms32_INDEX_ABOVE]->y() -
+                                                this->mc_Ports[ms32_INDEX_ABOVE]->boundingRect().height()) + 2.0);
    }
 
    {
       //configure port right
-      this->mc_Ports[ms32_IndexRight]->setParentItem(this->mpc_Boundary);
-      this->mc_Ports[ms32_IndexRight]->setX((
-                                               this->mc_Ports[ms32_IndexRight]->x() +
-                                               (this->mpc_Boundary->boundingRect().width()) +
-                                               this->mc_Ports[ms32_IndexRight]->boundingRect().height()) - 2.0);
-      this->mc_Ports[ms32_IndexRight]->setY(
-         this->mc_Ports[ms32_IndexRight]->y() -
-         ((-1.0 * (this->mc_Ports[ms32_IndexRight]->boundingRect().height() / 2.0)) - 8.0));
-      this->mc_Ports[ms32_IndexRight]->setRotation(90.0);
+      this->mc_Ports[ms32_INDEX_RIGHT]->setParentItem(this->mpc_Boundary);
+      this->mc_Ports[ms32_INDEX_RIGHT]->setX((
+                                                this->mc_Ports[ms32_INDEX_RIGHT]->x() +
+                                                (this->mpc_Boundary->boundingRect().width()) +
+                                                this->mc_Ports[ms32_INDEX_RIGHT]->boundingRect().height()) - 2.0);
+      this->mc_Ports[ms32_INDEX_RIGHT]->setY(
+         this->mc_Ports[ms32_INDEX_RIGHT]->y() -
+         ((-1.0 * (this->mc_Ports[ms32_INDEX_RIGHT]->boundingRect().height() / 2.0)) - 8.0));
+      this->mc_Ports[ms32_INDEX_RIGHT]->setRotation(90.0);
    }
 
    {
       //configure port left
-      this->mc_Ports[ms32_IndexLeft]->setParentItem(this->mpc_Boundary);
-      this->mc_Ports[ms32_IndexLeft]->setX((
-                                              this->mc_Ports[ms32_IndexLeft]->x() -
-                                              this->mc_Ports[ms32_IndexLeft]->boundingRect().height()) + 2.0);
-      this->mc_Ports[ms32_IndexLeft]->setY(
-         this->mc_Ports[ms32_IndexLeft]->y() +
+      this->mc_Ports[ms32_INDEX_LEFT]->setParentItem(this->mpc_Boundary);
+      this->mc_Ports[ms32_INDEX_LEFT]->setX((
+                                               this->mc_Ports[ms32_INDEX_LEFT]->x() -
+                                               this->mc_Ports[ms32_INDEX_LEFT]->boundingRect().height()) + 2.0);
+      this->mc_Ports[ms32_INDEX_LEFT]->setY(
+         this->mc_Ports[ms32_INDEX_LEFT]->y() +
          (((this->mpc_Boundary->boundingRect().height()) -
-           (this->mc_Ports[ms32_IndexLeft]->boundingRect().height() / 2.0)) - 7.0));
-      this->mc_Ports[ms32_IndexLeft]->setRotation(-90.0);
+           (this->mc_Ports[ms32_INDEX_LEFT]->boundingRect().height() / 2.0)) - 7.0));
+      this->mc_Ports[ms32_INDEX_LEFT]->setRotation(-90.0);
    }
 
    {
       //configure port bottom
-      this->mc_Ports[ms32_IndexBottom]->setParentItem(this->mpc_Boundary);
-      this->mc_Ports[ms32_IndexBottom]->setX(
-         this->mc_Ports[ms32_IndexBottom]->x() +
+      this->mc_Ports[ms32_INDEX_BOTTOM]->setParentItem(this->mpc_Boundary);
+      this->mc_Ports[ms32_INDEX_BOTTOM]->setX(
+         this->mc_Ports[ms32_INDEX_BOTTOM]->x() +
          ((this->mpc_Boundary->boundingRect().width() / 2.0) +
-          (this->mc_Ports[ms32_IndexBottom]->boundingRect().width() / 2.0)));
-      this->mc_Ports[ms32_IndexBottom]->setY((
-                                                this->mc_Ports[ms32_IndexBottom]->y() +
-                                                this->mc_Ports[ms32_IndexBottom]->boundingRect().height() +
-                                                this->mpc_Boundary->boundingRect().height()) - 2.01);
-      this->mc_Ports[ms32_IndexBottom]->setRotation(180.0);
+          (this->mc_Ports[ms32_INDEX_BOTTOM]->boundingRect().width() / 2.0)));
+      this->mc_Ports[ms32_INDEX_BOTTOM]->setY((
+                                                 this->mc_Ports[ms32_INDEX_BOTTOM]->y() +
+                                                 this->mc_Ports[ms32_INDEX_BOTTOM]->boundingRect().height() +
+                                                 this->mpc_Boundary->boundingRect().height()) - 2.01);
+      this->mc_Ports[ms32_INDEX_BOTTOM]->setRotation(180.0);
    }
 }
 
@@ -247,28 +247,28 @@ void C_GiNode::m_DetectIconSize(void)
 
    switch (u32_ScaleCategory)
    {
-   case mhu32_ScaleCategory0:
+   case mhu32_SCALE_CATEGORY_0:
       this->ms32_IconSize = 16;
       break;
-   case mhu32_ScaleCategory1:
+   case mhu32_SCALE_CATEGORY_1:
       this->ms32_IconSize = 24;
       break;
-   case mhu32_ScaleCategory2:
+   case mhu32_SCALE_CATEGORY_2:
       this->ms32_IconSize = 32;
       break;
-   case mhu32_ScaleCategory3:
+   case mhu32_SCALE_CATEGORY_3:
       this->ms32_IconSize = 40;
       break;
-   case mhu32_ScaleCategory4:
+   case mhu32_SCALE_CATEGORY_4:
       this->ms32_IconSize = 48;
       break;
-   case mhu32_ScaleCategory5:
+   case mhu32_SCALE_CATEGORY_5:
       this->ms32_IconSize = 56;
       break;
-   case mhu32_ScaleCategory6:
+   case mhu32_SCALE_CATEGORY_6:
       this->ms32_IconSize = 64;
       break;
-   case mhu32_ScaleCategory7:
+   case mhu32_SCALE_CATEGORY_7:
       this->ms32_IconSize = 72;
       break;
    default:
@@ -300,66 +300,66 @@ void C_GiNode::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
       this->mpc_ConflictIcon->update();
 
       // move only by mouse movements
-      this->mc_Ports[ms32_IndexAbove]->moveBy((of64_DiffWidth / 2.0), 0.0);
-      this->mc_Ports[ms32_IndexBottom]->moveBy((of64_DiffWidth / 2.0), of64_DiffHeight);
-      this->mc_Ports[ms32_IndexLeft]->moveBy(0.0, (of64_DiffHeight / 2.0));
-      this->mc_Ports[ms32_IndexRight]->moveBy(of64_DiffWidth, 0.0);
+      this->mc_Ports[ms32_INDEX_ABOVE]->moveBy((of64_DiffWidth / 2.0), 0.0);
+      this->mc_Ports[ms32_INDEX_BOTTOM]->moveBy((of64_DiffWidth / 2.0), of64_DiffHeight);
+      this->mc_Ports[ms32_INDEX_LEFT]->moveBy(0.0, (of64_DiffHeight / 2.0));
+      this->mc_Ports[ms32_INDEX_RIGHT]->moveBy(of64_DiffWidth, 0.0);
    }
    else
    {
       // move only by constructor
-      this->mc_Ports[ms32_IndexLeft]->moveBy(0.0, (of64_DiffHeight / 2.0) * -1.0);
+      this->mc_Ports[ms32_INDEX_LEFT]->moveBy(0.0, (of64_DiffHeight / 2.0) * -1.0);
    }
 
    // move on both situations
-   this->mc_Ports[ms32_IndexRight]->moveBy(0.0, (of64_DiffHeight / 2.0));
+   this->mc_Ports[ms32_INDEX_RIGHT]->moveBy(0.0, (of64_DiffHeight / 2.0));
 
    // adapting the size of the ports
-   this->mc_Ports[ms32_IndexAbove]->StretchPort((of64_DiffWidth / 2.0));
-   this->mc_Ports[ms32_IndexBottom]->StretchPort((of64_DiffWidth / 2.0));
-   if (this->mpc_Boundary->f64_Height >= mhf64_MinWidthNode)
+   this->mc_Ports[ms32_INDEX_ABOVE]->StretchPort((of64_DiffWidth / 2.0));
+   this->mc_Ports[ms32_INDEX_BOTTOM]->StretchPort((of64_DiffWidth / 2.0));
+   if (this->mpc_Boundary->f64_Height >= mhf64_MIN_WIDTH_NODE)
    {
       // Resize the two ports only if the height is minimum long as the width
       // The aim is to get the ports left and right to the same proportions like the port above and bottom
-      this->mc_Ports[ms32_IndexLeft]->StretchPort((of64_DiffHeight / 2.0));
-      this->mc_Ports[ms32_IndexRight]->StretchPort((of64_DiffHeight / 2.0));
+      this->mc_Ports[ms32_INDEX_LEFT]->StretchPort((of64_DiffHeight / 2.0));
+      this->mc_Ports[ms32_INDEX_RIGHT]->StretchPort((of64_DiffHeight / 2.0));
    }
    else
    {
       // below the minimum resizing size, reset to default
-      this->mc_Ports[ms32_IndexLeft]->ResizePortToDefault();
-      this->mc_Ports[ms32_IndexRight]->ResizePortToDefault();
+      this->mc_Ports[ms32_INDEX_LEFT]->ResizePortToDefault();
+      this->mc_Ports[ms32_INDEX_RIGHT]->ResizePortToDefault();
    }
 
-   this->mc_Ports[ms32_IndexAbove]->update();
-   this->mc_Ports[ms32_IndexBottom]->update();
-   this->mc_Ports[ms32_IndexLeft]->update();
-   this->mc_Ports[ms32_IndexRight]->update();
+   this->mc_Ports[ms32_INDEX_ABOVE]->update();
+   this->mc_Ports[ms32_INDEX_BOTTOM]->update();
+   this->mc_Ports[ms32_INDEX_LEFT]->update();
+   this->mc_Ports[ms32_INDEX_RIGHT]->update();
 
    switch (u32_ScaleCategory)
    {
-   case mhu32_ScaleCategory0:
+   case mhu32_SCALE_CATEGORY_0:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_13;
       break;
-   case mhu32_ScaleCategory1:
+   case mhu32_SCALE_CATEGORY_1:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_18;
       break;
-   case mhu32_ScaleCategory2:
+   case mhu32_SCALE_CATEGORY_2:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_23;
       break;
-   case mhu32_ScaleCategory3:
+   case mhu32_SCALE_CATEGORY_3:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_28;
       break;
-   case mhu32_ScaleCategory4:
+   case mhu32_SCALE_CATEGORY_4:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_33;
       break;
-   case mhu32_ScaleCategory5:
+   case mhu32_SCALE_CATEGORY_5:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_38;
       break;
-   case mhu32_ScaleCategory6:
+   case mhu32_SCALE_CATEGORY_6:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_43;
       break;
-   case mhu32_ScaleCategory7:
+   case mhu32_SCALE_CATEGORY_7:
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_48;
       break;
    default:
@@ -945,66 +945,66 @@ sint32 C_GiNode::m_GetIconSize(void) const
 uint32 C_GiNode::m_GetScaleCategory(void) const
 {
    const QSizeF c_ActSize = this->mpc_Boundary->boundingRect().size();
-   uint32 u32_ScaleCategory = mhu32_ScaleCategory0;
+   uint32 u32_ScaleCategory = mhu32_SCALE_CATEGORY_0;
 
    // check first scaling
-   if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory1]) &&
-       (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory1]))
+   if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_1]) &&
+       (c_ActSize.height() >= mhaf64_SCALE_MIN_HEIGHT_NODE[mhu32_SCALE_CATEGORY_1]))
    {
       // check second scaling
-      if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory2]) &&
-          (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory2]))
+      if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_2]) &&
+          (c_ActSize.height() >= mhaf64_SCALE_MIN_HEIGHT_NODE[mhu32_SCALE_CATEGORY_2]))
       {
          // check third scaling
-         if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory3]) &&
-             (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory3]))
+         if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_3]) &&
+             (c_ActSize.height() >= mhaf64_SCALE_MIN_HEIGHT_NODE[mhu32_SCALE_CATEGORY_3]))
          {
             // check fourth scaling
-            if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory4]) &&
-                (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory4]))
+            if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_4]) &&
+                (c_ActSize.height() >= mhaf64_SCALE_MIN_HEIGHT_NODE[mhu32_SCALE_CATEGORY_4]))
             {
                // check fifth scaling
-               if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory5]) &&
-                   (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory5]))
+               if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_5]) &&
+                   (c_ActSize.height() >= mhaf64_SCALE_MIN_HEIGHT_NODE[mhu32_SCALE_CATEGORY_5]))
                {
                   // check sixth scaling
-                  if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory6]) &&
-                      (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory6]))
+                  if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_6]) &&
+                      (c_ActSize.height() >= mhaf64_SCALE_MIN_HEIGHT_NODE[mhu32_SCALE_CATEGORY_6]))
                   {
                      // check seventh scaling
-                     if ((c_ActSize.width() >= mhaf64_ScaleMinWidthNode[mhu32_ScaleCategory7]) &&
-                         (c_ActSize.height() >= mhaf64_ScaleMinHeightNode[mhu32_ScaleCategory7]))
+                     if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_7]) &&
+                         (c_ActSize.height() >= mhaf64_SCALE_MIN_HEIGHT_NODE[mhu32_SCALE_CATEGORY_7]))
                      {
-                        u32_ScaleCategory = mhu32_ScaleCategory7;
+                        u32_ScaleCategory = mhu32_SCALE_CATEGORY_7;
                      }
                      else
                      {
-                        u32_ScaleCategory = mhu32_ScaleCategory6;
+                        u32_ScaleCategory = mhu32_SCALE_CATEGORY_6;
                      }
                   }
                   else
                   {
-                     u32_ScaleCategory = mhu32_ScaleCategory5;
+                     u32_ScaleCategory = mhu32_SCALE_CATEGORY_5;
                   }
                }
                else
                {
-                  u32_ScaleCategory = mhu32_ScaleCategory4;
+                  u32_ScaleCategory = mhu32_SCALE_CATEGORY_4;
                }
             }
             else
             {
-               u32_ScaleCategory = mhu32_ScaleCategory3;
+               u32_ScaleCategory = mhu32_SCALE_CATEGORY_3;
             }
          }
          else
          {
-            u32_ScaleCategory = mhu32_ScaleCategory2;
+            u32_ScaleCategory = mhu32_SCALE_CATEGORY_2;
          }
       }
       else
       {
-         u32_ScaleCategory = mhu32_ScaleCategory1;
+         u32_ScaleCategory = mhu32_SCALE_CATEGORY_1;
       }
    }
 
@@ -1192,19 +1192,21 @@ void C_GiNode::AddConnection(C_GiLiBusConnector * const opc_Connection)
 
    \param[in,out]  opc_Connection      New connection
    \param[in,out]  orc_NodeConnection  New data
-   \param[in]      orc_NodeIds         Node ids
+   \param[in]      orc_Properties      Properties
    \param[in,out]  oru32_BusIndex      New bus index to connect to
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::AddConnectionAndData(C_GiLiBusConnector * const opc_Connection,
                                     const C_PuiSdNodeConnectionId & orc_NodeConnection,
-                                    const std::vector<uint8> & orc_NodeIds, const uint32 & oru32_BusIndex)
+                                    const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
+                                    const uint32 & oru32_BusIndex)
 {
    if (opc_Connection != NULL)
    {
       this->AddConnection(opc_Connection);
       C_PuiSdHandler::h_GetInstance()->AddConnection(
-         static_cast<uint32>(this->GetIndex()), orc_NodeConnection.u8_InterfaceNumber, orc_NodeIds, oru32_BusIndex);
+         static_cast<uint32>(this->GetIndex()), orc_NodeConnection.u8_InterfaceNumber, orc_Properties,
+         oru32_BusIndex);
    }
 }
 
@@ -1213,20 +1215,22 @@ void C_GiNode::AddConnectionAndData(C_GiLiBusConnector * const opc_Connection,
 
    \param[in]  opc_Connection       Old connection for reference only
    \param[in]  orc_NodeConnection   New connection data
-   \param[in]  orc_NodeIds          Node ids
+   \param[in]  orc_Properties       Properties
    \param[in]  oru32_BusIndex       Bus index to use instead of last used one
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::UpdateConnection(const C_GiLiBusConnector * const opc_Connection,
                                 const C_PuiSdNodeConnectionId & orc_NodeConnection,
-                                const std::vector<uint8> & orc_NodeIds, const uint32 & oru32_BusIndex) const
+                                const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
+                                const uint32 & oru32_BusIndex) const
 {
    const C_PuiSdNodeConnectionId * const pc_PrevConn = this->GetNodeConnectionId(opc_Connection);
 
    if (pc_PrevConn != NULL)
    {
       C_PuiSdHandler::h_GetInstance()->ChangeCompleteConnection(static_cast<uint32>(this->ms32_Index), *pc_PrevConn,
-                                                                orc_NodeConnection, orc_NodeIds, oru32_BusIndex);
+                                                                orc_NodeConnection, orc_Properties,
+                                                                oru32_BusIndex);
    }
 }
 
@@ -1235,11 +1239,11 @@ void C_GiNode::UpdateConnection(const C_GiLiBusConnector * const opc_Connection,
 
    \param[in]  ou8_Interface     New interface number
    \param[in]  opc_Connection    Associated connection
-   \param[in]  orc_NodeIds       Node ids
+   \param[in]  orc_Properties    Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::ChangeInterface(const uint8 ou8_Interface, const C_GiLiBusConnector * const opc_Connection,
-                               const std::vector<uint8> & orc_NodeIds) const
+                               const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties) const
 {
    if (opc_Connection != NULL)
    {
@@ -1250,7 +1254,7 @@ void C_GiNode::ChangeInterface(const uint8 ou8_Interface, const C_GiLiBusConnect
          if (pc_ConnectionId != NULL)
          {
             C_PuiSdHandler::h_GetInstance()->ChangeConnection(static_cast<uint32>(this->ms32_Index), *pc_ConnectionId,
-                                                              ou8_Interface, orc_NodeIds);
+                                                              ou8_Interface, orc_Properties);
          }
          pc_Bus->GetType();
       }

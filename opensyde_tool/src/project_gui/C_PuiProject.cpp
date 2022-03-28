@@ -43,8 +43,8 @@ using namespace stw_tgl;
 using namespace stw_scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_PuiProject::mhc_TempFolder = "service_project_temp";
-const QString C_PuiProject::mhc_ServiceProjectExtension = "syde_sp";
+const QString C_PuiProject::mhc_TEMP_FOLDER = "service_project_temp";
+const QString C_PuiProject::mhc_SERVICE_PROJECT_EXTENSION = "syde_sp";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -122,7 +122,7 @@ sint32 C_PuiProject::SaveCurrentProjectForServiceMode(const QString & orc_FilePa
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
    if ((orc_FilePath != "") &&
-       (c_TargetFileInfo.suffix() == mhc_ServiceProjectExtension) &&
+       (c_TargetFileInfo.suffix() == mhc_SERVICE_PROJECT_EXTENSION) &&
        (orc_ViewConfigs.size() == u32_ViewCount))
    {
       uint32 u32_ViewCounter;
@@ -764,7 +764,7 @@ sint32 C_PuiProject::m_SaveServiceModeProject(const QString & orc_FilePath, cons
    const QString c_CurrentProjectPath = this->GetPath();
    const QString c_TargetFileName = c_TargetFileInfo.baseName();
    const QString c_ExePath = C_Uti::h_GetExePath();
-   const QString c_TemporaryPath = c_ExePath + "/" + mhc_TempFolder + "/";
+   const QString c_TemporaryPath = c_ExePath + "/" + mhc_TEMP_FOLDER + "/";
    const QString c_TemporaryProjectPath = c_TemporaryPath + c_TargetFileName + "/" + c_TargetFileName + ".syde";
    C_SCLString c_ErrorString;
 
@@ -904,7 +904,7 @@ sint32 C_PuiProject::m_LoadServiceModeProject(const QString & orc_Password, stw_
    const QFileInfo c_FileInfo(this->GetPath());
    const QString c_ProjectName = c_FileInfo.baseName();
    const QString c_ExePath = C_Uti::h_GetExePath();
-   const QString c_TemporaryPath = c_ExePath + "/" + mhc_TempFolder + "/";
+   const QString c_TemporaryPath = c_ExePath + "/" + mhc_TEMP_FOLDER + "/";
    const QString c_TemporaryProjectPath = c_TemporaryPath + c_ProjectName + "/" + c_ProjectName + ".syde";
    C_SCLString c_ErrorString;
 
@@ -947,7 +947,7 @@ bool C_PuiProject::m_IsServiceModeProject(void) const
    const QFileInfo c_FileInfo(this->GetPath());
    bool q_Return;
 
-   if (c_FileInfo.suffix() == mhc_ServiceProjectExtension)
+   if (c_FileInfo.suffix() == mhc_SERVICE_PROJECT_EXTENSION)
    {
       q_Return = true;
    }

@@ -48,13 +48,13 @@ Q_SIGNALS:
 
 private:
    QMap<QString, QSvgRenderer *> mc_ActiveRenderers;
-   static const QColor mhc_HighlightBackgroundColor;
-   static const QColor mhc_HighlightForegroundColor;
-   static const QColor mhc_HighlightBorderColor;
-   static const QColor mhc_DefaultBackgroundColor;
-   static const QColor mhc_DefaultBorderColor;
-   static const QFont mhc_HighlightFont;
-   static const QFont mhc_DefaultFont;
+   static const QColor mhc_HIGHLIGHT_BACKGROUND_COLOR;
+   static const QColor mhc_HIGHLIGHT_FOREGROUND_COLOR;
+   static const QColor mhc_HIGHLIGHT_BORDER_COLOR;
+   static const QColor mhc_DEFAULT_BACKGROUND_COLOR;
+   static const QColor mhc_DEFAULT_BORDER_COLOR;
+   static const QFont mhc_HIGHLIGHT_FONT;
+   static const QFont mhc_DEFAULT_FONT;
 
    void m_PaintSelectedCellIcon(QPainter * const opc_Painter, const QRect & orc_CellRect, const QModelIndex & orc_Index,
                                 const bool oq_Selected) const;

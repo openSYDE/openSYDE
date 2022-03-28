@@ -34,22 +34,22 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_TblTreDataElementModel::mhc_IconNode = ":/images/system_definition/IconNode.svg";
-const QString C_TblTreDataElementModel::mhc_IconDatapool = ":/images/system_definition/IconDataPoolSmall.svg";
-const QString C_TblTreDataElementModel::mhc_IconList = ":/images/system_definition/IconDatapoolList.svg";
-const QString C_TblTreDataElementModel::mhc_IconVariable = ":/images/system_definition/IconVariable.svg";
-const QString C_TblTreDataElementModel::mhc_IconParameter = ":/images/system_definition/IconParameter.svg";
-const QString C_TblTreDataElementModel::mhc_IconSignal = ":/images/system_definition/IconSignal.svg";
-const QString C_TblTreDataElementModel::mhc_IconEthernet = ":/images/system_definition/IconBus.svg";
-const QString C_TblTreDataElementModel::mhc_IconCAN = ":/images/system_definition/IconBus.svg";
-const QString C_TblTreDataElementModel::mhc_IconMessage = ":/images/system_definition/IconMessage.svg";
-const QString C_TblTreDataElementModel::mhc_IconHALCInput =
+const QString C_TblTreDataElementModel::mhc_ICON_NODE = ":/images/system_definition/IconNode.svg";
+const QString C_TblTreDataElementModel::mhc_ICON_DATAPOOL = ":/images/system_definition/IconDataPoolSmall.svg";
+const QString C_TblTreDataElementModel::mhc_ICON_LIST = ":/images/system_definition/IconDatapoolList.svg";
+const QString C_TblTreDataElementModel::mhc_ICON_VARIABLE = ":/images/system_definition/IconVariable.svg";
+const QString C_TblTreDataElementModel::mhc_ICON_PARAMETER = ":/images/system_definition/IconParameter.svg";
+const QString C_TblTreDataElementModel::mhc_ICON_SIGNAL = ":/images/system_definition/IconSignal.svg";
+const QString C_TblTreDataElementModel::mhc_ICON_ETHERNET = ":/images/system_definition/IconBus.svg";
+const QString C_TblTreDataElementModel::mhc_ICON_CAN = ":/images/system_definition/IconBus.svg";
+const QString C_TblTreDataElementModel::mhc_ICON_MESSAGE = ":/images/system_definition/IconMessage.svg";
+const QString C_TblTreDataElementModel::mhc_ICON_HALC_INPUT =
    "://images/system_definition/NodeEdit/halc/InputSmallActive.svg";
-const QString C_TblTreDataElementModel::mhc_IconHALCOutput =
+const QString C_TblTreDataElementModel::mhc_ICON_HALC_OUTPUT =
    "://images/system_definition/NodeEdit/halc/OutputSmallActive.svg";
-const QString C_TblTreDataElementModel::mhc_IconHALCMisc =
+const QString C_TblTreDataElementModel::mhc_ICON_HALC_MISC =
    "://images/system_definition/NodeEdit/halc/OtherSmallActive.svg";
-const QString C_TblTreDataElementModel::mhc_AdditionalDataPoolInfo = " (Already assigned)";
+const QString C_TblTreDataElementModel::mhc_ADDITIONAL_DATA_POOL_INFO = " (Already assigned)";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -115,7 +115,7 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
    this->mpc_InvisibleRootItem = new C_TblTreItem();
 
    //Static
-   pc_NodeItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconNode);
+   pc_NodeItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_NODE);
 
    //Node
    if (pc_Node != NULL)
@@ -171,7 +171,7 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
          pc_DataPoolItem->c_Name = rc_DataPool.c_Name.c_str();
          pc_DataPoolItem->c_ToolTipHeading = rc_DataPool.c_Name.c_str();
          pc_DataPoolItem->c_ToolTipContent = rc_DataPool.c_Comment.c_str();
-         pc_DataPoolItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconDatapool);
+         pc_DataPoolItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_DATAPOOL);
 
          // Append protocol type if COMM datapool
          if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
@@ -204,14 +204,14 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
             {
                pc_DataPoolItem->q_Enabled = false;
                pc_DataPoolItem->q_Selectable = false;
-               pc_DataPoolItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalDataPoolInfo;
+               pc_DataPoolItem->c_Name += C_TblTreDataElementModel::mhc_ADDITIONAL_DATA_POOL_INFO;
             }
          }
          else
          {
             pc_DataPoolItem->q_Enabled = false;
             pc_DataPoolItem->q_Selectable = false;
-            pc_DataPoolItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalDataPoolInfo;
+            pc_DataPoolItem->c_Name += C_TblTreDataElementModel::mhc_ADDITIONAL_DATA_POOL_INFO;
          }
 
          //Flags
@@ -486,8 +486,8 @@ QModelIndex C_TblTreDataElementModel::GetIndexForItem(const std::vector<uint32> 
          q_FoundSomething = false;
          for (sintn sn_ItChild = 0; sn_ItChild < this->rowCount(c_PreviousParent); ++sn_ItChild)
          {
-            const sintn sn_Column = 0;
-            const QModelIndex c_Tmp = this->index(sn_ItChild, sn_Column, c_PreviousParent);
+            const sintn sn_COLUMN = 0;
+            const QModelIndex c_Tmp = this->index(sn_ItChild, sn_COLUMN, c_PreviousParent);
             //lint -e{9079}  Result of Qt interface restrictions, set by index function
             const C_TblTreItem * const pc_TreeItem =
                static_cast<const C_TblTreItem *>(c_Tmp.internalPointer());
@@ -688,10 +688,10 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex,  con
             switch (pc_Bus->e_Type)
             {
             case C_OSCSystemBus::eCAN:
-               pc_BusItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconCAN);
+               pc_BusItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_CAN);
                break;
             case C_OSCSystemBus::eETHERNET:
-               pc_BusItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconEthernet);
+               pc_BusItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_ETHERNET);
                break;
             default:
                tgl_assert(false);
@@ -805,7 +805,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32 ou32_ViewInde
             const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
             q_NodeValid = false;
             //Static
-            pc_NodeItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconNode);
+            pc_NodeItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_NODE);
             //Node
             if ((pc_Node != NULL) && (pc_Node->c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_OPEN_SYDE))
             {
@@ -856,7 +856,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32 ou32_ViewInde
                   pc_DataPoolItem->c_Name = rc_DataPool.c_Name.c_str();
                   pc_DataPoolItem->c_ToolTipHeading = rc_DataPool.c_Name.c_str();
                   pc_DataPoolItem->c_ToolTipContent = rc_DataPool.c_Comment.c_str();
-                  pc_DataPoolItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconDatapool);
+                  pc_DataPoolItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_DATAPOOL);
                   pc_DataPoolItem->q_Selectable = false;
                   // Append protocol type if COMM datapool
                   if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
@@ -916,7 +916,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32 ou32_ViewInde
                               // info and
                               // consistency with superior tree items
                               pc_ListItem->c_ToolTipContent = rc_List.c_Comment.c_str();
-                              pc_ListItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconList);
+                              pc_ListItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_LIST);
                               pc_ListItem->q_Selectable = false;
                               //Flag
                               q_ListValid = false;
@@ -956,11 +956,11 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32 ou32_ViewInde
                                  {
                                  case C_OSCNodeDataPool::eDIAG:
                                     q_DataPoolDiagValid = true;
-                                    pc_ElementItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconVariable);
+                                    pc_ElementItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_VARIABLE);
                                     break;
                                  case C_OSCNodeDataPool::eNVM:
                                     q_DataPoolNvmValid = true;
-                                    pc_ElementItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconParameter);
+                                    pc_ElementItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_PARAMETER);
                                     break;
                                  default:
                                     break;
@@ -1280,13 +1280,13 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfig(C_TblTreItem * 
    switch (orc_DomainDef.e_Category)
    {
    case C_OSCHalcDefDomain::eCA_INPUT:
-      pc_ChannelItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconHALCInput);
+      pc_ChannelItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_HALC_INPUT);
       break;
    case C_OSCHalcDefDomain::eCA_OUTPUT:
-      pc_ChannelItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconHALCOutput);
+      pc_ChannelItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_HALC_OUTPUT);
       break;
    case C_OSCHalcDefDomain::eCA_OTHER:
-      pc_ChannelItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconHALCMisc);
+      pc_ChannelItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_HALC_MISC);
       break;
    default:
       tgl_assert(false);
@@ -1445,7 +1445,7 @@ void C_TblTreDataElementModel::mh_InitDatapoolElementsHALCConfigList(C_TblTreIte
    pc_ListItem->c_Name = orc_List.c_Name.c_str();
    pc_ListItem->c_ToolTipHeading = orc_List.c_Name.c_str();
    pc_ListItem->c_ToolTipContent = orc_List.c_Comment.c_str();
-   pc_ListItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconList);
+   pc_ListItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_LIST);
    pc_ListItem->q_Enabled = true;
    pc_ListItem->q_Selectable = false;
    //Init other item
@@ -1846,7 +1846,7 @@ bool C_TblTreDataElementModel::mh_AddCOMMMessageItems(C_TblTreItem * const opc_B
             pc_MessageItem->c_ToolTipHeading = pc_MessageItem->c_Name;
             pc_MessageItem->c_ToolTipContent =
                C_SdUtil::h_GetToolTipContentMessage(orc_MessageIds[u32_ItMessage]);
-            pc_MessageItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconMessage);
+            pc_MessageItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_MESSAGE);
             pc_MessageItem->q_Selectable = false;
             //Signals
             pc_MessageItem->ReserveChildrenSpace(pc_Message->c_Signals.size());
@@ -1867,7 +1867,7 @@ bool C_TblTreDataElementModel::mh_AddCOMMMessageItems(C_TblTreItem * const opc_B
                   pc_ElementItem->c_ToolTipHeading = pc_Element->c_Name.c_str();
                   pc_ElementItem->c_ToolTipContent =
                      C_SdUtil::h_GetToolTipContentSignal(orc_MessageIds[u32_ItMessage], u32_ItSignal);
-                  pc_ElementItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconSignal);
+                  pc_ElementItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_SIGNAL);
                   pc_ElementItem->ConfigureDynamicName(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                                                        oq_ShowArrayIndexElements, oq_Show64BitValues,
                                                        opc_AlreasyUsedElements);
@@ -2027,7 +2027,7 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
             const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
             q_NodeValid = false;
             //Static
-            pc_NodeItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconNode);
+            pc_NodeItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_NODE);
             //Node
             if ((pc_Node != NULL) && (pc_Node->c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_OPEN_SYDE))
             {
@@ -2079,7 +2079,7 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
                   pc_DataPoolItem->c_Name = rc_DataPool.c_Name.c_str();
                   pc_DataPoolItem->c_ToolTipHeading = rc_DataPool.c_Name.c_str();
                   pc_DataPoolItem->c_ToolTipContent = rc_DataPool.c_Comment.c_str();
-                  pc_DataPoolItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconDatapool);
+                  pc_DataPoolItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_DATAPOOL);
                   //Flag
                   q_DataPoolValid = false;
                   //Data pool
@@ -2095,7 +2095,7 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
                      pc_ListItem->c_ToolTipHeading = rc_List.c_Name.c_str();
                      pc_ListItem->c_ToolTipContent =
                         C_SdUtil::h_GetToolTipContentDpList(u32_ItNode, u32_ItDataPool, u32_ItList);
-                     pc_ListItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconList);
+                     pc_ListItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_ICON_LIST);
                      //Elements
                      if (rc_List.c_Elements.size() > 0)
                      {

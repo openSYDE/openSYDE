@@ -20,8 +20,8 @@ using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_OgeWiBopperle::mhsn_PointSize = 5;
-const stw_types::sintn C_OgeWiBopperle::mhsn_PointDistance = 10;
+const stw_types::sintn C_OgeWiBopperle::mhsn_POINT_SIZE = 5;
+const stw_types::sintn C_OgeWiBopperle::mhsn_POINT_DISTANCE = 10;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -95,7 +95,7 @@ void C_OgeWiBopperle::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
    sint32 s32_Counter;
-   sintn sn_CoordX = mhsn_PointDistance;
+   sintn sn_CoordX = mhsn_POINT_DISTANCE;
 
    // set the initial color
    c_Painter.setPen(Qt::transparent);
@@ -110,8 +110,8 @@ void C_OgeWiBopperle::paintEvent(QPaintEvent * const opc_Event)
       }
 
       // draw the circle
-      c_Painter.drawEllipse(sn_CoordX, (mhsn_PointSize / 2), mhsn_PointSize, mhsn_PointSize);
-      sn_CoordX += (mhsn_PointDistance + mhsn_PointSize);
+      c_Painter.drawEllipse(sn_CoordX, (mhsn_POINT_SIZE / 2), mhsn_POINT_SIZE, mhsn_POINT_SIZE);
+      sn_CoordX += (mhsn_POINT_DISTANCE + mhsn_POINT_SIZE);
 
       if (s32_Counter == this->ms32_CurrentIndex)
       {
@@ -128,8 +128,8 @@ void C_OgeWiBopperle::m_AdaptSize()
 {
    const sintn sn_CountIndex = this->ms32_CountIndex;
 
-   this->setMinimumSize(((mhsn_PointSize * sn_CountIndex) + (mhsn_PointDistance * (sn_CountIndex + 1))),
-                        (mhsn_PointSize * 2));
-   this->setMaximumSize(((mhsn_PointSize * sn_CountIndex) + (mhsn_PointDistance * (sn_CountIndex + 1))),
-                        (mhsn_PointSize * 2));
+   this->setMinimumSize(((mhsn_POINT_SIZE * sn_CountIndex) + (mhsn_POINT_DISTANCE * (sn_CountIndex + 1))),
+                        (mhsn_POINT_SIZE * 2));
+   this->setMaximumSize(((mhsn_POINT_SIZE * sn_CountIndex) + (mhsn_POINT_DISTANCE * (sn_CountIndex + 1))),
+                        (mhsn_POINT_SIZE * 2));
 }

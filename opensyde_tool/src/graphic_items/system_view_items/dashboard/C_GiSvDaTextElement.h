@@ -39,6 +39,8 @@ public:
 
    //GI base
    virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;
+
+   void EnableEditContent(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

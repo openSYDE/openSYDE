@@ -14,6 +14,7 @@
 #include "C_SyvUtil.h"
 #include "C_SyvUpDeviceInfo.h"
 #include "C_PuiSvNodeUpdate.h"
+#include "C_OSCSuSequencesNodeStates.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -25,6 +26,16 @@ namespace stw_opensyde_gui
 class C_GiSvSubNodeData
 {
 public:
+   class C_GiSvSubNodeDataPreconditionErrors
+   {
+   public:
+      bool q_NvmWriteError;
+      bool q_PemWriteError;
+      bool q_DebuggerEnableError;
+      bool q_DebuggerDisableError;
+      bool q_EthToEthError;
+   };
+
    C_GiSvSubNodeData(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_NodeIndex);
    ~C_GiSvSubNodeData(void);
 
@@ -32,11 +43,14 @@ public:
    void SetUpdating(const bool oq_Active);
    void SetNodeUpdateInProgress(const bool oq_Active, const bool oq_Aborted,
                                 const stw_types::uint32 ou32_FailedApplicationIndex);
-   void SetNoResponse(void);
+   void SetErrorState(void);
    void UpdateInitialPackageStatus(const stw_opensyde_gui_logic::C_SyvUpDeviceInfo & orc_DeviceApplicationInfos);
    bool CheckUpdateDisabledState() const;
-   bool IsStwDevice(void) const;
+   bool HasNodeAnAvailableFlashloader(void) const;
    bool CheckAlwaysUpdate(void) const;
+   void SetNodeConnectStates(const stw_opensyde_core::C_OSCSuSequencesNodeConnectStates & orc_NodeStates,
+                             const C_GiSvSubNodeDataPreconditionErrors & orc_PreconditionErrors);
+   void SetNodeUpdateStates(const stw_opensyde_core::C_OSCSuSequencesNodeUpdateStates & orc_NodeStates);
 
    void CopyInitialStatus(C_GiSvSubNodeData & orc_NodeData) const;
    void CopyUpdateStatus(C_GiSvSubNodeData & orc_NodeData) const;
@@ -49,6 +63,7 @@ public:
 
    void DiscardInfo(void);
 
+   stw_types::uint32 GetNodeIndex(void) const;
    bool GetDataBlockFoundStatus(void) const;
    bool GetUpdateFailedStatus(void) const;
    bool GetUpdateSuccessStatus(void) const;
@@ -60,9 +75,15 @@ public:
    stw_types::uint32 GetHexFileInfosCount(void) const;
    stw_types::uint32 GetParamFileInfosCount(void) const;
    stw_types::uint32 GetFileInfosCount(void) const;
+   bool IsPemFileInfoSet(void) const;
    stw_types::uint32 GetHexAppInfoAmbiguousSize(void) const;
    bool GetHexAppInfoAmbiguous(const stw_types::uint32 ou32_ApplicationIndex) const;
    stw_opensyde_gui_logic::C_SyvUpDeviceInfo GetDeviceInfo(void) const;
+   const stw_opensyde_core::C_OSCSuSequencesNodeConnectStates & GetNodeConnectStates(void) const;
+   const C_GiSvSubNodeDataPreconditionErrors & GetNodeConnectPreconditionErrors(void) const;
+   const stw_opensyde_core::C_OSCSuSequencesNodeUpdateStates & GetNodeUpdateStates(void) const;
+   bool IsNodeConnectStatesSet(void) const;
+   bool IsNodeUpdateStatesSet(void) const;
 
 private:
    void m_CheckThirdParty(void);
@@ -77,6 +98,7 @@ private:
    stw_types::uint32 mu32_ViewIndex;
    stw_types::uint32 mu32_NodeIndex;
 
+   bool mq_UpdateInProgress;
    bool mq_UpdateFailed;
    bool mq_UpdateSuccess;
    bool mq_ValidStatus;
@@ -89,8 +111,18 @@ private:
    std::vector<stw_diag_lib::C_XFLECUInformation> mc_HexFileInfos;
    std::vector<QString> mc_ParamFileInfos;
    std::vector<QString> mc_FileInfos;
+   QString mc_PemFileInfo;
    std::vector<bool> mc_HexAppInfoAmbiguous;
    stw_opensyde_gui_logic::C_SyvUpDeviceInfo mc_DeviceInfo;
+
+   // Precondition check errors
+   C_GiSvSubNodeDataPreconditionErrors mc_PreconditionErrors;
+
+   // Sequence states
+   stw_opensyde_core::C_OSCSuSequencesNodeConnectStates mc_ConnectStates;
+   stw_opensyde_core::C_OSCSuSequencesNodeUpdateStates mc_UpdateStates;
+   bool mq_ConnectStatesSet;
+   bool mq_UpdateStatesSet;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

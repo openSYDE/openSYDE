@@ -25,7 +25,7 @@ using namespace stw_errors;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 C_OSCNodeDataPoolContentUtil::mhf64_Epsilon = 1e-5; // to check for a 6 digit precision (openSYDE default)
+const float64 C_OSCNodeDataPoolContentUtil::mhf64_EPSILON = 1e-5; // to check for a 6 digit precision (openSYDE default)
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -536,8 +536,8 @@ sint32 C_OSCNodeDataPoolContentUtil::h_SetValueInMinMaxRange(const C_OSCNodeData
             // because of possible numeric problems (1.25987e-321) it is checked in an epsilon environment
             // precision is 6 decimal points (should be enough and is openSYDE default)
 
-            if (((f64_Value < f64_Min) && (std::abs(f64_Value - f64_Min) >= mhf64_Epsilon)) ||
-                ((f64_Value > f64_Max) && (std::abs(f64_Value - f64_Max) >= mhf64_Epsilon)))
+            if (((f64_Value < f64_Min) && (std::abs(f64_Value - f64_Min) >= mhf64_EPSILON)) ||
+                ((f64_Value > f64_Max) && (std::abs(f64_Value - f64_Max) >= mhf64_EPSILON)))
             {
                // initial value not in min and max range, take closer min or max value
                if (std::abs(f64_Value - f64_Min) <= std::abs(f64_Value - f64_Max))

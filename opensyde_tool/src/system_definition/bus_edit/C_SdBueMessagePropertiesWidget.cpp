@@ -65,7 +65,7 @@ const uint32 mu32_DEFAULT_CYCLE_TIME = 100U;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const opc_Parent) :
@@ -104,7 +104,7 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
 
    //Initial setup
    m_OnTxMethodChange(this->mpc_Ui->pc_ComboBoxTxMethod->currentIndex());
-   m_OnExtendedChange(this->mpc_Ui->pc_CheckBoxExtendedType->isChecked());
+   m_OnExtendedChangeWithoutDataAccess(this->mpc_Ui->pc_CheckBoxExtendedType->isChecked());
 
    //We do want the SpinBoxes to emit "valueChanged" on button clicks immediately but
    // for changes through keyboard only after enter or when the field is left.
@@ -119,7 +119,7 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
    // connects
    // These elements have multiple connects to different slots
    connect(this->mpc_Ui->pc_CheckBoxExtendedType, &C_OgeChxProperties::toggled, this,
-           &C_SdBueMessagePropertiesWidget::m_OnExtendedChange);
+           &C_SdBueMessagePropertiesWidget::m_OnExtendedChangeWithoutDataAccess);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxTxMethod, static_cast<void (QComboBox::*)(
                                                              sintn)>(&C_OgeCbxText::currentIndexChanged), this,
@@ -244,7 +244,7 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set message sync manager
 
-   \param[in,out] opc_Value Message sync manager
+   \param[in,out]  opc_Value  Message sync manager
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetMessageSyncManager(
@@ -258,8 +258,8 @@ void C_SdBueMessagePropertiesWidget::SetMessageSyncManager(
 
    Sets the private message id of widget
 
-   \param[in] oq_IsValid    Flag if ID is valid
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  oq_IsValid     Flag if ID is valid
+   \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetMessageId(const bool oq_IsValid,
@@ -394,12 +394,12 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle extended id checkbox change
+/*! \brief   Handle extended id checkbox change (no data access in this function)
 
-   \param[in] orq_Extended Extended ID active
+   \param[in]  orq_Extended   Extended ID active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessagePropertiesWidget::m_OnExtendedChange(const bool & orq_Extended) const
+void C_SdBueMessagePropertiesWidget::m_OnExtendedChangeWithoutDataAccess(const bool & orq_Extended) const
 {
    if (this->me_ComProtocol == C_OSCCanProtocol::eCAN_OPEN_SAFETY)
    {
@@ -423,7 +423,7 @@ void C_SdBueMessagePropertiesWidget::m_OnExtendedChange(const bool & orq_Extende
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle checkbox tx method change
 
-   \param[in] ors32_State Check box state
+   \param[in]  ors32_State    Check box state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnTxMethodChange(const sint32 & ors32_State) const
@@ -466,7 +466,7 @@ void C_SdBueMessagePropertiesWidget::m_OnTxMethodChange(const sint32 & ors32_Sta
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform tx method type to index
 
-   \param[in] ore_TxMethod Tx method type
+   \param[in]  ore_TxMethod   Tx method type
 
    \return
    Combo box index
@@ -497,7 +497,7 @@ sint32 C_SdBueMessagePropertiesWidget::mh_TxMethodToIndex(const C_OSCCanMessage:
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform index to tx method type
 
-   \param[in] ors32_Index Index
+   \param[in]  ors32_Index    Index
 
    \return
    Tx method type
@@ -544,6 +544,17 @@ void C_SdBueMessagePropertiesWidget::m_OnIdChanged(void)
    m_OnPropertiesChanged();
    m_CheckMessageId();
    Q_EMIT this->SigMessageNameChanged();
+   Q_EMIT this->SigRecheckError();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle extended flag change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessagePropertiesWidget::m_OnExtendedChanged()
+{
+   m_OnPropertiesChanged();
+   m_CheckMessageId();
    Q_EMIT this->SigRecheckError();
 }
 
@@ -935,10 +946,10 @@ void C_SdBueMessagePropertiesWidget::m_OnTxChanged(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle receiver changed
 
-   \param[in] ou32_NodeIndex      Node index (ID)
-   \param[in] ou32_InterfaceIndex Interface index (ID)
-   \param[in] ou32_DatapoolIndex  Datapool index (ID)
-   \param[in] oq_Checked          Flag if checked
+   \param[in]  ou32_NodeIndex       Node index (ID)
+   \param[in]  ou32_InterfaceIndex  Interface index (ID)
+   \param[in]  ou32_DatapoolIndex   Datapool index (ID)
+   \param[in]  oq_Checked           Flag if checked
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnRxChanged(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
@@ -1039,10 +1050,10 @@ void C_SdBueMessagePropertiesWidget::m_OnRxChanged(const uint32 ou32_NodeIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle auto receive timeout flag changed (bus mode)
 
-   \param[in] ou32_NodeIndex      Node index (ID)
-   \param[in] ou32_InterfaceIndex Interface index (ID)
-   \param[in] ou32_DatapoolIndex  Datapool index (ID)
-   \param[in] oe_TimeoutMode      Receive timeout mode
+   \param[in]  ou32_NodeIndex       Node index (ID)
+   \param[in]  ou32_InterfaceIndex  Interface index (ID)
+   \param[in]  ou32_DatapoolIndex   Datapool index (ID)
+   \param[in]  oe_TimeoutMode       Receive timeout mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutFlagChanged(const uint32 ou32_NodeIndex,
@@ -1063,10 +1074,10 @@ void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutFlagChanged(const uint32 ou32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle receive timeout value changed (bus mode)
 
-   \param[in] ou32_NodeIndex      Node index (ID)
-   \param[in] ou32_InterfaceIndex Interface index (ID)
-   \param[in] ou32_DatapoolIndex  Datapool index (ID)
-   \param[in] ou32_TimeoutValue   Receive timeout value
+   \param[in]  ou32_NodeIndex       Node index (ID)
+   \param[in]  ou32_InterfaceIndex  Interface index (ID)
+   \param[in]  ou32_DatapoolIndex   Datapool index (ID)
+   \param[in]  ou32_TimeoutValue    Receive timeout value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutValueChanged(const uint32 ou32_NodeIndex,
@@ -1090,7 +1101,7 @@ void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutValueChanged(const uint32 ou32
 void C_SdBueMessagePropertiesWidget::m_ConnectProtocolSpecificFields(void) const
 {
    connect(this->mpc_Ui->pc_CheckBoxExtendedType, &C_OgeChxProperties::toggled, this,
-           &C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged);
+           &C_SdBueMessagePropertiesWidget::m_OnExtendedChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxId, static_cast<void (QSpinBox::*)(sintn)>(&C_OgeSpxNumber::valueChanged), this,
            &C_SdBueMessagePropertiesWidget::m_OnIdChanged);
@@ -1110,7 +1121,7 @@ void C_SdBueMessagePropertiesWidget::m_ConnectProtocolSpecificFields(void) const
 void C_SdBueMessagePropertiesWidget::m_DisconnectProtocolSpecificFields(void) const
 {
    disconnect(this->mpc_Ui->pc_CheckBoxExtendedType, &C_OgeChxProperties::toggled, this,
-              &C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged);
+              &C_SdBueMessagePropertiesWidget::m_OnExtendedChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_SpinBoxId, static_cast<void (QSpinBox::*)(sintn)>(&C_OgeSpxNumber::valueChanged), this,
               &C_SdBueMessagePropertiesWidget::m_OnIdChanged);
@@ -1170,7 +1181,7 @@ void C_SdBueMessagePropertiesWidget::m_DisconnectNodeSpecificFields(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set widgets visible/invisible depending on 'mode' (node vs bus).
 
-   \param[in]       oq_BusMode  true: bus mode, false: node mode
+   \param[in]  oq_BusMode  true: bus mode, false: node mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_SetModeSpecificWidgetsVisible(const bool oq_BusMode) const
@@ -1191,8 +1202,8 @@ void C_SdBueMessagePropertiesWidget::m_SetModeSpecificWidgetsVisible(const bool 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set transmit widgets visible and receive widgets invisible or vice versa.
 
-   \param[in]       oq_Visible   true: show transmit and hide receive
-                                 false: hide transmit and show receive
+   \param[in]  oq_Visible  true: show transmit and hide receive
+                           false: hide transmit and show receive
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_SetNodeModeTransmitVisible(const bool oq_Visible) const
@@ -1206,7 +1217,7 @@ void C_SdBueMessagePropertiesWidget::m_SetNodeModeTransmitVisible(const bool oq_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set node mode receive widgets visible/invisible.
 
-   \param[in]       oq_Visible   true: show, false: hide
+   \param[in]  oq_Visible  true: show, false: hide
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_SetNodeModeReceiveVisible(const bool oq_Visible) const
@@ -1619,10 +1630,10 @@ sint32 C_SdBueMessagePropertiesWidget::m_GetVectorIndexOfComboBoxSelection(void)
 
    Throws assertion when not found
 
-   \param[in]       ou32_VectorIndex            Index of the vectors mc_NodeIndexes, mc_InterfaceIndexes and
-                                                mc_DatapoolIndexes
-   \param[out]      oru32_ComboBoxNodeIndex     Detected index of node combo box
-   \param[out]      oru32_ComboBoxDatapoolIndex Detected index of Datapool combo box
+   \param[in]   ou32_VectorIndex             Index of the vectors mc_NodeIndexes, mc_InterfaceIndexes and
+                                             mc_DatapoolIndexes
+   \param[out]  oru32_ComboBoxNodeIndex      Detected index of node combo box
+   \param[out]  oru32_ComboBoxDatapoolIndex  Detected index of Datapool combo box
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_GetComboBoxIndexesByVectorIndex(const uint32 ou32_VectorIndex,
@@ -1679,7 +1690,7 @@ void C_SdBueMessagePropertiesWidget::m_SyncLaterToCycle(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the tool tip and color of combo boxes for node and Datapool transmitter configuration
 
-   \param[in]       oq_Valid     Flag if transmitter configuration is valid or not
+   \param[in]  oq_Valid    Flag if transmitter configuration is valid or not
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_BusModeAdaptTransmitterComboBoxesValid(const bool oq_Valid) const
@@ -1713,7 +1724,7 @@ void C_SdBueMessagePropertiesWidget::m_BusModeAdaptTransmitterComboBoxesValid(co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adaption and updated of the ui due to changed direction
 
-   \param[in]  oq_DontDisconnect    Do a disconnect and connect for all change signals
+   \param[in]  oq_Disconnect  Do a disconnect and connect for all change signals
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_NodeModeDirectionChanged(const bool oq_Disconnect)
@@ -1937,9 +1948,9 @@ uint32 C_SdBueMessagePropertiesWidget::m_GetDefaultTimeout(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the node 'mode' of the widget with all necessary indexes
 
-   \param[in] ou32_NodeIndex      Node index
-   \param[in] ou32_InterfaceIndex Interface index
-   \param[in] orc_DatapoolIndexes All Datapool indexes associated to the same protocol
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  orc_DatapoolIndexes  All Datapool indexes associated to the same protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetNodeId(const stw_types::uint32 ou32_NodeIndex,
@@ -1958,7 +1969,7 @@ void C_SdBueMessagePropertiesWidget::SetNodeId(const stw_types::uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the bus 'mode' of the widget
 
-   \param[in] ou32_BusIndex Bus index
+   \param[in]  ou32_BusIndex  Bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetBusId(const uint32 ou32_BusIndex)
@@ -2011,7 +2022,7 @@ void C_SdBueMessagePropertiesWidget::OnConnectionChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new com protocol
 
-   \param[in] ore_Value New value
+   \param[in]  ore_Value   New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Type & ore_Value)
@@ -2061,7 +2072,7 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Ty
       this->mpc_Ui->pc_ComboBoxTxMethod->setEnabled(true);
    }
    //Min max handling (initially extended type is always set to false)
-   m_OnExtendedChange(false);
+   m_OnExtendedChangeWithoutDataAccess(false);
    //Restrict delay time to 16 bit unsigned
    this->mpc_Ui->pc_SpinBoxEarly->SetMinimumCustom(0);
    this->mpc_Ui->pc_SpinBoxEarly->SetMaximumCustom(50000);
@@ -2086,8 +2097,8 @@ void C_SdBueMessagePropertiesWidget::SelectName(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   In case of a disconnected node update of the unique message ids
 
-   \param[in]     ou32_NodeIndex      Node index
-   \param[in]     ou32_InterfaceIndex Interface index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::OnNodeDisconnected(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
@@ -2196,6 +2207,7 @@ GetMatchingMessageIds(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check bus name
+
    - check input
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -2244,6 +2256,7 @@ void C_SdBueMessagePropertiesWidget::m_CheckMessageName(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check bus id
+
    - check input
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -2252,6 +2265,7 @@ void C_SdBueMessagePropertiesWidget::m_CheckMessageId(void) const
    if (this->mq_IdIsValid)
    {
       const uint32 u32_Id = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxId->value());
+      const bool q_Id = this->mpc_Ui->pc_CheckBoxExtendedType->isChecked();
 
       //check
       bool q_NameIsValid = false;
@@ -2261,7 +2275,8 @@ void C_SdBueMessagePropertiesWidget::m_CheckMessageId(void) const
 
       if (this->mpc_MessageSyncManager != NULL)
       {
-         this->mpc_MessageSyncManager->CheckMessageIdBus(u32_Id, q_NameIsValid, &this->mc_MessageId, &q_EcosRangeError,
+         this->mpc_MessageSyncManager->CheckMessageIdBus(C_OSCCanMessageUniqueId(u32_Id,
+                                                                                 q_Id), q_NameIsValid, &this->mc_MessageId, &q_EcosRangeError,
                                                          &q_EcosEvenError, &q_DuplicateDetected);
       }
 

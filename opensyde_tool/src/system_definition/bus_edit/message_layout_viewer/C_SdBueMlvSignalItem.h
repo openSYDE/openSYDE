@@ -90,8 +90,8 @@ private:
    QRectF mc_RightResizeItemRectClick;
 
    const stw_types::float64 mf64_Space;
-   static const stw_types::float64 mhf64_ResizeItemHeight;
-   static const stw_types::float64 mhf64_ResizeItemClickOffset;
+   static const stw_types::float64 mhf64_RESIZE_ITEM_HEIGHT;
+   static const stw_types::float64 mhf64_RESIZE_ITEM_CLICK_OFFSET;
    QColor mc_DrawReizeItemColor;
 };
 

@@ -77,7 +77,7 @@ public:
                                   std::vector<QString> * const opc_CriticalDatapoolNamespaceNames) const;
    stw_types::sint32 MapNodeNameToIndex(const QString & orc_NodeName, stw_types::uint32 & oru32_NodeIndex) const;
    stw_types::sint32 MapNodeIndexToName(const stw_types::uint32 ou32_NodeIndex, QString & orc_NodeName) const;
-   bool IsNodeAStwDevice(const stw_types::uint32 ou32_NodeIndex) const;
+   bool HasNodeAnAvailableFlashloader(const stw_types::uint32 ou32_NodeIndex) const;
    bool CheckNodeIndexAssociatedWithAnotherNodeIndex(const stw_types::uint32 ou32_FirstNodeIndex,
                                                      const stw_types::uint32 ou32_SecondNodeIndex) const;
 
