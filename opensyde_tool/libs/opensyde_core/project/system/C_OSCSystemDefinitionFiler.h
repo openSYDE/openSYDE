@@ -75,6 +75,10 @@ public:
    static const stw_types::uint16 hu16_FILE_VERSION_2 = 2U;
    static const stw_types::uint16 hu16_FILE_VERSION_3 = 3U;
    static const stw_types::uint16 hu16_FILE_VERSION_LATEST = hu16_FILE_VERSION_3;
+
+private:
+   static std::map<stw_types::uint32, stw_scl::C_SCLString> mh_MapNodeIndicesToName(
+      const std::vector<C_OSCNode> & orc_Nodes);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

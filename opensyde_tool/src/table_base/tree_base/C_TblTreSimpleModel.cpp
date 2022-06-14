@@ -13,10 +13,12 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
+#include "stwerrors.h"
 #include "C_TblTreSimpleModel.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
+using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -117,7 +119,8 @@ QModelIndex C_TblTreSimpleModel::parent(const QModelIndex & orc_Index) const
             const sint32 s32_Index = pc_TreeItem->pc_Parent->GetIndexInParentNumber();
             if (s32_Index >= 0)
             {
-               c_Retval = createIndex(s32_Index, orc_Index.column(), pc_TreeItem->pc_Parent);
+               //Parent should always use column 0
+               c_Retval = createIndex(s32_Index, 0, pc_TreeItem->pc_Parent);
             }
          }
       }
@@ -158,4 +161,45 @@ sintn C_TblTreSimpleModel::rowCount(const QModelIndex & orc_Parent) const
    }
 
    return sn_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Count layers
+
+   \param[in]   orc_Index           Index
+   \param[out]  oru32_ValidLayers   Number of valid layers, starts with 1 for the top layer
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Valid layers returned
+   \retval   C_CONFIG   Could not determine number of valid layers
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_TblTreSimpleModel::m_CountLayers(const QModelIndex & orc_Index, uint32 & oru32_ValidLayers) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_Index.isValid())
+   {
+      //lint -e{9079}  Result of Qt interface restrictions, set by index function
+      const C_TblTreSimpleItem * const pc_TreeItem =
+         static_cast<const C_TblTreSimpleItem *>(orc_Index.internalPointer());
+
+      if (pc_TreeItem != NULL)
+      {
+         oru32_ValidLayers = 0UL;
+         this->m_CountLayers(orc_Index.parent(), oru32_ValidLayers);
+         ++oru32_ValidLayers;
+      }
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
+   }
+   else
+   {
+      oru32_ValidLayers = 0UL;
+   }
+   return s32_Retval;
 }

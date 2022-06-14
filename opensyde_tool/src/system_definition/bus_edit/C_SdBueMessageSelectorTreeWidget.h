@@ -19,6 +19,7 @@
 #include "C_OgeTreeWidgetToolTipBase.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
 #include "C_OSCCanMessageIdentificationIndices.h"
+#include "C_SdBusMessageSelectorTreeWidgetItem.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -79,6 +80,7 @@ public:
    void OnMessageIdChange(void);
    void OnMessageNameChange(void);
    void OnSignalNameChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void OnSignalPositionChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void OnNodeDisconnected(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
    void RecheckErrorGlobal(const bool & orq_HandleSelection = true);
    void RecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -90,6 +92,7 @@ public:
    void SelectSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint32 & oru32_SignalIndex, const bool oq_BlockSignal = true);
    stw_types::sint32 GetLevelOfPos(const QPoint & orc_Pos) const;
+   bool IsSelectedMessageContentReadOnly(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -102,6 +105,7 @@ Q_SIGNALS:
    void SigSignalCountOfMessageChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void SigMessageCountChanged(void);
    void SigSelectName(void);
+   void SigRefreshSelection(void);
    void SigZeroMessages(void);
    void SigErrorChanged(void);
    void SigReload(void);
@@ -121,11 +125,16 @@ private:
    C_SdBueMessageSelectorTreeWidget & operator =(const C_SdBueMessageSelectorTreeWidget &);
 
    void m_ReloadTree(const bool & orq_HandleSelection = true);
+   void m_AddSignal(const stw_types::uint32 ou32_MessageIndex);
+   void m_AddCoSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                      const stw_types::uint32 ou32_SignalIndex, const stw_types::uint16 ou16_StartBit);
+   void m_AutoAdaptCoDlc(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_InsertMessage(const stw_types::uint32 & oru32_MessageIdIndex);
    void m_InsertSignal(QTreeWidgetItem * const opc_MessageItem, const stw_types::uint32 ou32_SignalIndex,
                        const QString & orc_SignalName) const;
 
    void m_SelectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected);
+   void m_CoMessageCheckedStateChanged(C_SdBusMessageSelectorTreeWidgetItem * const opc_Item);
    void m_DeselectChildren(const QTreeWidgetItem * const opc_Parent) const;
    void m_TreeSizeChanged(void);
    void m_ScrollBarRangeChanged(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
@@ -138,6 +147,7 @@ private:
    stw_types::sint32 m_GetMessageIdForAdd(stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_UpdateUniqueMessageIds(void);
    void m_UpdateUniqueMessageIdsSignals(const stw_types::uint32 & oru32_InternalMessageIndex);
+   void m_CoLoadEdsRestricitions(void);
    void m_DisconnectSelection(void);
    void m_ReconnectSelection(void);
    void m_SendMessageSelectionUpdate(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
@@ -163,6 +173,7 @@ private:
    stw_opensyde_gui_logic::C_SdBueUnoManager * mpc_UndoManager;
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * mpc_MessageSyncManager;
    std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> mc_UniqueMessageIds;
+   std::vector<stw_types::uint8> mc_CoUniqueMessagesPDOMappingRo;
    std::vector<std::vector<stw_types::uint32> > mc_UniqueMessageIdsSignalsOrder;
    std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> mc_SelectedMessageIds;
    std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> mc_ExpandedMessageIds;

@@ -288,6 +288,12 @@ QString C_SdUtil::h_ConvertTxMethodToName(const C_OSCCanMessage::E_TxMethodType 
    case C_OSCCanMessage::eTX_METHOD_CYCLIC:
       c_Retval = C_GtGetText::h_GetText("Cyclic");
       break;
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
+      c_Retval = C_GtGetText::h_GetText("CANopen transmission type 254");
+      break;
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
+      c_Retval = C_GtGetText::h_GetText("CANopen transmission type 255");
+      break;
    case C_OSCCanMessage::eTX_METHOD_ON_CHANGE:
       c_Retval = C_GtGetText::h_GetText("On Change");
       break;
@@ -954,6 +960,7 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message, C_Pui
             orc_Message.u32_CanId = mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX;
          }
          break;
+      case C_OSCCanProtocol::eCAN_OPEN:
       case C_OSCCanProtocol::eLAYER2:
       default:
          //No restrictions

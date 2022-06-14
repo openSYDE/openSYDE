@@ -19,6 +19,7 @@
 #include "TGLUtils.h"
 #include "stwerrors.h"
 #include "C_OSCUtils.h"
+#include "C_OgeSpxInt64.h"
 #include "C_OgeSpxDoubleAutoFix.h"
 #include "C_SdNdeDpContentUtil.h"
 
@@ -260,9 +261,9 @@ QString C_OgeSpxDoubleAutoFix::m_PrepareSpinBoxValue(const QString & orc_Text) c
 //----------------------------------------------------------------------------------------------------------------------
 QString C_OgeSpxDoubleAutoFix::m_ExtractSpinBoxValue(const QString & orc_Text) const
 {
-   QString c_Retval = orc_Text;
+   const QString c_Retval = C_OgeSpxInt64::h_ExtractSpinBoxValue(orc_Text, this->suffix());
 
-   return c_Retval.remove(this->suffix());
+   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

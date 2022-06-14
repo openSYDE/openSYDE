@@ -95,6 +95,7 @@ private:
    void m_InitBorderItems(void);
    void m_InitEmptyItems(void);
    void m_InitProtocolItems(void);
+   void m_CoLoadEdsRestricitions(void);
    void m_AddSignal(const stw_types::uint32 ou32_SignalIndex);
    void m_RemoveSignal(const stw_types::uint32 ou32_SignalIndex);
 
@@ -198,6 +199,9 @@ private:
 
    // ECeS hint
    C_SdBueMlvBaseItem * mapc_ECeSHints[2];
+
+   // CANopen specific
+   bool mq_CoFixedMapping;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

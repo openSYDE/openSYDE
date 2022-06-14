@@ -299,6 +299,59 @@ C_SCLString C_OSCExportUti::h_GetTypePrefix(const C_OSCNodeDataPoolContent::E_Ty
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get type prefix according to data type
+
+   \param[in]  oe_Type     data type (uint8, sint8, ...)
+
+   \return
+   data type as string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCExportUti::h_GetElementTypeAsString(const C_OSCNodeDataPoolContent::E_Type oe_Type)
+{
+   C_SCLString c_Retval;
+
+   switch (oe_Type)
+   {
+   case C_OSCNodeDataPoolContent::eUINT8: // Data type unsigned 8 bit integer
+      c_Retval += "UINT8";
+      break;
+   case C_OSCNodeDataPoolContent::eUINT16: // Data type unsigned 16 bit integer
+      c_Retval += "UINT16";
+      break;
+   case C_OSCNodeDataPoolContent::eUINT32: // Data type unsigned 32 bit integer
+      c_Retval += "UINT32";
+      break;
+   case C_OSCNodeDataPoolContent::eUINT64: // Data type unsigned 64 bit integer
+      c_Retval += "UINT64";
+      break;
+   case C_OSCNodeDataPoolContent::eSINT8: // Data type signed 8 bit integer
+      c_Retval += "SINT8";
+      break;
+   case C_OSCNodeDataPoolContent::eSINT16: // Data type signed 16 bit integer
+      c_Retval += "SINT16";
+      break;
+   case C_OSCNodeDataPoolContent::eSINT32: // Data type signed 32 bit integer
+      c_Retval += "SINT32";
+      break;
+   case C_OSCNodeDataPoolContent::eSINT64: // Data type signed 64 bit integer
+      c_Retval += "SINT64";
+      break;
+   case C_OSCNodeDataPoolContent::eFLOAT32: // Data type 32 bit floating point
+      c_Retval += "FLOAT32";
+      break;
+   case C_OSCNodeDataPoolContent::eFLOAT64: // Data type 64 bit floating point
+      c_Retval += "FLOAT64";
+      break;
+   default:
+      tgl_assert(false);
+      break;
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get C variable name for a Datapool list element.
 
    \param[in]  orc_Name       Name

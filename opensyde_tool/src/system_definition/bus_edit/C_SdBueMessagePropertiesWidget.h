@@ -89,18 +89,24 @@ private:
 
    bool mq_InternalRxChange;
 
+   // CANopen specific
+   bool mq_CoDeviceIsTransmitter;
+   bool mq_CoEventTimerDisabled;
+
    void m_CheckMessageName(void) const;
    void m_CheckMessageId(void) const;
    void m_CheckEarlyTime(void) const;
    void m_TrimmMessageName(void) const;
    void m_RegisterChange(void);
    void m_LoadFromData(void);
+   void m_CoLoadEdsRestricitions(const stw_opensyde_core::C_OSCCanMessage * const opc_Message);
    void m_OnExtendedChangeWithoutDataAccess(const bool & orq_Extended) const;
    void m_OnTxMethodChange(const stw_types::sint32 & ors32_State) const;
    static stw_types::sint32 mh_TxMethodToIndex(const stw_opensyde_core::C_OSCCanMessage::E_TxMethodType & ore_TxMethod);
    static stw_opensyde_core::C_OSCCanMessage::E_TxMethodType mh_IndexToTxMethod(const stw_types::sint32 & ors32_Index);
    void m_OnNameChanged(void);
    void m_OnIdChanged(void);
+   void m_OnCobIdChanged(void);
    void m_OnExtendedChanged(void);
    void m_OnDlcChanged(void);
    void m_OnCycleTimeChanged(void);

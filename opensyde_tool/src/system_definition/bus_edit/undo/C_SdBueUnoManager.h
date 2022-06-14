@@ -14,8 +14,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTreeWidget>
 #include "C_UtiUndoStack.h"
-#include "C_OSCCanMessageIdentificationIndices.h"
+#include "C_SdBueCoAddSignalsResultEntry.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
+#include "C_OSCCanMessageIdentificationIndices.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -71,6 +72,11 @@ public:
                     const stw_types::uint16 ou16_MultiplexerValue,
                     C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                     QTreeWidget * const opc_MessageTreeWidget);
+   void DoAddCoSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                      const stw_types::uint32 ou32_SignalIndex, const stw_types::uint16 ou16_StartBit,
+                      const std::vector<C_SdBueCoAddSignalsResultEntry> & orc_NewSignalInfo,
+                      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+                      QTreeWidget * const opc_MessageTreeWidget);
    void DoDeleteSignals(const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageId,
                         const std::vector<stw_types::uint32> & orc_SignalIndex,
                         C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,

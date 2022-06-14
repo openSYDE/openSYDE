@@ -296,6 +296,18 @@ sint32 C_UsHandler::GetSdNodeEditHalcSplitterX(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get HALC screen splitter x position value
+
+   \return
+   Current HALC screen splitter x position value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_UsHandler::GetSdNodeEditCoManagerSplitterX(void) const
+{
+   return this->ms32_SdNodEditCoManagerSplitterX;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get bus edit tree splitter x position value
 
    \return
@@ -648,6 +660,18 @@ QString C_UsHandler::GetProjSdTopologyLastKnownImportPath(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known can open path
+
+   \return
+   Last known CAN open path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetProjSdTopologyLastKnownCANopenEDSPath(void) const
+{
+   return this->mc_ProjSdTopologyLastKnownCANopenEDSPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get last known import path of an device-definition file
 
    \return
@@ -950,6 +974,17 @@ void C_UsHandler::SetSdNodeEditHalcSplitterX(const sint32 os32_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set node edit HALC screen splitter x position value
+
+   \param[in]  os32_Value  New splitter position x value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetSdNodeEditCoManagerSplitterX(const sint32 os32_Value)
+{
+   this->ms32_SdNodEditCoManagerSplitterX = os32_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set bus edit tree splitter x position value
 
    \param[in]  os32_Value  New bus edit tree splitter x position value
@@ -1226,6 +1261,17 @@ void C_UsHandler::SetLastKnownServiceProjectPath(const QString & orc_NewPath)
 void C_UsHandler::SetProjSdTopologyLastKnownImportPath(const QString & orc_New)
 {
    this->mc_ProjSdTopologyLastKnownImportPath = orc_New;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known CAN open path
+
+   \param[in]  orc_New  New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdTopologyLastKnownCANopenEDSPath(const QString & orc_New)
+{
+   this->mc_ProjSdTopologyLastKnownCANopenEDSPath = orc_New;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2362,6 +2408,7 @@ C_UsHandler::C_UsHandler(void) :
    mc_DefaultProjectsFolder(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/openSYDE/Projects"),
    ms32_SdNodeEditSplitterX(1000),
    ms32_SdNodEditHalcSplitterX(400),
+   ms32_SdNodEditCoManagerSplitterX(400),
    ms32_SdBusEditTreeSplitterX(0),
    ms32_SdBusEditLayoutSplitterX(0)
 {

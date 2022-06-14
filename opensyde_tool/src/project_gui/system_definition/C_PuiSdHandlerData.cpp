@@ -498,7 +498,7 @@ QString C_PuiSdHandlerData::h_AutomaticCStringAdaptation(const QString & orc_Inp
 
    for (sintn sn_It = 0; sn_It < orc_Input.length(); ++sn_It)
    {
-      if (C_OSCUtils::h_CheckValidCName(orc_Input.at(sn_It).toLatin1()) == false)
+      if (C_OSCUtils::h_CheckValidCName(orc_Input.at(sn_It).toLatin1(), true) == false)
       {
          c_Retval += "_";
       }
@@ -694,6 +694,28 @@ uint32 C_PuiSdHandlerData::m_GetHashBus(const uint32 ou32_BusIndex) const
       rc_Bus.CalcHash(u32_Retval);
    }
    return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node added
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeAdded(const uint32 ou32_Index)
+{
+   Q_EMIT this->SigSyncNodeAdded(ou32_Index);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle data sync for node about to be deleted
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerData::m_HandleSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
+{
+   Q_EMIT this->SigSyncNodeAboutToBeDeleted(ou32_Index);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -1307,6 +1307,9 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetProtocolNameByType(const C_OSCC
    case C_OSCCanProtocol::eECES:
       c_Name = "eces";
       break;
+   case C_OSCCanProtocol::eCAN_OPEN:
+      c_Name = "can open";
+      break;
    default:
       tgl_assert(false);
       break;
@@ -1370,7 +1373,10 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetTransmissionTriggerNameByType(
    case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
       c_Name = "OSY_COM_COMM_METHOD_ON_EVENT";
       break;
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
    default:
+      //not supported for COMM
       tgl_assert(false);
       break;
    }

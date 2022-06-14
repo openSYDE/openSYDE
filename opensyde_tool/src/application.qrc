@@ -677,5 +677,6 @@
         <file>images/main_page_and_navi_bar/Icon_password_key.svg</file>
         <file>images/main_page_and_navi_bar/IconEditDisabled.svg</file>
         <file>images/main_page_and_navi_bar/Icon_open_list_disabled.svg</file>
+        <file>images/system_definition/IconBusInactive.svg</file>
     </qresource>
 </RCC>

@@ -13,6 +13,7 @@
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
+#include "TGLUtils.h"
 #include "C_UsHandler.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdBueMessageSignalEditWidget.h"
@@ -48,11 +49,21 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSignalEditWidget::C_SdBueMessageSignalEditWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
-   mpc_Ui(new Ui::C_SdBueMessageSignalEditWidget)
+   mpc_Ui(new Ui::C_SdBueMessageSignalEditWidget),
+   me_ProtocolType(C_OSCCanProtocol::eLAYER2)
 {
+   // Init UI
    mpc_Ui->setupUi(this);
+
    this->mpc_Ui->pc_MsgPropertiesWidget->setVisible(false);
    this->mpc_Ui->pc_SignalLabel->setVisible(false);
+   this->mpc_Ui->pc_CoDisabledInfoWidget->setVisible(false);
+
+   this->mpc_Ui->pc_CoDisabledInfoIconLabel->SetSvg("://images/Info_Icon_MessageBox.svg");
+   this->mpc_Ui->pc_CoDisabledInfoNoteLabel->SetForegroundColor(3);
+   this->mpc_Ui->pc_CoDisabledInfoNoteLabel->SetFontPixel(14, false, true);
+   this->mpc_Ui->pc_CoDisabledInfoLabel->SetForegroundColor(7);
+   this->mpc_Ui->pc_CoDisabledInfoLabel->SetFontPixel(14, false, false);
 
    this->InitStaticNames();
 
@@ -75,6 +86,8 @@ C_SdBueMessageSignalEditWidget::C_SdBueMessageSignalEditWidget(QWidget * const o
            &C_SdBueMessageSignalEditWidget::m_OnSignalNameChanged);
    connect(this->mpc_Ui->pc_SigPropertiesWidget, &C_SdBueSignalPropertiesWidget::SigStartBitChanged, this,
            &C_SdBueMessageSignalEditWidget::m_OnSignalStartBitChanged);
+   connect(this->mpc_Ui->pc_SigPropertiesWidget, &C_SdBueSignalPropertiesWidget::SigSignalPositionChanged, this,
+           &C_SdBueMessageSignalEditWidget::m_OnSignalPositionChanged);
    connect(this->mpc_Ui->pc_MsgLayoutViewerWidget, &C_SdBueMlvWidget::SigSignalActivated, this,
            &C_SdBueMessageSignalEditWidget::m_OnSignalActivated);
    //Error
@@ -150,9 +163,11 @@ void C_SdBueMessageSignalEditWidget::SetMessageSyncManager(
    \param[in]  ore_Value   New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value) const
+void C_SdBueMessageSignalEditWidget::SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value)
 {
+   this->me_ProtocolType = ore_Value;
    this->mpc_Ui->pc_MsgPropertiesWidget->SetComProtocol(ore_Value);
+   this->mpc_Ui->pc_SigPropertiesWidget->SetComProtocol(ore_Value);
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SetComProtocol(ore_Value);
 }
 
@@ -172,6 +187,8 @@ void C_SdBueMessageSignalEditWidget::SelectMessage(const C_OSCCanMessageIdentifi
    this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(true, orc_MessageId);
    //also initialize signal properties to have valid indices for everything besides signal index itself
    this->mpc_Ui->pc_SigPropertiesWidget->SetSignalId(orc_MessageId, 0U);
+
+   this->m_HandleDisabledPdoInfo(orc_MessageId);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -191,6 +208,8 @@ void C_SdBueMessageSignalEditWidget::SelectSignal(const C_OSCCanMessageIdentific
    this->mpc_Ui->pc_MessageLabel->setVisible(false);
    this->mpc_Ui->pc_SignalLabel->setVisible(true);
    this->mpc_Ui->pc_SigPropertiesWidget->SetSignalId(orc_MessageId, oru32_SignalIndex);
+
+   this->m_HandleDisabledPdoInfo(orc_MessageId);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -303,6 +322,9 @@ void C_SdBueMessageSignalEditWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_SignalLabel->setText(C_GtGetText::h_GetText("Signal Properties"));
    this->mpc_Ui->pc_MessageLabel->setText(C_GtGetText::h_GetText("Message Properties"));
+   this->mpc_Ui->pc_CoDisabledInfoNoteLabel->setText(C_GtGetText::h_GetText("Note:"));
+   this->mpc_Ui->pc_CoDisabledInfoLabel->setText(
+      C_GtGetText::h_GetText("This PDO is disabled. Unique COB-ID check is inactive on disabled PDOs."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -329,16 +351,49 @@ void C_SdBueMessageSignalEditWidget::SelectName(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reload the current selection
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalEditWidget::RefreshSelection(void)
+{
+   bool q_MessageSelected;
+   bool q_SignalSelected;
+   C_OSCCanMessageIdentificationIndices c_MessageId;
+   uint32 u32_SignalIndex;
+
+   this->GetLastSelection(q_MessageSelected, NULL,
+                          q_SignalSelected, NULL,
+                          &c_MessageId, &u32_SignalIndex);
+
+   if (q_SignalSelected == true)
+   {
+      this->SelectSignal(c_MessageId, u32_SignalIndex);
+   }
+   else if (q_MessageSelected == true)
+   {
+      this->SelectMessage(c_MessageId);
+   }
+   else
+   {
+      // Nothing to do
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get last selection info
 
    \param[out]  orq_MessageSelected    Set flag if there is a selected message
-   \param[out]  orc_MessageName        Selected message name if any
+   \param[out]  opc_MessageName        Optional: Selected message name if any
    \param[out]  orq_SignalSelected     Flag if signal selected
-   \param[out]  orc_SignalName         Selected signal name if any
+   \param[out]  opc_SignalName         Optional: Selected signal name if any
+   \param[out]  opc_MessageId          Optional: Selected message id if any
+   \param[out]  opu32_SignalIndex      Optional: Selected signal index if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected, QString & orc_MessageName,
-                                                      bool & orq_SignalSelected, QString & orc_SignalName) const
+void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected, QString * const opc_MessageName,
+                                                      bool & orq_SignalSelected, QString * const opc_SignalName,
+                                                      C_OSCCanMessageIdentificationIndices * const opc_MessageId,
+                                                      uint32 * const opu32_SignalIndex) const
 {
    // do not use visibility of signal/message properties widget here, because they might be already invisible
    orq_MessageSelected = false;
@@ -352,8 +407,16 @@ void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected
       const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MatchingIds[0]);
       if (pc_Message != NULL)
       {
-         orc_MessageName = pc_Message->c_Name.c_str();
          orq_MessageSelected = true;
+
+         if (opc_MessageName != NULL)
+         {
+            *opc_MessageName = pc_Message->c_Name.c_str();
+         }
+         if (opc_MessageId != NULL)
+         {
+            *opc_MessageId = c_MatchingIds[0];
+         }
       }
    }
 
@@ -367,10 +430,26 @@ void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected
          C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_Id, u32_SignalIndex);
       if ((pc_Message != NULL) && (pc_Signal != NULL))
       {
-         orc_MessageName = pc_Message->c_Name.c_str();
-         orc_SignalName = pc_Signal->c_Name.c_str();
          orq_MessageSelected = false;
          orq_SignalSelected = true;
+
+         if (opc_MessageName != NULL)
+         {
+            *opc_MessageName = pc_Message->c_Name.c_str();
+         }
+         if (opc_SignalName != NULL)
+         {
+            *opc_SignalName = pc_Signal->c_Name.c_str();
+         }
+
+         if (opc_MessageId != NULL)
+         {
+            *opc_MessageId = c_Id;
+         }
+         if (opu32_SignalIndex != NULL)
+         {
+            *opu32_SignalIndex = u32_SignalIndex;
+         }
       }
    }
 }
@@ -477,10 +556,11 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaSelector(void)
    //If not current selected
    if (this->m_GetMessageId(c_MessageId) == C_NO_ERR)
    {
-      Q_EMIT this->SigRecheckError(c_MessageId);
+      Q_EMIT (this->SigRecheckError(c_MessageId));
    }
-   Q_EMIT this->SigChanged();
+   Q_EMIT (this->SigChanged());
    Q_EMIT (this->SigSignalStartBitChanged(c_MessageId));
+   Q_EMIT (this->SigSignalPositionChanged(c_MessageId));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -520,6 +600,18 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalStartBitChanged(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT (this->SigSignalStartBitChanged(orc_MessageId));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of signal position
+
+   \param[in]  orc_MessageId  Message identification indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalEditWidget::m_OnSignalPositionChanged(
+   const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+{
+   Q_EMIT (this->SigSignalPositionChanged(orc_MessageId));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -582,4 +674,31 @@ sint32 C_SdBueMessageSignalEditWidget::m_GetMessageId(C_OSCCanMessageIdentificat
 void C_SdBueMessageSignalEditWidget::m_OnChange(void)
 {
    Q_EMIT this->SigChanged();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Shows or hides the disabled CANopen PDO info depending of the message and protocol type
+
+   \param[in]  orc_MessageId  Message identification indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalEditWidget::m_HandleDisabledPdoInfo(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+const
+{
+   bool q_ShowDisabledPdoInfo = false;
+
+   if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+   {
+      // Special case for CANopen: Check if PDOs are disabled
+      const C_OSCCanMessage * const pc_CanMessage =
+         C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
+
+      tgl_assert(pc_CanMessage != NULL);
+      if (pc_CanMessage != NULL)
+      {
+         q_ShowDisabledPdoInfo = !pc_CanMessage->q_CanOpenManagerMessageActive;
+      }
+   }
+
+   this->mpc_Ui->pc_CoDisabledInfoWidget->setVisible(q_ShowDisabledPdoInfo);
 }

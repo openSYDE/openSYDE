@@ -13,6 +13,7 @@
 
 #include <QWidget>
 #include "stwtypes.h"
+#include "C_OSCNode.h"
 #include "C_OSCCanMessage.h"
 #include "C_OgePopUpDialog.h"
 #include "C_OSCCanProtocol.h"
@@ -57,7 +58,9 @@ public:
    explicit C_CieImportReportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                     const QString & orc_FilePath, const stw_types::uint32 ou32_BusIndex,
                                     const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType,
-                                    const std::vector<C_CieImportDataAssignment > & orc_ImportDataAssigned);
+                                    const std::vector<C_CieImportDataAssignment > & orc_ImportDataAssigned,
+                                    const std::vector<C_CieImportDataAssignment> & orc_SkippedImportDataAssigned,
+                                    const stw_scl::C_SCLString * const opc_NodeNameReplacement);
    ~C_CieImportReportWidget(void);
 
    void InitStaticNames(void) const;
@@ -73,18 +76,20 @@ private:
    const stw_types::uint32 mu32_BusIndex;
    const stw_opensyde_core::C_OSCCanProtocol::E_Type me_ProtocolType;
    std::vector<C_CieImportDataAssignment> mc_ImportedAssignedData;
+   std::vector<C_CieImportDataAssignment> mc_SkippedImportedAssignedData;
+   const stw_scl::C_SCLString * const mpc_NodeNameReplacement;
 
    static const QString mhc_HTML_TABLE_HEADER_START;
    static const QString mhc_HTML_TABLE_DATA_START;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);
-   void m_AdaptMessageNames(void);
-   void m_AdaptMessagesToProtocolType(void);
-   static void mh_AdaptName(stw_scl::C_SCLString & orc_Name, stw_scl::C_SCLString & orc_Comment);
+   static void mh_AdaptMessageNames(std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment);
+   void m_AdaptMessagesToProtocolType(std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment);
    stw_types::sint32 m_ShowReport(const QString & orc_Suffix);
-   stw_types::sint32 m_CheckMessages(void) const;
-   stw_types::sint32 m_CheckMessageMatches(const QString & orc_Suffix);
+   stw_types::sint32 m_CheckMessages(std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment) const;
+   stw_types::sint32 m_CheckMessageMatches(const QString & orc_Suffix,
+                                           std::vector<C_CieImportDataAssignment>  & orc_ImportDataAssignment);
    stw_types::sint32 m_GetMessageOverrideInfo(stw_opensyde_core::C_OSCCanMessage & orc_ImportMessageToFind,
                                               const bool oq_Tx, const stw_types::uint32 ou32_OsyNodeIndex,
                                               const stw_types::uint32 ou32_OsyInterfaceIndex,
@@ -92,21 +97,24 @@ private:
                                                         stw_types::sint32> & orc_MessageOverrideInfo,
                                               const stw_types::uint32 ou32_MessageIndex,
                                               const QString & orc_Suffix) const;
+   void m_GetTableWithMessageEntries(stw_types::sint32 & ors32_Retval, QString & orc_ImportTable,
+                                     stw_types::uint32 & oru32_MessageCount, const QString & orc_Suffix,
+                                     std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment);
    void m_InsertMessages(void) const;
-   static stw_types::sint32 mh_GetMessageEntries(stw_types::uint32 & oru32_EntryCount,
-                                                 stw_types::uint32 & oru32_NewEntryCount, QString & orc_TableEntries,
-                                                 std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_MessageList,
-                                                 std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_OSCMessageData,
-                                                 const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const
-                                                 std::vector<QString> & orc_InfoMessagesPerMessage, const
-                                                 std::vector< std::pair<stw_types::sint32, stw_types::sint32> > & orc_MessageOverrideIndices, const
-                                                 stw_types::uint32 ou32_NodeIndex, const
-                                                 stw_scl::C_SCLString & orc_TpdpRpdo, const QString & orc_Suffix);
-   static QString mh_GetMessageEntry(const stw_types::uint32 ou32_Index,
-                                     stw_opensyde_core::C_OSCCanMessage & orc_CurMessage,
-                                     const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const
-                                     QString & orc_InfoMessages, const stw_types::uint32 ou32_NodeIndex, const
-                                     stw_scl::C_SCLString & orc_TpdoRpdo, const stw_types::uint32 ou32_MessageIndex, const QString & orc_Suffix);
+   stw_types::sint32 m_GetMessageEntries(stw_types::uint32 & oru32_EntryCount, stw_types::uint32 & oru32_NewEntryCount,
+                                         QString & orc_TableEntries,
+                                         std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_MessageList,
+                                         std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_OSCMessageData,
+                                         const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const
+                                         std::vector<QString> & orc_InfoMessagesPerMessage, const
+                                         std::vector< std::pair<stw_types::sint32, stw_types::sint32> > & orc_MessageOverrideIndices, const
+                                         stw_types::uint32 ou32_NodeIndex, const bool oq_IsTx,
+                                         const QString & orc_Suffix) const;
+   QString m_GetMessageEntry(const stw_types::uint32 ou32_Index, stw_opensyde_core::C_OSCCanMessage & orc_CurMessage,
+                             const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const
+                             QString & orc_InfoMessages, const stw_types::uint32 ou32_NodeIndex, const bool oq_IsTx,
+                             const stw_types::uint32 ou32_MessageIndex,
+                             const QString & orc_Suffix) const;
    static stw_types::sint32 mh_InsertMessages(const stw_types::uint32 ou32_NodeIndex,
                                               const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Type,
                                               const stw_types::uint32 ou32_InterfaceIndex,
@@ -117,6 +125,8 @@ private:
                                               std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCSignalData, const
                                               std::vector<stw_opensyde_gui_logic::C_PuiSdNodeDataPoolListElement> & orc_UiSignalData, const
                                               std::vector<std::pair<stw_types::sint32, stw_types::sint32> > & orc_MessageOverrideIndices);
+   QString m_GetMessageName(const stw_opensyde_core::C_OSCNode & orc_Node, const bool oq_IsTx,
+                            const stw_types::uint32 ou32_MessageIndex) const;
 
    //Avoid call
    C_CieImportReportWidget(const C_CieImportReportWidget &);

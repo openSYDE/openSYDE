@@ -59,11 +59,11 @@ void C_PuiSdHandler::h_Destroy(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdHandler::C_PuiSdHandler(QObject * const opc_Parent) :
-   C_PuiSdHandlerBusLogic(opc_Parent)
+   C_PuiSdHandlerCanOpenLogic(opc_Parent)
 {
 }
 

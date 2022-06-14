@@ -43,6 +43,9 @@ public:
    static stw_scl::C_SCLString h_PrepareItemNameForFileName(const stw_scl::C_SCLString & orc_ItemName);
    static stw_scl::C_SCLString h_CombinePaths(const stw_scl::C_SCLString & orc_BasePathName,
                                               const stw_scl::C_SCLString & orc_SubFolderFileName);
+   static stw_types::sint32 h_SaveStringToFile(const stw_scl::C_SCLString & orc_CompleteFileAsString,
+                                               const stw_scl::C_SCLString & orc_CompleteFilePath,
+                                               const stw_scl::C_SCLString & orc_LogHeading);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

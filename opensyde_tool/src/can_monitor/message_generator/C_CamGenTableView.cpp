@@ -1011,7 +1011,7 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
                c_NewMessage.u32_Id = pc_Message->u32_CanId;
 
                //Cyclic
-               if (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_CYCLIC)
+               if (pc_Message->IsTransmissionTypeACyclicType())
                {
                   c_NewMessage.q_DoCyclicTrigger = true;
                }

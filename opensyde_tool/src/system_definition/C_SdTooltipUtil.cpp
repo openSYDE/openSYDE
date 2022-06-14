@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get string for tooltip content for message.
 
-   \param[in] orc_Message Message for which the tooltip is requested
+   \param[in]  orc_Message    Message for which the tooltip is requested
 
    \return
    Content as string
@@ -84,6 +84,16 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
    case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
       c_ToolTipContent +=
          static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Tx-Method: On Event\n"));
+      break;
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
+      c_ToolTipContent +=
+         static_cast<QString>(static_cast<QString>("   ") +
+                              C_GtGetText::h_GetText("Tx-Method: CANopen transmission type 254\n"));
+      break;
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
+      c_ToolTipContent +=
+         static_cast<QString>(static_cast<QString>("   ") +
+                              C_GtGetText::h_GetText("Tx-Method: CANopen transmission type 255\n"));
       break;
    case C_OSCCanMessage::eTX_METHOD_CYCLIC:
       c_ToolTipContent +=
@@ -248,7 +258,7 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert node data pool content type to simplified name
 
-   \param[in] ore_Type Node data pool content type
+   \param[in]  ore_Type    Node data pool content type
 
    \return
    Simplified name

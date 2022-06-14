@@ -161,7 +161,7 @@ sint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_ElementIndi
 
                pc_ApplicationItem->u32_Index = u32_ApplicationCounter;
                pc_ApplicationItem->q_Enabled = true;
-               pc_ApplicationItem->q_Checkable = true;
+               pc_ApplicationItem->q_CheckBoxVisible = true;
                pc_ApplicationItem->q_Selectable = true;
 
                pc_NodeItem->AddChild(pc_ApplicationItem);
@@ -172,7 +172,7 @@ sint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_ElementIndi
       }
 
       pc_NodeItem->q_Enabled = q_HasProgApp;
-      pc_NodeItem->q_Checkable = q_HasProgApp;
+      pc_NodeItem->q_CheckBoxVisible = q_HasProgApp;
       pc_NodeItem->q_Selectable = q_HasProgApp;
 
       if (q_HasProgApp == true)
@@ -182,7 +182,7 @@ sint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_ElementIndi
    } //lint !e593  //no memory leak because of the parent of pc_NodeItem and the Qt memory management
 
    pc_VisibleRootItem->q_Enabled = true;
-   pc_VisibleRootItem->q_Checkable = true;
+   pc_VisibleRootItem->q_CheckBoxVisible = true;
    pc_VisibleRootItem->q_Selectable = false;
 
    this->m_CheckInitItems(*pc_VisibleRootItem, orc_ElementIndices);

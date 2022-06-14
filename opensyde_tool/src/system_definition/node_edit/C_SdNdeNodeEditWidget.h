@@ -19,6 +19,7 @@
 #include "C_SdNdeDpEditWidget.h"
 #include "C_SdBueComIfDescriptionWidget.h"
 #include "C_SdNdeNodePropertiesTabContentWidget.h"
+#include "C_SdNdeCoWidget.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -55,6 +56,7 @@ public:
    static const stw_types::sintn hsn_TAB_INDEX_PROPERTIES;
    static const stw_types::sintn hsn_TAB_INDEX_DATA_POOL;
    static const stw_types::sintn hsn_TAB_INDEX_COMM;
+   static const stw_types::sintn hsn_TAB_INDEX_CO_MANAGER;
    static const stw_types::sintn hsn_TAB_INDEX_HALC;
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -92,11 +94,13 @@ private:
    void m_CreateTabWidgetsAlways(const stw_types::sintn osn_Index, const bool oq_AdaptCursor);
    void m_ReloadDataPools(void) const;
    void m_ReloadCommMessages(void) const;
+   void m_ReloadCommDatapools(void) const;
    void m_HalcLoadedFromTSP(void) const;
    void m_CreatePropertiesTab(const bool oq_AdaptCursor);
    void m_CreateDpTab(const bool oq_AdaptCursor);
    void m_CreateCommTab(const bool oq_AdaptCursor);
    void m_CreateHalTab(const bool oq_AdaptCursor);
+   void m_CreateCoManagerTab(const bool oq_AdaptCursor);
    static void mh_StartWaitingCursor(void);
    static void mh_EndWaitingCursor(void);
 
@@ -108,6 +112,7 @@ private:
    C_SdNdeDpEditWidget * mpc_DataPoolEditWidget;
    C_SdBueComIfDescriptionWidget * mpc_ComIfDescriptionWidget;
    C_SdNdeHalcWidget * mpc_HalWidget;
+   C_SdNdeCoWidget * mpc_CoManagerWidget;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

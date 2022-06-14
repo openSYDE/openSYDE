@@ -112,7 +112,7 @@ sint32 C_PuiSvDbDataElementHandler::RegisterDataPoolElement(
 
          // Update the counter
          this->m_SetWidgetDataPoolElementCount(this->mc_MappingDpElementToDataSerie.size());
-         this->m_UpdateDataPoolElementTimeoutAndValidFlag();
+         this->m_UpdateDataPoolElementTimeoutAndValidFlag(orc_WidgetDataPoolElementId);
          this->m_DataPoolElementsChanged();
          this->mc_CriticalSection.Release();
 
@@ -966,16 +966,35 @@ sint32 C_PuiSvDbDataElementHandler::m_ScaleMinMax(const uint32 ou32_WidgetDataPo
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(void)
 {
+   QMap<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32>::const_iterator c_ItItem;
+
+   for (c_ItItem = this->mc_MappingDpElementToDataSerie.cbegin();
+        c_ItItem != this->mc_MappingDpElementToDataSerie.cend();
+        ++c_ItItem)
+   {
+      m_UpdateDataPoolElementTimeoutAndValidFlag(c_ItItem.key());
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the timeout values and valid flags for a specific registered datapool element
+
+   \param[in]  orc_Id   Which datapool element to update
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(
+   const C_PuiSvDbNodeDataPoolListElementId & orc_Id)
+{
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    tgl_assert(pc_View != NULL);
    if (pc_View != NULL)
    {
-      QMap<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32>::const_iterator c_ItItem;
+      const QMap<C_PuiSvDbNodeDataPoolListElementId,
+                 stw_types::uint32>::const_iterator c_ItItem = this->mc_MappingDpElementToDataSerie.constFind(orc_Id);
 
-      for (c_ItItem = this->mc_MappingDpElementToDataSerie.begin();
-           c_ItItem != this->mc_MappingDpElementToDataSerie.end();
-           ++c_ItItem)
+      tgl_assert(c_ItItem != this->mc_MappingDpElementToDataSerie.cend());
+      if (c_ItItem != this->mc_MappingDpElementToDataSerie.cend())
       {
          const C_PuiSvDbNodeDataPoolListElementId & rc_ElementId = c_ItItem.key();
          auto && rc_Value = this->mc_DataPoolElementValid[c_ItItem.value()];

@@ -64,6 +64,8 @@ protected:
    static stw_types::sint32 mh_SortMessagesByName(stw_opensyde_core::C_OSCNode & orc_OSCNode, C_PuiSdNode & orc_UiNode);
    stw_types::uint32 m_GetHashNode(const stw_types::uint32 ou32_NodeIndex) const;
    stw_types::uint32 m_GetHashBus(const stw_types::uint32 ou32_BusIndex) const;
+   virtual void m_HandleSyncNodeAdded(const stw_types::uint32 ou32_Index);
+   virtual void m_HandleSyncNodeAboutToBeDeleted(const stw_types::uint32 ou32_Index);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -73,6 +75,7 @@ Q_SIGNALS:
    void SigNodesChanged(void);
    void SigNodeChanged(const stw_types::uint32 ou32_Index);
    void SigBussesChanged(void);
+   void SigBusChanged(const stw_types::uint32 ou32_Index);
    void SigSyncNodeAdded(const stw_types::uint32 ou32_Index);
    void SigSyncNodeHALC(const stw_types::uint32 ou32_Index);
    void SigSyncNodeAboutToBeDeleted(const stw_types::uint32 ou32_Index);

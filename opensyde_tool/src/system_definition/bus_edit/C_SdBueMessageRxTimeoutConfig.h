@@ -35,7 +35,7 @@ class C_SdBueMessageRxTimeoutConfig :
 
 public:
    explicit C_SdBueMessageRxTimeoutConfig(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                          const stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_ReceiveTimeoutMode, const bool oq_TxMethodOnEvent, const stw_types::uint32 ou32_ReceiveTimeoutValue, const stw_types::uint32 ou32_LastKnownCycleTimeValue, const stw_types::uint32 ou32_AutoReceiveTimeoutValue,
+                                          const stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_ReceiveTimeoutMode, const bool oq_TxMethodOnEvent, const bool oq_DisablePossible, const stw_types::uint32 ou32_ReceiveTimeoutValue, const stw_types::uint32 ou32_LastKnownCycleTimeValue, const stw_types::uint32 ou32_AutoReceiveTimeoutValue,
                                           const QString & orc_NameForTitle);
    ~C_SdBueMessageRxTimeoutConfig(void);
 

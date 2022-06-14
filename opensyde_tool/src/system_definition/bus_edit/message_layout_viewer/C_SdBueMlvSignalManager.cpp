@@ -87,10 +87,11 @@ C_SdBueMlvSignalManager::~C_SdBueMlvSignalManager()
 
    \param[in]     ou32_SignalIndex        Index of the signal
    \param[in]     orc_ColorConfiguration  Color configuration
+   \param[in]     oq_Resizeable           Flag if signal shall be resizeable or not
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
-                                         const C_SignalItemColors & orc_ColorConfiguration)
+                                         const C_SignalItemColors & orc_ColorConfiguration, const bool oq_Resizeable)
 {
    const C_OSCCanSignal * const pc_Signal =
       C_PuiSdHandler::h_GetInstance()->GetCanSignal(this->mc_MessageId, ou32_SignalIndex);
@@ -121,7 +122,7 @@ void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
       }
       else
       {
-         this->mq_Resizeable = true;
+         this->mq_Resizeable = oq_Resizeable;
       }
    }
    this->mq_MultiplexerSignal = (this->mc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL);

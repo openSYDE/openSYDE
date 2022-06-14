@@ -410,6 +410,22 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxTransparent.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabSvgOnly.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeFraFrame</class>
    <extends>QFrame</extends>
    <header>C_OgeFraFrame.h</header>
@@ -419,22 +435,6 @@
    <class>stw_opensyde_gui::C_SebGraphicsView</class>
    <extends>QGraphicsView</extends>
    <header>C_SebGraphicsView.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabFrameError</class>

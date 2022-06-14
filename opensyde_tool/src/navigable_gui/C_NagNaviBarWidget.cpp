@@ -167,6 +167,8 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
            &C_NagNaviBarWidget::m_NodeChanged);
    connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigBussesChanged,
            this, &C_NagNaviBarWidget::m_BussesChanged);
+   connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigBusChanged,
+           this, &C_NagNaviBarWidget::m_BusChanged);
 
    connect(this->mpc_Ui->pc_PushButtonCanMonitor, &C_OgePubProjAction::clicked, this,
            &C_NagNaviBarWidget::m_OpenCanMonitor);
@@ -662,6 +664,26 @@ void C_NagNaviBarWidget::m_BussesChanged(void) const
    }
    //Update view
    this->mpc_Ui->pc_TreeViewBuses->SetContent(c_Buses);
+   //Trigger error check
+   m_UpdateBusErrors();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot function for single bus changed
+
+   \param[in]  ou32_BusIndex  Bus index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagNaviBarWidget::m_BusChanged(const uint32 ou32_BusIndex) const
+{
+   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ou32_BusIndex);
+
+   tgl_assert(pc_Bus != NULL);
+   if (pc_Bus != NULL)
+   {
+      this->mpc_Ui->pc_TreeViewBuses->UpdateItem(ou32_BusIndex, pc_Bus->c_Name.c_str());
+   }
+
    //Trigger error check
    m_UpdateBusErrors();
 }

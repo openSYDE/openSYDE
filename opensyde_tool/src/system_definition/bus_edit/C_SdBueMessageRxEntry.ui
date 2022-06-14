@@ -143,15 +143,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
    <header>C_OgeGbxTransparent.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeChxDefaultSmall</class>

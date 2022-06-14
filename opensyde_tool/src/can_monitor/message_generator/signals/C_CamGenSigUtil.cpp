@@ -296,7 +296,7 @@ uint32 C_CamGenSigUtil::h_CalcMessageHash(const C_OSCCanMessage & orc_Message,
    uint32 u32_Retval = 0UL;
    const uint32 u32_Size = orc_DatapoolPart.size();
 
-   orc_Message.CalcHash(u32_Retval);
+   orc_Message.CalcHash(u32_Retval, true);
    stw_scl::C_SCLChecksums::CalcCRC32(&u32_Size, sizeof(u32_Size), u32_Retval);
    for (uint32 u32_ItDpPart = 0UL; u32_ItDpPart < orc_DatapoolPart.size(); ++u32_ItDpPart)
    {

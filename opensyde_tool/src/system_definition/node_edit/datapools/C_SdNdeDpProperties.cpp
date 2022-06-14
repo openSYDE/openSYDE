@@ -383,6 +383,7 @@ void C_SdNdeDpProperties::InitStaticNames(void)
                                                         "Symbolic Datapool name. Unique within a node."
                                                         "\nFollowing C naming conventions are required:"
                                                         "\n - must not be empty"
+                                                        "\n - must not start with digits"
                                                         "\n - only alphanumeric characters and \"_\""
                                                         "\n - should not be longer than 31 characters"));
 
@@ -997,6 +998,12 @@ void C_SdNdeDpProperties::m_InitComboBoxProtocols(const C_OSCCanProtocol::E_Type
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eECES));
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::
                                                                                          eCAN_OPEN_SAFETY));
+   //lint -e{506,774} Temporrary handling of non visible feature
+   if (mq_ENABLE_CAN_OPEN_FEATURE)
+   {
+      this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::
+                                                                                            eCAN_OPEN));
+   }
 
    this->mpc_Ui->pc_ComboBoxProtocol->setCurrentText(C_PuiSdUtil::h_ConvertProtocolTypeToString(oe_ComProtocolType));
 }
@@ -1020,6 +1027,10 @@ C_OSCCanProtocol::E_Type C_SdNdeDpProperties::m_GetSelectedProtocol(void) const
    else if (c_ActualProtocol == C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eCAN_OPEN_SAFETY))
    {
       e_Retval = C_OSCCanProtocol::eCAN_OPEN_SAFETY;
+   }
+   else if (c_ActualProtocol == C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eCAN_OPEN))
+   {
+      e_Retval = C_OSCCanProtocol::eCAN_OPEN;
    }
    else
    {

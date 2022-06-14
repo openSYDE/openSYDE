@@ -143,6 +143,7 @@ void C_SdNdeHalcChannelWidget::InitStaticNames(void) const
                          C_GtGetText::h_GetText("Symbolic channel name. Unique within node.\n"
                                                 "Following C naming conventions are required:"
                                                 "\n - must not be empty"
+                                                "\n - must not start with digits"
                                                 "\n - only alphanumeric characters and \"_\""
                                                 "\n - should not be longer than 31 characters"));
    this->mpc_Ui->pc_LabChannelTitle->

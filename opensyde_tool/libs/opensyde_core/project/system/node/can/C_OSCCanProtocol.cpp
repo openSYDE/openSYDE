@@ -24,6 +24,7 @@ using namespace stw_tgl;
 using namespace stw_errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const std::vector<C_OSCCanProtocol::E_Type> C_OSCCanProtocol::hc_ALL_PROTOCOLS = C_OSCCanProtocol::mh_GetAllProtocols();
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -51,7 +52,7 @@ C_OSCCanProtocol::C_OSCCanProtocol(void) :
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanProtocol::CalcHash(uint32 & oru32_HashValue) const
@@ -68,11 +69,11 @@ void C_OSCCanProtocol::CalcHash(uint32 & oru32_HashValue) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all signals for one message
 
-   \param[in]  orc_DataPool          Data pool with message signal data
-   \param[in]  ou32_InterfaceIndex   Communication interface index
-   \param[in]  ou32_MessageIndex     Message index
-   \param[in]  oq_IsTx               true: Flag message is tx; false: rx
-   \param[out] orc_Signals           Contained signals
+   \param[in]   orc_DataPool           Data pool with message signal data
+   \param[in]   ou32_InterfaceIndex    Communication interface index
+   \param[in]   ou32_MessageIndex      Message index
+   \param[in]   oq_IsTx                true: Flag message is tx; false: rx
+   \param[out]  orc_Signals            Contained signals
 
    \return
    C_NO_ERR Result valid
@@ -133,9 +134,9 @@ sint32 C_OSCCanProtocol::GetAllSignalsForMessage(const C_OSCNodeDataPool & orc_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific com list Rx or Tx
 
-   \param[in] orc_DataPool         Data pool containing list
-   \param[in] ou32_InterfaceIndex  Interface index
-   \param[in] oq_IsTx              Flag if Tx list was requested (otherwise Rx)
+   \param[in]  orc_DataPool         Data pool containing list
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  oq_IsTx              Flag if Tx list was requested (otherwise Rx)
 
    \return
    NULL No matching list found
@@ -159,9 +160,9 @@ const C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComListConst(const C_OSCNod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific list index
 
-   \param[in] orc_DataPool         Data pool containing list
-   \param[in] ou32_InterfaceIndex  Interface index
-   \param[in] oq_IsTx              Flag if Tx list was requested (otherwise Rx)
+   \param[in]  orc_DataPool         Data pool containing list
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  oq_IsTx              Flag if Tx list was requested (otherwise Rx)
 
    \return
      -1 No matching list found
@@ -198,9 +199,9 @@ sint32 C_OSCCanProtocol::h_GetListIndex(const C_OSCNodeDataPool & orc_DataPool, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific com list Rx or Tx
 
-   \param[in] orc_DataPool         Data pool containing list
-   \param[in] ou32_InterfaceIndex  Interface index
-   \param[in] oq_IsTx              Flag if Tx list was requested (otherwise Rx)
+   \param[in]  orc_DataPool         Data pool containing list
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  oq_IsTx              Flag if Tx list was requested (otherwise Rx)
 
    \return
    NULL No matching list found
@@ -235,10 +236,10 @@ C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComList(C_OSCNodeDataPool & orc_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get index of specific com list Rx or Tx
 
-   \param[in]  orc_DataPool         Data pool containing list
-   \param[in]  ou32_InterfaceIndex  Interface index
-   \param[in]  oq_IsTx              Flag if Tx list was requested (otherwise Rx)
-   \param[out] oru32_ListIndex      List index
+   \param[in]   orc_DataPool           Data pool containing list
+   \param[in]   ou32_InterfaceIndex    Interface index
+   \param[in]   oq_IsTx                Flag if Tx list was requested (otherwise Rx)
+   \param[out]  oru32_ListIndex        List index
 
    \return
    C_NO_ERR Operation success
@@ -274,11 +275,11 @@ sint32 C_OSCCanProtocol::h_GetComListIndex(const C_OSCNodeDataPool & orc_DataPoo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific com list element
 
-   \param[in] orc_DataPool         Data pool containing list element
-   \param[in] ou32_InterfaceIndex  Interface index
-   \param[in] oq_IsTx              Flag if element is part of Tx list (otherwise Rx)
-   \param[in] ou32_MessageIndex    Message index
-   \param[in] ou32_SignalIndex     Signal index
+   \param[in]  orc_DataPool         Data pool containing list element
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  oq_IsTx              Flag if element is part of Tx list (otherwise Rx)
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  ou32_SignalIndex     Signal index
 
    \return
    NULL No matching list element found
@@ -318,11 +319,11 @@ const C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElementConst(co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific com list element
 
-   \param[in] orc_DataPool         Data pool containing list element
-   \param[in] ou32_InterfaceIndex  Interface index
-   \param[in] oq_IsTx              Flag if element is part of Tx list (otherwise Rx)
-   \param[in] ou32_MessageIndex    Message index
-   \param[in] ou32_SignalIndex     Signal index
+   \param[in]  orc_DataPool         Data pool containing list element
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  oq_IsTx              Flag if element is part of Tx list (otherwise Rx)
+   \param[in]  ou32_MessageIndex    Message index
+   \param[in]  ou32_SignalIndex     Signal index
 
    \return
    NULL No matching list element found
@@ -361,7 +362,7 @@ C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElement(C_OSCNodeData
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if communication list is of tx type
 
-   \param[in]   orc_List    list to check
+   \param[in]  orc_List    list to check
 
    \return
    true  Tx
@@ -386,7 +387,7 @@ bool C_OSCCanProtocol::h_ListIsComTx(const C_OSCNodeDataPoolList & orc_List)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get CAN message DLC offset for signal range check
 
-   \param[in] oe_Type Current protocol type
+   \param[in]  oe_Type  Current protocol type
 
    \return
    CAN message DLC offset for signal range check
@@ -403,10 +404,62 @@ uint32 C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(const E_Type oe_Ty
       break;
    case C_OSCCanProtocol::eLAYER2:
    case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OSCCanProtocol::eCAN_OPEN:
    default:
       u32_Retval = 0UL;
       break;
    }
 
    return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get CAN message signals gaps valid flag
+
+   \param[in]  oe_Type  Current protocol type
+
+   \retval   True    Gaps between signals in a CAN message are valid
+   \retval   False   Gaps between signals in a CAN message are not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(const E_Type oe_Type)
+{
+   bool q_Retval;
+
+   switch (oe_Type)
+   {
+   case C_OSCCanProtocol::eCAN_OPEN:
+      q_Retval = false;
+      break;
+   case C_OSCCanProtocol::eLAYER2:
+   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OSCCanProtocol::eECES:
+   default:
+      q_Retval = true;
+      break;
+   }
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all protocols
+
+   \return
+   All protocols
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<C_OSCCanProtocol::E_Type> C_OSCCanProtocol::mh_GetAllProtocols()
+{
+   std::vector<C_OSCCanProtocol::E_Type> c_Retval;
+   c_Retval.push_back(eLAYER2);
+   c_Retval.push_back(eCAN_OPEN_SAFETY);
+   c_Retval.push_back(eECES);
+   c_Retval.push_back(eCAN_OPEN);
+   //Check vector indices are same as enum values
+   for (uint32 u32_ItProt = 0UL; u32_ItProt < c_Retval.size(); ++u32_ItProt)
+   {
+      tgl_assert(static_cast<uint32>(c_Retval[u32_ItProt]) == u32_ItProt);
+   }
+   return c_Retval;
 }

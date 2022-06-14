@@ -36,7 +36,8 @@ using namespace stw_opensyde_core;
 const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TAB_INDEX_PROPERTIES = 0;
 const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TAB_INDEX_DATA_POOL = 1;
 const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TAB_INDEX_COMM = 2;
-const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TAB_INDEX_HALC = 3;
+const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TAB_INDEX_CO_MANAGER = 3;
+const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TAB_INDEX_HALC = 4;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -68,7 +69,8 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
    mpc_PropertiesWidget(NULL),
    mpc_DataPoolEditWidget(NULL),
    mpc_ComIfDescriptionWidget(NULL),
-   mpc_HalWidget(NULL)
+   mpc_HalWidget(NULL),
+   mpc_CoManagerWidget(NULL)
 {
    mpc_Ui->setupUi(this);
 
@@ -82,6 +84,11 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
 
    // show the initial tab
    this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(osn_TabIndex);
+   //lint -e{506,774,948} Temporrary handling of non visible feature
+   if (mq_ENABLE_CAN_OPEN_FEATURE == false)
+   {
+      this->mpc_Ui->pc_TabWidgetPageNavi->setTabVisible(hsn_TAB_INDEX_CO_MANAGER, false);
+   }
    m_CurrentTabChanged(osn_TabIndex);
 }
 
@@ -108,6 +115,7 @@ void C_SdNdeNodeEditWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TAB_INDEX_PROPERTIES, C_GtGetText::h_GetText("Properties"));
    this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TAB_INDEX_DATA_POOL, C_GtGetText::h_GetText("Datapools"));
    this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TAB_INDEX_COMM, C_GtGetText::h_GetText("COMM Messages"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TAB_INDEX_CO_MANAGER, C_GtGetText::h_GetText("CANopen Manager"));
    this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TAB_INDEX_HALC, C_GtGetText::h_GetText("Hardware Configurator"));
 
    //Tool tips
@@ -245,6 +253,16 @@ void C_SdNdeNodeEditWidget::OpenDetail(const sint32 os32_MainIndex, const sint32
          this->mpc_HalWidget->ShowChannel(os32_MainIndex, os32_ListIndex);
       }
    }
+   else if (os32_Flag == 5)
+   {
+      // show CANopen Manager
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_CO_MANAGER);
+      tgl_assert(this->mpc_CoManagerWidget != NULL);
+      if (this->mpc_CoManagerWidget != NULL)
+      {
+         // TODO: Handle CANopen Manager
+      }
+   }
    else
    {
       // nothing to do
@@ -317,7 +335,23 @@ void C_SdNdeNodeEditWidget::m_LoadUserSettings() const
    {
       this->mpc_PropertiesWidget->LoadUserSettings();
    }
-   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex());
+   //lint -e{506,774,948} Temporrary handling of non visible feature
+   if (mq_ENABLE_CAN_OPEN_FEATURE == false)
+   {
+      if (this->mpc_Ui->pc_TabWidgetPageNavi->isTabVisible(C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex()))
+      {
+         this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(
+            C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex());
+      }
+      else
+      {
+         this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(0);
+      }
+   }
+   else
+   {
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex());
+   }
    if (this->mpc_HalWidget != NULL)
    {
       this->mpc_HalWidget->LoadUserSettings();
@@ -325,6 +359,10 @@ void C_SdNdeNodeEditWidget::m_LoadUserSettings() const
    if (this->mpc_ComIfDescriptionWidget != NULL)
    {
       this->mpc_ComIfDescriptionWidget->LoadUserSettings();
+   }
+   if (this->mpc_CoManagerWidget != NULL)
+   {
+      this->mpc_CoManagerWidget->LoadUserSettings();
    }
 }
 
@@ -346,6 +384,10 @@ void C_SdNdeNodeEditWidget::m_SaveUserSettings() const
    if (this->mpc_ComIfDescriptionWidget != NULL)
    {
       this->mpc_ComIfDescriptionWidget->SaveUserSettings();
+   }
+   if (this->mpc_CoManagerWidget != NULL)
+   {
+      this->mpc_CoManagerWidget->SaveUserSettings();
    }
 }
 
@@ -498,6 +540,10 @@ void C_SdNdeNodeEditWidget::m_CreateTabWidgetsAlways(const sintn osn_Index, cons
    {
       m_CreateHalTab(oq_AdaptCursor);
    }
+   else if (osn_Index == hsn_TAB_INDEX_CO_MANAGER)
+   {
+      m_CreateCoManagerTab(oq_AdaptCursor);
+   }
    else
    {
       //Nothing to do
@@ -533,6 +579,16 @@ void C_SdNdeNodeEditWidget::m_ReloadCommMessages(void) const
       this->mpc_ComIfDescriptionWidget->SetNodeId(this->mu32_NodeIndex,
                                                   this->mpc_ComIfDescriptionWidget->GetActProtocol());
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reload COMM datapools
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_ReloadCommDatapools() const
+{
+   this->m_ReloadDataPools();
+   this->m_ReloadCommMessages();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -709,6 +765,40 @@ void C_SdNdeNodeEditWidget::m_CreateHalTab(const bool oq_AdaptCursor)
       if (this->mq_SkipLoadUserSettings == false)
       {
          this->mpc_HalWidget->LoadUserSettings();
+      }
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_EndWaitingCursor();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create hal tab content
+
+   \param[in]  oq_AdaptCursor    Adapt cursor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_CreateCoManagerTab(const bool oq_AdaptCursor)
+{
+   if (this->mpc_CoManagerWidget == NULL)
+   {
+      if (oq_AdaptCursor)
+      {
+         C_SdNdeNodeEditWidget::mh_StartWaitingCursor();
+      }
+      this->mpc_CoManagerWidget = new C_SdNdeCoWidget();
+      this->mpc_CoManagerWidget->SetNode(this->mu32_NodeIndex);
+
+      connect(mpc_CoManagerWidget, &C_SdNdeCoWidget::SigErrorChange, this,
+              &C_SdNdeNodeEditWidget::SigErrorChange);
+      connect(mpc_CoManagerWidget, &C_SdNdeCoWidget::SigCommDatapoolsChanged, this,
+              &C_SdNdeNodeEditWidget::m_ReloadCommDatapools);
+
+      this->mpc_Ui->pc_TabCoManagerLayout->addWidget(this->mpc_CoManagerWidget);
+      if (this->mq_SkipLoadUserSettings == false)
+      {
+         this->mpc_CoManagerWidget->LoadUserSettings();
       }
       if (oq_AdaptCursor)
       {

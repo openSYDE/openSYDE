@@ -257,6 +257,7 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
       C_GtGetText::h_GetText("Symbolic Data Block name. Unique within node\n"
                              "\nFollowing C naming conventions are required:"
                              "\n - must not be empty"
+                             "\n - must not start with digits"
                              "\n - only alphanumeric characters and \"_\""
                              "\n - should not be longer than 31 characters"));
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),

@@ -63,7 +63,8 @@ border-radius: 4px;
 border-width: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgePubConfigure:enabled
+stw_opensyde_gui_elements--C_OgePubConfigure:enabled,
+stw_opensyde_gui_elements--C_OgePubGenericTextWithBackground
 {
 border-style: none;
 }
@@ -234,14 +235,19 @@ border-radius: 14px;
 }
 
 /* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgePubHalcOverview,
+stw_opensyde_gui_elements--C_OgePubGenericTextWithBackground
+{
+text-align: left;
+padding-left: 19px;
+padding-right: 19px;
+}
+
 stw_opensyde_gui_elements--C_OgePubHalcOverview
 {
 border-style: solid;
 border-width: 1px;
 border-bottom-width: 0px;
-text-align: left;
-padding-left: 19px;
-padding-right: 19px;
 }
 
 /* --------------------------------------------------------------------- */

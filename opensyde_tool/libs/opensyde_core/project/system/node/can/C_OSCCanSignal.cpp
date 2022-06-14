@@ -41,14 +41,16 @@ C_OSCCanSignal::C_OSCCanSignal(void) :
    u16_ComBitStart(0),
    u32_ComDataElementIndex(0),
    e_MultiplexerType(eMUX_DEFAULT),
-   u16_MultiplexValue(0)
+   u16_MultiplexValue(0),
+   u16_CanOpenManagerObjectDictionaryIndex(0),
+   u8_CanOpenManagerObjectDictionarySubIndex(0)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current not equal to orc_Cmp
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    Current not equal to orc_Cmp
@@ -77,7 +79,7 @@ bool C_OSCCanSignal::operator !=(const C_OSCCanSignal & orc_Cmp) const
 
    Returns negotiation of != operator.
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    Current is equal to orc_Cmp
@@ -95,10 +97,12 @@ bool C_OSCCanSignal::operator ==(const C_OSCCanSignal & orc_Cmp) const
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue     Hash value with init [in] value and result [out] value
+   \param[in]      oq_R20Compatible    Flag to calculate the hash of only elements present in R20
+                                       to allow compatibility with existing hash values from R20 release
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanSignal::CalcHash(uint32 & oru32_HashValue) const
+void C_OSCCanSignal::CalcHash(uint32 & oru32_HashValue, const bool oq_R20Compatible) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_ComByteOrder, sizeof(this->e_ComByteOrder), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_MultiplexerType, sizeof(this->e_MultiplexerType), oru32_HashValue);
@@ -107,12 +111,19 @@ void C_OSCCanSignal::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_ComDataElementIndex, sizeof(this->u32_ComDataElementIndex),
                                       oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_MultiplexValue, sizeof(this->u16_MultiplexValue), oru32_HashValue);
+   if (oq_R20Compatible == false)
+   {
+      stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_CanOpenManagerObjectDictionaryIndex,
+                                         sizeof(this->u16_CanOpenManagerObjectDictionaryIndex), oru32_HashValue);
+      stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_CanOpenManagerObjectDictionarySubIndex,
+                                         sizeof(this->u8_CanOpenManagerObjectDictionarySubIndex), oru32_HashValue);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the position of a signal bit in the data bytes
 
-   \param[in]     ou16_SignalBitPosition   Signal bit position starting at 0
+   \param[in]  ou16_SignalBitPosition  Signal bit position starting at 0
 
    \return
    Data bytes bit position
@@ -126,8 +137,8 @@ uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_SignalBit
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the position of a signal bit in the data bytes
 
-   \param[in]     ou16_StartBit            New start bit for the signal
-   \param[in]     ou16_SignalBitPosition   Signal bit position starting at 0
+   \param[in]  ou16_StartBit           New start bit for the signal
+   \param[in]  ou16_SignalBitPosition  Signal bit position starting at 0
 
    \return
    Data bytes bit position
@@ -175,7 +186,7 @@ uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_StartBit,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the positions of all signal bits in the data bytes
 
-   \param[out]     orc_SetPositions   Signal bit positions
+   \param[out]  orc_SetPositions    Signal bit positions
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanSignal::GetDataBytesBitPositionsOfSignal(std::set<uint16> & orc_SetPositions) const
@@ -209,4 +220,41 @@ void C_OSCCanSignal::GetDataBytesBitPositionsOfSignal(std::set<uint16> & orc_Set
 
       orc_SetPositions.insert(u16_DataBytesBitPos);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the flag if the bit position in the message is part of this signal
+
+   \param[in]  ou16_MessageBitPosition           Bin position in message for checking
+
+   \retval   True       Bit in message is part of signal
+   \retval   False      Bit in message is not part of signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanSignal::IsBitPosPartOfSignal(const uint16 ou16_MessageBitPosition) const
+{
+   bool q_Return = false;
+
+   if (this->e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+   {
+      // Intel byte order has an 1:1 mapping
+      // Check if the bit is in range
+      if ((ou16_MessageBitPosition >= this->u16_ComBitStart) &&
+          (ou16_MessageBitPosition < (this->u16_ComBitStart + this->u16_ComBitLength)))
+      {
+         q_Return = true;
+      }
+   }
+   else
+   {
+      std::set<uint16> c_SetPositions;
+
+      this->GetDataBytesBitPositionsOfSignal(c_SetPositions);
+      if (c_SetPositions.find(ou16_MessageBitPosition) != c_SetPositions.end())
+      {
+         q_Return = true;
+      }
+   }
+
+   return q_Return;
 }

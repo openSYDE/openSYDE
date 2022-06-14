@@ -391,7 +391,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
                                        "The openSYDE Target Support Package device \"%1\" does not match the "
                                        "device type \"%2\" of this node")).
                arg(this->mc_Package.c_DeviceName.c_str()).
-               arg(pc_Node->pc_DeviceDefinition->c_DeviceName.c_str()));
+               arg(pc_Node->c_DeviceType.c_str()));
             c_Message.SetCustomMinHeight(230, 180);
             c_Message.Execute();
          }

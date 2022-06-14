@@ -43,7 +43,7 @@ using namespace stw_opensyde_gui_logic;
 C_TblTreeModelCheckableItem::C_TblTreeModelCheckableItem(void) :
    C_TblTreItem(),
    e_CheckState(Qt::Unchecked),
-   q_Checkable(false)
+   q_CheckBoxVisible(false)
 {
 }
 
@@ -107,7 +107,7 @@ QVariant C_TblTreeModelCheckable::data(const QModelIndex & orc_Index, const sint
       C_TblTreeModelCheckableItem * const pc_TreeItem =
          static_cast<C_TblTreeModelCheckableItem *>(orc_Index.internalPointer());
 
-      if (pc_TreeItem != NULL)
+      if ((pc_TreeItem != NULL) && (pc_TreeItem->q_CheckBoxVisible))
       {
          c_Return = static_cast<sintn>(pc_TreeItem->e_CheckState);
       }
@@ -191,7 +191,7 @@ Qt::ItemFlags C_TblTreeModelCheckable::flags(const QModelIndex & orc_Index) cons
          static_cast<const C_TblTreeModelCheckableItem *>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
       {
-         if (pc_TreeItem->q_Checkable == true)
+         if (pc_TreeItem->q_CheckBoxVisible == true)
          {
             c_Retval = c_Retval | Qt::ItemIsUserCheckable;
          }

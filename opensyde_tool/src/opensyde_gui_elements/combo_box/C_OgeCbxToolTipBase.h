@@ -33,6 +33,7 @@ public:
    virtual bool event(QEvent * const opc_Event) override;
 
    void SetItemState(const stw_types::sint32 os32_Index, const bool oq_Status) const;
+   void SetItemVisible(const stw_types::sint32 os32_Index, const bool oq_Visible) const;
 
 protected:
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;

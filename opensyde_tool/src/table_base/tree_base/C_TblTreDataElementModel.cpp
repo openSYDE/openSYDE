@@ -699,7 +699,7 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex,  con
             }
             //Protocols
             pc_BusItem->ReserveChildrenSpace(3UL);
-            for (uint8 u8_ItProtocol = 0U; u8_ItProtocol < 3U; ++u8_ItProtocol)
+            for (uint8 u8_ItProtocol = 0U; u8_ItProtocol < 4U; ++u8_ItProtocol)
             {
                bool q_ProtocolValid;
                C_PuiSdNodeCanMessageSyncManager * const pc_SyncManager = new C_PuiSdNodeCanMessageSyncManager();
@@ -719,6 +719,9 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex,  con
                   break;
                case 2U:
                   e_Type = C_OSCCanProtocol::eCAN_OPEN_SAFETY;
+                  break;
+               case 3U:
+                  e_Type = C_OSCCanProtocol::eCAN_OPEN;
                   break;
                default:
                   e_Type = C_OSCCanProtocol::eLAYER2;

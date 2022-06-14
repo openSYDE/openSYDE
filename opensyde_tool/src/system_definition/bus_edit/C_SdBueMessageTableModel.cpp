@@ -263,7 +263,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                      c_Retval = C_SdUtil::h_ConvertTxMethodToName(pc_Message->e_TxMethod);
                      break;
                   case eCYCLE_TIME:
-                     if (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_CYCLIC)
+                     if (pc_Message->IsTransmissionTypeACyclicType())
                      {
                         c_Retval = static_cast<uint64>(pc_Message->u32_CycleTimeMs);
                      }
@@ -424,9 +424,12 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                            {
                               for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
                               {
-                                 if (pc_Message->CheckErrorSignal(pc_List, u32_ItSignal,
-                                                                  C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                                     rc_MessageId.e_ComProtocol)))
+                                 if (pc_Message->CheckErrorSignal(
+                                        pc_List, u32_ItSignal,
+                                        C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                           rc_MessageId.e_ComProtocol),
+                                        C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                           rc_MessageId.e_ComProtocol)))
                                  {
                                     q_SignalsValid = false;
                                  }

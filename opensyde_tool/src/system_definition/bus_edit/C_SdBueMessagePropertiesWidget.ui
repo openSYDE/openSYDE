@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>793</width>
-    <height>797</height>
+    <height>837</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -246,32 +246,75 @@ p, li { white-space: pre-wrap; }
       </layout>
      </item>
      <item>
-      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0" columnstretch="0,0,0,0,0,0">
+      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0" columnstretch="0,0,0,0,0,0">
        <property name="horizontalSpacing">
         <number>20</number>
        </property>
        <property name="verticalSpacing">
         <number>10</number>
        </property>
-       <item row="9" column="0">
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTransmitterDatapoolOnly">
-         <property name="text">
-          <string>Datapool</string>
+       <item row="13" column="0" colspan="6">
+        <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxCriticalMessage">
+         <property name="title">
+          <string>Crit</string>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCriticalMessage">
+            <property name="text">
+             <string>Critical Message</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelEarly">
-         <property name="text">
-          <string>Early</string>
+       <item row="3" column="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
-        </widget>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>10</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
        </item>
-       <item row="9" column="1">
-        <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxTransmitterDatapoolOnly">
+       <item row="10" column="1">
+        <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxTransmitterDatapool">
          <property name="minimumSize">
           <size>
-           <width>100</width>
+           <width>0</width>
            <height>30</height>
           </size>
          </property>
@@ -280,53 +323,18 @@ p, li { white-space: pre-wrap; }
            <width>16777215</width>
            <height>30</height>
           </size>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="4">
-        <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxCycleTime">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="3">
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDlc">
-         <property name="minimumSize">
-          <size>
-           <width>62</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>62</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>DLC</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelID">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCobId">
          <property name="text">
-          <string>ID</string>
+          <string>COB-ID</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxId">
+        <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxCobId">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -344,15 +352,76 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDirection">
+       <item row="9" column="0">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTransmitterNode">
          <property name="text">
-          <string>Direction</string>
+          <string>Node</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
-        <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxDirection">
+       <item row="0" column="0" colspan="6">
+        <layout class="QVBoxLayout" name="verticalLayout_11">
+         <property name="topMargin">
+          <number>20</number>
+         </property>
+         <item>
+          <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelCanSettings">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>CANSettings</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_21" stretch="0">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>1</number>
+           </property>
+           <item>
+            <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_SeparatorCANSettings">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="11" column="1">
+        <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxTransmitterDatapoolOnly">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -367,7 +436,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="10" column="0" colspan="6">
+       <item row="12" column="0" colspan="6">
         <layout class="QVBoxLayout" name="verticalLayout_13">
          <property name="topMargin">
           <number>5</number>
@@ -434,32 +503,70 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </item>
-       <item row="7" column="0">
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTransmitterNode">
-         <property name="text">
-          <string>Node</string>
-         </property>
+       <item row="3" column="0">
+        <widget class="QWidget" name="pc_WidgetIdAndCoDlcLabel" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelID">
+            <property name="text">
+             <string>ID</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCoDlc">
+            <property name="text">
+             <string>DLC</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelCoDlcAuto">
+            <property name="text">
+             <string>(Auto)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item row="3" column="3">
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCycleTime">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDlc">
+         <property name="minimumSize">
+          <size>
+           <width>62</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>62</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="text">
-          <string>Cycle time</string>
+          <string>DLC</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+       <item row="6" column="0">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelEarly">
+         <property name="text">
+          <string>Early</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>10</width>
-           <height>1</height>
-          </size>
-         </property>
-        </spacer>
+        </widget>
        </item>
        <item row="1" column="0" colspan="6">
         <widget class="stw_opensyde_gui_elements::C_OgeChxProperties" name="pc_CheckBoxExtendedType">
@@ -468,14 +575,23 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="4" column="3">
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelLater">
-         <property name="text">
-          <string>Later</string>
+       <item row="6" column="1">
+        <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxEarly">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
          </property>
         </widget>
        </item>
-       <item row="4" column="4">
+       <item row="6" column="4">
         <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxLater">
          <property name="minimumSize">
           <size>
@@ -491,12 +607,64 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="11" column="0" colspan="6">
-        <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxCriticalMessage">
-         <property name="title">
-          <string>Crit</string>
+       <item row="4" column="0">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTxMethod">
+         <property name="text">
+          <string>Tx method</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1">
+        </widget>
+       </item>
+       <item row="3" column="5">
+        <spacer name="horizontalSpacer_30">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="9" column="1" colspan="4">
+        <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxTransmitterNode">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="4">
+        <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxCycleTime">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QWidget" name="pc_WidgetIdAndCoDlcSpinBox" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
            <number>0</number>
           </property>
@@ -513,161 +681,129 @@ p, li { white-space: pre-wrap; }
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCriticalMessage">
-            <property name="text">
-             <string>Critical Message</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
+           <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxId">
+            <property name="minimumSize">
              <size>
-              <width>20</width>
-              <height>40</height>
+              <width>100</width>
+              <height>30</height>
              </size>
             </property>
-           </spacer>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="displayIntegerBase">
+             <number>16</number>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="0" column="0" colspan="6">
-        <layout class="QVBoxLayout" name="verticalLayout_11">
-         <property name="topMargin">
-          <number>20</number>
+       <item row="2" column="2" colspan="3">
+        <widget class="stw_opensyde_gui_elements::C_OgeChxDefaultSmall" name="pc_CheckBoxCobIdWithNodeId">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>0</height>
+          </size>
          </property>
-         <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelCanSettings">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>CANSettings</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_21" stretch="0">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>1</number>
-           </property>
-           <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_SeparatorCANSettings">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>1</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>1</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
+         <property name="text">
+          <string>+ $NodeId</string>
+         </property>
+        </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTxMethod">
+       <item row="6" column="3">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelLater">
+         <property name="text">
+          <string>Later</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="4">
+        <widget class="QWidget" name="pc_WidgetDlcSpinBox" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxDlc">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>30</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxDirection">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTxMethodCo">
          <property name="text">
           <string>Tx method</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxTxMethod">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
+       <item row="7" column="0">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDirection">
+         <property name="text">
+          <string>Direction</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="4">
-        <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxDlc">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
+       <item row="10" column="0">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTransmitterDatapool">
+         <property name="text">
+          <string>Datapool</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="5">
-        <spacer name="horizontalSpacer_30">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>1</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="1">
-        <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxEarly">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
+       <item row="4" column="3">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCycleTime">
+         <property name="text">
+          <string>Cycle time</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="0" colspan="6">
+       <item row="8" column="0" colspan="6">
         <layout class="QVBoxLayout" name="verticalLayout_12">
          <property name="topMargin">
           <number>5</number>
@@ -728,43 +864,76 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </item>
-       <item row="8" column="0">
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTransmitterDatapool">
+       <item row="11" column="0">
+        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTransmitterDatapoolOnly">
          <property name="text">
           <string>Datapool</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
-        <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxTransmitterDatapool">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
+       <item row="4" column="1">
+        <widget class="QWidget" name="pc_WidgetTxMethod" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxTxMethod">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>30</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="7" column="1" colspan="4">
-        <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxTransmitterNode">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
+       <item row="5" column="1" colspan="4">
+        <widget class="QWidget" name="pc_WidgetTxMethodCo" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="pc_LabelPlaceHolderForLayout">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -820,11 +989,6 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.h</header>
@@ -841,20 +1005,25 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeLabGroupItem.h</header>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabHeadingGroupBold.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
    <extends>QComboBox</extends>
    <header>C_OgeCbxText.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLePropertiesName.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
    <header>C_OgeGbxTransparent.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLePropertiesName.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
@@ -872,14 +1041,21 @@ p, li { white-space: pre-wrap; }
    <header>C_SdBueMessageRxList.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeChxDefaultSmall</class>
+   <extends>QCheckBox</extends>
+   <header>C_OgeChxDefaultSmall.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>pc_LineEditName</tabstop>
   <tabstop>pc_TextEditComment</tabstop>
   <tabstop>pc_CheckBoxExtendedType</tabstop>
-  <tabstop>pc_SpinBoxId</tabstop>
-  <tabstop>pc_SpinBoxDlc</tabstop>
-  <tabstop>pc_ComboBoxTxMethod</tabstop>
   <tabstop>pc_SpinBoxCycleTime</tabstop>
   <tabstop>pc_SpinBoxEarly</tabstop>
   <tabstop>pc_SpinBoxLater</tabstop>

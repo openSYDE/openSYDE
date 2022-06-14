@@ -110,6 +110,7 @@ private:
    void m_NodesChanged(void) const;
    void m_NodeChanged(const stw_types::uint32 ou32_NodeIndex) const;
    void m_BussesChanged(void) const;
+   void m_BusChanged(const stw_types::uint32 ou32_BusIndex) const;
 
    void m_AddViewClicked(void);
    void m_OpenCanMonitor(void);

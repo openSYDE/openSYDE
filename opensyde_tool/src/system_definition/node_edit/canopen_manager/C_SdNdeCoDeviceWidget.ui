@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C_SdNdeCoDeviceWidget</class>
+ <widget class="QWidget" name="C_SdNdeCoDeviceWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>C_SdNdeCoDeviceWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="stw_opensyde_gui::C_SdNdeCoDeviceEdsWidget" name="pc_DevEdsWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="stw_opensyde_gui::C_SdNdeCoDeviceConfigWidget" name="pc_DevConfigWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="stw_opensyde_gui::C_SdNdeCoPdoWidget" name="pc_DevPdoWidget" native="true"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>stw_opensyde_gui::C_SdNdeCoDeviceEdsWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeCoDeviceEdsWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_SdNdeCoDeviceConfigWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeCoDeviceConfigWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_SdNdeCoPdoWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeCoPdoWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

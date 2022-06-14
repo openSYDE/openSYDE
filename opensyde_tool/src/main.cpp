@@ -58,6 +58,7 @@ sintn main(sintn osn_Argc, charn * opacn_Argv[])
 
    // turn on the DPI support**
    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+   QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 
    QApplication c_Appl(osn_Argc, opacn_Argv);
    {

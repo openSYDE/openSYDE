@@ -150,7 +150,8 @@ C_SdBueMlvGraphicsScene::C_SdBueMlvGraphicsScene(QObject * const opc_Parent) :
    me_InteractionMode(C_SdBueMlvSignalManager::eIAM_NONE),
    mc_LastMousePos(0.0, 0.0),
    ms32_LastGridIndex(-1),
-   mq_SignalChanged(false)
+   mq_SignalChanged(false),
+   mq_CoFixedMapping(false)
 {
    //Initialize
    this->m_PrepareNextColorSection();
@@ -226,6 +227,8 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
       this->mc_MessageId = orc_MessageId;
       this->mq_MultiplexedMessage = oq_MultiplexedMessage;
       this->mu16_MultiplexerValue = ou16_MultiplexValue;
+
+      this->m_CoLoadEdsRestricitions();
 
       this->mpc_AddMultiplexed->setVisible(this->mq_MultiplexedMessage);
 
@@ -451,24 +454,32 @@ void C_SdBueMlvGraphicsScene::RefreshColors(void)
 void C_SdBueMlvGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    this->mc_LastMousePos = opc_Event->scenePos();
-   this->m_SearchClickedItem(this->mc_LastMousePos);
 
-   if (this->mpc_ActualSignal != NULL)
+   if (this->mq_CoFixedMapping == false)
    {
-      this->me_InteractionMode = this->mpc_ActualSignal->GetInteractionMode(this->mc_LastMousePos);
+      this->m_SearchClickedItem(this->mc_LastMousePos);
 
-      if ((this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_RESIZELEFT_INTEL) ||
-          (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_RESIZERIGHT_INTEL))
+      if (this->mpc_ActualSignal != NULL)
       {
-         Q_EMIT (this->SigChangeCursor(Qt::SizeHorCursor));
-      }
-      else if (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_MOVE)
-      {
-         Q_EMIT (this->SigChangeCursor(Qt::SizeAllCursor));
+         this->me_InteractionMode = this->mpc_ActualSignal->GetInteractionMode(this->mc_LastMousePos);
+
+         if ((this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_RESIZELEFT_INTEL) ||
+             (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_RESIZERIGHT_INTEL))
+         {
+            Q_EMIT (this->SigChangeCursor(Qt::SizeHorCursor));
+         }
+         else if (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_MOVE)
+         {
+            Q_EMIT (this->SigChangeCursor(Qt::SizeAllCursor));
+         }
+         else
+         {
+            // nothing to do
+         }
       }
       else
       {
-         // nothing to do
+         this->me_InteractionMode = C_SdBueMlvSignalManager::eIAM_NONE;
       }
    }
    else
@@ -754,6 +765,35 @@ void C_SdBueMlvGraphicsScene::m_InitProtocolItems(void)
 } //lint !e429  //no memory leak because of the parent of mapc_ECeSHints by addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load the EDS file restrictions and adapt the ui
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMlvGraphicsScene::m_CoLoadEdsRestricitions(void)
+{
+   this->mq_CoFixedMapping = false;
+
+   if (this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN)
+   {
+      // The manager must be the only node associated by this message
+      const C_OSCCanOpenManagerDeviceInfo * const pc_Manager =
+         C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerDevice(this->mc_MessageId);
+
+      tgl_assert(pc_Manager != NULL);
+      if (pc_Manager != NULL)
+      {
+         const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+         if (pc_Message != NULL)
+         {
+            // Message Tx flag is relative to the device, not the manager when using the EDS file content
+            // PDO Mapping
+            pc_Manager->c_EDSFileContent.IsPDOMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
+                                                        !this->mc_MessageId.q_MessageIsTx, this->mq_CoFixedMapping);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a signal
 
    \param[in]     ou32_SignalIndex    Index of the signal
@@ -799,7 +839,8 @@ void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32 ou32_SignalIndex)
    connect(pc_Item, &C_SdBueMlvSignalManager::SigHideToolTip, this, &C_SdBueMlvGraphicsScene::m_HandleHideToolTip);
 
    // set the information only when the signals are connected
-   pc_Item->LoadSignal(ou32_SignalIndex, c_ColorConfig);
+   // Special case: CANopen signals have a constant size
+   pc_Item->LoadSignal(ou32_SignalIndex, c_ColorConfig, this->me_Protocol != C_OSCCanProtocol::eCAN_OPEN);
 
    if (pc_SignalUiItem != NULL)
    {
@@ -1473,13 +1514,26 @@ void C_SdBueMlvGraphicsScene::m_OnCustomContextMenuRequested(const QGraphicsScen
 
    if (this->mpc_ActualSignal != NULL)
    {
-      // an item was clicked
+      // an item was clicked and is not a CANopen signal
       q_Enabled = true;
    }
 
-   this->mpc_Copy->setEnabled(q_Enabled);
-   this->mpc_Cut->setEnabled(q_Enabled);
-   this->mpc_Delete->setEnabled(q_Enabled);
+   // Not all functions are available with CANopen
+   if (this->me_Protocol != C_OSCCanProtocol::eCAN_OPEN)
+   {
+      this->mpc_Copy->setEnabled(q_Enabled);
+      this->mpc_Cut->setEnabled(q_Enabled);
+      this->mpc_Paste->setEnabled(true);
+   }
+   else
+   {
+      this->mpc_Copy->setEnabled(false);
+      this->mpc_Cut->setEnabled(false);
+      this->mpc_Paste->setEnabled(false);
+   }
+
+   this->mpc_Add->setEnabled(!this->mq_CoFixedMapping);
+   this->mpc_Delete->setEnabled((q_Enabled == true) && (this->mq_CoFixedMapping == false));
 
    this->mpc_ContextMenu->popup(opc_Event->screenPos());
 }

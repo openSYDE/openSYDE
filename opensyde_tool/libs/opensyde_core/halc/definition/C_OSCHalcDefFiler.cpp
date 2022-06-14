@@ -20,6 +20,7 @@
 #include "C_OSCXMLParserLog.h"
 #include "C_OSCHalcDefFiler.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_OSCSystemFilerUtil.h"
 #include "C_OSCHalcDefStructFiler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -107,50 +108,15 @@ sint32 C_OSCHalcDefFiler::h_LoadFile(C_OSCHalcDefBase & orc_IOData, const C_SCLS
 
    \return
    C_NO_ERR   data saved
-   C_CONFIG   data invalid
    C_RD_WR    could not erase pre-existing file before saving
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcDefFiler::h_SaveFile(const C_OSCHalcDefBase & orc_IOData, const C_SCLString & orc_Path)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   const sint32 s32_Retval = C_OSCSystemFilerUtil::h_SaveStringToFile(orc_IOData.c_FileString, orc_Path,
+                                                                      "Saving HALC definition");
 
-   if (TGL_FileExists(orc_Path) == true)
-   {
-      //erase it:
-      sintn sn_Return;
-      sn_Return = std::remove(orc_Path.c_str());
-      if (sn_Return != 0)
-      {
-         osc_write_log_error("Saving HALC definition", "Could not erase pre-existing file \"" + orc_Path + "\".");
-         s32_Retval = C_RD_WR;
-      }
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      const C_SCLString c_Folder = TGL_ExtractFilePath(orc_Path);
-      if (TGL_DirectoryExists(c_Folder) == false)
-      {
-         if (TGL_CreateDirectory(c_Folder) != 0)
-         {
-            osc_write_log_error("Saving HALC definition", "Could not create folder \"" + c_Folder + "\".");
-            s32_Retval = C_RD_WR;
-         }
-      }
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      //Write
-      std::ofstream c_File;
-
-      c_File.open(orc_Path.c_str(), std::ofstream::out);
-      if (c_File.is_open())
-      {
-         c_File.write(orc_IOData.c_FileString.c_str(), orc_IOData.c_FileString.Length());
-         c_File.close();
-      }
-   }
    return s32_Retval;
 }
 

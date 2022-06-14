@@ -114,6 +114,7 @@ void C_SdBueBusEditPropertiesWidget::InitStaticNames(void) const
                                                         "Symbolic bus name. Unique within Network Topology.\n"
                                                         "\nC naming conventions must be followed:"
                                                         "\n - must not be empty"
+                                                        "\n - must not start with digits"
                                                         "\n - only alphanumeric characters and \"_\""
                                                         "\n - should not be longer than 31 characters"));
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),

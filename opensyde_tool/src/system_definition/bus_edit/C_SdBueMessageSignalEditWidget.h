@@ -37,7 +37,7 @@ public:
    explicit C_SdBueMessageSignalEditWidget(QWidget * const opc_Parent = NULL);
    virtual ~C_SdBueMessageSignalEditWidget(void);
    void SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const;
-   void SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value) const;
+   void SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value);
    void SelectMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void SelectSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint32 & oru32_SignalIndex) const;
@@ -51,8 +51,11 @@ public:
    const;
    void InitStaticNames(void) const;
    void SelectName(void) const;
-   void GetLastSelection(bool & orq_MessageSelected, QString & orc_MessageName, bool & orq_SignalSelected,
-                         QString & orc_SignalName) const;
+   void RefreshSelection(void);
+   void GetLastSelection(bool & orq_MessageSelected, QString * const opc_MessageName, bool & orq_SignalSelected,
+                         QString * const opc_SignalName,
+                         stw_opensyde_core::C_OSCCanMessageIdentificationIndices * const opc_MessageId = NULL,
+                         stw_types::uint32 * const opu32_SignalIndex = NULL) const;
    void RefreshColors(void) const;
    void ConnectAllChanges(void) const;
    void DisconnectAllChanges(void) const;
@@ -66,6 +69,7 @@ Q_SIGNALS:
    void SigMessageNameChanged(void);
    void SigSignalNameChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void SigSignalStartBitChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void SigSignalPositionChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void SigRecheckErrorGlobal(void);
    void SigRecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void SigSignalSelected(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -103,14 +107,17 @@ private:
    void m_OnSignalActivated(const stw_types::uint32 ou32_SignalIndex);
    void m_OnSignalNameChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_OnSignalStartBitChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void m_OnSignalPositionChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_OnSignalTypeChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                               const stw_types::uint32 ou32_SignalIndex) const;
    void m_RecheckErrorGlobal(void);
    void m_RecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    stw_types::sint32 m_GetMessageId(stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void m_OnChange(void);
+   void m_HandleDisabledPdoInfo(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
 
    Ui::C_SdBueMessageSignalEditWidget * mpc_Ui;
+   stw_opensyde_core::C_OSCCanProtocol::E_Type me_ProtocolType;
 };
 }
 

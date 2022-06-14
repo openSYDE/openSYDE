@@ -47,6 +47,9 @@ public:
 
    void SetIsUnsigned(const bool & orq_Value);
 
+   static const QChar hc_UNIT_SEPERATION_CHARACTER;
+   static QString h_ExtractSpinBoxValue(const QString & orc_Text, const QString & orc_Suffix);
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 

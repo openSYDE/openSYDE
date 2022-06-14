@@ -45,12 +45,13 @@ public:
    bool operator !=(const C_OSCCanSignal & orc_Cmp) const;
    bool operator ==(const C_OSCCanSignal & orc_Cmp) const;
 
-   void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+   void CalcHash(stw_types::uint32 & oru32_HashValue, const bool oq_R20Compatible = false) const;
    // Helper functions for byte order
    stw_types::uint16 GetDataBytesBitPosOfSignalBit(const stw_types::uint16 ou16_SignalBitPosition) const;
    stw_types::uint16 GetDataBytesBitPosOfSignalBit(const stw_types::uint16 ou16_StartBit,
                                                    const stw_types::uint16 ou16_SignalBitPosition) const;
    void GetDataBytesBitPositionsOfSignal(std::set<stw_types::uint16> & orc_SetPositions) const;
+   bool IsBitPosPartOfSignal(const stw_types::uint16 ou16_MessageBitPosition) const;
 
    E_ByteOrderType e_ComByteOrder;     ///< Communication value byte order
    stw_types::uint16 u16_ComBitLength; ///< Communication value bit length
@@ -62,6 +63,11 @@ public:
    E_MultiplexerType e_MultiplexerType;  ///< Signal multiplexer type
    stw_types::uint16 u16_MultiplexValue; ///< Only used if eMULTIPLEXED_SIGNAL
    ///< Multiplexer value if this signal should be present and represents the associated multiplex group
+   ///
+   stw_types::uint16 u16_CanOpenManagerObjectDictionaryIndex; ///< CANopen manager specific information about object
+   ///< dictionary index
+   stw_types::uint8 u8_CanOpenManagerObjectDictionarySubIndex; ///< CANopen manager specific information about object
+   ///< dictionary sub index
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

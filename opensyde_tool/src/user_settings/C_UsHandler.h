@@ -60,6 +60,7 @@ public:
    stw_types::sint32 GetNaviBarNodeSectionSize(void) const;
    stw_types::sint32 GetSdNodeEditSplitterX(void) const;
    stw_types::sint32 GetSdNodeEditHalcSplitterX(void) const;
+   stw_types::sint32 GetSdNodeEditCoManagerSplitterX(void) const;
    stw_types::sint32 GetSdBusEditTreeSplitterX(void) const;
    stw_types::sint32 GetSdBusEditTreeSplitterX2(void) const;
    stw_types::sint32 GetSdBusEditLayoutSplitterX(void) const;
@@ -80,6 +81,7 @@ public:
    QString GetProjSdTopologyLastKnownCodeExportPath(void) const;
    QString GetProjSdTopologyLastKnownExportPath(void) const;
    QString GetProjSdTopologyLastKnownImportPath(void) const;
+   QString GetProjSdTopologyLastKnownCANopenEDSPath(void) const;
    QString GetProjSdTopologyLastKnownDeviceDefPath(void) const;
    QString GetProjSdTopologyLastKnownRtfPath(void) const;
    QString GetProjSdTopologyLastKnownRtfCompanyName(void) const;
@@ -114,6 +116,7 @@ public:
    void SetNaviBarNodeSectionSize(const stw_types::sint32 os32_Value);
    void SetSdNodeEditSplitterX(const stw_types::sint32 os32_Value);
    void SetSdNodeEditHalcSplitterX(const stw_types::sint32 os32_Value);
+   void SetSdNodeEditCoManagerSplitterX(const stw_types::sint32 os32_Value);
    void SetSdBusEditTreeSplitterX(const stw_types::sint32 os32_Value);
    void SetSdBusEditTreeSplitterX2(const stw_types::sint32 os32_Value);
    void SetSdBusEditLayoutSplitterX(const stw_types::sint32 os32_Value);
@@ -134,6 +137,7 @@ public:
    void SetProjSdTopologyLastKnownCodeExportPath(const QString & orc_New);
    void SetProjSdTopologyLastKnownExportPath(const QString & orc_New);
    void SetProjSdTopologyLastKnownImportPath(const QString & orc_New);
+   void SetProjSdTopologyLastKnownCANopenEDSPath(const QString & orc_New);
    void SetProjSdTopologyLastKnownDeviceDefPath(const QString & orc_New);
    void SetProjSdTopologyLastKnownRtfPath(const QString & orc_New);
    void SetProjSdTopologyLastKnownRtfCompanyName(const QString & orc_New);
@@ -259,6 +263,8 @@ private:
    stw_types::sint32 ms32_SdNodeEditSplitterX;             ///< History of last known node edit splitter position x
                                                            // value
    stw_types::sint32 ms32_SdNodEditHalcSplitterX;          ///< History of last known halc splitter position x value
+   stw_types::sint32 ms32_SdNodEditCoManagerSplitterX;     ///< History of last known CANopen Manager splitter position
+                                                           // x value
    stw_types::sint32 ms32_SdBusEditTreeSplitterX;          ///< History of last known bus edit tree splitter
                                                            // position x value
    stw_types::sint32 ms32_SdBusEditTreeSplitterX2;         ///< History of last known sys def bus edit tree splitter
@@ -273,6 +279,7 @@ private:
    QString mc_ProjSdTopologyLastKnownCodeExportPath;       ///< History of last known code export path
    QString mc_ProjSdTopologyLastKnownExportPath;           ///< History of last known export path
    QString mc_ProjSdTopologyLastKnownImportPath;           ///< History of last known import path
+   QString mc_ProjSdTopologyLastKnownCANopenEDSPath;       ///< History of last known CAN open path
    QString mc_ProjSdTopologyLastKnownDeviceDefPath;        ///< History of last known import path for a syde_devdef-file
    QString mc_ProjSdTopologyLastKnownRtfPath;              ///< History of last known rtf file export path
    QString mc_ProjSdTopologyLastKnownRtfCompanyName;       ///< History of last known rtf file export company name

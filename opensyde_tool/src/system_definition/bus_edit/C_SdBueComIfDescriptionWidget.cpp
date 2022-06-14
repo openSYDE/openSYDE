@@ -27,6 +27,10 @@
 #include "C_GtGetText.h"
 #include "C_CieUtil.h"
 #include "C_OgeLabGenericNoPaddingNoMargins.h"
+#include "C_SdBueMessageSelectorWidget.h"
+#include "C_SdBueMessageSignalEditWidget.h"
+#include "C_SdBueMessageSignalTableWidget.h"
+#include "C_SdBueNodeSelectorWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -86,6 +90,18 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
    // Splitter stretch: if there is more space stretch right widget (i.e. index 1)
    this->mpc_Ui->pc_Splitter->setStretchFactor(0, 0);
    this->mpc_Ui->pc_Splitter->setStretchFactor(1, 10);
+
+   //Handle CANopen disable
+   //lint -e{506,774,948} Temporrary handling of non visible feature
+   if (mq_ENABLE_CAN_OPEN_FEATURE == false)
+   {
+      const sintn sn_Index = this->mpc_Ui->pc_ProtocolTabWidget->indexOf(this->mpc_Ui->pc_Tab4);
+      tgl_assert(sn_Index >= 0);
+      if (sn_Index >= 0)
+      {
+         this->mpc_Ui->pc_ProtocolTabWidget->setTabVisible(sn_Index, false);
+      }
+   }
 
    //Links
    this->mpc_Ui->pc_LinkToBusLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
@@ -151,8 +167,12 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
            &C_SdBueComIfDescriptionWidget::m_OnSignalNameChange);
    connect(this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SigSignalStartBitChanged, this,
            &C_SdBueComIfDescriptionWidget::m_OnSignalStartBitChange);
+   connect(this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SigSignalPositionChanged, this,
+           &C_SdBueComIfDescriptionWidget::m_OnSignalPositionChange);
    connect(this->mpc_Ui->pc_MessageSelectorWidget, &C_SdBueMessageSelectorWidget::SigSelectName,
            this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SelectName);
+   connect(this->mpc_Ui->pc_MessageSelectorWidget, &C_SdBueMessageSelectorWidget::SigRefreshSelection,
+           this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::RefreshSelection);
    //Error
    connect(this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SigRecheckError, this,
            &C_SdBueComIfDescriptionWidget::m_RecheckError);
@@ -214,6 +234,12 @@ void C_SdBueComIfDescriptionWidget::InitStaticNames(void) const
       2, c_Protocol, static_cast<QString>(C_GtGetText::h_GetText("Edit Messages and Signals of protocol type %1 "
                                                                  "(ESX CANopen safety protocol).")).arg(c_Protocol));
 
+   // tooltip CANopen
+   c_Protocol = C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eCAN_OPEN);
+   this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(
+      3, c_Protocol, static_cast<QString>(C_GtGetText::h_GetText("Edit PDO Messages and Signals of protocol type %1 "
+                                                                 )).arg(c_Protocol));
+
    this->mpc_Ui->pc_InterfaceSelectorTitleLabel->setText(C_GtGetText::h_GetText("Node Interface"));
 
    this->mpc_Ui->pc_HintToBusLabel->setText(C_GtGetText::h_GetText("Node Interface is already used on a bus.\n"
@@ -265,11 +291,11 @@ void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeI
       this->mc_InterfaceNames.clear();
       this->mc_BusNames.clear();
       this->mc_MessageCount.clear();
-      this->mc_MessageCount.resize(static_cast<uint32>(C_OSCCanProtocol::eECES) + 1U);
+      this->mc_MessageCount.resize(C_OSCCanProtocol::hc_ALL_PROTOCOLS.size());
       this->mc_SignalCount.clear();
-      this->mc_SignalCount.resize(static_cast<uint32>(C_OSCCanProtocol::eECES) + 1U);
+      this->mc_SignalCount.resize(C_OSCCanProtocol::hc_ALL_PROTOCOLS.size());
       this->mc_ProtocolUsedOnBus.clear();
-      this->mc_ProtocolUsedOnBus.resize(static_cast<uint32>(C_OSCCanProtocol::eECES) + 1U);
+      this->mc_ProtocolUsedOnBus.resize(C_OSCCanProtocol::hc_ALL_PROTOCOLS.size());
 
       for (u32_ItInterface = 0U; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size(); ++u32_ItInterface)
       {
@@ -294,7 +320,7 @@ void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeI
                }
 
                // Check the protocols for usage
-               for (u32_ProtocolCounter = 0U; u32_ProtocolCounter <= static_cast<uint32>(C_OSCCanProtocol::eECES);
+               for (u32_ProtocolCounter = 0U; u32_ProtocolCounter < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size();
                     ++u32_ProtocolCounter)
                {
                   bool q_ProtocolUsed = false;
@@ -305,7 +331,7 @@ void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeI
                   {
                      const C_OSCCanProtocol & rc_Protocol = pc_Node->c_ComProtocols[u32_NodeComProtocolCounter];
 
-                     if (static_cast<uint32>(rc_Protocol.e_Type) == u32_ProtocolCounter)
+                     if (rc_Protocol.e_Type == C_OSCCanProtocol::hc_ALL_PROTOCOLS[u32_ProtocolCounter])
                      {
                         if ((u32_CanCounter < rc_Protocol.c_ComMessages.size()) &&
                             (rc_Protocol.c_ComMessages[u32_CanCounter].q_IsComProtocolUsedByInterface == true))
@@ -322,7 +348,7 @@ void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeI
             else
             {
                // Bus is not connected, so no specific protocol can be used on the bus
-               for (u32_ProtocolCounter = 0U; u32_ProtocolCounter <= static_cast<uint32>(C_OSCCanProtocol::eECES);
+               for (u32_ProtocolCounter = 0U; u32_ProtocolCounter < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size();
                     ++u32_ProtocolCounter)
                {
                   this->mc_ProtocolUsedOnBus[u32_ProtocolCounter].push_back(false);
@@ -333,7 +359,7 @@ void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeI
             this->mc_InterfaceNames.push_back(c_InterfaceName);
             this->mc_BusNames.push_back(c_BusName);
 
-            for (u32_ProtocolCounter = 0U; u32_ProtocolCounter <= static_cast<uint32>(C_OSCCanProtocol::eECES);
+            for (u32_ProtocolCounter = 0U; u32_ProtocolCounter < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size();
                  ++u32_ProtocolCounter)
             {
                this->mc_MessageCount[u32_ProtocolCounter].push_back(0U);
@@ -407,9 +433,9 @@ void C_SdBueComIfDescriptionWidget::SetBusId(const uint32 ou32_BusIndex)
    // Prepare message counter vector
    c_MsgCounter.push_back(0);
    this->mc_MessageCount.clear();
-   this->mc_MessageCount.resize(static_cast<uint32>(C_OSCCanProtocol::eECES) + 1U, c_MsgCounter);
+   this->mc_MessageCount.resize(C_OSCCanProtocol::hc_ALL_PROTOCOLS.size(), c_MsgCounter);
    this->mc_SignalCount.clear();
-   this->mc_SignalCount.resize(static_cast<uint32>(C_OSCCanProtocol::eECES) + 1U, c_MsgCounter);
+   this->mc_SignalCount.resize(C_OSCCanProtocol::hc_ALL_PROTOCOLS.size(), c_MsgCounter);
 
    //Set flag
    this->mq_IndexValid = true;
@@ -859,12 +885,17 @@ void C_SdBueComIfDescriptionWidget::m_Reload(void)
                                                       this->mc_DatapoolIndexes);
       }
 
+      // Selector widget needs to know the protocol before reloading messages,
+      // but for all other adaptions of the widget, the messages must be reloaded already
+      // -> UpdateButtonText
+      this->mpc_Ui->pc_MessageSelectorWidget->SetProtocolType(e_Protocol);
+
       //Message sync manager
       m_ReloadMessages();
 
       //Update widgets
       this->mpc_Ui->pc_NodeSelectorWidget->SetProtocol(e_Protocol);
-      this->mpc_Ui->pc_MessageSelectorWidget->SetProtocolType(e_Protocol);
+      this->mpc_Ui->pc_MessageSelectorWidget->UpdateButtonText();
       this->mpc_Ui->pc_MsgSigEditWidget->SetComProtocol(e_Protocol);
 
       //Show messages
@@ -997,6 +1028,9 @@ C_OSCCanProtocol::E_Type C_SdBueComIfDescriptionWidget::GetActProtocol(void) con
    case 2:
       e_Protocol = C_OSCCanProtocol::eCAN_OPEN_SAFETY;
       break;
+   case 3:
+      e_Protocol = C_OSCCanProtocol::eCAN_OPEN;
+      break;
    case 0: // default case: layer 2
    default:
       e_Protocol = C_OSCCanProtocol::eLAYER2;
@@ -1106,8 +1140,8 @@ void C_SdBueComIfDescriptionWidget::SaveUserSettings(void) const
       }
       else
       {
-         this->mpc_Ui->pc_MsgSigEditWidget->GetLastSelection(q_MessageSelected, c_SelectedMessageName,
-                                                             q_SignalSelected, c_SelectedSignalName);
+         this->mpc_Ui->pc_MsgSigEditWidget->GetLastSelection(q_MessageSelected, &c_SelectedMessageName,
+                                                             q_SignalSelected, &c_SelectedSignalName);
       }
 
       if (this->mq_ModeSingleNode == false)
@@ -1189,6 +1223,14 @@ void C_SdBueComIfDescriptionWidget::LoadUserSettings(void)
          const C_UsCommunication c_UserSettingsBus = C_UsHandler::h_GetInstance()->GetProjSdBus(pc_Bus->c_Name.c_str());
          c_UserSettingsBus.GetLastSelectedMessage(e_SelectedProtocol, q_MessageSelected, c_SelectedMessageName,
                                                   q_SignalSelected, c_SelectedSignalName);
+         //lint -e{506,774,948} Temporrary handling of non visible feature
+         if (mq_ENABLE_CAN_OPEN_FEATURE == false)
+         {
+            if (e_SelectedProtocol == C_OSCCanProtocol::eCAN_OPEN)
+            {
+               e_SelectedProtocol = C_OSCCanProtocol::eLAYER2;
+            }
+         }
          //Reinit necessary (in some cases)
          this->mc_MessageSyncManager.Init(this->mu32_BusIndex, e_SelectedProtocol);
          this->mpc_Ui->pc_MsgSigTableWidget->LoadUserSettings(c_UserSettingsBus.GetMessageOverviewColumnWidth(),
@@ -1212,6 +1254,14 @@ void C_SdBueComIfDescriptionWidget::LoadUserSettings(void)
 
          // Protocol
          e_SelectedProtocol = c_UserSettingsNode.GetSelectedProtocol();
+         //lint -e{506,774,948} Temporrary handling of non visible feature
+         if (mq_ENABLE_CAN_OPEN_FEATURE == false)
+         {
+            if (e_SelectedProtocol == C_OSCCanProtocol::eCAN_OPEN)
+            {
+               e_SelectedProtocol = C_OSCCanProtocol::eLAYER2;
+            }
+         }
          this->m_SetProtocol(e_SelectedProtocol);
 
          // Interface
@@ -1255,6 +1305,7 @@ void C_SdBueComIfDescriptionWidget::LoadUserSettings(void)
    //Set
    this->mpc_Ui->pc_NodeSelectorWidget->SetProtocol(e_SelectedProtocol);
    this->mpc_Ui->pc_MessageSelectorWidget->SetProtocolType(e_SelectedProtocol);
+   this->mpc_Ui->pc_MessageSelectorWidget->UpdateButtonText();
    this->mpc_Ui->pc_MsgSigEditWidget->SetComProtocol(e_SelectedProtocol);
    if ((q_MessageSelected == true) || (q_SignalSelected == true))
    {
@@ -1319,6 +1370,9 @@ sintn C_SdBueComIfDescriptionWidget::mh_GetIndexOfProtocol(const C_OSCCanProtoco
       break;
    case C_OSCCanProtocol::eLAYER2:
       sn_Index = 0;
+      break;
+   case C_OSCCanProtocol::eCAN_OPEN:
+      sn_Index = 3;
       break;
    default:
       tgl_assert(false);
@@ -1413,6 +1467,18 @@ void C_SdBueComIfDescriptionWidget::m_OnSignalStartBitChange(const C_OSCCanMessa
 const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->OnSignalStartBitChange(orc_MessageId);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The signal position has changed
+
+   \param[in]  orc_MessageId  Message identification indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueComIfDescriptionWidget::m_OnSignalPositionChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+const
+{
+   this->mpc_Ui->pc_MessageSelectorWidget->OnSignalPositionChange(orc_MessageId);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1666,7 +1732,7 @@ void C_SdBueComIfDescriptionWidget::m_UpdateText(void)
    const C_OSCCanProtocol::E_Type e_CurrentProt = this->GetActProtocol();
 
    // For current interface
-   for (u32_ProtocolCounter = 0U; u32_ProtocolCounter <= static_cast<uint32>(C_OSCCanProtocol::eECES);
+   for (u32_ProtocolCounter = 0U; u32_ProtocolCounter < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size();
         ++u32_ProtocolCounter)
    {
       if (this->mq_ModeSingleNode == true)
@@ -1676,12 +1742,13 @@ void C_SdBueComIfDescriptionWidget::m_UpdateText(void)
          {
             this->mc_MessageCount[u32_ProtocolCounter][this->mu32_InterfaceIndex] =
                this->mc_MessageSyncManager.GetUniqueMessageCount(
-                  static_cast<C_OSCCanProtocol::E_Type>(u32_ProtocolCounter),
-                  &this->mc_SignalCount[u32_ProtocolCounter][this->mu32_InterfaceIndex]);
+                  C_OSCCanProtocol::hc_ALL_PROTOCOLS[u32_ProtocolCounter],
+                  &this->mc_SignalCount[u32_ProtocolCounter][this->
+                                                             mu32_InterfaceIndex]);
          }
          else
          {
-            this->m_GetNodeMessageAndSignalCount(static_cast<C_OSCCanProtocol::E_Type>(u32_ProtocolCounter),
+            this->m_GetNodeMessageAndSignalCount(C_OSCCanProtocol::hc_ALL_PROTOCOLS[u32_ProtocolCounter],
                                                  this->mu32_InterfaceIndex,
                                                  this->mc_MessageCount[u32_ProtocolCounter][this->mu32_InterfaceIndex],
                                                  this->mc_SignalCount[u32_ProtocolCounter][this->mu32_InterfaceIndex]);
@@ -1691,8 +1758,7 @@ void C_SdBueComIfDescriptionWidget::m_UpdateText(void)
       {
          // In bus mode the signal count is not relevant
          this->mc_MessageCount[u32_ProtocolCounter][0] =
-            this->mc_MessageSyncManager.GetUniqueMessageCount(
-               static_cast<C_OSCCanProtocol::E_Type>(u32_ProtocolCounter));
+            this->mc_MessageSyncManager.GetUniqueMessageCount(C_OSCCanProtocol::hc_ALL_PROTOCOLS[u32_ProtocolCounter]);
       }
    }
 
@@ -1709,7 +1775,7 @@ void C_SdBueComIfDescriptionWidget::m_UpdateText(void)
             bool q_AtLeastOneIsUsedOnBus = false;
 
             // Check if at least one protocol is not used on bus for using the sync manager in node mode
-            for (u32_ProtocolCounter = 0U; u32_ProtocolCounter <= static_cast<uint32>(C_OSCCanProtocol::eECES);
+            for (u32_ProtocolCounter = 0U; u32_ProtocolCounter < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size();
                  ++u32_ProtocolCounter)
             {
                q_AllProtocolsUsedOnBus = q_AllProtocolsUsedOnBus &&
@@ -1724,15 +1790,16 @@ void C_SdBueComIfDescriptionWidget::m_UpdateText(void)
                c_TempMessageSyncManager.Init(this->mu32_NodeIndex, u32_InterfaceCounter, e_CurrentProt);
 
                // One initialization of the temporary sync manager can be used for all protocols
-               for (u32_ProtocolCounter = 0U; u32_ProtocolCounter <= static_cast<uint32>(C_OSCCanProtocol::eECES);
+               for (u32_ProtocolCounter = 0U; u32_ProtocolCounter < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size();
                     ++u32_ProtocolCounter)
                {
                   if (this->mc_ProtocolUsedOnBus[u32_ProtocolCounter][u32_InterfaceCounter] == false)
                   {
                      this->mc_MessageCount[u32_ProtocolCounter][u32_InterfaceCounter] =
-                        c_TempMessageSyncManager.GetUniqueMessageCount(
-                           static_cast<C_OSCCanProtocol::E_Type>(u32_ProtocolCounter),
-                           &this->mc_SignalCount[u32_ProtocolCounter][u32_InterfaceCounter]);
+                        c_TempMessageSyncManager.GetUniqueMessageCount(C_OSCCanProtocol::hc_ALL_PROTOCOLS[
+                                                                          u32_ProtocolCounter],
+                                                                       &this->mc_SignalCount[u32_ProtocolCounter][
+                                                                          u32_InterfaceCounter]);
                   }
                }
             }
@@ -1740,16 +1807,16 @@ void C_SdBueComIfDescriptionWidget::m_UpdateText(void)
             if (q_AtLeastOneIsUsedOnBus == true)
             {
                // Now get the count for each protocol on each interface which is used on a bus
-               for (u32_ProtocolCounter = 0U; u32_ProtocolCounter <= static_cast<uint32>(C_OSCCanProtocol::eECES);
+               for (u32_ProtocolCounter = 0U; u32_ProtocolCounter < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size();
                     ++u32_ProtocolCounter)
                {
                   if (this->mc_ProtocolUsedOnBus[u32_ProtocolCounter][u32_InterfaceCounter] == true)
                   {
-                     this->m_GetNodeMessageAndSignalCount(
-                        static_cast<C_OSCCanProtocol::E_Type>(u32_ProtocolCounter),
-                        u32_InterfaceCounter,
-                        this->mc_MessageCount[u32_ProtocolCounter][u32_InterfaceCounter],
-                        this->mc_SignalCount[u32_ProtocolCounter][u32_InterfaceCounter]);
+                     this->m_GetNodeMessageAndSignalCount(C_OSCCanProtocol::hc_ALL_PROTOCOLS[u32_ProtocolCounter],
+                                                          u32_InterfaceCounter,
+                                                          this->mc_MessageCount[u32_ProtocolCounter][
+                                                             u32_InterfaceCounter],
+                                                          this->mc_SignalCount[u32_ProtocolCounter][u32_InterfaceCounter]);
                   }
                }
             }
@@ -1774,6 +1841,7 @@ void C_SdBueComIfDescriptionWidget::m_UpdateTabText(void) const
    this->m_UpdateTabText(C_OSCCanProtocol::eLAYER2);
    this->m_UpdateTabText(C_OSCCanProtocol::eECES);
    this->m_UpdateTabText(C_OSCCanProtocol::eCAN_OPEN_SAFETY);
+   this->m_UpdateTabText(C_OSCCanProtocol::eCAN_OPEN);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1785,7 +1853,7 @@ void C_SdBueComIfDescriptionWidget::m_UpdateTabText(void) const
 void C_SdBueComIfDescriptionWidget::m_UpdateTabText(const C_OSCCanProtocol::E_Type oe_Protocol) const
 {
    QString c_Text;
-   uint32 u32_Count;
+   uint32 u32_Count = 0U;
 
    if (this->mq_ModeSingleNode == false)
    {

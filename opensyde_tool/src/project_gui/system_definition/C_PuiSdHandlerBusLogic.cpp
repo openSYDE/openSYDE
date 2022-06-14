@@ -130,8 +130,8 @@ void C_PuiSdHandlerBusLogic::SetOSCBus(const uint32 ou32_Index, const C_OSCSyste
       this->mc_CoreDefinition.c_Buses[ou32_Index] = orc_Item;
    }
 
-   //signal "bus change"
-   Q_EMIT this->SigBussesChanged();
+   //Signal new name!
+   Q_EMIT (this->SigBusChanged(ou32_Index));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -435,46 +435,32 @@ const
       //Check message errors
       if (opc_InvalidProtocols != NULL)
       {
-         for (uint8 u8_ItToggle = 0; u8_ItToggle < 3; ++u8_ItToggle)
+         for (uint8 u8_ItProt = 0; u8_ItProt < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size(); ++u8_ItProt)
          {
             bool q_MessageNameConflict;
             bool q_MessageIdInvalid;
             bool q_MessagesHaveNoTx;
             bool q_DelayTimeInvalid;
             bool q_MessageSignalInvalid;
-            C_OSCCanProtocol::E_Type e_Type;
-            uint32 u32_CANMessageValidSignalsDLCOffset = 0UL;
-            if (u8_ItToggle == 0)
+            const C_OSCCanProtocol::E_Type e_Type = C_OSCCanProtocol::hc_ALL_PROTOCOLS[u8_ItProt];
+            C_PuiSdNodeCanMessageSyncManager c_SyncMan;
+
+            c_SyncMan.Init(ou32_BusIndex, e_Type);
+
+            c_SyncMan.CheckErrorBus(&q_MessageNameConflict, &q_MessageIdInvalid, &q_MessagesHaveNoTx,
+                                    &q_DelayTimeInvalid,
+                                    &q_MessageSignalInvalid,
+                                    C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(e_Type),
+                                    C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(e_Type));
+            if (((((q_MessageNameConflict == false) && (q_MessageIdInvalid == false)) &&
+                  (q_DelayTimeInvalid == false)) && (q_MessageSignalInvalid == false)) &&
+                (q_MessagesHaveNoTx == false))
             {
-               e_Type = C_OSCCanProtocol::eLAYER2;
-            }
-            else if (u8_ItToggle == 1)
-            {
-               e_Type = C_OSCCanProtocol::eECES;
-               u32_CANMessageValidSignalsDLCOffset = 2UL;
+               //No error
             }
             else
             {
-               e_Type = C_OSCCanProtocol::eCAN_OPEN_SAFETY;
-            }
-            {
-               C_PuiSdNodeCanMessageSyncManager c_SyncMan;
-
-               c_SyncMan.Init(ou32_BusIndex, e_Type);
-
-               c_SyncMan.CheckErrorBus(&q_MessageNameConflict, &q_MessageIdInvalid, &q_MessagesHaveNoTx,
-                                       &q_DelayTimeInvalid,
-                                       &q_MessageSignalInvalid, u32_CANMessageValidSignalsDLCOffset);
-               if (((((q_MessageNameConflict == false) && (q_MessageIdInvalid == false)) &&
-                     (q_DelayTimeInvalid == false)) && (q_MessageSignalInvalid == false)) &&
-                   (q_MessagesHaveNoTx == false))
-               {
-                  //No error
-               }
-               else
-               {
-                  opc_InvalidProtocols->push_back(e_Type);
-               }
+               opc_InvalidProtocols->push_back(e_Type);
             }
          }
       }
@@ -608,29 +594,33 @@ void C_PuiSdHandlerBusLogic::ChangeConnection(const uint32 ou32_NodeIndex, const
                                               const uint8 ou8_NewInterface,
                                               const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
+   //Copy is necessary as the value changes during function call
+   const C_PuiSdNodeConnectionId c_OrgCopy = orc_ID;
    C_PuiSdNodeConnectionId c_Tmp;
 
    c_Tmp.e_InterfaceType = orc_ID.e_InterfaceType;
    c_Tmp.u8_InterfaceNumber = ou8_NewInterface;
 
-   ChangeCompleteConnection(ou32_NodeIndex, orc_ID, c_Tmp, orc_Properties);
+   ChangeCompleteConnection(ou32_NodeIndex, c_OrgCopy, c_Tmp, orc_Properties, 0xFFFFFFFFUL, false);
+   m_HandleChangeConnectionForCanOpen(ou32_NodeIndex, c_OrgCopy, ou8_NewInterface);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change complete connection
 
-   \param[in]  ou32_NodeIndex    Index of node this interface is part of
-   \param[in]  orc_PrevID        Previous interface ID
-   \param[in]  orc_NewID         New interface ID
-   \param[in]  orc_Properties    Properties
-   \param[in]  oru32_BusIndex    Bus index to use instead of last used one
+   \param[in]  ou32_NodeIndex          Index of node this interface is part of
+   \param[in]  orc_PrevID              Previous interface ID
+   \param[in]  orc_NewID               New interface ID
+   \param[in]  orc_Properties          Properties
+   \param[in]  oru32_BusIndex          Bus index to use instead of last used one
+   \param[in]  oq_IncludeCanOpenSync   Flag to include CANopen data snyc handling
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32 ou32_NodeIndex,
                                                       const C_PuiSdNodeConnectionId & orc_PrevID,
                                                       const C_PuiSdNodeConnectionId & orc_NewID,
-                                                      const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
-                                                      const uint32 & oru32_BusIndex)
+                                                      const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties, const uint32 & oru32_BusIndex,
+                                                      const bool oq_IncludeCanOpenSync)
 {
    //Copy is necessary as the value changes during function call
    const C_PuiSdNodeConnectionId c_PrevIDCopy = orc_PrevID;
@@ -698,6 +688,10 @@ void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32 ou32_NodeInde
             {
                rc_BusConn.c_ConnectionID = orc_NewID;
             }
+         }
+         if (oq_IncludeCanOpenSync)
+         {
+            this->m_HandleChangeCompleteConnectionForCanOpen(u32_CurIndex, c_PrevIDCopy, orc_NewID);
          }
       }
    }
@@ -2564,6 +2558,8 @@ std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::m_GetExistingMessageNames(co
    m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OSCCanProtocol::eCAN_OPEN_SAFETY, oru32_InterfaceIndex,
                                      c_ExistingNames);
    m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OSCCanProtocol::eECES, oru32_InterfaceIndex, c_ExistingNames);
+   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OSCCanProtocol::eCAN_OPEN, oru32_InterfaceIndex,
+                                     c_ExistingNames);
 
    return c_ExistingNames;
 }

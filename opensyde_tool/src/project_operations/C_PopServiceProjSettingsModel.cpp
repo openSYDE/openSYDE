@@ -86,28 +86,28 @@ sint32 C_PopServiceProjSettingsModel::Init(const std::vector<stw_types::uint32> 
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(u32_ViewCnt);
       if (pc_View != NULL)
       {
-         pc_TreeNode->c_Name = "VIEW #" + QString::number(u32_ViewCnt) + " - " + pc_View->GetName();
+         pc_TreeNode->c_Name = "VIEW #" + QString::number(u32_ViewCnt + 1UL) + " - " + pc_View->GetName();
          pc_TreeNode->q_Enabled = true;
-         pc_TreeNode->q_Checkable = true;
+         pc_TreeNode->q_CheckBoxVisible = true;
          pc_TreeNode->q_Selectable = true;
          pc_VisibleRootItem->AddChild(pc_TreeNode);
 
          C_TblTreeModelCheckableItem * const pc_TreeNodeSetup = new C_TblTreeModelCheckableItem();
          pc_TreeNodeSetup->c_Name = C_GtGetText::h_GetText("Setup");
          pc_TreeNodeSetup->q_Enabled = true;
-         pc_TreeNodeSetup->q_Checkable = true;
+         pc_TreeNodeSetup->q_CheckBoxVisible = true;
          pc_TreeNodeSetup->q_Selectable = true;
 
          C_TblTreeModelCheckableItem * const pc_TreeNodeUpdate = new C_TblTreeModelCheckableItem();
          pc_TreeNodeUpdate->c_Name = C_GtGetText::h_GetText("Update");
          pc_TreeNodeUpdate->q_Enabled = true;
-         pc_TreeNodeUpdate->q_Checkable = true;
+         pc_TreeNodeUpdate->q_CheckBoxVisible = true;
          pc_TreeNodeUpdate->q_Selectable = true;
 
          C_TblTreeModelCheckableItem * const pc_TreeNodeDashb = new C_TblTreeModelCheckableItem();
          pc_TreeNodeDashb->c_Name = C_GtGetText::h_GetText("Dashboard");
          pc_TreeNodeDashb->q_Enabled = true;
-         pc_TreeNodeDashb->q_Checkable = true;
+         pc_TreeNodeDashb->q_CheckBoxVisible = true;
          pc_TreeNodeDashb->q_Selectable = true;
 
          pc_TreeNode->AddChild(pc_TreeNodeSetup);
@@ -122,7 +122,7 @@ sint32 C_PopServiceProjSettingsModel::Init(const std::vector<stw_types::uint32> 
    }
 
    pc_VisibleRootItem->q_Enabled = true;
-   pc_VisibleRootItem->q_Checkable = true;
+   pc_VisibleRootItem->q_CheckBoxVisible = true;
    pc_VisibleRootItem->q_Selectable = true;
 
    this->m_CheckInitItems(*pc_VisibleRootItem, orc_ElementIndices);

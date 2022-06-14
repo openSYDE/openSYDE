@@ -90,6 +90,11 @@
          <string>ECoS</string>
         </attribute>
        </widget>
+       <widget class="QWidget" name="pc_Tab4">
+        <attribute name="title">
+         <string>CANopen</string>
+        </attribute>
+       </widget>
       </widget>
      </item>
      <item>

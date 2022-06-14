@@ -88,6 +88,8 @@ protected:
    stw_types::sint32 m_ScaleMinMax(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
                                    stw_types::float64 & orf64_Min, stw_types::float64 & orf64_Max) const;
    void m_UpdateDataPoolElementTimeoutAndValidFlag(void);
+   void m_UpdateDataPoolElementTimeoutAndValidFlag(
+      const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id);
 
    virtual bool m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const;
    bool m_CheckManualReadRequired(void) const;

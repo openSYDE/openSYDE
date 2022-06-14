@@ -677,10 +677,12 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                                  rc_DataPool, u32_ItInterface, false);
                               if ((pc_TxList != NULL) && (pc_RxList != NULL))
                               {
-                                 if (rc_MessageContainer.CheckLocalError(*pc_TxList, *pc_RxList,
-                                                                         C_OSCCanProtocol::
-                                                                         h_GetCANMessageValidSignalsDLCOffset(
-                                                                            pc_Protocol->e_Type)) == true)
+                                 if (rc_MessageContainer.CheckLocalError(
+                                        *pc_TxList, *pc_RxList,
+                                        C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                           pc_Protocol->e_Type),
+                                        C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                           pc_Protocol->e_Type)) == true)
                                  {
                                     q_ResultError = true;
                                     q_CurRes = true;
@@ -924,10 +926,10 @@ sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * c
                                        false);
                                  if ((pc_TxList != NULL) && (pc_RxList != NULL))
                                  {
-                                    *opq_DataPoolsInvalid = rc_MessageContainer.CheckLocalError(*pc_TxList,
-                                                                                                *pc_RxList,
-                                                                                                C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                                                                   rc_Protocol.e_Type));
+                                    *opq_DataPoolsInvalid = rc_MessageContainer.CheckLocalError(
+                                       *pc_TxList, *pc_RxList,
+                                       C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(rc_Protocol.e_Type),
+                                       C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(rc_Protocol.e_Type));
                                     //Check global error
                                     if (*opq_DataPoolsInvalid == false)
                                     {

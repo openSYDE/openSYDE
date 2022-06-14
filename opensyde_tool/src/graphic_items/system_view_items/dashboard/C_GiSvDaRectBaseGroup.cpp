@@ -1354,12 +1354,14 @@ void C_GiSvDaRectBaseGroup::wheelEvent(QGraphicsSceneWheelEvent * const opc_Even
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::hoverEnterEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
-   if ((this->mq_EditModeActive == false) ||
-       (this->mq_EditContentModeEnabled == true))
+   if ((this->mq_EditModeActive == true) &&
+       (this->mq_EditContentModeEnabled == false))
    {
-      this->mpc_ProxyWidget->TriggerHoverEnterEvent(opc_Event);
-      C_GiBiRectBaseGroup::hoverEnterEvent(opc_Event);
+      QApplication::setOverrideCursor(Qt::SizeAllCursor);
    }
+
+   this->mpc_ProxyWidget->TriggerHoverEnterEvent(opc_Event);
+   C_GiBiRectBaseGroup::hoverEnterEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1370,200 +1372,196 @@ void C_GiSvDaRectBaseGroup::hoverEnterEvent(QGraphicsSceneHoverEvent * const opc
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
-   if ((this->mq_EditModeActive == false) ||
-       (this->mq_EditContentModeEnabled == true))
-   {
-      this->mpc_ProxyWidget->TriggerHoverMoveEvent(opc_Event);
-      C_GiBiRectBaseGroup::hoverMoveEvent(opc_Event);
+   this->mpc_ProxyWidget->TriggerHoverMoveEvent(opc_Event);
+   C_GiBiRectBaseGroup::hoverMoveEvent(opc_Event);
 
-      //Handle tool tips
-      if ((this->mpc_RefreshIcon->isVisible() == true) &&
-          (this->mpc_RefreshIcon->contains(this->mpc_RefreshIcon->mapFromScene(opc_Event->scenePos())) == true))
+   //Handle tool tips
+   if ((this->mpc_RefreshIcon->isVisible() == true) &&
+       (this->mpc_RefreshIcon->contains(this->mpc_RefreshIcon->mapFromScene(opc_Event->scenePos())) == true))
+   {
+      QString c_ManualItems;
+      QString c_Text;
+      if (this->mq_ReadItem == true)
       {
-         QString c_ManualItems;
-         QString c_Text;
-         if (this->mq_ReadItem == true)
+         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+         if (pc_View != NULL)
          {
-            const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-            if (pc_View != NULL)
+            for (uint32 u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
             {
-               for (uint32 u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
+               C_PuiSvDbNodeDataPoolListElementId c_Id;
+               if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
                {
-                  C_PuiSvDbNodeDataPoolListElementId c_Id;
-                  if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
+                  C_PuiSvReadDataConfiguration c_Config;
+                  if (pc_View->GetReadRailAssignment(c_Id, c_Config) == C_NO_ERR)
                   {
-                     C_PuiSvReadDataConfiguration c_Config;
-                     if (pc_View->GetReadRailAssignment(c_Id, c_Config) == C_NO_ERR)
+                     if (c_Config.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
                      {
-                        if (c_Config.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
+                        const C_OSCNodeDataPoolListElement * const pc_Element =
+                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
+                        if (pc_Element != NULL)
                         {
-                           const C_OSCNodeDataPoolListElement * const pc_Element =
-                              C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
-                           if (pc_Element != NULL)
+                           //Add name
+                           if (c_Id.GetUseArrayElementIndex())
                            {
-                              //Add name
-                              if (c_Id.GetUseArrayElementIndex())
-                              {
-                                 c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
-                                    c_Id.GetArrayElementIndex());
-                              }
-                              else
-                              {
-                                 c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
-                              }
-                              c_ManualItems += "\n";
+                              c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                                 c_Id.GetArrayElementIndex());
                            }
+                           else
+                           {
+                              c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
+                           }
+                           c_ManualItems += "\n";
                         }
                      }
                   }
                }
             }
-            c_Text = C_GtGetText::h_GetText("Trigger manual read for:\n");
          }
-         else
-         {
-            const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-            if (pc_View != NULL)
-            {
-               for (uint32 u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
-               {
-                  C_PuiSvDbNodeDataPoolListElementId c_Id;
-                  if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
-                  {
-                     const C_OSCNodeDataPoolListElement * const pc_Element =
-                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
-                     if (pc_Element != NULL)
-                     {
-                        //Add name
-                        if (c_Id.GetUseArrayElementIndex())
-                        {
-                           c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
-                              c_Id.GetArrayElementIndex());
-                        }
-                        else
-                        {
-                           c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
-                        }
-                        c_ManualItems += "\n";
-                     }
-                  }
-               }
-            }
-            c_Text = C_GtGetText::h_GetText("Trigger manual write for:\n");
-         }
-         c_Text += c_ManualItems;
-         if (this->mq_ConnectionActive == false)
-         {
-            c_Text += C_GtGetText::h_GetText("\nOnly available while connected.");
-         }
-         //Check if redisplay necessary
-         if (c_Text.compare(this->GetCurrentToolTipContent()) != 0)
-         {
-            Q_EMIT this->SigHideToolTip();
-         }
-         this->SetDefaultToolTipHeading("");
-         this->SetDefaultToolTipContent(c_Text);
-         this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
-      }
-      else if (((this->mpc_WarningIcon != NULL) && (this->mpc_WarningIcon->isVisible() == true)) &&
-               (this->mpc_WarningIcon->contains(this->mpc_WarningIcon->mapFromScene(opc_Event->scenePos())) == true))
-      {
-         const QString c_Heading = C_GtGetText::h_GetText("Configuration Warning");
-         QString c_Content;
-         QString c_Name;
-         //if there are no data elements use this tooltip
-         if (this->GetWidgetDataPoolElementCount() == 0U)
-         {
-            c_Content += C_GtGetText::h_GetText("- No data element selected");
-         }
-         else
-         {
-            if (m_CheckHasValidElements(c_Name) == false)
-            {
-               c_Content +=
-                  static_cast<QString>(C_GtGetText::h_GetText(
-                                          "- This widget and this data element (\"%1\") does not match, "
-                                          "possible reasons:\n"
-                                          "   Data element was deleted\n"
-                                          "   Data element has become an array\n"
-                                          "   Data element has different value range")).arg(c_Name);
-            }
-            if (m_CheckHasAnyRequiredNodesActive() == false)
-            {
-               if (c_Content.isEmpty() == false)
-               {
-                  c_Content += "\n";
-               }
-               c_Content += C_GtGetText::h_GetText("- There is a data element of an inactive node");
-            }
-            if (m_CheckHasAnyRequiredBusesConnected() == false)
-            {
-               if (c_Content.isEmpty() == false)
-               {
-                  c_Content += "\n";
-               }
-               c_Content += C_GtGetText::h_GetText("- There is a signal of an inactive bus");
-            }
-            if (m_CheckHasAnyRequiredNodesValidDashboardRouting() == false)
-            {
-               if (c_Content.isEmpty() == false)
-               {
-                  c_Content += "\n";
-               }
-               c_Content += C_GtGetText::h_GetText("- There is a data element of a node with "
-                                                   "disabled communication interface flags for Dashboard");
-            }
-         }
-         //Check if redisplay necessary
-         if (c_Content.compare(this->GetCurrentToolTipContent()) != 0)
-         {
-            Q_EMIT (this->SigHideToolTip());
-         }
-         this->SetDefaultToolTipHeading(c_Heading);
-         this->SetDefaultToolTipContent(c_Content);
-         this->SetDefaultToolTipType(C_NagToolTip::eWARNING);
-      }
-      else if (((this->mpc_ConflictIcon != NULL) && (this->mpc_ConflictIcon->isVisible() == true)) &&
-               (this->mpc_ConflictIcon->contains(this->mpc_ConflictIcon->mapFromScene(opc_Event->scenePos())) == true))
-      {
-         m_UpdateErrorIconToolTip();
+         c_Text = C_GtGetText::h_GetText("Trigger manual read for:\n");
       }
       else
       {
-         C_PuiSvDbNodeDataPoolListElementId c_Id;
-         QString c_Heading = "";
-         const QString c_NewContent = m_GetCommonToolTipContent();
-         //Check if redisplay necessary
-         if (c_NewContent.compare(this->GetCurrentToolTipContent()) != 0)
+         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+         if (pc_View != NULL)
          {
-            Q_EMIT this->SigHideToolTip();
-         }
-
-         //get element name as heading
-         if (c_NewContent.isEmpty() == false)
-         {
-            if (this->GetDataPoolElementIndex(0, c_Id) == C_NO_ERR)
+            for (uint32 u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
             {
-               if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id) != NULL)
+               C_PuiSvDbNodeDataPoolListElementId c_Id;
+               if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
                {
-                  const QString c_ElementName =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id)->c_Name.c_str();
-                  if (c_Id.GetUseArrayElementIndex())
+                  const C_OSCNodeDataPoolListElement * const pc_Element =
+                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
+                  if (pc_Element != NULL)
                   {
-                     c_Heading = static_cast<QString>("%1[%2]").arg(c_ElementName).arg(c_Id.GetArrayElementIndex());
-                  }
-                  else
-                  {
-                     c_Heading = c_ElementName;
+                     //Add name
+                     if (c_Id.GetUseArrayElementIndex())
+                     {
+                        c_ManualItems += static_cast<QString>("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                           c_Id.GetArrayElementIndex());
+                     }
+                     else
+                     {
+                        c_ManualItems += static_cast<QString>(pc_Element->c_Name.c_str());
+                     }
+                     c_ManualItems += "\n";
                   }
                }
             }
          }
-
-         this->SetDefaultToolTipHeading(c_Heading);
-         this->SetDefaultToolTipContent(c_NewContent);
-         this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+         c_Text = C_GtGetText::h_GetText("Trigger manual write for:\n");
       }
+      c_Text += c_ManualItems;
+      if (this->mq_ConnectionActive == false)
+      {
+         c_Text += C_GtGetText::h_GetText("\nOnly available while connected.");
+      }
+      //Check if redisplay necessary
+      if (c_Text.compare(this->GetCurrentToolTipContent()) != 0)
+      {
+         Q_EMIT this->SigHideToolTip();
+      }
+      this->SetDefaultToolTipHeading("");
+      this->SetDefaultToolTipContent(c_Text);
+      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
+   }
+   else if (((this->mpc_WarningIcon != NULL) && (this->mpc_WarningIcon->isVisible() == true)) &&
+            (this->mpc_WarningIcon->contains(this->mpc_WarningIcon->mapFromScene(opc_Event->scenePos())) == true))
+   {
+      const QString c_Heading = C_GtGetText::h_GetText("Configuration Warning");
+      QString c_Content;
+      QString c_Name;
+      //if there are no data elements use this tooltip
+      if (this->GetWidgetDataPoolElementCount() == 0U)
+      {
+         c_Content += C_GtGetText::h_GetText("- No data element selected");
+      }
+      else
+      {
+         if (m_CheckHasValidElements(c_Name) == false)
+         {
+            c_Content +=
+               static_cast<QString>(C_GtGetText::h_GetText(
+                                       "- This widget and this data element (\"%1\") does not match, "
+                                       "possible reasons:\n"
+                                       "   Data element was deleted\n"
+                                       "   Data element has become an array\n"
+                                       "   Data element has different value range")).arg(c_Name);
+         }
+         if (m_CheckHasAnyRequiredNodesActive() == false)
+         {
+            if (c_Content.isEmpty() == false)
+            {
+               c_Content += "\n";
+            }
+            c_Content += C_GtGetText::h_GetText("- There is a data element of an inactive node");
+         }
+         if (m_CheckHasAnyRequiredBusesConnected() == false)
+         {
+            if (c_Content.isEmpty() == false)
+            {
+               c_Content += "\n";
+            }
+            c_Content += C_GtGetText::h_GetText("- There is a signal of an inactive bus");
+         }
+         if (m_CheckHasAnyRequiredNodesValidDashboardRouting() == false)
+         {
+            if (c_Content.isEmpty() == false)
+            {
+               c_Content += "\n";
+            }
+            c_Content += C_GtGetText::h_GetText("- There is a data element of a node with "
+                                                "disabled communication interface flags for Dashboard");
+         }
+      }
+      //Check if redisplay necessary
+      if (c_Content.compare(this->GetCurrentToolTipContent()) != 0)
+      {
+         Q_EMIT (this->SigHideToolTip());
+      }
+      this->SetDefaultToolTipHeading(c_Heading);
+      this->SetDefaultToolTipContent(c_Content);
+      this->SetDefaultToolTipType(C_NagToolTip::eWARNING);
+   }
+   else if (((this->mpc_ConflictIcon != NULL) && (this->mpc_ConflictIcon->isVisible() == true)) &&
+            (this->mpc_ConflictIcon->contains(this->mpc_ConflictIcon->mapFromScene(opc_Event->scenePos())) == true))
+   {
+      m_UpdateErrorIconToolTip();
+   }
+   else
+   {
+      C_PuiSvDbNodeDataPoolListElementId c_Id;
+      QString c_Heading = "";
+      const QString c_NewContent = m_GetCommonToolTipContent();
+      //Check if redisplay necessary
+      if (c_NewContent.compare(this->GetCurrentToolTipContent()) != 0)
+      {
+         Q_EMIT this->SigHideToolTip();
+      }
+
+      //get element name as heading
+      if (c_NewContent.isEmpty() == false)
+      {
+         if (this->GetDataPoolElementIndex(0, c_Id) == C_NO_ERR)
+         {
+            if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id) != NULL)
+            {
+               const QString c_ElementName =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id)->c_Name.c_str();
+               if (c_Id.GetUseArrayElementIndex())
+               {
+                  c_Heading = static_cast<QString>("%1[%2]").arg(c_ElementName).arg(c_Id.GetArrayElementIndex());
+               }
+               else
+               {
+                  c_Heading = c_ElementName;
+               }
+            }
+         }
+      }
+
+      this->SetDefaultToolTipHeading(c_Heading);
+      this->SetDefaultToolTipContent(c_NewContent);
+      this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
    }
 }
 
@@ -1580,6 +1578,12 @@ void C_GiSvDaRectBaseGroup::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc
    C_GiBiRectBaseGroup::hoverLeaveEvent(opc_Event);
 
    Q_EMIT (this->SigHideToolTip());
+
+   if ((this->mq_EditModeActive == true) &&
+       (this->mq_EditContentModeEnabled == false))
+   {
+      QApplication::restoreOverrideCursor();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

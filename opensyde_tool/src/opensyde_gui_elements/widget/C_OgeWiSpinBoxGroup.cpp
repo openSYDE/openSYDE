@@ -172,7 +172,7 @@ void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::SetSuffix(const QString & orc_Value) const
 {
-   this->mpc_Ui->pc_DoubleSpinBox->setSuffix(orc_Value);
+   this->mpc_Ui->pc_DoubleSpinBox->SetSuffix(orc_Value);
    this->mpc_Ui->pc_SpinBox64->SetSuffix(orc_Value);
 }
 

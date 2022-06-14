@@ -31,10 +31,14 @@ public:
    static stw_types::sint32 h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,
                                        const stw_scl::C_SCLString & orc_BasePath, const bool oq_SkipContent = false);
    static stw_types::sint32 h_SaveNodeFile(const C_OSCNode & orc_Node, const stw_scl::C_SCLString & orc_FilePath,
-                                           std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles);
+                                           std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles,
+                                           const std::map<stw_types::uint32,
+                                                          stw_scl::C_SCLString> & orc_NodeIndicesToNameMap);
    static stw_types::sint32 h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,
                                        const stw_scl::C_SCLString & orc_BasePath,
-                                       std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles);
+                                       std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles,
+                                       const std::map<stw_types::uint32,
+                                                      stw_scl::C_SCLString> & orc_NodeIndicesToNameMap);
    static stw_types::sint32 h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & orc_NodeComProtocols,
                                                    const std::vector<C_OSCNodeDataPool> & orc_NodeDataPools,
                                                    C_OSCXMLParserBase & orc_XMLParser,
@@ -74,6 +78,16 @@ private:
    static stw_types::sint32 mh_SaveHALC(const C_OSCHalcConfig & orc_Config, C_OSCXMLParserBase & orc_XMLParser,
                                         const stw_scl::C_SCLString & orc_BasePath,
                                         std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles);
+   static stw_types::sint32 mh_LoadCANOpenManagers(std::map<stw_types::uint8, C_OSCCanOpenManagerInfo> & orc_Config,
+                                                   C_OSCXMLParserBase & orc_XMLParser,
+                                                   const stw_scl::C_SCLString & orc_BasePath);
+   static stw_types::sint32 mh_SaveCANOpenManagers(const std::map<stw_types::uint8,
+                                                                  C_OSCCanOpenManagerInfo> & orc_Config,
+                                                   C_OSCXMLParserBase & orc_XMLParser,
+                                                   const stw_scl::C_SCLString & orc_BasePath,
+                                                   std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles,
+                                                   const std::map<stw_types::uint32,
+                                                                  stw_scl::C_SCLString> & orc_NodeIndicesToNameMap);
    static stw_scl::C_SCLString mh_DiagnosticServerToString(const C_OSCNodeProperties::E_DiagnosticServerProtocol &
                                                            ore_DiagnosticProtocol);
    static stw_types::sint32 mh_StringToDiagnosticServer(const stw_scl::C_SCLString & orc_String,

@@ -59,12 +59,12 @@ void C_OSCCanMessageContainer::CalcHash(uint32 & oru32_HashValue) const
 
    for (uint32 u32_Counter = 0U; u32_Counter < this->c_RxMessages.size(); ++u32_Counter)
    {
-      this->c_RxMessages[u32_Counter].CalcHash(oru32_HashValue);
+      this->c_RxMessages[u32_Counter].CalcHash(oru32_HashValue, false);
    }
 
    for (uint32 u32_Counter = 0U; u32_Counter < this->c_TxMessages.size(); ++u32_Counter)
    {
-      this->c_TxMessages[u32_Counter].CalcHash(oru32_HashValue);
+      this->c_TxMessages[u32_Counter].CalcHash(oru32_HashValue, false);
    }
 
    //Force CRC change if single Rx message is moved to empty Tx (previously no change in CRC calculation)
@@ -184,6 +184,7 @@ std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool 
    \param[out]  opq_IdInvalid                         Id out of 11 bit / 29 bit range
    \param[out]  opq_SignalInvalid                     An error found for a signal
    \param[in]   ou32_CANMessageValidSignalsDLCOffset  CAN message DLC offset for valid signal range check
+   \param[in]   oq_CANMessageSignalGapsValid          Flag if gaps between signals are valid or handled as errors
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolList * const opc_List,
@@ -191,7 +192,8 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
                                                       bool * const opq_NameConflict, bool * const opq_NameInvalid,
                                                       bool * const opq_DelayTimeInvalid, bool * const opq_IdConflict,
                                                       bool * const opq_IdInvalid, bool * const opq_SignalInvalid,
-                                                      const uint32 ou32_CANMessageValidSignalsDLCOffset) const
+                                                      const uint32 ou32_CANMessageValidSignalsDLCOffset,
+                                                      const bool oq_CANMessageSignalGapsValid) const
 {
    const std::vector<C_OSCCanMessage> & rc_Messages = this->GetMessagesConst(orq_IsTx);
 
@@ -343,7 +345,9 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
       if (opq_DelayTimeInvalid != NULL)
       {
          *opq_DelayTimeInvalid = false;
-         if (rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE)
+         if ((rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE) ||
+             (rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254) ||
+             (rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255))
          {
             if (static_cast<uint32>(rc_Message.u16_DelayTimeMs) > rc_Message.u32_CycleTimeMs)
             {
@@ -359,7 +363,8 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
          for (uint32 u32_ItSignal = 0; (u32_ItSignal < rc_Message.c_Signals.size()) && (*opq_SignalInvalid == false);
               ++u32_ItSignal)
          {
-            if (rc_Message.CheckErrorSignal(opc_List, u32_ItSignal, ou32_CANMessageValidSignalsDLCOffset))
+            if (rc_Message.CheckErrorSignal(opc_List, u32_ItSignal, ou32_CANMessageValidSignalsDLCOffset,
+                                            oq_CANMessageSignalGapsValid))
             {
                *opq_SignalInvalid = true;
             }
@@ -376,6 +381,7 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
    \param[in]      orc_ListTx                            Node data pool list containing tx signal data
    \param[in]      orc_ListRx                            Node data pool list containing rx signal data
    \param[in]      ou32_CANMessageValidSignalsDLCOffset  CAN message DLC offset for valid signal range check
+   \param[in]      oq_CANMessageSignalGapsValid          Flag if gaps between signals are valid or handled as errors
    \param[in,out]  opc_InvalidTxMessages                 Optional vector of invalid Tx CAN message names
    \param[in,out]  opc_InvalidRxMessages                 Optional vector of invalid Rx CAN message names
 
@@ -387,6 +393,7 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
 bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc_ListTx,
                                                const C_OSCNodeDataPoolList & orc_ListRx,
                                                const uint32 ou32_CANMessageValidSignalsDLCOffset,
+                                               const bool oq_CANMessageSignalGapsValid,
                                                std::vector<uint32> * const opc_InvalidTxMessages,
                                                std::vector<uint32> * const opc_InvalidRxMessages) const
 {
@@ -403,7 +410,8 @@ bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc
       bool q_IdInvalid = false;
       bool q_SignalInvalid = false;
       this->CheckMessageLocalError(&orc_ListTx, u32_ItMessage, true, &q_NameConflict, &q_NameInvalid, &q_DelayInvalid,
-                                   &q_IdConflict, &q_IdInvalid, &q_SignalInvalid, ou32_CANMessageValidSignalsDLCOffset);
+                                   &q_IdConflict, &q_IdInvalid, &q_SignalInvalid, ou32_CANMessageValidSignalsDLCOffset,
+                                   oq_CANMessageSignalGapsValid);
       if ((((((q_NameConflict == true) || (q_NameInvalid == true)) || (q_DelayInvalid == true)) ||
             (q_IdConflict == true)) || (q_IdInvalid == true)) || (q_SignalInvalid == true))
       {
@@ -425,7 +433,8 @@ bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc
       bool q_IdInvalid = false;
       bool q_SignalInvalid = false;
       this->CheckMessageLocalError(&orc_ListRx, u32_ItMessage, false, &q_NameConflict, &q_NameInvalid, &q_DelayInvalid,
-                                   &q_IdConflict, &q_IdInvalid, &q_SignalInvalid, ou32_CANMessageValidSignalsDLCOffset);
+                                   &q_IdConflict, &q_IdInvalid, &q_SignalInvalid, ou32_CANMessageValidSignalsDLCOffset,
+                                   oq_CANMessageSignalGapsValid);
       if ((((((q_NameConflict == true) || (q_NameInvalid == true)) || (q_DelayInvalid == true)) ||
             (q_IdConflict == true)) || (q_IdInvalid == true)) || (q_SignalInvalid == true))
       {

@@ -32,6 +32,8 @@ public:
 
 protected:
    C_TblTreSimpleItem * mpc_InvisibleRootItem;
+
+   stw_types::sint32 m_CountLayers(const QModelIndex & orc_Index, stw_types::uint32 & oru32_ValidLayers) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

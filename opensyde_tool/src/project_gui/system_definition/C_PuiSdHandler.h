@@ -12,7 +12,7 @@
 #define C_PUISDHANDLERH
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_PuiSdHandlerBusLogic.h"
+#include "C_PuiSdHandlerCanOpenLogic.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -22,7 +22,7 @@ namespace stw_opensyde_gui_logic
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiSdHandler :
-   public C_PuiSdHandlerBusLogic
+   public C_PuiSdHandlerCanOpenLogic
 {
 public:
    static C_PuiSdHandler * h_GetInstance(void);

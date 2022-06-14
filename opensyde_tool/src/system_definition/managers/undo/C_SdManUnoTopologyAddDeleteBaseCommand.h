@@ -83,6 +83,17 @@ private:
    void m_SaveToDataMultiNode(const stw_types::uint32 ou32_NodeIndex);
    void m_Clear(void);
    void m_Delete(void);
+   void m_HandleCanOpenBeforeDelete(void) const;
+   void m_HandleCanOpenNodeBeforeDelete(const stw_types::uint32 ou32_Index) const;
+   void m_HandleCanOpenManagerBeforeDelete(const stw_types::uint32 ou32_Index) const;
+   void m_HandleCanOpenDeviceBeforeDelete(const stw_types::uint32 ou32_Index) const;
+   void m_HandleCanOpenBusBeforeDelete(const stw_types::uint32 ou32_Index) const;
+   void m_HandleCanOpenNodeBusConnectorBeforeDelete(const stw_types::uint32 ou32_NodeIndex,
+                                                    const C_PuiSdNodeConnectionId & orc_ConnectionId) const;
+   void m_HandleCanOpenManagerNodeBusConnectorBeforeDelete(const stw_types::uint32 ou32_NodeIndex,
+                                                           const C_PuiSdNodeConnectionId & orc_ConnectionId) const;
+   void m_HandleCanOpenDeviceNodeBusConnectorBeforeDelete(const stw_types::uint32 ou32_NodeIndex,
+                                                          const C_PuiSdNodeConnectionId & orc_ConnectionId) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

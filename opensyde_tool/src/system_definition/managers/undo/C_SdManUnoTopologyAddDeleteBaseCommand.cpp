@@ -140,6 +140,7 @@ C_SdTopologyDataSnapshot C_SdManUnoTopologyAddDeleteBaseCommand::GetDataBackup()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_DeleteSave(void)
 {
+   m_HandleCanOpenBeforeDelete();
    m_SaveToData();
    m_Delete();
    Q_EMIT (this->SigErrorChange());
@@ -602,6 +603,278 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_Delete(void)
       for (vector<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
       {
          pc_Scene->DeleteItem(*c_ItItem);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle CANopen data before delete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenBeforeDelete() const
+{
+   const vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
+   C_GiNode * pc_Node;
+   C_GiLiBus * pc_Bus;
+   C_GiLiBusConnector * pc_BusConnector;
+   C_PuiSdDataElement * pc_Data;
+
+   //Other elements
+   for (vector<QGraphicsItem *>::const_iterator c_ItRelatedItem = c_RelatedItems.begin();
+        c_ItRelatedItem != c_RelatedItems.end(); ++c_ItRelatedItem)
+   {
+      C_GiUnique * const pc_Unique = dynamic_cast<C_GiUnique *>(*c_ItRelatedItem);
+      if (pc_Unique != NULL)
+      {
+         //lint -e{740}  no problem because of common base class
+
+         pc_Data = dynamic_cast<C_PuiSdDataElement *>(*c_ItRelatedItem);
+         if (pc_Data != NULL)
+         {
+            const sint32 s32_Index = pc_Data->GetIndex();
+            if (s32_Index >= 0)
+            {
+               const uint32 u32_Index = static_cast<uint32>(s32_Index);
+               //Save to scene data
+               pc_Data->UpdateData();
+
+               //Backup scene data internally
+               //Node
+               if (dynamic_cast<C_GiNode *>(*c_ItRelatedItem) != NULL)
+               {
+                  m_HandleCanOpenNodeBeforeDelete(u32_Index);
+               }
+               //Bus
+
+               pc_Bus = dynamic_cast<C_GiLiBus *>(*c_ItRelatedItem);
+               if (pc_Bus != NULL)
+               {
+                  m_HandleCanOpenBusBeforeDelete(u32_Index);
+               }
+            }
+         }
+         else
+         {
+            //Bus connector
+
+            pc_BusConnector = dynamic_cast<C_GiLiBusConnector *>(*c_ItRelatedItem);
+            if (pc_BusConnector != NULL)
+            {
+               //Node data
+               pc_Node = pc_BusConnector->GetNodeItem();
+               if (pc_Node != NULL)
+               {
+                  const sint32 s32_NodeIndex = pc_Node->GetIndex();
+
+                  //Trigger update node data again to be save in the case only the bus of a bus connector was
+                  // selected
+                  pc_Node->UpdateData();
+                  if (s32_NodeIndex >= 0)
+                  {
+                     const uint32 u32_NodeIndex = static_cast<uint32>(s32_NodeIndex);
+                     const sint32 s32_BusConnectionDataIndex = pc_Node->GetIndexOfConnector(pc_BusConnector);
+                     if (s32_BusConnectionDataIndex >= 0)
+                     {
+                        //Core
+                        const C_PuiSdNodeConnectionId * const pc_CurConnId = pc_Node->GetNodeConnectionId(
+                           pc_BusConnector);
+                        if (pc_CurConnId != NULL)
+                        {
+                           m_HandleCanOpenNodeBusConnectorBeforeDelete(u32_NodeIndex, *pc_CurConnId);
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle CANopen node data before delete
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenNodeBeforeDelete(const uint32 ou32_Index) const
+{
+   m_HandleCanOpenManagerBeforeDelete(ou32_Index);
+   m_HandleCanOpenDeviceBeforeDelete(ou32_Index);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle CANopen manager data before delete
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenManagerBeforeDelete(const uint32 ou32_Index) const
+{
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_Index);
+
+   if (pc_Node != NULL)
+   {
+      std::vector<uint8> c_Tmp;
+      c_Tmp.reserve(pc_Node->c_CanOpenManagers.size());
+      for (std::map<uint8, C_OSCCanOpenManagerInfo>::const_iterator c_ItManager =
+              pc_Node->c_CanOpenManagers.begin();
+           c_ItManager != pc_Node->c_CanOpenManagers.end(); ++c_ItManager)
+      {
+         c_Tmp.push_back(c_ItManager->first);
+      }
+      for (uint32 u32_ItDelete = 0UL; u32_ItDelete < c_Tmp.size(); ++u32_ItDelete)
+      {
+         bool q_Tmp;
+         tgl_assert(C_PuiSdHandler::h_GetInstance()->DeleteCanOpenManager(ou32_Index,
+                                                                          c_Tmp[u32_ItDelete], true,
+                                                                          q_Tmp) == C_NO_ERR);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle CANopen device data before delete
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenDeviceBeforeDelete(const uint32 ou32_Index) const
+{
+   for (uint32 u32_ItNode = 0UL; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+   {
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
+      if (pc_Node != NULL)
+      {
+         for (std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_ItManager =
+                 pc_Node->c_CanOpenManagers.begin();
+              c_ItManager != pc_Node->c_CanOpenManagers.end(); ++c_ItManager)
+         {
+            std::vector<C_OSCCanInterfaceId> c_Tmp;
+            for (std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice =
+                    c_ItManager->second.c_CanOpenDevices.begin();
+                 c_ItDevice != c_ItManager->second.c_CanOpenDevices.end(); ++c_ItDevice)
+            {
+               if (c_ItDevice->first.u32_NodeIndex == ou32_Index)
+               {
+                  c_Tmp.push_back(c_ItDevice->first);
+               }
+            }
+            for (uint32 u32_ItDelete = 0UL; u32_ItDelete < c_Tmp.size(); ++u32_ItDelete)
+            {
+               tgl_assert(C_PuiSdHandler::h_GetInstance()->DeleteCanOpenManagerDevice(u32_ItNode, c_ItManager->first,
+                                                                                      c_Tmp[u32_ItDelete]) == C_NO_ERR);
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle CANopen bus data before delete
+
+   \param[in]  ou32_Index  Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenBusBeforeDelete(const uint32 ou32_Index) const
+{
+   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ou32_Index);
+
+   if (pc_Bus != NULL)
+   {
+      if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+      {
+         std::vector<uint32> c_NodeIndexes;
+         std::vector<uint32> c_InterfaceIndexes;
+         C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(ou32_Index, c_NodeIndexes,
+                                                                                            c_InterfaceIndexes);
+         tgl_assert(c_NodeIndexes.size() == c_InterfaceIndexes.size());
+         if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
+         {
+            for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
+            {
+               uint8 u8_InterfaceNumber;
+               tgl_assert(C_PuiSdHandler::h_GetInstance()->TranslateCanInterfaceIndexToId(c_NodeIndexes[u32_ItNode],
+                                                                                          c_InterfaceIndexes[u32_ItNode],
+                                                                                          u8_InterfaceNumber) ==
+                          C_NO_ERR);
+               //Don't check result as this manager might not exist
+               C_PuiSdHandler::h_GetInstance()->DeleteAllCanOpenManagerDevices(c_NodeIndexes[u32_ItNode],
+                                                                               u8_InterfaceNumber);
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle CANopen node bus connector data before delete
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_ConnectionId  Connection ID
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenNodeBusConnectorBeforeDelete(const uint32 ou32_NodeIndex,
+                                                                                         const C_PuiSdNodeConnectionId & orc_ConnectionId)
+const
+{
+   if (orc_ConnectionId.e_InterfaceType == C_OSCSystemBus::eCAN)
+   {
+      m_HandleCanOpenManagerNodeBusConnectorBeforeDelete(ou32_NodeIndex, orc_ConnectionId);
+      m_HandleCanOpenDeviceNodeBusConnectorBeforeDelete(ou32_NodeIndex, orc_ConnectionId);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle CANopen manager node bus connector data before delete
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_ConnectionId  Connection ID
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenManagerNodeBusConnectorBeforeDelete(
+   const uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ConnectionId) const
+{
+   //Don't check result as this manager might not exist
+   C_PuiSdHandler::h_GetInstance()->DeleteAllCanOpenManagerDevices(ou32_NodeIndex, orc_ConnectionId.u8_InterfaceNumber);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle CANopen device node bus connector data before delete
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_ConnectionId  Connection ID
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::m_HandleCanOpenDeviceNodeBusConnectorBeforeDelete(
+   const uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ConnectionId) const
+{
+   for (uint32 u32_ItNode = 0UL; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+   {
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
+      if (pc_Node != NULL)
+      {
+         for (std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_ItManager =
+                 pc_Node->c_CanOpenManagers.begin();
+              c_ItManager != pc_Node->c_CanOpenManagers.end(); ++c_ItManager)
+         {
+            std::vector<C_OSCCanInterfaceId> c_Tmp;
+            for (std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice =
+                    c_ItManager->second.c_CanOpenDevices.begin();
+                 c_ItDevice != c_ItManager->second.c_CanOpenDevices.end(); ++c_ItDevice)
+            {
+               if ((c_ItDevice->first.u32_NodeIndex == ou32_NodeIndex) &&
+                   (c_ItDevice->first.u8_InterfaceNumber == orc_ConnectionId.u8_InterfaceNumber))
+               {
+                  c_Tmp.push_back(c_ItDevice->first);
+               }
+            }
+            for (uint32 u32_ItDelete = 0UL; u32_ItDelete < c_Tmp.size(); ++u32_ItDelete)
+            {
+               tgl_assert(C_PuiSdHandler::h_GetInstance()->DeleteCanOpenManagerDevice(u32_ItNode, c_ItManager->first,
+                                                                                      c_Tmp[u32_ItDelete]) == C_NO_ERR);
+            }
+         }
       }
    }
 }

@@ -17,6 +17,7 @@
 #include <QScrollBar>
 #include <QAbstractItemView>
 #include <QStandardItemModel>
+#include <QListView>
 #include "C_OgeWiUtil.h"
 #include "C_OgeCbxToolTipBase.h"
 
@@ -141,6 +142,29 @@ void C_OgeCbxToolTipBase::SetItemState(const stw_types::sint32 os32_Index, const
             pc_Item->setFlags(c_Flags);
          }
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set item at index as visible or invisible
+
+   \param[in] os32_Index Index to disable
+   \param[in] oq_Visible Item visibility flag
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeCbxToolTipBase::SetItemVisible(const stw_types::sint32 os32_Index, const bool oq_Visible) const
+{
+   if (os32_Index < this->count())
+   {
+      QListView * const pc_ListView = dynamic_cast<QListView *>(this->view());
+
+      // Hide the Combobox item
+      if (pc_ListView != NULL)
+      {
+         pc_ListView->setRowHidden(os32_Index, !oq_Visible);
+      }
+
+      this->SetItemState(os32_Index, oq_Visible);
    }
 }
 

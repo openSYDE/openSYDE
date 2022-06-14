@@ -36,6 +36,9 @@ const stw_types::uint32 mu32_FLAG_EDIT_NAME = 1U;
 const stw_types::uint32 mu32_FLAG_OPEN_PROPERTIES = 2U;
 const stw_types::uint32 mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR = 3U;
 
+//CANopen Manager
+const stw_types::float32 mf32_HEARTBEAT_CONSUMER_TIME_FACTOR = 1.5f;
+
 //Animation timer
 const stw_types::sintn msn_ANIMATION_STEPS = 10;
 const stw_types::sintn msn_TIMER_INTERVAL = 10; //ms
@@ -156,8 +159,12 @@ const stw_types::sintn msn_C_ITEM_MAX_CHAR_COUNT = 31;
 
 //Node id restrictions
 const stw_types::uint8 mu8_NODE_ID_CLIENT = 126; //127 is reserved for broadcasts
+const stw_types::uint8 mu8_MIN_NODE_ID_OS = 0;
 const stw_types::uint8 mu8_MAX_NODE_ID_OS = 125;
 const stw_types::uint8 mu8_MAX_NODE_ID_STW = static_cast<stw_types::uint8> (254); //255 is reserved
+const stw_types::uint8 mu8_MIN_NODE_ID_CANOPEN = static_cast<stw_types::uint8> (1);
+const stw_types::uint8 mu8_MAX_NODE_ID_CANOPEN = static_cast<stw_types::uint8> (127);
+
 //Data pool sizes
 const stw_types::uint32 mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN = 0x101U;
 const stw_types::uint32 mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX = 0x17FU;
@@ -208,6 +215,9 @@ const QString mc_REPORT_HEADLINE_HTML_TAG_START = "<h3>";
 const QString mc_REPORT_HEADLINE_HTML_TAG_END = "</h3>";
 const QString mc_REPORT_HIGHLIGHT_TAG_START = "<span style=\" font-weight: bold;\">";
 const QString mc_REPORT_HIGHLIGHT_TAG_END = "</span>";
+
+// Features
+const bool mq_ENABLE_CAN_OPEN_FEATURE = false;
 
 //User roles
 //----------------------------------------------------------------------------------------------------------------------

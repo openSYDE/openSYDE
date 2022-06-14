@@ -39,6 +39,7 @@ SOURCES += ../src/main.cpp \
     ../src/navigable_gui/C_NagTopTreeView.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.cpp \
+    ../src/project_gui/system_definition/C_PuiSdHandlerCanOpenLogic.cpp \
     ../src/project_gui/system_definition/node/C_PuiSdNodeInterfaceAutomaticProperties.cpp \
     ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbElementIdCRCGroup.cpp \
@@ -46,9 +47,28 @@ SOURCES += ../src/main.cpp \
     ../src/project_operations/C_PopPasswordDialogWidget.cpp \
     ../src/project_operations/C_PopServiceProjSettingsModel.cpp \
     ../src/system_definition/C_SdTopologyWidget.cpp \
+    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.cpp \
+    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.cpp \
+    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsResultEntry.cpp \
+    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.cpp \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.cpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoAddDeviceDialog.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoConfigTreeModel.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoConfigTreeView.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceEdsWidget.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceWidget.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoManagerIntfWidget.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewWidget.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoWidget.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewTableModel.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewTableView.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableModel.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableView.cpp \
     ../src/system_views/C_SyvHandlerWidget.cpp \
     ../src/system_views/system_update/C_SyvUpUpdateWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacConfig.cpp \
@@ -83,6 +103,7 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubToolBar.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubUseCase.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubUseCaseNav.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubGenericTextWithBackground.cpp \
     ../src/system_definition/C_SdTopologyToolbox.cpp \
     ../src/graphic_items/C_GiPort.cpp \
     ../src/graphic_items/C_GiNode.cpp \
@@ -524,6 +545,7 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/dashboards/properties/C_SyvDaPeBase.cpp \
     ../src/system_views/dashboards/properties/C_SyvDaPeLabel.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxProperties.cpp \
+    ../src/opensyde_gui_elements/check_box/C_OgeChxPropertiesSmall.cpp \
     ../src/project_gui/system_views/C_PuiSvReadDataConfiguration.cpp \
     ../src/system_views/dashboards/properties/C_SyvDaPeDataElementBrowse.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementScaling.cpp \
@@ -890,6 +912,7 @@ HEADERS  += \
     ../src/navigable_gui/C_NagTopTreeView.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.h \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.h \
+    ../src/project_gui/system_definition/C_PuiSdHandlerCanOpenLogic.h \
     ../src/project_gui/system_definition/node/C_PuiSdNodeInterfaceAutomaticProperties.h \
     ../src/project_gui/system_views/C_PuiSvLastKnownHalElementId.h \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbElementIdCRCGroup.h \
@@ -897,9 +920,28 @@ HEADERS  += \
     ../src/project_operations/C_PopPasswordDialogWidget.h \
     ../src/project_operations/C_PopServiceProjSettingsModel.h \
     ../src/system_definition/C_SdTopologyWidget.h \
+    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.h \
+    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.h \
+    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsResultEntry.h \
+    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.h \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.h \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoAddDeviceDialog.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoConfigTreeModel.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoConfigTreeView.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceEdsWidget.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceWidget.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoManagerIntfWidget.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewWidget.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoWidget.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewTableModel.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewTableView.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableModel.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableView.h \
     ../src/system_views/C_SyvHandlerWidget.h \
     ../src/system_views/system_update/C_SyvUpUpdateWidget.h \
     ../src/system_views/system_update/update_package/C_SyvUpPacConfig.h \
@@ -935,6 +977,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/push_button/C_OgePubToolBar.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubUseCase.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubUseCaseNav.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubGenericTextWithBackground.h \
     ../src/system_definition/C_SdTopologyToolbox.h \
     ../src/graphic_items/C_GiPort.h \
     ../src/graphic_items/C_GiNode.h \
@@ -1377,6 +1420,7 @@ HEADERS  += \
     ../src/system_views/dashboards/properties/C_SyvDaPeBase.h \
     ../src/system_views/dashboards/properties/C_SyvDaPeLabel.h \
     ../src/opensyde_gui_elements/check_box/C_OgeChxProperties.h \
+    ../src/opensyde_gui_elements/check_box/C_OgeChxPropertiesSmall.h \
     ../src/project_gui/system_views/C_PuiSvReadDataConfiguration.h \
     ../src/system_views/dashboards/properties/C_SyvDaPeDataElementBrowse.h \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbDataElementScaling.h \
@@ -1719,9 +1763,18 @@ FORMS    += \
     ../src/project_operations/C_PopCreateServiceProjDialogWidget.ui \
     ../src/project_operations/C_PopPasswordDialogWidget.ui \
     ../src/system_definition/C_SdTopologyWidget.ui \
+    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.ui \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.ui \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.ui \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoAddDeviceDialog.ui \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.ui \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.ui \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.ui \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceEdsWidget.ui \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceWidget.ui \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoManagerIntfWidget.ui \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewWidget.ui \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoWidget.ui \
     ../src/system_views/C_SyvHandlerWidget.ui \
     ../src/opensyde_gui_elements/C_OgePopUpDialog.ui \
     ../src/opensyde_gui_elements/widget/C_OgeWiHover.ui \
@@ -1896,6 +1949,7 @@ INCLUDEPATH += ../src \
                ../src/system_definition/node_edit \
                ../src/system_definition/node_edit/data_blocks \
                ../src/system_definition/node_edit/datapools \
+               ../src/system_definition/node_edit/canopen_manager \
                ../src/system_definition/node_edit/halc \
                ../src/system_definition/node_edit/halc/overview \
                ../src/system_definition/node_edit/undo \
@@ -1904,6 +1958,7 @@ INCLUDEPATH += ../src \
                ../src/system_definition/node_edit/undo/data_set \
                ../src/system_definition/node_edit/stw_flashloader_options \
                ../src/system_definition/bus_edit \
+               ../src/system_definition/bus_edit/canopen \
                ../src/system_definition/bus_edit/undo \
                ../src/system_definition/bus_edit/message_layout_viewer \
                ../src/system_views \
@@ -1985,4 +2040,3 @@ QMAKE_TARGET_PRODUCT = openSYDE
 QMAKE_TARGET_COPYRIGHT = STW (c) 2018
 
 DISTFILES +=
-

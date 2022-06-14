@@ -75,11 +75,19 @@ C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueSignalPropertiesWidget),
    mpc_MessageSyncManager(NULL),
+   me_ComProtocol(C_OSCCanProtocol::eLAYER2),
    mu32_SignalIndex(0U),
    me_DataType(eTY_UNSIGNED)
 {
    // init UI
    this->mpc_Ui->setupUi(this);
+
+   this->mpc_Ui->pc_LabelObjectDictTitle->SetForegroundColor(4);
+   this->mpc_Ui->pc_LabelObjectDictTitle->SetFontPixel(13);
+
+   this->mpc_Ui->pc_LabelObjectDictValue->SetBackgroundColor(11);
+   this->mpc_Ui->pc_LabelObjectDictValue->SetForegroundColor(1);
+   this->mpc_Ui->pc_LabelObjectDictValue->SetFontPixel(13);
 
    this->mpc_Ui->pc_ComboBoxType->view()->setTextElideMode(Qt::ElideRight);
 
@@ -125,6 +133,7 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelMuxType->setText(C_GtGetText::h_GetText("Multiplexer Type"));
    this->mpc_Ui->pc_LabelMuxValue->setText(C_GtGetText::h_GetText("Multiplexer Value"));
    this->mpc_Ui->pc_CheckBoxAutoMinMax->setText(C_GtGetText::h_GetText("Auto min/max"));
+   this->mpc_Ui->pc_LabelObjectDictTitle->setText(C_GtGetText::h_GetText("Object Dictionary"));
 
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
 
@@ -288,6 +297,25 @@ void C_SdBueSignalPropertiesWidget::SetSignalId(const C_OSCCanMessageIdentificat
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new com protocol
+
+   \param[in]  oe_Value   New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Type oe_Value)
+{
+   const bool q_CanOpenActive = (oe_Value == C_OSCCanProtocol::eCAN_OPEN);
+
+   this->me_ComProtocol = oe_Value;
+
+   this->mpc_Ui->pc_WidgetObjectDict->setVisible(q_CanOpenActive);
+
+   this->mpc_Ui->pc_ComboBoxByteOrder->setEnabled(!q_CanOpenActive);
+
+   // All other elements will be en-/disabled in the m_LoadFromData function calls
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   On change of signal position in message
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -411,6 +439,14 @@ void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
          //Set range before value
          m_HandleMuxValueRange(*pc_OSCMessage, this->mu32_SignalIndex);
 
+         if (this->me_ComProtocol == C_OSCCanProtocol::eCAN_OPEN)
+         {
+            this->mpc_Ui->pc_LabelObjectDictValue->setText(
+               QString::number(rc_OSCSignal.u16_CanOpenManagerObjectDictionaryIndex, 16) +
+               static_cast<QString>(C_GtGetText::h_GetText("sub")) +
+               QString::number(rc_OSCSignal.u8_CanOpenManagerObjectDictionarySubIndex));
+         }
+
          //Update all fields
          m_UpdateUIForChange(eCHA_NAME);
          m_UpdateUIForChange(eCHA_COMMENT);
@@ -427,7 +463,45 @@ void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
          m_UpdateUIForChange(eCHA_START_BIT);
          m_UpdateUIForChange(eCHA_MUX_TYPE);
          m_UpdateUIForChange(eCHA_MUX_VALUE);
+
+         this->m_CoLoadEdsRestricitions();
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load the EDS file restrictions and adapt the ui
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_CoLoadEdsRestricitions(void)
+{
+   if (this->me_ComProtocol == C_OSCCanProtocol::eCAN_OPEN)
+   {
+      // The manager must be the only node associated by this message
+      const C_OSCCanOpenManagerDeviceInfo * const pc_Manager =
+         C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerDevice(this->mc_MessageId);
+
+      tgl_assert(pc_Manager != NULL);
+      if (pc_Manager != NULL)
+      {
+         const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+         if (pc_Message != NULL)
+         {
+            bool q_RoFlag = false;
+
+            // Message Tx flag is relative to the device, not the manager when using the EDS file content
+            // PDO Mapping
+            pc_Manager->c_EDSFileContent.IsPDOMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
+                                                        !this->mc_MessageId.q_MessageIsTx, q_RoFlag);
+
+            this->mpc_Ui->pc_SpinBoxStartBit->setEnabled(!q_RoFlag);
+         }
+      }
+   }
+   else
+   {
+      this->mpc_Ui->pc_SpinBoxStartBit->setEnabled(true);
    }
 }
 
@@ -770,10 +844,13 @@ void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErr
       bool q_NameInvalid = false;
       bool q_NameConflict = false;
 
-      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, &q_NameConflict, &q_NameInvalid,
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL,
+                                           &q_NameConflict, &q_NameInvalid,
                                            NULL, NULL, NULL, NULL, NULL,
                                            C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(this->mc_MessageId.
-                                                                                                  e_ComProtocol));
+                                                                                                  e_ComProtocol),
+                                           C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(this->mc_MessageId.
+                                                                                            e_ComProtocol));
 
       q_Combined = (q_NameInvalid == false) && (q_NameConflict == false);
       //set invalid text property
@@ -823,9 +900,11 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXType(const bool & orq_SignalErrorC
    {
       bool q_MuxTypeInvalid;
 
-      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL,
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL,
                                            NULL, NULL, NULL, NULL, &q_MuxTypeInvalid, NULL,
                                            C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                              this->mc_MessageId.e_ComProtocol),
+                                           C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
                                               this->mc_MessageId.e_ComProtocol));
       //set invalid text property
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ComboBoxMuxType, "Valid", !q_MuxTypeInvalid);
@@ -868,8 +947,11 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXValue(const bool & orq_SignalError
    {
       bool q_MuxValueInvalid;
 
-      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL,
-                                           NULL, NULL, NULL, NULL, NULL, &q_MuxValueInvalid,  C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL,
+                                           NULL, NULL, NULL, NULL, NULL, &q_MuxValueInvalid,
+                                           C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                              this->mc_MessageId.e_ComProtocol),
+                                           C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
                                               this->mc_MessageId.e_ComProtocol));
       //set invalid text property
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxMuxValue, "Valid", !q_MuxValueInvalid);
@@ -909,17 +991,33 @@ void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_Sign
       bool q_PositionValid;
       bool q_LayoutConflict = false;
       bool q_BorderConflict = false;
+      bool q_GapConflict = false;
 
-      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, &q_LayoutConflict, &q_BorderConflict, NULL,
-                                           NULL, NULL, NULL, NULL, NULL, NULL, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex,
+                                           &q_LayoutConflict, &q_BorderConflict, &q_GapConflict,
+                                           NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                                           C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                              this->mc_MessageId.e_ComProtocol),
+                                           C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
                                               this->mc_MessageId.e_ComProtocol));
       q_PositionValid = (q_LayoutConflict == false) && (q_BorderConflict == false);
       //set invalid text property
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxStartBit, "Valid", q_PositionValid);
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxStartBit, "Valid",
+                                             q_PositionValid && (q_GapConflict == false));
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxLength, "Valid", q_PositionValid);
       if (q_PositionValid == true)
       {
-         this->mpc_Ui->pc_SpinBoxStartBit->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
+         if (q_GapConflict == true)
+         {
+            // Special case: Gap error is only relevant for the start bit
+            const QString c_Content = C_GtGetText::h_GetText(
+               "A gap between signals is detected and is not allowed for CANopen.");
+            this->mpc_Ui->pc_SpinBoxStartBit->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
+         }
+         else
+         {
+            this->mpc_Ui->pc_SpinBoxStartBit->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
+         }
          this->mpc_Ui->pc_SpinBoxLength->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
       }
       else
@@ -1646,6 +1744,8 @@ void C_SdBueSignalPropertiesWidget::m_UpdateOtherSignalsForChange(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change)
 {
+   const bool q_CanOpenActive = (this->me_ComProtocol == C_OSCCanProtocol::eCAN_OPEN);
+
    //Don't trigger any new changes as all data is pulled from the internal data
    m_DisconnectAll();
    switch (oe_Change)
@@ -1688,13 +1788,11 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       //Restrictions
       if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
-         this->mpc_Ui->pc_LabelType->setEnabled(false);
          this->mpc_Ui->pc_ComboBoxType->setEnabled(false);
       }
       else
       {
-         this->mpc_Ui->pc_LabelType->setEnabled(true);
-         this->mpc_Ui->pc_ComboBoxType->setEnabled(true);
+         this->mpc_Ui->pc_ComboBoxType->setEnabled(!q_CanOpenActive);
       }
       //Value
       this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(static_cast<sintn>(this->me_DataType));
@@ -1717,13 +1815,11 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       if ((this->mc_DataOSCSignalCommon.GetType() == C_OSCNodeDataPoolContent::eFLOAT32) ||
           (this->mc_DataOSCSignalCommon.GetType() == C_OSCNodeDataPoolContent::eFLOAT64))
       {
-         this->mpc_Ui->pc_LabelLength->setEnabled(false);
          this->mpc_Ui->pc_SpinBoxLength->setEnabled(false);
       }
       else
       {
-         this->mpc_Ui->pc_LabelLength->setEnabled(true);
-         this->mpc_Ui->pc_SpinBoxLength->setEnabled(true);
+         this->mpc_Ui->pc_SpinBoxLength->setEnabled(!q_CanOpenActive);
       }
       this->mpc_Ui->pc_SpinBoxLength->SetMinimumCustom(1);
       if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
@@ -1748,12 +1844,10 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       //Restrictions
       if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
-         this->mpc_Ui->pc_LabelInitValue->setEnabled(false);
          this->mpc_Ui->pc_WidgetInit->setEnabled(false);
       }
       else
       {
-         this->mpc_Ui->pc_LabelInitValue->setEnabled(true);
          this->mpc_Ui->pc_WidgetInit->setEnabled(true);
       }
       //Value
@@ -1767,12 +1861,10 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       //Restrictions
       if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
-         this->mpc_Ui->pc_LabelUnit->setEnabled(false);
          this->mpc_Ui->pc_LineEditUnit->setEnabled(false);
       }
       else
       {
-         this->mpc_Ui->pc_LabelUnit->setEnabled(true);
          this->mpc_Ui->pc_LineEditUnit->setEnabled(true);
       }
       //Value
@@ -1790,12 +1882,10 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
          {
             this->mpc_Ui->pc_SpinBoxMuxValue->setEnabled(true);
-            this->mpc_Ui->pc_LabelMuxValue->setEnabled(true);
          }
          else
          {
             this->mpc_Ui->pc_SpinBoxMuxValue->setEnabled(false);
-            this->mpc_Ui->pc_LabelMuxValue->setEnabled(false);
          }
          this->mpc_Ui->pc_SpinBoxMuxValue->setVisible(true);
          this->mpc_Ui->pc_LabelMuxValue->setVisible(true);
@@ -1828,12 +1918,10 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       //Restrictions
       if (this->mc_DataUiSignalCommon.q_AutoMinMaxActive)
       {
-         this->mpc_Ui->pc_LabelMin->setEnabled(false);
          this->mpc_Ui->pc_WidgetMin->setEnabled(false);
       }
       else
       {
-         this->mpc_Ui->pc_LabelMin->setEnabled(true);
          this->mpc_Ui->pc_WidgetMin->setEnabled(true);
       }
       //Value
@@ -1846,12 +1934,10 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       //Restrictions
       if (this->mc_DataUiSignalCommon.q_AutoMinMaxActive)
       {
-         this->mpc_Ui->pc_LabelMax->setEnabled(false);
          this->mpc_Ui->pc_WidgetMax->setEnabled(false);
       }
       else
       {
-         this->mpc_Ui->pc_LabelMax->setEnabled(true);
          this->mpc_Ui->pc_WidgetMax->setEnabled(true);
       }
       //Value
@@ -1877,12 +1963,10 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       //Restrictions
       if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
-         this->mpc_Ui->pc_LabelFactor->setEnabled(false);
          this->mpc_Ui->pc_DoubleSpinBoxFactor->setEnabled(false);
       }
       else
       {
-         this->mpc_Ui->pc_LabelFactor->setEnabled(true);
          this->mpc_Ui->pc_DoubleSpinBoxFactor->setEnabled(true);
       }
       //Factor needs to be above zero
@@ -1896,12 +1980,10 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       //Restrictions
       if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
-         this->mpc_Ui->pc_LabelOffset->setEnabled(false);
          this->mpc_Ui->pc_DoubleSpinBoxOffset->setEnabled(false);
       }
       else
       {
-         this->mpc_Ui->pc_LabelOffset->setEnabled(true);
          this->mpc_Ui->pc_DoubleSpinBoxOffset->setEnabled(true);
       }
       this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64>::lowest());
@@ -1993,9 +2075,11 @@ void C_SdBueSignalPropertiesWidget::m_SendSignalForChange(const C_SdBueSignalPro
    case eCHA_START_BIT:
       Q_EMIT (this->SigRecheckError(this->mc_MessageId));
       Q_EMIT (this->SigStartBitChanged(this->mc_MessageId));
+      Q_EMIT (this->SigSignalPositionChanged(this->mc_MessageId));
       break;
    case eCHA_LENGTH:
       Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      Q_EMIT (this->SigSignalPositionChanged(this->mc_MessageId));
       break;
    case eCHA_MUX_VALUE:
       Q_EMIT (this->SigRecheckError(this->mc_MessageId));

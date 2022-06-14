@@ -3730,6 +3730,14 @@ void C_SdTopologyScene::m_InitNodeData(C_OSCNode & orc_OSCNode, const QString & 
          //default name: same as device type
          orc_OSCNode.c_Properties.c_Name = C_PuiSdHandler::h_AutomaticCStringAdaptation(
             orc_OSCNode.pc_DeviceDefinition->GetDisplayName().c_str()).toStdString().c_str();
+
+         //special handling for "3rd Party" node:
+         //Fix leading digit to avoid naming error after node drag&drop
+         if (orc_OSCNode.c_Properties.c_Name == "3rd_Party")
+         {
+            orc_OSCNode.c_Properties.c_Name = "Third_Party";
+         }
+
          if (orc_MainDevice.isEmpty())
          {
             orc_OSCNode.c_DeviceType = orc_NodeType.toStdString().c_str();

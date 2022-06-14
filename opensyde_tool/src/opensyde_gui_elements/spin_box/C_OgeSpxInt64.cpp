@@ -23,6 +23,7 @@ using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const QChar C_OgeSpxInt64::hc_UNIT_SEPERATION_CHARACTER = ' ';
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -201,11 +202,11 @@ QVariant C_OgeSpxInt64::GetValue(void) const
    const QLineEdit * const pc_LineEdit = this->lineEdit();
    QString c_Text = pc_LineEdit->text();
 
-   //Eliminate suffix
-   c_Text = this->m_ExtractSpinBoxValue(c_Text);
-
    //Change invalid value if necessary
    this->fixup(c_Text);
+
+   //Eliminate suffix (before to int conversion)
+   c_Text = this->m_ExtractSpinBoxValue(c_Text);
 
    if (mq_IsUnsigned == true)
    {
@@ -376,8 +377,8 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Validate current input string
 
-   \param[in,out]  orc_Input   Input string
-   \param[in,out]  orsn_Pos    Position
+   \param[in,out]  orc_Input  Input string
+   \param[in,out]  orsn_Pos   Position
 
    \return
    Invalid      Unusable
@@ -506,13 +507,14 @@ QString C_OgeSpxInt64::m_PrepareSpinBoxValue(const QString & orc_Text) const
 {
    QString c_Retval;
 
-   if (this->mc_Suffix.compare("") == 0)
+   if (this->mc_Suffix.isEmpty())
    {
       c_Retval = orc_Text;
    }
    else
    {
-      c_Retval = static_cast<QString>("%1 %2").arg(orc_Text, this->mc_Suffix);
+      c_Retval = static_cast<QString>("%1%2%3").arg(orc_Text, C_OgeSpxInt64::hc_UNIT_SEPERATION_CHARACTER,
+                                                    this->mc_Suffix);
    }
    return c_Retval;
 }
@@ -528,9 +530,9 @@ QString C_OgeSpxInt64::m_PrepareSpinBoxValue(const QString & orc_Text) const
 //----------------------------------------------------------------------------------------------------------------------
 QString C_OgeSpxInt64::m_ExtractSpinBoxValue(const QString & orc_Text) const
 {
-   QString c_Retval = orc_Text;
+   const QString c_Retval = C_OgeSpxInt64::h_ExtractSpinBoxValue(orc_Text, this->mc_Suffix);
 
-   return c_Retval.remove(this->mc_Suffix);
+   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -560,6 +562,35 @@ void C_OgeSpxInt64::SetIsUnsigned(const bool & orq_Value)
    m_ResetMinMax();
    //Reset value
    this->SetValue(this->GetValue(), true);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Extract spin box value
+
+   \param[in]  orc_Text    Text
+   \param[in]  orc_Suffix  Suffix
+
+   \return
+   String without suffix
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxInt64::h_ExtractSpinBoxValue(const QString & orc_Text, const QString & orc_Suffix)
+{
+   QString c_Retval = orc_Text;
+
+   if (orc_Suffix.isEmpty() == false)
+   {
+      if (c_Retval.contains(C_OgeSpxInt64::hc_UNIT_SEPERATION_CHARACTER))
+      {
+         const QStringList c_Tmp = c_Retval.split(C_OgeSpxInt64::hc_UNIT_SEPERATION_CHARACTER);
+         tgl_assert(c_Tmp.size() > 0);
+         if (c_Tmp.size() > 0)
+         {
+            c_Retval = c_Tmp.at(0);
+         }
+      }
+   }
+   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

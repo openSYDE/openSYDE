@@ -67,7 +67,8 @@ public:
                            QObject * const opc_Parent = NULL);
    virtual ~C_SdBueMlvSignalManager();
 
-   void LoadSignal(const stw_types::uint32 ou32_SignalIndex, const C_SignalItemColors & orc_ColorConfiguration);
+   void LoadSignal(const stw_types::uint32 ou32_SignalIndex, const C_SignalItemColors & orc_ColorConfiguration,
+                   const bool oq_Resizeable);
    void SetColorConfiguration(const C_SignalItemColors & orc_ColorConfiguration);
    void SetName(const QString & orc_Name);
    bool SetStartBit(const stw_types::uint16 ou16_Position);

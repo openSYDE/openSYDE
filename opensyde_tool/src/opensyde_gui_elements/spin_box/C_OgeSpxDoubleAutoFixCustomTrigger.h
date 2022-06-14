@@ -26,6 +26,7 @@ class C_OgeSpxDoubleAutoFixCustomTrigger :
 public:
    C_OgeSpxDoubleAutoFixCustomTrigger(QWidget * const opc_Parent = NULL);
 
+   void SetSuffix(const QString & orc_Suffix);
    virtual void stepBy(const stw_types::sintn osn_Steps) override;
 
    //The signals keyword is necessary for Qt signal slot functionality

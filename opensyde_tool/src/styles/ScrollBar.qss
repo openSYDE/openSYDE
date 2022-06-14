@@ -109,6 +109,7 @@ stw_opensyde_gui--C_SyvUpProgressLog QScrollBar:vertical,
 stw_opensyde_gui_logic--C_PopFileTableView QScrollBar:vertical,
 stw_opensyde_gui--C_SdBueMessageTableView QScrollBar:vertical,
 stw_opensyde_gui--C_SdNdeHalcOvTableView QScrollBar:vertical,
+stw_opensyde_gui--C_SdNdeCoOverviewTableView QScrollBar:vertical,
 stw_opensyde_gui--C_SdBueSignalTableView QScrollBar:vertical
 {
 width: 8px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
@@ -122,6 +123,7 @@ stw_opensyde_gui--C_SyvUpProgressLog QScrollBar:horizontal,
 stw_opensyde_gui_logic--C_PopFileTableView QScrollBar:horizontal,
 stw_opensyde_gui--C_SdBueMessageTableView QScrollBar:horizontal,
 stw_opensyde_gui--C_SdNdeHalcOvTableView QScrollBar:horizontal,
+stw_opensyde_gui--C_SdNdeCoOverviewTableView QScrollBar:horizontal,
 stw_opensyde_gui--C_SdBueSignalTableView QScrollBar:horizontal
 {
 height: 8px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
@@ -135,6 +137,7 @@ padding-right: 0px;
 /* message tables scroll bar */
 stw_opensyde_gui--C_SdBueMessageTableView QScrollBar:vertical,
 stw_opensyde_gui--C_SdNdeHalcOvTableView QScrollBar:vertical,
+stw_opensyde_gui--C_SdNdeCoOverviewTableView QScrollBar:vertical,
 stw_opensyde_gui--C_SdBueSignalTableView QScrollBar:vertical
 {
 width: 8px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
@@ -364,9 +367,11 @@ padding-left: 2px;
 
 stw_opensyde_gui_elements--C_OgeDarkScrollArea QScrollBar:vertical,
 stw_opensyde_gui--C_TblTreDataElementView QScrollBar:vertical,
+stw_opensyde_gui--C_SdBueCoAddSignalsView QScrollBar:vertical,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView QScrollBar:vertical,
 stw_opensyde_gui_elements--C_OgeTreeViewCheckable QScrollBar:vertical,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget QScrollBar:vertical,
+stw_opensyde_gui--C_SdNdeCoConfigTreeView QScrollBar:vertical,
 stw_opensyde_gui--C_SdNdeHalcChannelTreeView QScrollBar:vertical
 {
 width: 20px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
@@ -388,9 +393,11 @@ padding-left: 10px;
 /*--------- horizontal not tested/used yet*/
 stw_opensyde_gui--C_SdSearchTreeWidget QScrollBar:horizontal,
 stw_opensyde_gui--C_TblTreDataElementView QScrollBar:horizontal,
+stw_opensyde_gui--C_SdBueCoAddSignalsView QScrollBar:horizontal,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView QScrollBar:horizontal,
 stw_opensyde_gui_elements--C_OgeTreeViewCheckable QScrollBar:horizontal,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget QScrollBar:horizontal,
+stw_opensyde_gui--C_SdNdeCoConfigTreeView QScrollBar:horizontal,
 stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar:horizontal,
 stw_opensyde_gui--C_SyvUpPacSectionNodeWidget QScrollBar:horizontal,
 stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar:horizontal,

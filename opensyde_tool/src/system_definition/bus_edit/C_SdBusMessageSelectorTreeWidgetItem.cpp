@@ -15,6 +15,7 @@
 #include "C_SdBusMessageSelectorTreeWidgetItem.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_types;
 using namespace stw_opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -104,6 +105,26 @@ void C_SdBusMessageSelectorTreeWidgetItem::SetAlwaysActive(const bool & orq_Valu
 {
    this->mq_IsAlwaysActive = orq_Value;
    m_UpdateIcon();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends the signal in case of a changed check state of the message
+
+   \param[in]  osn_Column  Column
+   \param[in]  osn_Role    Data role
+   \param[in]  orc_Value   New data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBusMessageSelectorTreeWidgetItem::setData(const sintn osn_Column, const sintn osn_Role,
+                                                   const QVariant & orc_Value)
+{
+   QTreeWidgetItem::setData(osn_Column, osn_Role, orc_Value);
+
+   if ((this->mq_IsMessage == true) &&
+       (osn_Role == static_cast<sintn>(Qt::CheckStateRole)))
+   {
+      Q_EMIT (this->SigCheckedStateChanged(this));
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

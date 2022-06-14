@@ -530,7 +530,7 @@ uint32 C_PuiSdHandlerNodeLogic::AddNodeAndSort(C_OSCNode & orc_OSCNode, const C_
 
    //signal "node change"
    Q_EMIT (this->SigNodesChanged());
-   Q_EMIT (this->SigSyncNodeAdded(u32_Index));
+   this->m_HandleSyncNodeAdded(u32_Index);
 
    // No adaption of the shared Datapools necessary.
    // The new node index is always higher than the already existing nodes indexes
@@ -605,7 +605,7 @@ uint32 C_PuiSdHandlerNodeLogic::AddNodeSquadAndSort(std::vector<C_OSCNode> & orc
    for (u32_NodeCounter = 0U; u32_NodeCounter < orc_OSCNodes.size(); ++u32_NodeCounter)
    {
       // Signals for all node indexes necessary
-      Q_EMIT (this->SigSyncNodeAdded(u32_NodeIndex + u32_NodeCounter));
+      this->m_HandleSyncNodeAdded(u32_NodeIndex + u32_NodeCounter);
    }
 
    // No adaption of the shared Datapools or already existing node squads necessary.
@@ -634,7 +634,7 @@ void C_PuiSdHandlerNodeLogic::RemoveNode(const uint32 ou32_NodeIndex)
         --s32_NodeIndexCounter)
    {
       //Synchronization engine (First!)
-      Q_EMIT (this->SigSyncNodeAboutToBeDeleted(c_AllNodeIndexToRemove[static_cast<uint32>(s32_NodeIndexCounter)]));
+      this->m_HandleSyncNodeAboutToBeDeleted(c_AllNodeIndexToRemove[static_cast<uint32>(s32_NodeIndexCounter)]);
    }
 
    tgl_assert(this->mc_CoreDefinition.DeleteNode(ou32_NodeIndex) == C_NO_ERR);

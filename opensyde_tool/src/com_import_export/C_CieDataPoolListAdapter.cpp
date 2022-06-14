@@ -90,11 +90,15 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDBCFileIm
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add all necessary elements to the imported core elements
 
-   \param[in]  orc_OSCRxMessageData          Imported core Rx message data
-   \param[in]  orc_OSCRxSignalData           Imported core Rx signal data
-   \param[in]  orc_OSCTxMessageData          Imported core Tx message data
-   \param[in]  orc_OSCTxSignalData           Imported core Tx signal data
-   \param[in]  orc_InfoMessagesPerMessage    Information messages per message
+   \param[in]  orc_OSCRxMessageData                Imported core Rx message data
+   \param[in]  orc_OSCRxSignalData                 Imported core Rx signal data
+   \param[in]  orc_RxSignalDefaultMinMaxValuesUsed Flag if imported core Rx signal data uses the default min
+                                                   max values or or specific set values
+   \param[in]  orc_OSCTxMessageData                Imported core Tx message data
+   \param[in]  orc_OSCTxSignalData                 Imported core Tx signal data
+   \param[in]  orc_TxSignalDefaultMinMaxValuesUsed Flag if imported core Rx signal data uses the default min
+                                                   max values or or specific set values
+   \param[in]  orc_InfoMessagesPerMessage          Information messages per message
 
    \return
    Complete structure as required by our interface
@@ -103,8 +107,10 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDBCFileIm
 C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDSFileImport(
    const std::vector<C_OSCCanMessage> & orc_OSCRxMessageData,
    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCRxSignalData,
+   const std::vector<uint8> & orc_RxSignalDefaultMinMaxValuesUsed,
    const std::vector<C_OSCCanMessage> & orc_OSCTxMessageData,
    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCTxSignalData,
+   const std::vector<uint8> & orc_TxSignalDefaultMinMaxValuesUsed,
    const std::vector<std::vector<stw_scl::C_SCLString> > & orc_InfoMessagesPerMessage)
 {
    C_CieDataPoolListStructure c_Retval;
@@ -114,6 +120,10 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDS
    c_Retval.c_Core.c_OSCRxSignalData = orc_OSCRxSignalData;
    c_Retval.c_Core.c_OSCTxMessageData = orc_OSCTxMessageData;
    c_Retval.c_Core.c_OSCTxSignalData = orc_OSCTxSignalData;
+
+   //Check the flags
+   tgl_assert(orc_RxSignalDefaultMinMaxValuesUsed.size() == orc_OSCRxSignalData.size());
+   tgl_assert(orc_TxSignalDefaultMinMaxValuesUsed.size() == orc_OSCTxSignalData.size());
 
    //Handle messages
    tgl_assert(orc_InfoMessagesPerMessage.size() == (orc_OSCRxMessageData.size() + orc_OSCTxMessageData.size()));
@@ -145,8 +155,25 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDS
    }
 
    //Ui
-   mh_FillUpUiStructure(c_Retval, true);
+   mh_FillUpUiStructure(c_Retval, true, &orc_RxSignalDefaultMinMaxValuesUsed, &orc_TxSignalDefaultMinMaxValuesUsed);
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Assign node
+
+   \param[in]      orc_Id              Id
+   \param[in,out]  orc_OSCMessageData  OSC message data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CieDataPoolListAdapter::h_AssignNode(const C_OSCCanInterfaceId & orc_Id,
+                                            std::vector<C_OSCCanMessage> & orc_OSCMessageData)
+{
+   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < orc_OSCMessageData.size(); ++u32_ItMessage)
+   {
+      C_OSCCanMessage & rc_Message = orc_OSCMessageData[u32_ItMessage];
+      rc_Message.c_CanOpenManagerOwnerNodeIndex = orc_Id;
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -263,14 +290,22 @@ void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDBCValues(
 
    This function handles TX methods for messages and calls mh_FillUpUiStructureForSignal for signals.
 
-   \param[in,out]  orc_DataPoolListStructure          openSYDE data structure for data pool lists
-   \param[in,out]  oq_ActivateAutoMinMaxForSignals    Flag to automatically set the auto min max flag if necessary
+   \param[in,out]  orc_DataPoolListStructure           openSYDE data structure for data pool lists
+   \param[in,out]  oq_ActivateAutoMinMaxForSignals     Flag to automatically set the auto min max flag if necessary
+   \param[in]      opc_RxSignalDefaultMinMaxValuesUsed Optional flags if imported core Rx signal data uses the default
+                                                       min max values or or specific set values
+   \param[in]      opc_TxSignalDefaultMinMaxValuesUsed Optional flags if imported core Tx signal data uses the default
+                                                       min max values or or specific set values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure & orc_DataPoolListStructure,
-                                                    const bool oq_ActivateAutoMinMaxForSignals)
+                                                    const bool oq_ActivateAutoMinMaxForSignals,
+                                                    const std::vector<uint8> * const opc_RxSignalDefaultMinMaxValuesUsed,
+                                                    const std::vector<uint8> * const opc_TxSignalDefaultMinMaxValuesUsed)
 {
    C_PuiSdNodeDataPoolListElement c_DefaultUiSignal;
+   uintn un_SignalCounter = 0U;
+   const uint8 * pu8_DefaultMinMaxValuesUsed = NULL;
 
    //Set import default values (different from default values)
    if (oq_ActivateAutoMinMaxForSignals == true)
@@ -321,10 +356,20 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
             c_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
          }
       }
-      mh_FillUpUiStructureForSignals(*c_MessageIter, false, c_DefaultUiSignal, orc_DataPoolListStructure);
+
+      if (opc_RxSignalDefaultMinMaxValuesUsed != NULL)
+      {
+         pu8_DefaultMinMaxValuesUsed = &(*opc_RxSignalDefaultMinMaxValuesUsed)[un_SignalCounter];
+      }
+
+      mh_FillUpUiStructureForSignals(*c_MessageIter, false, c_DefaultUiSignal, orc_DataPoolListStructure,
+                                     pu8_DefaultMinMaxValuesUsed);
+      un_SignalCounter += c_MessageIter->c_Signals.size();
       orc_DataPoolListStructure.c_Ui.c_UiRxMessageData.push_back(c_UiMessage);
    }
    // Tx messages
+   un_SignalCounter = 0U;
+   pu8_DefaultMinMaxValuesUsed = NULL;
    orc_DataPoolListStructure.c_Ui.c_UiTxMessageData.reserve(orc_DataPoolListStructure.c_Core.c_OSCTxMessageData.size());
    for (c_MessageIter = orc_DataPoolListStructure.c_Core.c_OSCTxMessageData.begin();
         c_MessageIter != orc_DataPoolListStructure.c_Core.c_OSCTxMessageData.end();
@@ -332,7 +377,15 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
    {
       C_PuiSdNodeCanMessage c_UiMessage;
       c_UiMessage.c_Signals.resize(c_MessageIter->c_Signals.size());
-      mh_FillUpUiStructureForSignals(*c_MessageIter, true, c_DefaultUiSignal, orc_DataPoolListStructure);
+
+      if (opc_TxSignalDefaultMinMaxValuesUsed != NULL)
+      {
+         pu8_DefaultMinMaxValuesUsed = &(*opc_TxSignalDefaultMinMaxValuesUsed)[un_SignalCounter];
+      }
+
+      mh_FillUpUiStructureForSignals(*c_MessageIter, true, c_DefaultUiSignal, orc_DataPoolListStructure,
+                                     pu8_DefaultMinMaxValuesUsed);
+      un_SignalCounter += c_MessageIter->c_Signals.size();
       orc_DataPoolListStructure.c_Ui.c_UiTxMessageData.push_back(c_UiMessage);
    }
 
@@ -347,26 +400,38 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
 
    Handles adaption of Ui specific auto min/max setting (multiplexed signal only)
 
-   \param[in]      orc_Message                  Message that holds the signals
-   \param[in]      orc_DefaultUiSig             Default Ui signal
-   \param[in,out]  orc_DataPoolListStructure    Data pool list structure
-   \param[in]      oq_TxMessage                 Tx message
+   \param[in]      orc_Message                        Message that holds the signals
+   \param[in]      orc_DefaultUiSig                   Default Ui signal
+   \param[in,out]  orc_DataPoolListStructure          Data pool list structure
+   \param[in]      oq_TxMessage                       Tx message
+   \param[in]      opu8_SignalDefaultMinMaxValuesUsed Optional flags if imported core signal data uses the default
+                                                      min max values or or specific set values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolListAdapter::mh_FillUpUiStructureForSignals(const C_OSCCanMessage & orc_Message,
                                                               const bool oq_TxMessage,
                                                               const C_PuiSdNodeDataPoolListElement & orc_DefaultUiSig,
-                                                              C_CieDataPoolListStructure & orc_DataPoolListStructure)
+                                                              C_CieDataPoolListStructure & orc_DataPoolListStructure,
+                                                              const uint8 * const opu8_SignalDefaultMinMaxValuesUsed)
 {
-   std::vector<C_OSCCanSignal>::const_iterator c_SignalIter;
    C_PuiSdNodeDataPoolListElement c_AdaptedUiSignal;
+   uintn un_SignalCounter;
 
-   for (c_SignalIter = orc_Message.c_Signals.begin(); c_SignalIter != orc_Message.c_Signals.end(); ++c_SignalIter)
+   for (un_SignalCounter = 0U; un_SignalCounter < orc_Message.c_Signals.size(); ++un_SignalCounter)
    {
       c_AdaptedUiSignal = orc_DefaultUiSig;
-      if (c_SignalIter->e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (orc_Message.c_Signals[un_SignalCounter].e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          c_AdaptedUiSignal.q_AutoMinMaxActive = true;
+      }
+      else if (opu8_SignalDefaultMinMaxValuesUsed != NULL)
+      {
+         c_AdaptedUiSignal.q_AutoMinMaxActive =
+            (opu8_SignalDefaultMinMaxValuesUsed[un_SignalCounter] == 1U) ? true : false;
+      }
+      else
+      {
+         // Nothing to do
       }
 
       if (oq_TxMessage == true)

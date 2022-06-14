@@ -56,7 +56,7 @@ stw_opensyde_gui_elements--C_OgeLabToolBarSearchResultSubtitle,
 stw_opensyde_gui_elements--C_OgeLabToolBarNoSearchResult,
 stw_opensyde_gui_elements--C_OgeLeToolBarSearch,
 stw_opensyde_gui_elements--C_OgeTebMessageDetails,
-stw_opensyde_gui--C_SdNdeHalcConfigTreeView,
+stw_opensyde_gui--C_SdNdeHalcConfigTreeView
 stw_opensyde_gui_elements--C_OgeLeTable,
 stw_opensyde_gui_elements--C_OgeSpxTable,
 stw_opensyde_gui_elements--C_OgeSpxFactorTable,
@@ -137,9 +137,11 @@ stw_opensyde_gui_elements--C_OgeTedPropertiesComment,
 stw_opensyde_gui_elements--C_OgeTedDbComment,
 stw_opensyde_gui_elements--C_OgeTebReport,
 stw_opensyde_gui--C_TblTreDataElementView,
+stw_opensyde_gui--C_SdBueCoAddSignalsView,
 stw_opensyde_gui--C_SdNdeHalcConfigImportView,
 stw_opensyde_gui_elements--C_OgeTreeViewCheckable,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget,
+stw_opensyde_gui--C_SdNdeCoConfigTreeView,
 stw_opensyde_gui_elements--C_OgeChxDefaultSmall,
 stw_opensyde_gui_elements--C_OgeLeProperties,
 stw_opensyde_gui_elements--C_OgeLeIpAddress,
@@ -174,6 +176,7 @@ stw_opensyde_gui_elements--C_OgePubMessageOk,
 stw_opensyde_gui_elements--C_OgePubMessageCancel,
 stw_opensyde_gui_elements--C_OgePubHalcOverview,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="13"][SemiBold="true"][Bold="false"],
+stw_opensyde_gui_elements--C_OgePubGenericTextWithBackground[Font="13"][SemiBold="true"][Bold="false"],
 stw_opensyde_gui_elements--C_OgePubAddChartDataElement
 {
 font-family: "Segoe UI Semibold";
@@ -205,7 +208,8 @@ stw_opensyde_gui_elements--C_OgeContextMenu,
 stw_opensyde_gui_elements--C_OgeLabListHeaderHighlighted,
 stw_opensyde_gui_elements--C_OgeLabComListHeader,
 stw_opensyde_gui_elements--C_OgeSpxEditProperties,
-stw_opensyde_gui_elements--C_OgeLabDescriptionMessage
+stw_opensyde_gui_elements--C_OgeLabDescriptionMessage,
+stw_opensyde_gui--C_SdNdeCoOverviewTableView
 {
 font-family: "Segoe UI";
 font-size: 14px;
@@ -223,6 +227,7 @@ stw_opensyde_gui--C_SdNdeDpListDataSetHeaderView,
 stw_opensyde_gui--C_SdNdeDpListDataSetHeaderView::section,
 stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch,
 stw_opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
+stw_opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
 stw_opensyde_gui_elements--C_OgePubUpdate,
 stw_opensyde_gui_elements--C_OgeChxSystemCommisioningEdit,
 stw_opensyde_gui_elements--C_OgePubHalcPanel

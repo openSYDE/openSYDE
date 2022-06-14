@@ -76,6 +76,7 @@ void C_OSCNode::Initialize(void)
    c_Applications.resize(0);
    c_ComProtocols.resize(0);
    c_HALCConfig.Clear();
+   c_CanOpenManagers.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -843,6 +844,13 @@ void C_OSCNode::CalcHash(uint32 & oru32_HashValue) const
    }
 
    this->c_HALCConfig.CalcHash(oru32_HashValue);
+   for (std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_It = this->c_CanOpenManagers.begin();
+        c_It != this->c_CanOpenManagers.end(); ++c_It)
+   {
+      const uint8 u8_Value = c_It->first;
+      stw_scl::C_SCLChecksums::CalcCRC32(&u8_Value, sizeof(u8_Value), oru32_HashValue);
+      c_It->second.CalcHash(oru32_HashValue);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1570,8 +1578,8 @@ void C_OSCNode::CheckErrorDataPool(const uint32 ou32_DataPoolIndex, bool * const
                            const bool q_Error = rc_Container.CheckLocalError(
                               rc_CheckedDataPool.c_Lists[u32_TxListIndex],
                               rc_CheckedDataPool.c_Lists[u32_RxListIndex],
-                              C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                 pc_Protocol->e_Type));
+                              C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(pc_Protocol->e_Type),
+                              C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(pc_Protocol->e_Type));
                            if (q_Error == true)
                            {
                               *opq_IsErrorInListOrMessage = true;
@@ -2066,6 +2074,10 @@ void C_OSCNode::m_GetAllMessages(const uint32 ou32_InterfaceIndex, std::vector<c
                                opu32_SkipMessageIndex);
    //ECoS
    m_AppendAllProtocolMessages(ou32_InterfaceIndex, C_OSCCanProtocol::eCAN_OPEN_SAFETY, orc_Messages,
+                               ope_SkipComProtocol, opu32_SkipInterfaceIndex, opq_SkipMessageIsTxFlag,
+                               opu32_SkipMessageIndex);
+   //CAN open manager
+   m_AppendAllProtocolMessages(ou32_InterfaceIndex, C_OSCCanProtocol::eCAN_OPEN, orc_Messages,
                                ope_SkipComProtocol, opu32_SkipInterfaceIndex, opq_SkipMessageIsTxFlag,
                                opu32_SkipMessageIndex);
 }

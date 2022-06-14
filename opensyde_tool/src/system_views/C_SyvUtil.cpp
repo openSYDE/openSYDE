@@ -377,6 +377,12 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
                case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
                   c_Retval = static_cast<QString>(C_GtGetText::h_GetText("On Event"));
                   break;
+               case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
+                  c_Retval = static_cast<QString>(C_GtGetText::h_GetText("CANopen transmission type 254"));
+                  break;
+               case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
+                  c_Retval = static_cast<QString>(C_GtGetText::h_GetText("CANopen transmission type 255"));
+                  break;
                case C_OSCCanMessage::eTX_METHOD_CYCLIC:
                   c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Cyclic (%1 ms)")).arg(
                      pc_Message->u32_CycleTimeMs);

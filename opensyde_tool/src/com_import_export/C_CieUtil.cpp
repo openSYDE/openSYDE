@@ -72,11 +72,11 @@ C_CieUtil::C_CieUtil(void)
 
    Supported are dbc, eds and dcf files.
 
-   \param[in]     ou32_BusIndex           Index of bus in system definition
-   \param[in]     oe_ProtocolType         Type of comm protocol
-   \param[in]     opc_Parent              Parent for dialog
-   \param[out]    orc_NodeIndexes         Node indexes that got messages
-   \param[out]    orc_InterfaceIndexes    Interface indexes that got messages
+   \param[in]   ou32_BusIndex          Index of bus in system definition
+   \param[in]   oe_ProtocolType        Type of comm protocol
+   \param[in]   opc_Parent             Parent for dialog
+   \param[out]  orc_NodeIndexes        Node indexes that got messages
+   \param[out]  orc_InterfaceIndexes   Interface indexes that got messages
 
    \return
    C_NO_ERR    File imported
@@ -141,11 +141,11 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_BusIndex, const C_OSCCanProtoco
 
    Only DBC files are supported yet.
 
-   \param[in]  orc_CommDef           Complete network definition to export.
-   \param[in]  opc_Parent            Parent for dialogs.
-   \param[in]  ou32_NumOfNodes       number of input nodes for x-check.
-   \param[in]  ou32_NumOfMessages    number of input messages for x-check.
-   \param[in]  ou32_NumOfSignals     number of input signals for x-check.
+   \param[in]  orc_CommDef          Complete network definition to export.
+   \param[in]  opc_Parent           Parent for dialogs.
+   \param[in]  ou32_NumOfNodes      number of input nodes for x-check.
+   \param[in]  ou32_NumOfMessages   number of input messages for x-check.
+   \param[in]  ou32_NumOfSignals    number of input signals for x-check.
 
    \return
    C_NO_ERR    Network to file exported
@@ -291,16 +291,66 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt name as specified
+
+   * Eliminate spaces
+   * Cut after 31 characters
+
+   \param[in,out]  orc_Name      Old/New name
+   \param[in,out]  orc_Comment   Comment
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CieUtil::h_AdaptName(stw_scl::C_SCLString & orc_Name, stw_scl::C_SCLString & orc_Comment)
+{
+   stw_scl::C_SCLString c_NewName;
+   //Remove spaces
+   for (uint32 u32_ItOldName = 0; u32_ItOldName < orc_Name.Length(); ++u32_ItOldName)
+   {
+      if (orc_Name[static_cast<sintn>(u32_ItOldName + 1UL)] == ' ')
+      {
+         //Skip
+      }
+      else
+      {
+         c_NewName += orc_Name[static_cast<sintn>(u32_ItOldName + 1UL)];
+         //Cut string
+         if (c_NewName.Length() >= msn_C_ITEM_MAX_CHAR_COUNT)
+         {
+            break;
+         }
+      }
+   }
+   if (orc_Name == c_NewName)
+   {
+      //No change
+   }
+   else
+   {
+      stw_scl::C_SCLString c_Addition;
+      if (orc_Comment != "")
+      {
+         c_Addition = "\n";
+      }
+      //Set comment before overwriting the original name
+      //Translation: 1=Original name from file,2=Optional line break if there was some more content
+      orc_Comment +=
+         static_cast<QString>(C_GtGetText::h_GetText("%2Original name (from import source): %1")).arg(orc_Name.c_str()).
+         arg(c_Addition.c_str()).toStdString().c_str();
+      orc_Name = c_NewName;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Import a DBC file
 
    File path is assumed to be absolute and non empty.
 
-   \param[in]     ou32_BusIndex           Index of bus in system definition
-   \param[in]     oe_ProtocolType         Type of comm protocol
-   \param[in]     orc_FullFilePath        Absolute file path to dbc file
-   \param[in]     opc_Parent              Parent for dialog
-   \param[out]    orc_NodeIndexes         Node indexes that got messages
-   \param[out]    orc_InterfaceIndexes    Interface indexes that got messages
+   \param[in]   ou32_BusIndex          Index of bus in system definition
+   \param[in]   oe_ProtocolType        Type of comm protocol
+   \param[in]   orc_FullFilePath       Absolute file path to dbc file
+   \param[in]   opc_Parent             Parent for dialog
+   \param[out]  orc_NodeIndexes        Node indexes that got messages
+   \param[out]  orc_InterfaceIndexes   Interface indexes that got messages
 
    \return
    C_NO_ERR    File imported
@@ -409,12 +459,14 @@ sint32 C_CieUtil::mh_ImportDBCFile(const uint32 ou32_BusIndex, const C_OSCCanPro
                c_NodeAssignmentsConverted.push_back(c_NodeAssignmentConverted);
             }
 
+            const std::vector<C_CieImportDataAssignment> c_SkippedImportDataAssigned;
             // create message report for user
             QPointer<C_OgePopUpDialog> const c_PopUpDialogReportDialog =
                new C_OgePopUpDialog(opc_Parent, opc_Parent);
             C_CieImportReportWidget * const pc_DialogImportReport =
                new C_CieImportReportWidget(*c_PopUpDialogReportDialog, orc_FullFilePath, ou32_BusIndex,
-                                           oe_ProtocolType, c_NodeAssignmentsConverted);
+                                           oe_ProtocolType, c_NodeAssignmentsConverted, c_SkippedImportDataAssigned,
+                                           NULL);
 
             Q_UNUSED(pc_DialogImportReport)
 
@@ -466,12 +518,12 @@ sint32 C_CieUtil::mh_ImportDBCFile(const uint32 ou32_BusIndex, const C_OSCCanPro
 
    File path is assumed to be absolute and non empty.
 
-   \param[in]     ou32_BusIndex           Index of bus in system definition
-   \param[in]     oe_ProtocolType         Type of comm protocol
-   \param[in]     orc_FullFilePath        Absolute file path to dbc file
-   \param[in]     opc_Parent              Parent for dialog
-   \param[out]    orc_NodeIndexes         Node indexes that got messages
-   \param[out]    orc_InterfaceIndexes    Interface indexes that got messages
+   \param[in]   ou32_BusIndex          Index of bus in system definition
+   \param[in]   oe_ProtocolType        Type of comm protocol
+   \param[in]   orc_FullFilePath       Absolute file path to dbc file
+   \param[in]   opc_Parent             Parent for dialog
+   \param[out]  orc_NodeIndexes        Node indexes that got messages
+   \param[out]  orc_InterfaceIndexes   Interface indexes that got messages
 
    \return
    C_NO_ERR    File imported
@@ -514,13 +566,26 @@ sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCan
             C_SCLString c_ParsingError;
             std::vector<C_OSCCanMessage> c_OSCRxMessageData;
             std::vector<C_OSCNodeDataPoolListElement> c_OSCRxSignalData;
+            std::vector<uint8> c_RxSignalDefaultMinMaxValuesUsed;
             std::vector<C_OSCCanMessage> c_OSCTxMessageData;
             std::vector<C_OSCNodeDataPoolListElement> c_OSCTxSignalData;
+            std::vector<uint8> c_TxSignalDefaultMinMaxValuesUsed;
             std::vector<std::vector<C_SCLString> > c_ImportMessagesPerMessage;
+            std::vector<C_OSCCanMessage> c_InvalidOSCRxMessageData;
+            std::vector<C_OSCNodeDataPoolListElement> c_InvalidOSCRxSignalData;
+            std::vector<uint8> c_InvalidRxSignalDefaultMinMaxValuesUsed;
+            std::vector<C_OSCCanMessage> c_InvalidOSCTxMessageData;
+            std::vector<C_OSCNodeDataPoolListElement> c_InvalidOSCTxSignalData;
+            std::vector<uint8> c_InvalidTxSignalDefaultMinMaxValuesUsed;
+            std::vector<std::vector<C_SCLString> > c_InvalidImportMessagesPerMessage;
             const sint32 s32_ImportResult = C_OSCImportEdsDcf::h_Import(
-               orc_FullFilePath.toStdString().c_str(), rc_CurInterface.u8_NodeID, c_OSCRxMessageData,
-               c_OSCRxSignalData, c_OSCTxMessageData, c_OSCTxSignalData, c_ImportMessagesPerMessage,
-               c_ParsingError);
+               orc_FullFilePath.toStdString().c_str(), rc_CurInterface.u8_NodeID,
+               c_OSCRxMessageData, c_OSCRxSignalData, c_RxSignalDefaultMinMaxValuesUsed,
+               c_OSCTxMessageData, c_OSCTxSignalData, c_TxSignalDefaultMinMaxValuesUsed,
+               c_ImportMessagesPerMessage, c_ParsingError, false,
+               c_InvalidOSCRxMessageData, c_InvalidOSCRxSignalData, c_InvalidRxSignalDefaultMinMaxValuesUsed,
+               c_InvalidOSCTxMessageData, c_InvalidOSCTxSignalData, c_InvalidTxSignalDefaultMinMaxValuesUsed,
+               c_InvalidImportMessagesPerMessage);
             if (s32_ImportResult == C_NO_ERR)
             {
                C_CieImportDataAssignment c_NodeAssignment;
@@ -529,8 +594,10 @@ sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCan
                c_NodeAssignment.c_ImportData =
                   C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDSFileImport(c_OSCRxMessageData,
                                                                                   c_OSCRxSignalData,
+                                                                                  c_RxSignalDefaultMinMaxValuesUsed,
                                                                                   c_OSCTxMessageData,
                                                                                   c_OSCTxSignalData,
+                                                                                  c_TxSignalDefaultMinMaxValuesUsed,
                                                                                   c_ImportMessagesPerMessage);
                if ((c_NodeAssignment.c_ImportData.c_Core.c_OSCRxMessageData.size() > 0UL) ||
                    (c_NodeAssignment.c_ImportData.c_Core.c_OSCTxMessageData.size() > 0UL))
@@ -538,10 +605,12 @@ sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCan
                   std::vector<C_CieImportDataAssignment> c_NodeAssignmentVector;
                   c_NodeAssignmentVector.push_back(c_NodeAssignment);
 
+                  const std::vector<C_CieImportDataAssignment> c_SkippedImportDataAssigned;
+
                   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(opc_Parent, opc_Parent);
                   C_CieImportReportWidget * const pc_Dialog =
                      new C_CieImportReportWidget(*c_New, orc_FullFilePath, ou32_BusIndex, oe_ProtocolType,
-                                                 c_NodeAssignmentVector);
+                                                 c_NodeAssignmentVector, c_SkippedImportDataAssigned, NULL);
 
                   Q_UNUSED(pc_Dialog)
 

@@ -40,7 +40,8 @@ public:
                   const std::vector<stw_types::uint32> & orc_DatapoolIndexes) const;
    void SetBusId(const stw_types::uint32 ou32_BusIndex) const;
    void SetUndoManager(stw_opensyde_gui_logic::C_SdBueUnoManager * const opc_Value) const;
-   void SetProtocolType(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value) const;
+   void SetProtocolType(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value);
+   void UpdateButtonText(void) const;
    void SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const;
    void InitFromData(void) const;
    void InitStaticNames(void) const;
@@ -48,6 +49,7 @@ public:
    void OnMessageNameChange(void) const;
    void OnSignalNameChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void OnSignalStartBitChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
+   void OnSignalPositionChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void OnNodeDisconnected(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex) const;
    void RecheckErrorGlobal(void) const;
    void RecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
@@ -83,6 +85,7 @@ Q_SIGNALS:
    void SigMessagesSelected(void);
    void SigMessageCountChanged(void);
    void SigSelectName(void);
+   void SigRefreshSelection(void);
    void SigErrorChanged(void);
    void SigCommDataPoolAdded(void);
 
@@ -97,6 +100,7 @@ private:
    Ui::C_SdBueMessageSelectorWidget * mpc_Ui;
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
    bool mq_MessagesActive;
+   stw_opensyde_core::C_OSCCanProtocol::E_Type me_ProtocolType;
    QAction * mpc_AddMessageAction;
    QAction * mpc_AddSignalAction;
    QAction * mpc_AddSignalActionWithKey;

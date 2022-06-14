@@ -47,14 +47,18 @@ C_OSCCanMessage::C_OSCCanMessage(void) :
    e_TxMethod(eTX_METHOD_CYCLIC),
    u32_CycleTimeMs(100),
    u16_DelayTimeMs(10),
-   u32_TimeoutMs(310)
+   u32_TimeoutMs(310),
+   q_CanOpenManagerCobIdIncludesNodeID(true),
+   u32_CanOpenManagerCobIdOffset(0),
+   q_CanOpenManagerMessageActive(true),
+   u16_CanOpenManagerPdoIndex(0)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current not equal to orc_Cmp
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    Current not equal to orc_Cmp
@@ -87,10 +91,12 @@ bool C_OSCCanMessage::operator !=(const C_OSCCanMessage & orc_Cmp) const
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue Hash value with unit [in] value and result [out] value
+   \param[in,out]  oru32_HashValue     Hash value with unit [in] value and result [out] value
+   \param[in]      oq_R20Compatible    Flag to calculate the hash of only elements present in R20
+                                       to allow compatibility with existing hash values from R20 release
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue) const
+void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue, const bool oq_R20Compatible) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
@@ -106,17 +112,35 @@ void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue) const
 
    for (uint32 u32_Counter = 0U; u32_Counter < this->c_Signals.size(); ++u32_Counter)
    {
-      this->c_Signals[u32_Counter].CalcHash(oru32_HashValue);
+      this->c_Signals[u32_Counter].CalcHash(oru32_HashValue, oq_R20Compatible);
+   }
+   if (oq_R20Compatible == false)
+   {
+      this->c_CanOpenManagerOwnerNodeIndex.CalcHash(oru32_HashValue);
+
+      stw_scl::C_SCLChecksums::CalcCRC32(&this->q_CanOpenManagerCobIdIncludesNodeID,
+                                         sizeof(this->q_CanOpenManagerCobIdIncludesNodeID),
+                                         oru32_HashValue);
+      stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_CanOpenManagerCobIdOffset,
+                                         sizeof(this->u32_CanOpenManagerCobIdOffset),
+                                         oru32_HashValue);
+      stw_scl::C_SCLChecksums::CalcCRC32(&this->q_CanOpenManagerMessageActive,
+                                         sizeof(this->q_CanOpenManagerMessageActive),
+                                         oru32_HashValue);
+      stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_CanOpenManagerPdoIndex,
+                                         sizeof(this->u16_CanOpenManagerPdoIndex),
+                                         oru32_HashValue);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check error for specified signal
 
-   \param[in] opc_List                             Node data pool list containing signal data
-                                                   (Optional as it is only required by some checks)
-   \param[in] oru32_SignalIndex                    Signal index
-   \param[in] ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
+   \param[in]  opc_List                               Node data pool list containing signal data
+                                                      (Optional as it is only required by some checks)
+   \param[in]  oru32_SignalIndex                      Signal index
+   \param[in]  ou32_CANMessageValidSignalsDLCOffset   CAN message DLC offset for valid signal range check
+   \param[in]  oq_CANMessageSignalGapsValid           Flag if gaps between signals are valid or handled as errors
 
    \return
    True  Error
@@ -124,11 +148,13 @@ void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_List, const uint32 & oru32_SignalIndex,
-                                       const uint32 ou32_CANMessageValidSignalsDLCOffset) const
+                                       const uint32 ou32_CANMessageValidSignalsDLCOffset,
+                                       const bool oq_CANMessageSignalGapsValid) const
 {
    bool q_Retval;
    bool q_LayoutConflict;
    bool q_BorderConflict;
+   bool q_GapConflict;
    bool q_NameConflict;
    bool q_NoMultiplexerButMultiplexed;
    bool q_MultiplexedValueOutOfRange;
@@ -144,16 +170,21 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
       bool q_MinOverMax;
       bool q_ValueBelowMin;
       bool q_ValueOverMax;
-      this->CheckErrorSignalDetailed(opc_List, oru32_SignalIndex, &q_LayoutConflict, &q_BorderConflict,
+      this->CheckErrorSignalDetailed(opc_List, oru32_SignalIndex, &q_LayoutConflict, &q_BorderConflict, &q_GapConflict,
                                      &q_NameConflict, &q_NameInvalid, &q_MinOverMax, &q_ValueBelowMin,
                                      &q_ValueOverMax, &q_NoMultiplexerButMultiplexed, &q_MultiplexedValueOutOfRange,
-                                     ou32_CANMessageValidSignalsDLCOffset);
-      if (((((((q_MultiplexedValueOutOfRange == false) && ((q_NoMultiplexerButMultiplexed == false) &&
-                                                           ((q_LayoutConflict == false) &&
-                                                            (q_BorderConflict == false))) &&
-               (q_NameConflict == false)) &&
-              (q_NameInvalid == false)) && (q_MinOverMax == false)) && (q_ValueBelowMin == false)) &&
-           (q_ValueOverMax == false)))
+                                     ou32_CANMessageValidSignalsDLCOffset,
+                                     oq_CANMessageSignalGapsValid);
+      if ((q_MultiplexedValueOutOfRange == false) &&
+          (q_NoMultiplexerButMultiplexed == false) &&
+          (q_LayoutConflict == false) &&
+          (q_BorderConflict == false) &&
+          (q_GapConflict == false) &&
+          (q_NameConflict == false) &&
+          (q_NameInvalid == false) &&
+          (q_MinOverMax == false) &&
+          (q_ValueBelowMin == false) &&
+          (q_ValueOverMax == false))
       {
          q_Retval = false;
       }
@@ -177,15 +208,18 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
    else
    {
       //Do separate conflict checks, then reuse previous non conflict value
-      this->CheckErrorSignalDetailed(opc_List, oru32_SignalIndex, &q_LayoutConflict, &q_BorderConflict, &q_NameConflict,
+      this->CheckErrorSignalDetailed(opc_List, oru32_SignalIndex, &q_LayoutConflict, &q_BorderConflict, &q_GapConflict,
+                                     &q_NameConflict,
                                      NULL, NULL,
                                      NULL, NULL, &q_NoMultiplexerButMultiplexed, &q_MultiplexedValueOutOfRange,
-                                     ou32_CANMessageValidSignalsDLCOffset);
+                                     ou32_CANMessageValidSignalsDLCOffset,
+                                     oq_CANMessageSignalGapsValid);
       if ((q_NameConflict == true) ||
           (q_LayoutConflict == true) ||
           (q_NoMultiplexerButMultiplexed == true) ||
           (q_MultiplexedValueOutOfRange == true) ||
-          (q_BorderConflict == true))
+          (q_BorderConflict == true) ||
+          (q_GapConflict == true))
       {
          q_Retval = true;
       }
@@ -201,29 +235,34 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check detailed error for specified signal
 
-   \param[in]  opc_List                             Node data pool list containing signal data
-                                                    (Optional as it is only required by some checks)
-   \param[in]  oru32_SignalIndex                    Signal index
-   \param[out] opq_LayoutConflict                   Layout conflict
-   \param[out] opq_BorderConflict                   Border not usable as variable
-   \param[out] opq_NameConflict                     Name conflict
-   \param[out] opq_NameInvalid                      Name not usable as variable
-   \param[out] opq_MinOverMax                       Minimum value over maximum value
-   \param[out] opq_ValueBelowMin                    Init value below minimum
-   \param[out] opq_ValueOverMax                     Init value over maximum
-   \param[out] opq_NoMultiplexerButMultiplexed      Multiplexed signal(s) but no multiplexer
-   \param[out] opq_MultiplexedValueOutOfRange       Multiplexed signal multiplexer value out of range of multiplexer
-   \param[in]  ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
+   \param[in]   opc_List                              Node data pool list containing signal data
+                                                      (Optional as it is only required by some checks)
+   \param[in]   oru32_SignalIndex                     Signal index
+   \param[out]  opq_LayoutConflict                    Layout conflict
+   \param[out]  opq_BorderConflict                    Border not usable as variable
+   \param[out]  opq_GapConflict                       Gap between signals found and
+                                                      oq_CANMessageSignalGapsValid is false
+   \param[out]  opq_NameConflict                      Name conflict
+   \param[out]  opq_NameInvalid                       Name not usable as variable
+   \param[out]  opq_MinOverMax                        Minimum value over maximum value
+   \param[out]  opq_ValueBelowMin                     Init value below minimum
+   \param[out]  opq_ValueOverMax                      Init value over maximum
+   \param[out]  opq_NoMultiplexerButMultiplexed       Multiplexed signal(s) but no multiplexer
+   \param[out]  opq_MultiplexedValueOutOfRange        Multiplexed signal multiplexer value out of range of multiplexer
+   \param[in]   ou32_CANMessageValidSignalsDLCOffset  CAN message DLC offset for valid signal range check
+   \param[in]   oq_CANMessageSignalGapsValid          Flag if gaps between signals are valid or handled as errors
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * const opc_List,
                                                const uint32 & oru32_SignalIndex, bool * const opq_LayoutConflict,
-                                               bool * const opq_BorderConflict, bool * const opq_NameConflict,
-                                               bool * const opq_NameInvalid, bool * const opq_MinOverMax,
-                                               bool * const opq_ValueBelowMin, bool * const opq_ValueOverMax,
+                                               bool * const opq_BorderConflict, bool * const opq_GapConflict,
+                                               bool * const opq_NameConflict, bool * const opq_NameInvalid,
+                                               bool * const opq_MinOverMax, bool * const opq_ValueBelowMin,
+                                               bool * const opq_ValueOverMax,
                                                bool * const opq_NoMultiplexerButMultiplexed,
                                                bool * const opq_MultiplexedValueOutOfRange,
-                                               const uint32 ou32_CANMessageValidSignalsDLCOffset) const
+                                               const uint32 ou32_CANMessageValidSignalsDLCOffset,
+                                               const bool oq_CANMessageSignalGapsValid) const
 {
    if (opq_LayoutConflict != NULL)
    {
@@ -232,6 +271,10 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
    if (opq_BorderConflict != NULL)
    {
       *opq_BorderConflict = false;
+   }
+   if (opq_GapConflict != NULL)
+   {
+      *opq_GapConflict = false;
    }
    if (oru32_SignalIndex < this->c_Signals.size())
    {
@@ -302,6 +345,74 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
          else
          {
             *opq_BorderConflict = true;
+         }
+      }
+      if ((opq_GapConflict != NULL)  &&
+          (oq_CANMessageSignalGapsValid == false))
+      {
+         bool q_NoCheckNecessary = false;
+         uint16 u16_RelevantBitPos;
+
+         *opq_GapConflict = true;
+         if (rc_CheckedSignal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+         {
+            if (rc_CheckedSignal.u16_ComBitStart > 0U)
+            {
+               // Intel byte order is the previous bit the relevant bit
+               u16_RelevantBitPos = rc_CheckedSignal.u16_ComBitStart - 1U;
+            }
+            else
+            {
+               // In the other case no gap possible
+               q_NoCheckNecessary = true;
+               *opq_GapConflict = false;
+            }
+         }
+         else
+         {
+            const uint16 u16_ComBitStartModulo = rc_CheckedSignal.u16_ComBitStart % 8U;
+            if ((u16_ComBitStartModulo + 1U) <= rc_CheckedSignal.u16_ComBitLength)
+            {
+               // Needs all lower bits of the byte, so the first bit before the message is in the byte before
+               if (rc_CheckedSignal.u16_ComBitStart >= 8U)
+               {
+                  u16_RelevantBitPos = static_cast<uint16>(rc_CheckedSignal.u16_ComBitStart - u16_ComBitStartModulo) -
+                                       1U;
+               }
+               else
+               {
+                  //But it is the first byte, no gap before possible
+                  q_NoCheckNecessary = true;
+                  *opq_GapConflict = false;
+               }
+            }
+            else
+            {
+               // Needs not the entire byte, the first bit before the message is next to the end of the message
+               u16_RelevantBitPos = rc_CheckedSignal.u16_ComBitStart - rc_CheckedSignal.u16_ComBitLength;
+            }
+         }
+
+         if (q_NoCheckNecessary == false)
+         {
+            // The signal shall not have a gap before its start bit
+            // Comparing with the other signals
+            for (uint32 u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
+            {
+               const C_OSCCanSignal & rc_CurrentSignal = c_Signals[u32_ItSignal];
+               //Skip current signal
+               if (u32_ItSignal != oru32_SignalIndex)
+               {
+                  if (rc_CurrentSignal.IsBitPosPartOfSignal(u16_RelevantBitPos) == true)
+                  {
+                     // At least one signal is on this position
+                     // In case of multiple elements on this position, an other part of
+                     // this error check will control for it
+                     *opq_GapConflict = false;
+                     break;
+                  }
+               }
+            }
          }
       }
       if (opc_List != NULL)
@@ -390,12 +501,45 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Is transmission type a cyclic type
+
+   \return
+   Flags
+
+   \retval   True    Transmission type is a cyclic type
+   \retval   False   Transmission type is not a cyclic type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanMessage::IsTransmissionTypeACyclicType() const
+{
+   return C_OSCCanMessage::h_IsTransmissionTypeACyclicType(this->e_TxMethod);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Is transmission type a cyclic type
+
+   \param[in]  oe_Type  Transmission type
+
+   \return
+   Flags
+
+   \retval   True    Transmission type is a cyclic type
+   \retval   False   Transmission type is not a cyclic type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanMessage::h_IsTransmissionTypeACyclicType(const C_OSCCanMessage::E_TxMethodType oe_Type)
+{
+   return ((oe_Type == eTX_METHOD_CYCLIC) || ((oe_Type == eTX_METHOD_CAN_OPEN_TYPE_254)) ||
+           (oe_Type == eTX_METHOD_CAN_OPEN_TYPE_255));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Gets the information if the CAN message is multiplexed
 
    A multiplexer signal must be defined to be a multiplexed CAN message.
    This multiplexer must be unique, therefore the first found multiplexer is also the only multiplexer.
 
-   \param[out] opu32_MultiplexerIndex Multiplexer index
+   \param[out]  opu32_MultiplexerIndex    Multiplexer index
 
    \retval   true    CAN message is multiplexed, has a multiplexer signal
    \retval   false   CAN message is not multiplexed
@@ -409,8 +553,8 @@ bool C_OSCCanMessage::IsMultiplexed(uint32 * const opu32_MultiplexerIndex) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if any of the specified signals is a multiplexer signal
 
-   \param[in]  orc_Signals            Signals to check
-   \param[out] opu32_MultiplexerIndex Multiplexer index
+   \param[in]   orc_Signals               Signals to check
+   \param[out]  opu32_MultiplexerIndex    Multiplexer index
 
    \retval   true    Contains multiplexer signal
    \retval   false   No multiplexer signal found
@@ -442,7 +586,7 @@ bool C_OSCCanMessage::h_ContainsMultiplexer(const std::vector<C_OSCCanSignal> & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Returns all possible multiplexer values
 
-   \param[out] orc_Values All multiplexer values
+   \param[out]  orc_Values    All multiplexer values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessage::GetMultiplexerValues(std::set<uint16> & orc_Values) const
@@ -462,8 +606,8 @@ void C_OSCCanMessage::GetMultiplexerValues(std::set<uint16> & orc_Values) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get hashes for signal
 
-   \param[in] opc_List          Node data pool list containing signal data
-   \param[in] oru32_SignalIndex Signal index
+   \param[in]  opc_List             Node data pool list containing signal data
+   \param[in]  oru32_SignalIndex    Signal index
 
    \return
    Hashes for signal

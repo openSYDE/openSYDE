@@ -54,7 +54,8 @@ public:
    void ChangeCompleteConnection(const stw_types::uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_PrevID,
                                  const C_PuiSdNodeConnectionId & orc_NewID,
                                  const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
-                                 const stw_types::uint32 & oru32_BusIndex = 0xFFFFFFFFUL);
+                                 const stw_types::uint32 & oru32_BusIndex = 0xFFFFFFFFUL,
+                                 const bool oq_IncludeCanOpenSync = true);
    void SetUINodeConnections(const stw_types::uint32 ou32_NodeIndex,
                              const std::vector<C_PuiSdNodeConnection> & orc_Connections);
    void SetUINodeConnectionId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ConnectionIndex,
@@ -212,6 +213,12 @@ protected:
                                           const C_PuiSdNodeCanMessage & orc_UIMessage);
    stw_types::sint32 m_DeleteUiCanMessage(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   virtual void m_HandleChangeConnectionForCanOpen(const stw_types::uint32 ou32_NodeIndex,
+                                                   const C_PuiSdNodeConnectionId & orc_PrevId,
+                                                   const stw_types::uint8 ou8_NewInterface) = 0;
+   virtual void m_HandleChangeCompleteConnectionForCanOpen(const stw_types::uint32 ou32_NodeIndex,
+                                                           const C_PuiSdNodeConnectionId & orc_PrevId,
+                                                           const C_PuiSdNodeConnectionId & orc_NewId) = 0;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

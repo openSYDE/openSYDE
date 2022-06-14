@@ -46,6 +46,8 @@ C_SdBueMessageRxList::C_SdBueMessageRxList(QWidget * const opc_Parent) :
    mpc_Ui(new Ui::C_SdBueMessageRxList),
    mu32_LastKnownCycleTimeValue(0),
    mq_TxMethodOnEvent(false),
+   mq_DisableOptionPossible(false),
+   mq_DisableTimeoutConfiguration(false),
    mq_ModeSingleNode(false)
 {
    mpc_Ui->setupUi(this);
@@ -92,6 +94,7 @@ void C_SdBueMessageRxList::InitStaticNames(void) const
    \param[in] orc_DatapoolIndexes            Datapool Indexes (ID)
    \param[in] orc_ReceiveTimeoutModes        Receive timeout modes
    \param[in] orc_ReceiveTimeoutValues       Receive timeout values
+   \param[in] oq_ReadOnly                    Flag if elements shall be read only
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
@@ -100,7 +103,7 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
                                     const std::vector<uint32> & orc_InterfaceIndexes,
                                     const std::vector<uint32> & orc_DatapoolIndexes,
                                     const std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> & orc_ReceiveTimeoutModes,
-                                    const std::vector<uint32> & orc_ReceiveTimeoutValues)
+                                    const std::vector<uint32> & orc_ReceiveTimeoutValues, const bool oq_ReadOnly)
 {
    Clear();
    //Can happen at start up
@@ -141,9 +144,10 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
                     &C_SdBueMessageRxList::SigNodeReceiveTimeoutMode);
             pc_Entry->Init(orc_EntryNames[u32_ItEntry], orc_NodeIndexes[u32_ItEntry], orc_InterfaceIndexes[u32_ItEntry],
                            c_ReceiveTimeoutModes, c_ReceiveTimeoutValues, c_NodeDatapoolIndexes,
-                           c_NodeDatapoolNames, true);
+                           c_NodeDatapoolNames, true, oq_ReadOnly);
             pc_Entry->SetLastKnownCycleTimeValue(this->mu32_LastKnownCycleTimeValue);
-            pc_Entry->SetTxMethodOnEvent(this->mq_TxMethodOnEvent);
+            pc_Entry->SetRxTimeoutPreconditions(this->mq_TxMethodOnEvent, this->mq_DisableOptionPossible);
+            pc_Entry->SetRxTimeoutConfigurationDisabled(this->mq_DisableTimeoutConfiguration);
             this->mpc_Ui->pc_VerticalLayout->insertWidget(this->mpc_Ui->pc_VerticalLayout->count() - 1, pc_Entry);
             this->mc_Entries.push_back(pc_Entry);
 
@@ -195,18 +199,40 @@ void C_SdBueMessageRxList::SetLastKnownCycleTimeValue(const uint32 ou32_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set flag of Tx method on event
 
-   \param[in] oq_TxMethodOnEvent   Flag if Tx message mode is on event
+   \param[in] oq_TxMethodOnEvent               Flag if Tx message mode is on event
+   \param[in] oq_DisableOptionPossible         Flag if timeout option disable is available
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxList::SetTxMethodOnEvent(const bool oq_TxMethodOnEvent)
+void C_SdBueMessageRxList::SetRxTimeoutPreconditions(const bool oq_TxMethodOnEvent, const bool oq_DisableOptionPossible)
 {
    this->mq_TxMethodOnEvent = oq_TxMethodOnEvent;
+   this->mq_DisableOptionPossible = oq_DisableOptionPossible;
    for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
       C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
       if (pc_Entry != NULL)
       {
-         pc_Entry->SetTxMethodOnEvent(oq_TxMethodOnEvent);
+         pc_Entry->SetRxTimeoutPreconditions(oq_TxMethodOnEvent, oq_DisableOptionPossible);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the timeout configuration enabled or disabled
+
+   \param[in] oq_DisableTimeoutConfiguration   Flag if timeout configuration is disabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageRxList::SetRxTimeoutConfigurationDisabled(const bool oq_DisableTimeoutConfiguration)
+{
+   this->mq_DisableTimeoutConfiguration = oq_DisableTimeoutConfiguration;
+
+   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
+   {
+      C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
+      if (pc_Entry != NULL)
+      {
+         pc_Entry->SetRxTimeoutConfigurationDisabled(oq_DisableTimeoutConfiguration);
       }
    }
 }

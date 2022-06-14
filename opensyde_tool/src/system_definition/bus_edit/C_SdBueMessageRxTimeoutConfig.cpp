@@ -46,6 +46,7 @@ const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_DISABLED = 2;
    \param[in,out] orc_Parent                Reference to parent
    \param[in] oe_ReceiveTimeoutMode         Receive timeout mode
    \param[in] oq_TxMethodOnEvent            Flag if Tx method is on event
+   \param[in] oq_DisablePossible            Flag if the timeout configuration can be disabled
    \param[in] ou32_ReceiveTimeoutValue      Receive timeout value
    \param[in] u32_LastKnownCycleTimeValue   Last known cycle time value
    \param[in] ou32_AutoReceiveTimeoutValue  Calculated default timeout value
@@ -53,7 +54,7 @@ const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_DISABLED = 2;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & orc_Parent,
-                                                             const C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_ReceiveTimeoutMode, const bool oq_TxMethodOnEvent, const uint32 ou32_ReceiveTimeoutValue, const uint32 ou32_LastKnownCycleTimeValue, const uint32 ou32_AutoReceiveTimeoutValue,
+                                                             const C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_ReceiveTimeoutMode, const bool oq_TxMethodOnEvent, const bool oq_DisablePossible, const uint32 ou32_ReceiveTimeoutValue, const uint32 ou32_LastKnownCycleTimeValue, const uint32 ou32_AutoReceiveTimeoutValue,
                                                              const QString & orc_NameForTitle) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageRxTimeoutConfig),
@@ -82,8 +83,11 @@ C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & 
    else
    {
       // In case of a not on event message, the timeout time can not be disabled
-      //lint -e{1938}  static const is guaranteed preinitialized before main
-      this->mpc_Ui->pc_ComboBoxTimeoutActive->SetItemState(mhs32_INDEX_DISABLED, false);
+      if (oq_DisablePossible == false)
+      {
+         //lint -e{1938}  static const is guaranteed preinitialized before main
+         this->mpc_Ui->pc_ComboBoxTimeoutActive->SetItemState(mhs32_INDEX_DISABLED, false);
+      }
 
       this->mpc_Ui->pc_SpinBoxTimeout->SetMinimumCustom(ou32_LastKnownCycleTimeValue);
 
@@ -107,7 +111,7 @@ C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & 
    this->mpc_ParentDialog->SetSubTitle(C_GtGetText::h_GetText("Receive Timeout"));
 
    if ((oe_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_DISABLED) &&
-       (oq_TxMethodOnEvent == true))
+       (oq_DisablePossible == true))
    {
       //lint -e{1938}  static const is guaranteed preinitialized before main
       this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_DISABLED);

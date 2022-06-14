@@ -132,6 +132,9 @@ QString C_PuiSdUtil::h_ConvertProtocolTypeToString(const C_OSCCanProtocol::E_Typ
    case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
       c_ProtocolName = "ECoS";
       break;
+   case C_OSCCanProtocol::eCAN_OPEN:
+      c_ProtocolName = "CANopen";
+      break;
    case C_OSCCanProtocol::eLAYER2: // default case
    default:
       c_ProtocolName = "OSI Layer 2";
@@ -161,6 +164,9 @@ QString C_PuiSdUtil::h_ConvertProtocolTypeToDatapoolNameString(const C_OSCCanPro
       break;
    case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
       c_ProtocolName = "ECoS";
+      break;
+   case C_OSCCanProtocol::eCAN_OPEN:
+      c_ProtocolName = "CANopen";
       break;
    case C_OSCCanProtocol::eLAYER2: // default case
    default:

@@ -454,7 +454,7 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
          if (mpc_ConfigDataElement == NULL)
          {
             mpc_ConfigDataElement = opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText(
-                                                                              "Edit properties"));
+                                                                              "Edit Properties"));
             // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
             this->mpc_ConfigDataElement->setVisible(false);
             connect(mpc_ConfigDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::EditElementProperties);

@@ -300,6 +300,7 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                         "Symbolic node name. Unique within Network Topology.\n"
                                                         "\nFollowing C naming conventions are required:"
                                                         "\n - must not be empty"
+                                                        "\n - must not start with digits"
                                                         "\n - only alphanumeric characters and \"_\""
                                                         "\n - should not be longer than 31 characters"));
 
@@ -362,7 +363,8 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_COL_DIAGNOSTIC, Qt::Horizontal,
                                                                   C_GtGetText::h_GetText("Usable for Dashboard"),
                                                                   C_GtGetText::h_GetText(
-                                                                     "If enabled, the interface is usable for Dashboard. "
+                                                                     "If enabled, the interface is usable for Dashboard "
+                                                                     "(Access of Datapool data elements via diagnostic protocol). "
                                                                      "(SYSTEM COMMISSIONING - Dashboards)"
                                                                      "\n\nThis property is just "
                                                                      "a configuration for openSYDE PC tool, "
@@ -526,18 +528,6 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             {
                this->mpc_Ui->pc_ComboBoxProgramming->setCurrentIndex(
                   C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_DISABLED);
-            }
-
-            //STW device? Assumption: If Flashloader support, its an STW device
-            if (pc_Node->IsAnyUpdateAvailable() == true)
-            {
-               //show STW logo
-               this->mpc_Ui->pc_StwLogo->setVisible(true);
-            }
-            else
-            {
-               //hide STW logo
-               this->mpc_Ui->pc_StwLogo->setVisible(false);
             }
 
             //load device picture

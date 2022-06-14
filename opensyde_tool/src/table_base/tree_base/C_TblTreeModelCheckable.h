@@ -30,9 +30,9 @@ class C_TblTreeModelCheckableItem :
 {
 public:
    C_TblTreeModelCheckableItem(void);
-   Qt::CheckState e_CheckState;
 
-   bool q_Checkable;
+   Qt::CheckState e_CheckState;
+   bool q_CheckBoxVisible;
 };
 
 class C_TblTreeModelCheckable :

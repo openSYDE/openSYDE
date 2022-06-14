@@ -35,7 +35,8 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_SdBueMessageSelectorTreeWidget.h"
-#include "C_SdBusMessageSelectorTreeWidgetItem.h"
+#include "C_OgePopUpDialog.h"
+#include "C_SdBueCoAddSignalsDialog.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -262,15 +263,19 @@ void C_SdBueMessageSelectorTreeWidget::Add(void)
       //Check either no selection or top level selection
       if ((q_Result == false) || (c_Selection.parent().isValid() == false))
       {
-         //Message
-         C_OSCCanMessageIdentificationIndices c_MessageId;
-
-         if (this->m_GetMessageIdForAdd(c_MessageId) == C_NO_ERR)
+         // Adding message for CANopen is not possible
+         if (this->me_ProtocolType != C_OSCCanProtocol::eCAN_OPEN)
          {
-            //Core
-            this->mpc_UndoManager->DoAddMessage(c_MessageId, this->mpc_MessageSyncManager, this);
+            //Message
+            C_OSCCanMessageIdentificationIndices c_MessageId;
 
-            this->SelectMessage(c_MessageId, false);
+            if (this->m_GetMessageIdForAdd(c_MessageId) == C_NO_ERR)
+            {
+               //Core
+               this->mpc_UndoManager->DoAddMessage(c_MessageId, this->mpc_MessageSyncManager, this);
+
+               this->SelectMessage(c_MessageId, false);
+            }
          }
       }
       else
@@ -283,16 +288,7 @@ void C_SdBueMessageSelectorTreeWidget::Add(void)
             const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageId);
             if (pc_Message != NULL)
             {
-               const uint32 u32_ItSignal = pc_Message->c_Signals.size();
-               const uint16 u16_StartBit = C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(c_MessageId);
-
-               //Core
-               this->mpc_UndoManager->DoAddSignal(c_MessageId, u32_ItSignal, u16_StartBit,
-                                                  C_OSCCanSignal::eMUX_DEFAULT, 0,
-                                                  this->mpc_MessageSyncManager,
-                                                  this);
-
-               this->SelectSignal(c_MessageId, u32_ItSignal, false);
+               this->m_AddSignal(u32_MessageIndex);
             }
          }
       }
@@ -349,22 +345,9 @@ void C_SdBueMessageSelectorTreeWidget::AddSignal(void)
          }
          if (u32_MessageIndex < this->mc_UniqueMessageIds.size())
          {
-            const C_OSCCanMessageIdentificationIndices c_MessageId = this->mc_UniqueMessageIds[u32_MessageIndex];
-            const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageId);
-            if (pc_Message != NULL)
-            {
-               const uint32 u32_ItSignal = pc_Message->c_Signals.size();
+            this->m_AddSignal(u32_MessageIndex);
 
-               const uint16 u16_StartBit = C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(c_MessageId);
-
-               //Core
-               this->mpc_UndoManager->DoAddSignal(c_MessageId, u32_ItSignal, u16_StartBit,
-                                                  C_OSCCanSignal::eMUX_DEFAULT, 0,
-                                                  this->mpc_MessageSyncManager,
-                                                  this);
-               this->SelectSignal(c_MessageId, u32_ItSignal, false);
-               Q_EMIT (this->SigSelectName());
-            }
+            Q_EMIT (this->SigSelectName());
          }
       }
    }
@@ -402,9 +385,18 @@ void C_SdBueMessageSelectorTreeWidget::AddSignalWithStartBit(const C_OSCCanMessa
          }
          else
          {
-            this->mpc_UndoManager->DoAddSignal(orc_MessageId, u32_ItSignal, ou16_StartBit, C_OSCCanSignal::eMUX_DEFAULT,
-                                               0, this->mpc_MessageSyncManager,
-                                               this);
+            // Multiplexed CANopen signals are not supported by openSYDE
+            if (this->me_ProtocolType != C_OSCCanProtocol::eCAN_OPEN)
+            {
+               this->mpc_UndoManager->DoAddSignal(orc_MessageId, u32_ItSignal, ou16_StartBit,
+                                                  C_OSCCanSignal::eMUX_DEFAULT,
+                                                  0, this->mpc_MessageSyncManager,
+                                                  this);
+            }
+            else
+            {
+               this->m_AddCoSignal(orc_MessageId, u32_ItSignal, ou16_StartBit);
+            }
          }
          this->SelectSignal(orc_MessageId, u32_ItSignal, false);
          Q_EMIT (this->SigSelectName());
@@ -433,14 +425,18 @@ void C_SdBueMessageSelectorTreeWidget::Delete(void)
          if (c_ItIndex->parent().isValid() == false)
          {
             //Message
-            if (c_ItIndex->row() >= 0)
+            if (this->me_ProtocolType != C_OSCCanProtocol::eCAN_OPEN)
             {
-               const uint32 u32_MessageIndex = c_ItIndex->row();
-
-               tgl_assert(u32_MessageIndex < this->mc_UniqueMessageIds.size());
-               if (u32_MessageIndex < this->mc_UniqueMessageIds.size())
+               // Deleting of CANopen PDO messages is not allowed. Deleting is only possible for the other protocols
+               if (c_ItIndex->row() >= 0)
                {
-                  c_SelectedMessageIds.push_back(this->mc_UniqueMessageIds[u32_MessageIndex]);
+                  const uint32 u32_MessageIndex = c_ItIndex->row();
+
+                  tgl_assert(u32_MessageIndex < this->mc_UniqueMessageIds.size());
+                  if (u32_MessageIndex < this->mc_UniqueMessageIds.size())
+                  {
+                     c_SelectedMessageIds.push_back(this->mc_UniqueMessageIds[u32_MessageIndex]);
+                  }
                }
             }
          }
@@ -1151,11 +1147,18 @@ void C_SdBueMessageSelectorTreeWidget::InternalAddSignal(const C_OSCCanMessageId
                         C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName(orc_MessageId, oru32_SignalIndex));
          //Ui update trigger
          this->updateGeometry();
+
+         if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+         {
+            // Adapt the DLC of the message in case of CANopen
+            this->m_AutoAdaptCoDlc(orc_MessageId);
+         }
+
          //Error handling
          RecheckErrorGlobal(false);
          //Signal
-         Q_EMIT this->SigSignalCountOfMessageChanged(orc_MessageId);
-         Q_EMIT this->SigErrorChanged();
+         Q_EMIT (this->SigSignalCountOfMessageChanged(orc_MessageId));
+         Q_EMIT (this->SigErrorChanged());
       }
    }
 }
@@ -1188,9 +1191,17 @@ void C_SdBueMessageSelectorTreeWidget::InternalDeleteSignal(const C_OSCCanMessag
             this->updateGeometry();
             //Error handling
             RecheckErrorGlobal(false);
+
+            if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+            {
+               // Adapt the DLC of the message in case of CANopen
+               this->m_AutoAdaptCoDlc(orc_MessageId);
+            }
+
             //Signal
-            Q_EMIT this->SigSignalCountOfMessageChanged(orc_MessageId);
-            Q_EMIT this->SigErrorChanged();
+            Q_EMIT (this->SigSignalCountOfMessageChanged(orc_MessageId));
+            Q_EMIT (this->SigErrorChanged());
+
             //Handle selection
             if (pc_Parent->childCount() > 0)
             {
@@ -1278,6 +1289,18 @@ void C_SdBueMessageSelectorTreeWidget::OnSignalNameChange(const C_OSCCanMessageI
       }
    }
    m_RestoreSelection(false, false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The signal position has changed
+
+   \param[in]  orc_MessageId  Message identification indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::OnSignalPositionChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+{
+   // A change of the position (start bit or length can cause a change for the auto DLC mechanism)
+   this->m_AutoAdaptCoDlc(orc_MessageId);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1375,7 +1398,10 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentif
             this->mpc_MessageSyncManager->CheckMessageHasTx(q_HasTx, orc_MessageId);
             pc_MessageContainer->CheckMessageLocalError(NULL, orc_MessageId.u32_MessageIndex,
                                                         orc_MessageId.q_MessageIsTx, NULL, NULL, &q_DelayInvalid, NULL,
-                                                        NULL, NULL, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                                        NULL, NULL,
+                                                        C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                                           orc_MessageId.e_ComProtocol),
+                                                        C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
                                                            orc_MessageId.e_ComProtocol));
             if (pc_Message->c_Signals.size() > 0)
             {
@@ -1397,6 +1423,8 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentif
                         {
                            if (pc_Message->CheckErrorSignal(pc_List, u32_ItSignal,
                                                             C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                                               orc_MessageId.e_ComProtocol),
+                                                            C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
                                                                orc_MessageId.e_ComProtocol)))
                            {
                               //Error
@@ -1612,6 +1640,59 @@ sint32 C_SdBueMessageSelectorTreeWidget::GetLevelOfPos(const QPoint & orc_Pos) c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the current selected signals message parent is read only
+
+   \retval   true    The message of the selected signal has the read only flag
+   \retval   false   The message of the selected signal has no read only flag
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdBueMessageSelectorTreeWidget::IsSelectedMessageContentReadOnly(void) const
+{
+   bool q_Return = false;
+
+   // If empty, this information is not available and can not be checked
+   if (this->mc_CoUniqueMessagesPDOMappingRo.empty() == false)
+   {
+      uint32 u32_MessageIndex;
+      const QModelIndexList c_IndexList = this->selectedIndexes();
+
+      if (c_IndexList.isEmpty() == false)
+      {
+         bool q_MsgIndexValid = false;
+         // Only one relevant to check for signal.
+         const QModelIndexList::const_iterator c_ItIndex = c_IndexList.begin();
+
+         if (c_ItIndex->parent().isValid() == true)
+         {
+            //Signal
+            if (c_ItIndex->parent().row() >= 0)
+            {
+               q_MsgIndexValid = true;
+               u32_MessageIndex = c_ItIndex->parent().row();
+            }
+         }
+         else
+         {
+            //Message
+            if (c_ItIndex->row() >= 0)
+            {
+               q_MsgIndexValid = true;
+               u32_MessageIndex = c_ItIndex->row();
+            }
+         }
+
+         if ((q_MsgIndexValid == true) &&
+             (u32_MessageIndex < this->mc_CoUniqueMessagesPDOMappingRo.size()))
+         {
+            q_Return = (this->mc_CoUniqueMessagesPDOMappingRo[u32_MessageIndex] == 1U) ? true : false;
+         }
+      }
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overrided paint event
 
    Draws the seperator lines
@@ -1798,21 +1879,24 @@ void C_SdBueMessageSelectorTreeWidget::dropEvent(QDropEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::startDrag(const Qt::DropActions oc_SupportedActions)
 {
-   const QList<QTreeWidgetItem *> c_SelectedItems = this->selectedItems();
-
-   if ((c_SelectedItems.size() > 0) && (this->mimeTypes().size() > 0))
+   if (this->me_ProtocolType != C_OSCCanProtocol::eCAN_OPEN)
    {
-      QMimeData * const pc_Mime = this->mimeData(c_SelectedItems);
-      if (pc_Mime != NULL)
+      const QList<QTreeWidgetItem *> c_SelectedItems = this->selectedItems();
+
+      if ((c_SelectedItems.size() > 0) && (this->mimeTypes().size() > 0))
       {
-         //Manual drag
-         QDrag * const pc_Drag = new QDrag(this);
+         QMimeData * const pc_Mime = this->mimeData(c_SelectedItems);
+         if (pc_Mime != NULL)
+         {
+            //Manual drag
+            QDrag * const pc_Drag = new QDrag(this);
 
-         //Store in mime
+            //Store in mime
 
-         pc_Drag->setMimeData(pc_Mime);
-         pc_Drag->exec(oc_SupportedActions, this->defaultDropAction());
-         //lint -e429 Qt parent handling will take care of it
+            pc_Drag->setMimeData(pc_Mime);
+            pc_Drag->exec(oc_SupportedActions, this->defaultDropAction());
+            //lint -e429 Qt parent handling will take care of it
+         }
       }
    }
 }
@@ -1977,6 +2061,139 @@ void C_SdBueMessageSelectorTreeWidget::m_ReloadTree(const bool & orq_HandleSelec
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new signal
+
+   \param[in]  ou32_MessageIndex Index of message which will get the new signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::m_AddSignal(const uint32 ou32_MessageIndex)
+{
+   const C_OSCCanMessageIdentificationIndices c_MessageId = this->mc_UniqueMessageIds[ou32_MessageIndex];
+   const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageId);
+
+   if (pc_Message != NULL)
+   {
+      const uint32 u32_ItSignal = pc_Message->c_Signals.size();
+      const uint16 u16_StartBit = C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(c_MessageId);
+
+      if (this->me_ProtocolType != C_OSCCanProtocol::eCAN_OPEN)
+      {
+         //Core
+         this->mpc_UndoManager->DoAddSignal(c_MessageId, u32_ItSignal, u16_StartBit,
+                                            C_OSCCanSignal::eMUX_DEFAULT, 0,
+                                            this->mpc_MessageSyncManager,
+                                            this);
+      }
+      else
+      {
+         this->m_AddCoSignal(c_MessageId, u32_ItSignal, u16_StartBit);
+      }
+
+      this->SelectSignal(c_MessageId, u32_ItSignal, false);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new CANopen specific signal
+
+   \param[in]      orc_MessageId             Message identification indices
+   \param[in]      ou32_SignalIndex          Signal index
+   \param[in]      ou16_StartBit             Start bit of signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::m_AddCoSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                                     const uint32 ou32_SignalIndex, const uint16 ou16_StartBit)
+{
+   // TODO SFI: Add CANopen signal
+   QPointer<C_OgePopUpDialog> const c_PopUp = new C_OgePopUpDialog(this, this);
+   C_SdBueCoAddSignalsDialog * const pc_AddDialog = new C_SdBueCoAddSignalsDialog(*c_PopUp,
+                                                                                  orc_MessageId);
+
+   //Resize
+   c_PopUp->SetSize(QSize(800, 800));
+
+   Q_UNUSED(pc_AddDialog)
+
+   if (c_PopUp->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      const std::vector<C_SdBueCoAddSignalsResultEntry> c_Signals = pc_AddDialog->GetSelectedSignals();
+      if (c_Signals.size() > 0UL)
+      {
+         //Core
+         this->mpc_UndoManager->DoAddCoSignal(orc_MessageId, ou32_SignalIndex, ou16_StartBit, c_Signals,
+                                              this->mpc_MessageSyncManager,
+                                              this);
+      }
+   }
+
+   if (c_PopUp != NULL)
+   {
+      pc_AddDialog->PrepareCleanUp();
+      c_PopUp->HideOverlay();
+      c_PopUp->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of pc_AddDialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt the DLC of the CANopen message in case of changed signals
+
+   \param[in]      orc_MessageId             Message identification indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::m_AutoAdaptCoDlc(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+{
+   if ((this->mpc_MessageSyncManager != NULL) &&
+       (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN))
+   {
+      const C_OSCCanMessage * const pc_CanMessage =
+         C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
+
+      if (pc_CanMessage != NULL)
+      {
+         //copy current message
+         C_OSCCanMessage c_MessageData = *pc_CanMessage;
+         uintn un_SignalCounter;
+
+         c_MessageData.u16_Dlc = 0U;
+
+         // Check the size of all signals
+         for (un_SignalCounter = 0U; un_SignalCounter < c_MessageData.c_Signals.size(); ++un_SignalCounter)
+         {
+            // In case of CANopen the DLC is adapted automatically. Adapt to the added signals
+            const C_OSCCanSignal & rc_CurSignal = c_MessageData.c_Signals[un_SignalCounter];
+            const uint16 u16_LastBit = rc_CurSignal.u16_ComBitStart +
+                                       rc_CurSignal.u16_ComBitLength;
+            uint16 u16_NeededBytes = u16_LastBit / 8U;
+
+            // Check for not byte aligned signals
+            if ((u16_LastBit % 8U) != 0U)
+            {
+               ++u16_NeededBytes;
+            }
+
+            if (u16_NeededBytes > c_MessageData.u16_Dlc)
+            {
+               c_MessageData.u16_Dlc = u16_NeededBytes;
+
+               if (c_MessageData.u16_Dlc >= 8U)
+               {
+                  // 8 is maximum
+                  c_MessageData.u16_Dlc = 8U;
+                  break;
+               }
+            }
+         }
+
+         tgl_assert(this->mpc_MessageSyncManager->SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
+                       orc_MessageId, c_MessageData) == C_NO_ERR);
+
+         // In case of a selected message, the DLC spin box must be updated
+         Q_EMIT (this->SigRefreshSelection());
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32 & oru32_MessageIdIndex)
 {
    if (oru32_MessageIdIndex < this->mc_UniqueMessageIds.size())
@@ -1985,12 +2202,23 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32 & oru32_Mess
       const C_OSCCanMessage * const pc_MessageData = C_PuiSdHandler::h_GetInstance()->GetCanMessage(rc_MessageId);
       if (pc_MessageData != NULL)
       {
-         QTreeWidgetItem * const pc_Message = new C_SdBusMessageSelectorTreeWidgetItem(true);
+         C_SdBusMessageSelectorTreeWidgetItem * const pc_Message = new C_SdBusMessageSelectorTreeWidgetItem(true);
 
          uint32 u32_Counter;
          uint32 u32_SignalDataIndex;
          const QString c_Text = static_cast<QString>("%1 (0x%2)").arg(pc_MessageData->c_Name.c_str()).arg(
             QString::number(pc_MessageData->u32_CanId, 16).toUpper());
+
+         if ((this->mpc_MessageSyncManager != NULL) &&
+             (this->mpc_MessageSyncManager->GetCurrentComProtocol() == C_OSCCanProtocol::eCAN_OPEN))
+         {
+            // Special case: CANopen PDO messages can be activated/deactivated
+            pc_Message->setFlags(pc_Message->flags() | Qt::ItemIsUserCheckable);
+            pc_Message->setCheckState(0, ((pc_MessageData->q_CanOpenManagerMessageActive == true) ?
+                                          Qt::Checked : Qt::Unchecked));
+            connect(pc_Message, &C_SdBusMessageSelectorTreeWidgetItem::SigCheckedStateChanged,
+                    this, &C_SdBueMessageSelectorTreeWidget::m_CoMessageCheckedStateChanged);
+         }
 
          this->insertTopLevelItem(oru32_MessageIdIndex, pc_Message);
 
@@ -2152,6 +2380,52 @@ void C_SdBueMessageSelectorTreeWidget::m_SelectionChanged(const QItemSelection &
    this->updateGeometry();
 
    Q_EMIT this->SigSelectionChanged();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for changed items of the tree widget
+
+   \param[in]  opc_Item   Changed item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::m_CoMessageCheckedStateChanged(
+   C_SdBusMessageSelectorTreeWidgetItem * const opc_Item)
+{
+   tgl_assert(this->mpc_UndoManager != NULL);
+   if (this->mpc_UndoManager != NULL)
+   {
+      const sint32 s32_MessageIndex = this->indexOfTopLevelItem(opc_Item);
+
+      if (s32_MessageIndex >= 0)
+      {
+         const uint32 u32_MessageIndex = static_cast<uint32>(s32_MessageIndex);
+         if (u32_MessageIndex < this->mc_UniqueMessageIds.size())
+         {
+            const C_OSCCanMessageIdentificationIndices & rc_MessageId = this->mc_UniqueMessageIds[u32_MessageIndex];
+            // Get the current version of the message
+            const C_OSCCanMessage * const pc_CanMessage =
+               C_PuiSdHandler::h_GetInstance()->GetCanMessage(rc_MessageId);
+            if (pc_CanMessage != NULL)
+            {
+               // Adapt the message
+               const bool q_Enabled = (opc_Item->checkState(0) == Qt::Checked) ? true : false;
+               C_OSCCanMessage c_MessageData = *pc_CanMessage;
+
+               c_MessageData.q_CanOpenManagerMessageActive = q_Enabled;
+
+               //save new message data
+               tgl_assert(this->mpc_MessageSyncManager->
+                          SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
+                             rc_MessageId,
+                             c_MessageData) == C_NO_ERR);
+
+               // Change can cause a changed error state
+               Q_EMIT (this->SigErrorChanged());
+               Q_EMIT (this->SigRefreshSelection());
+            }
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2343,6 +2617,8 @@ void C_SdBueMessageSelectorTreeWidget::m_UpdateUniqueMessageIds(void)
       {
          m_UpdateUniqueMessageIdsSignals(u32_ItMessage);
       }
+
+      this->m_CoLoadEdsRestricitions();
    }
 }
 
@@ -2372,6 +2648,48 @@ void C_SdBueMessageSelectorTreeWidget::m_UpdateUniqueMessageIdsSignals(const uin
          std::sort(c_Begin, orc_CurrentSignals.end(),
                    static_cast<C_SdBueSortHelperSignal>(this->mc_UniqueMessageIds[oru32_InternalMessageIndex]));
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load the EDS file restrictions
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::m_CoLoadEdsRestricitions(void)
+{
+   this->mc_CoUniqueMessagesPDOMappingRo.clear();
+
+   if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+   {
+      uintn un_MessageCounter;
+
+      for (un_MessageCounter = 0U; un_MessageCounter < this->mc_UniqueMessageIds.size(); ++un_MessageCounter)
+      {
+         const C_OSCCanMessageIdentificationIndices & rc_MsgId = this->mc_UniqueMessageIds[un_MessageCounter];
+         // The manager must be the only node associated by this message
+         const C_OSCCanOpenManagerDeviceInfo * const pc_Manager =
+            C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerDevice(rc_MsgId);
+
+         tgl_assert(pc_Manager != NULL);
+         if (pc_Manager != NULL)
+         {
+            const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(rc_MsgId);
+            tgl_assert(pc_Message != NULL);
+            if (pc_Message != NULL)
+            {
+               bool q_RoFlag = false;
+
+               // Message Tx flag is relative to the device, not the manager when using the EDS file content
+               // PDO Mapping
+               pc_Manager->c_EDSFileContent.IsPDOMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
+                                                           !rc_MsgId.q_MessageIsTx, q_RoFlag);
+
+               this->mc_CoUniqueMessagesPDOMappingRo.push_back(static_cast<uint8>(q_RoFlag));
+            }
+         }
+      }
+      tgl_assert(this->mc_UniqueMessageIds.size() == this->mc_CoUniqueMessagesPDOMappingRo.size());
    }
 }
 

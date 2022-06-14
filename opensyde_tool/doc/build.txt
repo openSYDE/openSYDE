@@ -28,7 +28,3 @@ How to build:
 6.1 Tip: Configure the temporary folder for each pro file and for each build target differently.
      This will reduce the build time when changing the build target often.
 7. Build the project
-
-Further information on how to install and configure your Qt Creator:
-====================================================================
-https://redmine.sensor-technik.de/projects/s0032/wiki/Qt_Getting_Started

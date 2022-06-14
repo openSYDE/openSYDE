@@ -40,9 +40,13 @@ public:
    static C_CieDataPoolListStructure h_GetStructureFromDCFAndEDSFileImport(
       const std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_OSCRxMessageData,
       const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCRxSignalData,
+      const std::vector<stw_types::uint8> & orc_RxSignalDefaultMinMaxValuesUsed,
       const std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_OSCTxMessageData,
       const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCTxSignalData,
+      const std::vector<stw_types::uint8> & orc_TxSignalDefaultMinMaxValuesUsed,
       const std::vector<std::vector<stw_scl::C_SCLString> > & orc_InfoMessagesPerMessage);
+   static void h_AssignNode(const stw_opensyde_core::C_OSCCanInterfaceId & orc_Id,
+                            std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_OSCMessageData);
 
    // to convert openSYDE data structures to DBC data structures
    static stw_types::sint32 h_ConvertToDBCImportMessage(const stw_types::uint32 ou32_BusIndex,
@@ -54,11 +58,13 @@ public:
 private:
    // internal function called by adapters to fill Ui data structures
    static void mh_FillUpUiStructure(C_CieDataPoolListStructure & orc_DataPoolListStructure,
-                                    const bool oq_ActivateAutoMinMaxForSignals);
+                                    const bool oq_ActivateAutoMinMaxForSignals,
+                                    const std::vector<stw_types::uint8> * const opc_RxSignalDefaultMinMaxValuesUsed = NULL, const std::vector<stw_types::uint8> * const opc_TxSignalDefaultMinMaxValuesUsed = NULL);
    static void mh_FillUpUiStructureForSignals(const stw_opensyde_core::C_OSCCanMessage & orc_Message,
                                               const bool oq_TxMessage,
                                               const C_PuiSdNodeDataPoolListElement & orc_DefaultUiSig,
-                                              C_CieDataPoolListStructure & orc_DataPoolListStructure);
+                                              C_CieDataPoolListStructure & orc_DataPoolListStructure,
+                                              const stw_types::uint8 * const opu8_SignalDefaultMinMaxValuesUsed);
 
    static void mh_FillUpCoreStructureByDBCValues(
       const std::vector<stw_opensyde_gui_logic::C_CieConverter::C_CIENodeMessage> & orc_CIENodeMessages,

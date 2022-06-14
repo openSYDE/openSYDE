@@ -35,6 +35,7 @@ public:
       const stw_opensyde_gui_logic::C_CieConverter::C_CIECommDefinition & orc_CommDef, QWidget * const opc_Parent,
       const stw_types::uint32 ou32_NumOfNodes, const stw_types::uint32 ou32_NumOfMessages,
       const stw_types::uint32 ou32_NumOfSignals);
+   static void h_AdaptName(stw_scl::C_SCLString & orc_Name, stw_scl::C_SCLString & orc_Comment);
 
 private:
    static const QSize mhc_SIZE_REPORT;

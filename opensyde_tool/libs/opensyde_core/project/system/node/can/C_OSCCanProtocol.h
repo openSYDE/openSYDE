@@ -32,7 +32,8 @@ public:
    {
       eLAYER2,          ///< Data pool communication protocol OSI layer 2
       eCAN_OPEN_SAFETY, ///< Data pool communication protocol CAN open safety (safety protocol)
-      eECES             ///< Data pool communication protocol ECeS (safety protocol)
+      eECES,            ///< Data pool communication protocol ECeS (safety protocol)
+      eCAN_OPEN         ///< Data pool communication protocol CAN open manager
    };
 
    C_OSCCanProtocol(void);
@@ -63,11 +64,17 @@ public:
                                                     const stw_types::uint32 ou32_SignalIndex) const;
    static bool h_ListIsComTx(const C_OSCNodeDataPoolList & orc_List);
    static stw_types::uint32 h_GetCANMessageValidSignalsDLCOffset(const E_Type oe_Type);
+   static bool h_GetCANMessageSignalGapsValid(const E_Type oe_Type);
 
    E_Type e_Type;                                       ///< Communication protocol associated to this data pool
    stw_types::uint32 u32_DataPoolIndex;                 ///< Related data pool index
    std::vector<C_OSCCanMessageContainer> c_ComMessages; ///< Communication messages.
    ///< Vector size needs to be number of CAN interfaces.
+   static const std::vector<C_OSCCanProtocol::E_Type> hc_ALL_PROTOCOLS; ///< Vector with all available CAN protocols, in
+   /// the same order as the enum
+
+private:
+   static std::vector<C_OSCCanProtocol::E_Type> mh_GetAllProtocols(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

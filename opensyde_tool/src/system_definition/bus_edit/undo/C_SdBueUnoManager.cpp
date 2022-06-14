@@ -380,6 +380,105 @@ void C_SdBueUnoManager::DoAddSignal(const C_OSCCanMessageIdentificationIndices &
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do add CANopen signal
+
+   \param[in]      orc_MessageId             Message identification indices
+   \param[in]      ou32_SignalIndex          Signal index
+   \param[in]      ou16_StartBit             Start bit of signal
+   \param[in]      orc_NewSignalInfo         New signal info
+   \param[in,out]  opc_MessageSyncManager    Message sync manager to perform actions on
+   \param[in,out]  opc_MessageTreeWidget     Message tree widget to perform actions on
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueUnoManager::DoAddCoSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                      const uint32 ou32_SignalIndex, const uint16 ou16_StartBit,
+                                      const std::vector<C_SdBueCoAddSignalsResultEntry> & orc_NewSignalInfo,
+                                      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+                                      QTreeWidget * const opc_MessageTreeWidget)
+{
+   const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> c_MessageId =
+      std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices>(orc_NewSignalInfo.size(), orc_MessageId);
+
+   std::vector<stw_types::uint32> c_SignalIndex;
+   std::vector<stw_types::uint16> c_StartBit;
+   const std::vector<stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType> c_MultiplexerType =
+      std::vector<stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType>(
+         orc_NewSignalInfo.size(), C_OSCCanSignal::eMUX_DEFAULT);
+   const std::vector<stw_types::uint16> c_MultiplexerValue =
+      std::vector<stw_types::uint16>(orc_NewSignalInfo.size(), 0U);
+
+   std::vector<C_PuiSdNodeDataPoolListElement> c_UISignalCommon;
+   const std::vector<C_PuiSdNodeCanSignal> c_UISignal = std::vector<C_PuiSdNodeCanSignal>(
+      orc_NewSignalInfo.size(), C_PuiSdNodeCanSignal());
+   const std::vector<C_OSCCanProtocol::E_Type> c_ProtocolType = std::vector<C_OSCCanProtocol::E_Type>(
+      orc_NewSignalInfo.size(), C_OSCCanProtocol::eCAN_OPEN);
+
+   std::vector<C_OSCCanSignal> c_Signal;
+   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> c_OSCSignalCommon;
+
+   C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
+      dynamic_cast<C_SdBueMessageSelectorTreeWidget * const>(opc_MessageTreeWidget);
+   bool q_EndReached = false;
+   uint16 u16_StartBit = ou16_StartBit;
+
+   c_SignalIndex.reserve(orc_NewSignalInfo.size());
+   c_StartBit.reserve(orc_NewSignalInfo.size());
+   c_Signal.reserve(orc_NewSignalInfo.size());
+   c_OSCSignalCommon.reserve(orc_NewSignalInfo.size());
+   c_UISignalCommon.reserve(orc_NewSignalInfo.size());
+
+   for (uint32 u32_SignalCounter = 0; u32_SignalCounter < orc_NewSignalInfo.size(); ++u32_SignalCounter)
+   {
+      const C_SdBueCoAddSignalsResultEntry & rc_Result = orc_NewSignalInfo[u32_SignalCounter];
+      C_OSCCanSignal c_SignalData = rc_Result.c_SignalData;
+      C_OSCNodeDataPoolListElement c_SignalCommonData = rc_Result.c_DatapoolData;
+      C_PuiSdNodeDataPoolListElement c_UISignalCommonData;
+
+      // Bring to default values
+      c_SignalCommonData.c_DataSetValues.resize(1);
+      c_SignalCommonData.c_DataSetValues[0] = c_SignalCommonData.c_MinValue;
+
+      // Change the default values
+      c_SignalData.u16_ComBitStart = u16_StartBit;
+
+      // Change the default values
+      c_UISignalCommonData.q_AutoMinMaxActive = rc_Result.q_AutoMinMaxUsed;
+
+      c_SignalIndex.push_back(ou32_SignalIndex + u32_SignalCounter);
+      c_StartBit.push_back(u16_StartBit);
+      c_Signal.push_back(c_SignalData);
+      c_OSCSignalCommon.push_back(c_SignalCommonData);
+      c_UISignalCommon.push_back(c_UISignalCommonData);
+
+      if (q_EndReached == false)
+      {
+         u16_StartBit += rc_Result.c_SignalData.u16_ComBitLength;
+         if (u16_StartBit > 63U)
+         {
+            u16_StartBit = 0U;
+            q_EndReached = true;
+         }
+      }
+   }
+   {
+      C_SdBueUnoSignalAddCommand * const pc_AddCommand = new C_SdBueUnoSignalAddCommand(c_MessageId,
+                                                                                        c_SignalIndex,
+                                                                                        c_StartBit,
+                                                                                        c_MultiplexerType,
+                                                                                        c_MultiplexerValue,
+                                                                                        opc_MessageSyncManager,
+                                                                                        pc_MessageTreeWidget,
+                                                                                        "Add CANopen Signal");
+
+      // Set the CANopen specific adapted signal configuration
+      pc_AddCommand->SetInitialData(c_Signal, c_OSCSignalCommon, c_UISignalCommon, c_UISignal, c_ProtocolType);
+
+      this->DoPush(pc_AddCommand);
+   }
+   //lint -e429 Qt command stack will take care of it
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do delete signals
 
    \param[in]      orc_MessageId             Message identification indices

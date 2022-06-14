@@ -117,14 +117,8 @@ else()
    message("OPENSYDE_CORE_SKIP_IMPORTS not detected ... dragging in package")
 
    set(OPENSYDE_CORE_IMPORTS_SOURCES
-      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCCanOpenObjectDictionary.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCImportEdsDcf.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCCanOpenObjectDictionary.h
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCImportEdsDcf.h
-   )
-
-   set(OPENSYDE_CORE_IMPORTS_INCLUDE_DIRECTORIES
-      ${CMAKE_CURRENT_SOURCE_DIR}/imports
    )
 endif()
 
@@ -136,6 +130,8 @@ else()
 
    set(OPENSYDE_CORE_CODE_GENERATION_SOURCES
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportCommunicationStack.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportCanOpenConfig.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportCanOpenInit.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportDataPool.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportHalc.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportNode.cpp
@@ -143,6 +139,8 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportParamSet.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportUti.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportCommunicationStack.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportCanOpenConfig.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportCanOpenInit.h
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportDataPool.h
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportHalc.h
       ${CMAKE_CURRENT_SOURCE_DIR}/exports/C_OSCExportNode.h
@@ -217,6 +215,11 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanProtocol.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanSignal.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanUtil.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanInterfaceId.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OSCCanOpenManagerMappableSignal.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OSCCanOpenManagerDeviceInfo.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OSCCanOpenManagerInfo.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OSCCanOpenManagerFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OSCNode.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OSCNodeSquad.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OSCNodeSquadFiler.cpp
@@ -238,6 +241,10 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OSCNodeStwFlashloaderSettings.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OSCNodeCommFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OSCNodeDataPoolId.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCCanOpenObjectDictionary.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCCanOpenEdsInfoBlock.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCCanOpenEdsDeviceInfoBlock.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCCanOpenEdsFileInfoBlock.cpp
 
       ${CMAKE_CURRENT_SOURCE_DIR}/halc/configuration/C_OSCHalcConfig.h
       ${CMAKE_CURRENT_SOURCE_DIR}/halc/configuration/C_OSCHalcConfigChannel.h
@@ -313,9 +320,19 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanProtocol.h
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanSignal.h
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanUtil.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/C_OSCCanInterfaceId.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OSCCanOpenManagerMappableSignal.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OSCCanOpenManagerDeviceInfo.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OSCCanOpenManagerInfo.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OSCCanOpenManagerFiler.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCCanOpenObjectDictionary.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCCanOpenEdsInfoBlock.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCCanOpenEdsDeviceInfoBlock.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OSCCanOpenEdsFileInfoBlock.h
    )
 
    set(OPENSYDE_CORE_PROJECT_HANDLING_INCLUDE_DIRECTORIES
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports
       ${CMAKE_CURRENT_SOURCE_DIR}/halc
       ${CMAKE_CURRENT_SOURCE_DIR}/halc/configuration
       ${CMAKE_CURRENT_SOURCE_DIR}/halc/configuration/standalone
@@ -327,6 +344,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/FileLoadersV2
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open
    )
 endif()
 
@@ -596,7 +614,6 @@ set(OPENSYDE_CORE_SOURCES
 set(OPENSYDE_CORE_INCLUDE_DIRECTORIES
    ${OPENSYDE_CORE_COMMON_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_ZIPPING_INCLUDE_DIRECTORIES}
-   ${OPENSYDE_CORE_IMPORTS_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_CODE_GENERATION_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PROJECT_HANDLING_INCLUDE_DIRECTORIES}
    ${OPENSYDE_CORE_PARAM_SET_INCLUDE_DIRECTORIES}

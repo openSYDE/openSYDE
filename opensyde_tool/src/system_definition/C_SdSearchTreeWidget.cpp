@@ -683,6 +683,7 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
             // flag for handling HALC view, but no specific channel
             s32_Flag = 4;
          }
+         // TODO: Add handling CANopen Manager with s32_Flag = 5
          else
          {
             // default handling

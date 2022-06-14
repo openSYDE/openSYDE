@@ -865,6 +865,8 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
 
    // Sys def node edit HALC splitter
    orc_Ini.WriteInteger("SdNodeEdit", "HalcSplitterX", orc_UserSettings.GetSdNodeEditHalcSplitterX());
+   // Sys def node edit HALC splitter
+   orc_Ini.WriteInteger("SdNodeEdit", "CoManagerSplitterX", orc_UserSettings.GetSdNodeEditCoManagerSplitterX());
 
    // Sys def bus edit splitters
    orc_Ini.WriteInteger("SdBusEdit", "TreeSplitterX", orc_UserSettings.GetSdBusEditTreeSplitterX());
@@ -947,6 +949,10 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       //Import
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_import_path",
                           orc_UserSettings.GetProjSdTopologyLastKnownImportPath().toStdString().c_str());
+
+      //Import CANopen
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_CANopen_EDS_path",
+                          orc_UserSettings.GetProjSdTopologyLastKnownCANopenEDSPath().toStdString().c_str());
 
       //Export
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_export_path",
@@ -1835,6 +1841,10 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    s32_Value = orc_Ini.ReadInteger("SdNodeEdit", "HalcSplitterX", 400);
    orc_UserSettings.SetSdNodeEditHalcSplitterX(s32_Value);
 
+   // Sys def node edit CANopen Manager splitter
+   s32_Value = orc_Ini.ReadInteger("SdNodeEdit", "CoManagerSplitterX", 400);
+   orc_UserSettings.SetSdNodeEditCoManagerSplitterX(s32_Value);
+
    // Sys def bus edit splitters
    s32_Value = orc_Ini.ReadInteger("SdBusEdit", "TreeSplitterX", 0);
    orc_UserSettings.SetSdBusEditTreeSplitterX(s32_Value);
@@ -1923,6 +1933,11 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
       orc_UserSettings.SetProjSdTopologyLastKnownImportPath(
          orc_Ini.ReadString(
             orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_import_path", "").c_str());
+
+      //Import CANopen
+      orc_UserSettings.SetProjSdTopologyLastKnownCANopenEDSPath(
+         orc_Ini.ReadString(
+            orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_CANopen_EDS_path", "").c_str());
 
       //Export
       orc_UserSettings.SetProjSdTopologyLastKnownExportPath(
@@ -2034,6 +2049,9 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
 
       //Import
       orc_UserSettings.SetProjSdTopologyLastKnownImportPath("");
+
+      //Import CANopen
+      orc_UserSettings.SetProjSdTopologyLastKnownCANopenEDSPath("");
 
       //Export
       orc_UserSettings.SetProjSdTopologyLastKnownExportPath("");

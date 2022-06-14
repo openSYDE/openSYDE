@@ -52,6 +52,7 @@ C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_P
    mpc_Ui(new Ui::C_SdBueMessageSelectorWidget),
    mpc_ContextMenu(NULL),
    mq_MessagesActive(true),
+   me_ProtocolType(C_OSCCanProtocol::eLAYER2),
    mpc_AddMessageAction(NULL),
    mpc_AddSignalAction(NULL),
    mpc_AddSignalActionWithKey(NULL),
@@ -99,6 +100,8 @@ C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_P
            &C_SdBueMessageSelectorWidget::m_OnSignalCountOfMessageChanged);
    connect(this->mpc_Ui->pc_MessageTreeWidget, &C_SdBueMessageSelectorTreeWidget::SigMessageCountChanged, this,
            &C_SdBueMessageSelectorWidget::m_OnMessageCountChanged);
+   connect(this->mpc_Ui->pc_MessageTreeWidget, &C_SdBueMessageSelectorTreeWidget::SigRefreshSelection, this,
+           &C_SdBueMessageSelectorWidget::SigRefreshSelection);
    connect(this->mpc_Ui->pc_MessageTreeWidget, &C_SdBueMessageSelectorTreeWidget::SigSelectName, this,
            &C_SdBueMessageSelectorWidget::SigSelectName);
    connect(this->mpc_Ui->pc_PbAddMessage, &QPushButton::clicked, this,
@@ -151,9 +154,51 @@ void C_SdBueMessageSelectorWidget::SetBusId(const uint32 ou32_BusIndex) const
    \param[in]  ore_Value   Com protocol value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSelectorWidget::SetProtocolType(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value) const
+void C_SdBueMessageSelectorWidget::SetProtocolType(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value)
 {
-   this->mpc_Ui->pc_MessageTreeWidget->SetProtocolType(ore_Value);
+   this->me_ProtocolType = ore_Value;
+
+   this->mpc_Ui->pc_MessageTreeWidget->SetProtocolType(this->me_ProtocolType);
+
+   //Text
+   if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+   {
+      this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(
+         C_GtGetText::h_GetText("PDO Messages"),
+         C_GtGetText::h_GetText("Show overview of all PDO messages / mapped signals"));
+
+      this->mpc_Ui->pc_PbAddMessage->setEnabled(false);
+   }
+   else
+   {
+      this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(C_GtGetText::h_GetText("Messages"),
+                                                               C_GtGetText::h_GetText(
+                                                                  "Show overview of all messages / signals"));
+
+      this->mpc_Ui->pc_PbAddMessage->setEnabled(true);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the button text and its tooltip text
+
+   Must be called after protocol type was set and the messages are reloaded
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorWidget::UpdateButtonText(void) const
+{
+   QString c_Text;
+
+   //Text
+   if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+   {
+      c_Text = static_cast<QString>(C_GtGetText::h_GetText("PDO Messages (%1)"));
+   }
+   else
+   {
+      c_Text = static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)"));
+   }
+   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(c_Text.arg(this->mpc_Ui->pc_MessageTreeWidget->topLevelItemCount()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -187,13 +232,6 @@ void C_SdBueMessageSelectorWidget::InitFromData(void) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->InitFromData();
 
-   //Text
-   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(this->
-                                                                                                                mpc_Ui->
-                                                                                                                pc_MessageTreeWidget
-                                                                                                                ->
-                                                                                                                topLevelItemCount()));
-
    //Handle visibility
    if (this->mpc_Ui->pc_MessageTreeWidget->topLevelItemCount() > 0)
    {
@@ -214,10 +252,6 @@ void C_SdBueMessageSelectorWidget::InitFromData(void) const
 void C_SdBueMessageSelectorWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_PbAddMessage->setText(C_GtGetText::h_GetText("Add new Message"));
-
-   this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(C_GtGetText::h_GetText("Messages"),
-                                                            C_GtGetText::h_GetText(
-                                                               "Show overview of all messages / signals"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -262,6 +296,19 @@ const
    Q_UNUSED(orc_MessageId)
    //Handles resorting
    this->mpc_Ui->pc_MessageTreeWidget->OnMessageNameChange();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The signal position has changed
+
+   \param[in]  orc_MessageId  Message identification indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorWidget::OnSignalPositionChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+const
+{
+   //Handles resorting
+   this->mpc_Ui->pc_MessageTreeWidget->OnSignalPositionChange(orc_MessageId);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -449,52 +496,73 @@ void C_SdBueMessageSelectorWidget::DeleteSignal(const C_OSCCanMessageIdentificat
 void C_SdBueMessageSelectorWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOriginal = true;
+   const bool q_ProtCoActive = (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN);
+   const bool q_ReadOnly = this->mpc_Ui->pc_MessageTreeWidget->IsSelectedMessageContentReadOnly();
 
-   //shift
-   if (C_Uti::h_CheckKeyModifier(opc_KeyEvent->modifiers(), Qt::ShiftModifier) == true)
+   if (q_ProtCoActive == false)
    {
-      switch (opc_KeyEvent->key())
+      // Functionality for all protocols except CANopen
+      //shift
+      if (C_Uti::h_CheckKeyModifier(opc_KeyEvent->modifiers(), Qt::ShiftModifier) == true)
       {
-      case Qt::Key_Delete:
-         // cut
-         this->mpc_Ui->pc_MessageTreeWidget->Cut();
-         q_CallOriginal = false;
-         break;
-      case Qt::Key_Insert:
-         // paste
-         this->mpc_Ui->pc_MessageTreeWidget->Paste();
-         break;
-      default:
-         break;
+         switch (opc_KeyEvent->key())
+         {
+         case Qt::Key_Delete:
+            // cut
+            this->mpc_Ui->pc_MessageTreeWidget->Cut();
+            q_CallOriginal = false;
+            break;
+         case Qt::Key_Insert:
+            // paste
+            this->mpc_Ui->pc_MessageTreeWidget->Paste();
+            break;
+         default:
+            break;
+         }
+      }
+
+      //ctrl
+      if (C_Uti::h_CheckKeyModifier(opc_KeyEvent->modifiers(), Qt::ControlModifier) == true)
+      {
+         switch (opc_KeyEvent->key())
+         {
+         case Qt::Key_X:
+            // cut
+            this->mpc_Ui->pc_MessageTreeWidget->Cut();
+            q_CallOriginal = false;
+            break;
+         case Qt::Key_Insert:
+         case Qt::Key_C:
+            // copy
+            this->mpc_Ui->pc_MessageTreeWidget->Copy();
+            q_CallOriginal = false;
+            break;
+         case Qt::Key_V:
+            // paste
+            this->mpc_Ui->pc_MessageTreeWidget->Paste();
+            break;
+         default:
+            break;
+         }
       }
    }
+
+   // For all protocols
    //ctrl
    if (C_Uti::h_CheckKeyModifier(opc_KeyEvent->modifiers(), Qt::ControlModifier) == true)
    {
-      switch (opc_KeyEvent->key())
+      if (q_ReadOnly == false)
       {
-      case Qt::Key_X:
-         // cut
-         this->mpc_Ui->pc_MessageTreeWidget->Cut();
-         q_CallOriginal = false;
-         break;
-      case Qt::Key_Insert:
-      case Qt::Key_C:
-         // copy
-         this->mpc_Ui->pc_MessageTreeWidget->Copy();
-         q_CallOriginal = false;
-         break;
-      case Qt::Key_V:
-         // paste
-         this->mpc_Ui->pc_MessageTreeWidget->Paste();
-         break;
-      case Qt::Key_BracketRight: // Qt::Key_BracketRight matches the "Not-Num-Plus"-Key
-      case Qt::Key_Plus:
-         this->mpc_Ui->pc_MessageTreeWidget->Add();
-         q_CallOriginal = false;
-         break;
-      default:
-         break;
+         switch (opc_KeyEvent->key())
+         {
+         case Qt::Key_BracketRight: // Qt::Key_BracketRight matches the "Not-Num-Plus"-Key
+         case Qt::Key_Plus:
+            this->mpc_Ui->pc_MessageTreeWidget->Add();
+            q_CallOriginal = false;
+            break;
+         default:
+            break;
+         }
       }
    }
    else
@@ -505,7 +573,10 @@ void C_SdBueMessageSelectorWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
          this->mpc_Ui->pc_MessageTreeWidget->EditName();
          break;
       case Qt::Key_Delete:
-         this->mpc_Ui->pc_MessageTreeWidget->Delete();
+         if (q_ReadOnly == false)
+         {
+            this->mpc_Ui->pc_MessageTreeWidget->Delete();
+         }
          break;
       default:
          break;
@@ -580,7 +651,7 @@ void C_SdBueMessageSelectorWidget::m_SelectMessage(const C_OSCCanMessageIdentifi
 void C_SdBueMessageSelectorWidget::m_SelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                   const uint32 & oru32_SignalIndex)
 {
-   Q_EMIT this->SigSignalSelected(orc_MessageId, oru32_SignalIndex);
+   Q_EMIT (this->SigSignalSelected(orc_MessageId, oru32_SignalIndex));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -661,10 +732,13 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
          const QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
          const sint32 s32_Level = this->mpc_Ui->pc_MessageTreeWidget->GetLevelOfPos(c_PosGlobal);
          bool q_ShowContextMenu = true;
+         const bool q_ProtCoActive = (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN);
+         const bool q_ReadOnly = this->mpc_Ui->pc_MessageTreeWidget->IsSelectedMessageContentReadOnly();
 
          if (s32_Level == 1) // Message level
          {
             this->mpc_AddMessageAction->setVisible(true);
+            this->mpc_AddMessageAction->setEnabled(!q_ProtCoActive);
             this->mpc_AddSignalAction->setVisible(true);
             this->mpc_AddSignalActionWithKey->setVisible(false);
 
@@ -675,6 +749,12 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
             this->mpc_CutAction->setVisible(true);
             this->mpc_PasteAction->setVisible(true);
             this->mpc_DeleteAction->setVisible(true);
+
+            this->mpc_AddSignalAction->setEnabled(!q_ReadOnly);
+            this->mpc_CopyAction->setEnabled(!q_ProtCoActive);
+            this->mpc_CutAction->setEnabled(!q_ProtCoActive);
+            this->mpc_PasteAction->setEnabled(!q_ProtCoActive);
+            this->mpc_DeleteAction->setEnabled(!q_ProtCoActive);
          }
          else if (s32_Level == 2) // Signal level
          {
@@ -689,12 +769,19 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
             this->mpc_CutAction->setVisible(true);
             this->mpc_PasteAction->setVisible(true);
             this->mpc_DeleteAction->setVisible(true);
+
+            this->mpc_CopyAction->setEnabled(!q_ProtCoActive);
+            this->mpc_CutAction->setEnabled(!q_ProtCoActive);
+            this->mpc_PasteAction->setEnabled(!q_ProtCoActive);
+            // Message has PDO mapping read only
+            this->mpc_AddSignalActionWithKey->setEnabled(!q_ReadOnly);
+            this->mpc_DeleteAction->setEnabled(!q_ReadOnly);
          }
          else if (this->mpc_Ui->pc_PbTreeWidgetRoot->rect().contains(this->mpc_Ui->pc_PbTreeWidgetRoot->mapFromGlobal(
                                                                         this->mapToGlobal(orc_Pos))) == true)
          {
             // no level and under
-            this->mpc_AddMessageAction->setVisible(true);
+            this->mpc_AddMessageAction->setVisible(!q_ProtCoActive);
             this->mpc_AddSignalAction->setVisible(false);
             this->mpc_AddSignalActionWithKey->setVisible(false);
 
@@ -705,6 +792,8 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
             this->mpc_CutAction->setVisible(false);
             this->mpc_PasteAction->setVisible(true);
             this->mpc_DeleteAction->setVisible(false);
+
+            this->mpc_PasteAction->setEnabled(!q_ProtCoActive);
 
             this->m_MessagesButtonClicked();
          }

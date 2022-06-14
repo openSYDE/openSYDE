@@ -254,33 +254,16 @@ void C_GiSvDaSpinBoxBase::SendCurrentValue(void)
    if (this->mpc_SpinBoxWidget != NULL)
    {
       // Prepare the value
-      QString c_Value = this->mpc_SpinBoxWidget->GetText();
-      C_PuiSvDbDataElementScaling c_Scaling;
+      const QVariant c_Value = this->mpc_SpinBoxWidget->GetValue();
       bool q_Success = false;
-
-      // Prepare the string
-      tgl_assert(this->GetDataPoolElementScaling(0, c_Scaling) == C_NO_ERR);
-      c_Value = c_Value.remove(c_Scaling.c_Unit);
-      c_Value = c_Value.trimmed();
 
       this->mf64_WriteValue = c_Value.toDouble(&q_Success);
 
+      tgl_assert(q_Success);
       if (q_Success == true)
       {
          // Send the value
          C_GiSvDaRectBaseGroup::SendCurrentValue();
-      }
-      else
-      {
-         //Attempt replace of ','
-         QString c_Tmp = c_Value;
-         c_Tmp.replace(',', '.');
-         this->mf64_WriteValue = c_Tmp.toDouble(&q_Success);
-         if (q_Success == true)
-         {
-            // Send the value
-            C_GiSvDaRectBaseGroup::SendCurrentValue();
-         }
       }
    }
 }

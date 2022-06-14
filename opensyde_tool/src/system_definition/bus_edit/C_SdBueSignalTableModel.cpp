@@ -470,8 +470,9 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                            c_MessageId.q_MessageIsTx);
                      QStringList c_Tmp;
                      const bool q_SignalValid = !pc_Message->CheckErrorSignal(
-                        pc_List, u32_SignalIndex, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                           c_MessageId.e_ComProtocol));
+                        pc_List, u32_SignalIndex,
+                        C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(c_MessageId.e_ComProtocol),
+                        C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(c_MessageId.e_ComProtocol));
                      c_Tmp.push_back(QString::number(20));
                      if (q_SignalValid == false)
                      {

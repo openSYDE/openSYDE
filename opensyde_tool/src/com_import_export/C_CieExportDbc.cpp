@@ -637,7 +637,7 @@ sint32 C_CieExportDbc::mh_SetTransmission(const C_CieConverter::C_CIENodeMessage
 
    Vector::DBC::Attribute c_TransmissionMode;
    c_TransmissionMode.name = mhc_MSG_SEND_TYPE;
-   if (orc_Message.c_CanMessage.e_TxMethod == C_OSCCanMessage::E_TxMethodType::eTX_METHOD_CYCLIC)
+   if (C_OSCCanMessage::h_IsTransmissionTypeACyclicType(orc_Message.c_CanMessage.e_TxMethod))
    {
       // cyclic message -> also set cycle time
       c_TransmissionMode.enumValue = 0;
@@ -654,7 +654,7 @@ sint32 C_CieExportDbc::mh_SetTransmission(const C_CieConverter::C_CIENodeMessage
                                             c_TransmissionMode.name, c_TransmissionMode));
 
    // set cycle time
-   if (orc_Message.c_CanMessage.e_TxMethod == C_OSCCanMessage::E_TxMethodType::eTX_METHOD_CYCLIC)
+   if (C_OSCCanMessage::h_IsTransmissionTypeACyclicType(orc_Message.c_CanMessage.e_TxMethod))
    {
       Vector::DBC::Attribute c_CycleTime;
       c_CycleTime.name = mhc_MSG_CYCLE_TIME;

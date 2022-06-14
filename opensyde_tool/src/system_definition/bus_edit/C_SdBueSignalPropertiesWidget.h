@@ -45,6 +45,7 @@ public:
    void SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value);
    void SetSignalId(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                     const stw_types::uint32 ou32_SignalIndex);
+   void SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Value);
    void ReloadPosition(void);
    stw_opensyde_core::C_OSCCanMessageIdentificationIndices GetMessageId(void) const;
    stw_types::uint32 GetSignalIndex(void) const;
@@ -88,6 +89,7 @@ private:
    Ui::C_SdBueSignalPropertiesWidget * mpc_Ui;
 
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * mpc_MessageSyncManager;
+   stw_opensyde_core::C_OSCCanProtocol::E_Type me_ComProtocol;
    stw_opensyde_core::C_OSCCanMessageIdentificationIndices mc_MessageId;
    stw_types::uint32 mu32_SignalIndex;
    E_Type me_DataType;
@@ -104,6 +106,7 @@ private:
    void m_HandleNameChangeWithSignal(void);
    void m_HandleCommentChange(void);
    void m_LoadFromData(void);
+   void m_CoLoadEdsRestricitions(void);
    void m_HandleAutoMinMaxCheckBoxChange(void);
    void m_HandleMinChange(void);
    void m_HandleMaxChange(void);
@@ -160,6 +163,7 @@ Q_SIGNALS:
    void SigChanged(void);
    void SigNameChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void SigStartBitChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void SigSignalPositionChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void SigUpdateMlv(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint32 ou32_SignalIndex);
    void SigRecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);

@@ -45,6 +45,7 @@ public:
    std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> GetUniqueMessages(void) const;
    stw_types::uint32 GetUniqueMessageCount(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ComProtocol,
                                            stw_types::uint32 * const opu32_SignalCount = NULL) const;
+   stw_opensyde_core::C_OSCCanProtocol::E_Type GetCurrentComProtocol(void) const;
    static void h_GetConnectedAndActiveInterfaces(const stw_types::uint32 ou32_BusIndex,
                                                  const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComProtocol,
                                                  std::vector<stw_types::uint32> & orc_NodeIndexes,
@@ -128,7 +129,8 @@ public:
    void CheckErrorBus(bool * const opq_MessageNameInvalid, bool * const opq_MessageIdInvalid,
                       bool * const opq_MessagesHaveNoTx, bool * const opq_DelayTimeInvalid,
                       bool * const opq_MessageSignalInvalid,
-                      const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset) const;
+                      const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset,
+                      const bool oq_CANMessageSignalGapsValid) const;
    void CheckMessageIdBus(const stw_opensyde_core::C_OSCCanMessageUniqueId & orc_MessageId, bool & orq_Valid, const stw_opensyde_core::C_OSCCanMessageIdentificationIndices * const opc_SkipMessage =
                              NULL, bool * const opq_EcosRangeError = NULL, bool * const opq_EcosEvenError = NULL,
                           bool * const opq_DuplicateDetected = NULL) const;
@@ -198,6 +200,9 @@ private:
    bool m_RecheckCriticalMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    stw_types::uint64 m_GetNewUniqueId(void) const;
    static stw_types::uint64 mh_GetNewUniqueId(const std::vector<stw_types::uint64> & orc_ExistingUniqueIds);
+   void m_ReportCANopenUsage(const QString & orc_Function) const;
+   static void mh_ReportCANopenUsage(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Type,
+                                     const QString & orc_Function);
 
    bool mq_SingleNodeMode;
    std::vector<std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> > mc_MessageMatches;
@@ -209,6 +214,7 @@ private:
    mc_MessageMatchesForOtherProtocols; ///< Level 1: Different Protocols
    ///< Level 2: Different messages
    ///< Level 3: Matching message ids (Which IDs correlate to the same message)
+   std::vector<stw_opensyde_core::C_OSCCanProtocol::E_Type> mc_OtherProtocols;
    stw_opensyde_core::C_OSCCanProtocol::E_Type me_Protocol; ///< Current protocol
    std::vector<stw_types::uint64> mc_MessageMatchUniqueIds; ///< Unique Ids for Matching message ids (current protocol)
    ///< Should always be in sync with mc_MessageMatches
